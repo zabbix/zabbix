@@ -718,10 +718,12 @@ var hintBox = {
 				e = d;
 			}
 			hintBox.showHint(e, target, hintText, width, className, false);
+
 		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);
+
 		}).on('remove', function(e) {
-			hintBox.hideHint(e, target);
+			hintBox.deleteHint(target);
 		});
 
 		jQuery(target).removeAttr('onmouseover');
@@ -827,6 +829,11 @@ var hintBox = {
 		if (target.isStatic && !hideStatic) {
 			return;
 		}
+
+		hintBox.deleteHint(target);
+	},
+
+	deleteHint: function(target) {
 		if (target.hintBoxItem) {
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
@@ -845,6 +852,7 @@ function hide_color_picker() {
 	if (!color_picker) {
 		return;
 	}
+
 	color_picker.style.zIndex = 1000;
 	color_picker.style.visibility = 'hidden';
 	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
@@ -856,6 +864,7 @@ function show_color_picker(id) {
 	if (!color_picker) {
 		return;
 	}
+
 	curr_lbl = document.getElementById('lbl_' + id);
 	curr_txt = document.getElementById(id);
 	var pos = getPosition(curr_lbl);
@@ -870,6 +879,7 @@ function create_color_picker() {
 	if (color_picker) {
 		return;
 	}
+
 	color_picker = document.createElement('div');
 	color_picker.setAttribute('id', 'color_picker');
 	color_picker.innerHTML = color_table;

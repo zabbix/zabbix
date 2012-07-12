@@ -106,15 +106,13 @@ var flickerfreeScreen = {
 		}
 
 		if (isSelfRefresh && screen.refreshInterval > 0) {
-			window.setTimeout(function() {
-				jQuery(document).delay(0).queue('refresh', function() {
-					flickerfreeScreen.refresh(id, true);
-				}).dequeue('refresh');
-			}, flickerfreeScreen.screens[id].refreshInterval);
+			window.setTimeout(function() { flickerfreeScreen.refresh(id, true); }, flickerfreeScreen.screens[id].refreshInterval);
 		}
 	},
 
 	refreshAll: function(period, stime) {
+		var rt = 0;
+
 		for (var id in this.screens) {
 			if (empty(this.screens[id]) || empty(this.screens[id].resourcetype)) {
 				continue;
@@ -123,9 +121,7 @@ var flickerfreeScreen = {
 			this.screens[id].period = period;
 			this.screens[id].stime = stime;
 
-			jQuery(document).delay(0).queue('refreshAll', function() {
-				flickerfreeScreen.refresh(id, false);
-			}).dequeue('refreshAll');
+			this.refresh(id, false);
 		}
 	},
 
@@ -133,16 +129,13 @@ var flickerfreeScreen = {
 		this.screens[id].sort = sort;
 		this.screens[id].sortorder = sortorder;
 
-		jQuery(document).delay(0).queue('refreshWithSorting', function() {
-			flickerfreeScreen.refresh(id, false);
-		}).dequeue('refreshWithSorting');
+		this.refresh(id, false);
 	},
 
 	add: function(screen) {
 		timeControl.refreshPage = false;
 
-		var id = screen.id;
-		this.screens[id] = {
+		this.screens[screen.id] = {
 			'screenitemid': screen.screenitemid,
 			'screenid': screen.screenid,
 			'hostid': screen.hostid,
@@ -157,13 +150,9 @@ var flickerfreeScreen = {
 		};
 
 		if (screen.refreshInterval > 0) {
-			this.screens[id].refreshInterval = screen.refreshInterval * 1000;
+			this.screens[screen.id].refreshInterval = screen.refreshInterval * 1000;
 
-			window.setTimeout(function() {
-				jQuery(document).delay(0).queue('add', function() {
-					flickerfreeScreen.refresh(id, true);
-				}).dequeue('add');
-			}, flickerfreeScreen.screens[id].refreshInterval);
+			window.setTimeout(function() { flickerfreeScreen.refresh(screen.id, true); }, this.screens[screen.id].refreshInterval);
 		}
-	},
+	}
 };
