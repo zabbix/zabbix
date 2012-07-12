@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 00:19+0300\n"
-"PO-Revision-Date: 2012-03-30 17:07+0200\n"
+"PO-Revision-Date: 2012-07-13 02:03+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -83,7 +83,7 @@ msgstr "(0 - unendlich)"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Nur Superadministratoren können Gruppe erstellen)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:140
@@ -109,7 +109,7 @@ msgstr "(kein Proxy)"
 
 #: include/items.inc.php:526 include/items.inc.php:527
 msgid "*UNKNOWN*"
-msgstr ""
+msgstr "*UNBEKANNT*"
 
 #: include/views/configuration.screen.constructor.edit.php:454 popup.php:1878
 #: popup.php:1879
@@ -190,7 +190,7 @@ msgstr "VERFÜGBARKEITSBERICHT"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Akzeptable SLA"
 
 #: sysmap.php:83
 msgid "Access denied!"
@@ -682,11 +682,11 @@ msgstr "Audit"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Aktionen auditieren"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Logs auditieren"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -713,7 +713,7 @@ msgstr "Authentifizierungsmethode"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Authentifizierungsmethode auf HTTP geändert"
 
 #: authentication.php:122 authentication.php:123
 msgid "Authentication method changed to LDAP"
@@ -864,7 +864,7 @@ msgstr "Nach Auslöservorlage"
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "KONFIGURATION VON AKTIONEN"
 
 # oder "DER"?
 #: include/views/configuration.application.edit.php:23
@@ -874,7 +874,7 @@ msgstr "KONFIGURATION VON APPLIKATIONEN"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "KONFIGURATION DER AUTHENTIFIZIERUNG"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
@@ -899,7 +899,7 @@ msgstr "KONFIGURATION VON DIAGRAMMEN"
 
 #: adm.gui.php:103
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "KONFIGURATION DER GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -908,7 +908,7 @@ msgstr "KONFIGURATION DER SYSTEMGRUPPEN"
 
 #: hosts.php:570 hosts.php:619 hosts.php:641
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "KONFIGURATION VON SYSTEMEN"
 
 #: adm.housekeeper.php:82
 msgid "CONFIGURATION OF HOUSEKEEPER"
@@ -920,7 +920,7 @@ msgstr ""
 
 #: adm.images.php:145
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "KONFIGURATION VON BILDERN"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
@@ -940,7 +940,7 @@ msgstr "KONFIGURATION VON ELEMENTEN"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "KONFIGURATION VON MAKROS"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -968,7 +968,7 @@ msgstr "KONFIGURATION DER PROXYS"
 
 #: adm.regexps.php:204
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "KONFIGURATION REGULÄRER AUSDRÜCKE"
 
 #: include/views/configuration.screen.constructor.list.php:23
 msgid "CONFIGURATION OF SCREEN"
@@ -991,7 +991,7 @@ msgstr "KONFIGURATION DER VORFÜHRUNG"
 
 #: templates.php:408 templates.php:428
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "KONFIGURATION VON VORLAGEN"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"
@@ -1037,7 +1037,7 @@ msgstr "KONFIGURATION DER WEB-ÜBERWACHUNG"
 
 #: adm.workingtime.php:72
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "KONFIGURATION DER ARBEITSZEIT"
 
 #: adm.triggerdisplayoptions.php:92
 msgid "CONFIGURATION OF ZABBIX"
@@ -1142,7 +1142,7 @@ msgstr "Kann Bild nicht hinzufügen"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Kann Bild nicht hinzufügen."
 
 #: disc_prototypes.php:277 items.php:438 screenedit.php:180
 msgid "Cannot add item"
@@ -1150,7 +1150,7 @@ msgstr "Kann Element nicht hinzufügen"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Kann Makro nicht hinzufügen."
 
 #: maintenance.php:108
 msgid "Cannot add maintenance"
@@ -1232,15 +1232,15 @@ msgstr "Kann Wertezuordnung nicht hinzufügen"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Kann Authentifizierungsmethode nicht auf HTTP ändern"
 
 #: authentication.php:127
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Kann Authentifizierungsmethode nicht auf LDAP ändern"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Kann Authentifizierungsmethode nicht auf Zabbix-intern ändern"
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
@@ -1288,7 +1288,7 @@ msgstr "Kann keine weitere Datenbank-Verbindung aufbauen."
 
 #: api/classes/CTrigger.php:1492
 msgid "Cannot create dependency"
-msgstr ""
+msgstr "Kann Abhängigkeit nicht anlegen"
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
@@ -1296,11 +1296,11 @@ msgstr "Kann Discovery-Regel nicht anlegen"
 
 #: api/classes/CHostGroup.php:616
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "Kann keine namenlose Gruppe anlegen."
 
 #: api/classes/CHost.php:1821
 msgid "Cannot create host group."
-msgstr ""
+msgstr "Kann Host-Gruppe nicht anlegen."
 
 #: adm.iconmapping.php:66
 msgid "Cannot create icon map"
@@ -1328,6 +1328,8 @@ msgstr ""
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr ""
+"Kann Zabbix-internen Benutzer \"%1$s\" nicht löschen. Versuchen Sie ihn zu "
+"deaktivieren."
 
 #: actionconf.php:171
 msgid "Cannot delete action"
@@ -1339,7 +1341,7 @@ msgstr "Kann Applikation nicht löschen"
 
 #: api/classes/CTrigger.php:1542
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "Kann Abhängigkeit nicht löschen"
 
 #: api/classes/CDiscoveryRule.php:624 discoveryconf.php:135
 #: host_discovery.php:166
@@ -1348,7 +1350,7 @@ msgstr "Kann Discovery-Regel nicht löschen"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "Kann Discovery-Regeln nicht löschen"
 
 #: graphs.php:237
 msgid "Cannot delete graph"
@@ -1524,7 +1526,7 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image for map \"%1$s."
-msgstr ""
+msgstr "Finde kein Hintergrundbild für Karte \"%1$s."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1681
@@ -1560,7 +1562,7 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Finde keinen Host \"%1$s\", verwendet in Karte \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
@@ -1700,7 +1702,11 @@ msgstr[1] ""
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
 msgstr[0] ""
+"Kann Vorlage \"%2$s\" nicht importieren. Die verknüpfte Vorlage \"%3$s\" "
+"existiert nicht."
 msgstr[1] ""
+"Kann Vorlage \"%2$s\" nicht importieren. Die verknüpften Vorlagen \"%3$s\" "
+"existieren nicht."
 
 #: include/classes/class.cview.php:113
 #, fuzzy, php-format
@@ -1880,7 +1886,7 @@ msgstr "Kann Bild nicht aktualisieren"
 
 #: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
-msgstr ""
+msgstr "Kann Bild nicht aktualisieren."
 
 #: disc_prototypes.php:273 items.php:434 screenedit.php:173
 msgid "Cannot update item"
@@ -1892,7 +1898,7 @@ msgstr "Kann Elemente nicht aktualisieren"
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr ""
+msgstr "Kann Makro nicht aktualisieren."
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
@@ -2081,7 +2087,7 @@ msgstr "Keine zirkuläre Verbindung möglich für Karten-Element \"%s\"."
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr ""
+msgstr "Zirkularbezug in Karte: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
@@ -2091,7 +2097,7 @@ msgstr ""
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr ""
+msgstr "Zirkularbezug in Vorlagen: %1$s."
 
 #: api/classes/CTemplate.php:1787 api/classes/CTemplate.php:1876
 msgid "Circular template linkage is not allowed."
@@ -2268,7 +2274,7 @@ msgstr ""
 
 #: authentication.php:24
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "Konfiguration der Authentifizierung"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
@@ -2284,11 +2290,11 @@ msgstr "Diagrammkonfiguration"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr ""
+msgstr "Konfiguration der Hostgruppen"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
-msgstr ""
+msgstr "Konfiguration der Systeme"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeper"
@@ -2300,7 +2306,7 @@ msgstr ""
 
 #: adm.images.php:25
 msgid "Configuration of images"
-msgstr ""
+msgstr "Konfiguration der Bilder"
 
 #: disc_prototypes.php:27
 msgid "Configuration of item prototypes"
@@ -2312,7 +2318,7 @@ msgstr "Konfiguration von Elementen"
 
 #: adm.macros.php:24
 msgid "Configuration of macros"
-msgstr ""
+msgstr "Konfiguration der Makros"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance"
@@ -2376,11 +2382,11 @@ msgstr "Konfiguration von Auslösern"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr ""
+msgstr "Konfiguration der Benutzergruppen"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr ""
+msgstr "Konfiguration der Benutzer"
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
@@ -2392,7 +2398,7 @@ msgstr ""
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
-msgstr ""
+msgstr "Konfiguration der Arbeitszeit"
 
 #: adm.gui.php:64 adm.housekeeper.php:51 adm.other.php:56
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
@@ -2436,6 +2442,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Verbindung zu Zabbix-Server \"%s\" fehlgeschlagen. Mögliche Gründe:\n"
+"1. Falsche Server-IP/DNS in \"zabbix.conf.php\";\n"
+"2. Falsche DNS-Server-Konfiguration.\n"
 
 #: api/classes/CScript.php:468
 #, php-format
@@ -2446,6 +2455,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Verbindung zu Zabbix-Server \"%s\" verweigert. Mögliche Gründe:\n"
+"1. Falsche Server-IP/DNS in \"zabbix.conf.php\";\n"
+"2. Sicherheitsvorrichtungen (z. B. SELinux) blockieren die Verbindung;\n"
+"3. Zabbix-Serverdienst läuft nicht;\n"
+"4. Firewall blockiert die TCP-Verbindung.\n"
 
 #: api/classes/CScript.php:474
 #, php-format
@@ -2465,7 +2479,7 @@ msgstr "Vertragsnummer"
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
-msgstr ""
+msgstr "Koordinaten"
 
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
@@ -2481,7 +2495,7 @@ msgstr "Kopiere Ausgewählte zu ..."
 #: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
-msgstr ""
+msgstr "Gültige Anmeldung \"%s\"."
 
 #: api/classes/CImage.php:485
 msgid "Could not save image!"
@@ -2525,12 +2539,12 @@ msgstr ""
 
 #: hosts.php:635
 msgid "Create host"
-msgstr ""
+msgstr "Erstelle System"
 
 #: include/views/configuration.hostgroups.list.php:28
 #: include/views/configuration.hostgroups.list.php:31
 msgid "Create host group"
-msgstr ""
+msgstr "Erstelle Host-Gruppe"
 
 #: adm.iconmapping.php:107
 msgid "Create icon map"
