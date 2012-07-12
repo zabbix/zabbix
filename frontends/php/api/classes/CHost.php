@@ -2305,7 +2305,8 @@ class CHost extends CZBXAPI {
 				$options['applicationids'] === null &&
 				$options['dhostids'] === null &&
 				$options['dserviceids'] === null &&
-				$options['httptestids'] === null) {
+				$options['httptestids'] === null &&
+				$options['groupids'] === null) {
 
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
