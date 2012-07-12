@@ -321,6 +321,11 @@
 				},
 					url = new Curl();
 
+				$('#testResultTable').css({
+					opacity: 0.5
+				});
+				$('#testPreloader').show();
+
 				for (var id in this.expressions) {
 					ajaxData.expressions[id] = this.expressions[id].data;
 				}
@@ -362,6 +367,11 @@
 					result: response.data.final ? '<?php echo _('TRUE'); ?>' : '<?php echo _('FALSE'); ?>'
 				};
 				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));
+
+				$('#testResultTable').css({
+					opacity: 1
+				});
+				$('#testPreloader').hide();
 			}
 		};
 	}(jQuery));

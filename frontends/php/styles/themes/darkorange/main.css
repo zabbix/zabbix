@@ -511,3 +511,11 @@ div.control-severity label span {
 div.control-severity label span:hover {
 	color: #000;
 }
+
+div.preloader {
+	display: inline-block;
+	background: url("images/preloader.gif") no-repeat;
+	width: 80px;
+	height: 12px;
+	vertical-align: middle;
+}
