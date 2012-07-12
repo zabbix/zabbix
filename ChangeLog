@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-5290] fixed slow query in "Host status" dashboard widget for large setups (Toms)
 A......... [ZBX-5086] fixed that, when saving host without changes, templated triggers loses those dependencies which were added additionally to host trigger (Toms)
 A......... [ZBX-5086] fixed just one dependency added to host trigger when linking template with trigger who has several dependencies (Toms)
 A......... [ZBX-5086] improved template linkage circularity check; added more precise exception messages (Toms)
