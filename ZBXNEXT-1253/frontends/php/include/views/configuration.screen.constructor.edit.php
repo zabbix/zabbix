@@ -353,6 +353,8 @@ elseif ($resourcetype == SCREEN_RESOURCE_ACTIONS) {
 	$screenFormList->addRow(
 		_('Sort triggers by'),
 		new CComboBox('sort_triggers', $sort_triggers, null, array(
+			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
+			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
 			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
 			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
 			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),

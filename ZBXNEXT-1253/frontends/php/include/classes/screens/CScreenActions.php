@@ -43,6 +43,16 @@ class CScreenActions extends CScreenBase {
 		$sortorder = ZBX_SORT_DOWN;
 		$sorttitle = '';
 		switch ($this->screenitem['sort_triggers']) {
+			case SCREEN_SORT_TRIGGERS_TIME_ASC:
+				$sortfield = 'clock';
+				$sortorder = ZBX_SORT_UP;
+				$sorttitle = _('Time');
+				break;
+			case SCREEN_SORT_TRIGGERS_TIME_DESC:
+				$sortfield = 'clock';
+				$sortorder = ZBX_SORT_DOWN;
+				$sorttitle = _('Time');
+				break;
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
 				$sortfield = 'description';
 				$sortorder = ZBX_SORT_UP;
@@ -94,7 +104,7 @@ class CScreenActions extends CScreenBase {
 		$actionTable = new CTableInfo(_('No actions found.'));
 		$actionTable->setHeader(array(
 			is_show_all_nodes() ? _('Nodes') : null,
-			_('Time'),
+			($sortfield == 'clock' && !empty($sorttitle)) ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
 			($sortfield == 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
 			($sortfield == 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
 			($sortfield == 'retries') ? array($sortfieldSpan, $sortorderSpan) : _('Retries left'),
