@@ -24,7 +24,8 @@
 #	error "This module is only available for Windows OS"
 #endif
 
-#define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
+#include "perfmon.h"
+
 #define UNSUPPORTED_REFRESH_PERIOD		600
 #define USE_DEFAULT_INTERVAL			0
 
@@ -36,13 +37,16 @@ typedef struct
 }
 ZBX_PERF_STAT_DATA;
 
+extern ZBX_PERF_STAT_DATA	ppsd;
+
 PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval);
 void			remove_perf_counter(PERF_COUNTER_DATA *counter);
 
 double	compute_average_value(PERF_COUNTER_DATA *counter, int interval);
 
-int	init_perf_collector();
+int	init_perf_collector(int multithreaded);
 void	free_perf_collector();
+int	perf_collector_started();
 void	collect_perfstat();
 
 #endif

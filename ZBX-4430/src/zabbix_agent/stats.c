@@ -29,6 +29,7 @@
 
 #ifdef _WINDOWS
 #	include "service.h"
+#	include "perfstat.h"
 #else
 #	include "daemon.h"
 #	include "ipc.h"
