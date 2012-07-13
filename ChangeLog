@@ -856,6 +856,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.15rc1
 
+A......... [ZBX-5264] fixed 'undefined variable: nodeids [api/classes/class.cscreen.php:286]' (Toms)
 ..F....... [ZBX-5316] fixed incorrect screen items can be deleted when deleting hosts (Vedmak)
 ..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
 ..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
