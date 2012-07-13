@@ -601,6 +601,14 @@ function DBfetch(&$cursor) {
 			if (!$result = $cursor->fetchArray(SQLITE3_ASSOC)) {
 				unset($cursor);
 			}
+			else {
+				// cast all of the values to string to be consistent with other DB drivers: all of them return
+				// only strings.
+				foreach ($result as &$value) {
+					$value = (string) $value;
+				}
+				unset($value);
+			}
 			if ($DB['TRANSACTIONS'] == 0) {
 				unlock_sqlite3_access();
 			}
