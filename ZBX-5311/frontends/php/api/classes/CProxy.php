@@ -290,11 +290,31 @@ class CProxy extends CZBXAPI {
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
 
+		$proxyIds = zbx_objectValues($proxies, 'proxyid');
+
+		// do not allow to delete proxies with discovery rules
+		if ($delete && API::Drule()->get(array(
+			'filter' => array('proxy_hostid' => $proxyIds),
+			'preservekeys' => true,
+			'limit' => 1
+		))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('There is discovery rule associated with proxy'));
+		};
+
+		// do not allow to delete proxies with associated hosts
+		if ($delete && API::Host()->get(array(
+			'filter' => array('proxy_hostid' => $proxyIds),
+			'preservekeys' => true,
+			'limit' => 1
+		))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('There is host associated with proxy'));
+		};
+
 		foreach ($proxies as &$proxy) {
 			if (isset($proxy['proxyid'])) {
 				$proxy['hostid'] = $proxy['proxyid'];
 			}
-			if (isset($proxy['hostid'])) {
+			elseif (isset($proxy['hostid'])) {
 				$proxy['proxyid'] = $proxy['hostid'];
 			}
 		}
@@ -305,7 +325,7 @@ class CProxy extends CZBXAPI {
 			$proxyDBfields = array('proxyid'=> null);
 			$dbProxies = $this->get(array(
 				'output' => array('proxyid', 'hostid', 'host', 'status'),
-				'proxyids' => zbx_objectValues($proxies, 'proxyid'),
+				'proxyids' => $proxyIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -519,10 +539,11 @@ class CProxy extends CZBXAPI {
 		}
 
 		if (!empty($actionids)) {
-			$update = array();
-			$update[] = array(
-				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionids)
+			$update = array(
+				array(
+					'values' => array('status' => ACTION_STATUS_DISABLED),
+					'where' => array('actionid' => $actionids)
+				)
 			);
 			DB::update('actions', $update);
 		}
@@ -537,10 +558,11 @@ class CProxy extends CZBXAPI {
 		DB::delete('interface', array('hostid' => $proxyids));
 
 		// proxies
-		$update = array();
-		$update[] = array(
-			'values' => array('proxy_hostid' => 0),
-			'where' => array('proxy_hostid' => $proxyids)
+		$update = array(
+			array(
+				'values' => array('proxy_hostid' => 0),
+				'where' => array('proxy_hostid' => $proxyids)
+			)
 		);
 		DB::update('hosts', $update);
 
@@ -548,7 +570,7 @@ class CProxy extends CZBXAPI {
 		DB::delete('hosts', array('hostid' => $proxyids));
 
 		// TODO: remove info from API
-		foreach ($proxies as $hnum => $proxy) {
+		foreach ($proxies as $proxy) {
 			info(_s('Deleted: Proxy "%1$s".', $proxy['host']));
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].'] ['.$proxy['hostid'].']');
 		}
