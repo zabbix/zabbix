@@ -169,8 +169,6 @@ switch ($data['method']) {
 		);
 		break;
 	case 'screen.get':
-		$page['isFlickerfree'] = true;
-
 		$options = array(
 			'mode' => !empty($data['mode']) ? $data['mode'] : null,
 			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,

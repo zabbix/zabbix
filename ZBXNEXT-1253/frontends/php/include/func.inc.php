@@ -1464,9 +1464,6 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
 		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
 	}
-	elseif (!empty($page['isFlickerfree'])) {
-		$script = 'javascript: flickerfreeScreen.refreshWithSorting("'.$link->getArgument('flickerfreeScreenId').'", "'.$tabfield.'", "'.$sortorder.'");';
-	}
 	else {
 		$script = 'javascript: redirect("'.$url.'");';
 	}

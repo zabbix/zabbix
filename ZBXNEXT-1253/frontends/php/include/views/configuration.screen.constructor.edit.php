@@ -347,9 +347,29 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 
 /*
  * History of actions
+ */
+elseif ($resourcetype == SCREEN_RESOURCE_ACTIONS) {
+	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 2));
+	$screenFormList->addRow(
+		_('Sort triggers by'),
+		new CComboBox('sort_triggers', $sort_triggers, null, array(
+			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
+			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
+			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
+			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
+			SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC => _('Retries left (ascending)'),
+			SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC => _('Retries left (descending)'),
+			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)'),
+			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)')
+		))
+	);
+	$screenFormList->addVar('resourceid', 0);
+}
+
+/*
  * History of events
  */
-elseif (in_array($resourcetype, array(SCREEN_RESOURCE_EVENTS, SCREEN_RESOURCE_ACTIONS))) {
+elseif ($resourcetype == SCREEN_RESOURCE_EVENTS) {
 	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 2));
 	$screenFormList->addVar('resourceid', 0);
 }

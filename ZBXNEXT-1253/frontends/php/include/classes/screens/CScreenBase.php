@@ -31,8 +31,6 @@ class CScreenBase {
 	public $period;
 	public $stime;
 	public $profileIdx;
-	public $sort;
-	public $sortorder;
 	public $dataId;
 
 	/**
@@ -49,8 +47,6 @@ class CScreenBase {
 	 * @param int		$options['period']
 	 * @param int		$options['stime']
 	 * @param string	$options['profileIdx']
-	 * @param string	$options['sort']
-	 * @param string	$options['sortorder']
 	 * @param string	$options['dataId']
 	 */
 	public function __construct(array $options = array()) {
@@ -58,18 +54,15 @@ class CScreenBase {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
-		$this->action = !empty($options['action']) ? $options['action'] : '';
+		$this->action = !empty($options['action']) ? $options['action'] : null;
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
 		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
 		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
-		$this->sort = !empty($options['sort']) ? $options['sort'] : get_request('sort', null);
-		$this->sortorder = !empty($options['sortorder']) ? $options['sortorder'] : get_request('sortorder', null);
 
 		// calculate stime
 		if ($this->stime > 19000000000000 && $this->stime < 21000000000000) {
 			$this->stime = zbxDateToTime($this->stime);
-
 		}
 		if (($this->stime + $this->period) > time() || empty($this->stime)) {
 			$this->stime = time() - $this->period;
@@ -96,6 +89,11 @@ class CScreenBase {
 		// get resourcetype
 		if (is_null($this->resourcetype) && !empty($this->screenitem['resourcetype'])) {
 			$this->resourcetype = $this->screenitem['resourcetype'];
+		}
+
+		// create action url
+		if (empty($this->action)) {
+			$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.$this->screenitem['screenitemid'];
 		}
 	}
 
@@ -163,8 +161,6 @@ class CScreenBase {
 				'period' => $this->period,
 				'stime' => $this->stime,
 				'profileIdx' => $this->profileIdx,
-				'sort' => $this->sort,
-				'sortorder' => $this->sortorder,
 				'data' => !empty($data) ? $data : null
 			);
 

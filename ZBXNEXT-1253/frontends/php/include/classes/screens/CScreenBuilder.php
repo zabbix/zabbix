@@ -285,22 +285,22 @@ class CScreenBuilder {
 				}
 				// screen cell
 				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
-					$screenBuilder = CScreenBuilder::getScreen(array(
+					$screenBase = CScreenBuilder::getScreen(array(
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem,
 						'mode' => $this->mode,
 						'profileIdx' => $this->profileIdx
 					));
 
-					if (!empty($screenBuilder)) {
+					if (!empty($screenBase)) {
 						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
-							$screenBuilder->action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
+							$screenBase->action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
 						}
 						elseif ($this->mode == SCREEN_MODE_EDIT && empty($screenitem['screenitemid'])) {
-							$screenBuilder->action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
+							$screenBase->action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
 						}
 
-						$item = $screenBuilder->get();
+						$item = $screenBase->get();
 					}
 					else {
 						$item = null;

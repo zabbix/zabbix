@@ -924,6 +924,7 @@ function make_latest_issues(array $filter = array()) {
 	$infoDiv = new CDiv(_n('%2$d of %1$d issue is shown', '%2$d of %1$d issues are shown', $triggersTotalCount, count($triggers)));
 	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
 	$widgetDiv = new CDiv(array($table, $infoDiv, $script));
+
 	return $widgetDiv;
 }
 

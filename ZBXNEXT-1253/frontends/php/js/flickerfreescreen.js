@@ -37,8 +37,6 @@ var flickerfreeScreen = {
 		url.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
 		url.setArgument('period', !empty(screen.period) ? screen.period : null);
 		url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
-		url.setArgument('sort', !empty(screen.sort) ? screen.sort : null);
-		url.setArgument('sortorder', !empty(screen.sortorder) ? screen.sortorder : null);
 
 		// SCREEN_RESOURCE_GRAPH
 		// SCREEN_RESOURCE_SIMPLE_GRAPH
@@ -111,8 +109,6 @@ var flickerfreeScreen = {
 	},
 
 	refreshAll: function(period, stime) {
-		var rt = 0;
-
 		for (var id in this.screens) {
 			if (empty(this.screens[id]) || empty(this.screens[id].resourcetype)) {
 				continue;
@@ -125,13 +121,6 @@ var flickerfreeScreen = {
 		}
 	},
 
-	refreshWithSorting: function(id, sort, sortorder) {
-		this.screens[id].sort = sort;
-		this.screens[id].sortorder = sortorder;
-
-		this.refresh(id, false);
-	},
-
 	add: function(screen) {
 		timeControl.refreshPage = false;
 
@@ -141,8 +130,6 @@ var flickerfreeScreen = {
 			'hostid': screen.hostid,
 			'period': screen.period,
 			'stime': screen.stime,
-			'sort': screen.sort,
-			'sortorder': screen.sortorder,
 			'mode': screen.mode,
 			'resourcetype': screen.resourcetype,
 			'profileIdx': screen.profileIdx,
