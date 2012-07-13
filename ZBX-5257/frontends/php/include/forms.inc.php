@@ -1195,17 +1195,9 @@
 			'go' => get_request('go', 'massupdate'),
 			'g_triggerid' => get_request('g_triggerid', array()),
 			'priority' => get_request('priority', 0),
-			'config' => select_config()
+			'config' => select_config(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
@@ -1243,17 +1235,9 @@
 			'url' => get_request('url', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array()
+			'templates' => array(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger
