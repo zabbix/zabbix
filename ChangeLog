@@ -8,7 +8,7 @@ Bug fixes:
 Changes for 2.0.2rc1
 
 New features:
-A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated French, German, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBX-4281] separated links to hosts and templates for host groups on search page (Vedmak)
 ..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 
