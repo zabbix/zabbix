@@ -17,14 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
- * File containing CProxy class for API.
  * @package API
- */
-/**
- * Class containing methods for operations with Proxies
  */
 class CProxy extends CZBXAPI {
 
@@ -34,7 +30,7 @@ class CProxy extends CZBXAPI {
 	/**
 	 * Get Proxy data
 	 *
-	 * @param _array $options
+	 * @param array $options
 	 * @param array $options['nodeids']
 	 * @param array $options['proxyids']
 	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
@@ -286,29 +282,9 @@ class CProxy extends CZBXAPI {
 	}
 
 	protected function checkInput(&$proxies, $method) {
-		$create = ($method == 'create');
 		$update = ($method == 'update');
-		$delete = ($method == 'delete');
 
 		$proxyIds = zbx_objectValues($proxies, 'proxyid');
-
-		// do not allow to delete proxies with discovery rules
-		if ($delete && API::Drule()->get(array(
-			'filter' => array('proxy_hostid' => $proxyIds),
-			'preservekeys' => true,
-			'limit' => 1
-		))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('There is discovery rule associated with proxy'));
-		};
-
-		// do not allow to delete proxies with associated hosts
-		if ($delete && API::Host()->get(array(
-			'filter' => array('proxy_hostid' => $proxyIds),
-			'preservekeys' => true,
-			'limit' => 1
-		))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('There is host associated with proxy'));
-		};
 
 		foreach ($proxies as &$proxy) {
 			if (isset($proxy['proxyid'])) {
@@ -321,7 +297,7 @@ class CProxy extends CZBXAPI {
 		unset($proxy);
 
 		// permissions
-		if ($update || $delete) {
+		if ($update) {
 			$proxyDBfields = array('proxyid'=> null);
 			$dbProxies = $this->get(array(
 				'output' => array('proxyid', 'hostid', 'host', 'status'),
@@ -339,7 +315,7 @@ class CProxy extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%s".', $proxy['host']));
 			}
 
-			if ($update || $delete) {
+			if ($update) {
 				if (!isset($dbProxies[$proxy['proxyid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
@@ -352,10 +328,6 @@ class CProxy extends CZBXAPI {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s".', $proxy['host']));
 					}
 				}
-
-				if ($delete) {
-					$proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
-				}
 			}
 			else {
 				if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
@@ -365,10 +337,6 @@ class CProxy extends CZBXAPI {
 				if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && !isset($proxy['interfaces'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s".', $proxy['host']));
 				}
-			}
-
-			if ($delete) {
-				continue;
 			}
 
 			if (isset($proxy['interfaces'])) {
@@ -509,30 +477,29 @@ class CProxy extends CZBXAPI {
 	}
 
 	/**
-	 * Delete Proxy
+	 * Delete Proxy.
 	 *
 	 * @param array $proxies
-	 * @param array $proxies[0, ...]['hostid'] Host ID to delete
-	 * @return array|boolean
+	 *
+	 * @return array
 	 */
-	public function delete($proxies) {
+	public function delete(array $proxies) {
 		if (empty($proxies)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$proxies = zbx_toArray($proxies);
-		$proxyids = zbx_objectValues($proxies, 'proxyid');
+		$proxyIds = zbx_objectValues($proxies, 'proxyid');
 
-		$this->checkInput($proxies, __FUNCTION__);
+		$proxies = $this->checkOnDelete($proxyIds);
 
 		$actionids = array();
-
 		// get conditions
 		$dbActions = DBselect(
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
 			' WHERE c.conditiontype='.CONDITION_TYPE_PROXY.
-				' AND '.DBcondition('c.value', $proxyids)
+				' AND '.DBcondition('c.value', $proxyIds)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -540,10 +507,8 @@ class CProxy extends CZBXAPI {
 
 		if (!empty($actionids)) {
 			$update = array(
-				array(
-					'values' => array('status' => ACTION_STATUS_DISABLED),
-					'where' => array('actionid' => $actionids)
-				)
+				'values' => array('status' => ACTION_STATUS_DISABLED),
+				'where' => array('actionid' => $actionids)
 			);
 			DB::update('actions', $update);
 		}
@@ -551,23 +516,14 @@ class CProxy extends CZBXAPI {
 		// delete action conditions
 		DB::delete('conditions', array(
 			'conditiontype' => CONDITION_TYPE_PROXY,
-			'value' => $proxyids
+			'value' => $proxyIds
 		));
 
 		// interfaces
-		DB::delete('interface', array('hostid' => $proxyids));
-
-		// proxies
-		$update = array(
-			array(
-				'values' => array('proxy_hostid' => 0),
-				'where' => array('proxy_hostid' => $proxyids)
-			)
-		);
-		DB::update('hosts', $update);
+		DB::delete('interface', array('hostid' => $proxyIds));
 
 		// delete host
-		DB::delete('hosts', array('hostid' => $proxyids));
+		DB::delete('hosts', array('hostid' => $proxyIds));
 
 		// TODO: remove info from API
 		foreach ($proxies as $proxy) {
@@ -575,7 +531,7 @@ class CProxy extends CZBXAPI {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].'] ['.$proxy['hostid'].']');
 		}
 
-		return array('proxyids' => $proxyids);
+		return array('proxyids' => $proxyIds);
 	}
 
 	/**
@@ -624,5 +580,49 @@ class CProxy extends CZBXAPI {
 
 		return (count($proxyids) == $count);
 	}
+
+	/**
+	 * Check if proxies can be deleted.
+	 *  - only super admin can delete proxy
+	 *  - cannot delete proxy if it is used in host
+	 *  - cannot delete proxy if it is used in discovery rule
+	 *
+	 * @param array $proxyIds
+	 *
+	 * @return array|bool
+	 */
+	protected function checkOnDelete(array $proxyIds) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can delete proxies.'));
+		}
+
+		$dbProxies = DBselect(
+			'SELECT h.hostid,h.host'.
+				' FROM hosts h'.
+				' WHERE '.DBcondition('h.hostid', $proxyIds));
+		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
+
+
+		// check for discovery rules
+		$dRule = DBfetch(DBselect(
+			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
+			' FROM drules dr'.
+			' WHERE '.DBcondition('dr.proxy_hostid', $proxyIds), 1));
+		if ($dRule) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('There is discovery rule "%1$s" associated with proxy "%2$s".', $dRule['name'], $dbProxies[$dRule['proxy_hostid']]['host']));
+		}
+
+		// check for hosts
+		$host = DBfetch(DBselect(
+			'SELECT h.hostid,h.name,h.proxy_hostid'.
+				' FROM hosts h'.
+				' WHERE '.DBcondition('h.proxy_hostid', $proxyIds), 1));
+		if ($host) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('There is host "%1$s" associated with proxy "%2$s".', $host['name'], $dbProxies[$host['proxy_hostid']]['host']));
+		}
+
+		return $dbProxies;
+	}
 }
-?>
