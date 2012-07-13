@@ -142,8 +142,8 @@ class CScreen extends CZBXAPI{
 		}
 
 		// node
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 		if (!isset($options['screenids']) && !isset($options['screenitemids'])) {
-			$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 			$sql_parts['where']['node'] = DBin_node('s.screenid', $nodeids);
 		}
 
