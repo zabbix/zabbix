@@ -24,8 +24,6 @@
 #include "log.h"
 #include "mutexs.h"
 
-#ifdef _WINDOWS
-
 ZBX_PERF_STAT_DATA	ppsd;
 static ZBX_MUTEX	perfstat_access = ZBX_MUTEX_NULL;
 
@@ -361,5 +359,3 @@ void	collect_perfstat()
 			deactivate_perf_counter(cptr);
 	}
 }
-
-#endif	/* _WINDOWS */
