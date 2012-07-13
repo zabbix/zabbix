@@ -48,6 +48,33 @@ class testTemplateInheritance extends CWebTest {
 	}
 
 	/**
+	 * Creates a new item on the template and checks that the inherited item matches the original.
+	 *
+	 * @todo implement the test
+	 */
+	public function testTemplateInheritance_CreateItem() {
+		$this->markTestIncomplete();
+	}
+
+	/**
+	 * Creates a new trigger on the template and checks that the inherited trigger matches the original.
+	 *
+	 * @todo implement the test
+	 */
+	public function testTemplateInheritance_CreateTrigger() {
+		$this->markTestIncomplete();
+	}
+
+	/**
+	 * Creates a new graph on the template and checks that the inherited graph matches the original.
+	 *
+	 * @todo implement the test
+	 */
+	public function testTemplateInheritance_CreateGraph() {
+		$this->markTestIncomplete();
+	}
+
+	/**
 	 * Creates a new LLD rule on the template and checks that the inherited LLD rule matches the original.
 	 *
 	 * @todo match fields for different LLD types
@@ -84,6 +111,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->wait();
 		$this->click('link=Discovery rules');
 		$this->wait();
+		$this->ok($this->templateName.': Test LLD');
 		$this->click('link=Test LLD');
 		$this->wait();
 
@@ -150,6 +178,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->wait();
 		$this->click('link=Item prototypes');
 		$this->wait();
+		$this->ok($this->templateName.': Test LLD item');
 		$this->click('link=Test LLD item');
 		$this->wait();
 
@@ -208,6 +237,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->wait();
 		$this->click('link=Trigger prototypes');
 		$this->wait();
+		$this->ok($this->templateName.': Test LLD trigger');
 		$this->click('link=Test LLD trigger');
 		$this->wait();
 
@@ -218,6 +248,15 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('url', 'url');
 		$this->assertTrue($this->isChecked('severity_2'));
 		$this->assertFalse($this->isChecked('status'));
+	}
+
+	/**
+	 * Creates a new graph prototype on the template and checks that the inherited graph prototype matches the original.
+	 *
+	 * @todo implement the test
+	 */
+	public function testTemplateInheritance_CreateGraphPrototype() {
+		$this->markTestIncomplete();
 	}
 
 	/**
