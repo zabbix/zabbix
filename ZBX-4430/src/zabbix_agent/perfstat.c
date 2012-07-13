@@ -27,7 +27,7 @@
 #ifdef _WINDOWS
 
 static ZBX_PERF_STAT_DATA	*ppsd = NULL;
-static ZBX_MUTEX		perfstat_access;
+static ZBX_MUTEX		perfstat_access = ZBX_MUTEX_NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -216,13 +216,13 @@ double	compute_average_value(PERF_COUNTER_DATA *counter, int interval)
 	return sum / (double)count;
 }
 
-int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
+int	init_perf_collector()
 {
 	const char	*__function_name = "init_perf_collector";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ppsd = pperf;
+	ppsd = &collector->perfs;
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
 	{

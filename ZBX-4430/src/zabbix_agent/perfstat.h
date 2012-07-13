@@ -20,7 +20,9 @@
 #ifndef ZABBIX_PERFSTAT_H
 #define ZABBIX_PERFSTAT_H
 
-#ifdef _WINDOWS
+#ifndef _WINDOWS
+#	error "This module is only available for Windows OS"
+#endif
 
 #define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
 #define UNSUPPORTED_REFRESH_PERIOD		600
@@ -39,10 +41,8 @@ void			remove_perf_counter(PERF_COUNTER_DATA *counter);
 
 double	compute_average_value(PERF_COUNTER_DATA *counter, int interval);
 
-int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf);
+int	init_perf_collector();
 void	free_perf_collector();
 void	collect_perfstat();
 
-#endif /* _WINDOWS */
-
-#endif /* ZABBIX_PERFSTAT_H */
+#endif

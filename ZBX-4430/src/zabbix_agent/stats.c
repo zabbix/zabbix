@@ -161,8 +161,6 @@ void	init_collector_data()
 
 	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)(collector + 1);
 	collector->cpus.count = cpu_count;
-
-	init_perf_collector(&collector->perfs);
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
@@ -445,10 +443,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	if (CPU_COLLECTOR_STARTED(collector))
 		free_cpu_collector(&(collector->cpus));
-
-#ifdef _WINDOWS
-	free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
-#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 
