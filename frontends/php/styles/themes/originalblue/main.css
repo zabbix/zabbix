@@ -35,9 +35,5 @@ table.ack_msgs tr.msg { background-color: #F8F8F8; }
 .ui-widget-content a.on:hover { color: #CC4444; }
 
 div.preloader {
-	display: inline-block;
 	background: url("images/preloader.gif") no-repeat;
-	width: 80px;
-	height: 12px;
-	vertical-align: middle;
 }
