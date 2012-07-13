@@ -396,3 +396,10 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 
 /**************** TRIGGER DISPLAYING FORM ***************/
 div.trigger_displaying_form_col { width: 12em; zoom:1; *display: inline; }
+
+/* preloader */
+div.preloader {
+	display: inline-block;
+	width: 80px;
+	height: 12px;
+}
