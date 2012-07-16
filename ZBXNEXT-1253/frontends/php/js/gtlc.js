@@ -201,7 +201,7 @@ var timeControl = {
 		this.objectList[objid].processed = 0;
 		this.objectList[objid].refresh = true;
 
-		//this.processObjects();
+		this.processObjects();
 	},
 
 	addSBox: function(e, objid) {
@@ -745,7 +745,7 @@ var CScrollBar = Class.create(CDebug, {
 			// variable initialization
 			this.timeline = ZBX_TIMELINES[timelineid];
 			this.ghostBox = new CGhostBox(this.dom.ghost);
-			this.size.scrollline = width - 32; // border (17 * 2) - 2 = 32
+			this.size.scrollline = width - 36; // border (17 * 2) + 2 = 36
 			this.px2sec = (this.timeline.endtime() - this.timeline.starttime()) / this.size.scrollline;
 
 			// additional dom objects
@@ -2097,7 +2097,7 @@ var sbox = Class.create(CDebug, {
 		this.timeline.period(new_period);
 		this.timeline.usertime(userstarttime);
 
-		//ZBX_TIMELINES[this.timeline.timelineid] = this.timeline; POINT
+		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 
 		this.onchange(this.sbox_id, this.timeline.timelineid, true);
 	},
