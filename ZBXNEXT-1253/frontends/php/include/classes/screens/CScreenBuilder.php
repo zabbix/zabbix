@@ -405,7 +405,7 @@ class CScreenBuilder {
 	 * @param string	$id
 	 * @param array		$timeline
 	 */
-	public static function insertScreenScrollJs($id, $timeline) {
+	public function insertScreenScrollJs($id, $timeline) {
 		$timeControlData = array(
 			'id' => $id,
 			'domid' => 'screen_scroll',
@@ -415,6 +415,7 @@ class CScreenBuilder {
 			'scrollWidthByImage' => 0,
 			'dynamic' => 0,
 			'mainObject' => 1,
+			'periodFixed' => CProfile::get($this->profileIdx.'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
@@ -424,16 +425,16 @@ class CScreenBuilder {
 	/**
 	 * Insert javascript to init screens.
 	 *
-	 * @param string	$screenid
+	 * @param string $screenid
 	 */
-	public static function insertInitScreenJs($screenid) {
+	public function insertInitScreenJs($screenid) {
 		zbx_add_post_js('init_screen("'.$screenid.'", "iframe", "'.$screenid.'");');
 	}
 
 	/**
 	 * Insert javascript to start time control rendering.
 	 *
-	 * @param string	$screenid
+	 * @param string $screenid
 	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');

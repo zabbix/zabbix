@@ -135,8 +135,8 @@ else {
 		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
 	}
 
-	CScreenBuilder::insertScreenScrollJs($screen['screenid'], $timeline);
-	CScreenBuilder::insertProcessObjectsJs();
+	$screenBuilder->insertScreenScrollJs($screen['screenid'], $timeline);
+	$screenBuilder->insertProcessObjectsJs();
 
 	$screenWidget->addItem(BR());
 }

@@ -36,7 +36,7 @@ $screenBuilder = new CScreenBuilder(array(
 ));
 $screenWidget->addItem($screenBuilder->show());
 
-CScreenBuilder::insertInitScreenJs($this->data['screenid']);
-CScreenBuilder::insertProcessObjectsJs();
+$screenBuilder->insertInitScreenJs($this->data['screenid']);
+$screenBuilder->insertProcessObjectsJs();
 
 return $screenWidget;

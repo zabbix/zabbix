@@ -74,8 +74,8 @@ else {
 
 	$screenWidget->addItem($screenBuilder->show());
 
-	CScreenBuilder::insertScreenScrollJs($this->data['screen']['screenid'], $timeline);
-	CScreenBuilder::insertProcessObjectsJs();
+	$screenBuilder->insertScreenScrollJs($this->data['screen']['screenid'], $timeline);
+	$screenBuilder->insertProcessObjectsJs();
 }
 
 return $screenWidget;
