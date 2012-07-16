@@ -30,6 +30,7 @@ if (!empty($this->data['screen']['templateid'])) {
 $screenWidget->addItem(BR());
 
 $screenBuilder = new CScreenBuilder(array(
+	'isFlickerfree' => false,
 	'screen' => $this->data['screen'],
 	'mode' => SCREEN_MODE_EDIT
 ));

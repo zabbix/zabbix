@@ -126,6 +126,12 @@ if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
 $chartWidget = new CWidget('hat_charts');
 $chartTable = new CTableInfo(_('No charts defined.'), 'chart');
 
+$chartForm = new CForm('get');
+$chartForm->addVar('fullscreen', $_REQUEST['fullscreen']);
+$chartForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
+$chartForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
+$chartForm->addItem(array(SPACE._('Graph').SPACE, $pageFilter->getGraphsCB(true)));
+
 $icons = array();
 if ($pageFilter->graphsSelected) {
 	$chartWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
@@ -137,12 +143,6 @@ if ($pageFilter->graphsSelected) {
 	$icons[] = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
 	$effectiveperiod = navigation_bar_calc('web.graph', $_REQUEST['graphid']);
-
-	$chartForm = new CForm('get');
-	$chartForm->addVar('fullscreen', $_REQUEST['fullscreen']);
-	$chartForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
-	$chartForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
-	$chartForm->addItem(array(SPACE._('Graph').SPACE, $pageFilter->getGraphsCB(true)));
 
 	$domGraphId = 'graph';
 	$graphDims = getGraphDims($_REQUEST['graphid']);
@@ -196,7 +196,8 @@ if ($pageFilter->graphsSelected) {
 }
 
 $chartWidget->addPageHeader(_('Graphs'), $icons);
-$chartWidget->addHeader($pageFilter->graphs[$pageFilter->graphid], $chartForm);
+
+$chartWidget->addHeader(!empty($pageFilter->graphs[$pageFilter->graphid]) ? $pageFilter->graphs[$pageFilter->graphid] : null, $chartForm);
 $chartWidget->addItem(BR());
 $chartWidget->addItem($chartTable);
 $chartWidget->show();

@@ -286,10 +286,11 @@ class CScreenBuilder {
 				// screen cell
 				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
 					$screenBase = CScreenBuilder::getScreen(array(
-						'resourcetype' => $screenitem['resourcetype'],
-						'screenitem' => $screenitem,
+						'isFlickerfree' => $this->isFlickerfree,
 						'mode' => $this->mode,
-						'profileIdx' => $this->profileIdx
+						'profileIdx' => $this->profileIdx,
+						'resourcetype' => $screenitem['resourcetype'],
+						'screenitem' => $screenitem
 					));
 
 					if (!empty($screenBase)) {
