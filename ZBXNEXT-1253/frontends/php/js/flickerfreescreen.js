@@ -72,6 +72,27 @@ var flickerfreeScreen = {
 			});
 		}
 
+		// SCREEN_RESOURCE_DATA_OVERVIEW
+		else if (screen.resourcetype == 10) {
+			jQuery('<div>').load(url.getUrl(), function() {
+				jQuery(this).find('img').each(function() {
+					var id = '#' + jQuery(this).attr('id');
+
+					jQuery('<img />', {
+						id: jQuery(this).attr('id') + '_tmp',
+						border: jQuery(id).attr('border'),
+						alt: jQuery(id).attr('alt'),
+						name: jQuery(id).attr('name')
+					}).attr('src', jQuery(this).attr('src')).load(function() {
+						var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+
+						jQuery(this).attr('id', id);
+						jQuery('#' + id).replaceWith(jQuery(this));
+					});
+				});
+			});
+		}
+
 		// SCREEN_RESOURCE_CLOCK
 		// SCREEN_RESOURCE_URL
 		else if (screen.resourcetype == 7 || screen.resourcetype == 11) {
