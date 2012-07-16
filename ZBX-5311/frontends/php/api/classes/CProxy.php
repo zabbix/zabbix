@@ -489,9 +489,15 @@ class CProxy extends CZBXAPI {
 		}
 
 		$proxies = zbx_toArray($proxies);
+		$this->validateOnDelete($proxies);
+
 		$proxyIds = zbx_objectValues($proxies, 'proxyid');
 
-		$proxies = $this->checkOnDelete($proxyIds);
+		$dbProxies = DBselect(
+			'SELECT h.hostid,h.host'.
+					' FROM hosts h'.
+					' WHERE '.DBcondition('h.hostid', $proxyIds));
+		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
 
 		$actionids = array();
 		// get conditions
@@ -526,7 +532,7 @@ class CProxy extends CZBXAPI {
 		DB::delete('hosts', array('hostid' => $proxyIds));
 
 		// TODO: remove info from API
-		foreach ($proxies as $proxy) {
+		foreach ($dbProxies as $proxy) {
 			info(_s('Deleted: Proxy "%1$s".', $proxy['host']));
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].'] ['.$proxy['hostid'].']');
 		}
@@ -584,45 +590,59 @@ class CProxy extends CZBXAPI {
 	/**
 	 * Check if proxies can be deleted.
 	 *  - only super admin can delete proxy
-	 *  - cannot delete proxy if it is used in host
+	 *  - cannot delete proxy if it is used to monitor host
 	 *  - cannot delete proxy if it is used in discovery rule
 	 *
-	 * @param array $proxyIds
-	 *
-	 * @return array|bool
+	 * @param array $proxies
 	 */
-	protected function checkOnDelete(array $proxyIds) {
+	protected function validateOnDelete(array $proxies) {
+		$this->checkPermissions();
+		$this->checkUsedInDiscoveryRule($proxies);
+		$this->checkUsedForMonitoring($proxies);
+	}
+
+	/**
+	 * Check permission for proxies.
+	 * Only super admin have write access for proxies.
+	 */
+	protected function checkPermissions() {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can delete proxies.'));
 		}
+	}
 
-		$dbProxies = DBselect(
-			'SELECT h.hostid,h.host'.
-				' FROM hosts h'.
-				' WHERE '.DBcondition('h.hostid', $proxyIds));
-		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
-
-
-		// check for discovery rules
+	/**
+	 * Check if proxy is used in discovery rule.
+	 *
+	 * @param array $proxies
+	 */
+	protected function checkUsedInDiscoveryRule(array $proxies) {
 		$dRule = DBfetch(DBselect(
 			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
-			' FROM drules dr'.
-			' WHERE '.DBcondition('dr.proxy_hostid', $proxyIds), 1));
+					' FROM drules dr'.
+					' WHERE '.DBcondition('dr.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
 		if ($dRule) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('There is discovery rule "%1$s" associated with proxy "%2$s".', $dRule['name'], $dbProxies[$dRule['proxy_hostid']]['host']));
-		}
+			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$dRule['proxy_hostid']));
 
-		// check for hosts
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('There is discovery rule "%1$s" associated with proxy "%2$s".', $dRule['name'], $proxy['host']));
+		}
+	}
+
+	/**
+	 * Check if proxy is used to monitor hosts.
+	 *
+	 * @param array $proxies
+	 */
+	protected function checkUsedForMonitoring(array $proxies) {
 		$host = DBfetch(DBselect(
-			'SELECT h.hostid,h.name,h.proxy_hostid'.
-				' FROM hosts h'.
-				' WHERE '.DBcondition('h.proxy_hostid', $proxyIds), 1));
+			'SELECT h.name,h.proxy_hostid'.
+					' FROM hosts h'.
+					' WHERE '.DBcondition('h.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
 		if ($host) {
+			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('There is host "%1$s" associated with proxy "%2$s".', $host['name'], $dbProxies[$host['proxy_hostid']]['host']));
+				_s('There is host "%1$s" associated with proxy "%2$s".', $host['name'], $proxy['host']));
 		}
-
-		return $dbProxies;
 	}
 }
