@@ -117,23 +117,25 @@ else {
 	}
 	$screenWidget->addHeader($screen['name'], $headerForm);
 
-	$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
+	// create time control
+	$period = navigation_bar_calc('web.screens', $screen['screenid'], true);
+	$stime = get_request('stime', null);
+
+	$timeline = array(
+		'period' => $period,
+		'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
+	);
+	if (!empty($stime)) {
+		$timeline['usertime'] = date('YmdHis', zbxDateToTime($stime) + $period);
+	}
+
+	// append screens to widget
 	$screenBuilder = new CScreenBuilder(array(
 		'screen' => $screen,
-		'effectiveperiod' => $effectiveperiod,
 		'mode' => SCREEN_MODE_PREVIEW,
 		'profileIdx' => 'web.screens'
 	));
 	$screenWidget->addItem($screenBuilder->show());
-
-	// create time control
-	$timeline = array(
-		'period' => $effectiveperiod,
-		'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
-	);
-	if (!empty($this->data['stime'])) {
-		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
-	}
 
 	$screenBuilder->insertScreenScrollJs($screen['screenid'], $timeline);
 	$screenBuilder->insertProcessObjectsJs();

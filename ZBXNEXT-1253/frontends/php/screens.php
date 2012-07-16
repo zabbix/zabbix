@@ -115,16 +115,14 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $data = array(
 	'fullscreen' => get_request('fullscreen'),
 	'stime' => get_request('stime'),
+	'elementid' => get_request('elementid', false),
 
 	// whether we should use screen name to fetch a screen (if this is false, elementid is used)
-	'use_screen_name' => isset($_REQUEST['screenname']),
-
-	// getting element id from GET parameters
-	'elementid' => get_request('elementid', false)
+	'use_screen_name' => isset($_REQUEST['screenname'])
 );
 
 // if none is provided
-if ($data['elementid'] === false && !$data['use_screen_name']) {
+if (empty($data['elementid']) && !$data['use_screen_name']) {
 	// get element id saved in profile from the last visit
 	$data['elementid'] = CProfile::get('web.screens.elementid', null);
 
