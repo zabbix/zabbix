@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated French, German, Japanese and Russian translations;
 ..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-4963] fixed inherited trigger prototypes lacking certain data (Pavels)
 ..F....... [ZBX-5273] fixed the host configuration form when using SQLite (Pavels)
 A......... [ZBX-5290] fixed slow query in "Host status" dashboard widget for large setups (Toms)
 A......... [ZBX-5086] fixed templated triggers losing those dependencies which were added additionally to host trigger when saving a host without making any changes (Toms)
