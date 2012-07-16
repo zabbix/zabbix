@@ -293,7 +293,6 @@
 			<thead>
 			<tr class="header">
 				<td></td>
-				<td><?php echo _('Element type'); ?></td>
 				<td><?php echo _('Element name'); ?></td>
 				<td><?php echo _('Link indicators'); ?></td>
 			</tr>
@@ -373,7 +372,6 @@
 <script type="text/x-jquery-tmpl" id="mapLinksRow">
 	<tr>
 		<td><span class="link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></span></td>
-		<td>#{elementType}</td>
 		<td>#{elementName}</td>
 		<td class="pre">#{linktriggers}</td>
 	</tr>
