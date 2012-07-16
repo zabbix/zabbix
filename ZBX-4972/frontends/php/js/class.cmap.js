@@ -180,13 +180,7 @@ ZABBIX.apps.map = (function() {
 			}
 
 			// create container for forms
-			this.formContainer = jQuery('<div></div>', {id: 'divSelementForm'})
-				.css({
-					zIndex: 100,
-					position: 'absolute',
-					top: '50px',
-					left: '500px'
-				})
+			this.formContainer = jQuery('<div></div>', {class: 'floatWindow'})
 				.appendTo('body')
 				.draggable({
 					containment: [0, 0, 3200, 3200]
@@ -1119,6 +1113,7 @@ ZABBIX.apps.map = (function() {
 
 			// create form
 			this.domNode = jQuery(tpl.evaluate(formTplData)).appendTo(formContainer);
+			this.domNode.append(new Template(jQuery('#linkFormTpl').html()).evaluate());
 
 			// populate icons selects
 			for (i in this.sysmap.iconList) {
@@ -1151,7 +1146,8 @@ ZABBIX.apps.map = (function() {
 			 */
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');
-				this.domNode.toggle(true);
+				this.formContainer.show();
+				this.domNode.show();
 				this.active = true;
 			},
 
@@ -1424,7 +1420,7 @@ ZABBIX.apps.map = (function() {
 			// create form
 			var tpl = new Template(jQuery('#mapMassFormTpl').html());
 			this.domNode = jQuery(tpl.evaluate()).appendTo(formContainer);
-
+			this.domNode.append(new Template(jQuery('#linkFormTpl').html()).evaluate());
 
 			// populate icons selects
 			for (i in this.sysmap.iconList) {
@@ -1448,7 +1444,8 @@ ZABBIX.apps.map = (function() {
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#massDragHandler');
 				jQuery('#massElementCount').text(this.sysmap.selection.count);
-				this.domNode.toggle(true);
+				this.formContainer.show();
+				this.domNode.show();
 				this.updateList();
 			},
 
@@ -1570,7 +1567,7 @@ ZABBIX.apps.map = (function() {
 			 * Show form.
 			 */
 			show: function() {
-				this.domNode.toggle(true);
+				this.domNode.show();
 				jQuery('#elementApply, #elementRemove').button('disable');
 			},
 
@@ -1579,7 +1576,7 @@ ZABBIX.apps.map = (function() {
 			 */
 			hide: function() {
 				jQuery('#linksList tr').removeClass('selected');
-				this.domNode.toggle(false);
+				this.domNode.hide();
 				jQuery('#elementApply, #elementRemove').button('enable');
 			},
 
