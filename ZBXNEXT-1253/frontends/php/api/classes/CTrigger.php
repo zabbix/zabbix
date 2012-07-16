@@ -1756,12 +1756,10 @@ class CTrigger extends CTriggerGeneral {
 		$parentTriggers = $this->get(array(
 			'hostids' => $templateIds,
 			'preservekeys' => true,
-			'output' => array(
-				'triggerid',
-				'templateid'
-			),
+			'output' => array('triggerid'),
 			'selectDependencies' => API_OUTPUT_REFER
 		));
+
 		if ($parentTriggers) {
 			$childTriggers = $this->get(array(
 				'hostids' => ($hostIds) ? $hostIds : null,
@@ -1780,13 +1778,13 @@ class CTrigger extends CTriggerGeneral {
 					if ($parentDependencies) {
 						$dependencies = array();
 						foreach ($parentDependencies as $depTrigger) {
-							$dependencies[$childTrigger['triggerid']] = $depTrigger['triggerid'];
+							$dependencies[] = $depTrigger['triggerid'];
 						}
 						$host = reset($childTrigger['hosts']);
 						$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
 						foreach ($dependencies as $triggerId => $depTriggerId) {
 							$newDependencies[] = array(
-								'triggerid' => $triggerId,
+								'triggerid' => $childTrigger['triggerid'],
 								'dependsOnTriggerid' => $depTriggerId
 							);
 						}
@@ -1833,7 +1831,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$downTriggerIds = $trigger['dependencies'];
 
-			// the trigger can't be dependant on itself
+			// the trigger can't depend on itself
 			if (in_array($trigger['triggerid'], $trigger['dependencies'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
 			}

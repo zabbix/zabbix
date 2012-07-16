@@ -74,7 +74,7 @@ function updateRegexp(array $regexp, array $expressions) {
 		$regexpId = $regexp['regexpid'];
 		unset($regexp['regexpid']);
 
-		// check existance
+		// check existence
 		if (!getRegexp($regexpId)) {
 			throw new Exception(_('Regular expression does not exist.'));
 		}

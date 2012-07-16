@@ -48,8 +48,8 @@ a.history:hover, a.history:active { color: #FF8800; }
 a.disabled:link, a.disabled:visited, a.disabled:active { color: #EE0000; }
 a.disabled:hover { color: #CC4444; }
 
-a.on:link, a.on:visited, a.on:active { color: #EE0000; }
-a.on:hover { color: #CC4444; }
+a.on:link, a.on:visited, a.on:active, .ui-widget-content a.on { color: #EE0000; }
+a.on:hover, .ui-widget-content a.on:hover { color: #CC4444; }
 
 .unknown, a.unknown { color: #999999; }
 a.unknown:hover { color: #BBB; }

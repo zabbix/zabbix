@@ -184,7 +184,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 <script type="text/javascript" src="js/browsers.js"></script>
 <script type="text/javascript">var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
+	// is menu is frontend messaging
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&isMenu='.(defined('ZBX_PAGE_NO_MENU') ? 0 : 1);
 	echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
 
 	if (!empty($page['scripts']) && is_array($page['scripts'])) {
@@ -252,7 +253,17 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$debug->setAttribute('onclick', 'javascript: '.$d_script);
 			array_push($page_header_r_col, $debug, '|');
 		}
-		array_push($page_header_r_col, new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+
+		// it is not possible to logout from HTTP authentication
+		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
+		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && $config['authentication_type'] == ZBX_AUTH_HTTP) {
+			$logout =  new CLink(_('Logout'), '', 'small_font', null, 'nosid');
+			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, null, false);
+		}
+		else {
+			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid');
+		}
+		array_push($page_header_r_col, $logout);
 	}
 	else {
 		$page_header_r_col[] = array('|', new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
@@ -456,7 +467,7 @@ if ($denied_page_requested) {
 	access_deny();
 }
 
-if ($page['type'] == PAGE_TYPE_HTML) {
+if ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	zbx_add_post_js('var msglistid = initMessages({});');
 }
 

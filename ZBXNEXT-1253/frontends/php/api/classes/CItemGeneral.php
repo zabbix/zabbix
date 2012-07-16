@@ -206,6 +206,8 @@ abstract class CItemGeneral extends CZBXAPI {
 				if (!isset($dbHosts[$item['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+
+				check_db_fields($itemDbFields, $fullItem);
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
@@ -729,6 +731,10 @@ abstract class CItemGeneral extends CZBXAPI {
 			if (!is_string($delayFlex)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect flexible interval in item "%1$s". Flexible interval must be a string.', $item['name']));
+			}
+
+			if ($delayFlex === '') {
+				return true;
 			}
 
 			$validator = new CTimePeriodValidator();
