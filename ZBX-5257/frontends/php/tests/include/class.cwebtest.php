@@ -52,7 +52,9 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'Cannot modify header',
 		'Parse error',
 		'syntax error',
-		'Try to read inaccessible property'
+		'Try to read inaccessible property',
+		// catch errors like "Argument 1 passed to CHostGroup::delete() must be an array, string given [api/classes/CHostGroup.php:696]"
+		'.php:'
 	);
 
 	// List of strings that SHOULD appear on every page
