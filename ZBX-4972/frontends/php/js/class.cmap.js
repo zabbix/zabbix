@@ -306,10 +306,13 @@ ZABBIX.apps.map = (function() {
 			},
 
 			removeLinksBySelementId: function(selementid) {
-				var linkids = this.getLinksBySelementIds([selementid]),
+				var selementIds = {},
+					linkids,
 					i,
 					ln;
 
+				selementIds[selementid] = selementid;
+				linkids = this.getLinksBySelementIds(selementIds);
 				for (i = 0, ln = linkids.length; i < ln; i++) {
 					this.links[linkids[i]].remove();
 				}
