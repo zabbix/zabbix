@@ -52,7 +52,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'Cannot modify header',
 		'Parse error',
 		'syntax error',
-		'Try to read inaccessible property'
+		'Try to read inaccessible property',
+		'.php:'
 	);
 
 	// List of strings that SHOULD appear on every page

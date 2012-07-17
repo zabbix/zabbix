@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated French, German, Japanese and Russian translations;
 ..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5267] fixed error when delete single host group (Vedmak)
 ..F....... [ZBX-5319] fixed incorrect calculation of action escalation steps delay (Vedmak)
 ....I..... [ZBX-5320] fixed the default path to an agent configuration file in the default data (Sasha)
 A.F....... [ZBX-4963] fixed inherited trigger prototypes lacking certain data (Pavels)
