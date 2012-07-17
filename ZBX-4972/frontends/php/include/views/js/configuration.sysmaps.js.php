@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<form id="selementForm" name="selementForm">
 		<input type="hidden" id="elementid" name="elementid">
-		<table id="elementFormTable" class="formtable" style="width:100%">
+		<table id="elementFormTable" class="formtable">
 			<thead>
 			<tr class="header">
 				<td id="formDragHandler" colspan="2" class="form_row_first move"><?php echo _('Edit map element'); ?></td>
@@ -203,7 +203,7 @@
 			<tr>
 				<td colspan="2">
 					<?php echo _('Selected elements'); ?>:
-					<div style="border: 1px dotted black; margin-bottom: 5px; height: 128px; overflow-y: scroll;">
+					<div id="elements-selected">
 						<table class="tableinfo">
 							<tbody id="massList"></tbody>
 						</table>
@@ -212,14 +212,14 @@
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox" style="display: inline; ">
+					<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox">
 					<label for="chkboxLabel"><?php echo _('Label'); ?></label>
 				</td>
 				<td><textarea id="massLabel" cols="56" rows="4" name="label" class="input"></textarea></td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox" style="display: inline; ">
+					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox">
 					<label for="chkboxLabelLocation"><?php echo _('Label location'); ?></label>
 				</td>
 				<td><select id="massLabelLocation" class="input" name="label_location">
@@ -233,35 +233,35 @@
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap" class="checkbox" style="display: inline; ">
+					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap" class="checkbox">
 					<label for="chkboxMassUseIconmap"><?php echo _('Automatic icon selection'); ?></label>
 				</td>
-				<td><input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1" style="display: inline; "></select></td>
+				<td><input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1"></select></td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff" class="checkbox" style="display: inline; ">
+					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff" class="checkbox">
 					<label for="chkboxMassIconidOff"><?php echo _('Icon (default)'); ?></label>
 				</td>
 				<td><select class="input" name="iconid_off" id="massIconidOff"></select></td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn" class="checkbox" style="display: inline; ">
+					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn" class="checkbox">
 					<label for="chkboxMassIconidOn"><?php echo _('Icon (problem)'); ?></label>
 				</td>
 				<td><select class="input" name="iconid_on" id="massIconidOn"></select></td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance" class="checkbox" style="display: inline; ">
+					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance" class="checkbox">
 					<label for="chkboxMassIconidMaintenance"><?php echo _('Icon (maintenance)'); ?></label>
 				</td>
 				<td><select class="input" name="iconid_maintenance" id="massIconidMaintenance"></select></td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled" class="checkbox" style="display: inline; ">
+					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled" class="checkbox">
 					<label for="chkboxMassIconidDisabled"><?php echo _('Icon (disabled)'); ?></label>
 				</td>
 				<td><select class="input" name="iconid_disabled" id="massIconidDisabled"></select>
@@ -312,10 +312,10 @@
 			<tbody></tbody>
 		</table>
 	</div>
-	<form id="linkForm" name="linkForm" style="display: none;">
+	<form id="linkForm" name="linkForm">
 		<input type="hidden" name="selementid1">
 
-		<table class="formtable" style="width: 100%;">
+		<table class="formtable">
 			<tbody>
 			<tr>
 				<td><label for="linklabel"><?php echo _('Label'); ?></label></td>

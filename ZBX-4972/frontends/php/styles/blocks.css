@@ -16,24 +16,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-/************************************************************/
-/*					ZABBIX MAPS								*/
-/************************************************************/
-#sysmap_cnt .sysmap_element { position: absolute; z-index: 10; }
-#sysmap_cnt .selementArea { background-color: rgb(204, 204, 204); background-color: rgba(204, 204, 204, 0.5); }
-#sysmap_cnt .selected { border: 3px #FFCC00 solid; margin: -3px; }
-#sysmap_cnt .ui-selecting { border: 3px #FFCC00 solid; margin: -3px; }
-
-#map-window { z-index: 100; position: absolute; display: none; top: 50px; left: 500px;
-	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5); }
-#map-window #linkForm #linklabel { margin-top: 4px; }
-
-.colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
-fieldset { margin: 0; padding: 0; }
-fieldset { border: 1px solid gray; margin-bottom: 2px; padding: 2px; }
-fieldset legend { margin: 0.2em 0.5em; }
-
-#mapLinkContainer { border: 1px solid #AAA; max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none; }
 
 /************************************************************/
 /*					ZABBIX MESSAGING						*/
