@@ -180,7 +180,7 @@ ZABBIX.apps.map = (function() {
 			}
 
 			// create container for forms
-			this.formContainer = jQuery('<div></div>', {class: 'floatWindow'})
+			this.formContainer = jQuery('<div></div>', {id: 'map-window'})
 				.appendTo('body')
 				.draggable({
 					containment: [0, 0, 3200, 3200]
@@ -305,43 +305,6 @@ ZABBIX.apps.map = (function() {
 				}
 			},
 
-			// connectors
-			removeLinks: function() {
-				var selementid1 = null,
-					selementid2 = null,
-					selementid,
-					linkids,
-					i,
-					ln;
-
-				if (this.selection.count !== 2) {
-					alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
-					return false;
-				}
-
-				for (selementid in this.selection.selements) {
-					if (selementid1 === null) {
-						selementid1 = selementid;
-					}
-					else {
-						selementid2 = selementid;
-					}
-				}
-
-				linkids = this.getLinksBySelementIds([selementid1, selementid2]);
-				if (linkids.length === 0) {
-					return false;
-				}
-
-				if (confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])) {
-					for (i = 0, ln = linkids.length; i < ln; i++) {
-						this.links[linkids[i]].remove();
-					}
-					this.linkForm.hide();
-					this.updateImage();
-				}
-			},
-
 			removeLinksBySelementId: function(selementid) {
 				var linkids = this.getLinksBySelementIds([selementid]),
 					i,
@@ -450,9 +413,26 @@ ZABBIX.apps.map = (function() {
 					that.linkForm.updateList(that.selection.selements);
 				});
 
-				// remove link
+				/**
+				 * Removes all of the links between the selected elements.
+				 */
 				jQuery('#linkRemove').click(function() {
-					that.removeLinks();
+					var linkids;
+
+					if (that.selection.count !== 2) {
+						alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
+						return false;
+					}
+
+					linkids = that.getLinksBySelementIds(that.selection.selements);
+					if (linkids.length && confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])) {
+						for (var i = 0, ln = linkids.length; i < ln; i++) {
+							that.links[linkids[i]].remove();
+						}
+						that.linkForm.hide();
+						that.linkForm.updateList({});
+						that.updateImage();
+					}
 				});
 
 
@@ -516,7 +496,7 @@ ZABBIX.apps.map = (function() {
 				}, this));
 
 				// open link form
-				jQuery('#linksList').delegate('.openlink', 'click', function() {
+				jQuery('.element-links').delegate('.openlink', 'click', function() {
 					that.currentLinkId = jQuery(this).data('linkid');
 					jQuery('#linksList tr').removeClass('selected');
 					jQuery(this).parent().parent().addClass('selected');
@@ -528,9 +508,7 @@ ZABBIX.apps.map = (function() {
 				// link form
 				jQuery('#formLinkRemove').click(function() {
 					that.links[that.currentLinkId].remove();
-					for (var selementid in that.selection.selements) {
-						that.linkForm.updateList(selementid);
-					}
+					that.linkForm.updateList(that.selection.selements);
 					that.linkForm.hide();
 					that.updateImage();
 				});
@@ -601,11 +579,10 @@ ZABBIX.apps.map = (function() {
 				var selementid;
 				this.linkForm.hide();
 				if (this.selection.count == 0) {
-					this.form.hide();
-					this.massForm.hide();
-					this.linkForm.hide();
+					jQuery('#map-window').hide();
 				}
 				else {
+					this.linkForm.updateList(this.selection.selements);
 					if (this.selection.count == 1) {
 						for (selementid in this.selection.selements) {
 							this.form.setValues(this.selements[selementid].getData());
@@ -617,9 +594,6 @@ ZABBIX.apps.map = (function() {
 						this.form.hide();
 						this.massForm.show();
 					}
-
-					this.linkForm.updateList(this.selection.selements);
-					jQuery('#mapLinksContainer').show();
 				}
 			}
 		};
@@ -1496,7 +1470,7 @@ ZABBIX.apps.map = (function() {
 			 */
 			hide: function() {
 				jQuery('#linksList tr').removeClass('selected');
-				this.domNode.hide();
+				jQuery('#linkForm').hide();
 				jQuery('#elementApply, #elementRemove').button('enable');
 			},
 

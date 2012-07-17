@@ -24,7 +24,7 @@
 #sysmap_cnt .selected { border: 3px #FFCC00 solid; margin: -3px; }
 #sysmap_cnt .ui-selecting { border: 3px #FFCC00 solid; margin: -3px; }
 
-.floatWindow { z-index: 100; position: absolute; display: none; top: 50px; left: 500px;
+#map-window { z-index: 100; position: absolute; display: none; top: 50px; left: 500px;
 	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5); }
 fieldset { margin: 0; padding: 0; }
 .colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
