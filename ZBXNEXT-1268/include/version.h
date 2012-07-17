@@ -20,8 +20,8 @@
 #ifndef ZABBIX_VERSION_H
 #define ZABBIX_VERSION_H
 
-#define ZBX_STR2(str) #str
-#define ZBX_STR(str) ZBX_STR2(str)
+#define ZBX_STR2(str)	#str
+#define ZBX_STR(str)	ZBX_STR2(str)
 
 #define APPLICATION_NAME	"Zabbix Agent"
 #define ZABBIX_REVDATE		"20 June 2012"
