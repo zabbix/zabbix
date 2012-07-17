@@ -153,33 +153,25 @@ foreach ($_REQUEST['itemid'] as $itemid) {
 	}
 }
 
-// resets get params for proper page refresh
-if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
-	navigation_bar_calc('web.item.graph', $_REQUEST['itemid'], true);
-
-	if ($_REQUEST['action'] != 'showvalues') {
-		jsRedirect('history.php?action='.get_request('action', 'showgraph').'&itemid='.$_REQUEST['itemid']);
-		require_once dirname(__FILE__).'/include/page_footer.php';
-		exit();
-	}
-}
-
 $item = reset($items);
 $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];
+$itemid = reset($_REQUEST['itemid']);
+
+navigation_bar_calc('web.item.graph', $itemid, true);
 
 $data = array(
-	'itemid' => get_request('itemid'),
+	'itemid' => $itemid,
 	'items' => $items,
 	'item' => $item,
 	'action' => get_request('action'),
 	'period' => get_request('period'),
-	'time' => zbxDateToTime(get_request('stime')),
+	'stime' => get_request('stime'),
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
 	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1)
 );
-$data['till'] = $data['time'] + $data['period'];
+$data['till'] = zbxDateToTime($data['stime']) + $data['period'];
 
 // render view
 $historyView = new CView('monitoring.history', $data);

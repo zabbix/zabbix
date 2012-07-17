@@ -31,6 +31,7 @@ class CScreenBase {
 	public $period;
 	public $stime;
 	public $profileIdx;
+	public $profileIdx2;
 	public $dataId;
 
 	/**
@@ -47,6 +48,7 @@ class CScreenBase {
 	 * @param int		$options['period']
 	 * @param int		$options['stime']
 	 * @param string	$options['profileIdx']
+	 * @param int		$options['profileIdx2']
 	 * @param string	$options['dataId']
 	 */
 	public function __construct(array $options = array()) {
@@ -59,6 +61,7 @@ class CScreenBase {
 		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
 		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
+		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
 
 		// calculate stime
 		if ($this->stime > 19000000000000 && $this->stime < 21000000000000) {
@@ -102,11 +105,15 @@ class CScreenBase {
 	 */
 	public function updateProfile() {
 		if (!empty($this->profileIdx)) {
+			if (empty($this->profileIdx2)) {
+				$this->profileIdx2 = !empty($this->screenid) ? $this->screenid : 0;
+			}
+
 			if (!empty($this->period) && $this->period >= ZBX_MIN_PERIOD) {
-				CProfile::update($this->profileIdx.'.period', $this->period, PROFILE_TYPE_INT, $this->screenid);
+				CProfile::update($this->profileIdx.'.period', $this->period, PROFILE_TYPE_INT, $this->profileIdx2);
 			}
 			if (!empty($this->stime)) {
-				CProfile::update($this->profileIdx.'.stime', $this->stime, PROFILE_TYPE_STR, $this->screenid);
+				CProfile::update($this->profileIdx.'.stime', $this->stime, PROFILE_TYPE_STR, $this->profileIdx2);
 			}
 		}
 	}

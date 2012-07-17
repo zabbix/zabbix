@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 $page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
 $page['hist_arg'] = array('hostid', 'groupid', 'graphid');
-$page['scripts'] = array('class.calendar.js', 'gtlc.js');
+$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -109,12 +109,12 @@ $pageFilter = new CPageFilter(array(
 	'graphs' => array('templated' => 0),
 	'graphid' => get_request('graphid', null),
 ));
-$_REQUEST['graphid'] = $pageFilter->graphid;
+$graphid = $pageFilter->graphid;
 
 // resets get params for proper page refresh
 if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
-	navigation_bar_calc('web.graph', $_REQUEST['graphid'], true);
-	jsRedirect('charts.php?graphid='.$_REQUEST['graphid']);
+	navigation_bar_calc('web.graph', $graphid, true);
+	jsRedirect('charts.php?graphid='.$graphid);
 
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
@@ -123,83 +123,15 @@ if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
 /*
  * Display
  */
-$chartWidget = new CWidget('hat_charts');
-$chartTable = new CTableInfo(_('No charts defined.'), 'chart');
+$data = array(
+	'pageFilter' => $pageFilter,
+	'fullscreen' => get_request('fullscreen'),
+	'graphid' => $graphid
+);
 
-$chartForm = new CForm('get');
-$chartForm->addVar('fullscreen', $_REQUEST['fullscreen']);
-$chartForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
-$chartForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
-$chartForm->addItem(array(SPACE._('Graph').SPACE, $pageFilter->getGraphsCB(true)));
-
-$icons = array();
-if ($pageFilter->graphsSelected) {
-	$chartWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
-
-	$icons[] = get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $_REQUEST['graphid']));
-	$icons[] = SPACE;
-	$icons[] = get_icon('reset', array('id' => $_REQUEST['graphid']));
-	$icons[] = SPACE;
-	$icons[] = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-
-	$effectiveperiod = navigation_bar_calc('web.graph', $_REQUEST['graphid']);
-
-	$domGraphId = 'graph';
-	$graphDims = getGraphDims($_REQUEST['graphid']);
-
-	if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-		$loadSBox = 0;
-		$scrollWidthByImage = 0;
-		$containerid = 'graph_cont1';
-		$src = 'chart6.php?graphid='.$_REQUEST['graphid'];
-	}
-	else {
-		$loadSBox = 1;
-		$scrollWidthByImage = 1;
-		$containerid = 'graph_cont1';
-		$src = 'chart2.php?graphid='.$_REQUEST['graphid'];
-	}
-
-	$graphContainer = new CCol();
-	$graphContainer->setAttribute('id', $containerid);
-	$chartTable->addRow($graphContainer);
-
-	$utime = zbxDateToTime($_REQUEST['stime']);
-	$starttime = get_min_itemclock_by_graphid($_REQUEST['graphid']);
-	if ($utime < $starttime) {
-		$starttime = $utime;
-	}
-
-	$timeline = array(
-		'starttime' => date('YmdHis', $starttime),
-		'period' => $effectiveperiod,
-		'usertime' => date('YmdHis', $utime + $effectiveperiod)
-	);
-
-	$timeControlData = array(
-		'id' => $_REQUEST['graphid'],
-		'domid' => $domGraphId,
-		'containerid' => $containerid,
-		'src' => $src,
-		'objDims' => $graphDims,
-		'loadSBox' => $loadSBox,
-		'loadImage' => 1,
-		'loadScroll' => 1,
-		'scrollWidthByImage' => $scrollWidthByImage,
-		'dynamic' => 1,
-		'periodFixed' => CProfile::get('web.charts.timelinefixed', 1),
-		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-	);
-
-	zbx_add_post_js('timeControl.addObject("'.$domGraphId.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
-	zbx_add_post_js('timeControl.processObjects();');
-}
-
-$chartWidget->addPageHeader(_('Graphs'), $icons);
-
-$chartWidget->addHeader(!empty($pageFilter->graphs[$pageFilter->graphid]) ? $pageFilter->graphs[$pageFilter->graphid] : null, $chartForm);
-$chartWidget->addItem(BR());
-$chartWidget->addItem($chartTable);
-$chartWidget->show();
+// render view
+$chartsView = new CView('monitoring.charts', $data);
+$chartsView->render();
+$chartsView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -51,31 +51,32 @@ if ($requestType == PAGE_TYPE_JSON && (!isset($data['params']) || !is_array($dat
 $result = array();
 switch ($data['method']) {
 	case 'host.get':
-		$search = $data['params']['search'];
-
 		$result = API::Host()->get(array(
 			'startSearch' => 1,
-			'search' => $search,
+			'search' => $data['params']['search'],
 			'output' => array('hostid', 'host', 'name'),
 			'sortfield' => 'name',
 			'limit' => 15
 		));
 		break;
+
 	case 'message.mute':
 		$msgsettings = getMessageSettings();
 		$msgsettings['sounds.mute'] = 1;
 		updateMessageSettings($msgsettings);
 		break;
+
 	case 'message.unmute':
 		$msgsettings = getMessageSettings();
 		$msgsettings['sounds.mute'] = 0;
 		updateMessageSettings($msgsettings);
 		break;
+
 	case 'message.settings':
 		$result = getMessageSettings();
 		break;
+
 	case 'message.get':
-		$params = $data['params'];
 		$msgsettings = getMessageSettings();
 
 		// if no severity is selected, show nothing
@@ -86,8 +87,8 @@ switch ($data['method']) {
 		// timeout
 		$timeOut = time() - $msgsettings['timeout'];
 		$lastMsgTime = 0;
-		if (isset($params['messageLast']['events'])) {
-			$lastMsgTime = $params['messageLast']['events']['time'];
+		if (isset($data['params']['messageLast']['events'])) {
+			$lastMsgTime = $data['params']['messageLast']['events']['time'];
 		}
 
 		$options = array(
@@ -144,20 +145,19 @@ switch ($data['method']) {
 		}
 		array_multisort($sortClock, SORT_ASC, $sortEvent, SORT_ASC, $result);
 		break;
+
 	case 'message.closeAll':
-		$params = $data['params'];
 		$msgsettings = getMessageSettings();
-		switch (strtolower($params['caption'])) {
+		switch (strtolower($data['params']['caption'])) {
 			case 'events':
-				$msgsettings['last.clock'] = (int) $params['time'] + 1;
+				$msgsettings['last.clock'] = (int) $data['params']['time'] + 1;
 				updateMessageSettings($msgsettings);
 				break;
 		}
 		break;
-	case 'zabbix.status':
-		$config = select_config();
-		$session = Z::getInstance()->getSession();
 
+	case 'zabbix.status':
+		$session = Z::getInstance()->getSession();
 		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + SERVER_CHECK_INTERVAL) <= time()) {
 			$session['serverCheckResult'] = zabbixIsRunning();
 			$session['serverCheckTime'] = time();
@@ -168,6 +168,7 @@ switch ($data['method']) {
 			'message' => $session['serverCheckResult'] ? '' : _('Zabbix server is not running: the information displayed may not be current.')
 		);
 		break;
+
 	case 'screen.get':
 		$options = array(
 			'mode' => !empty($data['mode']) ? $data['mode'] : null,
@@ -185,6 +186,10 @@ switch ($data['method']) {
 			$options['filter_task'] = !empty($data['filterTask']) ? $data['filterTask'] : null;
 			$options['mark_color'] = !empty($data['markColor']) ? $data['markColor'] : null;
 		}
+		elseif ($options['resourcetype'] == SCREEN_RESOURCE_CHART) {
+			$options['graphid'] = !empty($data['graphid']) ? $data['graphid'] : null;
+			$options['profileIdx2'] = $options['graphid'];
+		}
 
 		$screen = CScreenBuilder::getScreen($options);
 		$screen->updateProfile();
@@ -200,8 +205,8 @@ switch ($data['method']) {
 				}
 			}
 		}
-
 		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }

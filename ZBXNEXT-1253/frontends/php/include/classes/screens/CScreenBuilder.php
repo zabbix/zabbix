@@ -153,6 +153,9 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_HISTORY:
 				return new CScreenHistory($options);
 
+			case SCREEN_RESOURCE_CHART:
+				return new CScreenChart($options);
+
 			default:
 				return null;
 		}
@@ -427,7 +430,7 @@ class CScreenBuilder {
 	 *
 	 * @param string $screenid
 	 */
-	public function insertInitScreenJs($screenid) {
+	public static function insertInitScreenJs($screenid) {
 		zbx_add_post_js('init_screen("'.$screenid.'", "iframe", "'.$screenid.'");');
 	}
 

@@ -331,6 +331,8 @@ class CScreenHistory extends CScreenBase {
 			}
 
 			if ($this->mode == SCREEN_MODE_JS) {
+				$timeControlData['dynamic'] = 0;
+
 				return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');';
 			}
 			else {

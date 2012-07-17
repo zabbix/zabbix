@@ -264,7 +264,6 @@ var timeControl = {
 			throw('timeControl: Object is not declared "' + objid + '".');
 		}
 
-		var obj = this.objectList[objid];
 		var usertime = ZBX_TIMELINES[timelineid].usertime();
 		var period = ZBX_TIMELINES[timelineid].period();
 
@@ -273,61 +272,6 @@ var timeControl = {
 		}
 
 		var date = new CDate((usertime - period) * 1000);
-		var stime = date.getZBXDate();
-
-		if (obj.dynamic) {
-			this.updateProfile(obj.id, stime, period); // ajax update of starttime and period
-
-			if (obj.mainObject) {
-				for (var key in this.objectList) {
-					if (empty(this.objectList[key])) {
-						continue;
-					}
-
-					if (this.objectList[key].dynamic) {
-						this.objectList[key].timeline.period(period);
-						this.objectList[key].timeline.usertime(usertime);
-						this.loadDynamic(this.objectList[key].domid, stime, period);
-
-						if (isset(key, ZBX_SCROLLBARS)) {
-							ZBX_SCROLLBARS[key].setBarPosition();
-							ZBX_SCROLLBARS[key].setGhostByBar();
-							ZBX_SCROLLBARS[key].setTabInfo();
-
-							if (this.objectList[key].loadImage && !is_null($(obj.domid))) {
-								ZBX_SCROLLBARS[key].disabled = 1;
-							}
-						}
-					}
-				}
-			}
-			else {
-				this.loadDynamic(obj.domid, stime, period);
-
-				if (isset(objid, ZBX_SCROLLBARS)) {
-					ZBX_SCROLLBARS[objid].setBarPosition();
-					ZBX_SCROLLBARS[objid].setGhostByBar();
-					ZBX_SCROLLBARS[objid].setTabInfo();
-
-					if (!is_null($(obj.domid))) {
-						ZBX_SCROLLBARS[objid].disabled = 1;
-					}
-				}
-			}
-		}
-		else {
-			if (this.refreshPage) {
-				var url = new Curl(location.href);
-				url.setArgument('stime', stime);
-				url.setArgument('period', period);
-				url.unsetArgument('output');
-
-				location.href = url.getUrl();
-			}
-			else {
-				flickerfreeScreen.refreshAll(period, stime);
-			}
-		}
 
 		// update time control
 		for (var key in this.objectList) {
@@ -344,75 +288,42 @@ var timeControl = {
 				ZBX_SCROLLBARS[key].setTabInfo();
 			}
 		}
+
+		if (this.refreshPage) {
+			var url = new Curl(location.href);
+			url.setArgument('period', period);
+			url.setArgument('stime', date.getZBXDate());
+			url.unsetArgument('output');
+
+			location.href = url.getUrl();
+		}
+		else {
+			flickerfreeScreen.refreshAll(period, date.getZBXDate());
+		}
 	},
 
-	objectReset: function(id) {
+	objectReset: function() {
 		var usertime = 1600000000;
 		var period = 3600;
 		var stime = 201911051255;
 
-		this.updateProfile(id, stime, period);
-
+		// update time control
 		for (var key in this.objectList) {
 			if (empty(this.objectList[key])) {
 				continue;
 			}
 
-			if (this.objectList[key].dynamic) {
-				this.objectList[key].timeline.period(period);
-				this.objectList[key].timeline.usertime(usertime);
-				this.loadDynamic(this.objectList[key].domid, stime, period);
+			this.objectList[key].timeline.period(period);
+			this.objectList[key].timeline.usertime(usertime);
 
-				if (isset(key, ZBX_SCROLLBARS)) {
-					ZBX_SCROLLBARS[key].setBarPosition();
-					ZBX_SCROLLBARS[key].setGhostByBar();
-					ZBX_SCROLLBARS[key].setTabInfo();
-
-					if (this.objectList[key].loadImage) {
-						ZBX_SCROLLBARS[key].disabled = 1;
-					}
-				}
-			}
-			else if (!this.objectList[key].dynamic) {
-				var url = new Curl(location.href);
-				url.unsetArgument('stime');
-				url.unsetArgument('period');
-				url.unsetArgument('output');
-
-				location.href = url.getUrl();
+			if (isset(key, ZBX_SCROLLBARS)) {
+				ZBX_SCROLLBARS[key].setBarPosition();
+				ZBX_SCROLLBARS[key].setGhostByBar();
+				ZBX_SCROLLBARS[key].setTabInfo();
 			}
 		}
-	},
 
-	loadDynamic: function(id, stime, period) {
-		this.debug('loadDynamic', id);
-
-		var obj = this.objectList[id];
-		var dom_object = $(obj.domid);
-
-		if (!is_null(dom_object) && dom_object.nodeName.toLowerCase() == 'img') {
-			var url = new Curl(obj.src);
-			url.setArgument('stime', stime);
-			url.setArgument('period', period);
-			url.setArgument('refresh', Math.floor(Math.random() * 1000));
-
-			dom_object.src = url.getUrl();
-		}
-	},
-
-	updateProfile: function(id, stime, period) {
-		if (typeof(Ajax) == 'undefined') {
-			throw('Prototype.js lib is required!');
-		}
-
-		var params = [];
-		params['favobj'] = 'timeline';
-		params['favid'] = id;
-		params['graphid'] = id;
-		params['period'] = period;
-		params['stime'] = stime;
-
-		send_params(params);
+		flickerfreeScreen.refreshAll(period, stime);
 	},
 
 	getPeriod: function(objid) {

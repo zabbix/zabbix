@@ -44,7 +44,7 @@ var flickerfreeScreen = {
 			url.setArgument('mode', 3); // SCREEN_MODE_JS
 			url.setArgument('hostid', screen.hostid);
 
-			jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
+			jQuery.getScript(url.getUrl(), function() {
 				timeControl.refreshObject(id);
 			});
 		}
@@ -53,20 +53,20 @@ var flickerfreeScreen = {
 		else if (screen.resourcetype == 2) {
 			jQuery('<div>').load(url.getUrl(), function() {
 				jQuery(this).find('img').each(function() {
-					var id = '#' + jQuery(this).attr('id');
+					var mapId = '#' + jQuery(this).attr('id');
 
 					jQuery('<img />', {
 						id: jQuery(this).attr('id') + '_tmp',
-						calss: jQuery(id).attr('class'),
-						border: jQuery(id).attr('border'),
-						usemap: jQuery(id).attr('usemap'),
-						alt: jQuery(id).attr('alt'),
-						name: jQuery(id).attr('name')
+						calss: jQuery(mapId).attr('class'),
+						border: jQuery(mapId).attr('border'),
+						usemap: jQuery(mapId).attr('usemap'),
+						alt: jQuery(mapId).attr('alt'),
+						name: jQuery(mapId).attr('name')
 					}).attr('src', jQuery(this).attr('src')).load(function() {
-						var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+						var mapId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 
-						jQuery(this).attr('id', id);
-						jQuery('#' + id).replaceWith(jQuery(this));
+						jQuery(this).attr('id', mapId);
+						jQuery('#' + mapId).replaceWith(jQuery(this));
 					});
 				});
 			});
@@ -76,20 +76,23 @@ var flickerfreeScreen = {
 		else if (screen.resourcetype == 10) {
 			jQuery('<div>').load(url.getUrl(), function() {
 				jQuery(this).find('img').each(function() {
-					var id = '#' + jQuery(this).attr('id');
+					var workImage = jQuery(this);
+					var doId = '#' + jQuery(this).attr('id');
 
 					jQuery('<img />', {
 						id: jQuery(this).attr('id') + '_tmp',
-						border: jQuery(id).attr('border'),
-						alt: jQuery(id).attr('alt'),
-						name: jQuery(id).attr('name')
+						border: jQuery(doId).attr('border'),
+						alt: jQuery(doId).attr('alt'),
+						name: jQuery(doId).attr('name')
 					}).attr('src', jQuery(this).attr('src')).load(function() {
-						var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+						var doId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 
-						jQuery(this).attr('id', id);
-						jQuery('#' + id).replaceWith(jQuery(this));
+						jQuery(this).attr('id', doId);
+						jQuery(workImage).replaceWith(jQuery(this));
 					});
 				});
+
+				jQuery('#flickerfreescreen_' + id).replaceWith(jQuery('div', this));
 			});
 		}
 
@@ -111,13 +114,24 @@ var flickerfreeScreen = {
 			if (screen.data.action == 'showgraph') {
 				url.setArgument('mode', 3); // SCREEN_MODE_JS
 
-				jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
+				jQuery.getScript(url.getUrl(), function() {
 					timeControl.refreshObject(id);
 				});
 			}
 			else {
 				jQuery('#flickerfreescreen_' + id).load(url.getUrl());
 			}
+		}
+
+		// SCREEN_RESOURCE_CHART
+		else if (screen.resourcetype == 18) {
+			url.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
+			url.setArgument('graphid', !empty(screen.data.graphid) ? screen.data.graphid : null);
+			url.setArgument('mode', 3); // SCREEN_MODE_JS
+
+			jQuery.getScript(url.getUrl(), function() {
+				timeControl.refreshObject(id);
+			});
 		}
 
 		else {

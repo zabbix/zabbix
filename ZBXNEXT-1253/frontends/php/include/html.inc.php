@@ -273,7 +273,7 @@ function get_icon($name, $params = array()) {
 			$icon = new CIcon(_('Menu'), 'iconmenu', 'create_page_menu(event, "'.$params['menu'].'");');
 			break;
 		case 'reset':
-			$icon = new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset("'.$params['id'].'");');
+			$icon = new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
 			break;
 	}
 	return $icon;

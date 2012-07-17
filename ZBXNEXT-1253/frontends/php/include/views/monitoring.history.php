@@ -126,20 +126,20 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 }
 
 // create history screen
-$screenBuilder = CScreenBuilder::getScreen(array(
+$screen = CScreenBuilder::getScreen(array(
 	'resourcetype' => SCREEN_RESOURCE_HISTORY,
 	'action' => $this->data['action'],
 	'items' => $this->data['items'],
 	'item' => $this->data['item'],
 	'itemid' => $this->data['itemid'],
+	'profileIdx' => 'web.item.graph',
 	'period' => $this->data['period'],
-	'stime' => get_request('stime'),
+	'stime' => $this->data['stime'],
 	'filter' => get_request('filter'),
 	'filterTask' => get_request('filter_task'),
 	'markColor' => get_request('mark_color'),
 	'plaintext' => $this->data['plaintext']
 ));
-$screenBuilder = $screenBuilder->get();
 
 // append graph to widget
 if (!$this->data['plaintext']) {
@@ -153,7 +153,7 @@ if (!$this->data['plaintext']) {
 		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 	}
 
-	$historyWidget->addItem($screenBuilder);
+	$historyWidget->addItem($screen->get());
 
 	if (str_in_array($this->data['action'], array('showvalues', 'showgraph'))) {
 		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
@@ -168,8 +168,10 @@ else {
 		$plaintextSpan->addItem(array(new CJSscript($text), BR()));
 	}
 
+	$screen = $screen->get();
+
 	$pre = new CTag('pre', true);
-	foreach ($screenBuilder as $text) {
+	foreach ($screen as $text) {
 		$pre->addItem(new CJSscript($text));
 	}
 	$plaintextSpan->addItem($pre);
