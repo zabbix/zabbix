@@ -669,7 +669,7 @@ ZABBIX.apps.map = (function() {
 					this.data[key] = data[key];
 				}
 
-				this.trigger('afterUpdate', this);
+				sysmap.updateImage();
 			},
 
 			/**
@@ -1741,10 +1741,6 @@ ZABBIX.apps.map = (function() {
 					jQuery('#areaSizeHeight').val(element.data.height);
 				}
 			}
-			sysmap.updateImage();
-		});
-
-		Link.prototype.bind('afterUpdate', function() {
 			sysmap.updateImage();
 		});
 
