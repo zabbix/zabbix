@@ -34,8 +34,7 @@ $fields = array(
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,	IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION)), null),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
-	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), 'isset({save})&&isset({escalation})', _('Default escalation period')),
-	'escalation' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'), null),
+	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), 'isset({save})', _('Default operation step duration')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'def_longdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -351,10 +350,6 @@ if (isset($_REQUEST['form'])) {
 		sortOperations($data['action']['operations']);
 	}
 	else {
-		if (isset($_REQUEST['escalation']) && $_REQUEST['esc_period'] == 0) {
-			$_REQUEST['esc_period'] = SEC_PER_HOUR;
-		}
-
 		$data['action']['name'] = get_request('name');
 		$data['action']['eventsource'] = get_request('eventsource');
 		$data['action']['evaltype'] = get_request('evaltype', 0);

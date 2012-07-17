@@ -1510,7 +1510,7 @@ class CAction extends CZBXAPI {
 
 			if (isset($operation['esc_period'])) {
 				if (isset($operation['esc_period']) && $operation['esc_period'] != 0 && $operation['esc_period'] < SEC_PER_MIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation escalation period.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation step duration.'));
 				}
 			}
 
