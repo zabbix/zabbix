@@ -636,22 +636,21 @@ function get_operators_by_conditiontype($conditiontype) {
 }
 
 function count_operations_delay($operations, $def_period = 0) {
-	$delays = array(0, 0);
+	$delays = array(1 => 0);
 	$periods = array();
 	$max_step = 0;
 
 	foreach ($operations as $operation) {
-		$step_from = $operation['esc_step_from'] ? $operation['esc_step_from'] : 1;
 		$step_to = $operation['esc_step_to'] ? $operation['esc_step_to'] : 9999;
 		$esc_period = $operation['esc_period'] ? $operation['esc_period'] : $def_period;
 
-		$max_step = ($max_step > $step_from) ? $max_step : $step_from;
+		if ($max_step < $operation['esc_step_from']) {
+			$max_step = $operation['esc_step_from'];
+		}
 
-		for ($i = $step_from; $i < $step_to; $i++) {
-			if (isset($periods[$i]) && $periods[$i] < $esc_period) {
-			}
-			else {
-				$periods[$i]= $esc_period;
+		for ($i = $operation['esc_step_from']; $i <= $step_to; $i++) {
+			if (!isset($periods[$i]) || $periods[$i] > $esc_period) {
+				$periods[$i] = $esc_period;
 			}
 		}
 	}
