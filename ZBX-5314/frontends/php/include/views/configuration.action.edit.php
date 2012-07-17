@@ -41,9 +41,9 @@ $actionFormList = new CFormList('actionlist');
 $actionFormList->addRow(_('Name'), new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$actionFormList->addRow(_('Default escalation period (minimum 60 seconds)'), array(
+	$actionFormList->addRow(_('Default operation step duration'), array(
 		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6, 'no'),
-		' ('._('seconds').')')
+		' ('._('minimum 60 seconds').')')
 	);
 }
 else {
@@ -317,7 +317,7 @@ $operationFormList = new CFormList('operationlist');
 $operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
 $operationsTable->attr('style', 'min-width: 600px;');
 if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Period (sec)'), _('Delay'), _('Action')));
+	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')));
 }
 else {
 	$operationsTable->setHeader(array(_('Details'), _('Action')));
@@ -360,8 +360,8 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 		$operationRow = array(
 			$esc_steps_txt,
 			$details,
-			$esc_period_txt,
 			$esc_delay_txt,
+			$esc_period_txt,
 			array(
 				new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
 				SPACE, SPACE, SPACE,
@@ -429,7 +429,7 @@ if (!empty($this->data['new_operation'])) {
 		);
 
 		$stepTable->addRow(array(
-			_('Escalation period'),
+			_('Step duration'),
 			new CCol(array(
 				new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 5),
 				SPACE,

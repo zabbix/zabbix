@@ -52,7 +52,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'Cannot modify header',
 		'Parse error',
 		'syntax error',
-		'Try to read inaccessible property'
+		'Try to read inaccessible property',
+		'.php:'
 	);
 
 	// List of strings that SHOULD appear on every page
@@ -230,6 +231,36 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		// WARNING: not tested yet
 		// clicks button named "Unlink and clear" next to template named $template
 		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
+	}
+
+	/**
+	 * Assert that the element with the given name has a specific value.
+	 *
+	 * @param $name
+	 * @param $value
+	 */
+	public function assertElementValue($name, $value) {
+		$this->assertElementPresent("//*[@name='".$name."' and @value='".$value."']");
+	}
+
+	/**
+	 * Assert that the element with the given name contains a specific text.
+	 *
+	 * @param $name
+	 * @param $text
+	 */
+	public function assertElementText($name, $text) {
+		$this->assertElementPresent("//*[@name='".$name."' and text()='".$text."']");
+	}
+
+	/**
+	 * Assert that the element with the given name contains a specific text.
+	 *
+	 * @param $name
+	 * @param $text
+	 */
+	public function assertDrowpdownValueText($name, $text) {
+		$this->assertElementPresent("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
 	}
 
 	public function templateLink($host, $template) {

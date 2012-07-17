@@ -693,7 +693,7 @@ class CHostGroup extends CZBXAPI {
 	 *
 	 * @return boolean
 	 */
-	public function delete(array $groupids) {
+	public function delete($groupids) {
 		if (empty($groupids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
