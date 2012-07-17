@@ -671,7 +671,11 @@ ZABBIX.apps.map = (function() {
 			remove: function() {
 				delete this.sysmap.data.links[this.id];
 				delete this.sysmap.links[this.id];
-				this.trigger('afterRemove', this);
+
+				if (sysmap.form.active) {
+					sysmap.linkForm.updateList(sysmap.selection.selements);
+				}
+				sysmap.linkForm.hide();
 			},
 
 			/**
@@ -1735,15 +1739,6 @@ ZABBIX.apps.map = (function() {
 
 		Link.prototype.bind('afterUpdate', function() {
 			sysmap.updateImage();
-		});
-
-		Link.prototype.bind('afterRemove', function() {
-			if (sysmap.form.active) {
-				for (var selementid in sysmap.selection.selements) {
-					sysmap.linkForm.updateList(selementid);
-				}
-			}
-			sysmap.linkForm.hide();
 		});
 
 		return sysmap;
