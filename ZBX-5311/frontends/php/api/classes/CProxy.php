@@ -485,7 +485,7 @@ class CProxy extends CZBXAPI {
 	 */
 	public function delete(array $proxies) {
 		$proxies = zbx_toArray($proxies);
-		$this->validateOnDelete($proxies);
+		$this->validateDelete($proxies);
 
 		$proxyIds = zbx_objectValues($proxies, 'proxyid');
 
@@ -642,7 +642,7 @@ class CProxy extends CZBXAPI {
 		if ($host) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Host "%1$s" is associated with proxy "%2$s".', $host['name'], $proxy['host']));
+				_s('Host "%1$s" is monitored with proxy "%2$s".', $host['name'], $proxy['host']));
 		}
 	}
 }
