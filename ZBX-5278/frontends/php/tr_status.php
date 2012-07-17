@@ -185,7 +185,7 @@ $filterForm->addVar('hostid', $_REQUEST['hostid']);
 $tr_select = new CComboBox('show_triggers', $show_triggers);
 $tr_select->addItem(TRIGGERS_OPTION_ALL, _('Any'));
 $tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
-$filterForm->addRow(_('Triggers status'), $tr_select);
+$filterForm->addRow(_('Triggers, referencing enabled items'), $tr_select);
 
 if ($config['event_ack_enable']) {
 	$cb_ack_status = new CComboBox('ack_status', $ack_status);
