@@ -34,8 +34,7 @@
  ******************************************************************************/
 static void	app_title()
 {
-	printf("%s v%s (revision %s) (%s)\n", title_message,
-			ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
+	printf("%s v%s (revision %s) (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
 }
 
 /******************************************************************************
