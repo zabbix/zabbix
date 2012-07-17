@@ -1510,7 +1510,7 @@ class CAction extends CZBXAPI {
 
 			if (isset($operation['esc_period'])) {
 				if (isset($operation['esc_period']) && $operation['esc_period'] != 0 && $operation['esc_period'] < SEC_PER_MIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation escalation period.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation step duration.'));
 				}
 			}
 
@@ -1688,6 +1688,7 @@ class CAction extends CZBXAPI {
 
 		$discoveryCheckTypes = discovery_check_type2str();
 		$discoveryObjectStatuses = discovery_object_status2str();
+		$timePeriodValidator = new CTimePeriodValidator();
 
 		foreach ($conditions as $condition) {
 			switch ($condition['conditiontype']) {
@@ -1720,7 +1721,7 @@ class CAction extends CZBXAPI {
 					break;
 
 				case CONDITION_TYPE_TIME_PERIOD:
-					if (!validate_period($condition['value'])) {
+					if (!$timePeriodValidator->validate($condition['value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action condition period "%s".', $condition['value']));
 					}
 					break;

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * Add value map with mappings.
  *
@@ -58,8 +58,8 @@ function updateValueMap(array $valueMap, array $mappings) {
 	$valueMapId = $valueMap['valuemapid'];
 	unset($valueMap['valuemapid']);
 
-	// check existance
-	if(!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
+	// check existence
+	if (!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
 		throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $valueMapId));
 	}
 
@@ -242,7 +242,7 @@ function getValueMapMappings($valueMapId) {
  * If value map or mapping is not found unchanged value returned,
  * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
  *
- * @param string $value	  value that mapping should be applied to
+ * @param string $value	     value that mapping should be applied to
  * @param int    $valueMapId value map id which should be used
  *
  * @return string
@@ -269,4 +269,3 @@ function applyValueMap($value, $valueMapId) {
 	}
 	return $value;
 }
-?>

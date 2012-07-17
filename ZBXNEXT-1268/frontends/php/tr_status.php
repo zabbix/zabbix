@@ -170,7 +170,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$trigg_wdgt->addPageHeader(_('STATUS OF TRIGGERS').SPACE.'['.date(_('d M Y H:i:s')).']', $fs_icon);
+	$trigg_wdgt->addPageHeader(_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']', $fs_icon);
 	$trigg_wdgt->addHeader(_('Triggers'), $r_form);
 	$trigg_wdgt->addHeaderRowNumber();
 
@@ -503,7 +503,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			$dep_table->addRow(bold(_('Depends on').':'));
 
 			foreach($trigger['dependencies'] as $dep){
-				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));
+				$dep_table->addRow(' - '.CTriggerHelper::expandDescriptionById($dep['triggerid']));
 			}
 
 			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
@@ -518,8 +518,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
 		if (!empty($triggerids_down[$trigger['triggerid']])) {
-			$depTriggers = zbx_toObject($triggerids_down[$trigger['triggerid']], 'triggerid');
-			$depTriggers = expandTriggerDescriptions($depTriggers);
+			$depTriggers = CTriggerHelper::batchExpandDescriptionById($triggerids_down[$trigger['triggerid']]);
+
 			foreach ($depTriggers as $depTrigger) {
 				$dep_table->addRow(SPACE.'-'.SPACE.$depTrigger['description']);
 				$dependency = true;
