@@ -586,15 +586,19 @@ ZABBIX.apps.map = (function() {
 				}
 				else {
 					this.linkForm.updateList(this.selection.selements);
+					// only one element selected
 					if (this.selection.count == 1) {
 						for (selementid in this.selection.selements) {
 							this.form.setValues(this.selements[selementid].getData());
 						}
 						this.massForm.hide();
+						jQuery('#link-connect-to').show();
 						this.form.show();
 					}
+					// multiple elements selected
 					else {
 						this.form.hide();
+						jQuery('#link-connect-to').hide();
 						this.massForm.show();
 					}
 				}

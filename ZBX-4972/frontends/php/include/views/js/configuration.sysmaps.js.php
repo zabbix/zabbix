@@ -321,7 +321,7 @@
 				<td><label for="linklabel"><?php echo _('Label'); ?></label></td>
 				<td><textarea cols="48" rows="4" name="label" id="linklabel" class="input"></textarea></td>
 			</tr>
-			<tr>
+			<tr id="link-connect-to">
 				<td><label for="selementid2"><?php echo _('Connect to'); ?></label></td>
 				<td><select class="input" name="selementid2" id="selementid2"></select></td>
 			</tr>
