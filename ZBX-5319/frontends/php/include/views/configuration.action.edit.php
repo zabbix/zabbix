@@ -46,9 +46,6 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		' ('._('minimum 60 seconds').')')
 	);
 }
-else {
-	$actionForm->addVar('esc_period', 0);
-}
 
 $actionFormList->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
 $actionFormList->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
@@ -439,11 +436,6 @@ if (!empty($this->data['new_operation'])) {
 		);
 
 		$newOperationsTable->addRow(array(_('Step'), $stepTable));
-	}
-	else {
-		$newOperationsTable->addItem(new CVar('new_operation[esc_step_from]', 1));
-		$newOperationsTable->addItem(new CVar('new_operation[esc_step_to]', 1));
-		$newOperationsTable->addItem(new CVar('new_operation[esc_period]', 0));
 	}
 
 	$operationTypeComboBox = new CComboBox('new_operation[operationtype]', $this->data['new_operation']['operationtype'], 'submit()');
