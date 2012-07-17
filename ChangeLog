@@ -8,6 +8,7 @@ Bug fixes:
 Changes for 2.0.2rc1
 
 New features:
+...GI..... [ZBXNEXT-1268] add resource information (version, description etc.) to Windows binaries (dimir)
 A.F....... [ZBX-1357] updated French, German, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBX-4281] separated links to hosts and templates for host groups on search page (Vedmak)
 ..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
