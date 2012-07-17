@@ -287,9 +287,9 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
-	<div id="mapLinksContainer" style="border: 1px solid #AAA; max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
-		<table class="tableinfo">
-			<caption><?php echo _('Edit element links'); ?></caption>
+	<div id="mapLinksContainer">
+		<table id="element-links" class="tableinfo element-links">
+			<caption><?php echo _('Element links'); ?></caption>
 			<thead>
 			<tr class="header">
 				<td></td>
@@ -297,10 +297,21 @@
 				<td><?php echo _('Link indicators'); ?></td>
 			</tr>
 			</thead>
-			<tbody id=linksList></tbody>
+			<tbody></tbody>
+		</table>
+		<table id="mass-element-links" class="tableinfo element-links">
+			<caption><?php echo _('Links between the selected elements'); ?></caption>
+			<thead>
+			<tr class="header">
+				<td></td>
+				<td><?php echo _('From'); ?></td>
+				<td><?php echo _('To'); ?></td>
+				<td><?php echo _('Link indicators'); ?></td>
+			</tr>
+			</thead>
+			<tbody></tbody>
 		</table>
 	</div>
-
 	<form id="linkForm" name="linkForm" style="display: none;">
 		<input type="hidden" name="selementid1">
 
@@ -369,10 +380,19 @@
 	</form>
 </script>
 
-<script type="text/x-jquery-tmpl" id="mapLinksRow">
+<script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
 	<tr>
 		<td><span class="link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></span></td>
-		<td>#{elementName}</td>
+		<td>#{toElementName}</td>
+		<td class="pre">#{linktriggers}</td>
+	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="massElementLinkTableRowTpl">
+	<tr>
+		<td><span class="link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></span></td>
+		<td>#{fromElementName}</td>
+		<td>#{toElementName}</td>
 		<td class="pre">#{linktriggers}</td>
 	</tr>
 </script>

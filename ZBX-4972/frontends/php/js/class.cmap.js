@@ -1654,27 +1654,42 @@ ZABBIX.apps.map = (function() {
 			 */
 			updateList: function(selementIds) {
 				var links = this.sysmap.getLinksBySelementIds(selementIds),
+					linkTable,
 					rowTpl,
 					list,
 					i,
 					ln,
 					link,
 					linkedSelementid,
-					element,
-					elementTypeText,
 					linktriggers;
 
-				jQuery('#linksList').empty();
+				jQuery('.element-links').hide();
+				jQuery('.element-links tbody').empty();
 				if (links.length) {
 					jQuery('#mapLinksContainer').show();
 
-					rowTpl = new Template(jQuery('#mapLinksRow').html());
+					if (jQuery.objectSize(selementIds) > 1) {
+						rowTpl = '#massElementLinkTableRowTpl';
+						linkTable = jQuery('#mass-element-links');
+					}
+					else {
+						rowTpl = '#elementLinkTableRowTpl';
+						linkTable = jQuery('#element-links');
+					}
+					rowTpl = new Template(jQuery(rowTpl).html());
 
 					list = [];
 					for (i = 0, ln = links.length; i < ln; i++) {
 						link = this.sysmap.links[links[i]].data;
-						linkedSelementid = (!!selementIds[link.selementid1]) ? link.selementid2 : link.selementid1;
-						element = this.sysmap.selements[linkedSelementid];
+
+						// if multiple elements are selected, display element2 as the "to" element
+						// if only one element is selected, display the element on the opposite end
+						if (jQuery.objectSize(selementIds) > 1 || !!selementIds[link.selementid1]) {
+							linkedSelementid = link.selementid2;
+						}
+						else {
+							linkedSelementid = link.selementid1;
+						}
 
 						linktriggers = [];
 						for (var linktrigger in link.linktriggers) {
@@ -1682,38 +1697,43 @@ ZABBIX.apps.map = (function() {
 						}
 
 						list.push({
-							elementName: element.data.elementName,
+							fromElementName: this.sysmap.selements[link.selementid1].data.elementName,
+							toElementName: this.sysmap.selements[linkedSelementid].data.elementName,
 							linkid: link.linkid,
 							linktriggers: linktriggers.join('\n')
 						});
 					}
 
-					// sort by elementtype and then by element name
+					// sort by "from" element and then by "to" element
 					list.sort(function(a, b) {
-						if (a.elementType < b.elementType) {
+						var fromElementA = a.fromElementName.toLowerCase();
+						var fromElementB = b.fromElementName.toLowerCase();
+
+						if (fromElementA < fromElementB) {
 							return -1;
 						}
-						if (a.elementType > b.elementType) {
+						if (fromElementA > fromElementB) {
 							return 1;
 						}
-						if (a.elementType == b.elementType) {
-							var elementTypeA = a.elementName.toLowerCase();
-							var elementTypeB = b.elementName.toLowerCase();
+						if (fromElementA == fromElementB) {
+							var toElementA = a.toElementName.toLowerCase();
+							var toElementB = b.toElementName.toLowerCase();
 
-							if (elementTypeA < elementTypeB) {
+							if (toElementA < toElementB) {
 								return -1;
 							}
-							if (elementTypeA > elementTypeB) {
+							if (toElementA > toElementB) {
 								return 1;
 							}
 						}
 						return 0;
 					});
 					for (i = 0, ln = list.length; i < ln; i++) {
-						jQuery(rowTpl.evaluate(list[i])).appendTo('#linksList');
+						jQuery(rowTpl.evaluate(list[i])).appendTo(linkTable.find('tbody'));
 					}
-					jQuery('#linksList tr:nth-child(odd)').addClass('odd_row');
-					jQuery('#linksList tr:nth-child(even)').addClass('even_row');
+					linkTable.find('tbody tr:nth-child(odd)').addClass('odd_row');
+					linkTable.find('tbody tr:nth-child(even)').addClass('even_row');
+					linkTable.show();
 				}
 				else {
 					jQuery('#mapLinksContainer').hide();

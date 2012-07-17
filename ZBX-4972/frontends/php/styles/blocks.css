@@ -31,6 +31,8 @@ fieldset { margin: 0; padding: 0; }
 fieldset { border: 1px solid gray; margin-bottom: 2px; padding: 2px; }
 fieldset legend { margin: 0.2em 0.5em; }
 
+#mapLinkContainer { border: 1px solid #AAA; max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none; }
+
 /************************************************************/
 /*					ZABBIX MESSAGING						*/
 /************************************************************/
