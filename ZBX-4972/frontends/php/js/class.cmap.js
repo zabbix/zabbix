@@ -447,6 +447,7 @@ ZABBIX.apps.map = (function() {
 					link = new Link(that);
 					that.links[link.id] = link;
 					that.updateImage();
+					that.linkForm.updateList(that.selection.selements);
 				});
 
 				// remove link
