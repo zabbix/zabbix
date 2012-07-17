@@ -484,10 +484,6 @@ class CProxy extends CZBXAPI {
 	 * @return array
 	 */
 	public function delete(array $proxies) {
-		if (empty($proxies)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
 		$proxies = zbx_toArray($proxies);
 		$this->validateOnDelete($proxies);
 
@@ -541,6 +537,24 @@ class CProxy extends CZBXAPI {
 	}
 
 	/**
+	 * Check if proxies can be deleted.
+	 *  - only super admin can delete proxy
+	 *  - cannot delete proxy if it is used to monitor host
+	 *  - cannot delete proxy if it is used in discovery rule
+	 *
+	 * @param array $proxies
+	 */
+	protected function validateDelete(array $proxies) {
+		if (empty($proxies)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$this->checkPermissions();
+		$this->checkUsedInDiscoveryRule($proxies);
+		$this->checkUsedForMonitoring($proxies);
+	}
+
+	/**
 	 * Check if user has read permissions for proxy.
 	 *
 	 * @param array $proxyids
@@ -588,20 +602,6 @@ class CProxy extends CZBXAPI {
 	}
 
 	/**
-	 * Check if proxies can be deleted.
-	 *  - only super admin can delete proxy
-	 *  - cannot delete proxy if it is used to monitor host
-	 *  - cannot delete proxy if it is used in discovery rule
-	 *
-	 * @param array $proxies
-	 */
-	protected function validateOnDelete(array $proxies) {
-		$this->checkPermissions();
-		$this->checkUsedInDiscoveryRule($proxies);
-		$this->checkUsedForMonitoring($proxies);
-	}
-
-	/**
 	 * Check permission for proxies.
 	 * Only super admin have write access for proxies.
 	 */
@@ -625,7 +625,7 @@ class CProxy extends CZBXAPI {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$dRule['proxy_hostid']));
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('There is discovery rule "%1$s" associated with proxy "%2$s".', $dRule['name'], $proxy['host']));
+				_s('Proxy "%1$s" is used by discovery rule "%2$s".', $proxy['host'], $dRule['name']));
 		}
 	}
 
@@ -642,7 +642,7 @@ class CProxy extends CZBXAPI {
 		if ($host) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('There is host "%1$s" associated with proxy "%2$s".', $host['name'], $proxy['host']));
+				_s('Host "%1$s" is associated with proxy "%2$s".', $host['name'], $proxy['host']));
 		}
 	}
 }
