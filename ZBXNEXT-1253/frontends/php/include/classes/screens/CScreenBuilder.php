@@ -26,6 +26,7 @@ class CScreenBuilder {
 	public $screen;
 	public $mode;
 	public $profileIdx;
+	public $profileIdx2;
 
 	/**
 	 * Init screen data.
@@ -34,7 +35,8 @@ class CScreenBuilder {
 	 * @param boolean	$options['isFlickerfree']
 	 * @param int		$options['mode']
 	 * @param boolean	$options['isTemplate']
-	 * @param string	$options['profileIdx']
+	 * @param string	$options['profileIdx']		Profile table entity name #1
+	 * @param int		$options['profileIdx2']		Profile table record id belongs to #1
 	 * @param array		$options['screen']
 	 */
 	public function __construct(array $options = array()) {
@@ -42,6 +44,7 @@ class CScreenBuilder {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
 		$this->isTemplate = isset($options['isTemplate']) ? $options['isTemplate'] : false;
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
+		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : '';
 
 		// get screen
 		if (!empty($options['screen'])) {
@@ -292,6 +295,7 @@ class CScreenBuilder {
 						'isFlickerfree' => $this->isFlickerfree,
 						'mode' => $this->mode,
 						'profileIdx' => $this->profileIdx,
+						'profileIdx2' => $this->profileIdx2,
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem
 					));

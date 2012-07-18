@@ -177,7 +177,8 @@ switch ($data['method']) {
 			'hostid' => !empty($data['hostid']) ? $data['hostid'] : null,
 			'period' => !empty($data['period']) ? $data['period'] : null,
 			'stime' => !empty($data['stime']) ? $data['stime'] : null,
-			'profileIdx' => !empty($data['profileIdx']) ? $data['profileIdx'] : null
+			'profileIdx' => !empty($data['profileIdx']) ? $data['profileIdx'] : null,
+			'profileIdx2' => !empty($data['profileIdx2']) ? $data['profileIdx2'] : null
 		);
 		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
 			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
@@ -191,9 +192,9 @@ switch ($data['method']) {
 			$options['profileIdx2'] = $options['graphid'];
 		}
 
-		$screen = CScreenBuilder::getScreen($options);
-		$screen->updateProfile();
-		$screen = $screen->get();
+		$screenBase = CScreenBuilder::getScreen($options);
+		$screen = $screenBase->get();
+		$screenBase->updateProfile();
 
 		if (!empty($screen)) {
 			if ($options['mode'] == SCREEN_MODE_JS) {

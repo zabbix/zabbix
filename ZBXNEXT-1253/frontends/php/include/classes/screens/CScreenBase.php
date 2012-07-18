@@ -177,6 +177,7 @@ class CScreenBase {
 				'period' => $this->period,
 				'stime' => $this->stime,
 				'profileIdx' => $this->profileIdx,
+				'profileIdx2' => $this->profileIdx2,
 				'data' => !empty($data) ? $data : null
 			);
 

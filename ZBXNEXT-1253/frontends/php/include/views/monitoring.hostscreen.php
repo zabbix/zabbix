@@ -21,6 +21,9 @@
 
 $screenWidget = new CWidget();
 $screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.hostscreen.filter.state', 1));
+if (!empty($this->data['hostid'])) {
+	$screenWidget->addItem(get_header_host_table('screens', $this->data['hostid']));
+}
 
 $form = new CForm('get');
 $form->addVar('fullscreen', $_REQUEST['fullscreen']);
@@ -55,18 +58,18 @@ else {
 	}
 	$screenWidget->addHeader($screenList);
 
-	$period = navigation_bar_calc('web.screens', $this->data['screen']['screenid'], true);
-
 	$screenBuilder = new CScreenBuilder(array(
 		'screen' => $this->data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
-		'period' => $period,
-		'profileIdx' => 'web.screens'
+		'period' => $this->data['period'],
+		'stime' => $this->data['stime'],
+		'profileIdx' => 'web.screens',
+		'profileIdx2' => $this->data['screen']['screenid']
 	));
 
 	$timeline = array(
-		'period' => $period,
-		'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
+		'period' => $this->data['period'],
+		'starttime' => date('YmdHis', $this->data['stime'] - $this->data['period'])
 	);
 	if (!empty($this->data['stime'])) {
 		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);

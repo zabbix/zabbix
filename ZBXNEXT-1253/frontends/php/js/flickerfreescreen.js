@@ -35,6 +35,7 @@ var flickerfreeScreen = {
 		url.setArgument('flickerfreeScreenId', id);
 		url.setArgument('screenitemid', screen.screenitemid);
 		url.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
+		url.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
 		url.setArgument('period', !empty(screen.period) ? screen.period : null);
 		url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
 
@@ -170,6 +171,7 @@ var flickerfreeScreen = {
 			'mode': screen.mode,
 			'resourcetype': screen.resourcetype,
 			'profileIdx': screen.profileIdx,
+			'profileIdx2': screen.profileIdx2,
 			'data': screen.data
 		};
 
