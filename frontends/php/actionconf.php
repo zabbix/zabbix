@@ -34,7 +34,7 @@ $fields = array(
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,	IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION)), null),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
-	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), 'isset({save})', _('Default operation step duration')),
+	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null, _('Default operation step duration')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'def_longdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -251,7 +251,7 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			}
 			else {
 				$_REQUEST['operations'][] = $new_operation;
-				sortOperations($_REQUEST['operations']);
+				sortOperations($_REQUEST['eventsource'], $_REQUEST['operations']);
 			}
 		}
 
@@ -347,7 +347,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if (isset($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
-		sortOperations($data['action']['operations']);
+		sortOperations($data['action']['eventsource'], $data['action']['operations']);
 	}
 	else {
 		$data['action']['name'] = get_request('name');
