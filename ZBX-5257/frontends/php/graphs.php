@@ -340,12 +340,10 @@ elseif (isset($_REQUEST['form'])) {
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
 		$options = array(
 			'graphids' => $data['graphid'],
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid')
 		);
-		$graph = !empty($data['parent_discoveryid'])
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
-
+		$graph = !empty($data['parent_discoveryid']) ? API::GraphPrototype()->get($options) : API::Graph()->get($options);
 		$graph = reset($graph);
 
 		$data['name'] = $graph['name'];
@@ -366,6 +364,12 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
 		$data['templates'] = array();
+
+		// if no host has been selected for the navigation panel, use the first graph host
+		if (!$data['hostid']) {
+			$host = reset($graph['hosts']);
+			$data['hostid'] = $host['hostid'];
+		}
 
 		// templates
 		if (!empty($data['templateid'])) {
