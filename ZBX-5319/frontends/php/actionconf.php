@@ -251,7 +251,7 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			}
 			else {
 				$_REQUEST['operations'][] = $new_operation;
-				sortOperations($_REQUEST['operations']);
+				sortOperations($_REQUEST['eventsource'], $_REQUEST['operations']);
 			}
 		}
 
@@ -347,7 +347,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if (isset($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
-		sortOperations($data['action']['operations']);
+		sortOperations($data['action']['eventsource'], $data['action']['operations']);
 	}
 	else {
 		$data['action']['name'] = get_request('name');

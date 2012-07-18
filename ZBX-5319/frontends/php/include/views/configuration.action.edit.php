@@ -315,12 +315,12 @@ $operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
 $operationsTable->attr('style', 'min-width: 600px;');
 if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')));
+	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
 }
 else {
 	$operationsTable->setHeader(array(_('Details'), _('Action')));
 }
 
-$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
 foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
 		continue;
@@ -335,25 +335,26 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	$details = new CSpan(get_operation_desc(SHORT_DESCRIPTION, $operation));
 	$details->setHint(get_operation_desc(LONG_DESCRIPTION, $operation));
 
-	$esc_steps_txt = null;
-	$esc_period_txt = null;
-	$esc_delay_txt = null;
-
-	if ($operation['esc_step_from'] < 1) {
-		$operation['esc_step_from'] = 1;
-	}
-
-	$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
-
-	// display N-N as N
-	$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
-		? $operation['esc_step_from']
-		: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
-
-	$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
-	$esc_delay_txt = $delay[$operation['esc_step_from']] ? convert_units($delay[$operation['esc_step_from']], 'uptime') : _('Immediately');
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+		$esc_steps_txt = null;
+		$esc_period_txt = null;
+		$esc_delay_txt = null;
+
+		if ($operation['esc_step_from'] < 1) {
+			$operation['esc_step_from'] = 1;
+		}
+
+		$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+		// display N-N as N
+		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
+				? $operation['esc_step_from']
+				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+		$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
+		$esc_delay_txt = $delay[$operation['esc_step_from']] ? convert_units($delay[$operation['esc_step_from']], 'uptime') : _('Immediately');
+
 		$operationRow = array(
 			$esc_steps_txt,
 			$details,
