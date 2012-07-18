@@ -355,14 +355,14 @@ elseif ($resourcetype == SCREEN_RESOURCE_ACTIONS) {
 		new CComboBox('sort_triggers', $sort_triggers, null, array(
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
 			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
+			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
 			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
-			SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC => _('Retries left (ascending)'),
+			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
 			SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC => _('Retries left (descending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)')
+			SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC => _('Retries left (ascending)'),
+			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
+			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
 		))
 	);
 	$screenFormList->addVar('resourceid', 0);

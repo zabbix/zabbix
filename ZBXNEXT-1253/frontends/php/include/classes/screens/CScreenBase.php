@@ -47,8 +47,8 @@ class CScreenBase {
 	 * @param int		$options['hostid']
 	 * @param int		$options['period']
 	 * @param int		$options['stime']
-	 * @param string	$options['profileIdx']
-	 * @param int		$options['profileIdx2']
+	 * @param string	$options['profileIdx']		Profile table entity name #1
+	 * @param int		$options['profileIdx2']		Profile table record id belongs to #1
 	 * @param string	$options['dataId']
 	 */
 	public function __construct(array $options = array()) {
@@ -120,6 +120,8 @@ class CScreenBase {
 
 	/**
 	 * Create and get unique screen id for time control.
+	 *
+	 * @return string
 	 */
 	public function getDataId() {
 		if (empty($this->dataId)) {
@@ -131,6 +133,8 @@ class CScreenBase {
 
 	/**
 	 * Get unique screen container id.
+	 *
+	 * @return string
 	 */
 	public function getScreenId() {
 		return 'flickerfreescreen_'.$this->getDataId();
@@ -138,22 +142,27 @@ class CScreenBase {
 
 	/**
 	 * Get enveloped screen inside container.
+	 *
+	 * @param object	$item
+	 * @param boolean	$insertFlickerfreeJs
+	 * @param array		$flickerfreeData
+	 *
+	 * @return CDiv
 	 */
 	public function getOutput($item = null, $insertFlickerfreeJs = true, $flickerfreeData = array()) {
 		if ($insertFlickerfreeJs) {
 			$this->insertFlickerfreeJs($flickerfreeData);
 		}
 
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			return new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getScreenId());
-		}
-		else {
-			return new CDiv($item, null, $this->getScreenId());
-		}
+		return ($this->mode == SCREEN_MODE_EDIT)
+			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getScreenId())
+			: new CDiv($item, null, $this->getScreenId());
 	}
 
 	/**
 	 * Insert javascript flicker-free screen data.
+	 *
+	 * @param array	$data
 	 */
 	public function insertFlickerfreeJs($data = array()) {
 		if ($this->isFlickerfree) {

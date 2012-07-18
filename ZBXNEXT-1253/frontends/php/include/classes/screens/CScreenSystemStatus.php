@@ -26,7 +26,7 @@ class CScreenSystemStatus extends CScreenBase {
 	/**
 	 * Process screen.
 	 *
-	 * @return object CDiv (screen inside container)
+	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
 		$item = new CUIWidget('hat_syssum', make_system_status(array(

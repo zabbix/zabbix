@@ -24,24 +24,13 @@ class CScreenActions extends CScreenBase {
 	/**
 	 * Process screen.
 	 *
-	 * @return object CDiv (screen inside container)
+	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-
-		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error'.
-				' FROM events e,alerts a'.
-				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
-				' WHERE e.eventid=a.eventid'.
-					' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
-					' AND '.DBcondition('e.objectid', $available_triggers).
-					' AND '.DBin_node('a.alertid');
-		$alerts = DBfetchArray(DBselect($sql, $this->screenitem['elements']));
-
-		// sorting
 		$sortfield = 'clock';
 		$sortorder = ZBX_SORT_DOWN;
-		$sorttitle = '';
+		$sorttitle = _('Time');
+
 		switch ($this->screenitem['sort_triggers']) {
 			case SCREEN_SORT_TRIGGERS_TIME_ASC:
 				$sortfield = 'clock';
@@ -94,6 +83,19 @@ class CScreenActions extends CScreenBase {
 				$sorttitle = _('Recipient(s)');
 				break;
 		}
+
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+
+		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error'.
+				' FROM events e,alerts a'.
+					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
+				' WHERE e.eventid=a.eventid'.
+					' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
+					' AND '.DBcondition('e.objectid', $available_triggers).
+					' AND '.DBin_node('a.alertid').' '.
+				' ORDER BY '.$sortfield.' '.$sortorder;
+		$alerts = DBfetchArray(DBselect($sql, $this->screenitem['elements']));
+
 		order_result($alerts, $sortfield, $sortorder);
 
 		// indicator of sort field
@@ -104,7 +106,7 @@ class CScreenActions extends CScreenBase {
 		$actionTable = new CTableInfo(_('No actions found.'));
 		$actionTable->setHeader(array(
 			is_show_all_nodes() ? _('Nodes') : null,
-			($sortfield == 'clock' && !empty($sorttitle)) ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
+			($sortfield == 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
 			($sortfield == 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
 			($sortfield == 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
 			($sortfield == 'retries') ? array($sortfieldSpan, $sortorderSpan) : _('Retries left'),

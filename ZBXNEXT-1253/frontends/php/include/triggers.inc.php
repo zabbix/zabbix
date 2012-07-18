@@ -188,6 +188,7 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
  */
 function get_accessible_triggers($perm, $hostids = array(), $cache = 1) {
 	static $available_triggers;
+
 	$userid = CWebUser::$data['userid'];
 	$nodeid = get_current_nodeid();
 	$nodeid_str = is_array($nodeid) ? implode('', $nodeid) : strval($nodeid);
@@ -214,6 +215,7 @@ function get_accessible_triggers($perm, $hostids = array(), $cache = 1) {
 	$result = zbx_toHash($result);
 
 	$available_triggers[$cache_hash] = $result;
+
 	return $result;
 }
 

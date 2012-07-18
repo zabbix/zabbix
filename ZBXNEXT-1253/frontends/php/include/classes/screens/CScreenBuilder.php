@@ -78,7 +78,7 @@ class CScreenBuilder {
 	 * @param int		$options['screenitemid']
 	 * @param int		$options['hostid']
 	 *
-	 * @return object CScreenBase
+	 * @return CScreenBase
 	 */
 	public static function getScreen(array $options = array()) {
 		if (!empty($options['screenitemid']) && empty($options['screenitem'])) {
@@ -164,7 +164,7 @@ class CScreenBuilder {
 	/**
 	 * Process screen with particular screen objects.
 	 *
-	 * @return object CTable
+	 * @return CTable
 	 */
 	public function show() {
 		if (empty($this->screen)) {
@@ -436,8 +436,6 @@ class CScreenBuilder {
 
 	/**
 	 * Insert javascript to start time control rendering.
-	 *
-	 * @param string $screenid
 	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');

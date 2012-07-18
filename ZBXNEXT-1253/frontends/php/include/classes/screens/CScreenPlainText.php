@@ -24,7 +24,7 @@ class CScreenPlainText extends CScreenBase {
 	/**
 	 * Process screen.
 	 *
-	 * @return object CDiv (screen inside container)
+	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {

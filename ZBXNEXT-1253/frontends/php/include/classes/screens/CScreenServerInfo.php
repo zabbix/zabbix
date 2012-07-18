@@ -24,7 +24,7 @@ class CScreenServerInfo extends CScreenBase {
 	/**
 	 * Process screen.
 	 *
-	 * @return object CDiv (screen inside container)
+	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
 		return $this->getOutput(new CServerInfo());

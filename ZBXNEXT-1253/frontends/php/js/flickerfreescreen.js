@@ -22,7 +22,7 @@ var flickerfreeScreen = {
 
 	screens: [],
 
-	refresh: function(id, isSelfRefresh) {
+	refresh: function(id) {
 		var screen = this.screens[id];
 		if (empty(screen.resourcetype)) {
 			return;
@@ -138,8 +138,8 @@ var flickerfreeScreen = {
 			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
 		}
 
-		if (isSelfRefresh && screen.refreshInterval > 0) {
-			window.setTimeout(function() { flickerfreeScreen.refresh(id, true); }, flickerfreeScreen.screens[id].refreshInterval);
+		if (screen.refreshInterval > 0) {
+			this.screens[id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(id); }, screen.refreshInterval);
 		}
 	},
 
@@ -152,7 +152,9 @@ var flickerfreeScreen = {
 			this.screens[id].period = period;
 			this.screens[id].stime = stime;
 
-			this.refresh(id, false);
+			// restart global refresh time planing starting from now
+			clearTimeout(this.screens[id].timeout);
+			this.refresh(id);
 		}
 	},
 
@@ -173,8 +175,7 @@ var flickerfreeScreen = {
 
 		if (screen.refreshInterval > 0) {
 			this.screens[screen.id].refreshInterval = screen.refreshInterval * 1000;
-
-			window.setTimeout(function() { flickerfreeScreen.refresh(screen.id, true); }, this.screens[screen.id].refreshInterval);
+			this.screens[screen.id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].refreshInterval);
 		}
 	}
 };
