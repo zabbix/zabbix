@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated French, German, Japanese and Russian translations;
 ..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5348] fixed validation of itemid parameter for popup_bitem.php (Pavels)
 ..F....... [ZBX-5311] fixed error when delete proxy that is used by discovery rule (Vedmak)
 ....I..... [ZBX-5125] allow unique index in hosts_groups in database upgrade scripts (1.8 -> 2.0) (dimir)
 ....I..... [ZBX-5125] default discovery groupid in database upgrades scripts (1.8 -> 2.0) (dimir)
