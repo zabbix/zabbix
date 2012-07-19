@@ -31,9 +31,8 @@ $form->addVar('regexpid', $this->data['regexpid']);
 $exprTab = new CFormList('exprTab');
 $exprTab->addRow(_('Name'), new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, null, 128));
 
-$exprTable = new CTable(null, 'formElementTable');
+$exprTable = new CTable(null, 'formElementTable formWideTable');
 $exprTable->attr('id', 'exprTable');
-$exprTable->addStyle('min-width: 600px');
 
 $exprTable->setHeader(array(
 	_('Expression'),
