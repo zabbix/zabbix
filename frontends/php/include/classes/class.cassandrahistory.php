@@ -83,14 +83,12 @@ class CassandraHistory {
 	public function getData($itemid, $from = null, $to = null, $limit = null, $order = ZBX_SORT_UP){
 		$result = array();
 
-		$tzOffset = date('Z');
-
 		if ($from === null) {
 			$from = 0;
 			$keyFrom = '';
 		}
 		else {
-			$keyFrom = $this->_packCompositeKey($itemid, bcmul(strtotime('midnight', $from) + $tzOffset, 1000));
+			$keyFrom = $this->_packCompositeKey($itemid, bcmul($from - ($from % SEC_PER_DAY), 1000));
 		}
 
 		if ($to === null) {
@@ -98,7 +96,7 @@ class CassandraHistory {
 			$keyTo = '';
 		}
 		else {
-			$keyTo = $this->_packCompositeKey($itemid, bcmul($to + $tzOffset, 1000));
+			$keyTo = $this->_packCompositeKey($itemid, bcmul($to, 1000));
 		}
 
 		if ($order == ZBX_SORT_DOWN) {
