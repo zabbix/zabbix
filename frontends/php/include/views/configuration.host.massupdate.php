@@ -83,6 +83,7 @@ $hostFormList->addRow(
 	$statusComboBox
 );
 
+$templatesFormList = new CFormList('templatesFormList');
 // append templates table to from list
 $templatesTable = new CTable(_('No templates defined.'), 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
@@ -122,7 +123,7 @@ $templatesDiv = new CDiv(
 );
 $templatesDiv->setAttribute('id', 'templates_div');
 
-$hostFormList->addRow(
+$templatesFormList->addRow(
 	array(
 		_('Link templates'),
 		SPACE,
@@ -131,10 +132,11 @@ $hostFormList->addRow(
 	$templatesDiv
 );
 
+$ipmiFormList = new CFormList('ipmiFormList');
 // append ipmi to form list
 $ipmiAuthtypeComboBox = new CComboBox('ipmi_authtype', $this->data['ipmi_authtype']);
 $ipmiAuthtypeComboBox->addItems(ipmiAuthTypes());
-$hostFormList->addRow(
+$ipmiFormList->addRow(
 	array(
 		_('IPMI authentication algorithm'),
 		SPACE,
@@ -145,7 +147,7 @@ $hostFormList->addRow(
 
 $ipmiPrivilegeComboBox = new CComboBox('ipmi_privilege', $this->data['ipmi_privilege']);
 $ipmiPrivilegeComboBox->addItems(ipmiPrivileges());
-$hostFormList->addRow(
+$ipmiFormList->addRow(
 	array(
 		_('IPMI privilege level'),
 		SPACE,
@@ -154,7 +156,7 @@ $hostFormList->addRow(
 	$ipmiPrivilegeComboBox
 );
 
-$hostFormList->addRow(
+$ipmiFormList->addRow(
 	array(
 		_('IPMI username'),
 		SPACE,
@@ -163,7 +165,7 @@ $hostFormList->addRow(
 	new CTextBox('ipmi_username', $this->data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE)
 );
 
-$hostFormList->addRow(
+$ipmiFormList->addRow(
 	array(
 		_('IPMI password'),
 		SPACE,
@@ -172,12 +174,13 @@ $hostFormList->addRow(
 	new CTextBox('ipmi_password', $this->data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE)
 );
 
+$inventoryFormList = new CFormList('inventoryFormList');
 // append inventories to form list
 $inventoryModesComboBox = new CComboBox('inventory_mode', $this->data['inventory_mode'], 'submit()');
 $inventoryModesComboBox->addItem(HOST_INVENTORY_DISABLED, _('Disabled'));
 $inventoryModesComboBox->addItem(HOST_INVENTORY_MANUAL, _('Manual'));
 $inventoryModesComboBox->addItem(HOST_INVENTORY_AUTOMATIC, _('Automatic'));
-$hostFormList->addRow(
+$inventoryFormList->addRow(
 	array(
 		_('Inventory mode'),
 		SPACE,
@@ -193,7 +196,7 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 			$this->data['host_inventory'][$field] = '';
 		}
 
-		$hostFormList->addRow(
+		$inventoryFormList->addRow(
 			array(
 				$caption,
 				SPACE,
@@ -205,8 +208,11 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 }
 
 // append tabs to form
-$hostTab = new CTabView();
-$hostTab->addTab('hostTab', _('Mass update'), $hostFormList);
+$hostTab = new CTabView(array('remember' => 1));
+$hostTab->addTab('hostTab', _('Host'), $hostFormList);
+$hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
+$hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);
+$hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 $hostForm->addItem($hostTab);
 
 // append buttons to form
