@@ -123,6 +123,7 @@ var timeControl = {
 				graphUrl.setArgument('width', obj.objDims.width);
 				graphUrl.setArgument('period', obj.time.period);
 				graphUrl.setArgument('stime', date.getZBXDate());
+				graphUrl = this.getFormattedUrl(obj.domid, graphUrl);
 
 				obj.src = graphUrl.getUrl();
 			}
@@ -181,6 +182,7 @@ var timeControl = {
 		var imgUrl = new Curl(obj.src);
 		imgUrl.setArgument('period', period);
 		imgUrl.setArgument('stime', stime);
+		imgUrl = this.getFormattedUrl(objid, imgUrl);
 
 		jQuery('<img />', {id: obj.domid + '_tmp', src: imgUrl.getUrl(), class: 'borderless'}).load(function() {
 			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
@@ -193,6 +195,7 @@ var timeControl = {
 		graphUrl.setArgument('width', obj.objDims.width);
 		graphUrl.setArgument('period', period);
 		graphUrl.setArgument('stime', stime);
+		graphUrl = this.getFormattedUrl(objid, graphUrl);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
 	},
@@ -294,6 +297,7 @@ var timeControl = {
 			url.setArgument('period', period);
 			url.setArgument('stime', date.getZBXDate());
 			url.unsetArgument('output');
+			url = this.getFormattedUrl(objid, url);
 
 			location.href = url.getUrl();
 		}
@@ -327,9 +331,7 @@ var timeControl = {
 	},
 
 	getPeriod: function(objid) {
-		var obj = this.objectList[objid];
-
-		return obj.time.period;
+		return this.objectList[objid].time.period;
 	},
 
 	getSTime: function(objid) {
@@ -341,6 +343,17 @@ var timeControl = {
 
 	getObject: function(objid) {
 		return this.objectList[objid];
+	},
+
+	getFormattedUrl: function(objid, url) {
+		// ignore time in edit mode
+		if (flickerfreeScreen.screens[objid].mode == 1 // SCREEN_MODE_EDIT
+				&& flickerfreeScreen.screens[objid].resourcetype == 0) { // SCREEN_RESOURCE_GRAPH
+			url.unsetArgument('period');
+			url.unsetArgument('stime');
+		}
+
+		return url;
 	},
 
 	debug: function(fnc_name, id) {

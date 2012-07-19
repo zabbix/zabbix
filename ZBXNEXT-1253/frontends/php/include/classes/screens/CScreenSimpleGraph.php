@@ -60,7 +60,7 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		$timeline = array(
 			'period' => $this->period,
-			'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
+			'starttime' => date('YmdHis', time() - $this->period)
 		);
 
 		if (!zbx_empty($resourceid) && $this->mode != SCREEN_MODE_EDIT) {

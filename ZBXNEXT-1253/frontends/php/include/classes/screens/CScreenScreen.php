@@ -36,7 +36,7 @@ class CScreenScreen extends CScreenBase {
 
 		$screenBuilder = new CScreenBuilder(array(
 			'isFlickerfree' => $this->isFlickerfree,
-			'mode' => $this->mode,
+			'mode' => SCREEN_MODE_VIEW,
 			'screen' => $screen,
 			'period' => $this->period,
 			'stime' => $this->stime,

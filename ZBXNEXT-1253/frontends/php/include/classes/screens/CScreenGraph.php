@@ -147,7 +147,10 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$this->period.url_param('stime');
+				.'&legend='.$legend.'&graph3d='.$graph3d;
+			if ($this->mode != SCREEN_MODE_EDIT) {
+				$timeControlData['src'] .= '&period='.$this->period.url_param('stime');
+			}
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
@@ -165,13 +168,16 @@ class CScreenGraph extends CScreenBase {
 				if (!empty($this->stime)) {
 					$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 				}
+
 				if ($this->mode == SCREEN_MODE_PREVIEW) {
 					$timeControlData['loadSBox'] = 1;
 				}
 			}
 
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&period='.$this->period.url_param('stime');
+			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
+			if ($this->mode != SCREEN_MODE_EDIT) {
+				$timeControlData['src'] .= '&period='.$this->period.url_param('stime');
+			}
 		}
 
 		// output

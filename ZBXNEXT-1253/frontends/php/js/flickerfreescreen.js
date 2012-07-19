@@ -139,7 +139,7 @@ var flickerfreeScreen = {
 			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
 		}
 
-		if (screen.refreshInterval > 0) {
+		if (screen.isFlickerfree && screen.refreshInterval > 0) {
 			this.screens[id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(id); }, screen.refreshInterval);
 		}
 	},
@@ -163,19 +163,20 @@ var flickerfreeScreen = {
 		timeControl.refreshPage = false;
 
 		this.screens[screen.id] = {
+			'isFlickerfree': screen.isFlickerfree,
+			'mode': screen.mode,
+			'resourcetype': screen.resourcetype,
 			'screenitemid': screen.screenitemid,
 			'screenid': screen.screenid,
 			'hostid': screen.hostid,
 			'period': screen.period,
 			'stime': screen.stime,
-			'mode': screen.mode,
-			'resourcetype': screen.resourcetype,
 			'profileIdx': screen.profileIdx,
 			'profileIdx2': screen.profileIdx2,
 			'data': screen.data
 		};
 
-		if (screen.refreshInterval > 0) {
+		if (screen.isFlickerfree && screen.refreshInterval > 0) {
 			this.screens[screen.id].refreshInterval = screen.refreshInterval * 1000;
 			this.screens[screen.id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].refreshInterval);
 		}

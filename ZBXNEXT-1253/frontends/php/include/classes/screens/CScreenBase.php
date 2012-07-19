@@ -21,17 +21,80 @@
 
 class CScreenBase {
 
+	/**
+	 * @see CScreenBuilder::isFlickerfree
+	 */
 	public $isFlickerfree;
+
+	/**
+	 * @see CScreenBuilder::mode
+	 */
 	public $mode;
+
+	/**
+	 * Resource (screen) type
+	 *
+	 * @var int
+	 */
 	public $resourcetype;
+
+	/**
+	 * Screen id
+	 *
+	 * @var int
+	 */
 	public $screenid;
+
+	/**
+	 * Screen item data
+	 *
+	 * @var array
+	 */
 	public $screenitem;
+
+	/**
+	 * Action
+	 *
+	 * @var string
+	 */
 	public $action;
+
+	/**
+	 * Host id
+	 *
+	 * @var int
+	 */
 	public $hostid;
+
+	/**
+	 * Time control period
+	 *
+	 * @var int
+	 */
 	public $period;
+
+	/**
+	 * Time control start time
+	 *
+	 * @var string
+	 */
 	public $stime;
+
+	/**
+	 * @see CScreenBuilder::profileIdx
+	 */
 	public $profileIdx;
+
+	/**
+	 * @see CScreenBuilder::profileIdx2
+	 */
 	public $profileIdx2;
+
+	/**
+	 * Time control dom element id
+	 *
+	 * @var string
+	 */
 	public $dataId;
 
 	/**
@@ -47,8 +110,8 @@ class CScreenBase {
 	 * @param int		$options['hostid']
 	 * @param int		$options['period']
 	 * @param int		$options['stime']
-	 * @param string	$options['profileIdx']		Profile table entity name #1
-	 * @param int		$options['profileIdx2']		Profile table record id belongs to #1
+	 * @param string	$options['profileIdx']
+	 * @param int		$options['profileIdx2']
 	 * @param string	$options['dataId']
 	 */
 	public function __construct(array $options = array()) {
@@ -58,7 +121,7 @@ class CScreenBase {
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
-		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
+		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_PERIOD_DEFAULT);
 		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
@@ -165,23 +228,22 @@ class CScreenBase {
 	 * @param array	$data
 	 */
 	public function insertFlickerfreeJs($data = array()) {
-		if ($this->isFlickerfree) {
-			$jsData = array(
-				'id' => $this->getDataId(),
-				'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
-				'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : null,
-				'resourcetype' => $this->resourcetype,
-				'mode' => $this->mode,
-				'refreshInterval' => CWebUser::$data['refresh'],
-				'hostid' => $this->hostid,
-				'period' => $this->period,
-				'stime' => $this->stime,
-				'profileIdx' => $this->profileIdx,
-				'profileIdx2' => $this->profileIdx2,
-				'data' => !empty($data) ? $data : null
-			);
+		$jsData = array(
+			'id' => $this->getDataId(),
+			'isFlickerfree' => $this->isFlickerfree,
+			'resourcetype' => $this->resourcetype,
+			'mode' => $this->mode,
+			'refreshInterval' => CWebUser::$data['refresh'],
+			'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
+			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : null,
+			'hostid' => $this->hostid,
+			'period' => $this->period,
+			'stime' => $this->stime,
+			'profileIdx' => $this->profileIdx,
+			'profileIdx2' => $this->profileIdx2,
+			'data' => !empty($data) ? $data : null
+		);
 
-			zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
-		}
+		zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
 	}
 }

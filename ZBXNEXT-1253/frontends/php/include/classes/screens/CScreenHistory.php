@@ -21,12 +21,53 @@
 
 class CScreenHistory extends CScreenBase {
 
+	/**
+	 * Item id
+	 *
+	 * @var int
+	 */
 	public $itemid;
+
+	/**
+	 * Search string
+	 *
+	 * @var string
+	 */
 	public $filter;
+
+	/**
+	 * Filter show/hide
+	 *
+	 * @var int
+	 */
 	public $filterTask;
+
+	/**
+	 * Filter highlight color
+	 *
+	 * @var string
+	 */
 	public $markColor;
+
+	/**
+	 * Is plain text displayed
+	 *
+	 * @var boolean
+	 */
 	public $plaintext;
+
+	/**
+	 * Items data
+	 *
+	 * @var array
+	 */
 	public $items;
+
+	/**
+	 * Item data
+	 *
+	 * @var array
+	 */
 	public $item;
 
 	/**
@@ -35,7 +76,7 @@ class CScreenHistory extends CScreenBase {
 	 * @param array		$options
 	 * @param int		$options['itemid']
 	 * @param string	$options['filter']
-	 * @param string	$options['filterTask']
+	 * @param int		$options['filterTask']
 	 * @param int		$options['markColor']
 	 * @param boolean	$options['plaintext']
 	 * @param array		$options['items']
@@ -131,7 +172,7 @@ class CScreenHistory extends CScreenBase {
 					);
 				}
 
-				if (!zbx_empty($this->filter) && in_array($this->filterTask, array(filterTask_SHOW, filterTask_HIDE))) {
+				if (!zbx_empty($this->filter) && in_array($this->filterTask, array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))) {
 					$options['search'] = array('value' => $this->filter);
 					if ($this->filterTask == filterTask_HIDE) {
 						$options['excludeSearch'] = 1;

@@ -21,11 +21,46 @@
 
 class CScreenBuilder {
 
+	/**
+	 * Switch on/off flicker-free screens auto refresh.
+	 *
+	 * @var boolean
+	 */
 	public $isFlickerfree;
+
+	/**
+	 * Detect is screen is template or real
+	 *
+	 * @var boolean
+	 */
 	public $isTemplate;
+
+	/**
+	 * Screen data
+	 *
+	 * @var array
+	 */
 	public $screen;
+
+	/**
+	 * Display mode
+	 *
+	 * @var int
+	 */
 	public $mode;
+
+	/**
+	 * Profile table entity name #1
+	 *
+	 * @var string
+	 */
 	public $profileIdx;
+
+	/**
+	 * Profile table record id belongs to #1
+	 *
+	 * @var int
+	 */
 	public $profileIdx2;
 
 	/**
@@ -35,8 +70,8 @@ class CScreenBuilder {
 	 * @param boolean	$options['isFlickerfree']
 	 * @param int		$options['mode']
 	 * @param boolean	$options['isTemplate']
-	 * @param string	$options['profileIdx']		Profile table entity name #1
-	 * @param int		$options['profileIdx2']		Profile table record id belongs to #1
+	 * @param string	$options['profileIdx']
+	 * @param int		$options['profileIdx2']
 	 * @param array		$options['screen']
 	 */
 	public function __construct(array $options = array()) {

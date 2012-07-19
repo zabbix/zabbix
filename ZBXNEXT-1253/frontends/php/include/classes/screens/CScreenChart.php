@@ -21,6 +21,11 @@
 
 class CScreenChart extends CScreenBase {
 
+	/**
+	 * Graph id
+	 *
+	 * @var int
+	 */
 	public $graphid;
 
 	/**
