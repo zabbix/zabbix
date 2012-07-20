@@ -146,7 +146,7 @@ dnl check for DNS lookup functions
 found_resolv="no"
 LIBRESOLV_CHECK_CONFIG([no])
 if test "x$found_resolv" != "xyes"; then
-	AC_MSG_ERROR([Unable to DNS lookup functions "${found_resolv}"])
+	AC_MSG_ERROR([Unable to do DNS lookups (libresolv check failed)])
 fi
 LIBS="${LIBS} ${RESOLV_LIBS}"
 
@@ -958,7 +958,18 @@ dnl *****************************************************************
 
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
 [case "${enableval}" in
-  yes) LDFLAGS="${LDFLAGS} -static" ;;
+  yes)
+    LDFLAGS="${LDFLAGS} -static"
+    AC_MSG_CHECKING(if static linking is possible)
+    AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
+      [AC_MSG_RESULT([yes])
+        static_linking=yes],
+      [AC_MSG_RESULT([no])
+        static_linking=no])
+      if test "x$static_linking" = "xno"; then
+        AC_MSG_ERROR([static linking is not possible on this system])
+      fi
+    ;;
   no) ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static]) ;;
 esac])
@@ -1188,6 +1199,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
 
+	dnl Starting from 2.0 agent can do web monitoring
 	AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LIBCURL_LDFLAGS}"
 	AGENT_LIBS="${AGENT_LIBS} ${LIBCURL_LIBS}"
 
@@ -1347,7 +1359,7 @@ found_iconv="no"
 dnl Check for libiconv [by default - skip]
 LIBICONV_CHECK_CONFIG([no])
 if test "x$found_iconv" != "xyes"; then
-	AC_MSG_ERROR([Unable to find iconv.h "${found_iconv}"])
+	AC_MSG_ERROR([Unable to use iconv (libiconv check failed)])
 fi
 CFLAGS="$CFLAGS $ICONV_CFLAGS"
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
