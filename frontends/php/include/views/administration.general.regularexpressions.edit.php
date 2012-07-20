@@ -44,7 +44,7 @@ $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
 
 zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).')');
 
-$exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted'));
+$exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
 
 
 $exprForm = new CTable(null, 'formElementTable');
