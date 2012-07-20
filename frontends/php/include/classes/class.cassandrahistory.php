@@ -122,10 +122,14 @@ class CassandraHistory {
 			 * x - skip one byte
 			 * N - uint32 value
 			 */
-			$unpackedKey = unpack('x13/N2/x/', $key);
+			list($hi, $lo) = array_values(unpack('x13/N2/x/', $key));
 
-			$time = bcmul($unpackedKey['1'], 4294967296);
-			$time = bcadd($time, $unpackedKey['2']);
+			if ($lo < 0) {
+				$lo = bcadd($lo, '4294967296');
+			}
+
+			$time = bcadd(bcmul($hi, '4294967296'), $lo, 0);
+			// remove milliseconds
 			$time = bcdiv($time, 1000, 0);
 
 			foreach ($column as $timeOffset => $value) {
