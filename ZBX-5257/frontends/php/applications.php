@@ -219,7 +219,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// select the host for the navigation panel
-	$data['hostid'] = get_request('hostid', $data['apphostid']);
+	$data['hostid'] = get_request('hostid') ? get_request('hostid') : $data['apphostid'];
 
 	// get application hostid
 	$db_host = get_host_by_hostid($data['apphostid'], 1);
