@@ -111,10 +111,7 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 $maintenancePeriodFormList->addRow(_('Periods'),
 	array(
 		$maintenancePeriodTable,
-		new CSubmit('new_timeperiod', _('New'), null, 'link_menu'),
-		SPACE,
-		SPACE,
-		new CSubmit('del_timeperiod', _('Delete selected'), null, 'link_menu')
+		new CSubmit('new_timeperiod', _('New'), null, 'link_menu')
 	)
 );
 
