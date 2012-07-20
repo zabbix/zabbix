@@ -81,7 +81,6 @@ $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $thi
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
 $maintenancePeriodTable = new CTableInfo(_('No maintenance period defined.'));
 $maintenancePeriodTable->setHeader(array(
-	new CCheckBox('all_periods', null, 'checkAll("'.$maintenanceForm->getName().'", "all_periods", "g_timeperiodid");'),
 	_('Period type'),
 	_('Schedule'),
 	_('Period'),
@@ -90,11 +89,14 @@ $maintenancePeriodTable->setHeader(array(
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow(array(
-		new CCheckBox('g_timeperiodid[]', 'no', null, $id),
 		timeperiod_type2str($timeperiod['timeperiod_type']),
 		new CCol(shedule2str($timeperiod), 'wraptext'),
 		zbx_date2age(0, $timeperiod['period']),
-		new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu')
+		array(
+			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
+			SPACE,
+			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
+		)
 	));
 	$maintenanceForm->addVar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']);
 	$maintenanceForm->addVar('timeperiods['.$id.'][every]', $timeperiod['every']);
