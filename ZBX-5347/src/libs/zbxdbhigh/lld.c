@@ -1673,6 +1673,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, sz, del_gitems_alloc = 0;
+		int	idx;
 
 		sql = zbx_malloc(sql, sql_alloc);
 
@@ -1687,17 +1688,19 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 		DBget_graphitems(sql, &graph->del_gitems, &del_gitems_alloc, &graph->del_gitems_num);
 
-		for (i = graph->del_gitems_num - 1; i >= 0; i--)
+		for (i = 0; i < graph->gitems_num; i++)
 		{
-			if (NULL != (gitem = bsearch(&graph->del_gitems[i].itemid, graph->gitems, graph->gitems_num,
+			if (NULL != (gitem = bsearch(&graph->gitems[i].itemid, graph->del_gitems, graph->del_gitems_num,
 					sizeof(ZBX_GRAPH_ITEMS), ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				gitem->gitemid = graph->del_gitems[i].gitemid;
+				graph->gitems[i].gitemid = gitem->gitemid;
 
 				graph->del_gitems_num--;
 
-				if (0 != (sz = (graph->del_gitems_num - i) * sizeof(ZBX_GRAPH_ITEMS)))
-					memmove(&graph->del_gitems[i], &graph->del_gitems[i + 1], sz);
+				idx = (int)(gitem - graph->del_gitems);
+
+				if (0 != (sz = (graph->del_gitems_num - idx) * sizeof(ZBX_GRAPH_ITEMS)))
+					memmove(&graph->del_gitems[idx], &graph->del_gitems[idx + 1], sz);
 			}
 		}
 		zbx_free(sql);
