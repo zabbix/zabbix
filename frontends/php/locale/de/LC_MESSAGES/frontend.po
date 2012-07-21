@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-22 01:43+0300\n"
-"PO-Revision-Date: 2012-03-30 17:07+0200\n"
+"POT-Creation-Date: 2012-07-22 01:44+0300\n"
+"PO-Revision-Date: 2012-07-13 01:13+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -83,7 +83,7 @@ msgstr "(0 - unendlich)"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Nur Superadministratoren können Gruppe erstellen)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:140
@@ -717,7 +717,7 @@ msgstr ""
 
 #: authentication.php:122 authentication.php:123
 msgid "Authentication method changed to LDAP"
-msgstr "Authentifizierungsmethode zu LDAP geändert"
+msgstr "Authentifizierungsmethode auf LDAP geändert"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
@@ -2392,7 +2392,7 @@ msgstr ""
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
-msgstr ""
+msgstr "Konfiguration der Arbeitszeit"
 
 #: adm.gui.php:64 adm.housekeeper.php:51 adm.other.php:56
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
@@ -6243,7 +6243,7 @@ msgstr "Falscher Wert \"%1$s\" für das vorzeichenlose Ganzzahl-Feld \"%2$s\"."
 #: include/classes/db/DB.php:299
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%1$s\"."
-msgstr ""
+msgstr "Falscher Wert \"NULL\" für das NOT-NULL-Feld \"%1$s\"."
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, php-format
@@ -6252,7 +6252,7 @@ msgstr "Falscher Wert für setMessage(): \"%s\"."
 
 #: include/profiles.inc.php:241
 msgid "Incorrect working time."
-msgstr ""
+msgstr "Falsche Arbeitszeit."
 
 #: include/classes/import/CXmlImport18.php:1605
 #, php-format
