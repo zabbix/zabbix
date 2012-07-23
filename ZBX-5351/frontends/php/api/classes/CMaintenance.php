@@ -515,7 +515,7 @@ class CMaintenance extends CZBXAPI {
 
 			// validate maintenance active interval
 			if ($maintenance['active_since'] > $maintenance['active_till']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger than active till.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance "Active since" value cannot be bigger than "Active till".'));
 			}
 
 			// validate timeperiods
