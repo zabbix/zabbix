@@ -36,15 +36,13 @@ if (empty($this->data['slideshows'])) {
 	$slideWidget->addItem(new CTableInfo(_('No slide shows defined.')));
 }
 else {
-	$effectiveperiod = navigation_bar_calc('web.slides', $this->data['elementid'], true);
-
 	$favouriteIcon = $this->data['screen']
 		? get_icon('favourite', array('fav' => 'web.favorite.screenids', 'elname' => 'slideshowid', 'elid' => $this->data['elementid']))
 		: new CIcon(_('Favourites'), 'iconplus');
 
 	$refreshIcon = new CIcon(_('Menu'), 'iconmenu');
 	if (!empty($this->data['screen'])) {
-		$refreshIcon->addAction('onclick', 'javascript: create_page_menu(event, \'hat_slides\');');
+		$refreshIcon->addAction('onclick', 'javascript: create_page_menu(event, "hat_slides");');
 	}
 
 	$slideWidget->addPageHeader(
@@ -93,22 +91,21 @@ else {
 		// js menu
 		insert_js('var page_menu='.zbx_jsvalue($this->data['menu']).";\n".'var page_submenu='.zbx_jsvalue($this->data['submenu']).";\n");
 
+		// get timeline
+		$timeline = CScreenBase::calculateTime(array(
+			'profileIdx' => 'web.slides',
+			'profileIdx2' => $this->data['elementid'],
+			'period' => get_request('period'),
+			'stime' => get_request('stime')
+		));
+
 		$refresh_tab = array(array(
 			'id' => 'hat_slides',
 			'frequency' => $this->data['element']['delay'] * $this->data['refresh_multiplier'],
-			'url' => 'slides.php?elementid='.$this->data['elementid'].(is_null($this->data['tmpstime']) ? '' : '&stime='.$this->data['tmpstime']).url_param('period').url_param('groupid').url_param('hostid'),
+			'url' => 'slides.php?elementid='.$this->data['elementid'].'&period='.$timeline['period'].'&stime='.$timeline['stime'].url_param('groupid').url_param('hostid'),
 			'params'=> array('lastupdate' => time())
 		));
 		add_doll_objects($refresh_tab);
-
-		$effectiveperiod = navigation_bar_calc();
-		$timeline = array();
-		$timeline['period'] = $effectiveperiod;
-		$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
-
-		if (isset($_REQUEST['stime'])) {
-			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
-		}
 
 		$scrollDiv = new CDiv();
 		$scrollDiv->setAttribute('id', 'scrollbar_cntr');
@@ -126,8 +123,9 @@ else {
 			'periodFixed' => CProfile::get('web.slides.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
-		zbx_add_post_js('timeControl.addObject(\'iframe\', '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+		zbx_add_post_js('timeControl.addObject("iframe", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
 		zbx_add_post_js('timeControl.processObjects();');
+
 		$slideWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 	}
 	else {

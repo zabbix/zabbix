@@ -68,7 +68,12 @@ $host = reset($host);
 /*
  * Display
  */
-navigation_bar_calc();
+$timeline = CScreenBase::calculateTime(array(
+	'profileIdx' => get_request('profileIdx', 'web.charts'),
+	'profileIdx2' => get_request('graphid'),
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
+));
 
 CProfile::update('web.charts.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
@@ -80,12 +85,9 @@ $chart_header .= $host['name'].': '.$dbGraph['name'];
 
 $graph = new CChart($dbGraph['graphtype']);
 $graph->setHeader($chart_header);
-if (isset($_REQUEST['period'])) {
-	$graph->setPeriod($_REQUEST['period']);
-}
-if (isset($_REQUEST['stime'])) {
-	$graph->setSTime($_REQUEST['stime']);
-}
+$graph->setPeriod($timeline['period']);
+$graph->setSTime($timeline['stime']);
+
 if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
 }

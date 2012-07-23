@@ -20,7 +20,6 @@
 
 
 $chartsWidget = new CWidget('hat_charts');
-
 $chartForm = new CForm('get');
 $chartForm->addVar('fullscreen', $this->data['fullscreen']);
 $chartForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
@@ -47,16 +46,21 @@ $chartsWidget->addHeader(
 );
 $chartsWidget->addItem(BR());
 
-// append chart to widget
-$screen = CScreenBuilder::getScreen(array(
-	'resourcetype' => SCREEN_RESOURCE_CHART,
-	'graphid' => $this->data['graphid'],
-	'period' => $this->data['period'],
-	'stime' => $this->data['stime'],
-	'profileIdx' => 'web.charts',
-	'profileIdx2' => $this->data['graphid']
-));
-$chartsWidget->addItem($screen->get());
-CScreenBuilder::insertProcessObjectsJs();
+if (!empty($this->data['graphid'])) {
+	// append chart to widget
+	$screen = CScreenBuilder::getScreen(array(
+		'resourcetype' => SCREEN_RESOURCE_CHART,
+		'graphid' => $this->data['graphid'],
+		'period' => $this->data['period'],
+		'stime' => $this->data['stime'],
+		'profileIdx' => 'web.charts',
+		'profileIdx2' => $this->data['graphid']
+	));
+	$chartsWidget->addItem($screen->get());
+	CScreenBuilder::insertProcessObjectsJs();
+}
+else {
+	$chartsWidget->addItem(new CTableInfo(_('No charts defined.')));
+}
 
 return $chartsWidget;

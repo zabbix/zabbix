@@ -134,12 +134,24 @@ var flickerfreeScreen = {
 
 		// SCREEN_RESOURCE_CHART
 		else if (screen.resourcetype == 18) {
-			url.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
-			url.setArgument('graphid', !empty(screen.data.graphid) ? screen.data.graphid : null);
-			url.setArgument('mode', 3); // SCREEN_MODE_JS
+			jQuery('#flickerfreescreen_' + id).find('img').each(function() {
+				var workImage = jQuery(this);
+				var doId = '#' + jQuery(this).attr('id');
+				var url = new Curl(jQuery(this).attr('src'));
+				url.setArgument('period', !empty(screen.period) ? screen.period : null);
+				url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
 
-			jQuery.getScript(url.getUrl(), function() {
-				timeControl.refreshObject(id);
+				jQuery('<img />', {
+					id: jQuery(this).attr('id') + '_tmp',
+					border: jQuery(doId).attr('border'),
+					alt: jQuery(doId).attr('alt'),
+					name: jQuery(doId).attr('name')
+				}).attr('src', url.getUrl()).load(function() {
+					var doId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+
+					jQuery(this).attr('id', doId);
+					jQuery(workImage).replaceWith(jQuery(this));
+				});
 			});
 		}
 

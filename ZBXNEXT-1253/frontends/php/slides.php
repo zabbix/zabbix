@@ -98,15 +98,12 @@ if (isset($_REQUEST['favobj'])) {
 			$elementid = get_request('elementid');
 
 			if (!is_null($elementid)) {
-				$effectiveperiod = navigation_bar_calc();
-				$step = get_request('upd_counter');
-
 				$slideshow = get_slideshow_by_slideshowid($elementid);
-				$screen = get_slideshow($elementid, $step);
-
+				$screen = get_slideshow($elementid, get_request('upd_counter'));
 				$screens = API::Screen()->get(array(
 					'screenids' => $screen['screenid']
 				));
+
 				if (empty($screens)) {
 					insert_js('alert("'._('No permissions').'");');
 				}
@@ -131,7 +128,10 @@ if (isset($_REQUEST['favobj'])) {
 						'isFlickerfree' => false,
 						'screen' => $cur_screen,
 						'mode' => SCREEN_MODE_VIEW,
-						'period' => $effectiveperiod
+						'profileIdx' => 'web.slides',
+						'profileIdx2' => $elementid,
+						'period' => get_request('period'),
+						'stime' => get_request('stime')
 					));
 					echo $screenBuilder->show()->toString();
 
@@ -148,7 +148,7 @@ if (isset($_REQUEST['favobj'])) {
 	}
 	elseif ($_REQUEST['favobj'] == 'set_rf_rate') {
 		if (str_in_array($_REQUEST['favref'], array('hat_slides'))) {
-			$elementid = $_REQUEST['elementid'];
+			$elementid = get_request('elementid');
 
 			CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_STR, $elementid);
 
@@ -203,8 +203,6 @@ if (!isset($data['slideshows'][$data['elementid']])) {
 // get screen
 $data['screen'] = !empty($data['elementid']) ? get_slideshow($data['elementid'], 0) : array();
 if (!empty($data['screen'])) {
-	$data['tmpstime'] = get_request('stime');
-
 	// get groups and hosts
 	if (check_dynamic_items($data['elementid'], 1)) {
 		$data['hostid'] = get_request('hostid', 0);
@@ -217,8 +215,10 @@ if (!empty($data['screen'])) {
 		foreach ($options as $option) {
 			$params[$option] = 1;
 		}
+
 		$data['page_groups'] = get_viewed_groups(PERM_READ_ONLY, $params);
 		$data['page_hosts'] = get_viewed_hosts(PERM_READ_ONLY, $data['page_groups']['selected'], $params);
+
 		validate_group_with_host($data['page_groups'], $data['page_hosts']);
 	}
 
@@ -227,17 +227,19 @@ if (!empty($data['screen'])) {
 	if ($data['screen']['delay'] > 0) {
 		$data['element']['delay'] = $data['screen']['delay'];
 	}
+
 	show_messages();
 
 	// js menu
 	$data['menu'] = array();
 	$data['submenu'] = array();
-
 	$data['refresh_multiplier'] = CProfile::get('web.slides.rf_rate.hat_slides', 1, $data['elementid']);
+
 	if (empty($data['refresh_multiplier'])) {
 		$data['refresh_multiplier'] = 1;
 		CProfile::update('web.slides.rf_rate.hat_slides', $data['refresh_multiplier'], PROFILE_TYPE_STR, $data['elementid']);
 	}
+
 	make_refresh_menu('mainpage', 'hat_slides', $data['refresh_multiplier'], array('elementid' => $data['elementid']), $data['menu'], $data['submenu'], 2);
 }
 

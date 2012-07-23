@@ -117,27 +117,16 @@ else {
 	}
 	$screenWidget->addHeader($screen['name'], $headerForm);
 
-	// create time control
-	$period = navigation_bar_calc('web.screens', $screen['screenid'], true);
-	$stime = get_request('stime', null);
-
-	$timeline = array(
-		'period' => $period,
-		'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
-	);
-	if (!empty($stime)) {
-		$timeline['usertime'] = date('YmdHis', zbxDateToTime($stime) + $period);
-	}
-
 	// append screens to widget
 	$screenBuilder = new CScreenBuilder(array(
 		'screen' => $screen,
 		'mode' => SCREEN_MODE_PREVIEW,
-		'profileIdx' => 'web.screens'
+		'profileIdx' => 'web.screens',
+		'profileIdx2' => $screen['screenid']
 	));
 	$screenWidget->addItem($screenBuilder->show());
 
-	$screenBuilder->insertScreenScrollJs($screen['screenid'], $timeline);
+	$screenBuilder->insertScreenScrollJs($screen['screenid']);
 	$screenBuilder->insertProcessObjectsJs();
 
 	$screenWidget->addItem(BR());

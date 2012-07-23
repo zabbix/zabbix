@@ -1325,7 +1325,7 @@ var CScrollBar = Class.create(CDebug, {
 		var usertime = this.timeline.usertime();
 		var userstarttime = usertime - period;
 
-		this.dom.info_period.innerHTML = this.formatStampByDHM(period, false, true);
+		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
 
 		// info left
 		var date = datetoarray(userstarttime);
@@ -1368,65 +1368,6 @@ var CScrollBar = Class.create(CDebug, {
 			var sel = window.getSelection();
 			sel.removeAllRanges();
 		}
-	},
-
-	/**
-	 * optimization:
-	 *
-	 * 86400 = 24 * 60 * 60
-	 * 31536000 = 365 * 86400
-	 * 2592000 = 30 * 86400
-	 * 604800 = 7 * 86400
-	 */
-	formatStampByDHM: function(timestamp, isTsDouble, isExtend) {
-		this.debug('formatStampByDHM');
-
-		timestamp = timestamp || 0;
-		var years = 0;
-		var months = 0;
-		var weeks = 0;
-
-		if (isExtend) {
-			years = parseInt(timestamp / 31536000);
-			months = parseInt((timestamp - years * 31536000) / 2592000);
-			//weeks = parseInt((timestamp - years * 31536000 - months * 2592000) / 604800);
-		}
-
-		var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
-		var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
-		var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
-
-		if (isTsDouble) {
-			if (months.toString().length == 1) {
-				months = '0' + months;
-			}
-			if (weeks.toString().length == 1) {
-				weeks = '0' + weeks;
-			}
-			if (days.toString().length == 1) {
-				days = '0' + days;
-			}
-			if (hours.toString().length == 1) {
-				hours = '0' + hours;
-			}
-			if (minutes.toString().length == 1) {
-				minutes = '0' + minutes;
-			}
-		}
-
-		var str = '';
-		str += (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
-		str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
-		str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
-		str += (isExtend && isTsDouble)
-			? days + locale['S_DAY_SHORT'] + ' '
-			: (days == 0)
-				? ''
-				: days + locale['S_DAY_SHORT'] + ' ';
-		str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
-		str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
-
-		return str;
 	},
 
 	//----------------------------------------------------------------
@@ -1474,7 +1415,7 @@ var CScrollBar = Class.create(CDebug, {
 				break;
 			}
 
-			caption = this.formatStampByDHM(zooms[key], false, true);
+			caption = formatTimestamp(zooms[key], false, true);
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.linklist[links] = document.createElement('span');
@@ -1524,7 +1465,7 @@ var CScrollBar = Class.create(CDebug, {
 				continue;
 			}
 
-			caption = this.formatStampByDHM(moves[i], false, true);
+			caption = formatTimestamp(moves[i], false, true);
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.nav_linklist[links] = document.createElement('span');
@@ -1550,7 +1491,7 @@ var CScrollBar = Class.create(CDebug, {
 				continue;
 			}
 
-			caption = this.formatStampByDHM(moves[i], false, true);
+			caption = formatTimestamp(moves[i], false, true);
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.nav_linklist[links] = document.createElement('span');
@@ -2010,13 +1951,13 @@ var sbox = Class.create(CDebug, {
 
 		this.onchange(this.sbox_id, this.timeline.timelineid, true);
 
+		// synchronize sbox with timeline and scrollbar
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 		for (var sbid in ZBX_SCROLLBARS) {
 			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
 				continue;
 			}
 
-			// update bar
 			ZBX_SCROLLBARS[sbid].setBarPosition();
 			ZBX_SCROLLBARS[sbid].setGhostByBar();
 			ZBX_SCROLLBARS[sbid].setTabInfo();
@@ -2139,12 +2080,12 @@ var sbox = Class.create(CDebug, {
 	},
 
 	resizebox: function() {
-		this.debug('resizebox',this.sbox_id);
+		this.debug('resizebox', this.sbox_id);
 
 		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
 			// fix wrong selection box
 			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-				this.moveright(this.cobj.width - (this.start_event.left - this.cobj.left));
+				this.moveright(this.cobj.width - this.start_event.left - this.cobj.left);
 			}
 			else if (this.mouse_event.left < this.cobj.left) {
 				this.moveleft(this.cobj.left, this.start_event.left - this.cobj.left);
@@ -2164,7 +2105,7 @@ var sbox = Class.create(CDebug, {
 			this.period = this.calcperiod();
 
 			if (!is_null(this.dom_box)) {
-				this.dom_period_span.innerHTML = this.FormatStampbyDHM(this.period) + (this.period < 3600 ? ' [min 1h]' : '');
+				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
 			}
 		}
 	},
@@ -2209,24 +2150,10 @@ var sbox = Class.create(CDebug, {
 		return new_period;
 	},
 
-	FormatStampbyDHM: function(timestamp) {
-		this.debug('FormatStampbyDHM');
-
-		timestamp = timestamp || 0;
-		var days = parseInt(timestamp / 86400);
-		var hours = parseInt((timestamp - days * 86400) / 3600);
-		var minutes = parseInt((timestamp - days * 86400 - hours * 3600) / 60);
-
-		var str = (days == 0) ? '' : days + 'd ';
-		str += hours + 'h ' + minutes + 'm ';
-
-		return str;
-	},
-
 	validateW: function(w) {
 		this.debug('validateW');
 
-		if (((this.start_event.left - this.cobj.left) + w) > this.cobj.width) {
+		if ((this.start_event.left - this.cobj.left + w) > this.cobj.width) {
 			w = 0;
 		}
 
@@ -2243,7 +2170,7 @@ var sbox = Class.create(CDebug, {
 		if (h <= 0) {
 			h = 1;
 		}
-		if (((this.start_event.top-this.cobj.top) + h) > this.cobj.height) {
+		if ((this.start_event.top - this.cobj.top + h) > this.cobj.height) {
 			h = this.cobj.height - this.start_event.top;
 		}
 
@@ -2340,6 +2267,64 @@ function moveSBoxes() {
 		if (empty(ZBX_SBOX[key]) || !isset('sbox', ZBX_SBOX[key])) {
 			continue;
 		}
+
 		ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
+}
+
+/**
+ * optimization:
+ *
+ * 86400 = 24 * 60 * 60
+ * 31536000 = 365 * 86400
+ * 2592000 = 30 * 86400
+ * 604800 = 7 * 86400
+ */
+function formatTimestamp(timestamp, isTsDouble, isExtend) {
+	timestamp = timestamp || 0;
+	var years = 0;
+	var months = 0;
+	var weeks = 0;
+
+	if (isExtend) {
+		years = parseInt(timestamp / 31536000);
+		months = parseInt((timestamp - years * 31536000) / 2592000);
+		//weeks = parseInt((timestamp - years * 31536000 - months * 2592000) / 604800);
+	}
+
+	var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
+	var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
+	var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
+
+	if (isTsDouble) {
+		if (months.toString().length == 1) {
+			months = '0' + months;
+		}
+		if (weeks.toString().length == 1) {
+			weeks = '0' + weeks;
+		}
+		if (days.toString().length == 1) {
+			days = '0' + days;
+		}
+		if (hours.toString().length == 1) {
+			hours = '0' + hours;
+		}
+		if (minutes.toString().length == 1) {
+			minutes = '0' + minutes;
+		}
+	}
+
+	var str = '';
+	str += (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
+	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
+	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
+	str += (isExtend && isTsDouble)
+		? days + locale['S_DAY_SHORT'] + ' '
+		: (days == 0)
+			? ''
+			: days + locale['S_DAY_SHORT'] + ' ';
+	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
+	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
+
+	return str;
 }
