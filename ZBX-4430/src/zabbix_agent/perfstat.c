@@ -224,8 +224,8 @@ int	init_perf_collector(int multithreaded)
 	{
 		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
 		{
-			zbx_error("unable to create mutex for performance counters");
-			exit(FAIL);
+			zbx_error("cannot create mutex for performance counters");
+			exit(EXIT_FAILURE);
 		}
 	}
 
