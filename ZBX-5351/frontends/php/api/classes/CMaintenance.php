@@ -438,7 +438,7 @@ class CMaintenance extends CZBXAPI {
 	public function create(array $maintenances) {
 		$maintenances = zbx_toArray($maintenances);
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$hostids = array();
@@ -450,7 +450,7 @@ class CMaintenance extends CZBXAPI {
 
 		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected.'));
 		}
 
 		// hosts permissions
@@ -463,7 +463,7 @@ class CMaintenance extends CZBXAPI {
 		$updHosts = API::Host()->get($options);
 		foreach ($hostids as $hostid) {
 			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 		// groups permissions
@@ -476,7 +476,7 @@ class CMaintenance extends CZBXAPI {
 		$updGroups = API::HostGroup()->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -505,12 +505,12 @@ class CMaintenance extends CZBXAPI {
 
 			// validate maintenance active since
 			if (!validateMaxTime($maintenance['active_since'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 			}
 
 			// validate maintenance active till
 			if (!validateMaxTime($maintenance['active_till'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 			}
 
 			// validate maintenance active interval
@@ -520,7 +520,7 @@ class CMaintenance extends CZBXAPI {
 
 			// validate timeperiods
 			if (empty($maintenance['timeperiods'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
 			$insert[$mnum] = $maintenance;
@@ -584,7 +584,7 @@ class CMaintenance extends CZBXAPI {
 
 		// validate maintenance permissions
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$hostids = array();
@@ -601,7 +601,7 @@ class CMaintenance extends CZBXAPI {
 
 		foreach ($maintenances as $maintenance) {
 			if (!isset($updMaintenances[$maintenance['maintenanceid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			// Checking whether a maintenance with this name already exists. First, getting all maintenances with the same name as this
@@ -618,12 +618,12 @@ class CMaintenance extends CZBXAPI {
 
 			// validate maintenance active since
 			if (!validateMaxTime($maintenance['active_since'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 			}
 
 			// validate maintenance active till
 			if (!validateMaxTime($maintenance['active_till'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 			}
 
 			// validate maintenance active interval
@@ -633,7 +633,7 @@ class CMaintenance extends CZBXAPI {
 
 			// validate timeperiods
 			if (empty($maintenance['timeperiods'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
 			$hostids = array_merge($hostids, $maintenance['hostids']);
@@ -642,7 +642,7 @@ class CMaintenance extends CZBXAPI {
 
 		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected.'));
 		}
 
 		// validate hosts permissions
@@ -668,7 +668,7 @@ class CMaintenance extends CZBXAPI {
 		$updGroups = API::HostGroup()->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
