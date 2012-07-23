@@ -674,7 +674,6 @@ class CMaintenance extends CZBXAPI {
 
 		$this->removeSecondsFromTimes($maintenances);
 
-		$tid = 0;
 		$update = array();
 		foreach ($maintenances as $mnum => $maintenance) {
 			$dbFields = array(
@@ -691,71 +690,8 @@ class CMaintenance extends CZBXAPI {
 				'where' => array('maintenanceid' => $maintenance['maintenanceid'])
 			);
 
-			// getting current time periods
-			$timeperiodids = $timeperiods = array();
-			$dbTimeperiods = DBselect(
-				'SELECT tp.*'.
-				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', array($maintenance['maintenanceid'])).
-					' AND tp.timeperiodid=mw.timeperiodid'
-			);
-			while ($timeperiod = DBfetch($dbTimeperiods)) {
-				$timeperiodids[] = $timeperiod['timeperiodid'];
-				$timeperiods[] = $timeperiod;
-			}
-
-			// have time periods changed?
-			$timePeriodsChanged = false;
-			if (count($timeperiods) != count($maintenance['timeperiods'])) {
-				$timePeriodsChanged = true;
-			}
-			else {
-				foreach ($maintenance['timeperiods'] as $i => $currentTimePeriod) {
-					// if records are not completely identical
-					if ($currentTimePeriod['timeperiod_type'] != $timeperiods[$i]['timeperiod_type']
-							|| $currentTimePeriod['every'] != $timeperiods[$i]['every']
-							|| $currentTimePeriod['month'] != $timeperiods[$i]['month']
-							|| $currentTimePeriod['dayofweek'] != $timeperiods[$i]['dayofweek']
-							|| $currentTimePeriod['day'] != $timeperiods[$i]['day']
-							|| $currentTimePeriod['start_time'] != $timeperiods[$i]['start_time']
-							|| $currentTimePeriod['start_date'] != $timeperiods[$i]['start_date']
-							|| $currentTimePeriod['period'] != $timeperiods[$i]['period']) {
-						// this means, that time periods have changed (at least one of them)
-						$timePeriodsChanged = true;
-						break;
-					}
-				}
-			}
-
-			// if time periods have changed
-			if ($timePeriodsChanged) {
-				// wiping them out to insert new ones
-				DB::delete('timeperiods', array('timeperiodid' => $timeperiodids));
-				DB::delete('maintenances_windows', array('maintenanceid' => $maintenance['maintenanceid']));
-
-				// gathering the new ones to create
-				$insertTimeperiods = array();
-				foreach ($maintenance['timeperiods'] as $timeperiod) {
-					$tid++;
-					$insertTimeperiods[$tid] = $timeperiod;
-					$timeperiods[$tid] = $mnum;
-				}
-
-				if (!empty($insertTimeperiods)) {
-					// inserting them and getting back id's that were just inserted
-					$insertedTimepePiodids = DB::insert('timeperiods', $insertTimeperiods);
-
-					// inserting references to maintenances_windows table
-					$insertWindows = array();
-					foreach ($insertedTimepePiodids as $insertedTimepePiodid) {
-						$insertWindows[] = array(
-							'timeperiodid' => $insertedTimepePiodid,
-							'maintenanceid' => $maintenance['maintenanceid']
-						);
-					}
-					DB::insert('maintenances_windows', $insertWindows);
-				}
-			}
+			// update time periods
+			$this->replaceTimePeriods($maintenance);
 		}
 		DB::update('maintenances', $update);
 
@@ -904,5 +840,34 @@ class CMaintenance extends CZBXAPI {
 		}
 		unset($maintenance);
 	}
+
+	/**
+	 * Updates maintenance time periods.
+	 *
+	 * @param array $maintenance
+	 */
+	protected function replaceTimePeriods(array $maintenance) {
+		// update timeperiods
+		$timeperiods = DB::save('timeperiods', $maintenance['timeperiods']);
+
+		// replace the maintenance windows
+		DB::delete('maintenances_windows', array('maintenanceid' => $maintenance['maintenanceid']));
+		$newMaintenanceWindows = array();
+		foreach ($timeperiods as $tp) {
+			$newMaintenanceWindows[] = array(
+				'maintenanceid' => $maintenance['maintenanceid'],
+				'timeperiodid' => $tp['timeperiodid']
+			);
+		}
+		DB::insert('maintenances_windows', $newMaintenanceWindows);
+
+		// delete remaining timeperiods
+		DBselect(
+			'DELETE tp'.
+			' FROM timeperiods tp,maintenances_windows mw'.
+			' WHERE '.DBcondition('mw.timeperiodid', zbx_objectValues($timeperiods, 'timeperiodid'), true).
+				' AND mw.maintenanceid='.$maintenance['maintenanceid'].
+				' AND tp.timeperiodid=mw.timeperiodid'
+		);
+	}
 }
-?>

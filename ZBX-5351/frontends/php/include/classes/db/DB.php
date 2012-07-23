@@ -513,6 +513,43 @@ class DB {
 	}
 
 	/**
+	 * Saves the given records to the database. If the record has the primary key set, it is updated, otherwise - a new
+	 * record is inserted. For new records the newly generated PK is added to the result.
+	 *
+	 * @static
+	 *
+	 * @param $tableName
+	 * @param $data
+	 *
+	 * @return array    the same records, that have been passed with the primary keys set for new records
+	 */
+	public static function save($tableName, array $data) {
+		$pk = self::getPk($tableName);
+
+		$newRecords = array();
+		foreach ($data as $key => $record) {
+			// if the pk is set - update the record
+			if (isset($record[$pk])) {
+				self::updateByPk($tableName, $record[$pk], $record);
+			}
+			// if no pk is set, create the record later
+			else {
+				$newRecords[] = &$data[$key];
+			}
+		}
+
+		// insert the new records
+		if ($newRecords) {
+			$newIds = self::insert($tableName, $newRecords);
+			foreach ($newIds as $key => $id) {
+				$newRecords[$key][$pk] = $id;
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Delete data from DB
 	 *
 	 * Example:
