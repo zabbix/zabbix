@@ -459,6 +459,11 @@ table.tableinfo caption {
 	line-height: 22px;
 }
 
+/* regexp test result table, based on .tableinfo */
+#testResultTable tr td:first-child {
+	width: auto;
+}
+
 /* flicker */
 table.flicker { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;  border: 0; }
 table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 4px; line-height: 12px; }
