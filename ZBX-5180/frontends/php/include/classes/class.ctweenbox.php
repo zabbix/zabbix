@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CTweenBox {
 
@@ -77,7 +76,7 @@ class CTweenBox {
 			$caption_r = _('Other');
 		}
 
-		$grp_tab = new CTable();
+		$grp_tab = new CTable(null, 'tweenBoxTable');
 		$grp_tab->attr('name', $this->name);
 		$grp_tab->attr('id', zbx_formatDomId($this->name));
 		$grp_tab->setCellSpacing(0);
@@ -87,12 +86,12 @@ class CTweenBox {
 			$grp_tab->addRow(array($caption_l, SPACE, $caption_r));
 		}
 
-		$add_btn = new CButton('add', ' &laquo; ', null, 'formlist');
-		$add_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
-		$rmv_btn = new CButton('remove', ' &raquo; ', null, 'formlist');
-		$rmv_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
+		$add_btn = new CButton('add', '  &laquo;  ', null, 'formlist');
+		$add_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
+		$rmv_btn = new CButton('remove', '  &raquo;  ', null, 'formlist');
+		$rmv_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
-		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn), 'top'), $this->rbox));
+		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn)), $this->rbox));
 		return $grp_tab;
 	}
 
@@ -112,4 +111,3 @@ class CTweenBox {
 		return $tab->toString();
 	}
 }
-?>
