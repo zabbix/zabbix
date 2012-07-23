@@ -630,7 +630,7 @@ COpt::memoryPick();
 //------
 
 			foreach($actions as $anum => $action){
-// Existance
+// Existence
 				if (isset($action['name'])) {
 					$options = array(
 						'filter' => array( 'name' => $action['name'] ),
