@@ -987,4 +987,11 @@ class CGraphPrototype extends CGraphGeneral {
 		return true;
 	}
 
+	protected function createReal($graph) {
+		// mark the graph as a graph prototype
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+
+		return parent::createReal($graph);
+	}
+
 }
