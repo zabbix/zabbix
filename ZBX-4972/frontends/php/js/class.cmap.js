@@ -333,7 +333,7 @@ ZABBIX.apps.map = (function() {
 				for (linkid in this.data.links) {
 					link = this.data.links[linkid];
 					if (!!selementIds[link.selementid1] && !!selementIds[link.selementid2]
-							|| jQuery.objectSize(selementIds) === 1 && (!!selementIds[link.selementid1] || !!selementIds[link.selementid2])) {
+							|| objectSize(selementIds) === 1 && (!!selementIds[link.selementid1] || !!selementIds[link.selementid2])) {
 						linkIds.push(linkid);
 					}
 				}
@@ -518,6 +518,7 @@ ZABBIX.apps.map = (function() {
 				jQuery('#formLinkApply').click(function() {
 					var linkData = that.linkForm.getValues();
 					that.links[that.currentLinkId].update(linkData)
+					that.linkForm.updateList(that.selection.selements);
 				});
 				jQuery('#formLinkClose').click(function() {
 					that.linkForm.hide();
@@ -1473,7 +1474,7 @@ ZABBIX.apps.map = (function() {
 			 */
 			show: function() {
 				this.domNode.show();
-				jQuery('#elementApply, #elementRemove').button('disable');
+				jQuery('.element-edit-control').button('disable');
 			},
 
 			/**
@@ -1482,7 +1483,7 @@ ZABBIX.apps.map = (function() {
 			hide: function() {
 				jQuery('#linksList tr').removeClass('selected');
 				jQuery('#linkForm').hide();
-				jQuery('#elementApply, #elementRemove').button('enable');
+				jQuery('.element-edit-control').button('enable');
 			},
 
 			/**
@@ -1530,16 +1531,19 @@ ZABBIX.apps.map = (function() {
 					i,
 					ln;
 
-				// get currenlty selected element
-				for (selementid in this.sysmap.selection.selements) {
-					selement1 = this.sysmap.selements[selementid];
-				}
+				// if only one element is selected, make sure that element1 is equal to the selected element and
+				// element2 - to the connected
+				if (this.sysmap.selection.count === 1) {
+					// get currently selected element
+					for (selementid in this.sysmap.selection.selements) {
+						selement1 = this.sysmap.selements[selementid];
+					}
 
-				// make that selementi1 always equal to selected element and selementid2 to connected
-				if (selement1.id !== link.selementid1) {
-					tmp = link.selementid1;
-					link.selementid1 = selement1.id;
-					link.selementid2 = tmp;
+					if (selement1.id !== link.selementid1) {
+						tmp = link.selementid1;
+						link.selementid1 = selement1.id;
+						link.selementid2 = tmp;
+					}
 				}
 
 				// populate list of elements to connect with
@@ -1654,7 +1658,7 @@ ZABBIX.apps.map = (function() {
 				if (links.length) {
 					jQuery('#mapLinksContainer').show();
 
-					if (jQuery.objectSize(selementIds) > 1) {
+					if (objectSize(selementIds) > 1) {
 						rowTpl = '#massElementLinkTableRowTpl';
 						linkTable = jQuery('#mass-element-links');
 					}
@@ -1670,7 +1674,7 @@ ZABBIX.apps.map = (function() {
 
 						// if multiple elements are selected, display element2 as the "to" element
 						// if only one element is selected, display the element on the opposite end
-						if (jQuery.objectSize(selementIds) > 1 || !!selementIds[link.selementid1]) {
+						if (objectSize(selementIds) > 1 || !!selementIds[link.selementid1]) {
 							linkedSelementid = link.selementid2;
 						}
 						else {

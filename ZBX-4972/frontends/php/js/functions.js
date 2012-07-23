@@ -843,13 +843,13 @@ function moveListBoxSelectedItem(formname, objname, from, to, action) {
 }
 
 /**
- *  Returns the size of an associative array.
+ * Returns the number of properties of an object.
  *
  * @param obj
  *
  * @return {Number}
  */
-jQuery.objectSize = function(obj) {
+function objectSize(obj) {
 	var size = 0, key;
 	for (key in obj) {
 		if (obj.hasOwnProperty(key)) size++;
