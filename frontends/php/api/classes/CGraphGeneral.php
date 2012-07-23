@@ -138,7 +138,13 @@ abstract class CGraphGeneral extends CZBXAPI {
 		return array('graphids' => $graphids);
 	}
 
-
+	/**
+	 * Creates a new graph and returns it's ID.
+	 *
+	 * @param $graph
+	 *
+	 * @return mixed
+	 */
 	protected function createReal($graph) {
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
