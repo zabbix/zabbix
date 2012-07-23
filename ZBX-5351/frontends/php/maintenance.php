@@ -42,7 +42,7 @@ $fields = array(
 	// maintenance
 	'maintenanceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 	'maintenanceids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null),
-	'mname' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'mname' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'maintenance_type' =>		array(T_ZBX_INT, O_OPT, null,	null,		'isset({save})'),
 	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'active_since' =>			array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
@@ -108,47 +108,30 @@ elseif (isset($_REQUEST['save'])) {
 		$msg2 = _('Cannot add maintenance');
 	}
 
-	$active_since = zbxDateToTime(get_request('active_since', date('YmdHi')));
-	$active_till = zbxDateToTime(get_request('active_till'));
+	$maintenance = array(
+		'name' => $_REQUEST['mname'],
+		'maintenance_type' => $_REQUEST['maintenance_type'],
+		'description' => $_REQUEST['description'],
+		'active_since' => zbxDateToTime(get_request('active_since', date('YmdHi'))),
+		'active_till' => zbxDateToTime(get_request('active_till')),
+		'timeperiods' => get_request('timeperiods', array()),
+		'hostids' => get_request('hostids', array()),
+		'groupids' => get_request('groupids', array())
+	);
 
-	$isValid = true;
-	if (empty($active_since)) {
-		error(_s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
-		$isValid = false;
+	if (isset($_REQUEST['maintenanceid'])) {
+		$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
+		$result = API::Maintenance()->update($maintenance);
 	}
-	if (empty($active_till)) {
-		error(_s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
-		$isValid = false;
+	else {
+		$result = API::Maintenance()->create($maintenance);
 	}
 
-	if ($isValid) {
-		$maintenance = array(
-			'name' => $_REQUEST['mname'],
-			'maintenance_type' => $_REQUEST['maintenance_type'],
-			'description' => $_REQUEST['description'],
-			'active_since' => $active_since,
-			'active_till' => $active_till,
-			'timeperiods' => get_request('timeperiods', array()),
-			'hostids' => get_request('hostids', array()),
-			'groupids' => get_request('groupids', array())
-		);
-
-		if (isset($_REQUEST['maintenanceid'])) {
-			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
-			$result = API::Maintenance()->update($maintenance);
-		}
-		else {
-			$result = API::Maintenance()->create($maintenance);
-		}
-
-		if ($result) {
-			add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').': '.$_REQUEST['mname']);
-			unset($_REQUEST['form']);
-		}
-		show_messages($result, $msg1, $msg2);
-	} else {
-		show_error_message($msg2);
+	if ($result) {
+		add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').': '.$_REQUEST['mname']);
+		unset($_REQUEST['form']);
 	}
+	show_messages($result, $msg1, $msg2);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
