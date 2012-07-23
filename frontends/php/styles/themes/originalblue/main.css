@@ -33,3 +33,7 @@ table.ack_msgs tr.msg { background-color: #F8F8F8; }
 
 .ui-widget-content a.on { color: #EE0000; }
 .ui-widget-content a.on:hover { color: #CC4444; }
+
+div.preloader {
+	background: url("images/preloader.gif") no-repeat;
+}
