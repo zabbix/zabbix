@@ -187,6 +187,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 	text-decoration: none;
 	padding: 1px 1px 0 1px;
 	margin: 0;
+	cursor: pointer;
 }
 .link_menu:hover {
 	color: #6C80B9;
@@ -315,7 +316,14 @@ div #div_node_tree {
 div.thin_header { width: 100%; color: #FFFFFF;  background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; border: 0 #000000 solid; text-align: center; }
 
 /* form element */
-.formElementTable tr td { vertical-align: top; padding-left: 5px; padding-right: 5px; height: 24px; }
+.formElementTable tr td {
+	vertical-align: top;
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 24px;
+}
+
+.formWideTable { min-width: 600px; }
 
 /* page table */
 table.page_header {

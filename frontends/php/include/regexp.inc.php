@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function getRegexp($regexpId) {
 	return DBfetch(DBselect(
 		'SELECT re.*'.
@@ -172,26 +172,30 @@ function deleteRegexpExpressions(array $expressionIds) {
 	DB::delete('expressions', array('expressionid' => $expressionIds));
 }
 
-function expression_type2str($expression_type) {
-	switch ($expression_type) {
-		case EXPRESSION_TYPE_INCLUDED:
-			$str = _('Character string included');
-			break;
-		case EXPRESSION_TYPE_ANY_INCLUDED:
-			$str = _('Any character string included');
-			break;
-		case EXPRESSION_TYPE_NOT_INCLUDED:
-			$str = _('Character string not included');
-			break;
-		case EXPRESSION_TYPE_TRUE:
-			$str = _('Result is TRUE');
-			break;
-		case EXPRESSION_TYPE_FALSE:
-			$str = _('Result is FALSE');
-			break;
-		default:
-			$str = _('Unknown');
+function expression_type2str($type = null) {
+	$types = array(
+		EXPRESSION_TYPE_INCLUDED => _('Character string included'),
+		EXPRESSION_TYPE_ANY_INCLUDED => _('Any character string included'),
+		EXPRESSION_TYPE_NOT_INCLUDED => _('Character string not included'),
+		EXPRESSION_TYPE_TRUE => _('Result is TRUE'),
+		EXPRESSION_TYPE_FALSE => _('Result is FALSE')
+	);
+
+	if ($type === null) {
+		return $types;
 	}
-	return $str;
+	elseif (isset($types[$type])) {
+		return $types[$type];
+	}
+	else {
+		return _('Unknown');
+	}
 }
-?>
+
+function expressionDelimiters() {
+	return array(
+		',' => ',',
+		'.' => '.',
+		'/' => '/'
+	);
+}
