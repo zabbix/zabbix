@@ -54,24 +54,16 @@ class CScreenChart extends CScreenBase {
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 			$loadSBox = 0;
 			$scrollWidthByImage = 0;
-			$src = 'chart6.php?graphid='.$this->graphid;
+			$src = 'chart6.php';
 		}
 		else {
 			$loadSBox = 1;
 			$scrollWidthByImage = 1;
-			$src = 'chart2.php?graphid='.$this->graphid;
+			$src = 'chart2.php';
 		}
+		$src .= '?graphid='.$this->graphid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'];
 
-		$starttime = get_min_itemclock_by_graphid($this->graphid);
-		if ($this->stime < $starttime) {
-			$starttime = $this->stime;
-		}
-
-		$timeline = array(
-			'starttime' => date('YmdHis', $starttime),
-			'period' => $this->period,
-			'usertime' => date('YmdHis', $this->stime + $this->period)
-		);
+		$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($this->graphid));
 
 		$timeControlData = array(
 			'id' => $this->graphid,
@@ -94,14 +86,14 @@ class CScreenChart extends CScreenBase {
 			$timeControlData['loadSBox'] = 0;
 			$timeControlData['loadScroll'] = 0;
 
-			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
+			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
 			if ($this->mode == SCREEN_MODE_VIEW) { // used is slide shows
-				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
 			// graph container

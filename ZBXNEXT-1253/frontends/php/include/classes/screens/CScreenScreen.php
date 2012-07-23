@@ -38,8 +38,8 @@ class CScreenScreen extends CScreenBase {
 			'isFlickerfree' => $this->isFlickerfree,
 			'mode' => SCREEN_MODE_VIEW,
 			'screen' => $screen,
-			'period' => $this->period,
-			'stime' => $this->stime,
+			'period' => $this->timeline['period'],
+			'stime' => $this->timeline['stime'],
 			'profileIdx' => $this->profileIdx
 		));
 

@@ -111,22 +111,15 @@ $pageFilter = new CPageFilter(array(
 ));
 $graphid = $pageFilter->graphid;
 
-// resets get params for proper page refresh
-if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
-	navigation_bar_calc('web.graph', $graphid, true);
-	jsRedirect('charts.php?graphid='.$graphid);
-
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
-}
-
 /*
  * Display
  */
 $data = array(
 	'pageFilter' => $pageFilter,
+	'graphid' => $graphid,
 	'fullscreen' => get_request('fullscreen'),
-	'graphid' => $graphid
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
 );
 
 // render view

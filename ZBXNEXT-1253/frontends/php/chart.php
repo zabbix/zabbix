@@ -30,11 +30,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'itemid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'period' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
+	'stime' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'from' =>	array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
 	'width' =>	array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
 	'height' =>	array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
-	'border' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'stime' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null)
+	'border' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
 );
 check_fields($fields);
 
@@ -57,12 +57,17 @@ if (empty($dbItems)) {
 /*
  * Display
  */
-navigation_bar_calc('web.item.graph', $_REQUEST['itemid']);
+$timeline = CScreenBase::calculateTime(array(
+	'profileIdx' => get_request('profileIdx', 'web.item.graph'),
+	'profileIdx2' => $_REQUEST['itemid'],
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
+));
 
 $graph = new CChart();
-if (isset($_REQUEST['period'])) {
-	$graph->setPeriod($_REQUEST['period']);
-}
+$graph->setPeriod($timeline['period']);
+$graph->setSTime($timeline['stime']);
+
 if (isset($_REQUEST['from'])) {
 	$graph->setFrom($_REQUEST['from']);
 }
@@ -74,9 +79,6 @@ if (isset($_REQUEST['height'])) {
 }
 if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
-}
-if (isset($_REQUEST['stime'])) {
-	$graph->setSTime($_REQUEST['stime']);
 }
 $graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
 $graph->draw();

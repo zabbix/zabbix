@@ -58,26 +58,18 @@ else {
 	}
 	$screenWidget->addHeader($screenList);
 
+	// append screens to widget
 	$screenBuilder = new CScreenBuilder(array(
 		'screen' => $this->data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
+		'hostid' => $this->data['hostid'],
 		'period' => $this->data['period'],
 		'stime' => $this->data['stime'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['screen']['screenid']
 	));
-
-	$timeline = array(
-		'period' => $this->data['period'],
-		'starttime' => date('YmdHis', $this->data['stime'] - $this->data['period'])
-	);
-	if (!empty($this->data['stime'])) {
-		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
-	}
-
 	$screenWidget->addItem($screenBuilder->show());
-
-	$screenBuilder->insertScreenScrollJs($this->data['screen']['screenid'], $timeline);
+	$screenBuilder->insertScreenScrollJs($this->data['screen']['screenid']);
 	$screenBuilder->insertProcessObjectsJs();
 }
 

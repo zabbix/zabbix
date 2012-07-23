@@ -203,6 +203,10 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 	border: 0;
 }
 
+.menu-host {
+	cursor: pointer;
+}
+
 .transparent { border: 0; background-color: transparent; }
 .transparent:focus { outline-width: 0; }
 

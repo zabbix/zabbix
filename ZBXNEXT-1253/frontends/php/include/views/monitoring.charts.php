@@ -50,10 +50,11 @@ $chartsWidget->addItem(BR());
 // append chart to widget
 $screen = CScreenBuilder::getScreen(array(
 	'resourcetype' => SCREEN_RESOURCE_CHART,
-	'profileIdx' => 'web.charts',
 	'graphid' => $this->data['graphid'],
-	'period' => navigation_bar_calc('web.charts', $this->data['graphid'], true),
-	'stime' => get_request('stime')
+	'period' => $this->data['period'],
+	'stime' => $this->data['stime'],
+	'profileIdx' => 'web.charts',
+	'profileIdx2' => $this->data['graphid']
 ));
 $chartsWidget->addItem($screen->get());
 CScreenBuilder::insertProcessObjectsJs();

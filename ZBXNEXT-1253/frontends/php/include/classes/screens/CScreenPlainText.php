@@ -63,8 +63,8 @@ class CScreenPlainText extends CScreenBase {
 			'sortorder' => ZBX_SORT_DOWN,
 			'sortfield' => $orderField,
 			'limit' => $this->screenitem['elements'],
-			'time_from' => $this->stime,
-			'time_till' => $this->stime + $this->period
+			'time_from' => $this->timeline['stime'],
+			'time_till' => $this->timeline['stime'] + $this->timeline['period']
 		));
 		foreach ($histories as $history) {
 			switch ($item['value_type']) {

@@ -133,6 +133,7 @@ $screen = CScreenBuilder::getScreen(array(
 	'item' => $this->data['item'],
 	'itemid' => $this->data['itemid'],
 	'profileIdx' => 'web.item.graph',
+	'profileIdx2' => $this->data['itemid'],
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => get_request('filter'),

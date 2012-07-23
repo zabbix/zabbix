@@ -137,19 +137,12 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			$timeline = array(
-				'period' => $this->period,
-				'starttime' => date('YmdHis', get_min_itemclock_by_graphid($resourceid))
-			);
-
-			if (!empty($this->stime)) {
-				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
-			}
+			$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($resourceid));
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
 				.'&legend='.$legend.'&graph3d='.$graph3d;
 			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->period.url_param('stime');
+				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime'.$this->timeline['stime'];
 			}
 		}
 		else {
@@ -158,17 +151,7 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			$timeline = array(
-				'period' => $this->period
-			);
-
 			if ($this->mode != SCREEN_MODE_EDIT && !empty($graphid)) {
-				$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
-
-				if (!empty($this->stime)) {
-					$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
-				}
-
 				if ($this->mode == SCREEN_MODE_PREVIEW) {
 					$timeControlData['loadSBox'] = 1;
 				}
@@ -176,27 +159,27 @@ class CScreenGraph extends CScreenBase {
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
 			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->period.url_param('stime');
+				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime'.$this->timeline['stime'];
 			}
 		}
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
-			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
+			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
 			if ($this->mode == SCREEN_MODE_VIEW) { // used is slide shows
-				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
 			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-				$item = new CLink(null, 'charts.php?graphid='.$resourceid.url_params(array('period', 'stime')));
+				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].'&stime'.$this->timeline['stime']);
 			}
 			$item->setAttribute('id', $containerid);
 

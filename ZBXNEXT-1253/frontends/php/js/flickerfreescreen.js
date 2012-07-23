@@ -34,6 +34,7 @@ var flickerfreeScreen = {
 		url.setArgument('mode', screen.mode);
 		url.setArgument('flickerfreeScreenId', id);
 		url.setArgument('screenitemid', screen.screenitemid);
+		url.setArgument('hostid', screen.hostid);
 		url.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
 		url.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
 		url.setArgument('period', !empty(screen.period) ? screen.period : null);
@@ -43,7 +44,6 @@ var flickerfreeScreen = {
 		// SCREEN_RESOURCE_SIMPLE_GRAPH
 		if (screen.resourcetype == 0 || screen.resourcetype == 1) {
 			url.setArgument('mode', 3); // SCREEN_MODE_JS
-			url.setArgument('hostid', screen.hostid);
 
 			jQuery.getScript(url.getUrl(), function() {
 				timeControl.refreshObject(id);
@@ -97,12 +97,6 @@ var flickerfreeScreen = {
 			});
 		}
 
-		// SCREEN_RESOURCE_CLOCK
-		// SCREEN_RESOURCE_URL
-		else if (screen.resourcetype == 7 || screen.resourcetype == 11) {
-			// don't refresh screen
-		}
-
 		// SCREEN_RESOURCE_HISTORY
 		else if (screen.resourcetype == 17) {
 			url.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
@@ -113,10 +107,24 @@ var flickerfreeScreen = {
 			url.setArgument('mark_color', !empty(screen.data.markColor) ? screen.data.markColor : null);
 
 			if (screen.data.action == 'showgraph') {
-				url.setArgument('mode', 3); // SCREEN_MODE_JS
+				jQuery('#flickerfreescreen_' + id).find('img').each(function() {
+					var workImage = jQuery(this);
+					var doId = '#' + jQuery(this).attr('id');
+					var chartUrl = new Curl(jQuery(this).attr('src'));
+					chartUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
+					chartUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
 
-				jQuery.getScript(url.getUrl(), function() {
-					timeControl.refreshObject(id);
+					jQuery('<img />', {
+						id: jQuery(this).attr('id') + '_tmp',
+						border: jQuery(doId).attr('border'),
+						alt: jQuery(doId).attr('alt'),
+						name: jQuery(doId).attr('name')
+					}).attr('src', chartUrl.getUrl()).load(function() {
+						var doId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+
+						jQuery(this).attr('id', doId);
+						jQuery(workImage).replaceWith(jQuery(this));
+					});
 				});
 			}
 			else {
@@ -135,6 +143,10 @@ var flickerfreeScreen = {
 			});
 		}
 
+		// SCREEN_RESOURCE_CLOCK
+		else if (screen.resourcetype == 7) {
+			// don't refresh screen
+		}
 		else {
 			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
 		}

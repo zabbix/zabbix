@@ -194,7 +194,6 @@ switch ($data['method']) {
 
 		$screenBase = CScreenBuilder::getScreen($options);
 		$screen = $screenBase->get();
-		$screenBase->updateProfile();
 
 		if (!empty($screen)) {
 			if ($options['mode'] == SCREEN_MODE_JS) {

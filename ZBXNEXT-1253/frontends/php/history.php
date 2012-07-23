@@ -158,8 +158,6 @@ $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];
 $itemid = reset($_REQUEST['itemid']);
 
-navigation_bar_calc('web.item.graph', $itemid, true);
-
 $data = array(
 	'itemid' => $itemid,
 	'items' => $items,
@@ -171,7 +169,6 @@ $data = array(
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
 	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1)
 );
-$data['till'] = zbxDateToTime($data['stime']) + $data['period'];
 
 // render view
 $historyView = new CView('monitoring.history', $data);

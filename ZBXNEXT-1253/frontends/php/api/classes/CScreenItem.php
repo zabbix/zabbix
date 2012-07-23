@@ -67,7 +67,6 @@ class CScreenItem extends CZBXAPI {
 		$this->getOptions = zbx_array_merge($this->getOptions, array(
 			'screenitemids'	=> null,
 			'screenids'		=> null,
-			'hostids'		=> null,
 			'editable'		=> null,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
@@ -110,31 +109,6 @@ class CScreenItem extends CZBXAPI {
 				else {
 					$result[] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
 				}
-			}
-		}
-
-		// fill result with real resourceid
-		if (!is_null($options['hostids']) && !empty($result)) {
-			if (empty($options['screenitemid'])) {
-				$options['screenitemid'] = zbx_objectValues($result, 'screenitemid');
-			}
-
-			$templateScreens = API::TemplateScreen()->get(array(
-				'screenitemids' => $options['screenitemid'],
-				'hostids' => $options['hostids'],
-				'selectScreenItems' => API_OUTPUT_EXTEND
-			));
-			if (!empty($templateScreens)) {
-				foreach ($result as &$resultScreenitem) {
-					foreach ($templateScreens as $templateScreen) {
-						foreach ($templateScreen['screenitems'] as $screenitem) {
-							if ($resultScreenitem['screenitemid'] == $screenitem['screenitemid'] && !empty($screenitem['real_resourceid'])) {
-								$resultScreenitem['real_resourceid'] = $screenitem['real_resourceid'];
-							}
-						}
-					}
-				}
-				unset($resultScreenitem);
 			}
 		}
 

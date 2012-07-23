@@ -120,8 +120,7 @@ class CScreenHistory extends CScreenBase {
 	public function get() {
 		$output = array();
 
-		$time = zbxDateToTime($this->stime);
-		$till = $time + $this->period;
+		$stime = zbxDateToTime($this->timeline['stime']);
 
 		$iv_string = array(
 			ITEM_VALUE_TYPE_LOG => 1,
@@ -145,8 +144,8 @@ class CScreenHistory extends CScreenBase {
 			elseif ($this->action == 'showvalues') {
 				$config = select_config();
 
-				$options['time_from'] = $time - 10; // some seconds to allow script to execute
-				$options['time_till'] = $till;
+				$options['time_from'] = $stime - 10; // some seconds to allow script to execute
+				$options['time_till'] = $stime + $this->timeline['period'];
 				$options['limit'] = $config['search_limit'];
 			}
 
@@ -319,7 +318,7 @@ class CScreenHistory extends CScreenBase {
 		if ($this->action == 'showgraph' && !isset($iv_string[$this->item['value_type']])) {
 			$this->dataId = 'historyGraph';
 			$containerid = 'graph_cont1';
-			$src = 'chart.php?itemid='.$this->item['itemid'];
+			$src = 'chart.php?itemid='.$this->item['itemid'].'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'];
 
 			$historyTable = new CTableInfo(_('No charts defined.'), 'chart');
 			$graphContainer = new CCol();
@@ -332,16 +331,7 @@ class CScreenHistory extends CScreenBase {
 		if (!$this->plaintext && str_in_array($this->action, array('showvalues', 'showgraph'))) {
 			$graphDims = getGraphDims();
 
-			$starttime = get_min_itemclock_by_itemid($this->item['itemid']);
-			if ($time < $starttime) {
-				$starttime = $time;
-			}
-
-			$timeline = array(
-				'starttime' => date('YmdHis', $starttime),
-				'period' => $this->period,
-				'usertime' => date('YmdHis', $till)
-			);
+			$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($this->item['itemid']));
 
 			$timeControlData = array(
 				'periodFixed' => CProfile::get('web.history.timelinefixed', 1),
@@ -374,10 +364,10 @@ class CScreenHistory extends CScreenBase {
 			if ($this->mode == SCREEN_MODE_JS) {
 				$timeControlData['dynamic'] = 0;
 
-				return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');';
+				return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');';
 			}
 			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 				zbx_add_post_js('timeControl.processObjects();');
 			}
 		}

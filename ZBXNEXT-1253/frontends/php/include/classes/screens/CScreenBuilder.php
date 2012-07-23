@@ -29,13 +29,6 @@ class CScreenBuilder {
 	public $isFlickerfree;
 
 	/**
-	 * Detect is screen is template or real
-	 *
-	 * @var boolean
-	 */
-	public $isTemplate;
-
-	/**
 	 * Screen data
 	 *
 	 * @var array
@@ -48,6 +41,13 @@ class CScreenBuilder {
 	 * @var int
 	 */
 	public $mode;
+
+	/**
+	 * Host id
+	 *
+	 * @var string
+	 */
+	public $hostid;
 
 	/**
 	 * Profile table entity name #1
@@ -64,12 +64,21 @@ class CScreenBuilder {
 	public $profileIdx2;
 
 	/**
+	 * Time control timeline
+	 *
+	 * @var array
+	 */
+	public $timeline;
+
+	/**
 	 * Init screen data.
 	 *
 	 * @param array		$options
 	 * @param boolean	$options['isFlickerfree']
 	 * @param int		$options['mode']
-	 * @param boolean	$options['isTemplate']
+	 * @param int		$options['hostid']
+	 * @param int		$options['period']
+	 * @param int		$options['stime']
 	 * @param string	$options['profileIdx']
 	 * @param int		$options['profileIdx2']
 	 * @param array		$options['screen']
@@ -77,54 +86,75 @@ class CScreenBuilder {
 	public function __construct(array $options = array()) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
-		$this->isTemplate = isset($options['isTemplate']) ? $options['isTemplate'] : false;
-		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
-		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : '';
+		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
 
 		// get screen
 		if (!empty($options['screen'])) {
 			$this->screen = $options['screen'];
 		}
 		elseif (!empty($options['screenid'])) {
-			$options = array(
+			$params = array(
 				'screenids' => $options['screenid'],
 				'output' => API_OUTPUT_EXTEND,
 				'selectScreenItems' => API_OUTPUT_EXTEND
 			);
 			if (in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_EDIT))) {
-				$options['editable'] = true;
+				$params['editable'] = true;
 			}
+			$this->screen = API::Screen()->get($params);
 
-			$this->screen = $this->isTemplate
-				? API::TemplateScreen()->get($options)
-				: API::Screen()->get($options);
-			if (empty($this->screen) && !$this->isTemplate) {
-				$this->screen = API::TemplateScreen()->get($options);
-				if (empty($this->screen)) {
-					access_deny();
-				}
+			if (!empty($this->screen)) {
+				$this->screen = reset($this->screen);
 			}
-			$this->screen = reset($this->screen);
+			else {
+				access_deny();
+			}
 		}
+
+		// calculate time
+		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
+		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
+
+		$this->timeline = CScreenBase::calculateTime(array(
+			'profileIdx' => $this->profileIdx,
+			'profileIdx2' => $this->profileIdx2,
+			'period' => !empty($options['period']) ? $options['period'] : null,
+			'stime' => !empty($options['stime']) ? $options['stime'] : null
+		));
 	}
 
 	/**
 	 * Get particular screen object.
 	 *
+	 * @static
+	 *
 	 * @param array		$options
 	 * @param int		$options['resourcetype']
 	 * @param int		$options['screenitemid']
 	 * @param int		$options['hostid']
+	 * @param int		$options['period']
+	 * @param int		$options['stime']
+	 * @param string	$options['profileIdx']
+	 * @param int		$options['profileIdx2']
 	 *
 	 * @return CScreenBase
 	 */
 	public static function getScreen(array $options = array()) {
-		if (!empty($options['screenitemid']) && empty($options['screenitem'])) {
-			$options['screenitem'] = API::ScreenItem()->get(array(
-				'screenitemids' => $options['screenitemid'],
-				'hostids' => !empty($options['hostid']) ? $options['hostid'] : 0,
-				'output' => API_OUTPUT_EXTEND
-			));
+		// get resourcetype from screenitem
+		if (empty($options['screenitem']) && !empty($options['screenitemid'])) {
+			if (!empty($options['hostid'])) {
+				$options['screenitem'] = API::TemplateScreenItem()->get(array(
+					'screenitemids' => $options['screenitemid'],
+					'hostids' => $options['hostid'],
+					'output' => API_OUTPUT_EXTEND
+				));
+			}
+			else {
+				$options['screenitem'] = API::ScreenItem()->get(array(
+					'screenitemids' => $options['screenitemid'],
+					'output' => API_OUTPUT_EXTEND
+				));
+			}
 			$options['screenitem'] = reset($options['screenitem']);
 		}
 
@@ -136,6 +166,7 @@ class CScreenBuilder {
 			return null;
 		}
 
+		// get screen
 		switch ($options['resourcetype']) {
 			case SCREEN_RESOURCE_GRAPH:
 				return new CScreenGraph($options);
@@ -329,8 +360,10 @@ class CScreenBuilder {
 					$screenBase = CScreenBuilder::getScreen(array(
 						'isFlickerfree' => $this->isFlickerfree,
 						'mode' => $this->mode,
+						'hostid' => $this->hostid,
 						'profileIdx' => $this->profileIdx,
 						'profileIdx2' => $this->profileIdx2,
+						'timeline' => $this->timeline,
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem
 					));
@@ -447,7 +480,7 @@ class CScreenBuilder {
 	 * @param string	$id
 	 * @param array		$timeline
 	 */
-	public function insertScreenScrollJs($id, $timeline) {
+	public function insertScreenScrollJs($id) {
 		$timeControlData = array(
 			'id' => $id,
 			'domid' => 'screen_scroll',
@@ -461,11 +494,13 @@ class CScreenBuilder {
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
-		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 	}
 
 	/**
 	 * Insert javascript to init screens.
+	 *
+	 * @static
 	 *
 	 * @param string $screenid
 	 */
@@ -475,6 +510,8 @@ class CScreenBuilder {
 
 	/**
 	 * Insert javascript to start time control rendering.
+	 *
+	 * @static
 	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');

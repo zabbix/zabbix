@@ -22,7 +22,7 @@
 var timeControl = {
 
 	objectList: {}, // objects needs to be controlled
-	refreshPage : true,
+	refreshPage: true,
 	debug_status: 0, // debug status: 0 - off, 1 - on, 2 - SDI;
 	debug_info: '', // debug string
 	debug_prev: '', // don't log repeated fnc
@@ -276,22 +276,6 @@ var timeControl = {
 
 		var date = new CDate((usertime - period) * 1000);
 
-		// update time control
-		for (var key in this.objectList) {
-			if (empty(this.objectList[key]) || !this.objectList[key].mainObject) {
-				continue;
-			}
-
-			this.objectList[key].timeline.period(period);
-			this.objectList[key].timeline.usertime(usertime);
-
-			if (isset(key, ZBX_SCROLLBARS)) {
-				ZBX_SCROLLBARS[key].setBarPosition();
-				ZBX_SCROLLBARS[key].setGhostByBar();
-				ZBX_SCROLLBARS[key].setTabInfo();
-			}
-		}
-
 		if (this.refreshPage) {
 			var url = new Curl(location.href);
 			url.setArgument('period', period);
@@ -347,7 +331,8 @@ var timeControl = {
 
 	getFormattedUrl: function(objid, url) {
 		// ignore time in edit mode
-		if (flickerfreeScreen.screens[objid].mode == 1 // SCREEN_MODE_EDIT
+		if (!empty(flickerfreeScreen.screens[objid])
+				&& flickerfreeScreen.screens[objid].mode == 1 // SCREEN_MODE_EDIT
 				&& flickerfreeScreen.screens[objid].resourcetype == 0) { // SCREEN_RESOURCE_GRAPH
 			url.unsetArgument('period');
 			url.unsetArgument('stime');
@@ -698,6 +683,7 @@ var CScrollBar = Class.create(CDebug, {
 	onBarChange: function() {
 		this.changed = 1;
 		this.onchange(this.scrollbarid, this.timeline.timelineid, true);
+		this.updateGlobalTimeline();
 	},
 
 	barmousedown: function() {
@@ -710,6 +696,10 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	onchange: function() { // executed every time the bar period or bar time is changed (mouse button released)
+	},
+
+	updateGlobalTimeline: function() {
+		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 	},
 
 	//------- MOVE -------
@@ -756,29 +746,23 @@ var CScrollBar = Class.create(CDebug, {
 			period = this.timeline.period();
 		}
 
+		// fixed
 		if (this.fixedperiod == 1) {
-			// fixed
 			var usertime = this.timeline.usertime();
-			if (period) {
-				var new_usertime = usertime - period; // by clicking this.dom.left we move bar by period
-			}
-			else {
-				var new_usertime = usertime - left;
-			}
+			var new_usertime = (period)
+				? usertime - period // by clicking this.dom.left we move bar by period
+				: usertime - left;
 
 			// if we slide to another timezone
 			new_usertime -= this.getTZdiff(usertime, new_usertime);
 
 			this.timeline.usertime(new_usertime);
 		}
+		// dynamic
 		else {
-			// dynamic
-			if (period) {
-				var new_period = this.timeline.period() + 86400; // by clicking this.dom.left we expand period by 1day
-			}
-			else {
-				var new_period = this.timeline.period() + left;
-			}
+			var new_period = (period)
+				? this.timeline.period() + 86400 // by clicking this.dom.left we expand period by 1day
+				: this.timeline.period() + left;
 
 			this.timeline.period(new_period);
 		}
@@ -804,17 +788,15 @@ var CScrollBar = Class.create(CDebug, {
 		}
 
 		var usertime = this.timeline.usertime();
+
+		// fixed
 		if (this.fixedperiod == 1) {
-			// fixed
-			if (period) {
-				var new_usertime = usertime + period; // by clicking this.dom.left we move bar by period
-			}
-			else {
-				var new_usertime = usertime + right;
-			}
+			var new_usertime = (period)
+				? new_usertime = usertime + period // by clicking this.dom.left we move bar by period
+				: usertime + right;
 		}
+		// dynamic
 		else {
-			// dynamic
 			if (period) {
 				var new_period = this.timeline.period() + 86400; // by clicking this.dom.left we expand period by 1day
 				var new_usertime = usertime + 86400; // by clicking this.dom.left we move bar by period
@@ -987,13 +969,13 @@ var CScrollBar = Class.create(CDebug, {
 
 		time = parseInt(time / 1000);
 
+		// fixed
 		if (this.fixedperiod == 1) {
-			// fixed
 			var new_usertime = time + this.timeline.period();
 			this.timeline.usertime(new_usertime);
 		}
+		// dynamic
 		else {
-			// dynamic
 			var new_period = Math.abs(this.timeline.usertime() - time);
 			this.timeline.period(new_period);
 		}
@@ -1003,6 +985,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.setGhostByBar();
 		this.setTabInfo();
 		this.onBarChange();
+
 	},
 
 	setCalendarRight: function(time) {
@@ -1014,12 +997,12 @@ var CScrollBar = Class.create(CDebug, {
 
 		time = parseInt(time / 1000);
 
+		// fixed
 		if (this.fixedperiod == 1) {
-			// fixed
 			this.timeline.usertime(time);
 		}
+		// dynamic
 		else {
-			// dynamic
 			var startusertime = this.timeline.usertime() - this.timeline.period();
 			this.timeline.usertime(time);
 
@@ -1331,6 +1314,8 @@ var CScrollBar = Class.create(CDebug, {
 
 			this.timeline.usertime(new_usertime);
 		}
+
+		this.updateGlobalTimeline();
 	},
 
 	setTabInfo: function() {
@@ -1357,6 +1342,8 @@ var CScrollBar = Class.create(CDebug, {
 
 		// seting zoom link styles
 		this.setZoomLinksStyle();
+
+		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 	},
 
 	//----------------------------------------------------------------
@@ -2010,7 +1997,7 @@ var sbox = Class.create(CDebug, {
 		this.debug('onselect');
 
 		this.px2time = this.timeline.period() / this.cobj.width;
-		var userstarttime = (this.timeline.usertime() - this.timeline.period());
+		var userstarttime = this.timeline.usertime() - this.timeline.period();
 		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
 		var new_period = this.calcperiod();
 
@@ -2021,9 +2008,20 @@ var sbox = Class.create(CDebug, {
 		this.timeline.period(new_period);
 		this.timeline.usertime(userstarttime);
 
-		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
-
 		this.onchange(this.sbox_id, this.timeline.timelineid, true);
+
+		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
+		for (var sbid in ZBX_SCROLLBARS) {
+			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
+				continue;
+			}
+
+			// update bar
+			ZBX_SCROLLBARS[sbid].setBarPosition();
+			ZBX_SCROLLBARS[sbid].setGhostByBar();
+			ZBX_SCROLLBARS[sbid].setTabInfo();
+			ZBX_SCROLLBARS[sbid].onBarChange();
+		}
 	},
 
 	onchange: function() {

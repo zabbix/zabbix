@@ -55,18 +55,10 @@ class CScreenSimpleGraph extends CScreenBase {
 		}
 
 		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($resourceid)) {
-			$this->action = 'history.php?action=showgraph&itemid='.$resourceid.url_params(array('period', 'stime'));
+			$this->action = 'history.php?action=showgraph&itemid='.$resourceid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'];
 		}
 
-		$timeline = array(
-			'period' => $this->period,
-			'starttime' => date('YmdHis', time() - $this->period)
-		);
-
 		if (!zbx_empty($resourceid) && $this->mode != SCREEN_MODE_EDIT) {
-			if (!empty($this->stime)) {
-				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
-			}
 			if ($this->mode == SCREEN_MODE_PREVIEW) {
 				$timeControlData['loadSBox'] = 1;
 			}
@@ -78,21 +70,21 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
-			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
+			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
 			if ($this->mode == SCREEN_MODE_VIEW) { // used in slide shows
-				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
 			if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-				$item = new CLink(null, 'charts.php?graphid='.$resourceid.url_params(array('period', 'stime')));
+				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime']);
 			}
 			$item->setAttribute('id', $containerid);
 
