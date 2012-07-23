@@ -567,7 +567,7 @@ static int	get_values(unsigned char poller_type)
 	DC_ITEM		items[MAX_BUNCH_ITEMS];
 	AGENT_RESULT	results[MAX_BUNCH_ITEMS];
 	int		errcodes[MAX_BUNCH_ITEMS];
-	zbx_timespec_t	timespecs[MAX_BUNCH_ITEMS];
+	zbx_timespec_t	timespec;
 	int		i, num;
 	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
 
@@ -591,7 +591,6 @@ static int	get_values(unsigned char poller_type)
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = NOTSUPPORTED;
-			zbx_timespec(&timespecs[i]);
 			continue;
 		}
 
@@ -614,7 +613,6 @@ static int	get_values(unsigned char poller_type)
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
 					errcodes[i] = NETWORK_ERROR;
-					zbx_timespec(&timespecs[i]);
 					continue;
 				}
 				break;
@@ -645,7 +643,6 @@ static int	get_values(unsigned char poller_type)
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = NOTSUPPORTED;
-					zbx_timespec(&timespecs[i]);
 					continue;
 				}
 				break;
@@ -687,17 +684,17 @@ static int	get_values(unsigned char poller_type)
 	if (SUCCEED != is_bunch_poller(poller_type))
 	{
 		if (SUCCEED == errcodes[0])
-		{
 			errcodes[0] = get_value(&items[0], &results[0]);
-			zbx_timespec(&timespecs[0]);
-		}
 	}
 	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
 	{
 		alarm(CONFIG_TIMEOUT);
-		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, timespecs, num);
+		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		alarm(0);
+
 	}
+
+	zbx_timespec(&timespec);
 
 	/* process item values */
 	for (i = 0; i < num; i++)
@@ -707,11 +704,11 @@ static int	get_values(unsigned char poller_type)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-				activate_host(&items[i], &timespecs[i]);
+				activate_host(&items[i], &timespec);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
-				deactivate_host(&items[i], &timespecs[i], results[i].msg);
+				deactivate_host(&items[i], &timespec, results[i].msg);
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
@@ -720,17 +717,17 @@ static int	get_values(unsigned char poller_type)
 
 		if (SUCCEED == errcodes[i])
 		{
-			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespecs[i],
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
 					ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, timespecs[i].sec);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, timespec.sec);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
-			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespecs[i],
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
 					ITEM_STATUS_NOTSUPPORTED, results[i].msg, 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespecs[i].sec);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespec.sec);
 		}
 		else if (NETWORK_ERROR == errcodes[i] || GATEWAY_ERROR == errcodes[i])
 		{

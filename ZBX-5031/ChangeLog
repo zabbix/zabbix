@@ -1,4 +1,7 @@
-Changes for 2.0.2
+Changes for 2.0.2rc2
+
+Bug fixes:
+........S. [ZBX-5031] fixed possible history syncer crash while processing JMX items (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.2rc1
