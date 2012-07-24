@@ -211,12 +211,8 @@ class DB {
 	 */
 	protected static function getPk($tableName) {
 		$schema = self::getSchema($tableName);
-		if (strpos($schema['key'], ',') !== false) {
-			return explode(',', $schema['key']);
-		}
-		else {
-			return $schema['key'];
-		}
+
+		return $schema['key'];
 	}
 
 	/**
@@ -480,34 +476,14 @@ class DB {
 	 * @static
 	 *
 	 * @param string $tableName
-	 * @param mixed $pk         A single PK value or an associative array of values,
-	 *                          e.g. array('field1' => 'value1', 'field2' => 'value2')
+	 * @param string $pk
 	 * @param array $values
 	 *
 	 * @return bool
 	 */
 	public static function updateByPk($tableName, $pk, array $values) {
-		$dbPkNames = self::getPk($tableName);
-
-		if (is_array($pk)) {
-			if (!is_array($dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has a simple primary key, composite is given.', $tableName));
-			}
-
-			if (!array_equal(array_keys($pk), $dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Incorrect primary keys for table "%1$s".', $tableName));
-			}
-		}
-		else {
-			if (is_array($dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has a composite primary key, simple is given.', $tableName));
-			}
-
-			$pk = array($dbPkNames => $pk);
-		}
-
 		return self::update($tableName, array(
-			'where' => $pk,
+			'where' => array(self::getPk($tableName) => $pk),
 			'values' => $values
 		));
 	}
