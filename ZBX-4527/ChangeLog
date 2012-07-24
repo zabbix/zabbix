@@ -1,5 +1,6 @@
 Changes for 1.8.15rc1
 
+........S. [ZBX-4527] removed limitation of alerter script command line (Sasha)
 ....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
 ..F....... [ZBX-5319] fixed incorrect calculation of action escalation steps delay (Vedmak)
 A......... [ZBX-5264] fixed 'undefined variable: nodeids [api/classes/class.cscreen.php:286]' (Toms)
