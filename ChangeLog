@@ -10,6 +10,8 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 2.0.2rc2
 
+Bug fixes:
+........S. [ZBX-4976] fixed {HOST.CONN}, {HOST.IP) and {HOST.DNS} macros substitution for global scripts (Sasha)
 A......... [ZBX-5349] fixed graph prototypes being created with an incorrect flag (Pavels)
 
 --------------------------------------------------------------------------------
@@ -880,6 +882,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.15rc1
 
+....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
 ..F....... [ZBX-5319] fixed incorrect calculation of action escalation steps delay (Vedmak)
 A......... [ZBX-5264] fixed 'undefined variable: nodeids [api/classes/class.cscreen.php:286]' (Toms)
 ..F....... [ZBX-5316] fixed incorrect screen items can be deleted when deleting hosts (Vedmak)
