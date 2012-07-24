@@ -1,5 +1,7 @@
 Changes for 2.0.2rc2
 
+Bug fixes:
+........S. [ZBX-4976] fixed {HOST.CONN}, {HOST.IP) and {HOST.DNS} macros substitution for global scripts (Sasha)
 A......... [ZBX-5349] fixed graph prototypes being created with an incorrect flag (Pavels)
 
 --------------------------------------------------------------------------------

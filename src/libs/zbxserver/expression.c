@@ -713,7 +713,7 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_interface_value_by_hostid                                  *
+ * Function: DBget_interface_value                                            *
  *                                                                            *
  * Purpose: request interface value by hostid and request                     *
  *                                                                            *
@@ -730,7 +730,7 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 #define ZBX_REQUEST_HOST_IPADDRESS	1
 #define ZBX_REQUEST_HOST_DNS		2
 #define ZBX_REQUEST_HOST_CONN		3
-static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int request)
+static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int request)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -841,7 +841,7 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 			case ZBX_REQUEST_HOST_DNS:
 			case ZBX_REQUEST_HOST_CONN:
 				ZBX_STR2UINT64(hostid, row[3]);
-				ret = DBget_interface_value_by_hostid(hostid, replace_to, request);
+				ret = DBget_interface_value(hostid, replace_to, request);
 				break;
 			case ZBX_REQUEST_ITEM_ID:
 				*replace_to = zbx_strdup(*replace_to, row[7]);
@@ -2539,16 +2539,12 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
-			else if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT)))
-			{
-				if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
-					replace_to = zbx_strdup(replace_to, interface.ip_orig);
-				else if	(0 == strcmp(m, MVAR_HOST_DNS))
-					replace_to = zbx_strdup(replace_to, interface.dns_orig);
-				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_strdup(replace_to,
-							1 == interface.useip ? interface.ip_orig : interface.dns_orig);
-			}
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_IPADDRESS);
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_DNS);
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_CONN);
 		}
 
 		if (FAIL == ret)
