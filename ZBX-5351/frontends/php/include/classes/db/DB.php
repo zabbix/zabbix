@@ -380,7 +380,7 @@ class DB {
 	 * @param array  $values pair of fieldname => fieldvalue
 	 * @param bool   $getids
 	 *
-	 * @return array of ids
+	 * @return array    an array of ids with the keys preserved
 	 */
 	public static function insert($table, $values, $getids = true) {
 		if (empty($values)) {
@@ -510,7 +510,7 @@ class DB {
 			}
 			// if no pk is set, create the record later
 			else {
-				$newRecords[] = &$data[$key];
+				$newRecords[$key] = $data[$key];
 			}
 		}
 
@@ -518,7 +518,7 @@ class DB {
 		if ($newRecords) {
 			$newIds = self::insert($tableName, $newRecords);
 			foreach ($newIds as $key => $id) {
-				$newRecords[$key][$pk] = $id;
+				$data[$key][$pk] = $id;
 			}
 		}
 
