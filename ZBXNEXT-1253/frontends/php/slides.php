@@ -115,15 +115,6 @@ if (isset($_REQUEST['favobj'])) {
 					));
 					$cur_screen = reset($screens);
 
-					$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
-
-					if ($screen['delay'] > 0) {
-						$refresh = $screen['delay'];
-					}
-					else {
-						$refresh = $slideshow['delay'];
-					}
-
 					$screenBuilder = new CScreenBuilder(array(
 						'isFlickerfree' => false,
 						'screen' => $cur_screen,
@@ -134,6 +125,9 @@ if (isset($_REQUEST['favobj'])) {
 						'stime' => get_request('stime')
 					));
 					echo $screenBuilder->show()->toString();
+
+					$refresh = ($screen['delay'] > 0) ? $screen['delay'] : $slideshow['delay'];
+					$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
 					$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
 					$script .= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";

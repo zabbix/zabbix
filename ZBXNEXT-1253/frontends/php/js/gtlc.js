@@ -23,6 +23,7 @@ var timeControl = {
 
 	objectList: {}, // objects needs to be controlled
 	refreshPage: true,
+	refreshInterval: 0,
 	debug_status: 0, // debug status: 0 - off, 1 - on, 2 - SDI;
 	debug_info: '', // debug string
 	debug_prev: '', // don't log repeated fnc
@@ -88,19 +89,19 @@ var timeControl = {
 	processObjects: function() {
 		this.debug('processObjects');
 
-		for (var key in this.objectList) {
-			if (empty(this.objectList[key])) {
+		for (var objid in this.objectList) {
+			if (empty(this.objectList[objid])) {
 				continue;
 			}
 
-			if (this.objectList[key].processed == 1) {
+			if (this.objectList[objid].processed == 1) {
 				continue;
 			}
 			else {
-				this.objectList[key].processed = 1;
+				this.objectList[objid].processed = 1;
 			}
 
-			var obj = this.objectList[key];
+			var obj = this.objectList[objid];
 
 			// width
 			if ((!isset('width', obj.objDims) || obj.objDims.width < 0) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)) {
@@ -207,56 +208,34 @@ var timeControl = {
 		this.processObjects();
 	},
 
-	addSBox: function(e, objid) {
-		this.debug('addSBox', objid);
-
-		var obj = this.objectList[objid];
-		var img = $(obj.domid);
-
-		if (!is_null(img)) {
-			removeListener(img, 'load', obj.sbox_listener);
+	refreshTime: function(refreshInterval) {
+		if (!empty(refreshInterval)) {
+			this.refreshInterval = refreshInterval * 1000;
 		}
 
-		ZBX_SBOX[obj.domid] = new Object;
-		ZBX_SBOX[obj.domid].shiftT = parseInt(obj.objDims.shiftYtop);
-		ZBX_SBOX[obj.domid].shiftL = parseInt(obj.objDims.shiftXleft);
-		ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
-		ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
-		ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
-
-		var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
-		sbox.onchange = this.objectUpdate.bind(this);
-	},
-
-	addScroll: function(e, objid) {
-		this.debug('addScroll', objid);
-
-		var obj = this.objectList[objid];
-		var img = $(obj.domid);
-
-		if (!is_null(img)) {
-			removeListener(img, 'load', obj.scroll_listener);
-		}
-
-		var width = null;
-		if (obj.scrollWidthByImage == 0) {
-			width = get_bodywidth() - 30;
-			if (!is_number(width)) {
-				width = 900;
+		for (var sbid in ZBX_SCROLLBARS) {
+			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
+				continue;
 			}
+
+			var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
+
+			// refresh timeline
+			if (ZBX_TIMELINES[timelineid].now()) {
+				ZBX_TIMELINES[timelineid].usertime(ZBX_TIMELINES[timelineid].usertime() + this.refreshInterval * 10);
+			}
+			ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].endtime() + this.refreshInterval * 10);
+
+			// refresh scrollbar
+			ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
+			ZBX_SCROLLBARS[sbid].setBarPosition();
+			ZBX_SCROLLBARS[sbid].setGhostByBar();
+			ZBX_SCROLLBARS[sbid].setTabInfo();
+			ZBX_SCROLLBARS[sbid].onBarChange();
 		}
 
-		var scrl = scrollCreate(
-			obj.domid,
-			width,
-			obj.timeline.timelineid,
-			this.objectList[objid].periodFixed,
-			this.objectList[objid].sliderMaximumTimePeriod
-		);
-		scrl.onchange = this.objectUpdate.bind(this);
-
-		if (obj.dynamic && !is_null($(img))) {
-			addListener(obj.domid, 'load', function() { ZBX_SCROLLBARS[scrl.scrollbarid].disabled = 0; });
+		if (this.refreshInterval > 0) {
+			window.setTimeout(function() { timeControl.refreshTime(); }, this.refreshInterval);
 		}
 	},
 
@@ -312,6 +291,59 @@ var timeControl = {
 		}
 
 		flickerfreeScreen.refreshAll(period, stime);
+	},
+
+	addSBox: function(e, objid) {
+		this.debug('addSBox', objid);
+
+		var obj = this.objectList[objid];
+		var img = $(obj.domid);
+
+		if (!is_null(img)) {
+			removeListener(img, 'load', obj.sbox_listener);
+		}
+
+		ZBX_SBOX[obj.domid] = new Object;
+		ZBX_SBOX[obj.domid].shiftT = parseInt(obj.objDims.shiftYtop);
+		ZBX_SBOX[obj.domid].shiftL = parseInt(obj.objDims.shiftXleft);
+		ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
+		ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
+		ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
+
+		var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
+		sbox.onchange = this.objectUpdate.bind(this);
+	},
+
+	addScroll: function(e, objid) {
+		this.debug('addScroll', objid);
+
+		var obj = this.objectList[objid];
+		var img = $(obj.domid);
+
+		if (!is_null(img)) {
+			removeListener(img, 'load', obj.scroll_listener);
+		}
+
+		var width = null;
+		if (obj.scrollWidthByImage == 0) {
+			width = get_bodywidth() - 30;
+			if (!is_number(width)) {
+				width = 900;
+			}
+		}
+
+		var scrl = scrollCreate(
+			obj.domid,
+			width,
+			obj.timeline.timelineid,
+			this.objectList[objid].periodFixed,
+			this.objectList[objid].sliderMaximumTimePeriod
+		);
+		scrl.onchange = this.objectUpdate.bind(this);
+
+		if (obj.dynamic && !is_null($(img))) {
+			addListener(obj.domid, 'load', function() { ZBX_SCROLLBARS[scrl.scrollbarid].disabled = 0; });
+		}
 	},
 
 	getPeriod: function(objid) {
@@ -1958,6 +1990,7 @@ var sbox = Class.create(CDebug, {
 				continue;
 			}
 
+			ZBX_SCROLLBARS[sbid].timeline = this.timeline;
 			ZBX_SCROLLBARS[sbid].setBarPosition();
 			ZBX_SCROLLBARS[sbid].setGhostByBar();
 			ZBX_SCROLLBARS[sbid].setTabInfo();

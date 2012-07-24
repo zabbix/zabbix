@@ -495,6 +495,7 @@ class CScreenBuilder {
 		);
 
 		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
+		zbx_add_post_js('timeControl.refreshTime('.CWebUser::$data['refresh'].');');
 	}
 
 	/**
