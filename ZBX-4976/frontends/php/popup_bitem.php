@@ -60,7 +60,7 @@ require_once 'include/page_header.php';
 
 	$_REQUEST['caption'] = get_request('caption','');
 	$_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
-	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && ($_REQUEST['itemid'] > 0)){
+	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && $_REQUEST['itemid'] && zbx_is_int($_REQUEST['itemid'])){
 		$_REQUEST['caption'] = itemName(get_item_by_itemid($_REQUEST['itemid']));
 	}
 
@@ -107,12 +107,6 @@ require_once 'include/page_header.php';
 		$calc_fnc	= get_request('calc_fnc',	2);
 		$axisside	= get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
-		$description = '';
-		if($itemid > 0){
-			$description = get_item_by_itemid($itemid);
-			$description = itemName($description);
-		}
-
 		$frmGItem->addVar('gid',$gid);
 		$frmGItem->addVar('config',$config);
 		$frmGItem->addVar('list_name',$list_name);
@@ -121,7 +115,7 @@ require_once 'include/page_header.php';
 		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
 			_('Caption')), new CTextBox('caption',$caption,32));
 
-		$txtCondVal = new CTextBox('name',$description,50,'yes');
+		$txtCondVal = new CTextBox('name',$caption,50,'yes');
 
 		$btnSelect = new CSubmit('btn1',_('Select'),
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
