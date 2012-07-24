@@ -24,13 +24,8 @@ var timeControl = {
 	objectList: {}, // objects needs to be controlled
 	refreshPage: true,
 	refreshInterval: 0,
-	debug_status: 0, // debug status: 0 - off, 1 - on, 2 - SDI;
-	debug_info: '', // debug string
-	debug_prev: '', // don't log repeated fnc
 
 	addObject: function(domid, time, objData) {
-		this.debug('addObject', domid);
-
 		this.objectList[domid] = {
 			'refresh': false,
 			'processed': 0,
@@ -75,20 +70,18 @@ var timeControl = {
 			? time.endtime
 			: nowDate.setZBXDate(time.usertime) / 1000;
 
-		this.objectList[domid].time = time;
 		this.objectList[domid].timeline = create_timeline(
 			this.objectList[domid].domid,
 			parseInt(time.period),
 			parseInt(time.starttime),
 			parseInt(time.usertime),
 			parseInt(time.endtime),
-			this.objectList[domid].sliderMaximumTimePeriod
+			this.objectList[domid].sliderMaximumTimePeriod,
+			time.isNow
 		);
 	},
 
 	processObjects: function() {
-		this.debug('processObjects');
-
 		for (var objid in this.objectList) {
 			if (empty(this.objectList[objid])) {
 				continue;
@@ -118,11 +111,11 @@ var timeControl = {
 
 			// url
 			if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-				var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
+				var date = new CDate((obj.timeline.usertime() - obj.timeline.period()) * 1000);
 				var graphUrl = new Curl(obj.src);
 
 				graphUrl.setArgument('width', obj.objDims.width);
-				graphUrl.setArgument('period', obj.time.period);
+				graphUrl.setArgument('period', obj.timeline.period());
 				graphUrl.setArgument('stime', date.getZBXDate());
 				graphUrl = this.getFormattedUrl(obj.domid, graphUrl);
 
@@ -147,8 +140,6 @@ var timeControl = {
 	},
 
 	addImage: function(objid) {
-		this.debug('addImage', objid);
-
 		var obj = this.objectList[objid];
 
 		var img = document.createElement('img');
@@ -220,13 +211,15 @@ var timeControl = {
 
 			var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
 
-			// refresh timeline
-			if (ZBX_TIMELINES[timelineid].now()) {
-				ZBX_TIMELINES[timelineid].usertime(ZBX_TIMELINES[timelineid].usertime() + this.refreshInterval * 10);
+			// timeline
+			if (ZBX_TIMELINES[timelineid].isNow()) {
+				ZBX_TIMELINES[timelineid].setNow();
 			}
-			ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].endtime() + this.refreshInterval * 10);
+			else {
+				ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
+			}
 
-			// refresh scrollbar
+			// scrollbar
 			ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
 			ZBX_SCROLLBARS[sbid].setBarPosition();
 			ZBX_SCROLLBARS[sbid].setGhostByBar();
@@ -240,8 +233,6 @@ var timeControl = {
 	},
 
 	objectUpdate: function(objid, timelineid) {
-		this.debug('objectUpdate', objid);
-
 		if (!isset(objid, this.objectList)) {
 			throw('timeControl: Object is not declared "' + objid + '".');
 		}
@@ -294,8 +285,6 @@ var timeControl = {
 	},
 
 	addSBox: function(e, objid) {
-		this.debug('addSBox', objid);
-
 		var obj = this.objectList[objid];
 		var img = $(obj.domid);
 
@@ -315,8 +304,6 @@ var timeControl = {
 	},
 
 	addScroll: function(e, objid) {
-		this.debug('addScroll', objid);
-
 		var obj = this.objectList[objid];
 		var img = $(obj.domid);
 
@@ -347,12 +334,12 @@ var timeControl = {
 	},
 
 	getPeriod: function(objid) {
-		return this.objectList[objid].time.period;
+		return this.objectList[objid].timeline.period();
 	},
 
 	getSTime: function(objid) {
 		var obj = this.objectList[objid];
-		var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
+		var date = new CDate((obj.timeline.usertime() - obj.timeline.period()) * 1000);
 
 		return date.getZBXDate();
 	},
@@ -371,26 +358,6 @@ var timeControl = {
 		}
 
 		return url;
-	},
-
-	debug: function(fnc_name, id) {
-		if (this.debug_status) {
-			var str = 'timeLine.' + fnc_name;
-
-			if (typeof(id) != 'undefined') {
-				str += ' :' + id;
-			}
-			if (this.debug_prev == str) {
-				return true;
-			}
-
-			this.debug_info += str + '\n';
-			if (this.debug_status == 2) {
-				SDI(str);
-			}
-
-			this.debug_prev = str;
-		}
 	}
 };
 
@@ -431,7 +398,7 @@ function onload_update_scroll(id, w, period, stime, timel, bar_stime) {
 // timeline control core
 var ZBX_TIMELINES = {};
 
-function create_timeline(tlid, period, starttime, usertime, endtime, maximumperiod) {
+function create_timeline(tlid, period, starttime, usertime, endtime, maximumperiod, isNow) {
 	if (is_null(tlid)) {
 		tlid = ZBX_TIMELINES.length;
 	}
@@ -445,8 +412,11 @@ function create_timeline(tlid, period, starttime, usertime, endtime, maximumperi
 	if ('undefined' == typeof(endtime)) {
 		endtime = now;
 	}
+	if ('undefined' == typeof(isNow)) {
+		isNow = false;
+	}
 
-	ZBX_TIMELINES[tlid] = new CTimeLine(tlid, period, starttime, usertime, endtime, maximumperiod);
+	ZBX_TIMELINES[tlid] = new CTimeLine(tlid, period, starttime, usertime, endtime, maximumperiod, isNow);
 
 	return ZBX_TIMELINES[tlid];
 }
@@ -458,11 +428,12 @@ var CTimeLine = Class.create(CDebug, {
 	_usertime:	null,	// selected end time (bar, user selection)
 	_period:	null,	// selected period
 	_now:		false,	// state if time is set to NOW
+	_isNow:		false,	// state if time is set to NOW (for outside usage)
 	timelineid:	null,	// own id in array
 	minperiod:	3600,	// minimal allowed period
 	maxperiod:	null,	// max period in seconds
 
-	initialize: function($super, id, period, starttime, usertime, endtime, maximumperiod) {
+	initialize: function($super, id, period, starttime, usertime, endtime, maximumperiod, isNow) {
 		this.timelineid = id;
 		$super('CTimeLine[' + id + ']');
 
@@ -475,12 +446,11 @@ var CTimeLine = Class.create(CDebug, {
 		this.usertime(usertime);
 		this.period(period);
 		this.maxperiod = maximumperiod;
+		this.isNow(isNow);
 	},
 
 	timeNow: function() {
-		var tmp_date = new CDate();
-
-		return parseInt(tmp_date.getTime() / 1000);
+		return parseInt(new CDate().getTime() / 1000);
 	},
 
 	setNow: function() {
@@ -499,8 +469,6 @@ var CTimeLine = Class.create(CDebug, {
 
 
 	period: function(period) {
-		this.debug('period');
-
 		if ('undefined' == typeof(period)) {
 			return this._period;
 		}
@@ -516,8 +484,6 @@ var CTimeLine = Class.create(CDebug, {
 	},
 
 	usertime: function(usertime) {
-		this.debug('usertime');
-
 		if ('undefined' == typeof(usertime)) {
 			return this._usertime;
 		}
@@ -535,8 +501,6 @@ var CTimeLine = Class.create(CDebug, {
 	},
 
 	starttime: function(starttime) {
-		this.debug('starttime');
-
 		if ('undefined' == typeof(starttime)) {
 			return this._starttime;
 		}
@@ -546,8 +510,6 @@ var CTimeLine = Class.create(CDebug, {
 	},
 
 	endtime: function(endtime) {
-		this.debug('endtime');
-
 		if ('undefined' == typeof(endtime)) {
 			return this._endtime;
 		}
@@ -559,24 +521,12 @@ var CTimeLine = Class.create(CDebug, {
 		return this._endtime;
 	},
 
-	debug: function(fnc_name, id) {
-		if (this.debug_status) {
-			var str = 'CTimeLine[' + this.timelineid + '].' + fnc_name;
-
-			if (typeof(id) != 'undefined') {
-				str += ' :' + id;
-			}
-			if (this.debug_prev == str) {
-				return true;
-			}
-
-			this.debug_info += str + '\n';
-			if (this.debug_status == 2) {
-				SDI(str);
-			}
-
-			this.debug_prev = str;
+	isNow: function(isNow) {
+		if ('undefined' == typeof(isNow)) {
+			return this._isNow;
 		}
+
+		this._isNow = isNow;
 	}
 });
 
@@ -673,7 +623,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.maxperiod = maximalperiod;
 
 		try {
-			this.fixedperiod = fixedperiod == 1 ? 1 : 0;
+			this.fixedperiod = (fixedperiod == 1) ? 1 : 0;
 
 			// checks
 			if (!isset(timelineid, ZBX_TIMELINES)) {
@@ -715,6 +665,9 @@ var CScrollBar = Class.create(CDebug, {
 	onBarChange: function() {
 		this.changed = 1;
 		this.onchange(this.scrollbarid, this.timeline.timelineid, true);
+
+		ZBX_TIMELINES[this.timeline.timelineid].isNow(ZBX_TIMELINES[this.timeline.timelineid].now());
+
 		this.updateGlobalTimeline();
 	},
 
@@ -736,8 +689,6 @@ var CScrollBar = Class.create(CDebug, {
 
 	//------- MOVE -------
 	setFullPeriod: function() {
-		this.debug('setFullPeriod');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -751,8 +702,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setZoom: function(e, zoom) {
-		this.debug('setZoom', zoom);
-
 		if (this.disabled) {
 			return false;
 		}
@@ -765,8 +714,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	navigateLeft: function(e, left) {
-		this.debug('navigateLeft', this.fixedperiod);
-
 		if (this.disabled) {
 			return false;
 		}
@@ -806,8 +753,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	navigateRight: function(e, right) {
-		this.debug('navigateRight', this.fixedperiod);
-
 		if (this.disabled) {
 			return false;
 		}
@@ -852,8 +797,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setBarPosition: function(rightSide, periodWidth, setTimeLine) {
-		this.debug('setBarPosition');
-
 		if ('undefined' == typeof(periodWidth)) {
 			var periodWidth =  null;
 		}
@@ -930,8 +873,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setGhostByBar: function(ui) {
-		this.debug('setGhostByBar');
-
 		var dims = (arguments.length > 0)
 			? {'left': ui.position.left, 'width': jQuery(ui.helper.context).width()}
 			: getDimensions(this.dom.bar);
@@ -948,8 +889,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setBarByGhost: function() {
-		this.debug('setBarByGhost');
-
 		var dimensions = getDimensions(this.dom.ghost);
 
 		this.setBarPosition(dimensions.right, dimensions.width, false);
@@ -958,8 +897,6 @@ var CScrollBar = Class.create(CDebug, {
 
 	//------- CALENDAR -------
 	calendarShowLeft: function() {
-		this.debug('calendarShowLeft');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -975,8 +912,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	calendarShowRight: function() {
-		this.debug('calendarShowRight');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -993,8 +928,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setCalendarLeft: function(time) {
-		this.debug('setCalendarLeft', time);
-
 		if (this.disabled) {
 			return false;
 		}
@@ -1021,8 +954,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setCalendarRight: function(time) {
-		this.debug('setCalendarRight', time);
-
 		if (this.disabled) {
 			return false;
 		}
@@ -1051,16 +982,12 @@ var CScrollBar = Class.create(CDebug, {
 
 	//------- DRAG & DROP -------
 	barDragStart: function(e, ui) {
-		this.debug('barDragStart');
-
 		if (this.disabled) {
 			return false;
 		}
 	},
 
 	barDragChange: function(e, ui) {
-		this.debug('barDragChange');
-
 		if (this.disabled) {
 			ui.helper[0].stop(e);
 			return false;
@@ -1075,8 +1002,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	barDragEnd: function(e, ui) {
-		this.debug('barDragEnd');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -1089,8 +1014,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	makeBarDragable: function(element) {
-		this.debug('makeBarDragable');
-
 		// TODO: write proper function
 		jQuery(element).draggable({
 			containment: 'parent',
@@ -1103,8 +1026,6 @@ var CScrollBar = Class.create(CDebug, {
 
 	// <left arr>
 	make_left_arr_dragable: function(element) {
-		this.debug('make_left_arr_dragable');
-
 		var pD = {
 			'left': jQuery(this.dom.overlevel).offset().left,
 			'width': jQuery(this.dom.overlevel).width()
@@ -1121,8 +1042,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	leftArrowDragStart: function(e, ui) {
-		this.debug('leftArrowDragStart');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -1136,8 +1055,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	leftArrowDragChange: function(e, ui) {
-		this.debug('leftArrowDragChange');
-
 		if (this.disabled) {
 			ui.helper.context.stop(e);
 			return false;
@@ -1150,11 +1067,10 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	leftArrowDragEnd: function(e, ui) {
-		this.debug('leftArrowDragEnd');
-
 		if (this.disabled) {
 			return false;
 		}
+
 		var element = ui.helper.context;
 		this.position.leftArr = getDimensions(element);
 		this.ghostBox.endResize();
@@ -1163,8 +1079,6 @@ var CScrollBar = Class.create(CDebug, {
 
 	// <right arr>
 	make_right_arr_dragable: function(element) {
-		this.debug('make_right_arr_dragable');
-
 		var pD = {
 			'left': jQuery(this.dom.overlevel).offset().left,
 			'width': jQuery(this.dom.overlevel).width()
@@ -1181,8 +1095,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	rightArrowDragStart: function(e, ui) {
-		this.debug('rightArrowDragStart');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -1195,8 +1107,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	rightArrowDragChange: function(e, ui) {
-		this.debug('rightArrowDragChange');
-
 		if (this.disabled) {
 			ui.helper.context.stop(e);
 			return false;
@@ -1209,8 +1119,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	rightArrowDragEnd: function(e, ui) {
-		this.debug('rightArrowDragEnd');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -1226,8 +1134,6 @@ var CScrollBar = Class.create(CDebug, {
 	------------------------------ FUNC USES ------------------------------
 	---------------------------------------------------------------------*/
 	switchPeriodState: function() {
-		this.debug('switchPeriodState');
-
 		if (this.disabled) {
 			return false;
 		}
@@ -1241,17 +1147,12 @@ var CScrollBar = Class.create(CDebug, {
 		};
 		send_params(params);
 
-		if (this.fixedperiod) {
-			this.dom.period_state.innerHTML = locale['S_FIXED_SMALL'];
-		}
-		else {
-			this.dom.period_state.innerHTML = locale['S_DYNAMIC_SMALL'];
-		}
+		this.dom.period_state.innerHTML = (this.fixedperiod)
+			? locale['S_FIXED_SMALL']
+			: locale['S_DYNAMIC_SMALL'];
 	},
 
 	getTZOffset: function(time) {
-		this.debug('getTZOffset');
-
 		var date = new CDate(time * 1000);
 		var TimezoneOffset = date.getTimezoneOffset();
 
@@ -1259,8 +1160,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	getTZdiff: function(time1, time2) {
-		this.debug('getTZdiff');
-
 		var date = new CDate(time1 * 1000);
 		var TimezoneOffset = date.getTimezoneOffset();
 
@@ -1271,8 +1170,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	roundTime: function(usertime) {
-		this.debug('roundTime');
-
 		var time = parseInt(usertime);
 
 		if (time > 86400) {
@@ -1289,8 +1186,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	updateTimeLine: function(dim) {
-		this.debug('updateTimeLine');
-
 		// timeline update
 		var starttime = this.timeline.starttime();
 		var period = this.timeline.period();
@@ -1351,8 +1246,6 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setTabInfo: function() {
-		this.debug('setTabInfo');
-
 		var period = this.timeline.period();
 		var usertime = this.timeline.usertime();
 		var userstarttime = usertime - period;
@@ -1406,8 +1299,6 @@ var CScrollBar = Class.create(CDebug, {
 	//-------- SCROLL CREATION ---------------------------------------
 	//----------------------------------------------------------------
 	appendCalendars: function() {
-		this.debug('appendCalendars');
-
 		this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left, null, null, 'scrollbar_cntr');
 		this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
 		this.clndrLeft.clndr.onselect = this.setCalendarLeft.bind(this);
@@ -1431,8 +1322,6 @@ var CScrollBar = Class.create(CDebug, {
 	 * 31536000 = 365 * 86400
 	 */
 	appendZoomLinks: function() {
-		this.debug('appendZoomLinks');
-
 		var timeline = this.timeline.endtime() - this.timeline.starttime();
 
 		var caption = '';
@@ -1477,8 +1366,6 @@ var CScrollBar = Class.create(CDebug, {
 	 * 31536000 = 365 * 86400
 	 */
 	appendNavLinks: function() {
-		this.debug('appendNavLinks');
-
 		var timeline = this.timeline.endtime() - this.timeline.starttime();
 		var caption = '';
 		var moves = [3600, 43200, 86400, 604800, 2592000, 15552000, 31536000];
@@ -1807,8 +1694,6 @@ var CGhostBox = Class.create(CDebug, {
 	},
 
 	startResize: function(side) {
-		this.debug('startResize');
-
 		this.sideToMove = side;
 		this.flip = 0;
 
@@ -1827,8 +1712,6 @@ var CGhostBox = Class.create(CDebug, {
 	},
 
 	calcResizeByPX: function(px) {
-		this.debug('calcResizeByPX');
-
 		px = parseInt(px, 10);
 		this.flip = 0;
 
@@ -1861,8 +1744,6 @@ var CGhostBox = Class.create(CDebug, {
 	},
 
 	resizeBox: function(px) {
-		this.debug('resizeBox');
-
 		if ('undefined' != typeof(px)) {
 			this.calcResizeByPX(px);
 		}
@@ -1967,8 +1848,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	onselect: function() {
-		this.debug('onselect');
-
 		this.px2time = this.timeline.period() / this.cobj.width;
 		var userstarttime = this.timeline.usertime() - this.timeline.period();
 		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
@@ -2002,8 +1881,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	mousedown: function(e) {
-		this.debug('mousedown', this.sbox_id);
-
 		e = e || window.event;
 		if (e.which && e.which != 1) {
 			return false;
@@ -2040,8 +1917,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	mousemove: function(e) {
-		this.debug('mousemove', this.sbox_id);
-
 		e = e || window.event;
 
 		if (IE) {
@@ -2055,8 +1930,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	mouseup: function(e) {
-		this.debug('mouseup', this.sbox_id);
-
 		e = e || window.event;
 
 		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
@@ -2070,8 +1943,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	create_box: function() {
-		this.debug('create_box');
-
 		if (is_null(this.dom_box)) {
 			this.dom_box = document.createElement('div');
 			this.dom_obj.appendChild(this.dom_box);
@@ -2113,8 +1984,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	resizebox: function() {
-		this.debug('resizebox', this.sbox_id);
-
 		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
 			// fix wrong selection box
 			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
@@ -2144,8 +2013,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	moveleft: function(left, width) {
-		this.debug('moveleft');
-
 		if (!is_null(this.dom_box)) {
 			this.dom_box.style.left = left + 'px';
 		}
@@ -2158,8 +2025,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	moveright: function(width) {
-		this.debug('moveright');
-
 		if (!is_null(this.dom_box)) {
 			this.dom_box.style.left = this.box.left + 'px';
 		}
@@ -2170,8 +2035,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	calcperiod: function() {
-		this.debug('calcperiod');
-
 		if (this.box.width + 1 >= this.cobj.width) {
 			var new_period = this.timeline.period();
 		}
@@ -2184,12 +2047,9 @@ var sbox = Class.create(CDebug, {
 	},
 
 	validateW: function(w) {
-		this.debug('validateW');
-
 		if ((this.start_event.left - this.cobj.left + w) > this.cobj.width) {
 			w = 0;
 		}
-
 		if (this.mouse_event.left < this.cobj.left) {
 			w = 0;
 		}
@@ -2198,8 +2058,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	validateH: function(h) {
-		this.debug('validateH');
-
 		if (h <= 0) {
 			h = 1;
 		}
@@ -2211,8 +2069,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	moveSBoxByObj: function() {
-		this.debug('moveSBoxByObj', this.sbox_id);
-
 		var posxy = getPosition(this.grphobj);
 		var dims = getDimensions(this.grphobj);
 
@@ -2225,8 +2081,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	optimizeEvent: function(e) {
-		this.debug('optimizeEvent');
-
 		if (e.pageX || e.pageY) {
 			this.mouse_event.left = e.pageX;
 			this.mouse_event.top = e.pageY;
@@ -2248,8 +2102,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	clear_params: function() {
-		this.debug('clear_params', this.sbox_id);
-
 		if (!is_null(this.dom_box)) {
 			this.dom_obj.removeChild(this.dom_box);
 		}

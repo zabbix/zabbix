@@ -495,6 +495,15 @@ class CScreenBuilder {
 		);
 
 		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
+
+		$this->insertScreenRefreshTime();
+	}
+
+	/**
+	 * Insert javascript to make time control synchronizes with NOW!
+	 *
+	 */
+	public static function insertScreenRefreshTime() {
 		zbx_add_post_js('timeControl.refreshTime('.CWebUser::$data['refresh'].');');
 	}
 

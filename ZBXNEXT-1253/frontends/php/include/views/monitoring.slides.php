@@ -124,7 +124,7 @@ else {
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 		zbx_add_post_js('timeControl.addObject("iframe", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
-		zbx_add_post_js('timeControl.processObjects();');
+		CScreenBuilder::insertProcessObjectsJs();
 
 		$slideWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 	}

@@ -58,6 +58,7 @@ if (!empty($this->data['graphid'])) {
 	));
 	$chartsWidget->addItem($screen->get());
 	CScreenBuilder::insertProcessObjectsJs();
+	CScreenBuilder::insertScreenRefreshTime();
 }
 else {
 	$chartsWidget->addItem(new CTableInfo(_('No charts defined.')));

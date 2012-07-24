@@ -256,6 +256,7 @@ class CScreenBase {
 		}
 
 		$time = time();
+		$isNow = false;
 
 		// period
 		if (empty($options['period'])) {
@@ -286,6 +287,7 @@ class CScreenBase {
 			if (zbxDateToTime($options['stime']) > $time) {
 				$options['stime'] = date('YmdHis', $time - $options['period']);
 				$usertime = date('YmdHis', $time);
+				$isNow = true;
 			}
 
 			if ($options['doUpdate'] && !empty($options['profileIdx'])) {
@@ -311,7 +313,8 @@ class CScreenBase {
 			'period' => $options['period'],
 			'stime' => $options['stime'],
 			'starttime' => date('YmdHis', $time - ZBX_MAX_PERIOD),
-			'usertime' => $usertime
+			'usertime' => $usertime,
+			'isNow' => $isNow
 		);
 	}
 

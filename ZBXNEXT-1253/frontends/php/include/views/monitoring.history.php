@@ -158,6 +158,7 @@ if (!$this->data['plaintext']) {
 
 	if (str_in_array($this->data['action'], array('showvalues', 'showgraph'))) {
 		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
+		CScreenBuilder::insertScreenRefreshTime();
 	}
 }
 
