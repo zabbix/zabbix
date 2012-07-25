@@ -166,7 +166,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 		$dbGitemIds = zbx_objectValues($dbGitems, 'gitemid');
 
 		// update the graph if it's modified
-		if ($this->objectModified($graph, $dbGraph)) {
+		if (DB::recordModified('graphs', $dbGraph, $graph)) {
 			DB::updateByPk($this->tableName(), $graph['graphid'], $graph);
 		}
 
@@ -176,7 +176,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 		foreach ($graph['gitems'] as $gitem) {
 			// updating an existing item
 			if (isset($gitem['gitemid'], $dbGitems[$gitem['gitemid']])) {
-				if ($this->objectModified($gitem, $dbGitems[$gitem['gitemid']], 'graphs_items')) {
+				if (DB::recordModified('graphs_items', $dbGitems[$gitem['gitemid']], $gitem)) {
 					DB::updateByPk('graphs_items', $gitem['gitemid'], $gitem);
 				}
 
