@@ -411,6 +411,8 @@ class CZBXAPI {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
 				}
 			}
+
+			$sqlParts['select'] = array_unique($sqlParts['select']);
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {

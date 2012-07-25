@@ -58,9 +58,6 @@ class CMaintenance extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('maintenanceid', 'name', 'maintenance_type');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('maintenance' => 'm.maintenanceid'),
 			'from'		=> array('maintenances' => 'maintenances m'),
@@ -89,6 +86,7 @@ class CMaintenance extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
+			'selectTimeperiods'         => null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -367,40 +365,8 @@ class CMaintenance extends CZBXAPI {
 			return $result;
 		}
 
-		// selectGroups
-		if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'maintenanceids' => $maintenanceids,
-				'preservekeys' => true,
-				'output' => $options['selectGroups']
-			);
-			$groups = API::HostGroup()->get($objParams);
-			foreach ($groups as $group) {
-				$gmaintenances = $group['maintenances'];
-				unset($group['maintenances']);
-				foreach ($gmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['groups'][] = $group;
-				}
-			}
-		}
-
-		// selectHosts
-		if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'maintenanceids' => $maintenanceids,
-				'preservekeys' => true,
-				'output' => $options['selectHosts']
-			);
-			$hosts = API::Host()->get($objParams);
-			foreach ($hosts as $host) {
-				$hmaintenances = $host['maintenances'];
-				unset($host['maintenances']);
-				foreach ($hmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['hosts'][] = $host;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		if (is_null($options['preservekeys'])) {
@@ -862,12 +828,80 @@ class CMaintenance extends CZBXAPI {
 		DB::insert('maintenances_windows', $newMaintenanceWindows);
 
 		// delete remaining timeperiods
-		DBselect(
+		DBexecute(
 			'DELETE tp'.
 			' FROM timeperiods tp,maintenances_windows mw'.
 			' WHERE '.DBcondition('mw.timeperiodid', zbx_objectValues($timeperiods, 'timeperiodid'), true).
 				' AND mw.maintenanceid='.$maintenance['maintenanceid'].
 				' AND tp.timeperiodid=mw.timeperiodid'
 		);
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$maintenanceIds = array_keys($result);
+
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+
+		// selectGroups
+		if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
+			$objParams = array(
+				'output' => $options['selectGroups'],
+				'maintenanceids' => $maintenanceIds,
+				'preservekeys' => true
+			);
+			$groups = API::HostGroup()->get($objParams);
+			foreach ($groups as $group) {
+				$gmaintenances = $group['maintenances'];
+				unset($group['maintenances']);
+				foreach ($gmaintenances as $maintenance) {
+					$result[$maintenance['maintenanceid']]['groups'][] = $group;
+				}
+			}
+		}
+
+		// selectHosts
+		if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+			$objParams = array(
+				'output' => $options['selectHosts'],
+				'maintenanceids' => $maintenanceIds,
+				'preservekeys' => true
+			);
+			$hosts = API::Host()->get($objParams);
+			foreach ($hosts as $host) {
+				$hmaintenances = $host['maintenances'];
+				unset($host['maintenances']);
+				foreach ($hmaintenances as $maintenance) {
+					$result[$maintenance['maintenanceid']]['hosts'][] = $host;
+				}
+			}
+		}
+
+		// selectTimeperiods
+		if ($options['selectTimeperiods'] !== null) {
+			foreach ($result as &$maintenance) {
+				$maintenance['timeperiods'] = array();
+			}
+			unset($maintenance);
+
+			// create the SELECT part of the query
+			$sqlParts = $this->applyQueryOutputOptions('timeperiods', 'tp', array(
+				'output' => $options['selectTimeperiods']
+			), array('select' => array('tp.timeperiodid')));
+			$query = DBSelect(
+				'SELECT '.implode($sqlParts['select'], ',').',mw.maintenanceid'.
+				' FROM timeperiods tp,maintenances_windows mw'.
+				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceIds).
+					' AND tp.timeperiodid=mw.timeperiodid'
+			);
+			while ($tp = DBfetch($query)) {
+				$refId = $tp['maintenanceid'];
+				$tp = $this->unsetExtraFields('timeperiods', $tp, $options['selectTimeperiods']);
+				$result[$refId]['timeperiods'][] = $tp;
+			}
+		}
+
+		return $result;
 	}
 }
