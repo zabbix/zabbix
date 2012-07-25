@@ -308,12 +308,12 @@ if (!empty($data['form'])) {
 
 	if (!empty($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
 		// get maintenance
-		$options = array(
+		$maintenance = API::Maintenance()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'selectTimeperiods' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'maintenanceids' => $data['maintenanceid'],
-			'output' => API_OUTPUT_EXTEND
-		);
-		$maintenance = API::Maintenance()->get($options);
+		));
 		$maintenance = reset($maintenance);
 		$data['mname'] = $maintenance['name'];
 		$data['maintenance_type'] = $maintenance['maintenance_type'];
@@ -321,17 +321,9 @@ if (!empty($data['form'])) {
 		$data['active_till'] = $maintenance['active_till'];
 		$data['description'] = $maintenance['description'];
 
-		// get time periods
-		$data['timeperiods'] = array();
-		$sql = 'SELECT DISTINCT mw.maintenanceid,tp.*'.
-				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE mw.maintenanceid='.$data['maintenanceid'].
-					' AND tp.timeperiodid=mw.timeperiodid'.
-				' ORDER BY tp.timeperiod_type,tp.start_date';
-		$db_timeperiods = DBselect($sql);
-		while ($timeperiod = DBfetch($db_timeperiods)) {
-			$data['timeperiods'][] = $timeperiod;
-		}
+		// time periods
+		$data['timeperiods'] = $maintenance['timeperiods'];
+		CArrayHelper::sort($data['timeperiods'], array('timeperiod_type', 'start_date'));
 
 		// get hosts
 		$options = array(
