@@ -526,6 +526,75 @@ class DB {
 	}
 
 	/**
+	 * Replaces the records given in $oldRecords with the ones in $newRecords.
+	 *
+	 * If a record with the same primary key as a new one already exists in the old records, the record is updated
+	 * only if they are different. For new records the newly generated PK is added to the result. Old records that are
+	 * not present in the new records are deleted.
+	 *
+	 * All of the records must have the primary key defined.
+	 *
+	 * @static
+	 *
+	 * @param $tableName
+	 * @param array $oldRecords
+	 * @param array $newRecords
+	 *
+	 * @return array    the new records, that have been passed with the primary keys set for newly inserted records
+	 */
+	public static function replace($tableName, array $oldRecords, array $newRecords) {
+		$pk = self::getPk($tableName);
+		$oldRecords = zbx_toHash($oldRecords, $pk);
+
+		$modifiedRecords = array();
+		foreach ($newRecords as $record) {
+			// if it's a new or modified record - save it later
+			if (!isset($record[$pk]) || self::recordModified($tableName, $oldRecords[$record[$pk]], $record)) {
+				$modifiedRecords[] = $record;
+			}
+
+			// remove the existing records from the collection, the remaining ones will be deleted
+			if(isset($record[$pk])) {
+				unset($oldRecords[$record[$pk]]);
+			}
+		}
+
+		// save modified records
+		if ($modifiedRecords) {
+			$modifiedRecords = self::save($tableName, $modifiedRecords);
+		}
+
+		// delete remaining records
+		if ($oldRecords) {
+			DB::delete($tableName, array(
+				$pk => array_keys($oldRecords)
+			));
+		}
+
+		return $modifiedRecords;
+	}
+
+	/**
+	 * Compares the fields, that are present in both records, and returns true if any of the values differ.
+	 *
+	 * @static
+	 * @param $tableName
+	 * @param array $oldRecord
+	 * @param array $newRecord
+	 *
+	 * @return bool
+	 */
+	public static function recordModified($tableName, array $oldRecord, array $newRecord) {
+		foreach ($oldRecord as $field => $value) {
+			if (self::hasField($tableName, $field) && isset($newRecord[$field]) && $value != $newRecord[$field]) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Delete data from DB
 	 *
 	 * Example:

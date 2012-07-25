@@ -555,15 +555,15 @@ class CMaintenance extends CZBXAPI {
 
 		$hostids = array();
 		$groupids = array();
-		$options = array(
+		$updMaintenances = $this->get(array(
 			'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_REFER,
 			'selectHosts' => API_OUTPUT_REFER,
+			'selectTimeperiods' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		);
-		$updMaintenances = $this->get($options);
+		));
 
 		foreach ($maintenances as $maintenance) {
 			if (!isset($updMaintenances[$maintenance['maintenanceid']])) {
@@ -657,7 +657,7 @@ class CMaintenance extends CZBXAPI {
 			);
 
 			// update time periods
-			$this->replaceTimePeriods($maintenance);
+			$this->replaceTimePeriods($updMaintenances[$maintenance['maintenanceid']], $maintenance);
 		}
 		DB::update('maintenances', $update);
 
@@ -811,30 +811,24 @@ class CMaintenance extends CZBXAPI {
 	 * Updates maintenance time periods.
 	 *
 	 * @param array $maintenance
+	 * @param array $oldMaintenance
 	 */
-	protected function replaceTimePeriods(array $maintenance) {
-		// update timeperiods
-		$timeperiods = DB::save('timeperiods', $maintenance['timeperiods']);
+	protected function replaceTimePeriods(array $oldMaintenance, array $maintenance) {
+		// replace time periods
+		$timePeriods = DB::replace('timeperiods', $oldMaintenance['timeperiods'], $maintenance['timeperiods']);
 
-		// replace the maintenance windows
-		DB::delete('maintenances_windows', array('maintenanceid' => $maintenance['maintenanceid']));
+		// link new time periods to maintenance
+		$oldTimePeriods = zbx_toHash($oldMaintenance['timeperiods'], 'timeperiodid');
 		$newMaintenanceWindows = array();
-		foreach ($timeperiods as $tp) {
-			$newMaintenanceWindows[] = array(
-				'maintenanceid' => $maintenance['maintenanceid'],
-				'timeperiodid' => $tp['timeperiodid']
-			);
+		foreach ($timePeriods as $tp) {
+			if (!isset($oldTimePeriods[$tp['timeperiodid']])) {
+				$newMaintenanceWindows[] = array(
+					'maintenanceid' => $maintenance['maintenanceid'],
+					'timeperiodid' => $tp['timeperiodid']
+				);
+			}
 		}
 		DB::insert('maintenances_windows', $newMaintenanceWindows);
-
-		// delete remaining timeperiods
-		DBexecute(
-			'DELETE tp'.
-			' FROM timeperiods tp,maintenances_windows mw'.
-			' WHERE '.DBcondition('mw.timeperiodid', zbx_objectValues($timeperiods, 'timeperiodid'), true).
-				' AND mw.maintenanceid='.$maintenance['maintenanceid'].
-				' AND tp.timeperiodid=mw.timeperiodid'
-		);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
