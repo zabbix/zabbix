@@ -1,3 +1,6 @@
+Changes for 2.0.2
+
+--------------------------------------------------------------------------------
 Changes for 2.0.2rc2
 
 Bug fixes:
@@ -88,8 +91,6 @@ Changes for 2.0.1
 
 --------------------------------------------------------------------------------
 Changes for 2.0.1rc2
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-5094] removed trailing backslash from returned value {#FSNAME} by Windows agent (Sasha)
