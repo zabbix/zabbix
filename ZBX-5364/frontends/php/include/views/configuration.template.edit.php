@@ -282,6 +282,26 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$templateList->addRow(_('Graphs'), $listBox);
 	}
 
+	// template screens
+	$templateScreens = API::TemplateScreen()->get(array(
+		'templateids' => $templateid,
+		'noInheritance' => true,
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
+	));
+	if (!empty($templateScreens)) {
+		$screensList = array();
+		foreach ($templateScreens as $tplScreenId => $templateScreen) {
+			$screensList[$tplScreenId] = $templateScreen['name'];
+		}
+		order_result($screensList);
+
+		$listBox = new CListBox('screens', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($screensList);
+		$templateList->addRow(_('Screens'), $listBox);
+	}
+
 // Discovery rules
 	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
 		'inherited' => false,
@@ -363,26 +383,6 @@ if ($_REQUEST['form'] == 'full_clone') {
 			$listBox->addItems($prototypeList);
 
 			$templateList->addRow(_('Graph prototypes'), $listBox);
-		}
-
-		// template screens
-		$templateScreens = API::TemplateScreen()->get(array(
-			'templateids' => $templateid,
-			'noInheritance' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-		if (!empty($templateScreens)) {
-			$screensList = array();
-			foreach ($templateScreens as $tplScreenId => $templateScreen) {
-				$screensList[$tplScreenId] = $templateScreen['name'];
-			}
-			order_result($screensList);
-
-			$listBox = new CListBox('screens', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($screensList);
-			$templateList->addRow(_('Screens'), $listBox);
 		}
 	}
 }
