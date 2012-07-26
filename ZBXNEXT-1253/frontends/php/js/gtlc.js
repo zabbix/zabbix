@@ -281,7 +281,18 @@ var timeControl = {
 			}
 		}
 
-		flickerfreeScreen.refreshAll(period, stime);
+		if (this.refreshPage) {
+			var url = new Curl(location.href);
+			url.setArgument('period', period);
+			url.setArgument('stime', stime);
+			url.unsetArgument('output');
+			url = this.getFormattedUrl(objid, url);
+
+			location.href = url.getUrl();
+		}
+		else {
+			flickerfreeScreen.refreshAll(period, stime);
+		}
 	},
 
 	addSBox: function(e, objid) {
@@ -350,7 +361,8 @@ var timeControl = {
 
 	getFormattedUrl: function(objid, url) {
 		// ignore time in edit mode
-		if (!empty(flickerfreeScreen.screens[objid])
+		if (typeof(flickerfreeScreen) != 'undefined'
+				&& !empty(flickerfreeScreen.screens[objid])
 				&& flickerfreeScreen.screens[objid].mode == 1 // SCREEN_MODE_EDIT
 				&& flickerfreeScreen.screens[objid].resourcetype == 0) { // SCREEN_RESOURCE_GRAPH
 			url.unsetArgument('period');
