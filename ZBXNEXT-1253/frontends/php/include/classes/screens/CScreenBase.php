@@ -230,7 +230,7 @@ class CScreenBase {
 			'data' => !empty($data) ? $data : null
 		);
 
-		zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
+		zbx_add_post_js('window.flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
 	}
 
 	/**

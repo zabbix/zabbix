@@ -182,6 +182,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
 <script type="text/javascript" src="js/browsers.js"></script>
+<script type="text/javascript" src="js/jsDump.js"></script>
 <script type="text/javascript">var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
 	// is menu is frontend messaging

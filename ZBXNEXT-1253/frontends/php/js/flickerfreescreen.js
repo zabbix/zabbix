@@ -18,191 +18,202 @@
  **/
 
 
-var flickerfreeScreen = {
+jQuery(function($) {
+	'use strict';
 
-	screens: [],
+	window.flickerfreeScreen = {
 
-	refresh: function(id) {
-		var screen = this.screens[id];
-		if (empty(screen.resourcetype)) {
-			return;
-		}
+		screens: [],
 
-		var url = new Curl('jsrpc.php');
-		url.setArgument('type', 9); // PAGE_TYPE_TEXT
-		url.setArgument('method', 'screen.get');
-		url.setArgument('mode', screen.mode);
-		url.setArgument('flickerfreeScreenId', id);
-		url.setArgument('screenitemid', screen.screenitemid);
-		url.setArgument('hostid', screen.hostid);
-		url.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
-		url.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
-		url.setArgument('period', !empty(screen.period) ? screen.period : null);
-		url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+		refresh: function(id) {
+			var screen = this.screens[id];
+			if (empty(screen.resourcetype)) {
+				return;
+			}
 
-		// SCREEN_RESOURCE_GRAPH
-		// SCREEN_RESOURCE_SIMPLE_GRAPH
-		if (screen.resourcetype == 0 || screen.resourcetype == 1) {
-			url.setArgument('mode', 3); // SCREEN_MODE_JS
+			var ajaxUrl = new Curl('jsrpc.php');
+			ajaxUrl.setArgument('type', 9); // PAGE_TYPE_TEXT
+			ajaxUrl.setArgument('method', 'screen.get');
+			ajaxUrl.setArgument('mode', screen.mode);
+			ajaxUrl.setArgument('flickerfreeScreenId', id);
+			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
+			ajaxUrl.setArgument('hostid', screen.hostid);
+			ajaxUrl.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
+			ajaxUrl.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
+			ajaxUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
+			ajaxUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
 
-			jQuery.getScript(url.getUrl(), function() {
-				timeControl.refreshObject(id);
-			});
-		}
-
-		// SCREEN_RESOURCE_MAP
-		else if (screen.resourcetype == 2) {
-			jQuery('<div>').load(url.getUrl(), function() {
-				jQuery(this).find('img').each(function() {
-					var mapId = '#' + jQuery(this).attr('id');
-
-					jQuery('<img />', {
-						id: jQuery(this).attr('id') + '_tmp',
-						calss: jQuery(mapId).attr('class'),
-						border: jQuery(mapId).attr('border'),
-						usemap: jQuery(mapId).attr('usemap'),
-						alt: jQuery(mapId).attr('alt'),
-						name: jQuery(mapId).attr('name')
-					}).attr('src', jQuery(this).attr('src')).load(function() {
-						var mapId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
-
-						jQuery(this).attr('id', mapId);
-						jQuery('#' + mapId).replaceWith(jQuery(this));
+			// SCREEN_RESOURCE_GRAPH
+			// SCREEN_RESOURCE_SIMPLE_GRAPH
+			if (screen.resourcetype == 0 || screen.resourcetype == 1) {
+				this.refreshImg(id, function() {
+					$('#flickerfreescreen_' + id).find('a').each(function() {
+						var chartUrl = new Curl($(this).attr('href'));
+						chartUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
+						chartUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+						$(this).attr('href', chartUrl.getUrl());
 					});
 				});
-			});
-		}
+			}
 
-		// SCREEN_RESOURCE_DATA_OVERVIEW
-		else if (screen.resourcetype == 10) {
-			jQuery('<div>').load(url.getUrl(), function() {
-				jQuery(this).find('img').each(function() {
-					var workImage = jQuery(this);
-					var doId = '#' + jQuery(this).attr('id');
+			// SCREEN_RESOURCE_MAP
+			// SCREEN_RESOURCE_CHART
+			else if (screen.resourcetype == 2 || screen.resourcetype == 18) {
+				this.refreshImg(id);
+			}
 
-					jQuery('<img />', {
-						id: jQuery(this).attr('id') + '_tmp',
-						border: jQuery(doId).attr('border'),
-						alt: jQuery(doId).attr('alt'),
-						name: jQuery(doId).attr('name')
-					}).attr('src', jQuery(this).attr('src')).load(function() {
-						var doId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+			// SCREEN_RESOURCE_HISTORY
+			else if (screen.resourcetype == 17) {
+				if (screen.data.action == 'showgraph') {
+					this.refreshImg(id);
+				}
+				else {
+					ajaxUrl.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
+					ajaxUrl.setArgument('itemid', !empty(screen.data.itemid) ? screen.data.itemid : null);
+					ajaxUrl.setArgument('action', !empty(screen.data.action) ? screen.data.action : null);
+					ajaxUrl.setArgument('filter', !empty(screen.data.filter) ? screen.data.filter : null);
+					ajaxUrl.setArgument('filter_task', !empty(screen.data.filterTask) ? screen.data.filterTask : null);
+					ajaxUrl.setArgument('mark_color', !empty(screen.data.markColor) ? screen.data.markColor : null);
 
-						jQuery(this).attr('id', doId);
-						jQuery(workImage).replaceWith(jQuery(this));
-					});
-				});
+					this.refreshHtml(id, ajaxUrl);
+				}
+			}
 
-				jQuery('#flickerfreescreen_' + id).replaceWith(jQuery('div', this));
-			});
-		}
+			// SCREEN_RESOURCE_CLOCK
+			else if (screen.resourcetype == 7) {
+				// don't refresh anything
+			}
 
-		// SCREEN_RESOURCE_HISTORY
-		else if (screen.resourcetype == 17) {
-			url.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
-			url.setArgument('itemid', !empty(screen.data.itemid) ? screen.data.itemid : null);
-			url.setArgument('action', !empty(screen.data.action) ? screen.data.action : null);
-			url.setArgument('filter', !empty(screen.data.filter) ? screen.data.filter : null);
-			url.setArgument('filter_task', !empty(screen.data.filterTask) ? screen.data.filterTask : null);
-			url.setArgument('mark_color', !empty(screen.data.markColor) ? screen.data.markColor : null);
+			// others
+			else {
+				this.refreshHtml(id, ajaxUrl);
+			}
 
-			if (screen.data.action == 'showgraph') {
-				jQuery('#flickerfreescreen_' + id).find('img').each(function() {
-					var workImage = jQuery(this);
-					var doId = '#' + jQuery(this).attr('id');
-					var chartUrl = new Curl(jQuery(this).attr('src'));
-					chartUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
-					chartUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+			// set next refresh execution time
+			if (screen.isFlickerfree && screen.refreshInterval > 0) {
+				clearTimeout(screen.timeout);
+				screen.timeout = window.setTimeout(function() { flickerfreeScreen.refresh(id); }, screen.refreshInterval);
+			}
+		},
 
-					jQuery('<img />', {
-						id: jQuery(this).attr('id') + '_tmp',
-						border: jQuery(doId).attr('border'),
-						alt: jQuery(doId).attr('alt'),
-						name: jQuery(doId).attr('name')
-					}).attr('src', chartUrl.getUrl()).load(function() {
-						var doId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+		refreshAll: function(period, stime) {
+			for (var id in this.screens) {
+				if (empty(this.screens[id]) || empty(this.screens[id].resourcetype)) {
+					continue;
+				}
 
-						jQuery(this).attr('id', doId);
-						jQuery(workImage).replaceWith(jQuery(this));
-					});
-				});
+				this.screens[id].period = period;
+				this.screens[id].stime = stime;
+
+				// restart refresh execution starting from now
+				clearTimeout(this.screens[id].timeout);
+				this.refresh(id);
+			}
+		},
+
+		refreshHtml: function(id, ajaxUrl) {
+			var screen = this.screens[id];
+
+			if (screen.isRefreshing) {
+				screen.isReRefreshRequire = true;
 			}
 			else {
-				jQuery('#flickerfreescreen_' + id).load(url.getUrl());
-			}
-		}
+				screen.isRefreshing = true;
+				var ajaxRequest = $.ajax({
+					url: ajaxUrl.getUrl(),
+					type: 'post',
+					data: {},
+					dataType: 'html',
+					success: function(data) {
+						var imgTotal = $(data).find('img').length;
 
-		// SCREEN_RESOURCE_CHART
-		else if (screen.resourcetype == 18) {
-			jQuery('#flickerfreescreen_' + id).find('img').each(function() {
-				var workImage = jQuery(this);
-				var doId = '#' + jQuery(this).attr('id');
-				var url = new Curl(jQuery(this).attr('src'));
-				url.setArgument('period', !empty(screen.period) ? screen.period : null);
-				url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+						// preload images
+						if (imgTotal > 0) {
+							var loaded = 0;
 
-				jQuery('<img />', {
-					id: jQuery(this).attr('id') + '_tmp',
-					border: jQuery(doId).attr('border'),
-					alt: jQuery(doId).attr('alt'),
-					name: jQuery(doId).attr('name')
-				}).attr('src', url.getUrl()).load(function() {
-					var doId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+							$(data).find('img').each(function() {
+								$(this).load(function() {
+									loaded++;
 
-					jQuery(this).attr('id', doId);
-					jQuery(workImage).replaceWith(jQuery(this));
+									if (imgTotal == loaded) {
+										$('#flickerfreescreen_' + id).replaceWith(data);
+										screen.isRefreshing = false;
+									}
+								});
+							});
+						}
+						else {
+							$('#flickerfreescreen_' + id).html(data);
+							screen.isRefreshing = false;
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						screen.isRefreshing = false;
+					}
 				});
-			});
-		}
 
-		// SCREEN_RESOURCE_CLOCK
-		else if (screen.resourcetype == 7) {
-			// don't refresh screen
-		}
-		else {
-			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
-		}
-
-		if (screen.isFlickerfree && screen.refreshInterval > 0) {
-			this.screens[id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(id); }, screen.refreshInterval);
-		}
-	},
-
-	refreshAll: function(period, stime) {
-		for (var id in this.screens) {
-			if (empty(this.screens[id]) || empty(this.screens[id].resourcetype)) {
-				continue;
+				$.when(ajaxRequest).always(function() {
+					if (screen.isReRefreshRequire) {
+						screen.isReRefreshRequire = false;
+						flickerfreeScreen.refreshHtml(id, ajaxUrl);
+						return;
+					}
+				});
 			}
+		},
 
-			this.screens[id].period = period;
-			this.screens[id].stime = stime;
+		refreshImg: function(id, successAtion) {
+			var screen = this.screens[id];
 
-			// restart global refresh time planing starting from now
-			clearTimeout(this.screens[id].timeout);
-			this.refresh(id);
+			if (screen.isRefreshing) {
+				screen.isReRefreshRequire = true;
+			}
+			else {
+				screen.isRefreshing = true;
+
+				$('#flickerfreescreen_' + id).find('img').each(function() {
+					var workImg = $(this);
+					var doId = '#' + $(this).attr('id');
+					var chartUrl = new Curl($(this).attr('src'));
+					chartUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
+					chartUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+					chartUrl.setArgument('curtime', new CDate().getTime());
+
+					// img
+					$('<img />', {
+						id: $(this).attr('id') + '_tmp',
+						calss: $(doId).attr('class'),
+						border: $(doId).attr('border'),
+						usemap: $(doId).attr('usemap'),
+						alt: $(doId).attr('alt'),
+						name: $(doId).attr('name')
+					}).attr('src', chartUrl.getUrl()).load(function() {
+						var doId = $(this).attr('id').substring(0, $(this).attr('id').indexOf('_tmp'));
+
+						$(this).attr('id', doId);
+						$(workImg).replaceWith($(this));
+
+						if (typeof(successAtion) !== 'undefined') {
+							successAtion();
+						}
+
+						screen.isRefreshing = false;
+					});
+				});
+			}
+		},
+
+		add: function(screen) {
+			timeControl.refreshPage = false;
+
+			this.screens[screen.id] = screen;
+			this.screens[screen.id].refreshInterval = (screen.refreshInterval > 0) ? screen.refreshInterval * 1000 : 0;
+			this.screens[screen.id].isRefreshing = false;
+			this.screens[screen.id].isReRefreshRequire = false;
+
+			if (screen.isFlickerfree && screen.refreshInterval > 0) {
+				this.screens[screen.id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].refreshInterval);
+			}
 		}
-	},
-
-	add: function(screen) {
-		timeControl.refreshPage = false;
-
-		this.screens[screen.id] = {
-			'isFlickerfree': screen.isFlickerfree,
-			'mode': screen.mode,
-			'resourcetype': screen.resourcetype,
-			'screenitemid': screen.screenitemid,
-			'screenid': screen.screenid,
-			'hostid': screen.hostid,
-			'period': screen.period,
-			'stime': screen.stime,
-			'profileIdx': screen.profileIdx,
-			'profileIdx2': screen.profileIdx2,
-			'data': screen.data
-		};
-
-		if (screen.isFlickerfree && screen.refreshInterval > 0) {
-			this.screens[screen.id].refreshInterval = screen.refreshInterval * 1000;
-			this.screens[screen.id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].refreshInterval);
-		}
-	}
-};
+	};
+});
