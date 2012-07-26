@@ -133,7 +133,7 @@ class CScreenGraph extends CScreenBase {
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
-				$this->screenitem['url'] = 'chart6.php?graphid='.$resourceid;
+				$this->screenitem['url'] = 'chart6.php?graphid='.$resourceid.'&screenid='.$this->screenitem['screenid'];
 				$isDefault = true;
 			}
 
@@ -147,7 +147,7 @@ class CScreenGraph extends CScreenBase {
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
-				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceid;
+				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceid.'&screenid='.$this->screenitem['screenid'];
 				$isDefault = true;
 			}
 

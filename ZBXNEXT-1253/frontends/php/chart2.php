@@ -30,6 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'graphid' =>	array(T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null),
+	'screenid' =>	array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'period' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'border' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
@@ -69,13 +70,13 @@ $host = reset($host);
  * Display
  */
 $timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.charts'),
-	'profileIdx2' => get_request('graphid'),
+	'profileIdx' => get_request('profileIdx', 'web.screens'),
+	'profileIdx2' => get_request('screenid', get_request('graphid')),
 	'period' => get_request('period'),
 	'stime' => get_request('stime')
 ));
 
-CProfile::update('web.charts.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
+CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 $chart_header = '';
 if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {

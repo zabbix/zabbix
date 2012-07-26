@@ -230,7 +230,7 @@ class CScreenBase {
 			'mode' => $this->mode,
 			'refreshInterval' => CWebUser::$data['refresh'],
 			'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
-			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : null,
+			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : $this->screenid,
 			'groupid' => $this->groupid,
 			'hostid' => $this->hostid,
 			'period' => $this->timeline['period'],

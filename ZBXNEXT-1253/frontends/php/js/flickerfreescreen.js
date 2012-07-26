@@ -36,6 +36,7 @@ jQuery(function($) {
 			ajaxUrl.setArgument('method', 'screen.get');
 			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
+			ajaxUrl.setArgument('screenid', screen.screenid);
 			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
 			ajaxUrl.setArgument('groupid', screen.groupid);
 			ajaxUrl.setArgument('hostid', screen.hostid);
@@ -175,6 +176,7 @@ jQuery(function($) {
 					var workImg = $(this);
 					var doId = '#' + $(this).attr('id');
 					var chartUrl = new Curl($(this).attr('src'));
+					chartUrl.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
 					chartUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
 					chartUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
 					chartUrl.setArgument('curtime', new CDate().getTime());
