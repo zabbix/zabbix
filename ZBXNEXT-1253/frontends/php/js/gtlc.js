@@ -224,7 +224,7 @@ var timeControl = {
 			ZBX_SCROLLBARS[sbid].setBarPosition();
 			ZBX_SCROLLBARS[sbid].setGhostByBar();
 			ZBX_SCROLLBARS[sbid].setTabInfo();
-			ZBX_SCROLLBARS[sbid].onBarChange();
+			ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 		}
 
 		if (this.refreshInterval > 0) {
@@ -666,8 +666,6 @@ var CScrollBar = Class.create(CDebug, {
 		this.changed = 1;
 		this.onchange(this.scrollbarid, this.timeline.timelineid, true);
 
-		ZBX_TIMELINES[this.timeline.timelineid].isNow(ZBX_TIMELINES[this.timeline.timelineid].now());
-
 		this.updateGlobalTimeline();
 	},
 
@@ -685,6 +683,7 @@ var CScrollBar = Class.create(CDebug, {
 
 	updateGlobalTimeline: function() {
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
+		ZBX_TIMELINES[this.timeline.timelineid].isNow(ZBX_TIMELINES[this.timeline.timelineid].now());
 	},
 
 	//------- MOVE -------

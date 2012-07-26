@@ -56,6 +56,8 @@ class CScreenPlainText extends CScreenBase {
 		$table = new CTableInfo(_('No data defined.'));
 		$table->setHeader(array(_('Timestamp'), $host['name'].': '.itemName($item)));
 
+		$stime = zbxDateToTime($this->timeline['stime']);
+
 		$histories = API::History()->get(array(
 			'history' => $item['value_type'],
 			'itemids' => $this->screenitem['resourceid'],
@@ -63,8 +65,8 @@ class CScreenPlainText extends CScreenBase {
 			'sortorder' => ZBX_SORT_DOWN,
 			'sortfield' => $orderField,
 			'limit' => $this->screenitem['elements'],
-			'time_from' => $this->timeline['stime'],
-			'time_till' => $this->timeline['stime'] + $this->timeline['period']
+			'time_from' => $stime,
+			'time_till' => $stime + $this->timeline['period']
 		));
 		foreach ($histories as $history) {
 			switch ($item['value_type']) {

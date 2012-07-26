@@ -174,6 +174,7 @@ switch ($data['method']) {
 			'mode' => !empty($data['mode']) ? $data['mode'] : null,
 			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
 			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
+			'groupid' => !empty($data['groupid']) ? $data['groupid'] : null,
 			'hostid' => !empty($data['hostid']) ? $data['hostid'] : null,
 			'period' => !empty($data['period']) ? $data['period'] : null,
 			'stime' => !empty($data['stime']) ? $data['stime'] : null,

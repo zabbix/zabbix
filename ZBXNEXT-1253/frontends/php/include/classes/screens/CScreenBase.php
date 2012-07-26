@@ -60,6 +60,13 @@ class CScreenBase {
 	public $action;
 
 	/**
+	 * Group id
+	 *
+	 * @var int
+	 */
+	public $groupid;
+
+	/**
 	 * Host id
 	 *
 	 * @var int
@@ -100,6 +107,7 @@ class CScreenBase {
 	 * @param int		$options['screenid']
 	 * @param array		$options['screenitem']
 	 * @param string	$options['action']
+	 * @param int		$options['groupid']
 	 * @param int		$options['hostid']
 	 * @param int		$options['period']
 	 * @param int		$options['stime']
@@ -114,6 +122,7 @@ class CScreenBase {
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;
+		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
 
 		// calculate timeline
@@ -222,6 +231,7 @@ class CScreenBase {
 			'refreshInterval' => CWebUser::$data['refresh'],
 			'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
 			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : null,
+			'groupid' => $this->groupid,
 			'hostid' => $this->hostid,
 			'period' => $this->timeline['period'],
 			'stime' => $this->timeline['stime'],

@@ -122,7 +122,9 @@ else {
 		'screen' => $screen,
 		'mode' => SCREEN_MODE_PREVIEW,
 		'profileIdx' => 'web.screens',
-		'profileIdx2' => $screen['screenid']
+		'profileIdx2' => $screen['screenid'],
+		'groupid' => get_request('groupid'),
+		'hostid' => get_request('hostid')
 	));
 	$screenWidget->addItem($screenBuilder->show());
 

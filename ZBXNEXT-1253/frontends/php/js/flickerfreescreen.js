@@ -37,6 +37,7 @@ jQuery(function($) {
 			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
 			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
+			ajaxUrl.setArgument('groupid', screen.groupid);
 			ajaxUrl.setArgument('hostid', screen.hostid);
 			ajaxUrl.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
 			ajaxUrl.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
@@ -156,7 +157,6 @@ jQuery(function($) {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
 						flickerfreeScreen.refreshHtml(id, ajaxUrl);
-						return;
 					}
 				});
 			}
