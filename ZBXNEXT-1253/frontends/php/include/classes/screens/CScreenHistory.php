@@ -90,8 +90,8 @@ class CScreenHistory extends CScreenBase {
 		// mandatory
 		$this->itemid = isset($options['itemid']) ? $options['itemid'] : null;
 		$this->filter = isset($options['filter']) ? $options['filter'] : null;
-		$this->filterTask = isset($options['filterTask']) ? $options['filterTask'] : null;
-		$this->markColor = isset($options['markColor']) ? $options['markColor'] : MARK_COLOR_RED;
+		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
+		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
 
 		// optional
 		$this->items = isset($options['items']) ? $options['items'] : null;
@@ -173,7 +173,7 @@ class CScreenHistory extends CScreenBase {
 
 				if (!zbx_empty($this->filter) && in_array($this->filterTask, array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))) {
 					$options['search'] = array('value' => $this->filter);
-					if ($this->filterTask == filterTask_HIDE) {
+					if ($this->filterTask == FILTER_TASK_HIDE) {
 						$options['excludeSearch'] = 1;
 					}
 				}
@@ -192,10 +192,10 @@ class CScreenHistory extends CScreenBase {
 						if (isset($this->filter) && !zbx_empty($this->filter)) {
 							$contain = zbx_stristr($data['value'], $this->filter);
 
-							if ($contain && $this->filterTask == filterTask_MARK) {
+							if ($contain && $this->filterTask == FILTER_TASK_MARK) {
 								$color = $this->markColor;
 							}
-							if (!$contain && $this->filterTask == filterTask_INVERT_MARK) {
+							if (!$contain && $this->filterTask == FILTER_TASK_INVERT_MARK) {
 								$color = $this->markColor;
 							}
 
@@ -212,7 +212,7 @@ class CScreenHistory extends CScreenBase {
 							}
 						}
 
-						$row = array(nbsp(zbx_date2str(_('[Y.M.d H:i:s]'), $data['clock'])));
+						$row = array(nbsp(zbx_date2str(_('Y.M.d H:i:s'), $data['clock'])));
 
 						if ($isManyItems) {
 							$row[] = $host['name'].': '.itemName($item);
@@ -238,7 +238,7 @@ class CScreenHistory extends CScreenBase {
 							$min_color = 0x98;
 							$max_color = 0xF8;
 							$int_color = ($max_color - $min_color) / count($this->itemid);
-							$int_color *= array_search($data['itemid'], $this->itemid);
+							$int_color *= array_search($data['itemid'], array($this->itemid));
 							$int_color += $min_color;
 							$newRow->setAttribute('style', 'background-color: '.sprintf("#%X%X%X", $int_color, $int_color, $int_color));
 						}

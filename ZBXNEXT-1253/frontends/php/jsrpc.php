@@ -185,8 +185,8 @@ switch ($data['method']) {
 			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
 			$options['action'] = !empty($data['action']) ? $data['action'] : null;
 			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
-			$options['filter_task'] = !empty($data['filterTask']) ? $data['filterTask'] : null;
-			$options['mark_color'] = !empty($data['markColor']) ? $data['markColor'] : null;
+			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
+			$options['mark_color'] = !empty($data['mark_color']) ? $data['mark_color'] : null;
 		}
 		elseif ($options['resourcetype'] == SCREEN_RESOURCE_CHART) {
 			$options['graphid'] = !empty($data['graphid']) ? $data['graphid'] : null;
@@ -194,7 +194,9 @@ switch ($data['method']) {
 		}
 
 		$screenBase = CScreenBuilder::getScreen($options);
-		$screen = $screenBase->get();
+		if (!empty($screenBase)) {
+			$screen = $screenBase->get();
+		}
 
 		if (!empty($screen)) {
 			if ($options['mode'] == SCREEN_MODE_JS) {
@@ -205,6 +207,9 @@ switch ($data['method']) {
 					$result = $screen->toString();
 				}
 			}
+		}
+		else {
+			$result = '';
 		}
 		break;
 

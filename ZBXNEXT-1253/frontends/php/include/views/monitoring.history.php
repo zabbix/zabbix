@@ -137,8 +137,8 @@ $screen = CScreenBuilder::getScreen(array(
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => get_request('filter'),
-	'filterTask' => get_request('filter_task'),
-	'markColor' => get_request('mark_color'),
+	'filter_task' => get_request('filter_task'),
+	'mark_color' => get_request('mark_color'),
 	'plaintext' => $this->data['plaintext']
 ));
 
