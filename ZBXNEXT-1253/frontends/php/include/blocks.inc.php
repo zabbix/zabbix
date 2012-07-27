@@ -820,7 +820,7 @@ function make_latest_issues(array $filter = array()) {
 	$lastChangeHeaderDiv = new CDiv(array(_('Last change'), SPACE));
 	$lastChangeHeaderDiv->addStyle('float: left');
 
-	$table  = new CTableInfo();
+	$table = new CTableInfo();
 	$table->setHeader(
 		array(
 			is_show_all_nodes() ? _('Node') : null,
@@ -886,7 +886,13 @@ function make_latest_issues(array $filter = array()) {
 			'limit' => 1
 		));
 		if ($event = reset($events)) {
-			$ack = getEventAckState($event, true, true, $ackParams);
+			$ack = getEventAckState(
+				$event,
+				!empty($filter['backUrl']) ? $filter['backUrl'] : true,
+				true,
+				$ackParams
+			);
+
 			$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
 
 			// actions

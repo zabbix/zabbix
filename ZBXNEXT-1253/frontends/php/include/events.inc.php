@@ -251,9 +251,8 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 	return $table;
 }
 
-function getEventAckState($event, $isBackurl = false, $isLink = true, $params = array()) {
+function getEventAckState($event, $backUrl = false, $isLink = true, $params = array()) {
 	$config = select_config();
-	global $page;
 
 	if (!$config['event_ack_enable']) {
 		return null;
@@ -264,8 +263,14 @@ function getEventAckState($event, $isBackurl = false, $isLink = true, $params = 
 	}
 
 	if ($isLink) {
-		if ($isBackurl) {
-			$backurl = '&backurl='.$page['file'];
+		if (!empty($backUrl)) {
+			if (is_bool($backUrl)) {
+				global $page;
+				$backurl = '&backurl='.$page['file'];
+			}
+			else {
+				$backurl = '&backurl='.$backUrl;
+			}
 		}
 		else {
 			$backurl = '';

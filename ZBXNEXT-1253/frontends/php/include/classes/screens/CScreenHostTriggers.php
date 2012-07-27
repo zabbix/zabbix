@@ -32,9 +32,11 @@ class CScreenHostTriggers extends CScreenBase {
 		$params = array(
 			'groupids' => null,
 			'hostids' => null,
+			'screenid' => $this->screenid,
 			'maintenance' => null,
 			'severity' => null,
-			'limit' => $this->screenitem['elements']
+			'limit' => $this->screenitem['elements'],
+			'backUrl' => $this->pageFile
 		);
 
 		// by default triggers are sorted by date desc, do we need to override this?
@@ -121,9 +123,7 @@ class CScreenHostTriggers extends CScreenBase {
 			$item->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
 		}
 
-		$params['screenid'] = $this->screenid;
-
-		$output = new CUIWidget('hat_trstatus', make_latest_issues($params, true));
+		$output = new CUIWidget('hat_trstatus', make_latest_issues($params));
 		$output->setDoubleHeader(array(_('STATUS OF TRIGGERS'), SPACE, zbx_date2str(_('[H:i:s]')), SPACE), $item);
 
 		return $this->getOutput($output);
