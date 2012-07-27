@@ -919,32 +919,15 @@ if test "x$ARCH" = "xlinux"; then
 	esac
 fi
 
-dnl For HP-UX prior to 11.31 agent needs to be linked against ipv6 library.
-dnl This is because of introduced LLD in Zabbix 2.0. More information:
-dnl http://h20000.www2.hp.com/bc/docs/support/SupportManual/c02258083/c02258083.pdf
-if test "x$ARCH" = "xhpux" -a "x$enable_agent" = "xyes"; then
-	AC_MSG_CHECKING([if agent needs to be linked with ipv6 library])
+dnl Low Level Discovery needs a way to get the list of network
+dnl interfaces available on the monitored system. On HP-UX systems
+dnl that way depends on the OS version.
+if test "x$ARCH" = "xhpux"; then
 	hpux_version=${host_os#hpux}
 	hpux_major=${hpux_version%.*}
 	hpux_minor=${hpux_version#*.}
 
-	if test $hpux_major -lt 11 -o $hpux_major -eq 11 -a $hpux_minor -lt 31; then
-		AC_MSG_RESULT([yes])
-
-		AC_MSG_CHECKING([if ipv6 library is available])
-		ipv6_save_LDLAGS="$LDFLAGS"
-		LDFLAGS="-lipv6"
-		AC_TRY_LINK(
-			[#include <net/if.h>],
-			[struct if_nameindex *ni; ni = if_nameindex(); if_freenameindex(ni);],
-			AC_MSG_RESULT(yes)
-			AGENT_LIBS="${AGENT_LIBS} -lipv6",
-			AC_MSG_RESULT(no)
-			AC_MSG_ERROR(cannot compile agent because ipv6 library is not available))
-		LDFLAGS="$ipv6_save_LDLAGS"
-	else
-		AC_MSG_RESULT([no])
-	fi
+	AC_DEFINE_UNQUOTED([HPUX_VERSION], $hpux_major$hpux_minor, [Define to HP-UX version])
 fi
 
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
