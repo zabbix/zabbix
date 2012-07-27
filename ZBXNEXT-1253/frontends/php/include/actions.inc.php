@@ -516,19 +516,24 @@ function operation_type2str($type = null) {
 	}
 }
 
-function sortOperations(&$operations) {
-	$esc_step_from = array();
-	$esc_step_to = array();
-	$esc_period = array();
-	$operationTypes = array();
+function sortOperations($eventsource, &$operations) {
+	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+		$esc_step_from = array();
+		$esc_step_to = array();
+		$esc_period = array();
+		$operationTypes = array();
 
-	foreach ($operations as $key => $operation) {
-		$esc_step_from[$key] = $operation['esc_step_from'];
-		$esc_step_to[$key] = $operation['esc_step_to'];
-		$esc_period[$key] = $operation['esc_period'];
-		$operationTypes[$key] = $operation['operationtype'];
+		foreach ($operations as $key => $operation) {
+			$esc_step_from[$key] = $operation['esc_step_from'];
+			$esc_step_to[$key] = $operation['esc_step_to'];
+			$esc_period[$key] = $operation['esc_period'];
+			$operationTypes[$key] = $operation['operationtype'];
+		}
+		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $operations);
 	}
-	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $operations);
+	else {
+		CArrayHelper::sort($operations, array('operationtype'));
+	}
 }
 
 function get_operators_by_conditiontype($conditiontype) {
@@ -636,21 +641,20 @@ function get_operators_by_conditiontype($conditiontype) {
 }
 
 function count_operations_delay($operations, $def_period = 0) {
-	$delays = array(0, 0);
+	$delays = array(1 => 0);
 	$periods = array();
 	$max_step = 0;
 
 	foreach ($operations as $operation) {
-		$step_from = $operation['esc_step_from'] ? $operation['esc_step_from'] : 1;
 		$step_to = $operation['esc_step_to'] ? $operation['esc_step_to'] : 9999;
 		$esc_period = $operation['esc_period'] ? $operation['esc_period'] : $def_period;
 
-		$max_step = ($max_step > $step_from) ? $max_step : $step_from;
+		if ($max_step < $operation['esc_step_from']) {
+			$max_step = $operation['esc_step_from'];
+		}
 
-		for ($i = $step_from; $i < $step_to; $i++) {
-			if (isset($periods[$i]) && $periods[$i] < $esc_period) {
-			}
-			else {
+		for ($i = $operation['esc_step_from']; $i <= $step_to; $i++) {
+			if (!isset($periods[$i]) || $periods[$i] > $esc_period) {
 				$periods[$i] = $esc_period;
 			}
 		}
@@ -658,7 +662,7 @@ function count_operations_delay($operations, $def_period = 0) {
 
 	for ($i = 1; $i <= $max_step; $i++) {
 		$esc_period = isset($periods[$i]) ? $periods[$i] : $def_period;
-		$delays[$i + 1] = $delays[$i] + $esc_period;
+		$delays[$i+1] = $delays[$i] + $esc_period;
 	}
 
 	return $delays;
