@@ -344,6 +344,7 @@ function getDimensions(obj, trueSide) {
 			dim.bottom = dim.top + dim.height;
 		}
 	}
+
 	return dim;
 }
 
@@ -362,6 +363,7 @@ function getParent(obj, name) {
 function getPosition(obj) {
 	obj = $(obj);
 	var pos = {top: 0, left: 0};
+
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
 		pos.left = obj.offsetLeft;
 		pos.top = obj.offsetTop;
@@ -379,6 +381,7 @@ function getPosition(obj) {
 		} catch(e) {
 		}
 	}
+
 	return pos;
 }
 

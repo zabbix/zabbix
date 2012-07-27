@@ -885,7 +885,7 @@ var CScrollBar = Class.create(CDebug, {
 
 	setGhostByBar: function(ui) {
 		var dims = (arguments.length > 0)
-			? {'left': ui.position.left, 'width': jQuery(ui.helper.context).width()}
+			? {left: ui.position.left, width: jQuery(ui.helper.context).width()}
 			: getDimensions(this.dom.bar);
 
 		// ghost
@@ -1038,8 +1038,8 @@ var CScrollBar = Class.create(CDebug, {
 	// <left arr>
 	make_left_arr_dragable: function(element) {
 		var pD = {
-			'left': jQuery(this.dom.overlevel).offset().left,
-			'width': jQuery(this.dom.overlevel).width()
+			left: jQuery(this.dom.overlevel).offset().left,
+			width: jQuery(this.dom.overlevel).width()
 		};
 
 		// TODO: write proper function
@@ -1091,8 +1091,8 @@ var CScrollBar = Class.create(CDebug, {
 	// <right arr>
 	make_right_arr_dragable: function(element) {
 		var pD = {
-			'left': jQuery(this.dom.overlevel).offset().left,
-			'width': jQuery(this.dom.overlevel).width()
+			left: jQuery(this.dom.overlevel).offset().left,
+			width: jQuery(this.dom.overlevel).width()
 		};
 
 		// TODO: write proper function
@@ -1198,14 +1198,12 @@ var CScrollBar = Class.create(CDebug, {
 
 	updateTimeLine: function(dim) {
 		// timeline update
-		var starttime = this.timeline.starttime();
 		var period = this.timeline.period();
-		var new_usertime = parseInt(dim.right * this.px2sec, 10) + starttime;
+		var new_usertime = parseInt(dim.right * this.px2sec, 10) + this.timeline.starttime();
 		var new_period = parseInt(dim.width * this.px2sec, 10);
 
 		if (new_period > 86400) {
-			new_period = this.roundTime(new_period);
-			new_period -= this.getTZOffset(new_period);
+			new_period = this.roundTime(new_period) - this.getTZOffset(new_period);
 		}
 
 		var right = false;
@@ -1310,7 +1308,7 @@ var CScrollBar = Class.create(CDebug, {
 	//-------- SCROLL CREATION ---------------------------------------
 	//----------------------------------------------------------------
 	appendCalendars: function() {
-		this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left, null, null, 'scrollbar_cntr');
+		this.clndrLeft = create_calendar(this.timeline.usertime() - this.timeline.period(), this.dom.info_left, null, null, 'scrollbar_cntr');
 		this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
 		this.clndrLeft.clndr.onselect = this.setCalendarLeft.bind(this);
 		addListener(this.dom.info_left, 'click', this.calendarShowLeft.bindAsEventListener(this));
@@ -1676,7 +1674,9 @@ var CScrollBar = Class.create(CDebug, {
 });
 
 var CGhostBox = Class.create(CDebug, {
-	box: null, // resized dom object
+	box:		null, // resized dom object
+	sideToMove:	null, // 0 - left side, 1 - right side
+	flip:		null, // if flip < 0, ghost is fliped
 
 	// resize start position
 	start: {
@@ -1692,9 +1692,6 @@ var CGhostBox = Class.create(CDebug, {
 		rightSide:	null
 	},
 
-	sideToMove:	null, // 0 - left side, 1 - right side
-	flip:		null, // if flip < 0, ghost is fliped
-
 	initialize: function($super, id) {
 		$super('CGhostBox[' + id + ']');
 
@@ -1705,12 +1702,11 @@ var CGhostBox = Class.create(CDebug, {
 	},
 
 	startResize: function(side) {
-		this.sideToMove = side;
-		this.flip = 0;
-
 		var dimensions = getDimensions(this.box);
 
-		this.start.width = dimensions.width; // - borders (2 x 1px)
+		this.sideToMove = side;
+		this.flip = 0;
+		this.start.width = dimensions.width;
 		this.start.leftSide = dimensions.left;
 		this.start.rightSide = dimensions.right;
 		this.box.style.zIndex = 20;
@@ -1734,7 +1730,7 @@ var CGhostBox = Class.create(CDebug, {
 				this.current.rightSide = this.start.rightSide + Math.abs(this.flip);
 			}
 			else {
-				this.current.leftSide = (this.start.leftSide + px);
+				this.current.leftSide = this.start.leftSide + px;
 				this.current.rightSide = this.start.rightSide;
 			}
 		}
@@ -1755,7 +1751,7 @@ var CGhostBox = Class.create(CDebug, {
 	},
 
 	resizeBox: function(px) {
-		if ('undefined' != typeof(px)) {
+		if (typeof(px) != 'undefined') {
 			this.calcResizeByPX(px);
 		}
 
@@ -1796,6 +1792,7 @@ function sbox_init(sbid, timeline, domobjectid) {
 	}
 
 	ZBX_SBOX[sbid].sbox = box;
+
 	return box;
 }
 
@@ -2046,12 +2043,14 @@ var sbox = Class.create(CDebug, {
 	},
 
 	calcperiod: function() {
+		var new_period;
+
 		if (this.box.width + 1 >= this.cobj.width) {
-			var new_period = this.timeline.period();
+			new_period = this.timeline.period();
 		}
 		else {
 			this.px2time = this.timeline.period() / this.cobj.width;
-			var new_period = Math.round(this.box.width * this.px2time);
+			new_period = Math.round(this.box.width * this.px2time);
 		}
 
 		return new_period;
@@ -2080,13 +2079,14 @@ var sbox = Class.create(CDebug, {
 	},
 
 	moveSBoxByObj: function() {
-		var posxy = getPosition(this.grphobj);
+		var posxy = jQuery('#' + jQuery(this.grphobj).attr('id')).position();
 		var dims = getDimensions(this.grphobj);
 
 		this.dom_obj.style.top = (posxy.top + ZBX_SBOX[this.sbox_id].shiftT) + 'px';
 		this.dom_obj.style.left = posxy.left + 'px';
-		this.dom_obj.style.width = dims.width + 'px';
-
+		if (dims.width > 0) {
+			this.dom_obj.style.width = dims.width + 'px';
+		}
 		this.cobj.top = posxy.top + ZBX_SBOX[this.sbox_id].shiftT;
 		this.cobj.left = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
 	},
@@ -2147,13 +2147,11 @@ var sbox = Class.create(CDebug, {
 });
 
 function create_box_on_obj(obj, height) {
-	var parent = obj.parentNode;
-
 	var div = document.createElement('div');
-	parent.appendChild(div);
-
 	div.className = 'box_on';
 	div.style.height = (height + 2) + 'px';
+
+	obj.parentNode.appendChild(div);
 
 	return div;
 }
