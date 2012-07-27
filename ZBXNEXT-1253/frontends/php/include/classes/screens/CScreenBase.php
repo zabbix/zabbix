@@ -27,6 +27,13 @@ class CScreenBase {
 	public $isFlickerfree;
 
 	/**
+	 * Page file.
+	 *
+	 * @var string
+	 */
+	public $pageFile;
+
+	/**
 	 * @see CScreenBuilder::mode
 	 */
 	public $mode;
@@ -102,6 +109,7 @@ class CScreenBase {
 	 *
 	 * @param array		$options
 	 * @param boolean	$options['isFlickerfree']
+	 * @param string	$options['pageFile']
 	 * @param int		$options['mode']
 	 * @param int		$options['resourcetype']
 	 * @param int		$options['screenid']
@@ -124,6 +132,15 @@ class CScreenBase {
 		$this->action = !empty($options['action']) ? $options['action'] : null;
 		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
+
+		// get page file
+		if (!empty($options['pageFile'])) {
+			$this->pageFile = $options['pageFile'];
+		}
+		else {
+			global $page;
+			$this->pageFile = $page['file'];
+		}
 
 		// calculate timeline
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
@@ -226,6 +243,7 @@ class CScreenBase {
 		$jsData = array(
 			'id' => $this->getDataId(),
 			'isFlickerfree' => $this->isFlickerfree,
+			'pageFile' => $this->pageFile,
 			'resourcetype' => $this->resourcetype,
 			'mode' => $this->mode,
 			'refreshInterval' => CWebUser::$data['refresh'],

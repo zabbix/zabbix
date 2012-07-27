@@ -29,6 +29,13 @@ class CScreenBuilder {
 	public $isFlickerfree;
 
 	/**
+	 * Page file.
+	 *
+	 * @var string
+	 */
+	public $pageFile;
+
+	/**
 	 * Screen data
 	 *
 	 * @var array
@@ -75,6 +82,7 @@ class CScreenBuilder {
 	 *
 	 * @param array		$options
 	 * @param boolean	$options['isFlickerfree']
+	 * @param string	$options['pageFile']
 	 * @param int		$options['mode']
 	 * @param int		$options['hostid']
 	 * @param int		$options['period']
@@ -87,6 +95,15 @@ class CScreenBuilder {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
+
+		// get page file
+		if (!empty($options['pageFile'])) {
+			$this->pageFile = $options['pageFile'];
+		}
+		else {
+			global $page;
+			$this->pageFile = $page['file'];
+		}
 
 		// get screen
 		if (!empty($options['screen'])) {
@@ -359,6 +376,7 @@ class CScreenBuilder {
 				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
 					$screenBase = CScreenBuilder::getScreen(array(
 						'isFlickerfree' => $this->isFlickerfree,
+						'pageFile' => $this->pageFile,
 						'mode' => $this->mode,
 						'hostid' => $this->hostid,
 						'profileIdx' => $this->profileIdx,

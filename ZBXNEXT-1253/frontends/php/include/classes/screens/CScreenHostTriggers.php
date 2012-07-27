@@ -98,7 +98,7 @@ class CScreenHostTriggers extends CScreenBase {
 				$params['hostids'] = $hostid;
 			}
 
-			$item = new CForm();
+			$item = new CForm(null, $this->pageFile);
 
 			$groupComboBox = new CComboBox('tr_groupid', $groupid, 'submit()');
 			$groupComboBox->addItem(0, _('all'));

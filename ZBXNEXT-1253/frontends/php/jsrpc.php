@@ -171,6 +171,7 @@ switch ($data['method']) {
 
 	case 'screen.get':
 		$options = array(
+			'pageFile' => !empty($data['pageFile']) ? $data['pageFile'] : null,
 			'mode' => !empty($data['mode']) ? $data['mode'] : null,
 			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
 			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,

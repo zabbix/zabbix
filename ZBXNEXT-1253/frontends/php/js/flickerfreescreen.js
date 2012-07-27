@@ -36,6 +36,7 @@ jQuery(function($) {
 			ajaxUrl.setArgument('method', 'screen.get');
 			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
+			ajaxUrl.setArgument('pageFile', screen.pageFile);
 			ajaxUrl.setArgument('screenid', screen.screenid);
 			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
 			ajaxUrl.setArgument('groupid', screen.groupid);
