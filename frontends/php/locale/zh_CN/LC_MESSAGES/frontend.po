@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-22 01:43+0300\n"
+"POT-Creation-Date: 2012-07-29 18:28+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -337,11 +337,12 @@ msgstr "Active till"
 #: dashconf.php:211 history.php:263 include/blocks.inc.php:1083
 #: include/blocks.inc.php:1089 include/blocks.inc.php:1194
 #: include/blocks.inc.php:1239 include/blocks.inc.php:1245
-#: include/forms.inc.php:1668 include/forms.inc.php:1972
-#: include/reports.inc.php:326 include/reports.inc.php:422
-#: include/reports.inc.php:462
+#: include/forms.inc.php:1668 include/reports.inc.php:326
+#: include/reports.inc.php:422 include/reports.inc.php:462
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:112
+#: include/views/administration.general.regularexpressions.edit.php:43
+#: include/views/administration.general.regularexpressions.edit.php:56
 #: include/views/administration.general.valuemapping.edit.php:40
 #: include/views/administration.usergroups.edit.php:101
 #: include/views/administration.usergroups.edit.php:105
@@ -376,6 +377,7 @@ msgstr "Active till"
 #: include/views/configuration.triggers.edit.php:94
 #: include/views/configuration.triggers.edit.php:288
 #: include/views/configuration.triggers.massupdate.php:96
+#: include/views/js/adm.regexprs.edit.js.php:252
 #: include/views/js/configuration.action.edit.js.php:275
 #: include/views/js/configuration.discovery.edit.js.php:66
 #: include/views/js/configuration.sysmaps.js.php:175
@@ -536,7 +538,7 @@ msgstr "Allowed hosts"
 msgid "Any"
 msgstr ""
 
-#: include/regexp.inc.php:181
+#: include/regexp.inc.php:178 include/views/js/adm.regexprs.edit.js.php:116
 msgid "Any character string included"
 msgstr "Any character string included"
 
@@ -953,7 +955,7 @@ msgstr "配置节点"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "配置代理服务器"
 
-#: adm.regexps.php:204
+#: adm.regexps.php:184
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr ""
 
@@ -1076,8 +1078,8 @@ msgid "Canada (136 characters)"
 msgstr ""
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:254
-#: include/forms.inc.php:1670 include/forms.inc.php:1973
-#: include/js.inc.php:222 include/setup.inc.php:138
+#: include/forms.inc.php:1670 include/js.inc.php:222 include/setup.inc.php:138
+#: include/views/administration.general.regularexpressions.edit.php:58
 #: include/views/configuration.action.edit.php:946
 #: include/views/configuration.action.edit.php:955
 #: include/views/configuration.services.parent.list.php:62
@@ -1167,7 +1169,7 @@ msgstr "Cannot add node"
 msgid "Cannot add proxy"
 msgstr "Cannot add proxy"
 
-#: adm.regexps.php:84
+#: adm.regexps.php:108
 msgid "Cannot add regular expression"
 msgstr "无法添加表达式"
 
@@ -1402,7 +1404,7 @@ msgstr "Cannot delete node"
 msgid "Cannot delete proxy"
 msgstr "Cannot delete proxy"
 
-#: adm.regexps.php:117
+#: adm.regexps.php:141
 #, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
@@ -1904,7 +1906,7 @@ msgstr "Cannot update node"
 msgid "Cannot update proxy"
 msgstr "Cannot update proxy"
 
-#: adm.regexps.php:78
+#: adm.regexps.php:102
 msgid "Cannot update regular expression"
 msgstr "无法更新表达式"
 
@@ -1969,7 +1971,8 @@ msgstr "Cannot update value map"
 msgid "Caption"
 msgstr "Caption"
 
-#: include/forms.inc.php:1871 include/forms.inc.php:1967
+#: include/views/administration.general.regularexpressions.edit.php:40
+#: include/views/administration.general.regularexpressions.edit.php:54
 msgid "Case sensitive"
 msgstr "Case sensitive"
 
@@ -2006,11 +2009,11 @@ msgstr "修改密码"
 msgid "Character"
 msgstr "字符串"
 
-#: include/regexp.inc.php:178
+#: include/regexp.inc.php:177 include/views/js/adm.regexprs.edit.js.php:113
 msgid "Character string included"
 msgstr "Character string included"
 
-#: include/regexp.inc.php:184
+#: include/regexp.inc.php:179 include/views/js/adm.regexprs.edit.js.php:119
 msgid "Character string not included"
 msgstr "Character string not included"
 
@@ -2101,8 +2104,8 @@ msgstr ""
 msgid "Clock"
 msgstr "Clock"
 
-#: include/forms.inc.php:1835
 #: include/views/administration.general.iconmap.edit.php:141
+#: include/views/administration.general.regularexpressions.edit.php:87
 #: include/views/administration.proxy.edit.php:94
 #: include/views/administration.script.edit.php:121
 #: include/views/configuration.action.edit.php:973
@@ -2158,7 +2161,7 @@ msgstr "列宽度"
 msgid "Columns"
 msgstr "列数"
 
-#: include/forms.inc.php:1807
+#: include/views/js/adm.regexprs.edit.js.php:23
 msgid "Combined result"
 msgstr "Combined result"
 
@@ -2999,7 +3002,7 @@ msgstr ""
 msgid "Delayed by"
 msgstr "Delayed by"
 
-#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1901
+#: include/classes/class.cbuttondelete.php:25
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:152 jsLoader.php:99
 #: tr_logform.php:333 tr_logform.php:350
@@ -3076,7 +3079,7 @@ msgstr ""
 msgid "Delete proxy?"
 msgstr ""
 
-#: include/forms.inc.php:1837
+#: include/views/administration.general.regularexpressions.edit.php:88
 msgid "Delete regular expression?"
 msgstr "删除表达式?"
 
@@ -3323,8 +3326,7 @@ msgstr ""
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/forms.inc.php:1798 include/forms.inc.php:1879
-#: include/forms.inc.php:1959
+#: include/views/administration.general.regularexpressions.edit.php:53
 msgid "Delimiter"
 msgstr "分隔符"
 
@@ -3803,13 +3805,13 @@ msgstr "事件"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/forms.inc.php:1872 include/forms.inc.php:1886
 #: include/views/administration.users.edit.php:157
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:377
 #: include/views/configuration.maintenance.edit.php:97
 #: include/views/configuration.screen.list.php:59
 #: include/views/configuration.triggers.edit.php:77
+#: include/views/js/adm.regexprs.edit.js.php:7
 #: include/views/js/configuration.sysmaps.js.php:377 sysmaps.php:268
 #: sysmaps.php:292
 msgid "Edit"
@@ -4172,10 +4174,6 @@ msgstr ""
 msgid "Expand single problem"
 msgstr "Expand single problem"
 
-#: include/forms.inc.php:1739 include/forms.inc.php:1870
-msgid "Expected result"
-msgstr "期望的结果"
-
 #: api/rpc/class.cjsonrpc.php:81
 #, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
@@ -4199,9 +4197,11 @@ msgstr "导出所选"
 msgid "Export to CSV"
 msgstr ""
 
-#: include/forms.inc.php:1738 include/forms.inc.php:1869
-#: include/forms.inc.php:1942 include/triggers.inc.php:1631
+#: include/triggers.inc.php:1631
 #: include/views/administration.general.iconmap.edit.php:41
+#: include/views/administration.general.regularexpressions.edit.php:38
+#: include/views/administration.general.regularexpressions.edit.php:51
+#: include/views/administration.general.regularexpressions.edit.php:73
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:132
 #: include/views/configuration.triggers.edit.php:143
@@ -4219,7 +4219,7 @@ msgstr ""
 msgid "Expression Variable Elements"
 msgstr ""
 
-#: include/triggers.inc.php:651
+#: include/triggers.inc.php:651 include/views/js/adm.regexprs.edit.js.php:220
 msgid "Expression cannot be empty"
 msgstr "Expression cannot be empty"
 
@@ -4227,11 +4227,14 @@ msgstr "Expression cannot be empty"
 msgid "Expression constructor"
 msgstr ""
 
-#: include/forms.inc.php:1951
+#: include/views/administration.general.regularexpressions.edit.php:39
+#: include/views/administration.general.regularexpressions.edit.php:52
+#: include/views/administration.general.regularexpressions.edit.php:73
 msgid "Expression type"
 msgstr "Expression type"
 
-#: include/views/administration.general.regularexpressions.edit.php:33
+#: include/views/administration.general.regularexpressions.edit.php:47
+#: include/views/administration.general.regularexpressions.edit.php:78
 #: include/views/administration.general.regularexpressions.list.php:29
 msgid "Expressions"
 msgstr "表达式"
@@ -4250,7 +4253,8 @@ msgctxt "Friday short"
 msgid "F"
 msgstr ""
 
-#: include/forms.inc.php:1794 include/forms.inc.php:1814
+#: include/views/js/adm.regexprs.edit.js.php:365
+#: include/views/js/adm.regexprs.edit.js.php:374
 msgid "FALSE"
 msgstr "FALSE"
 
@@ -4467,7 +4471,7 @@ msgid "GSM modem"
 msgstr "GSM Modem"
 
 #: adm.gui.php:88 adm.housekeeper.php:67 adm.iconmapping.php:93
-#: adm.images.php:127 adm.macros.php:158 adm.other.php:100 adm.regexps.php:186
+#: adm.images.php:127 adm.macros.php:158 adm.other.php:100 adm.regexps.php:166
 #: adm.triggerdisplayingoptions.php:76 adm.triggerdisplayoptions.php:76
 #: adm.triggerseverities.php:79 adm.valuemapping.php:115
 #: adm.workingtime.php:57 include/views/administration.general.gui.edit.php:51
@@ -4503,7 +4507,7 @@ msgstr "Giga"
 msgid "Given expression is not a macro"
 msgstr ""
 
-#: include/classes/class.globalregexp.php:71
+#: include/classes/class.globalregexp.php:78
 msgid "Global expression does not exist."
 msgstr ""
 
@@ -5205,7 +5209,7 @@ msgid "Hours"
 msgstr "Hours"
 
 #: adm.gui.php:89 adm.housekeeper.php:68 adm.iconmapping.php:94
-#: adm.images.php:128 adm.macros.php:159 adm.other.php:101 adm.regexps.php:187
+#: adm.images.php:128 adm.macros.php:159 adm.other.php:101 adm.regexps.php:167
 #: adm.triggerdisplayingoptions.php:77 adm.triggerdisplayoptions.php:77
 #: adm.triggerseverities.php:80 adm.valuemapping.php:116
 #: adm.workingtime.php:58
@@ -5436,7 +5440,7 @@ msgstr ""
 
 #: adm.gui.php:91 adm.housekeeper.php:70 adm.iconmapping.php:96
 #: adm.iconmapping.php:159 adm.images.php:130 adm.macros.php:161
-#: adm.other.php:103 adm.regexps.php:189 adm.triggerdisplayingoptions.php:79
+#: adm.other.php:103 adm.regexps.php:169 adm.triggerdisplayingoptions.php:79
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:82
 #: adm.valuemapping.php:118 adm.workingtime.php:60
 msgid "Icon mapping"
@@ -5453,6 +5457,10 @@ msgstr ""
 
 #: include/views/js/configuration.sysmaps.js.php:111
 msgid "Icons"
+msgstr ""
+
+#: include/views/js/adm.regexprs.edit.js.php:225
+msgid "Identical expression already exists"
 msgstr ""
 
 #: include/config.inc.php:250
@@ -5490,7 +5498,7 @@ msgid "Image updated"
 msgstr "图片已更新"
 
 #: adm.gui.php:90 adm.housekeeper.php:69 adm.iconmapping.php:95
-#: adm.images.php:129 adm.macros.php:160 adm.other.php:102 adm.regexps.php:188
+#: adm.images.php:129 adm.macros.php:160 adm.other.php:102 adm.regexps.php:168
 #: adm.triggerdisplayingoptions.php:78 adm.triggerdisplayoptions.php:78
 #: adm.triggerseverities.php:81 adm.valuemapping.php:117
 #: adm.workingtime.php:59
@@ -5787,10 +5795,6 @@ msgstr ""
 msgid "Incorrect dependency."
 msgstr ""
 
-#: adm.regexps.php:159
-msgid "Incorrect expression"
-msgstr "错误的表达式"
-
 #: include/classes/db/DB.php:460 include/classes/db/DB.php:540
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
@@ -5879,7 +5883,7 @@ msgstr ""
 msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:283
+#: api/classes/CGraphGeneral.php:289
 msgid "Incorrect item for axis value."
 msgstr ""
 
@@ -7063,7 +7067,7 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr ""
 
 #: adm.gui.php:93 adm.housekeeper.php:72 adm.iconmapping.php:98
-#: adm.images.php:132 adm.macros.php:163 adm.other.php:105 adm.regexps.php:191
+#: adm.images.php:132 adm.macros.php:163 adm.other.php:105 adm.regexps.php:171
 #: adm.triggerdisplayingoptions.php:81 adm.triggerdisplayoptions.php:81
 #: adm.triggerseverities.php:84 adm.valuemapping.php:120
 #: adm.workingtime.php:62
@@ -7585,15 +7589,16 @@ msgstr ""
 msgid "NTLM authentication"
 msgstr ""
 
-#: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:91
-#: adm.regexps.php:121 disc_prototypes.php:43 graphs.php:42
+#: actionconf.php:34 actionconf.php:157 adm.regexps.php:37 adm.regexps.php:115
+#: adm.regexps.php:145 disc_prototypes.php:43 graphs.php:42
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:653 hosts.php:684
 #: httpconf.php:43 httpmon.php:143 include/forms.inc.php:549
-#: include/forms.inc.php:1733 include/hosts.inc.php:115
-#: include/reports.inc.php:376 include/setup.inc.php:319
+#: include/hosts.inc.php:115 include/reports.inc.php:376
+#: include/setup.inc.php:319
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:33
+#: include/views/administration.general.regularexpressions.edit.php:32
 #: include/views/administration.general.regularexpressions.list.php:29
 #: include/views/administration.general.valuemapping.edit.php:34
 #: include/views/administration.general.valuemapping.list.php:23
@@ -7679,7 +7684,7 @@ msgstr "Never"
 msgid "Never executed"
 msgstr ""
 
-#: include/forms.inc.php:1900 include/views/configuration.action.edit.php:396
+#: include/views/configuration.action.edit.php:396
 #: include/views/configuration.action.edit.php:596
 #: include/views/configuration.action.edit.php:896
 #: include/views/configuration.discovery.edit.php:54
@@ -7698,10 +7703,6 @@ msgstr "新的触发条件"
 #: jsLoader.php:146
 msgid "New element"
 msgstr ""
-
-#: include/views/administration.general.regularexpressions.edit.php:36
-msgid "New expression"
-msgstr "New expression"
 
 #: disc_prototypes.php:50 host_discovery.php:52
 #: include/views/configuration.item.edit.php:304
@@ -7730,7 +7731,7 @@ msgstr "New maintenance period"
 msgid "New media"
 msgstr "新方法"
 
-#: adm.regexps.php:200
+#: adm.regexps.php:180
 msgid "New regular expression"
 msgstr "新表达式"
 
@@ -7752,10 +7753,10 @@ msgid "Next check"
 msgstr "Next check"
 
 #: events.php:690 include/config.inc.php:560 include/events.inc.php:277
-#: include/events.inc.php:291 include/forms.inc.php:1885
-#: include/triggers.inc.php:1633
+#: include/events.inc.php:291 include/triggers.inc.php:1633
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
+#: include/views/js/adm.regexprs.edit.js.php:146
 msgid "No"
 msgstr "No"
 
@@ -8783,7 +8784,7 @@ msgid "Original blue"
 msgstr "原始的蓝色"
 
 #: adm.gui.php:98 adm.housekeeper.php:77 adm.iconmapping.php:103
-#: adm.images.php:137 adm.macros.php:168 adm.other.php:110 adm.regexps.php:196
+#: adm.images.php:137 adm.macros.php:168 adm.other.php:110 adm.regexps.php:176
 #: adm.triggerdisplayingoptions.php:86 adm.triggerdisplayoptions.php:86
 #: adm.triggerseverities.php:89 adm.valuemapping.php:125
 #: adm.workingtime.php:67 include/classes/class.ctweenbox.php:77
@@ -9485,7 +9486,6 @@ msgid "Regexp"
 msgstr ""
 
 #: include/audit.inc.php:47
-#: include/views/administration.general.regularexpressions.edit.php:30
 msgid "Regular expression"
 msgstr "正则表达式"
 
@@ -9494,11 +9494,11 @@ msgstr "正则表达式"
 msgid "Regular expression \"%s\" already exists."
 msgstr ""
 
-#: adm.regexps.php:83
+#: adm.regexps.php:107
 msgid "Regular expression added"
 msgstr "表达式已添加"
 
-#: adm.regexps.php:116
+#: adm.regexps.php:140
 #, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
@@ -9508,12 +9508,12 @@ msgstr[0] "表达式已删除"
 msgid "Regular expression does not exist."
 msgstr ""
 
-#: adm.regexps.php:77
+#: adm.regexps.php:101
 msgid "Regular expression updated"
 msgstr "表达式已更新"
 
 #: adm.gui.php:92 adm.housekeeper.php:71 adm.iconmapping.php:97
-#: adm.images.php:131 adm.macros.php:162 adm.other.php:104 adm.regexps.php:190
+#: adm.images.php:131 adm.macros.php:162 adm.other.php:104 adm.regexps.php:170
 #: adm.triggerdisplayingoptions.php:80 adm.triggerdisplayoptions.php:80
 #: adm.triggerseverities.php:83 adm.valuemapping.php:119
 #: adm.workingtime.php:61
@@ -9552,6 +9552,7 @@ msgstr "Remote command"
 #: include/views/configuration.triggers.edit.php:278
 #: include/views/configuration.triggers.massupdate.php:87
 #: include/views/js/administration.general.valuemapping.edit.js.php:14
+#: include/views/js/adm.regexprs.edit.js.php:8
 #: include/views/js/common.macros.js.php:14
 #: include/views/js/configuration.action.edit.js.php:9
 #: include/views/js/configuration.action.edit.js.php:21
@@ -9734,16 +9735,17 @@ msgstr "Response time"
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
 
-#: include/forms.inc.php:1740 include/forms.inc.php:1822 tr_testexpr.php:129
-#: tr_testexpr.php:161
+#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:74
+#: tr_testexpr.php:129 tr_testexpr.php:161
 msgid "Result"
 msgstr "Result"
 
-#: include/regexp.inc.php:190
+#: include/regexp.inc.php:181 include/views/js/adm.regexprs.edit.js.php:125
 msgid "Result is FALSE"
 msgstr "Result is FALSE"
 
-#: include/regexp.inc.php:187
+#: include/regexp.inc.php:180 include/views/js/adm.regexprs.edit.js.php:122
 msgid "Result is TRUE"
 msgstr "Result is TRUE"
 
@@ -10020,7 +10022,6 @@ msgid "Saturday"
 msgstr "Saturday"
 
 #: acknow.php:174 dashconf.php:270 include/forms.inc.php:1668
-#: include/forms.inc.php:1826 include/forms.inc.php:1972
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
@@ -10029,6 +10030,7 @@ msgstr "Saturday"
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.macros.edit.php:34
 #: include/views/administration.general.other.edit.php:48
+#: include/views/administration.general.regularexpressions.edit.php:91
 #: include/views/administration.general.triggerDisplayOptions.edit.php:120
 #: include/views/administration.general.triggerSeverity.edit.php:76
 #: include/views/administration.general.valuemapping.edit.php:61
@@ -11065,7 +11067,8 @@ msgstr "TOTAL"
 msgid "TRIGGER COMMENTS"
 msgstr "TRIGGER COMMENTS"
 
-#: include/forms.inc.php:1792 include/forms.inc.php:1811
+#: include/views/js/adm.regexprs.edit.js.php:365
+#: include/views/js/adm.regexprs.edit.js.php:374
 msgid "TRUE"
 msgstr "TRUE"
 
@@ -11223,8 +11226,8 @@ msgstr ""
 msgid "Tera"
 msgstr "Tera"
 
-#: include/forms.inc.php:1831
 #: include/views/administration.authentication.edit.php:88
+#: include/views/administration.general.regularexpressions.edit.php:79
 #: include/views/configuration.triggers.edit.php:211 tr_testexpr.php:25
 #: tr_testexpr.php:115 tr_testexpr.php:164
 msgid "Test"
@@ -11242,7 +11245,12 @@ msgstr ""
 msgid "Test data"
 msgstr "测试数据"
 
-#: adm.regexps.php:37 include/forms.inc.php:1734
+#: include/views/administration.general.regularexpressions.edit.php:69
+msgid "Test expressions"
+msgstr ""
+
+#: adm.regexps.php:38
+#: include/views/administration.general.regularexpressions.edit.php:66
 msgid "Test string"
 msgstr "Test string"
 
@@ -11492,7 +11500,7 @@ msgid "Trigger deleted"
 msgstr "触发器已删除"
 
 #: adm.gui.php:97 adm.housekeeper.php:76 adm.iconmapping.php:102
-#: adm.images.php:136 adm.macros.php:167 adm.other.php:109 adm.regexps.php:195
+#: adm.images.php:136 adm.macros.php:167 adm.other.php:109 adm.regexps.php:175
 #: adm.triggerdisplayingoptions.php:85 adm.triggerdisplayoptions.php:85
 #: adm.triggerseverities.php:88 adm.valuemapping.php:124
 #: adm.workingtime.php:66
@@ -11550,7 +11558,7 @@ msgid "Trigger prototypes of"
 msgstr ""
 
 #: adm.gui.php:96 adm.housekeeper.php:75 adm.iconmapping.php:101
-#: adm.images.php:135 adm.macros.php:166 adm.other.php:108 adm.regexps.php:194
+#: adm.images.php:135 adm.macros.php:166 adm.other.php:108 adm.regexps.php:174
 #: adm.triggerdisplayingoptions.php:84 adm.triggerdisplayoptions.php:84
 #: adm.triggerseverities.php:87 adm.valuemapping.php:123
 #: adm.workingtime.php:65
@@ -11834,7 +11842,7 @@ msgstr "单位Units"
 #: include/items.inc.php:157 include/maintenances.inc.php:41
 #: include/maps.inc.php:39 include/maps.inc.php:681 include/maps.inc.php:771
 #: include/maps.inc.php:868 include/media.inc.php:39 include/nodes.inc.php:257
-#: include/perm.inc.php:30 include/regexp.inc.php:193
+#: include/perm.inc.php:30 include/regexp.inc.php:191
 #: include/screens.inc.php:55 include/triggers.inc.php:260
 #: include/triggers.inc.php:367 include/triggers.inc.php:385
 #: include/users.inc.php:50 include/users.inc.php:65
@@ -11965,7 +11973,8 @@ msgstr ""
 #: include/views/configuration.action.edit.php:953
 #: include/views/configuration.host.massupdate.php:219
 #: include/views/configuration.httpconf.popup.php:74
-#: include/views/configuration.item.massupdate.php:451 popup_period.php:183
+#: include/views/configuration.item.massupdate.php:451
+#: include/views/js/adm.regexprs.edit.js.php:258 popup_period.php:183
 msgid "Update"
 msgstr "更新"
 
@@ -12292,7 +12301,7 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr ""
 
 #: adm.gui.php:94 adm.housekeeper.php:73 adm.iconmapping.php:99
-#: adm.images.php:133 adm.macros.php:164 adm.other.php:106 adm.regexps.php:192
+#: adm.images.php:133 adm.macros.php:164 adm.other.php:106 adm.regexps.php:172
 #: adm.triggerdisplayingoptions.php:82 adm.triggerdisplayoptions.php:82
 #: adm.triggerseverities.php:85 adm.valuemapping.php:121
 #: adm.valuemapping.php:177 adm.workingtime.php:63
@@ -12535,7 +12544,7 @@ msgid "Wizard"
 msgstr ""
 
 #: adm.gui.php:95 adm.housekeeper.php:74 adm.iconmapping.php:100
-#: adm.images.php:134 adm.macros.php:165 adm.other.php:107 adm.regexps.php:193
+#: adm.images.php:134 adm.macros.php:165 adm.other.php:107 adm.regexps.php:173
 #: adm.triggerdisplayingoptions.php:83 adm.triggerdisplayoptions.php:83
 #: adm.triggerseverities.php:86 adm.valuemapping.php:122
 #: adm.workingtime.php:64
@@ -12737,8 +12746,9 @@ msgstr "每年"
 #: events.php:690 include/blocks.inc.php:694
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:560
 #: include/events.inc.php:280 include/events.inc.php:294
-#: include/forms.inc.php:1885 include/triggers.inc.php:1633
+#: include/triggers.inc.php:1633
 #: include/views/administration.users.list.php:74
+#: include/views/js/adm.regexprs.edit.js.php:143
 msgid "Yes"
 msgstr "Yes"
 
@@ -13110,6 +13120,10 @@ msgstr ""
 #: include/setup.inc.php:353 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
 msgid "default"
+msgstr ""
+
+#: include/views/js/adm.regexprs.edit.js.php:130
+msgid "delimiter"
 msgstr ""
 
 #: jsLoader.php:86
