@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2012 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,8 +46,15 @@
 #define MAX_REACHABLE_ITEMS	64
 #define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
 
+#ifdef HAVE_CASSANDRA
+#	include "zbxcassa.h"
+#endif
+
 extern unsigned char	process_type;
 extern int		process_num;
+
+extern zbx_cassandra_hosts_t	CONFIG_CASSANDRA_HOSTS;
+extern char			*CONFIG_CASSANDRA_KEYSPACE;
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 {
@@ -841,6 +848,9 @@ void	main_poller_loop(unsigned char poller_type)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_connect(ZBX_CASSANDRA_CONNECT_NORMAL, &CONFIG_CASSANDRA_HOSTS, CONFIG_CASSANDRA_KEYSPACE);
+#endif
 
 	for (;;)
 	{
