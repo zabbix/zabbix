@@ -1242,6 +1242,8 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
 
+			$this->deleteDependencies($trigger);
+
 			// add dependencies
 			if (!empty($trigger['dependencies'])) {
 				$newDeps = array();
@@ -1547,7 +1549,7 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * @param $triggers
 	 */
-	protected function createReal(array &$triggers) {
+	protected function createReal(array &$triggers) {sdex();
 		$triggers = zbx_toArray($triggers);
 
 		// insert triggers without expression
