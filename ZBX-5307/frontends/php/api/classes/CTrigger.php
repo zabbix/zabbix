@@ -1813,18 +1813,18 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// trigger hosts
-			$hosts = DBFetchArray(get_hosts_by_triggerid($trigger['triggerid']));
+			$triggerHosts = DBFetchArray(get_hosts_by_triggerid($trigger['triggerid']));
 
 			// forbid dependencies from hosts to templates
-			$isTemplatedTrigger = in_array(HOST_STATUS_TEMPLATE, zbx_objectValues($hosts, 'status'));
+			$isTemplatedTrigger = in_array(HOST_STATUS_TEMPLATE, zbx_objectValues($triggerHosts, 'status'));
 			if (!$isTemplatedTrigger) {
-				$templates = API::Template()->get(array(
+				$triggerTemplates = API::Template()->get(array(
 					'triggerids' => $trigger['dependencies'],
 					'output' => array('status'),
 					'nopermissions' => true,
 					'limit' => 1
 				));
-				if ($templates) {
+				if ($triggerTemplates) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add dependency from a host to a template.'));
 				}
 			}
@@ -1854,22 +1854,24 @@ class CTrigger extends CTriggerGeneral {
 
 			} while (!empty($upTriggerids));
 
-			$templateids = zbx_objectValues($hosts, 'hostid');
-			$templateids = zbx_toHash($templateids);
+			$triggerHostIds = zbx_objectValues($triggerHosts, 'hostid');
+			$triggerHostIds = zbx_toHash($triggerHostIds);
 
-			$delTemplateids = array();
+			// fetch all templates that are used in dependencies
+			$depTemplateIds = array();
 			$dbDepHosts = get_hosts_by_triggerid($trigger['dependencies']);
 			while ($dephost = DBfetch($dbDepHosts)) {
 				if ($dephost['status'] == HOST_STATUS_TEMPLATE) {
-					$templates[$dephost['hostid']] = $dephost;
-					$delTemplateids[$dephost['hostid']] = $dephost['hostid'];
+					$depTemplateIds[$dephost['hostid']] = $dephost['hostid'];
 				}
 			}
 
-			$tdiff = array_diff($delTemplateids, $templateids);
-			if (!empty($templateids) && !empty($delTemplateids) && !empty($tdiff)) {
-				$tpls = zbx_array_merge($templateids, $delTemplateids);
+			// run the check only if a templated trigger has dependencies on other templates
+			$tdiff = array_diff($depTemplateIds, $triggerHostIds);
+			if (!empty($triggerHostIds) && !empty($depTemplateIds) && !empty($tdiff)) {
+				$tpls = zbx_array_merge($triggerHostIds, $depTemplateIds);
 
+				// create a list of all hosts, that are linked to the affected templates
 				$dbLowlvltpl = DBselect(
 					'SELECT DISTINCT ht.templateid,ht.hostid,h.host'.
 					' FROM hosts_templates ht,hosts h'.
@@ -1884,16 +1886,18 @@ class CTrigger extends CTriggerGeneral {
 					$map[$lowlvltpl['hostid']][$lowlvltpl['templateid']] = $lowlvltpl['host'];
 				}
 
+				// check that if at least one template used in the trigger and dependencies is linked to the host,
+				// that all templates used in dependencies are also linked
 				foreach ($map as $templates) {
 					$setWithDep = false;
 
-					foreach ($templateids as $tplid) {
+					foreach ($triggerHostIds as $tplid) {
 						if (isset($templates[$tplid])) {
 							$setWithDep = true;
 							break;
 						}
 					}
-					foreach ($delTemplateids as $delTplId) {
+					foreach ($depTemplateIds as $delTplId) {
 						if (!isset($templates[$delTplId]) && $setWithDep) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all templates are linked to host "%s".', reset($templates)));
 						}
