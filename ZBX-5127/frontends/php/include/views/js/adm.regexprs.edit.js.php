@@ -221,7 +221,8 @@
 					return false;
 				}
 				for (var id in this.expressions) {
-					if (this.expressions[id].equals(data)) {
+					// if we update expression, no error if equals itself
+					if (id != this.selectedID && this.expressions[id].equals(data)) {
 						alert('<?php echo _('Identical expression already exists'); ?>');
 						return false;
 					}
