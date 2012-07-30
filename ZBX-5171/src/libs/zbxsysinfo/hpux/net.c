@@ -134,7 +134,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 #if HPUX_VERSION < 1131
 	char			*if_list = NULL;
-	size_t			if_list_alloc = 2, if_list_offset = 0;
+	size_t			if_list_alloc = 64, if_list_offset = 0;
 #else
 	struct if_nameindex	*ni;
 #endif
