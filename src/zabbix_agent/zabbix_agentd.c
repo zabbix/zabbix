@@ -28,7 +28,9 @@
 #include "alias.h"
 
 #include "stats.h"
-#include "perfstat.h"
+#ifdef _WINDOWS
+#	include "perfstat.h"
+#endif
 #include "active.h"
 #include "listener.h"
 
@@ -577,6 +579,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_collector_data();
 
 #ifdef _WINDOWS
+	init_perf_collector(1);
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 	load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -685,7 +688,7 @@ void	zbx_on_exit()
 		zbx_free(threads);
 	}
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 	zbx_sleep(2);	/* wait for all processes to exit */
 #endif
 
@@ -697,6 +700,9 @@ void	zbx_on_exit()
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
+#ifdef _WINDOWS
+	free_perf_collector();
+#endif
 
 	exit(SUCCEED);
 }
@@ -764,7 +770,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
 #ifdef _WINDOWS
-			init_collector_data();	/* required for reading PerfCounter */
+			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 			load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -775,7 +781,7 @@ int	main(int argc, char **argv)
 			else
 				test_parameters();
 #ifdef _WINDOWS
-			free_collector_data();
+			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 #endif
 			free_metrics();
 			alias_list_free();
