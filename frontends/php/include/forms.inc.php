@@ -1382,8 +1382,13 @@
 		$new_timeperiod = get_request('new_timeperiod', array());
 		$new = is_array($new_timeperiod);
 
-		if (is_array($new_timeperiod) && isset($new_timeperiod['id'])) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+		if (is_array($new_timeperiod)) {
+			if (isset($new_timeperiod['id'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+			}
+			if (isset($new_timeperiod['timeperiodid'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[timeperiodid]', $new_timeperiod['timeperiodid']));
+			}
 		}
 		if (!is_array($new_timeperiod)) {
 			$new_timeperiod = array();
