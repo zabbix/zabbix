@@ -116,7 +116,7 @@ REORG TABLE config
 /
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT alert_usrgrpid IN (SELECT usrgrpid FROM usrgrp)
 /
-UPDATE config SET discovery_groupid=NULL WHERE NOT discovery_groupid IN (SELECT groupid FROM groups)
+UPDATE config SET discovery_groupid=(SELECT MIN(groupid) FROM groups) WHERE NOT discovery_groupid IN (SELECT groupid FROM groups)
 /
 
 UPDATE config SET default_theme='darkblue' WHERE default_theme='css_bb.css'
