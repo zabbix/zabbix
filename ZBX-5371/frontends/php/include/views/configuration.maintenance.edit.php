@@ -96,6 +96,9 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		zbx_date2age(0, $timeperiod['period']),
 		new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu')
 	));
+	if (isset($timeperiod['timeperiodid'])) {
+		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
+	}
 	$maintenanceForm->addVar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']);
 	$maintenanceForm->addVar('timeperiods['.$id.'][every]', $timeperiod['every']);
 	$maintenanceForm->addVar('timeperiods['.$id.'][month]', $timeperiod['month']);
