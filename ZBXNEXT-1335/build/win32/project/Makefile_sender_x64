@@ -1,6 +1,0 @@
-PROGNAME = ..\..\..\bin\win64\zabbix_sender.exe
-INCS = /I .\ /I ..\include /I ..\..\..\include /I ..\..\..\src\zabbix_sender
-CFLAGS = $(INCS) /O2 /Ob1 /GF /FD /EHsc /MT /Gy /W3 /c /TC /D _WINDOWS /D _WIN32_WINNT=0x0500 /D _CONSOLE /D UNICODE /D _UNICODE /D NDEBUG /D _WIN64 /D HAVE_WINLDAP_H /D HAVE_ASSERT_H /D ZABBIX_SERVICE /D "_VC80_UPGRADE=0x0600" /D HAVE_IPV6
-LFLAGS = /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"zabbix_sender.exe.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"zabbix_sender.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE:NO /MACHINE:X64
-
-include Makefile_sender.inc
