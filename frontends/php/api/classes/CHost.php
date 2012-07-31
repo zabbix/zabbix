@@ -2065,10 +2065,14 @@ class CHost extends CZBXAPI {
 		}
 
 		if (isset($data['macros'])) {
-			$result = API::UserMacro()->delete(zbx_toArray($data['macros']));
-			if (!$result) {
-				self::exception();
-			}
+			$hostMacros = API::UserMacro()->get(array(
+				'hostids' => $hostids,
+				'filter' => array(
+					'macro' => $data['macros']
+				)
+			));
+			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
+			API::UserMacro()->delete($hostMacroIds);
 		}
 
 		if (isset($data['interfaces'])) {
