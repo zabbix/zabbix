@@ -1195,17 +1195,9 @@
 			'go' => get_request('go', 'massupdate'),
 			'g_triggerid' => get_request('g_triggerid', array()),
 			'priority' => get_request('priority', 0),
-			'config' => select_config()
+			'config' => select_config(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
@@ -1243,21 +1235,18 @@
 			'url' => get_request('url', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array()
+			'templates' => array(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger
-			$data['trigger'] = get_trigger_by_triggerid($data['triggerid']);
+			$trigger = API::Trigger()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('hostid'),
+				'triggerids' => $data['triggerid']
+			));
+			$data['trigger'] = reset($trigger);
 			if (!empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
 			}
@@ -1266,17 +1255,23 @@
 			$tmp_triggerid = $data['triggerid'];
 			do {
 				$db_triggers = DBfetch(DBselect(
-					'SELECT t.triggerid,t.templateid,h.name'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid='.$tmp_triggerid.
-						' AND h.hostid=i.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'
+					'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
+					' FROM triggers t'.
+						' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
+						' LEFT JOIN items i ON f.itemid=i.itemid'.
+						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+					' WHERE t.triggerid='.$tmp_triggerid
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$link = empty($data['parent_discoveryid'])
-						? 'triggers.php?form=update&triggerid='.$db_triggers['triggerid']
-						: 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$data['parent_discoveryid'];
+					// parent trigger prototype link
+					if ($data['parent_discoveryid']) {
+						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					}
+					// parent trigger link
+					else {
+						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
+					}
 
 					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
 					$data['templates'][] = SPACE.RARR.SPACE;
@@ -1287,6 +1282,12 @@
 			array_shift($data['templates']);
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
+
+			// if no host has been selected for the navigation panel, use the first trigger host
+			if (!$data['hostid']) {
+				$hosts = reset($data['trigger']['hosts']);
+				$data['hostid'] = $hosts['hostid'];
+			}
 		}
 
 		if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {
