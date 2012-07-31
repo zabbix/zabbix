@@ -876,7 +876,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy cofiguration copy: %s",
+		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
 		DBrollback();
 	}

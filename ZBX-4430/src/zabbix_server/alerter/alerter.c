@@ -43,7 +43,7 @@ extern unsigned char	process_type;
  * Parameters: alert - alert details                                          *
  *             mediatype - media details                                      *
  *                                                                            *
- * Return value: SUCCESS - action executed sucessfully                        *
+ * Return value: SUCCESS - action executed successfully                       *
  *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *

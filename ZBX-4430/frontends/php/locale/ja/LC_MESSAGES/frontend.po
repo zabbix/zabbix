@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 00:22+0300\n"
+"POT-Creation-Date: 2012-07-18 01:26+0300\n"
 "PO-Revision-Date: 2012-06-20 11:12+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -284,11 +284,11 @@ msgstr "アクション\"%s\"はすでに存在しています"
 msgid "Action \"%s\" no operations defined."
 msgstr "アクション\"%s\"に実行内容が設定されていません。"
 
-#: actionconf.php:150
+#: actionconf.php:149
 msgid "Action added"
 msgstr "アクションを追加しました"
 
-#: actionconf.php:171
+#: actionconf.php:170
 msgid "Action deleted"
 msgstr "アクションを削除しました"
 
@@ -296,7 +296,7 @@ msgstr "アクションを削除しました"
 msgid "Action operations"
 msgstr "アクションの実行内容"
 
-#: actionconf.php:146
+#: actionconf.php:145
 msgid "Action updated"
 msgstr "アクションを更新しました"
 
@@ -334,7 +334,7 @@ msgstr "開始日時"
 msgid "Active till"
 msgstr "終了日時"
 
-#: dashconf.php:206 history.php:263 include/blocks.inc.php:1083
+#: dashconf.php:211 history.php:263 include/blocks.inc.php:1083
 #: include/blocks.inc.php:1089 include/blocks.inc.php:1194
 #: include/blocks.inc.php:1239 include/blocks.inc.php:1245
 #: include/forms.inc.php:1668 include/forms.inc.php:1972
@@ -492,7 +492,7 @@ msgstr "エイリアス"
 msgid "Align icons"
 msgstr "グリッドに揃える"
 
-#: dashconf.php:170 dashconf.php:250 include/blocks.inc.php:1173
+#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1173
 #: include/blocks.inc.php:1182 include/blocks.inc.php:1227
 #: include/blocks.inc.php:1305 include/blocks.inc.php:1314
 #: include/nodes.inc.php:156 include/page_header.php:329
@@ -1094,7 +1094,7 @@ msgstr "キャンセル"
 msgid "Cannot acknowledge event"
 msgstr "イベントの障害対応コメントを入力できません"
 
-#: actionconf.php:150
+#: actionconf.php:149
 msgid "Cannot add action"
 msgstr "アクションを追加できません"
 
@@ -1313,7 +1313,7 @@ msgstr ""
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbixユーザ\"%1$s\"を削除できません。ユーザを無効に設定してください。"
 
-#: actionconf.php:171
+#: actionconf.php:170
 msgid "Cannot delete action"
 msgstr "アクションを削除できません"
 
@@ -1398,7 +1398,7 @@ msgstr "ネットワークマップを削除できません"
 msgid "Cannot delete node"
 msgstr "ノードを削除できません"
 
-#: proxies.php:111 proxies.php:159
+#: proxies.php:110 proxies.php:156
 msgid "Cannot delete proxy"
 msgstr "プロキシを削除できません"
 
@@ -1434,7 +1434,7 @@ msgstr "スクリプトを削除できません。スクリプト\"%1$s\"は実�
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "スクリプトを削除できません。スクリプトID\"%s\"は存在しません。"
 
-#: actionconf.php:309
+#: actionconf.php:308
 msgid "Cannot delete selected actions"
 msgstr "選択したアクションを削除できません。"
 
@@ -1462,7 +1462,7 @@ msgstr "テンプレートのアイテムを削除できません"
 msgid "Cannot delete templated items."
 msgstr "テンプレートのアイテムを削除できません"
 
-#: api/classes/CTrigger.php:1127 api/classes/CTriggerPrototype.php:1045
+#: api/classes/CTrigger.php:1127 api/classes/CTriggerPrototype.php:1044
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません"
@@ -1665,8 +1665,8 @@ msgid "Cannot have empty visible template name"
 msgstr "テンプレート名に空白は設定できません"
 
 #: api/classes/CTrigger.php:1570 api/classes/CTrigger.php:1642
-#: api/classes/CTriggerPrototype.php:1142
-#: api/classes/CTriggerPrototype.php:1193
+#: api/classes/CTriggerPrototype.php:1141
+#: api/classes/CTriggerPrototype.php:1192
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "条件式\"%s\"を展開できません"
@@ -1797,7 +1797,7 @@ msgstr "テンプレートのリンクを削除できません"
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "トリガー\"%s\"のリンクを削除できません。ホストにリンクされたテンプレートのアイテムを利用しています。"
 
-#: actionconf.php:146
+#: actionconf.php:145
 msgid "Cannot update action"
 msgstr "アクションを更新できません"
 
@@ -1932,7 +1932,7 @@ msgstr "サービスを更新できません"
 msgid "Cannot update slide show"
 msgstr "スライドショーを更新できません"
 
-#: actionconf.php:299 trigger_prototypes.php:283 triggers.php:311
+#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:311
 msgid "Cannot update status"
 msgstr "ステータスを更新できません"
 
@@ -2162,8 +2162,8 @@ msgstr "列"
 msgid "Combined result"
 msgstr "結果の結合"
 
-#: include/actions.inc.php:842 include/actions.inc.php:876
-#: include/actions.inc.php:944
+#: include/actions.inc.php:841 include/actions.inc.php:875
+#: include/actions.inc.php:943
 #: include/views/administration.auditacts.list.php:106
 #: include/views/administration.script.edit.php:68
 msgid "Command"
@@ -2626,7 +2626,7 @@ msgstr "作成: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のトリガー\"%1$s\"。"
 
-#: api/classes/CTriggerPrototype.php:1149
+#: api/classes/CTriggerPrototype.php:1148
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
@@ -2763,7 +2763,7 @@ msgstr "D"
 msgid "D, d M Y H:i:s O"
 msgstr "D, Y/m/d H:i:s O"
 
-#: dashconf.php:110
+#: dashconf.php:112
 msgid "DASHBOARD CONFIGURATION"
 msgstr "ダッシュボードの設定"
 
@@ -2818,11 +2818,11 @@ msgstr "暗く"
 msgid "Dashboard"
 msgstr "ダッシュボード"
 
-#: dashconf.php:26
+#: dashconf.php:27
 msgid "Dashboard configuration"
 msgstr "ダッシュボードの設定"
 
-#: dashconf.php:165
+#: dashconf.php:168
 msgid "Dashboard filter"
 msgstr "ダッシュボードフィルタ"
 
@@ -2974,18 +2974,14 @@ msgstr "デフォルトの認証"
 msgid "Default delay (in seconds)"
 msgstr "デフォルトの更新間隔 (秒)"
 
-#: actionconf.php:37
-msgid "Default escalation period"
-msgstr "デフォルトのエスカレーション間隔"
-
-#: include/views/configuration.action.edit.php:44
-msgid "Default escalation period (minimum 60 seconds)"
-msgstr "デフォルトのエスカレーション間隔 (最小60秒)"
-
 #: include/views/configuration.action.edit.php:54
 #: include/views/configuration.action.edit.php:541
 msgid "Default message"
 msgstr "デフォルトのメッセージ"
+
+#: actionconf.php:37 include/views/configuration.action.edit.php:44
+msgid "Default operation step duration"
+msgstr ""
 
 #: include/views/configuration.action.edit.php:53
 msgid "Default subject"
@@ -3000,7 +2996,6 @@ msgstr "デフォルトのテーマ"
 msgid "Default theme \"%1$s\"."
 msgstr "デフォルトのテーマ\"%1$s\"。"
 
-#: include/views/configuration.action.edit.php:320
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:49
 #: include/views/configuration.slideconf.list.php:41
@@ -3108,7 +3103,7 @@ msgstr "スクリーンを削除しますか？"
 msgid "Delete script?"
 msgstr "スクリプトを削除しますか？"
 
-#: dashconf.php:209 hosts.php:877 include/reports.inc.php:317
+#: dashconf.php:214 hosts.php:877 include/reports.inc.php:317
 #: include/reports.inc.php:411 include/reports.inc.php:453
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
@@ -3318,7 +3313,7 @@ msgstr "削除: \"%2$s\"のアイテム\"%1$s\"。"
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
-#: api/classes/CProxy.php:552
+#: api/classes/CProxy.php:532
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr "削除: プロキシ \"%1$s\"."
@@ -3334,7 +3329,7 @@ msgstr "削除: テンプレート\"%1$s\"。"
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のトリガー\"%1$s\"。"
 
-#: api/classes/CTriggerPrototype.php:1105
+#: api/classes/CTriggerPrototype.php:1104
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
@@ -3395,7 +3390,7 @@ msgstr "配布ステータス"
 msgid "Description"
 msgstr "説明"
 
-#: include/actions.inc.php:911 include/blocks.inc.php:686
+#: include/actions.inc.php:910 include/blocks.inc.php:686
 #: include/config.inc.php:341
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
@@ -3501,7 +3496,7 @@ msgstr "選択したメディアタイプを削除しますか？"
 msgid "Disable selected triggers?"
 msgstr "選択したトリガーを無効にしますか？"
 
-#: auditlogs.php:152 dashboard.php:227 dashconf.php:161
+#: auditlogs.php:152 dashboard.php:227 dashconf.php:164
 #: include/discovery.inc.php:119 include/httptest.inc.php:46
 #: include/items.inc.php:147 include/triggers.inc.php:1633
 #: include/users.inc.php:60
@@ -3790,6 +3785,10 @@ msgstr "ユーザー名\"%s\"は重複しています"
 msgid "Duration"
 msgstr "継続期間"
 
+#: include/views/configuration.action.edit.php:320
+msgid "Duration (sec)"
+msgstr ""
+
 #: include/locales.inc.php:47
 msgid "Dutch (nl_NL)"
 msgstr "オランダ語 (nl_NL)"
@@ -3886,11 +3885,11 @@ msgstr "条件式のホスト名が空白です。"
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:2099 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:949 api/classes/CItemPrototype.php:678
-#: api/classes/CProxy.php:500 api/classes/CService.php:344
+#: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1327 api/classes/CTrigger.php:1416
-#: api/classes/CTrigger.php:1507 api/classes/CTriggerPrototype.php:1026
+#: api/classes/CTrigger.php:1507 api/classes/CTriggerPrototype.php:1025
 #: api/classes/CUserGroup.php:647 api/classes/CUserMacro.php:504
 #: api/classes/CUserMacro.php:658
 msgid "Empty input parameter."
@@ -4010,7 +4009,7 @@ msgstr "選択したメディアタイプを有効にしますか？"
 msgid "Enable selected triggers?"
 msgstr "選択したトリガーを有効にしますか？"
 
-#: auditlogs.php:149 dashboard.php:227 dashconf.php:157
+#: auditlogs.php:149 dashboard.php:227 dashconf.php:160
 #: include/discovery.inc.php:118 include/httptest.inc.php:45
 #: include/items.inc.php:146
 #: include/views/administration.mediatypes.edit.php:94
@@ -4038,8 +4037,8 @@ msgstr "有効"
 msgid "English (en_GB)"
 msgstr "英語 (en_GB)"
 
-#: include/actions.inc.php:682 include/actions.inc.php:767
-#: include/actions.inc.php:843 include/items.inc.php:35
+#: include/actions.inc.php:681 include/actions.inc.php:766
+#: include/actions.inc.php:842 include/items.inc.php:35
 #: include/views/administration.auditacts.list.php:76
 #: include/views/configuration.host.discovery.list.php:59
 #: include/views/configuration.item.list.php:64
@@ -4077,7 +4076,7 @@ msgstr "エラー詳細: 受信した値が空です"
 msgid "Error in item key: \"%s\"."
 msgstr "アイテムキーのエラー: \"%s\""
 
-#: include/db.inc.php:909 include/db.inc.php:965
+#: include/db.inc.php:917 include/db.inc.php:973
 #, php-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
@@ -4086,10 +4085,6 @@ msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 #, php-format
 msgid "Error: %1$s"
 msgstr "エラー: %1$s"
-
-#: include/views/configuration.action.edit.php:432
-msgid "Escalation period"
-msgstr "エスカレーション間隔"
 
 #: include/events.inc.php:115
 msgid "Event"
@@ -4108,7 +4103,7 @@ msgstr "障害対応済"
 msgid "Event acknowledges \"%1$s\"."
 msgstr "イベントの障害対応コメント\"%1$s\"."
 
-#: dashconf.php:256
+#: dashconf.php:260
 msgid "Event acknowledging disabled"
 msgstr "イベントの障害対応コメントが無効です"
 
@@ -4280,7 +4275,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "失敗"
 
-#: include/actions.inc.php:1016 include/blocks.inc.php:965
+#: include/actions.inc.php:1015 include/blocks.inc.php:965
 msgid "Failed"
 msgstr "失敗"
 
@@ -4356,7 +4351,7 @@ msgstr "表示するために生成したファイルが存在しません。\"%
 msgid "Filled region"
 msgstr "面"
 
-#: dashconf.php:261 events.php:321 history.php:296 hostinventories.php:134
+#: dashconf.php:265 events.php:321 history.php:296 hostinventories.php:134
 #: hosts.php:659 include/classes/class.cwidget.php:134
 #: include/forms.inc.php:573 include/reports.inc.php:172
 #: include/views/administration.auditacts.list.php:49
@@ -4791,7 +4786,7 @@ msgstr "グループを更新しました"
 msgid "Grouping by"
 msgstr "次によるグルーピング"
 
-#: dashconf.php:213 include/reports.inc.php:540
+#: dashconf.php:217 include/reports.inc.php:540
 #: include/views/administration.users.edit.php:80
 #: include/views/administration.users.list.php:58
 #: include/views/configuration.host.edit.php:186
@@ -4988,6 +4983,11 @@ msgstr "ホスト"
 msgid "Host \"%1$s\" already exists."
 msgstr "ホスト\"%1$s\"はすでに存在しています。"
 
+#: api/classes/CProxy.php:645
+#, php-format
+msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
+msgstr ""
+
 #: api/classes/CTemplate.php:1004
 #, php-format
 msgid "Host \"%s\" already exists."
@@ -5058,7 +5058,7 @@ msgstr "ホストグループ内のホスト"
 msgid "Host group label type"
 msgstr "ホストグループのラベルタイプ"
 
-#: dashconf.php:175 include/forms.inc.php:196 include/menu.inc.php:164
+#: dashconf.php:180 include/forms.inc.php:196 include/menu.inc.php:164
 #: include/views/administration.script.edit.php:91
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.hostgroups.list.php:39
@@ -5118,7 +5118,7 @@ msgstr "ホストステータス"
 msgid "Host status became \"%s\""
 msgstr "ホストのステータスが\"%s\"になりました"
 
-#: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:150
+#: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:147
 msgid "Host status updated"
 msgstr "ホストのステータスを更新しました"
 
@@ -5153,7 +5153,7 @@ msgstr "同じホスト名\"%s\"を持つホストがすでに存在します。
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在します。"
 
-#: dashconf.php:223 hostinventoriesoverview.php:81 hostinventories.php:94
+#: dashconf.php:227 hostinventoriesoverview.php:81 hostinventories.php:94
 #: hosts.php:646 include/forms.inc.php:223 include/forms.inc.php:816
 #: include/items.inc.php:732 include/menu.inc.php:116 include/menu.inc.php:172
 #: include/reports.inc.php:585 include/views/administration.proxy.edit.php:82
@@ -5564,9 +5564,9 @@ msgstr "グループ"
 msgid "In maintenance"
 msgstr "メンテナンス中"
 
-#: include/actions.inc.php:715 include/actions.inc.php:795
-#: include/actions.inc.php:869 include/actions.inc.php:933
-#: include/actions.inc.php:1010
+#: include/actions.inc.php:714 include/actions.inc.php:794
+#: include/actions.inc.php:868 include/actions.inc.php:932
+#: include/actions.inc.php:1009
 #: include/views/administration.auditacts.list.php:94
 msgid "In progress"
 msgstr "進捗中"
@@ -5586,7 +5586,7 @@ msgstr "サービス\"%1$s\"依存関係のフィールド\"soft\"の値が正�
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "マップ\"%2$s\"のラベルタイプの値%1$sが正しくありません。"
 
-#: api/classes/CProxy.php:364
+#: api/classes/CProxy.php:352
 #, php-format
 msgid "Incorrect IP for passive proxy \"%1$s\"."
 msgstr "パッシブプロキシ\"%1$s\"のIPアドレスが正しくありません。"
@@ -5682,10 +5682,6 @@ msgstr "実行するアクションの障害対応コメントのタイプが正
 msgid "Incorrect action operation condition type."
 msgstr "実行するアクションの実行条件のタイプが正しくありません。"
 
-#: api/classes/CAction.php:1513
-msgid "Incorrect action operation escalation period."
-msgstr "実行するアクションのエスカレーションの期間の値が正しくありません。"
-
 #: api/classes/CAction.php:1503 api/classes/CAction.php:1507
 msgid "Incorrect action operation escalation step values."
 msgstr "実行するアクションのエスカレーションステップの値が正しくありません。"
@@ -5702,6 +5698,10 @@ msgstr "実行するアクションのホストの値が正しくありません
 #, php-format
 msgid "Incorrect action operation port \"%s\"."
 msgstr "実行するアクションのポート\"%s\"が正しくありません。"
+
+#: api/classes/CAction.php:1513
+msgid "Incorrect action operation step duration."
+msgstr ""
 
 #: api/classes/CAction.php:1651
 msgid "Incorrect action operation type."
@@ -5747,7 +5747,7 @@ msgstr "サービス\"%1$s\"のSLAの値の計算が正しくありません。"
 msgid "Incorrect characters used for Node name."
 msgstr "ノード名に不正な文字列が利用されています。"
 
-#: api/classes/CProxy.php:373
+#: api/classes/CProxy.php:361
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
 msgstr "プロキシ名\"%s\"に不正な文字列が使用されています。"
@@ -7381,9 +7381,9 @@ msgid "Menu"
 msgstr "メニュー"
 
 #: acknow.php:208 include/actions.inc.php:351 include/actions.inc.php:360
-#: include/actions.inc.php:366 include/actions.inc.php:681
-#: include/actions.inc.php:730 include/actions.inc.php:766
-#: include/actions.inc.php:810
+#: include/actions.inc.php:366 include/actions.inc.php:680
+#: include/actions.inc.php:729 include/actions.inc.php:765
+#: include/actions.inc.php:809
 #: include/views/administration.auditacts.list.php:75
 #: include/views/administration.auditacts.list.php:103
 #: include/views/configuration.action.edit.php:553
@@ -7594,7 +7594,7 @@ msgstr "データなし"
 msgid "NTLM authentication"
 msgstr "NTLM認証"
 
-#: actionconf.php:34 actionconf.php:158 adm.regexps.php:36 adm.regexps.php:91
+#: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:91
 #: adm.regexps.php:121 disc_prototypes.php:43 graphs.php:42
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:653 hosts.php:684
 #: httpconf.php:43 httpmon.php:143 include/forms.inc.php:549
@@ -7799,8 +7799,8 @@ msgstr "障害対応コメントが設定されていません。"
 msgid "No actions defined."
 msgstr "アクションが設定されていません。"
 
-#: include/actions.inc.php:673 include/actions.inc.php:758
-#: include/actions.inc.php:837 include/actions.inc.php:906
+#: include/actions.inc.php:672 include/actions.inc.php:757
+#: include/actions.inc.php:836 include/actions.inc.php:905
 msgid "No actions found."
 msgstr "アクションが設定されていません。"
 
@@ -8030,12 +8030,12 @@ msgstr "インターフェースが設定されていません。"
 msgid "No interfaces for host \"%s\"."
 msgstr "ホスト\"%s\"にインターフェースが設定されていません。"
 
-#: api/classes/CProxy.php:356
+#: api/classes/CProxy.php:344
 #, php-format
 msgid "No interfaces for proxy \"%s\"."
 msgstr "プロキシ\"%s\"にインターフェースが設定されていません。"
 
-#: api/classes/CProxy.php:332 api/classes/CProxy.php:346
+#: api/classes/CProxy.php:328 api/classes/CProxy.php:338
 #, php-format
 msgid "No interfaces provided for proxy \"%s\"."
 msgstr "プロキシ\"%s\"にインターフェースが設定されていません。"
@@ -8176,16 +8176,16 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CItemGeneral.php:175 api/classes/CItemGeneral.php:207
 #: api/classes/CItem.php:966 api/classes/CItemPrototype.php:695
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
-#: api/classes/CMap.php:555 api/classes/CProxy.php:324
-#: api/classes/CProxy.php:342 api/classes/CScreenItem.php:249
+#: api/classes/CMap.php:555 api/classes/CProxy.php:320
+#: api/classes/CProxy.php:334 api/classes/CScreenItem.php:249
 #: api/classes/CScreenItem.php:335 api/classes/CScreen.php:485
 #: api/classes/CScreen.php:539 api/classes/CService.php:1254
 #: api/classes/CService.php:1269 api/classes/CTrigger.php:1118
 #: api/classes/CTrigger.php:1710 api/classes/CTrigger.php:1722
-#: api/classes/CTriggerPrototype.php:948
-#: api/classes/CTriggerPrototype.php:1040
-#: api/classes/CTriggerPrototype.php:1231
-#: api/classes/CTriggerPrototype.php:1243 api/classes/CUserMacro.php:828
+#: api/classes/CTriggerPrototype.php:947
+#: api/classes/CTriggerPrototype.php:1039
+#: api/classes/CTriggerPrototype.php:1230
+#: api/classes/CTriggerPrototype.php:1242 api/classes/CUserMacro.php:828
 #: api/classes/CUserMacro.php:941 api/classes/CWebCheck.php:464
 #: include/config.inc.php:236
 msgid "No permissions to referred object or it does not exist!"
@@ -8356,8 +8356,8 @@ msgstr "ノードを更新しました"
 msgid "Node with same ID already exists."
 msgstr "同じIDを持つノードがすでに存在します。"
 
-#: include/actions.inc.php:675 include/actions.inc.php:760
-#: include/actions.inc.php:839 include/actions.inc.php:909
+#: include/actions.inc.php:674 include/actions.inc.php:759
+#: include/actions.inc.php:838 include/actions.inc.php:908
 #: include/forms.inc.php:169
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.node.list.php:25
@@ -8583,7 +8583,7 @@ msgstr "10月"
 msgid "Off"
 msgstr "OFF"
 
-#: include/actions.inc.php:1013 include/blocks.inc.php:964
+#: include/actions.inc.php:1012 include/blocks.inc.php:964
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:226
 #: report3.php:86
@@ -8684,6 +8684,10 @@ msgstr "有効なホストのアイテムのみカウント"
 msgid "Only one check can be unique."
 msgstr "ユニークかどうかだけチェックします。"
 
+#: api/classes/CProxy.php:610
+msgid "Only super admins can delete proxies."
+msgstr ""
+
 #: include/services.inc.php:299
 #, php-format
 msgid "Only the last 20%% of the indicator is displayed."
@@ -8701,7 +8705,7 @@ msgstr "整数のみ"
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:244
+#: actionconf.php:243
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
@@ -9135,10 +9139,6 @@ msgstr "パーセンタイルライン (右)"
 msgid "Period"
 msgstr "期間"
 
-#: include/views/configuration.action.edit.php:320
-msgid "Period (sec)"
-msgstr "期間(秒)"
-
 #: include/forms.inc.php:1493
 #: include/views/configuration.maintenance.edit.php:85
 msgid "Period type"
@@ -9308,7 +9308,7 @@ msgstr "php-ldapモジュールが見つかりません。"
 msgid "Problem"
 msgstr "障害"
 
-#: dashconf.php:258 include/views/configuration.sysmap.edit.php:146
+#: dashconf.php:262 include/views/configuration.sysmap.edit.php:146
 msgid "Problem display"
 msgstr "障害の表示"
 
@@ -9357,7 +9357,12 @@ msgstr "プロキシ"
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "ホスト\"%2$s\"のプロキシ\"%1$s\"は存在しません。"
 
-#: api/classes/CProxy.php:381
+#: api/classes/CProxy.php:628
+#, php-format
+msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
+msgstr ""
+
+#: api/classes/CProxy.php:369
 #, php-format
 msgid "Proxy \"%s\" already exists."
 msgstr "プロキシ\"%s\"はすでに存在します。"
@@ -9366,7 +9371,7 @@ msgstr "プロキシ\"%s\"はすでに存在します。"
 msgid "Proxy added"
 msgstr "プロキシを追加しました"
 
-#: proxies.php:111 proxies.php:159
+#: proxies.php:110 proxies.php:156
 msgid "Proxy deleted"
 msgstr "プロキシを削除しました"
 
@@ -9374,11 +9379,11 @@ msgstr "プロキシを削除しました"
 msgid "Proxy hosts"
 msgstr "プロキシホスト"
 
-#: api/classes/CProxy.php:416
+#: api/classes/CProxy.php:404
 msgid "Proxy interface creation failed."
 msgstr "プロキシのインターフェース作成に失敗しました。"
 
-#: api/classes/CProxy.php:480
+#: api/classes/CProxy.php:468
 msgid "Proxy interface update failed."
 msgstr "プロキシのインターフェース更新に失敗しました。"
 
@@ -9445,7 +9450,7 @@ msgstr "受信した値"
 msgid "Recipient"
 msgstr "送信先"
 
-#: include/actions.inc.php:680 include/actions.inc.php:765
+#: include/actions.inc.php:679 include/actions.inc.php:764
 #: include/views/administration.auditacts.list.php:74
 msgid "Recipient(s)"
 msgstr "送信先"
@@ -9454,12 +9459,12 @@ msgstr "送信先"
 msgid "Recovery"
 msgstr "復旧"
 
-#: actionconf.php:44 include/views/configuration.action.edit.php:57
+#: actionconf.php:43 include/views/configuration.action.edit.php:57
 #: include/views/configuration.action.edit.php:60
 msgid "Recovery message"
 msgstr "リカバリメッセージ"
 
-#: actionconf.php:43 include/views/configuration.action.edit.php:59
+#: actionconf.php:42 include/views/configuration.action.edit.php:59
 msgid "Recovery subject"
 msgstr "リカバリの件名"
 
@@ -9760,7 +9765,7 @@ msgstr "\"%s\"の結果"
 msgid "Result type"
 msgstr "結果のタイプ"
 
-#: include/actions.inc.php:679 include/actions.inc.php:764
+#: include/actions.inc.php:678 include/actions.inc.php:763
 #: include/views/administration.auditacts.list.php:73
 msgid "Retries left"
 msgstr "リトライの残り回数"
@@ -10023,7 +10028,7 @@ msgstr "土"
 msgid "Saturday"
 msgstr "土曜"
 
-#: acknow.php:174 dashconf.php:266 include/forms.inc.php:1668
+#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1668
 #: include/forms.inc.php:1826 include/forms.inc.php:1972
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:57
@@ -10381,11 +10386,11 @@ msgstr "プロトタイプの選択"
 msgid "Select rows with value like"
 msgstr "次の値が含まれる行を表示"
 
-#: dashconf.php:171 history.php:294
+#: dashconf.php:174 history.php:294
 msgid "Selected"
 msgstr "選択"
 
-#: actionconf.php:309
+#: actionconf.php:308
 msgid "Selected actions deleted"
 msgstr "選択したアクションを削除しました"
 
@@ -10429,7 +10434,7 @@ msgstr "ユーザーグループに送信"
 msgid "Send to Users"
 msgstr "ユーザーに送信"
 
-#: include/actions.inc.php:930
+#: include/actions.inc.php:929
 msgid "Sent"
 msgstr "送信済"
 
@@ -10437,7 +10442,7 @@ msgstr "送信済"
 msgid "Sep"
 msgstr "9月"
 
-#: dashconf.php:251 include/views/configuration.sysmap.edit.php:139
+#: dashconf.php:255 include/views/configuration.sysmap.edit.php:139
 msgid "Separated"
 msgstr "障害数と未対応数を表示"
 
@@ -10597,7 +10602,7 @@ msgstr "イベントの表示期間(日) \"%1$s\""
 msgid "Show graph of item"
 msgstr "アイテムのグラフを表示"
 
-#: dashconf.php:223
+#: dashconf.php:227
 msgid "Show hosts in maintenance"
 msgstr "メンテナンス中のホストを表示"
 
@@ -10817,7 +10822,7 @@ msgstr "ソート順(0->999)"
 msgid "Sort triggers by"
 msgstr "次によるトリガーのソート"
 
-#: include/db.inc.php:1001
+#: include/db.inc.php:1009
 #, php-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "フィールド\"%1$s\"による並べ替えは許可されていません。"
@@ -10851,14 +10856,18 @@ msgstr "積算グラフ"
 msgid "Standard items"
 msgstr "標準のアイテム"
 
+#: include/views/configuration.action.edit.php:320
+msgid "Start in"
+msgstr ""
+
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
 msgstr "ステータス"
 
 #: events.php:442 events.php:451 events.php:515 events.php:528 hosts.php:692
-#: httpdetails.php:133 httpmon.php:146 include/actions.inc.php:678
-#: include/actions.inc.php:763 include/actions.inc.php:841
-#: include/actions.inc.php:912 include/events.inc.php:131
+#: httpdetails.php:133 httpmon.php:146 include/actions.inc.php:677
+#: include/actions.inc.php:762 include/actions.inc.php:840
+#: include/actions.inc.php:911 include/events.inc.php:131
 #: include/events.inc.php:204 include/events.inc.php:207
 #: include/forms.inc.php:498 include/forms.inc.php:836
 #: include/views/administration.auditacts.list.php:72
@@ -10924,11 +10933,11 @@ msgstr "トリガーのステータス"
 msgid "Status only"
 msgstr "ステータスのみ"
 
-#: actionconf.php:299 trigger_prototypes.php:283 triggers.php:311
+#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:311
 msgid "Status updated"
 msgstr "ステータスを更新しました"
 
-#: httpdetails.php:133 include/actions.inc.php:781 include/actions.inc.php:855
+#: httpdetails.php:133 include/actions.inc.php:780 include/actions.inc.php:854
 #: include/views/configuration.action.edit.php:441
 msgid "Step"
 msgstr "ステップ"
@@ -10942,6 +10951,10 @@ msgstr "ステップ\"%1$s\" [%3$sの%2$s] 失敗: %4$s"
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "ステップ\"%s\"はすでに存在します。"
+
+#: include/views/configuration.action.edit.php:432
+msgid "Step duration"
+msgstr ""
 
 #: include/views/configuration.httpconf.popup.php:68 popup_httpstep.php:24
 msgid "Step of scenario"
@@ -10976,8 +10989,8 @@ msgid "Subfilter [affects only filtered data!]"
 msgstr "サブフィルタ [フィルタされたデータにのみ影響します！]"
 
 #: include/actions.inc.php:350 include/actions.inc.php:359
-#: include/actions.inc.php:365 include/actions.inc.php:725
-#: include/actions.inc.php:805
+#: include/actions.inc.php:365 include/actions.inc.php:724
+#: include/actions.inc.php:804
 #: include/views/administration.auditacts.list.php:103
 #: include/views/configuration.action.edit.php:549
 msgid "Subject"
@@ -11333,9 +11346,9 @@ msgid "Till"
 msgstr "終了"
 
 #: events.php:438 events.php:447 events.php:511 events.php:524
-#: include/acknow.inc.php:42 include/actions.inc.php:676
-#: include/actions.inc.php:761 include/actions.inc.php:784
-#: include/actions.inc.php:840 include/actions.inc.php:858
+#: include/acknow.inc.php:42 include/actions.inc.php:675
+#: include/actions.inc.php:760 include/actions.inc.php:783
+#: include/actions.inc.php:839 include/actions.inc.php:857
 #: include/events.inc.php:116 include/events.inc.php:130
 #: include/events.inc.php:204 include/events.inc.php:207
 #: include/screens.inc.php:1238
@@ -11390,7 +11403,7 @@ msgstr "すべてのアイテムのため1つのホストインターフェイ�
 msgid "Today"
 msgstr "今日"
 
-#: api/classes/CProxy.php:359
+#: api/classes/CProxy.php:347
 #, php-format
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr "プロキシ\"%s\"に設定されたインターフェースが多すぎます。"
@@ -11452,7 +11465,7 @@ msgstr "トリガー"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: api/classes/CTriggerPrototype.php:1004
+#: api/classes/CTriggerPrototype.php:1003
 #, php-format
 msgid "Trigger \"%1$s\" does not have item prototype."
 msgstr "トリガー\"%1$s\"にはアイテムのプロトタイプが設定されていません。"
@@ -11616,7 +11629,7 @@ msgstr "トリガーのステータス"
 msgid "Triggers top 100"
 msgstr "障害発生数上位100項目"
 
-#: dashconf.php:245
+#: dashconf.php:249
 msgid "Triggers with severity"
 msgstr "表示するトリガーの深刻度"
 
@@ -11647,8 +11660,8 @@ msgstr "2つの要素を選択する必要があります"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "2つのアイテム(\"%1$s\"と\"%2$s\")から1つのホストのインベントリフィールド\"%3$s\"を自動的に設定することはできません。"
 
-#: hostinventories.php:160 include/actions.inc.php:677
-#: include/actions.inc.php:762 include/forms.inc.php:494
+#: hostinventories.php:160 include/actions.inc.php:676
+#: include/actions.inc.php:761 include/forms.inc.php:494
 #: include/hosts.inc.php:105
 #: include/views/administration.auditacts.list.php:71
 #: include/views/administration.general.image.edit.php:34
@@ -11788,7 +11801,7 @@ msgstr "未対応の正常イベント"
 msgid "Unacknowledged PROBLEM events"
 msgstr "未対応の障害イベント"
 
-#: dashconf.php:252 include/views/configuration.sysmap.edit.php:140
+#: dashconf.php:256 include/views/configuration.sysmap.edit.php:140
 msgid "Unacknowledged only"
 msgstr "障害対応コメント未入力のみ"
 
@@ -12021,7 +12034,7 @@ msgstr "更新: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のトリガー\"%1$s\"。"
 
-#: api/classes/CTriggerPrototype.php:1213
+#: api/classes/CTriggerPrototype.php:1212
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
@@ -12062,7 +12075,7 @@ msgstr "指定した深刻度のときに使用"
 msgid "Used in actions"
 msgstr "アクションで利用"
 
-#: httpconf.php:52 include/acknow.inc.php:42 include/actions.inc.php:910
+#: httpconf.php:52 include/acknow.inc.php:42 include/actions.inc.php:909
 #: include/audit.inc.php:24 include/forms.inc.php:37 include/forms.inc.php:40
 #: include/hosts.inc.php:68 include/setup.inc.php:278
 #: include/views/administration.auditlogs.list.php:56
@@ -12589,7 +12602,7 @@ msgstr "マップリンクの設定が正しくありません"
 msgid "Wrong fields for media type."
 msgstr "メディアタイプの設定が正しくありません。"
 
-#: api/classes/CProxy.php:319
+#: api/classes/CProxy.php:315
 #, php-format
 msgid "Wrong fields for proxy \"%s\"."
 msgstr "プロキシ\"%s\"の設定が正しくありません。"
@@ -12618,7 +12631,7 @@ msgstr "サービス\"%1$s\"の設定が正しくありません。"
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のための時間の設定が正しくありません。"
 
-#: api/classes/CTriggerPrototype.php:887 api/classes/CTriggerPrototype.php:952
+#: api/classes/CTriggerPrototype.php:887 api/classes/CTriggerPrototype.php:951
 msgid "Wrong fields for trigger."
 msgstr "トリガーの設定が正しくありません。"
 
@@ -13135,7 +13148,7 @@ msgstr "every"
 msgid "exactly"
 msgstr ""
 
-#: include/actions.inc.php:866
+#: include/actions.inc.php:865
 #: include/views/administration.auditacts.list.php:89
 msgid "executed"
 msgstr "実行"
@@ -13240,6 +13253,10 @@ msgstr "最大"
 msgid "min"
 msgstr "最小"
 
+#: include/views/configuration.action.edit.php:46
+msgid "minimum 60 seconds"
+msgstr ""
+
 #: include/views/configuration.maintenance.edit.php:50
 #: include/views/configuration.maintenance.edit.php:56
 #: include/views/configuration.maintenance.edit.php:65
@@ -13302,8 +13319,8 @@ msgstr "停止中"
 msgid "not selected"
 msgstr "選択されていません"
 
-#: include/actions.inc.php:719 include/actions.inc.php:799
-#: include/actions.inc.php:872 include/actions.inc.php:936
+#: include/actions.inc.php:718 include/actions.inc.php:798
+#: include/actions.inc.php:871 include/actions.inc.php:935
 #: include/views/administration.auditacts.list.php:98
 msgid "not sent"
 msgstr "未送信"
@@ -13370,11 +13387,10 @@ msgstr "秒"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
-#: include/views/configuration.action.edit.php:46
 msgid "seconds"
 msgstr "秒"
 
-#: include/actions.inc.php:711 include/actions.inc.php:791
+#: include/actions.inc.php:710 include/actions.inc.php:790
 #: include/views/administration.auditacts.list.php:86
 msgid "sent"
 msgstr "送信済み"

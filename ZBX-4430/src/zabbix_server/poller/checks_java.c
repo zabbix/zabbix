@@ -120,16 +120,14 @@ exit:
 
 int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result)
 {
-	int		errcode = SUCCEED;
-	zbx_timespec_t	timespec;
+	int	errcode = SUCCEED;
 
-	get_values_java(request, item, result, &errcode, &timespec, 1);
+	get_values_java(request, item, result, &errcode, 1);
 
 	return errcode;
 }
 
-void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, zbx_timespec_t *timespecs, int num)
+void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
 {
 	const char	*__function_name = "get_values_java";
 
@@ -245,16 +243,6 @@ exit:
 				errcodes[i] = err;
 			}
 		}
-	}
-
-	zbx_timespec(&timespecs[0]);
-
-	for (i = 1; i < num; i++)
-	{
-		if (SUCCEED != errcodes[i])
-			continue;
-
-		timespecs[i] = timespecs[0];
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
