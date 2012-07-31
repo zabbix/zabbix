@@ -546,10 +546,6 @@ void	main_pinger_loop()
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	for (;;)
 	{
 		zbx_setproctitle("%s [getting values]", get_process_type_string(process_type));
