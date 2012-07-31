@@ -974,7 +974,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// expandDescription
-		if (!is_null($options['expandDescription'])) {
+		if (!is_null($options['expandDescription']) && array_key_exists('description', reset($result))) {
 			$result = CTriggerHelper::batchExpandDescription($result);
 		}
 
