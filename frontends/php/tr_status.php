@@ -54,6 +54,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'ack_status'=>			array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
 		'show_severity'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
 		'show_details'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
+		'show_maintenance'=>	array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'status_change_days'=>	array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'status_change'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'txt_select'=>			array(T_ZBX_STR, O_OPT,  	null,	null, 	null),
@@ -99,6 +100,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['show_details'] =	0;
+		$_REQUEST['show_maintenance'] =	1;
 		$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 		$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
@@ -110,11 +112,13 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	else{
 		if(isset($_REQUEST['filter_set'])){
 			$_REQUEST['show_details'] = get_request('show_details', 0);
+			$_REQUEST['show_maintenance'] = get_request('show_maintenance', 0);
 			$_REQUEST['status_change'] = get_request('status_change', 0);
 			$_REQUEST['show_triggers'] = get_request('show_triggers', TRIGGERS_OPTION_ONLYTRUE);
 		}
 		else{
 			$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
+			$_REQUEST['show_maintenance'] = get_request('show_maintenance',	CProfile::get('web.tr_status.filter.show_maintenance', 1));
 			$_REQUEST['status_change'] = get_request('status_change', CProfile::get('web.tr_status.filter.status_change', 0));
 			$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 		}
@@ -141,6 +145,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_maintenance', $_REQUEST['show_maintenance'], PROFILE_TYPE_INT);
 		CProfile::update('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
 		CProfile::update('web.tr_status.filter.ack_status', $_REQUEST['ack_status'], PROFILE_TYPE_INT);
 		CProfile::update('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
@@ -239,6 +244,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 
+	$filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
+
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
 	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
@@ -328,6 +335,9 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	}
 	if($_REQUEST['status_change']){
 		$options['lastChangeSince'] = time() - $_REQUEST['status_change_days'] * SEC_PER_DAY;
+	}
+	if (!get_request('show_maintenance')) {
+		$options['maintenance'] = false;
 	}
 
 	$triggers = API::Trigger()->get($options);
