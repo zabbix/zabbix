@@ -1895,7 +1895,7 @@ class CTrigger extends CTriggerGeneral {
 					}
 					foreach ($depTemplateIds as $delTplId) {
 						if (!isset($templates[$delTplId]) && $setWithDep) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all templates are linked to host "%s".', reset($templates)));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all templates are linked to "%s".', reset($templates)));
 						}
 					}
 				}
