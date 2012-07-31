@@ -13,7 +13,7 @@
 			resizable: false,
 			minWidth: 200,
 			minHeight: 100,
-			title: '<?php echo _('Execution confirmation'); ?>',
+			title: <?php echo CJs::encodeJson(_('Execution confirmation')); ?>,
 			close: function() {
 				jQuery(this).dialog('destroy');
 			}

@@ -180,13 +180,7 @@ ZABBIX.apps.map = (function() {
 			}
 
 			// create container for forms
-			this.formContainer = jQuery('<div></div>', {id: 'divSelementForm'})
-				.css({
-					zIndex: 100,
-					position: 'absolute',
-					top: '50px',
-					left: '500px'
-				})
+			this.formContainer = jQuery('<div></div>', {id: 'map-window'})
 				.appendTo('body')
 				.draggable({
 					containment: [0, 0, 3200, 3200]
@@ -311,77 +305,40 @@ ZABBIX.apps.map = (function() {
 				}
 			},
 
-			// connectors
-			removeLinks: function() {
-				var selementid1 = null,
-					selementid2 = null,
-					selementid,
+			removeLinksBySelementId: function(selementid) {
+				var selementIds = {},
 					linkids,
 					i,
 					ln;
 
-				if (this.selection.count !== 2) {
-					alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
-					return false;
-				}
-
-				for (selementid in this.selection.selements) {
-					if (selementid1 === null) {
-						selementid1 = selementid;
-					}
-					else {
-						selementid2 = selementid;
-					}
-				}
-
-				linkids = this.getLinksBySelementIds(selementid1, selementid2);
-				if (linkids.length === 0) {
-					return false;
-				}
-
-				if (confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])) {
-					for (i = 0, ln = linkids.length; i < ln; i++) {
-						this.links[linkids[i]].remove();
-					}
-					this.linkForm.hide();
-					this.updateImage();
-				}
-			},
-
-			removeLinksBySelementId: function(selementid) {
-				var linkids = this.getLinksBySelementIds(selementid),
-					i,
-					ln;
-
+				selementIds[selementid] = selementid;
+				linkids = this.getLinksBySelementIds(selementIds);
 				for (i = 0, ln = linkids.length; i < ln; i++) {
 					this.links[linkids[i]].remove();
 				}
 			},
 
-			getLinksBySelementIds: function(selementid1, selementid2) {
-				var links = [],
+			/**
+			 * Returns the links between the given elements.
+			 *
+			 * @param selementIds
+			 *
+			 * @return {Array}  an array of link ids
+			 */
+			getLinksBySelementIds: function(selementIds) {
+				var linkIds = [],
+					link,
 					linkid;
 
-				if (typeof(selementid2) === 'undefined') {
-					selementid2 = null;
+				for (linkid in this.data.links) {
+					link = this.data.links[linkid];
+					if (!!selementIds[link.selementid1] && !!selementIds[link.selementid2]
+							|| objectSize(selementIds) === 1 && (!!selementIds[link.selementid1] || !!selementIds[link.selementid2])) {
+						linkIds.push(linkid);
+					}
 				}
 
-				for (linkid in this.data.links) {
-					if (selementid2 === null) {
-						if (this.data.links[linkid].selementid1 === selementid1 || this.data.links[linkid].selementid2 === selementid1) {
-							links.push(linkid);
-						}
-					}
-					else {
-						if (this.data.links[linkid].selementid1 === selementid1 && this.data.links[linkid].selementid2 === selementid2) {
-							links.push(linkid);
-						}
-						else if (this.data.links[linkid].selementid1 === selementid2 && this.data.links[linkid].selementid2 === selementid1) {
-							links.push(linkid);
-						}
-					}
-				}
-				return links;
+				return linkIds;
 			},
 
 			bindActions: function() {
@@ -456,11 +413,29 @@ ZABBIX.apps.map = (function() {
 					link = new Link(that);
 					that.links[link.id] = link;
 					that.updateImage();
+					that.linkForm.updateList(that.selection.selements);
 				});
 
-				// remove link
+				/**
+				 * Removes all of the links between the selected elements.
+				 */
 				jQuery('#linkRemove').click(function() {
-					that.removeLinks();
+					var linkids;
+
+					if (that.selection.count !== 2) {
+						alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
+						return false;
+					}
+
+					linkids = that.getLinksBySelementIds(that.selection.selements);
+					if (linkids.length && confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])) {
+						for (var i = 0, ln = linkids.length; i < ln; i++) {
+							that.links[linkids[i]].remove();
+						}
+						that.linkForm.hide();
+						that.linkForm.updateList({});
+						that.updateImage();
+					}
 				});
 
 
@@ -524,7 +499,7 @@ ZABBIX.apps.map = (function() {
 				}, this));
 
 				// open link form
-				jQuery('#linksList').delegate('.openlink', 'click', function() {
+				jQuery('.element-links').delegate('.openlink', 'click', function() {
 					that.currentLinkId = jQuery(this).data('linkid');
 					jQuery('#linksList tr').removeClass('selected');
 					jQuery(this).parent().parent().addClass('selected');
@@ -536,15 +511,14 @@ ZABBIX.apps.map = (function() {
 				// link form
 				jQuery('#formLinkRemove').click(function() {
 					that.links[that.currentLinkId].remove();
-					for (var selementid in that.selection.selements) {
-						that.form.updateList(selementid);
-					}
+					that.linkForm.updateList(that.selection.selements);
 					that.linkForm.hide();
 					that.updateImage();
 				});
 				jQuery('#formLinkApply').click(function() {
 					var linkData = that.linkForm.getValues();
 					that.links[that.currentLinkId].update(linkData)
+					that.linkForm.updateList(that.selection.selements);
 				});
 				jQuery('#formLinkClose').click(function() {
 					that.linkForm.hide();
@@ -609,19 +583,25 @@ ZABBIX.apps.map = (function() {
 				var selementid;
 				this.linkForm.hide();
 				if (this.selection.count == 0) {
-					this.form.hide();
-					this.massForm.hide();
-				}
-				else if (this.selection.count == 1) {
-					for (selementid in this.selection.selements) {
-						this.form.setValues(this.selements[selementid].getData());
-					}
-					this.massForm.hide();
-					this.form.show();
+					jQuery('#map-window').hide();
 				}
 				else {
-					this.form.hide();
-					this.massForm.show();
+					this.linkForm.updateList(this.selection.selements);
+					// only one element selected
+					if (this.selection.count == 1) {
+						for (selementid in this.selection.selements) {
+							this.form.setValues(this.selements[selementid].getData());
+						}
+						this.massForm.hide();
+						jQuery('#link-connect-to').show();
+						this.form.show();
+					}
+					// multiple elements selected
+					else {
+						this.form.hide();
+						jQuery('#link-connect-to').hide();
+						this.massForm.show();
+					}
 				}
 			}
 		};
@@ -690,7 +670,7 @@ ZABBIX.apps.map = (function() {
 					this.data[key] = data[key];
 				}
 
-				this.trigger('afterUpdate', this);
+				sysmap.updateImage();
 			},
 
 			/**
@@ -699,7 +679,11 @@ ZABBIX.apps.map = (function() {
 			remove: function() {
 				delete this.sysmap.data.links[this.id];
 				delete this.sysmap.links[this.id];
-				this.trigger('afterRemove', this);
+
+				if (sysmap.form.active) {
+					sysmap.linkForm.updateList(sysmap.selection.selements);
+				}
+				sysmap.linkForm.hide();
 			},
 
 			/**
@@ -1151,7 +1135,8 @@ ZABBIX.apps.map = (function() {
 			 */
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');
-				this.domNode.toggle(true);
+				this.formContainer.show();
+				this.domNode.show();
 				this.active = true;
 			},
 
@@ -1212,8 +1197,6 @@ ZABBIX.apps.map = (function() {
 				if (this.sysmap.data.iconmapid === '0') {
 					jQuery('#use_iconmap').prop('disabled', true);
 				}
-
-				this.updateList(selement.selementid);
 			},
 
 			/**
@@ -1274,87 +1257,6 @@ ZABBIX.apps.map = (function() {
 					}
 				}
 				return data;
-			},
-
-			/**
-			 * Updates links list for element.
-			 * @param {String} selementid
-			 */
-			updateList: function(selementid) {
-				var links = this.sysmap.getLinksBySelementIds(selementid),
-					rowTpl,
-					list,
-					i,
-					ln,
-					link,
-					linkedSelementid,
-					element,
-					elementTypeText,
-					linktriggers;
-
-				if (links.length) {
-					jQuery('#mapLinksContainer').toggle(true);
-					jQuery('#linksList').empty();
-
-					rowTpl = new Template(jQuery('#mapLinksRow').html());
-
-					list = [];
-					for (i = 0, ln = links.length; i < ln; i++) {
-						link = this.sysmap.links[links[i]].data;
-						linkedSelementid = (selementid == link.selementid1) ? link.selementid2 : link.selementid1;
-						element = this.sysmap.selements[linkedSelementid];
-						elementTypeText = '';
-						switch (element.data.elementtype) {
-							case '0': elementTypeText = locale['S_HOST']; break;
-							case '1': elementTypeText = locale['S_MAP']; break;
-							case '2': elementTypeText = locale['S_TRIGGER']; break;
-							case '3': elementTypeText = locale['S_HOST_GROUP']; break;
-							case '4': elementTypeText = locale['S_IMAGE']; break;
-						}
-
-						linktriggers = [];
-						for (var linktrigger in link.linktriggers) {
-							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
-						}
-
-						list.push({
-							elementType: elementTypeText,
-							elementName: element.data.elementName,
-							linkid: link.linkid,
-							linktriggers: linktriggers.join('\n')
-						});
-					}
-
-					// sort by elementtype and then by element name
-					list.sort(function(a, b) {
-						if (a.elementType < b.elementType) {
-							return -1;
-						}
-						if (a.elementType > b.elementType) {
-							return 1;
-						}
-						if (a.elementType == b.elementType) {
-							var elementTypeA = a.elementName.toLowerCase();
-							var elementTypeB = b.elementName.toLowerCase();
-
-							if (elementTypeA < elementTypeB) {
-								return -1;
-							}
-							if (elementTypeA > elementTypeB) {
-								return 1;
-							}
-						}
-						return 0;
-					});
-					for (i = 0, ln = list.length; i < ln; i++) {
-						jQuery(rowTpl.evaluate(list[i])).appendTo('#linksList');
-					}
-					jQuery('#linksList tr:nth-child(odd)').addClass('odd_row');
-					jQuery('#linksList tr:nth-child(even)').addClass('even_row');
-				}
-				else {
-					jQuery('#mapLinksContainer').toggle(false);
-				}
 			}
 		};
 
@@ -1425,7 +1327,6 @@ ZABBIX.apps.map = (function() {
 			var tpl = new Template(jQuery('#mapMassFormTpl').html());
 			this.domNode = jQuery(tpl.evaluate()).appendTo(formContainer);
 
-
 			// populate icons selects
 			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
@@ -1448,7 +1349,8 @@ ZABBIX.apps.map = (function() {
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#massDragHandler');
 				jQuery('#massElementCount').text(this.sysmap.selection.count);
-				this.domNode.toggle(true);
+				this.formContainer.show();
+				this.domNode.show();
 				this.updateList();
 			},
 
@@ -1560,7 +1462,8 @@ ZABBIX.apps.map = (function() {
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
 			this.triggerids = {};
-			this.domNode = jQuery('#linkForm');
+
+			this.domNode = jQuery(new Template(jQuery('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
 
 			// apply jQuery UI elements
 			jQuery('#formLinkApply, #formLinkRemove, #formLinkClose').button();
@@ -1570,8 +1473,8 @@ ZABBIX.apps.map = (function() {
 			 * Show form.
 			 */
 			show: function() {
-				this.domNode.toggle(true);
-				jQuery('#elementApply, #elementRemove').button('disable');
+				this.domNode.show();
+				jQuery('.element-edit-control').button('disable');
 			},
 
 			/**
@@ -1579,8 +1482,8 @@ ZABBIX.apps.map = (function() {
 			 */
 			hide: function() {
 				jQuery('#linksList tr').removeClass('selected');
-				this.domNode.toggle(false);
-				jQuery('#elementApply, #elementRemove').button('enable');
+				jQuery('#linkForm').hide();
+				jQuery('.element-edit-control').button('enable');
 			},
 
 			/**
@@ -1628,16 +1531,19 @@ ZABBIX.apps.map = (function() {
 					i,
 					ln;
 
-				// get currenlty selected element
-				for (selementid in this.sysmap.selection.selements) {
-					selement1 = this.sysmap.selements[selementid];
-				}
+				// if only one element is selected, make sure that element1 is equal to the selected element and
+				// element2 - to the connected
+				if (this.sysmap.selection.count === 1) {
+					// get currently selected element
+					for (selementid in this.sysmap.selection.selements) {
+						selement1 = this.sysmap.selements[selementid];
+					}
 
-				// make that selementi1 always equal to selected element and selementid2 to connected
-				if (selement1.id !== link.selementid1) {
-					tmp = link.selementid1;
-					link.selementid1 = selement1.id;
-					link.selementid2 = tmp;
+					if (selement1.id !== link.selementid1) {
+						tmp = link.selementid1;
+						link.selementid1 = selement1.id;
+						link.selementid2 = tmp;
+					}
 				}
 
 				// populate list of elements to connect with
@@ -1730,6 +1636,98 @@ ZABBIX.apps.map = (function() {
 					jQuery(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer');
 				}
 				jQuery('.colorpicker', this.domNode).change();
+			},
+
+			/**
+			 * Updates links list for element.
+			 * @param {String} selementIds
+			 */
+			updateList: function(selementIds) {
+				var links = this.sysmap.getLinksBySelementIds(selementIds),
+					linkTable,
+					rowTpl,
+					list,
+					i,
+					ln,
+					link,
+					linkedSelementid,
+					linktriggers;
+
+				jQuery('.element-links').hide();
+				jQuery('.element-links tbody').empty();
+				if (links.length) {
+					jQuery('#mapLinksContainer').show();
+
+					if (objectSize(selementIds) > 1) {
+						rowTpl = '#massElementLinkTableRowTpl';
+						linkTable = jQuery('#mass-element-links');
+					}
+					else {
+						rowTpl = '#elementLinkTableRowTpl';
+						linkTable = jQuery('#element-links');
+					}
+					rowTpl = new Template(jQuery(rowTpl).html());
+
+					list = [];
+					for (i = 0, ln = links.length; i < ln; i++) {
+						link = this.sysmap.links[links[i]].data;
+
+						// if multiple elements are selected, display element2 as the "to" element
+						// if only one element is selected, display the element on the opposite end
+						if (objectSize(selementIds) > 1 || !!selementIds[link.selementid1]) {
+							linkedSelementid = link.selementid2;
+						}
+						else {
+							linkedSelementid = link.selementid1;
+						}
+
+						linktriggers = [];
+						for (var linktrigger in link.linktriggers) {
+							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
+						}
+
+						list.push({
+							fromElementName: this.sysmap.selements[link.selementid1].data.elementName,
+							toElementName: this.sysmap.selements[linkedSelementid].data.elementName,
+							linkid: link.linkid,
+							linktriggers: linktriggers.join('\n')
+						});
+					}
+
+					// sort by "from" element and then by "to" element
+					list.sort(function(a, b) {
+						var fromElementA = a.fromElementName.toLowerCase();
+						var fromElementB = b.fromElementName.toLowerCase();
+
+						if (fromElementA < fromElementB) {
+							return -1;
+						}
+						if (fromElementA > fromElementB) {
+							return 1;
+						}
+						if (fromElementA == fromElementB) {
+							var toElementA = a.toElementName.toLowerCase();
+							var toElementB = b.toElementName.toLowerCase();
+
+							if (toElementA < toElementB) {
+								return -1;
+							}
+							if (toElementA > toElementB) {
+								return 1;
+							}
+						}
+						return 0;
+					});
+					for (i = 0, ln = list.length; i < ln; i++) {
+						jQuery(rowTpl.evaluate(list[i])).appendTo(linkTable.find('tbody'));
+					}
+					linkTable.find('tbody tr:nth-child(odd)').addClass('odd_row');
+					linkTable.find('tbody tr:nth-child(even)').addClass('even_row');
+					linkTable.show();
+				}
+				else {
+					jQuery('#mapLinksContainer').hide();
+				}
 			}
 		};
 
@@ -1748,19 +1746,6 @@ ZABBIX.apps.map = (function() {
 				}
 			}
 			sysmap.updateImage();
-		});
-
-		Link.prototype.bind('afterUpdate', function() {
-			sysmap.updateImage();
-		});
-
-		Link.prototype.bind('afterRemove', function() {
-			if (sysmap.form.active) {
-				for (var selementid in sysmap.selection.selements) {
-					sysmap.form.updateList(selementid);
-				}
-			}
-			sysmap.linkForm.hide();
 		});
 
 		return sysmap;
