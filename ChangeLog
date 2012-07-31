@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5355] fixed translated string escaping the in map pop up menu script (Pavels)
 ..F....... [ZBX-5257] changed technical host names to visible host names in several places (Pavels)
 ..F....... [ZBX-5257] fixed incorrect links to parent trigger and graph prototypes in the configuration forms (Pavels)
 ..F....... [ZBX-5257] fixed multiple navigation panel issues (Pavels)
