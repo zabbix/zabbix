@@ -8,6 +8,17 @@ Bug fixes:
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.3rc1
+
+Bug fixes:
+....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.2
+
+2.0.2rc2 was released as 2.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.2rc2
 
 Bug fixes:
@@ -98,8 +109,6 @@ Changes for 2.0.1
 
 --------------------------------------------------------------------------------
 Changes for 2.0.1rc2
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-5094] removed trailing backslash from returned value {#FSNAME} by Windows agent (Sasha)
