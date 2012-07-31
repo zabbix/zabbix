@@ -1549,7 +1549,7 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * @param $triggers
 	 */
-	protected function createReal(array &$triggers) {sdex();
+	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
 
 		// insert triggers without expression
