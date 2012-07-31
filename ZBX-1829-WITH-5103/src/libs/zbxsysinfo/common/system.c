@@ -146,9 +146,9 @@ static void	get_52_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 {
 	zbx_strcpy_alloc(os, os_alloc, os_offset, " Microsoft Windows");
 
-	if (0 != GetSystemMetrics(89))	/* SM_SERVERR2 */
+	if (0 != GetSystemMetrics(89))			/* SM_SERVERR2 */
 		zbx_strcpy_alloc(os, os_alloc, os_offset, " Server 2003 R2");
-	else if (0 != (vi->wSuiteMask & VER_SUITE_WH_SERVER))
+	else if (0 != (vi->wSuiteMask & 0x8000))	/* VER_SUITE_WH_SERVER */
 		zbx_strcpy_alloc(os, os_alloc, os_offset, " Home Server");
 	else if (VER_NT_WORKSTATION == vi->wProductType && PROCESSOR_ARCHITECTURE_AMD64 == si->wProcessorArchitecture)
 		zbx_strcpy_alloc(os, os_alloc, os_offset, " XP Professional");
@@ -188,58 +188,59 @@ static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 
 	pGPI(vi->dwMajorVersion, vi->dwMinorVersion, 0, 0, &product_type);
 
+	/* use constants in order to support Windows 2000 */
 	switch (product_type)
 	{
-		case PRODUCT_ULTIMATE:
+		case 0x0001:	/* PRODUCT_ULTIMATE */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Ultimate Edition");
 			break;
-		case PRODUCT_PROFESSIONAL:
+		case 0x0030:	/* PRODUCT_PROFESSIONAL */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Professional");
 			break;
-		case PRODUCT_HOME_PREMIUM:
+		case 0x0003:	/* PRODUCT_HOME_PREMIUM */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Home Premium Edition");
 			break;
-		case PRODUCT_HOME_BASIC:
+		case 0x0002:	/* PRODUCT_HOME_BASIC */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Home Basic Edition");
 			break;
-		case PRODUCT_ENTERPRISE:
+		case 0x0004:	/* PRODUCT_ENTERPRISE */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Enterprise Edition");
 			break;
-		case PRODUCT_BUSINESS:
+		case 0x0006:	/* PRODUCT_BUSINESS */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Business Edition");
 			break;
-		case PRODUCT_STARTER:
+		case 0x000B:	/* PRODUCT_STARTER */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Starter Edition");
 			break;
-		case PRODUCT_CLUSTER_SERVER:
+		case 0x0012:	/* PRODUCT_CLUSTER_SERVER */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Cluster Server Edition");
 			break;
-		case PRODUCT_DATACENTER_SERVER:
+		case 0x0008:	/* PRODUCT_DATACENTER_SERVER */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Datacenter Edition");
 			break;
-		case PRODUCT_DATACENTER_SERVER_CORE:
+		case 0x000C:	/* PRODUCT_DATACENTER_SERVER_CORE */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Datacenter Edition (core installation)");
 			break;
-		case PRODUCT_ENTERPRISE_SERVER:
-		case PRODUCT_ENTERPRISE_SERVER_IA64:
+		case 0x000A:	/* PRODUCT_ENTERPRISE_SERVER */
+		case 0x000F:	/* PRODUCT_ENTERPRISE_SERVER_IA64 */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Enterprise Edition");
 			break;
-		case PRODUCT_ENTERPRISE_SERVER_CORE:
+		case 0x000E:	/* PRODUCT_ENTERPRISE_SERVER_CORE */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Enterprise Edition (core installation)");
 			break;
-		case PRODUCT_SMALLBUSINESS_SERVER:
+		case 0x0009:	/* PRODUCT_SMALLBUSINESS_SERVER */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Small Business Server");
 			break;
-		case PRODUCT_SMALLBUSINESS_SERVER_PREMIUM:
+		case 0x0019:	/* PRODUCT_SMALLBUSINESS_SERVER_PREMIUM */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Small Business Server Premium Edition");
 			break;
-		case PRODUCT_STANDARD_SERVER:
+		case 0x0007:	/* PRODUCT_STANDARD_SERVER */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Standard Edition");
 			break;
-		case PRODUCT_STANDARD_SERVER_CORE:
+		case 0x000D:	/* PRODUCT_STANDARD_SERVER_CORE */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Standard Edition (core installation)");
 			break;
-		case PRODUCT_WEB_SERVER:
+		case 0x0011:	/* PRODUCT_WEB_SERVER */
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Web Server Edition");
 			break;
 	}
