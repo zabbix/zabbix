@@ -23,6 +23,7 @@
 #include "sysinfo.h"
 
 #ifdef _WINDOWS
+#	include "perfmon.h"
 
 #define MAX_CPU_HISTORY	(15 * SEC_PER_MIN)
 
