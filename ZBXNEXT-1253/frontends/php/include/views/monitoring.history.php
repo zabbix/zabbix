@@ -43,7 +43,7 @@ if (count($this->data['items']) == 1) {
 
 // append action form to header
 $actionForm = new CForm('get');
-$actionForm->addVar('itemid', $this->data['itemid']);
+$actionForm->addVar('itemid', $_REQUEST['itemid']);
 
 if (isset($_REQUEST['filter_task'])) {
 	$actionForm->addVar('filter_task', $_REQUEST['filter_task']);

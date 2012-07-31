@@ -108,6 +108,8 @@ if (isset($_REQUEST['favobj'])) {
 					insert_js('alert("'._('No permissions').'");');
 				}
 				else {
+					$page['type'] = PAGE_TYPE_JS;
+
 					$screens = API::Screen()->get(array(
 						'screenids' => $screen['screenid'],
 						'output' => API_OUTPUT_EXTEND,
