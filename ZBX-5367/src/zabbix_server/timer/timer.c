@@ -856,7 +856,7 @@ void	main_timer_loop()
 
 		process_time_functions();
 
-		if (0 == nextcheck % SEC_PER_MIN || time(NULL) >= nextcheck + 30)
+		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
 		{
 			zbx_setproctitle("%s [processing maintenance periods]", get_process_type_string(process_type));
 
