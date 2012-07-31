@@ -27,22 +27,22 @@ var timeControl = {
 
 	addObject: function(domid, time, objData) {
 		this.objectList[domid] = {
-			'refresh': false,
-			'processed': 0,
-			'id': domid,
-			'containerid': null,
-			'domid': domid,
-			'time': {},
-			'objDims': {},
-			'src': location.href,
-			'dynamic': 1,
-			'periodFixed': 1,
-			'loadSBox': 0,
-			'loadImage': 0,
-			'loadScroll': 1,
-			'scrollWidthByImage': 0,
-			'mainObject': 0, // object on changing will reflect on all others
-			'sliderMaximumTimePeriod': null // max period in seconds
+			refresh: false,
+			processed: 0,
+			id: domid,
+			containerid: null,
+			domid: domid,
+			time: {},
+			objDims: {},
+			src: location.href,
+			dynamic: 1,
+			periodFixed: 1,
+			loadSBox: 0,
+			loadImage: 0,
+			loadScroll: 1,
+			scrollWidthByImage: 0,
+			mainObject: 0, // object on changing will reflect on all others
+			sliderMaximumTimePeriod: null // max period in seconds
 		};
 
 		for (var key in this.objectList[domid]) {
@@ -579,44 +579,44 @@ var CScrollBar = Class.create(CDebug, {
 	px2sec:			null, // seconds in pixel
 
 	dom: {
-		'scrollbar':	null,
-		'info':			null,
-		'gmenu':		null,
-		'zoom':			null,
-		'text':			null,
-		'links':		null,
-		'linklist':		[],
-		'timeline':		null,
-		'info_left':	null,
-		'info_right':	null,
-		'sublevel':		null,
-		'left':			null,
-		'right':		null,
-		'bg':			null,
-		'overlevel':	null,
-		'bar':			null,
-		'icon':			null,
-		'center':		null,
-		'ghost':		null,
-		'left_arr':		null,
-		'right_arr':	null,
-		'subline':		null,
-		'nav_links':	null,
-		'nav_linklist':	[],
-		'period_state':	null,
-		'info_period':	null
+		scrollbar:		null,
+		info:			null,
+		gmenu:			null,
+		zoom:			null,
+		text:			null,
+		links:			null,
+		linklist:		[],
+		timeline:		null,
+		info_left:		null,
+		info_right:		null,
+		sublevel:		null,
+		left:			null,
+		right:			null,
+		bg:				null,
+		overlevel:		null,
+		bar:			null,
+		icon:			null,
+		center:			null,
+		ghost:			null,
+		left_arr:		null,
+		right_arr:		null,
+		subline:		null,
+		nav_links:		null,
+		nav_linklist:	[],
+		period_state:	null,
+		info_period:	null
 	},
 
 	size: {
-		'scrollline':	null,	// scroll line width
-		'barminwidth':	21		// bar minimal width
+		scrollline:		null,	// scroll line width
+		barminwidth:	21		// bar minimal width
 	},
 
 	position: {
-		'bar':		null,	// bar dimensions
-		'ghost':	null,	// ghost dimensions
-		'leftArr':	null,	// left arrow dimensions
-		'rightArr':	null	// right arrow dimensions
+		bar:		null,	// bar dimensions
+		ghost:		null,	// ghost dimensions
+		leftArr:	null,	// left arrow dimensions
+		rightArr:	null	// right arrow dimensions
 	},
 
 	// status
@@ -819,8 +819,7 @@ var CScrollBar = Class.create(CDebug, {
 		}
 
 		if (is_null(periodWidth)) {
-			var periodTime = this.timeline.period();
-			var width = Math.round(periodTime / this.px2sec);
+			var width = Math.round(this.timeline.period() / this.px2sec);
 			periodWidth = width;
 		}
 		else {
@@ -828,10 +827,8 @@ var CScrollBar = Class.create(CDebug, {
 		}
 
 		if (is_null(rightSide)) {
-			var periodTime = this.timeline.period();
 			var userTime = this.timeline.usertime();
 			var startTime = this.timeline.starttime();
-			var endTime = this.timeline.endtime();
 
 			rightSide = Math.round((userTime - startTime) / this.px2sec);
 		}
@@ -919,6 +916,7 @@ var CScrollBar = Class.create(CDebug, {
 		if (CR) {
 			pos.top -= 20;
 		}
+
 		this.clndrLeft.clndr.clndrshow(pos.top, pos.left);
 	},
 
@@ -935,6 +933,7 @@ var CScrollBar = Class.create(CDebug, {
 		if (CR) {
 			pos.top -= 20;
 		}
+
 		this.clndrRight.clndr.clndrshow(pos.top, pos.left);
 	},
 
@@ -947,13 +946,11 @@ var CScrollBar = Class.create(CDebug, {
 
 		// fixed
 		if (this.fixedperiod == 1) {
-			var new_usertime = time + this.timeline.period();
-			this.timeline.usertime(new_usertime);
+			this.timeline.usertime(time + this.timeline.period());
 		}
 		// dynamic
 		else {
-			var new_period = Math.abs(this.timeline.usertime() - time);
-			this.timeline.period(new_period);
+			this.timeline.period(Math.abs(this.timeline.usertime() - time));
 		}
 
 		// bar
@@ -979,9 +976,7 @@ var CScrollBar = Class.create(CDebug, {
 		else {
 			var startusertime = this.timeline.usertime() - this.timeline.period();
 			this.timeline.usertime(time);
-
-			var new_period = this.timeline.usertime() - startusertime;
-			this.timeline.period(new_period);
+			this.timeline.period(this.timeline.usertime() - startusertime);
 		}
 
 		// bar
@@ -1004,9 +999,7 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		var element = ui.helper.context;
-
-		this.position.bar = getDimensions(element);
+		this.position.bar = getDimensions(ui.helper.context);
 		this.setGhostByBar(ui);
 		this.updateTimeLine(this.position.bar);
 		this.setTabInfo();
@@ -1017,15 +1010,13 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		var element = ui.helper.context;
-
-		this.position.bar = getDimensions(element);
+		this.position.bar = getDimensions(ui.helper.context);
 		this.ghostBox.endResize();
 		this.setBarByGhost();
+		this.setGhostByBar();
 	},
 
 	makeBarDragable: function(element) {
-		// TODO: write proper function
 		jQuery(element).draggable({
 			containment: 'parent',
 			axis: 'x',
@@ -1042,7 +1033,6 @@ var CScrollBar = Class.create(CDebug, {
 			width: jQuery(this.dom.overlevel).width()
 		};
 
-		// TODO: write proper function
 		jQuery(element).draggable({
 			containment: [pD.left - 4, 0, pD.width + pD.left - 4, 0],
 			axis: 'x',
@@ -1057,9 +1047,7 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		var element = ui.helper.context;
-
-		this.position.leftArr = getDimensions(element);
+		this.position.leftArr = getDimensions(ui.helper.context);
 		this.ghostBox.userstartime = this.timeline.usertime();
 		this.ghostBox.usertime = this.timeline.usertime();
 		this.ghostBox.startResize(0);
@@ -1082,8 +1070,7 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		var element = ui.helper.context;
-		this.position.leftArr = getDimensions(element);
+		this.position.leftArr = getDimensions(ui.helper.context);
 		this.ghostBox.endResize();
 		this.setBarByGhost();
 	},
@@ -1095,7 +1082,6 @@ var CScrollBar = Class.create(CDebug, {
 			width: jQuery(this.dom.overlevel).width()
 		};
 
-		// TODO: write proper function
 		jQuery(element).draggable({
 			containment: [pD.left - 4, 0, pD.width + pD.left - 5, 0],
 			axis: 'x',
@@ -1110,9 +1096,7 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		var element = ui.helper.context;
-
-		this.position.rightArr = getDimensions(element);
+		this.position.rightArr = getDimensions(ui.helper.context);
 		this.ghostBox.userstartime = this.timeline.usertime() - this.timeline.period();
 		this.ghostBox.startResize(1);
 	},
@@ -1134,9 +1118,7 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		var element = ui.helper.context;
-
-		this.position.rightArr = getDimensions(element);
+		this.position.rightArr = getDimensions(ui.helper.context);
 		this.ghostBox.endResize();
 		this.setBarByGhost();
 	},
@@ -1164,10 +1146,7 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	getTZOffset: function(time) {
-		var date = new CDate(time * 1000);
-		var TimezoneOffset = date.getTimezoneOffset();
-
-		return TimezoneOffset * 60;
+		return new CDate(time * 1000).getTimezoneOffset() * 60;
 	},
 
 	getTZdiff: function(time1, time2) {
@@ -1175,9 +1154,8 @@ var CScrollBar = Class.create(CDebug, {
 		var TimezoneOffset = date.getTimezoneOffset();
 
 		date.setTime(time2 * 1000);
-		var offset = (TimezoneOffset - date.getTimezoneOffset()) * 60;
 
-		return offset;
+		return (TimezoneOffset - date.getTimezoneOffset()) * 60;
 	},
 
 	roundTime: function(usertime) {
@@ -1206,21 +1184,8 @@ var CScrollBar = Class.create(CDebug, {
 			new_period = this.roundTime(new_period) - this.getTZOffset(new_period);
 		}
 
-		var right = false;
-		var left = false;
-		if (this.ghostBox.sideToMove == 1 && this.ghostBox.flip >= 0) {
-			right = true;
-		}
-		else if (this.ghostBox.sideToMove == 0 && this.ghostBox.flip < 0) {
-			right = true;
-		}
-
-		if (this.ghostBox.sideToMove == 0 && this.ghostBox.flip >= 0) {
-			left = true;
-		}
-		else if (this.ghostBox.sideToMove == 1 && this.ghostBox.flip < 0) {
-			left = true;
-		}
+		var right = (this.ghostBox.sideToMove == 1 && this.ghostBox.flip >= 0) || (this.ghostBox.sideToMove == 0 && this.ghostBox.flip < 0);
+		var left = (this.ghostBox.sideToMove == 0 && this.ghostBox.flip >= 0) || (this.ghostBox.sideToMove == 1 && this.ghostBox.flip < 0);
 
 		// hack for bars most right position
 		if (dim.right == this.size.scrollline) {
@@ -1349,20 +1314,20 @@ var CScrollBar = Class.create(CDebug, {
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.linklist[links] = document.createElement('span');
-			this.dom.links.appendChild(this.dom.linklist[links]);
 			this.dom.linklist[links].className = 'link';
 			this.dom.linklist[links].setAttribute('zoom', zooms[key]);
 			this.dom.linklist[links].appendChild(document.createTextNode(caption));
+			this.dom.links.appendChild(this.dom.linklist[links]);
 			addListener(this.dom.linklist[links], 'click', this.setZoom.bindAsEventListener(this, zooms[key]), true);
 
 			links++;
 		}
 
 		this.dom.linklist[links] = document.createElement('span');
-		this.dom.links.appendChild(this.dom.linklist[links]);
 		this.dom.linklist[links].className = 'link';
 		this.dom.linklist[links].setAttribute('zoom', this.maxperiod);
 		this.dom.linklist[links].appendChild(document.createTextNode(locale['S_ALL_S']));
+		this.dom.links.appendChild(this.dom.linklist[links]);
 		addListener(this.dom.linklist[links], 'click', this.setFullPeriod.bindAsEventListener(this), true);
 	},
 
@@ -1379,11 +1344,11 @@ var CScrollBar = Class.create(CDebug, {
 		var caption = '';
 		var moves = [3600, 43200, 86400, 604800, 2592000, 15552000, 31536000];
 		var links = 0;
-		var tmp_laquo = document.createElement('span');
 
-		this.dom.nav_links.appendChild(tmp_laquo);
+		var tmp_laquo = document.createElement('span');
 		tmp_laquo.className = 'text';
 		tmp_laquo.innerHTML = ' &laquo;&laquo; ';
+		this.dom.nav_links.appendChild(tmp_laquo);
 
 		for (var i = moves.length; i >= 0; i--) {
 			if (!isset(i, moves) || !is_number(moves[i])) {
@@ -1397,19 +1362,19 @@ var CScrollBar = Class.create(CDebug, {
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.nav_linklist[links] = document.createElement('span');
-			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
 			this.dom.nav_linklist[links].className = 'link';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
+			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
 			addListener(this.dom.nav_linklist[links], 'click', this.navigateLeft.bindAsEventListener(this, moves[i]));
 
 			links++;
 		}
 
 		var tmp_laquo = document.createElement('span');
-		this.dom.nav_links.appendChild(tmp_laquo);
 		tmp_laquo.className = 'text';
 		tmp_laquo.innerHTML = ' | ';
+		this.dom.nav_links.appendChild(tmp_laquo);
 
 		for (var i = 0; i < moves.length; i++) {
 			if (!isset(i, moves) || !is_number(moves[i])) {
@@ -1423,19 +1388,19 @@ var CScrollBar = Class.create(CDebug, {
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.nav_linklist[links] = document.createElement('span');
-			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
 			this.dom.nav_linklist[links].className = 'link';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
+			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
 			addListener(this.dom.nav_linklist[links], 'click', this.navigateRight.bindAsEventListener(this, moves[i]));
 
 			links++;
 		}
 
 		var tmp_raquo = document.createElement('span');
-		this.dom.nav_links.appendChild(tmp_raquo);
 		tmp_raquo.className = 'text';
 		tmp_raquo.innerHTML = ' &raquo;&raquo; ';
+		this.dom.nav_links.appendChild(tmp_raquo);
 	},
 
 	setZoomLinksStyle: function() {
@@ -1478,8 +1443,8 @@ var CScrollBar = Class.create(CDebug, {
 		scr_cntr.style.margin = '5px 0 0 0';
 
 		this.dom.scrollbar = document.createElement('div');
-		scr_cntr.appendChild(this.dom.scrollbar);
 		this.dom.scrollbar.className = 'scrollbar';
+		scr_cntr.appendChild(this.dom.scrollbar);
 
 		Element.extend(this.dom.scrollbar);
 		this.dom.scrollbar.setStyle({width: w + 'px'});
@@ -1515,9 +1480,9 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_left.appendChild(document.createTextNode('02.07.2009 12:15:12'));
 
 		var sep = document.createElement('span');
-		this.dom.timeline.appendChild(sep);
 		sep.className = 'info_sep1';
 		sep.appendChild(document.createTextNode(' - '));
+		this.dom.timeline.appendChild(sep);
 
 		// right
 		this.dom.info_right = document.createElement('span');
@@ -1593,9 +1558,9 @@ var CScrollBar = Class.create(CDebug, {
 
 		// state
 		var tmp  = document.createElement('span');
-		this.dom.period.appendChild(tmp);
 		tmp.className = 'period_state_begin';
 		tmp.appendChild(document.createTextNode('('));
+		this.dom.period.appendChild(tmp);
 
 		this.dom.period_state = document.createElement('span');
 		this.dom.period.appendChild(this.dom.period_state);
@@ -1604,9 +1569,9 @@ var CScrollBar = Class.create(CDebug, {
 		addListener(this.dom.period_state, 'click', this.switchPeriodState.bindAsEventListener(this));
 
 		var tmp  = document.createElement('span');
-		this.dom.period.appendChild(tmp);
 		tmp.className = 'period_state_end';
 		tmp.appendChild(document.createTextNode(')'));
+		this.dom.period.appendChild(tmp);
 
 		// period info
 		this.dom.info_period = document.createElement('div');
@@ -1614,62 +1579,62 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_period.className = 'info_period';
 		this.dom.info_period.appendChild(document.createTextNode('0h 0m'));
 
-	/*
-	<div class="scrollbar">
-		<div class="info">
-			<div class="zoom">
-				<span class="text">Zoom:</span>
-				<span class="links">
-					<span class="link">1h</span>
-					<span class="link">2h</span>
-					<span class="link">3h</span>
-					<span class="link">6h</span>
-					<span class="link">12h</span>
-					<span class="link">1d</span>
-					<span class="link">5d</span>
-					<span class="link">1w</span>
-					<span class="link">1m</span>
-					<span class="link">3m</span>
-					<span class="link">6m</span>
-					<span class="link">YTD</span>
-					<span class="link">1y</span>
-				</span>
-			</div>
-			<div class="gmenu"></div>
-			<div class="timeline">
-				<span class="info_right">30.06.2009 16:35:08</span>
-				<span class="info_sep1"> - </span>
-				<span class="info_left">30.06.2009 16:35:00</span>
-			</div>
-		</div>
-		<div class="sublevel">
-			<div class="left"></div>
-			<div class="right"></div>
-			<div class="bg">
-			</div>
-		</div>
-		<div class="overlevel">
-			<div class="bar">
-				<div class="icon">
-					<div class="center"></div>
+		/*
+		<div class="scrollbar">
+			<div class="info">
+				<div class="zoom">
+					<span class="text">Zoom:</span>
+					<span class="links">
+						<span class="link">1h</span>
+						<span class="link">2h</span>
+						<span class="link">3h</span>
+						<span class="link">6h</span>
+						<span class="link">12h</span>
+						<span class="link">1d</span>
+						<span class="link">5d</span>
+						<span class="link">1w</span>
+						<span class="link">1m</span>
+						<span class="link">3m</span>
+						<span class="link">6m</span>
+						<span class="link">YTD</span>
+						<span class="link">1y</span>
+					</span>
+				</div>
+				<div class="gmenu"></div>
+				<div class="timeline">
+					<span class="info_right">30.06.2009 16:35:08</span>
+					<span class="info_sep1"> - </span>
+					<span class="info_left">30.06.2009 16:35:00</span>
 				</div>
 			</div>
-			<div class="ghost">
-				<div class="left_arr"></div>
-				<div class="right_arr"></div>
+			<div class="sublevel">
+				<div class="left"></div>
+				<div class="right"></div>
+				<div class="bg">
+				</div>
+			</div>
+			<div class="overlevel">
+				<div class="bar">
+					<div class="icon">
+						<div class="center"></div>
+					</div>
+				</div>
+				<div class="ghost">
+					<div class="left_arr"></div>
+					<div class="right_arr"></div>
+				</div>
+			</div>
+			<div class="subline">
+				<div class="nav_links"></div>
+				<div class="info_period">0h 0m</div>
+				<div class="period">
+					(
+					<span class="period_state">fixed</span>
+					)
+				</div>
 			</div>
 		</div>
-		<div class="subline">
-			<div class="nav_links"></div>
-			<div class="info_period">0h 0m</div>
-			<div class="period">
-				(
-				<span class="period_state">fixed</span>
-				)
-			</div>
-		</div>
-	</div>
-	*/
+		*/
 	}
 });
 
