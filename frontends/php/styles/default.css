@@ -825,3 +825,21 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	border-radius: 5px;
 	font-size: 1.5em;
 }
+
+/* maps */
+#sysmap_cnt .sysmap_element { position: absolute; z-index: 10; }
+#sysmap_cnt .selementArea { background-color: rgb(204, 204, 204); background-color: rgba(204, 204, 204, 0.5); }
+#sysmap_cnt .selected { border: 3px #FFCC00 solid; margin: -3px; }
+#sysmap_cnt .ui-selecting { border: 3px #FFCC00 solid; margin: -3px; }
+
+#map-window { z-index: 100; position: absolute; display: none; top: 50px; left: 500px;
+	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5); }
+#map-window .formtable { width: 100%; }
+#map-window #elements-selected { border: 1px dotted black; margin-bottom: 5px; height: 128px; overflow-y: scroll; overflow-x: hidden; }
+#map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
+#map-window #linkForm { display: none; }
+#map-window #linkForm #linklabel { margin-top: 4px; }
+
+.colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
+fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
+fieldset legend { margin: 0.2em 0.5em; }
