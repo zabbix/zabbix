@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-31 22:33+0300\n"
-"PO-Revision-Date: 2012-07-16 09:06+0200\n"
+"POT-Creation-Date: 2012-07-31 22:47+0300\n"
+"PO-Revision-Date: 2012-07-23 16:16+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
@@ -2940,7 +2940,7 @@ msgstr "Сообщение по умолчанию"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
-msgstr ""
+msgstr "Длительность шага операции по умолчанию"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
@@ -3748,7 +3748,7 @@ msgstr "Длительность"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Duration (sec)"
-msgstr ""
+msgstr "Длительность (сек)"
 
 #: include/locales.inc.php:47
 msgid "Dutch (nl_NL)"
@@ -4941,7 +4941,7 @@ msgstr "Узел сети \"%1$s\" уже существует."
 #: api/classes/CProxy.php:645
 #, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
-msgstr ""
+msgstr "Узел сети \"%1$s\" наблюдается через прокси \"%2$s\"."
 
 #: api/classes/CTemplate.php:1004
 #, php-format
@@ -5657,7 +5657,7 @@ msgstr "Некорректный порт \"%s\" в операции дейст�
 
 #: api/classes/CAction.php:1513
 msgid "Incorrect action operation step duration."
-msgstr ""
+msgstr "Некорректная длительность шага операции действия."
 
 #: api/classes/CAction.php:1651
 msgid "Incorrect action operation type."
@@ -8658,7 +8658,7 @@ msgstr "Только одна проверка может быть уникал�
 
 #: api/classes/CProxy.php:610
 msgid "Only super admins can delete proxies."
-msgstr ""
+msgstr "Только Супер-Администраторы могут удалять прокси."
 
 #: include/services.inc.php:299
 #, php-format
@@ -9332,7 +9332,7 @@ msgstr "Прокси \"%1$s\" для узла сети \"%2$s\" не сущес�
 #: api/classes/CProxy.php:628
 #, php-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr ""
+msgstr "Прокси \"%1$s\" используется в правиле обнаружения \"%2$s\"."
 
 #: api/classes/CProxy.php:369
 #, php-format
@@ -10832,7 +10832,7 @@ msgstr "Стандартные элементы данных"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Start in"
-msgstr ""
+msgstr "Начинать в"
 
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
@@ -10929,7 +10929,7 @@ msgstr "Шаг \"%s\" уже существует."
 
 #: include/views/configuration.action.edit.php:430
 msgid "Step duration"
-msgstr ""
+msgstr "Длительность шага"
 
 #: include/views/configuration.httpconf.popup.php:68 popup_httpstep.php:24
 msgid "Step of scenario"
@@ -13226,7 +13226,7 @@ msgstr "мин"
 
 #: include/views/configuration.action.edit.php:46
 msgid "minimum 60 seconds"
-msgstr ""
+msgstr "минимум 60 секунд"
 
 #: include/views/configuration.maintenance.edit.php:50
 #: include/views/configuration.maintenance.edit.php:56
