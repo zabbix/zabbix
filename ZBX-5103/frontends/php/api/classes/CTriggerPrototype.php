@@ -919,8 +919,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-		foreach ($createdTriggers as $trigger) {
-			$trigger['expression'] = explode_exp($trigger['expression']);
+		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
 		}
 
