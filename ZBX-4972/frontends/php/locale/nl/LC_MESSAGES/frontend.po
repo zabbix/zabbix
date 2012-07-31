@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 00:19+0300\n"
+"POT-Creation-Date: 2012-07-18 01:26+0300\n"
 "PO-Revision-Date: 2012-05-04 21:18+0200\n"
 "Last-Translator: Raymond Kuiper <qix@the-wired.net>\n"
 "Language-Team: NL\n"
@@ -292,11 +292,11 @@ msgstr "Actie \"%s\" bestaat reeds."
 msgid "Action \"%s\" no operations defined."
 msgstr "Actie \"%s\" heeft geen handelingen gedefinieerd."
 
-#: actionconf.php:150
+#: actionconf.php:149
 msgid "Action added"
 msgstr "Actie toegevoegd"
 
-#: actionconf.php:171
+#: actionconf.php:170
 msgid "Action deleted"
 msgstr "Actie verwijderd"
 
@@ -304,7 +304,7 @@ msgstr "Actie verwijderd"
 msgid "Action operations"
 msgstr "Actie handelingen"
 
-#: actionconf.php:146
+#: actionconf.php:145
 msgid "Action updated"
 msgstr "Actie bijgewerkt"
 
@@ -342,7 +342,7 @@ msgstr "Actief sinds"
 msgid "Active till"
 msgstr "Actief tot"
 
-#: dashconf.php:206 history.php:263 include/blocks.inc.php:1083
+#: dashconf.php:211 history.php:263 include/blocks.inc.php:1083
 #: include/blocks.inc.php:1089 include/blocks.inc.php:1194
 #: include/blocks.inc.php:1239 include/blocks.inc.php:1245
 #: include/forms.inc.php:1668 include/forms.inc.php:1972
@@ -500,7 +500,7 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "Iconen uitlijnen"
 
-#: dashconf.php:170 dashconf.php:250 include/blocks.inc.php:1173
+#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1173
 #: include/blocks.inc.php:1182 include/blocks.inc.php:1227
 #: include/blocks.inc.php:1305 include/blocks.inc.php:1314
 #: include/nodes.inc.php:156 include/page_header.php:329
@@ -1102,7 +1102,7 @@ msgstr "Annuleer"
 msgid "Cannot acknowledge event"
 msgstr "Kan event niet bevestigen"
 
-#: actionconf.php:150
+#: actionconf.php:149
 msgid "Cannot add action"
 msgstr "kan actie niet toevoegen"
 
@@ -1321,7 +1321,7 @@ msgstr ""
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Kan de Zabbix gebruiker \"%1$s\" niet verwijderen, probeer de gebruiker uit te schakelen."
 
-#: actionconf.php:171
+#: actionconf.php:170
 msgid "Cannot delete action"
 msgstr "Kan actie niet verwijderen"
 
@@ -1406,7 +1406,7 @@ msgstr "Kan netwerk kaart niet verwijderen"
 msgid "Cannot delete node"
 msgstr "Kan node niet verwijderen"
 
-#: proxies.php:111 proxies.php:159
+#: proxies.php:110 proxies.php:156
 msgid "Cannot delete proxy"
 msgstr "Kan proxy niet verwijderen"
 
@@ -1443,7 +1443,7 @@ msgstr "Kan de scripts niet verwijderen. Het script \"%1$s\" wordt gebruikt in e
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Kan de scripts niet verwijderen. Het script met scriptid \"%s\" bestaat niet."
 
-#: actionconf.php:309
+#: actionconf.php:308
 msgid "Cannot delete selected actions"
 msgstr "Kan de geslecteerde acties niet verwijderen"
 
@@ -1471,7 +1471,7 @@ msgstr "Kan een template item niet verwijderen."
 msgid "Cannot delete templated items."
 msgstr "Kan template items niet verwijderen."
 
-#: api/classes/CTrigger.php:1127 api/classes/CTriggerPrototype.php:1045
+#: api/classes/CTrigger.php:1127 api/classes/CTriggerPrototype.php:1044
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Kan de template trigger \"%1$s:%2$s\" niet verwijderen."
@@ -1674,8 +1674,8 @@ msgid "Cannot have empty visible template name"
 msgstr "Zichtbare template naam mag niet leeg zijn"
 
 #: api/classes/CTrigger.php:1570 api/classes/CTrigger.php:1642
-#: api/classes/CTriggerPrototype.php:1142
-#: api/classes/CTriggerPrototype.php:1193
+#: api/classes/CTriggerPrototype.php:1141
+#: api/classes/CTriggerPrototype.php:1192
 #, fuzzy, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Kan expressie \"%s\" niet imploderen."
@@ -1808,7 +1808,7 @@ msgstr "Kan template niet ontkoppelen"
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Kan de trigger \"%s\" niet onkopplen, er is een template aan de host gekoppeld welke de items bevat."
 
-#: actionconf.php:146
+#: actionconf.php:145
 msgid "Cannot update action"
 msgstr "Kan actie niet bijwerken"
 
@@ -1943,7 +1943,7 @@ msgstr "Kan service niet bijwerken"
 msgid "Cannot update slide show"
 msgstr "Kan de diavoorstelling niet bijwerken"
 
-#: actionconf.php:299 trigger_prototypes.php:283 triggers.php:311
+#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:311
 msgid "Cannot update status"
 msgstr "kan status niet bijwerken"
 
@@ -2173,8 +2173,8 @@ msgstr "Kolomen"
 msgid "Combined result"
 msgstr ""
 
-#: include/actions.inc.php:842 include/actions.inc.php:876
-#: include/actions.inc.php:944
+#: include/actions.inc.php:841 include/actions.inc.php:875
+#: include/actions.inc.php:943
 #: include/views/administration.auditacts.list.php:106
 #: include/views/administration.script.edit.php:68
 msgid "Command"
@@ -2627,7 +2627,7 @@ msgstr ""
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:1149
+#: api/classes/CTriggerPrototype.php:1148
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -2764,7 +2764,7 @@ msgstr ""
 msgid "D, d M Y H:i:s O"
 msgstr ""
 
-#: dashconf.php:110
+#: dashconf.php:112
 msgid "DASHBOARD CONFIGURATION"
 msgstr ""
 
@@ -2819,11 +2819,11 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
-#: dashconf.php:26
+#: dashconf.php:27
 msgid "Dashboard configuration"
 msgstr ""
 
-#: dashconf.php:165
+#: dashconf.php:168
 msgid "Dashboard filter"
 msgstr ""
 
@@ -2975,17 +2975,13 @@ msgstr ""
 msgid "Default delay (in seconds)"
 msgstr ""
 
-#: actionconf.php:37
-msgid "Default escalation period"
-msgstr ""
-
-#: include/views/configuration.action.edit.php:44
-msgid "Default escalation period (minimum 60 seconds)"
-msgstr ""
-
 #: include/views/configuration.action.edit.php:54
 #: include/views/configuration.action.edit.php:541
 msgid "Default message"
+msgstr ""
+
+#: actionconf.php:37 include/views/configuration.action.edit.php:44
+msgid "Default operation step duration"
 msgstr ""
 
 #: include/views/configuration.action.edit.php:53
@@ -3001,7 +2997,6 @@ msgstr ""
 msgid "Default theme \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:320
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:49
 #: include/views/configuration.slideconf.list.php:41
@@ -3109,7 +3104,7 @@ msgstr "Verwijder scherm?"
 msgid "Delete script?"
 msgstr ""
 
-#: dashconf.php:209 hosts.php:877 include/reports.inc.php:317
+#: dashconf.php:214 hosts.php:877 include/reports.inc.php:317
 #: include/reports.inc.php:411 include/reports.inc.php:453
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
@@ -3321,7 +3316,7 @@ msgstr ""
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CProxy.php:552
+#: api/classes/CProxy.php:532
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr ""
@@ -3337,7 +3332,7 @@ msgstr ""
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:1105
+#: api/classes/CTriggerPrototype.php:1104
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3398,7 +3393,7 @@ msgstr ""
 msgid "Description"
 msgstr "Omschrijving"
 
-#: include/actions.inc.php:911 include/blocks.inc.php:686
+#: include/actions.inc.php:910 include/blocks.inc.php:686
 #: include/config.inc.php:341
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
@@ -3504,7 +3499,7 @@ msgstr ""
 msgid "Disable selected triggers?"
 msgstr ""
 
-#: auditlogs.php:152 dashboard.php:227 dashconf.php:161
+#: auditlogs.php:152 dashboard.php:227 dashconf.php:164
 #: include/discovery.inc.php:119 include/httptest.inc.php:46
 #: include/items.inc.php:147 include/triggers.inc.php:1633
 #: include/users.inc.php:60
@@ -3793,6 +3788,10 @@ msgstr ""
 msgid "Duration"
 msgstr "Duur"
 
+#: include/views/configuration.action.edit.php:320
+msgid "Duration (sec)"
+msgstr ""
+
 #: include/locales.inc.php:47
 msgid "Dutch (nl_NL)"
 msgstr "Dutch (nl_NL)"
@@ -3889,11 +3888,11 @@ msgstr ""
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:2099 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:949 api/classes/CItemPrototype.php:678
-#: api/classes/CProxy.php:500 api/classes/CService.php:344
+#: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1327 api/classes/CTrigger.php:1416
-#: api/classes/CTrigger.php:1507 api/classes/CTriggerPrototype.php:1026
+#: api/classes/CTrigger.php:1507 api/classes/CTriggerPrototype.php:1025
 #: api/classes/CUserGroup.php:647 api/classes/CUserMacro.php:504
 #: api/classes/CUserMacro.php:658
 msgid "Empty input parameter."
@@ -4013,7 +4012,7 @@ msgstr ""
 msgid "Enable selected triggers?"
 msgstr ""
 
-#: auditlogs.php:149 dashboard.php:227 dashconf.php:157
+#: auditlogs.php:149 dashboard.php:227 dashconf.php:160
 #: include/discovery.inc.php:118 include/httptest.inc.php:45
 #: include/items.inc.php:146
 #: include/views/administration.mediatypes.edit.php:94
@@ -4041,8 +4040,8 @@ msgstr "Geactiveerd"
 msgid "English (en_GB)"
 msgstr "English (en_GB)"
 
-#: include/actions.inc.php:682 include/actions.inc.php:767
-#: include/actions.inc.php:843 include/items.inc.php:35
+#: include/actions.inc.php:681 include/actions.inc.php:766
+#: include/actions.inc.php:842 include/items.inc.php:35
 #: include/views/administration.auditacts.list.php:76
 #: include/views/configuration.host.discovery.list.php:59
 #: include/views/configuration.item.list.php:64
@@ -4080,7 +4079,7 @@ msgstr ""
 msgid "Error in item key: \"%s\"."
 msgstr ""
 
-#: include/db.inc.php:909 include/db.inc.php:965
+#: include/db.inc.php:917 include/db.inc.php:973
 #, php-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr ""
@@ -4088,10 +4087,6 @@ msgstr ""
 #: httpdetails.php:155 httpdetails.php:207
 #, php-format
 msgid "Error: %1$s"
-msgstr ""
-
-#: include/views/configuration.action.edit.php:432
-msgid "Escalation period"
 msgstr ""
 
 #: include/events.inc.php:115
@@ -4111,7 +4106,7 @@ msgstr ""
 msgid "Event acknowledges \"%1$s\"."
 msgstr ""
 
-#: dashconf.php:256
+#: dashconf.php:260
 msgid "Event acknowledging disabled"
 msgstr ""
 
@@ -4283,7 +4278,7 @@ msgstr ""
 msgid "Fail"
 msgstr ""
 
-#: include/actions.inc.php:1016 include/blocks.inc.php:965
+#: include/actions.inc.php:1015 include/blocks.inc.php:965
 msgid "Failed"
 msgstr ""
 
@@ -4359,7 +4354,7 @@ msgstr ""
 msgid "Filled region"
 msgstr ""
 
-#: dashconf.php:261 events.php:321 history.php:296 hostinventories.php:134
+#: dashconf.php:265 events.php:321 history.php:296 hostinventories.php:134
 #: hosts.php:659 include/classes/class.cwidget.php:134
 #: include/forms.inc.php:573 include/reports.inc.php:172
 #: include/views/administration.auditacts.list.php:49
@@ -4794,7 +4789,7 @@ msgstr "Groep bijgewerkt"
 msgid "Grouping by"
 msgstr ""
 
-#: dashconf.php:213 include/reports.inc.php:540
+#: dashconf.php:217 include/reports.inc.php:540
 #: include/views/administration.users.edit.php:80
 #: include/views/administration.users.list.php:58
 #: include/views/configuration.host.edit.php:186
@@ -4991,6 +4986,11 @@ msgstr "Host"
 msgid "Host \"%1$s\" already exists."
 msgstr ""
 
+#: api/classes/CProxy.php:645
+#, php-format
+msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
+msgstr ""
+
 #: api/classes/CTemplate.php:1004
 #, php-format
 msgid "Host \"%s\" already exists."
@@ -5061,7 +5061,7 @@ msgstr ""
 msgid "Host group label type"
 msgstr ""
 
-#: dashconf.php:175 include/forms.inc.php:196 include/menu.inc.php:164
+#: dashconf.php:180 include/forms.inc.php:196 include/menu.inc.php:164
 #: include/views/administration.script.edit.php:91
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.hostgroups.list.php:39
@@ -5121,7 +5121,7 @@ msgstr ""
 msgid "Host status became \"%s\""
 msgstr ""
 
-#: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:150
+#: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:147
 msgid "Host status updated"
 msgstr "Host status bijgewerkt"
 
@@ -5156,7 +5156,7 @@ msgstr ""
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Er bestaat reeds een host met de zichtbare naam \"%s\"."
 
-#: dashconf.php:223 hostinventoriesoverview.php:81 hostinventories.php:94
+#: dashconf.php:227 hostinventoriesoverview.php:81 hostinventories.php:94
 #: hosts.php:646 include/forms.inc.php:223 include/forms.inc.php:816
 #: include/items.inc.php:732 include/menu.inc.php:116 include/menu.inc.php:172
 #: include/reports.inc.php:585 include/views/administration.proxy.edit.php:82
@@ -5567,9 +5567,9 @@ msgstr ""
 msgid "In maintenance"
 msgstr ""
 
-#: include/actions.inc.php:715 include/actions.inc.php:795
-#: include/actions.inc.php:869 include/actions.inc.php:933
-#: include/actions.inc.php:1010
+#: include/actions.inc.php:714 include/actions.inc.php:794
+#: include/actions.inc.php:868 include/actions.inc.php:932
+#: include/actions.inc.php:1009
 #: include/views/administration.auditacts.list.php:94
 msgid "In progress"
 msgstr ""
@@ -5589,7 +5589,7 @@ msgstr ""
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr ""
 
-#: api/classes/CProxy.php:364
+#: api/classes/CProxy.php:352
 #, php-format
 msgid "Incorrect IP for passive proxy \"%1$s\"."
 msgstr ""
@@ -5685,10 +5685,6 @@ msgstr ""
 msgid "Incorrect action operation condition type."
 msgstr ""
 
-#: api/classes/CAction.php:1513
-msgid "Incorrect action operation escalation period."
-msgstr ""
-
 #: api/classes/CAction.php:1503 api/classes/CAction.php:1507
 msgid "Incorrect action operation escalation step values."
 msgstr ""
@@ -5704,6 +5700,10 @@ msgstr ""
 #: api/classes/CAction.php:1591 api/classes/CAction.php:1595
 #, php-format
 msgid "Incorrect action operation port \"%s\"."
+msgstr ""
+
+#: api/classes/CAction.php:1513
+msgid "Incorrect action operation step duration."
 msgstr ""
 
 #: api/classes/CAction.php:1651
@@ -5750,7 +5750,7 @@ msgstr ""
 msgid "Incorrect characters used for Node name."
 msgstr ""
 
-#: api/classes/CProxy.php:373
+#: api/classes/CProxy.php:361
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
 msgstr ""
@@ -7394,9 +7394,9 @@ msgid "Menu"
 msgstr "Menu"
 
 #: acknow.php:208 include/actions.inc.php:351 include/actions.inc.php:360
-#: include/actions.inc.php:366 include/actions.inc.php:681
-#: include/actions.inc.php:730 include/actions.inc.php:766
-#: include/actions.inc.php:810
+#: include/actions.inc.php:366 include/actions.inc.php:680
+#: include/actions.inc.php:729 include/actions.inc.php:765
+#: include/actions.inc.php:809
 #: include/views/administration.auditacts.list.php:75
 #: include/views/administration.auditacts.list.php:103
 #: include/views/configuration.action.edit.php:553
@@ -7607,7 +7607,7 @@ msgstr ""
 msgid "NTLM authentication"
 msgstr ""
 
-#: actionconf.php:34 actionconf.php:158 adm.regexps.php:36 adm.regexps.php:91
+#: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:91
 #: adm.regexps.php:121 disc_prototypes.php:43 graphs.php:42
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:653 hosts.php:684
 #: httpconf.php:43 httpmon.php:143 include/forms.inc.php:549
@@ -7812,8 +7812,8 @@ msgstr ""
 msgid "No actions defined."
 msgstr ""
 
-#: include/actions.inc.php:673 include/actions.inc.php:758
-#: include/actions.inc.php:837 include/actions.inc.php:906
+#: include/actions.inc.php:672 include/actions.inc.php:757
+#: include/actions.inc.php:836 include/actions.inc.php:905
 msgid "No actions found."
 msgstr ""
 
@@ -8043,12 +8043,12 @@ msgstr ""
 msgid "No interfaces for host \"%s\"."
 msgstr ""
 
-#: api/classes/CProxy.php:356
+#: api/classes/CProxy.php:344
 #, php-format
 msgid "No interfaces for proxy \"%s\"."
 msgstr ""
 
-#: api/classes/CProxy.php:332 api/classes/CProxy.php:346
+#: api/classes/CProxy.php:328 api/classes/CProxy.php:338
 #, php-format
 msgid "No interfaces provided for proxy \"%s\"."
 msgstr ""
@@ -8189,16 +8189,16 @@ msgstr ""
 #: api/classes/CItemGeneral.php:175 api/classes/CItemGeneral.php:207
 #: api/classes/CItem.php:966 api/classes/CItemPrototype.php:695
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
-#: api/classes/CMap.php:555 api/classes/CProxy.php:324
-#: api/classes/CProxy.php:342 api/classes/CScreenItem.php:249
+#: api/classes/CMap.php:555 api/classes/CProxy.php:320
+#: api/classes/CProxy.php:334 api/classes/CScreenItem.php:249
 #: api/classes/CScreenItem.php:335 api/classes/CScreen.php:485
 #: api/classes/CScreen.php:539 api/classes/CService.php:1254
 #: api/classes/CService.php:1269 api/classes/CTrigger.php:1118
 #: api/classes/CTrigger.php:1710 api/classes/CTrigger.php:1722
-#: api/classes/CTriggerPrototype.php:948
-#: api/classes/CTriggerPrototype.php:1040
-#: api/classes/CTriggerPrototype.php:1231
-#: api/classes/CTriggerPrototype.php:1243 api/classes/CUserMacro.php:828
+#: api/classes/CTriggerPrototype.php:947
+#: api/classes/CTriggerPrototype.php:1039
+#: api/classes/CTriggerPrototype.php:1230
+#: api/classes/CTriggerPrototype.php:1242 api/classes/CUserMacro.php:828
 #: api/classes/CUserMacro.php:941 api/classes/CWebCheck.php:464
 #: include/config.inc.php:236
 msgid "No permissions to referred object or it does not exist!"
@@ -8369,8 +8369,8 @@ msgstr ""
 msgid "Node with same ID already exists."
 msgstr ""
 
-#: include/actions.inc.php:675 include/actions.inc.php:760
-#: include/actions.inc.php:839 include/actions.inc.php:909
+#: include/actions.inc.php:674 include/actions.inc.php:759
+#: include/actions.inc.php:838 include/actions.inc.php:908
 #: include/forms.inc.php:169
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.node.list.php:25
@@ -8596,7 +8596,7 @@ msgstr ""
 msgid "Off"
 msgstr "UIT"
 
-#: include/actions.inc.php:1013 include/blocks.inc.php:964
+#: include/actions.inc.php:1012 include/blocks.inc.php:964
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:226
 #: report3.php:86
@@ -8697,6 +8697,10 @@ msgstr ""
 msgid "Only one check can be unique."
 msgstr ""
 
+#: api/classes/CProxy.php:610
+msgid "Only super admins can delete proxies."
+msgstr ""
+
 #: include/services.inc.php:299
 #, php-format
 msgid "Only the last 20%% of the indicator is displayed."
@@ -8714,7 +8718,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:244
+#: actionconf.php:243
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -9148,10 +9152,6 @@ msgstr ""
 msgid "Period"
 msgstr "Periode"
 
-#: include/views/configuration.action.edit.php:320
-msgid "Period (sec)"
-msgstr ""
-
 #: include/forms.inc.php:1493
 #: include/views/configuration.maintenance.edit.php:85
 msgid "Period type"
@@ -9321,7 +9321,7 @@ msgstr ""
 msgid "Problem"
 msgstr ""
 
-#: dashconf.php:258 include/views/configuration.sysmap.edit.php:146
+#: dashconf.php:262 include/views/configuration.sysmap.edit.php:146
 msgid "Problem display"
 msgstr ""
 
@@ -9370,7 +9370,12 @@ msgstr ""
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr ""
 
-#: api/classes/CProxy.php:381
+#: api/classes/CProxy.php:628
+#, php-format
+msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
+msgstr ""
+
+#: api/classes/CProxy.php:369
 #, php-format
 msgid "Proxy \"%s\" already exists."
 msgstr ""
@@ -9379,7 +9384,7 @@ msgstr ""
 msgid "Proxy added"
 msgstr ""
 
-#: proxies.php:111 proxies.php:159
+#: proxies.php:110 proxies.php:156
 msgid "Proxy deleted"
 msgstr ""
 
@@ -9387,11 +9392,11 @@ msgstr ""
 msgid "Proxy hosts"
 msgstr ""
 
-#: api/classes/CProxy.php:416
+#: api/classes/CProxy.php:404
 msgid "Proxy interface creation failed."
 msgstr ""
 
-#: api/classes/CProxy.php:480
+#: api/classes/CProxy.php:468
 msgid "Proxy interface update failed."
 msgstr ""
 
@@ -9458,7 +9463,7 @@ msgstr ""
 msgid "Recipient"
 msgstr ""
 
-#: include/actions.inc.php:680 include/actions.inc.php:765
+#: include/actions.inc.php:679 include/actions.inc.php:764
 #: include/views/administration.auditacts.list.php:74
 msgid "Recipient(s)"
 msgstr "Ontvanger(s)"
@@ -9467,12 +9472,12 @@ msgstr "Ontvanger(s)"
 msgid "Recovery"
 msgstr ""
 
-#: actionconf.php:44 include/views/configuration.action.edit.php:57
+#: actionconf.php:43 include/views/configuration.action.edit.php:57
 #: include/views/configuration.action.edit.php:60
 msgid "Recovery message"
 msgstr ""
 
-#: actionconf.php:43 include/views/configuration.action.edit.php:59
+#: actionconf.php:42 include/views/configuration.action.edit.php:59
 msgid "Recovery subject"
 msgstr ""
 
@@ -9773,7 +9778,7 @@ msgstr ""
 msgid "Result type"
 msgstr ""
 
-#: include/actions.inc.php:679 include/actions.inc.php:764
+#: include/actions.inc.php:678 include/actions.inc.php:763
 #: include/views/administration.auditacts.list.php:73
 msgid "Retries left"
 msgstr ""
@@ -10036,7 +10041,7 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
-#: acknow.php:174 dashconf.php:266 include/forms.inc.php:1668
+#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1668
 #: include/forms.inc.php:1826 include/forms.inc.php:1972
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:57
@@ -10394,11 +10399,11 @@ msgstr ""
 msgid "Select rows with value like"
 msgstr ""
 
-#: dashconf.php:171 history.php:294
+#: dashconf.php:174 history.php:294
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:309
+#: actionconf.php:308
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -10442,7 +10447,7 @@ msgstr ""
 msgid "Send to Users"
 msgstr ""
 
-#: include/actions.inc.php:930
+#: include/actions.inc.php:929
 msgid "Sent"
 msgstr ""
 
@@ -10450,7 +10455,7 @@ msgstr ""
 msgid "Sep"
 msgstr ""
 
-#: dashconf.php:251 include/views/configuration.sysmap.edit.php:139
+#: dashconf.php:255 include/views/configuration.sysmap.edit.php:139
 msgid "Separated"
 msgstr ""
 
@@ -10610,7 +10615,7 @@ msgstr ""
 msgid "Show graph of item"
 msgstr ""
 
-#: dashconf.php:223
+#: dashconf.php:227
 msgid "Show hosts in maintenance"
 msgstr ""
 
@@ -10830,7 +10835,7 @@ msgstr "Sorteer orde (0->999)"
 msgid "Sort triggers by"
 msgstr ""
 
-#: include/db.inc.php:1001
+#: include/db.inc.php:1009
 #, php-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr ""
@@ -10864,14 +10869,18 @@ msgstr ""
 msgid "Standard items"
 msgstr ""
 
+#: include/views/configuration.action.edit.php:320
+msgid "Start in"
+msgstr ""
+
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
 msgstr ""
 
 #: events.php:442 events.php:451 events.php:515 events.php:528 hosts.php:692
-#: httpdetails.php:133 httpmon.php:146 include/actions.inc.php:678
-#: include/actions.inc.php:763 include/actions.inc.php:841
-#: include/actions.inc.php:912 include/events.inc.php:131
+#: httpdetails.php:133 httpmon.php:146 include/actions.inc.php:677
+#: include/actions.inc.php:762 include/actions.inc.php:840
+#: include/actions.inc.php:911 include/events.inc.php:131
 #: include/events.inc.php:204 include/events.inc.php:207
 #: include/forms.inc.php:498 include/forms.inc.php:836
 #: include/views/administration.auditacts.list.php:72
@@ -10937,11 +10946,11 @@ msgstr "Status van triggers"
 msgid "Status only"
 msgstr "Status alleen"
 
-#: actionconf.php:299 trigger_prototypes.php:283 triggers.php:311
+#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:311
 msgid "Status updated"
 msgstr "Status bijgewerkt"
 
-#: httpdetails.php:133 include/actions.inc.php:781 include/actions.inc.php:855
+#: httpdetails.php:133 include/actions.inc.php:780 include/actions.inc.php:854
 #: include/views/configuration.action.edit.php:441
 msgid "Step"
 msgstr ""
@@ -10954,6 +10963,10 @@ msgstr ""
 #: api/classes/CWebCheck.php:589
 #, php-format
 msgid "Step \"%s\" already exists."
+msgstr ""
+
+#: include/views/configuration.action.edit.php:432
+msgid "Step duration"
 msgstr ""
 
 #: include/views/configuration.httpconf.popup.php:68 popup_httpstep.php:24
@@ -10989,8 +11002,8 @@ msgid "Subfilter [affects only filtered data!]"
 msgstr ""
 
 #: include/actions.inc.php:350 include/actions.inc.php:359
-#: include/actions.inc.php:365 include/actions.inc.php:725
-#: include/actions.inc.php:805
+#: include/actions.inc.php:365 include/actions.inc.php:724
+#: include/actions.inc.php:804
 #: include/views/administration.auditacts.list.php:103
 #: include/views/configuration.action.edit.php:549
 msgid "Subject"
@@ -11349,9 +11362,9 @@ msgid "Till"
 msgstr "Tot"
 
 #: events.php:438 events.php:447 events.php:511 events.php:524
-#: include/acknow.inc.php:42 include/actions.inc.php:676
-#: include/actions.inc.php:761 include/actions.inc.php:784
-#: include/actions.inc.php:840 include/actions.inc.php:858
+#: include/acknow.inc.php:42 include/actions.inc.php:675
+#: include/actions.inc.php:760 include/actions.inc.php:783
+#: include/actions.inc.php:839 include/actions.inc.php:857
 #: include/events.inc.php:116 include/events.inc.php:130
 #: include/events.inc.php:204 include/events.inc.php:207
 #: include/screens.inc.php:1238
@@ -11406,7 +11419,7 @@ msgstr ""
 msgid "Today"
 msgstr ""
 
-#: api/classes/CProxy.php:359
+#: api/classes/CProxy.php:347
 #, php-format
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr ""
@@ -11468,7 +11481,7 @@ msgstr "Trigger"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:1004
+#: api/classes/CTriggerPrototype.php:1003
 #, php-format
 msgid "Trigger \"%1$s\" does not have item prototype."
 msgstr ""
@@ -11632,7 +11645,7 @@ msgstr "Trigger status"
 msgid "Triggers top 100"
 msgstr "Trigger top 100"
 
-#: dashconf.php:245
+#: dashconf.php:249
 msgid "Triggers with severity"
 msgstr "Triggers met severity"
 
@@ -11663,8 +11676,8 @@ msgstr "Twee elementen moeten geselecteerd worden"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Twee items (\"%1$s\" en \"%2$s\") kunnen niet beiden het host inventory veld \"%3$s\" vullen, dit zal conflicteren."
 
-#: hostinventories.php:160 include/actions.inc.php:677
-#: include/actions.inc.php:762 include/forms.inc.php:494
+#: hostinventories.php:160 include/actions.inc.php:676
+#: include/actions.inc.php:761 include/forms.inc.php:494
 #: include/hosts.inc.php:105
 #: include/views/administration.auditacts.list.php:71
 #: include/views/administration.general.image.edit.php:34
@@ -11804,7 +11817,7 @@ msgstr "Niet bevestigde OK gebeurtenissen"
 msgid "Unacknowledged PROBLEM events"
 msgstr "Niet bevestigde PROBLEM gebeurtenissen"
 
-#: dashconf.php:252 include/views/configuration.sysmap.edit.php:140
+#: dashconf.php:256 include/views/configuration.sysmap.edit.php:140
 msgid "Unacknowledged only"
 msgstr "Alleen niet bevestigd"
 
@@ -12037,7 +12050,7 @@ msgstr "Bijgewerkt: Item prototype \"%1$s\" van \"%2$s\"."
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Bijgewerkt: Trigger \"%1$s\" van \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1213
+#: api/classes/CTriggerPrototype.php:1212
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Bijgewerkt: Trigger prototype \"%1$s\" van \"%2$s\"."
@@ -12078,7 +12091,7 @@ msgstr "Gebruiks als severity"
 msgid "Used in actions"
 msgstr "Gebruikt in acties"
 
-#: httpconf.php:52 include/acknow.inc.php:42 include/actions.inc.php:910
+#: httpconf.php:52 include/acknow.inc.php:42 include/actions.inc.php:909
 #: include/audit.inc.php:24 include/forms.inc.php:37 include/forms.inc.php:40
 #: include/hosts.inc.php:68 include/setup.inc.php:278
 #: include/views/administration.auditlogs.list.php:56
@@ -12608,7 +12621,7 @@ msgstr "Verkeerder velden voor koppeling"
 msgid "Wrong fields for media type."
 msgstr ""
 
-#: api/classes/CProxy.php:319
+#: api/classes/CProxy.php:315
 #, php-format
 msgid "Wrong fields for proxy \"%s\"."
 msgstr ""
@@ -12637,7 +12650,7 @@ msgstr ""
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:887 api/classes/CTriggerPrototype.php:952
+#: api/classes/CTriggerPrototype.php:887 api/classes/CTriggerPrototype.php:951
 msgid "Wrong fields for trigger."
 msgstr ""
 
@@ -13153,7 +13166,7 @@ msgstr "elke"
 msgid "exactly"
 msgstr "exact"
 
-#: include/actions.inc.php:866
+#: include/actions.inc.php:865
 #: include/views/administration.auditacts.list.php:89
 msgid "executed"
 msgstr "uitgevoerd"
@@ -13261,6 +13274,10 @@ msgstr "max"
 msgid "min"
 msgstr "min"
 
+#: include/views/configuration.action.edit.php:46
+msgid "minimum 60 seconds"
+msgstr ""
+
 #: include/views/configuration.maintenance.edit.php:50
 #: include/views/configuration.maintenance.edit.php:56
 #: include/views/configuration.maintenance.edit.php:65
@@ -13324,8 +13341,8 @@ msgstr "Niet lopende"
 msgid "not selected"
 msgstr "niet geselecteerd"
 
-#: include/actions.inc.php:719 include/actions.inc.php:799
-#: include/actions.inc.php:872 include/actions.inc.php:936
+#: include/actions.inc.php:718 include/actions.inc.php:798
+#: include/actions.inc.php:871 include/actions.inc.php:935
 #: include/views/administration.auditacts.list.php:98
 msgid "not sent"
 msgstr "Niet verzonden"
@@ -13394,11 +13411,10 @@ msgstr "sec"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
-#: include/views/configuration.action.edit.php:46
 msgid "seconds"
 msgstr "seconden"
 
-#: include/actions.inc.php:711 include/actions.inc.php:791
+#: include/actions.inc.php:710 include/actions.inc.php:790
 #: include/views/administration.auditacts.list.php:86
 msgid "sent"
 msgstr "Verzonden"

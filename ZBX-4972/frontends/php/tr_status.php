@@ -470,8 +470,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		// trigger js menu
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$str_tmp = CJs::encodeJson("triggers.php?form=update&triggerid=".$trigger['triggerid']."&switch_node=".id2nodeid($trigger['triggerid']));
-			$menu_trigger_conf = "['"._('Configuration of triggers')."',". $str_tmp .",
+			$configurationUrl = 'triggers.php?form=update&triggerid='.$trigger['triggerid'].'&hostid='.$pageFilter->hostid.'&switch_node='.id2nodeid($trigger['triggerid']);
+			$menu_trigger_conf = "['"._('Configuration of triggers')."',".CJs::encodeJson($configurationUrl).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';

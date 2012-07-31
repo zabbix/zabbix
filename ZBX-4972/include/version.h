@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,20 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_JAVA_H
-#define ZABBIX_CHECKS_JAVA_H
+#ifndef ZABBIX_VERSION_H
+#define ZABBIX_VERSION_H
 
-#include "dbcache.h"
-#include "sysinfo.h"
+#define ZBX_STR2(str)	#str
+#define ZBX_STR(str)	ZBX_STR2(str)
 
-#define ZBX_JAVA_GATEWAY_REQUEST_INTERNAL	0
-#define ZBX_JAVA_GATEWAY_REQUEST_JMX		1
-
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_JAVA_GATEWAY;
-extern int	CONFIG_JAVA_GATEWAY_PORT;
-
-int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result);
-void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num);
+#define APPLICATION_NAME	"Zabbix Agent"
+#define ZABBIX_REVDATE		"31 July 2012"
+#define ZABBIX_VERSION_MAJOR	2
+#define ZABBIX_VERSION_MINOR	0
+#define ZABBIX_VERSION_PATCH	2
+#define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
+#define ZABBIX_VERSION_RC	""
+#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
+				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
+#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
 
 #endif
