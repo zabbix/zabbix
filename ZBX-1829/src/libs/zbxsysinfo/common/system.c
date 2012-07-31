@@ -188,6 +188,7 @@ static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 
 	pGPI(vi->dwMajorVersion, vi->dwMinorVersion, 0, 0, &product_type);
 
+	/* use constants in order to support Windows 2000 */
 	switch (product_type)
 	{
 		case 0x0001:	/* PRODUCT_ULTIMATE */
