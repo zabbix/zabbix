@@ -16,6 +16,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A......... [ZBX-5250] fixed the "macros" parameter in the host.massremove and template.massremove methods (Pavels)
 A.F....... [ZBX-5351] fixed an undefined index error when deleting maintenance time intervals (Pavels)
 A.F....... [ZBX-5351] fixed time intevals being recreated when updating maintenances (Pavels)
 ..F....... [ZBX-5355] fixed translated string escaping the in map pop up menu script (Pavels)
