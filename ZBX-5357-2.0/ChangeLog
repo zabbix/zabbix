@@ -1,5 +1,13 @@
+Changes for 2.0.2
+
+2.0.2rc2 was released as 2.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.2rc2
 
+Bug fixes:
+........S. [ZBX-5031] fixed possible history syncer crash while processing JMX items (Sasha)
+........S. [ZBX-4976] fixed {HOST.CONN}, {HOST.IP) and {HOST.DNS} macros substitution for global scripts (Sasha)
 A......... [ZBX-5349] fixed graph prototypes being created with an incorrect flag (Pavels)
 
 --------------------------------------------------------------------------------
@@ -85,8 +93,6 @@ Changes for 2.0.1
 
 --------------------------------------------------------------------------------
 Changes for 2.0.1rc2
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-5094] removed trailing backslash from returned value {#FSNAME} by Windows agent (Sasha)
