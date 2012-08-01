@@ -292,16 +292,15 @@ while($db_item = DBfetch($db_items)){
 
 	$lastvalue = formatItemValue($db_item);
 
+	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& ($db_item['lastvalue'] - $db_item['prevvalue'] != 0)) {
+			&& (bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits) != 0)) {
 
 		$change = '';
 		if (($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
 			$change = '+';
 		}
-
-		$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 
 		// for 'unixtime' change should be calculated as uptime
 		$change .= convert_units(
@@ -466,16 +465,15 @@ while ($db_item = DBfetch($db_items)) {
 	$lastvalue = formatItemValue($db_item);
 
 	// column "change"
+	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& ($db_item['lastvalue'] - $db_item['prevvalue'] != 0)) {
+			&& (bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits) != 0)) {
 
 		$change = '';
-		if(($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
+		if (($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
 			$change = '+';
 		}
-
-		$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 
 		// for 'unixtime' change should be calculated as uptime
 		$change .= convert_units(

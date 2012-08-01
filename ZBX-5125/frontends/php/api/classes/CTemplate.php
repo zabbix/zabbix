@@ -1594,8 +1594,14 @@ class CTemplate extends CZBXAPI {
 		}
 
 		if (isset($data['macros'])) {
-			$result = API::UserMacro()->delete(zbx_toArray($data['macros']));
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macros"));
+			$hostMacros = API::UserMacro()->get(array(
+				'hostids' => $hostids,
+				'filter' => array(
+					'macro' => $data['macros']
+				)
+			));
+			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
+			API::UserMacro()->delete($hostMacroIds);
 		}
 
 		return array('templateids' => $templateids);
