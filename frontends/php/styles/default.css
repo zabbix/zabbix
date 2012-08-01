@@ -325,6 +325,17 @@ div.thin_header { width: 100%; color: #FFFFFF;  background: #5c9ccc url(themes/o
 
 .formWideTable { min-width: 600px; }
 
+/* tween box table */
+.tweenBoxTable tr td {
+	padding: 0;
+	vertical-align: middle;
+	height: 24px;
+}
+.tweenBoxTable tr td input {
+	margin: 5px;
+	padding: 5px;
+}
+
 /* page table */
 table.page_header {
 	background-color: #FFF;
