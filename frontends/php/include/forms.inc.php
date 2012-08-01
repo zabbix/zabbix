@@ -1195,17 +1195,9 @@
 			'go' => get_request('go', 'massupdate'),
 			'g_triggerid' => get_request('g_triggerid', array()),
 			'priority' => get_request('priority', 0),
-			'config' => select_config()
+			'config' => select_config(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
@@ -1243,21 +1235,18 @@
 			'url' => get_request('url', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array()
+			'templates' => array(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger
-			$data['trigger'] = get_trigger_by_triggerid($data['triggerid']);
+			$trigger = API::Trigger()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('hostid'),
+				'triggerids' => $data['triggerid']
+			));
+			$data['trigger'] = reset($trigger);
 			if (!empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
 			}
@@ -1266,17 +1255,23 @@
 			$tmp_triggerid = $data['triggerid'];
 			do {
 				$db_triggers = DBfetch(DBselect(
-					'SELECT t.triggerid,t.templateid,h.name'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid='.$tmp_triggerid.
-						' AND h.hostid=i.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'
+					'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
+					' FROM triggers t'.
+						' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
+						' LEFT JOIN items i ON f.itemid=i.itemid'.
+						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+					' WHERE t.triggerid='.$tmp_triggerid
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$link = empty($data['parent_discoveryid'])
-						? 'triggers.php?form=update&triggerid='.$db_triggers['triggerid']
-						: 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$data['parent_discoveryid'];
+					// parent trigger prototype link
+					if ($data['parent_discoveryid']) {
+						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					}
+					// parent trigger link
+					else {
+						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
+					}
 
 					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
 					$data['templates'][] = SPACE.RARR.SPACE;
@@ -1287,6 +1282,12 @@
 			array_shift($data['templates']);
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
+
+			// if no host has been selected for the navigation panel, use the first trigger host
+			if (!$data['hostid']) {
+				$hosts = reset($data['trigger']['hosts']);
+				$data['hostid'] = $hosts['hostid'];
+			}
 		}
 
 		if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {
@@ -1375,14 +1376,19 @@
 	}
 
 	function get_timeperiod_form() {
-		$tblPeriod = new CTableInfo();
+		$tblPeriod = new CTable(null, 'formElementTable');
 
 		// init new_timeperiod variable
 		$new_timeperiod = get_request('new_timeperiod', array());
 		$new = is_array($new_timeperiod);
 
-		if (is_array($new_timeperiod) && isset($new_timeperiod['id'])) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+		if (is_array($new_timeperiod)) {
+			if (isset($new_timeperiod['id'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+			}
+			if (isset($new_timeperiod['timeperiodid'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[timeperiodid]', $new_timeperiod['timeperiodid']));
+			}
 		}
 		if (!is_array($new_timeperiod)) {
 			$new_timeperiod = array();
@@ -1553,26 +1559,13 @@
 			));
 			$tblPeriod->addRow(array(_('Month'), $tabMonths));
 
-			$radioDaily = new CTag('input');
-			$radioDaily->setAttribute('type', 'radio');
-			$radioDaily->setAttribute('name', 'new_timeperiod[month_date_type]');
-			$radioDaily->setAttribute('value', '0');
-			$radioDaily->setAttribute('onclick', 'submit()');
-
-			$radioDaily2 = new CTag('input');
-			$radioDaily2->setAttribute('type', 'radio');
-			$radioDaily2->setAttribute('name', 'new_timeperiod[month_date_type]');
-			$radioDaily2->setAttribute('value', '1');
-			$radioDaily2->setAttribute('onclick', 'submit()');
-
-			if ($new_timeperiod['month_date_type']) {
-				$radioDaily2->setAttribute('checked', 'checked');
-			}
-			else {
-				$radioDaily->setAttribute('checked', 'checked');
-			}
-
-			$tblPeriod->addRow(array(_('Date'), array($radioDaily, _('Day'), SPACE, SPACE, $radioDaily2, _('Day of week'))));
+			$tblPeriod->addRow(array(_('Date'), array(
+				new CRadioButton('new_timeperiod[month_date_type]', '0', null, null, !$new_timeperiod['month_date_type'], 'submit()'),
+				_('Day'),
+				SPACE,
+				new CRadioButton('new_timeperiod[month_date_type]', '1', null, null, $new_timeperiod['month_date_type'], 'submit()'),
+				_('Day of week')))
+			);
 
 			if ($new_timeperiod['month_date_type'] > 0) {
 				$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
@@ -1615,14 +1608,9 @@
 
 			$clndr_icon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
 			$clndr_icon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_timeperiod_date"].clndr.clndrshow(pos.top, pos.left);');
-
-			$filtertimetab = new CTable(null, 'calendar');
-			$filtertimetab->setAttribute('width', '10%');
-			$filtertimetab->setCellPadding(0);
-			$filtertimetab->setCellSpacing(0);
-
 			$start_date = zbxDateToTime($new_timeperiod['start_date']);
-			$filtertimetab->addRow(array(
+
+			$tblPeriod->addRow(array(_('Date'), array(
 				new CNumericBox('new_timeperiod_day', ($start_date > 0) ? date('d', $start_date) : '', 2),
 				'/',
 				new CNumericBox('new_timeperiod_month', ($start_date > 0) ? date('m', $start_date) : '', 2),
@@ -1633,45 +1621,31 @@
 				':',
 				new CNumericBox('new_timeperiod_minute', ($start_date > 0) ? date('i', $start_date) : '', 2),
 				$clndr_icon
-			));
+			)));
 			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');
 
-			$tblPeriod->addRow(array(_('Date'), $filtertimetab));
 		}
 
 		if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-			$tabTime = new CTable(null, 'calendar');
-			$tabTime->addRow(array(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2), ':', new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2)));
-			$tblPeriod->addRow(array(_('At (hour:minute)'), $tabTime));
+			$tblPeriod->addRow(array(_('At (hour:minute)'), array(
+				new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2),
+				':',
+				new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2)))
+			);
 		}
 
-		$perHours = new CComboBox('new_timeperiod[period_hours]', $new_timeperiod['period_hours']);
-		for ($i = 0; $i < 24; $i++) {
-			$perHours->addItem($i, $i);
-		}
-		$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes']);
-		for ($i = 0; $i < 60; $i++) {
-			$perMinutes->addItem($i, $i);
-		}
+		$perHours = new CComboBox('new_timeperiod[period_hours]', $new_timeperiod['period_hours'], null, range(0, 23));
+		$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes'], null, range(0, 59));
 		$tblPeriod->addRow(array(
 			_('Maintenance period length'),
 			array(
 				new CNumericBox('new_timeperiod[period_days]', $new_timeperiod['period_days'], 3),
 				_('Days').SPACE.SPACE,
 				$perHours,
-				SPACE._('Hours'),
+				_('Hours').SPACE.SPACE,
 				$perMinutes,
-				SPACE._('Minutes')
+				_('Minutes')
 		)));
-
-		$td = new CCol(array(
-			new CSubmit('add_timeperiod', $new ? _('Save') : _('Add')),
-			SPACE,
-			new CSubmit('cancel_new_timeperiod', _('Cancel'))
-		));
-		$td->setAttribute('colspan', '3');
-		$td->setAttribute('style', 'text-align: right;');
-		$tblPeriod->setFooter($td);
 
 		return $tblPeriod;
 	}

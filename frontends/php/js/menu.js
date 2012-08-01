@@ -592,13 +592,17 @@ function createMenuHeader(label) {
 }
 
 /**
- * Creates a menu link object for the menu
+ * Creates a menu link object for the menu.
+ *
+ * Supported config values:
+ * - nosid - exclude the SID parameter from the URL.
  *
  * @param label
  * @param action    the target URL
+ * @param config    additional configuration parameter
  *
  * @return {Array}
  */
-function createMenuItem(label, action) {
-	return [label, action, null, { outer: 'pum_o_item', inner: 'pum_i_item' }];
+function createMenuItem(label, action, config) {
+	return [label, action, config, { outer: 'pum_o_item', inner: 'pum_i_item' }];
 }
