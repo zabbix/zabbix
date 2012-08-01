@@ -1,5 +1,6 @@
 Changes for 1.8.15rc1
 
+........S. [ZBX-5367] fixed assignment of elements to a maintenance mode by a timer process (Sasha)
 ..F....... [ZBX-5348] fixed validation of itemid parameter for popup_bitem.php (Vedmak)
 ....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
 ..F....... [ZBX-5319] fixed incorrect calculation of action escalation steps delay (Vedmak)
