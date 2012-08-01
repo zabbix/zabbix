@@ -18,6 +18,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5352] fixed displaying the "Change" column if values have the close values (Vedmak)
 A......... [ZBX-5363] fixed importing a template which use item as min/max value in graph (Vedmak)
 A......... [ZBX-5345] fixed "group" option in the "configuration.export" method (Vedmak)
 A.F....... [ZBX-5371] unified multiple import-related error messages (Pavels)
