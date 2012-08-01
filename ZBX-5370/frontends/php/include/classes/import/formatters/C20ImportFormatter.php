@@ -88,6 +88,9 @@ class C20ImportFormatter extends CImportFormatter {
 					$host['inventory_mode'] = $host['inventory']['inventory_mode'];
 					unset($host['inventory']['inventory_mode']);
 				}
+				else {
+					$host['inventory_mode'] = HOST_INVENTORY_DISABLED;
+				}
 
 				$hostsData[] = CArrayHelper::getByKeys($host, array(
 					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
