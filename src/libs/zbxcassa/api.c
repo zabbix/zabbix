@@ -527,6 +527,8 @@ static GPtrArray	*zbx_cassandra_get_values(GByteArray *key, char *column_family,
 void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t itemid,
 		zbx_uint64_t clock_from, zbx_uint64_t clock_to, int last_n)
 {
+	const char	*__function_name = "zbx_cassandra_fetch_history_values";
+
 	int		i, j;
 	zbx_uint64_t	date;
 
@@ -537,6 +539,9 @@ void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t i
 	GByteArray	*__value_key;
 	SlicePredicate	*__value_predicate;
 	GPtrArray	*__value_result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " clock_from:" ZBX_FS_UI64 " clock_to:" ZBX_FS_UI64
+			" last_n:%d", __function_name, itemid, clock_from, clock_to, last_n);
 
 	if (0 != clock_from)
 		clock_from++;
@@ -549,9 +554,14 @@ void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t i
 	__index_predicate = g_object_new(TYPE_SLICE_PREDICATE, NULL);
 	__index_predicate->slice_range = g_object_new(TYPE_SLICE_RANGE, NULL);
 	__index_predicate->slice_range->start = zbx_cassandra_encode_composite_type(
-			itemid, clock_to - clock_to % SEC_PER_DAY);
+			itemid, (clock_to - clock_to % SEC_PER_DAY) * 1000);
 	__index_predicate->slice_range->finish = zbx_cassandra_encode_composite_type(
-			itemid, clock_from - clock_from % SEC_PER_DAY);
+			itemid, (clock_from - clock_from % SEC_PER_DAY) * 1000);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() for querying metric_by_parameter: start:" ZBX_FS_UI64 " finish:" ZBX_FS_UI64,
+			__function_name, (clock_to - clock_to % SEC_PER_DAY) * 1000,
+			(clock_from - clock_from % SEC_PER_DAY) * 1000);
+
 	__index_predicate->slice_range->reversed = TRUE;
 	__index_predicate->slice_range->count = INT_MAX;
 	__index_predicate->__isset_slice_range = TRUE;
@@ -569,23 +579,37 @@ void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t i
 
 		__index_result = zbx_cassandra_get_values(__index_key, "metric_by_parameter", __index_predicate);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %d values from metric_by_parameter",
+				__function_name, __index_result->len);
+
 		for (i = 0; i < __index_result->len; i++)
 		{
 			__value_key = COLUMN_OR_SUPER_COLUMN(__index_result->pdata[i])->column->name;
 
 			zbx_cassandra_decode_composite_type(NULL, &date, __value_key);
 
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() decoded date:" ZBX_FS_UI64, __function_name, date);
+
 			__value_predicate->slice_range->start = zbx_cassandra_encode_integer_type(
-					date == clock_to - clock_to % SEC_PER_DAY ?
+					date == (clock_to - clock_to % SEC_PER_DAY) * 1000 ?
 					clock_to % SEC_PER_DAY * 1000 : (SEC_PER_DAY - 1) * 1000);
 			__value_predicate->slice_range->finish = zbx_cassandra_encode_integer_type(
-					date == clock_from - clock_from % SEC_PER_DAY ?
+					date == (clock_from - clock_from % SEC_PER_DAY) * 1000 ?
 					clock_from % SEC_PER_DAY * 1000 : 0);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() for querying metric: start:" ZBX_FS_UI64
+					" finish:" ZBX_FS_UI64, __function_name,
+					date == (clock_to - clock_to % SEC_PER_DAY) * 1000 ?
+						clock_to % SEC_PER_DAY * 1000 : (SEC_PER_DAY - 1) * 1000,
+					date == (clock_from - clock_from % SEC_PER_DAY) * 1000 ?
+						clock_from % SEC_PER_DAY * 1000 : 0);
 
 			if (0 != last_n)
 				__value_predicate->slice_range->count = last_n;
 
 			__value_result = zbx_cassandra_get_values(__value_key, "metric", __value_predicate);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() %d values from metric", __function_name, __value_result->len);
 
 			for (j = 0; j < __value_result->len; j++)
 			{
@@ -636,6 +660,7 @@ void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t i
 	g_object_unref(__index_predicate);
 
 	g_byte_array_unref(__index_key);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %d values", __function_name, values->values_num);
 }
 
 /* code that is currently not being used: */

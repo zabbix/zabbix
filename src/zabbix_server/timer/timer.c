@@ -32,9 +32,18 @@
 
 #include "timer.h"
 
+#ifdef HAVE_CASSANDRA
+#	include "zbxcassa.h"
+#endif
+
 #define TIMER_DELAY	30
 
 extern unsigned char	process_type;
+
+#ifdef HAVE_CASSANDRA
+extern zbx_cassandra_hosts_t	CONFIG_CASSANDRA_HOSTS;
+extern char			*CONFIG_CASSANDRA_KEYSPACE;
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -860,6 +869,10 @@ void	main_timer_loop()
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_connect(ZBX_CASSANDRA_CONNECT_NORMAL, &CONFIG_CASSANDRA_HOSTS, CONFIG_CASSANDRA_KEYSPACE);
+#endif
+
 
 	for (;;)
 	{

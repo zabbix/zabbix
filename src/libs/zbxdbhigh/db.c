@@ -2060,7 +2060,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 			for (i = 0; i < c_values.values_num; i++)
 				sum_f += atof(c_values.values[i]);
 
-			h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, sum_f);
+			h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, sum_f / c_values.values_num);
 			break;
 		case ZBX_DB_GET_HIST_MAX:
 			if (0 == c_values.values_num)
