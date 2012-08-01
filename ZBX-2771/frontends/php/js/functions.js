@@ -841,3 +841,18 @@ function moveListBoxSelectedItem(formname, objname, from, to, action) {
 
 	return true;
 }
+
+/**
+ * Returns the number of properties of an object.
+ *
+ * @param obj
+ *
+ * @return {Number}
+ */
+function objectSize(obj) {
+	var size = 0, key;
+	for (key in obj) {
+		if (obj.hasOwnProperty(key)) size++;
+	}
+	return size;
+}
