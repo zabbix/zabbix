@@ -171,8 +171,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/validators/CTimePeriodValidator.php -text
-frontends/php/include/classes/validators/CValidator.php -text
 frontends/php/js/servercheck.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -253,7 +251,6 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/general/CTimePeriodValidatorTest.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -558,9 +555,3 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/p
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
-upgrades/dbpatches/2.2/postgresql/patch/history_str_sync.sql -text
-upgrades/dbpatches/2.2/postgresql/patch/history_sync.sql -text
-upgrades/dbpatches/2.2/postgresql/patch/history_uint_sync.sql -text
-upgrades/dbpatches/2.2/postgresql/patch/proxy_autoreg_host.sql -text
-upgrades/dbpatches/2.2/postgresql/patch/proxy_dhistory.sql -text
-upgrades/dbpatches/2.2/postgresql/patch/proxy_history.sql -text

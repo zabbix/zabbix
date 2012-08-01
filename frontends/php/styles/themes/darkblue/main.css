@@ -536,3 +536,7 @@ div.control-severity label span {
 div.control-severity label span:hover {
 	color: #000;
 }
+
+div.preloader {
+	background: url("images/preloader.gif") no-repeat;
+}

@@ -98,6 +98,9 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
 		)
 	));
+	if (isset($timeperiod['timeperiodid'])) {
+		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
+	}
 	$maintenanceForm->addVar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']);
 	$maintenanceForm->addVar('timeperiods['.$id.'][every]', $timeperiod['every']);
 	$maintenanceForm->addVar('timeperiods['.$id.'][month]', $timeperiod['month']);
