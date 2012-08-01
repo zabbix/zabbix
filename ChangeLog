@@ -19,6 +19,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+........S. [ZBX-5367] fixed assignment of elements to a maintenance mode by a timer process (Sasha)
 ..F....... [ZBX-5364] added showing application and templates screen subentities when full cloning host or template (Vedmak)
 A......... [ZBX-5370] fixed errors on importing of maps (Vedmak)
 ..F....... [ZBX-2771] fixed localization of popups in Monitoring->Events (Vedmak)
@@ -919,6 +920,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.15rc1
 
+........S. [ZBX-5367] fixed assignment of elements to a maintenance mode by a timer process (Sasha)
 ..F....... [ZBX-5348] fixed validation of itemid parameter for popup_bitem.php (Vedmak)
 ....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
 ..F....... [ZBX-5319] fixed incorrect calculation of action escalation steps delay (Vedmak)
