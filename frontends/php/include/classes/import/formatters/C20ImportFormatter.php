@@ -231,12 +231,20 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (!empty($this->data['maps'])) {
 			foreach ($this->data['maps'] as $map) {
-				if (!empty($map['selements'])) {
-					$map['selements'] = array_values($map['selements']);
+				CArrayHelper::convertFieldToArray($map, 'selements');
+				foreach ($map['selements'] as &$selement) {
+					CArrayHelper::convertFieldToArray($selement, 'urls');
 				}
-				if (!empty($map['links'])) {
-					$map['links'] = array_values($map['links']);
+				unset($selement);
+
+				CArrayHelper::convertFieldToArray($map, 'links');
+				foreach ($map['links'] as &$link) {
+					CArrayHelper::convertFieldToArray($link, 'linktriggers');
 				}
+				unset($link);
+
+				CArrayHelper::convertFieldToArray($map, 'urls');
+
 				$mapsData[] = $map;
 			}
 		}
