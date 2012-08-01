@@ -340,12 +340,10 @@ elseif (isset($_REQUEST['form'])) {
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
 		$options = array(
 			'graphids' => $data['graphid'],
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid')
 		);
-		$graph = !empty($data['parent_discoveryid'])
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
-
+		$graph = !empty($data['parent_discoveryid']) ? API::GraphPrototype()->get($options) : API::Graph()->get($options);
 		$graph = reset($graph);
 
 		$data['name'] = $graph['name'];
@@ -367,16 +365,42 @@ elseif (isset($_REQUEST['form'])) {
 		$data['templateid'] = $graph['templateid'];
 		$data['templates'] = array();
 
+		// if no host has been selected for the navigation panel, use the first graph host
+		if (!$data['hostid']) {
+			$host = reset($graph['hosts']);
+			$data['hostid'] = $host['hostid'];
+		}
+
 		// templates
 		if (!empty($data['templateid'])) {
 			$parentGraphid = $data['templateid'];
 			do {
 				$parentGraph = get_graph_by_graphid($parentGraphid);
-				$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
-				$parentTemplate = DBfetch($parentTemplate);
 
-				$data['templates'][] = new CLink($parentTemplate['host'],
-					'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid'].url_param('parent_discoveryid'));
+				// parent graph prototype link
+				if (get_request('parent_discoveryid')) {
+					$parentGraphPrototype = API::GraphPrototype()->get(array(
+						'graphids' => $parentGraph['graphid'],
+						'selectTemplates' => API_OUTPUT_EXTEND,
+						'selectDiscoveryRule' => array('itemid')
+					));
+					$parentGraphPrototype = reset($parentGraphPrototype);
+					$parentTemplate = reset($parentGraphPrototype['templates']);
+
+					$link = new CLink($parentTemplate['name'],
+						'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['hostid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
+					);
+				}
+				// parent graph link
+				else {
+					$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
+					$parentTemplate = DBfetch($parentTemplate);
+
+					$link = new CLink($parentTemplate['name'],
+						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
+					);
+				}
+				$data['templates'][] = $link;
 				$data['templates'][] = SPACE.RARR.SPACE;
 
 				$parentGraphid = $parentGraph['templateid'];
