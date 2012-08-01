@@ -43,6 +43,7 @@ function set_zbx_locales() {
 	$ZBX_LOCALES = array(
 		'en_GB' => _('English (en_GB)'),
 		'zh_CN' => _('Chinese (zh_CN)'),
+		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
 		'nl_NL' => _('Dutch (nl_NL)'),
 		'fr_FR' => _('French (fr_FR)'),
@@ -129,6 +130,7 @@ function zbx_locale_variants_win($language) {
 	$winLanguageName = array(
 		'en_gb' => 'english',
 		'zh_cn' => 'chinese',
+		'zh_tw' => 'chinese',
 		'cs_cz' => 'czech',
 		'nl_nl' => 'dutch',
 		'fr_fr' => 'french',
