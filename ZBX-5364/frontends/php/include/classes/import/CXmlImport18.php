@@ -480,7 +480,7 @@ class CXmlImport18 {
 							if (is_array($screenitem['resourceid'])) {
 								$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
 								if (empty($db_hostgroups)) {
-									$error = _s('Cannot find hostgroup "%1$s" used in exported screen "%2$s".',
+									$error = _s('Cannot find group "%1$s" used in screen "%2$s".',
 											$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
 									throw new Exception($error);
 								}
@@ -492,7 +492,7 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_HOST_TRIGGERS:
 							$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
 							if (empty($db_hosts)) {
-								$error = _s('Cannot find host "%1$s" used in exported screen "%2$s".',
+								$error = _s('Cannot find host "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['host'], $screen['name']);
 								throw new Exception($error);
 							}
@@ -503,7 +503,7 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_GRAPH:
 							$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 							if (empty($db_graphs)) {
-								$error = _s('Cannot find graph "%1$s" used in exported screen "%2$s".',
+								$error = _s('Cannot find graph "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
@@ -516,7 +516,7 @@ class CXmlImport18 {
 							$db_items = API::Item()->getObjects($screenitem['resourceid']);
 
 							if (empty($db_items)) {
-								$error = _s('Cannot find item "%1$s" used in exported screen "%2$s".',
+								$error = _s('Cannot find item "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
 								throw new Exception($error);
 							}
@@ -527,7 +527,7 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_MAP:
 							$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
 							if (empty($db_sysmaps)) {
-								$error = _s('Cannot find map "%1$s" used in exported screen "%2$s".',
+								$error = _s('Cannot find map "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
@@ -538,7 +538,7 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_SCREEN:
 							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
 							if (empty($db_screens)) {
-								$error = _s('Cannot find screen "%1$s" used in exported screen "%2$s".',
+								$error = _s('Cannot find screen "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
@@ -669,28 +669,11 @@ class CXmlImport18 {
 				continue; // break if not update updateExisting
 			}
 
-			// icon map
-			if (isset($sysmap['iconmap'])) {
-				$iconMap = API::IconMap()->get(array(
-					'filter' => array('name' => $sysmap['iconmap']),
-					'output' => API_OUTPUT_SHORTEN,
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				$iconMap = reset($iconMap);
-				if (!$iconMap) {
-					$error = _s('Cannot find icon map "%1$s" used in exported map "%2$s".', $sysmap['iconmap'], $sysmap['name']);
-					throw new Exception($error);
-				}
-
-				$sysmap['iconmapid'] = $iconMap['iconmapid'];
-			}
-
 			if (isset($sysmap['backgroundid'])) {
 				$image = getImageByIdent($sysmap['backgroundid']);
 
 				if (!$image) {
-					error(_s('Cannot find background image "%1$s" used in exported map "%2$s".',
+					error(_s('Cannot find background image "%1$s" used in map "%2$s".',
 						$sysmap['backgroundid']['name'], $sysmap['name']));
 					$sysmap['backgroundid'] = 0;
 				}
@@ -737,7 +720,7 @@ class CXmlImport18 {
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
 						if (empty($db_hostgroups)) {
-							$error = _s('Cannot find hostgroup "%1$s" used in exported map "%2$s".',
+							$error = _s('Cannot find group "%1$s" used in map "%2$s".',
 									$nodeCaption.$selement['elementid']['name'], $sysmap['name']);
 							throw new Exception($error);
 						}
@@ -748,7 +731,7 @@ class CXmlImport18 {
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$db_hosts = API::Host()->getObjects($selement['elementid']);
 						if (empty($db_hosts)) {
-							$error = _s('Cannot find host "%1$s" used in exported map "%2$s".',
+							$error = _s('Cannot find host "%1$s" used in map "%2$s".',
 									$nodeCaption.$selement['elementid']['host'], $sysmap['name']);
 							throw new Exception($error);
 						}
@@ -759,7 +742,7 @@ class CXmlImport18 {
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
 						if (empty($db_triggers)) {
-							$error = _s('Cannot find trigger "%1$s" used in exported map "%2$s".',
+							$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
 									$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'], $sysmap['name']);
 							throw new Exception($error);
 						}
@@ -781,7 +764,7 @@ class CXmlImport18 {
 					if (isset($selement[$icon])) {
 						$image = getImageByIdent($selement[$icon]);
 						if (!$image) {
-							$error = _s('Cannot find image "%1$s" used in exported map "%2$s".', $selement[$icon]['name'], $sysmap['name']);
+							$error = _s('Cannot find icon "%1$s" used in map "%2$s".', $selement[$icon]['name'], $sysmap['name']);
 							throw new Exception($error);
 						}
 						$selement[$icon] = $image['imageid'];
@@ -802,7 +785,7 @@ class CXmlImport18 {
 					$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 					if (empty($db_triggers)) {
 						$nodeCaption = isset($linktrigger['triggerid']['node']) ? $linktrigger['triggerid']['node'].':' : '';
-						$error = _s('Cannot find trigger "%1$s" used in exported map "%2$s".',
+						$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
 								$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'], $sysmap['name']);
 						throw new Exception($error);
 					}
@@ -1678,7 +1661,7 @@ class CXmlImport18 {
 												$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 
 												if (empty($db_graphs)) {
-													$error = _s('Cannot find graph "%1$s" used in exported screen "%2$s".',
+													$error = _s('Cannot find graph "%1$s" used in screen "%2$s".',
 															$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
 													throw new Exception($error);
 												}
@@ -1691,7 +1674,7 @@ class CXmlImport18 {
 												$db_items = API::Item()->getObjects($screenitem['resourceid']);
 
 												if (empty($db_items)) {
-													$error = _s('Cannot find item "%1$s" used in exported screen "%2$s".',
+													$error = _s('Cannot find item "%1$s" used in screen "%2$s".',
 															$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
 													throw new Exception($error);
 												}

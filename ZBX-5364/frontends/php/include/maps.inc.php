@@ -87,86 +87,47 @@ function getActionMapBySysmap($sysmap) {
 
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
-	$options = array(
+	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
 		'hostids' => $hostids,
 		'output' => array('status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
 		'selectScreens' => API_OUTPUT_COUNT,
-	);
-	$hosts = API::Host()->get($options);
+	));
 
-
-	foreach ($sysmap['selements'] as $db_element) {
-		$links_menus = '';
-		$menus = '';
-
-		if ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$host = $hosts[$db_element['elementid']];
-			$tools_menus = '';
-			foreach ($scripts_by_hosts[$db_element['elementid']] as $script) {
-				$str_tmp = zbx_jsvalue('javascript: executeScript('.$db_element['elementid'].', '.
-							$script['scriptid'].', '.
-							zbx_jsvalue($script['confirmation']).')'
-				);
-
-				$tools_menus .= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-			}
-
-			if (!empty($tools_menus)) {
-				$menus .= "['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-				$menus .= $tools_menus;
-			}
-			if ($host['status'] == HOST_STATUS_MONITORED) {
-				$links_menus .= "['"._('Status of triggers')."',\"javascript: redirect('tr_status.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-				if ($host['screens']) {
-					$links_menus .= "['"._('Host screens')."',\"javascript: redirect('host_screen.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-				}
-			}
-		}
-		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-			$links_menus .= "['"._('Submap')."',\"javascript: redirect('maps.php?sysmapid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-		}
-		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-			$links_menus .= "['"._('Latest events')."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time() - SEC_PER_WEEK)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-		}
-		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-			$links_menus .= "['"._('Status of triggers')."',\"javascript: redirect('tr_status.php?hostid=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-		}
-
-		if (!empty($links_menus)) {
-			$menus .= "['"._('Go to')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			$menus .= $links_menus;
-		}
-
-		if (!empty($db_element['urls'])) {
-			order_result($db_element['urls'], 'name');
-			$menus .= "['"._('URLs')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			foreach ($db_element['urls'] as $url) {
-				$menus .= "[".zbx_jsvalue($url['name']).",".zbx_jsvalue($url['url']).", 'nosid'],";
-			}
-		}
-
-		$menus = trim($menus, ',');
-		$menus = 'show_popup_menu(event,['.$menus.'],180); cancelEvent(event);';
-
-		$back = get_png_by_selement($map_info[$db_element['selementid']]);
-
-		$r_area = new CArea(
+	foreach ($sysmap['selements'] as $elem) {
+		$back = get_png_by_selement($map_info[$elem['selementid']]);
+		$area = new CArea(
 			array(
-				$db_element['x'],
-				$db_element['y'],
-				$db_element['x'] + imagesx($back),
-				$db_element['y'] + imagesy($back)),
+				$elem['x'],
+				$elem['y'],
+				$elem['x'] + imagesx($back),
+				$elem['y'] + imagesy($back)
+			),
 			'', '', 'rect'
 		);
+		$area->addClass('menu-map');
 
-		if (!empty($menus)) {
-			$r_area->addAction('onclick', 'javascript: '.$menus);
+		// pop up menu
+		order_result($elem['urls'], 'name');
+		$menuData = array(
+			'urls' => array_values($elem['urls']),
+			'elementId' => $elem['elementid'],
+			'elementType' => $elem['elementtype'],
+			'scripts' => array(),
+			'hasScreens' => false,
+			'isMonitored' => false
+		);
+		if ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
+			$host = $hosts[$elem['elementid']];
+			$menuData['scripts'] = $scripts_by_hosts[$elem['elementid']];
+			$menuData['hasScreens'] = (bool) $host['screens'];
+			$menuData['isMonitored'] = $hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED;
 		}
+		$area->setAttribute('data-menu', $menuData);
 
-		$action_map->addItem($r_area);
+		$action_map->addItem($area);
 	}
 
 	return $action_map;
