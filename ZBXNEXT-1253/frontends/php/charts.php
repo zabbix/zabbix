@@ -61,19 +61,11 @@ if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'hat') {
 		CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
-	if ($_REQUEST['favobj'] == 'timeline') {
-		if (isset($_REQUEST['graphid']) && isset($_REQUEST['period'])) {
-			navigation_bar_calc('web.graph', $_REQUEST['favid'], true);
-		}
-	}
-
-	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
 		if (isset($_REQUEST['favid'])) {
-			CProfile::update('web.charts.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
+			CProfile::update('web.screens.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
 		}
 	}
-
 	if (str_in_array($_REQUEST['favobj'], array('itemid', 'graphid'))) {
 		$result = false;
 		if ($_REQUEST['favaction'] == 'add') {

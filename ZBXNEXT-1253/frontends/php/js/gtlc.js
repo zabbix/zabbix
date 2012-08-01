@@ -240,8 +240,8 @@ var timeControl = {
 		var usertime = ZBX_TIMELINES[timelineid].usertime();
 		var period = ZBX_TIMELINES[timelineid].period();
 
-		if (ZBX_TIMELINES[timelineid].now()) {
-			usertime += 31536000; // 86400 * 365 = 1 year
+		if (ZBX_TIMELINES[timelineid].now() || ZBX_TIMELINES[timelineid].isNow()) {
+			usertime += 31536000; // 31536000 = 86400 * 365 = 1 year
 		}
 
 		var date = new CDate((usertime - period) * 1000);
@@ -256,7 +256,7 @@ var timeControl = {
 			location.href = url.getUrl();
 		}
 		else {
-			flickerfreeScreen.refreshAll(period, date.getZBXDate());
+			flickerfreeScreen.refreshAll(period, date.getZBXDate(), ZBX_TIMELINES[timelineid].isNow());
 
 			// update related objects
 			for (var objid in this.objectList) {
@@ -306,7 +306,7 @@ var timeControl = {
 			location.href = url.getUrl();
 		}
 		else {
-			flickerfreeScreen.refreshAll(period, stime);
+			flickerfreeScreen.refreshAll(period, stime, true);
 		}
 	},
 
@@ -553,7 +553,7 @@ var CTimeLine = Class.create(CDebug, {
 			return this._isNow;
 		}
 
-		this._isNow = isNow;
+		this._isNow = (isNow == 1) ? true : (isNow ? isNow : false);
 	}
 });
 

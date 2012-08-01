@@ -55,15 +55,14 @@ if (!$map) {
 	access_deny();
 }
 
-$mapOptions = array(
+$mapPainter = new CMapPainter($map, array(
 	'map' => array(
-		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements'])),
+		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements']))
 	),
 	'grid' => array(
-		'size' => get_request('grid', 0),
-	),
-);
-$mapPainter = new CMapPainter($map, $mapOptions);
+		'size' => get_request('grid', 0)
+	)
+));
 
 $im = $mapPainter->paint();
 
@@ -106,7 +105,7 @@ if ($nocalculations) {
 		$iconMaps = API::IconMap()->get(array(
 			'iconmapids' => $map['iconmapid'],
 			'output' => array('default_iconid'),
-			'preservekeys' => true,
+			'preservekeys' => true
 		));
 		$iconMap = reset($iconMaps);
 		$defaultAutoIconId = $iconMap['default_iconid'];
@@ -127,15 +126,12 @@ if ($nocalculations) {
 
 		$map_info[$selement['selementid']] = array(
 			'iconid' => $iconid,
-			'icon_type' => SYSMAP_ELEMENT_ICON_OFF,
+			'icon_type' => SYSMAP_ELEMENT_ICON_OFF
 		);
 
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE) {
-			$map_info[$selement['selementid']]['name'] = _('Image');
-		}
-		else {
-			$map_info[$selement['selementid']]['name'] = $selement['elementName'];
-		}
+		$map_info[$selement['selementid']]['name'] = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			? _('Image')
+			: $selement['elementName'];
 	}
 
 	$allLinks = true;

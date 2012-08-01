@@ -43,8 +43,8 @@ jQuery(function($) {
 			ajaxUrl.setArgument('hostid', screen.hostid);
 			ajaxUrl.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
 			ajaxUrl.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
-			ajaxUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
-			ajaxUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+			ajaxUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+			ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 
 			// SCREEN_RESOURCE_GRAPH
 			// SCREEN_RESOURCE_SIMPLE_GRAPH
@@ -52,8 +52,8 @@ jQuery(function($) {
 				this.refreshImg(id, function() {
 					$('#flickerfreescreen_' + id).find('a').each(function() {
 						var chartUrl = new Curl($(this).attr('href'));
-						chartUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
-						chartUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+						chartUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+						chartUrl.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 						$(this).attr('href', chartUrl.getUrl());
 					});
 				});
@@ -99,14 +99,15 @@ jQuery(function($) {
 			}
 		},
 
-		refreshAll: function(period, stime) {
+		refreshAll: function(period, stime, isNow) {
 			for (var id in this.screens) {
 				if (empty(this.screens[id]) || empty(this.screens[id].resourcetype)) {
 					continue;
 				}
 
-				this.screens[id].period = period;
-				this.screens[id].stime = stime;
+				this.screens[id].timeline.period = period;
+				this.screens[id].timeline.stime = stime;
+				this.screens[id].timeline.isNow = isNow;
 
 				// restart refresh execution starting from now
 				clearTimeout(this.screens[id].timeout);
@@ -178,8 +179,8 @@ jQuery(function($) {
 					var doId = '#' + $(this).attr('id');
 					var chartUrl = new Curl($(this).attr('src'));
 					chartUrl.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
-					chartUrl.setArgument('period', !empty(screen.period) ? screen.period : null);
-					chartUrl.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+					chartUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+					chartUrl.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					chartUrl.setArgument('curtime', new CDate().getTime());
 
 					// img
@@ -204,6 +205,12 @@ jQuery(function($) {
 					});
 				});
 			}
+		},
+
+		getCalculatedSTime: function(screen) {
+			return (screen.timeline.isNow || screen.timeline.isNow == 1)
+				? new CDate((new CDate().setZBXDate(screen.timeline.stime) / 1000 + 31536000) * 1000).getZBXDate() // 31536000 = 86400 * 365 = 1 year
+				: screen.timeline.stime;
 		},
 
 		add: function(screen) {

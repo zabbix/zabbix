@@ -39,7 +39,7 @@ class CScreenScreen extends CScreenBase {
 			'mode' => ($this->mode == SCREEN_MODE_EDIT) ? SCREEN_MODE_VIEW : SCREEN_MODE_PREVIEW,
 			'screen' => $screen,
 			'period' => $this->timeline['period'],
-			'stime' => $this->timeline['stime'],
+			'stime' => $this->timeline['stimeNow'],
 			'profileIdx' => $this->profileIdx
 		));
 

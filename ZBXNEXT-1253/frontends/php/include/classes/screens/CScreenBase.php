@@ -154,6 +154,7 @@ class CScreenBase {
 				'stime' => !empty($options['stime']) ? $options['stime'] : null
 			));
 		}
+		CScreenBase::debugTime($this->timeline);
 
 		// get screenitem
 		if (!empty($options['screenitem'])) {
@@ -251,8 +252,7 @@ class CScreenBase {
 			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : $this->screenid,
 			'groupid' => $this->groupid,
 			'hostid' => $this->hostid,
-			'period' => $this->timeline['period'],
-			'stime' => $this->timeline['stime'],
+			'timeline' => $this->timeline,
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
 			'data' => !empty($data) ? $data : null
@@ -283,9 +283,6 @@ class CScreenBase {
 			$options['profileIdx2'] = 0;
 		}
 
-		$time = time();
-		$isNow = false;
-
 		// period
 		if (empty($options['period'])) {
 			$options['period'] = !empty($options['profileIdx'])
@@ -309,30 +306,55 @@ class CScreenBase {
 		}
 
 		// stime
-		if (!empty($options['stime'])) {
-			$usertime = date('YmdHis', zbxDateToTime($options['stime']) + $options['period']);
+		$time = time();
+		$usertime = null;
+		$stimeNow = null;
+		$isNow = false;
 
+		if (!empty($options['stime'])) {
 			if (zbxDateToTime($options['stime']) > $time) {
+				$stimeNow = $options['stime'];
 				$options['stime'] = date('YmdHis', $time - $options['period']);
 				$usertime = date('YmdHis', $time);
 				$isNow = true;
 			}
+			else {
+				$usertime = date('YmdHis', zbxDateToTime($options['stime']) + $options['period']);
+				$isNow = false;
+			}
 
 			if ($options['doUpdate'] && !empty($options['profileIdx'])) {
 				CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
+				CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
 			}
 		}
 		else {
 			if (!empty($options['profileIdx'])) {
-				$options['stime'] = CProfile::get($options['profileIdx'].'.stime', PROFILE_TYPE_STR, $options['profileIdx2']);
-				$usertime = date('YmdHis', zbxDateToTime($options['stime']) + $options['period']);
+				$isNow = CProfile::get($options['profileIdx'].'.isnow', null, $options['profileIdx2']);
+				if ($isNow) {
+					$options['stime'] = date('YmdHis', $time - $options['period']);
+					$usertime = date('YmdHis', $time);
+					$stimeNow = date('YmdHis', zbxDateToTime($options['stime']) + 31536000); // 31536000 = 86400 * 365 = 1 year
+
+					if ($options['doUpdate']) {
+						CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
+					}
+				}
+				else {
+					$options['stime'] = CProfile::get($options['profileIdx'].'.stime', null, $options['profileIdx2']);
+					$usertime = date('YmdHis', zbxDateToTime($options['stime']) + $options['period']);
+				}
 			}
-			if (empty($options['stime']) || (!empty($options['stime']) && zbxDateToTime($options['stime']) < 3600)) {
+
+			if (empty($options['stime'])) {
 				$options['stime'] = date('YmdHis', $time - $options['period']);
 				$usertime = date('YmdHis', $time);
+				$stimeNow = date('YmdHis', zbxDateToTime($options['stime']) + 31536000); // 31536000 = 86400 * 365 = 1 year
+				$isNow = true;
 
 				if ($options['doUpdate'] && !empty($options['profileIdx'])) {
 					CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
+					CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
 				}
 			}
 		}
@@ -340,16 +362,29 @@ class CScreenBase {
 		return array(
 			'period' => $options['period'],
 			'stime' => $options['stime'],
+			'stimeNow' => !empty($stimeNow) ? $stimeNow : $options['stime'],
 			'starttime' => date('YmdHis', $time - ZBX_MAX_PERIOD),
 			'usertime' => $usertime,
 			'isNow' => $isNow
 		);
 	}
 
-	public static function traceTime(array $time = array()) {
-		echo 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>';
-		echo 'starttime='.date('F j, Y, g:i a', zbxDateToTime($time['starttime'])).', ('.$time['starttime'].')<br/>';
-		echo 'stime='.date('F j, Y, g:i a', zbxDateToTime($time['stime'])).', ('.$time['stime'].')<br/>';
-		echo 'usertime='.date('F j, Y, g:i a', zbxDateToTime($time['usertime'])).', ('.$time['usertime'].')<br/>';
+	/**
+	 * Easy way to view time data.
+	 *
+	 * @static
+	 *
+	 * @param array		$time
+	 * @param int		$options['period']
+	 * @param string	$options['stime']
+	 * @param string	$options['starttime']
+	 * @param string	$options['usertime']
+	 */
+	public static function debugTime(array $time = array()) {
+		echo 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
+				'starttime='.date('F j, Y, g:i a', zbxDateToTime($time['starttime'])).', ('.$time['starttime'].')<br/>'.
+				'stime='.date('F j, Y, g:i a', zbxDateToTime($time['stime'])).', ('.$time['stime'].')<br/>'.
+				'usertime='.date('F j, Y, g:i a', zbxDateToTime($time['usertime'])).', ('.$time['usertime'].')<br/>'.
+				'isnow='.$time['isNow'].'<br/>';
 	}
 }
