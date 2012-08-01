@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ function set_zbx_locales() {
 }
 
 /**
- * Return an array of locale name variants based of language.
+ * Return an array of locale name variants based on language.
  *
  * @param string $language in format 'ru_RU', 'en_EN' and so on
  * @return array a list of possible locale names
