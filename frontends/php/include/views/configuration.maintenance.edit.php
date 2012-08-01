@@ -79,9 +79,8 @@ $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $thi
  * Maintenance period tab
  */
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
-$maintenancePeriodTable = new CTableInfo(_('No maintenance period defined.'));
+$maintenancePeriodTable = new CTable(_('No maintenance period defined.'), 'formElementTable');
 $maintenancePeriodTable->setHeader(array(
-	new CCheckBox('all_periods', null, 'checkAll("'.$maintenanceForm->getName().'", "all_periods", "g_timeperiodid");'),
 	_('Period type'),
 	_('Schedule'),
 	_('Period'),
@@ -90,11 +89,14 @@ $maintenancePeriodTable->setHeader(array(
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow(array(
-		new CCheckBox('g_timeperiodid[]', 'no', null, $id),
 		timeperiod_type2str($timeperiod['timeperiod_type']),
 		new CCol(shedule2str($timeperiod), 'wraptext'),
 		zbx_date2age(0, $timeperiod['period']),
-		new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu')
+		array(
+			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
+			SPACE.SPACE,
+			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
+		)
 	));
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
@@ -109,19 +111,29 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenanceForm->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
-$maintenancePeriodFormList->addRow(_('Periods'),
-	array(
-		$maintenancePeriodTable,
-		new CSubmit('new_timeperiod', _('New'), null, 'link_menu'),
-		SPACE,
-		SPACE,
-		new CSubmit('del_timeperiod', _('Delete selected'), null, 'link_menu')
-	)
-);
+$periodsDiv = new CDiv($maintenancePeriodTable, 'objectgroup inlineblock border_dotted');
+if (!isset($_REQUEST['new_timeperiod'])) {
+	$periodsDiv->addItem(new CSubmit('new_timeperiod', _('New'), null, 'link_menu'));
+}
+$maintenancePeriodFormList->addRow(_('Periods'), $periodsDiv);
 
 if (isset($_REQUEST['new_timeperiod'])) {
-	$label = (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) ? _('Edit maintenance period') : _('New maintenance period');
-	$maintenancePeriodFormList->addRow(SPACE, array(BR(), create_hat($label, get_timeperiod_form(), null, 'hat_new_timeperiod')));
+	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {
+		$saveLabel = _('Save');
+	}
+	else {
+		$saveLabel = _('Add');
+	}
+
+	$footer = array(
+		new CSubmit('add_timeperiod', $saveLabel, null, 'link_menu'),
+		SPACE.SPACE,
+		new CSubmit('cancel_new_timeperiod', _('Cancel'), null, 'link_menu')
+	);
+
+	$maintenancePeriodFormList->addRow(_('Maintenance period'),
+		new CDiv(array(get_timeperiod_form(), $footer), 'objectgroup inlineblock border_dotted')
+	);
 }
 
 /*
@@ -177,4 +189,5 @@ else {
 }
 
 $maintenanceWidget->addItem($maintenanceForm);
+
 return $maintenanceWidget;
