@@ -132,4 +132,13 @@ function timer($timer = null) {
 		$timers[$timer]['last'] = $mtime;
 	}
 }
+
+/**
+ * Shorthand for throwing exception
+ *
+ * @param string $ex	exception text
+ */
+function sdex($ex = 'My exception') {
+	throw new APIException(ZBX_API_ERROR_INTERNAL, $ex);
+}
 ?>
