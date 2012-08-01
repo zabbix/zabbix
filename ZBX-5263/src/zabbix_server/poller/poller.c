@@ -42,19 +42,20 @@
 #endif
 #include "checks_telnet.h"
 #include "checks_calculated.h"
-
-#define MAX_REACHABLE_ITEMS	64
-#define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
-
 #ifdef HAVE_CASSANDRA
 #	include "zbxcassa.h"
 #endif
 
+#define MAX_REACHABLE_ITEMS	64
+#define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
+
 extern unsigned char	process_type;
 extern int		process_num;
 
+#ifdef HAVE_CASSANDRA
 extern zbx_cassandra_hosts_t	CONFIG_CASSANDRA_HOSTS;
 extern char			*CONFIG_CASSANDRA_KEYSPACE;
+#endif
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 {

@@ -36,8 +36,10 @@ extern int			ZBX_SYNC_MAX;
 extern unsigned char		process_type;
 extern int			process_num;
 
+#ifdef HAVE_CASSANDRA
 extern zbx_cassandra_hosts_t	CONFIG_CASSANDRA_HOSTS;
 extern char			*CONFIG_CASSANDRA_KEYSPACE;
+#endif
 
 /******************************************************************************
  *                                                                            *
