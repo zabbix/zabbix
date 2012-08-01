@@ -1376,7 +1376,7 @@
 	}
 
 	function get_timeperiod_form() {
-		$tblPeriod = new CTableInfo();
+		$tblPeriod = new CTable(null, 'formElementTable');
 
 		// init new_timeperiod variable
 		$new_timeperiod = get_request('new_timeperiod', array());
@@ -1559,26 +1559,13 @@
 			));
 			$tblPeriod->addRow(array(_('Month'), $tabMonths));
 
-			$radioDaily = new CTag('input');
-			$radioDaily->setAttribute('type', 'radio');
-			$radioDaily->setAttribute('name', 'new_timeperiod[month_date_type]');
-			$radioDaily->setAttribute('value', '0');
-			$radioDaily->setAttribute('onclick', 'submit()');
-
-			$radioDaily2 = new CTag('input');
-			$radioDaily2->setAttribute('type', 'radio');
-			$radioDaily2->setAttribute('name', 'new_timeperiod[month_date_type]');
-			$radioDaily2->setAttribute('value', '1');
-			$radioDaily2->setAttribute('onclick', 'submit()');
-
-			if ($new_timeperiod['month_date_type']) {
-				$radioDaily2->setAttribute('checked', 'checked');
-			}
-			else {
-				$radioDaily->setAttribute('checked', 'checked');
-			}
-
-			$tblPeriod->addRow(array(_('Date'), array($radioDaily, _('Day'), SPACE, SPACE, $radioDaily2, _('Day of week'))));
+			$tblPeriod->addRow(array(_('Date'), array(
+				new CRadioButton('new_timeperiod[month_date_type]', '0', null, null, !$new_timeperiod['month_date_type'], 'submit()'),
+				_('Day'),
+				SPACE,
+				new CRadioButton('new_timeperiod[month_date_type]', '1', null, null, $new_timeperiod['month_date_type'], 'submit()'),
+				_('Day of week')))
+			);
 
 			if ($new_timeperiod['month_date_type'] > 0) {
 				$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
@@ -1621,14 +1608,9 @@
 
 			$clndr_icon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
 			$clndr_icon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_timeperiod_date"].clndr.clndrshow(pos.top, pos.left);');
-
-			$filtertimetab = new CTable(null, 'calendar');
-			$filtertimetab->setAttribute('width', '10%');
-			$filtertimetab->setCellPadding(0);
-			$filtertimetab->setCellSpacing(0);
-
 			$start_date = zbxDateToTime($new_timeperiod['start_date']);
-			$filtertimetab->addRow(array(
+
+			$tblPeriod->addRow(array(_('Date'), array(
 				new CNumericBox('new_timeperiod_day', ($start_date > 0) ? date('d', $start_date) : '', 2),
 				'/',
 				new CNumericBox('new_timeperiod_month', ($start_date > 0) ? date('m', $start_date) : '', 2),
@@ -1639,45 +1621,31 @@
 				':',
 				new CNumericBox('new_timeperiod_minute', ($start_date > 0) ? date('i', $start_date) : '', 2),
 				$clndr_icon
-			));
+			)));
 			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');
 
-			$tblPeriod->addRow(array(_('Date'), $filtertimetab));
 		}
 
 		if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-			$tabTime = new CTable(null, 'calendar');
-			$tabTime->addRow(array(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2), ':', new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2)));
-			$tblPeriod->addRow(array(_('At (hour:minute)'), $tabTime));
+			$tblPeriod->addRow(array(_('At (hour:minute)'), array(
+				new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2),
+				':',
+				new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2)))
+			);
 		}
 
-		$perHours = new CComboBox('new_timeperiod[period_hours]', $new_timeperiod['period_hours']);
-		for ($i = 0; $i < 24; $i++) {
-			$perHours->addItem($i, $i);
-		}
-		$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes']);
-		for ($i = 0; $i < 60; $i++) {
-			$perMinutes->addItem($i, $i);
-		}
+		$perHours = new CComboBox('new_timeperiod[period_hours]', $new_timeperiod['period_hours'], null, range(0, 23));
+		$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes'], null, range(0, 59));
 		$tblPeriod->addRow(array(
 			_('Maintenance period length'),
 			array(
 				new CNumericBox('new_timeperiod[period_days]', $new_timeperiod['period_days'], 3),
 				_('Days').SPACE.SPACE,
 				$perHours,
-				SPACE._('Hours'),
+				_('Hours').SPACE.SPACE,
 				$perMinutes,
-				SPACE._('Minutes')
+				_('Minutes')
 		)));
-
-		$td = new CCol(array(
-			new CSubmit('add_timeperiod', $new ? _('Save') : _('Add')),
-			SPACE,
-			new CSubmit('cancel_new_timeperiod', _('Cancel'))
-		));
-		$td->setAttribute('colspan', '3');
-		$td->setAttribute('style', 'text-align: right;');
-		$tblPeriod->setFooter($td);
 
 		return $tblPeriod;
 	}
