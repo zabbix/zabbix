@@ -18,6 +18,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-2771] fixed localization of popups in Monitoring->Events (Vedmak)
 ..F....... [ZBX-5360] fixed editing large inventory fields on host mass update form (Vedmak)
 ..F....... [ZBX-5352] fixed displaying the "Change" column if values have the close values (Vedmak)
 A......... [ZBX-5363] fixed importing a template which use item as min/max value in graph (Vedmak)
