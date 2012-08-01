@@ -1195,17 +1195,9 @@
 			'go' => get_request('go', 'massupdate'),
 			'g_triggerid' => get_request('g_triggerid', array()),
 			'priority' => get_request('priority', 0),
-			'config' => select_config()
+			'config' => select_config(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
@@ -1243,21 +1235,18 @@
 			'url' => get_request('url', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array()
+			'templates' => array(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger
-			$data['trigger'] = get_trigger_by_triggerid($data['triggerid']);
+			$trigger = API::Trigger()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('hostid'),
+				'triggerids' => $data['triggerid']
+			));
+			$data['trigger'] = reset($trigger);
 			if (!empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
 			}
@@ -1266,17 +1255,23 @@
 			$tmp_triggerid = $data['triggerid'];
 			do {
 				$db_triggers = DBfetch(DBselect(
-					'SELECT t.triggerid,t.templateid,h.name'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid='.$tmp_triggerid.
-						' AND h.hostid=i.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'
+					'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
+					' FROM triggers t'.
+						' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
+						' LEFT JOIN items i ON f.itemid=i.itemid'.
+						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+					' WHERE t.triggerid='.$tmp_triggerid
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$link = empty($data['parent_discoveryid'])
-						? 'triggers.php?form=update&triggerid='.$db_triggers['triggerid']
-						: 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$data['parent_discoveryid'];
+					// parent trigger prototype link
+					if ($data['parent_discoveryid']) {
+						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					}
+					// parent trigger link
+					else {
+						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
+					}
 
 					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
 					$data['templates'][] = SPACE.RARR.SPACE;
@@ -1287,6 +1282,12 @@
 			array_shift($data['templates']);
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
+
+			// if no host has been selected for the navigation panel, use the first trigger host
+			if (!$data['hostid']) {
+				$hosts = reset($data['trigger']['hosts']);
+				$data['hostid'] = $hosts['hostid'];
+			}
 		}
 
 		if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {
@@ -1381,8 +1382,13 @@
 		$new_timeperiod = get_request('new_timeperiod', array());
 		$new = is_array($new_timeperiod);
 
-		if (is_array($new_timeperiod) && isset($new_timeperiod['id'])) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+		if (is_array($new_timeperiod)) {
+			if (isset($new_timeperiod['id'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+			}
+			if (isset($new_timeperiod['timeperiodid'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[timeperiodid]', $new_timeperiod['timeperiodid']));
+			}
 		}
 		if (!is_array($new_timeperiod)) {
 			$new_timeperiod = array();
@@ -1666,285 +1672,3 @@
 		return $frmHostP;
 	}
 
-	function get_regexp_form(){
-		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])){
-			$sql = 'SELECT re.* '.
-				' FROM regexps re '.
-				' WHERE '.DBin_node('re.regexpid').
-					' AND re.regexpid='.$_REQUEST['regexpid'];
-			$regexp = DBfetch(DBSelect($sql));
-
-			$rename			= $regexp['name'];
-			$test_string	= $regexp['test_string'];
-
-			$expressions = array();
-			$sql = 'SELECT e.* '.
-					' FROM expressions e '.
-					' WHERE '.DBin_node('e.expressionid').
-						' AND e.regexpid='.$regexp['regexpid'].
-					' ORDER BY e.expression_type';
-
-			$db_exps = DBselect($sql);
-			while($exp = DBfetch($db_exps)){
-				$expressions[] = $exp;
-			}
-		}
-		else{
-			$rename			= get_request('rename','');
-			$test_string	= get_request('test_string','');
-
-			$expressions 	= get_request('expressions',array());
-		}
-
-		$tblRE = new CTable('','formtable nowrap');
-
-		$tblRE->addRow(array(_('Name'), new CTextBox('rename', $rename, 60, 'no', 128)));
-		$tblRE->addRow(array(_('Test string'), new CTextArea('test_string', $test_string)));
-
-		$tabExp = new CTableInfo();
-
-		$td1 = new CCol(_('Expression'));
-		$td2 = new CCol(_('Expected result'));
-		$td3 = new CCol(_('Result'));
-
-		$tabExp->setHeader(array($td1,$td2,$td3));
-
-		$final_result = !empty($test_string);
-
-		foreach($expressions as $id => $expression){
-
-			$results = array();
-			$paterns = array($expression['expression']);
-
-			if(!empty($test_string)){
-				if($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED){
-					$paterns = explode($expression['exp_delimiter'],$expression['expression']);
-				}
-
-				if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_TRUE,EXPRESSION_TYPE_FALSE))){
-					if($expression['case_sensitive'])
-						$results[$id] = preg_match('/'.$paterns[0].'/',$test_string);
-					else
-						$results[$id] = preg_match('/'.$paterns[0].'/i',$test_string);
-
-					if($expression['expression_type'] == EXPRESSION_TYPE_TRUE)
-						$final_result &= $results[$id];
-					else
-						$final_result &= !$results[$id];
-				}
-				else{
-					$results[$id] = true;
-
-					$tmp_result = false;
-					if($expression['case_sensitive']){
-						foreach($paterns as $pid => $patern){
-							$tmp_result |= (zbx_strstr($test_string,$patern) !== false);
-						}
-					}
-					else{
-						foreach($paterns as $pid => $patern){
-							$tmp_result |= (zbx_stristr($test_string,$patern) !== false);
-						}
-					}
-
-					if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED)))
-						$results[$id] &= $tmp_result;
-					else if($expression['expression_type'] == EXPRESSION_TYPE_NOT_INCLUDED){
-						$results[$id] &= !$tmp_result;
-					}
-					$final_result &= $results[$id];
-				}
-			}
-
-			if(isset($results[$id]) && $results[$id])
-				$exp_res = new CSpan(_('TRUE'), 'green bold');
-			else
-				$exp_res = new CSpan(_('FALSE'), 'red bold');
-
-			$expec_result = expression_type2str($expression['expression_type']);
-			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
-				$expec_result.=' ('._('Delimiter')."='".$expression['exp_delimiter']."')";
-
-			$tabExp->addRow(array(
-				$expression['expression'],
-				$expec_result,
-				$exp_res
-			));
-		}
-
-		$td = new CCol(_('Combined result'), 'bold');
-		$td->setColSpan(2);
-
-		if ($final_result) {
-			$final_result = new CSpan(_('TRUE'), 'green bold');
-		}
-		else {
-			$final_result = new CSpan(_('FALSE'), 'red bold');
-		}
-
-		$tabExp->addRow(array(
-			$td,
-			$final_result
-		));
-
-		$tblRE->addRow(array(_('Result'), $tabExp));
-
-		$tblFoot = new CTableInfo(null);
-
-		$td = new CCol(array(new CSubmit('save', _('Save'))));
-		$td->setColSpan(2);
-		$td->addStyle('text-align: right;');
-
-		$td->addItem(SPACE);
-		$td->addItem(new CSubmit('test', _('Test')));
-
-		if (isset($_REQUEST['regexpid'])) {
-			$td->addItem(SPACE);
-			$td->addItem(new CSubmit('clone', _('Clone')));
-			$td->addItem(SPACE);
-			$td->addItem(new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
-		}
-
-		$td->addItem(SPACE);
-		$td->addItem(new CButtonCancel(url_param("regexpid")));
-
-		$tblFoot->setFooter($td);
-
-		return array($tblRE, $tblFoot);
-	}
-
-	function get_expressions_tab() {
-		if (isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])) {
-			$expressions = array();
-			$sql = 'SELECT e.* '.
-					' FROM expressions e '.
-					' WHERE '.DBin_node('e.expressionid').
-						' AND e.regexpid='.$_REQUEST['regexpid'].
-					' ORDER BY e.expression_type';
-
-			$db_exps = DBselect($sql);
-			while ($exp = DBfetch($db_exps)) {
-				$expressions[] = $exp;
-			}
-		}
-		else {
-			$expressions = get_request('expressions',array());
-		}
-
-		$tblExp = new CTableInfo();
-		$tblExp->setHeader(array(
-			new CCheckBox('all_expressions', null, 'checkAll("regularExpressionsForm", "all_expressions", "g_expressionid");'),
-			_('Expression'),
-			_('Expected result'),
-			_('Case sensitive'),
-			_('Edit')
-		));
-
-		foreach($expressions as $id => $expression){
-
-			$exp_result = expression_type2str($expression['expression_type']);
-			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
-				$exp_result.=' ('._('Delimiter')."='".$expression['exp_delimiter']."')";
-
-			$tblExp->addRow(array(
-				new CCheckBox('g_expressionid[]', 'no', null, $id),
-				$expression['expression'],
-				$exp_result,
-				$expression['case_sensitive'] ? _('Yes') : _('No'),
-				new CSubmit('edit_expressionid['.$id.']', _('Edit'))
-			));
-
-			if (isset($expression['expressionid'])) {
-				$tblExp->addItem(new CVar('expressions['.$id.'][expressionid]', $expression['expressionid']));
-			}
-			$tblExp->addItem(new CVar('expressions['.$id.'][expression]', $expression['expression']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][expression_type]', $expression['expression_type']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][case_sensitive]', $expression['case_sensitive']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][exp_delimiter]', $expression['exp_delimiter']));
-		}
-
-		$buttons = array();
-		if(!isset($_REQUEST['new_expression'])){
-			$buttons[] = new CSubmit('new_expression', _('New'));
-			$buttons[] = new CSubmit('delete_expression', _('Delete'));
-		}
-
-		$td = new CCol($buttons);
-		$td->setAttribute('colspan', '5');
-		$td->setAttribute('style', 'text-align: right;');
-		$tblExp->setFooter($td);
-
-		return $tblExp;
-	}
-
-	function get_expression_form(){
-		$tblExp = new CTable();
-
-		/* init new_timeperiod variable */
-		$new_expression = get_request('new_expression', array());
-
-		if(is_array($new_expression) && isset($new_expression['id'])){
-			$tblExp->addItem(new Cvar('new_expression[id]', $new_expression['id']));
-		}
-
-		if(!is_array($new_expression)){
-			$new_expression = array();
-		}
-
-		if (isset($new_expression['expressionid'])) {
-			$tblExp->addItem(new CVar('new_expression[expressionid]', $new_expression['expressionid']));
-		}
-		if (!isset($new_expression['expression'])) {
-			$new_expression['expression'] = '';
-		}
-		if (!isset($new_expression['expression_type'])) {
-			$new_expression['expression_type'] = EXPRESSION_TYPE_INCLUDED;
-		}
-		if (!isset($new_expression['case_sensitive'])) {
-			$new_expression['case_sensitive'] = 0;
-		}
-		if (!isset($new_expression['exp_delimiter'])) {
-			$new_expression['exp_delimiter'] = ',';
-		}
-
-		$tblExp->addRow(array(_('Expression'), new CTextBox('new_expression[expression]', $new_expression['expression'], 60)));
-
-		$cmbType = new CComboBox('new_expression[expression_type]', $new_expression['expression_type'], 'javascript: submit();');
-		$cmbType->addItem(EXPRESSION_TYPE_INCLUDED, expression_type2str(EXPRESSION_TYPE_INCLUDED));
-		$cmbType->addItem(EXPRESSION_TYPE_ANY_INCLUDED, expression_type2str(EXPRESSION_TYPE_ANY_INCLUDED));
-		$cmbType->addItem(EXPRESSION_TYPE_NOT_INCLUDED, expression_type2str(EXPRESSION_TYPE_NOT_INCLUDED));
-		$cmbType->addItem(EXPRESSION_TYPE_TRUE, expression_type2str(EXPRESSION_TYPE_TRUE));
-		$cmbType->addItem(EXPRESSION_TYPE_FALSE, expression_type2str(EXPRESSION_TYPE_FALSE));
-
-		$tblExp->addRow(array(_('Expression type'), $cmbType));
-
-		if(EXPRESSION_TYPE_ANY_INCLUDED == $new_expression['expression_type']){
-			$cmbDelimiter = new CComboBox('new_expression[exp_delimiter]', $new_expression['exp_delimiter']);
-			$cmbDelimiter->addItem(',', ',');
-			$cmbDelimiter->addItem('.', '.');
-			$cmbDelimiter->addItem('/', '/');
-
-			$tblExp->addRow(array(_('Delimiter'), $cmbDelimiter));
-		}
-		else{
-			$tblExp->addItem(new Cvar('new_expression[exp_delimiter]', $new_expression['exp_delimiter']));
-		}
-
-		$chkbCase = new CCheckBox('new_expression[case_sensitive]', $new_expression['case_sensitive'], null, 1);
-
-		$tblExp->addRow(array(_('Case sensitive'), $chkbCase));
-
-		$tblExpFooter = new CTableInfo($tblExp);
-
-		$oper_buttons = array();
-		$oper_buttons[] = new CSubmit('add_expression', isset($new_expression['id']) ? _('Save') : _('Add'));
-		$oper_buttons[] = new CSubmit('cancel_new_expression', _('Cancel'));
-
-		$td = new CCol($oper_buttons);
-		$td->setAttribute('colspan', 2);
-		$td->setAttribute('style', 'text-align: right;');
-
-		$tblExpFooter->setFooter($td);
-
-	return $tblExpFooter;
-	}

@@ -87,6 +87,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 
 // js templates
 require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
+require_once dirname(__FILE__).'/include/views/js/monitoring.maps.js.php';
 
 $options = array(
 	'output' => API_OUTPUT_EXTEND,
@@ -180,4 +181,4 @@ $map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, SPACE, $fs_icon));
 $map_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
+
