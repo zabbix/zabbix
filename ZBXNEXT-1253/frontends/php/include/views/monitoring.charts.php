@@ -53,7 +53,7 @@ if (!empty($this->data['graphid'])) {
 		'graphid' => $this->data['graphid'],
 		'period' => $this->data['period'],
 		'stime' => $this->data['stime'],
-		'profileIdx' => 'web.charts',
+		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['graphid']
 	));
 	$chartsWidget->addItem($screen->get());
@@ -61,7 +61,7 @@ if (!empty($this->data['graphid'])) {
 	CScreenBuilder::insertScreenRefreshTime();
 }
 else {
-	$chartsWidget->addItem(new CTableInfo(_('No charts defined.')));
+	$chartsWidget->addItem(new CTableInfo(_('No graphs defined.')));
 }
 
 return $chartsWidget;

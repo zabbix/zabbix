@@ -320,7 +320,7 @@ class CScreenHistory extends CScreenBase {
 			$containerid = 'graph_cont1';
 			$src = 'chart.php?itemid='.$this->item['itemid'].'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'];
 
-			$historyTable = new CTableInfo(_('No charts defined.'), 'chart');
+			$historyTable = new CTableInfo(_('No graphs defined.'), 'chart');
 			$graphContainer = new CCol();
 			$graphContainer->setAttribute('id', $containerid);
 			$historyTable->addRow($graphContainer);

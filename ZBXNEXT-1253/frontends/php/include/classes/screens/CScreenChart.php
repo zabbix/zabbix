@@ -100,7 +100,7 @@ class CScreenChart extends CScreenBase {
 			$graphContainer = new CCol();
 			$graphContainer->setAttribute('id', $containerId);
 
-			$item = new CTableInfo(_('No charts defined.'), 'chart');
+			$item = new CTableInfo(_('No graphs defined.'), 'chart');
 			$item->addRow($graphContainer);
 
 			return $this->getOutput($item, true, array('graphid' => $this->graphid));

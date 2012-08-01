@@ -257,6 +257,17 @@ var timeControl = {
 		}
 		else {
 			flickerfreeScreen.refreshAll(period, date.getZBXDate());
+
+			// update related objects
+			for (var objid in this.objectList) {
+				if (empty(this.objectList[objid])) {
+					continue;
+				}
+
+				if (isset(objid, ZBX_SBOX)) {
+					ZBX_SBOX[objid].sbox.timeline = ZBX_TIMELINES[timelineid];
+				}
+			}
 		}
 	},
 
@@ -266,18 +277,22 @@ var timeControl = {
 		var stime = 201911051255;
 
 		// update time control
-		for (var key in this.objectList) {
-			if (empty(this.objectList[key])) {
+		for (var objid in this.objectList) {
+			if (empty(this.objectList[objid])) {
 				continue;
 			}
 
-			this.objectList[key].timeline.period(period);
-			this.objectList[key].timeline.usertime(usertime);
+			this.objectList[objid].timeline.period(period);
+			this.objectList[objid].timeline.usertime(usertime);
 
-			if (isset(key, ZBX_SCROLLBARS)) {
-				ZBX_SCROLLBARS[key].setBarPosition();
-				ZBX_SCROLLBARS[key].setGhostByBar();
-				ZBX_SCROLLBARS[key].setTabInfo();
+			if (isset(objid, ZBX_SCROLLBARS)) {
+				ZBX_SCROLLBARS[objid].setBarPosition();
+				ZBX_SCROLLBARS[objid].setGhostByBar();
+				ZBX_SCROLLBARS[objid].setTabInfo();
+			}
+
+			if (isset(objid, ZBX_SBOX)) {
+				ZBX_SBOX[objid].sbox.timeline = this.objectList[objid].timeline;
 			}
 		}
 
@@ -958,7 +973,6 @@ var CScrollBar = Class.create(CDebug, {
 		this.setGhostByBar();
 		this.setTabInfo();
 		this.onBarChange();
-
 	},
 
 	setCalendarRight: function(time) {
@@ -1764,6 +1778,7 @@ function sbox_init(sbid, timeline, domobjectid) {
 var sbox = Class.create(CDebug, {
 
 	sbox_id:			'',		// id to create references in array to self
+	timeline:			{},		// timelines object
 	mouse_event:		{},		// json object wheres defined needed event params
 	start_event:		{},		// copy of mouse_event when box created
 	stime:				0,		// new start time
@@ -2115,7 +2130,6 @@ function create_box_on_obj(obj, height) {
 	var div = document.createElement('div');
 	div.className = 'box_on';
 	div.style.height = (height + 2) + 'px';
-
 	obj.parentNode.appendChild(div);
 
 	return div;
