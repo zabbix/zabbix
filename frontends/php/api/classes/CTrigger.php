@@ -1241,8 +1241,13 @@ class CTrigger extends CTriggerGeneral {
 
 		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
+		}
 
-			// add dependencies
+		// clear all dependencies on inherited triggers
+		$this->deleteDependencies($triggers);
+
+		// add new dependencies
+		foreach ($triggers as $trigger) {
 			if (!empty($trigger['dependencies'])) {
 				$newDeps = array();
 				foreach ($trigger['dependencies'] as $depTrigger) {
