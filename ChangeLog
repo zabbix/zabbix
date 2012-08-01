@@ -19,6 +19,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+....I..... [ZBX-5125] added more validations of duplicates in upgrade patches (1.8 -> 2.0) (dimir)
 ........S. [ZBX-4527] removed limitation of alerter script command line (Sasha)
 ..F....... [ZBX-5385] fixed "service down" cells not filled in monitoring -> discovery with the classic theme (Toms)
 A......... [ZBX-5308] fixed trigger dependencies are not overridden by new triggers in parent templates (Toms)
