@@ -1819,7 +1819,7 @@ class CTrigger extends CTriggerGeneral {
 			if (!$triggerTemplates) {
 				$triggerDependencyTemplates = API::Template()->get(array(
 					'triggerids' => $trigger['dependencies'],
-					'output' => array('status'),
+					'output' => API_OUTPUT_SHORTEN,
 					'nopermissions' => true,
 					'limit' => 1
 				));
@@ -1854,13 +1854,12 @@ class CTrigger extends CTriggerGeneral {
 			} while (!empty($upTriggerids));
 
 			// fetch all templates that are used in dependencies
-			$depTemplateIds = array();
-			$dbDepHosts = get_hosts_by_triggerid($trigger['dependencies']);
-			while ($dephost = DBfetch($dbDepHosts)) {
-				if ($dephost['status'] == HOST_STATUS_TEMPLATE) {
-					$depTemplateIds[$dephost['hostid']] = $dephost['hostid'];
-				}
-			}
+			$triggerDependencyTemplates = API::Template()->get(array(
+				'triggerids' => $trigger['dependencies'],
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+			));
+			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
 
 			// run the check only if a templated trigger has dependencies on other templates
 			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'hostid'));
