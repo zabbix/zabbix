@@ -926,7 +926,11 @@ class CConfigurationImport {
 			if ($triggerId) {
 				$deps = array();
 				foreach ($trigger['dependencies'] as $dependency) {
-					$deps[] = array('triggerid' => $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']));
+					$triggeId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+					if (!$triggeId) {
+						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.', $trigger['description'], $dependency['name']));
+					}
+					$deps[] = array('triggerid' => $triggerId);
 				}
 
 				$trigger['dependencies'] = $deps;
@@ -941,11 +945,14 @@ class CConfigurationImport {
 		}
 
 		$triggerDependencies = array();
+		$newTriggers = array();
 		if ($this->options['triggers']['createMissing'] && $triggersToCreate) {
 			$newTriggerIds = API::Trigger()->create($triggersToCreate);
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$trigger = $triggersToCreate[$tnum];
 				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerId);
+
+				$newTriggers[$triggerId] = $trigger;
 			}
 		}
 
@@ -954,7 +961,12 @@ class CConfigurationImport {
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$deps = array();
 				foreach ($triggersToCreateDependencies[$tnum] as $dependency) {
-					$deps[] = array('triggerid' => $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']));
+					$triggeId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+					if (!$triggeId) {
+						$trigger = $newTriggers[$triggerId];
+						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.', $trigger['description'], $dependency['name']));
+					}
+					$deps[] = array('triggerid' => $triggerId);
 				}
 
 				if (!empty($deps)) {
