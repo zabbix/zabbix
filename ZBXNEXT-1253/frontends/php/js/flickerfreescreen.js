@@ -213,6 +213,22 @@ jQuery(function($) {
 				: screen.timeline.stime;
 		},
 
+		submitForm: function(formName) {
+			var period, stime;
+
+			for (var id in this.screens) {
+				if (!empty(this.screens[id])) {
+					period = this.screens[id].timeline.period;
+					stime = this.getCalculatedSTime(this.screens[id]);
+					break;
+				}
+			}
+
+			$('form[name='+ formName +']').append('<input type="hidden" name="period" value="' + period + '" />');
+			$('form[name='+ formName +']').append('<input type="hidden" name="stime" value="' + stime + '" />');
+			$('form[name='+ formName +']').submit();
+		},
+
 		add: function(screen) {
 			timeControl.refreshPage = false;
 

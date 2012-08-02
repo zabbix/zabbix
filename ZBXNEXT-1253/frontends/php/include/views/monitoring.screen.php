@@ -70,6 +70,7 @@ else {
 
 	// append screens combobox to page header
 	$headerForm = new CForm('get');
+	$headerForm->setName('headerForm');
 	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
 
 	$elementsComboBox = new CComboBox('elementid', $screen['screenid'], 'submit()');
@@ -101,7 +102,7 @@ else {
 		validate_group_with_host($PAGE_GROUPS, $PAGE_HOSTS);
 
 		// groups
-		$groupsComboBox = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
+		$groupsComboBox = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
 		foreach ($PAGE_GROUPS['groups'] as $groupid => $name) {
 			$groupsComboBox->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
 		}
@@ -109,7 +110,7 @@ else {
 
 		// hosts
 		$PAGE_HOSTS['hosts']['0'] = _('Default');
-		$hostsComboBox = new CComboBox('hostid', $PAGE_HOSTS['selected'], 'javascript: submit();');
+		$hostsComboBox = new CComboBox('hostid', $PAGE_HOSTS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
 		foreach ($PAGE_HOSTS['hosts'] as $hostid => $name) {
 			$hostsComboBox->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 		}
@@ -124,7 +125,9 @@ else {
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $screen['screenid'],
 		'groupid' => get_request('groupid'),
-		'hostid' => get_request('hostid')
+		'hostid' => get_request('hostid'),
+		'period' => $this->data['period'],
+		'stime' => $this->data['stime']
 	));
 	$screenWidget->addItem($screenBuilder->show());
 
