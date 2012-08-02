@@ -109,19 +109,6 @@ var timeControl = {
 				obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
 			}
 
-			// url
-			if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-				var date = new CDate((obj.timeline.usertime() - obj.timeline.period()) * 1000);
-				var graphUrl = new Curl(obj.src);
-
-				graphUrl.setArgument('width', obj.objDims.width);
-				graphUrl.setArgument('period', obj.timeline.period());
-				graphUrl.setArgument('stime', date.getZBXDate());
-				graphUrl = this.getFormattedUrl(obj.domid, graphUrl);
-
-				obj.src = graphUrl.getUrl();
-			}
-
 			// image
 			if (obj.loadImage) {
 				if (!obj.refresh) {

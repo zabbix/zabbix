@@ -78,14 +78,14 @@ $timeline = CScreenBase::calculateTime(array(
 
 CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
-$chart_header = '';
+$chartHeader = '';
 if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
-	$chart_header = get_node_name_by_elid($dbGraph['graphid'], true, ': ');
+	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, ': ');
 }
-$chart_header .= $host['name'].': '.$dbGraph['name'];
+$chartHeader .= $host['name'].': '.$dbGraph['name'];
 
 $graph = new CChart($dbGraph['graphtype']);
-$graph->setHeader($chart_header);
+$graph->setHeader($chartHeader);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 

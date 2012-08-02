@@ -154,7 +154,6 @@ class CScreenBase {
 				'stime' => !empty($options['stime']) ? $options['stime'] : null
 			));
 		}
-		CScreenBase::debugTime($this->timeline);
 
 		// get screenitem
 		if (!empty($options['screenitem'])) {
@@ -384,6 +383,7 @@ class CScreenBase {
 		echo 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
 				'starttime='.date('F j, Y, g:i a', zbxDateToTime($time['starttime'])).', ('.$time['starttime'].')<br/>'.
 				'stime='.date('F j, Y, g:i a', zbxDateToTime($time['stime'])).', ('.$time['stime'].')<br/>'.
+				'stimeNow='.date('F j, Y, g:i a', zbxDateToTime($time['stimeNow'])).', ('.$time['stimeNow'].')<br/>'.
 				'usertime='.date('F j, Y, g:i a', zbxDateToTime($time['usertime'])).', ('.$time['usertime'].')<br/>'.
 				'isnow='.$time['isNow'].'<br/>';
 	}
