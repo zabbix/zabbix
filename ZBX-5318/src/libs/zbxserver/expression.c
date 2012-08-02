@@ -1400,9 +1400,8 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 			" left join media_type mt"
 				" on mt.mediatypeid=a.mediatypeid"
 			" where a.eventid=" ZBX_FS_UI64
-				" and a.alerttype in (%d,%d)"
 			" order by a.clock",
-			eventid, ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND);
+			eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1415,26 +1414,28 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 		if (0 != esc_step)
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%d. ", esc_step);
 
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s %s %s",
-				zbx_date2str(now), zbx_time2str(now),
-				zbx_alert_type_string(type),
-				zbx_alert_status_string(type, status),
-				SUCCEED == DBis_null(row[3]) ? "" : row[3],
-				row[4]);
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s",
+				zbx_date2str(now), zbx_time2str(now),	/* date, time */
+				zbx_alert_type_string(type),		/* alert type */
+				zbx_alert_status_string(type, status));	/* alert status */
 
 		if (ALERT_TYPE_COMMAND == type)
 		{
 			if (NULL != (p = strchr(row[8], ':')))
 			{
 				*p = '\0';
-				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " \"%s\"", row[8]);
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " \"%s\"", row[8]);	/* host */
 				*p = ':';
 			}
 		}
 		else
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " \"%s\"", zbx_user_string(userid));
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s %s \"%s\"",
+					row[3],				/* media type description */
+					row[4],				/* send to */
+					zbx_user_string(userid));	/* alert user */
 
 		if (ALERT_STATUS_FAILED == status)
+			/* alert error */
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s", row[5]);
 
 		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');

@@ -94,12 +94,11 @@ fail:
 	return ret;
 }
 
+#ifdef HAVE_OPENIPMI
 static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_ipmi_command";
-	int		ret = FAIL;
-#ifdef HAVE_OPENIPMI
-	int		val;
+	int		val, ret;
 	char		*port = NULL;
 	DC_ITEM		item;
 
@@ -133,20 +132,18 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 	}
 fail:
 	zbx_free(port);
-#else
-	zbx_strlcpy(error, "support for IPMI commands was not compiled in", max_error_len);
-#endif	/* HAVE_OPENIPMI */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
+#endif
 
 static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, char **result,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
-	int		ret = FAIL;
+	int		ret;
 	AGENT_RESULT	agent_result;
 	DC_ITEM		item;
 	int             (*function)();
@@ -181,13 +178,10 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
-#ifdef HAVE_SSH2
 		item.key = zbx_dsprintf(item.key, "ssh.run[,,%s]", script->port);
+#ifdef HAVE_SSH2
 		function = get_value_ssh;
-#else
-		zbx_strlcpy(error, "Support for SSH scripts was not compiled in", max_error_len);
-		goto fail;
-#endif	/* HAVE_SSH2 */
+#endif
 	}
 	else
 	{
@@ -346,9 +340,11 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 			}
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
+#ifdef HAVE_OPENIPMI
 			if (SUCCEED == (ret = zbx_execute_ipmi_command(host, script->command, error, max_error_len)))
 				if (NULL != result)
 					*result = zbx_strdup(*result, "IPMI command successfully executed");
+#endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
 			substitute_simple_macros(NULL, NULL, host, NULL, &script->publickey,
