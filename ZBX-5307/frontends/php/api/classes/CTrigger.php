@@ -1470,20 +1470,10 @@ class CTrigger extends CTriggerGeneral {
 						$newDep = array($childTrigger['triggerid'] => $depTriggerId);
 						$newDep = replace_template_dependencies($newDep, $childHost['hostid']);
 
-						// if the child host is a template - propagate the dependency to the children
-						if ($childHost['status'] == HOST_STATUS_TEMPLATE) {
-							$this->addDependencies(array(array(
-								'triggerid' => $childTrigger['triggerid'],
-								'dependsOnTriggerid' => $newDep[$childTrigger['triggerid']]
-							)));
-						}
-						// if it's a host, just add the dependency
-						else {
-							DB::insert('trigger_depends', array(array(
-								'triggerid_down' => $childTrigger['triggerid'],
-								'triggerid_up' => $newDep[$childTrigger['triggerid']]
-							)));
-						}
+						$this->addDependencies(array(array(
+							'triggerid' => $childTrigger['triggerid'],
+							'dependsOnTriggerid' => $newDep[$childTrigger['triggerid']]
+						)));
 					}
 				}
 			}
