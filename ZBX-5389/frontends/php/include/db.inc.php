@@ -680,7 +680,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
 	}
 
 	function zbx_limit($min = 1, $max = null) {
-		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+		return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
@@ -699,7 +699,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
 	}
 
 	function zbx_limit($min = 1, $max = null) {
-		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+		return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
