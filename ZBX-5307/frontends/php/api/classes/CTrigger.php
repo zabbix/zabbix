@@ -1808,19 +1808,22 @@ class CTrigger extends CTriggerGeneral {
 				continue;
 			}
 
-			// trigger hosts
-			$triggerHosts = DBFetchArray(get_hosts_by_triggerid($trigger['triggerid']));
+			// trigger templates
+			$triggerTemplates = API::Template()->get(array(
+				'output' => array('status', 'hostid'),
+				'triggerids' => $trigger['triggerid'],
+				'nopermissions' => true
+			));
 
 			// forbid dependencies from hosts to templates
-			$isTemplatedTrigger = in_array(HOST_STATUS_TEMPLATE, zbx_objectValues($triggerHosts, 'status'));
-			if (!$isTemplatedTrigger) {
-				$triggerTemplates = API::Template()->get(array(
+			if (!$triggerTemplates) {
+				$triggerDependencyTemplates = API::Template()->get(array(
 					'triggerids' => $trigger['dependencies'],
 					'output' => array('status'),
 					'nopermissions' => true,
 					'limit' => 1
 				));
-				if ($triggerTemplates) {
+				if ($triggerDependencyTemplates) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add dependency from a host to a template.'));
 				}
 			}
@@ -1850,9 +1853,6 @@ class CTrigger extends CTriggerGeneral {
 
 			} while (!empty($upTriggerids));
 
-			$triggerHostIds = zbx_objectValues($triggerHosts, 'hostid');
-			$triggerHostIds = zbx_toHash($triggerHostIds);
-
 			// fetch all templates that are used in dependencies
 			$depTemplateIds = array();
 			$dbDepHosts = get_hosts_by_triggerid($trigger['dependencies']);
@@ -1863,16 +1863,17 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// run the check only if a templated trigger has dependencies on other templates
-			$tdiff = array_diff($depTemplateIds, $triggerHostIds);
-			if (!empty($triggerHostIds) && !empty($depTemplateIds) && !empty($tdiff)) {
-				$tpls = zbx_array_merge($triggerHostIds, $depTemplateIds);
+			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'hostid'));
+			$tdiff = array_diff($depTemplateIds, $triggerTemplateIds);
+			if (!empty($triggerTemplateIds) && !empty($depTemplateIds) && !empty($tdiff)) {
+				$affectedTemplateIds = zbx_array_merge($triggerTemplateIds, $depTemplateIds);
 
-				// create a list of all hosts, that are linked to the affected templates
+				// create a list of all hosts, that are children of the affected templates
 				$dbLowlvltpl = DBselect(
 					'SELECT DISTINCT ht.templateid,ht.hostid,h.host'.
 					' FROM hosts_templates ht,hosts h'.
 					' WHERE h.hostid=ht.hostid'.
-						' AND'.DBcondition('ht.templateid', $tpls)
+						' AND'.DBcondition('ht.templateid', $affectedTemplateIds)
 				);
 				$map = array();
 				while ($lowlvltpl = DBfetch($dbLowlvltpl)) {
@@ -1882,20 +1883,21 @@ class CTrigger extends CTriggerGeneral {
 					$map[$lowlvltpl['hostid']][$lowlvltpl['templateid']] = $lowlvltpl['host'];
 				}
 
-				// check that if at least one template used in the trigger and dependencies is linked to the host,
-				// that all templates used in dependencies are also linked
+				// check that if some host is linked to the template, that the trigger belongs to,
+				// the host must also be linked to all of the templates, that trigger dependencies point to
 				foreach ($map as $templates) {
-					$setWithDep = false;
-
-					foreach ($triggerHostIds as $tplid) {
-						if (isset($templates[$tplid])) {
-							$setWithDep = true;
+					foreach ($triggerTemplateIds as $triggerTemplateId) {
+						// is the host linked to one of the trigger templates?
+						if (isset($templates[$triggerTemplateId])) {
+							// then make sure all of the dependency templates are also linked
+							foreach ($depTemplateIds as $depTemplateId) {
+								if (!isset($templates[$depTemplateId])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Not all templates are linked to "%s".', reset($templates))
+									);
+								}
+							}
 							break;
-						}
-					}
-					foreach ($depTemplateIds as $delTplId) {
-						if (!isset($templates[$delTplId]) && $setWithDep) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all templates are linked to "%s".', reset($templates)));
 						}
 					}
 				}
@@ -1913,6 +1915,7 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	protected function checkDependencyParents(array $triggers) {
 		// fetch all templated dependency trigger parents
+		$depTriggerIds = array();
 		foreach ($triggers as $trigger) {
 			foreach ($trigger['dependencies'] as $depTriggerId) {
 				$depTriggerIds[$depTriggerId] = $depTriggerId;
