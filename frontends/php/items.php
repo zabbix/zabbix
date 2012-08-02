@@ -629,8 +629,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	$rs = API::Item()->delete($group_itemid);
 
 	if ($rs) {
-		foreach ($rs['itemids'] as $itemId) {
-			$item = $itemsToDelete[$itemId];
+		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
 
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
