@@ -1082,6 +1082,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.position.leftArr = getDimensions(ui.helper.context);
 		this.ghostBox.endResize();
 		this.setBarByGhost();
+		this.setGhostByBar();
 	},
 
 	// <right arr>
@@ -1130,6 +1131,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.position.rightArr = getDimensions(ui.helper.context);
 		this.ghostBox.endResize();
 		this.setBarByGhost();
+		this.setGhostByBar();
 	},
 
 	/*---------------------------------------------------------------------
