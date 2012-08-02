@@ -208,6 +208,11 @@ jQuery(function($) {
 		},
 
 		getCalculatedSTime: function(screen) {
+			if (!empty(timeControl.objectList[screen.id].sliderMaximumTimePeriod)
+					&& screen.timeline.period >= timeControl.objectList[screen.id].sliderMaximumTimePeriod) {
+				return new CDate(timeControl.objectList[screen.id].timeline.starttime() * 1000).getZBXDate();
+			}
+
 			return (screen.timeline.isNow || screen.timeline.isNow == 1)
 				? new CDate((new CDate().setZBXDate(screen.timeline.stime) / 1000 + 31536000) * 1000).getZBXDate() // 31536000 = 86400 * 365 = 1 year
 				: screen.timeline.stime;
