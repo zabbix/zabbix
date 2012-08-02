@@ -7,6 +7,10 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A......... [ZBX-5307] added a validation rule to prevent dependencies from a trigger to a trigger inherited from it (Pavels)
+A......... [ZBX-5307] fixed inherited trigger dependencies not being validated on hosts (Pavels)
+A......... [ZBX-5307] fixed an undefined index error when importing a trigger, that depends on an unexisting trigger (Pavels)
+A......... [ZBX-5307] fixed errors when importing item prototypes without applications (Pavels)
 ..F....... [ZBX-5396] fixed sorting helper function (Toms)
 ..F....... [ZBX-5108] fixed undefined index errors when deleting a templated item from the list (Pavels)
 ....I..... [ZBX-5125] added more validation of duplicates in upgrade patches (1.8 -> 2.0) (dimir)
