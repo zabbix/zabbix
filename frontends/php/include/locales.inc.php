@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ function set_zbx_locales() {
 	$ZBX_LOCALES = array(
 		'en_GB' => _('English (en_GB)'),
 		'zh_CN' => _('Chinese (zh_CN)'),
+		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
 		'nl_NL' => _('Dutch (nl_NL)'),
 		'fr_FR' => _('French (fr_FR)'),
@@ -65,7 +66,7 @@ function set_zbx_locales() {
 }
 
 /**
- * Return an array of locale name variants based of language.
+ * Return an array of locale name variants based on language.
  *
  * @param string $language in format 'ru_RU', 'en_EN' and so on
  * @return array a list of possible locale names
@@ -129,6 +130,7 @@ function zbx_locale_variants_win($language) {
 	$winLanguageName = array(
 		'en_gb' => 'english',
 		'zh_cn' => 'chinese',
+		'zh_tw' => 'chinese',
 		'cs_cz' => 'czech',
 		'nl_nl' => 'dutch',
 		'fr_fr' => 'french',
