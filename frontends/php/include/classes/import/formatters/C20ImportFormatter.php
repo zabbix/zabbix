@@ -312,6 +312,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($discoveryRule['item_prototypes'])) {
 			foreach ($discoveryRule['item_prototypes'] as &$prototype) {
 				$prototype = $this->renameItemFields($prototype);
+				CArrayHelper::convertFieldToArray($prototype, 'applications');
 			}
 			unset($prototype);
 		}
