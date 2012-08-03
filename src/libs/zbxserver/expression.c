@@ -1363,70 +1363,84 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*buf = NULL;
+	char		*buf = NULL, *p;
 	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
-	int		status, esc_step;
+	int		esc_step;
+	unsigned char	type, status;
 	time_t		now;
-	zbx_uint64_t	userid;
+	zbx_uint64_t	userid, eventid;
 
 	buf = zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
+	eventid = (NULL != escalation ? escalation->eventid : event->eventid);
+
 	if (NULL != escalation && escalation->eventid == event->eventid)
 	{
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-				"Problem started: %s %s Age: %s\n",
-				zbx_date2str(event->clock),
-				zbx_time2str(event->clock),
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
+				zbx_date2str(event->clock), zbx_time2str(event->clock),
 				zbx_age2str(time(NULL) - event->clock));
 	}
 	else
 	{
-		result = DBselect("select clock from events where eventid=" ZBX_FS_UI64,
-				escalation != NULL ? escalation->eventid : event->eventid);
+		result = DBselect("select clock from events where eventid=" ZBX_FS_UI64, eventid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
 			now = (time_t)atoi(row[0]);
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-					"Problem started: %s %s Age: %s\n",
-					zbx_date2str(now),
-					zbx_time2str(now),
-					zbx_age2str(time(NULL) - now));
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
+					zbx_date2str(now), zbx_time2str(now), zbx_age2str(time(NULL) - now));
 		}
-
 		DBfree_result(result);
 	}
 
-	result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error,a.esc_step,a.userid"
+	result = DBselect("select a.clock,a.alerttype,a.status,mt.description,a.sendto"
+				",a.error,a.esc_step,a.userid,a.message"
 			" from alerts a"
-			" left join media_type m on m.mediatypeid=a.mediatypeid"
-			" where a.eventid=" ZBX_FS_UI64 " and a.alerttype=%d order by a.clock",
-			escalation != NULL ? escalation->eventid : event->eventid,
-			ALERT_TYPE_MESSAGE);
+			" left join media_type mt"
+				" on mt.mediatypeid=a.mediatypeid"
+			" where a.eventid=" ZBX_FS_UI64
+			" order by a.clock",
+			eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		now		= atoi(row[0]);
-		status		= atoi(row[1]);
-		esc_step	= atoi(row[5]);
-		ZBX_DBROW2UINT64(userid, row[6]);
+		now = atoi(row[0]);
+		type = (unsigned char)atoi(row[1]);
+		status = (unsigned char)atoi(row[2]);
+		esc_step = atoi(row[6]);
+		ZBX_DBROW2UINT64(userid, row[7]);
 
-		if (esc_step != 0)
+		if (0 != esc_step)
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%d. ", esc_step);
 
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-				"%s %s %-11s %s %s \"%s\" %s\n",
-				zbx_date2str(now),
-				zbx_time2str(now),
-				(status == ALERT_STATUS_NOT_SENT ? "in progress" :
-					(status == ALERT_STATUS_SENT ? "sent" : "failed")),
-				SUCCEED == DBis_null(row[2]) ? "" : row[2],
-				row[3],
-				zbx_user_string(userid),
-				row[4]);
-	}
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s",
+				zbx_date2str(now), zbx_time2str(now),	/* date, time */
+				zbx_alert_type_string(type),		/* alert type */
+				zbx_alert_status_string(type, status));	/* alert status */
 
+		if (ALERT_TYPE_COMMAND == type)
+		{
+			if (NULL != (p = strchr(row[8], ':')))
+			{
+				*p = '\0';
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " \"%s\"", row[8]);	/* host */
+				*p = ':';
+			}
+		}
+		else
+		{
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s %s \"%s\"",
+					SUCCEED == DBis_null(row[3]) ? "" : row[3],	/* media type description */
+					row[4],						/* send to */
+					zbx_user_string(userid));			/* alert user */
+		}
+
+		if (ALERT_STATUS_FAILED == status)
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s", row[5]);	/* alert error */
+
+		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
+	}
 	DBfree_result(result);
 
 	if (NULL != escalation && escalation->r_eventid == event->eventid)
