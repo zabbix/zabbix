@@ -71,6 +71,13 @@ class CScreenBuilder {
 	public $profileIdx2;
 
 	/**
+	 * Is profile will be updated
+	 *
+	 * @var boolean
+	 */
+	public $updateProfile;
+
+	/**
 	 * Time control timeline
 	 *
 	 * @var array
@@ -89,6 +96,7 @@ class CScreenBuilder {
 	 * @param int		$options['stime']
 	 * @param string	$options['profileIdx']
 	 * @param int		$options['profileIdx2']
+	 * @param boolean	$options['updateProfile']
 	 * @param array		$options['screen']
 	 */
 	public function __construct(array $options = array()) {
@@ -131,10 +139,12 @@ class CScreenBuilder {
 		// calculate time
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
+		$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
 
 		$this->timeline = CScreenBase::calculateTime(array(
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
+			'updateProfile' => $this->updateProfile,
 			'period' => !empty($options['period']) ? $options['period'] : null,
 			'stime' => !empty($options['stime']) ? $options['stime'] : null
 		));
@@ -149,10 +159,6 @@ class CScreenBuilder {
 	 * @param int		$options['resourcetype']
 	 * @param int		$options['screenitemid']
 	 * @param int		$options['hostid']
-	 * @param int		$options['period']
-	 * @param int		$options['stime']
-	 * @param string	$options['profileIdx']
-	 * @param int		$options['profileIdx2']
 	 *
 	 * @return CScreenBase
 	 */
@@ -381,6 +387,7 @@ class CScreenBuilder {
 						'hostid' => $this->hostid,
 						'profileIdx' => $this->profileIdx,
 						'profileIdx2' => $this->profileIdx2,
+						'updateProfile' => $this->updateProfile,
 						'timeline' => $this->timeline,
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem

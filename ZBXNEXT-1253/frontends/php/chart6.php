@@ -68,6 +68,7 @@ $host = reset($db_data['hosts']);
 $timeline = CScreenBase::calculateTime(array(
 	'profileIdx' => get_request('profileIdx', 'web.screens'),
 	'profileIdx2' => get_request('screenid', get_request('graphid')),
+	'updateProfile' => get_request('updateProfile', true),
 	'period' => get_request('period'),
 	'stime' => get_request('stime')
 ));

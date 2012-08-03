@@ -55,7 +55,8 @@ class CScreenSimpleGraph extends CScreenBase {
 		}
 
 		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($resourceid)) {
-			$this->action = 'history.php?action=showgraph&itemid='.$resourceid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
+			$this->action = 'history.php?action=showgraph&itemid='.$resourceid.'&period='.$this->timeline['period'].
+					'&stime='.$this->timeline['stimeNow'].'&updateProfile='.zbx_toString($this->updateProfile);
 		}
 
 		if (!zbx_empty($resourceid) && $this->mode != SCREEN_MODE_EDIT) {
@@ -84,7 +85,8 @@ class CScreenSimpleGraph extends CScreenBase {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow']);
+				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].
+						'&stime='.$this->timeline['stimeNow'].'&updateProfile='.zbx_toString($this->updateProfile));
 			}
 			$item->setAttribute('id', $containerid);
 

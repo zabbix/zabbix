@@ -61,7 +61,7 @@ class CScreenChart extends CScreenBase {
 			$scrollWidthByImage = 1;
 			$src = 'chart2.php';
 		}
-		$src .= '?graphid='.$this->graphid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
+		$src .= '?graphid='.$this->graphid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.zbx_toString($this->updateProfile);
 
 		$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($this->graphid));
 

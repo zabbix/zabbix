@@ -180,7 +180,8 @@ switch ($data['method']) {
 			'period' => !empty($data['period']) ? $data['period'] : null,
 			'stime' => !empty($data['stime']) ? $data['stime'] : null,
 			'profileIdx' => !empty($data['profileIdx']) ? $data['profileIdx'] : null,
-			'profileIdx2' => !empty($data['profileIdx2']) ? $data['profileIdx2'] : null
+			'profileIdx2' => !empty($data['profileIdx2']) ? $data['profileIdx2'] : null,
+			'updateProfile' => isset($data['updateProfile']) ? $data['updateProfile'] : null
 		);
 		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
 			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;

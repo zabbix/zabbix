@@ -60,6 +60,7 @@ if (empty($dbItems)) {
 $timeline = CScreenBase::calculateTime(array(
 	'profileIdx' => get_request('profileIdx', 'web.item.graph'),
 	'profileIdx2' => get_request('itemid'),
+	'updateProfile' => get_request('updateProfile', true),
 	'period' => get_request('period'),
 	'stime' => get_request('stime')
 ));

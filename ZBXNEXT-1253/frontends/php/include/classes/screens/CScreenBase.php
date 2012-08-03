@@ -98,6 +98,11 @@ class CScreenBase {
 	public $profileIdx2;
 
 	/**
+	 * @see CScreenBuilder::updateProfile
+	 */
+	public $updateProfile;
+
+	/**
 	 * Time control dom element id
 	 *
 	 * @var string
@@ -121,6 +126,7 @@ class CScreenBase {
 	 * @param int		$options['stime']
 	 * @param string	$options['profileIdx']
 	 * @param int		$options['profileIdx2']
+	 * @param boolean	$options['updateProfile']
 	 * @param array		$options['timeline']
 	 * @param string	$options['dataId']
 	 */
@@ -145,11 +151,13 @@ class CScreenBase {
 		// calculate timeline
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
+		$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
 		$this->timeline = !empty($options['timeline']) ? $options['timeline'] : null;
 		if (empty($this->timeline)) {
 			$this->timeline = $this->calculateTime(array(
 				'profileIdx' => $this->profileIdx,
 				'profileIdx2' => $this->profileIdx2,
+				'updateProfile' => $this->updateProfile,
 				'period' => !empty($options['period']) ? $options['period'] : null,
 				'stime' => !empty($options['stime']) ? $options['stime'] : null
 			));
@@ -254,6 +262,7 @@ class CScreenBase {
 			'timeline' => $this->timeline,
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
+			'updateProfile' => $this->updateProfile,
 			'data' => !empty($data) ? $data : null
 		);
 
@@ -268,15 +277,15 @@ class CScreenBase {
 	 * @param array		$options
 	 * @param string	$options['profileIdx']
 	 * @param int		$options['profileIdx2']
+	 * @param boolean	$options['updateProfile']
 	 * @param int		$options['period']
 	 * @param string	$options['stime']
-	 * @param boolean	$options['doUpdate']
 	 *
 	 * @return array
 	 */
 	public static function calculateTime(array $options = array()) {
-		if (!array_key_exists('doUpdate', $options)) {
-			$options['doUpdate'] = true;
+		if (!array_key_exists('updateProfile', $options)) {
+			$options['updateProfile'] = true;
 		}
 		if (empty($options['profileIdx2'])) {
 			$options['profileIdx2'] = 0;
@@ -300,7 +309,7 @@ class CScreenBase {
 				$options['period'] = ZBX_MAX_PERIOD;
 			}
 		}
-		if ($options['doUpdate'] && !empty($options['profileIdx'])) {
+		if ($options['updateProfile'] && !empty($options['profileIdx'])) {
 			CProfile::update($options['profileIdx'].'.period', $options['period'], PROFILE_TYPE_INT, $options['profileIdx2']);
 		}
 
@@ -322,7 +331,7 @@ class CScreenBase {
 				$isNow = false;
 			}
 
-			if ($options['doUpdate'] && !empty($options['profileIdx'])) {
+			if ($options['updateProfile'] && !empty($options['profileIdx'])) {
 				CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
 				CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
 			}
@@ -335,7 +344,7 @@ class CScreenBase {
 					$usertime = date('YmdHis', $time);
 					$stimeNow = date('YmdHis', zbxDateToTime($options['stime']) + 31536000); // 31536000 = 86400 * 365 = 1 year
 
-					if ($options['doUpdate']) {
+					if ($options['updateProfile']) {
 						CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
 					}
 				}
@@ -351,7 +360,7 @@ class CScreenBase {
 				$stimeNow = date('YmdHis', zbxDateToTime($options['stime']) + 31536000); // 31536000 = 86400 * 365 = 1 year
 				$isNow = true;
 
-				if ($options['doUpdate'] && !empty($options['profileIdx'])) {
+				if ($options['updateProfile'] && !empty($options['profileIdx'])) {
 					CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
 					CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
 				}
@@ -373,11 +382,13 @@ class CScreenBase {
 	 *
 	 * @static
 	 *
-	 * @param array		$time
+	 * @param array		$options
 	 * @param int		$options['period']
 	 * @param string	$options['stime']
+	 * @param string	$options['stimeNow']
 	 * @param string	$options['starttime']
 	 * @param string	$options['usertime']
+	 * @param boolean	$options['isNow']
 	 */
 	public static function debugTime(array $time = array()) {
 		echo 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
