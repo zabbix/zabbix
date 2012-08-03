@@ -148,7 +148,11 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	DC_ITEM		item;
 	int             (*function)();
 
+#ifdef HAVE_SSH2
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
+#else
+	assert(ZBX_SCRIPT_TYPE_TELNET == script->type);
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -176,18 +180,20 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		goto fail;
 	}
 
+#ifdef HAVE_SSH2
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
 		item.key = zbx_dsprintf(item.key, "ssh.run[,,%s]", script->port);
-#ifdef HAVE_SSH2
 		function = get_value_ssh;
-#endif
 	}
 	else
 	{
+#endif
 		item.key = zbx_dsprintf(item.key, "telnet.run[,,%s]", script->port);
 		function = get_value_telnet;
+#ifdef HAVE_SSH2
 	}
+#endif
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	item.params = zbx_strdup(item.params, script->command);
 
@@ -342,15 +348,24 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 		case ZBX_SCRIPT_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
 			if (SUCCEED == (ret = zbx_execute_ipmi_command(host, script->command, error, max_error_len)))
+			{
 				if (NULL != result)
 					*result = zbx_strdup(*result, "IPMI command successfully executed");
+			}
+#else
+			zbx_strlcpy(error, "Support for IPMI commands was not compiled in", max_error_len);
 #endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
+#ifdef HAVE_SSH2
 			substitute_simple_macros(NULL, NULL, host, NULL, &script->publickey,
 					MACRO_TYPE_ITEM_FIELD, NULL, 0);
 			substitute_simple_macros(NULL, NULL, host, NULL, &script->privatekey,
 					MACRO_TYPE_ITEM_FIELD, NULL, 0);
+#else
+			zbx_strlcpy(error, "Support for SSH script was not compiled in", max_error_len);
+			break;
+#endif
 		case ZBX_SCRIPT_TYPE_TELNET:
 			substitute_simple_macros(NULL, NULL, host, NULL, &script->username,
 					MACRO_TYPE_ITEM_FIELD, NULL, 0);

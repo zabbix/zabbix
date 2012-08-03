@@ -495,22 +495,10 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 					script.execute_on = (unsigned char)atoi(row[4]);
 					break;
-#ifndef HAVE_OPENIPMI
-				case ZBX_SCRIPT_TYPE_IPMI:
-					zbx_strlcpy(error, "support for IPMI commands was not compiled in", sizeof(error));
-					rc = FAIL;
-					break;
-#endif
 				case ZBX_SCRIPT_TYPE_SSH:
-#ifndef HAVE_SSH2
-					zbx_strlcpy(error, "Support for SSH scripts was not compiled in", sizeof(error));
-					rc = FAIL;
-					break;
-#else
 					script.authtype = (unsigned char)atoi(row[6]);
 					script.publickey = zbx_strdup(script.publickey, row[9]);
 					script.privatekey = zbx_strdup(script.privatekey, row[10]);
-#endif
 				case ZBX_SCRIPT_TYPE_TELNET:
 					script.port = zbx_strdup(script.port, row[5]);
 					script.username = zbx_strdup(script.username, row[7]);
@@ -521,8 +509,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 					break;
 			}
 
-			if (SUCCEED == rc)
-				rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
+			rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
 		}
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);

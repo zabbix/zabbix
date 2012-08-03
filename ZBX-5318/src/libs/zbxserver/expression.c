@@ -1429,14 +1429,15 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 			}
 		}
 		else
+		{
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s %s \"%s\"",
-					row[3],				/* media type description */
-					row[4],				/* send to */
-					zbx_user_string(userid));	/* alert user */
+					SUCCEED == DBis_null(row[3]) ? "" : row[3],	/* media type description */
+					row[4],						/* send to */
+					zbx_user_string(userid));			/* alert user */
+		}
 
 		if (ALERT_STATUS_FAILED == status)
-			/* alert error */
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s", row[5]);
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s", row[5]);	/* alert error */
 
 		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
 	}
