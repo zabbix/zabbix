@@ -1,7 +1,7 @@
 Changes for 2.0.3rc1
 
 New features:
-
+........S. [ZBX-5318] added remote commands in expanded {ESC.HISTORY} macro (Sasha)
 A.F....... [ZBX-1357] added Chinese (Taiwan) translation; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-1357] updated German, Japanese, Latvian, Spanish and Russian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-583] added the maintenance filter to the trigger status page (Pavels)

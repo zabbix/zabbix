@@ -2645,6 +2645,30 @@ const char	*zbx_nodetype_string(unsigned char nodetype)
 	}
 }
 
+const char	*zbx_alert_type_string(unsigned char type)
+{
+	switch (type)
+	{
+		case ALERT_TYPE_MESSAGE:
+			return "message";
+		default:
+			return "script";
+	}
+}
+
+const char	*zbx_alert_status_string(unsigned char type, unsigned char status)
+{
+	switch (status)
+	{
+		case ALERT_STATUS_SENT:
+			return (ALERT_TYPE_MESSAGE == type ? "sent" : "executed");
+		case ALERT_STATUS_NOT_SENT:
+			return "in progress";
+		default:
+			return "failed";
+	}
+}
+
 const char	*zbx_escalation_status_string(unsigned char status)
 {
 	switch (status)
