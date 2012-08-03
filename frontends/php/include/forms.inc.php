@@ -1241,11 +1241,12 @@
 
 		if (!empty($data['triggerid'])) {
 			// get trigger
-			$trigger = API::Trigger()->get(array(
+			$options = array(
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => array('hostid'),
 				'triggerids' => $data['triggerid']
-			));
+			);
+			$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 			$data['trigger'] = reset($trigger);
 			if (!empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
