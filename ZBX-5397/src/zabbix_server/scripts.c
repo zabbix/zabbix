@@ -55,7 +55,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
 	{
@@ -118,7 +118,7 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
 	{
@@ -171,7 +171,8 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	item.privatekey = script->privatekey;
 	item.password = script->password;
 
-	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &script->port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
+			&script->port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
 	if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
 	{
@@ -351,15 +352,15 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 					*result = zbx_strdup(*result, "IPMI command successfully executed");
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->publickey,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->privatekey,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 		case ZBX_SCRIPT_TYPE_TELNET:
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->username,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->password,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 			ret = zbx_execute_script_on_terminal(host, script, result, error, max_error_len);
 			break;
@@ -373,8 +374,8 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 
 			if (SUCCEED == check_script_permissions(groupid, host->hostid, error, max_error_len))
 			{
-				substitute_simple_macros(NULL, NULL, host, NULL, &script->command,
-						MACRO_TYPE_SCRIPT, NULL, 0);
+				substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+						&script->command, MACRO_TYPE_SCRIPT, NULL, 0);
 
 				ret = zbx_execute_script(host, script, result, error, max_error_len);	/* recursion */
 			}

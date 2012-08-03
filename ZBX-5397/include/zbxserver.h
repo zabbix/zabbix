@@ -35,19 +35,20 @@
 #define MACRO_TYPE_TRIGGER_URL		0x0010
 #define MACRO_TYPE_ITEM_KEY		0x0020
 #define MACRO_TYPE_INTERFACE_ADDR	0x0040
-#define MACRO_TYPE_INTERFACE_PORT	0x0080
-#define MACRO_TYPE_FUNCTION_PARAMETER	0x0100
-#define MACRO_TYPE_ITEM_FIELD		0x0200
-#define MACRO_TYPE_SCRIPT		0x0400
-#define MACRO_TYPE_ITEM_EXPRESSION	0x0800
-#define MACRO_TYPE_LLD_LIFETIME		0x1000
-#define MACRO_TYPE_SNMP_OID		0x2000
+#define MACRO_TYPE_INTERFACE_ADDR_DB	0x0080
+#define MACRO_TYPE_INTERFACE_PORT	0x0100
+#define MACRO_TYPE_FUNCTION_PARAMETER	0x0200
+#define MACRO_TYPE_ITEM_FIELD		0x0400
+#define MACRO_TYPE_SCRIPT		0x0800
+#define MACRO_TYPE_ITEM_EXPRESSION	0x1000
+#define MACRO_TYPE_LLD_LIFETIME		0x2000
+#define MACRO_TYPE_SNMP_OID		0x4000
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 
-int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host,
+int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item,
 		DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
@@ -57,7 +58,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
 void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row);
-int	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type,
+int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *jp_row, int macro_type,
 		char *error, size_t mexerrlen);
 
 #endif
