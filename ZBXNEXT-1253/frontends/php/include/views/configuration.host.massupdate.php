@@ -186,20 +186,36 @@ $hostFormList->addRow(
 	$inventoryModesComboBox
 );
 
+$hostInventoryTable = DB::getSchema('host_inventory');
 if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-	foreach ($this->data['inventories'] as $field => $caption) {
-		$caption = $caption['title'];
+	foreach ($this->data['inventories'] as $field => $fieldInfo) {
 		if (!isset($this->data['host_inventory'][$field])) {
 			$this->data['host_inventory'][$field] = '';
 		}
 
+		if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT) {
+			$fieldInput = new CTextArea('host_inventory['.$field.']', $this->data['host_inventory'][$field]);
+			$fieldInput->addStyle('width: 64em;');
+		}
+		else {
+			$fieldLength = $hostInventoryTable['fields'][$field]['length'];
+			$fieldInput = new CTextBox('host_inventory['.$field.']', $this->data['host_inventory'][$field]);
+			$fieldInput->setAttribute('maxlength', $fieldLength);
+			$fieldInput->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
+		}
+
 		$hostFormList->addRow(
 			array(
-				$caption,
+				$fieldInfo['title'],
 				SPACE,
-				new CVisibilityBox('visible['.$field.']', isset($this->data['visible'][$field]), 'host_inventory['.$field.']', _('Original'))
+				new CVisibilityBox(
+					'visible['.$field.']',
+					isset($this->data['visible'][$field]),
+					'host_inventory['.$field.']',
+					_('Original')
+				)
 			),
-			new CTextBox('host_inventory['.$field.']', $this->data['host_inventory'][$field], ZBX_TEXTBOX_STANDARD_SIZE)
+			$fieldInput
 		);
 	}
 }

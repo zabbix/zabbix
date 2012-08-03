@@ -11,7 +11,7 @@ DELETE FROM hosts_groups
 		LEFT OUTER JOIN (
 			SELECT MIN(hg2.hostgroupid) AS hostgroupid
 			FROM hosts_groups hg2
-			GROUP BY hostid,groupid
+			GROUP BY hg2.hostid,hg2.groupid
 		) keep_rows ON
 			hg1.hostgroupid=keep_rows.hostgroupid
 		WHERE keep_rows.hostgroupid IS NULL

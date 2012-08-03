@@ -20,7 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "threads.h"
-#include "stats.h"
+#include "perfstat.h"
 #include "log.h"
 
 int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -32,13 +32,13 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (!PERF_COLLECTOR_STARTED(collector))
+	if (SUCCEED != perf_collector_started())
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started!");
 		return ret;
 	}
 
-	for (perfs = collector->perfs.pPerfCounterList; NULL != perfs; perfs = perfs->next)
+	for (perfs = ppsd.pPerfCounterList; NULL != perfs; perfs = perfs->next)
 	{
 		if (NULL != perfs->name && 0 == strcmp(perfs->name, param))
 		{
@@ -95,13 +95,13 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	if (1 < interval)
 	{
-		if (!PERF_COLLECTOR_STARTED(collector))
+		if (SUCCEED != perf_collector_started())
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started!");
 			goto clean;
 		}
 
-		for (perfs = collector->perfs.pPerfCounterList; NULL != perfs; perfs = perfs->next)
+		for (perfs = ppsd.pPerfCounterList; NULL != perfs; perfs = perfs->next)
 		{
 			if (0 == strcmp(perfs->counterpath, counterpath) && perfs->interval == interval)
 			{
