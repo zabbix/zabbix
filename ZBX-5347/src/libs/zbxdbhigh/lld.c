@@ -1503,9 +1503,9 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_graph                                                 *
+ * Function: DBlld_graph_exists                                               *
  *                                                                            *
- * Purpose: add or update graph                                               *
+ * Purpose: check if graph exists                                             *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1688,6 +1688,8 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 		DBget_graphitems(sql, &graph->del_gitems, &del_gitems_alloc, &graph->del_gitems_num);
 
+		/* Run through graph items that must exist removing them from */
+		/* del_items. What's left in del_items will be removed later. */
 		for (i = 0; i < graph->gitems_num; i++)
 		{
 			if (NULL != (gitem = bsearch(&graph->gitems[i].itemid, graph->del_gitems, graph->del_gitems_num,
