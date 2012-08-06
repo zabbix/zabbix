@@ -548,7 +548,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 				if ($dynamic == SCREEN_DYNAMIC_ITEM && isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0) {
 					$hosts = API::Host()->get(array(
 						'hostids' => $_REQUEST['hostid'],
-						'output' => array('hostid', 'host')
+						'output' => array('hostid', 'name')
 					));
 					$host = reset($hosts);
 
@@ -611,7 +611,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 							$url->setArgument('items['.$gitem['itemid'].']['.$name.']', $value);
 						}
 					}
-					$url->setArgument('name', $host['host'].': '.$graph['name']);
+					$url->setArgument('name', $host['name'].': '.$graph['name']);
 					$url = $url->getUrl();
 				}
 
