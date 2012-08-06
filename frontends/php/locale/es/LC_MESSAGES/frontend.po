@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-06 11:03+0300\n"
-"PO-Revision-Date: 2012-07-31 21:46+0200\n"
+"POT-Creation-Date: 2012-08-06 11:04+0300\n"
+"PO-Revision-Date: 2012-08-06 09:58+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" debe estar entre 1970.01.01 y 2038.01.18."
 
 #: include/profiles.inc.php:287
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -665,11 +665,11 @@ msgstr "En (horas:minutos)"
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Debe seleccionarse por lo menos un servidor o un grupo."
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Ha de existir al menos una ventana de mantenimiento."
 
 #: include/classes/class.frontendsetup.php:291
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -1502,7 +1502,7 @@ msgstr "No se puede habilitar el tipo de medio"
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No se pudo encontrar la imagen de fondo \"%1$s\" utilizada en el mapa \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1664
@@ -1546,12 +1546,12 @@ msgstr "No se pudo encontrar el interfaz del servidor en \"%1$s\" para el ítem 
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No se pudo encontrar el icono \"%1$s\" utilizado en el mapa \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No se pudo encontrar el mapa de icono \"%1$s\" utilizado en el mapa \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1677
@@ -1568,7 +1568,7 @@ msgstr "No se pudo encontrar el mapa \"%1$s\" utilizado en el mapa exportado \"%
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No se pudo encontrar el mapa \"%1$s\" utilizado en el mapa \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
@@ -1591,7 +1591,7 @@ msgstr "No se puede encontrar pantalla \"%1$s\" usada en pantalla \"%2$s\"."
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No se pudo encontrar el iniciador \"%1$s\" utilizado en el mapa \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:227
 #, php-format
@@ -2713,7 +2713,7 @@ msgstr "D"
 
 #: include/defines.inc.php:886
 msgid "D, d M Y H:i:s O"
-msgstr ""
+msgstr "D, d M Y H:i:s O"
 
 #: dashconf.php:112
 msgid "DASHBOARD CONFIGURATION"
@@ -2860,7 +2860,7 @@ msgstr "Fecha HW mantenimiento expira"
 
 #: include/hosts.inc.php:320
 msgid "Date HW purchased"
-msgstr ""
+msgstr "Fecha HW compra"
 
 #: include/forms.inc.php:1582 report3.php:127 report4.php:138 report5.php:45
 #: tr_status.php:208 tr_status.php:210
@@ -3852,7 +3852,7 @@ msgstr ""
 
 #: api/classes/CUserMacro.php:890
 msgid "Empty macro."
-msgstr ""
+msgstr "Macro vacía."
 
 #: api/classes/CService.php:1110
 msgid "Empty name."
@@ -3873,19 +3873,19 @@ msgstr ""
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
-msgstr ""
+msgstr "Activar"
 
 #: include/views/administration.usergroups.list.php:137
 msgid "Enable DEBUG"
-msgstr ""
+msgstr "Activar DEPURACIÓN"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
-msgstr ""
+msgstr "Activar confirmación"
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
-msgstr ""
+msgstr "¿Activar modo depuración en los grupos seleccionados?"
 
 #: include/views/administration.general.gui.edit.php:41
 msgid "Enable event acknowledges"
@@ -3893,11 +3893,11 @@ msgstr ""
 
 #: include/actions.inc.php:289 include/actions.inc.php:500
 msgid "Enable host"
-msgstr ""
+msgstr "Activar servidor"
 
 #: hosts.php:803
 msgid "Enable host?"
-msgstr ""
+msgstr "¿Activar servidor?"
 
 #: include/views/administration.proxy.list.php:88
 msgid "Enable hosts monitored by selected proxies?"
@@ -3919,41 +3919,41 @@ msgstr "Activar"
 
 #: include/views/configuration.httpconf.list.php:130
 msgid "Enable selected WEB scenarios?"
-msgstr ""
+msgstr "¿Activar los escenarios WEB seleccionados?"
 
 #: include/views/configuration.action.list.php:94
 msgid "Enable selected actions?"
-msgstr ""
+msgstr "¿Activar las acciones seleccionadas?"
 
 #: include/views/configuration.application.list.php:82
 msgid "Enable selected applications?"
-msgstr ""
+msgstr "¿Activar las aplicaciones seleccionadas?"
 
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:102
 msgid "Enable selected discovery rules?"
-msgstr ""
+msgstr "¿Activar las reglas de descubrimiento seleccionadas?"
 
 #: include/views/administration.usergroups.list.php:130
 msgid "Enable selected groups?"
-msgstr ""
+msgstr "¿Activar los grupos seleccionados?"
 
 #: hosts.php:868 include/views/configuration.hostgroups.list.php:120
 msgid "Enable selected hosts?"
-msgstr ""
+msgstr "¿Activar los servidores seleccionados?"
 
 #: include/views/configuration.item.list.php:238
 #: include/views/configuration.item.prototype.list.php:105
 msgid "Enable selected items?"
-msgstr ""
+msgstr "¿Activar los ítems seleccionados?"
 
 #: include/views/administration.mediatypes.list.php:110
 msgid "Enable selected media types?"
-msgstr ""
+msgstr "¿Activar los tipos de medio seleccionados?"
 
 #: include/views/configuration.triggers.list.php:226
 msgid "Enable selected triggers?"
-msgstr ""
+msgstr "¿Activar los iniciadores seleccionados?"
 
 #: auditlogs.php:149 dashboard.php:227 dashconf.php:160
 #: include/discovery.inc.php:118 include/httptest.inc.php:45
@@ -4051,19 +4051,19 @@ msgstr ""
 
 #: dashconf.php:260
 msgid "Event acknowledging disabled"
-msgstr ""
+msgstr "Reconocimiento de eventos desactivado"
 
 #: tr_events.php:30 tr_events.php:115
 msgid "Event details"
-msgstr ""
+msgstr "Detalles del evento"
 
 #: include/triggers.inc.php:1632
 msgid "Event generation"
-msgstr ""
+msgstr "Generación de eventos"
 
 #: tr_events.php:139
 msgid "Event list [previous 20]"
-msgstr ""
+msgstr "Lista de eventos [20 anteriores]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
@@ -4123,7 +4123,7 @@ msgstr ""
 
 #: sysmap.php:191
 msgid "Expand macros"
-msgstr ""
+msgstr "Expandir macros"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Expand single problem"
@@ -4240,53 +4240,53 @@ msgstr ""
 
 #: dashboard.php:259 include/blocks.inc.php:1076
 msgid "Favourite graphs"
-msgstr ""
+msgstr "Gráficos favoritos"
 
 #: dashboard.php:273 include/blocks.inc.php:1192
 msgid "Favourite maps"
-msgstr ""
+msgstr "Mapas favoritos"
 
 #: dashboard.php:266 include/blocks.inc.php:1237
 msgid "Favourite screens"
-msgstr ""
+msgstr "Pantallas favoritas"
 
 #: include/views/monitoring.slides.php:43 slides.php:80 slides.php:87
 msgid "Favourites"
-msgstr ""
+msgstr "Favoritos"
 
 #: include/func.inc.php:219
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: include/forms.inc.php:1537 include/func.inc.php:107
 #: include/func.inc.php:236 jsLoader.php:110
 msgid "February"
-msgstr ""
+msgstr "Febrero"
 
 #: hostinventoriesoverview.php:87
 msgid "Field"
-msgstr ""
+msgstr "Campo"
 
 #: api/classes/CDRule.php:527
 msgid "Field \"druleid\" is required."
-msgstr ""
+msgstr "El campo \"druleid\" es necesario."
 
 #: api/classes/CTemplate.php:991
 msgid "Field \"host\" is mandatory"
-msgstr ""
+msgstr "El campo \"servidor\" es obligatorio"
 
 #: api/classes/CDRule.php:534
 msgid "Field \"name\" is required."
-msgstr ""
+msgstr "El campo \"nombre\" es necesario."
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr ""
+msgstr "Campo:"
 
 #: include/classes/helpers/CUploadFile.php:143
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr ""
+msgstr "El archivo es demasiado grande, el tamaño máximo de carga es %1$s bytes."
 
 #: include/classes/class.cview.php:68
 #, php-format
@@ -4309,11 +4309,11 @@ msgstr "Filtro"
 
 #: include/reports.inc.php:106
 msgid "Filter by host group"
-msgstr ""
+msgstr "Filtrar por grupo de servidores"
 
 #: tr_status.php:245
 msgid "Filter by name"
-msgstr ""
+msgstr "Filtrar por nombre"
 
 #: include/setup.inc.php:131
 msgid "Finish"
@@ -4321,16 +4321,16 @@ msgstr "Finalizar"
 
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
-msgstr ""
+msgstr "Primero"
 
 #: include/func.inc.php:1580
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "Primero"
 
 #: include/views/js/configuration.sysmaps.js.php:40
 msgid "Fit to map"
-msgstr ""
+msgstr "Ajustar al mapa"
 
 #: include/views/configuration.graph.edit.php:163
 #: include/views/configuration.graph.edit.php:221
@@ -4344,15 +4344,15 @@ msgstr ""
 
 #: profile.php:113 users.php:132
 msgid "For guest, password must be empty"
-msgstr ""
+msgstr "La contraseña del usuario invitado debe estar vacía."
 
 #: include/items.inc.php:1329 include/views/configuration.item.edit.php:201
 msgid "Formula"
-msgstr ""
+msgstr "Fórmula"
 
 #: include/forms.inc.php:1591 include/maintenances.inc.php:106
 msgid "Fourth"
-msgstr ""
+msgstr "Cuarto"
 
 #: include/locales.inc.php:49
 msgid "French (fr_FR)"
@@ -4360,7 +4360,7 @@ msgstr "Francés (fr_FR)"
 
 #: include/func.inc.php:199
 msgid "Fri"
-msgstr ""
+msgstr "Vie"
 
 #: include/forms.inc.php:1522 include/forms.inc.php:1603
 #: include/func.inc.php:128 include/func.inc.php:211
@@ -4381,11 +4381,11 @@ msgstr "Desde"
 #: include/views/administration.usergroups.list.php:49
 #: include/views/administration.users.list.php:61
 msgid "Frontend access"
-msgstr ""
+msgstr "Acceso al frontal"
 
 #: usergrps.php:225
 msgid "Frontend access updated"
-msgstr ""
+msgstr "Acceso al frontal actualizado"
 
 #: include/views/administration.users.edit.php:175
 msgid "Frontend messaging"
@@ -4394,11 +4394,11 @@ msgstr ""
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.template.edit.php:436
 msgid "Full clone"
-msgstr ""
+msgstr "Clonar todo"
 
 #: include/html.inc.php:267
 msgid "Fullscreen"
-msgstr ""
+msgstr "Pantalla completa"
 
 #: include/views/configuration.graph.edit.php:71
 #: include/views/configuration.triggers.expression.php:68 popup_bitem.php:133
@@ -4430,11 +4430,11 @@ msgstr "Modem GSM"
 #: adm.triggerseverities.php:79 adm.valuemapping.php:115
 #: adm.workingtime.php:57 include/views/administration.general.gui.edit.php:51
 msgid "GUI"
-msgstr ""
+msgstr "GUI"
 
 #: include/classes/class.cwebuser.php:41 include/classes/class.cwebuser.php:95
 msgid "GUI access disabled."
-msgstr ""
+msgstr "Acceso GUI desactivado."
 
 #: include/menu.inc.php:232
 msgid "General"
@@ -4443,7 +4443,7 @@ msgstr "Zabbix"
 #: chart4.php:180 chart5.php:201 include/classes/class.cbar.php:739
 #, php-format
 msgid "Generated in %s sec"
-msgstr ""
+msgstr "Generado en %s segs"
 
 #: include/locales.inc.php:50
 msgid "German (de_DE)"
@@ -4455,7 +4455,7 @@ msgstr "Obtener soporte"
 
 #: include/func.inc.php:550
 msgid "Giga"
-msgstr ""
+msgstr "Giga"
 
 #: include/triggers.inc.php:1902 tr_testexpr.php:36
 msgid "Given expression is not a macro"
@@ -4642,19 +4642,19 @@ msgstr "Gráficos"
 
 #: graphs.php:290
 msgid "Graphs copied"
-msgstr ""
+msgstr "Gráficos copiados"
 
 #: graphs.php:244
 msgid "Graphs deleted"
-msgstr ""
+msgstr "Gráficos eliminados"
 
 #: include/locales.inc.php:51
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Griego (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:60 sysmap.php:193
 msgid "Grid"
-msgstr ""
+msgstr "Rejilla"
 
 #: api/classes/CUserGroup.php:508 charts.php:134 events.php:295
 #: hostinventoriesoverview.php:79 hostinventories.php:93
@@ -4682,7 +4682,7 @@ msgstr "Grupo"
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
 msgid "Group \"%1$s\" does not exist."
-msgstr ""
+msgstr "El grupo \"%1$s\" no existe."
 
 #: include/classes/import/importers/CHostImporter.php:135
 #, php-format
@@ -4714,11 +4714,11 @@ msgstr "Grupo eliminado"
 
 #: include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
-msgstr ""
+msgstr "Grupo para los servidores descubiertos"
 
 #: adm.other.php:69
 msgid "Group for discovered hosts."
-msgstr ""
+msgstr "Grupo para los servidores descubiertos."
 
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
@@ -4731,7 +4731,7 @@ msgstr "Grupo actualizado"
 
 #: hostinventoriesoverview.php:80
 msgid "Grouping by"
-msgstr ""
+msgstr "Agrupar por"
 
 #: dashconf.php:217 include/reports.inc.php:540
 #: include/views/administration.users.edit.php:80
@@ -4816,7 +4816,7 @@ msgstr "Ayuda"
 
 #: include/items.inc.php:131
 msgid "Hexadecimal"
-msgstr ""
+msgstr "Hexadecimal"
 
 #: jsLoader.php:135 sysmap.php:159
 msgid "Hidden"
@@ -4829,7 +4829,7 @@ msgstr "Ocultar"
 
 #: tr_status.php:207
 msgid "Hide all"
-msgstr ""
+msgstr "Ocultar todo"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Hide disabled scenarios"
@@ -4923,12 +4923,12 @@ msgstr "Alineación horizontal"
 #: popup.php:1492 popup.php:1622 queue.php:249 report2.php:223 report5.php:60
 #: tr_status.php:174 tr_status.php:293
 msgid "Host"
-msgstr "Equipo/Plantilla"
+msgstr "Servidor"
 
 #: api/classes/CHost.php:1740
 #, php-format
 msgid "Host \"%1$s\" already exists."
-msgstr ""
+msgstr "El servidor \"%1$s\" ya existe."
 
 #: api/classes/CProxy.php:645
 #, php-format
@@ -4938,7 +4938,7 @@ msgstr ""
 #: api/classes/CTemplate.php:1004
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr ""
+msgstr "El servidor \"%s\" ya existe."
 
 #: include/classes/import/CXmlImport18.php:927
 #, php-format
@@ -4951,7 +4951,7 @@ msgstr ""
 
 #: include/actions.inc.php:53
 msgid "Host IP"
-msgstr "IP del equipo"
+msgstr "IP del servidor"
 
 #: include/forms.inc.php:1687
 msgid "Host Inventory"
@@ -5088,7 +5088,7 @@ msgstr ""
 
 #: hosts.php:321
 msgid "Host updated"
-msgstr "Equipo actualizado"
+msgstr "Servidor actualizado"
 
 #: api/classes/CHost.php:1419 api/classes/CTemplate.php:1391
 #, php-format
@@ -5099,7 +5099,7 @@ msgstr ""
 #: api/classes/CTemplate.php:1364
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
-msgstr ""
+msgstr "Ya existe un servidor con el nombre \"%s\"."
 
 #: dashconf.php:227 hostinventoriesoverview.php:81 hostinventories.php:94
 #: hosts.php:644 include/forms.inc.php:223 include/forms.inc.php:816
@@ -5114,23 +5114,23 @@ msgstr ""
 #: include/views/conf.import.php:27 popup.php:45 search.php:129 search.php:218
 #: search.php:262 search.php:282 search.php:287 search.php:303
 msgid "Hosts"
-msgstr "Equipos"
+msgstr "Servidores"
 
 #: include/views/configuration.maintenance.edit.php:159
 msgid "Hosts & Groups"
-msgstr ""
+msgstr "Servidores y grupos"
 
 #: include/classes/class.cserverinfo.php:48
 msgid "Hosts (m/n/t)"
-msgstr "Equipos (m/n/p)"
+msgstr "Servidores (m/n/p)"
 
 #: include/views/configuration.template.edit.php:195
 msgid "Hosts / templates"
-msgstr ""
+msgstr "Servidores / plantillas"
 
 #: popup.php:41
 msgid "Hosts and templates"
-msgstr ""
+msgstr "Servidores y plantillas"
 
 #: include/views/configuration.hostgroups.edit.php:59
 msgid "Hosts in"
@@ -5147,11 +5147,11 @@ msgstr "Información de los equipos"
 #: include/views/configuration.screen.constructor.edit.php:538
 #: overview.php:134
 msgid "Hosts location"
-msgstr ""
+msgstr "Ubicación de servidores"
 
 #: hosts.php:292
 msgid "Hosts updated"
-msgstr ""
+msgstr "Servidores actualizados"
 
 #: include/reports.inc.php:212 include/reports.inc.php:658
 #: include/reports.inc.php:666
@@ -5173,7 +5173,7 @@ msgstr "Caducidad para acciones y eventos"
 
 #: include/locales.inc.php:52
 msgid "Hungarian (hu_HU)"
-msgstr ""
+msgstr "Húngaro (hu_HU)"
 
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
@@ -5299,23 +5299,23 @@ msgstr "Icono"
 
 #: include/views/js/configuration.sysmaps.js.php:244
 msgid "Icon (default)"
-msgstr ""
+msgstr "Icono (por defecto)"
 
 #: include/views/js/configuration.sysmaps.js.php:265
 msgid "Icon (disabled)"
-msgstr ""
+msgstr "Icono (desactivado)"
 
 #: include/views/js/configuration.sysmaps.js.php:258
 msgid "Icon (maintenance)"
-msgstr ""
+msgstr "Icono (mantenimiento)"
 
 #: include/views/js/configuration.sysmaps.js.php:251
 msgid "Icon (problem)"
-msgstr ""
+msgstr "Icono (problema)"
 
 #: include/views/configuration.sysmap.edit.php:81
 msgid "Icon highlight"
-msgstr ""
+msgstr "Destacar icono"
 
 #: include/views/configuration.sysmap.edit.php:133
 msgid "Icon label location"
