@@ -626,9 +626,9 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 		'preservekeys' => true
 	));
 
-	$rs = API::Item()->delete($group_itemid);
+	$go_result = API::Item()->delete($group_itemid);
 
-	if ($rs) {
+	if ($go_result) {
 		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
 
@@ -996,6 +996,7 @@ else {
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
 
 	// render view
+	var_dump($_REQUEST);
 	$itemView = new CView('configuration.item.list', $data);
 	$itemView->render();
 	$itemView->show();
