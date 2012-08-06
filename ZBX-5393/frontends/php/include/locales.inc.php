@@ -72,7 +72,7 @@ function set_zbx_locales() {
  * @return array a list of possible locale names
  */
 function zbx_locale_variants($language) {
-	if (stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false) {
+	if ((stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false) || (stristr($_SERVER['SERVER_SOFTWARE'], 'win64') !== false)) {
 		return zbx_locale_variants_win($language);
 	}
 	else {
@@ -146,7 +146,8 @@ function zbx_locale_variants_win($language) {
 		'sk_sk' => 'slovak',
 		'es_es' => 'spanish',
 		'sv_se' => 'swedish',
-		'uk_ua' => 'ukrainian'
+		'uk_ua' => 'ukrainian',
+		'el_gr' => 'greek'
 	);
 	return array($winLanguageName[strtolower($language)]);
 }
