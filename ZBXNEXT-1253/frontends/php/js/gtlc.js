@@ -685,10 +685,10 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	onBarChange: function() {
+		this.updateGlobalTimeline();
+
 		this.changed = 1;
 		this.onchange(this.scrollbarid, this.timeline.timelineid, true);
-
-		this.updateGlobalTimeline();
 	},
 
 	barmousedown: function() {
@@ -1845,8 +1845,6 @@ var sbox = Class.create(CDebug, {
 		this.timeline.period(new_period);
 		this.timeline.usertime(userstarttime);
 
-		this.onchange(this.sbox_id, this.timeline.timelineid, true);
-
 		// synchronize sbox with timeline and scrollbar
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 		for (var sbid in ZBX_SCROLLBARS) {
@@ -1860,6 +1858,8 @@ var sbox = Class.create(CDebug, {
 			ZBX_SCROLLBARS[sbid].setTabInfo();
 			ZBX_SCROLLBARS[sbid].onBarChange();
 		}
+
+		this.onchange(this.sbox_id, this.timeline.timelineid, true);
 	},
 
 	onchange: function() {
