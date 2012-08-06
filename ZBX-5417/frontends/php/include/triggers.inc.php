@@ -1145,8 +1145,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name'),
-		'sortfield' => 'description',
-		'expandDescription' => true
+		'sortfield' => 'description'
 	));
 
 	// get hosts
@@ -1172,6 +1171,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
 		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
+		$trigger['description'] = CTriggerHelper::expandReferenceMacros($trigger);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
 
