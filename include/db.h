@@ -483,7 +483,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
  ******************************************************************************/
 typedef struct
 {
-	zbx_uint64_t	itemid; /* itemid should come first for correct sorting */
+	zbx_uint64_t	itemid;	/* itemid should come first for correct sorting */
 	zbx_uint64_t	gitemid;
 	char		key[ITEM_KEY_LEN * 4 + 1];
 	int		drawtype;
