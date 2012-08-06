@@ -177,7 +177,7 @@ class CMapImporter extends CImporter {
 		if (!empty($map['iconmap'])) {
 			$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
 			if (!$map['iconmapid']) {
-				throw new Exception(_s('Cannot find icon map "%1$s" for map "%2$s".', $map['iconmap']['name'], $map['name']));
+				throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".', $map['iconmap']['name'], $map['name']));
 			}
 		}
 
@@ -185,7 +185,9 @@ class CMapImporter extends CImporter {
 			$image = getImageByIdent($map['background']);
 
 			if (!$image) {
-				throw new Exception(_s('Cannot find background image for map "%1$s.', $map['name']));
+				throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
+					$map['background']['name'], $map['name']
+				));
 			}
 			$map['backgroundid'] = $image['imageid'];
 		}
@@ -197,7 +199,7 @@ class CMapImporter extends CImporter {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$selement['elementid'] = $this->referencer->resolveMap($selement['element']['name']);
 						if (!$selement['elementid']) {
-							throw new Exception(_s('Cannot find map "%1$s" used in map %2$s".',
+							throw new Exception(_s('Cannot find map "%1$s" used in map "%2$s".',
 								$selement['element']['name'], $map['name']));
 						}
 						break;
@@ -242,7 +244,7 @@ class CMapImporter extends CImporter {
 					if (!empty($selement[$element])) {
 						$image = getImageByIdent($selement[$element]);
 						if (!$image) {
-							throw new Exception(_s('Cannot find icon "%1$s" for map "%2$s".',
+							throw new Exception(_s('Cannot find icon "%1$s" used in map "%2$s".',
 								$selement[$element]['name'], $map['name']));
 						}
 						$selement[$field] = $image['imageid'];
@@ -263,7 +265,7 @@ class CMapImporter extends CImporter {
 				foreach ($link['linktriggers'] as &$linktrigger) {
 					$dbTriggers = API::Trigger()->getObjects($linktrigger['trigger']);
 					if (empty($dbTriggers)) {
-						throw new Exception(_s('Cannot find trigger "%1$s" for map "%2$s".',
+						throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
 							$linktrigger['trigger']['description'], $map['name']));
 					}
 

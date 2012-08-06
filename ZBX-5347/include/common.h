@@ -436,6 +436,7 @@ typedef enum
 	ALERT_STATUS_SENT,
 	ALERT_STATUS_FAILED
 } zbx_alert_status_t;
+const char	*zbx_alert_status_string(unsigned char type, unsigned char status);
 
 /* escalation statuses */
 typedef enum
@@ -454,6 +455,7 @@ typedef enum
 	ALERT_TYPE_MESSAGE = 0,
 	ALERT_TYPE_COMMAND
 } zbx_alert_type_t;
+const char	*zbx_alert_type_string(unsigned char type);
 
 /* item statuses */
 typedef enum

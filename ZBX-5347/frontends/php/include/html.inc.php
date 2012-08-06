@@ -411,7 +411,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Item prototypes'), 'disc_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Item prototypes'), 'disc_prototypes.php?hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['items'].')'
 				));
 			}
@@ -436,7 +436,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['triggers'].')'
 				));
 			}
@@ -461,7 +461,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Graph prototypes'), 'graphs.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Graph prototypes'), 'graphs.php?hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['graphs'].')'
 				));
 			}

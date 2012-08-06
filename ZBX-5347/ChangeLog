@@ -1,10 +1,59 @@
 Changes for 2.0.3rc1
 
+New features:
+........S. [ZBX-5318] added remote commands in expanded {ESC.HISTORY} macro (Sasha)
+A.F....... [ZBX-1357] added Chinese (Taiwan) translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated German, Japanese, Latvian, Spanish and Russian translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBXNEXT-583] added the maintenance filter to the trigger status page (Pavels)
+A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the maintenance.get method (Pavels)
+..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
+
 Bug fixes:
 ........S. [ZBX-5347] fixed creating of multiply entries in graphs based on LLD prototypes (Sasha)
+..F....... [ZBX-5257] fixed trigger prototype form not being populated with data when editing a trigger prototype (Pavels)
+A......... [ZBX-5307] added a validation rule to prevent dependencies from a trigger to a trigger inherited from it (Pavels)
+A......... [ZBX-5307] fixed inherited trigger dependencies not being validated on hosts (Pavels)
+A......... [ZBX-5307] fixed an undefined index error when importing a trigger, that depends on an unexisting trigger (Pavels)
+A......... [ZBX-5307] fixed errors when importing item prototypes without applications (Pavels)
+..F....... [ZBX-5396] fixed sorting helper function (Toms)
+..F....... [ZBX-5108] fixed undefined index errors when deleting a templated item from the list (Pavels)
+....I..... [ZBX-5125] added more validation of duplicates in upgrade patches (1.8 -> 2.0) (dimir)
+........S. [ZBX-4527] removed length limitation of the alerter script command line (Sasha)
+..F....... [ZBX-5385] fixed "service down" cells not filled in Monitoring -> Discovery with the classic theme (Toms)
+A......... [ZBX-5308] fixed trigger dependencies not being overridden by new triggers in parent templates (Toms)
+........S. [ZBX-5367] fixed assignment of elements to a maintenance mode by the timer process (Sasha)
+..F....... [ZBX-5364] added showing application and templated screen subentities when full cloning host or template (Vedmak)
+A......... [ZBX-5370] fixed errors on importing of maps (Vedmak)
+..F....... [ZBX-2771] fixed localization of popups in Monitoring->Events (Vedmak)
+..F....... [ZBX-5360] fixed editing large inventory fields in the host mass update form (Vedmak)
+..F....... [ZBX-5352] fixed displaying the "Change" column when the change for the value is non-significant (Vedmak)
+A......... [ZBX-5363] fixed importing templates which use item as min/max value in graph (Vedmak)
+A......... [ZBX-5345] fixed "group" option in the "configuration.export" method (Vedmak)
+A.F....... [ZBX-5371] unified multiple import-related error messages (Pavels)
+A......... [ZBX-5250] fixed the "macros" parameter in the host.massremove and template.massremove methods (Pavels)
+A.F....... [ZBX-5351] fixed an undefined index error when deleting maintenance time intervals (Pavels)
+A.F....... [ZBX-5351] fixed time intervals being recreated when updating maintenances (Pavels)
+..F....... [ZBX-5355] fixed translated string escaping in the map pop up menu script (Pavels)
+..F....... [ZBX-5257] changed technical host names to visible host names in several places (Pavels)
+..F....... [ZBX-5257] fixed incorrect links to parent trigger and graph prototypes in the configuration forms (Pavels)
+..F....... [ZBX-5257] fixed multiple navigation panel issues (Pavels)
+...G...... [ZBX-4430] fixed -t and -p options for Windows 2000/XP agent (Sasha)
+...G...... [ZBX-1829] improved system.uname check to support latest Windows versions (Sasha)
+...G...... [ZBX-5103] fixed compatibility of the agent with Windows 2000 (Sasha)
+....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.2
+
+2.0.2rc2 was released as 2.0.2 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.2rc2
+
+Bug fixes:
+........S. [ZBX-5031] fixed possible history syncer crash while processing JMX items (Sasha)
+........S. [ZBX-4976] fixed {HOST.CONN}, {HOST.IP) and {HOST.DNS} macro substitution for global scripts (Sasha)
+A......... [ZBX-5349] fixed graph prototypes being created with an incorrect flag (Pavels)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.2rc1
@@ -90,8 +139,6 @@ Changes for 2.0.1
 --------------------------------------------------------------------------------
 Changes for 2.0.1rc2
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-5094] removed trailing backslash from returned value {#FSNAME} by Windows agent (Sasha)
 
@@ -146,6 +193,7 @@ A......... [ZBX-5092] fixed the get method "nodeids" parameter not working in so
 .......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
 .......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
 ..F....... [ZBX-5080] fixed incorrect JavaScript parameter encoding in the map editor (Pavels)
+..F....... [ZBX-5245] fixed subfilter going out of screen when there are too many items (Toms)
 ..F....... [ZBX-4974] fixed showing of groups w/o templates when linking a template (Toms)
 ..F....... [ZBX-5096] fixed error when creating a hostgroup with too long name (Vedmak)
 ..F....... [ZBX-4985] improved hostgroup area icon layout (Vedmak)
@@ -874,6 +922,10 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.15rc1
 
+........S. [ZBX-4527] removed limitation of alerter script command line (Sasha)
+........S. [ZBX-5367] fixed assignment of elements to a maintenance mode by a timer process (Sasha)
+..F....... [ZBX-5348] fixed validation of itemid parameter for popup_bitem.php (Vedmak)
+....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
 ..F....... [ZBX-5319] fixed incorrect calculation of action escalation steps delay (Vedmak)
 A......... [ZBX-5264] fixed 'undefined variable: nodeids [api/classes/class.cscreen.php:286]' (Toms)
 ..F....... [ZBX-5316] fixed incorrect screen items can be deleted when deleting hosts (Vedmak)
