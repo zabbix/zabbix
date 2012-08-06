@@ -996,7 +996,6 @@ else {
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
 
 	// render view
-	var_dump($_REQUEST);
 	$itemView = new CView('configuration.item.list', $data);
 	$itemView->render();
 	$itemView->show();
