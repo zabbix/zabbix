@@ -828,7 +828,7 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 
 	result = DBselect(
 			"select h.hostid,h.proxy_hostid,h.host,h.name,i.itemid,i.name,i.key_,i.description"
-				",ii.ip,ii.dns,ii.useip,ii.type"
+				",ii.ip,ii.dns,ii.useip,ii.type,ii.main"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 				" join functions f on f.itemid=i.itemid"
@@ -867,21 +867,29 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 
 				if (SUCCEED != DBis_null(row[11]))	/* interface type */
 				{
-					addr = zbx_strdup(addr, row[8]);	/* ip */
-					substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
-					strscpy(dc_item.interface.ip_orig, addr);
-					zbx_free(addr);
-
-					addr = zbx_strdup(addr, row[9]);	/* dns */
-					substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
-					strscpy(dc_item.interface.dns_orig, addr);
-					zbx_free(addr);
-
+					dc_item.interface.type = (unsigned char)atoi(row[11]);
 					dc_item.interface.addr = ('1' == *row[10] ? dc_item.interface.ip_orig :
 							dc_item.interface.dns_orig);
-					dc_item.interface.type = (unsigned char)atoi(row[11]);
+
+					if ('1' != *row[12] || INTERFACE_TYPE_AGENT == dc_item.interface.type)
+					{
+						addr = zbx_strdup(addr, row[8]);	/* ip */
+						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
+								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						strscpy(dc_item.interface.ip_orig, addr);
+						zbx_free(addr);
+
+						addr = zbx_strdup(addr, row[9]);	/* dns */
+						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
+								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						strscpy(dc_item.interface.dns_orig, addr);
+						zbx_free(addr);
+					}
+					else
+					{
+						strscpy(dc_item.interface.ip_orig, row[8]);
+						strscpy(dc_item.interface.dns_orig, row[9]);
+					}
 				}
 				else
 					dc_item.interface.type = INTERFACE_TYPE_UNKNOWN;
