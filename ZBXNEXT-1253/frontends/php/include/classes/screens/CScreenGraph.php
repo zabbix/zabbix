@@ -27,7 +27,6 @@ class CScreenGraph extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		echo strval(false);
 		$this->dataId = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$resourceid = !empty($this->screenitem['real_resourceid']) ? $this->screenitem['real_resourceid'] : $this->screenitem['resourceid'];
 		$containerid = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
@@ -143,7 +142,7 @@ class CScreenGraph extends CScreenBase {
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
 				.'&legend='.$legend.'&graph3d='.$graph3d;
 			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.zbx_toString($this->updateProfile);
+				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
 			}
 		}
 		else {
@@ -160,7 +159,7 @@ class CScreenGraph extends CScreenBase {
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
 			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.zbx_toString($this->updateProfile);
+				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
 			}
 		}
 
@@ -181,7 +180,7 @@ class CScreenGraph extends CScreenBase {
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].
-						'&stime='.$this->timeline['stimeNow'].'&updateProfile='.zbx_toString($this->updateProfile));
+						'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile);
 			}
 			$item->setAttribute('id', $containerid);
 

@@ -287,6 +287,14 @@ class CScreenBase {
 		if (!array_key_exists('updateProfile', $options)) {
 			$options['updateProfile'] = true;
 		}
+		else {
+			if (is_string($options['updateProfile'])) {
+				$options['updateProfile'] = ($options['updateProfile'] == 'true');
+			}
+			elseif (is_numeric($options['updateProfile'])) {
+				$options['updateProfile'] = ($options['updateProfile'] == 1);
+			}
+		}
 		if (empty($options['profileIdx2'])) {
 			$options['profileIdx2'] = 0;
 		}

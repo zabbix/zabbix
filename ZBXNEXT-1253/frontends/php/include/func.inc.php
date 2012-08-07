@@ -1454,14 +1454,6 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	}
 }
 
-function zbx_toString($value) {
-	if (is_bool($value)) {
-		return $value ? 'true' : 'false';
-	}
-
-	return $value;
-}
-
 /**
  * Check if two arrays have same values.
  *

@@ -28,13 +28,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'itemid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-	'period' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
-	'stime' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'from' =>	array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
-	'width' =>	array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
-	'height' =>	array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
-	'border' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
+	'itemid' =>			array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
+	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
+	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
+	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
+	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
 );
 check_fields($fields);
 
