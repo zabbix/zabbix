@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../views/js/monitoring.maps.js.php';
+
 class CScreenMap extends CScreenBase {
 
 	/**
@@ -56,6 +58,6 @@ class CScreenMap extends CScreenBase {
 
 		$this->insertFlickerfreeJs();
 
-		return new CDiv($output, null, $this->getScreenId());
+		return new CDiv($output, 'map-container', $this->getScreenId());
 	}
 }

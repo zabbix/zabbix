@@ -1308,7 +1308,6 @@ var CScrollBar = Class.create(CDebug, {
 	 */
 	appendZoomLinks: function() {
 		var timeline = this.timeline.endtime() - this.timeline.starttime();
-
 		var caption = '';
 		var zooms = [3600, 7200, 10800, 21600, 43200, 86400, 604800, 1209600, 2592000, 7776000, 15552000, 31536000];
 		var links = 0;
@@ -1416,6 +1415,7 @@ var CScrollBar = Class.create(CDebug, {
 
 	setZoomLinksStyle: function() {
 		var period = this.timeline.period();
+
 		for (var i = 0; i < this.dom.linklist.length; i++) {
 			if (!isset(i, this.dom.linklist) || empty(this.dom.linklist[i])) {
 				continue;

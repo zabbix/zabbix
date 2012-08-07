@@ -149,7 +149,7 @@ class CScreenActions extends CScreenBase {
 				new CCol($status, 'top'),
 				new CCol($retries, 'top'),
 				new CCol($alert['sendto'], 'top'),
-				new CCol($message, 'top'),
+				new CCol($message, 'top pre'),
 				new CCol($error, 'wraptext top')
 			));
 		}
