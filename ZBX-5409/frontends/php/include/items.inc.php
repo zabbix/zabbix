@@ -893,12 +893,13 @@ function delete_trends_by_itemid($itemIds) {
  * value.
  *
  * @param array $item
+ * @param string $unknownString the text to be used if the item has no data
  *
  * @return string
  */
-function formatItemValue(array $item) {
+function formatItemValue(array $item, $unknownString = '-') {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
-		return '-';
+		return $unknownString;
 	}
 
 	$value = formatItemValueType($item);
