@@ -334,6 +334,9 @@ function get_screen_plaintext($itemid, $elements, $style = 0) {
 	));
 	foreach ($hData as $data) {
 		switch ($item['value_type']) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				sscanf($data['value'], '%f', $value);
+				break;
 			case ITEM_VALUE_TYPE_TEXT:
 				// do not use break
 			case ITEM_VALUE_TYPE_STR:

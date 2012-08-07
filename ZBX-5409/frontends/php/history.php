@@ -424,18 +424,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$host = reset($item['hosts']);
 
 				if(!isset($data['value'])) $data['value'] = '';
+				$value = $data['value'];
 
-				if($item['valuemapid'] > 0){
-					$value = applyValueMap($data['value'], $item['valuemapid']);
-					$value_mapped = true;
-				}
-				else{
-					$value = $data['value'];
-					$value_mapped = false;
-				}
-
-				if(($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) && !$value_mapped)
+				// convert the value to float before applying the value map
+				if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 					sscanf($data['value'], '%f', $value);
+				}
+
+				// apply value map
+				if($item['valuemapid']) {
+					$value = applyValueMap($value, $item['valuemapid']);
+				}
 
 				$table->addRow(array(
 					zbx_date2str(HISTORY_ITEM_DATE_FORMAT, $data['clock']),
