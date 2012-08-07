@@ -133,8 +133,8 @@ function zbx_locale_variants_win($language) {
 		'zh_tw' => 'chinese',
 		'cs_cz' => 'czech',
 		'nl_nl' => 'dutch',
-		'fr_fr' => 'french',
-		'de_de' => 'german',
+		'fr_fr' => array('French_France.1252', 'french'),
+		'de_de' => array('German_Germany.1252', 'german'),
 		'hu_hu' => 'hungarian',
 		'it_it' => 'italian',
 		'ko_kr' => 'korean',
@@ -149,6 +149,6 @@ function zbx_locale_variants_win($language) {
 		'uk_ua' => 'ukrainian',
 		'el_gr' => 'greek'
 	);
-	return array($winLanguageName[strtolower($language)]);
+	return is_array($winLanguageName[strtolower($language)]) ? $winLanguageName[strtolower($language)] : array($winLanguageName[strtolower($language)]);
 }
 ?>
