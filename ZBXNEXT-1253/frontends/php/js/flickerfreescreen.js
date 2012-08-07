@@ -239,7 +239,7 @@ jQuery(function($) {
 				$.when(ajaxRequest).always(function() {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
-						flickerfreeScreen.refreshProfile(id);
+						flickerfreeScreen.refreshProfile(id, ajaxUrl);
 					}
 				});
 			}
