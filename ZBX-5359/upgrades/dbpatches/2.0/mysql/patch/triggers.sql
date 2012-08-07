@@ -31,7 +31,7 @@ BEGIN
 			WHERE e.source = 0		-- EVENT_SOURCE_TRIGGERS
 				AND e.object = 0	-- EVENT_OBJECT_TRIGGER
 				AND e.value IN (0,1)	-- TRIGGER_VALUE_FALSE (OK), TRIGGER_VALUE_TRUE (PROBLEM)
-			ORDER BY e.source, e.object, e.objectid, e.clock, e.eventid, e.value
+			ORDER BY e.objectid, e.clock, e.eventid
 		);
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET n_done = 1;
 
