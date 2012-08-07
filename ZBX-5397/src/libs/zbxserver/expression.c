@@ -715,7 +715,7 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
  *                                                                            *
  * Function: DBget_interface_value                                            *
  *                                                                            *
- * Purpose: request interface value by hostid and request                     *
+ * Purpose: request interface value by hostid                                 *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -3295,6 +3295,7 @@ static void	quote_key_param(char **param, int forced)
  *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
  *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
  *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
+ *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]           *
  *           echo.sh["{$MACRO}"]     | a,b         | echo.sh["a,b"]           *
  *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
  *                                                                            *
