@@ -22,6 +22,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+...G...... [ZBX-5358] fixed converting to UTF8 of interface name in net.if.discovery check (Sasha)
 ....I..... [ZBX-5359] improved performance of MySQL patches for migrating to the 2.0 schema (Sasha)
 .......PS. [ZBX-5397] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters (Sasha)
 ..F....... [ZBX-5410] fixed displaying of a visible host name in the dynamic graphs (Sasha)
