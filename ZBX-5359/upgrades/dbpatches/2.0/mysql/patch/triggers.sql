@@ -21,7 +21,6 @@ BEGIN
 	DECLARE v_type integer;
 	DECLARE prev_triggerid bigint unsigned;
 	DECLARE prev_value integer;
-	DECLARE no_prev_event boolean;
 
 	DECLARE n_done integer DEFAULT 0;
 	DECLARE n_cur CURSOR FOR (
