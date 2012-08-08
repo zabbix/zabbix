@@ -50,7 +50,7 @@
 			var removedCount = jQuery(this).data('removedCount');
 
 			if (removedCount) {
-				return confirm(<?php echo CJs::encodeJson(_('Are you sure you want to delete')); ?> + ' ' + removedCount + ' ' + <?php echo CJs::encodeJson(('macro(s)')); ?>+'?');
+				return confirm(<?php echo CJs::encodeJson(_('Are you sure you want to delete')); ?> + ' ' + removedCount + ' ' + <?php echo CJs::encodeJson(_('macro(s)')); ?>+'?');
 			}
 		});
 	});
