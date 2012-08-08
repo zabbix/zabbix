@@ -123,12 +123,3 @@ function _xn($message, $message_plural, $num, $context) {
 	}
 }
 
-/**
- * Secure gettext print function
- *
- * @param type $msg
- */
-function GTPrint($msg) {
-	echo addslashes($msg);
-}
-
