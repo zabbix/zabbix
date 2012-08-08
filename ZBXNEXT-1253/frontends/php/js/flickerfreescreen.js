@@ -43,7 +43,7 @@ jQuery(function($) {
 			ajaxUrl.setArgument('hostid', screen.hostid);
 			ajaxUrl.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
 			ajaxUrl.setArgument('profileIdx2', !empty(screen.profileIdx2) ? screen.profileIdx2 : null);
-			ajaxUrl.setArgument('updateProfile', !empty(screen.updateProfile) ? screen.updateProfile : null);
+			ajaxUrl.setArgument('updateProfile', !empty(screen.updateProfile) ? +screen.updateProfile : null);
 			ajaxUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
 			ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 
@@ -185,7 +185,7 @@ jQuery(function($) {
 					var doId = '#' + $(this).attr('id');
 					var chartUrl = new Curl($(this).attr('src'));
 					chartUrl.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
-					chartUrl.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? screen.updateProfile : null);
+					chartUrl.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? +screen.updateProfile : null);
 					chartUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
 					chartUrl.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					chartUrl.setArgument('curtime', new CDate().getTime());
@@ -268,9 +268,9 @@ jQuery(function($) {
 				}
 			}
 
-			$('form[name='+ formName +']').append('<input type="hidden" name="period" value="' + period + '" />');
-			$('form[name='+ formName +']').append('<input type="hidden" name="stime" value="' + stime + '" />');
-			$('form[name='+ formName +']').submit();
+			$('form[name=' + formName + ']').append('<input type="hidden" name="period" value="' + period + '" />');
+			$('form[name=' + formName + ']').append('<input type="hidden" name="stime" value="' + stime + '" />');
+			$('form[name=' + formName + ']').submit();
 		},
 
 		add: function(screen) {
