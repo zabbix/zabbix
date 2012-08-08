@@ -21,6 +21,7 @@
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
 		'use strict';
+
 		if (this === void 0 || this === null) {
 			throw new TypeError();
 		}
@@ -344,7 +345,7 @@ var chkbxRange = {
 		}
 	},
 
-	submitGo: function(e){
+	submitGo: function(e) {
 		e = e || window.event;
 
 		if (this.pageGoCount > 0) {
@@ -461,7 +462,7 @@ var AudioList = {
 		this.endLoop(audiofile);
 	},
 
-	stopAll: function(e){
+	stopAll: function(e) {
 		for (var name in this.list) {
 			if (empty(this.dom[name])) {
 				continue;
@@ -674,7 +675,7 @@ var jqBlink = {
 };
 
 /*
- * ZABBIX HintBoxes
+ * HintBox class.
  */
 var hintBox = {
 
@@ -711,12 +712,20 @@ var hintBox = {
 
 	HintWraper: function(e, target, hintText, width, className) {
 		target.isStatic = false;
-		jQuery(target).bind('mouseenter', function(e, d){
-			if (d) e = d;
+
+		jQuery(target).on('mouseenter', function(e, d) {
+			if (d) {
+				e = d;
+			}
 			hintBox.showHint(e, target, hintText, width, className, false);
-		}).bind('mouseleave', function(e){
+
+		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);
+
+		}).on('remove', function(e) {
+			hintBox.deleteHint(target);
 		});
+
 		jQuery(target).removeAttr('onmouseover');
 		jQuery(target).trigger('mouseenter', e);
 	},
@@ -724,11 +733,13 @@ var hintBox = {
 	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
+
 		if (!isStatic) {
 			target.isStatic = true;
 			hintBox.showHint(e, target, hint, width, className, true);
+
 			if (resizeAfterLoad) {
-				hint.one('load', function(e){
+				hint.one('load', function(e) {
 					hintBox.positionHint(e, target);
 				});
 			}
@@ -736,11 +747,12 @@ var hintBox = {
 	},
 
 	showHint: function(e, target, hintText, width, className, isStatic) {
-		if (target.hintBoxItem) return;
+		if (target.hintBoxItem) {
+			return;
+		}
+
 		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
-
 		hintBox.positionHint(e, target);
-
 		target.hintBoxItem.show();
 	},
 
@@ -814,10 +826,18 @@ var hintBox = {
 	},
 
 	hideHint: function(e, target, hideStatic) {
-		if (target.isStatic && !hideStatic) return;
+		if (target.isStatic && !hideStatic) {
+			return;
+		}
+
+		hintBox.deleteHint(target);
+	},
+
+	deleteHint: function(target) {
 		if (target.hintBoxItem) {
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
+
 			if (target.isStatic) {
 				delete target.isStatic;
 			}
@@ -832,6 +852,7 @@ function hide_color_picker() {
 	if (!color_picker) {
 		return;
 	}
+
 	color_picker.style.zIndex = 1000;
 	color_picker.style.visibility = 'hidden';
 	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
@@ -843,6 +864,7 @@ function show_color_picker(id) {
 	if (!color_picker) {
 		return;
 	}
+
 	curr_lbl = document.getElementById('lbl_' + id);
 	curr_txt = document.getElementById(id);
 	var pos = getPosition(curr_lbl);
@@ -857,6 +879,7 @@ function create_color_picker() {
 	if (color_picker) {
 		return;
 	}
+
 	color_picker = document.createElement('div');
 	color_picker.setAttribute('id', 'color_picker');
 	color_picker.innerHTML = color_table;
@@ -974,6 +997,7 @@ function changeHatStateUI(icon, divid) {
 		'favref': divid,
 		'favstate': hat_state
 	};
+
 	send_params(params);
 }
 
@@ -997,6 +1021,7 @@ function change_hat_state(icon, divid) {
 		'favref': divid,
 		'favstate': hat_state
 	};
+
 	send_params(params);
 }
 
@@ -1031,6 +1056,7 @@ function setRefreshRate(pmasterid, dollid, interval, params) {
 	params['favobj'] = 'set_rf_rate';
 	params['favref'] = dollid;
 	params['favcnt'] = interval;
+
 	send_params(params);
 }
 
@@ -1048,6 +1074,7 @@ function switch_mute(icon) {
 		'favref': 'sound',
 		'favstate': sound_state
 	};
+
 	send_params(params);
 }
 
