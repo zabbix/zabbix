@@ -88,36 +88,36 @@ function getActionMapBySysmap($sysmap) {
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
 	$hosts = API::Host()->get(array(
-		'nodeids' => get_current_nodeid(true),
-		'hostids' => $hostids,
-		'output' => array('status'),
-		'nopermissions' => true,
-		'preservekeys' => true,
-		'selectScreens' => API_OUTPUT_COUNT,
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $hostids,
+			'output' => array('status'),
+			'nopermissions' => true,
+			'preservekeys' => true,
+			'selectScreens' => API_OUTPUT_COUNT,
 	));
 
 	foreach ($sysmap['selements'] as $elem) {
 		$back = get_png_by_selement($map_info[$elem['selementid']]);
 		$area = new CArea(
-			array(
-				$elem['x'],
-				$elem['y'],
-				$elem['x'] + imagesx($back),
-				$elem['y'] + imagesy($back)
-			),
-			'', '', 'rect'
+				array(
+						$elem['x'],
+						$elem['y'],
+						$elem['x'] + imagesx($back),
+						$elem['y'] + imagesy($back)
+				),
+				'', '', 'rect'
 		);
 		$area->addClass('menu-map');
 
 		// pop up menu
 		order_result($elem['urls'], 'name');
 		$menuData = array(
-			'urls' => array_values($elem['urls']),
-			'elementId' => $elem['elementid'],
-			'elementType' => $elem['elementtype'],
-			'scripts' => array(),
-			'hasScreens' => false,
-			'isMonitored' => false
+				'urls' => array_values($elem['urls']),
+				'elementId' => $elem['elementid'],
+				'elementType' => $elem['elementtype'],
+				'scripts' => array(),
+				'hasScreens' => false,
+				'isMonitored' => false
 		);
 		if ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$host = $hosts[$elem['elementid']];
