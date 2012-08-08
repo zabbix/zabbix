@@ -1434,6 +1434,7 @@ class CTrigger extends CTriggerGeneral {
 			$triggers[$triggerId]['dependencies'][] = $dep['dependsOnTriggerid'];
 		}
 		$this->checkDependencies($triggers);
+		$this->checkDependencyParents($triggers);
 	}
 
 	/**
@@ -1455,46 +1456,31 @@ class CTrigger extends CTriggerGeneral {
 			$depTriggerId = $dep['dependsOnTriggerid'];
 			$triggerids[$dep['triggerid']] = $dep['triggerid'];
 
-			try {
-				DB::insert('trigger_depends', array(array(
-					'triggerid_down' => $triggerId,
-					'triggerid_up' => $depTriggerId
-				)));
+			DB::insert('trigger_depends', array(array(
+				'triggerid_down' => $triggerId,
+				'triggerid_up' => $depTriggerId
+			)));
 
-				// propagate the dependencies to the child triggers
-				$childTriggers = API::getApi()->select($this->tableName(), array(
-					'output' => array('triggerid'),
-					'filter' => array(
-						'templateid' => $triggerId
-					)
-				));
-				if ($childTriggers) {
-					foreach ($childTriggers as $childTrigger) {
-						$childHostsQuery = get_hosts_by_triggerid($childTrigger['triggerid']);
-						while ($childHost = DBfetch($childHostsQuery)) {
-							$newDep = array($childTrigger['triggerid'] => $depTriggerId);
-							$newDep = replace_template_dependencies($newDep, $childHost['hostid']);
+			// propagate the dependencies to the child triggers
+			$childTriggers = API::getApi()->select($this->tableName(), array(
+				'output' => array('triggerid'),
+				'filter' => array(
+					'templateid' => $triggerId
+				)
+			));
+			if ($childTriggers) {
+				foreach ($childTriggers as $childTrigger) {
+					$childHostsQuery = get_hosts_by_triggerid($childTrigger['triggerid']);
+					while ($childHost = DBfetch($childHostsQuery)) {
+						$newDep = array($childTrigger['triggerid'] => $depTriggerId);
+						$newDep = replace_template_dependencies($newDep, $childHost['hostid']);
 
-							// if the child host is a template - propagate the dependency to the children
-							if ($childHost['status'] == HOST_STATUS_TEMPLATE) {
-								$this->addDependencies(array(array(
-									'triggerid' => $childTrigger['triggerid'],
-									'dependsOnTriggerid' => $newDep[$childTrigger['triggerid']]
-								)));
-							}
-							// if it's a host, just add the dependency
-							else {
-								DB::insert('trigger_depends', array(array(
-									'triggerid_down' => $childTrigger['triggerid'],
-									'triggerid_up' => $newDep[$childTrigger['triggerid']]
-								)));
-							}
-						}
+						$this->addDependencies(array(array(
+							'triggerid' => $childTrigger['triggerid'],
+							'dependsOnTriggerid' => $newDep[$childTrigger['triggerid']]
+						)));
 					}
 				}
-			}
-			catch(APIException $result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create dependency'));
 			}
 		}
 		return array('triggerids' => $triggerids);
@@ -1817,19 +1803,22 @@ class CTrigger extends CTriggerGeneral {
 				continue;
 			}
 
-			// trigger hosts
-			$hosts = DBFetchArray(get_hosts_by_triggerid($trigger['triggerid']));
+			// trigger templates
+			$triggerTemplates = API::Template()->get(array(
+				'output' => array('status', 'hostid'),
+				'triggerids' => $trigger['triggerid'],
+				'nopermissions' => true
+			));
 
 			// forbid dependencies from hosts to templates
-			$isTemplatedTrigger = in_array(HOST_STATUS_TEMPLATE, zbx_objectValues($hosts, 'status'));
-			if (!$isTemplatedTrigger) {
-				$templates = API::Template()->get(array(
+			if (!$triggerTemplates) {
+				$triggerDependencyTemplates = API::Template()->get(array(
 					'triggerids' => $trigger['dependencies'],
-					'output' => array('status'),
+					'output' => API_OUTPUT_SHORTEN,
 					'nopermissions' => true,
 					'limit' => 1
 				));
-				if ($templates) {
+				if ($triggerDependencyTemplates) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add dependency from a host to a template.'));
 				}
 			}
@@ -1859,27 +1848,26 @@ class CTrigger extends CTriggerGeneral {
 
 			} while (!empty($upTriggerids));
 
-			$templateids = zbx_objectValues($hosts, 'hostid');
-			$templateids = zbx_toHash($templateids);
+			// fetch all templates that are used in dependencies
+			$triggerDependencyTemplates = API::Template()->get(array(
+				'triggerids' => $trigger['dependencies'],
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+			));
+			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
 
-			$delTemplateids = array();
-			$dbDepHosts = get_hosts_by_triggerid($trigger['dependencies']);
-			while ($dephost = DBfetch($dbDepHosts)) {
-				if ($dephost['status'] == HOST_STATUS_TEMPLATE) {
-					$templates[$dephost['hostid']] = $dephost;
-					$delTemplateids[$dephost['hostid']] = $dephost['hostid'];
-				}
-			}
+			// run the check only if a templated trigger has dependencies on other templates
+			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'hostid'));
+			$tdiff = array_diff($depTemplateIds, $triggerTemplateIds);
+			if (!empty($triggerTemplateIds) && !empty($depTemplateIds) && !empty($tdiff)) {
+				$affectedTemplateIds = zbx_array_merge($triggerTemplateIds, $depTemplateIds);
 
-			$tdiff = array_diff($delTemplateids, $templateids);
-			if (!empty($templateids) && !empty($delTemplateids) && !empty($tdiff)) {
-				$tpls = zbx_array_merge($templateids, $delTemplateids);
-
+				// create a list of all hosts, that are children of the affected templates
 				$dbLowlvltpl = DBselect(
 					'SELECT DISTINCT ht.templateid,ht.hostid,h.host'.
 					' FROM hosts_templates ht,hosts h'.
 					' WHERE h.hostid=ht.hostid'.
-						' AND'.DBcondition('ht.templateid', $tpls)
+						' AND'.DBcondition('ht.templateid', $affectedTemplateIds)
 				);
 				$map = array();
 				while ($lowlvltpl = DBfetch($dbLowlvltpl)) {
@@ -1889,19 +1877,61 @@ class CTrigger extends CTriggerGeneral {
 					$map[$lowlvltpl['hostid']][$lowlvltpl['templateid']] = $lowlvltpl['host'];
 				}
 
+				// check that if some host is linked to the template, that the trigger belongs to,
+				// the host must also be linked to all of the templates, that trigger dependencies point to
 				foreach ($map as $templates) {
-					$setWithDep = false;
-
-					foreach ($templateids as $tplid) {
-						if (isset($templates[$tplid])) {
-							$setWithDep = true;
+					foreach ($triggerTemplateIds as $triggerTemplateId) {
+						// is the host linked to one of the trigger templates?
+						if (isset($templates[$triggerTemplateId])) {
+							// then make sure all of the dependency templates are also linked
+							foreach ($depTemplateIds as $depTemplateId) {
+								if (!isset($templates[$depTemplateId])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Not all templates are linked to "%s".', reset($templates))
+									);
+								}
+							}
 							break;
 						}
 					}
-					foreach ($delTemplateids as $delTplId) {
-						if (!isset($templates[$delTplId]) && $setWithDep) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all templates are linked to host "%s".', reset($templates)));
-						}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check that none of the triggers have dependencies on their children. Checks only one level of inheritance, but
+	 * since is is called on each inheritance step, also works for multiple inheritance levels.
+	 *
+	 * @throws APIException     if at least one trigger is dependant on it's child
+	 *
+	 * @param array $triggers
+	 */
+	protected function checkDependencyParents(array $triggers) {
+		// fetch all templated dependency trigger parents
+		$depTriggerIds = array();
+		foreach ($triggers as $trigger) {
+			foreach ($trigger['dependencies'] as $depTriggerId) {
+				$depTriggerIds[$depTriggerId] = $depTriggerId;
+			}
+		}
+		$parentDepTriggers = DBfetchArray(DBSelect(
+			'SELECT templateid,triggerid'.
+			' FROM triggers'.
+			' WHERE templateid>0'.
+				' AND '.DBcondition('triggerid', $depTriggerIds)
+		));
+		if ($parentDepTriggers) {
+			$parentDepTriggers = zbx_toHash($parentDepTriggers, 'triggerid');
+			foreach ($triggers as $trigger) {
+				foreach ($trigger['dependencies'] as $depTriggerId) {
+					// check if the current trigger is the parent of the dependency trigger
+					if (isset($parentDepTriggers[$depTriggerId])
+							&& $parentDepTriggers[$depTriggerId]['templateid'] == $trigger['triggerid']) {
+
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Trigger cannot be dependant on a trigger, that is inherited from it.')
+						);
 					}
 				}
 			}
