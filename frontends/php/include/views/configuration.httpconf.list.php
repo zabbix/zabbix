@@ -54,10 +54,10 @@ $httpForm->setName('scenarios');
 $httpForm->addVar('hostid', $this->data['hostid']);
 
 if (!empty($this->data['showAllApps'])) {
-	$expandLink = new CLink(new CImg('images/general/opened.gif'), '?close=1'.url_param('groupid').url_param('hostid'));
+	$expandLink = new CLink(new CImg('images/general/minus.png'), '?close=1'.url_param('groupid').url_param('hostid'));
 }
 else {
-	$expandLink = new CLink(new CImg('images/general/closed.gif'), '?open=1'.url_param('groupid').url_param('hostid'));
+	$expandLink = new CLink(new CImg('images/general/plus.png'), '?open=1'.url_param('groupid').url_param('hostid'));
 }
 
 $httpTable = new CTableInfo(_('No web scenarios defined.'));
@@ -103,10 +103,10 @@ foreach ($httpTableRows as $appid => $app_rows) {
 	$db_app = $this->data['db_apps'][$appid];
 
 	if (uint_in_array($db_app['applicationid'], $_REQUEST['applications']) || isset($this->data['showAllApps'])) {
-		$link = new CLink(new CImg('images/general/opened.gif'), '?close=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
+		$link = new CLink(new CImg('images/general/minus.png'), '?close=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
 	}
 	else {
-		$link = new CLink(new CImg('images/general/closed.gif'), '?open=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
+		$link = new CLink(new CImg('images/general/plus.png'), '?open=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
 	}
 
 	$column = new CCol(array(

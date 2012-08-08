@@ -122,7 +122,7 @@ if (isset($_REQUEST['sysmapid']) && !isset($maps[$_REQUEST['sysmapid']])) {
 }
 
 $map_wdgt = new CWidget('hat_maps');
-$table = new CTable(_('No maps defined.'), 'map');
+$table = new CTable(_('No maps defined.'), 'map map-container');
 $table->setAttribute('style', 'margin-top:4px;');
 
 $icon = $fs_icon = null;

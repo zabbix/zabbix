@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CScreen class for API.
  * @package API
@@ -135,7 +135,7 @@ class CScreen extends CZBXAPI {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT s.screenid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT s.screenid) AS rowscount');
 
 			// groupCount
 			if (!is_null($options['groupCount'])) {
@@ -304,9 +304,9 @@ class CScreen extends CZBXAPI {
 			foreach ($restrGroups as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-						&& uint_in_array($screenItem['resourcetype'], array(
-							SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-							SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_HOSTGROUP_TRIGGERS))) {
+							&& uint_in_array($screenItem['resourcetype'], array(
+								SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+								SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_HOSTGROUP_TRIGGERS))) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -316,7 +316,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrHosts as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-						&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_HOST_TRIGGERS))) {
+							&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_HOST_TRIGGERS))) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -335,7 +335,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrItems as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-						&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
+							&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -345,7 +345,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrMaps as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-						&& $screenItem['resourcetype'] == SCREEN_RESOURCE_MAP) {
+							&& $screenItem['resourcetype'] == SCREEN_RESOURCE_MAP) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -355,7 +355,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrScreens as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-						&& $screenItem['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
+							&& $screenItem['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -366,7 +366,7 @@ class CScreen extends CZBXAPI {
 			return $result;
 		}
 
-		// Adding ScreenItems
+		// adding ScreenItems
 		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
 			if (!isset($screensItems)) {
 				$screensItems = array();
@@ -376,7 +376,7 @@ class CScreen extends CZBXAPI {
 				}
 			}
 
-			foreach ($screensItems as $snum => $sitem) {
+			foreach ($screensItems as $sitem) {
 				if (!isset($result[$sitem['screenid']]['screenitems'])) {
 					$result[$sitem['screenid']]['screenitems'] = array();
 				}
@@ -552,8 +552,8 @@ class CScreen extends CZBXAPI {
 	/**
 	 * Replaces all of the screen items of the given screen with the new ones.
 	 *
-	 * @param int $screenid        The ID of the target screen
-	 * @param array $screenItems   An array of screen items
+	 * @param int $screenid			The ID of the target screen
+	 * @param array $screenItems	An array of screen items
 	 */
 	protected function replaceItems($screenid, $screenItems) {
 		$dbScreenItems = API::ScreenItem()->get(array(
