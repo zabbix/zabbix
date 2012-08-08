@@ -761,6 +761,7 @@ function make_latest_issues(array $filter = array()) {
 		'groupids' => $filter['groupids'],
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
+		'withUnacknowledgedEvents' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -876,6 +877,7 @@ function make_latest_issues(array $filter = array()) {
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'triggerids' => $trigger['triggerid'],
+			'acknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE,
