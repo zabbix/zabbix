@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CScreenItem class for API.
  * @package API
@@ -68,7 +68,6 @@ class CScreenItem extends CZBXAPI {
 			'screenitemids'	=> null,
 			'screenids'		=> null,
 			'editable'		=> null,
-			'selectScreen'	=> null, // not implemented
 			'sortfield'		=> '',
 			'sortorder'		=> '',
 			'preservekeys'	=> null,
@@ -98,11 +97,11 @@ class CScreenItem extends CZBXAPI {
 		// fetch results
 		$result = array();
 		while ($row = DBfetch($res)) {
-			// a count query, return a single result
+			// count query, return a single result
 			if ($options['countOutput'] !== null) {
 				$result = $row['rowscount'];
 			}
-			// a normal select query
+			// normal select query
 			else {
 				if ($options['preservekeys'] !== null) {
 					$result[$row['screenitemid']] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
@@ -112,6 +111,7 @@ class CScreenItem extends CZBXAPI {
 				}
 			}
 		}
+
 		return $result;
 	}
 
@@ -180,7 +180,7 @@ class CScreenItem extends CZBXAPI {
 	 * Update screen items using the given 'x' and 'y' parameters.
 	 * If the given cell is free, a new screen item will be created.
 	 *
-	 * @param array $screenItems    An array of screen items with the given X and Y coordinates
+	 * @param array $screenItems	An array of screen items with the given X and Y coordinates
 	 * @return array				An array, that contains the IDs of the updated items
 	 *								under the 'screenitemids' key
 	 */
@@ -261,7 +261,7 @@ class CScreenItem extends CZBXAPI {
 	/**
 	 * Returns true if the given screen items exist and are available for reading.
 	 *
-	 * @param array $screenItemids  An array if screen item IDs
+	 * @param array $screenItemids	An array if screen item IDs
 	 * @return boolean
 	 */
 	public function isReadable(array $screenItemids) {
@@ -285,7 +285,7 @@ class CScreenItem extends CZBXAPI {
 	/**
 	 * Returns true if the given screen items exist and are available for writing.
 	 *
-	 * @param array $screenItemids  An array if screen item IDs
+	 * @param array $screenItemids	An array if screen item IDs
 	 * @return boolean
 	 */
 	public function isWritable(array $screenItemids) {
@@ -344,8 +344,8 @@ class CScreenItem extends CZBXAPI {
 			if (!empty($options['check_duplicate_resource_in_cell']) && isset($screenItem['x']) && isset($screenItem['y'])) {
 				foreach ($dbScreenItems as $dbScreenItem) {
 					if ($dbScreenItem['screenid'] == $screenItem['screenid']
-						&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
-						&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
+							&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
+							&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exists.'));
 					}
 				}
@@ -524,4 +524,3 @@ class CScreenItem extends CZBXAPI {
 		return $sqlParts;
 	}
 }
-?>
