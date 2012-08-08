@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,16 +172,16 @@ if(isset($showAll)){
 		url_param('groupid').
 		url_param('hostid').
 		url_param('select');
-	$link = new CLink(new CImg('images/general/opened.gif'),$url);
-//		$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+	$link = new CLink(new CImg('images/general/minus.png'),$url);
+//		$link = new CLink(new CImg('images/general/minus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 }
 else{
 	$url = '?open=1'.
 		url_param('groupid').
 		url_param('hostid').
 		url_param('select');
-	$link = new CLink(new CImg('images/general/closed.gif'),$url);
-//		$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+	$link = new CLink(new CImg('images/general/plus.png'),$url);
+//		$link = new CLink(new CImg('images/general/plus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 }
 
 $table = new CTableInfo(_('No values found.'));
@@ -352,12 +352,12 @@ foreach ($db_apps as $appid => $db_app) {
 	}
 
 	if(isset($showAll)){
-		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/closed.gif');
-		else $img = new CImg('images/general/opened.gif');
+		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/plus.png');
+		else $img = new CImg('images/general/minus.png');
 	}
 	else{
-		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/opened.gif');
-		else $img = new CImg('images/general/closed.gif');
+		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/minus.png');
+		else $img = new CImg('images/general/plus.png');
 	}
 
 	if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){
@@ -524,12 +524,12 @@ foreach ($db_hosts as $hostid => $db_host) {
 	}
 
 	if(isset($showAll)){
-		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/closed.gif');
-		else $img = new CImg('images/general/opened.gif');
+		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/plus.png');
+		else $img = new CImg('images/general/minus.png');
 	}
 	else{
-		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/opened.gif');
-		else $img = new CImg('images/general/closed.gif');
+		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/minus.png');
+		else $img = new CImg('images/general/plus.png');
 	}
 
 	if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){

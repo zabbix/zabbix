@@ -291,7 +291,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function select($tableName, array $options) {
-		$limit = (isset($options['limit'])) ? $options['limit'] : null;
+		$limit = isset($options['limit']) ? $options['limit'] : null;
 
 		$sql = $this->createSelectQuery($tableName, $options);
 		$query = DBSelect($sql, $limit);

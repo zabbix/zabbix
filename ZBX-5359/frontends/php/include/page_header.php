@@ -154,6 +154,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		if (!empty($DB['DB'])) {
 			$config = select_config();
 			$css = getUserTheme(CWebUser::$data);
+
 			echo '<style type="text/css">'."\n".
 					'.disaster { background: #'.$config['severity_color_5'].' !important; }'."\n".
 					'.high { background: #'.$config['severity_color_4'].' !important; }'."\n".
@@ -476,11 +477,11 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
 	$error_msg = _n('%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s.',
-			'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s.',
-			$failedAttempts,
-			$attempip,
-			zbx_date2str(_('d M Y'), $attempdate),
-			zbx_date2str(_('H:i'), $attempdate)
+		'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s.',
+		$failedAttempts,
+		$attempip,
+		zbx_date2str(_('d M Y'), $attempdate),
+		zbx_date2str(_('H:i'), $attempdate)
 	);
 	error($error_msg);
 

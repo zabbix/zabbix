@@ -263,27 +263,21 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 		switch (strtolower($_REQUEST['output'])) {
 			case 'text':
 				return PAGE_TYPE_TEXT;
-				break;
 			case 'ajax':
 				return PAGE_TYPE_JS;
-				break;
 			case 'json':
 				return PAGE_TYPE_JSON;
-				break;
 			case 'json-rpc':
 				return PAGE_TYPE_JSON_RPC;
-				break;
 			case 'html':
 				return PAGE_TYPE_HTML_BLOCK;
-				break;
 			case 'img':
 				return PAGE_TYPE_IMAGE;
-				break;
 			case 'css':
 				return PAGE_TYPE_CSS;
-				break;
 		}
 	}
+
 	return $default;
 }
 

@@ -1,6 +1,7 @@
 Changes for 2.0.3rc1
 
 New features:
+A.F....... [ZBXNEXT-1253] implemented the flicked-free screens (Eduard)
 ........S. [ZBX-5318] added remote commands in expanded {ESC.HISTORY} macro (Sasha)
 A.F....... [ZBX-1357] added Chinese (Taiwan) translation; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-1357] updated German, Japanese, Latvian, Spanish and Russian translations; thanks to Zabbix translators (Richlv)
@@ -10,6 +11,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 
 Bug fixes:
 ....I..... [ZBX-5359] improved performance of MySQL patches for migrating to the 2.0 schema (Sasha)
+.......PS. [ZBX-5397] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters (Sasha)
 ..F....... [ZBX-5410] fixed displaying of a visible host name in the dynamic graphs (Sasha)
 ........S. [ZBX-5347] fixed creating of multiply entries in graphs based on LLD prototypes (Sasha)
 ..F....... [ZBX-5257] fixed trigger prototype form not being populated with data when editing a trigger prototype (Pavels)
