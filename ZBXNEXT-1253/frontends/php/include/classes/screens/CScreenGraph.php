@@ -42,7 +42,7 @@ class CScreenGraph extends CScreenBase {
 			// get host
 			$hosts = API::Host()->get(array(
 				'hostids' => $this->hostid,
-				'output' => array('hostid', 'host')
+				'output' => array('hostid', 'name')
 			));
 			$host = reset($hosts);
 
@@ -112,7 +112,7 @@ class CScreenGraph extends CScreenBase {
 				}
 			}
 
-			$this->screenitem['url']->setArgument('name', $host['host'].': '.$graph['name']);
+			$this->screenitem['url']->setArgument('name', $host['name'].': '.$graph['name']);
 			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
 		}
 
