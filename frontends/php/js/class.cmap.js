@@ -195,7 +195,7 @@ ZABBIX.apps.map = (function() {
 			// initialize SELECTABLE
 			this.container.selectable({
 				start: jQuery.proxy(function(event) {
-					if(!event.ctrlKey && !event.metaKey){
+					if(!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
 					}
 				}, this),
@@ -1245,7 +1245,7 @@ ZABBIX.apps.map = (function() {
 				}
 
 				if (data.elementid === '0' && data.elementtype !== '4') {
-					switch(data.elementtype){
+					switch (data.elementtype) {
 						case '0': alert('Host is not selected.');
 							return false;
 						case '1': alert('Map is not selected.');
@@ -1256,6 +1256,7 @@ ZABBIX.apps.map = (function() {
 							return false;
 					}
 				}
+
 				return data;
 			}
 		};
