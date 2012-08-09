@@ -641,7 +641,7 @@ if (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_MYSQL) {
 		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
@@ -660,7 +660,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
@@ -729,7 +729,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
