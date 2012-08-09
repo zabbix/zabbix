@@ -1135,7 +1135,20 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
-function get_triggers_overview($hostids, $view_style = null, $params = array()) {
+/**
+ * Creates and returns the trigger overview table for the given hosts.
+ *
+ * Possible $view_style values:
+ * - STYLE_TOP
+ * - STYLE_LEFT
+ *
+ * @param string|array $hostids
+ * @param int $view_style	    table display style: either hosts on top, or host on the left side
+ * @param string $screenId		the ID of the screen, that contains the trigger overview table
+ *
+ * @return CTableInfo
+ */
+function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 	if (is_null($view_style)) {
 		$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
 	}
@@ -1147,8 +1160,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name'),
-		'sortfield' => 'description',
-		'expandDescription' => true
+		'sortfield' => 'description'
 	));
 
 	// get hosts
@@ -1174,6 +1186,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
 		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
+		$trigger['description'] = CTriggerHelper::expandReferenceMacros($trigger);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
 
@@ -1212,7 +1225,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		foreach ($triggers as $description => $triggerHosts) {
 			$tableColumns = array(nbsp($description));
 			foreach ($hostNames as $hostid => $hostName) {
-				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $params));
+				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $screenId));
 			}
 			$triggerTable->addRow($tableColumns);
 		}
@@ -1236,7 +1249,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 
 			$tableColumns = array($hostSpan);
 			foreach ($triggers as $triggerHosts) {
-				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $params));
+				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $screenId));
 			}
 			$triggerTable->addRow($tableColumns);
 		}
@@ -1244,7 +1257,18 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 	return $triggerTable;
 }
 
-function get_trigger_overview_cells($triggerHosts, $hostName, $params = array()) {
+/**
+ * Creates and returns a trigger status cell for the trigger overview table.
+ *
+ * @see get_triggers_overview()
+ *
+ * @param array $triggerHosts	an array with the data about the trigger for each host
+ * @param string $hostName	the name of the cells corresponding host
+ * @param string $screenId
+ *
+ * @return CCol
+ */
+function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) {
 	$ack = null;
 	$css_class = null;
 	$desc = array();
@@ -1259,9 +1283,9 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 				if ($config['event_ack_enable'] == 1) {
 					$event = get_last_event_by_triggerid($triggerHosts[$hostName]['triggerid']);
 					if ($event) {
-						if (!empty($params['screenid'])) {
+						if ($screenId) {
 							global $page;
-							$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&screenid='.$params['screenid'].'&backurl='.$page['file']);
+							$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&screenid='.$screenId.'&backurl='.$page['file']);
 						}
 						else {
 							$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php', array('tw' => '_blank'));

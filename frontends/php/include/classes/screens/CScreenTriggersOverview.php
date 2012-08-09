@@ -33,6 +33,6 @@ class CScreenTriggersOverview extends CScreenBase {
 			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
 		}
 
-		return $this->getOutput(get_triggers_overview($hostids, $this->screenitem['style'], array('screenid' => $this->screenid)));
+		return $this->getOutput(get_triggers_overview($hostids, $this->screenitem['style'], $this->screenid));
 	}
 }
