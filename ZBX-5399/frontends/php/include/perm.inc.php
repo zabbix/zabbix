@@ -196,10 +196,9 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 		'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name,MIN(r.permission) AS permission,g.userid'.
 		' FROM groups hg'.
 			' LEFT JOIN rights r ON r.id=hg.groupid'.
-			' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid'.
+			' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid AND g.userid='.$userid.
 			' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-		' WHERE g.userid='.$userid.
-			' AND '.DBin_node('hg.groupid', $nodeid).
+		' WHERE '.DBin_node('hg.groupid', $nodeid).
 		' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid,g.userid'.
 		' ORDER BY node_name,hg.name,permission'
 	);
@@ -209,7 +208,7 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 		}
 
 		// deny if no rights defined
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			$group_data['permission'] = PERM_MAX;
 		}
 		elseif (isset($processed[$group_data['groupid']])) {
