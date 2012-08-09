@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-09 14:59+0300\n"
+"POT-Creation-Date: 2012-08-09 15:13+0300\n"
 "PO-Revision-Date: 2012-06-20 11:12+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -18,15 +18,15 @@ msgstr ""
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\"は1970.01.01から2038.01.18の間で設定してください。"
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"復旧トリガーの表示期間\"は\"0\"かそれ以上の整数を設定してください"
+msgstr "\"復旧トリガーの表示期間\"は\"0\"かそれ以上の整数を設定してください。"
 
 #: include/profiles.inc.php:291
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"トリガー変化時の点滅期間\"は\"0\"かそれ以上の整数を設定してください"
+msgstr "\"トリガー変化時の点滅期間\"は\"0\"かそれ以上の整数を設定してください。"
 
 #: include/func.inc.php:418
 #, php-format
@@ -659,11 +659,11 @@ msgstr "開始時刻 (時:分)"
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "少なくとも1つ以上のホストまたはホストグループを選択する必要があります。"
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "少なくとも1つ以上のメンテナンス期間を作成する必要があります。"
 
 #: include/classes/class.frontendsetup.php:291
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -1495,7 +1495,7 @@ msgstr "メディアタイプを有効にできません"
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されている背景画像\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1664
@@ -1539,12 +1539,12 @@ msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に�
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているアイコン\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているアイコンのマッピング\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1677
@@ -1561,7 +1561,7 @@ msgstr "エクスポートされたマップ\"%2$s\"で利用されているマ�
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているマップ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
@@ -1584,7 +1584,7 @@ msgstr "スクリーン\"%2$s\"で利用されているスクリーン\"%1$s\"�
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているトリガー\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:227
 #, php-format
@@ -1987,7 +1987,7 @@ msgstr "中国語 (zh_CN)"
 
 #: include/locales.inc.php:46
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "中国語 (zh_TW)"
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -6845,11 +6845,11 @@ msgstr "次にリンク"
 
 #: include/views/js/configuration.sysmaps.js.php:303
 msgid "Links between the selected elements"
-msgstr ""
+msgstr "選択された要素間のリンク"
 
 #: include/views/js/configuration.sysmaps.js.php:292
 msgid "Links for the selected element"
-msgstr ""
+msgstr "選択された要素のリンク"
 
 #: include/classes/class.clist.php:33
 msgid "List is empty"
@@ -7039,7 +7039,7 @@ msgstr "メンテナンス\"%s\"はすでに存在します。"
 
 #: api/classes/CMaintenance.php:484 api/classes/CMaintenance.php:597
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr ""
+msgstr "メンテナンス期間の開始時刻は終了時刻よりも大きい値を指定できません。"
 
 #: maintenance.php:107
 msgid "Maintenance added"
@@ -8343,7 +8343,7 @@ msgstr "テンプレートではないアイテム"
 #: api/classes/CTrigger.php:1906
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
-msgstr ""
+msgstr "すべてのテンプレートは\"%s\"にリンクされていません。"
 
 #: api/classes/CUser.php:449
 msgid "Not allowed to set password for user \"guest\"."
@@ -11456,7 +11456,7 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 #: include/classes/import/CConfigurationImport.php:967
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "トリガー\"%1$s\"は存在しないトリガー\"%2$s\"に依存しています。"
 
 #: api/classes/CTriggerPrototype.php:1015
 #, php-format
@@ -11486,7 +11486,7 @@ msgstr "トリガーを追加しました"
 
 #: api/classes/CTrigger.php:1949
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
-msgstr ""
+msgstr "トリガーは自身を継承したトリガーと依存関係を持つことはできません。"
 
 #: tr_comments.php:26
 msgid "Trigger comments"
@@ -12767,7 +12767,7 @@ msgstr "ヨタ"
 
 #: include/views/administration.users.edit.php:105
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
-msgstr "Webサーバーにロケールがインストールされていないため、選択した言語は利用できません。"
+msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
 
 #: api/classes/CUser.php:432
 #, php-format
@@ -13421,7 +13421,7 @@ msgstr "テンプレートID\"%1$s\"が%2$s回利用されています"
 
 #: include/func.inc.php:1673
 msgid "to"
-msgstr "to"
+msgstr ""
 
 #: api/classes/CMap.php:581
 msgid "trigger"
@@ -13440,7 +13440,7 @@ msgstr "値"
 #: jsLoader.php:91
 msgctxt "week short"
 msgid "w"
-msgstr "w"
+msgstr ""
 
 #: include/maintenances.inc.php:74
 msgid "week"
@@ -13457,7 +13457,7 @@ msgstr "整数"
 #: include/func.inc.php:441 jsLoader.php:89
 msgctxt "year short"
 msgid "y"
-msgstr "y"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:316
 #: include/classes/class.frontendsetup.php:335
@@ -13471,7 +13471,7 @@ msgstr "y"
 #: include/classes/class.frontendsetup.php:566
 #: include/classes/class.frontendsetup.php:585
 msgid "yes"
-msgstr "yes"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:52
 #: include/views/configuration.maintenance.edit.php:67
@@ -13483,4 +13483,4 @@ msgstr ""
 #: include/func.inc.php:546
 msgctxt "Micro short"
 msgid "µ"
-msgstr "µ"
+msgstr ""

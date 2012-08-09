@@ -2,23 +2,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-09 14:59+0300\n"
-"PO-Revision-Date: 2012-05-25 19:19+0200\n"
-"Last-Translator: jrprado <jrpradojunior@gmail.com>\n"
+"POT-Creation-Date: 2012-08-09 15:13+0300\n"
+"PO-Revision-Date: 2012-08-08 13:47+0200\n"
+"Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" deve estar entre 1970.01.01 e 2038.01.18."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -413,7 +413,7 @@ msgstr "Adicionar link"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Adicionar faltante"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
@@ -610,6 +610,8 @@ msgstr "Aplicações"
 msgid "Apply"
 msgstr "Aplicar"
 
+# Where on Zabbix this is used ? 
+# Can be "Aproximando" or "Aproximação"... but i need to see the context.
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
@@ -666,15 +668,15 @@ msgstr "às (horas:minutos)"
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "No mínimo um host ou grupo deverá ser selecionado."
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "No mínimo um período de manutenção deverá ser criado."
 
 #: include/classes/class.frontendsetup.php:291
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Ao menos um tipo de banco (MySQL, PostgreSQL, Oracle, SQLite3 ou IBM DB2) deverá ser suportado."
 
 #: include/menu.inc.php:270
 msgid "Audit"
@@ -777,7 +779,7 @@ msgstr "Lado do eixo"
 #: include/func.inc.php:386
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
@@ -990,7 +992,7 @@ msgstr "CONFIGURAÇÃO DE TEMPLATES"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE OPÇÕES DE EXIBIÇÃO DA TRIGGER"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:41
@@ -1132,7 +1134,7 @@ msgstr "Imagem não foi incluída"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Não foi possível adicionar a imagem."
 
 #: disc_prototypes.php:277 items.php:438 screenedit.php:180
 msgid "Cannot add item"
@@ -1140,7 +1142,7 @@ msgstr "Item não foi adicionado"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Não foi possível adicionar a macro."
 
 #: maintenance.php:108
 msgid "Cannot add maintenance"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-09 14:59+0300\n"
-"PO-Revision-Date: 2012-07-29 16:46+0200\n"
+"POT-Creation-Date: 2012-08-09 15:13+0300\n"
+"PO-Revision-Date: 2012-08-09 14:10+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -2005,7 +2005,7 @@ msgstr "Ķīniešu (zh_CN)"
 
 #: include/locales.inc.php:46
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "Ķīniešu (zh_TW)"
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -6252,7 +6252,7 @@ msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:69
 msgid "Internet Explorer"
-msgstr ""
+msgstr "Internet Explorer"
 
 #: include/forms.inc.php:861
 #: include/views/configuration.host.discovery.list.php:56
@@ -6506,7 +6506,7 @@ msgstr "Rādītāji atjaunoti"
 
 #: include/hosts.inc.php:474 include/items.inc.php:184
 msgid "JMX"
-msgstr ""
+msgstr "JMX"
 
 #: include/items.inc.php:91
 msgid "JMX agent"
@@ -6651,7 +6651,7 @@ msgstr "LDAP"
 
 #: authentication.php:185
 msgid "LDAP authentication"
-msgstr ""
+msgstr "LDAP autentifikācija"
 
 #: authentication.php:35
 #: include/views/administration.authentication.edit.php:57
@@ -6878,7 +6878,7 @@ msgstr ""
 #: include/classes/screens/CScreenHistory.php:164
 #: include/views/configuration.screen.constructor.edit.php:511
 msgid "Local time"
-msgstr ""
+msgstr "Vietējais laiks"
 
 #: include/hosts.inc.php:220
 msgid "Location"
@@ -6886,11 +6886,11 @@ msgstr "Atrašanās vieta"
 
 #: include/hosts.inc.php:225
 msgid "Location latitude"
-msgstr ""
+msgstr "Atrašanās vietas ģeogrāfiskais platums"
 
 #: include/hosts.inc.php:230
 msgid "Location longitude"
-msgstr ""
+msgstr "Atrašanās vietas ģeogrāfiskais garums"
 
 #: include/forms.inc.php:418 include/items.inc.php:111
 #: include/triggers.inc.php:2119 include/views/configuration.item.edit.php:219
@@ -6964,11 +6964,11 @@ msgstr ""
 
 #: hostinventories.php:164 include/hosts.inc.php:160
 msgid "MAC address A"
-msgstr ""
+msgstr "MAC adrese A"
 
 #: include/hosts.inc.php:165
 msgid "MAC address B"
-msgstr ""
+msgstr "MAC adrese B"
 
 #: include/maps.inc.php:652
 msgid "MAINTENANCE"
@@ -6976,11 +6976,11 @@ msgstr ""
 
 #: include/hosts.inc.php:40
 msgid "MD2"
-msgstr ""
+msgstr "MD2"
 
 #: include/hosts.inc.php:41
 msgid "MD5"
-msgstr ""
+msgstr "MD5"
 
 #: report5.php:52
 msgid "MOST BUSY TRIGGERS TOP 100"
@@ -7187,11 +7187,11 @@ msgstr ""
 
 #: include/views/monitoring.history.php:110
 msgid "Mark others"
-msgstr ""
+msgstr "Iekrāsot pārējās"
 
 #: include/views/monitoring.history.php:109
 msgid "Mark selected"
-msgstr ""
+msgstr "Iekrāsot izvēlētās"
 
 #: hosts.php:865 include/views/configuration.host.massupdate.php:225
 #: include/views/configuration.item.list.php:245
@@ -13068,15 +13068,15 @@ msgstr "un"
 
 #: include/views/monitoring.history.php:117
 msgid "as Blue"
-msgstr ""
+msgstr "zilas"
 
 #: include/views/monitoring.history.php:116
 msgid "as Green"
-msgstr ""
+msgstr "zaļas"
 
 #: include/views/monitoring.history.php:115
 msgid "as Red"
-msgstr ""
+msgstr "sarkanas"
 
 #: include/classes/class.cchart.php:1752 include/classes/class.cchart.php:1774
 #: include/graphs.inc.php:95
@@ -13269,7 +13269,7 @@ msgstr ""
 
 #: api/classes/CMap.php:582
 msgid "map"
-msgstr ""
+msgstr "karte"
 
 #: include/classes/class.cchart.php:1753 include/classes/class.cchart.php:1767
 #: include/graphs.inc.php:90
