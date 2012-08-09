@@ -143,6 +143,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 <!doctype html>
 <html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 		<title><?php echo $page_title; ?></title>
 		<meta name="Author" content="Zabbix SIA" />
 		<meta charset="utf-8" />

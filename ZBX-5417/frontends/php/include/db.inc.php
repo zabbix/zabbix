@@ -641,7 +641,7 @@ if (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_MYSQL) {
 		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
@@ -660,7 +660,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
@@ -679,8 +679,13 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
 		return ' CAST('.$field.' AS NUMBER(20)) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
-		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
@@ -698,8 +703,13 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
-		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
@@ -719,7 +729,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
