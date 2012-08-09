@@ -87,6 +87,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 
 // js templates
 require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
+require_once dirname(__FILE__).'/include/views/js/monitoring.maps.js.php';
 
 $options = array(
 	'output' => API_OUTPUT_EXTEND,
@@ -121,7 +122,7 @@ if (isset($_REQUEST['sysmapid']) && !isset($maps[$_REQUEST['sysmapid']])) {
 }
 
 $map_wdgt = new CWidget('hat_maps');
-$table = new CTable(_('No maps defined.'), 'map');
+$table = new CTable(_('No maps defined.'), 'map map-container');
 $table->setAttribute('style', 'margin-top:4px;');
 
 $icon = $fs_icon = null;
@@ -180,4 +181,4 @@ $map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, SPACE, $fs_icon));
 $map_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
+

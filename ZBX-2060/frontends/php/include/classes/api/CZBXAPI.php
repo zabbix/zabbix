@@ -291,7 +291,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function select($tableName, array $options) {
-		$limit = (isset($options['limit'])) ? $options['limit'] : null;
+		$limit = isset($options['limit']) ? $options['limit'] : null;
 
 		$sql = $this->createSelectQuery($tableName, $options);
 		$query = DBSelect($sql, $limit);
@@ -411,6 +411,8 @@ class CZBXAPI {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
 				}
 			}
+
+			$sqlParts['select'] = array_unique($sqlParts['select']);
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
@@ -607,25 +609,6 @@ class CZBXAPI {
 	protected function extendObject($tableName, array $object, array $fields) {
 		$objects = $this->extendObjects($tableName, array($object), $fields);
 		return reset($objects);
-	}
-
-	/**
-	 * Compares the fields, that are present in both objects, and returns true if any of the values differ.
-	 *
-	 * @param $existingObject
-	 * @param $newObject
-	 * @param null $tableName
-	 *
-	 * @return bool
-	 */
-	protected function objectModified($newObject, $existingObject, $tableName = null) {
-		foreach ($existingObject as $field => $value) {
-			if ($this->hasField($field, $tableName) && isset($newObject[$field]) && $value != $newObject[$field]) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
