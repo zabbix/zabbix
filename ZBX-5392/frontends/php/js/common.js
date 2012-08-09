@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 // jQuery no conflict
 if (typeof(jQuery) != 'undefined') {
@@ -36,7 +37,7 @@ function empty(obj) {
 	if (obj === false) {
 		return true;
 	}
-	if (is_string(obj) && (obj === '')) {
+	if (is_string(obj) && obj === '') {
 		return true;
 	}
 	return is_array(obj) && obj.length == 0;
@@ -72,7 +73,7 @@ function is_string(obj) {
 }
 
 function is_array(obj) {
-	return (obj != null) && (typeof obj == "object") && ('splice' in obj) && ('join' in obj);
+	return (obj != null) && (typeof obj == 'object') && ('splice' in obj) && ('join' in obj);
 }
 
 function SDI(msg) {
@@ -124,7 +125,6 @@ function SDJ(obj, name) {
 }
 
 // functions below should be sorted alphabetically
-
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
 
@@ -208,7 +208,7 @@ function checkAll(form_name, chkMain, shkName) {
 function checkLocalAll(form_name, chkMain, chkName) {
 	var frmForm = document.forms[form_name];
 
-	var checkboxes = $$('input[name='+chkName+']');
+	var checkboxes = $$('input[name=' + chkName + ']');
 	for (var i = 0; i < checkboxes.length; i++) {
 		if (isset('type', checkboxes[i]) && checkboxes[i].type == 'checkbox') {
 			checkboxes[i].checked = frmForm.elements[chkMain].checked;
@@ -344,6 +344,7 @@ function getDimensions(obj, trueSide) {
 			dim.bottom = dim.top + dim.height;
 		}
 	}
+
 	return dim;
 }
 
@@ -362,6 +363,7 @@ function getParent(obj, name) {
 function getPosition(obj) {
 	obj = $(obj);
 	var pos = {top: 0, left: 0};
+
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
 		pos.left = obj.offsetLeft;
 		pos.top = obj.offsetTop;
@@ -372,13 +374,14 @@ function getPosition(obj) {
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
 
-				if (IE && (obj.offsetParent.toString() == 'unknown')) {
+				if (IE && obj.offsetParent.toString() == 'unknown') {
 					break;
 				}
 			}
 		} catch(e) {
 		}
 	}
+
 	return pos;
 }
 
@@ -402,18 +405,18 @@ function get_bodywidth() {
 	var w2 = parseInt(document.body.offsetWidth);
 
 	if (KQ) {
-		w = (w2 < w)?w2:w;
-		w-=16;
+		w = (w2 < w) ? w2 : w;
+		w -=16;
 	}
 	else {
-		w = (w2 < w)?w2:w;
+		w = (w2 < w) ? w2 : w;
 	}
 	return w;
 }
 
 function get_cursor_position(e) {
 	e = e || window.event;
-	var cursor = {x:0, y:0};
+	var cursor = {x: 0, y: 0};
 	if (e.pageX || e.pageY) {
 		cursor.x = e.pageX;
 		cursor.y = e.pageY;
@@ -429,6 +432,7 @@ function get_cursor_position(e) {
 
 function get_scroll_pos() {
 	var scrOfX = 0, scrOfY = 0;
+
 	// netscape compliant
 	if (typeof(window.pageYOffset) == 'number') {
 		scrOfY = window.pageYOffset;
@@ -449,7 +453,7 @@ function get_scroll_pos() {
 
 function insertInElement(element_name, text, tagName) {
 	if (IE) {
-		var elems = $$(tagName+'[name='+element_name+']');
+		var elems = $$(tagName + '[name=' + element_name + ']');
 	}
 	else {
 		var elems = document.getElementsByName(element_name);
@@ -472,7 +476,7 @@ function openWinCentered(loc, winname, iwidth, iheight, params) {
 		params = ', ' + params;
 	}
 
-	var WinObjReferer = window.open(loc, winname, 'width=' + iwidth + ',height=' + iheight + ',top=' + tp + ',left=' + lf + params);
+	var WinObjReferer = window.open(loc, winname, 'width=' + iwidth + ', height=' + iheight + ', top=' + tp + ', left=' + lf + params);
 	WinObjReferer.focus();
 }
 
@@ -489,7 +493,7 @@ function PopUp(url, width, height, form_name) {
 	var left = (screen.width - (width + 150)) / 2;
 	var top = (screen.height - (height + 150)) / 2;
 
-	var popup = window.open(url, form_name, 'width=' + width + ',height=' + height + ',top=' + top + ',left=' + left + ',resizable=yes,scrollbars=yes,location=no,menubar=no');
+	var popup = window.open(url, form_name, 'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + ', resizable=yes, scrollbars=yes, location=no, menubar=no');
 	popup.focus();
 	return false;
 }
@@ -515,7 +519,7 @@ function redirect(uri, method, needle) {
 				continue;
 			}
 			if (typeof(needle) != 'undefined' && key.indexOf(needle) > -1) {
-				action += '&'+key+'='+args[key];
+				action += '&' + key + '=' + args[key];
 				continue;
 			}
 			var hInput = document.createElement('input');
@@ -526,7 +530,7 @@ function redirect(uri, method, needle) {
 			hInput.setAttribute('value', args[key]);
 		}
 
-		postForm.setAttribute('action', url.getPath()+'?'+action.substr(1));
+		postForm.setAttribute('action', url.getPath() + '?' + action.substr(1));
 		postForm.submit();
 	}
 	return false;
@@ -627,6 +631,6 @@ function switchElementsClass(obj, class1, class2) {
 	return result;
 }
 
-function zbx_throw(msg){
+function zbx_throw(msg) {
 	throw(msg);
 }

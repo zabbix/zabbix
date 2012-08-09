@@ -46,7 +46,7 @@ Cscreen.prototype = {
 		this.screen_obj = $(obj_id);
 
 		function wedge() {
-			return false
+			return false;
 		}
 
 		jQuery('.draggable').draggable({
@@ -107,17 +107,17 @@ Cscreen.prototype = {
 				var link = jQuery(element).find('.empty_change_link')[0];
 				if (link) {
 					var href = jQuery(link).attr('href');
-					href = href.replace(/\&x\=[0-9]+/,"&x="+x2);
-					href = href.replace(/\&y\=[0-9]+/,"&y="+y2);
-					jQuery(link).attr('href',href);
+					href = href.replace(/\&x\=[0-9]+/, '&x=' + x2);
+					href = href.replace(/\&y\=[0-9]+/, '&y=' + y2);
+					jQuery(link).attr('href', href);
 				}
 
 				var link = jQuery(dropDiv).find('.empty_change_link')[0];
 				if (link) {
 					var href = jQuery(link).attr('href');
-					href = href.replace(/\&x\=[0-9]+/,"&x="+x1);
-					href = href.replace(/\&y\=[0-9]+/,"&y="+y1);
-					jQuery(link).attr('href',href);
+					href = href.replace(/\&x\=[0-9]+/, '&x=' + x1);
+					href = href.replace(/\&y\=[0-9]+/, '&y=' + y1);
+					jQuery(link).attr('href', href);
 				}
 
 				element.data({ycoord: y2, xcoord: x2});

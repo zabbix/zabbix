@@ -188,6 +188,7 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
  */
 function get_accessible_triggers($perm, $hostids = array(), $cache = 1) {
 	static $available_triggers;
+
 	$userid = CWebUser::$data['userid'];
 	$nodeid = get_current_nodeid();
 	$nodeid_str = is_array($nodeid) ? implode('', $nodeid) : strval($nodeid);
@@ -214,6 +215,7 @@ function get_accessible_triggers($perm, $hostids = array(), $cache = 1) {
 	$result = zbx_toHash($result);
 
 	$available_triggers[$cache_hash] = $result;
+
 	return $result;
 }
 
@@ -1370,7 +1372,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 		}
 
 		if ($dependency) {
-			$img = new Cimg('images/general/down_icon.png', 'DEP_DOWN');
+			$img = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 			array_push($desc, $img);
@@ -1390,7 +1392,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 		}
 
 		if ($dependency) {
-			$img = new Cimg('images/general/up_icon.png', 'DEP_UP');
+			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 			array_push($desc, $img);
