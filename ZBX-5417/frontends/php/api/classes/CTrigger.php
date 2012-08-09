@@ -107,6 +107,7 @@ class CTrigger extends CTriggerGeneral {
 			// output
 			'expandData'					=> null,
 			'expandDescription'				=> null,
+			'expandExpression'				=> null,
 			'output'						=> API_OUTPUT_REFER,
 			'selectGroups'					=> null,
 			'selectHosts'					=> null,
@@ -145,6 +146,11 @@ class CTrigger extends CTriggerGeneral {
 						$fieldsToUnset[] = 'expression';
 					}
 				}
+			}
+
+			// ignore the "expandExpression" parameter if the expression is not requested
+			if ($options['expandExpression'] !== null && !str_in_array('expression', $options['output'])) {
+				$options['expandExpression'] = null;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -968,8 +974,18 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// expandDescription
-		if (!is_null($options['expandDescription'])) {
+		if (!is_null($options['expandDescription']) && array_key_exists('description', reset($result))) {
 			$result = CTriggerHelper::batchExpandDescription($result);
+		}
+
+		// expand expression
+		if ($options['expandExpression'] !== null) {
+			foreach ($result as &$trigger) {
+				if ($trigger['expression']) {
+					$trigger['expression'] = explode_exp($trigger['expression'], false, true);
+				}
+			}
+			unset($trigger);
 		}
 
 		if (!empty($fieldsToUnset)) {
