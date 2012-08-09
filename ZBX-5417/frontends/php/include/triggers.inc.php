@@ -1142,9 +1142,9 @@ function replace_template_dependencies($deps, $hostid) {
  * - STYLE_TOP
  * - STYLE_LEFT
  *
- * @param int|arary $hostids
- * @param int $view_style	table display style: either hosts on top, or host on the left side
- * @param int $screenId		the ID of the screen, that contains the trigger overview table
+ * @param string|array $hostids
+ * @param int $view_style	    table display style: either hosts on top, or host on the left side
+ * @param string $screenId		the ID of the screen, that contains the trigger overview table
  *
  * @return CTableInfo
  */
@@ -1264,7 +1264,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
  *
  * @param array $triggerHosts	an array with the data about the trigger for each host
  * @param string $hostName	the name of the cells corresponding host
- * @param int $screenId
+ * @param string $screenId
  *
  * @return CCol
  */
