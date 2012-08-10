@@ -707,19 +707,27 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
-#define zbx_free(ptr)		\
-	if (ptr)		\
-	{			\
-		free(ptr);	\
-		ptr = NULL;	\
-	}
+#define zbx_free(ptr)			\
+	do				\
+	{				\
+		if (ptr)		\
+		{			\
+			free(ptr);	\
+			ptr = NULL;	\
+		}			\
+	}				\
+	while (0)
 
-#define zbx_fclose(file)	\
-	if (file)		\
-	{			\
-		fclose(file);	\
-		file = NULL;	\
-	}
+#define zbx_fclose(file)		\
+	do				\
+	{				\
+		if (file)		\
+		{			\
+			fclose(file);	\
+			file = NULL;	\
+		}			\
+	}				\
+	while (0)
 
 #define THIS_SHOULD_NEVER_HAPPEN	zbx_error("ERROR [file:%s,line:%d] "				\
 							"Something impossible has just happened.",	\
