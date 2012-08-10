@@ -11,6 +11,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5399] fixed group list selection for super admin users (Eduard)
 ..F....... [ZBX-5417] fixed macros being expanded in trigger overview trigger names (Pavels)
 ..F....... [ZBX-5417] removed the select item key button from the LLD form (Pavels)
 ..F....... [ZBX-5389] fixed zbx_limit() function causing Monitoring->Graph not working on Oracle DB (Toms)
