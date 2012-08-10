@@ -1274,8 +1274,7 @@ class CTemplate extends CHostGeneral {
 
 		if (isset($data['groups']) && !empty($data['groups'])) {
 			$options = array('groups' => $data['groups'], 'templates' => $templates);
-			$result = API::HostGroup()->massAdd($options);
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
+			API::HostGroup()->massAdd($options);
 		}
 
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
@@ -1297,8 +1296,7 @@ class CTemplate extends CHostGeneral {
 					$hostMacrosToAdd[] = $hostMacro;
 				}
 			}
-			$result = API::UserMacro()->create($hostMacrosToAdd);
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
+			API::UserMacro()->create($hostMacrosToAdd);
 		}
 
 		return array('templateids' => zbx_objectValues($data['templates'], 'templateid'));
@@ -1571,21 +1569,20 @@ class CTemplate extends CHostGeneral {
 				'groupids' => zbx_toArray($data['groupids']),
 				'templateids' => $templateids
 			);
-			$result = API::HostGroup()->massRemove($options);
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink groups"));
+			API::HostGroup()->massRemove($options);
 		}
 
 		if (isset($data['hostids'])) {
-			$result = API::Template()->unlink($templateids, zbx_toArray($data['hostids']));
+			API::Template()->unlink($templateids, zbx_toArray($data['hostids']));
 		}
 
 		if (isset($data['templateids_clear'])) {
 			$templateidsClear = zbx_toArray($data['templateids_clear']);
-			$result = $this->unlink($templateidsClear, $data['templateids'], true);
+			$this->unlink($templateidsClear, $data['templateids'], true);
 		}
 
 		if (isset($data['templateids_unlink'])) {
-			$result = $this->unlink(zbx_toArray($data['templateids_unlink']), $templateids);
+			$this->unlink(zbx_toArray($data['templateids_unlink']), $templateids);
 		}
 
 		if (isset($data['macros'])) {

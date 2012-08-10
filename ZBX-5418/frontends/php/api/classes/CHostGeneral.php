@@ -33,7 +33,7 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * @return bool
 	 */
 	protected function link(array $templateids, array $targetids) {
-		if (empty($templateids)) return true;
+		if (empty($templateids)) return;
 
 		//check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateids);
@@ -286,8 +286,6 @@ abstract class CHostGeneral extends CZBXAPI {
 				));
 			}
 		}
-
-		return true;
 	}
 
 	/**
@@ -298,7 +296,7 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * @param null|array $targetids the IDs of the hosts to unlink the templates from
 	 * @param bool $clear           delete all of the inherited objects from the hosts
 	 *
-	 * @return bool
+	 * @return void
 	 */
 	protected function unlink($templateids, $targetids=null, $clear=false) {
 
@@ -629,8 +627,6 @@ abstract class CHostGeneral extends CZBXAPI {
 
 			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
 		}
-
-		return true;
 	}
 
 	/**

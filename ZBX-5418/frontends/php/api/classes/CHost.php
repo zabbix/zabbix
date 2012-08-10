@@ -1611,10 +1611,7 @@ class CHost extends CHostGeneral {
 				'interfaces' => $data['interfaces']
 			);
 
-			$result = API::HostInterface()->massAdd($options);
-			if (!$result) {
-				self::exception();
-			}
+			API::HostInterface()->massAdd($options);
 		}
 
 		if (isset($data['groups']) && !empty($data['groups'])) {
@@ -1624,21 +1621,15 @@ class CHost extends CHostGeneral {
 				'hosts' => $data['hosts'],
 				'groups' => $data['groups']
 			);
-			$result = API::HostGroup()->massAdd($options);
-			if (!$result) {
-				self::exception();
-			}
+			API::HostGroup()->massAdd($options);
 		}
 
 		if (!empty($data['templates'])) {
 			$data['templates'] = zbx_toArray($data['templates']);
-			$result = $this->link(
+			$this->link(
 				zbx_objectValues($data['templates'], 'templateid'),
 				zbx_objectValues($data['hosts'], 'hostid')
 			);
-			if (!$result) {
-				self::exception();
-			}
 		}
 
 		if (isset($data['macros']) && !empty($data['macros'])) {
@@ -1653,10 +1644,7 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			$result = API::UserMacro()->create($hostMacrosToAdd);
-			if (!$result) {
-				self::exception();
-			}
+			API::UserMacro()->create($hostMacrosToAdd);
 		}
 
 		return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
@@ -2034,24 +2022,15 @@ class CHost extends CHostGeneral {
 				'hostids' => $hostids,
 				'groupids' => zbx_toArray($data['groupids'])
 			);
-			$result = API::HostGroup()->massRemove($options);
-			if (!$result) {
-				self::exception();
-			}
+			API::HostGroup()->massRemove($options);
 		}
 
 		if (isset($data['templateids'])) {
-			$result = $this->unlink(zbx_toArray($data['templateids']), $hostids);
-			if (!$result) {
-				self::exception();
-			}
+			$this->unlink(zbx_toArray($data['templateids']), $hostids);
 		}
 
 		if (isset($data['templateids_clear'])) {
-			$result = $this->unlink(zbx_toArray($data['templateids_clear']), $hostids, true);
-			if (!$result) {
-				self::exception();
-			}
+			$this->unlink(zbx_toArray($data['templateids_clear']), $hostids, true);
 		}
 
 		if (isset($data['macros'])) {
@@ -2070,10 +2049,7 @@ class CHost extends CHostGeneral {
 				'hostids' => $hostids,
 				'interfaces' => zbx_toArray($data['interfaces'])
 			);
-			$result = API::HostInterface()->massRemove($options);
-			if (!$result) {
-				self::exception();
-			}
+			API::HostInterface()->massRemove($options);
 		}
 
 		return array('hostids' => $hostids);
