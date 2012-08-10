@@ -1279,13 +1279,11 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
-			$hostids = zbx_objectValues($data['hosts'], 'hostid');
-			$this->link($templateids, $hostids);
+			$this->link($templateids, zbx_objectValues($data['hosts'], 'hostid'));
 		}
 
 		if (isset($data['templates_link']) && !empty($data['templates_link'])) {
-			$templatesLinkids = zbx_objectValues($data['templates_link'], 'templateid');
-			$this->link($templatesLinkids, $templateids);
+			$this->link(zbx_objectValues($data['templates_link'], 'templateid'), $templateids);
 		}
 
 		if (isset($data['macros']) && !empty($data['macros'])) {
@@ -1481,8 +1479,8 @@ class CTemplate extends CHostGeneral {
 
 			if (!empty($hostidsToDel)) {
 				$result = $this->massRemove(array(
-					'templateids' => $hostidsToDel,
-					'templateids_unlink' => $templateids
+					'hostids' => $hostidsToDel,
+					'templateids' => $templateids
 				));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
@@ -1575,6 +1573,10 @@ class CTemplate extends CHostGeneral {
 			);
 			$result = API::HostGroup()->massRemove($options);
 			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink groups"));
+		}
+
+		if (isset($data['hostids'])) {
+			$result = API::Template()->unlink($templateids, zbx_toArray($data['hostids']));
 		}
 
 		if (isset($data['templateids_clear'])) {

@@ -1889,7 +1889,7 @@ class CHost extends CHostGeneral {
 			if (!empty($templatesToDel)) {
 				$result = $this->massRemove(array(
 					'hostids' => $hostids,
-					'templateids' => $templatesToDel
+					'templateids_unlink' => $templatesToDel
 				));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot unlink template'));
@@ -2040,8 +2040,8 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if (isset($data['templateids'])) {
-			$result = $this->unlink(zbx_toArray($data['templateids']), $hostids);
+		if (isset($data['templateids_unlink'])) {
+			$result = $this->unlink(zbx_toArray($data['templateids_unlink']), $hostids);
 			if (!$result) {
 				self::exception();
 			}
