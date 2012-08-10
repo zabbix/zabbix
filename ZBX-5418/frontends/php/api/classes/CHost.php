@@ -1608,7 +1608,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$data['templates'] = array();
-		return parent::massAdd($data);
+		parent::massAdd($data);
 
 		return array('hostids' => zbx_objectValues($hosts, 'hostid'));
 	}
@@ -1954,57 +1954,19 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * remove Hosts from HostGroups. All Hosts are removed from all HostGroups.
+	 * Additional supported $data parameters are:
+	 * - interfaces  - an array of interfaces to delete from the hosts
 	 *
 	 * @param array $data
-	 * @param array $data['hostids']
-	 * @param array $data['groupids']
-	 * @param array $data['templateids']
-	 * @param array $data['macroids']
 	 *
 	 * @return array
 	 */
-	public function massRemove($data) {
+	public function massRemove(array $data) {
 		$hostids = zbx_toArray($data['hostids']);
 
-		$options = array(
-			'hostids' => $hostids,
-			'editable' => 1,
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_SHORTEN,
-		);
-		$updHosts = $this->get($options);
-		foreach ($hostids as $hostid) {
-			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		if (isset($data['groupids'])) {
-			$options = array(
-				'hostids' => $hostids,
-				'groupids' => zbx_toArray($data['groupids'])
-			);
-			API::HostGroup()->massRemove($options);
-		}
-
-		if (isset($data['templateids'])) {
-			$this->unlink(zbx_toArray($data['templateids']), $hostids);
-		}
-
-		if (isset($data['templateids_clear'])) {
-			$this->unlink(zbx_toArray($data['templateids_clear']), $hostids, true);
-		}
-
-		if (isset($data['macros'])) {
-			$hostMacros = API::UserMacro()->get(array(
-				'hostids' => $hostids,
-				'filter' => array(
-					'macro' => $data['macros']
-				)
-			));
-			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
-			API::UserMacro()->delete($hostMacroIds);
+		// check permissions
+		if (!$this->isWritable($hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		if (isset($data['interfaces'])) {
@@ -2014,6 +1976,15 @@ class CHost extends CHostGeneral {
 			);
 			API::HostInterface()->massRemove($options);
 		}
+
+		// rename the "templates" parameter to the common "templates_link"
+		if (isset($data['templateids'])) {
+			$data['templateids_unlink'] = $data['templateids'];
+			unset($data['templateids']);
+		}
+
+		$data['templateids'] = array();
+		parent::massRemove($data);
 
 		return array('hostids' => $hostids);
 	}

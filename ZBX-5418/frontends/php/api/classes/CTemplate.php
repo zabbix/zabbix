@@ -1512,61 +1512,27 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
+	 * Additional supported $data parameters are:
+	 * - hostids  - an array of host or template IDs to unlink the given templates from
 	 *
 	 * @param array $data
-	 * @param array $data['templateids']
-	 * @param array $data['groupids']
-	 * @param array $data['macroids']
-	 * @return boolean
+	 *
+	 * @return array
 	 */
-	public function massRemove($data) {
+	public function massRemove(array $data) {
 		$templateids = zbx_toArray($data['templateids']);
 
-		$updTemplates = API::Host()->get(array(
-			'hostids' => $templateids,
-			'editable' => 1,
-			'preservekeys' => 1,
-			'templated_hosts' => true,
-		));
-
-		foreach ($templateids as $templateid) {
-			if (!isset($updTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		if (isset($data['groupids'])) {
-			$options = array(
-				'groupids' => zbx_toArray($data['groupids']),
-				'templateids' => $templateids
-			);
-			API::HostGroup()->massRemove($options);
+		// check permissions
+		if (!$this->isWritable($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		if (isset($data['hostids'])) {
 			API::Template()->unlink($templateids, zbx_toArray($data['hostids']));
 		}
 
-		if (isset($data['templateids_clear'])) {
-			$templateidsClear = zbx_toArray($data['templateids_clear']);
-			$this->unlink($templateidsClear, $data['templateids'], true);
-		}
-
-		if (isset($data['templateids_unlink'])) {
-			$this->unlink(zbx_toArray($data['templateids_unlink']), $templateids);
-		}
-
-		if (isset($data['macros'])) {
-			$hostMacros = API::UserMacro()->get(array(
-				'hostids' => $templateids,
-				'filter' => array(
-					'macro' => $data['macros']
-				)
-			));
-			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
-			API::UserMacro()->delete($hostMacroIds);
-		}
+		$data['hostids'] = array();
+		parent::massRemove($data);
 
 		return array('templateids' => $templateids);
 	}

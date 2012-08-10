@@ -79,6 +79,54 @@ abstract class CHostGeneral extends CZBXAPI {
 	}
 
 	/**
+	 * Removes the relations between hosts or templates and other objects.
+	 *
+	 * Supported $data parameters are:
+	 * - hostsids           - an array of host IDs to be updated
+	 * - templatesids       - an array of template IDs to be updated
+	 * - groupids           - an array of host group IDs the hosts should be removed from
+	 * - templateids_unlink - an array of template IDs to unlink from the hosts
+	 * - templateids_clear  - an array of template IDs to unlink and clear from the hosts
+	 * - macros             - an array of macros to delete from the hosts
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function massRemove(array $data) {
+		$allHostIds = array_merge($data['hostids'], $data['templateids']);
+
+		if (isset($data['groupids'])) {
+			API::HostGroup()->massRemove(array(
+				'hostids' => $data['hostids'],
+				'templateids' => $data['templateids'],
+				'groupids' => zbx_toArray($data['groupids'])
+			));
+		}
+
+		if (!empty($data['templateids_unlink'])) {
+			$this->unlink(zbx_toArray($data['templateids_unlink']), $allHostIds);
+		}
+
+		if (isset($data['templateids_clear'])) {
+			$this->unlink(zbx_toArray($data['templateids_clear']), $allHostIds, true);
+		}
+
+		if (isset($data['macros'])) {
+			$hostMacros = API::UserMacro()->get(array(
+				'hostids' => $allHostIds,
+				'filter' => array(
+					'macro' => $data['macros']
+				)
+			));
+			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
+			API::UserMacro()->delete($hostMacroIds);
+		}
+
+		return array();
+	}
+
+	/**
 	 * Links the templates to the given hosts.
 	 *
 	 * @param array $templateids
