@@ -27,12 +27,12 @@ abstract class CHostGeneral extends CZBXAPI {
 	/**
 	 * Links the templates to the given hosts.
 	 *
-	 * @param $templateids
-	 * @param $targetids    an array of host IDs to link the templates to
+	 * @param array $templateids
+	 * @param array $targetids    an array of host IDs to link the templates to
 	 *
 	 * @return bool
 	 */
-	protected function link($templateids, $targetids) {
+	protected function link(array $templateids, array $targetids) {
 		if (empty($templateids)) return true;
 
 		//check if someone passed duplicate templates in the same query
