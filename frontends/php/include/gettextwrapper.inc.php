@@ -123,4 +123,3 @@ function _xn($message, $message_plural, $num, $context) {
 	}
 }
 
-?>
