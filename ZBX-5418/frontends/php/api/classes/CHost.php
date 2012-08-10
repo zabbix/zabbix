@@ -1607,8 +1607,8 @@ class CHost extends CHostGeneral {
 			$data['interfaces'] = zbx_toArray($data['interfaces']);
 
 			$options = array(
-				'hosts' => &$data['hosts'],
-				'interfaces' => &$data['interfaces']
+				'hosts' => $data['hosts'],
+				'interfaces' => $data['interfaces']
 			);
 
 			$result = API::HostInterface()->massAdd($options);
@@ -1621,8 +1621,8 @@ class CHost extends CHostGeneral {
 			$data['groups'] = zbx_toArray($data['groups']);
 
 			$options = array(
-				'hosts' => &$data['hosts'],
-				'groups' => &$data['groups']
+				'hosts' => $data['hosts'],
+				'groups' => $data['groups']
 			);
 			$result = API::HostGroup()->massAdd($options);
 			if (!$result) {
