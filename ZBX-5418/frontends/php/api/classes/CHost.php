@@ -1578,76 +1578,39 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+	 * Additional supported $data parameters are:
+	 * - interfaces  - an array of interfaces to create on the hosts
 	 *
 	 * @param array $data
-	 * @param array $data['groups']
-	 * @param array $data['templates']
-	 * @param array $data['macros']
 	 *
 	 * @return array
 	 */
-	public function massAdd($data) {
-		$data['hosts'] = zbx_toArray($data['hosts']);
+	public function massAdd(array $data) {
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
 
-		$options = array(
-			'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
-			'editable' => 1,
-			'preservekeys' => 1
-		);
-		$updHosts = $this->get($options);
-
-		foreach ($data['hosts'] as $host) {
-			if (!isset($updHosts[$host['hostid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation.'));
-			}
+		// check permissions
+		if (!$this->isWritable(zbx_objectValues($hosts, 'hostid'))) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		if (isset($data['interfaces']) && !empty($data['interfaces'])) {
-			$data['interfaces'] = zbx_toArray($data['interfaces']);
-
-			$options = array(
+		// add new interfaces
+		if (!empty($data['interfaces'])) {
+			API::HostInterface()->massAdd(array(
 				'hosts' => $data['hosts'],
-				'interfaces' => $data['interfaces']
-			);
-
-			API::HostInterface()->massAdd($options);
+				'interfaces' => zbx_toArray($data['interfaces'])
+			));
 		}
 
-		if (isset($data['groups']) && !empty($data['groups'])) {
-			$data['groups'] = zbx_toArray($data['groups']);
-
-			$options = array(
-				'hosts' => $data['hosts'],
-				'groups' => $data['groups']
-			);
-			API::HostGroup()->massAdd($options);
+		// rename the "templates" parameter to the common "templates_link"
+		if (isset($data['templates'])) {
+			$data['templates_link'] = $data['templates'];
+			unset($data['templates']);
 		}
 
-		if (!empty($data['templates'])) {
-			$data['templates'] = zbx_toArray($data['templates']);
-			$this->link(
-				zbx_objectValues($data['templates'], 'templateid'),
-				zbx_objectValues($data['hosts'], 'hostid')
-			);
-		}
+		$data['templates'] = array();
+		return parent::massAdd($data);
 
-		if (isset($data['macros']) && !empty($data['macros'])) {
-			$data['macros'] = zbx_toArray($data['macros']);
-
-			// add the macros to all hosts
-			$hostMacrosToAdd = array();
-			foreach ($data['macros'] as $hostMacro) {
-				foreach ($data['hosts'] as $host) {
-					$hostMacro['hostid'] = $host['hostid'];
-					$hostMacrosToAdd[] = $hostMacro;
-				}
-			}
-
-			API::UserMacro()->create($hostMacrosToAdd);
-		}
-
-		return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
+		return array('hostids' => zbx_objectValues($hosts, 'hostid'));
 	}
 
 	/**

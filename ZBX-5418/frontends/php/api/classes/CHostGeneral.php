@@ -25,6 +25,60 @@
 abstract class CHostGeneral extends CZBXAPI {
 
 	/**
+	 * Adds new relation between hosts or templates and other objects.
+	 *
+	 * Supported $data parameters are:
+	 * - hosts          - an array of hosts to be updated
+	 * - templates      - an array of templates to be updated
+	 * - groups         - an array of host groups to add the host to
+	 * - templates_link - an array of templates to link to the hosts
+	 * - macros         - an array of macros to create on the host
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function massAdd(array $data) {
+		$allHostIds = array_merge(
+			zbx_objectValues($data['hosts'], 'hostid'),
+			zbx_objectValues($data['templates'], 'templateid')
+		);
+
+		// add groups
+		if (isset($data['groups']) && !empty($data['groups'])) {
+			$data['groups'] = zbx_toArray($data['groups']);
+
+			API::HostGroup()->massAdd($options = array(
+				'hosts' => $data['hosts'],
+				'templates' => $data['templates'],
+				'groups' => $data['groups']
+			));
+		}
+
+		// link templates
+		if (!empty($data['templates_link'])) {
+			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
+		}
+
+		// create macros
+		if (isset($data['macros']) && !empty($data['macros'])) {
+			$data['macros'] = zbx_toArray($data['macros']);
+
+			$hostMacrosToAdd = array();
+			foreach ($data['macros'] as $hostMacro) {
+				foreach ($allHostIds as $hostid) {
+					$hostMacro['hostid'] = $hostid;
+					$hostMacrosToAdd[] = $hostMacro;
+				}
+			}
+
+			API::UserMacro()->create($hostMacrosToAdd);
+		}
+
+		return array();
+	}
+
+	/**
 	 * Links the templates to the given hosts.
 	 *
 	 * @param array $templateids

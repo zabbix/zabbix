@@ -1247,59 +1247,31 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Link Template to Hosts
+	 * Additional supported $data parameters are:
+	 * - hosts  - an array of hosts or templates to link the given templates to
 	 *
 	 * @param array $data
-	 * @param string $data['templates']
-	 * @param string $data['hosts']
-	 * @param string $data['groups']
-	 * @param string $data['templates_link']
-	 * @return boolean
+	 *
+	 * @return array
 	 */
-	public function massAdd($data) {
-		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
-		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
+	public function massAdd(array $data) {
+		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
+		$templateids = zbx_objectValues($templates, 'templateid');
 
-		$updTemplates = $this->get(array(
-			'templateids' => $templateids,
-			'editable' => 1,
-			'preservekeys' => 1
-		));
-
-		foreach ($templates as $template) {
-			if (!isset($updTemplates[$template['templateid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		// check permissions
+		if (!$this->isWritable($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		if (isset($data['groups']) && !empty($data['groups'])) {
-			$options = array('groups' => $data['groups'], 'templates' => $templates);
-			API::HostGroup()->massAdd($options);
-		}
-
+		// link hosts to the given templates
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
 			$this->link($templateids, zbx_objectValues($data['hosts'], 'hostid'));
 		}
 
-		if (isset($data['templates_link']) && !empty($data['templates_link'])) {
-			$this->link(zbx_objectValues($data['templates_link'], 'templateid'), $templateids);
-		}
+		$data['hosts'] = array();
+		parent::massAdd($data);
 
-		if (isset($data['macros']) && !empty($data['macros'])) {
-			$data['macros'] = zbx_toArray($data['macros']);
-
-			// add the macros to all hosts
-			$hostMacrosToAdd = array();
-			foreach ($data['macros'] as $hostMacro) {
-				foreach ($templateids as $templateId) {
-					$hostMacro['hostid'] = $templateId;
-					$hostMacrosToAdd[] = $hostMacro;
-				}
-			}
-			API::UserMacro()->create($hostMacrosToAdd);
-		}
-
-		return array('templateids' => zbx_objectValues($data['templates'], 'templateid'));
+		return array('templateids' => $templateids);
 	}
 
 	/**
