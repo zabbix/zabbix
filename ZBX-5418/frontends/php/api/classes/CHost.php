@@ -1979,7 +1979,7 @@ class CHost extends CHostGeneral {
 
 		// rename the "templates" parameter to the common "templates_link"
 		if (isset($data['templateids'])) {
-			$data['templateids_unlink'] = $data['templateids'];
+			$data['templateids_link'] = $data['templateids'];
 			unset($data['templateids']);
 		}
 

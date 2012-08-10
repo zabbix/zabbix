@@ -104,8 +104,8 @@ abstract class CHostGeneral extends CZBXAPI {
 			));
 		}
 
-		if (!empty($data['templateids_unlink'])) {
-			$this->unlink(zbx_toArray($data['templateids_unlink']), $allHostIds);
+		if (!empty($data['templateids_link'])) {
+			$this->unlink(zbx_toArray($data['templateids_link']), $allHostIds);
 		}
 
 		if (isset($data['templateids_clear'])) {

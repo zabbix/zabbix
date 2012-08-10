@@ -1468,7 +1468,7 @@ class CTemplate extends CHostGeneral {
 			if (!empty($templateidsToDel)) {
 				$result = $this->massRemove(array(
 					'templateids' => $templateids,
-					'templateids_unlink' => $templateidsToDel
+					'templateids_link' => $templateidsToDel
 				));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
