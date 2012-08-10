@@ -22,7 +22,7 @@
 /**
  * @package API
  */
-class CHost extends CZBXAPI {
+class CHost extends CHostGeneral {
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
@@ -1630,14 +1630,12 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-		if (isset($data['templates']) && !empty($data['templates'])) {
+		if (!empty($data['templates'])) {
 			$data['templates'] = zbx_toArray($data['templates']);
-
-			$options = array(
-				'hosts' => &$data['hosts'],
-				'templates' => &$data['templates']
+			$result = $this->link(
+				zbx_objectValues($data['templates'], 'templateid'),
+				zbx_objectValues($data['hosts'], 'hostid')
 			);
-			$result = API::Template()->massAdd($options);
 			if (!$result) {
 				self::exception();
 			}
@@ -2043,22 +2041,14 @@ class CHost extends CZBXAPI {
 		}
 
 		if (isset($data['templateids'])) {
-			$options = array(
-				'hostids' => $hostids,
-				'templateids' => zbx_toArray($data['templateids'])
-			);
-			$result = API::Template()->massRemove($options);
+			$result = $this->unlink(zbx_toArray($data['templateids']), $hostids);
 			if (!$result) {
 				self::exception();
 			}
 		}
 
 		if (isset($data['templateids_clear'])) {
-			$options = array(
-				'templateids' => $hostids,
-				'templateids_clear' => zbx_toArray($data['templateids_clear'])
-			);
-			$result = API::Template()->massRemove($options);
+			$result = $this->unlink(zbx_toArray($data['templateids_clear']), $hostids, true);
 			if (!$result) {
 				self::exception();
 			}
