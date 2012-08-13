@@ -23,6 +23,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-4168] fixed the "problem display" dashboard filter not being applied to the "latest 20 issues" block (Pavels)
 ........S. [ZBX-5435] fixed memory leak in a history syncer process (Andris)
 ..F....... [ZBX-5393] improved language encoding lookup for windows (Toms)
 ..F....... [ZBX-5393] secured javascript files, when translation contains apostrophes (Toms)
