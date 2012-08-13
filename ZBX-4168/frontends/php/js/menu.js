@@ -87,8 +87,7 @@ function truncateText(text, len) {
 	return (text.length > len) ? text.substring(0, len) + '...' : text;
 }
 
-function show_popup_menu(e, content, width){
-
+function show_popup_menu(e, content, width) {
 	if (A_MENUS[0] !== undefined) {
 		A_MENUS[0].collapse();
 	}
@@ -526,7 +525,9 @@ function menu_item (o_parent, n_order) {
 }
 
 function A_MENUS_onclick() {
-	return A_MENUS[this.o_root_n_id].onclick(this.this_n_id);
+	if (!is_null(A_MENUS[this.o_root_n_id])) {
+		return A_MENUS[this.o_root_n_id].onclick(this.this_n_id);
+	}
 }
 
 function A_MENUS_onmouseout() {
