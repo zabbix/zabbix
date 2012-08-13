@@ -156,27 +156,8 @@ jQuery(function($) {
 					data: {},
 					dataType: 'html',
 					success: function(data) {
-						var imgTotal = $(data).find('img').length;
-
-						// preload images
-						if (imgTotal > 0) {
-							var loaded = 0;
-
-							$(data).find('img').each(function() {
-								$(this).load(function() {
-									loaded++;
-
-									if (imgTotal == loaded) {
-										$('#flickerfreescreen_' + id).replaceWith(data);
-										screen.isRefreshing = false;
-									}
-								});
-							});
-						}
-						else {
-							$('#flickerfreescreen_' + id).html(data);
-							screen.isRefreshing = false;
-						}
+						$('#flickerfreescreen_' + id).html(data);
+						screen.isRefreshing = false;
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
 						screen.isRefreshing = false;
@@ -192,7 +173,7 @@ jQuery(function($) {
 			}
 		},
 
-		refreshImg: function(id, successAtion) {
+		refreshImg: function(id, successAction) {
 			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
@@ -225,8 +206,8 @@ jQuery(function($) {
 						$(this).attr('id', doId);
 						$(workImg).replaceWith($(this));
 
-						if (typeof(successAtion) !== 'undefined') {
-							successAtion();
+						if (typeof(successAction) !== 'undefined') {
+							successAction();
 						}
 
 						screen.isRefreshing = false;
