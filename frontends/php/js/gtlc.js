@@ -24,6 +24,7 @@ var timeControl = {
 	objectList: {}, // objects needs to be controlled
 	refreshPage: true,
 	refreshInterval: 0,
+	timeTimeout: null,
 
 	addObject: function(domid, time, objData) {
 		this.objectList[domid] = {
@@ -190,7 +191,6 @@ var timeControl = {
 	refreshObject: function(objid) {
 		this.objectList[objid].processed = 0;
 		this.objectList[objid].refresh = true;
-
 		this.processObjects();
 	},
 
@@ -199,32 +199,44 @@ var timeControl = {
 			this.refreshInterval = refreshInterval * 1000;
 		}
 
+		if (this.refreshInterval > 0) {
+			for (var sbid in ZBX_SCROLLBARS) {
+				if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
+					continue;
+				}
+
+				var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
+
+				// timeline
+				if (ZBX_TIMELINES[timelineid].isNow()) {
+					ZBX_TIMELINES[timelineid].setNow();
+				}
+				else {
+					ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
+				}
+
+				// scrollbar
+				ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
+				ZBX_SCROLLBARS[sbid].setBarPosition();
+				ZBX_SCROLLBARS[sbid].setGhostByBar();
+				ZBX_SCROLLBARS[sbid].setTabInfo();
+				ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
+			}
+
+			this.timeTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.refreshInterval);
+		}
+	},
+
+	isNow: function() {
 		for (var sbid in ZBX_SCROLLBARS) {
 			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
 				continue;
 			}
 
-			var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
-
-			// timeline
-			if (ZBX_TIMELINES[timelineid].isNow()) {
-				ZBX_TIMELINES[timelineid].setNow();
-			}
-			else {
-				ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
-			}
-
-			// scrollbar
-			ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
-			ZBX_SCROLLBARS[sbid].setBarPosition();
-			ZBX_SCROLLBARS[sbid].setGhostByBar();
-			ZBX_SCROLLBARS[sbid].setTabInfo();
-			ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
+			return ZBX_TIMELINES[ZBX_SCROLLBARS[sbid].timeline.timelineid].isNow();
 		}
 
-		if (this.refreshInterval > 0) {
-			window.setTimeout(function() { timeControl.refreshTime(); }, this.refreshInterval);
-		}
+		return null;
 	},
 
 	objectUpdate: function(objid, timelineid) {
