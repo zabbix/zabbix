@@ -35,7 +35,6 @@ class CTemplateScreen extends CScreen {
 	 * Get Screen data
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids'] Node IDs
 	 * @param boolean $options['with_items'] only with items
 	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
 	 * @param int $options['count'] count Hosts, returned column name is rowscount
@@ -64,7 +63,6 @@ class CTemplateScreen extends CScreen {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
 			'templateids'				=> null,
@@ -152,9 +150,6 @@ class CTemplateScreen extends CScreen {
 						' AND rr.permission<'.$permission.')';
 			}
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// screenids
 		if (!is_null($options['screenids'])) {
@@ -257,42 +252,7 @@ class CTemplateScreen extends CScreen {
 
 		$screenids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlGroup .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-					FROM '.$sqlFrom.'
-					WHERE '.DBin_node('s.screenid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -491,12 +451,6 @@ class CTemplateScreen extends CScreen {
 			'nopermissions' => true,
 			'limit' => 1
 		);
-		if (isset($data['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($data['node']);
-		}
-		elseif (isset($data['nodeids'])) {
-			$options['nodeids'] = $data['nodeids'];
-		}
 		$screens = $this->get($options);
 
 		return !empty($screens);

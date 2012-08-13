@@ -52,7 +52,6 @@ class CEvent extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$nodeCheck = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
@@ -72,7 +71,6 @@ class CEvent extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'triggerids'				=> null,
@@ -162,18 +160,10 @@ class CEvent extends CZBXAPI {
 			}
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// eventids
 		if (!is_null($options['eventids'])) {
 			zbx_value2array($options['eventids']);
 			$sqlParts['where'][] = DBcondition('e.eventid', $options['eventids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('e.objectid', $nodeids);
-			}
 		}
 
 		// triggerids
@@ -183,11 +173,6 @@ class CEvent extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['objectid'] = 'e.objectid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('e.objectid', $nodeids);
 			}
 		}
 
@@ -219,12 +204,6 @@ class CEvent extends CZBXAPI {
 			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-		}
-
-		// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('e.eventid', $nodeids);
 		}
 
 		// output
@@ -321,43 +300,7 @@ class CEvent extends CZBXAPI {
 		$eventids = array();
 		$triggerids = array();
 
-		// event fields
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		$sqlGroup = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlGroup .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
-
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -437,7 +380,6 @@ class CEvent extends CZBXAPI {
 		// adding hosts
 		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectHosts'],
 				'triggerids' => $triggerids,
 				'nopermissions' => true,
@@ -471,7 +413,6 @@ class CEvent extends CZBXAPI {
 		// adding triggers
 		if (!is_null($options['selectTriggers']) && str_in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectTriggers'],
 				'triggerids' => $triggerids,
 				'nopermissions' => true,
@@ -491,7 +432,6 @@ class CEvent extends CZBXAPI {
 		// adding items
 		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -527,7 +467,6 @@ class CEvent extends CZBXAPI {
 			$objParams = array(
 				'output' => $options['select_alerts'],
 				'selectMediatypes' => API_OUTPUT_EXTEND,
-				'nodeids' => $nodeids,
 				'eventids' => $eventids,
 				'nopermissions' => true,
 				'preservekeys' => true,

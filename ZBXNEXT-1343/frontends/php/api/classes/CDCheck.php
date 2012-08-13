@@ -34,7 +34,6 @@ class CDCheck extends CZBXAPI {
 
 	public function get($options) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
@@ -53,7 +52,6 @@ class CDCheck extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'dcheckids'					=> null,
 			'druleids'					=> null,
 			'dhostids'					=> null,
@@ -103,18 +101,10 @@ class CDCheck extends CZBXAPI {
 			return array();
 		}
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // dcheckids
 		if (!is_null($options['dcheckids'])) {
 			zbx_value2array($options['dcheckids']);
 			$sqlParts['where']['dcheckid'] = DBcondition('dc.dcheckid', $options['dcheckids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dc.dcheckid', $nodeids);
-			}
 		}
 
 // druleids
@@ -128,11 +118,6 @@ class CDCheck extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dc.druleid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dc.druleid', $nodeids);
 			}
 		}
 
@@ -173,13 +158,6 @@ class CDCheck extends CZBXAPI {
 			}
 		}
 
-// node check !!!!!
-// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('dc.dcheckid', $nodeids);
-		}
-
 
 // output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
@@ -218,32 +196,7 @@ class CDCheck extends CZBXAPI {
 		}
 //-------
 
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
- //SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dcheck = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -300,7 +253,6 @@ class CDCheck extends CZBXAPI {
 // select_drules
 		if (!is_null($options['selectDRules'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dcheckids' => $dcheckids,
 				'preservekeys' => 1
 			);
@@ -343,7 +295,6 @@ class CDCheck extends CZBXAPI {
 // selectDHosts
 		if (!is_null($options['selectDHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dcheckids' => $dcheckids,
 				'preservekeys' => 1
 			);
@@ -385,7 +336,6 @@ class CDCheck extends CZBXAPI {
 // selectHosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dcheckids' => $dcheckids,
 				'preservekeys' => 1,
 				'sortfield' => 'status'
@@ -449,7 +399,6 @@ class CDCheck extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'dcheckids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -472,7 +421,6 @@ class CDCheck extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'dcheckids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,

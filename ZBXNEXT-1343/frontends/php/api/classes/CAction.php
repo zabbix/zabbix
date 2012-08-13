@@ -65,7 +65,6 @@ class CAction extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'actionids'					=> null,
@@ -203,9 +202,6 @@ class CAction extends CZBXAPI {
 					')'.
 				')';
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// actionids
 		if (!is_null($options['actionids'])) {
@@ -346,35 +342,7 @@ class CAction extends CZBXAPI {
 
 		$actionids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('a.actionid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($action = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $action['rowscount'];
@@ -773,13 +741,6 @@ class CAction extends CZBXAPI {
 			'nopermissions' => true,
 			'limit' => 1
 		);
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
 
 		$objs = $this->get($options);
 		return !empty($objs);
@@ -1756,7 +1717,6 @@ class CAction extends CZBXAPI {
 				case CONDITION_TYPE_TRIGGER_NAME:
 				case CONDITION_TYPE_TRIGGER_VALUE:
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-				case CONDITION_TYPE_NODE:
 				case CONDITION_TYPE_DOBJECT:
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:

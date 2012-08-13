@@ -37,7 +37,6 @@ class CIconMap extends CZBXAPI {
 	/**
 	 * Get IconMap data.
 	 * @param array $options
-	 * @param array $options['nodeids']
 	 * @param array $options['iconmapids']
 	 * @param array $options['sysmapids']
 	 * @param array $options['editable']
@@ -64,7 +63,6 @@ class CIconMap extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'iconmapids'				=> null,
 			'sysmapids'					=> null,
 			'nopermissions'				=> null,
@@ -101,9 +99,6 @@ class CIconMap extends CZBXAPI {
 		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return array();
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// iconmapids
 		if (!is_null($options['iconmapids'])) {
@@ -154,35 +149,7 @@ class CIconMap extends CZBXAPI {
 
 		$iconMapids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('im.iconmapid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($iconMap = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $iconMap['rowscount'];
@@ -443,7 +410,6 @@ class CIconMap extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'iconmapids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -468,7 +434,6 @@ class CIconMap extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'iconmapids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,

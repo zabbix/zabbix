@@ -227,13 +227,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$options['hostids'] = zbx_toArray($object['hostids']);
 		}
 
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-
 		$objs = $this->get($options);
 
 		return !empty($objs);
@@ -252,12 +245,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 			'filter' => $graphData,
 			'output' => API_OUTPUT_EXTEND
 		);
-		if (isset($graphData['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($graphData['node']);
-		}
-		elseif (isset($graphData['nodeids'])) {
-			$options['nodeids'] = $graphData['nodeids'];
-		}
 		return $this->get($options);
 	}
 

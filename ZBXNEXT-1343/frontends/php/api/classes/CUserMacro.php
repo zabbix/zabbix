@@ -28,7 +28,6 @@ class CUserMacro extends CZBXAPI {
 	 * Get UserMacros data
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids'] Node IDs
 	 * @param array $options['groupids'] UserMacrosGroup IDs
 	 * @param array $options['macroids'] UserMacros IDs
 	 * @param boolean $options['monitored_macros'] only monitored UserMacros
@@ -76,7 +75,6 @@ class CUserMacro extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'hostmacroids'				=> null,
@@ -132,12 +130,8 @@ class CUserMacro extends CZBXAPI {
 				' AND rr.permission<'.$permission.')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// global macro
 		if (!is_null($options['globalmacro'])) {
-			$sqlPartsGlobal['where'][] = DBin_node('gm.globalmacroid', $nodeids);
 			$options['groupids'] = null;
 			$options['hostmacroids'] = null;
 			$options['triggerids'] = null;
@@ -146,9 +140,6 @@ class CUserMacro extends CZBXAPI {
 			$options['selectGroups'] = null;
 			$options['selectTemplates'] = null;
 			$options['selectHosts'] = null;
-		}
-		else {
-			$sqlParts['where'][] = DBin_node('hm.hostmacroid', $nodeids);
 		}
 
 		// globalmacroids

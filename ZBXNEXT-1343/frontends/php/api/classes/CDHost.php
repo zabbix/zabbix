@@ -36,7 +36,6 @@ class CDHost extends CZBXAPI {
  * Get Host data
  *
  * @param _array $options
- * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
  * @param array $options['hostids'] Host IDs
  * @param boolean $options['monitored_hosts'] only monitored Hosts
@@ -67,7 +66,6 @@ class CDHost extends CZBXAPI {
  */
 	public function get($options = array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
@@ -86,7 +84,6 @@ class CDHost extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'druleids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
@@ -138,18 +135,10 @@ class CDHost extends CZBXAPI {
 			return array();
 		}
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // dhostids
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
-			}
 		}
 
 // druleids
@@ -163,11 +152,6 @@ class CDHost extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dh.druleid', $nodeids);
 			}
 		}
 
@@ -184,11 +168,6 @@ class CDHost extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceids'] = 'ds.dserviceid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
 			}
 		}
 
@@ -209,11 +188,6 @@ class CDHost extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['groupid'] = 'hg.groupid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hg.groupid', $nodeids);
-			}
 		}
 
 // hostids
@@ -230,18 +204,6 @@ class CDHost extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hostid'] = 'h.hostid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('h.hostid', $nodeids);
-			}
-		}
-
-// node check !!!!!
-// should be last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
 		}
 
 // output
@@ -284,31 +246,7 @@ class CDHost extends CZBXAPI {
 
 		$dhostids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
- //SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dhost = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -388,7 +326,6 @@ class CDHost extends CZBXAPI {
 // select_drules
 		if (!is_null($options['selectDRules'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dhostids' => $dhostids,
 				'preservekeys' => 1
 			);
@@ -431,7 +368,6 @@ class CDHost extends CZBXAPI {
 // selectDServices
 		if (!is_null($options['selectDServices'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dhostids' => $dhostids,
 				'preservekeys' => 1
 			);
@@ -473,7 +409,6 @@ class CDHost extends CZBXAPI {
 // TODO :selectGroups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-					'nodeids' => $nodeids,
 					'output' => $options['selectGroups'],
 					'hostids' => $dhostids,
 					'preservekeys' => 1
@@ -492,7 +427,6 @@ class CDHost extends CZBXAPI {
 // selectHosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dhostids' => $dhostids,
 				'preservekeys' => 1
 			);
@@ -549,10 +483,6 @@ class CDHost extends CZBXAPI {
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 

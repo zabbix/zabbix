@@ -66,7 +66,6 @@ class CGraph extends CGraphGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -338,7 +337,6 @@ class CGraph extends CGraphGeneral {
 
 		$graphids = array();
 
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($graph = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
@@ -404,7 +402,6 @@ class CGraph extends CGraphGeneral {
 		// adding GraphItems
 		if (!is_null($options['selectGraphItems']) && str_in_array($options['selectGraphItems'], $subselectsAllowedOutputs)) {
 			$gitems = API::GraphItem()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGraphItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
@@ -423,7 +420,6 @@ class CGraph extends CGraphGeneral {
 		if (!is_null($options['selectGroups'])) {
 			if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 				$groups = API::HostGroup()->get(array(
-					'nodeids' => $options['nodeids'],
 					'output' => $options['selectGroups'],
 					'graphids' => $graphids,
 					'nopermissions' => true,
@@ -443,7 +439,6 @@ class CGraph extends CGraphGeneral {
 		if (!is_null($options['selectHosts'])) {
 			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$hosts = API::Host()->get(array(
-					'nodeids' => $options['nodeids'],
 					'output' => $options['selectHosts'],
 					'graphids' => $graphids,
 					'templated_hosts' => true,
@@ -463,7 +458,6 @@ class CGraph extends CGraphGeneral {
 		// adding Templates
 		if (!is_null($options['selectTemplates']) && str_in_array($options['selectTemplates'], $subselectsAllowedOutputs)) {
 			$templates = API::Template()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectTemplates'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
@@ -481,7 +475,6 @@ class CGraph extends CGraphGeneral {
 		// adding Items
 		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 			$items = API::Item()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'webitems' => true,
@@ -514,7 +507,6 @@ class CGraph extends CGraphGeneral {
 			}
 
 			$objParams = array(
-				'nodeids' => $options['nodeids'],
 				'itemids' => $ruleids,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -870,7 +862,6 @@ class CGraph extends CGraphGeneral {
 
 
 		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
 			'webitems' => true,
 			'editable' => true,
@@ -930,20 +921,5 @@ class CGraph extends CGraphGeneral {
 		}
 
 		return true;
-	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['graphids'] === null &&
-				$options['templateids'] === null &&
-				$options['hostids'] === null &&
-				$options['groupids'] === null &&
-				$options['itemids'] === null &&
-				$options['discoveryids'] === null) {
-
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 }

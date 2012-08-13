@@ -58,7 +58,6 @@ class CDiscoveryRule extends CItemGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -127,9 +126,6 @@ class CDiscoveryRule extends CItemGeneral {
 					' AND gg.userid='.$userid.
 					' AND rr.permission<'.$permission.')';
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// templateids
 		if (!is_null($options['templateids'])) {
@@ -249,42 +245,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$itemids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('i.itemid', $nodeids).
-					$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -340,7 +301,6 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!is_null($options['selectHosts'])) {
 			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams = array(
-					'nodeids' => $nodeids,
 					'itemids' => $itemids,
 					'templated_hosts' => true,
 					'output' => $options['selectHosts'],
@@ -371,7 +331,6 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding items
 		if (!is_null($options['selectItems'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -412,7 +371,6 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
 				'preservekeys' => true,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
@@ -452,7 +410,6 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
 				'preservekeys' => true,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
@@ -514,12 +471,6 @@ class CDiscoveryRule extends CItemGeneral {
 			$options['filter']['host'] = $object['host'];
 		}
 
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
 		$objs = $this->get($options);
 		return !empty($objs);
 	}
@@ -743,7 +694,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -770,7 +720,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,

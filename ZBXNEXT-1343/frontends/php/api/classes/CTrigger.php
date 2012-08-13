@@ -70,7 +70,6 @@ class CTrigger extends CTriggerGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'						=> null,
 			'groupids'						=> null,
 			'templateids'					=> null,
 			'hostids'						=> null,
@@ -619,7 +618,6 @@ class CTrigger extends CTriggerGeneral {
 
 		$triggerids = array();
 
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
@@ -824,7 +822,6 @@ class CTrigger extends CTriggerGeneral {
 		// adding groups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGroups'],
 				'triggerids' => $triggerids,
 				'preservekeys' => true
@@ -843,7 +840,6 @@ class CTrigger extends CTriggerGeneral {
 		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $options['nodeids'],
 				'triggerids' => $triggerids,
 				'templated_hosts' => true,
 				'nopermissions' => true,
@@ -920,7 +916,6 @@ class CTrigger extends CTriggerGeneral {
 		// adding items
 		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
 			$objParams = array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
 				'webitems' => true,
@@ -955,7 +950,6 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$objParams = array(
-				'nodeids' => $options['nodeids'],
 				'itemids' => $ruleids,
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -1020,15 +1014,6 @@ class CTrigger extends CTriggerGeneral {
 			'output' => API_OUTPUT_EXTEND
 		);
 
-		if (isset($triggerData['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($triggerData['node']);
-		}
-		else {
-			if (isset($triggerData['nodeids'])) {
-				$options['nodeids'] = $triggerData['nodeids'];
-			}
-		}
-
 		// expression is checked later
 		unset($options['filter']['expression']);
 		$result = $this->get($options);
@@ -1073,13 +1058,6 @@ class CTrigger extends CTriggerGeneral {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
 		);
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
 
 		$triggers = $this->get($options);
 		foreach ($triggers as $trigger) {
@@ -1225,8 +1203,7 @@ class CTrigger extends CTriggerGeneral {
 							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 								' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 								' AND h.host='.zbx_dbstr($exprPart['host']).
-								' AND h.hostid=i.hostid'.
-								' AND '.DBin_node('i.itemid');
+								' AND h.hostid=i.hostid';
 					if (!DBfetch(DBselect($sql))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".', $exprPart['item'], $exprPart['host']));
@@ -2017,7 +1994,6 @@ class CTrigger extends CTriggerGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'triggerids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -2037,7 +2013,6 @@ class CTrigger extends CTriggerGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'triggerids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
@@ -2069,21 +2044,5 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return false;
-	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['groupids'] === null &&
-			$options['templateids'] === null &&
-			$options['hostids'] === null &&
-			$options['triggerids'] === null &&
-			$options['itemids'] === null &&
-			$options['applicationids'] === null &&
-			$options['discoveryids'] === null) {
-
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 }

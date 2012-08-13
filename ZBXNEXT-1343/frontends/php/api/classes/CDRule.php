@@ -40,7 +40,6 @@ class CDRule extends CZBXAPI {
 */
 	public function get(array $options = array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
@@ -59,7 +58,6 @@ class CDRule extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'druleids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
@@ -96,18 +94,10 @@ class CDRule extends CZBXAPI {
 			return array();
 		}
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // druleids
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 			$sqlParts['where']['druleid'] = DBcondition('dr.druleid', $options['druleids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dr.druleid', $nodeids);
-			}
 		}
 
 // dhostids
@@ -123,11 +113,6 @@ class CDRule extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'dh.dhostid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
 			}
 		}
 
@@ -148,18 +133,6 @@ class CDRule extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
-			}
-		}
-
-// node check !!!!!
-// should be last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('dr.druleid', $nodeids);
 		}
 
 // output
@@ -206,30 +179,7 @@ class CDRule extends CZBXAPI {
 
 		$druleids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($drule = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -297,7 +247,6 @@ class CDRule extends CZBXAPI {
 // Adding Discovery Checks
 		if (!is_null($options['selectDChecks'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'druleids' => $druleids,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -341,7 +290,6 @@ class CDRule extends CZBXAPI {
 // Adding Discovery Hosts
 		if (!is_null($options['selectDHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'druleids' => $druleids,
 				'preservekeys' => 1
 			);
@@ -401,11 +349,6 @@ class CDRule extends CZBXAPI {
 		if (isset($object['name'])) $options['filter']['name'] = $object['name'];
 		if (isset($object['hostids'])) $options['druleids'] = zbx_toArray($object['druleids']);
 
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
-
 		$objs = $this->get($options);
 
 	return !empty($objs);
@@ -416,12 +359,6 @@ class CDRule extends CZBXAPI {
 
 		if (empty($dRules)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
-		}
-
-		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
 		}
 
 		$proxies = array();
@@ -721,12 +658,6 @@ class CDRule extends CZBXAPI {
 	public function delete(array $druleids) {
 		$druleids = zbx_toArray($druleids);
 
-		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-
 		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
@@ -794,7 +725,6 @@ class CDRule extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'druleids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -817,7 +747,6 @@ class CDRule extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'druleids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,

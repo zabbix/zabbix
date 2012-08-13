@@ -54,7 +54,6 @@ class CItemPrototype extends CItemGeneral{
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -124,9 +123,6 @@ class CItemPrototype extends CItemGeneral{
 									' AND gg.userid='.$userid.
 									' AND rr.permission<'.$permission.')';
 		}
-
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // templateids
 		if (!is_null($options['templateids'])) {
@@ -261,32 +257,7 @@ class CItemPrototype extends CItemGeneral{
 
 		$itemids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= ' AND '.implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('i.itemid', $nodeids).
-					$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-//SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -362,7 +333,6 @@ class CItemPrototype extends CItemGeneral{
 		if (!is_null($options['selectHosts'])) {
 			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams = array(
-					'nodeids' => $nodeids,
 					'itemids' => $itemids,
 					'templated_hosts' => 1,
 					'output' => $options['selectHosts'],
@@ -393,7 +363,6 @@ class CItemPrototype extends CItemGeneral{
 // Adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
 				'preservekeys' => 1,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
@@ -438,7 +407,6 @@ class CItemPrototype extends CItemGeneral{
 // Adding applications
 		if (!is_null($options['selectApplications']) && str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectApplications'],
 				'itemids' => $itemids,
 				'preservekeys' => 1
@@ -456,7 +424,6 @@ class CItemPrototype extends CItemGeneral{
 // Adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
 				'preservekeys' => 1,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
@@ -515,11 +482,6 @@ class CItemPrototype extends CItemGeneral{
 
 		if (isset($object['hostid'])) $options['hostids'] = $object['hostid'];
 		if (isset($object['host'])) $options['filter']['host'] = $object['host'];
-
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 

@@ -63,7 +63,6 @@ class CScript extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'				=> null,
 			'groupids'				=> null,
 			'hostids'				=> null,
 			'scriptids'				=> null,
@@ -145,20 +144,13 @@ class CScript extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			// only fetch scripts from the same nodes as the hosts
-			$hostNodeIds = array();
-			foreach ($options['hostids'] as $hostId) {
-				$hostNodeIds[] = id2nodeid($hostId);
-			}
-			$hostNodeIds = array_unique($hostNodeIds);
-
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['hostid'] = 'hg.hostid';
 			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
 				' OR '.
-				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
+				's.groupid IS NULL)';
 		}
 
 		// scriptids
@@ -197,9 +189,6 @@ class CScript extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
-
-		// node options
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$scriptids = array();
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -259,8 +248,7 @@ class CScript extends CZBXAPI {
 		$dbScripts = DBselect(
 			'SELECT s.scriptid'.
 			' FROM scripts s'.
-			' WHERE '.DBin_node('s.scriptid').
-				' AND s.name='.$script['name']
+			' WHERE s.name='.$script['name']
 		);
 		while ($script = DBfetch($dbScripts)) {
 			$scriptids[$script['scriptid']] = $script['scriptid'];
@@ -485,7 +473,6 @@ class CScript extends CZBXAPI {
 		$json = new CJSON();
 		$array = array(
 			'request' => 'command',
-			'nodeid' => id2nodeid($hostid),
 			'scriptid' => $scriptid,
 			'hostid' => $hostid
 		);
@@ -565,16 +552,6 @@ class CScript extends CZBXAPI {
 		return $scriptsByHost;
 	}
 
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['scriptids'] === null && $options['hostids'] === null && $options['groupids'] === null) {
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -598,8 +575,7 @@ class CScript extends CZBXAPI {
 				$result[$scriptid]['hosts'] = API::Host()->get(array(
 					'output' => $options['selectHosts'],
 					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
-					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
-					'nodeids' => id2nodeid($script['scriptid'])
+					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
 				));
 			}
 		}

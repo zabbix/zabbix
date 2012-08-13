@@ -35,7 +35,6 @@ class CMap extends CMapElement {
  * Get Map data
  *
  * @param array $options
- * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
  * @param array $options['hostids'] Host IDs
  * @param boolean $options['monitored_hosts'] only monitored Hosts
@@ -75,7 +74,6 @@ class CMap extends CMapElement {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -150,7 +148,6 @@ class CMap extends CMapElement {
 
 		$sysmapids = array();
 
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($sysmap = DBfetch($res)) {
 			if ($options['countOutput']) {
@@ -245,12 +242,9 @@ class CMap extends CMapElement {
 					}
 				}
 
-				$nodeids = get_current_nodeid(true);
-
 				if (!empty($hostsToCheck)) {
 					$hostOptions = array(
 						'hostids' => $hostsToCheck,
-						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => API_OUTPUT_SHORTEN
@@ -271,7 +265,6 @@ class CMap extends CMapElement {
 				if (!empty($mapsToCheck)) {
 					$mapOptions = array(
 						'sysmapids' => $mapsToCheck,
-						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => API_OUTPUT_SHORTEN
@@ -292,7 +285,6 @@ class CMap extends CMapElement {
 				if (!empty($triggersToCheck)) {
 					$triggeridOptions = array(
 						'triggerids' => $triggersToCheck,
-						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => API_OUTPUT_SHORTEN
@@ -313,7 +305,6 @@ class CMap extends CMapElement {
 				if (!empty($hostGroupsToCheck)) {
 					$hostgroupOptions = array(
 						'groupids' => $hostGroupsToCheck,
-						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => API_OUTPUT_SHORTEN
@@ -487,11 +478,6 @@ class CMap extends CMapElement {
 			'output' => API_OUTPUT_EXTEND
 		);
 
-		if (isset($sysmapData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($sysmapData['node']);
-		elseif (isset($sysmapData['nodeids']))
-			$options['nodeids'] = $sysmapData['nodeids'];
-
 		$result = $this->get($options);
 
 	return $result;
@@ -506,10 +492,6 @@ class CMap extends CMapElement {
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 
@@ -992,7 +974,6 @@ class CMap extends CMapElement {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -1009,7 +990,6 @@ class CMap extends CMapElement {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
@@ -1017,15 +997,6 @@ class CMap extends CMapElement {
 		));
 
 		return (count($ids) == $count);
-	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['sysmapids'] === null) {
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 }
 ?>

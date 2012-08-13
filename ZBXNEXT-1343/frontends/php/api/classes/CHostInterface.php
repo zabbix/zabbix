@@ -35,7 +35,6 @@ class CHostInterface extends CZBXAPI {
 	 * Get Interface Interface data
 	 *
 	 * @param array   $options
-	 * @param array   $options['nodeids']     Node IDs
 	 * @param array   $options['hostids']     Interface IDs
 	 * @param boolean $options['editable']    only with read-write permission. Ignored for SuperAdmins
 	 * @param boolean $options['selectHosts'] select Interface hosts
@@ -50,7 +49,6 @@ class CHostInterface extends CZBXAPI {
 	 */
 	public function get(array $options=array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
@@ -70,7 +68,6 @@ class CHostInterface extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'interfaceids'				=> null,
@@ -136,18 +133,10 @@ class CHostInterface extends CZBXAPI {
 					' AND rr.permission<'.$permission.')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// interfaceids
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 			$sqlParts['where']['interfaceid'] = DBcondition('hi.interfaceid', $options['interfaceids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hi.interfaceid', $nodeids);
-			}
 		}
 
 		// hostids
@@ -155,11 +144,6 @@ class CHostInterface extends CZBXAPI {
 			zbx_value2array($options['hostids']);
 			$sqlParts['select']['hostid'] = 'hi.hostid';
 			$sqlParts['where']['hostid'] = DBcondition('hi.hostid', $options['hostids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hi.hostid', $nodeids);
-			}
 		}
 
 		// itemids
@@ -172,11 +156,6 @@ class CHostInterface extends CZBXAPI {
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'hi.interfaceid=i.interfaceid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('i.itemid', $nodeids);
-			}
 		}
 
 		// triggerids
@@ -191,18 +170,6 @@ class CHostInterface extends CZBXAPI {
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'hi.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('f.triggerid', $nodeids);
-			}
-		}
-
-		// node check !!!!!
-		// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('hi.interfaceid', $nodeids);
 		}
 
 		// output
@@ -243,41 +210,7 @@ class CHostInterface extends CZBXAPI {
 
 		$interfaceids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($interface = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -328,7 +261,6 @@ class CHostInterface extends CZBXAPI {
 		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
 				'preservekeys' => true
 			);
@@ -376,7 +308,6 @@ class CHostInterface extends CZBXAPI {
 		// adding items
 		if (!is_null($options['selectItems'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => true,
@@ -446,13 +377,6 @@ class CHostInterface extends CZBXAPI {
 			'nopermissions' => true,
 			'limit' => 1
 		);
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
 
 		$objs = $this->get($options);
 

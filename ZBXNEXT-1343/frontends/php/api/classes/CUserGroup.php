@@ -36,7 +36,6 @@ class CUserGroup extends CZBXAPI {
 	 * Get UserGroups
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids'] Node IDs
 	 * @param array $options['usrgrpids'] UserGroup IDs
 	 * @param array $options['userids'] User IDs
 	 * @param boolean $options['status']
@@ -68,7 +67,6 @@ class CUserGroup extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'status'					=> null,
@@ -119,9 +117,6 @@ class CUserGroup extends CZBXAPI {
 		elseif (!is_null($options['editable']) && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
 			return array();
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
@@ -183,35 +178,7 @@ class CUserGroup extends CZBXAPI {
 
 		$usrgrpids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-				FROM '.$sqlFrom.'
-				WHERE '.DBin_node('g.usrgrpid', $nodeids).
-			$sqlWhere.
-			$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($usrgrp = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $usrgrp['rowscount'];
@@ -287,8 +254,7 @@ class CUserGroup extends CZBXAPI {
 
 		$sql = 'SELECT g.usrgrpid '.
 			' FROM usrgrp g '.
-			' WHERE g.name='.zbx_dbstr($groupData['name']).
-			' AND '.DBin_node('g.usrgrpid', false);
+			' WHERE g.name='.zbx_dbstr($groupData['name']);
 		$res = DBselect($sql);
 		while ($group = DBfetch($res)) {
 			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
@@ -307,10 +273,6 @@ class CUserGroup extends CZBXAPI {
 			'nopermissions' => 1,
 			'limit' => 1,
 		);
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 
@@ -341,7 +303,7 @@ class CUserGroup extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 			}
 
-			if ($this->exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))) {
+			if ($this->exists(array('name' => $usrgrp['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('User group').' [ '.$usrgrp['name'].' ] '._('already exists'));
 			}
 			$insert[$gnum] = $usrgrp;
@@ -707,7 +669,6 @@ class CUserGroup extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -723,7 +684,6 @@ class CUserGroup extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,

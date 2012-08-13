@@ -65,7 +65,6 @@ class CImage extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'imageids'					=> null,
 			'sysmapids'					=> null,
 			// filter
@@ -91,9 +90,6 @@ class CImage extends CZBXAPI {
 		if (!is_null($options['editable']) && (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)) {
 			return $result;
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// imageids
 		if (!is_null($options['imageids'])) {
@@ -149,34 +145,7 @@ class CImage extends CZBXAPI {
 
 		$imageids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('i.imageid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlParts['limit']);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($image = DBfetch($res)) {
 			if ($options['countOutput']) {
 				return $image['rowscount'];
@@ -234,14 +203,6 @@ class CImage extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND
 		);
 
-		if (isset($imageData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($imageData['node']);
-		elseif (isset($imageData['nodeids']))
-			$options['nodeids'] = $imageData['nodeids'];
-		else
-			$options['nodeids'] = get_current_nodeid(true);
-
-
 		$result = $this->get($options);
 
 	return $result;
@@ -263,11 +224,6 @@ class CImage extends CZBXAPI {
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 
@@ -335,7 +291,7 @@ class CImage extends CZBXAPI {
 
 						oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
 						if (!oci_execute($stmt)) {
-							$e = oci_error($stid);
+							$e = oci_error($stmt);
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Execute SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
 						}
 						oci_free_statement($stmt);

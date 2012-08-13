@@ -35,7 +35,6 @@ class CScreen extends CZBXAPI {
 	 * Get Screen data
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids'] Node IDs
 	 * @param boolean $options['with_items'] only with items
 	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
 	 * @param int $options['count'] count Hosts, returned column name is rowscount
@@ -64,7 +63,6 @@ class CScreen extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
 			'editable'					=> null,
@@ -155,7 +153,6 @@ class CScreen extends CZBXAPI {
 
 		$screenids = array();
 
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -246,7 +243,6 @@ class CScreen extends CZBXAPI {
 
 			// group
 			$allowedGroups = API::HostGroup()->get(array(
-				'nodeids' => $options['nodeids'],
 				'groupids' => $groupsToCheck,
 				'editable' => $options['editable']
 			));
@@ -254,7 +250,6 @@ class CScreen extends CZBXAPI {
 
 			// host
 			$allowedHosts = API::Host()->get(array(
-				'nodeids' => $options['nodeids'],
 				'hostids' => $hostsToCheck,
 				'editable' => $options['editable']
 			));
@@ -262,7 +257,6 @@ class CScreen extends CZBXAPI {
 
 			// graph
 			$allowedGraphs = API::Graph()->get(array(
-				'nodeids' => $options['nodeids'],
 				'graphids' => $graphsToCheck,
 				'editable' => $options['editable']
 			));
@@ -270,7 +264,6 @@ class CScreen extends CZBXAPI {
 
 			// item
 			$allowedItems = API::Item()->get(array(
-				'nodeids' => $options['nodeids'],
 				'itemids' => $itemsToCheck,
 				'webitems' => 1,
 				'editable' => $options['editable']
@@ -279,7 +272,6 @@ class CScreen extends CZBXAPI {
 
 			// map
 			$allowedMaps = API::Map()->get(array(
-				'nodeids' => $options['nodeids'],
 				'sysmapids' => $mapsToCheck,
 				'editable' => $options['editable']
 			));
@@ -287,7 +279,6 @@ class CScreen extends CZBXAPI {
 
 			// screen
 			$allowedScreens = API::Screen()->get(array(
-				'nodeids' => $options['nodeids'],
 				'screenids' => $screensToCheck,
 				'editable' => $options['editable']
 			));
@@ -403,12 +394,6 @@ class CScreen extends CZBXAPI {
 			'nopermissions' => true,
 			'limit' => 1
 		);
-		if (isset($data['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($data['node']);
-		}
-		elseif (isset($data['nodeids'])) {
-			$options['nodeids'] = $data['nodeids'];
-		}
 		$screens = $this->get($options);
 
 		return !empty($screens);
@@ -569,14 +554,5 @@ class CScreen extends CZBXAPI {
 		// deleted the old items
 		$deleteItemids = array_diff(array_keys($dbScreenItems), $result['screenitemids']);
 		API::ScreenItem()->delete($deleteItemids);
-	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['screenids'] === null && $options['screenitemids'] === null) {
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 }

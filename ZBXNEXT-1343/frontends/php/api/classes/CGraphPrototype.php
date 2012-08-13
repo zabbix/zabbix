@@ -66,7 +66,6 @@ class CGraphPrototype extends CGraphGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -146,10 +145,6 @@ class CGraphPrototype extends CGraphGeneral {
 							' AND ugg.userid='.$userid.
 							' AND rr.permission<'.$permission.'))';
 		}
-
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// groupids
 		if (!is_null($options['groupids'])) {
@@ -335,42 +330,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$graphids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('g.graphid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-
-		$dbRes = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($graph = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -436,7 +396,6 @@ class CGraphPrototype extends CGraphGeneral {
 		// adding GraphItems
 		if (!is_null($options['selectGraphItems']) && str_in_array($options['selectGraphItems'], $subselectsAllowedOutputs)) {
 			$gitems = API::GraphItem()->get(array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectGraphItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
@@ -456,7 +415,6 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['selectGroups'])) {
 			if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 				$groups = API::HostGroup()->get(array(
-					'nodeids' => $nodeids,
 					'output' => $options['selectGroups'],
 					'graphids' => $graphids,
 					'nopermissions' => true,
@@ -477,7 +435,6 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['selectHosts'])) {
 			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$hosts = API::Host()->get(array(
-					'nodeids' => $nodeids,
 					'output' => $options['selectHosts'],
 					'graphids' => $graphids,
 					'nopermissions' => true,
@@ -496,7 +453,6 @@ class CGraphPrototype extends CGraphGeneral {
 		// adding Templates
 		if (!is_null($options['selectTemplates']) && str_in_array($options['selectTemplates'], $subselectsAllowedOutputs)) {
 			$templates = API::Template()->get(array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectTemplates'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
@@ -514,7 +470,6 @@ class CGraphPrototype extends CGraphGeneral {
 		// adding Items
 		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 			$items = API::Item()->get(array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
@@ -545,7 +500,6 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'itemids' => $ruleids,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -915,7 +869,6 @@ class CGraphPrototype extends CGraphGeneral {
 
 
 		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
 			'webitems' => true,
 			'editable' => true,

@@ -36,7 +36,6 @@ class CTemplate extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
@@ -56,7 +55,6 @@ class CTemplate extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'parentTemplateids'			=> null,
@@ -139,9 +137,6 @@ class CTemplate extends CZBXAPI {
 				' AND rr.permission<'.$permission.')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -157,11 +152,6 @@ class CTemplate extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hg.groupid', $nodeids);
-			}
 		}
 
 		// templateids
@@ -169,11 +159,6 @@ class CTemplate extends CZBXAPI {
 			zbx_value2array($options['templateids']);
 
 			$sqlParts['where']['templateid'] = DBcondition('h.hostid', $options['templateids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('h.hostid', $nodeids);
-			}
 		}
 
 		// parentTemplateids
@@ -189,11 +174,6 @@ class CTemplate extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['templateid'] = 'ht.templateid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ht.templateid', $nodeids);
 			}
 		}
 
@@ -212,11 +192,6 @@ class CTemplate extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['ht'] = 'ht.hostid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ht.hostid', $nodeids);
-			}
 		}
 
 		// itemids
@@ -230,11 +205,6 @@ class CTemplate extends CZBXAPI {
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('i.itemid', $nodeids);
-			}
 		}
 
 		// triggerids
@@ -249,11 +219,6 @@ class CTemplate extends CZBXAPI {
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('f.triggerid', $nodeids);
-			}
 		}
 
 		// graphids
@@ -269,17 +234,6 @@ class CTemplate extends CZBXAPI {
 			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('gi.graphid', $nodeids);
-			}
-		}
-
-		// node check !!!!
-		// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$sqlParts['where'][] = DBin_node('h.hostid', $nodeids);
 		}
 
 		// with_items
@@ -463,7 +417,6 @@ class CTemplate extends CZBXAPI {
 		// Adding Groups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectGroups'],
 				'hostids' => $templateids,
 				'preservekeys' => 1
@@ -481,7 +434,6 @@ class CTemplate extends CZBXAPI {
 		// Adding Templates
 		if (!is_null($options['selectTemplates'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'parentTemplateids' => $templateids,
 				'preservekeys' => 1
 			);
@@ -527,7 +479,6 @@ class CTemplate extends CZBXAPI {
 		// Adding Hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'templateids' => $templateids,
 				'preservekeys' => 1
 			);
@@ -570,7 +521,6 @@ class CTemplate extends CZBXAPI {
 		// Adding parentTemplates
 		if (!is_null($options['selectParentTemplates'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'hostids' => $templateids,
 				'preservekeys' => 1
 			);
@@ -613,7 +563,6 @@ class CTemplate extends CZBXAPI {
 		// Adding Items
 		if (!is_null($options['selectItems'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'hostids' => $templateids,
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
@@ -656,7 +605,6 @@ class CTemplate extends CZBXAPI {
 		// Adding Discoveries
 		if (!is_null($options['selectDiscoveries'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'hostids' => $templateids,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 				'nopermissions' => 1,
@@ -701,7 +649,6 @@ class CTemplate extends CZBXAPI {
 		if (!is_null($options['selectTriggers'])) {
 			if (is_array($options['selectTriggers']) || str_in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$triggers = API::Trigger()->get(array(
-					'nodeids' => $nodeids,
 					'hostids' => $templateids,
 					'preservekeys' => true,
 					'output' => $options['selectTriggers']
@@ -725,7 +672,6 @@ class CTemplate extends CZBXAPI {
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
 				$triggers = API::Trigger()->get(array(
-					'nodeids' => $nodeids,
 					'hostids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true
@@ -745,7 +691,6 @@ class CTemplate extends CZBXAPI {
 		if (!is_null($options['selectGraphs'])) {
 			if (is_array($options['selectGraphs']) || str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$graphs = API::Graph()->get(array(
-					'nodeids' => $nodeids,
 					'hostids' => $templateids,
 					'preservekeys' => true,
 					'output' => $options['selectGraphs']
@@ -769,7 +714,6 @@ class CTemplate extends CZBXAPI {
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
 				$graphs = API::Graph()->get(array(
-					'nodeids' => $nodeids,
 					'hostids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true,
@@ -787,7 +731,6 @@ class CTemplate extends CZBXAPI {
 		// Adding applications
 		if (!is_null($options['selectApplications'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'hostids' => $templateids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -831,7 +774,6 @@ class CTemplate extends CZBXAPI {
 		// Adding screens
 		if (!is_null($options['selectScreens'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'templateids' => $templateids,
 				'editable' => $options['editable'],
 				'nopermissions' => 1,
@@ -871,7 +813,6 @@ class CTemplate extends CZBXAPI {
 		// Adding macros
 		if (!is_null($options['selectMacros']) && str_in_array($options['selectMacros'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectMacros'],
 				'hostids' => $templateids,
 				'preservekeys' => 1
@@ -908,11 +849,6 @@ class CTemplate extends CZBXAPI {
 			'output'=>API_OUTPUT_EXTEND
 		);
 
-		if (isset($templateData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($templateData['node']);
-		elseif (isset($templateData['nodeids']))
-			$options['nodeids'] = $templateData['nodeids'];
-
 		$result = $this->get($options);
 
 		return $result;
@@ -927,10 +863,6 @@ class CTemplate extends CZBXAPI {
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 
@@ -2239,7 +2171,6 @@ class CTemplate extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -2255,7 +2186,6 @@ class CTemplate extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,

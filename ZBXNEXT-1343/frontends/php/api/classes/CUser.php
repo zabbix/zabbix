@@ -31,7 +31,6 @@ class CUser extends CZBXAPI {
 	 * Get Users data
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids'] filter by Node IDs
 	 * @param array $options['usrgrpids'] filter by UserGroup IDs
 	 * @param array $options['userids'] filter by User IDs
 	 * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
@@ -60,7 +59,6 @@ class CUser extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'mediaids'					=> null,
@@ -190,38 +188,9 @@ class CUser extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		$userids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
 			if (!is_null($options['countOutput'])) {
@@ -454,9 +423,7 @@ class CUser extends CZBXAPI {
 			}
 
 			if (isset($user['alias'])) {
-				$nodeids = $update ? id2nodeid($user['userid']) : get_current_nodeid(false);
 				$userExist = $this->get(array(
-					'nodeids' => $nodeids,
 					'filter' => array('alias' => $user['alias']),
 					'nopermissions' => true
 				));
@@ -850,14 +817,11 @@ class CUser extends CZBXAPI {
 	}
 
 	private function dbLogin($user) {
-		global $ZBX_LOCALNODEID;
-
 		$login = DBfetch(DBselect(
 			'SELECT u.userid'.
 			' FROM users u'.
 			' WHERE u.alias='.zbx_dbstr($user['user']).
-				' AND u.passwd='.zbx_dbstr(md5($user['password'])).
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				' AND u.passwd='.zbx_dbstr(md5($user['password']))
 		));
 		if ($login) {
 			return true;
@@ -868,14 +832,11 @@ class CUser extends CZBXAPI {
 	}
 
 	public function logout($sessionid) {
-		global $ZBX_LOCALNODEID;
-
 		$session = DBfetch(DBselect(
 			'SELECT s.*'.
 			' FROM sessions s'.
 			' WHERE s.sessionid='.zbx_dbstr($sessionid).
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID)
+				' AND s.status='.ZBX_SESSION_ACTIVE
 		));
 		if (!$session) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
@@ -896,16 +857,13 @@ class CUser extends CZBXAPI {
 	 * @return string session ID
 	 */
 	public function login($user) {
-		global $ZBX_LOCALNODEID;
-
 		$name = $user['user'];
 		$password = md5($user['password']);
 
 		$userInfo = DBfetch(DBselect(
 			'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
 			' FROM users u'.
-			' WHERE u.alias='.zbx_dbstr($name).
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+			' WHERE u.alias='.zbx_dbstr($name)
 		));
 		if (!$userInfo) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
@@ -1007,8 +965,6 @@ class CUser extends CZBXAPI {
 	 * @return array    an array of user data
 	 */
 	public function checkAuthentication($sessionid) {
-		global $ZBX_LOCALNODEID;
-
 		// access DB only once per page load
 		if (!is_null(self::$userData)) {
 			return self::$userData;
@@ -1021,8 +977,7 @@ class CUser extends CZBXAPI {
 			' WHERE s.sessionid='.zbx_dbstr($sessionid).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND s.userid=u.userid'.
-				' AND ((s.lastaccess+u.autologout>'.$time.') OR (u.autologout=0))'.
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				' AND ((s.lastaccess+u.autologout>'.$time.') OR (u.autologout=0))'
 		));
 
 		if (!$userInfo) {
@@ -1065,8 +1020,6 @@ class CUser extends CZBXAPI {
 	}
 
 	private function _getUserData($userid) {
-		global $ZBX_LOCALNODEID, $ZBX_NODES;
-
 		$userData = DBfetch(DBselect(
 			'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,'.
 			' u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page'.
@@ -1086,15 +1039,6 @@ class CUser extends CZBXAPI {
 					? $_SERVER['HTTP_X_FORWARDED_FOR']
 					: $_SERVER['REMOTE_ADDR'];
 
-		if (isset($ZBX_NODES[$ZBX_LOCALNODEID])) {
-			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
-		}
-		else {
-			$userData['node'] = array();
-			$userData['node']['name'] = '- unknown -';
-			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
-		}
-
 		return $userData;
 	}
 
@@ -1109,7 +1053,6 @@ class CUser extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -1129,7 +1072,6 @@ class CUser extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
@@ -1137,14 +1079,6 @@ class CUser extends CZBXAPI {
 		));
 
 		return (count($ids) == $count);
-	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if (!isset($options['usrgrpids'])) {
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

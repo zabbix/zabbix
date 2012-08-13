@@ -65,7 +65,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'						=> null,
 			'groupids'						=> null,
 			'templateids'					=> null,
 			'hostids'						=> null,
@@ -169,9 +168,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 							' AND gg.userid='.$userid.
 							' AND rr.permission<'.$permission.'))';
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// groupids
 		if (!is_null($options['groupids'])) {
@@ -533,42 +529,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$triggerids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('t.triggerid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-
-		$dbRes = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -733,7 +694,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		// adding groups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$groups = API::HostGroup()->get(array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectGroups'],
 				'triggerids' => $triggerids,
 				'preservekeys' => true
@@ -751,7 +711,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'triggerids' => $triggerids,
 				'templated_hosts' => 1,
 				'nopermissions' => true,
@@ -817,7 +776,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		// adding items
 		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
 				'webitems' => 1,
@@ -850,7 +808,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'itemids' => $ruleids,
 				'nopermissions' => true,
 				'preservekeys' => true

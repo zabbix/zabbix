@@ -31,7 +31,6 @@ class CProxy extends CZBXAPI {
 	 * Get Proxy data
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids']
 	 * @param array $options['proxyids']
 	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
 	 * @param int $options['count'] returns value in rowscount
@@ -60,7 +59,6 @@ class CProxy extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'proxyids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -110,9 +108,6 @@ class CProxy extends CZBXAPI {
 			}
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
@@ -153,35 +148,7 @@ class CProxy extends CZBXAPI {
 
 		$proxyids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-				FROM '.$sqlFrom.'
-				WHERE '.DBin_node('h.hostid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($proxy = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $proxy['rowscount'];
@@ -219,7 +186,6 @@ class CProxy extends CZBXAPI {
 		// selectHosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'proxyids' => $proxyids,
 				'preservekeys' => true
 			);
@@ -235,7 +201,6 @@ class CProxy extends CZBXAPI {
 		// adding hostinterfaces
 		if (!is_null($options['selectInterfaces'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'hostids' => $proxyids,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -568,7 +533,6 @@ class CProxy extends CZBXAPI {
 		$proxyids = array_unique($proxyids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'proxyids' => $proxyids,
 			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
@@ -591,7 +555,6 @@ class CProxy extends CZBXAPI {
 		$proxyids = array_unique($proxyids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'proxyids' => $proxyids,
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,

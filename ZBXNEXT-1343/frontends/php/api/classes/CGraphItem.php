@@ -57,7 +57,6 @@ class CGraphItem extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'		=> null,
 			'graphids'		=> null,
 			'itemids'		=> null,
 			'type'			=> null,
@@ -100,9 +99,6 @@ class CGraphItem extends CZBXAPI {
 					' AND ugg.userid='.$userid.
 					' AND rr.permission<'.$permission.')';
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// graphids
 		if (!is_null($options['graphids'])) {
@@ -162,35 +158,7 @@ class CGraphItem extends CZBXAPI {
 
 		$gitemids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('gi.gitemid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($gitem = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				$result = $gitem['rowscount'];
@@ -225,7 +193,6 @@ class CGraphItem extends CZBXAPI {
 		// adding graphs
 		if (!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 			$graphs = API::Graph()->get(array(
-				'nodeids' => $nodeids,
 				'output' => $options['selectGraphs'],
 				'gitemids' => $gitemids,
 				'preservekeys' => true

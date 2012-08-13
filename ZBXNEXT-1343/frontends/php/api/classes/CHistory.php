@@ -47,7 +47,6 @@ class CHistory extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$nodeCheck = false;
 
 		// allowed columns for sorting
 		$sortColumns = array('itemid', 'clock');
@@ -66,7 +65,6 @@ class CHistory extends CZBXAPI {
 
 		$defOptions = array(
 			'history'					=> ITEM_VALUE_TYPE_UINT64,
-			'nodeids'					=> null,
 			'hostids'					=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
@@ -130,18 +128,10 @@ class CHistory extends CZBXAPI {
 			$options['itemids'] = array_keys($items);
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 			$sqlParts['where']['itemid'] = DBcondition('h.itemid', $options['itemids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('h.itemid', $nodeids);
-			}
 		}
 
 		// hostids
@@ -154,17 +144,6 @@ class CHistory extends CZBXAPI {
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sqlParts['where']['hi'] = 'h.itemid=i.itemid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('i.hostid', $nodeids);
-			}
-		}
-
-		// should be last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('h.itemid', $nodeids);
 		}
 
 		// time_from
@@ -226,35 +205,7 @@ class CHistory extends CZBXAPI {
 
 		$itemids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.
-					$sqlWhere.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		$count = 0;
 		$group = array();
 		while ($data = DBfetch($dbRes)) {

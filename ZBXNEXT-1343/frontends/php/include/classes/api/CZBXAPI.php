@@ -77,7 +77,6 @@ class CZBXAPI {
 		$this->pk = $this->pk($this->tableName());
 
 		$this->globalGetOptions = array(
-			'nodeids'				=> null,
 			// filter
 			'filter'				=> null,
 			'search'				=> null,
@@ -353,9 +352,6 @@ class CZBXAPI {
 		// add filter options
 		$sqlParts = $this->applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		// add node options
-		$sqlParts = $this->applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-
 		// add sort options
 		$sqlParts = $this->applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
 
@@ -450,29 +446,6 @@ class CZBXAPI {
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search($tableId, $options, $sqlParts);
-		}
-
-		return $sqlParts;
-	}
-
-	/**
-	 * Modifies the SQL parts to implement all of the node related options.
-	 *
-	 * @param $tableName
-	 * @param $tableAlias
-	 * @param array $options
-	 * @param array $sqlParts
-	 *
-	 * @return array
-	 */
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$pkOption = $this->pkOption($tableName);
-		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
-
-		// if no specific ids are given, apply the node filter
-		if (!isset($options[$pkOption])) {
-			$nodeids = (isset($options['nodeids'])) ? $options['nodeids'] : get_current_nodeid();
-			$sqlParts['where'][] = DBin_node($pkFieldId, $nodeids);
 		}
 
 		return $sqlParts;

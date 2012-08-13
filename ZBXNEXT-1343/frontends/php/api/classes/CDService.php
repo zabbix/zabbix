@@ -36,7 +36,6 @@ class CDService extends CZBXAPI{
  * Get Service data
  *
  * @param _array $options
- * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] ServiceGroup IDs
  * @param array $options['hostids'] Service IDs
  * @param boolean $options['monitored_hosts'] only monitored Services
@@ -67,7 +66,6 @@ class CDService extends CZBXAPI{
  */
 	public function get($options = array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
@@ -86,7 +84,6 @@ class CDService extends CZBXAPI{
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'dserviceids'				=> null,
 			'dhostids'					=> null,
 			'dcheckids'					=> null,
@@ -137,18 +134,10 @@ class CDService extends CZBXAPI{
 			return array();
 		}
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 			$sqlParts['where']['dserviceid'] = DBcondition('ds.dserviceid', $options['dserviceids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
-			}
 		}
 
 // dhostids
@@ -162,11 +151,6 @@ class CDService extends CZBXAPI{
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'ds.dhostid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ds.dhostid', $nodeids);
 			}
 		}
 
@@ -205,20 +189,7 @@ class CDService extends CZBXAPI{
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dh.druleid', $nodeids);
-			}
 		}
-
-// node check !!!!!
-// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
-		}
-
 
 // output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
@@ -260,31 +231,7 @@ class CDService extends CZBXAPI{
 
 		$dserviceids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
- //SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dservice = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -351,7 +298,6 @@ class CDService extends CZBXAPI{
 // select_drules
 		if (!is_null($options['selectDRules'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dserviceids' => $dserviceids,
 				'preservekeys' => 1
 			);
@@ -394,7 +340,6 @@ class CDService extends CZBXAPI{
 // selectDHosts
 		if (!is_null($options['selectDHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dserviceids' => $dserviceids,
 				'preservekeys' => 1
 			);
@@ -436,7 +381,6 @@ class CDService extends CZBXAPI{
 // selectHosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
 				'dserviceids' => $dserviceids,
 				'preservekeys' => 1,
 				'sortfield' => 'status'
@@ -494,10 +438,6 @@ class CDService extends CZBXAPI{
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 

@@ -36,7 +36,6 @@ abstract class CMapElement extends CZBXAPI {
  * Get Map data
  *
  * @param _array $options
- * @param array $options['nodeids'] Node IDs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['countoutput'] count Hosts, returned column name is rowscount
  * @param string $options['search'] search hosts by pattern in host names
@@ -47,7 +46,6 @@ abstract class CMapElement extends CZBXAPI {
  */
 	protected function getSelements($options = array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
@@ -66,7 +64,6 @@ abstract class CMapElement extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -104,18 +101,10 @@ abstract class CMapElement extends CZBXAPI {
 
 // editable + PERMISSION CHECK
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // selementids
 		if (!is_null($options['selementids'])) {
 			zbx_value2array($options['selementids']);
 			$sqlParts['where']['selementid'] = DBcondition('se.selementid', $options['selementids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('se.selementid', $nodeids);
-			}
 		}
 
 // sysmapids
@@ -131,18 +120,6 @@ abstract class CMapElement extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['sysmapid'] = 'se.sysmapid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('se.sysmapid', $nodeids);
-			}
-		}
-
-// node check !!!!!
-// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('se.selementid', $nodeids);
 		}
 
 // search
@@ -178,31 +155,7 @@ abstract class CMapElement extends CZBXAPI {
 
 		$selementids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-//SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($selement = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $selement['rowscount'];
@@ -303,7 +256,6 @@ abstract class CMapElement extends CZBXAPI {
 
 	protected function getLinks($options=array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		$sortColumns = array('linkid'); // allowed columns for sorting
@@ -318,7 +270,6 @@ abstract class CMapElement extends CZBXAPI {
 			'limit' => null);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -358,18 +309,10 @@ abstract class CMapElement extends CZBXAPI {
 
 // editable + PERMISSION CHECK
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // linkids
 		if (!is_null($options['linkids'])) {
 			zbx_value2array($options['linkids']);
 			$sqlParts['where']['linkid'] = DBcondition('sl.linkid', $options['linkids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('sl.linkid', $nodeids);
-			}
 		}
 
 // sysmapids
@@ -385,18 +328,6 @@ abstract class CMapElement extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['sysmapid'] = 'sl.sysmapid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('sl.sysmapid', $nodeids);
-			}
-		}
-
-// node check !!!!!
-// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('sl.linkid', $nodeids);
 		}
 
 // search
@@ -432,31 +363,7 @@ abstract class CMapElement extends CZBXAPI {
 
 		$linkids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-//SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($link = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $link['rowscount'];
