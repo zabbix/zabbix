@@ -3,22 +3,22 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-08-13 21:47+0300\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"PO-Revision-Date: 2012-08-11 15:38+0200\n"
+"Last-Translator: pengyao <pengyao@pengyao.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
-"Language: zh\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Country: CHINA\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" 必须介于1970年1月1日至2038年1月18日之间。"
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -106,7 +106,7 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:475 popup.php:1878
 #: popup.php:1879
 msgid "- all groups -"
-msgstr ""
+msgstr "- 所有组 -"
 
 #: acknow.php:97
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -150,7 +150,7 @@ msgstr "最近500个值"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
-msgstr ""
+msgstr "<手册>"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
@@ -186,12 +186,12 @@ msgstr ""
 
 #: sysmap.php:83
 msgid "Access denied!"
-msgstr ""
+msgstr "拒绝访问!"
 
 #: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "账户被锁定 %s 秒"
 
 #: events.php:566 events.php:579 include/actions.inc.php:189
 #: include/blocks.inc.php:833 include/blocks.inc.php:1345
@@ -395,7 +395,7 @@ msgstr "添加组件"
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "请先添加绘图项"
 
 #: include/actions.inc.php:283 include/actions.inc.php:498
 msgid "Add host"
@@ -415,7 +415,7 @@ msgstr ""
 
 #: jsLoader.php:177
 msgid "Add service"
-msgstr ""
+msgstr "添加服务"
 
 #: slides.php:88
 msgid "Add to"
@@ -428,11 +428,11 @@ msgstr ""
 
 #: include/actions.inc.php:502
 msgid "Add to host group"
-msgstr ""
+msgstr "添加至主机组"
 
 #: include/actions.inc.php:309 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
-msgstr ""
+msgstr "添加至主机组"
 
 #: auditlogs.php:134
 msgid "Added"
@@ -476,7 +476,7 @@ msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Agent接口"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -1050,15 +1050,15 @@ msgstr "Callback"
 
 #: api/classes/CTemplate.php:1441
 msgid "Can't add group"
-msgstr ""
+msgstr "添加组失败"
 
 #: api/classes/CTemplate.php:1517 api/classes/CTemplate.php:1527
 msgid "Can't link template"
-msgstr ""
+msgstr "链接模板失败"
 
 #: api/classes/CTemplate.php:1452
 msgid "Can't remove group"
-msgstr ""
+msgstr "删除组失败"
 
 #: api/classes/CTemplate.php:1578
 msgid "Can't unlink groups"
@@ -12767,7 +12767,7 @@ msgstr ""
 
 #: include/config.inc.php:243
 msgid "You are not logged in."
-msgstr ""
+msgstr "你没有登录"
 
 #: popup.php:475
 msgid "You can not switch hosts for current selection."
@@ -13171,19 +13171,19 @@ msgstr ""
 
 #: api/classes/CMap.php:580
 msgid "host"
-msgstr ""
+msgstr "主机"
 
 #: api/classes/CMap.php:579
 msgid "host group"
-msgstr ""
+msgstr "主机组"
 
 #: api/classes/CMap.php:577
 msgid "icon"
-msgstr ""
+msgstr "图标"
 
 #: api/classes/CMap.php:583
 msgid "image"
-msgstr ""
+msgstr "图片"
 
 #: include/actions.inc.php:27
 msgid "in"
@@ -13223,7 +13223,7 @@ msgstr ""
 
 #: include/views/js/common.macros.js.php:53
 msgid "macro(s)"
-msgstr ""
+msgstr "宏"
 
 #: include/actions.inc.php:144 include/views/configuration.action.edit.php:205
 msgid "maintenance"
@@ -13267,11 +13267,11 @@ msgstr ""
 #: include/func.inc.php:427 include/func.inc.php:483
 msgctxt "millisecond short"
 msgid "ms"
-msgstr ""
+msgstr "毫秒"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
-msgstr ""
+msgstr "必须是有效的LDAP用户"
 
 #: include/classes/class.frontendsetup.php:288
 #: include/classes/class.frontendsetup.php:316
@@ -13419,11 +13419,11 @@ msgstr ""
 #: include/classes/class.frontendsetup.php:375
 #: include/classes/class.frontendsetup.php:475
 msgid "unknown"
-msgstr ""
+msgstr "未知"
 
 #: include/views/common.macros.php:34
 msgid "value"
-msgstr ""
+msgstr "值"
 
 #: jsLoader.php:91
 msgctxt "week short"

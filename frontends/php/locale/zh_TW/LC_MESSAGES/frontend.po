@@ -64,13 +64,13 @@ msgstr[0] "已紀錄%1$s次登入失敗. 前次登入失敗是來自 %2$s 位於
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] "%2$d 的問題 %1$d 已展示"
+msgstr[0] "已展示%1$d之%2$d個議題"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] "%d 設備"
+msgstr[0] "%d個裝置"
 
 #: include/views/configuration.action.edit.php:424
 msgid "(0 - infinitely)"
@@ -2929,12 +2929,12 @@ msgstr "預設主旨"
 
 #: include/views/administration.general.gui.edit.php:31
 msgid "Default theme"
-msgstr "內定的佈景主題"
+msgstr "預設的佈景主題"
 
 #: adm.gui.php:68
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr "內定的佈景主題 \"%1$s\"."
+msgstr "預設的佈景主題 \"%1$s\"."
 
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:49
@@ -3349,7 +3349,7 @@ msgstr "裝置"
 
 #: discoveryconf.php:42 include/views/configuration.discovery.edit.php:67
 msgid "Device uniqueness criteria"
-msgstr "裝置唯一性條件"
+msgstr "裝置唯一性準則"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -5031,7 +5031,7 @@ msgstr "主機標示類型"
 
 #: include/html.inc.php:350
 msgid "Host list"
-msgstr "主機列表"
+msgstr "主機清單"
 
 #: hosts.php:51 include/actions.inc.php:62
 #: include/views/configuration.host.edit.php:170
@@ -5874,7 +5874,7 @@ msgstr "不正確的鍵值: %s"
 
 #: include/forms.inc.php:1163 items.php:760
 msgid "Incorrect list of items."
-msgstr "不正確的項目列表"
+msgstr "不正確的項目清單"
 
 #: api/classes/CTriggerExpression.php:58
 #, php-format
@@ -6319,7 +6319,7 @@ msgstr "是否在線?"
 #: include/blocks.inc.php:819 include/blocks.inc.php:829
 #: include/blocks.inc.php:1342
 msgid "Issue"
-msgstr "癥結"
+msgstr "議題"
 
 #: api/classes/CUser.php:172
 msgid "It is not possible to filter by user password."
@@ -6698,7 +6698,7 @@ msgstr "末"
 #, php-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] "最末 %1$d 問題"
+msgstr[0] "最近%1$d個議題"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -11349,7 +11349,7 @@ msgstr ""
 
 #: include/actions.inc.php:47
 msgid "Time period"
-msgstr "時間範圍"
+msgstr "時間期間"
 
 #: popup_trexpr.php:54
 msgid "Time shift"
@@ -13130,7 +13130,7 @@ msgstr "dd"
 #: include/setup.inc.php:353 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
 msgid "default"
-msgstr "內定的"
+msgstr "預設的"
 
 #: jsLoader.php:87
 msgid "dynamic"
