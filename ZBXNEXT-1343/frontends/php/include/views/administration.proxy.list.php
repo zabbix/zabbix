@@ -21,11 +21,6 @@
 <?php
 $proxyWidget = new CWidget();
 
-// create new proxy button
-$configComboBox = new CComboBox('config', 'proxies.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('nodes.php', _('Nodes'));
-$configComboBox->addItem('proxies.php', _('Proxies'));
-
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addItem($configComboBox);
