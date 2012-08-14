@@ -291,21 +291,18 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$menu_table->setCellPadding(5);
 	$menu_table->addRow($main_menu);
 
-	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-		$table = new CTable();
-		$table->addStyle('width: 100%;');
+	$menuRow = array($menu_table);
 
-		$tableColumn = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
-		$tableColumn->addStyle('padding-right: 20px; padding-bottom: 2px;');
-		$table->addRow($tableColumn);
-		$node_form = $table;
+	// zabbix server name
+	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
+		$tableColumn = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'), 'right');
+		$tableColumn->addStyle('padding-right: 5px; line-height: 1.8em;');
+		$menuRow[] = $tableColumn;
 	}
 
 	// 1st level menu
 	$table = new CTable(null, 'maxwidth');
-	$r_col = new CCol($node_form, 'right');
-	$r_col->setAttribute('style', 'line-height: 1.8em;');
-	$table->addRow(array($menu_table, $r_col));
+	$table->addRow($menuRow);
 
 	$page_menu = new CDiv(null, 'textwhite');
 	$page_menu->setAttribute('id', 'mmenu');
@@ -380,7 +377,7 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 }
 
 // unset multiple variables
-unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row, $db_nodes, $node_data, $sub_menu_table, $sub_menu_rows);
+unset($ZBX_MENU, $table, $top_page_row, $menu_table, $db_nodes, $node_data, $sub_menu_table);
 
 if ($denied_page_requested) {
 	access_deny();
