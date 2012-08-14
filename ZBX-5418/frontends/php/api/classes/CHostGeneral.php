@@ -82,8 +82,8 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * Removes the relations between hosts or templates and other objects.
 	 *
 	 * Supported $data parameters are:
-	 * - hostsids           - an array of host IDs to be updated
-	 * - templatesids       - an array of template IDs to be updated
+	 * - hostids           - an array of host IDs to be updated
+	 * - templateids       - an array of template IDs to be updated
 	 * - groupids           - an array of host group IDs the hosts should be removed from
 	 * - templateids_unlink - an array of template IDs to unlink from the hosts
 	 * - templateids_clear  - an array of template IDs to unlink and clear from the hosts
