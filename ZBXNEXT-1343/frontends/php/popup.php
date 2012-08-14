@@ -117,12 +117,6 @@ switch ($srctbl) {
 		$page['title'] = _('Host groups');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
-	case 'nodes':
-		if (ZBX_DISTRIBUTED) {
-			$page['title'] = _('Nodes');
-			$min_user_type = USER_TYPE_ZABBIX_USER;
-			break;
-		}
 	case 'drules':
 		$page['title'] = _('Discovery rules');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -178,7 +172,6 @@ $allowedSrcFields = array(
 	'screens2'				=> '"screenid", "name"',
 	'host_group_scr'		=> '"groupid", "name"',
 	'host_templates'		=> '"templateid", "name"',
-	'nodes'					=> '"nodeid", "name"',
 	'drules'				=> '"druleid", "name"',
 	'dchecks'				=> '"dcheckid", "name"',
 	'proxies'				=> '"hostid", "host"',
@@ -194,7 +187,6 @@ $fields = array(
 	'dstfld1' =>			array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'srctbl' =>				array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
 	'srcfld1' =>			array(T_ZBX_STR, O_MAND, P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
-	'nodeid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'group' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -269,13 +261,12 @@ $with_triggers = get_request('with_triggers', 0);
 $value_types = get_request('value_types', null);
 $submitParent = get_request('submitParent', 0);
 $normal_only = get_request('normal_only');
-$nodeid = get_request('nodeid', get_current_nodeid(false));
 $group = get_request('group', '');
 $host = get_request('host', '');
 $only_hostid = get_request('only_hostid', null);
 if (isset($only_hostid)) {
 	$_REQUEST['hostid'] = $only_hostid;
-	unset($_REQUEST['groupid'], $_REQUEST['nodeid']);
+	unset($_REQUEST['groupid']);
 }
 
 
@@ -315,8 +306,8 @@ if (!empty($host)) {
 
 $options = array(
 	'config' => array('select_latest' => true, 'deny_all' => true, 'popupDD' => true),
-	'groups' => array('nodeids' => $nodeid),
-	'hosts' => array('nodeids' => $nodeid),
+	'groups' => array(),
+	'hosts' => array(),
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 );
@@ -470,33 +461,12 @@ if (isset($only_hostid)) {
 	}
 
 	$cmbHosts = new CComboBox('hostid', $hostid);
-	$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$host['host']);
+	$cmbHosts->addItem($hostid, $host['host']);
 	$cmbHosts->setEnabled('disabled');
 	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
 }
 else {
-	if (str_in_array($srctbl, array('hosts', 'host_group', 'triggers', 'items', 'simple_graph', 'applications',
-			'screens', 'slides', 'graphs', 'sysmaps', 'plain_text', 'screens2', 'overview', 'host_group_scr'))) {
-		if (ZBX_DISTRIBUTED) {
-			$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
-
-			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
-			while ($node_data = DBfetch($db_nodes)) {
-				$cmbNode->addItem($node_data['nodeid'], $node_data['name']);
-				if (bccomp($nodeid , $node_data['nodeid']) == 0) {
-					$ok = true;
-				}
-			}
-			$frmTitle->addItem(array(SPACE, _('Node'), SPACE, $cmbNode, SPACE));
-		}
-	}
-
-	if (!isset($ok)) {
-		$nodeid = get_current_nodeid();
-	}
-	unset($ok);
-
 	if (str_in_array($srctbl, array('hosts_and_templates', 'hosts', 'templates', 'triggers', 'items', 'applications', 'host_templates', 'graphs', 'simple_graph', 'plain_text'))) {
 		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true)));
 	}
@@ -540,7 +510,6 @@ if ($srctbl == 'hosts') {
 	$table->setHeader(array(_('Name'), _('DNS'), _('IP'), _('Port'), _('Status'), _('Availability')));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'groupids' => $groupid,
 		'output' => array('hostid', 'name', 'status', 'available'),
 		'selectInterfaces' => array('dns', 'ip', 'useip', 'port')
@@ -629,7 +598,6 @@ elseif ($srctbl == 'templates') {
 	$table->setHeader(array(_('Name')));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'groupids' => $groupid,
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'name'
@@ -678,7 +646,6 @@ elseif ($srctbl == 'host_group') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => array('groupid', 'name'),
 		'preservekeys' => true
 	);
@@ -689,11 +656,7 @@ elseif ($srctbl == 'host_group') {
 	order_result($hostgroups, 'name');
 
 	foreach ($hostgroups as $gnum => $group) {
-		$nodeName = get_node_name_by_elid($group['groupid'], true);
-		$group['node_name'] = isset($nodeName) ? '('.$nodeName.') ' : '';
-		$hostgroups[$gnum]['node_name'] = $group['node_name'];
-
-		$name = new CSpan(get_node_name_by_elid($group['groupid'], null, ': ').$group['name'], 'link');
+		$name = new CSpan($group['name'], 'link');
 		$name->attr('id', 'spanid'.$group['groupid']);
 
 		if ($multiselect) {
@@ -739,7 +702,6 @@ elseif ($srctbl == 'host_templates') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'groupids' => $groupid,
 		'output' => array('templateid', 'name'),
 		'preservekeys' => true
@@ -751,7 +713,7 @@ elseif ($srctbl == 'host_templates') {
 	order_result($templates, 'name');
 
 	foreach ($templates as $template) {
-		$name = new CSpan(get_node_name_by_elid($template['templateid'], null, ': ').$template['name'], 'link');
+		$name = new CSpan($template['name'], 'link');
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).');';
@@ -790,7 +752,6 @@ elseif ($srctbl == 'hosts_and_templates') {
 	$table->setHeader(array(_('Name')));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'groupids' => $groupid,
 		'output' => array('hostid', 'name')
 	);
@@ -836,7 +797,6 @@ elseif ($srctbl == 'usrgrp') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
@@ -847,7 +807,7 @@ elseif ($srctbl == 'usrgrp') {
 	order_result($userGroups, 'name');
 
 	foreach ($userGroups as $userGroup) {
-		$name = new CSpan(get_node_name_by_elid($userGroup['usrgrpid'], null, ': ').$userGroup['name'], 'link');
+		$name = new CSpan($userGroup['name'], 'link');
 		$name->attr('id', 'spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
@@ -896,7 +856,6 @@ elseif ($srctbl == 'users') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => array('alias', 'name', 'surname', 'type', 'theme', 'lang'),
 		'preservekeys' => true
 	);
@@ -907,7 +866,7 @@ elseif ($srctbl == 'users') {
 	order_result($users, 'alias');
 
 	foreach ($users as $unum => $user) {
-		$alias = new CSpan(get_node_name_by_elid($user['userid'], null, ': ').$user['alias'], 'link');
+		$alias = new CSpan($user['alias'], 'link');
 		$alias->attr('id', 'spanid'.$user['userid']);
 
 		if ($multiselect) {
@@ -975,7 +934,6 @@ elseif ($srctbl == 'triggers') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'output' => array('triggerid', 'description', 'expression', 'priority', 'status'),
 		'selectHosts' => array('hostid', 'name'),
@@ -1091,7 +1049,6 @@ elseif ($srctbl == 'items') {
 	$table->setHeader($header);
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'webitems' => true,
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -1210,7 +1167,6 @@ elseif ($srctbl == 'prototypes') {
 	$table->setHeader($header);
 
 	$items = API::Item()->get(array(
-		'nodeids' => $nodeid,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
@@ -1281,7 +1237,6 @@ elseif ($srctbl == 'applications') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
 		'expandData' => true
@@ -1304,22 +1259,6 @@ elseif ($srctbl == 'applications') {
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 
 		$table->addRow(array($hostid > 0 ? null : $app['host'], $name));
-	}
-	$table->show();
-}
-/*
- * Nodes
- */
-elseif ($srctbl == 'nodes') {
-	$table = new CTableInfo(_('No nodes defined.'));
-	$table->setHeader(_('Name'));
-
-	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
-	while ($row = DBfetch($result)) {
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CSpan($row['name'], 'link');
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
-		$table->addRow($name);
 	}
 	$table->show();
 }
@@ -1358,7 +1297,6 @@ elseif ($srctbl == 'graphs') {
 		$options = array(
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => $nodeid,
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		);
@@ -1379,11 +1317,6 @@ elseif ($srctbl == 'graphs') {
 	foreach ($graphs as $graph) {
 		$host = reset($graph['hosts']);
 		$graph['hostname'] = $host['name'];
-		$graph['node_name'] = get_node_name_by_elid($graph['graphid'], null, ': ');
-
-		if (!$simpleName) {
-			$graph['name'] = $graph['node_name'].$graph['hostname'].': '.$graph['name'];
-		}
 		$description = new CSpan($graph['name'], 'link');
 
 		if ($multiselect) {
@@ -1453,7 +1386,6 @@ elseif ($srctbl == 'simple_graph') {
 		}
 
 		$options = array(
-			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
@@ -1565,7 +1497,6 @@ elseif ($srctbl == 'sysmaps') {
 	$excludeids = zbx_toHash($excludeids);
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
@@ -1579,8 +1510,6 @@ elseif ($srctbl == 'sysmaps') {
 		if (isset($excludeids[$sysmap['sysmapid']])) {
 			continue;
 		}
-		$sysmap['node_name'] = isset($sysmap['node_name']) ? '('.$sysmap['node_name'].') ' : '';
-		$name = $sysmap['node_name'].$sysmap['name'];
 		$description = new CSpan($sysmap['name'], 'link');
 
 		if ($multiselect) {
@@ -1628,7 +1557,6 @@ elseif ($srctbl == 'plain_text') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
@@ -1690,7 +1618,7 @@ elseif ($srctbl == 'slides') {
 	$table->setHeader($header);
 
 	$slideshows = array();
-	$result = DBselect('SELECT s.slideshowid,s.name FROM slideshows s WHERE '.DBin_node('s.slideshowid', $nodeid).' ORDER BY s.name');
+	$result = DBselect('SELECT s.slideshowid,s.name FROM slideshows s ORDER BY s.name');
 	while ($row = DBfetch($result)) {
 		if (!slideshow_accessible($row['slideshowid'], PERM_READ_ONLY)) {
 			continue;
@@ -1750,7 +1678,6 @@ elseif ($srctbl == 'screens') {
 	$table->setHeader($header);
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
@@ -1799,22 +1726,17 @@ elseif ($srctbl == 'screens2') {
 	$table->setHeader(_('Name'));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$screens = API::Screen()->get($options);
 	order_result($screens, 'name');
 
 	foreach ($screens as $row) {
-		$row['node_name'] = get_node_name_by_elid($row['screenid'], true);
-
 		if (check_screen_recursion($_REQUEST['screenid'], $row['screenid'])) {
 			continue;
 		}
-		$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 
 		$name = new CLink($row['name'], '#');
-		$row['name'] = $row['node_name'].$row['name'];
 
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
@@ -1830,7 +1752,6 @@ elseif ($srctbl == 'overview') {
 	$table->setHeader(_('Name'));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'monitored_hosts' => true,
 		'output' => API_OUTPUT_EXTEND
 	);
@@ -1841,11 +1762,7 @@ elseif ($srctbl == 'overview') {
 	order_result($hostGroups, 'name');
 
 	foreach ($hostGroups as $hostGroup) {
-		$hostGroup['node_name'] = get_node_name_by_elid($hostGroup['groupid']);
 		$name = new CSpan($hostGroup['name'], 'link');
-
-		$hostGroup['node_name'] = isset($hostGroup['node_name']) ? '('.$hostGroup['node_name'].') ' : '';
-		$hostGroup['name'] = $hostGroup['node_name'].$hostGroup['name'];
 
 		$action = get_window_opener($dstfrm, $dstfld1, $hostGroup[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $hostGroup[$srcfld2]) : '');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
@@ -1861,7 +1778,6 @@ elseif ($srctbl == 'host_group_scr') {
 	$table->setHeader(array(_('Name')));
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => API_OUTPUT_EXTEND
 	);
 	if (!is_null($writeonly)) {
@@ -1872,17 +1788,14 @@ elseif ($srctbl == 'host_group_scr') {
 
 	$all = false;
 	foreach ($hostGroups as $hostGroup) {
-		$hostGroup['node_name'] = get_node_name_by_elid($hostGroup['groupid']);
-
 		if (!$all) {
-			$action = get_window_opener($dstfrm, $dstfld1, create_id_by_nodeid(0, $nodeid)).get_window_opener($dstfrm, $dstfld2, $hostGroup['node_name']._('- all groups -'));
+			$action = get_window_opener($dstfrm, $dstfld1, 0).get_window_opener($dstfrm, $dstfld2, _('- all groups -'));
 			$name = new CLink(bold(_('- all groups -')), '#');
 			$name->setAttribute('onclick', $action.' close_window(); return false;');
 			$table->addRow($name);
 			$all = true;
 		}
 		$name = new CLink($hostGroup['name'], '#');
-		$hostGroup['name'] = $hostGroup['node_name'].$hostGroup['name'];
 
 		$name->setAttribute('onclick',
 			get_window_opener($dstfrm, $dstfld1, $hostGroup[$srcfld1]).
@@ -1900,7 +1813,7 @@ elseif ($srctbl == 'drules') {
 	$table = new CTableInfo(_('No discovery rules defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect('SELECT DISTINCT d.* FROM drules d WHERE '.DBin_node('d.druleid', $nodeid));
+	$result = DBselect('SELECT DISTINCT d.* FROM drules d');
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['name'], 'link');
@@ -1942,8 +1855,7 @@ elseif ($srctbl == 'proxies') {
 	$result = DBselect(
 		'SELECT DISTINCT h.hostid,h.host'.
 		' FROM hosts h'.
-		' WHERE '.DBin_node('h.hostid', $nodeid).
-			' AND h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
+		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 		' ORDER BY h.host,h.hostid'
 	);
 	while ($row = DBfetch($result)) {
@@ -1981,7 +1893,6 @@ elseif ($srctbl == 'scripts') {
 	$table->setHeader($header);
 
 	$options = array(
-		'nodeids' => $nodeid,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);

@@ -33,7 +33,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields=array(
 	'dstfrm'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
 	'permission'=>	array(T_ZBX_INT, O_MAND,P_SYS,	IN(PERM_DENY.','.PERM_READ_ONLY.','.PERM_READ_WRITE),	NULL),
-	'nodeid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	NULL),
 );
 
 check_fields($fields);
@@ -41,30 +40,10 @@ check_fields($fields);
 <?php
 	$dstfrm		= get_request('dstfrm',		0);			// destination form
 	$permission	= get_request('permission',	PERM_DENY);		// right
-	$nodeid		= get_request('nodeid', 	CProfile::get('web.popup_right.nodeid.last',get_current_nodeid(false)));
-
-	CProfile::update('web.popup_right.nodeid.last', $nodeid, PROFILE_TYPE_ID);
 
 	$frmTitle = new CForm();
 	$frmTitle->addVar('dstfrm',$dstfrm);
 	$frmTitle->addVar('permission', $permission);
-
-	if(ZBX_DISTRIBUTED){
-		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
-
-		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
-		$cmbResourceNode->addItem(0, _('All'));
-
-		$sql = 'SELECT name,nodeid '.
-			' FROM nodes '.
-			' WHERE '.DBcondition('nodeid',$available_nodes);
-		$db_nodes = DBselect($sql);
-		while($node = DBfetch($db_nodes)){
-			$cmbResourceNode->addItem($node['nodeid'], $node['name']);
-		}
-
-		$frmTitle->addItem(array(_('Node'), SPACE, $cmbResourceNode));
-	}
 
 	show_table_header(permission2str($permission),$frmTitle);
 
@@ -74,29 +53,20 @@ check_fields($fields);
 	$table = new CTableInfo(_('No resources defined.'));
 	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),_('Name'))));
 
-// NODES
-	if($nodeid == 0) $nodeids = get_current_nodeid(true);
-	else $nodeids = $nodeid;
-
 	$count=0;
 	$grouplist = array();
 
 	$options = array(
-		'nodeids' => $nodeids,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$groups = API::HostGroup()->get($options);
-	foreach($groups as $gnum => $row){
-		$groups[$gnum]['nodename'] = get_node_name_by_elid($row['groupid'], true, ':').$row['name'];
-		if($nodeid == 0) $groups[$gnum]['name'] = $groups[$gnum]['nodename'];
-	}
 
 	order_result($groups, 'name');
 
 	foreach($groups as $gnum => $row){
 		$grouplist[$count] = array(
 			'groupid' => $row['groupid'],
-			'name' => $row['nodename'],
+			'name' => $row['name'],
 			'permission' => $permission
 		);
 
