@@ -304,10 +304,6 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	try {
 		DBstart();
 
@@ -602,7 +598,6 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 		'SELECT h.hostid,h.host'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-			' AND '.DBin_node('h.hostid').
 		' ORDER BY h.host'
 	));
 

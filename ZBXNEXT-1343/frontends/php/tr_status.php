@@ -289,7 +289,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		_('Age'),
 		$show_event_col ? _('Duration') : null,
 		$config['event_ack_enable'] ? _('Acknowledged') : null,
-		is_show_all_nodes() ? _('Node') : null,
 		_('Host'),
 		make_sorting_header(_('Name'), 'description'),
 		_('Comments')
@@ -299,7 +298,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$sortfield = getPageSortField('description');
 	$sortorder = getPageSortOrder();
 	$options = array(
-		'nodeids' => get_current_nodeid(),
 		'monitored' => true,
 		'output' => array('triggerid', $sortfield),
 		'skipDependent' => true,
@@ -347,7 +345,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$paging = getPagingLine($triggers);
 
 	$options = array(
-		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
@@ -409,7 +406,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
-			'nodeids' => get_current_nodeid(),
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'filter' => array(
 				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
@@ -480,7 +476,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		// trigger js menu
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$configurationUrl = 'triggers.php?form=update&triggerid='.$trigger['triggerid'].'&hostid='.$pageFilter->hostid.'&switch_node='.id2nodeid($trigger['triggerid']);
+			$configurationUrl = 'triggers.php?form=update&triggerid='.$trigger['triggerid'].'&hostid='.$pageFilter->hostid;
 			$menu_trigger_conf = "['"._('Configuration of triggers')."',".CJs::encodeJson($configurationUrl).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
@@ -662,7 +658,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			zbx_date2age($trigger['lastchange']),
 			$show_event_col ? SPACE : NULL,
 			$to_ack,
-			get_node_name_by_elid($trigger['triggerid']),
 			$host,
 			$tr_desc,
 			new CLink(zbx_empty($trigger['comments']) ? _('Add') : _('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid'])
@@ -712,7 +707,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 					zbx_date2age($row_event['clock']),
 					zbx_date2age($next_clock, $row_event['clock']),
 					($config['event_ack_enable']) ? $ack : NULL,
-					is_show_all_nodes() ? SPACE : null,
 					$empty_col
 				), 'odd_row');
 				$row->setAttribute('data-parentid', $trigger['triggerid']);

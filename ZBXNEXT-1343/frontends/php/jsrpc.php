@@ -92,7 +92,6 @@ switch ($data['method']) {
 		}
 
 		$options = array(
-			'nodeids' => get_current_nodeid(true),
 			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeOut)),
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 			'priority' => array_keys($msgsettings['triggers.severities']),
@@ -132,7 +131,7 @@ switch ($data['method']) {
 				'priority' => $priority,
 				'sound' => $sound,
 				'color' => getSeverityColor($trigger['priority'], $event['value']),
-				'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, ':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
+				'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
 				'body' => array(
 					_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
 					_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',

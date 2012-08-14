@@ -172,7 +172,6 @@ else {
 		'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 		' FROM slideshows s'.
 			' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
-		' WHERE '.DBin_node('s.slideshowid').
 		' GROUP BY s.slideshowid,s.name,s.delay'
 	));
 	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());

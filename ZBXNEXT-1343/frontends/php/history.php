@@ -139,7 +139,6 @@ if (isset($_REQUEST['remove_log']) && isset($_REQUEST['cmbitemlist'])) {
  * Display
  */
 $items = API::Item()->get(array(
-	'nodeids' => get_current_nodeid(),
 	'itemids' => $_REQUEST['itemid'],
 	'webitems' => true,
 	'selectHosts' => array('hostid', 'name'),

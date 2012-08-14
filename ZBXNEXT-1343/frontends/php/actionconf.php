@@ -113,10 +113,6 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 	unset($_REQUEST['new_opcondition']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$action = array(
 		'name'		=> get_request('name'),
 		'eventsource'	=> get_request('eventsource', 0),
@@ -161,10 +157,6 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$result = API::Action()->delete($_REQUEST['actionid']);
 
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
@@ -270,10 +262,6 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$status = ($_REQUEST['go'] == 'activate') ? 0 : 1;
 	$status_name = $status ? 'disabled' : 'enabled';
 
@@ -283,8 +271,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	$go_result = DBselect(
 		'SELECT DISTINCT a.actionid'.
 		' FROM actions a'.
-		' WHERE '.DBin_node('a.actionid', $nodes).
-			' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid'])
+		' WHERE '.DBcondition('a.actionid', $_REQUEST['g_actionid'])
 	);
 	while ($row = DBfetch($go_result)) {
 		$res = DBexecute('UPDATE actions SET status='.$status.' WHERE actionid='.$row['actionid']);
@@ -300,10 +287,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$go_result = API::Action()->delete($_REQUEST['g_actionid']);
 	show_messages($go_result, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }

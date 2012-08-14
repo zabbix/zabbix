@@ -91,7 +91,6 @@ require_once dirname(__FILE__).'/include/views/js/monitoring.maps.js.php';
 
 $options = array(
 	'output' => API_OUTPUT_EXTEND,
-	'nodeids' => get_current_nodeid(),
 	'expandUrls' => true,
 	'selectSelements' => API_OUTPUT_EXTEND,
 	'selectLinks' => API_OUTPUT_EXTEND,
@@ -138,7 +137,7 @@ if (!empty($maps)) {
 	$cmbMaps = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
 	order_result($maps, 'name');
 	foreach ($maps as $sysmapid => $map) {
-		$cmbMaps->addItem($sysmapid, get_node_name_by_elid($sysmapid, null, ': ').$map['name']);
+		$cmbMaps->addItem($sysmapid, $map['name']);
 	}
 	$form->addItem($cmbMaps);
 

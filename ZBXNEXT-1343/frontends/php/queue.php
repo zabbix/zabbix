@@ -113,7 +113,6 @@ require_once 'include/page_header.php';
 				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$ipmi_item_types).'))'.
 				' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
 				')'.
-			' AND '.DBin_node('i.itemid', get_current_nodeid()).
 			' AND i.flags NOT IN ('.ZBX_FLAG_DISCOVERY_CHILD.')'.
 		' ORDER BY i.lastclock,h.name,i.name,i.key_';
 	$result = DBselect($sql);
@@ -245,7 +244,6 @@ require_once 'include/page_header.php';
 		$table->setHeader(array(
 			_('Next check'),
 			_('Delayed by'),
-			is_show_all_nodes() ? _('Node') : null,
 			_('Host'),
 			_('Name')
 		));
@@ -275,7 +273,6 @@ require_once 'include/page_header.php';
 			$table->addRow(array(
 				zbx_date2str(QUEUE_NODES_DATE_FORMAT, $r[0]),
 				zbx_date2age($r[0]),
-				get_node_name_by_elid($r[1]),
 				$r[2],
 				$r[3]
 			));

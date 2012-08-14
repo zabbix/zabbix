@@ -56,7 +56,6 @@ $rprt_wdgt->addItem(BR());
 
 $table = new CTableInfo(_('No triggers found.'));
 $table->setHeader(array(
-	is_show_all_nodes() ? _('Node') : null,
 	_('Host'),
 	_('Trigger'),
 	_('Severity'),
@@ -132,12 +131,8 @@ foreach ($triggers as $tid => $trigger) {
 CArrayHelper::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
 foreach ($triggers as $trigger) {
 	$menus = '';
-	$host_nodeid = id2nodeid($trigger['hostid']);
 	foreach ($scripts_by_hosts[$trigger['hostid']] as $script) {
-		$script_nodeid = id2nodeid($script['scriptid']);
-		if (bccomp($host_nodeid, $script_nodeid) == 0) {
-			$menus .= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','Global script',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-		}
+		$menus .= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','Global script',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 	}
 
 	$menus .= "['"._('URLs')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
@@ -159,7 +154,6 @@ foreach ($triggers as $trigger) {
 			zbx_jsvalue($trigger['items'], true).");");
 
 	$table->addRow(array(
-		get_node_name_by_elid($trigger['triggerid']),
 		$hostSpan,
 		$tr_desc,
 		getSeverityCell($trigger['priority']),

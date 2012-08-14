@@ -47,8 +47,6 @@ $fields = array(
 	'zbx_server_name' =>	array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'zbx_server_port' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')),
 	'message' =>			array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'nodename' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null),
-	'nodeid' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999),	null),
 	// actions
 	'save_config' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'retry' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),

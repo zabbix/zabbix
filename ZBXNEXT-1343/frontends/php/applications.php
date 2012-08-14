@@ -143,8 +143,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$db_applications = DBselect(
 		'SELECT a.applicationid,a.name,a.hostid'.
 		' FROM applications a'.
-		' WHERE '.DBin_node('a.applicationid').
-			' AND '.DBcondition('a.applicationid', $applications)
+		' WHERE '.DBcondition('a.applicationid', $applications)
 	);
 	while ($db_app = DBfetch($db_applications)) {
 		if (!isset($applications[$db_app['applicationid']])) {
@@ -172,8 +171,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 				' LEFT JOIN items i ON ia.itemid=i.itemid'.
 			' WHERE ia.applicationid='.$appid.
 				' AND i.hostid='.$_REQUEST['hostid'].
-				' AND i.type<>9'.
-				' AND '.DBin_node('ia.applicationid')
+				' AND i.type<>9'
 		);
 		while ($item = DBfetch($db_items)) {
 			if ($_REQUEST['go'] == 'activate') {

@@ -190,15 +190,13 @@ if (isset($_REQUEST['form'])) {
 	if (isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])) {
 		$regExp = DBfetch(DBSelect('SELECT re.name, re.test_string'.
 				' FROM regexps re'.
-				' WHERE '.DBin_node('re.regexpid').
-				' AND re.regexpid='.$_REQUEST['regexpid']));
+				' WHERE re.regexpid='.$_REQUEST['regexpid']));
 		$data['name'] = $regExp['name'];
 		$data['test_string'] = $regExp['test_string'];
 
 		$dbExpressions = DBselect('SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
 				' FROM expressions e'.
-				' WHERE '.DBin_node('e.expressionid').
-				' AND e.regexpid='.$_REQUEST['regexpid'].
+				' WHERE e.regexpid='.$_REQUEST['regexpid'].
 				' ORDER BY e.expression_type');
 		$data['expressions'] = DBfetchArray($dbExpressions);
 	}
@@ -215,7 +213,7 @@ else {
 	$data['regexps'] = array();
 	$data['regexpids'] = array();
 
-	$db_regexps = DBselect('SELECT re.* FROM regexps re WHERE '.DBin_node('re.regexpid'));
+	$db_regexps = DBselect('SELECT re.* FROM regexps re');
 	while ($regexp = DBfetch($db_regexps)) {
 		$regexp['expressions'] = array();
 		$data['regexps'][$regexp['regexpid']] = $regexp;
@@ -224,8 +222,7 @@ else {
 	order_result($data['regexps'], 'name');
 
 	$data['db_exps'] = DBfetchArray(DBselect('SELECT e.* FROM expressions e WHERE '.
-			DBin_node('e.expressionid').
-			' AND '.DBcondition('e.regexpid', $data['regexpids']).
+			DBcondition('e.regexpid', $data['regexpids']).
 			' ORDER BY e.expression_type'));
 
 	$regExpForm = new CView('administration.general.regularexpressions.list', $data);

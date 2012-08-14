@@ -49,7 +49,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$sql = 'SELECT * '.
 			' FROM media_type '.
-			' WHERE '.DBin_node('mediatypeid').
 			' ORDER BY description';
 	$db_media_types = DBselect($sql);
 	while($media_type_data = DBfetch($db_media_types)){
@@ -109,7 +108,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		show_table_header(_('Notifications'), $form);
 
 		$header = array();
-		$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');
+		$db_users = DBselect('SELECT * FROM users ORDER BY alias,userid');
 		while($user_data = DBfetch($db_users)){
 			array_push($header, new CImg('vtext.php?text='.urlencode($user_data['alias']).'&theme='.$css));
 			$users[$user_data['userid']] = $user_data['alias'];

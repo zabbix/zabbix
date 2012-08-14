@@ -110,10 +110,6 @@ else {
 	array_push($options, 'templated_hosts');
 }
 
-if (!$ZBX_WITH_ALL_NODES) {
-	array_push($options, 'only_current_node');
-}
-
 foreach ($options as $option) {
 	$params[$option] = 1;
 }
@@ -131,7 +127,6 @@ if (isset($_REQUEST['triggerid'])) {
 		'triggerids' => $_REQUEST['triggerid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'nodeids' => get_current_nodeid(true),
 		'expandDescription' => true
 	);
 	$trigger_data = API::Trigger()->get($options);
@@ -219,7 +214,6 @@ else if (isset($_REQUEST['hostid'])) {
 
 	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		(($_REQUEST['hostid'] == 0) || (1 == $config)) ? _('Host') : NULL,
 		_('Name'),
 		_('Problems'),
@@ -237,7 +231,6 @@ else if (isset($_REQUEST['hostid'])) {
 		$actions = new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid'].'&triggerid='.$trigger['triggerid']);
 
 		$table->addRow(array(
-			get_node_name_by_elid($trigger['hostid']),
 			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $trigger['hosts'][0]['name'] : NULL,
 			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
 			$true,

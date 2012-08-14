@@ -397,7 +397,6 @@ else {
 	}
 	$options['object'] = EVENT_OBJECT_TRIGGER;
 	$options['filter'] = array('value_changed' => TRIGGER_VALUE_CHANGED_YES);
-	$options['nodeids'] = get_current_nodeid();
 	$options['filters'] = array(
 		'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 		'object' => EVENT_OBJECT_TRIGGER,
@@ -557,7 +556,6 @@ else {
 	else {
 		$table->setHeader(array(
 			_('Time'),
-			is_show_all_nodes() ? _('Node') : null,
 			($_REQUEST['hostid'] == 0) ? _('Host') : null,
 			_('Description'),
 			_('Status'),
@@ -570,7 +568,6 @@ else {
 		if ($CSV_EXPORT) {
 			$csvRows[] = array(
 				_('Time'),
-				is_show_all_nodes() ? _('Node') : null,
 				($_REQUEST['hostid'] == 0) ? _('Host') : null,
 				_('Description'),
 				_('Status'),
@@ -583,7 +580,6 @@ else {
 
 		if ($pageFilter->hostsSelected) {
 			$options = array(
-				'nodeids' => get_current_nodeid(),
 				'filter' => array(
 					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'object' => EVENT_OBJECT_TRIGGER,
@@ -602,7 +598,6 @@ else {
 
 			// trigger options
 			$trigOpt = array(
-				'nodeids' => get_current_nodeid(),
 				'output' => API_OUTPUT_SHORTEN
 			);
 
@@ -627,7 +622,6 @@ else {
 
 			// query event with extend data
 			$options = array(
-				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events, 'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
@@ -730,7 +724,6 @@ else {
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 						'action'
 					),
-					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$_REQUEST['hostid'] ? null : $hostSpan,
 					new CSpan($tr_desc, 'link_menu'),
 					$statusSpan,
@@ -743,7 +736,6 @@ else {
 				if ($CSV_EXPORT) {
 					$csvRows[] = array(
 						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
-						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),

@@ -78,8 +78,8 @@ try {
 		$msg_fail = _('Cannot delete value map');
 
 		$sql = 'SELECT v.name,v.valuemapid'.
-				' FROM valuemaps v WHERE '.DBin_node('v.valuemapid').
-				' AND v.valuemapid='.$_REQUEST['valuemapid'];
+				' FROM valuemaps v WHERE'.
+				' v.valuemapid='.$_REQUEST['valuemapid'];
 		if ($valueMapToDelete = DBfetch(DBselect($sql))) {
 			deleteValueMap($_REQUEST['valuemapid']);
 		}
@@ -178,14 +178,14 @@ else {
 	$cnf_wdgt->addItem(BR());
 
 	$data['valuemaps'] = array();
-	$db_valuemaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
+	$db_valuemaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v');
 	while ($db_valuemap = DBfetch($db_valuemaps)) {
 		$data['valuemaps'][$db_valuemap['valuemapid']] = $db_valuemap;
 		$data['valuemaps'][$db_valuemap['valuemapid']]['maps'] = array();
 	}
 	order_result($data['valuemaps'], 'name');
 
-	$db_maps = DBselect('SELECT m.valuemapid,m.value,m.newvalue FROM mappings m WHERE '.DBin_node('mappingid'));
+	$db_maps = DBselect('SELECT m.valuemapid,m.value,m.newvalue FROM mappings m');
 	while ($db_map = DBfetch($db_maps)) {
 		$data['valuemaps'][$db_map['valuemapid']]['maps'][] = array(
 			'value' => $db_map['value'],

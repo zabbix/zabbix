@@ -175,8 +175,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $data['slideshows'] = array();
 $db_slideshows = DBselect(
 	'SELECT s.slideshowid,s.name'.
-	' FROM slideshows s'.
-	' WHERE '.DBin_node('s.slideshowid')
+	' FROM slideshows s'
 );
 while ($slideshow = DBfetch($db_slideshows)) {
 	if (slideshow_accessible($slideshow['slideshowid'], PERM_READ_ONLY)) {
@@ -204,9 +203,6 @@ if (!empty($data['screen'])) {
 		$data['hostid'] = get_request('hostid', 0);
 
 		$options = array('allow_all_hosts', 'monitored_hosts', 'with_items');
-		if (!$ZBX_WITH_ALL_NODES) {
-			array_push($options, 'only_current_node');
-		}
 		$params = array();
 		foreach ($options as $option) {
 			$params[$option] = 1;

@@ -43,7 +43,6 @@ if (!isset($_REQUEST['triggerid'])) {
 $db_data = API::Trigger()->get(array(
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_EXTEND,
-	'nodeids' => get_current_nodeid(true),
 	'expandDescription' => true
 ));
 if (empty($db_data)) {

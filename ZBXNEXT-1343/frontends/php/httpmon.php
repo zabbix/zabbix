@@ -138,7 +138,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$table = new CTableInfo(_('No web checks defined.'));
 	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 		$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'h.name') : null,
 		make_sorting_header(array($link, SPACE, _('Name')), 'wt.name'),
 		_('Number of steps'),
@@ -262,7 +261,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		array_push($app_rows, new CRow(array(
-			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
 			array(str_repeat(SPACE,6), $name),
 			$httptest_data['step_count'],
@@ -298,7 +296,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$col->setColSpan(6);
 
 		$table->addRow(array(
-				get_node_name_by_elid($db_app['applicationid']),
 				($_REQUEST['hostid'] > 0) ? null : $db_app['hostname'],
 				$col
 			));

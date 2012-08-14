@@ -53,10 +53,6 @@ $_REQUEST['go'] = get_request('go', 'none');
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
@@ -126,8 +122,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		$dbHosts = DBselect(
 			'SELECT h.hostid,h.status'.
 			' FROM hosts h'.
-			' WHERE h.proxy_hostid='.$hostid.
-				' AND '.DBin_node('h.hostid')
+			' WHERE h.proxy_hostid='.$hostid
 		);
 
 		while ($dbHost = DBfetch($dbHosts)) {
@@ -215,8 +210,7 @@ if (isset($_REQUEST['form'])) {
 	$data['dbHosts'] = DBfetchArray(DBselect(
 		'SELECT h.hostid,h.proxy_hostid,h.name'.
 		' FROM hosts h'.
-		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			' AND '.DBin_node('h.hostid')
+		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
 	));
 	order_result($data['dbHosts'], 'name');
 

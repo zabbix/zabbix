@@ -156,9 +156,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			show_messages($result, _('Network map updated'), _('Cannot update network map'));
 		}
 		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
-				access_deny();
-
 			$result = API::Map()->create($map);
 
 			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');

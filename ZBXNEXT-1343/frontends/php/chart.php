@@ -49,7 +49,6 @@ if (!DBfetch(DBselect('SELECT i.itemid FROM items i WHERE i.itemid='.$_REQUEST['
 $dbItems = API::Item()->get(array(
 	'itemids' => $_REQUEST['itemid'],
 	'webitems' => true,
-	'nodeids' => get_current_nodeid(true)
 ));
 if (empty($dbItems)) {
 	access_deny();

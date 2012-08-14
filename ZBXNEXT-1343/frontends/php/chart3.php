@@ -96,7 +96,6 @@ else {
 	$dbItems = API::Item()->get(array(
 		'webitems' => true,
 		'itemids' => zbx_objectValues($items, 'itemid'),
-		'nodeids' => get_current_nodeid(true),
 		'output' => API_OUTPUT_SHORTEN
 	));
 	$dbItems = zbx_toHash($dbItems, 'itemid');

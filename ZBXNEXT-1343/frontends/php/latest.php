@@ -187,7 +187,6 @@ else{
 $table = new CTableInfo(_('No values found.'));
 $table->setHeader(array(
 	$link,
-	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 	($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'h.name') : NULL,
 	make_sorting_header(_('Name'), 'i.name'),
 	make_sorting_header(_('Last check'), 'i.lastclock'),
@@ -325,7 +324,6 @@ while($db_item = DBfetch($db_items)){
 
 	array_push($app_rows, new CRow(array(
 		SPACE,
-		is_show_all_nodes()?SPACE:null,
 		($_REQUEST['hostid']>0)?NULL:SPACE,
 		new CCol(SPACE.SPACE.$description, $item_status),
 		new CCol($lastclock, $item_status),
@@ -384,7 +382,6 @@ foreach ($db_apps as $appid => $db_app) {
 
 	$table->addRow(array(
 		$link,
-		get_node_name_by_elid($db_app['applicationid']),
 		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
 		$col
 	));
@@ -498,7 +495,6 @@ while ($db_item = DBfetch($db_items)) {
 	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
 	array_push($app_rows, new CRow(array(
 		SPACE,
-		is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 		$_REQUEST['hostid'] ? null : SPACE,
 		new CCol(SPACE.SPACE.$description, $item_status),
 		new CCol($lastclock, $item_status),
@@ -557,7 +553,6 @@ foreach ($db_hosts as $hostid => $db_host) {
 
 	$table->addRow(array(
 		$link,
-		get_node_name_by_elid($db_host['hostid']),
 		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
 		$col
 	));

@@ -181,27 +181,19 @@ $dashList->addRow(_('Host groups'), $cmbGroups);
 
 if ($grpswitch == 1) {
 	$options = array(
-		'nodeids' => get_current_nodeid(true),
 		'groupids' => $groupids,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$groups = API::HostGroup()->get($options);
 
-	foreach ($groups as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid'], true, ': ');
-	}
-	unset($group);
-
-	$sortFields = array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+	CArrayHelper::sort($groups, array(
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
-	CArrayHelper::sort($groups, $sortFields);
+	));
 
 	$lstGroups = new CListBox('del_groups[]', null, 15);
 	$lstGroups->setAttribute('style', 'width: 200px;');
 	foreach ($groups as $gnum => $group) {
-		$lstGroups->addItem($group['groupid'], $group['nodename'].$group['name']);
+		$lstGroups->addItem($group['groupid'], $group['name']);
 	}
 
 	if (!$filterEnable) {

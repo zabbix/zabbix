@@ -153,7 +153,6 @@ else{
 
 	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
 		make_sorting_header(_('Host'), 'name'),
 		_('Group'),
 		make_sorting_header(_('Name'), 'pr_name'),
@@ -240,7 +239,6 @@ else{
 				$host_groups = implode(', ', $host_groups);
 
 				$row = array(
-					get_node_name_by_elid($host['hostid']),
 					new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
 					$host_groups,
 					zbx_str2links($host['inventory']['name']),

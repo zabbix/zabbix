@@ -23,7 +23,6 @@ $proxyWidget = new CWidget();
 
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem($configComboBox);
 $createForm->addItem(new CSubmit('form', _('Create proxy')));
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
 $proxyWidget->addHeader(_('Proxies'));
