@@ -311,14 +311,6 @@ div.hintbox {
 	color: #1F1F1F;
 }
 
-/* node tree */
-div #div_node_tree {
-	background-color: gray;
-	position: absolute;
-	border: 2px solid black;
-	right: 0;
-	z-index: 200;
-}
 div.thin_header { width: 100%; color: #FFFFFF;  background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; border: 0 #000000 solid; text-align: center; }
 
 /* form element */
