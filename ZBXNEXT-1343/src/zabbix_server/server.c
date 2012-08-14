@@ -102,7 +102,6 @@ unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int	CONFIG_ALERTER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
-int	CONFIG_NODEWATCHER_FORKS	= 1;
 int	CONFIG_PINGER_FORKS		= 1;
 int	CONFIG_POLLER_FORKS		= 5;
 int	CONFIG_UNREACHABLE_POLLER_FORKS	= 1;
@@ -157,11 +156,6 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
-int	CONFIG_NODEID			= 0;
-int	CONFIG_MASTER_NODEID		= 0;
-int	CONFIG_NODE_NOEVENTS		= 0;
-int	CONFIG_NODE_NOHISTORY		= 0;
-
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
 char	*CONFIG_JAVA_GATEWAY		= NULL;
@@ -178,9 +172,6 @@ int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 /* how often zabbix server sends configuration data to proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600;	/* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
-
-/* mutex for node syncs */
-ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
@@ -362,12 +353,6 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			0},
 		{"DBPort",			&CONFIG_DBPORT,				TYPE_INT,
 			PARM_OPT,	1024,			65535},
-		{"NodeID",			&CONFIG_NODEID,				TYPE_INT,
-			PARM_OPT,	0,			999},
-		{"NodeNoEvents",		&CONFIG_NODE_NOEVENTS,			TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"NodeNoHistory",		&CONFIG_NODE_NOHISTORY,			TYPE_INT,
-			PARM_OPT,	0,			1},
 		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		TYPE_INT,
@@ -549,12 +534,6 @@ int	MAIN_ZABBIX_ENTRY()
 	DBupdate_triggers_status_after_restart();
 
 	DBclose();
-
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
-	{
-		zbx_error("Unable to create mutex for node syncs");
-		exit(FAIL);
-	}
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
@@ -766,8 +745,6 @@ void	zbx_on_exit()
 	free_database_cache();
 	free_configuration_cache();
 	DBclose();
-
-	zbx_mutex_destroy(&node_sync_access);
 
 #ifdef HAVE_OPENIPMI
 	free_ipmi_handler();

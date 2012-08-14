@@ -32,8 +32,6 @@ extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 extern char	*CONFIG_DBSOCKET;
 extern int	CONFIG_DBPORT;
-extern int	CONFIG_NODEID;
-extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
@@ -433,9 +431,9 @@ typedef struct
 DB_ESCALATION;
 
 #define DB_NODE			"%s"
-#define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
+#define DBnode_local(fieldid)	DBnode(fieldid, 0)
 const char	*DBnode(const char *fieldid, int nodeid);
-#define DBis_node_local_id(id)	DBis_node_id(id, CONFIG_NODEID)
+#define DBis_node_local_id(id)	DBis_node_id(id, 0)
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);

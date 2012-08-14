@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 extern unsigned char	daemon_type;
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
-extern int		CONFIG_NODE_NOHISTORY;
 
 static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
@@ -1413,50 +1412,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		sql_offset = tmp_offset;
 #endif
 
-	if (0 == CONFIG_NODE_NOHISTORY && 0 < CONFIG_MASTER_NODEID)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		tmp_offset = sql_offset;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_sync (nodeid,itemid,clock,value,ns) values ");
-#endif
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (0 == history[i].keep_history)
-				continue;
-
-			if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null)
-				continue;
-
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_sync (nodeid,itemid,clock,value,ns) values ");
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL ",%d",
-					get_nodeid_by_id(history[i].itemid),
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.dbl,
-					history[i].ns);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
-		}
-
-#ifdef HAVE_MULTIROW_INSERT
-		if (',' == sql[sql_offset - 1])
-		{
-			sql_offset--;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-		}
-		else
-			sql_offset = tmp_offset;
-#endif
-	}
-
 /*
  * history_uint
  */
@@ -1498,50 +1453,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	else
 		sql_offset = tmp_offset;
 #endif
-
-	if (0 == CONFIG_NODE_NOHISTORY && 0 < CONFIG_MASTER_NODEID)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		tmp_offset = sql_offset;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_uint_sync (nodeid,itemid,clock,value,ns) values ");
-#endif
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (0 == history[i].keep_history)
-				continue;
-
-			if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null)
-				continue;
-
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_uint_sync (nodeid,itemid,clock,value,ns) values ");
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d",
-					get_nodeid_by_id(history[i].itemid),
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.ui64,
-					history[i].ns);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
-		}
-
-#ifdef HAVE_MULTIROW_INSERT
-		if (',' == sql[sql_offset - 1])
-		{
-			sql_offset--;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-		}
-		else
-			sql_offset = tmp_offset;
-#endif
-	}
 
 /*
  * history_str
@@ -1586,52 +1497,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	else
 		sql_offset = tmp_offset;
 #endif
-
-	if (0 == CONFIG_NODE_NOHISTORY && 0 < CONFIG_MASTER_NODEID)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		tmp_offset = sql_offset;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_str_sync (nodeid,itemid,clock,value,ns) values ");
-#endif
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (0 == history[i].keep_history)
-				continue;
-
-			if (ITEM_VALUE_TYPE_STR != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null)
-				continue;
-
-			value_esc = DBdyn_escape_string(history[i].value_orig.str);
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_str_sync (nodeid,itemid,clock,value,ns) values ");
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d,'%s',%d",
-					get_nodeid_by_id(history[i].itemid),
-					history[i].itemid,
-					history[i].clock,
-					value_esc,
-					history[i].ns);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
-			zbx_free(value_esc);
-		}
-
-#ifdef HAVE_MULTIROW_INSERT
-		if (',' == sql[sql_offset - 1])
-		{
-			sql_offset--;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-		}
-		else
-			sql_offset = tmp_offset;
-#endif
-	}
 
 	history_text_num = 0;
 	history_log_num = 0;
@@ -2932,7 +2797,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
 	table = DBget_table(table_name);
-	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
+	nodeid = 0;
 
 	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
 	max = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;

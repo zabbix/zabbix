@@ -2,7 +2,7 @@
 .SH NAME
 zabbix_server \- Zabbix server daemon.
 .SH SYNOPSIS
-.B zabbix_server [-hV] [-c \fI<config-file>\fR] [-n \fI<nodeid>\fR] [-R \fI<option>\fR]
+.B zabbix_server [-hV] [-c \fI<config-file>\fR] [-R \fI<option>\fR]
 .SH DESCRIPTION
 .B zabbix_server
 is the core daemon of Zabbix software.
@@ -10,8 +10,6 @@ is the core daemon of Zabbix software.
 .IP "-c, --config \fI<config-file>\fR"
 Use the alternate \fIconfig-file\fR instead of the default one.
 Absolute path should be specified.
-.IP "-n, --new-nodeid \fI<nodeid>\fR"
-Convert database data to new \fInodeid\fR. Does not start the server. Run this only once.
 .IP "-R, --runtime-control \fI<option>\fR"
 Perform administrative functions according to \fIoption\fR.
 .SS

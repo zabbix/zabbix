@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -924,9 +924,7 @@ int	is_ip6(const char *ip);
 #endif
 int	is_ip4(const char *ip);
 
-void	zbx_on_exit(); /* calls exit() at the end! */
-
-int	get_nodeid_by_id(zbx_uint64_t id);
+void	zbx_on_exit();	/* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);

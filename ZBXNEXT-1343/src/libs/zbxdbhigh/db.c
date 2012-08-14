@@ -44,32 +44,18 @@ extern int	txn_error;
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
-	static char	dbnode[128];
+	fieldid = fieldid;
+	nodeid = nodeid;
 
-	if (-1 != nodeid)
-	{
-		zbx_uint64_t	min, max;
-
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
-
-		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-				fieldid, min, max);
-	}
-	else
-		*dbnode = '\0';
-
-	return dbnode;
+	return '\0';
 }
 
 int	DBis_node_id(zbx_uint64_t id, int nodeid)
 {
-	zbx_uint64_t	min, max;
+	id = id;
+	nodeid = nodeid;
 
-	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-	max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
-
-	return min <= id && id <= max ? SUCCEED : FAIL;
+	return FAIL;
 }
 
 void	DBclose()
@@ -1319,7 +1305,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	table = DBget_table(tablename);
-	nodeid = 0 <= CONFIG_NODEID ? CONFIG_NODEID : 0;
+	nodeid = 0;
 
 	if (0 != (table->flags & ZBX_SYNC))
 	{
