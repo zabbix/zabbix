@@ -63,7 +63,6 @@ else {
 $httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'host') : null,
 	make_sorting_header(array($expandLink, SPACE, _('Name')), 'name'),
 	_('Number of steps'),
@@ -84,7 +83,6 @@ foreach ($this->data['db_httptests'] as $httptestid => $httptest_data) {
 
 	$httpTableRows[$db_app['applicationid']][] = array(
 		new CCheckBox('group_httptestid['.$httptest_data['httptestid'].']', null, null, $httptest_data['httptestid']),
-		is_show_all_nodes() ? SPACE : null,
 		$_REQUEST['hostid'] > 0 ? null : $db_app['hostname'],
 		new CLink($httptest_data['name'], '?form=update'.'&httptestid='.$httptest_data['httptestid'].'&hostid='.$db_app['hostid'].url_param('groupid')),
 		$httptest_data['step_count'],
@@ -117,7 +115,7 @@ foreach ($httpTableRows as $appid => $app_rows) {
 	));
 	$column->setColSpan(6);
 
-	$httpTable->addRow(array(get_node_name_by_elid($db_app['applicationid']), $column));
+	$httpTable->addRow($column);
 
 	foreach ($app_rows as $row) {
 		$httpTable->addRow($row);

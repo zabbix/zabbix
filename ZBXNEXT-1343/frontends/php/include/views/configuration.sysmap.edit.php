@@ -55,10 +55,7 @@ $images = API::Image()->get(array(
 ));
 order_result($images, 'name');
 foreach ($images as $image) {
-	$cmbImg->addItem(
-		$image['imageid'],
-		get_node_name_by_elid($image['imageid'], null, ': ').$image['name']
-	);
+	$cmbImg->addItem($image['imageid']);
 }
 $sysmapList->addRow(_('Background image'), $cmbImg);
 

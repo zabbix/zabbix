@@ -111,11 +111,6 @@ if ($resourcetype == SCREEN_RESOURCE_GRAPH) {
 		$caption = ($graph['host']['status'] != HOST_STATUS_TEMPLATE)
 			? $graph['host']['name'].':'.$graph['name']
 			: $graph['name'];
-
-		$nodeName = get_node_name_by_elid($graph['host']['hostid']);
-		if (!zbx_empty($nodeName)) {
-			$caption = '('.$nodeName.') '.$caption;
-		}
 	}
 
 	if ($this->data['screen']['templateid']) {
@@ -163,11 +158,6 @@ elseif ($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		$caption = $item['host']['status'] != HOST_STATUS_TEMPLATE
 			? $item['host']['name'].':'.itemName($item)
 			: itemName($item);
-
-		$nodeName = get_node_name_by_elid($item['itemid']);
-		if (!zbx_empty($nodeName)) {
-			$caption = '('.$nodeName.') '.$caption;
-		}
 	}
 
 	if ($this->data['screen']['templateid']) {
@@ -209,10 +199,6 @@ elseif ($resourcetype == SCREEN_RESOURCE_MAP) {
 		$id = $resourceid;
 		$map = reset($maps);
 		$caption = $map['name'];
-		$nodeName = get_node_name_by_elid($map['sysmapid']);
-		if (!zbx_empty($nodeName)) {
-			$caption = '('.$nodeName.') '.$caption;
-		}
 	}
 
 	$screenFormList->addVar('resourceid', $id);
@@ -244,11 +230,6 @@ elseif ($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT) {
 		$item = reset($items);
 		$item['host'] = reset($item['hosts']);
 		$caption = $item['host']['name'].':'.itemName($item);
-
-		$nodeName = get_node_name_by_elid($item['itemid']);
-		if (!zbx_empty($nodeName)) {
-			$caption = '('.$nodeName.') '.$caption;
-		}
 	}
 
 	if ($this->data['screen']['templateid']) {
@@ -293,7 +274,7 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 				'editable' => true
 			));
 			foreach ($groups as $group) {
-				$caption = get_node_name_by_elid($group['groupid'], true, ':').$group['name'];
+				$caption = $group['name'];
 				$id = $resourceid;
 			}
 		}
@@ -317,7 +298,7 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 				'editable' => true
 			));
 			foreach ($hosts as $host) {
-				$caption = get_node_name_by_elid($host['hostid'], true, ':').$host['name'];
+				$caption = $host['name'];
 				$id = $resourceid;
 			}
 		}
@@ -390,7 +371,7 @@ elseif (in_array($resourcetype, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 			'editable' => true
 		));
 		foreach ($groups as $group) {
-			$caption = get_node_name_by_elid($group['groupid'], true, ':').$group['name'];
+			$caption = $group['name'];
 			$id = $resourceid;
 		}
 	}
@@ -415,26 +396,13 @@ elseif ($resourcetype == SCREEN_RESOURCE_SCREEN) {
 	$id = 0;
 
 	if ($resourceid > 0) {
-		$db_screens = DBselect(
-			'SELECT DISTINCT n.name AS node_name,s.screenid,s.name'.
-			' FROM screens s'.
-				' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.screenid').
-			' WHERE s.screenid='.$resourceid
-		);
-		while ($row = DBfetch($db_screens)) {
-			$screen = API::Screen()->get(array(
-				'screenids' => $row['screenid'],
-				'output' => API_OUTPUT_SHORTEN
-			));
-			if (empty($screen)) {
-				continue;
-			}
-			if (check_screen_recursion($_REQUEST['screenid'], $row['screenid'])) {
-				continue;
-			}
-
-			$row['node_name'] = !empty($row['node_name']) ? '('.$row['node_name'].') ' : '';
-			$caption = $row['node_name'].$row['name'];
+		$screen = API::Screen()->get(array(
+			'screenids' => $resourceid,
+			'output' => array('screenid', 'name')
+		));
+		if ($screen && !check_screen_recursion($_REQUEST['screenid'], $resourceid)) {
+			$screen = reset($screen);
+			$caption = $screen['name'];
 			$id = $resourceid;
 		}
 	}
@@ -458,23 +426,20 @@ elseif ($resourcetype == SCREEN_RESOURCE_HOSTS_INFO || $resourcetype == SCREEN_R
 	$caption = '';
 	$id = 0;
 
-	if (remove_nodes_from_id($resourceid) > 0) {
+	if ($resourceid > 0) {
 		$groups = API::HostGroup()->get(array(
 			'groupids' => $resourceid,
-			'nodeids' => get_current_nodeid(true),
 			'output' => array('name'),
 			'preservekeys' => true
 		));
 		if ($group = reset($groups)) {
-			$caption = get_node_name_by_elid($resourceid, true, ': ').$group['name'];
+			$caption = $group['name'];
 			$id = $resourceid;
 		}
 	}
-	elseif (remove_nodes_from_id($resourceid) == 0) {
-		if ($nodeName = get_node_name_by_elid($resourceid, true, ': ')) {
-			$caption = $nodeName._('- all groups -');
-			$id = $resourceid;
-		}
+	elseif ($resourceid == 0) {
+		$caption = _('- all groups -');
+		$id = $resourceid;
 	}
 
 	$screenFormList->addVar('resourceid', $id);

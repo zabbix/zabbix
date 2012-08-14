@@ -204,19 +204,6 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_MAINTENANCE:
 		$rowCondition[] = new CCol(_('maintenance'));
 		break;
-	case CONDITION_TYPE_NODE:
-		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
-			new CTextBox('node', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-			SPACE,
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?srctbl=nodes&srcfld1=nodeid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=node'.
-					'&writeonly=1", 450, 450);',
-				'link_menu'
-			)
-		);
-		break;
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
@@ -521,7 +508,6 @@ if (!empty($this->data['new_operation'])) {
 			$db_mediatypes = DBselect(
 				'SELECT mt.mediatypeid,mt.description'.
 				' FROM media_type mt'.
-				' WHERE '.DBin_node('mt.mediatypeid').
 				' ORDER BY mt.description'
 			);
 			while ($db_mediatype = DBfetch($db_mediatypes)) {

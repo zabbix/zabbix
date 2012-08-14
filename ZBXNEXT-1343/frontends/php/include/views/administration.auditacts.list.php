@@ -66,7 +66,6 @@ $auditForm->setName('auditForm');
 // create table
 $auditTable = new CTableInfo(_('No actions defined.'));
 $auditTable->setHeader(array(
-	is_show_all_nodes() ? _('Nodes') : null,
 	_('Time'),
 	_('Type'),
 	_('Status'),
@@ -109,7 +108,6 @@ foreach ($this->data['alerts'] as $alert) {
 	$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
 
 	$auditTable->addRow(array(
-		get_node_name_by_elid($alert['alertid']),
 		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
 		new CCol($mediatype['description'], 'top'),
 		new CCol($status, 'top'),

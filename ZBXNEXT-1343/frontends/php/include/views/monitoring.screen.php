@@ -75,22 +75,16 @@ else {
 
 	$elementsComboBox = new CComboBox('elementid', $screen['screenid'], 'submit()');
 	foreach ($this->data['screens'] as $dbScreen) {
-		$elementsComboBox->addItem($dbScreen['screenid'],
-			htmlspecialchars(get_node_name_by_elid($dbScreen['screenid'], null, ': ').$dbScreen['name']));
+		$elementsComboBox->addItem($dbScreen['screenid'], $dbScreen['name']);
 	}
 	$headerForm->addItem(array(_('Screens').SPACE, $elementsComboBox));
 
 	if (check_dynamic_items($screen['screenid'], 0)) {
-		global $ZBX_WITH_ALL_NODES;
-
 		if (!isset($_REQUEST['hostid'])) {
 			$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
 		}
 
 		$options = array('allow_all_hosts', 'monitored_hosts', 'with_items');
-		if (!$ZBX_WITH_ALL_NODES) {
-			array_push($options, 'only_current_node');
-		}
 		$params = array();
 		foreach ($options as $option) {
 			$params[$option] = 1;
@@ -104,7 +98,7 @@ else {
 		// groups
 		$groupsComboBox = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
 		foreach ($PAGE_GROUPS['groups'] as $groupid => $name) {
-			$groupsComboBox->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+			$groupsComboBox->addItem($groupid, $name);
 		}
 		$headerForm->addItem(array(SPACE._('Group').SPACE, $groupsComboBox));
 
@@ -112,7 +106,7 @@ else {
 		$PAGE_HOSTS['hosts']['0'] = _('Default');
 		$hostsComboBox = new CComboBox('hostid', $PAGE_HOSTS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
 		foreach ($PAGE_HOSTS['hosts'] as $hostid => $name) {
-			$hostsComboBox->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+			$hostsComboBox->addItem($hostid, $name);
 		}
 		$headerForm->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
 	}
