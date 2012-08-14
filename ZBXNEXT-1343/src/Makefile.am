@@ -33,7 +33,6 @@ PROXY_SUBDIRS = \
 	zabbix_server/pinger \
 	zabbix_server/poller \
 	zabbix_server/trapper \
-	zabbix_server/nodewatcher \
 	zabbix_server/selfmon \
 	zabbix_server/snmptrapper \
 	zabbix_proxy

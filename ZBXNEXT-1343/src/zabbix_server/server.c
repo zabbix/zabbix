@@ -45,9 +45,7 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "snmptrapper/snmptrapper.h"
-#include "nodewatcher/nodewatcher.h"
 #include "watchdog/watchdog.h"
-#include "utils/nodechange.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
@@ -60,12 +58,11 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix server";
-const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>] [-R <option>]";
+const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>              Absolute path to the configuration file",
-	"  -n --new-nodeid <nodeid>        Convert database data to new nodeid",
 	"  -R --runtime-control <option>   Perform administrative functions",
 	"",
 	"Runtime control options:",
@@ -83,7 +80,6 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
-	{"new-nodeid",		1,	NULL,	'n'},
 	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
@@ -91,7 +87,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:n:hVR:";
+static char	shortopts[] = "c:hVR:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -224,9 +220,6 @@ static void	zbx_set_defaults()
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
-
-	if (0 == CONFIG_NODEID)
-		CONFIG_NODEWATCHER_FORKS = 0;
 
 #ifdef HAVE_SQLITE3
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
@@ -426,7 +419,6 @@ int	main(int argc, char **argv)
 {
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch = '\0';
-	int		nodeid = 0;
 
 	progname = get_program_name(argv[0]);
 
@@ -450,10 +442,6 @@ int	main(int argc, char **argv)
 			case 'h':
 				help();
 				exit(-1);
-				break;
-			case 'n':
-				nodeid = (NULL == zbx_optarg ? 0 : atoi(zbx_optarg));
-				task = ZBX_TASK_CHANGE_NODEID;
 				break;
 			case 'V':
 				version();
@@ -481,22 +469,11 @@ int	main(int argc, char **argv)
 	init_ipmi_handler();
 #endif
 
-	switch (task)
-	{
-		case ZBX_TASK_CHANGE_NODEID:
-			exit(SUCCEED == change_nodeid(0, nodeid) ? EXIT_SUCCESS : EXIT_FAILURE);
-			break;
-		default:
-			break;
-	}
-
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	DB_RESULT	result;
-	DB_ROW		row;
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
 	int		i, server_num = 0, server_count = 0;
@@ -556,26 +533,11 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
-	if (0 != CONFIG_NODEID)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "NodeID:                    %3d", CONFIG_NODEID);
-		zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
-	}
-
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	if (0 != CONFIG_NODEID)
-	{
-		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-			CONFIG_MASTER_NODEID = atoi(row[0]);
-		DBfree_result(result);
-	}
 
 	init_database_cache();
 	init_configuration_cache();
@@ -597,7 +559,7 @@ int	MAIN_ZABBIX_ENTRY()
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
-			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
+			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
 			+ CONFIG_HISTSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
 			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS
 			+ CONFIG_SELFMON_FORKS;
@@ -704,12 +666,6 @@ int	MAIN_ZABBIX_ENTRY()
 		INIT_SERVER(ZBX_PROCESS_TYPE_TIMER, CONFIG_TIMER_FORKS);
 
 		main_timer_loop();
-	}
-	else if (server_num <= (server_count += CONFIG_NODEWATCHER_FORKS))
-	{
-		INIT_SERVER(ZBX_PROCESS_TYPE_NODEWATCHER, CONFIG_NODEWATCHER_FORKS);
-
-		main_nodewatcher_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
 	{
