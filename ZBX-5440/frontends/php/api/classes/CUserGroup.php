@@ -523,7 +523,7 @@ class CUserGroup extends CZBXAPI {
 			DB::update('usrgrp', $update);
 		}
 
-		if ($userids) {
+		if (!is_null($userids)) {
 			$usrgrps = $this->get(array(
 				'usrgrpids' => $usrgrpids,
 				'output' => API_OUTPUT_EXTEND,
