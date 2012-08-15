@@ -595,40 +595,49 @@ class CUserGroup extends CZBXAPI {
 			// unlink users from user groups
 			if (!empty($userIdsToUnlink)) {
 				DB::delete('users_groups', array(
-					'userid'=>$userIdsToUnlink,
-					'usrgrpid'=>$usrgrpids,
+					'userid' => $userIdsToUnlink,
+					'usrgrpid' => $usrgrpids,
 				));
 			}
 		}
 
+		// link rights to user groups
+		// update permissions to right-userGroup links
+		// unlink rights from user groups (permissions)
 		if (isset($data['rights'])) {
 
 			$rights = zbx_toArray($data['rights']);
 
+			// get already linked rights
 			$linkedRights = array();
 			$sql = 'SELECT groupid, permission, id'.
 				' FROM rights'.
 				' WHERE '.DBcondition('groupid', $usrgrpids);
 			$linkedRightsDb = DBselect($sql);
 			while ($link = DBfetch($linkedRightsDb)) {
-				if (!isset($linkedRights[$link['groupid']])) $linkedRights[$link['groupid']] = array();
+				if (!isset($linkedRights[$link['groupid']])) {
+					$linkedRights[$link['groupid']] = array();
+				}
 				$linkedRights[$link['groupid']][$link['id']] = $link['permission'];
 			}
 
-			$rightInsert = array();
-			$rightsUpdate = array();
-			$rightsToUnlink = array();
+			// get right-userGroup links to insert
+			// get right-userGroup links to update permissions
+			// get rightIds to unlink rights from user groups
+			$rightUsergroupLinksToInsert = array();
+			$rightUsergroupLinksToUpdate = array();
+			$rightIdsToUnlink = array();
 			foreach ($usrgrpids as $usrgrpid) {
 				foreach ($rights as $right) {
 					if (!isset($linkedRights[$usrgrpid][$right['id']])) {
-						$rightInsert[] = array(
+						$rightUsergroupLinksToInsert[] = array(
 							'groupid' => $usrgrpid,
 							'id' => $right['id'],
 							'permission' => $right['permission'],
 						);
 					}
 					elseif ($linkedRights[$usrgrpid][$right['id']] != $right['permission']) {
-						$rightsUpdate[] = array(
+						$rightUsergroupLinksToUpdate[] = array(
 							'values' => array('permission' => $right['permission']),
 							'where' => array('groupid' => $usrgrpid, 'id' => $right['id']),
 						);
@@ -637,23 +646,26 @@ class CUserGroup extends CZBXAPI {
 				}
 
 				if (isset($linkedRights[$usrgrpid]) && !empty($linkedRights[$usrgrpid])) {
-					$rightsToUnlink = array_merge($rightsToUnlink, array_keys($linkedRights[$usrgrpid]));
+					$rightIdsToUnlink = array_merge($rightidsToUnlink, array_keys($linkedRights[$usrgrpid]));
 				}
 			}
 
-			if (!empty($rightInsert)) {
-				DB::insert('rights', $rightInsert);
+			// link rights to user groups
+			if (!empty($rightUsergroupLinksToInsert)) {
+				DB::insert('rights', $rightUsergroupLinksToInsert);
 			}
 
-			if (!empty($rightsToUnlink)) {
+			// unlink rights from user groups
+			if (!empty($rightIdsToUnlink)) {
 				DB::delete('rights', array(
-					'id'=>$rightsToUnlink,
-					'groupid'=>$usrgrpids,
+					'id' => $rightIdsToUnlink,
+					'groupid' => $usrgrpids,
 				));
 			}
 
-			if (!empty($rightsUpdate)) {
-				DB::update('rights', $rightsUpdate);
+			// update right-userGroup permissions
+			if (!empty($rightUsergroupLinksToUpdate)) {
+				DB::update('rights', $rightUsergroupLinksToUpdate);
 			}
 		}
 
