@@ -88,12 +88,13 @@
 #		endif
 #	endif
 
+#	define ZBX_INT64_MAX	__UINT64_C(0x7fffffffffffffff)
+
 #	define zbx_uint64_t uint64_t
 #	if __WORDSIZE == 64
 #		define ZBX_FS_UI64 "%lu"
 #		define ZBX_FS_UO64 "%lo"
 #		define ZBX_FS_UX64 "%lx"
-#		define ZBX_OFFSET 10000000000000000UL
 #	else
 #		ifdef HAVE_LONG_LONG_QU
 #			define ZBX_FS_UI64 "%qu"
@@ -104,7 +105,6 @@
 #			define ZBX_FS_UO64 "%llo"
 #			define ZBX_FS_UX64 "%llx"
 #		endif
-#		define ZBX_OFFSET 10000000000000000ULL
 #	endif
 
 #ifndef PATH_SEPARATOR

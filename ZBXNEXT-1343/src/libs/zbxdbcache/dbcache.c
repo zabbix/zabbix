@@ -2756,12 +2756,12 @@ void	free_database_cache()
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
 	const char	*__function_name = "DCget_nextid";
-	int		i, nodeid;
+	int		i;
 	DB_RESULT	result;
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
 	ZBX_DC_ID	*id;
-	zbx_uint64_t	min, max, nextid;
+	zbx_uint64_t	nextid;
 
 	LOCK_CACHE_IDS;
 
@@ -2797,27 +2797,11 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
 	table = DBget_table(table_name);
-	nodeid = 0;
 
-	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-	max = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-
-	if (table->flags & ZBX_SYNC)
-	{
-		min += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
-		max += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid + (zbx_uint64_t)__UINT64_C(99999999999);
-	}
-	else
-		max += (zbx_uint64_t)__UINT64_C(99999999999999);
-
-	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-			table->recid,
-			table_name,
-			table->recid,
-			min, max);
+	result = DBselect("select max(%s) from %s", table->recid, table_name);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		id->lastid = min;
+		id->lastid = 0;
 	else
 		ZBX_STR2UINT64(id->lastid, row[0]);
 

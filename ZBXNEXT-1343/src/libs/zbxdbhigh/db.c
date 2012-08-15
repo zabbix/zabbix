@@ -1272,20 +1272,12 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
-	zbx_uint64_t	min, max;
 	int		found = FAIL, dbres;
 	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	table = DBget_table(tablename);
-
-	min = 0;
-
-	if (0 != (table->flags & ZBX_SYNC))
-		max = (zbx_uint64_t)__UINT64_C(99999999999);
-	else
-		max = (zbx_uint64_t)__UINT64_C(99999999999999);
 
 	while (FAIL == found)
 	{
@@ -1303,17 +1295,16 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 		{
 			DBfree_result(result);
 
-			result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-					table->recid, table->table, table->recid, min, max);
+			result = DBselect("select max(%s) from %s", table->recid, table->table);
 
 			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 			{
-				ret1 = min;
+				ret1 = 0;
 			}
 			else
 			{
 				ZBX_STR2UINT64(ret1, row[0]);
-				if (ret1 >= max)
+				if (ret1 >= ZBX_INT64_MAX)
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "maximum number of id's exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
@@ -1341,7 +1332,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			ZBX_STR2UINT64(ret1, row[0]);
 			DBfree_result(result);
 
-			if (ret1 < min || ret1 >= max)
+			if (ret1 < 0 || ret1 >= ZBX_INT64_MAX)
 			{
 				DBexecute("delete from ids where table_name='%s' and field_name='%s'",
 						table->table, table->recid);

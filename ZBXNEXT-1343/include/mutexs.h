@@ -45,16 +45,15 @@
 
 #	define ZBX_NO_MUTEX		-1
 #	define ZBX_MUTEX_LOG		0
-#	define ZBX_MUTEX_NODE_SYNC	1
-#	define ZBX_MUTEX_CACHE		2
-#	define ZBX_MUTEX_TRENDS		3
-#	define ZBX_MUTEX_CACHE_IDS	4
-#	define ZBX_MUTEX_CONFIG		5
-#	define ZBX_MUTEX_STRPOOL	6
-#	define ZBX_MUTEX_SELFMON	7
-#	define ZBX_MUTEX_CPUSTATS	8
-#	define ZBX_MUTEX_DISKSTATS	9
-#	define ZBX_MUTEX_COUNT		10
+#	define ZBX_MUTEX_CACHE		1
+#	define ZBX_MUTEX_TRENDS		2
+#	define ZBX_MUTEX_CACHE_IDS	3
+#	define ZBX_MUTEX_CONFIG		4
+#	define ZBX_MUTEX_STRPOOL	5
+#	define ZBX_MUTEX_SELFMON	6
+#	define ZBX_MUTEX_CPUSTATS	7
+#	define ZBX_MUTEX_DISKSTATS	8
+#	define ZBX_MUTEX_COUNT		9
 
 #	define ZBX_MUTEX_MAX_TRIES	20	/* seconds */
 

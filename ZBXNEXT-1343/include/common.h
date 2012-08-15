@@ -586,15 +586,6 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 #define SERVICE_ALGORITHM_MAX	1
 #define SERVICE_ALGORITHM_MIN	2
 
-/* types of nodes check sums */
-#define	NODE_CKSUM_TYPE_OLD	0
-#define	NODE_CKSUM_TYPE_NEW	1
-
-/* types of operation in config log */
-#define	NODE_CONFIGLOG_OP_UPDATE	0
-#define	NODE_CONFIGLOG_OP_ADD		1
-#define	NODE_CONFIGLOG_OP_DELETE	2
-
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0
 #define ZBX_HTTPITEM_TYPE_TIME		1

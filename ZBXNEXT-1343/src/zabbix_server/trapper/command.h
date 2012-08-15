@@ -18,8 +18,8 @@
 **/
 
 
-#ifndef ZABBIX_NODECOMMAND_H
-#define ZABBIX_NODECOMMAND_H
+#ifndef ZABBIX_COMMAND_H
+#define ZABBIX_COMMAND_H
 
 #include "comms.h"
 #include "zbxjson.h"
