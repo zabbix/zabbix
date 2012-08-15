@@ -369,9 +369,12 @@ class CUserGroup extends CZBXAPI {
 
 	/**
 	 * Update UserGroups.
+	 * Checks permissions - only superadmins can update usergroups.
+	 * Formats data to be used in massUpdate() method.
 	 *
 	 * @param array $usrgrps
-	 * @return boolean
+	 *
+	 * @return array returns passed group ids
 	 */
 	public function update($usrgrps) {
 
@@ -380,22 +383,22 @@ class CUserGroup extends CZBXAPI {
 		}
 
 		$usrgrps = zbx_toArray($usrgrps);
-		$usrgrpids = zbx_objectValues($usrgrps, 'usrgrpid');
 
-		foreach ($usrgrps as $ugnum => $usrgrp) {
+		foreach ($usrgrps as $usrgrp) {
+			// checks if usergroup id is present
 			$groupDbFields = array('usrgrpid' => null);
 			if (!check_db_fields($groupDbFields, $usrgrp)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 			}
 
-			$massUpdate = $usrgrp;
-			$massUpdate['usrgrpids'] = $usrgrp['usrgrpid'];
-			unset($massUpdate['usrgrpid']);
-			if (!$this->massUpdate($massUpdate))
+			$usrgrp['usrgrpids'] = $usrgrp['usrgrpid'];
+			unset($usrgrp['usrgrpid']);
+			if (!$this->massUpdate($usrgrp)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update group.'));
+			}
 		}
 
-		return array('usrgrpids'=> $usrgrpids);
+		return array('usrgrpids'=> zbx_objectValues($usrgrps, 'usrgrpid'));
 	}
 
 	public function massAdd($data) {
@@ -559,13 +562,17 @@ class CUserGroup extends CZBXAPI {
 					$useridsToUnlink = array_merge($useridsToUnlink, array_keys($linkedUsers[$usrgrpid]));
 				}
 			}
-			if (!empty($usersInsert))
+
+			if (!empty($usersInsert)) {
 				DB::insert('users_groups', $usersInsert);
-			if (!empty($useridsToUnlink))
+			}
+
+			if (!empty($useridsToUnlink)) {
 				DB::delete('users_groups', array(
 					'userid'=>$useridsToUnlink,
 					'usrgrpid'=>$usrgrpids,
 				));
+			}
 		}
 
 		if ($rights) {
@@ -583,7 +590,7 @@ class CUserGroup extends CZBXAPI {
 			$rightsUpdate = array();
 			$rightsToUnlink = array();
 			foreach ($usrgrpids as $usrgrpid) {
-				foreach ($rights as $rnum => $right) {
+				foreach ($rights as $right) {
 					if (!isset($linkedRights[$usrgrpid][$right['id']])) {
 						$rightInsert[] = array(
 							'groupid' => $usrgrpid,
