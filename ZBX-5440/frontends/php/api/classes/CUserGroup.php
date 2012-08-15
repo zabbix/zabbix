@@ -368,9 +368,9 @@ class CUserGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Update UserGroups.
-	 * Checks permissions - only superadmins can update usergroups.
-	 * Formats data to be used in massUpdate() method.
+	 * Update UserGroups. <br>
+	 * Checks permissions - only superadmins can update usergroups. <br>
+	 * Formats data to be used in massUpdate() method. <br>
 	 *
 	 * @param array $usrgrps
 	 *
@@ -480,7 +480,16 @@ class CUserGroup extends CZBXAPI {
 		return array('usrgrpids' => $usrgrpids);
 	}
 
+
+	/**
+	 * Mass update user group. <br>
+	 * Checks for permissions - only super admins can change user groups. <br>
+	 *
+	 * @param type $data
+	 * @return array return passed user group ids
+	 */
 	public function massUpdate($data) {
+
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update user groups.'));
 		}
@@ -499,7 +508,6 @@ class CUserGroup extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update user group names.'));
 		}
 
-		$update = array();
 		foreach ($usrgrpids as $usrgrpid) {
 			if (isset($data['name'])) {
 				$groupExists = $this->get(array(
@@ -513,14 +521,11 @@ class CUserGroup extends CZBXAPI {
 			}
 
 			if (!empty($data)) {
-				$update[] = array(
+				DB::update('usrgrp', array(
 					'values' => $data,
 					'where' => array('usrgrpid' => $usrgrpid),
-				);
+				));
 			}
-		}
-		if ($update) {
-			DB::update('usrgrp', $update);
 		}
 
 		if (!is_null($userids)) {
