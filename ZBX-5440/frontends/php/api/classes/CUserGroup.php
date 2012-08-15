@@ -368,9 +368,9 @@ class CUserGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Update UserGroups. <br>
-	 * Checks permissions - only superadmins can update usergroups. <br>
-	 * Formats data to be used in massUpdate() method. <br>
+	 * Update UserGroups.
+	 * Checks permissions - only superadmins can update usergroups.
+	 * Formats data to be used in massUpdate() method.
 	 *
 	 * @param array $usrgrps
 	 *
@@ -482,11 +482,15 @@ class CUserGroup extends CZBXAPI {
 
 
 	/**
-	 * Mass update user group. <br>
-	 * Checks for permissions - only super admins can change user groups. <br>
+	 * Mass update user group.
+	 * Checks for permissions - only super admins can change user groups.
 	 *
-	 * @param type $data
-	 * @return array return passed user group ids
+	 *
+	 * @param array $data
+	 * @param int|int[] $data['usrgrpids'] id or ids of user groups to be updated.
+	 * @param string $data['name'] name to be set to a user group. Only one host group id can be passed at a time!
+	 *
+	 * @return int|int[] returns passed user group ids
 	 */
 	public function massUpdate($data) {
 
@@ -503,24 +507,28 @@ class CUserGroup extends CZBXAPI {
 		$rights = isset($data['rights']) ? zbx_toArray($data['rights']) : array();
 		unset($data['rights']);
 
-		// check that we're not trying to set a single name to multiple groups
-		if (isset($data['name']) && count($usrgrpids) > 1) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update user group names.'));
-		}
-
-		foreach ($usrgrpids as $usrgrpid) {
-			if (isset($data['name'])) {
+		// $data['name'] parameter restrictions
+		if (isset($data['name'])) {
+			// same name can be set only to one hostgroup
+			if (count($usrgrpids) > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one user group name can be changed at a time.'));
+			}
+			else {
+				// check if there already is hostgroup with this name, except current hostgroup
 				$groupExists = $this->get(array(
 					'filter' => array('name' => $data['name']),
 					'output' => API_OUTPUT_SHORTEN,
 				));
 				$groupExists = reset($groupExists);
-				if ($groupExists && (bccomp($groupExists['usrgrpid'], $usrgrpid) != 0) ) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Group').' '.$data['name'].' '._('already exists'));
+				if ($groupExists && (bccomp($groupExists['usrgrpid'], $usrgrpids[0]) != 0) ) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with name "%s" already exists.', $data['name']));
 				}
 			}
+		}
 
-			if (!empty($data)) {
+		// update user group data if there is something to update
+		if (!empty($data)) {
+			foreach ($usrgrpids as $usrgrpid) {
 				DB::update('usrgrp', array(
 					'values' => $data,
 					'where' => array('usrgrpid' => $usrgrpid),
