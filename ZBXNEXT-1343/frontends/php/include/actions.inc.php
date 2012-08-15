@@ -46,7 +46,6 @@ function condition_type2str($conditiontype) {
 	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY] = _('Trigger severity');
 	$str_type[CONDITION_TYPE_TIME_PERIOD] = _('Time period');
 	$str_type[CONDITION_TYPE_MAINTENANCE] = _('Maintenance status');
-	$str_type[CONDITION_TYPE_NODE] = _('Node');
 	$str_type[CONDITION_TYPE_DRULE] = _('Discovery rule');
 	$str_type[CONDITION_TYPE_DCHECK] = _('Discovery check');
 	$str_type[CONDITION_TYPE_DOBJECT] = _('Discovery object');
@@ -85,7 +84,6 @@ function condition_value2str($conditiontype, $value) {
 			$groups = API::HostGroup()->get(array(
 				'groupids' => $value,
 				'output' => API_OUTPUT_EXTEND,
-				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
 
@@ -93,12 +91,7 @@ function condition_value2str($conditiontype, $value) {
 				error(_s('No host groups with groupid "%s".', $value));
 			}
 
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
-			}
-
-			$str_val .= $group['name'];
+			$str_val = $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
 			$trigs = API::Trigger()->get(array(
@@ -106,26 +99,16 @@ function condition_value2str($conditiontype, $value) {
 				'expandDescription' => true,
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => array('name'),
-				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
 			$trig = reset($trigs);
 			$host = reset($trig['hosts']);
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
-			}
-
-			$str_val .= $host['name'].': '.$trig['description'];
+			$str_val = $host['name'].': '.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$host = get_host_by_hostid($value);
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
-			}
-			$str_val.= $host['name'];
+			$str_val = $host['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
 		case CONDITION_TYPE_HOST_NAME:
@@ -142,10 +125,6 @@ function condition_value2str($conditiontype, $value) {
 			break;
 		case CONDITION_TYPE_MAINTENANCE:
 			$str_val = _('maintenance');
-			break;
-		case CONDITION_TYPE_NODE:
-			$node = get_node_by_nodeid($value);
-			$str_val = $node['name'];
 			break;
 		case CONDITION_TYPE_DRULE:
 			$drule = get_discovery_rule_by_druleid($value);
@@ -436,10 +415,6 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_PROXY
 	);
 
-	if (ZBX_DISTRIBUTED) {
-		array_push($conditions[EVENT_SOURCE_TRIGGERS], CONDITION_TYPE_NODE);
-	}
-
 	if (isset($conditions[$eventsource])) {
 		return $conditions[$eventsource];
 	}
@@ -574,10 +549,6 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_IN,
 		CONDITION_OPERATOR_NOT_IN
 	);
-	$operators[CONDITION_TYPE_NODE] = array(
-		CONDITION_OPERATOR_EQUAL,
-		CONDITION_OPERATOR_NOT_EQUAL
-	);
 	$operators[CONDITION_TYPE_DRULE] = array(
 		CONDITION_OPERATOR_EQUAL,
 		CONDITION_OPERATOR_NOT_EQUAL
@@ -671,7 +642,6 @@ function count_operations_delay($operations, $def_period = 0) {
 function get_action_msgs_for_event($event) {
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Nodes') : null,
 		_('Time'),
 		_('Type'),
 		_('Status'),
@@ -733,7 +703,6 @@ function get_action_msgs_for_event($event) {
 		}
 
 		$table->addRow(array(
-			get_node_name_by_elid($alert['alertid']),
 			new CCol($time, 'top'),
 			new CCol((!empty($mediatype['description']) ? $mediatype['description'] : ''), 'top'),
 			new CCol($status, 'top'),
@@ -750,7 +719,6 @@ function get_action_msgs_for_event($event) {
 function get_action_cmds_for_event($event) {
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Nodes') : null,
 		_('Time'),
 		_('Status'),
 		_('Command'),
@@ -793,7 +761,6 @@ function get_action_cmds_for_event($event) {
 		$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
 
 		$table->addRow(array(
-			get_node_name_by_elid($alert['alertid']),
 			new CCol($time, 'top'),
 			new CCol($status, 'top'),
 			new CCol($message, 'wraptext top'),
@@ -820,7 +787,6 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	$tab_hint = new CTableInfo(_('No actions found.'));
 	$tab_hint->setAttribute('style', 'width: 300px;');
 	$tab_hint->setHeader(array(
-		is_show_all_nodes() ? _('Nodes') : null,
 		_('User'),
 		_('Details'),
 		_('Status')
@@ -835,7 +801,6 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 				' AND '.DBcondition('e.objectid',$available_triggers).
-				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.alertid';
 	$result = DBselect($sql, 30);
 
@@ -866,7 +831,6 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 		}
 
 		$tab_hint->addRow(array(
-			get_node_name_by_elid($row['alertid']),
 			empty($row['alias']) ? ' - ' : $row['alias'],
 			$message,
 			$status

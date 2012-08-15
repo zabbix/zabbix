@@ -31,22 +31,14 @@ function getImageByIdent($ident) {
 		$images = array();
 
 		$dbImages = API::Image()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => get_current_nodeid(true)
+			'output' => API_OUTPUT_EXTEND
 		));
 		foreach ($dbImages as $image) {
 			if (!isset($images[$image['name']])) {
 				$images[$image['name']] = array();
 			}
 
-			$nodeName = get_node_name_by_elid($image['imageid'], true);
-
-			if (!is_null($nodeName)) {
-				$images[$image['name']][$nodeName] = $image;
-			}
-			else {
-				$images[$image['name']][] = $image;
-			}
+			$images[$image['name']][] = $image;
 		}
 	}
 
@@ -55,15 +47,5 @@ function getImageByIdent($ident) {
 		return 0;
 	}
 
-	$searchedImages = $images[$ident['name']];
-
-	if (!isset($ident['node'])) {
-		return reset($searchedImages);
-	}
-	elseif (isset($searchedImages[$ident['node']])) {
-		return $searchedImages[$ident['node']];
-	}
-	else {
-		return 0;
-	}
+	return ($images[$ident['name']]) ? reset($images[$ident['name']]) : 0;
 }

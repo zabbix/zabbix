@@ -682,7 +682,7 @@ function get_items_data_overview($hostids, $view_style) {
 	$items = array();
 	while ($row = DBfetch($db_items)) {
 		$descr = itemName($row);
-		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
+		$row['hostname'] = $row['hostname'];
 		$hostNames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with

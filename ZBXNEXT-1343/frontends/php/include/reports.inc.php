@@ -37,10 +37,10 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	$cmbHosts = new CComboBox('filter_hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 
 	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+		$cmbGroups->addItem($groupid, $name);
 	}
 	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+		$cmbHosts->addItem($hostid, $name);
 	}
 
 	$filterForm->addRow(_('Template group'),$cmbGroups);
@@ -68,17 +68,13 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 				' AND '.DBcondition('h.hostid',$available_hosts).
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.triggerid=f.triggerid '.
-				' AND '.DBin_node('t.triggerid').
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				$sql_cond.
 			' ORDER BY g.name');
 
 		while($row=DBfetch($result)){
-			$cmbHGrps->addItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid'], null, ': ').$row['name']
-				);
+			$cmbHGrps->addItem($row['groupid']);
 		}
 
 		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND '.DBcondition('h.hostid',$available_hosts);
@@ -89,7 +85,6 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.triggerid=f.triggerid '.
 				' AND h.status='.HOST_STATUS_TEMPLATE.
-				' AND '.DBin_node('t.triggerid').
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
 			' ORDER BY t.description';
@@ -98,7 +93,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		while ($row = DBfetch($result)) {
 			$cmbTrigs->addItem(
 				$row['triggerid'],
-				get_node_name_by_elid($row['triggerid'], null, ': ').CTriggerHelper::expandDescriptionById($row['triggerid'])
+				CTriggerHelper::expandDescriptionById($row['triggerid'])
 			);
 		}
 

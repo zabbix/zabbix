@@ -29,9 +29,6 @@
 				'userids' => $userid,
 				'output' => API_OUTPUT_EXTEND
 			);
-			if ($data['is_profile']) {
-				$options['nodeids'] = id2nodeid($userid);
-			}
 			$users = API::User()->get($options);
 			$user = reset($users);
 			$data['title'] = _('User').' "'.$user['alias'].'"';
@@ -164,33 +161,6 @@
 	}
 
 	function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
-		// nodes
-		if (ZBX_DISTRIBUTED) {
-			$lists['node']['label']		= _('Nodes');
-			$lists['node']['read_write']= new CListBox('nodes_write', null, 10);
-			$lists['node']['read_only']	= new CListBox('nodes_read', null, 10);
-			$lists['node']['deny']		= new CListBox('nodes_deny', null, 10);
-
-			$lists['node']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['deny']->setAttribute('style', 'background: #EBEFF2;');
-
-			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
-			foreach ($nodes as $node) {
-				switch($node['permission']) {
-					case PERM_READ_ONLY:
-						$list_name = 'read_only';
-						break;
-					case PERM_READ_WRITE:
-						$list_name = 'read_write';
-						break;
-					default:
-						$list_name = 'deny';
-				}
-				$lists['node'][$list_name]->addItem($node['nodeid'], $node['name']);
-			}
-			unset($nodes);
-		}
 
 		// group
 		$lists['group']['label']		= _('Host groups');
@@ -202,7 +172,7 @@
 		$lists['group']['read_only']->setAttribute('style', 'background: #EBEFF2;');
 		$lists['group']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
-		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
+		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 
 		foreach ($groups as $group) {
 			switch($group['permission']) {
@@ -215,7 +185,7 @@
 				default:
 					$list_name = 'deny';
 			}
-			$lists['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].':' ).$group['name']);
+			$lists['group'][$list_name]->addItem($group['groupid'], $group['name']);
 		}
 		unset($groups);
 
@@ -229,7 +199,7 @@
 		$lists['host']['read_only']->setAttribute('style', 'background: #EBEFF2;');
 		$lists['host']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
-		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 
 		foreach ($hosts as $host) {
 			switch($host['permission']) {
@@ -245,7 +215,7 @@
 			if (HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status']) {
 				$host['host_name'] = $host['host'];
 			}
-			$lists['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].':' ).$host['host_name']);
+			$lists['host'][$list_name]->addItem($host['hostid'], $host['host_name']);
 		}
 		unset($hosts);
 
@@ -1115,7 +1085,7 @@
 			}
 		}
 		else {
-			$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v WHERE '.DBin_node('v.valuemapid')));
+			$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v'));
 			order_result($data['valuemaps'], 'name');
 		}
 

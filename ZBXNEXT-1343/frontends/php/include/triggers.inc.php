@@ -190,18 +190,15 @@ function get_accessible_triggers($perm, $hostids = array(), $cache = 1) {
 	static $available_triggers;
 
 	$userid = CWebUser::$data['userid'];
-	$nodeid = get_current_nodeid();
-	$nodeid_str = is_array($nodeid) ? implode('', $nodeid) : strval($nodeid);
 	$hostid_str = implode('', $hostids);
-	$cache_hash = md5($userid.$perm.$nodeid_str.$hostid_str);
+	$cache_hash = md5($userid.$perm.$hostid_str);
 
 	if ($cache && isset($available_triggers[$cache_hash])) {
 		return $available_triggers[$cache_hash];
 	}
 
 	$options = array(
-		'output' => API_OUTPUT_SHORTEN,
-		'nodeids' => $nodeid
+		'output' => API_OUTPUT_SHORTEN
 	);
 	if (!empty($hostids)) {
 		$options['hostids'] = $hostids;
@@ -833,11 +830,11 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
 						$link = new CLink($function_data['host'].':'.$function_data['key_'],
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-							$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($function_data['itemid']), $style);
+							$trigger['discoveryRuleid'], $style);
 					}
 					else {
 						$link = new CLink($function_data['host'].':'.$function_data['key_'],
-							'items.php?form=update&itemid='.$function_data['itemid'].'&switch_node='.id2nodeid($function_data['itemid']), $style);
+							'items.php?form=update&itemid='.$function_data['itemid'], $style);
 					}
 					array_push($exp, array('{', $link,'.', bold($function_data['function'].'('), $function_data['parameter'], bold(')'), '}'));
 				}
@@ -1017,8 +1014,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
-					' AND h.hostid=i.hostid'.
-					' AND '.DBin_node('i.itemid');
+					' AND h.hostid=i.hostid';
 		if ($item = DBfetch(DBselect($sql))) {
 			if (!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$exprPart['functionName']]['value_types'][$item['value_type']])) {
 				error(_s('Incorrect item value type "%1$s:%2$s" provided for trigger function "%3$s".', $exprPart['host'], $exprPart['item'], $exprPart['function']));
@@ -1185,7 +1181,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 	foreach ($dbTriggers as $trigger) {
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
-		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
+		$trigger['host'] = $trigger['host'];
 		$trigger['description'] = CTriggerHelper::expandReferenceMacros($trigger);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
@@ -1597,7 +1593,6 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	$config = select_config();
 
 	$options = array(
-		'nodeids' => get_current_nodeid(),
 		'monitored' => true,
 		'countOutput' => true,
 		'filter' => array(),
@@ -1628,9 +1623,6 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 function make_trigger_details($trigger) {
 	$table = new CTableInfo();
 
-	if (is_show_all_nodes()) {
-		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
-	}
 	$expression = explode_exp($trigger['expression'], true, true);
 
 	$host = API::Host()->get(array(
@@ -1763,20 +1755,6 @@ function trim_extra_bracket($expr) {
 		} while (($expr = trim_extra_bracket($expr)) != $bak);
 	}
 	return $expr;
-}
-
-function create_node_list($node, &$arr, $depth = 0, $parent_expr = null) {
-	$add = 0;
-	if ($parent_expr != $node['expr']) {
-		$expr = $node['expr'];
-		$expr = $expr == '&' ? _('AND') : ($expr == '|' ? _('OR') : $expr);
-		array_push($arr, array('id' => $node['id'], 'expr' => $expr, 'depth' => $depth));
-		$add = 1;
-	}
-	if (isset($node['left'])) {
-		create_node_list($node['left'], $arr, $depth + $add, $node['expr']);
-		create_node_list($node['right'], $arr, $depth + $add, $node['expr']);
-	}
 }
 
 // build trigger expression html (with zabbix html classes) tree

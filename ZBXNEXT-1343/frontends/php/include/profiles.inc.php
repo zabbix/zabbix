@@ -38,7 +38,6 @@ class CProfile {
 			'SELECT p.*'.
 			' FROM profiles p'.
 			' WHERE p.userid='.self::$userDetails['userid'].
-				' AND '.DBin_node('p.profileid', false).
 			' ORDER BY p.userid,p.profileid'
 		);
 		while ($profile = DBfetch($db_profiles)) {
@@ -158,12 +157,8 @@ class CProfile {
 	private static function updateDB($idx, $value, $type, $idx2) {
 		$sql_cond = '';
 
-		if ($idx != 'web.nodes.switch_node') {
-			$sql_cond .= ' AND '.DBin_node('profileid', false);
-		}
-
 		if ($idx2 > 0) {
-			$sql_cond .= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
+			$sql_cond .= ' AND idx2='.$idx2;
 		}
 
 		$value_type = self::getFieldByType($type);
@@ -209,18 +204,14 @@ class CProfile {
 }
 
 /************ CONFIG **************/
-function select_config($cache = true, $nodeid = null) {
-	global $page, $ZBX_LOCALNODEID;
+function select_config($cache = true) {
+	global $page;
 	static $config;
 
 	if ($cache && isset($config)) {
 		return $config;
 	}
-	if (is_null($nodeid)) {
-		$nodeid = $ZBX_LOCALNODEID;
-	}
-
-	$db_config = DBfetch(DBselect('SELECT c.* FROM config c WHERE '.DBin_node('c.configid', $nodeid)));
+	$db_config = DBfetch(DBselect('SELECT c.* FROM config c'));
 	if (!empty($db_config)) {
 		$config = $db_config;
 		return $db_config;
@@ -332,7 +323,7 @@ function update_config($configs) {
 		return null;
 	}
 
-	return DBexecute('UPDATE config SET '.implode(',', $update).' WHERE '.DBin_node('configid', false));
+	return DBexecute('UPDATE config SET '.implode(',', $update));
 }
 
 /************ HISTORY **************/

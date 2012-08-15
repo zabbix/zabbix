@@ -112,9 +112,7 @@ function slideshow_accessible($slideshowid, $perm) {
 
 	$sql = 'SELECT s.slideshowid'.
 			' FROM slideshows s'.
-			' WHERE s.slideshowid='.$slideshowid.
-				' AND '.DBin_node('s.slideshowid', get_current_nodeid(null, $perm)
-	);
+			' WHERE s.slideshowid='.$slideshowid;
 	if (DBselect($sql)) {
 		$result = true;
 

@@ -88,7 +88,6 @@ function getActionMapBySysmap($sysmap) {
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
 	$hosts = API::Host()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'hostids' => $hostids,
 			'output' => array('status'),
 			'nopermissions' => true,
@@ -470,7 +469,6 @@ function add_elementNames(&$selements) {
 		'hostids' => $hostids,
 		'output' => array('name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -478,7 +476,6 @@ function add_elementNames(&$selements) {
 		'mapids' => $mapids,
 		'output' => array('name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -487,7 +484,6 @@ function add_elementNames(&$selements) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -495,7 +491,6 @@ function add_elementNames(&$selements) {
 		'hostgroupids' => $hostgroupids,
 		'output' => array('name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -503,7 +498,6 @@ function add_elementNames(&$selements) {
 		'imageids' => $imageids,
 		'output' => API_OUTPUT_EXTEND,
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -968,8 +962,7 @@ function getSelementsInfo($sysmap) {
 		$hosts = API::Host()->get(array(
 			'hostids' => array_keys($hosts_map),
 			'output' => array('name', 'status', 'maintenance_status', 'maintenanceid'),
-			'nopermissions' => true,
-			'nodeids' => get_current_nodeid(true)
+			'nopermissions' => true
 		));
 		$all_hosts = array_merge($all_hosts, $hosts);
 		foreach ($hosts as $host) {
@@ -983,8 +976,7 @@ function getSelementsInfo($sysmap) {
 		$hosts = API::Host()->get(array(
 			'groupids' => array_keys($hostgroups_map),
 			'output' => array('name', 'status', 'maintenance_status', 'maintenanceid'),
-			'nopermissions' => true,
-			'nodeids' => get_current_nodeid(true)
+			'nopermissions' => true
 		));
 		$all_hosts = array_merge($all_hosts, $hosts);
 		foreach ($hosts as $host) {
@@ -1015,7 +1007,6 @@ function getSelementsInfo($sysmap) {
 
 	if (!empty($triggers_map)) {
 		$triggers = API::Trigger()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
 			'filter' => array('value_flags' => null),
 			'output' => API_OUTPUT_EXTEND,
@@ -1033,7 +1024,6 @@ function getSelementsInfo($sysmap) {
 	// triggers from submaps, skip dependent
 	if (!empty($triggers_map_submaps)) {
 		$triggers = API::Trigger()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
 			'filter' => array('value_flags' => null),
 			'skipDependent' => true,
@@ -1056,7 +1046,6 @@ function getSelementsInfo($sysmap) {
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'nopermissions' => true,
 			'filter' => array('value_flags' => null),
-			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
 			'skipDependent' => true
 		));
@@ -1076,7 +1065,6 @@ function getSelementsInfo($sysmap) {
 		'triggerids' => array_keys($all_triggers),
 		'withLastEventUnacknowledged' => true,
 		'output' => API_OUTPUT_SHORTEN,
-		'nodeids' => get_current_nodeid(true),
 		'nopermissions' => true,
 		'monitored' => true,
 		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'value_flags' => null)
