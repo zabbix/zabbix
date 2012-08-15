@@ -23,33 +23,33 @@
 static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usage)
 {
 #ifdef HAVE_SYS_STATVFS_H
-	struct statvfs   s;
+	struct statvfs	s;
 #else
-	struct statfs   s;
+	struct statfs	s;
 #endif
 
 	assert(fs);
 
 #ifdef HAVE_SYS_STATVFS_H
-	if ( statvfs( fs, &s) != 0 )
+	if (0 != statvfs(fs, &s))
 #else
-	if ( statfs( fs, &s) != 0 )
+	if (0 != statfs(fs, &s))
 #endif
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(total)
+	if (0 != total)
 		(*total) = (double)(s.f_files);
 #ifdef HAVE_SYS_STATVFS_H
-	if(free)
+	if (0 != free)
 		(*free)  = (double)(s.f_favail);
-	if(usage)
+	if (0 != usage)
 		(*usage) = (double)(s.f_files - s.f_favail);
 #else
-	if(free)
+	if (0 != free)
 		(*free)  = (double)(s.f_ffree);
-	if(usage)
+	if (0 != usage)
 		(*usage) = (double)(s.f_files - s.f_ffree);
 #endif
 	return SYSINFO_RET_OK;
@@ -57,16 +57,16 @@ static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usa
 
 static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char 	mountPoint[MAX_STRING_LEN];
+	char	mountPoint[MAX_STRING_LEN];
 	double	value = 0;
 
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, mountPoint, MAX_STRING_LEN))
+		return SYSINFO_RET_FAIL;
 
-	if(get_fs_inodes_stat(mountPoint, NULL, NULL, &value) != SYSINFO_RET_OK)
+	if (SYSINFO_RET_OK != get_fs_inodes_stat(mountPoint, NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
@@ -79,13 +79,13 @@ static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags,
 	char 	mountPoint[MAX_STRING_LEN];
 	double	value = 0;
 
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, mountPoint, MAX_STRING_LEN))
+		return SYSINFO_RET_FAIL;
 
-	if(get_fs_inodes_stat(mountPoint, NULL, &value, NULL) != SYSINFO_RET_OK)
+	if (SYSINFO_RET_OK != get_fs_inodes_stat(mountPoint, NULL, &value, NULL))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
@@ -98,15 +98,13 @@ static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags
 	char 	mountPoint[MAX_STRING_LEN];
 	double	value = 0;
 
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (0 != get_param(param, 1, mountPoint, MAX_STRING_LEN))
+		return SYSINFO_RET_FAIL;
 
-	if(get_fs_inodes_stat(mountPoint, &value, NULL, NULL) != SYSINFO_RET_OK)
+	if (SYSINFO_RET_OK != get_fs_inodes_stat(mountPoint, &value, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
@@ -120,13 +118,13 @@ static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags
 	double	tot_val = 0;
 	double	free_val = 0;
 
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, mountPoint, MAX_STRING_LEN))
+		return SYSINFO_RET_FAIL;
 
-	if(get_fs_inodes_stat(mountPoint, &tot_val, &free_val, NULL) != SYSINFO_RET_OK)
+	if (SYSINFO_RET_OK != get_fs_inodes_stat(mountPoint, &tot_val, &free_val, NULL))
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, (100.0 * free_val) / tot_val);
@@ -140,13 +138,13 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
 	double	tot_val = 0;
 	double	usg_val = 0;
 
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, mountPoint, MAX_STRING_LEN))
+		return SYSINFO_RET_FAIL;
 
-	if(get_fs_inodes_stat(mountPoint, &tot_val, NULL, &usg_val) != SYSINFO_RET_OK)
+	if (SYSINFO_RET_OK != get_fs_inodes_stat(mountPoint, &tot_val, NULL, &usg_val))
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, (100.0 * usg_val) / tot_val);
@@ -166,27 +164,26 @@ int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		{NULL,		0}
 	};
 
-	char fsname[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
+	char	fsname[MAX_STRING_LEN], mode[MAX_STRING_LEN];
+	int	i;
 
-        if(num_param(param) > 2)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, fsname, sizeof(fsname)) != 0)
-                return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
+		return SYSINFO_RET_FAIL;
 
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-                mode[0] = '\0';
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		mode[0] = '\0';
 
-        if(mode[0] == '\0')
+	if ('\0' == mode[0])
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "total");
 	}
 
-	for(i=0; fl[i].mode!=0; i++)
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+	for (i = 0; 0 != fl[i].mode; i++)
+		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
 			return (fl[i].function)(cmd, fsname, flags, result);
 
 	return SYSINFO_RET_FAIL;
