@@ -334,8 +334,8 @@ typedef enum
 	CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 	CONDITION_TYPE_APPLICATION,
 	CONDITION_TYPE_MAINTENANCE,
-	CONDITION_TYPE_NODE,
-	CONDITION_TYPE_DRULE,
+	/*CONDITION_TYPE_NODE,*/
+	CONDITION_TYPE_DRULE = 18,
 	CONDITION_TYPE_DCHECK,
 	CONDITION_TYPE_PROXY,
 	CONDITION_TYPE_DOBJECT,
@@ -653,10 +653,6 @@ typedef enum
 } zbx_user_permission_t;
 
 const char	*zbx_permission_string(int perm);
-
-#define	ZBX_NODE_SLAVE	0
-#define	ZBX_NODE_MASTER	1
-const char	*zbx_nodetype_string(unsigned char nodetype);
 
 typedef struct
 {

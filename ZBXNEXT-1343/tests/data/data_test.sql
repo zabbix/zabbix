@@ -591,10 +591,6 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip,
 -- delete media type
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (560, 1, 1328684680, 2, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
 
--- add node
--- update node
--- delete node
-
 -- add proxy
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (564, 1, 1328684720, 0, 26, '[test_proxy1] [10054]', '192.168.3.32', 0, '');
 
