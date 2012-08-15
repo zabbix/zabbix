@@ -23,6 +23,8 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A.F....... [ZBX-5409] changed item value macros for items without data to be resolved into "UNKNOWN" (Pavels)
+..F....... [ZBX-5409] fixed value mappings on the latest data, item history pages and in plain text screen items and trigger names (Pavels)
 ..F....... [ZBX-5419] fixed session not terminated upon logout (Toms)
 ..F....... [ZBX-5419] fixed guest session not removed after login (Toms)
 ..F....... [ZBX-4168] fixed the "problem display" dashboard filter not being applied to the "latest 20 issues" block (Pavels)

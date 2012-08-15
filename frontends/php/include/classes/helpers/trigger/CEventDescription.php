@@ -29,6 +29,6 @@ class CEventDescription extends CTriggerDescription {
 			$trigger['ns']
 		);
 
-		return formatItemValue($item);
+		return formatItemValue($item, self::MACRO_ITEM_VALUE_UNKNOWN);
 	}
 }
