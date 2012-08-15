@@ -1205,8 +1205,8 @@ void	process_actions(DB_EVENT *event)
 
 	result = DBselect("select actionid,evaltype"
 			" from actions"
-			" where status=%d and eventsource=%d" DB_NODE,
-			ACTION_STATUS_ACTIVE, event->source, DBnode_local("actionid"));
+			" where status=%d and eventsource=%d",
+			ACTION_STATUS_ACTIVE, event->source);
 
 	while (NULL != (row = DBfetch(result)))
 	{

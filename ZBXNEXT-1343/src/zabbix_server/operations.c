@@ -53,27 +53,25 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 	{
 		case EVENT_OBJECT_DHOST:
 			zbx_snprintf(sql, sizeof(sql),
-				"select h.hostid"
-				" from hosts h,interface i,dservices ds"
-				" where h.hostid=i.hostid"
-					" and i.useip=1"
-					" and i.ip=ds.ip"
-					" and ds.dhostid=" ZBX_FS_UI64
-					DB_NODE
-				" order by i.hostid",
-				event->objectid, DBnode_local("i.interfaceid"));
+					"select h.hostid"
+					" from hosts h,interface i,dservices ds"
+					" where h.hostid=i.hostid"
+						" and i.useip=1"
+						" and i.ip=ds.ip"
+						" and ds.dhostid=" ZBX_FS_UI64
+					" order by i.hostid",
+					event->objectid);
 			break;
 		case EVENT_OBJECT_DSERVICE:
 			zbx_snprintf(sql, sizeof(sql),
-				"select h.hostid"
-				" from hosts h,interface i,dservices ds"
-				" where h.hostid=i.hostid"
-					" and i.useip=1"
-					" and i.ip=ds.ip"
-					" and ds.dserviceid =" ZBX_FS_UI64
-					DB_NODE
-				" order by i.hostid",
-				event->objectid, DBnode_local("i.interfaceid"));
+					"select h.hostid"
+					" from hosts h,interface i,dservices ds"
+					" where h.hostid=i.hostid"
+						" and i.useip=1"
+						" and i.ip=ds.ip"
+						" and ds.dserviceid =" ZBX_FS_UI64
+					" order by i.hostid",
+					event->objectid);
 			break;
 		default:
 			goto exit;
@@ -280,10 +278,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
 							" and ds.dhostid=" ZBX_FS_UI64
-						       	DB_NODE
 						" order by h.hostid",
-						dhostid,
-						DBnode_local("h.hostid"));
+						dhostid);
 
 				if (NULL != (row2 = DBfetch(result2)))
 				{
@@ -354,10 +350,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
-						DB_NODE
 					" order by hostid",
-					host_esc,
-					DBnode_local("hostid"));
+					host_esc);
 
 			result2 = DBselectN(sql, 1);
 
@@ -365,10 +359,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			{
 				hostid = DBget_maxid("hosts");
 
-				DBexecute("insert into hosts"
-							" (hostid,proxy_hostid,host,name)"
-						" values"
-							" (" ZBX_FS_UI64 ",%s,'%s','%s')",
+				DBexecute("insert into hosts (hostid,proxy_hostid,host,name)"
+						" values " ZBX_FS_UI64 ",%s,'%s','%s')",
 						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
@@ -382,9 +374,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 				if (host_proxy_hostid != proxy_hostid)
 				{
-					DBexecute("update hosts"
-							" set proxy_hostid=%s"
-							" where hostid=" ZBX_FS_UI64,
+					DBexecute("update hosts set proxy_hostid=%s where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid), hostid);
 				}
 

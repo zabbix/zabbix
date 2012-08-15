@@ -2280,10 +2280,7 @@ void	DCsync_configuration()
 			"select alert_history,event_history,refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
-			" from config"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("configid"));
+			" from config");
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2297,11 +2294,9 @@ void	DCsync_configuration()
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d)"
-				" and i.status in (%d,%d)"
-				DB_NODE,
+				" and i.status in (%d,%d)",
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-			DBnode_local("i.itemid"));
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED);
 	isec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2315,22 +2310,18 @@ void	DCsync_configuration()
 				" and h.status in (%d)"
 				" and i.status in (%d,%d)"
 				" and t.status in (%d)"
-				" and t.flags not in (%d)"
-				DB_NODE,
+				" and t.flags not in (%d)",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED,
-			ZBX_FLAG_DISCOVERY_CHILD,
-			DBnode_local("h.hostid"));
+			ZBX_FLAG_DISCOVERY_CHILD);
 	tsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	tdep_result = DBselect(
 			"select d.triggerid_down,d.triggerid_up"
 			" from trigger_depends d"
-			" where 1=1" DB_NODE
-			" order by d.triggerid_down",
-			DBnode_local("d.triggerid_down"));
+			" order by d.triggerid_down");
 	dsec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2343,13 +2334,11 @@ void	DCsync_configuration()
 				" and h.status in (%d)"
 				" and i.status in (%d,%d)"
 				" and t.status in (%d)"
-				" and t.flags not in (%d)"
-				DB_NODE,
+				" and t.flags not in (%d)",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED,
-			ZBX_FLAG_DISCOVERY_CHILD,
-			DBnode_local("h.hostid"));
+			ZBX_FLAG_DISCOVERY_CHILD);
 	fsec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2361,47 +2350,33 @@ void	DCsync_configuration()
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
 				"status,name"
 			" from hosts"
-			" where status in (%d,%d,%d)"
-				DB_NODE,
-			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
-			DBnode_local("hostid"));
+			" where status in (%d,%d,%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
 	hsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	htmpl_result = DBselect(
 			"select hostid,templateid"
 			" from hosts_templates"
-			" where 1=1"
-				DB_NODE
-			" order by hostid,templateid",
-			DBnode_local("hosttemplateid"));
+			" order by hostid,templateid");
 	htsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	gmacro_result = DBselect(
 			"select globalmacroid,macro,value"
-			" from globalmacro"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("globalmacroid"));
+			" from globalmacro");
 	gmsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	hmacro_result = DBselect(
 			"select hostmacroid,hostid,macro,value"
-			" from hostmacro"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("hostmacroid"));
+			" from hostmacro");
 	hmsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if_result = DBselect(
 			"select interfaceid,hostid,type,main,useip,ip,dns,port"
-			" from interface"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("interfaceid"));
+			" from interface");
 	ifsec = zbx_time() - sec;
 
 	START_SYNC;
@@ -2936,10 +2911,7 @@ void	DCload_config()
 			"select alert_history,event_history,refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
-			" from config"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("configid"));
+			" from config");
 
 	LOCK_CACHE;
 

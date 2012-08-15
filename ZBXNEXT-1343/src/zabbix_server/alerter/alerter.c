@@ -165,11 +165,9 @@ void	main_alerter_loop()
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
 					" and a.alerttype=%d"
-					DB_NODE
 				" order by a.alertid",
 				ALERT_STATUS_NOT_SENT,
-				ALERT_TYPE_MESSAGE,
-				DBnode_local("mt.mediatypeid"));
+				ALERT_TYPE_MESSAGE);
 
 		while (NULL != (row = DBfetch(result)))
 		{

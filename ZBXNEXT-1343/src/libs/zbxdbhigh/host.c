@@ -637,10 +637,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 				" from interface"
 				" where hostid=" ZBX_FS_UI64
 					" and type in (%d,%d,%d,%d)"
-					" and main=1"
-					DB_NODE,
+					" and main=1",
 				hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP,
-				INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX, DBnode_local("interfaceid"));
+				INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX);
 
 		while (NULL != (trow = DBfetch(tresult)))
 		{
@@ -897,7 +896,7 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
  *                                                                            *
  * Function: DBupdate_services_status_all                                     *
  *                                                                            *
- * Purpose: Cleaning parent nodes from triggers, updating ALL services status.*
+ * Purpose: Clean parent nodes from triggers, updating ALL services status.   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *

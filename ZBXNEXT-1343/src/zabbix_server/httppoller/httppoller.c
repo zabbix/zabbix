@@ -50,7 +50,7 @@ static int	get_minnextcheck(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		res;
+	int		res = FAIL;
 
 	result = DBselect(
 			"select min(t.nextcheck)"
@@ -61,20 +61,13 @@ static int	get_minnextcheck(int now)
 				" and t.status=%d"
 				" and h.proxy_hostid is null"
 				" and h.status=%d"
-				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
-				DB_NODE,
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)",
 			CONFIG_HTTPPOLLER_FORKS, process_num - 1,
 			HTTPTEST_STATUS_MONITORED,
 			HOST_STATUS_MONITORED,
-			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
-			DBnode_local("t.httptestid"));
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No httptests to process in get_minnextcheck.");
-		res = FAIL;
-	}
-	else
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		res = atoi(row[0]);
 
 	DBfree_result(result);

@@ -157,7 +157,7 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 		zbx_free(group);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")" DB_NODE, DBnode_local("h.hostid"));
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")");
 
 	result = DBselect("%s", sql);
 

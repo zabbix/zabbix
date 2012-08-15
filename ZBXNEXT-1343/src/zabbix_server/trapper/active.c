@@ -67,12 +67,10 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 			" from hosts"
 			" where host='%s'"
 				" and status in (%d,%d)"
-		       		" and proxy_hostid is null"
-				DB_NODE,
+				" and proxy_hostid is null",
 			host_esc,
 			HOST_STATUS_MONITORED,
-			HOST_STATUS_NOT_MONITORED,
-			DBnode_local("hostid"));
+			HOST_STATUS_NOT_MONITORED);
 
 	if (NULL != (row = DBfetch(result)))
 	{

@@ -32,31 +32,9 @@
 #if HAVE_POSTGRESQL
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
-/***************************************************************/
-/* ID structure: NNNSSSDDDDDDDDDDD, where                      */
-/*      NNN - nodeid (to which node the ID belongs to)         */
-/*      SSS - source nodeid (in which node was the ID created) */
-/*      DDDDDDDDDDD - the ID itself                            */
-/***************************************************************/
 
 extern int	txn_level;
 extern int	txn_error;
-
-const char	*DBnode(const char *fieldid, int nodeid)
-{
-	fieldid = fieldid;
-	nodeid = nodeid;
-
-	return '\0';
-}
-
-int	DBis_node_id(zbx_uint64_t id, int nodeid)
-{
-	id = id;
-	nodeid = nodeid;
-
-	return FAIL;
-}
 
 void	DBclose()
 {
@@ -524,13 +502,11 @@ void	DBupdate_triggers_status_after_restart()
 				" and h.status in (%d)"
 				" and i.status in (%d)"
 				" and i.type not in (%d,%d)"
-				" and t.status in (%d)"
-				DB_NODE,
+				" and t.status in (%d)",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
-			TRIGGER_STATUS_ENABLED,
-			DBnode_local("t.triggerid"));
+			TRIGGER_STATUS_ENABLED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -793,8 +769,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.ipmi_available<>%d and i.type in (%d))"
 					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
-				" and i.flags not in (%d)"
-				DB_NODE,
+				" and i.flags not in (%d)",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
@@ -810,8 +785,7 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_IPMI,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_JMX,
-			ZBX_FLAG_DISCOVERY_CHILD,
-			DBnode_local("i.itemid"));
+			ZBX_FLAG_DISCOVERY_CHILD);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1299,25 +1273,19 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
 	zbx_uint64_t	min, max;
-	int		found = FAIL, dbres, nodeid;
+	int		found = FAIL, dbres;
 	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	table = DBget_table(tablename);
-	nodeid = 0;
+
+	min = 0;
 
 	if (0 != (table->flags & ZBX_SYNC))
-	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid +
-			(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999);
-	}
+		max = (zbx_uint64_t)__UINT64_C(99999999999);
 	else
-	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
-	}
+		max = (zbx_uint64_t)__UINT64_C(99999999999999);
 
 	while (FAIL == found)
 	{
@@ -1328,8 +1296,8 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			return 0;
 		}
 
-		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-				nodeid, table->table, table->recid);
+		result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
+				table->table, table->recid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
@@ -1355,16 +1323,15 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			}
 			DBfree_result(result);
 
-			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
-					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
-					nodeid, table->table, table->recid, ret1);
+			dbres = DBexecute("insert into ids (table_name,field_name,nextid)"
+					" values ('%s','%s'," ZBX_FS_UI64 ")",
+					table->table, table->recid, ret1);
 
 			if (ZBX_DB_OK > dbres)
 			{
 				/* solving the problem of an invisible record created in a parallel transaction */
-				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
-						" and field_name='%s'",
-						nodeid, table->table, table->recid);
+				DBexecute("update ids set nextid=nextid+1 where table_name='%s' and field_name='%s'",
+						table->table, table->recid);
 			}
 
 			continue;
@@ -1376,16 +1343,16 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 			if (ret1 < min || ret1 >= max)
 			{
-				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-						nodeid, table->table, table->recid);
+				DBexecute("delete from ids where table_name='%s' and field_name='%s'",
+						table->table, table->recid);
 				continue;
 			}
 
-			DBexecute("update ids set nextid=nextid+%d where nodeid=%d and table_name='%s' and field_name='%s'",
-					num, nodeid, table->table, table->recid);
+			DBexecute("update ids set nextid=nextid+%d where table_name='%s' and field_name='%s'",
+					num, table->table, table->recid);
 
-			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-					nodeid, table->table, table->recid);
+			result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
+					table->table, table->recid);
 
 			if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			{
@@ -1656,10 +1623,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				"select hostid"
 				" from hosts"
 				" where proxy_hostid%s"
-					" and host='%s'"
-					DB_NODE,
-				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBnode_local("hostid"));
+					" and host='%s'",
+				DBsql_id_cmp(proxy_hostid), host_esc);
 
 		if (NULL != DBfetch(result))
 			res = FAIL;
@@ -1675,10 +1640,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				"select autoreg_hostid"
 				" from autoreg_host"
 				" where proxy_hostid%s"
-					" and host='%s'"
-					DB_NODE,
-				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBnode_local("autoreg_hostid"));
+					" and host='%s'",
+				DBsql_id_cmp(proxy_hostid), host_esc);
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -1817,9 +1780,8 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 	result = DBselect(
 			"select host"
 			" from hosts"
-			" where host like '%s%%' escape '%c'"
-				DB_NODE,
-			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBnode_local("hostid"));
+			" where host like '%s%%' escape '%c'",
+			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR);
 
 	zbx_free(host_name_sample_esc);
 

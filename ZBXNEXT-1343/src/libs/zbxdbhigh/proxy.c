@@ -123,9 +123,8 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 				"select hostid"
 				" from hosts"
 				" where host='%s'"
-					" and status in (%d)"
-					DB_NODE,
-				host_esc, HOST_STATUS_PROXY_ACTIVE, DBnode_local("hostid"));
+					" and status in (%d)",
+				host_esc, HOST_STATUS_PROXY_ACTIVE);
 
 		zbx_free(host_esc);
 
@@ -204,16 +203,7 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", table->table);
 
-	if (SUCCEED == str_in_list("globalmacro,regexps,expressions,config", table->table, ','))
-	{
-		char	*field_name;
-
-		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where 1=1" DB_NODE, DBnode_local(field_name));
-
-		zbx_free(field_name);
-	}
-	else if (SUCCEED == str_in_list("hosts,interface,hosts_templates,hostmacro", table->table, ','))
+	if (SUCCEED == str_in_list("hosts,interface,hosts_templates,hostmacro", table->table, ','))
 	{
 		if (0 == hosts->values_num)
 			goto skip_data;
@@ -254,9 +244,7 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (0 == strcmp(table->table, "groups"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				",config r where t.groupid=r.discovery_groupid" DB_NODE,
-				DBnode_local("r.configid"));
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,	",config r where t.groupid=r.discovery_groupid");
 	}
 	else if (0 == strcmp(table->table, "applications"))
 	{
@@ -287,9 +275,9 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		if (0 == httptests->values_num)
 			goto skip_data;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				",httpstep r where t.httpstepid=r.httpstepid"
-					" and");
+				" and");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.httptestid",
 				httptests->values, httptests->values_num);
 	}
@@ -1232,8 +1220,8 @@ static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t las
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
-				"values (0,'%s','%s'," ZBX_FS_UI64 ")",
+		DBexecute("insert into ids (table_name,field_name,nextid)"
+				"values ('%s','%s'," ZBX_FS_UI64 ")",
 				ht->table,
 				ht->lastfieldname,
 				lastid);
