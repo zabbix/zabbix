@@ -895,25 +895,22 @@ function delete_trends_by_itemid($itemIds) {
 
 /**
  * Format item lastvalue.
- * First try to apply value map if any is defined for item. If applied successfully it is returned.
- * If value map was not applied, format value depending on it's value type.
+ * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
+ * value.
  *
  * @param array $item
+ * @param string $unknownString the text to be used if the item has no data
  *
  * @return string
  */
-function formatItemValue(array $item) {
+function formatItemValue(array $item, $unknownString = '-') {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
-		return '-';
+		return $unknownString;
 	}
 
-	$value = null;
+	$value = formatItemValueType($item);
 	if ($item['valuemapid'] > 0) {
-		$value = applyValueMap($item['lastvalue'], $item['valuemapid']);
-	}
-
-	if ($value != $item['lastvalue']) {
-		$value = formatItemValueType($item);
+		$value = applyValueMap($value, $item['valuemapid']);
 	}
 
 	return $value;
