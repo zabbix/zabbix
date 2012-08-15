@@ -499,13 +499,6 @@ class CUserGroup extends CZBXAPI {
 		}
 
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
-		unset($data['usrgrpids']);
-
-		$userids = isset($data['userids']) ? zbx_toArray($data['userids']) : array();
-		unset($data['userids']);
-
-		$rights = isset($data['rights']) ? zbx_toArray($data['rights']) : array();
-		unset($data['rights']);
 
 		// $data['name'] parameter restrictions
 		if (isset($data['name'])) {
@@ -526,16 +519,21 @@ class CUserGroup extends CZBXAPI {
 			}
 		}
 
-		// update user group data if there is something to update
-		if (!empty($data)) {
+		// update usrgrp (user group) tbale if there is something to update
+		$usrgrp_table_update_data = $data;
+		unset($usrgrp_table_update_data['usrgrpids']);
+		unset($usrgrp_table_update_data['userids']);
+		unset($usrgrp_table_update_data['rights']);
+		if (!empty($usrgrp_table_update_data)) {
 			foreach ($usrgrpids as $usrgrpid) {
 				DB::update('usrgrp', array(
-					'values' => $data,
+					'values' => $usrgrp_table_update_data,
 					'where' => array('usrgrpid' => $usrgrpid),
 				));
 			}
 		}
 
+		$userids = isset($data['userids']) ? zbx_toArray($data['userids']) : array();
 		if (!is_null($userids)) {
 			$usrgrps = $this->get(array(
 				'usrgrpids' => $usrgrpids,
@@ -588,6 +586,7 @@ class CUserGroup extends CZBXAPI {
 			}
 		}
 
+		$rights = isset($data['rights']) ? zbx_toArray($data['rights']) : array();
 		if ($rights) {
 			$linkedRights = array();
 			$sql = 'SELECT groupid, permission, id'.
