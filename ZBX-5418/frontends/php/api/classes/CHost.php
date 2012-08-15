@@ -1609,9 +1609,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$data['templates'] = array();
-		parent::massAdd($data);
-
-		return array('hostids' => $hostIds);
+		return parent::massAdd($data);
 	}
 
 	/**
@@ -1985,9 +1983,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$data['templateids'] = array();
-		parent::massRemove($data);
-
-		return array('hostids' => $hostids);
+		return parent::massRemove($data);
 	}
 
 	/**

@@ -1269,9 +1269,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$data['hosts'] = array();
-		parent::massAdd($data);
-
-		return array('templateids' => $templateids);
+		return parent::massAdd($data);
 	}
 
 	/**
@@ -1532,9 +1530,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$data['hostids'] = array();
-		parent::massRemove($data);
-
-		return array('templateids' => $templateids);
+		return parent::massRemove($data);
 	}
 
 	public function isReadable($ids) {

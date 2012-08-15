@@ -39,10 +39,10 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * @return array
 	 */
 	public function massAdd(array $data) {
-		$allHostIds = array_merge(
-			zbx_objectValues($data['hosts'], 'hostid'),
-			zbx_objectValues($data['templates'], 'templateid')
-		);
+		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
+		$templateIds = zbx_objectValues($data['templates'], 'templateid');
+
+		$allHostIds = array_merge($hostIds, $templateIds);
 
 		// add groups
 		if (!empty($data['groups'])) {
@@ -73,7 +73,8 @@ abstract class CHostGeneral extends CZBXAPI {
 			API::UserMacro()->create($hostMacrosToAdd);
 		}
 
-		return array();
+		$ids = array('hostids' => $hostIds, 'templateids' => $templateIds);
+		return array($this->pkOption() => $ids[$this->pkOption()]);
 	}
 
 	/**
@@ -121,7 +122,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			API::UserMacro()->delete($hostMacroIds);
 		}
 
-		return array();
+		return array($this->pkOption() => $data[$this->pkOption()]);
 	}
 
 	/**
