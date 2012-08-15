@@ -601,8 +601,10 @@ class CUserGroup extends CZBXAPI {
 			}
 		}
 
-		$rights = isset($data['rights']) ? zbx_toArray($data['rights']) : array();
-		if ($rights) {
+		if (isset($data['rights'])) {
+
+			$rights = zbx_toArray($data['rights']);
+
 			$linkedRights = array();
 			$sql = 'SELECT groupid, permission, id'.
 				' FROM rights'.
