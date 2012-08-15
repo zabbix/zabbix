@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /************ REQUEST ************/
 function redirect($url) {
 	zbx_flush_post_cookies();
@@ -31,13 +31,10 @@ function redirect($url) {
 function jsRedirect($url, $timeout = null) {
 	zbx_flush_post_cookies();
 
-	$script = '';
-	if (is_numeric($timeout)) {
-		$script .= 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')';
-	}
-	else {
-		$script .= 'window.location.replace("'.$url.'");';
-	}
+	$script = is_numeric($timeout)
+		? 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')'
+		: 'window.location.replace("'.$url.'");';
+
 	insert_js($script);
 }
 
@@ -65,6 +62,7 @@ function get_cookie($name, $default_value = null) {
 	if (isset($_COOKIE[$name])) {
 		return $_COOKIE[$name];
 	}
+
 	return $default_value;
 }
 
@@ -116,6 +114,7 @@ function getMonthCaption($num) {
 		case 11: return _('November');
 		case 12: return _('December');
 	}
+
 	return _s('[Wrong value for month: "%s" ]', $num);
 }
 
@@ -130,6 +129,7 @@ function getDayOfWeekCaption($num) {
 		case 0:
 		case 7: return _('Sunday');
 	}
+
 	return _s('[Wrong value for day: "%s" ]', $num);
 }
 
@@ -269,6 +269,7 @@ function zbx_date2str($format, $value = null) {
 			$part .= $char;
 		}
 	}
+
 	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
 	return $output;
 }
@@ -277,13 +278,9 @@ function zbx_date2str($format, $value = null) {
 function zbx_date2age($start_date, $end_date = 0, $utime = false) {
 	if (!$utime) {
 		$start_date = date('U', $start_date);
-		if ($end_date) {
-			$end_date = date('U', $end_date);
-		}
-		else {
-			$end_date = time();
-		}
+		$end_date = !empty($end_date) ? date('U', $end_date) : time();
 	}
+
 	return convertUnitsS(abs($end_date - $start_date));
 }
 
@@ -295,7 +292,7 @@ function zbxDateToTime($strdate) {
 		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
-		return time();
+		return !empty($strdate) ? $strdate : time();
 	}
 }
 
@@ -311,6 +308,7 @@ function rgb2hex($color) {
 			$HEX[$id] = '0'.$value;
 		}
 	}
+
 	return $HEX[0].$HEX[1].$HEX[2];
 }
 
@@ -355,6 +353,7 @@ function zbx_num2bitstr($num, $rev = false) {
 			$strbin = $bit.$strbin;
 		}
 	}
+
 	return $strbin;
 }
 
@@ -393,6 +392,7 @@ function mem2str($size) {
 		$size = $size / 1024;
 		$prefix = _x('K', 'Kilo short');
 	}
+
 	return round($size, 6).$prefix;
 }
 
@@ -418,6 +418,7 @@ function convertUnitsUptime($value) {
 		$value .= _n('%1$d day, ', '%1$d days, ', $days);
 	}
 	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+
 	return $value;
 }
 
@@ -652,6 +653,7 @@ function zbx_avg($values) {
 	foreach ($values as $value) {
 		$sum = bcadd($sum, $value);
 	}
+
 	return bcdiv($sum, count($values));
 }
 
@@ -670,6 +672,7 @@ function zbx_empty($value) {
 	if (is_string($value) && $value === '') {
 		return true;
 	}
+
 	return false;
 }
 
@@ -738,6 +741,7 @@ function zbx_array_diff(array $primary, array $secondary, $field) {
 			$result['second'][] = $array;
 		}
 	}
+
 	return $result;
 }
 
@@ -771,6 +775,7 @@ function zbx_arrayFindDuplicates(array $array) {
 		}
 	}
 	arsort($countValues); // sorting, so that the most duplicates would be at the top
+
 	return $countValues;
 }
 
@@ -785,6 +790,7 @@ if (!function_exists('zbx_stripslashes')) {
 		elseif (is_string($value)) {
 			$value = stripslashes($value);
 		}
+
 		return $value;
 	}
 }
@@ -795,6 +801,7 @@ function zbx_nl2br($str) {
 	foreach ($str_arr as $id => $str_line) {
 		array_push($str_res, $str_line, BR());
 	}
+
 	return $str_res;
 }
 
@@ -863,6 +870,7 @@ function zbx_substring($haystack, $start, $end = null) {
 			$result = substr($haystack, $start, ($end - $start));
 		}
 	}
+
 	return $result;
 }
 
@@ -883,6 +891,7 @@ function zbx_substr($string, $start, $length = null) {
 			$result = substr($string, $start, $length);
 		}
 	}
+
 	return $result;
 }
 
@@ -897,6 +906,7 @@ function zbx_str_revert($str) {
 	else {
 		$result = strrev($str);
 	}
+
 	return $result;
 }
 
@@ -1014,6 +1024,7 @@ function natksort(&$array) {
 	}
 
 	$array = $new_array;
+
 	return true;
 }
 
@@ -1024,6 +1035,7 @@ function asort_by_key(&$array, $key) {
 	}
 	$key = htmlspecialchars($key);
 	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
+
 	return $array;
 }
 
@@ -1035,6 +1047,7 @@ function zbx_rksort(&$array, $flags = null) {
 		}
 		ksort($array, $flags);
 	}
+
 	return $array;
 }
 
@@ -1088,6 +1101,7 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 
 function order_by($def, $allways = '') {
 	global $page;
+
 	$orderString = '';
 
 	$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
@@ -1103,6 +1117,7 @@ function order_by($def, $allways = '') {
 		$orderString .= ($sortField === null) ? '' : ',';
 		$orderString .= $allways;
 	}
+
 	return empty($orderString) ? '' : ' ORDER BY '.$orderString;
 }
 
@@ -1148,6 +1163,7 @@ function zbx_implodeHash($glue1, $glue2, $hash) {
 	if (is_null($glue2)) {
 		$glue2 = $glue1;
 	}
+
 	$str = '';
 	foreach ($hash as $key => $value) {
 		if (!empty($str)) {
@@ -1155,6 +1171,7 @@ function zbx_implodeHash($glue1, $glue2, $hash) {
 		}
 		$str .= $key.$glue1.$value;
 	}
+
 	return $str;
 }
 
@@ -1170,6 +1187,7 @@ function zbx_array_merge() {
 			$result[$key] = $value;
 		}
 	}
+
 	return $result;
 }
 
@@ -1179,6 +1197,7 @@ function uint_in_array($needle, $haystack) {
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -1189,6 +1208,7 @@ function zbx_uint_array_intersect(&$array1, &$array2) {
 			$result[$key] = $value;
 		}
 	}
+
 	return $result;
 }
 
@@ -1210,6 +1230,7 @@ function str_in_array($needle, $haystack, $strict = false) {
 			}
 		}
 	}
+
 	return false;
 }
 
@@ -1261,6 +1282,7 @@ function zbx_toHash($value, $field = null) {
 			}
 		}
 	}
+
 	return $result;
 }
 
@@ -1294,6 +1316,7 @@ function zbx_toObject($value, $field) {
 			}
 		}
 	}
+
 	return $result;
 }
 
@@ -1317,6 +1340,7 @@ function zbx_toArray($value) {
 			$result = array($value);
 		}
 	}
+
 	return $result;
 }
 
@@ -1343,6 +1367,7 @@ function zbx_objectValues($value, $field) {
 			}
 		}
 	}
+
 	return $result;
 }
 
@@ -1354,6 +1379,7 @@ function zbx_cleanHashes(&$value) {
 			$value = array_values($value);
 		}
 	}
+
 	return $value;
 }
 
@@ -1374,6 +1400,7 @@ function zbx_toCSV($values) {
 		}
 		$csv .= '"'.implode($glue, $row).'"'."\n";
 	}
+
 	return $csv;
 }
 
@@ -1393,6 +1420,7 @@ function zbx_array_mintersect($keys, $array) {
 			$result[$field] = $array[$field];
 		}
 	}
+
 	return $result;
 }
 
@@ -1410,6 +1438,7 @@ function zbx_str2links($text) {
 		$start = $match[1] + zbx_strlen($match[0]);
 	}
 	$result[] = zbx_substr($text, $start, zbx_strlen($text));
+
 	return $result;
 }
 
@@ -1437,8 +1466,10 @@ function array_equal(array $a, array $b, $strict=false) {
 	if (count($a) !== count($b)) {
 		return false;
 	}
+
 	sort($a);
 	sort($b);
+
 	return $strict ? $a === $b : $a == $b;
 }
 
@@ -1481,7 +1512,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
 	}
 	else {
-		$script = "javascript: redirect('".$url."');";
+		$script = 'javascript: redirect("'.$url.'");';
 	}
 
 	zbx_value2array($obj);
@@ -1508,22 +1539,26 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	}
 	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
 	$col->setAttribute('onclick', $script);
+
 	return $col;
 }
 
-function getPageSortField($def) {
+function getPageSortField($default) {
 	global $page;
-	return get_request('sort', CProfile::get('web.'.$page['file'].'.sort', $def));
+
+	return get_request('sort', CProfile::get('web.'.$page['file'].'.sort', $default));
 }
 
-function getPageSortOrder($def = ZBX_SORT_UP) {
+function getPageSortOrder($default = ZBX_SORT_UP) {
 	global $page;
-	return get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $def));
+
+	return get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
 }
 
 /************* PAGING *************/
 function getPagingLine(&$items) {
 	global $page;
+
 	$config = select_config();
 
 	$search_limit = '';
@@ -1680,6 +1715,7 @@ function format_doll_init($doll) {
 	$obj['params']['favobj'] = 'hat';
 	$obj['params']['favref'] = $doll['id'];
 	$obj['params']['favaction'] = 'refresh';
+
 	return $obj;
 }
 
@@ -1724,6 +1760,7 @@ function bcfloor($number) {
 			$number = bcsub($number, 1, 0);
 		}
 	}
+
 	return $number == '-0' ? '0' : $number;
 }
 
@@ -1739,6 +1776,7 @@ function bcceil($number) {
 			$number = bcsub($number, 0, 0);
 		}
 	}
+
 	return $number == '-0' ? '0' : $number;
 }
 
@@ -1757,6 +1795,7 @@ function bcround($number, $precision = 0) {
 
 	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
+
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
 }
 

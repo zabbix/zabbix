@@ -118,10 +118,10 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$action = array(
-		'name'			=> get_request('name'),
+		'name'		=> get_request('name'),
 		'eventsource'	=> get_request('eventsource', 0),
-		'evaltype'		=> get_request('evaltype', 0),
-		'status'		=> get_request('status', ACTION_STATUS_DISABLED),
+		'evaltype'	=> get_request('evaltype', 0),
+		'status'	=> get_request('status', ACTION_STATUS_DISABLED),
 		'esc_period'	=> get_request('esc_period', 0),
 		'def_shortdata'	=> get_request('def_shortdata', ''),
 		'def_longdata'	=> get_request('def_longdata', ''),

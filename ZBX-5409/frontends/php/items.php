@@ -626,9 +626,9 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 		'preservekeys' => true
 	));
 
-	$rs = API::Item()->delete($group_itemid);
+	$go_result = API::Item()->delete($group_itemid);
 
-	if ($rs) {
+	if ($go_result) {
 		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
 

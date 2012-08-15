@@ -692,16 +692,16 @@ function get_items_data_overview($hostids, $view_style) {
 					|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $row['tr_value'] == TRIGGER_VALUE_TRUE)
 						&& $row['priority'] > $items[$descr][$row['hostname']]['severity']))) {
 			$items[$descr][$row['hostname']] = array(
-				'itemid'	=> $row['itemid'],
-				'value_type'=> $row['value_type'],
-				'lastvalue'	=> $row['lastvalue'],
-				'lastclock'	=> $row['lastclock'],
-				'units'		=> $row['units'],
-				'name'		=> $row['name'],
+				'itemid' => $row['itemid'],
+				'value_type' => $row['value_type'],
+				'lastvalue' => $row['lastvalue'],
+				'lastclock' => $row['lastclock'],
+				'units' => $row['units'],
+				'name' => $row['name'],
 				'valuemapid' => $row['valuemapid'],
-				'severity'	=> $row['priority'],
-				'tr_value'	=> $row['tr_value'],
-				'triggerid'	=> $row['triggerid']
+				'severity' => $row['priority'],
+				'tr_value' => $row['tr_value'],
+				'triggerid' => $row['triggerid']
 			);
 		}
 	}
@@ -716,7 +716,9 @@ function get_items_data_overview($hostids, $view_style) {
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
 		foreach ($hostNames as $hostname) {
-			$header = array_merge($header, array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
+			$img = new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css);
+			$img->setAttribute('id', uniqid('do_'));
+			$header = array_merge($header, array($img));
 		}
 		$table->setHeader($header, 'vertical_header');
 
@@ -731,7 +733,9 @@ function get_items_data_overview($hostids, $view_style) {
 	else {
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
-			$header = array_merge($header, array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css)));
+			$img = new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css);
+			$img->setAttribute('id', uniqid('do_'));
+			$header = array_merge($header, array($img));
 		}
 		$table->setHeader($header, 'vertical_header');
 
@@ -750,6 +754,7 @@ function get_items_data_overview($hostids, $view_style) {
 			$table->addRow($table_row);
 		}
 	}
+
 	return $table;
 }
 
@@ -801,11 +806,12 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 	$value_col = new CCol(array($value, $ack), $css_class);
 
 	if (isset($it_ov_menu)) {
-		$it_ov_menu  = new CPUMenu($it_ov_menu, 170);
+		$it_ov_menu = new CPUMenu($it_ov_menu, 170);
 		$value_col->onClick($it_ov_menu->getOnActionJS());
 		unset($it_ov_menu);
 	}
-	array_push($table_row,$value_col);
+	array_push($table_row, $value_col);
+
 	return $table_row;
 }
 
