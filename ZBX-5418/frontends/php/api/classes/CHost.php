@@ -1587,9 +1587,10 @@ class CHost extends CHostGeneral {
 	 */
 	public function massAdd(array $data) {
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
+		$hostIds = zbx_objectValues($hosts, 'hostid');
 
 		// check permissions
-		if (!$this->isWritable(zbx_objectValues($hosts, 'hostid'))) {
+		if (!$this->isWritable($hostIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
@@ -1610,7 +1611,7 @@ class CHost extends CHostGeneral {
 		$data['templates'] = array();
 		parent::massAdd($data);
 
-		return array('hostids' => zbx_objectValues($hosts, 'hostid'));
+		return array('hostids' => $hostIds);
 	}
 
 	/**

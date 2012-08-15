@@ -45,9 +45,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		);
 
 		// add groups
-		if (isset($data['groups']) && !empty($data['groups'])) {
-			$data['groups'] = zbx_toArray($data['groups']);
-
+		if (!empty($data['groups'])) {
 			API::HostGroup()->massAdd($options = array(
 				'hosts' => $data['hosts'],
 				'templates' => $data['templates'],
@@ -61,7 +59,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		// create macros
-		if (isset($data['macros']) && !empty($data['macros'])) {
+		if (!empty($data['macros'])) {
 			$data['macros'] = zbx_toArray($data['macros']);
 
 			$hostMacrosToAdd = array();
@@ -82,10 +80,10 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * Removes the relations between hosts or templates and other objects.
 	 *
 	 * Supported $data parameters are:
-	 * - hostids           - an array of host IDs to be updated
-	 * - templateids       - an array of template IDs to be updated
+	 * - hostids            - an array of host IDs to be updated
+	 * - templateids        - an array of template IDs to be updated
 	 * - groupids           - an array of host group IDs the hosts should be removed from
-	 * - templateids_unlink - an array of template IDs to unlink from the hosts
+	 * - templateids_link   - an array of template IDs to unlink from the hosts
 	 * - templateids_clear  - an array of template IDs to unlink and clear from the hosts
 	 * - macros             - an array of macros to delete from the hosts
 	 *
