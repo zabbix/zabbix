@@ -98,18 +98,14 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_command                                             *
+ * Function: process_command                                                  *
  *                                                                            *
- * Purpose: process command received from a master node or php                *
- *                                                                            *
- * Parameters:                                                                *
+ * Purpose: process command received from frontend                            *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)

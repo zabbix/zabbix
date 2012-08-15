@@ -46,7 +46,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
-	int		nodeid;
 	char		*tmp_str = NULL;
 	int		ret = FAIL;
 
@@ -341,26 +340,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
 					ret = SUCCEED;
 				DBfree_result(result);
-				break;
-			default:
-				ret = NOTSUPPORTED;
-				break;
-		}
-	}
-	else if (CONDITION_TYPE_NODE == condition->conditiontype)
-	{
-		nodeid = get_nodeid_by_id(event->objectid);
-		condition_value = atoi(condition->value);
-
-		switch (condition->operator)
-		{
-			case CONDITION_OPERATOR_EQUAL:
-				if (nodeid == condition_value)
-					ret = SUCCEED;
-				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				if (nodeid != condition_value)
-					ret = SUCCEED;
 				break;
 			default:
 				ret = NOTSUPPORTED;

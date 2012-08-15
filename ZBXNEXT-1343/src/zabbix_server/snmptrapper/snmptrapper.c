@@ -316,7 +316,7 @@ static void	close_trap_file()
  *                                                                            *
  * Function: open_trap_file                                                   *
  *                                                                            *
- * Purpose: open the trap file and get it's node number                       *
+ * Purpose: open the trap file and get it's inode number                      *
  *                                                                            *
  * Return value: file descriptor of the opened file or -1 otherwise           *
  *                                                                            *

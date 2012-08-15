@@ -1568,106 +1568,6 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_node_value                                                 *
- *                                                                            *
- * Purpose: request node value by trigger expression and number of function   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: returns requested host inventory value                       *
- *                      or *UNKNOWN* if inventory is not defined              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_node_value(DB_TRIGGER *trigger, char **replace_to, int N_functionid, const char *fieldname)
-{
-	const char	*__function_name = "DBget_node_value";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	functionid;
-	int		nodeid, ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
-		goto fail;
-
-	nodeid = get_nodeid_by_id(functionid);
-
-	if (0 == strcmp(fieldname, "nodeid"))
-	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", nodeid);
-		ret = SUCCEED;
-	}
-	else
-	{
-		result = DBselect("select distinct %s from nodes where nodeid=%d", fieldname, nodeid);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		{
-			*replace_to = zbx_strdup(*replace_to, row[0]);
-			ret = SUCCEED;
-		}
-		DBfree_result(result);
-	}
-fail:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_node_value_by_event                                          *
- *                                                                            *
- * Purpose: request node value by event                                       *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		nodeid, ret = FAIL;
-
-	nodeid = get_nodeid_by_id(event->objectid);
-
-	if (0 == strcmp(fieldname, "nodeid"))
-	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", nodeid);
-
-		ret = SUCCEED;
-	}
-	else
-	{
-		result = DBselect("select distinct %s from nodes where nodeid=%d", fieldname, nodeid);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		{
-			*replace_to = zbx_strdup(*replace_to, row[0]);
-
-			ret = SUCCEED;
-		}
-
-		DBfree_result(result);
-	}
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_autoreg_value_by_event                                       *
  *                                                                            *
  * Purpose: request value from autoreg_host table by event                    *
@@ -1843,9 +1743,6 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_PROFILE_LOCATION		MVAR_PROFILE "LOCATION}"
 #define MVAR_PROFILE_NOTES		MVAR_PROFILE "NOTES}"
 
-#define MVAR_NODE_ID			"{NODE.ID}"
-#define MVAR_NODE_NAME			"{NODE.NAME}"
-
 #define MVAR_DISCOVERY_RULE_NAME	"{DISCOVERY.RULE.NAME}"
 #define MVAR_DISCOVERY_SERVICE_NAME	"{DISCOVERY.SERVICE.NAME}"
 #define MVAR_DISCOVERY_SERVICE_PORT	"{DISCOVERY.SERVICE.PORT}"
@@ -1893,7 +1790,6 @@ static const char	*ex_macros[] =
 	MVAR_ITEM_VALUE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
 	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
-	MVAR_NODE_ID, MVAR_NODE_NAME,
 	NULL
 };
 
@@ -2359,10 +2255,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					else
 						ret = FAIL;
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-					ret = DBget_node_value(&event->trigger, &replace_to, N_functionid, "nodeid");
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-					ret = DBget_node_value(&event->trigger, &replace_to, N_functionid, "name");
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_PROXY_NAME);
@@ -2388,10 +2280,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
 				else if (0 == strcmp(m, MVAR_EVENT_AGE))
 					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-					ret = get_node_value_by_event(event, &replace_to, "nodeid");
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-					ret = get_node_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_RULE_NAME))
 					ret = DBget_drule_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
@@ -2461,10 +2349,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
 				else if (0 == strcmp(m, MVAR_EVENT_AGE))
 					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-					ret = get_node_value_by_event(event, &replace_to, "nodeid");
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-					ret = get_node_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
 					ret = get_autoreg_value_by_event(event, &replace_to, "host");
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
