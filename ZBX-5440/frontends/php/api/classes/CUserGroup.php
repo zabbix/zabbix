@@ -374,7 +374,7 @@ class CUserGroup extends CZBXAPI {
 	 *
 	 * @param array $usrgrps
 	 *
-	 * @return array returns passed group ids
+	 * @return int[] array['usrgrpids'] returns passed group ids
 	 */
 	public function update($usrgrps) {
 
@@ -496,7 +496,7 @@ class CUserGroup extends CZBXAPI {
 	 * @param int $data['rights']['id'] id of right.
 	 * @param int $data['rights']['permission'] permission level of right.
 	 *
-	 * @return int|int[] returns passed user group ids
+	 * @return int[] array['usrgrpids'] returns passed user group ids
 	 */
 	public function massUpdate($data) {
 
