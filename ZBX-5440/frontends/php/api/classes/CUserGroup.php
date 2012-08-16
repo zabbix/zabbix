@@ -530,25 +530,25 @@ class CUserGroup extends CZBXAPI {
 			}
 		}
 
-		// update usrgrp (user group) tbale if there is something to update
-		$usrgrp_table_update_data = $data;
-		unset($usrgrp_table_update_data['usrgrpids'], $usrgrp_table_update_data['userids'], $usrgrp_table_update_data['rights']);
-		if (!empty($usrgrp_table_update_data)) {
+		// update usrgrp (user group) table if there is something to update
+		$usrgrpTableUpdateData = $data;
+		unset($usrgrpTableUpdateData['usrgrpids'], $usrgrpTableUpdateData['userids'], $usrgrpTableUpdateData['rights']);
+		if (!empty($usrgrpTableUpdateData)) {
 			foreach ($usrgrpids as $usrgrpid) {
 				DB::update('usrgrp', array(
-					'values' => $usrgrp_table_update_data,
+					'values' => $usrgrpTableUpdateData,
 					'where' => array('usrgrpid' => $usrgrpid),
 				));
 			}
 		}
 
-		// check that user do not add himself to disabled user group
+		// check that user do not add himself to a disabled user group
 		// insert and delete user-userGroup links
 		if (isset($data['userids'])) {
 
 			$userids = zbx_toArray($data['userids']);
 
-			// check whether user trys to add himself to a disabled user group
+			// check whether user tries to add himself to a disabled user group
 			$usrgrps = $this->get(array(
 				'usrgrpids' => $usrgrpids,
 				'output' => API_OUTPUT_EXTEND,
