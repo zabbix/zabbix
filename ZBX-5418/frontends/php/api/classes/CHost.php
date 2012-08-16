@@ -1578,8 +1578,14 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * Additionally allows to create new interfaces on hosts.
+	 *
+	 * Checks write permissions for hosts.
+	 *
 	 * Additional supported $data parameters are:
-	 * - interfaces  - an array of interfaces to create on the hosts
+	 * - interfaces - an array of interfaces to create on the hosts
+	 * - templates  - an array of templates to link to the hosts, overrides the CHostGeneral::massAdd()
+	 *                'templates' parameter
 	 *
 	 * @param array $data
 	 *
@@ -1953,6 +1959,10 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * Additionally allows to remove interfaces from hosts.
+	 *
+	 * Checks write permissions for hosts.
+	 *
 	 * Additional supported $data parameters are:
 	 * - interfaces  - an array of interfaces to delete from the hosts
 	 *

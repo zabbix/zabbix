@@ -25,7 +25,10 @@
 abstract class CHostGeneral extends CZBXAPI {
 
 	/**
-	 * Adds new relation between hosts or templates and other objects.
+	 * Allows to:
+	 * - add hosts to groups;
+	 * - link templates to hosts;
+	 * - add new macros to hosts.
 	 *
 	 * Supported $data parameters are:
 	 * - hosts          - an array of hosts to be updated
@@ -78,7 +81,10 @@ abstract class CHostGeneral extends CZBXAPI {
 	}
 
 	/**
-	 * Removes the relations between hosts or templates and other objects.
+	 * Allows to:
+	 * - remove hosts from groups;
+	 * - unlink and clear templates from hosts;
+	 * - remove macros from hosts.
 	 *
 	 * Supported $data parameters are:
 	 * - hostids            - an array of host IDs to be updated

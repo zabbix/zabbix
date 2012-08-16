@@ -1247,6 +1247,10 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
+	 * Additionally allows to link templates to hosts and other templates.
+	 *
+	 * Checks write permissions for templates.
+	 *
 	 * Additional supported $data parameters are:
 	 * - hosts  - an array of hosts or templates to link the given templates to
 	 *
@@ -1510,6 +1514,10 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
+	 * Additionally allows to unlink templates from hosts and other templates.
+	 *
+	 * Checks write permissions for templates.
+	 *
 	 * Additional supported $data parameters are:
 	 * - hostids  - an array of host or template IDs to unlink the given templates from
 	 *
