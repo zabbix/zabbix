@@ -74,7 +74,6 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent("//select[@id='resourcetype']/option[text()='Maintenance']");
 		$this->assertElementPresent("//select[@id='resourcetype']/option[text()='Map']");
 		$this->assertElementPresent("//select[@id='resourcetype']/option[text()='Media type']");
-		$this->assertElementPresent("//select[@id='resourcetype']/option[text()='Node']");
 		$this->assertElementPresent("//select[@id='resourcetype']/option[text()='Proxy']");
 		$this->assertElementPresent("//select[@id='resourcetype']/option[text()='Regular expression']");
 		$this->assertElementPresent("//select[@id='resourcetype']/option[text()='Scenario']");

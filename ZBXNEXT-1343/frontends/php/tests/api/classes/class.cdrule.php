@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/../../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../../include/validate.inc.php';
 require_once dirname(__FILE__).'/../../../include/func.inc.php';
 require_once dirname(__FILE__).'/../../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../../include/nodes.inc.php';
 require_once dirname(__FILE__).'/../../../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../../../include/db.inc.php';
 require_once dirname(__FILE__).'/../../../include/classes/db/DB.php';
@@ -42,11 +41,6 @@ if (!function_exists('error')) {
 		return true;
 	}
 }
-if (!function_exists('get_accessible_nodes_by_user')) {
-	function get_accessible_nodes_by_user() {
-		return true;
-	}
-}
 
 class CDRuleTest extends PHPUnit_Framework_TestCase {
 
@@ -58,11 +52,6 @@ class CDRuleTest extends PHPUnit_Framework_TestCase {
 		$a->run();
 
 		self::$drule = new CDRule();
-
-		// some variable defines not to include config.inc.php
-		global $ZBX_CURRENT_NODEID;
-		$ZBX_CURRENT_NODEID = 0;
-		define('ZBX_DISTRIBUTED', false);
 
 		// set api to return objects, to pass user session verification
 		API::setReturnAPI();

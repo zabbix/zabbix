@@ -22,7 +22,6 @@
 
 require_once dirname(__FILE__).'/../../include/validate.inc.php';
 require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../include/nodes.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
@@ -98,11 +97,6 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 	 * @static
 	 */
 	public static function setUpBeforeClass() {
-
-		// some variable defines not to include config.inc.php
-		global $ZBX_CURRENT_NODEID;
-		$ZBX_CURRENT_NODEID = 0;
-		define('ZBX_DISTRIBUTED', false);
 
 		// add some user data
 		CZBXAPI::$userData = array(
