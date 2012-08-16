@@ -39,30 +39,18 @@ class DB {
 	const FIELD_TYPE_BLOB = 'blob';
 	const FIELD_TYPE_TEXT = 'text';
 
+	/**
+	 * The maximum possible ID, 2^63-1.
+	 *
+	 * @var string
+	 */
+	const MAX_ID = '9223372036854775807';
+
 	private static $schema = null;
-	private static $nodeId = null;
-	private static $maxNodeId = null;
-	private static $minNodeId = null;
 
 	private static function exception($code, $error) {
 		throw new DBException($error, $code);
 	}
-
-	/**
-	 * Initializes nodes.
-	 *
-	 * @static
-	 */
-	public static function init() {
-		global $ZBX_LOCALNODEID;
-
-		if (is_null(self::$nodeId)) {
-			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
-			self::$maxNodeId = bcadd(self::$minNodeId, '99999999999', 0);
-		}
-	}
-
 
 	/**
 	 * Reserve ids for primary key of passed table.
@@ -75,20 +63,17 @@ class DB {
 	 * @param string $table table name
 	 * @param int $count number of ids to reserve
 	 *
-	 * @return string
+	 * @return string   the next available ID
 	 */
 	protected static function reserveIds($table, $count) {
 		global $DB;
-
-		self::init();
 
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
 		$sql = 'SELECT nextid'.
 				' FROM ids'.
-				' WHERE nodeid='.self::$nodeId.
-					' AND table_name='.zbx_dbstr($table).
+				' WHERE table_name='.zbx_dbstr($table).
 					' AND field_name='.zbx_dbstr($id_name);
 
 		// SQLite3 does not support this syntax. Since we are in transaction, it can be ignored.
@@ -98,21 +83,18 @@ class DB {
 
 		$res = DBfetch(DBselect($sql));
 		if ($res) {
-			$maxNextId = bcadd($res['nextid'], $count, 0);
-			if (bccomp($maxNextId, self::$maxNodeId, 0) == 1 || bccomp($maxNextId, self::$minNodeId, 0) == -1) {
-				$nextid = self::refreshIds($table, $count);
+			if (!self::checkId(bcadd($res['nextid'], $count, 0))) {
+				self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"');
 			}
-			else {
-				$sql = 'UPDATE ids'.
-						' SET nextid=nextid+'.$count.
-						' WHERE nodeid='.self::$nodeId.
-							' AND table_name='.zbx_dbstr($table).
-							' AND field_name='.zbx_dbstr($id_name);
-				if (!DBexecute($sql)) {
-					self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-				}
-				$nextid = bcadd($res['nextid'], 1, 0);
+
+			$sql = 'UPDATE ids'.
+					' SET nextid=nextid+'.$count.
+					' WHERE table_name='.zbx_dbstr($table).
+						' AND field_name='.zbx_dbstr($id_name);
+			if (!DBexecute($sql)) {
+				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
+			$nextid = bcadd($res['nextid'], 1, 0);
 		}
 		else {
 			$nextid = self::refreshIds($table, $count);
@@ -130,37 +112,32 @@ class DB {
 	 * @param string $table table name
 	 * @param int $count number of ids to reserve
 	 *
-	 * @return string
+	 * @return string   the next available ID
 	 */
 	private static function refreshIds($table, $count) {
-		self::init();
-
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
 		$sql = 'DELETE FROM ids'.
-				' WHERE nodeid='.self::$nodeId.
-				' AND table_name='.zbx_dbstr($table).
-				' AND field_name='.zbx_dbstr($id_name);
+				' WHERE table_name='.zbx_dbstr($table).
+					' AND field_name='.zbx_dbstr($id_name);
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 		}
 
 		$sql = 'SELECT MAX('.$id_name.') AS id'.
-				' FROM '.$table.
-				' WHERE '.$id_name.'>='.self::$minNodeId.
-				' AND '.$id_name.'<='.self::$maxNodeId;
+				' FROM '.$table;
 		$row = DBfetch(DBselect($sql));
 
-		$nextid = ($row && $row['id']) ? $row['id'] : self::$minNodeId;
+		$nextid = ($row && $row['id']) ? $row['id'] : 0;
 
 		$maxNextId = bcadd($nextid, $count, 0);
-		if (bccomp($maxNextId, self::$maxNodeId, 0) == 1) {
+		if (!self::checkId($maxNextId)) {
 			self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"');
 		}
 
-		$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid)'.
-				' VALUES ('.self::$nodeId.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.$maxNextId.')';
+		$sql = 'INSERT INTO ids (table_name,field_name,nextid)'.
+				' VALUES ('.zbx_dbstr($table).','.zbx_dbstr($id_name).','.$maxNextId.')';
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 		}
@@ -632,5 +609,16 @@ class DB {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
 		}
 		return true;
+	}
+
+	/**
+	 * Returns true if the given ID is valid.
+	 *
+	 * @param string $id
+	 *
+	 * @return bool
+	 */
+	protected static function checkId($id) {
+		return bccomp($id, self::MAX_ID, 0) < 1;
 	}
 }

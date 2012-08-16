@@ -840,46 +840,34 @@ function in_node($id_var, $nodes = null) {
 
 function get_dbid($table, $field) {
 	// PGSQL on transaction failure on all queries returns false..
-	global $DB, $ZBX_LOCALNODEID;
+	global $DB;
 
 	if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_NO_FAILED_SQLS']) {
 		return 0;
 	}
 
-	$nodeid = get_current_nodeid(false);
 	$found = false;
 
 	do {
-		$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-		$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
-
-		$dbSelect = DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field));
+		$dbSelect = DBselect('SELECT i.nextid FROM ids i WHERE i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field));
 		if (!$dbSelect) {
 			return false;
 		}
 
 		$row = DBfetch($dbSelect);
 		if (!$row) {
-			$row = DBfetch(DBselect('SELECT MAX('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
-			if (!$row || ($row['id'] == 0)) {
-				DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
-			}
-			else {
-				DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',".$row['id'].')');
+			$row = DBfetch(DBselect('SELECT MAX('.$field.') AS id FROM '.$table));
+			if ($row) {
+				DBexecute("INSERT INTO ids (table_name,field_name,nextid) VALUES ('$table','$field',".$row['id'].')');
 			}
 			continue;
 		}
 		else {
 			$ret1 = $row['nextid'];
-			if (bccomp($ret1, $min) < 0 || !bccomp($ret1, $max) < 0) {
-				DBexecute('DELETE FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
-				continue;
-			}
-
-			$sql = 'UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field);
+			$sql = 'UPDATE ids SET nextid=nextid+1 WHERE table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field);
 			DBexecute($sql);
 
-			$row = DBfetch(DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field)));
+			$row = DBfetch(DBselect('SELECT i.nextid FROM ids i WHERE i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field)));
 			if (!$row || is_null($row['nextid'])) {
 				// should never be here
 				continue;

@@ -55,15 +55,13 @@ require_once dirname(__FILE__).'/users.inc.php';
 require_once dirname(__FILE__).'/valuemap.inc.php';
 
 global $USER_DETAILS, $USER_RIGHTS, $ZBX_PAGE_POST_JS, $page;
-global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
+global $ZBX_CONFIGURATION_FILE, $DB;
 global $ZBX_SERVER, $ZBX_SERVER_PORT;
 global $ZBX_LOCALES;
 
 $page = array();
 $USER_DETAILS = array();
 $USER_RIGHTS = array();
-$ZBX_LOCALNODEID = 0;
-$ZBX_LOCMASTERID = 0;
 $ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
 $ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).DIRECTORY_SEPARATOR.basename($ZBX_CONFIGURATION_FILE);
 
@@ -124,26 +122,10 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 		if (!DBconnect($error)) {
 			$_REQUEST['message'] = $error;
 
-			define('ZBX_DISTRIBUTED', false);
 			if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
 				define('ZBX_PAGE_NO_AUTHORIZATION', true);
 			}
 			$show_warning = true;
-		}
-		else {
-			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
-
-			// init LOCAL NODE ID
-			if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
-				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
-				$ZBX_LOCMASTERID = $local_node_data['masterid'];
-				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
-				define('ZBX_DISTRIBUTED', true);
-			}
-			else {
-				define('ZBX_DISTRIBUTED', false);
-			}
-			unset($local_node_data);
 		}
 		unset($error);
 	}
@@ -631,15 +613,14 @@ function get_status() {
 		+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u'));
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
 	$db_sessions = DBselect(
 		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
 		' FROM sessions s'.
-		' WHERE '.DBin_node('s.userid').
-			' AND s.status='.ZBX_SESSION_ACTIVE.
+		' WHERE s.status='.ZBX_SESSION_ACTIVE.
 		' GROUP BY s.userid,s.status'
 	);
 	while ($session = DBfetch($db_sessions)) {

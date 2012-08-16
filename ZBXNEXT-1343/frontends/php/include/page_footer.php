@@ -86,9 +86,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		if (CWebUser::$data['userid'] == 0) {
 			$conString = _('Not connected');
 		}
-		elseif (ZBX_DISTRIBUTED) {
-			$conString = _s('Connected as \'%1$s\' from \'%2$s\'', CWebUser::$data['alias'], CWebUser::$data['node']['name']);
-		}
 		else {
 			$conString = _s('Connected as \'%1$s\'', CWebUser::$data['alias']);
 		}

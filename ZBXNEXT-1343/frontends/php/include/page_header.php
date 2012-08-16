@@ -35,14 +35,10 @@ if ($_REQUEST['fullscreen'] = get_request('fullscreen', 0)) {
 
 require_once dirname(__FILE__).'/menu.inc.php';
 
-zbx_define_menu_restrictions($page, $ZBX_MENU);
-
 if (!defined('ZBX_PAGE_NO_THEME')) {
 	define('ZBX_PAGE_NO_THEME', false);
 }
 
-// init CURRENT NODE ID
-init_nodes();
 switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();
@@ -115,15 +111,6 @@ switch ($page['type']) {
 			$page_title = $ZBX_SERVER_NAME.': ';
 		}
 		$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
-
-		if (ZBX_DISTRIBUTED) {
-			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
-				$page_title .= ' ('._('All nodes').') ';
-			}
-			elseif (!empty($ZBX_NODES)) {
-				$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
-			}
-		}
 
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
 			$page_title .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
@@ -377,7 +364,7 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 }
 
 // unset multiple variables
-unset($ZBX_MENU, $table, $top_page_row, $menu_table, $db_nodes, $node_data, $sub_menu_table);
+unset($ZBX_MENU, $table, $top_page_row, $menu_table, $sub_menu_table);
 
 if ($denied_page_requested) {
 	access_deny();
