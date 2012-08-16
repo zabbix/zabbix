@@ -121,7 +121,7 @@ var timeControl = {
 			// image
 			if (obj.loadImage) {
 				if (!obj.refresh) {
-					this.addImage(obj.domid);
+					this.addImage(obj.domid, false);
 				}
 			}
 			else if (obj.loadScroll) {
@@ -135,29 +135,26 @@ var timeControl = {
 		}
 	},
 
-	addImage: function(objid) {
+	addImage: function(objid, rebuildListeners) {
 		var obj = this.objectList[objid];
 
-		var img = document.createElement('img');
-		img.className = 'borderless';
-		img.setAttribute('id', obj.domid);
-		img.setAttribute('src', obj.src);
-		$(obj.containerid).appendChild(img);
+		var img = $(obj.domid);
+		if (empty(img)) {
+			img = document.createElement('img');
+			img.setAttribute('id', obj.domid);
+			img.setAttribute('src', obj.src);
+			$(obj.containerid).appendChild(img);
+		}
 
-		if (obj.loadScroll) {
+		if (obj.loadScroll && empty(obj.scroll_listener)) {
 			obj.scroll_listener = this.addScroll.bindAsEventListener(this, obj.domid);
 			addListener(img, 'load', obj.scroll_listener);
 		}
 
-		if (obj.loadSBox) {
+		if (obj.loadSBox && empty(obj.sbox_listener)) {
 			obj.sbox_listener = this.addSBox.bindAsEventListener(this, obj.domid);
 			addListener(img, 'load', obj.sbox_listener);
 			addListener(img, 'load', moveSBoxes);
-
-			if (IE) {
-				// workaround to IE6 & IE7 DOM redraw problem
-				addListener(obj.domid, 'load', function() { setTimeout( function() { $('scrollbar_cntr').show(); }, 500); });
-			}
 		}
 	},
 
@@ -172,7 +169,7 @@ var timeControl = {
 		imgUrl.setArgument('stime', stime);
 		imgUrl = this.getFormattedUrl(objid, imgUrl);
 
-		jQuery('<img />', {id: obj.domid + '_tmp', src: imgUrl.getUrl(), 'class': 'borderless'}).load(function() {
+		jQuery('<img />', {id: obj.domid + '_tmp', src: imgUrl.getUrl()}).load(function() {
 			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 			jQuery('#' + id).replaceWith(jQuery(this));
 			jQuery(this).attr('id', id);
@@ -700,19 +697,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.updateGlobalTimeline();
 
 		this.changed = 1;
-		this.onchange(this.scrollbarid, this.timeline.timelineid, true);
-	},
-
-	barmousedown: function() {
-	},
-
-	scrollmouseout: function() { // u may use this func to attach some function on mouseout from scroll method
-	},
-
-	scrollmouseover: function() { // u may use this func to attach some function on mouseover from scroll method
-	},
-
-	onchange: function() { // executed every time the bar period or bar time is changed (mouse button released)
+		this.onchange(this.scrollbarid, this.timeline.timelineid);
 	},
 
 	updateGlobalTimeline: function() {
@@ -1662,6 +1647,7 @@ var CScrollBar = Class.create(CDebug, {
 });
 
 var CGhostBox = Class.create(CDebug, {
+
 	box:		null, // resized dom object
 	sideToMove:	null, // 0 - left side, 1 - right side
 	flip:		null, // if flip < 0, ghost is fliped
@@ -1749,7 +1735,7 @@ var CGhostBox = Class.create(CDebug, {
 });
 
 // selection box uppon graphs
-var ZBX_SBOX = {}; // selection box obj reference
+var ZBX_SBOX = {};
 
 function sbox_init(sbid, timeline, domobjectid) {
 	if (!isset(domobjectid, ZBX_SBOX)) {
@@ -1759,29 +1745,21 @@ function sbox_init(sbid, timeline, domobjectid) {
 		throw('Parametrs haven\'t been sent properly.');
 	}
 
-	if (is_null(sbid)) {
-		sbid = ZBX_SBOX.length;
-	}
+	sbid = !is_null(sbid) ? sbid : ZBX_SBOX.length;
 
 	var dims = getDimensions(domobjectid);
-	var width = dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR);
+	var width = (dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR)) - 2;
 
-	// graph borders
-	width -= 2;
-
-	var obj = $(domobjectid);
-	var box = new sbox(sbid, timeline, obj, width, ZBX_SBOX[sbid].height);
+	ZBX_SBOX[sbid].sbox = new sbox(sbid, timeline, domobjectid, width, ZBX_SBOX[sbid].height);
 
 	// listeners
 	addListener(window, 'resize', moveSBoxes);
-
 	if (KQ) {
 		setTimeout('ZBX_SBOX[' + sbid + '].sbox.moveSBoxByObj(' + sbid + ');', 500);
 	}
+	ZBX_SBOX[sbid].sbox.addListeners();
 
-	ZBX_SBOX[sbid].sbox = box;
-
-	return box;
+	return ZBX_SBOX[sbid].sbox;
 }
 
 var sbox = Class.create(CDebug, {
@@ -1801,25 +1779,12 @@ var sbox = Class.create(CDebug, {
 	px2time:			null,	// seconds in 1px
 	dynamic:			'',		// how page updates, all page/graph only update
 
-	initialize: function($super, sbid, timelineid, obj, width, height) {
+	initialize: function($super, sbid, timelineid, domobjectid, width, height) {
 		this.sbox_id = sbid;
 		$super('CBOX[' + sbid + ']');
 
-		// for some reason this parameter is need to be initialized due to cross object reference somewhere..
-		this.cobj = {};
-
-		// checks
-		if (is_null(obj)) {
-			throw('Failed to initialize Selection Box with given Object.');
-		}
 		if (!isset(timelineid, ZBX_TIMELINES)) {
 			throw('Failed to initialize Selection Box with given TimeLine.');
-		}
-
-		if (empty(this.dom_obj)) {
-			this.grphobj = obj;
-			this.dom_obj = create_box_on_obj(obj, height);
-			this.moveSBoxByObj();
 		}
 
 		// variable initialization
@@ -1827,58 +1792,40 @@ var sbox = Class.create(CDebug, {
 		this.cobj.width = width;
 		this.cobj.height = height;
 		this.box.width = 0;
+	},
 
-		// listeners
-		if (IE) {
-			addListener(obj, 'mousedown', this.mousedown.bindAsEventListener(this));
-			obj.onmousemove = this.mousemove.bindAsEventListener(this);
-			addListener(obj, 'click', this.ieMouseClick.bindAsEventListener(this));
+	addListeners: function() {
+		var sbox = ZBX_SBOX[this.sbox_id].sbox;
+		var obj = $(this.sbox_id);
+
+		if (is_null(obj)) {
+			throw('Failed to initialize Selection Box with given Object.');
 		}
-		else {
-			addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this), false);
-			addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this), true);
-			addListener(this.dom_obj, 'click', function(event) { cancelEvent(event); });
-		}
-		addListener(document, 'mouseup', this.mouseup.bindAsEventListener(this), true);
+
+		sbox.grphobj = obj;
+		sbox.dom_obj = create_box_on_obj(obj, this.cobj.height, this.sbox_id);
+		sbox.moveSBoxByObj();
 
 		ZBX_SBOX[this.sbox_id].mousedown = false;
-	},
 
-	onselect: function() {
-		this.px2time = this.timeline.period() / this.cobj.width;
-		var userstarttime = this.timeline.usertime() - this.timeline.period();
-		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
-		var new_period = this.calcperiod();
+		jQuery(sbox.grphobj).off();
+		jQuery(sbox.dom_obj).off();
 
-		if (this.start_event.left < this.mouse_event.left) {
-			userstarttime += new_period;
+		if (IE) {
+			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
+			jQuery(sbox.grphobj).mousemove(jQuery.proxy(sbox.mousemove, this));
+			jQuery(sbox.grphobj).click(jQuery.proxy(sbox.ieMouseClick, this));
+		}
+		else {
+			jQuery(sbox.dom_obj).mousedown(jQuery.proxy(sbox.mousedown, this));
+			jQuery(sbox.dom_obj).mousemove(jQuery.proxy(sbox.mousemove, this));
+			jQuery(sbox.dom_obj).click(function(event) { cancelEvent(event); });
 		}
 
-		this.timeline.period(new_period);
-		this.timeline.usertime(userstarttime);
-
-		// synchronize sbox with timeline and scrollbar
-		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
-		for (var sbid in ZBX_SCROLLBARS) {
-			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-				continue;
-			}
-
-			ZBX_SCROLLBARS[sbid].timeline = this.timeline;
-			ZBX_SCROLLBARS[sbid].setBarPosition();
-			ZBX_SCROLLBARS[sbid].setGhostByBar();
-			ZBX_SCROLLBARS[sbid].setTabInfo();
-			ZBX_SCROLLBARS[sbid].onBarChange();
-		}
-
-		this.onchange(this.sbox_id, this.timeline.timelineid, true);
-	},
-
-	onchange: function() {
+		jQuery(sbox.dom_obj).mouseup(jQuery.proxy(sbox.mouseup, this));
 	},
 
 	mousedown: function(e) {
-		e = e || window.event;
 		if (e.which && e.which != 1) {
 			return false;
 		}
@@ -1897,6 +1844,7 @@ var sbox = Class.create(CDebug, {
 
 			if (IE) {
 				var posxy = getPosition(this.dom_obj);
+
 				if (this.mouse_event.left < posxy.left || (this.mouse_event.left > (posxy.left + this.dom_obj.offsetWidth))) {
 					return false;
 				}
@@ -1914,8 +1862,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	mousemove: function(e) {
-		e = e || window.event;
-
 		if (IE) {
 			cancelEvent(e);
 		}
@@ -1927,8 +1873,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	mouseup: function(e) {
-		e = e || window.event;
-
 		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
 			this.onselect();
 			cancelEvent(e);
@@ -1937,6 +1881,56 @@ var sbox = Class.create(CDebug, {
 		}
 
 		return false;
+	},
+
+	ieMouseClick: function(e) {
+		if (e.which && e.which != 1) {
+			return true;
+		}
+		else if (e.button && e.button != 1) {
+			return true;
+		}
+
+		this.optimizeEvent(e);
+		deselectAll();
+
+		var posxy = getPosition(this.dom_obj);
+		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
+			return true;
+		}
+
+		Event.stop(e);
+	},
+
+	onselect: function() {
+		this.px2time = this.timeline.period() / this.cobj.width;
+		var userstarttime = this.timeline.usertime() - this.timeline.period();
+		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
+		var new_period = this.calcperiod();
+
+		if (this.start_event.left < this.mouse_event.left) {
+			userstarttime += new_period;
+		}
+
+		this.timeline.period(new_period);
+		this.timeline.usertime(userstarttime);
+
+		// synchronize sbox with timeline and scrollbar
+		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
+
+		for (var sbid in ZBX_SCROLLBARS) {
+			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
+				continue;
+			}
+
+			ZBX_SCROLLBARS[sbid].timeline = this.timeline;
+			ZBX_SCROLLBARS[sbid].setBarPosition();
+			ZBX_SCROLLBARS[sbid].setGhostByBar();
+			ZBX_SCROLLBARS[sbid].setTabInfo();
+			ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
+		}
+
+		this.onchange(this.sbox_id, this.timeline.timelineid);
 	},
 
 	create_box: function() {
@@ -1954,10 +1948,8 @@ var sbox = Class.create(CDebug, {
 			this.shifts.left = dims.left;
 			this.shifts.top = dims.top;
 
-			var top = this.mouse_event.top;
+			var top = 0; // we use only x axis
 			var left = this.mouse_event.left - dims.left;
-
-			top = 0; // we use only x axis
 
 			this.dom_box.setAttribute('id', 'selection_box');
 			this.dom_box.style.top = top + 'px';
@@ -2028,6 +2020,7 @@ var sbox = Class.create(CDebug, {
 		if (!is_null(this.dom_box)) {
 			this.dom_box.style.width = width + 'px';
 		}
+
 		this.box.width = width;
 	},
 
@@ -2112,34 +2105,16 @@ var sbox = Class.create(CDebug, {
 		this.shifts = {};
 		this.box = {};
 		this.box.width = 0;
-	},
-
-	ieMouseClick: function(e) {
-		e = e || window.event;
-		if (e.which && e.which != 1) {
-			return true;
-		}
-		else if (e.button && e.button != 1) {
-			return true;
-		}
-
-		this.optimizeEvent(e);
-		deselectAll();
-
-		var posxy = getPosition(this.dom_obj);
-		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-			return true;
-		}
-
-		Event.stop(e);
 	}
 });
 
 function create_box_on_obj(obj, height) {
 	var div = document.createElement('div');
+	div.id = jQuery(obj).attr('id') + '_box_on';
 	div.className = 'box_on';
 	div.style.height = (height + 2) + 'px';
-	obj.parentNode.appendChild(div);
+
+	jQuery(obj).parent().append(div);
 
 	return div;
 }
