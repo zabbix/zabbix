@@ -173,7 +173,6 @@ define('AUDIT_RESOURCE_VALUE_MAP',		17);
 define('AUDIT_RESOURCE_IT_SERVICE',		18);
 define('AUDIT_RESOURCE_MAP',			19);
 define('AUDIT_RESOURCE_SCREEN',			20);
-define('AUDIT_RESOURCE_NODE',			21);
 define('AUDIT_RESOURCE_SCENARIO',		22);
 define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
 define('AUDIT_RESOURCE_SLIDESHOW',		24);
@@ -202,7 +201,6 @@ define('CONDITION_TYPE_HOST_TEMPLATE',		13);
 define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
 define('CONDITION_TYPE_APPLICATION',		15);
 define('CONDITION_TYPE_MAINTENANCE',		16);
-define('CONDITION_TYPE_NODE',				17);
 define('CONDITION_TYPE_DRULE',				18);
 define('CONDITION_TYPE_DCHECK',				19);
 define('CONDITION_TYPE_PROXY',				20);
@@ -617,15 +615,8 @@ define('PERM_DENY',			0);
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
 define('PERM_RES_DATA_ARRAY',	2);
 
-define('RESOURCE_TYPE_NODE',	0);
-define('RESOURCE_TYPE_GROUP',	1);
-
 define('PARAM_TYPE_SECONDS',	0);
 define('PARAM_TYPE_COUNTS',		1);
-
-define('ZBX_NODE_CHILD',	0);
-define('ZBX_NODE_LOCAL',	1);
-define('ZBX_NODE_MASTER',	2);
 
 define('ZBX_FLAG_TRIGGER',	0);
 define('ZBX_FLAG_EVENT',	1);
@@ -771,7 +762,6 @@ define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*[KMGTsmhdw]?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');

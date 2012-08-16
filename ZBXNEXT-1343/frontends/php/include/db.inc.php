@@ -756,88 +756,6 @@ function zbx_sql_mod($x, $y) {
 	}
 }
 
-function DBid2nodeid($id_name) {
-	global $DB;
-
-	switch ($DB['TYPE']) {
-		case ZBX_DB_MYSQL:
-			$result = '('.$id_name.' div 100000000000000)';
-			break;
-		case ZBX_DB_ORACLE:
-			$result = 'round('.$id_name.'/100000000000000)';
-			break;
-		default:
-			$result = '('.$id_name.'/100000000000000)';
-	}
-	return $result;
-}
-
-function id2nodeid($id_var) {
-	return (int)bcdiv("$id_var", '100000000000000');
-}
-
-function DBin_node($id_name, $nodes = null) {
-	if (is_null($nodes)) {
-		$nodes = get_current_nodeid();
-	}
-	elseif (is_bool($nodes)) {
-		$nodes = get_current_nodeid($nodes);
-	}
-
-	if (empty($nodes)) {
-		$nodes = array(0);
-	}
-	elseif (!is_array($nodes)) {
-		if (is_string($nodes)) {
-			if (!preg_match('/^([0-9,]+)$/', $nodes)) {
-				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
-			}
-		}
-		elseif (!zbx_ctype_digit($nodes)) {
-			fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
-		}
-		$nodes = zbx_toArray($nodes);
-	}
-
-	if (count($nodes) == 1) {
-		$nodeid = reset($nodes);
-		$sql = $id_name.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999';
-	}
-	else {
-		$sql = '';
-		foreach ($nodes as $nodeid) {
-			$sql .= '('.$id_name.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999) OR ';
-		}
-		$sql = '('.rtrim($sql, ' OR ').')';
-	}
-	return $sql;
-}
-
-function in_node($id_var, $nodes = null) {
-	if (is_null($nodes)) {
-		$nodes = get_current_nodeid();
-	}
-
-	if (empty($nodes)) {
-		$nodes = 0;
-	}
-
-	if (zbx_ctype_digit($nodes)) {
-		$nodes = array($nodes);
-	}
-	elseif (is_string($nodes)) {
-		if (!preg_match('/^([0-9,]+)$/', $nodes)) {
-			fatal_error('Incorrect "nodes" for "in_node". Passed ['.$nodes.']');
-		}
-		$nodes = explode(',', $nodes);
-	}
-	elseif (!is_array($nodes)) {
-		fatal_error('Incorrect type of "nodes" for "in_node". Passed ['.gettype($nodes).']');
-	}
-
-	return uint_in_array(id2nodeid($id_var), $nodes);
-}
-
 function get_dbid($table, $field) {
 	// PGSQL on transaction failure on all queries returns false..
 	global $DB;
@@ -883,19 +801,6 @@ function get_dbid($table, $field) {
 	while (false == $found);
 
 	return $ret2;
-}
-
-function create_id_by_nodeid($id, $nodeid = 0) {
-	global $ZBX_LOCALNODEID;
-
-	if ($id == 0) {
-		return 0;
-	}
-	$nodeid = ($nodeid == 0) ? get_current_nodeid(false) : $nodeid;
-
-	$id = remove_nodes_from_id($id);
-	$id = bcadd($id, bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), 0);
-	return $id;
 }
 
 function zbx_db_distinct($sql_parts) {
@@ -1027,10 +932,6 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 			}
 		}
 	}
-}
-
-function remove_nodes_from_id($id) {
-	return bcmod($id, '100000000000');
 }
 
 /**

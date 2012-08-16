@@ -47,7 +47,6 @@ require_once dirname(__FILE__).'/items.inc.php';
 require_once dirname(__FILE__).'/maintenances.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/media.inc.php';
-require_once dirname(__FILE__).'/nodes.inc.php';
 require_once dirname(__FILE__).'/services.inc.php';
 require_once dirname(__FILE__).'/sounds.inc.php';
 require_once dirname(__FILE__).'/triggers.inc.php';
@@ -108,7 +107,6 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 	}
 	else {
 		$show_warning = true;
-		define('ZBX_DISTRIBUTED', false);
 		if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
 			define('ZBX_PAGE_NO_AUTHORIZATION', true);
 		}
@@ -142,7 +140,6 @@ else {
 	if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
 		define('ZBX_PAGE_NO_AUTHORIZATION', true);
 	}
-	define('ZBX_DISTRIBUTED', false);
 	$show_setup = true;
 }
 

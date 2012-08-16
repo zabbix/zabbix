@@ -34,7 +34,6 @@ define('ZBX_PAGE_NO_THEME', true); // don't load any themes for this page
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'distributed' =>		array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'trouble' =>			array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'type' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null),
 	'server' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),

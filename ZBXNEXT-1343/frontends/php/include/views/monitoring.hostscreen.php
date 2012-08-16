@@ -42,7 +42,7 @@ else {
 	// host screen list
 	$screenList = new CList(null, 'objectlist');
 	foreach ($this->data['screens'] as $screen) {
-		$screenName = get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name'];
+		$screenName = $screen['name'];
 
 		if (count($this->data['screens']) > 1) {
 			if (bccomp($screen['screenid'], $this->data['screenid']) == 0) {

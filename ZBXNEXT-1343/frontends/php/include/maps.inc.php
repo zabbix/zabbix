@@ -903,8 +903,7 @@ function getSelementsInfo($sysmap) {
 						'sysmapids' => $mapids,
 						'output' => API_OUTPUT_REFER,
 						'selectSelements' => API_OUTPUT_EXTEND,
-						'nopermissions' => true,
-						'nodeids' => get_current_nodeid(true)
+						'nopermissions' => true
 					));
 
 					$mapids = array();
