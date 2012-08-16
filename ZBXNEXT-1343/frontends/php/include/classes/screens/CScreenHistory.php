@@ -100,7 +100,6 @@ class CScreenHistory extends CScreenBase {
 
 		if (empty($this->items)) {
 			$this->items = API::Item()->get(array(
-				'nodeids' => get_current_nodeid(),
 				'itemids' => $this->itemid,
 				'webitems' => true,
 				'selectHosts' => array('hostid', 'name'),

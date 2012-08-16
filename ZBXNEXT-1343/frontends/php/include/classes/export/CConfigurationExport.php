@@ -916,7 +916,6 @@ class CConfigurationExport {
 		$groups = API::HostGroup()->get(array(
 			'groupids' => $groupIds,
 			'output' => array('name'),
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 		foreach ($groups as $id => $group) {
@@ -938,7 +937,6 @@ class CConfigurationExport {
 		$hosts = API::Host()->get(array(
 			'hostids' => $hostIds,
 			'output' => array('host'),
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 		foreach ($hosts as $id => $host) {
@@ -960,7 +958,6 @@ class CConfigurationExport {
 		$screens = API::Screen()->get(array(
 			'screenids' => $screenIds,
 			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 		foreach ($screens as $id => $screen) {
@@ -982,7 +979,6 @@ class CConfigurationExport {
 		$maps = API::Map()->get(array(
 			'sysmapids' => $mapIds,
 			'output' => array('name'),
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 		foreach ($maps as $id => $map) {
@@ -1005,7 +1001,6 @@ class CConfigurationExport {
 			'graphids' => $graphIds,
 			'selectHosts' => array('host'),
 			'output' => array('name'),
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 		foreach ($graphs as $id => $graph) {
@@ -1032,7 +1027,6 @@ class CConfigurationExport {
 			'itemids' => $itemIds,
 			'output' => array('key_'),
 			'selectHosts' => array('host'),
-			'nodeids' => get_current_nodeid(true),
 			'webitems' => true,
 			'preservekeys' => true
 		));
@@ -1059,7 +1053,6 @@ class CConfigurationExport {
 		$triggers = API::Trigger()->get(array(
 			'triggerids' => $triggerIds,
 			'output' => array('description', 'expression'),
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 		foreach ($triggers as $id => $trigger) {
@@ -1084,7 +1077,6 @@ class CConfigurationExport {
 		$images = API::Image()->get(array(
 			'imageids' => $imageIds,
 			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 		foreach ($images as $id => $image) {

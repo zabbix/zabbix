@@ -24,7 +24,6 @@ class CHostsInfo extends CTable {
 	public $style;
 
 	public function __construct($groupid = 0, $style = STYLE_HORISONTAL) {
-		$this->nodeid = id2nodeid($groupid);
 		$this->groupid = $groupid;
 		$this->style = null;
 
@@ -46,19 +45,15 @@ class CHostsInfo extends CTable {
 
 		// fetch accessible host ids
 		$hosts = API::Host()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
 		));
 		$hostIds = array_keys($hosts);
 
 		$cond_from = '';
-		if (remove_nodes_from_id($this->groupid) > 0) {
+		if ($this->groupid) {
 			$cond_from = ', hosts_groups hg ';
 			$cond_where = 'AND hg.hostid=h.hostid AND hg.groupid='.$this->groupid;
-		}
-		else {
-			$cond_where = ' AND '.DBin_node('h.hostid', $this->nodeid);
 		}
 
 		$db_host_cnt = DBselect(
@@ -100,14 +95,9 @@ class CHostsInfo extends CTable {
 		$uncn = $host_cnt['cnt'];
 		$total += $host_cnt['cnt'];
 
-		$node = get_node_by_nodeid($this->nodeid);
 		$header_str = _('Hosts info').SPACE;
 
-		if ($node > 0) {
-			$header_str .= '('.$node['name'].')'.SPACE;
-		}
-
-		if (remove_nodes_from_id($this->groupid) > 0) {
+		if ($this->groupid > 0) {
 			$group = get_hostgroup_by_groupid($this->groupid);
 			$header_str .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
 		}

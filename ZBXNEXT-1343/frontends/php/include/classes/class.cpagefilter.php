@@ -58,9 +58,6 @@ class CPageFilter {
 	}
 
 	public function __construct($options = array()) {
-		global $ZBX_WITH_ALL_NODES;
-
-		$this->config['all_nodes'] = $ZBX_WITH_ALL_NODES;
 		$this->config['select_latest'] = isset($options['config']['select_latest']);
 		$this->config['DDReset'] = get_request('ddreset', null);
 		$this->config['popupDD'] = isset($options['config']['popupDD']);
@@ -265,7 +262,6 @@ class CPageFilter {
 
 	private function _initGroups($groupid, $options) {
 		$def_options = array(
-			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => API_OUTPUT_EXTEND
 		);
 		$options = zbx_array_merge($def_options, $options);
@@ -311,7 +307,6 @@ class CPageFilter {
 		}
 		else {
 			$def_options = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'name'),
 				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
@@ -359,7 +354,6 @@ class CPageFilter {
 		}
 		else {
 			$def_ptions = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null
@@ -415,7 +409,6 @@ class CPageFilter {
 		}
 		else {
 			$def_ptions = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null
@@ -440,7 +433,6 @@ class CPageFilter {
 
 	private function _initDiscoveries($druleid, $options) {
 		$def_options = array(
-			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => API_OUTPUT_EXTEND
 		);
 		$options = zbx_array_merge($def_options, $options);
@@ -474,21 +466,16 @@ class CPageFilter {
 		$this->ids['druleid'] = $druleid;
 	}
 
-	public function getHostsCB($withNode = false) {
-		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode);
+	public function getHostsCB() {
+		return $this->_getCB('hostid', $this->hostid, $this->hosts);
 	}
 
-	public function getGroupsCB($withNode = false) {
-		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode);
+	public function getGroupsCB() {
+		return $this->_getCB('groupid', $this->groupid, $this->groups);
 	}
 
-	public function getGraphsCB($withNode = false) {
+	public function getGraphsCB() {
 		$items = $this->graphs;
-		if ($withNode) {
-			foreach ($items as $id => $item) {
-				$items[$id] = get_node_name_by_elid($id, null, ': ').$item;
-			}
-		}
 
 		natcasesort($items);
 		$items = array(0 => _('not selected')) + $items;
@@ -501,22 +488,16 @@ class CPageFilter {
 		return $graphComboBox;
 	}
 
-	public function getTriggerCB($withNode = false) {
-		return $this->_getCB('triggerid', $this->triggerid, $this->triggers, $withNode);
+	public function getTriggerCB() {
+		return $this->_getCB('triggerid', $this->triggerid, $this->triggers);
 	}
 
-	public function getDiscoveryCB($withNode = false) {
-		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode);
+	public function getDiscoveryCB() {
+		return $this->_getCB('druleid', $this->druleid, $this->drules);
 	}
 
-	private function _getCB($cbname, $selectedid, $items, $withNode) {
+	private function _getCB($cbname, $selectedid, $items) {
 		$cmb = new CComboBox($cbname, $selectedid, 'javascript: submit();');
-
-		if ($withNode) {
-			foreach ($items as $id => $item) {
-				$items[$id] = get_node_name_by_elid($id, null, ': ').$item;
-			}
-		}
 
 		natcasesort($items);
 

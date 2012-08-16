@@ -465,8 +465,6 @@ class CXmlImport18 {
 			}
 
 			foreach ($screen['screenitems'] as &$screenitem) {
-				$nodeCaption = isset($screenitem['resourceid']['node']) ? $screenitem['resourceid']['node'].':' : '';
-
 				if (!isset($screenitem['resourceid'])) {
 					$screenitem['resourceid'] = 0;
 				}
@@ -481,7 +479,7 @@ class CXmlImport18 {
 								$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
 								if (empty($db_hostgroups)) {
 									$error = _s('Cannot find group "%1$s" used in screen "%2$s".',
-											$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
+											$screenitem['resourceid']['name'], $screen['name']);
 									throw new Exception($error);
 								}
 
@@ -493,7 +491,7 @@ class CXmlImport18 {
 							$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
 							if (empty($db_hosts)) {
 								$error = _s('Cannot find host "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['host'], $screen['name']);
+										$screenitem['resourceid']['host'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -504,7 +502,7 @@ class CXmlImport18 {
 							$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 							if (empty($db_graphs)) {
 								$error = _s('Cannot find graph "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
+										$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -517,7 +515,7 @@ class CXmlImport18 {
 
 							if (empty($db_items)) {
 								$error = _s('Cannot find item "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
+										$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -528,7 +526,7 @@ class CXmlImport18 {
 							$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
 							if (empty($db_sysmaps)) {
 								$error = _s('Cannot find map "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
+										$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -539,7 +537,7 @@ class CXmlImport18 {
 							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
 							if (empty($db_screens)) {
 								$error = _s('Cannot find screen "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
+										$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -700,8 +698,6 @@ class CXmlImport18 {
 			}
 
 			foreach ($sysmap['selements'] as &$selement) {
-				$nodeCaption = isset($selement['elementid']['node']) ? $selement['elementid']['node'].':' : '';
-
 				if (!isset($selement['elementid'])) {
 					$selement['elementid'] = 0;
 				}
@@ -710,7 +706,7 @@ class CXmlImport18 {
 						$db_sysmaps = API::Map()->getObjects($selement['elementid']);
 						if (empty($db_sysmaps)) {
 							$error = _s('Cannot find map "%1$s" used in exported map "%2$s".',
-									$nodeCaption.$selement['elementid']['name'], $sysmap['name']);
+									$selement['elementid']['name'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -721,7 +717,7 @@ class CXmlImport18 {
 						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
 						if (empty($db_hostgroups)) {
 							$error = _s('Cannot find group "%1$s" used in map "%2$s".',
-									$nodeCaption.$selement['elementid']['name'], $sysmap['name']);
+									$selement['elementid']['name'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -732,7 +728,7 @@ class CXmlImport18 {
 						$db_hosts = API::Host()->getObjects($selement['elementid']);
 						if (empty($db_hosts)) {
 							$error = _s('Cannot find host "%1$s" used in map "%2$s".',
-									$nodeCaption.$selement['elementid']['host'], $sysmap['name']);
+									$selement['elementid']['host'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -743,7 +739,7 @@ class CXmlImport18 {
 						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
 						if (empty($db_triggers)) {
 							$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
-									$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'], $sysmap['name']);
+									$selement['elementid']['host'].':'.$selement['elementid']['description'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -784,9 +780,8 @@ class CXmlImport18 {
 				foreach ($link['linktriggers'] as &$linktrigger) {
 					$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 					if (empty($db_triggers)) {
-						$nodeCaption = isset($linktrigger['triggerid']['node']) ? $linktrigger['triggerid']['node'].':' : '';
 						$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
-								$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'], $sysmap['name']);
+								$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'], $sysmap['name']);
 						throw new Exception($error);
 					}
 
@@ -1648,9 +1643,6 @@ class CXmlImport18 {
 
 							if (isset($screen['screenitems'])) {
 								foreach ($screen['screenitems'] as &$screenitem) {
-									$nodeCaption = isset($screenitem['resourceid']['node'])
-											? $screenitem['resourceid']['node'].':' : '';
-
 									if (!isset($screenitem['resourceid'])) {
 										$screenitem['resourceid'] = 0;
 									}
@@ -1662,7 +1654,7 @@ class CXmlImport18 {
 
 												if (empty($db_graphs)) {
 													$error = _s('Cannot find graph "%1$s" used in screen "%2$s".',
-															$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
+															$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
 													throw new Exception($error);
 												}
 
@@ -1675,7 +1667,7 @@ class CXmlImport18 {
 
 												if (empty($db_items)) {
 													$error = _s('Cannot find item "%1$s" used in screen "%2$s".',
-															$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
+															$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
 													throw new Exception($error);
 												}
 

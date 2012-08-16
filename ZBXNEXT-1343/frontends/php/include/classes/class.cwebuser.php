@@ -115,8 +115,7 @@ class CWebUser {
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => 'en_gb',
-			'type' => '0',
-			'node' => array('name' => '- unknown -', 'nodeid' => 0)
+			'type' => '0'
 		);
 		self::makeGlobal();
 	}

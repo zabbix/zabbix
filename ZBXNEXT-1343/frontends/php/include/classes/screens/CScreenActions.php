@@ -92,7 +92,6 @@ class CScreenActions extends CScreenBase {
 				' WHERE e.eventid=a.eventid'.
 					' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
 					' AND '.DBcondition('e.objectid', $available_triggers).
-					' AND '.DBin_node('a.alertid').' '.
 				' ORDER BY '.$sortfield.' '.$sortorder;
 		$alerts = DBfetchArray(DBselect($sql, $this->screenitem['elements']));
 
@@ -105,7 +104,6 @@ class CScreenActions extends CScreenBase {
 		// create alert table
 		$actionTable = new CTableInfo(_('No actions found.'));
 		$actionTable->setHeader(array(
-			is_show_all_nodes() ? _('Nodes') : null,
 			($sortfield == 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
 			($sortfield == 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
 			($sortfield == 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
@@ -143,7 +141,6 @@ class CScreenActions extends CScreenBase {
 			$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
 
 			$actionTable->addRow(array(
-				get_node_name_by_elid($alert['alertid']),
 				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
 				new CCol(!empty($alert['description']) ? $alert['description'] : '-', 'top'),
 				new CCol($status, 'top'),
