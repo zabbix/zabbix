@@ -118,12 +118,17 @@ $data['screens'] = API::TemplateScreen()->get(array(
 	'output' => API_OUTPUT_EXTEND
 ));
 $data['screens'] = zbx_toHash($data['screens'], 'screenid');
+
+$screenid = null;
 if (!empty($data['screens'])) {
 	$screen = !isset($data['screens'][$data['screenid']]) ? reset($data['screens']) : $data['screens'][$data['screenid']];
+	if (!empty($screen['screenid'])) {
+		$screenid = $screen['screenid'];
+	}
 }
 
 $data['screen'] = API::TemplateScreen()->get(array(
-	'screenids' => $screen['screenid'],
+	'screenids' => $screenid,
 	'hostids' => $data['hostid'],
 	'output' => API_OUTPUT_EXTEND,
 	'selectScreenItems' => API_OUTPUT_EXTEND

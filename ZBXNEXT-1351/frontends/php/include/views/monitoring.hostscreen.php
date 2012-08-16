@@ -33,7 +33,6 @@ if (empty($this->data['screen'])) {
 	$screenWidget->addPageHeader(_('SCREENS'));
 	$screenWidget->addItem(BR());
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
-	$screenWidget->show();
 }
 else {
 	$screenWidget->addPageHeader(_('SCREENS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
