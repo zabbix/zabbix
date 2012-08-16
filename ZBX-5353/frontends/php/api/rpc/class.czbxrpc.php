@@ -36,6 +36,7 @@ class czbxrpc{
 // list of methods which does not require authentication
 		$withoutAuth = array(
 			'user.login' => 1,
+			'user.logout' => 1,
 			'user.checkAuthentication' => 1,
 			'apiinfo.version' => 1
 		);

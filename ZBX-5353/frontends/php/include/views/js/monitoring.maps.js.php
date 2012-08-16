@@ -3,7 +3,7 @@
 		/**
 		 * Handle map menus
 		 */
-		jQuery('#hat_maps').on('click', '.menu-map', function(event) {
+		jQuery('.map-container').on('click', '.menu-map', function(event) {
 			var menuData = jQuery(this).data('menu');
 			var menu = [];
 			var linkMenu = [];

@@ -56,6 +56,8 @@ $availableJScripts = array(
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
+	'servercheck.js' => '',
+	'flickerfreescreen.js' => '',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -74,8 +76,7 @@ $availableJScripts = array(
 	'class.cviewswitcher.js' => '',
 	'init.js' => '',
 	// templates
-	'sysmap.tpl.js' => 'templates/',
-	'servercheck.js' => ''
+	'sysmap.tpl.js' => 'templates/'
 );
 
 $tranStrings = array(
@@ -90,7 +91,7 @@ $tranStrings = array(
 		'S_WEEK_SHORT' => _x('w', 'week short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	),
 	'functions.js' => array(
 		'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q' => _('Do you wish to replace the conditional expression?'),
@@ -127,7 +128,7 @@ $tranStrings = array(
 		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short'),
 		'S_NOW' => _('Now'),
 		'S_DONE' => _('Done'),
-		'S_TIME' => _('Time'),
+		'S_TIME' => _('Time')
 	),
 	'class.cmap.js' => array(
 		'S_ON' => _('On'),
@@ -150,7 +151,7 @@ $tranStrings = array(
 		'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
+		'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled')
 	),
 	'class.cmessages.js' => array(
 		'S_MUTE' => _('Mute'),
@@ -158,14 +159,14 @@ $tranStrings = array(
 		'S_MESSAGES' => _('Messages'),
 		'S_CLEAR' => _('Clear'),
 		'S_SNOOZE' => _('Snooze'),
-		'S_MOVE' => _('Move'),
+		'S_MOVE' => _('Move')
 	),
 	'class.cookie.js' => array(
-		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.'),
+		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	),
 	'main.js' => array(
 		'S_CLOSE' => _('Close'),
-		'S_NO_ELEMENTS_SELECTED' => _('No elements selected!'),
+		'S_NO_ELEMENTS_SELECTED' => _('No elements selected!')
 	),
 	'init.js' => array(
 		'Host screens' => _('Host screens'),
@@ -207,7 +208,7 @@ else {
 	$files = $_GET['files'];
 }
 
-$js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
+$js = 'if (typeof(locale) == "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $origStr => $str) {
@@ -223,10 +224,10 @@ foreach ($files as $file) {
 }
 
 $jsLength = strlen($js);
-$ETag = md5($jsLength);
-if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $ETag) {
+$etag = md5($jsLength);
+if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
 	header('HTTP/1.1 304 Not Modified');
-	header('ETag: '.$ETag);
+	header('ETag: '.$etag);
 	exit();
 }
 
@@ -234,6 +235,6 @@ header('Content-type: text/javascript; charset=UTF-8');
 // breaks if "zlib.output_compression = On"
 // header('Content-length: '.$jsLength);
 header('Cache-Control: public, must-revalidate');
-header('ETag: '.$ETag);
+header('ETag: '.$etag);
 
 echo $js;
