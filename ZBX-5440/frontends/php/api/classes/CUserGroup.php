@@ -484,11 +484,17 @@ class CUserGroup extends CZBXAPI {
 	/**
 	 * Mass update user group.
 	 * Checks for permissions - only super admins can change user groups.
-	 *
+	 * Changes name to a group if name and one user group id is provided.
+	 * Links/unlinks users to user groups.
+	 * Links/unlinks rights to user groups.
 	 *
 	 * @param array $data
 	 * @param int|int[] $data['usrgrpids'] id or ids of user groups to be updated.
 	 * @param string $data['name'] name to be set to a user group. Only one host group id can be passed at a time!
+	 * @param null|int|int[] $data['userids'] user ids to link to given user groups. Missing user ids will be unlinked from user groups.
+	 * @param null|array $data['rights'] rights to link to given user groups. Missing rights will be unlinked from user groups.
+	 * @param int $data['rights']['id'] id of right.
+	 * @param int $data['rights']['permission'] permission level of right.
 	 *
 	 * @return int|int[] returns passed user group ids
 	 */
@@ -551,7 +557,7 @@ class CUserGroup extends CZBXAPI {
 				foreach ($usrgrps as $usrgrp) {
 					if (($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 						|| ($usrgrp['users_status'] == GROUP_STATUS_DISABLED)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot add himself to a disabled group.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot be added to a disabled group or group with disabled GUI access by himself.'));
 					}
 				}
 			}
