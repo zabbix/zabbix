@@ -645,12 +645,13 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 		t = now;
 		tmax = now + SEC_PER_YEAR;
 
+		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
+
 		while (t < tmax)
 		{
 			/* calculate 'nextcheck' value for the current interval */
 			current_delay = get_current_delay(delay, flex_intervals, t);
 
-			shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
 			nextcheck = current_delay * (int)(t / (time_t)current_delay) + (int)(shift % (zbx_uint64_t)current_delay);
 
 			while (nextcheck <= t)
@@ -660,21 +661,19 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 			/* the end of the current interval is the beginning of the next interval -1 */
 			if (FAIL != get_next_delay_interval(flex_intervals, t, &next_interval) && nextcheck > next_interval - 1)
 			{
-				/* 'nextcheck' falls out of the current interval */
-
-				/* Special case: current_delay equal to interval length, e.g. 60/1,12:45-12:46. */
-				/* For some itemid's, the 'nextcheck' points to the very beginning of */
-				/* the next interval, while it should be at the beginning of the current interval */
-				if (nextcheck == next_interval &&  now < (nextcheck - current_delay))
+				/* 'nextcheck' is beyond the current interval */
+				if (nextcheck == next_interval)
 				{
-					nextcheck -= current_delay;
-					break;
+					current_delay = get_current_delay(delay, flex_intervals, next_interval);
+
+					if (0 == (int)(shift % (zbx_uint64_t)current_delay))
+						break;
 				}
 
 				t = next_interval;
 			}
 			else
-				break;
+				break;	/* nextcheck is within the current interval */
 		}
 		delay = current_delay;
 	}
