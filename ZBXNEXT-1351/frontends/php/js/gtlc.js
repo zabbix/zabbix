@@ -2109,8 +2109,11 @@ var sbox = Class.create(CDebug, {
 });
 
 function create_box_on_obj(obj, height) {
+	var id = jQuery(obj).attr('id') + '_box_on';
+	jQuery('#' + id).remove();
+
 	var div = document.createElement('div');
-	div.id = jQuery(obj).attr('id') + '_box_on';
+	div.id = id;
 	div.className = 'box_on';
 	div.style.height = (height + 2) + 'px';
 
