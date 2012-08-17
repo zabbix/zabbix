@@ -363,13 +363,11 @@ extern unsigned char	daemon_type;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
-static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
-				unsigned char item_type, const char *key,
-				unsigned char flags, unsigned char *poller_type)
+static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid, unsigned char item_type, const char *key,
+		unsigned char flags, unsigned char *poller_type)
 {
-	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
-				ITEM_TYPE_AGGREGATE != item_type &&
-				ITEM_TYPE_CALCULATED != item_type))
+	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type && ITEM_TYPE_AGGREGATE != item_type &&
+			ITEM_TYPE_CALCULATED != item_type))
 	{
 		*poller_type = ZBX_NO_POLLER;
 		return;
@@ -1546,13 +1544,10 @@ static void	DCsync_hosts(DB_RESULT result)
 	const char		*__function_name = "DCsync_hosts";
 
 	DB_ROW			row;
-
 	ZBX_DC_HOST		*host;
 	ZBX_DC_IPMIHOST		*ipmihost;
 	ZBX_DC_PROXY		*proxy;
-
 	ZBX_DC_HOST_PH		*host_ph, host_ph_local;
-
 	int			found;
 	int			update_index;
 	zbx_uint64_t		hostid, proxy_hostid;
@@ -1595,7 +1590,7 @@ static void	DCsync_hosts(DB_RESULT result)
 				host_ph_local.host = host->host;
 				host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-				if (NULL != host_ph && host == host_ph->host_ptr)	/* see ZBX-4045 for NULL check */
+				if (host == host_ph->host_ptr)
 				{
 					zbx_strpool_release(host_ph->host);
 					zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
@@ -1746,7 +1741,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host_ph_local.host = host->host;
 		host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-		if (NULL != host_ph && host == host_ph->host_ptr)	/* see ZBX-4045 for NULL check */
+		if (host == host_ph->host_ptr)
 		{
 			zbx_strpool_release(host_ph->host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
@@ -1867,7 +1862,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 				gmacro_m_local.macro = gmacro->macro;
 				gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
-				if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
+				if (gmacro == gmacro_m->gmacro_ptr)
 				{
 					zbx_strpool_release(gmacro_m->macro);
 					zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
@@ -1912,7 +1907,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 		gmacro_m_local.macro = gmacro->macro;
 		gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
-		if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
+		if (gmacro == gmacro_m->gmacro_ptr)
 		{
 			zbx_strpool_release(gmacro_m->macro);
 			zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
@@ -2094,7 +2089,9 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
 				{
-					/* see ZBX-4045 for NULL check in the conditional */
+					/* 'NULL != interface_ht' handles cases (which shouldn't */
+					/* happen) when 2 main interfaces exist for this type.   */
+					/* See ZBX-4045 for NULL check in the conditional.       */
 					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
 				}
 			}
@@ -2192,7 +2189,9 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
 				{
-					/* see ZBX-4045 for NULL check in the conditional */
+					/* 'NULL != interface_ht' handles cases (which shouldn't */
+					/* happen) when 2 main interfaces exist for this type.   */
+					/* See ZBX-4045 for NULL check in the conditional.       */
 					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
 				}
 			}
