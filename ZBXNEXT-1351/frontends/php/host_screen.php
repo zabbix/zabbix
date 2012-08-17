@@ -113,12 +113,15 @@ $data = array(
 );
 CProfile::update('web.hostscreen.screenid', $data['screenid'], PROFILE_TYPE_ID);
 
+// get screen list
 $data['screens'] = API::TemplateScreen()->get(array(
 	'hostids' => $data['hostid'],
 	'output' => API_OUTPUT_EXTEND
 ));
 $data['screens'] = zbx_toHash($data['screens'], 'screenid');
+order_result($data['screens'], 'name');
 
+// get screen
 $screenid = null;
 if (!empty($data['screens'])) {
 	$screen = !isset($data['screens'][$data['screenid']]) ? reset($data['screens']) : $data['screens'][$data['screenid']];
@@ -134,7 +137,11 @@ $data['screen'] = API::TemplateScreen()->get(array(
 	'selectScreenItems' => API_OUTPUT_EXTEND
 ));
 $data['screen'] = reset($data['screen']);
-order_result($data['screens'], 'name');
+
+// get host
+if (!empty($data['screen']['hostid'])) {
+	$data['host'] = get_host_by_hostid($data['screen']['hostid']);
+}
 
 // render view
 $screenView = new CView('monitoring.hostscreen', $data);
