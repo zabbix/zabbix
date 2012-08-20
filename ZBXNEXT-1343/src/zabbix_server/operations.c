@@ -360,7 +360,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				hostid = DBget_maxid("hosts");
 
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,name)"
-						" values " ZBX_FS_UI64 ",%s,'%s','%s')",
+						" values (" ZBX_FS_UI64 ",%s,'%s','%s')",
 						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
