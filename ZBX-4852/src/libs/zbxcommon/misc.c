@@ -635,7 +635,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 	}
 	else
 	{
-		int		current_delay;
+		int		current_delay, try = 0;
 		time_t		next_interval, t, tmax;
 		zbx_uint64_t	shift;
 
@@ -654,11 +654,19 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 
 			nextcheck = current_delay * (int)(t / (time_t)current_delay) + (int)(shift % (zbx_uint64_t)current_delay);
 
-			while (nextcheck <= t)
-				nextcheck += current_delay;
+			if (0 == try)
+			{
+				while (nextcheck <= t)
+					nextcheck += current_delay;
+			}
+			else
+			{
+				while (nextcheck < t)
+					nextcheck += current_delay;
+			}
 
 			/* 'nextcheck' < end of the current interval ? */
-			/* the end of the current interval is the beginning of the next interval -1 */
+			/* the end of the current interval is the beginning of the next interval - 1 */
 			if (FAIL != get_next_delay_interval(flex_intervals, t, &next_interval) && nextcheck > next_interval - 1)
 			{
 				/* 'nextcheck' is beyond the current interval */
@@ -671,6 +679,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 				}
 
 				t = next_interval;
+				try++;
 			}
 			else
 				break;	/* nextcheck is within the current interval */
