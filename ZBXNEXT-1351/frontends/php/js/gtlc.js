@@ -1797,6 +1797,7 @@ var sbox = Class.create(CDebug, {
 
 	addListeners: function() {
 		var sbox = ZBX_SBOX[this.sbox_id].sbox;
+		sbox.clear_params();
 
 		if (sbox.is_active) {
 			return;
@@ -1809,7 +1810,7 @@ var sbox = Class.create(CDebug, {
 		}
 
 		sbox.grphobj = obj;
-		sbox.dom_obj = create_box_on_obj(obj, this.cobj.height, this.sbox_id);
+		sbox.dom_obj = this.create_box_container(obj, this.cobj.height, this.sbox_id);
 		sbox.moveSBoxByObj();
 
 		jQuery(sbox.grphobj).off();
@@ -1881,8 +1882,6 @@ var sbox = Class.create(CDebug, {
 			this.onselect();
 			cancelEvent(e);
 			this.clear_params();
-
-			ZBX_SBOX[this.sbox_id].sbox.is_active = false;
 		}
 	},
 
@@ -1934,6 +1933,23 @@ var sbox = Class.create(CDebug, {
 		}
 
 		this.onchange(this.sbox_id, this.timeline.timelineid);
+	},
+
+	create_box_container: function(obj, height) {
+		var id = jQuery(obj).attr('id') + '_box_on';
+
+		if (jQuery('#' + id).length) {
+			jQuery('#' + id).remove();
+		}
+
+		var div = document.createElement('div');
+		div.id = id;
+		div.className = 'box_on';
+		div.style.height = (height + 2) + 'px';
+
+		jQuery(obj).parent().append(div);
+
+		return div;
 	},
 
 	create_box: function() {
@@ -2111,25 +2127,9 @@ var sbox = Class.create(CDebug, {
 		this.shifts = {};
 		this.box = {};
 		this.box.width = 0;
+		this.is_active = false;
 	}
 });
-
-function create_box_on_obj(obj, height) {
-	var id = jQuery(obj).attr('id') + '_box_on';
-
-	if (jQuery('#' + id).length) {
-		jQuery('#' + id).remove();
-	}
-
-	var div = document.createElement('div');
-	div.id = id;
-	div.className = 'box_on';
-	div.style.height = (height + 2) + 'px';
-
-	jQuery(obj).parent().append(div);
-
-	return div;
-}
 
 function moveSBoxes() {
 	for (var key in ZBX_SBOX) {
