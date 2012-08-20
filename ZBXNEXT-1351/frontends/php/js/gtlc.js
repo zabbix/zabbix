@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -1778,6 +1778,7 @@ var sbox = Class.create(CDebug, {
 	shifts:				{},		// shifts regarding to main objet
 	px2time:			null,	// seconds in 1px
 	dynamic:			'',		// how page updates, all page/graph only update
+	is_active:			false,
 
 	initialize: function($super, sbid, timelineid, domobjectid, width, height) {
 		this.sbox_id = sbid;
@@ -1796,6 +1797,11 @@ var sbox = Class.create(CDebug, {
 
 	addListeners: function() {
 		var sbox = ZBX_SBOX[this.sbox_id].sbox;
+
+		if (sbox.is_active) {
+			return;
+		}
+
 		var obj = $(this.sbox_id);
 
 		if (is_null(obj)) {
@@ -1806,26 +1812,26 @@ var sbox = Class.create(CDebug, {
 		sbox.dom_obj = create_box_on_obj(obj, this.cobj.height, this.sbox_id);
 		sbox.moveSBoxByObj();
 
-		ZBX_SBOX[this.sbox_id].mousedown = false;
-
 		jQuery(sbox.grphobj).off();
 		jQuery(sbox.dom_obj).off();
 
 		if (IE) {
 			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
-			jQuery(sbox.grphobj).mousemove(jQuery.proxy(sbox.mousemove, this));
+			sbox.grphobj.onmousemove = this.mousemove.bindAsEventListener(this);
 			jQuery(sbox.grphobj).click(jQuery.proxy(sbox.ieMouseClick, this));
+			jQuery(sbox.grphobj).mouseup(jQuery.proxy(sbox.mouseup, this));
 		}
 		else {
 			jQuery(sbox.dom_obj).mousedown(jQuery.proxy(sbox.mousedown, this));
 			jQuery(sbox.dom_obj).mousemove(jQuery.proxy(sbox.mousemove, this));
 			jQuery(sbox.dom_obj).click(function(event) { cancelEvent(event); });
+			jQuery(sbox.dom_obj).mouseup(jQuery.proxy(sbox.mouseup, this));
 		}
-
-		jQuery(sbox.dom_obj).mouseup(jQuery.proxy(sbox.mouseup, this));
 	},
 
 	mousedown: function(e) {
+		e = e || window.event;
+
 		if (e.which && e.which != 1) {
 			return false;
 		}
@@ -1835,12 +1841,10 @@ var sbox = Class.create(CDebug, {
 
 		Event.stop(e);
 
-		if (ZBX_SBOX[this.sbox_id].mousedown == false) {
+		if (!ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			this.optimizeEvent(e);
 
-			if (!IE) {
-				deselectAll();
-			}
+			deselectAll();
 
 			if (IE) {
 				var posxy = getPosition(this.dom_obj);
@@ -1855,32 +1859,31 @@ var sbox = Class.create(CDebug, {
 
 			this.create_box();
 
-			ZBX_SBOX[this.sbox_id].mousedown = true;
+			ZBX_SBOX[this.sbox_id].sbox.is_active = true;
 		}
-
-		return false;
 	},
 
 	mousemove: function(e) {
+		e = e || window.event;
+
 		if (IE) {
 			cancelEvent(e);
 		}
 
-		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			this.optimizeEvent(e);
 			this.resizebox();
 		}
 	},
 
 	mouseup: function(e) {
-		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			this.onselect();
 			cancelEvent(e);
 			this.clear_params();
-			ZBX_SBOX[this.sbox_id].mousedown = false;
-		}
 
-		return false;
+			ZBX_SBOX[this.sbox_id].sbox.is_active = false;
+		}
 	},
 
 	ieMouseClick: function(e) {
@@ -1934,7 +1937,7 @@ var sbox = Class.create(CDebug, {
 	},
 
 	create_box: function() {
-		if (is_null(this.dom_box)) {
+		if (!jQuery('#selection_box').length) {
 			this.dom_box = document.createElement('div');
 			this.dom_obj.appendChild(this.dom_box);
 
@@ -1956,6 +1959,7 @@ var sbox = Class.create(CDebug, {
 			this.dom_box.style.left = left + 'px';
 			this.dom_box.style.height = this.cobj.height + 'px';
 			this.dom_box.style.width = '1px';
+			this.dom_box.style.zIndex = 98;
 
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;
@@ -1968,12 +1972,10 @@ var sbox = Class.create(CDebug, {
 				this.dom_box.onmousemove = this.mousemove.bindAsEventListener(this);
 			}
 		}
-
-		ZBX_SBOX[this.sbox_id].mousedown = false;
 	},
 
 	resizebox: function() {
-		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			// fix wrong selection box
 			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
 				this.moveright(this.cobj.width - this.start_event.left - this.cobj.left);
@@ -2096,7 +2098,11 @@ var sbox = Class.create(CDebug, {
 
 	clear_params: function() {
 		if (!is_null(this.dom_box)) {
-			this.dom_obj.removeChild(this.dom_box);
+			var id = jQuery(this.dom_box).attr('id');
+
+			if (jQuery('#' + id).length) {
+				jQuery('#' + id).remove();
+			}
 		}
 
 		this.mouse_event = {};
@@ -2110,7 +2116,10 @@ var sbox = Class.create(CDebug, {
 
 function create_box_on_obj(obj, height) {
 	var id = jQuery(obj).attr('id') + '_box_on';
-	jQuery('#' + id).remove();
+
+	if (jQuery('#' + id).length) {
+		jQuery('#' + id).remove();
+	}
 
 	var div = document.createElement('div');
 	div.id = id;
