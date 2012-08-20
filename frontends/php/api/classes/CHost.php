@@ -22,7 +22,7 @@
 /**
  * @package API
  */
-class CHost extends CZBXAPI {
+class CHost extends CHostGeneral {
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
@@ -1578,90 +1578,44 @@ class CHost extends CZBXAPI {
 	}
 
 	/**
-	 * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+	 * Additionally allows to create new interfaces on hosts.
+	 *
+	 * Checks write permissions for hosts.
+	 *
+	 * Additional supported $data parameters are:
+	 * - interfaces - an array of interfaces to create on the hosts
+	 * - templates  - an array of templates to link to the hosts, overrides the CHostGeneral::massAdd()
+	 *                'templates' parameter
 	 *
 	 * @param array $data
-	 * @param array $data['groups']
-	 * @param array $data['templates']
-	 * @param array $data['macros']
 	 *
 	 * @return array
 	 */
-	public function massAdd($data) {
-		$data['hosts'] = zbx_toArray($data['hosts']);
+	public function massAdd(array $data) {
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
+		$hostIds = zbx_objectValues($hosts, 'hostid');
 
-		$options = array(
-			'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
-			'editable' => 1,
-			'preservekeys' => 1
-		);
-		$updHosts = $this->get($options);
-
-		foreach ($data['hosts'] as $host) {
-			if (!isset($updHosts[$host['hostid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation.'));
-			}
+		// check permissions
+		if (!$this->isWritable($hostIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		if (isset($data['interfaces']) && !empty($data['interfaces'])) {
-			$data['interfaces'] = zbx_toArray($data['interfaces']);
-
-			$options = array(
-				'hosts' => &$data['hosts'],
-				'interfaces' => &$data['interfaces']
-			);
-
-			$result = API::HostInterface()->massAdd($options);
-			if (!$result) {
-				self::exception();
-			}
+		// add new interfaces
+		if (!empty($data['interfaces'])) {
+			API::HostInterface()->massAdd(array(
+				'hosts' => $data['hosts'],
+				'interfaces' => zbx_toArray($data['interfaces'])
+			));
 		}
 
-		if (isset($data['groups']) && !empty($data['groups'])) {
-			$data['groups'] = zbx_toArray($data['groups']);
-
-			$options = array(
-				'hosts' => &$data['hosts'],
-				'groups' => &$data['groups']
-			);
-			$result = API::HostGroup()->massAdd($options);
-			if (!$result) {
-				self::exception();
-			}
+		// rename the "templates" parameter to the common "templates_link"
+		if (isset($data['templates'])) {
+			$data['templates_link'] = $data['templates'];
+			unset($data['templates']);
 		}
 
-		if (isset($data['templates']) && !empty($data['templates'])) {
-			$data['templates'] = zbx_toArray($data['templates']);
-
-			$options = array(
-				'hosts' => &$data['hosts'],
-				'templates' => &$data['templates']
-			);
-			$result = API::Template()->massAdd($options);
-			if (!$result) {
-				self::exception();
-			}
-		}
-
-		if (isset($data['macros']) && !empty($data['macros'])) {
-			$data['macros'] = zbx_toArray($data['macros']);
-
-			// add the macros to all hosts
-			$hostMacrosToAdd = array();
-			foreach ($data['macros'] as $hostMacro) {
-				foreach ($data['hosts'] as $host) {
-					$hostMacro['hostid'] = $host['hostid'];
-					$hostMacrosToAdd[] = $hostMacro;
-				}
-			}
-
-			$result = API::UserMacro()->create($hostMacrosToAdd);
-			if (!$result) {
-				self::exception();
-			}
-		}
-
-		return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
+		$data['templates'] = array();
+		return parent::massAdd($data);
 	}
 
 	/**
@@ -2005,74 +1959,23 @@ class CHost extends CZBXAPI {
 	}
 
 	/**
-	 * remove Hosts from HostGroups. All Hosts are removed from all HostGroups.
+	 * Additionally allows to remove interfaces from hosts.
+	 *
+	 * Checks write permissions for hosts.
+	 *
+	 * Additional supported $data parameters are:
+	 * - interfaces  - an array of interfaces to delete from the hosts
 	 *
 	 * @param array $data
-	 * @param array $data['hostids']
-	 * @param array $data['groupids']
-	 * @param array $data['templateids']
-	 * @param array $data['macroids']
 	 *
 	 * @return array
 	 */
-	public function massRemove($data) {
+	public function massRemove(array $data) {
 		$hostids = zbx_toArray($data['hostids']);
 
-		$options = array(
-			'hostids' => $hostids,
-			'editable' => 1,
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_SHORTEN,
-		);
-		$updHosts = $this->get($options);
-		foreach ($hostids as $hostid) {
-			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		if (isset($data['groupids'])) {
-			$options = array(
-				'hostids' => $hostids,
-				'groupids' => zbx_toArray($data['groupids'])
-			);
-			$result = API::HostGroup()->massRemove($options);
-			if (!$result) {
-				self::exception();
-			}
-		}
-
-		if (isset($data['templateids'])) {
-			$options = array(
-				'hostids' => $hostids,
-				'templateids' => zbx_toArray($data['templateids'])
-			);
-			$result = API::Template()->massRemove($options);
-			if (!$result) {
-				self::exception();
-			}
-		}
-
-		if (isset($data['templateids_clear'])) {
-			$options = array(
-				'templateids' => $hostids,
-				'templateids_clear' => zbx_toArray($data['templateids_clear'])
-			);
-			$result = API::Template()->massRemove($options);
-			if (!$result) {
-				self::exception();
-			}
-		}
-
-		if (isset($data['macros'])) {
-			$hostMacros = API::UserMacro()->get(array(
-				'hostids' => $hostids,
-				'filter' => array(
-					'macro' => $data['macros']
-				)
-			));
-			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
-			API::UserMacro()->delete($hostMacroIds);
+		// check permissions
+		if (!$this->isWritable($hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		if (isset($data['interfaces'])) {
@@ -2080,13 +1983,17 @@ class CHost extends CZBXAPI {
 				'hostids' => $hostids,
 				'interfaces' => zbx_toArray($data['interfaces'])
 			);
-			$result = API::HostInterface()->massRemove($options);
-			if (!$result) {
-				self::exception();
-			}
+			API::HostInterface()->massRemove($options);
 		}
 
-		return array('hostids' => $hostids);
+		// rename the "templates" parameter to the common "templates_link"
+		if (isset($data['templateids'])) {
+			$data['templateids_link'] = $data['templateids'];
+			unset($data['templateids']);
+		}
+
+		$data['templateids'] = array();
+		return parent::massRemove($data);
 	}
 
 	/**
