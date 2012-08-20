@@ -271,10 +271,7 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($historyData as $data) {
 					$item = $this->items[$data['itemid']];
-
-					if (empty($data['value'])) {
-						$data['value'] = '';
-					}
+					$value = $data['value'];
 
 					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($data['value'], '%f', $value);
