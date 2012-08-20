@@ -100,7 +100,7 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, const char *db_dsn, const char *user, con
 	SQLINTEGER	err_int;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ODBC connect DSN:'%s' user:'%s'", __function_name, db_dsn, user);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() db_dsn:'%s' user:'%s'", __function_name, db_dsn, user);
 
 	clean_odbc_strerror();
 

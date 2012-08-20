@@ -46,11 +46,13 @@
  *           parameters separated by '\n'                                     *
  *                                                                            *
  ******************************************************************************/
-static char*	get_param_value(char* params, const char* param_name)
+static char	*get_param_value(char *params, const char *param_name)
 {
 	char	*p, *l, *n, *r, *buf = NULL;
 
-	for (p = params; NULL != p && '\0' != *p; p++)
+	assert(NULL != params);
+
+	for (p = params; '\0' != *p; p++)
 	{
 		r = NULL;
 
@@ -80,7 +82,8 @@ static char*	get_param_value(char* params, const char* param_name)
 		}
 
 		/* find EOL */
-		for (p = n; '\0' != *p && '\n' != *p; p++);
+		for (p = n; '\0' != *p && '\n' != *p; p++)
+			;
 
 		/* allocate result */
 		if (NULL != r)
@@ -105,7 +108,7 @@ static char*	get_param_value(char* params, const char* param_name)
 
 	return buf;
 }
-#endif /* HAVE_ODBC */
+#endif	/* HAVE_ODBC */
 
 /******************************************************************************
  *                                                                            *
@@ -125,6 +128,7 @@ static char*	get_param_value(char* params, const char* param_name)
  ******************************************************************************/
 int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 {
+	const char	*__function_name = "get_value_db";
 #ifdef HAVE_ODBC
 	ZBX_ODBC_DBH	dbh;
 	ZBX_ODBC_ROW	row;
@@ -134,7 +138,7 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 	init_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In database monitor: %s", item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s'", __function_name, item->key_orig);
 
 #ifdef HAVE_ODBC
 
