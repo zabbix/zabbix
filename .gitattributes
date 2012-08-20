@@ -162,6 +162,12 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/db/Db2DbBackend.php -text
+frontends/php/include/classes/db/DbBackend.php -text
+frontends/php/include/classes/db/MysqlDbBackend.php -text
+frontends/php/include/classes/db/OracleDbBacked.php -text
+frontends/php/include/classes/db/PostgresqlDbBackend.php -text
+frontends/php/include/classes/db/SqliteDbBackend.php -text
 frontends/php/include/classes/screens/CScreenActions.php -text
 frontends/php/include/classes/screens/CScreenBase.php -text
 frontends/php/include/classes/screens/CScreenBuilder.php -text

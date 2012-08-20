@@ -87,6 +87,10 @@ function DBconnect(&$error) {
 						DBexecute('SET NAMES utf8');
 					}
 				}
+
+				if ($result) {
+					$dbBackend = new MysqlDbBackend();
+				}
 				break;
 			case ZBX_DB_POSTGRESQL:
 				$pg_connection_string =
@@ -174,10 +178,50 @@ function DBconnect(&$error) {
 				$result = false;
 		}
 	}
+
+	if ($result && !$dbBackend->checkDbVersion()) {
+		$error = $dbBackend->getError();
+		$result = false;
+	}
+
 	if (false == $result) {
 		$DB['DB'] = null;
 	}
+
 	return $result;
+}
+
+function checkDbVersion(&$error) {
+	global $DB;
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_MYSQL:
+			$result = DBselect("SHOW TABLES LIKE 'dbversion'");
+
+			if (!DBfetch($result)) {
+				$error = _('The frontend does not match Zabbix database.');
+				return false;
+			}
+			break;
+		case ZBX_DB_POSTGRESQL:
+			break;
+		case ZBX_DB_ORACLE:
+			// oracle: SELECT * FROM dba_tables where table_name = 'table_name';
+			break;
+		case ZBX_DB_DB2:
+			break;
+		case ZBX_DB_SQLITE3:
+			break;
+	}
+
+	$version = DBfetch(DBselect("SELECT dv.mandatory, dv.optional FROM dbversion dv"));
+	if ($version['required'] < ZABBIX_DB_VERSION) {
+		$error = _('The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required version: %d. Contact your system administrator.',
+			$version['required'], $version['optional'], ZABBIX_DB_VERSION);
+		return false;
+	}
+
+	return true;
 }
 
 function DBclose() {
