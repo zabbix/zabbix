@@ -58,8 +58,7 @@ static void	odbc_free_row_data(ZBX_ODBC_DBH *pdbh)
 		zbx_free(pdbh->row_data);
 	}
 
-	if (0 != pdbh->data_len)
-		zbx_free(pdbh->data_len);
+	zbx_free(pdbh->data_len);
 
 	pdbh->col_num = 0;
 }

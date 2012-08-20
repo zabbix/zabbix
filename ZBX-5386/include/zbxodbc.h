@@ -25,7 +25,7 @@
 #include <sqlext.h>
 #include <sqltypes.h>
 
-typedef char**		ZBX_ODBC_ROW;
+typedef char	**ZBX_ODBC_ROW;
 
 typedef struct zbx_odbc_dbh_s
 {
