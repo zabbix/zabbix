@@ -761,6 +761,7 @@ function make_latest_issues(array $filter = array()) {
 		'groupids' => $filter['groupids'],
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
+		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -838,31 +839,23 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		// maintenance
-		$trigger_host = $hosts[$trigger['hostid']];
-
-		$text = null;
-		$style = 'link_menu';
-		if ($trigger_host['maintenance_status']) {
-			$style .= ' orange';
-
-			// get maintenance
-			$maintenances = API::Maintenance()->get(array(
-				'maintenanceids' => $trigger_host['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND
-			));
-			$maintenance = reset($maintenances);
-			$text = $maintenance['name'].' ['.($trigger_host['maintenance_type']
-				? _('Maintenance without data collection')
-				: _('Maintenance with data collection')).']';
-		}
-
-
 		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
-		if (!is_null($text)) {
-			$hostSpan->setHint($text, '', '', false);
+
+		// maintenance hint
+		if ($host['maintenance_status']) {
+			// get maintenance
+			$maintenances = API::Maintenance()->get(array(
+				'maintenanceids' => $host['maintenanceid'],
+				'output' => API_OUTPUT_EXTEND
+			));
+			$maintenance = reset($maintenances);
+
+			$hint = $maintenance['name'].' ['.($host['maintenance_type']
+				? _('Maintenance without data collection')
+				: _('Maintenance with data collection')).']';
+			$hostSpan->setHint($hint, '', '', false);
 		}
 
 		// unknown triggers
@@ -876,12 +869,13 @@ function make_latest_issues(array $filter = array()) {
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'triggerids' => $trigger['triggerid'],
+			'acknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE,
 				'value_changed' => TRIGGER_VALUE_CHANGED_YES
 			),
-			'sortfield' => array('object', 'objectid', 'eventid'),
+			'sortfield' => array('eventid'),
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		));

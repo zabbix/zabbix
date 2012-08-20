@@ -271,23 +271,17 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($historyData as $data) {
 					$item = $this->items[$data['itemid']];
-					$host = reset($item['hosts']);
 
 					if (empty($data['value'])) {
 						$data['value'] = '';
 					}
 
-					if ($item['valuemapid'] > 0) {
-						$value = applyValueMap($data['value'], $item['valuemapid']);
-						$value_mapped = true;
-					}
-					else {
-						$value = $data['value'];
-						$value_mapped = false;
+					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						sscanf($data['value'], '%f', $value);
 					}
 
-					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT && !$value_mapped) {
-						sscanf($data['value'], '%f', $value);
+					if ($item['valuemapid']) {
+						$value = applyValueMap($value, $item['valuemapid']);
 					}
 
 					if (empty($this->plaintext)) {
