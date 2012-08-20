@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
+#include "perfstat.h"
 
 static int	get_cpu_num()
 {

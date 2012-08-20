@@ -136,15 +136,15 @@ function make_favorite_maps() {
 	$favList = new CList(null, 'favorites');
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 	$sysmapids = array();
+
 	foreach ($fav_sysmaps as $favorite) {
 		$sysmapids[$favorite['value']] = $favorite['value'];
 	}
 
-	$options = array(
+	$sysmaps = API::Map()->get(array(
 		'sysmapids' => $sysmapids,
 		'output' => API_OUTPUT_EXTEND
-	);
-	$sysmaps = API::Map()->get($options);
+	));
 	foreach ($sysmaps as $sysmap) {
 		$sysmapid = $sysmap['sysmapid'];
 
@@ -177,7 +177,7 @@ function make_system_status($filter) {
 	// get host groups
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'monitored_hosts' => 1,
+		'monitored_hosts' => true,
 		'groupids' => $filter['groupids'],
 		'output' => array('groupid', 'name'),
 		'preservekeys' => true
@@ -761,6 +761,7 @@ function make_latest_issues(array $filter = array()) {
 		'groupids' => $filter['groupids'],
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
+		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -820,7 +821,7 @@ function make_latest_issues(array $filter = array()) {
 	$lastChangeHeaderDiv = new CDiv(array(_('Last change'), SPACE));
 	$lastChangeHeaderDiv->addStyle('float: left');
 
-	$table  = new CTableInfo();
+	$table = new CTableInfo();
 	$table->setHeader(
 		array(
 			is_show_all_nodes() ? _('Node') : null,
@@ -838,31 +839,23 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		// maintenance
-		$trigger_host = $hosts[$trigger['hostid']];
-
-		$text = null;
-		$style = 'link_menu';
-		if ($trigger_host['maintenance_status']) {
-			$style .= ' orange';
-
-			// get maintenance
-			$maintenances = API::Maintenance()->get(array(
-				'maintenanceids' => $trigger_host['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND
-			));
-			$maintenance = reset($maintenances);
-			$text = $maintenance['name'].' ['.($trigger_host['maintenance_type']
-				? _('Maintenance without data collection')
-				: _('Maintenance with data collection')).']';
-		}
-
-
 		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
-		if (!is_null($text)) {
-			$hostSpan->setHint($text, '', '', false);
+
+		// maintenance hint
+		if ($host['maintenance_status']) {
+			// get maintenance
+			$maintenances = API::Maintenance()->get(array(
+				'maintenanceids' => $host['maintenanceid'],
+				'output' => API_OUTPUT_EXTEND
+			));
+			$maintenance = reset($maintenances);
+
+			$hint = $maintenance['name'].' ['.($host['maintenance_type']
+				? _('Maintenance without data collection')
+				: _('Maintenance with data collection')).']';
+			$hostSpan->setHint($hint, '', '', false);
 		}
 
 		// unknown triggers
@@ -876,17 +869,24 @@ function make_latest_issues(array $filter = array()) {
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'triggerids' => $trigger['triggerid'],
+			'acknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE,
 				'value_changed' => TRIGGER_VALUE_CHANGED_YES
 			),
-			'sortfield' => array('object', 'objectid', 'eventid'),
+			'sortfield' => array('eventid'),
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		));
 		if ($event = reset($events)) {
-			$ack = getEventAckState($event, true, true, $ackParams);
+			$ack = getEventAckState(
+				$event,
+				!empty($filter['backUrl']) ? $filter['backUrl'] : true,
+				true,
+				$ackParams
+			);
+
 			$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
 
 			// actions
@@ -924,6 +924,7 @@ function make_latest_issues(array $filter = array()) {
 	$infoDiv = new CDiv(_n('%2$d of %1$d issue is shown', '%2$d of %1$d issues are shown', $triggersTotalCount, count($triggers)));
 	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
 	$widgetDiv = new CDiv(array($table, $infoDiv, $script));
+
 	return $widgetDiv;
 }
 

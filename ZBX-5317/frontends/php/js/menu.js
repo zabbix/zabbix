@@ -87,8 +87,7 @@ function truncateText(text, len) {
 	return (text.length > len) ? text.substring(0, len) + '...' : text;
 }
 
-function show_popup_menu(e, content, width){
-
+function show_popup_menu(e, content, width) {
 	if (A_MENUS[0] !== undefined) {
 		A_MENUS[0].collapse();
 	}
@@ -526,7 +525,9 @@ function menu_item (o_parent, n_order) {
 }
 
 function A_MENUS_onclick() {
-	return A_MENUS[this.o_root_n_id].onclick(this.this_n_id);
+	if (!is_null(A_MENUS[this.o_root_n_id])) {
+		return A_MENUS[this.o_root_n_id].onclick(this.this_n_id);
+	}
 }
 
 function A_MENUS_onmouseout() {
@@ -592,13 +593,17 @@ function createMenuHeader(label) {
 }
 
 /**
- * Creates a menu link object for the menu
+ * Creates a menu link object for the menu.
+ *
+ * Supported config values:
+ * - nosid - exclude the SID parameter from the URL.
  *
  * @param label
  * @param action    the target URL
+ * @param config    additional configuration parameter
  *
  * @return {Array}
  */
-function createMenuItem(label, action) {
-	return [label, action, null, { outer: 'pum_o_item', inner: 'pum_i_item' }];
+function createMenuItem(label, action, config) {
+	return [label, action, config, { outer: 'pum_o_item', inner: 'pum_i_item' }];
 }

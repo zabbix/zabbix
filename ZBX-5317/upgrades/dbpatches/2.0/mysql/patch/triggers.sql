@@ -4,88 +4,75 @@
 
 DROP INDEX events_2 ON events;
 CREATE INDEX events_2 ON events (clock);
-ALTER TABLE events MODIFY eventid bigint unsigned NOT NULL,
-		   ADD ns integer DEFAULT '0' NOT NULL,
-		   ADD value_changed integer DEFAULT '0' NOT NULL;
+ALTER TABLE events
+	MODIFY eventid bigint unsigned NOT NULL,
+	ADD ns integer DEFAULT '0' NOT NULL,
+	ADD value_changed integer DEFAULT '0' NOT NULL;
 
 -- Begin event redesign patch
 
-CREATE TEMPORARY TABLE tmp_events_eventid (eventid bigint unsigned PRIMARY KEY,prev_value integer);
-CREATE INDEX tmp_events_index on events (source, object, objectid, clock, eventid, value);
+DELIMITER $
+CREATE PROCEDURE zbx_convert_events()
+LANGUAGE SQL
+BEGIN
+	DECLARE v_eventid bigint unsigned;
+	DECLARE v_triggerid bigint unsigned;
+	DECLARE v_value integer;
+	DECLARE v_type integer;
+	DECLARE prev_triggerid bigint unsigned;
+	DECLARE prev_value integer;
 
--- Which OK events should have value_changed flag set?
--- Those that have a PROBLEM event (or no event) before them.
+	DECLARE n_done integer DEFAULT 0;
+	DECLARE n_cur CURSOR FOR (
+		SELECT e.eventid, e.objectid, e.value, t.type
+			FROM events e
+			JOIN triggers t ON t.triggerid = e.objectid
+			WHERE e.source = 0		-- EVENT_SOURCE_TRIGGERS
+				AND e.object = 0	-- EVENT_OBJECT_TRIGGER
+				AND e.value IN (0,1)	-- TRIGGER_VALUE_FALSE (OK), TRIGGER_VALUE_TRUE (PROBLEM)
+			ORDER BY e.objectid, e.clock, e.eventid
+		);
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET n_done = 1;
 
-INSERT INTO tmp_events_eventid (eventid,prev_value)
-(
-	SELECT e1.eventid,(SELECT e2.value
-				FROM events e2
-				WHERE e2.source=e1.source
-					AND e2.object=e1.object
-					AND e2.objectid=e1.objectid
-					AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
-					AND e2.value<2					-- TRIGGER_VALUE_UNKNOWN
-				ORDER BY e2.source DESC,
-						e2.object DESC,
-						e2.objectid DESC,
-						e2.clock DESC,
-						e2.eventid DESC,
-						e2.value DESC
-				LIMIT 1) AS prev_value
-		FROM events e1
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
-			AND e1.value=0							-- TRIGGER_VALUE_FALSE (OK)
-		HAVING prev_value IS NULL OR prev_value = 1				-- (NULL) or TRIGGER_VALUE_TRUE (PROBLEM)
-);
+	OPEN n_cur;
 
--- Which PROBLEM events should have value_changed flag set?
--- (1) Those that have an OK event (or no event) before them.
--- (2) Those that came from a "MULTIPLE PROBLEM" trigger.
+	n_loop: LOOP
+		FETCH n_cur INTO v_eventid, v_triggerid, v_value, v_type;
 
-INSERT INTO tmp_events_eventid (eventid,prev_value)
-(
-	SELECT e1.eventid,(SELECT e2.value
-				FROM events e2
-				WHERE e2.source=e1.source
-					AND e2.object=e1.object
-					AND e2.objectid=e1.objectid
-					AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
-					AND e2.value<2					-- TRIGGER_VALUE_UNKNOWN
-				ORDER BY e2.source DESC,
-						e2.object DESC,
-						e2.objectid DESC,
-						e2.clock DESC,
-						e2.eventid DESC,
-						e2.value DESC
-				LIMIT 1) AS prev_value
-		FROM events e1,triggers t
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
-			AND e1.objectid=t.triggerid
-			AND e1.value=1							-- TRIGGER_VALUE_TRUE
-			AND t.type=0							-- TRIGGER_TYPE_NORMAL
-		HAVING prev_value IS NULL OR prev_value = 0				-- (NULL) or TRIGGER_VALUE_TRUE (PROBLEM)
-);
+		IF n_done THEN
+			LEAVE n_loop;
+		END IF;
 
-INSERT INTO tmp_events_eventid (eventid)
-(
-	SELECT e1.eventid
-		FROM events e1,triggers t
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
-			AND e1.objectid=t.triggerid
-			AND e1.value=1							-- TRIGGER_VALUE_TRUE (PROBLEM)
-			AND t.type=1							-- TRIGGER_TYPE_MULTIPLE_TRUE
-);
+		IF prev_triggerid IS NULL OR prev_triggerid <> v_triggerid THEN
+			SET prev_value = NULL;
+		END IF;
 
--- Update the value_changed flag.
+		IF v_value = 0 THEN	-- TRIGGER_VALUE_FALSE (OK)
+			-- Which OK events should have value_changed flag set?
+			-- (1) those that have a PROBLEM event (or no event) before them
+			IF prev_value IS NULL OR prev_value = 1 THEN
+				UPDATE events set value_changed = 1 WHERE eventid = v_eventid;
+			END IF;
+		ELSE			-- TRIGGER_VALUE_TRUE (PROBLEM)
+			-- Which PROBLEM events should have value_changed flag set?
+			-- (1) those that have an OK event (or no event) before them
+			-- (2) those that came from a "MULTIPLE PROBLEM" trigger
+			IF v_type = 1 OR prev_value IS NULL OR prev_value = 0 THEN
+				UPDATE events set value_changed = 1 WHERE eventid = v_eventid;
+			END IF;
+		END IF;
 
-DROP INDEX tmp_events_index on events;
+		SET prev_value = v_value;
+		SET prev_triggerid = v_triggerid;
+	END LOOP n_loop;
 
-UPDATE events SET value_changed=1 WHERE eventid IN (SELECT eventid FROM tmp_events_eventid);
+	CLOSE n_cur;
+END$
+DELIMITER ;
 
-DROP TABLE tmp_events_eventid;
+CALL zbx_convert_events;
+
+DROP PROCEDURE zbx_convert_events;
 
 -- End event redesign patch
 
