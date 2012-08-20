@@ -33,15 +33,13 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
      ],[want_unixodbc=ifelse([$1],,[no],[$1])])
 
   if test "x$want_unixodbc" != "xno"; then
-	if test -z "$_libodbc_config" -o test; then
-		AC_PATH_PROG([_libodbc_config], [odbc_config], [no])
-	fi
+	AC_PATH_PROG([_libodbc_config], [odbc_config], [])
 
 	found_unixodbc="yes"
 
 	UNIXODBC_LIBS="-lodbc"
 
-	if test -x $_libodbc_config; then
+	if test -x "$_libodbc_config"; then
 		UNIXODBC_CFLAGS="-I`${_libodbc_config} --include-prefix`"
 		UNIXODBC_LDFLAGS="-L`${_libodbc_config} --lib-prefix`"
 	fi
