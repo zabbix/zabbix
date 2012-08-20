@@ -1,3 +1,7 @@
+Changes for 1.8.15
+
+1.8.15rc1 was released as 1.8.15 without any changes
+
 Changes for 1.8.15rc1
 
 ........S. [ZBX-4527] removed limitation of alerter script command line (Sasha)
