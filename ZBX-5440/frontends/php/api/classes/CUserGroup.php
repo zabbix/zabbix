@@ -507,7 +507,7 @@ class CUserGroup extends CZBXAPI {
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
 
 		if (count($usrgrpids) == 0) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No user group ids provided.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing parameter: usrgrpids.'));
 		}
 
 		// $data['name'] parameter restrictions
@@ -525,7 +525,7 @@ class CUserGroup extends CZBXAPI {
 				));
 				$groupExists = reset($groupExists);
 				if ($groupExists && (bccomp($groupExists['usrgrpid'], $usrgrpids[0]) != 0) ) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with name "%s" already exists.', $data['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%s" already exists.', $data['name']));
 				}
 			}
 		}
@@ -557,7 +557,7 @@ class CUserGroup extends CZBXAPI {
 				foreach ($usrgrps as $usrgrp) {
 					if (($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 						|| ($usrgrp['users_status'] == GROUP_STATUS_DISABLED)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot be added to a disabled group or group with disabled GUI access by himself.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot add himself to a disabled group or a group with disabled GUI access.'));
 					}
 				}
 			}
@@ -652,7 +652,7 @@ class CUserGroup extends CZBXAPI {
 				}
 
 				if (isset($linkedRights[$usrgrpid]) && !empty($linkedRights[$usrgrpid])) {
-					$rightIdsToUnlink = array_merge($rightidsToUnlink, array_keys($linkedRights[$usrgrpid]));
+					$rightIdsToUnlink = array_merge($rightIdsToUnlink, array_keys($linkedRights[$usrgrpid]));
 				}
 			}
 
