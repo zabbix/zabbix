@@ -198,7 +198,7 @@ else if (isset($_REQUEST['hostid'])) {
 		}
 	}
 	else {
-		// if a template is selected, fetch all of the hosts, that are linked to that templates
+		// if a template is selected, fetch all of the hosts, that are linked to those templates
 		if ($_REQUEST['hostid'] > 0) {
 			$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
 			$options['hostids'] = zbx_objectValues($hosts, 'hostid');
