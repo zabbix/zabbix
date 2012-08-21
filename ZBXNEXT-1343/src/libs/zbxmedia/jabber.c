@@ -405,14 +405,6 @@ static int	on_error(void *user_data, ikspak *pak)
 	return IKS_FILTER_EAT;
 }
 
-#ifdef DEBUG
-static void	on_log(jabber_session_p sess, const char *data, size_t size, int is_incoming)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: %s%s: %s",
-			__module_name, iks_is_secure(sess->prs) ? "Sec" : "", is_incoming ? "RECV" : "SEND", data);
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: connect_jabber                                                   *
@@ -449,10 +441,6 @@ static int	connect_jabber(const char *jabber_id, const char *password, int use_s
 		zbx_snprintf(jabber_error, jabber_error_len, "cannot create iksemel parser: %s", zbx_strerror(errno));
 		goto lbl_fail;
 	}
-
-#ifdef DEBUG
-	iks_set_log_hook(jsess->prs, (iksLogHook *)on_log);
-#endif
 
 	jsess->acc = iks_id_new(iks_parser_stack(jsess->prs), jabber_id);
 
