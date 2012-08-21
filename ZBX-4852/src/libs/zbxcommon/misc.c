@@ -541,7 +541,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			if (d1 <= day && day <= d2 && sec1 <= sec && sec < sec2)	/* current period */
 			{
 				if (0 == next || next > now - sec + sec2)
-					next = now - sec + sec2 + 1;		/* the next second after the */
+					next = now - sec + sec2;		/* the next second after the */
 										/* current interval's upper bound */
 			}
 			else if (d1 <= day && day <= d2 && sec < sec1)			/* will be active today */
