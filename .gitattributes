@@ -165,7 +165,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/db/Db2DbBackend.php -text
 frontends/php/include/classes/db/DbBackend.php -text
 frontends/php/include/classes/db/MysqlDbBackend.php -text
-frontends/php/include/classes/db/OracleDbBacked.php -text
+frontends/php/include/classes/db/OracleDbBackend.php -text
 frontends/php/include/classes/db/PostgresqlDbBackend.php -text
 frontends/php/include/classes/db/SqliteDbBackend.php -text
 frontends/php/include/classes/screens/CScreenActions.php -text

@@ -111,6 +111,9 @@ function DBconnect(&$error) {
 						DBexecute('set bytea_output = escape');
 					}
 				}
+				if ($result) {
+					$dbBackend = new PostgresqlDbBackend();
+				}
 				break;
 			case ZBX_DB_ORACLE:
 				$connect = '';
@@ -129,6 +132,9 @@ function DBconnect(&$error) {
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database';
 					$result = false;
+				}
+				if ($result) {
+					$dbBackend = new OracleDbBackend();
 				}
 				break;
 			case ZBX_DB_DB2:
@@ -154,6 +160,9 @@ function DBconnect(&$error) {
 						DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
 					}
 				}
+				if ($result) {
+					$dbBackend = new Db2DbBackend();
+				}
 				break;
 			case ZBX_DB_SQLITE3:
 				if (file_exists($DB['DATABASE'])) {
@@ -171,6 +180,9 @@ function DBconnect(&$error) {
 				else {
 					$error = 'Missing database';
 					$result = false;
+				}
+				if ($result) {
+					$dbBackend = new SqliteDbBackend();
 				}
 				break;
 			default:
