@@ -623,7 +623,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
 		int delay, const char *flex_intervals, time_t now, int *effective_delay)
 {
-	int	nextcheck;
+	int	nextcheck = 0;
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
@@ -635,7 +635,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 	}
 	else
 	{
-		int		current_delay, try = 0;
+		int		current_delay = SEC_PER_YEAR, try = 0;
 		time_t		next_interval, t, tmax;
 		zbx_uint64_t	shift;
 
@@ -670,14 +670,6 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 			if (FAIL != get_next_delay_interval(flex_intervals, t, &next_interval) && nextcheck > next_interval - 1)
 			{
 				/* 'nextcheck' is beyond the current interval */
-				if (nextcheck == next_interval)
-				{
-					current_delay = get_current_delay(delay, flex_intervals, next_interval);
-
-					if (0 == (int)(shift % (zbx_uint64_t)current_delay))
-						break;
-				}
-
 				t = next_interval;
 				try++;
 			}
