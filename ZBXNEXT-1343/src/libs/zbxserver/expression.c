@@ -2765,12 +2765,11 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 	for (i = 0; i < ifuncs->values_num; i++)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select %s,h.status"
-			" from %s"
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select " ZBX_SQL_ITEM_FIELDS ",h.status"
+			" from " ZBX_SQL_ITEM_TABLES
 			" where i.hostid=h.hostid"
-				" and",
-			ZBX_SQL_ITEM_FIELDS, ZBX_SQL_ITEM_TABLES);
+				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids, ifuncs->values_num);
 
 	zbx_free(itemids);

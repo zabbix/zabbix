@@ -2363,11 +2363,11 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	key_esc = DBdyn_escape_string(key);
 
 	result = DBselect(
-			"select %s"
+			"select " ZBX_SQL_ITEM_SELECT
 			" where h.host='%s'"
 				" and h.hostid=i.hostid"
 				" and i.key_='%s'",
-			ZBX_SQL_ITEM_SELECT, host_esc, key_esc);
+			host_esc, key_esc);
 
 	zbx_free(host_esc);
 	zbx_free(key_esc);
