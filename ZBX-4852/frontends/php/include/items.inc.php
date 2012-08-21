@@ -1219,7 +1219,7 @@ function calculate_item_nextcheck($interfaceid, $itemid, $item_type, $delay, $fl
 		$tmax = $now + SEC_PER_YEAR;
 		$try = 0;
 
-		$shift = (item_type == ITEM_TYPE_JMX) ? interfaceid : itemid;
+		$shift = ($item_type == ITEM_TYPE_JMX) ? $interfaceid : $itemid;
 
 		while ($t < $tmax) {
 			/* calculate 'nextcheck' value for the current interval */
