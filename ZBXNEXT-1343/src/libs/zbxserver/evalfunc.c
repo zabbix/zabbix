@@ -2366,7 +2366,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 			"select %s"
 			" where h.host='%s'"
 				" and h.hostid=i.hostid"
-				" and i.key_='%s'"
+				" and i.key_='%s'",
 			ZBX_SQL_ITEM_SELECT, host_esc, key_esc);
 
 	zbx_free(host_esc);
