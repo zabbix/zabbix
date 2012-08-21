@@ -25,7 +25,7 @@ $page['title'] = _('Warning');
 $page['file'] = 'warning.php';
 
 define('ZBX_PAGE_DO_REFRESH', 1);
-if (!defined('PAGE_HEADER_LOADED')) {
+if (!defined('PAGE_HEADER_LOADED') && !defined('ZBX_PAGE_NO_MENU')) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 

@@ -22,7 +22,7 @@
 /**
  * Database backend class for Oracle.
  */
-class OracleDbBacked extends DbBackend {
+class OracleDbBackend extends DbBackend {
 
 
 	/**
