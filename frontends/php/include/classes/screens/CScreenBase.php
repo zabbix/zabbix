@@ -320,7 +320,9 @@ class CScreenBase {
 		$isNow = false;
 
 		if (!empty($options['stime'])) {
-			if (zbxDateToTime($options['stime']) > $time) {
+			$stimeUnix = zbxDateToTime($options['stime']);
+
+			if ($stimeUnix > $time || ($stimeUnix + $options['period'] > $time)) {
 				$stimeNow = $options['stime'];
 				$options['stime'] = date('YmdHis', $time - $options['period']);
 				$usertime = date('YmdHis', $time);
