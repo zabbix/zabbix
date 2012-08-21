@@ -26,18 +26,14 @@ $chartForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroups
 $chartForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
 $chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->getGraphsCB(true)));
 
-$icons = array();
-if ($this->data['pageFilter']->graphsSelected) {
-	$chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
-
-	$icons[] = get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid']));
-	$icons[] = SPACE;
-	$icons[] = get_icon('reset', array('id' => $this->data['graphid']));
-	$icons[] = SPACE;
-	$icons[] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
-}
-
-$chartsWidget->addPageHeader(_('Graphs'), $icons);
+$chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
+$chartsWidget->addPageHeader(_('Graphs'), array(
+	get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
+	SPACE,
+	get_icon('reset', array('id' => $this->data['graphid'])),
+	SPACE,
+	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
+));
 $chartsWidget->addHeader(
 	!empty($this->data['pageFilter']->graphs[$this->data['pageFilter']->graphid])
 		? $this->data['pageFilter']->graphs[$this->data['pageFilter']->graphid]
@@ -61,6 +57,9 @@ if (!empty($this->data['graphid'])) {
 	CScreenBuilder::insertScreenRefreshTime();
 }
 else {
+	$screen = new CScreenBuilder();
+	$screen->insertScreenScrollJs('scrollbar');
+	$screen->insertProcessObjectsJs();
 	$chartsWidget->addItem(new CTableInfo(_('No graphs defined.')));
 }
 

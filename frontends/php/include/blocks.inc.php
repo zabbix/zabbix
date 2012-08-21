@@ -761,7 +761,7 @@ function make_latest_issues(array $filter = array()) {
 		'groupids' => $filter['groupids'],
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
+		'withLastEventUnacknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
