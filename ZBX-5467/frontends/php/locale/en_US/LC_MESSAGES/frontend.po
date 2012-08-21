@@ -1,13 +1,8 @@
-# English translations for PACKAGE package.
-# Copyright (C) 2012 Zabbix SIA
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2012.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-16 22:43+0300\n"
+"POT-Creation-Date: 2012-08-20 17:18+0300\n"
 "PO-Revision-Date: 2012-08-16 22:43+0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -16,6 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
@@ -1057,23 +1053,19 @@ msgstr "Calculated permissions"
 msgid "Callback"
 msgstr "Callback"
 
-#: api/classes/CTemplate.php:1441
+#: api/classes/CTemplate.php:1411
 msgid "Can't add group"
 msgstr "Can't add group"
 
-#: api/classes/CTemplate.php:1517 api/classes/CTemplate.php:1527
+#: api/classes/CTemplate.php:1487 api/classes/CTemplate.php:1497
 msgid "Can't link template"
 msgstr "Can't link template"
 
-#: api/classes/CTemplate.php:1452
+#: api/classes/CTemplate.php:1422
 msgid "Can't remove group"
 msgstr "Can't remove group"
 
-#: api/classes/CTemplate.php:1578
-msgid "Can't unlink groups"
-msgstr "Can't unlink groups"
-
-#: api/classes/CTemplate.php:1488 api/classes/CTemplate.php:1506
+#: api/classes/CTemplate.php:1458 api/classes/CTemplate.php:1476
 msgid "Can't unlink template"
 msgstr "Can't unlink template"
 
@@ -1284,7 +1276,7 @@ msgstr "Cannot create discovery rule"
 msgid "Cannot create group without name."
 msgstr "Cannot create group without name."
 
-#: api/classes/CHost.php:1821
+#: api/classes/CHost.php:1775
 msgid "Cannot create host group."
 msgstr "Cannot create host group."
 
@@ -1360,7 +1352,7 @@ msgstr "Cannot delete group"
 msgid "Cannot delete host"
 msgstr "Cannot delete host"
 
-#: api/classes/CHost.php:1832
+#: api/classes/CHost.php:1786
 msgid "Cannot delete host group."
 msgstr "Cannot delete host group."
 
@@ -1372,7 +1364,7 @@ msgstr "Cannot delete icon map"
 msgid "Cannot delete image"
 msgstr "Cannot delete image"
 
-#: api/classes/CHost.php:1926
+#: api/classes/CHost.php:1880
 msgid "Cannot delete inventory."
 msgstr "Cannot delete inventory."
 
@@ -1609,7 +1601,7 @@ msgstr "Cannot format Tree. Check logic structure in service links."
 msgid "Cannot format tree."
 msgstr "Cannot format tree."
 
-#: api/classes/CTemplate.php:1411
+#: api/classes/CTemplate.php:1381
 msgid "Cannot have empty visible template name"
 msgstr "Cannot have empty visible template name"
 
@@ -1643,7 +1635,7 @@ msgstr "Cannot include view file \"%s\"."
 msgid "Cannot insert user media."
 msgstr "Cannot insert user media."
 
-#: api/classes/CHost.php:1906
+#: api/classes/CHost.php:1860
 msgid "Cannot link template"
 msgstr "Cannot link template"
 
@@ -1651,27 +1643,23 @@ msgstr "Cannot link template"
 msgid "Cannot logout."
 msgstr "Cannot logout."
 
-#: api/classes/CHost.php:1724
+#: api/classes/CHost.php:1678
 msgid "Cannot mass update host name."
 msgstr "Cannot mass update host name."
 
-#: api/classes/CTemplate.php:1370
+#: api/classes/CTemplate.php:1340
 msgid "Cannot mass update template name"
 msgstr "Cannot mass update template name"
 
-#: api/classes/CUserGroup.php:496
-msgid "Cannot mass update user group names."
-msgstr "Cannot mass update user group names."
-
-#: api/classes/CHost.php:1714
+#: api/classes/CHost.php:1668
 msgid "Cannot mass update visible host name."
 msgstr "Cannot mass update visible host name."
 
-#: api/classes/CTemplate.php:1343
+#: api/classes/CTemplate.php:1313
 msgid "Cannot mass update visible template name"
 msgstr "Cannot mass update visible template name"
 
-#: api/classes/CTemplate.php:1622
+#: api/classes/CHostGeneral.php:154
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Cannot pass duplicate template IDs for the linkage: %s."
@@ -1711,39 +1699,39 @@ msgstr "Cannot switch host for interface."
 msgid "Cannot unblock users"
 msgstr "Cannot unblock users"
 
-#: api/classes/CTemplate.php:2184
+#: api/classes/CHostGeneral.php:690
 msgid "Cannot unlink and clear applications"
 msgstr "Cannot unlink and clear applications"
 
-#: api/classes/CTemplate.php:2037
+#: api/classes/CHostGeneral.php:543
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Cannot unlink and clear discovery rules"
 
-#: api/classes/CTemplate.php:2126
+#: api/classes/CHostGeneral.php:632
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Cannot unlink and clear graph prototypes"
 
-#: api/classes/CTemplate.php:2144
+#: api/classes/CHostGeneral.php:650
 msgid "Cannot unlink and clear graphs."
 msgstr "Cannot unlink and clear graphs."
 
-#: api/classes/CTemplate.php:2073
+#: api/classes/CHostGeneral.php:579
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Cannot unlink and clear item prototypes"
 
-#: api/classes/CTemplate.php:2055
+#: api/classes/CHostGeneral.php:561
 msgid "Cannot unlink and clear items"
 msgstr "Cannot unlink and clear items"
 
-#: api/classes/CTemplate.php:1975 api/classes/CTemplate.php:1992
+#: api/classes/CHostGeneral.php:481 api/classes/CHostGeneral.php:498
 msgid "Cannot unlink and clear triggers"
 msgstr "Cannot unlink and clear triggers"
 
-#: api/classes/CHost.php:1897
+#: api/classes/CHost.php:1851
 msgid "Cannot unlink template"
 msgstr "Cannot unlink template"
 
-#: api/classes/CTemplate.php:1929
+#: api/classes/CHostGeneral.php:435
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
@@ -1786,7 +1774,7 @@ msgstr "Cannot update graph"
 msgid "Cannot update group"
 msgstr "Cannot update group"
 
-#: api/classes/CUserGroup.php:395
+#: api/classes/CUserGroup.php:397
 msgid "Cannot update group."
 msgstr "Cannot update group."
 
@@ -2021,7 +2009,7 @@ msgstr "Circular reference in screens: %1$s."
 msgid "Circular reference in templates: %1$s."
 msgstr "Circular reference in templates: %1$s."
 
-#: api/classes/CTemplate.php:1793 api/classes/CTemplate.php:1882
+#: api/classes/CHostGeneral.php:325 api/classes/CHostGeneral.php:753
 msgid "Circular template linkage is not allowed."
 msgstr "Circular template linkage is not allowed."
 
@@ -3248,7 +3236,7 @@ msgstr "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Deleted: Graph \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHost.php:2249
+#: api/classes/CHost.php:2156
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Deleted: Host \"%1$s\"."
@@ -3826,14 +3814,14 @@ msgstr "Empty host name provided in expression."
 #: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
 #: api/classes/CGraphPrototype.php:781 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
-#: api/classes/CHost.php:2103 api/classes/CIconMap.php:409
+#: api/classes/CHost.php:2010 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:949 api/classes/CItemPrototype.php:678
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1348 api/classes/CTrigger.php:1437
 #: api/classes/CTrigger.php:1514 api/classes/CTriggerPrototype.php:1037
-#: api/classes/CUserGroup.php:647 api/classes/CUserMacro.php:504
+#: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:504
 #: api/classes/CUserMacro.php:658
 msgid "Empty input parameter."
 msgstr "Empty input parameter."
@@ -4654,8 +4642,7 @@ msgstr "Greek (el_GR)"
 msgid "Grid"
 msgstr "Grid"
 
-#: api/classes/CUserGroup.php:508 events.php:295
-#: hostinventoriesoverview.php:79 hostinventories.php:93
+#: events.php:295 hostinventoriesoverview.php:79 hostinventories.php:93
 #: hostinventories.php:158 hosts.php:642 httpmon.php:121
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
@@ -4929,7 +4916,7 @@ msgstr "Horizontal align"
 msgid "Host"
 msgstr "Host"
 
-#: api/classes/CHost.php:1740
+#: api/classes/CHost.php:1694
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" already exists."
@@ -5094,13 +5081,13 @@ msgstr "Host update failed."
 msgid "Host updated"
 msgstr "Host updated"
 
-#: api/classes/CHost.php:1419 api/classes/CTemplate.php:1391
+#: api/classes/CHost.php:1419 api/classes/CTemplate.php:1361
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Host with the same name \"%s\" already exists."
 
 #: api/classes/CHost.php:1425 api/classes/CTemplate.php:1014
-#: api/classes/CTemplate.php:1364
+#: api/classes/CTemplate.php:1334
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Host with the same visible name \"%s\" already exists."
@@ -5709,12 +5696,12 @@ msgstr "Incorrect characters used for Proxy name \"%s\"."
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Incorrect characters used for Template name [ %1$s ]"
 
-#: api/classes/CHost.php:1349 api/classes/CHost.php:1720
+#: api/classes/CHost.php:1349 api/classes/CHost.php:1674
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Incorrect characters used for host name \"%s\"."
 
-#: api/classes/CTemplate.php:1396
+#: api/classes/CTemplate.php:1366
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
 msgstr "Incorrect characters used for template name \"%s\"."
@@ -5974,7 +5961,7 @@ msgstr "Incorrect parameters for icon map update method \"%s\"."
 msgid "Incorrect parameters for maintenance."
 msgstr "Incorrect parameters for maintenance."
 
-#: api/classes/CUserGroup.php:341 api/classes/CUserGroup.php:388
+#: api/classes/CUserGroup.php:341 api/classes/CUserGroup.php:391
 msgid "Incorrect parameters for user group."
 msgstr "Incorrect parameters for user group."
 
@@ -7455,6 +7442,10 @@ msgstr "Missing items for graph \"%1$s\"."
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Missing key \"%1$s\" for host \"%2$s\"."
 
+#: api/classes/CUserGroup.php:510
+msgid "Missing parameter: usrgrpids."
+msgstr ""
+
 #: include/views/administration.proxy.list.php:46 report2.php:176
 msgid "Mode"
 msgstr "Mode"
@@ -7899,11 +7890,11 @@ msgstr "No graphs defined."
 msgid "No groups for host \"%s\"."
 msgstr "No groups for host \"%s\"."
 
-#: api/classes/CHost.php:1706
+#: api/classes/CHost.php:1660
 msgid "No groups for hosts."
 msgstr "No groups for hosts."
 
-#: api/classes/CTemplate.php:1335
+#: api/classes/CTemplate.php:1305
 msgid "No groups for template"
 msgstr "No groups for template"
 
@@ -8576,7 +8567,7 @@ msgstr "One time only"
 msgid "One-time downtime"
 msgstr "One-time downtime"
 
-#: api/classes/CUserGroup.php:330 api/classes/CUserGroup.php:404
+#: api/classes/CUserGroup.php:330 api/classes/CUserGroup.php:407
 msgid "Only Super Admins can add user groups."
 msgstr "Only Super Admins can add user groups."
 
@@ -8605,7 +8596,7 @@ msgid "Only Super Admins can delete media types."
 msgstr "Only Super Admins can delete media types."
 
 #. GETTEXT: API exception
-#: api/classes/CUserGroup.php:651
+#: api/classes/CUserGroup.php:705
 msgid "Only Super Admins can delete user groups."
 msgstr "Only Super Admins can delete user groups."
 
@@ -8621,7 +8612,7 @@ msgstr "Only Super Admins can update global macros."
 msgid "Only Super Admins can update icon maps."
 msgstr "Only Super Admins can update icon maps."
 
-#: api/classes/CUserGroup.php:379 api/classes/CUserGroup.php:482
+#: api/classes/CUserGroup.php:382 api/classes/CUserGroup.php:504
 msgid "Only Super Admins can update user groups."
 msgstr "Only Super Admins can update user groups."
 
@@ -8648,6 +8639,10 @@ msgstr "Only items assigned to enabled hosts are counted"
 #: api/classes/CDRule.php:517
 msgid "Only one check can be unique."
 msgstr "Only one check can be unique."
+
+#: api/classes/CUserGroup.php:517
+msgid "Only one user group name can be changed at a time."
+msgstr ""
 
 #: api/classes/CProxy.php:610
 msgid "Only super admins can delete proxies."
@@ -11124,7 +11119,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: api/classes/CHost.php:1745
+#: api/classes/CHost.php:1699
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Template \"%1$s\" already exists."
@@ -11143,7 +11138,7 @@ msgstr "Template \"%s\" already exists."
 msgid "Template added"
 msgstr "Template added"
 
-#: api/classes/CTemplate.php:1885
+#: api/classes/CHostGeneral.php:756
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Template cannot be linked to another template more than once even through other templates."
 
@@ -11179,23 +11174,23 @@ msgstr "Template trigger"
 msgid "Template updated"
 msgstr "Template updated"
 
-#: api/classes/CTemplate.php:1655 include/hosts.inc.php:1238
+#: api/classes/CHostGeneral.php:187 include/hosts.inc.php:1238
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
 msgstr "Template with application \"%1$s\" already linked to host."
 
-#: api/classes/CTemplate.php:1644 include/hosts.inc.php:1224
+#: api/classes/CHostGeneral.php:176 include/hosts.inc.php:1224
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "Template with item key \"%1$s\" already linked to host."
 
-#: api/classes/CHost.php:1435 api/classes/CTemplate.php:1386
+#: api/classes/CHost.php:1435 api/classes/CTemplate.php:1356
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Template with the same name \"%s\" already exists."
 
 #: api/classes/CHost.php:1441 api/classes/CTemplate.php:1010
-#: api/classes/CTemplate.php:1359
+#: api/classes/CTemplate.php:1329
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Template with the same visible name \"%s\" already exists."
@@ -11213,7 +11208,7 @@ msgstr "Templated items"
 msgid "Templates"
 msgstr "Templates"
 
-#: api/classes/CTemplate.php:2229
+#: api/classes/CHostGeneral.php:735
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
@@ -11538,12 +11533,12 @@ msgstr "Trigger expression must contain at least one host:key reference."
 msgid "Trigger form"
 msgstr "Trigger form"
 
-#: api/classes/CTemplate.php:1751
+#: api/classes/CHostGeneral.php:283
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr "Trigger has items from template \"%1$s\" that is not linked to host."
 
-#: api/classes/CTemplate.php:1706
+#: api/classes/CHostGeneral.php:238
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
@@ -11935,42 +11930,42 @@ msgstr "Unlink from template"
 msgid "Unlink from templates"
 msgstr "Unlink from templates"
 
-#: api/classes/CTemplate.php:2193
+#: api/classes/CHostGeneral.php:699
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Application \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTemplate.php:2046
+#: api/classes/CHostGeneral.php:552
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTemplate.php:2153
+#: api/classes/CHostGeneral.php:659
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTemplate.php:2135
+#: api/classes/CHostGeneral.php:641
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTemplate.php:2064
+#: api/classes/CHostGeneral.php:570
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Item \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTemplate.php:2082
+#: api/classes/CHostGeneral.php:588
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTemplate.php:1984
+#: api/classes/CHostGeneral.php:490
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTemplate.php:2001
+#: api/classes/CHostGeneral.php:507
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
@@ -12129,11 +12124,15 @@ msgstr "User added"
 msgid "User can't change type for himself"
 msgstr "User can't change type for himself"
 
+#: api/classes/CUserGroup.php:560
+msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
 msgstr "User cannot change GUI access for himself."
 
-#: api/classes/CUserGroup.php:421 api/classes/CUserGroup.php:532
+#: api/classes/CUserGroup.php:424
 msgid "User cannot change status of himself"
 msgstr "User cannot change status of himself"
 
@@ -12154,12 +12153,17 @@ msgstr "User deleted"
 msgid "User group"
 msgstr "User group"
 
-#: api/classes/CUserGroup.php:664
+#: api/classes/CUserGroup.php:718
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "User group \"%1$s\" is used in script \"%2$s\"."
 
-#: api/classes/CUserGroup.php:671
+#: api/classes/CUserGroup.php:528
+#, php-format
+msgid "User group \"%s\" already exists."
+msgstr ""
+
+#: api/classes/CUserGroup.php:725
 #, php-format
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "User group [%s] is used in configuration for database down messages."
@@ -12827,10 +12831,6 @@ msgstr "You did not specify targets for action operation command \"%s\"."
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "You did not specify targets for action operation global script \"%s\"."
 
-#: api/classes/CHost.php:1602
-msgid "You do not have enough rights for operation."
-msgstr "You do not have enough rights for operation."
-
 #: api/classes/CAlert.php:504 api/classes/CApplication.php:825
 #: api/classes/CApplication.php:836 api/classes/CEvent.php:683
 #: api/classes/CGraph.php:691 api/classes/CGraph.php:702
@@ -12839,18 +12839,18 @@ msgstr "You do not have enough rights for operation."
 #: api/classes/CHostGroup.php:653 api/classes/CHostGroup.php:711
 #: api/classes/CHostGroup.php:865 api/classes/CHostGroup.php:920
 #: api/classes/CHostGroup.php:986 api/classes/CHostGroup.php:999
-#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1700
-#: api/classes/CHost.php:2030 api/classes/CItem.php:1071
-#: api/classes/CItem.php:1074 api/classes/CItemPrototype.php:812
-#: api/classes/CItemPrototype.php:815 api/classes/CMaintenance.php:624
-#: api/classes/CMaintenance.php:731 api/classes/CMaintenance.php:743
-#: api/classes/CScript.php:295 api/classes/CScript.php:342
-#: api/classes/CScript.php:404 api/classes/CScript.php:454
-#: api/classes/CTemplate.php:974 api/classes/CTemplate.php:1066
-#: api/classes/CTemplate.php:1126 api/classes/CTemplate.php:1271
-#: api/classes/CTemplate.php:1329 api/classes/CTemplate.php:1568
-#: api/classes/CTemplateScreen.php:578 api/classes/CTemplateScreen.php:644
-#: api/classes/CWebCheck.php:344
+#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1600
+#: api/classes/CHost.php:1654 api/classes/CHost.php:1978
+#: api/classes/CItem.php:1071 api/classes/CItem.php:1074
+#: api/classes/CItemPrototype.php:812 api/classes/CItemPrototype.php:815
+#: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
+#: api/classes/CScript.php:342 api/classes/CScript.php:404
+#: api/classes/CScript.php:454 api/classes/CTemplate.php:974
+#: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
+#: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
+#: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:578
+#: api/classes/CTemplateScreen.php:644 api/classes/CWebCheck.php:344
 msgid "You do not have permission to perform this operation."
 msgstr "You do not have permission to perform this operation."
 
@@ -13051,7 +13051,7 @@ msgstr "all"
 
 #: api/classes/CImage.php:306 api/classes/CImage.php:416
 #: api/classes/CTemplateScreen.php:537 api/classes/CTemplateScreen.php:606
-#: api/classes/CUserGroup.php:345 api/classes/CUserGroup.php:508
+#: api/classes/CUserGroup.php:345
 msgid "already exists"
 msgstr "already exists"
 
@@ -13437,7 +13437,7 @@ msgstr "show icon mappings"
 msgid "show value mappings"
 msgstr "show value mappings"
 
-#: api/classes/CTemplate.php:1618
+#: api/classes/CHostGeneral.php:150
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "template ID \"%1$s\" is passed %2$s times"
