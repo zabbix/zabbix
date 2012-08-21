@@ -21,42 +21,37 @@
 
 $screenWidget = new CWidget();
 $screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.hostscreen.filter.state', 1));
-if (!empty($this->data['hostid'])) {
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['hostid']));
-}
 
 $form = new CForm('get');
 $form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $screenWidget->addItem($form);
 
-if (empty($this->data['screen'])) {
+if (empty($this->data['screen']) || empty($this->data['host'])) {
 	$screenWidget->addPageHeader(_('SCREENS'));
 	$screenWidget->addItem(BR());
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
-	$screenWidget->show();
+
+	$screenBuilder = new CScreenBuilder();
+	$screenBuilder->insertScreenScrollJs('scrollbar');
+	$screenBuilder->insertProcessObjectsJs();
 }
 else {
 	$screenWidget->addPageHeader(_('SCREENS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
 	$screenWidget->addItem(BR());
 
 	// host screen list
-	$screenList = new CList(null, 'objectlist');
-	foreach ($this->data['screens'] as $screen) {
-		$screenName = get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name'];
+	if (!empty($this->data['screens'])) {
+		$screenComboBox = new CComboBox(
+			'screenList',
+			'host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$this->data['screenid'],
+			'javascript: redirect(this.options[this.selectedIndex].value);'
+		);
+		foreach ($this->data['screens'] as $screen) {
+			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
+		}
 
-		if (count($this->data['screens']) > 1) {
-			if (bccomp($screen['screenid'], $this->data['screenid']) == 0) {
-				$screenList->addItem($screenName, 'selected');
-			}
-			else {
-				$screenList->addItem(new CLink($screenName, 'host_screen.php?screenid='.$screen['screenid'].'&hostid='.$this->data['hostid']));
-			}
-		}
-		else {
-			$screenList->addItem($screenName);
-		}
+		$screenWidget->addHeader(array($this->data['screen']['name'], SPACE, _('on'), SPACE, new CSpan($this->data['host']['name'], 'gold')), $screenComboBox);
 	}
-	$screenWidget->addHeader($screenList);
 
 	// append screens to widget
 	$screenBuilder = new CScreenBuilder(array(
