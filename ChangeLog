@@ -23,6 +23,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5460] fixed links are black and can not been seen in Dark Orange Theme bar text in Configuration -> Hosts -> host (Toms)
 ..F....... [ZBX-5317] fixed adding links for map elements (Vedmak)
 A......... [ZBX-5440] added check for user group mass update function if no user group ids is provided (Toms)
 A......... [ZBX-5440] fixed inability to remove last user and last permission from user group (Toms)
