@@ -40,7 +40,7 @@ else {
 	$screenWidget->addItem(BR());
 
 	// host screen list
-	if (count($this->data['screens']) > 1) {
+	if (!empty($this->data['screens'])) {
 		$screenComboBox = new CComboBox(
 			'screenList',
 			'host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$this->data['screenid'],
