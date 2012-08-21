@@ -231,7 +231,7 @@ abstract class CHostGeneral extends CZBXAPI {
 					'output'=> API_OUTPUT_EXTEND
 				);
 
-				$tmpTpls = $this->get($options);
+				$tmpTpls = API::Template()->get($options);
 				$tmpTpl = reset($tmpTpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
