@@ -412,9 +412,9 @@ int	check_time_period(const char *period, time_t now)
 			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
 
 			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
-			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2;	/* do not include upper bound */
 
-			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)
+			if (d1 <= day && day <= d2 && sec1 <= sec && sec < sec2)
 			{
 				ret = SUCCEED;
 				break;
@@ -536,15 +536,15 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
 
 			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
-			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2;	/* do not include upper bound */
 
-			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* current period */
+			if (d1 <= day && day <= d2 && sec1 <= sec && sec < sec2)	/* current period */
 			{
 				if (0 == next || next > now - sec + sec2)
 					next = now - sec + sec2 + 1;		/* the next second after the */
 										/* current interval's upper bound */
 			}
-			else if (day >= d1 && day <= d2 && sec < sec1)			/* will be active today */
+			else if (d1 <= day && day <= d2 && sec < sec1)			/* will be active today */
 			{
 				if (0 == next || next > now - sec + sec1)
 					next = now - sec + sec1;
@@ -555,29 +555,30 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 
 				next_day = (day + 1 <= 7 ? day + 1 : 1);
 
-				if (next_day >= d1 && next_day <= d2)                   /* will be active tomorrow */
+				if (d1 <= next_day && next_day <= d2)			/* will be active tomorrow */
 				{
 					if (0 == next || next > now - sec + SEC_PER_DAY + sec1)
 						next = now - sec + SEC_PER_DAY + sec1;
 				}
-				else                                                    /* later in the future */
+				else							/* later in the future */
 				{
-					int day_diff = -1;
+					int	day_diff = -1;
 
 					if (day < d1)
 						day_diff = d1 - day;
 					if (day >= d2)
 						day_diff = (d1 + 7) - day;
-					if (day >= d1 && day < d2)
+					if (d1 <= day && day < d2)
 					{
 						/* should never happen */
-						zabbix_log(LOG_LEVEL_ERR,
-								"could not deduce day difference [%s, day=%d, time=%02d:%02d:%02d]",
+						zabbix_log(LOG_LEVEL_ERR, "could not deduce day difference"
+								" [%s, day=%d, time=%02d:%02d:%02d]",
 								s, day, tm->tm_hour, tm->tm_min, tm->tm_sec);
 						day_diff = -1;
 					}
 
-					if (-1 != day_diff && (0 == next || next > now - sec + SEC_PER_DAY * day_diff + sec1))
+					if (-1 != day_diff &&
+							(0 == next || next > now - sec + SEC_PER_DAY * day_diff + sec1))
 						next = now - sec + SEC_PER_DAY * day_diff + sec1;
 				}
 			}
