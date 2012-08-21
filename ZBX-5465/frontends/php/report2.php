@@ -176,10 +176,6 @@ else if (isset($_REQUEST['hostid'])) {
 		_('Mode').SPACE,
 		$r_form
 	));
-// FILTER
-	$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
-	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
-//-------
 
 	$options = array(
 		'output' => array('triggerid', 'description', 'expression', 'value'),
@@ -188,7 +184,8 @@ else if (isset($_REQUEST['hostid'])) {
 		'monitored' => true,
 // Rquired for getting visible host name
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'filter' => array()
+		'filter' => array(),
+		'hostids' => array()
 	);
 
 	if (0 == $config) {
@@ -201,6 +198,7 @@ else if (isset($_REQUEST['hostid'])) {
 		}
 	}
 	else {
+		// if a template is selected, fetch all of the hosts, that are linked to that templates
 		if ($_REQUEST['hostid'] > 0) {
 			$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
 			$options['hostids'] = zbx_objectValues($hosts, 'hostid');
@@ -216,6 +214,10 @@ else if (isset($_REQUEST['hostid'])) {
 		'host',
 		'description'
 	));
+
+	// filter
+	$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS, $options['hostids']);
+	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 
 	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(

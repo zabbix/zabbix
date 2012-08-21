@@ -19,7 +19,7 @@
 **/
 
 
-function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
+function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS, array $usedHostIds = array()){
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
 
@@ -53,32 +53,17 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbTrigs->addItem(0, _('all'));
 		$cmbHGrps->addItem(0, _('all'));
 
-		$sql_cond = ' AND h.hostid=ht.hostid ';
-		if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
-
-		if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-			$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
-
-		$result = DBselect('SELECT DISTINCT g.groupid,g.name '.
-			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
-			' WHERE f.itemid=i.itemid '.
-				' AND h.hostid=i.hostid '.
-				' AND hg.hostid=h.hostid'.
-				' AND g.groupid=hg.groupid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.triggerid=f.triggerid '.
-				' AND '.DBin_node('t.triggerid').
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				$sql_cond.
-			' ORDER BY g.name');
-
-		while($row=DBfetch($result)){
+		// fetch the groups, that the used hosts belong to
+		$hostGroups = API::HostGroup()->get(array(
+			'output' => array('name', 'groupid'),
+			'hostids' => $usedHostIds,
+			'monitored_hosts' => true
+		));
+		foreach ($hostGroups as $hostGroup) {
 			$cmbHGrps->addItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid'], null, ': ').$row['name']
-				);
+				$hostGroup['groupid'],
+				get_node_name_by_elid($hostGroup['groupid'], null, ': ').$hostGroup['name']
+			);
 		}
 
 		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND '.DBcondition('h.hostid',$available_hosts);
