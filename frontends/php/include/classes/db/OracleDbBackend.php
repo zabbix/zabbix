@@ -24,14 +24,13 @@
  */
 class OracleDbBackend extends DbBackend {
 
-
 	/**
 	 * Check if 'dbversion' table exists.
 	 *
 	 * @return boolean
 	 */
 	protected function checkDbVersionTable() {
-		$tableExists = DBfetch(DBselect("SELECT table_name FROM user_tables where table_name='dbversion'"));
+		$tableExists = DBfetch(DBselect("SELECT table_name FROM user_tables WHERE table_name='DBVERSION'"));
 
 		if (!$tableExists) {
 			$this->setError(_('The frontend does not match Zabbix database.'));
