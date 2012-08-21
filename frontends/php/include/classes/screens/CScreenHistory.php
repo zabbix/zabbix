@@ -271,33 +271,26 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($historyData as $data) {
 					$item = $this->items[$data['itemid']];
+					$value = $data['value'];
 
-					if (empty($data['value'])) {
-						$data['value'] = '';
-					}
-
+					// format the value as float
 					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($data['value'], '%f', $value);
 					}
 
-					if ($item['valuemapid']) {
-						$value = applyValueMap($value, $item['valuemapid']);
-					}
-
+					// html table
 					if (empty($this->plaintext)) {
+						if ($item['valuemapid']) {
+							$value = applyValueMap($value, $item['valuemapid']);
+						}
+
 						$historyTable->addRow(array(
 							zbx_date2str(HISTORY_ITEM_DATE_FORMAT, $data['clock']),
 							zbx_nl2br($value)
 						));
 					}
+					// plain text
 					else {
-						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-							sscanf($data['value'], '%f', $value);
-						}
-						else {
-							$value = $data['value'];
-						}
-
 						$output[] = zbx_date2str(HISTORY_PLAINTEXT_DATE_FORMAT, $data['clock']);
 						$output[] = "\t".$data['clock']."\t".htmlspecialchars($value)."\n";
 					}
