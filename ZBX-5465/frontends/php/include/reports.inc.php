@@ -21,7 +21,9 @@
 /**
  * Creates the availability report page filter.
  *
- * @param int $config
+ * Possible $config values are AVAILABILITY_REPORT_BY_HOST or AVAILABILITY_REPORT_BY_TEMPLATE.
+ *
+ * @param int $config           report mode
  * @param array $PAGE_GROUPS    the data for the host/template group filter select
  * @param array $PAGE_HOSTS     the data for the host/template filter select
  * @param array $usedHostIds    the hosts the displayed triggers belong to
@@ -48,7 +50,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, arra
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
-	if ($config == 1) {
+	if ($config == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		$filterForm->addRow(_('Template group'),$cmbGroups);
 		$filterForm->addRow(_('Template'),$cmbHosts);
 
@@ -100,7 +102,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, arra
 		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
 		$filterForm->addRow(_('Filter by host group'),$cmbHGrps);
 	}
-	elseif ($config == 0) {
+	elseif ($config == AVAILABILITY_REPORT_BY_HOST) {
 		$filterForm->addRow(_('Host group'), $cmbGroups);
 		$filterForm->addRow(_('Host'), $cmbHosts);
 	}
