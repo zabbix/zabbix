@@ -2577,6 +2577,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		char		*privatekey_esc;
 		char		*filter_esc;
 		char		*description_esc;
+		char		*lifetime_esc;
 		int		delay;
 		int		history;
 		int		trends;
@@ -2635,7 +2636,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_community,"
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authpassphrase,"
 				"ti.snmpv3_privpassphrase,ti.authtype,ti.username,ti.password,ti.publickey,"
-				"ti.privatekey,ti.flags,ti.filter,ti.description,ti.inventory_link,hi.itemid"
+				"ti.privatekey,ti.flags,ti.filter,ti.description,ti.inventory_link,ti.lifetime,"
+				"hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2690,6 +2692,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		item[item_num].filter_esc = DBdyn_escape_string(row[32]);
 		item[item_num].description_esc = DBdyn_escape_string(row[33]);
 		item[item_num].inventory_link = (unsigned char)atoi(row[34]);
+		item[item_num].lifetime_esc = DBdyn_escape_string(row[35]);
 
 		switch (interface_type = get_interface_type_by_item_type(item[item_num].type))
 		{
@@ -2708,10 +2711,10 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				item[item_num].interfaceid = interfaceids[interface_type - 1];
 		}
 
-		if (SUCCEED != (DBis_null(row[35])))
+		if (SUCCEED != DBis_null(row[36]))
 		{
 			item[item_num].key_esc = NULL;
-			ZBX_STR2UINT64(item[item_num].itemid, row[35]);
+			ZBX_STR2UINT64(item[item_num].itemid, row[36]);
 		}
 		else
 		{
@@ -2734,7 +2737,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					"params,ipmi_sensor,snmp_community,snmp_oid,snmpv3_securityname,"
 					"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,authtype,"
 					"username,password,publickey,privatekey,templateid,flags,filter,description,"
-					"inventory_link,interfaceid)"
+					"inventory_link,interfaceid,lifetime)"
 				" values ";
 		zbx_uint64_t	*itemids = NULL, *protoids = NULL;
 		size_t		itemids_num = 0, protoids_num = 0;
@@ -2794,7 +2797,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 						"filter='%s',"
 						"description='%s',"
 						"inventory_link=%d,"
-						"interfaceid=%s"
+						"interfaceid=%s,"
+						"lifetime='%s'"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					item[i].name_esc, (int)item[i].type, (int)item[i].value_type,
 					(int)item[i].data_type, item[i].delay, item[i].delay_flex_esc,
@@ -2807,7 +2811,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					(int)item[i].authtype, item[i].username_esc, item[i].password_esc,
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
-					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid), item[i].itemid);
+					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
+					item[i].lifetime_esc, item[i].itemid);
 
 			new_items--;
 		}
@@ -2834,7 +2839,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
 						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,'%s','%s',%d,'%s',"
-						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s)%s",
+						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')%s",
 					itemid, item[i].name_esc, item[i].key_esc, hostid, (int)item[i].type,
 					(int)item[i].value_type, (int)item[i].data_type, item[i].delay,
 					item[i].delay_flex_esc, item[i].history, item[i].trends, (int)item[i].status,
@@ -2847,7 +2852,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					(int)item[i].authtype, item[i].username_esc, item[i].password_esc,
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
-					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid), row_dl);
+					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
+					item[i].lifetime_esc, row_dl);
 
 			zbx_free(item[i].key_esc);
 
@@ -2870,6 +2876,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 
 		for (i = 0; i < item_num; i++)
 		{
+			zbx_free(item[i].lifetime_esc);
 			zbx_free(item[i].description_esc);
 			zbx_free(item[i].filter_esc);
 			zbx_free(item[i].privatekey_esc);
