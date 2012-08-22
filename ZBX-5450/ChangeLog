@@ -1,5 +1,6 @@
 Changes for 1.8.16rc1
 
+........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
 
 Changes for 1.8.15
 

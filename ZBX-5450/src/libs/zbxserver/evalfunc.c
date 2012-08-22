@@ -336,8 +336,9 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_UINT64:
+			if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_uint64))
+				return FAIL;
 			ZBX_STR2UINT64(value_uint64, value);
-			ZBX_STR2UINT64(arg2_uint64, arg2);
 
 			switch (op)
 			{
@@ -369,8 +370,10 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
+			if (SUCCEED != is_double_prefix(arg2))
+				return FAIL;
+			arg2_double = str2double(arg2);
 			value_double = atof(value);
-			arg2_double = atof(arg2);
 
 			switch (op)
 			{
@@ -423,8 +426,6 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 			}
-
-			break;
 	}
 
 	return FAIL;
