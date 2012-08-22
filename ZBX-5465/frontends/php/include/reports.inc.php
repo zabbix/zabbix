@@ -18,14 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/**
+ * Creates the availability report page filter.
+ *
+ * @param int $config
+ * @param array $PAGE_GROUPS    the data for the host/template group filter select
+ * @param array $PAGE_HOSTS     the data for the host/template filter select
+ * @param array $usedHostIds    the hosts the displayed triggers belong to
+ *
+ * @return CFormTable
+ */
+function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, array $usedHostIds = array()){
 
-function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS, array $usedHostIds = array()){
-	$available_hosts = $PAGE_HOSTS['hostids'];
-
-
-/************************* FILTER *************************/
-/***********************************************************/
-	$filterForm = new CFormTable();//,'events.php?filter_set=1','POST',null,'sform');
+	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
 
@@ -66,7 +71,12 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS, array $usedHost
 			);
 		}
 
-		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND '.DBcondition('h.hostid',$available_hosts);
+		if ($PAGE_HOSTS['selected']) {
+			$sql_cond = ' AND h.hostid='.$PAGE_HOSTS['selected'];
+		}
+		else {
+			$sql_cond = ' AND '.DBcondition('h.hostid',$PAGE_HOSTS['hostids']);
+		}
 		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
 			' FROM triggers t,hosts h,items i,functions f '.
 			' WHERE f.itemid=i.itemid '.
