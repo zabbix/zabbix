@@ -97,7 +97,7 @@ $_REQUEST['groupid'] = $_REQUEST['filter_groupid'];
 $_REQUEST['hostid'] = $_REQUEST['filter_hostid'];
 // --------------
 
-$config = get_request('config', CProfile::get('web.avail_report.config', 0));
+$config = get_request('config', CProfile::get('web.avail_report.config', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.config', $config, PROFILE_TYPE_INT);
 
 $params = array();
@@ -219,7 +219,7 @@ else if (isset($_REQUEST['hostid'])) {
 	$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS, $options['hostids']);
 	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 
-	$table = new CTableInfo(_('No hosts defined.'));
+	$table = new CTableInfo(_('No triggers defined.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		($_REQUEST['hostid'] == 0) || ($config == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,

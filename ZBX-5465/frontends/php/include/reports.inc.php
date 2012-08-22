@@ -23,14 +23,15 @@
  *
  * Possible $config values are AVAILABILITY_REPORT_BY_HOST or AVAILABILITY_REPORT_BY_TEMPLATE.
  *
- * @param int $config           report mode
- * @param array $PAGE_GROUPS    the data for the host/template group filter select
- * @param array $PAGE_HOSTS     the data for the host/template filter select
- * @param array $usedHostIds    the hosts the displayed triggers belong to
+ * @param int $config                   report mode
+ * @param array $PAGE_GROUPS            the data for the host/template group filter select
+ * @param array $PAGE_HOSTS             the data for the host/template filter select
+ * @param string|string[] $usedHostIds  the hosts the displayed triggers belong to
  *
  * @return CFormTable
  */
-function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, array $usedHostIds = null){
+function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $usedHostIds = null){
+	$usedHostIds = (array) $usedHostIds;
 
 	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name','zbx_filter');
