@@ -42,6 +42,7 @@ function set_zbx_locales() {
 
 	$ZBX_LOCALES = array(
 		'en_GB' => _('English (en_GB)'),
+		'en_US' => _('English (en_US)'),
 		'zh_CN' => _('Chinese (zh_CN)'),
 		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
