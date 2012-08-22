@@ -296,6 +296,10 @@ function zbxDateToTime($strdate) {
 	}
 }
 
+function zbxAddSecondsToUnixtime($sec, $unixtime) {
+	return strtotime('+'.$sec.' seconds', zbxDateToTime($unixtime));
+}
+
 /*************** CONVERTING ******************/
 function rgb2hex($color) {
 	$HEX = array(
