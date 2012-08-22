@@ -9,7 +9,7 @@
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** but WITHOUT ANY WARRANTY; without even the implied warranty of872
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
@@ -869,7 +869,7 @@ function make_latest_issues(array $filter = array()) {
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'triggerids' => $trigger['triggerid'],
-			'acknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
+			'acknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE,
