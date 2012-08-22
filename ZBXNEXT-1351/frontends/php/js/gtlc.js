@@ -1239,10 +1239,6 @@ var CScrollBar = Class.create(CDebug, {
 		return dateArray;
 	},
 
-	debugUnixtime: function(unixtime) {
-		return new CDate(unixtime * 1000).getZBXDate();
-	},
-
 	//----------------------------------------------------------------
 	//-------- MISC --------------------------------------------------
 	//----------------------------------------------------------------
