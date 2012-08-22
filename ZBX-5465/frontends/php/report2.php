@@ -185,7 +185,7 @@ else if (isset($_REQUEST['hostid'])) {
 // Rquired for getting visible host name
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'filter' => array(),
-		'hostids' => array()
+		'hostids' => null
 	);
 
 	if (0 == $config) {
