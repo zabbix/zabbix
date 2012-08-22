@@ -452,9 +452,7 @@ class CUserMacro extends CZBXAPI {
 
 		foreach ($globalMacros as $globalMacro) {
 			$this->checkMacro($globalMacro);
-			if (isset($globalMacro['value'])) {
-				$this->checkValue($globalMacro);
-			}
+			$this->checkValue($globalMacro);
 			$this->checkUnsupportedFields('globalmacro', $globalMacro,
 				_s('Wrong fields for macro "%1$s".', $globalMacro['macro']));
 		}
@@ -603,9 +601,7 @@ class CUserMacro extends CZBXAPI {
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkMacro($hostMacro);
 			$this->checkHostId($hostMacro);
-			if (isset($hostMacro['value'])) {
-				$this->checkValue($hostMacro);
-			}
+			$this->checkValue($hostMacro);
 			$this->checkUnsupportedFields('hostmacro', $hostMacro,
 				_s('Wrong fields for macro "%1$s".', $hostMacro['macro']));
 		}
@@ -908,10 +904,10 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $macro
 	 *
-	 * @throws APIException if the field is empty or too long.
+	 * @throws APIException if the field is too long.
 	 */
 	protected function checkValue(array $macro) {
-		if (zbx_strlen($macro['value']) > 255) {
+		if (isset($macro['value']) && zbx_strlen($macro['value']) > 255) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 255 chars.', $macro['macro']));
 		}
 	}
