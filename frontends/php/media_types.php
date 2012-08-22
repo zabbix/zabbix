@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/media.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -198,7 +198,7 @@ else {
 	// get media types
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
-		'preservekeys' => 1,
+		'preservekeys' => true,
 		'editable' => true,
 		'limit' => ($config['search_limit'] + 1)
 	);
@@ -240,4 +240,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
