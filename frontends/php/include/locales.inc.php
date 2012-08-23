@@ -42,6 +42,7 @@ function set_zbx_locales() {
 
 	$ZBX_LOCALES = array(
 		'en_GB' => _('English (en_GB)'),
+		'en_US' => _('English (en_US)'),
 		'zh_CN' => _('Chinese (zh_CN)'),
 		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
@@ -128,7 +129,8 @@ function zbx_locale_variants_win($language) {
 	// windows locales are written like language[_country[.charset]]
 	// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
 	$winLanguageName = array(
-		'en_gb' => array('English_United States.1252', 'english'),
+		'en_gb' => array('English_United States.1252', 'english-uk'),
+		'en_us' => array('English_United States.1252', 'english-usa'),
 		'zh_cn' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
 		'zh_tw' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
 		'cs_cz' => array('Czech_Czech Republic.1250', 'czech'),
