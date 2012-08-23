@@ -271,39 +271,26 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($historyData as $data) {
 					$item = $this->items[$data['itemid']];
-					$host = reset($item['hosts']);
+					$value = $data['value'];
 
-					if (empty($data['value'])) {
-						$data['value'] = '';
-					}
-
-					if ($item['valuemapid'] > 0) {
-						$value = applyValueMap($data['value'], $item['valuemapid']);
-						$value_mapped = true;
-					}
-					else {
-						$value = $data['value'];
-						$value_mapped = false;
-					}
-
-					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT && !$value_mapped) {
+					// format the value as float
+					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($data['value'], '%f', $value);
 					}
 
+					// html table
 					if (empty($this->plaintext)) {
+						if ($item['valuemapid']) {
+							$value = applyValueMap($value, $item['valuemapid']);
+						}
+
 						$historyTable->addRow(array(
 							zbx_date2str(HISTORY_ITEM_DATE_FORMAT, $data['clock']),
 							zbx_nl2br($value)
 						));
 					}
+					// plain text
 					else {
-						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-							sscanf($data['value'], '%f', $value);
-						}
-						else {
-							$value = $data['value'];
-						}
-
 						$output[] = zbx_date2str(HISTORY_PLAINTEXT_DATE_FORMAT, $data['clock']);
 						$output[] = "\t".$data['clock']."\t".htmlspecialchars($value)."\n";
 					}

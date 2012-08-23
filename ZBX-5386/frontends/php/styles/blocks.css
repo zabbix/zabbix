@@ -218,7 +218,7 @@ div#selection_box {
 	z-index: 4;
 	overflow: hidden;
 }
-div.box_on { position: absolute; z-index: 2; border: 0 red solid; }
+div.box_on { position: absolute; z-index: 99; border: 0 red solid; }
 span#period_span {
 	font-weight: bold;
 	font-size: 11px;

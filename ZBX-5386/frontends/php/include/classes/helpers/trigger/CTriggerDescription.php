@@ -22,6 +22,11 @@
 class CTriggerDescription {
 
 	/**
+	 * The text to be used in item value macros for items, that don't have any data.
+	 */
+	const MACRO_ITEM_VALUE_UNKNOWN = 'UNKNOWN';
+
+	/**
 	 * Add one trigger to expand description.
 	 * Trigger array must have 'triggerid', 'description' and 'expression' fields.
 	 *
@@ -484,7 +489,7 @@ class CTriggerDescription {
 			$value = $item['newvalue'].' ('.$item['lastvalue'].')';
 		}
 		else {
-			$value = formatItemValueType($item);
+			$value = formatItemValue($item, self::MACRO_ITEM_VALUE_UNKNOWN);
 		}
 
 		return $value;

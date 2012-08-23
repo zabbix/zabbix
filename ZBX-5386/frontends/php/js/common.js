@@ -24,10 +24,7 @@ if (typeof(jQuery) != 'undefined') {
 }
 
 function isset(key, obj) {
-	if (is_null(key) || is_null(obj)) {
-		return false;
-	}
-	return (typeof(obj[key]) != 'undefined');
+	return (is_null(key) || is_null(obj)) ? false : (typeof(obj[key]) != 'undefined');
 }
 
 function empty(obj) {
@@ -40,6 +37,7 @@ function empty(obj) {
 	if (is_string(obj) && obj === '') {
 		return true;
 	}
+
 	return is_array(obj) && obj.length == 0;
 }
 
@@ -48,10 +46,7 @@ function is_null(obj) {
 }
 
 function is_number(obj) {
-	if (isNaN(obj)) {
-		return false;
-	}
-	return typeof(obj) === 'number';
+	return (isNaN(obj)) ? false : (typeof(obj) === 'number');
 }
 
 function is_object(obj, instance) {
@@ -81,6 +76,7 @@ function SDI(msg) {
 		console.log(msg);
 		return true;
 	}
+
 	var div_help = document.getElementById('div_help');
 
 	if (typeof(div_help) == 'undefined' || empty(div_help)) {
@@ -95,6 +91,7 @@ function SDI(msg) {
 		div_help.setAttribute('id', 'div_help');
 		div_help.setAttribute('style', 'position: absolute; left: 10px; top: 100px; border: 1px red solid; width: 400px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 	}
+
 	var pre = document.createElement('pre');
 	pre.appendChild(document.createTextNode(msg));
 	div_help.appendChild(document.createTextNode('DEBUG INFO: '));
@@ -115,20 +112,21 @@ function SDJ(obj, name) {
 
 	var debug = '';
 	name = name || 'none';
+
 	for (var key in obj) {
 		if (typeof(obj[key]) == name) {
 			continue;
 		}
 		debug += key + ': ' + obj[key] + ' (' + typeof(obj[key]) + ')' + '\n';
 	}
+
 	SDI(debug);
 }
 
-// functions below should be sorted alphabetically
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
-
 	element = $(element);
+
 	if (element.addEventListener) {
 		element.addEventListener(eventname, expression, bubbling);
 		return true;
@@ -140,6 +138,46 @@ function addListener(element, eventname, expression, bubbling) {
 	else {
 		return false;
 	}
+}
+
+function removeListener(element, eventname, expression, bubbling) {
+	bubbling = bubbling || false;
+	element = $(element);
+
+	if (element.removeEventListener) {
+		element.removeEventListener(eventname, expression, bubbling);
+		return true;
+	}
+	else if (element.detachEvent) {
+		element.detachEvent('on' + eventname, expression);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+function cancelEvent(e) {
+	if (!e) {
+		e = window.event;
+	}
+
+	if (e) {
+		if (IE) {
+			e.cancelBubble = true;
+			e.returnValue = false;
+
+			if (IE9) {
+				e.preventDefault();
+			}
+		}
+		else {
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	}
+
+	return false;
 }
 
 function add_variable(o_el, s_name, x_value, s_formname, o_document) {
@@ -164,6 +202,7 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document) {
 			throw "Missing form in 'this' object";
 		}
 	}
+
 	var o_variable = o_document.createElement('input');
 	if (!o_variable) {
 		throw "Can't create element";
@@ -177,43 +216,25 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document) {
 	return true;
 }
 
-function cancelEvent(e) {
-	if (!e) {
-		e = window.event;
-	}
-	if (e) {
-		if (IE) {
-			e.cancelBubble = true;
-			e.returnValue = false;
-			if (IE9) {
-				e.preventDefault();
-			}
-		}
-		else {
-			e.stopPropagation();
-			e.preventDefault();
-		}
-	}
-	return false;
-}
-
 function checkAll(form_name, chkMain, shkName) {
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkMain].checked;
 
 	chkbxRange.checkAll(shkName, value);
+
 	return true;
 }
 
 function checkLocalAll(form_name, chkMain, chkName) {
 	var frmForm = document.forms[form_name];
-
 	var checkboxes = $$('input[name=' + chkName + ']');
+
 	for (var i = 0; i < checkboxes.length; i++) {
 		if (isset('type', checkboxes[i]) && checkboxes[i].type == 'checkbox') {
 			checkboxes[i].checked = frmForm.elements[chkMain].checked;
 		}
 	}
+
 	return true;
 }
 
@@ -247,6 +268,7 @@ function clearAllForm(form) {
 	for (var i = 0; i < areas.length; i++) {
 		areas[i].innerHTML = '';
 	}
+
 	return true;
 }
 
@@ -287,6 +309,7 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 	if (doSubmit) {
 		objForm.submit();
 	}
+
 	return false;
 }
 
@@ -308,22 +331,22 @@ function getDimensions(obj, trueSide) {
 	}
 
 	var dim = {
-		'left':		0,
-		'top':		0,
-		'right':	0,
-		'bottom':	0,
-		'width':	0,
-		'height':	0
+		left:	0,
+		top:	0,
+		right:	0,
+		bottom:	0,
+		width:	0,
+		height:	0
 	};
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
 		var dim = {
-			'left':		parseInt(obj.style.left, 10),
-			'top':		parseInt(obj.style.top, 10),
-			'right':	parseInt(obj.style.right, 10),
-			'bottom':	parseInt(obj.style.bottom, 10),
-			'width':	parseInt(obj.style.width, 10),
-			'height':	parseInt(obj.style.height, 10)
+			left:	parseInt(obj.style.left, 10),
+			top:	parseInt(obj.style.top, 10),
+			right:	parseInt(obj.style.right, 10),
+			bottom:	parseInt(obj.style.bottom, 10),
+			width:	parseInt(obj.style.width, 10),
+			height:	parseInt(obj.style.height, 10)
 		};
 
 		if (!is_number(dim.top)) {
@@ -367,10 +390,10 @@ function getPosition(obj) {
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
 		pos.left = obj.offsetLeft;
 		pos.top = obj.offsetTop;
+
 		try {
 			while (!is_null(obj.offsetParent)) {
 				obj = obj.offsetParent;
-
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
 
@@ -392,11 +415,10 @@ function getSelectedText(obj) {
 	}
 	else if (obj.selectionStart) {
 		if (obj.selectionStart != obj.selectionEnd) {
-			var s = obj.selectionStart;
-			var e = obj.selectionEnd;
-			return obj.value.substring(s, e);
+			return obj.value.substring(obj.selectionStart, obj.selectionEnd);
 		}
 	}
+
 	return obj.value;
 }
 
@@ -411,12 +433,14 @@ function get_bodywidth() {
 	else {
 		w = (w2 < w) ? w2 : w;
 	}
+
 	return w;
 }
 
 function get_cursor_position(e) {
 	e = e || window.event;
 	var cursor = {x: 0, y: 0};
+
 	if (e.pageX || e.pageY) {
 		cursor.x = e.pageX;
 		cursor.y = e.pageY;
@@ -427,6 +451,7 @@ function get_cursor_position(e) {
 		cursor.x = e.clientX + (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
 		cursor.y = e.clientY + (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
 	}
+
 	return cursor;
 }
 
@@ -448,16 +473,14 @@ function get_scroll_pos() {
 		scrOfY = document.documentElement.scrollTop;
 		scrOfX = document.documentElement.scrollLeft;
 	}
+
 	return [scrOfX, scrOfY];
 }
 
 function insertInElement(element_name, text, tagName) {
-	if (IE) {
-		var elems = $$(tagName + '[name=' + element_name + ']');
-	}
-	else {
-		var elems = document.getElementsByName(element_name);
-	}
+	var elems = (IE)
+		? $$(tagName + '[name=' + element_name + ']')
+		: document.getElementsByName(element_name);
 
 	for (var key = 0; key < elems.length; key++) {
 		if (typeof(elems[key]) != 'undefined' && !is_null(elems[key])) {
@@ -467,14 +490,14 @@ function insertInElement(element_name, text, tagName) {
 }
 
 function openWinCentered(loc, winname, iwidth, iheight, params) {
-	var uri = new Curl(loc);
-	loc = uri.getUrl();
-
 	var tp = Math.ceil((screen.height - iheight) / 2);
 	var lf = Math.ceil((screen.width - iwidth) / 2);
+
 	if (params.length > 0) {
 		params = ', ' + params;
 	}
+
+	loc = new Curl(loc).getUrl();
 
 	var WinObjReferer = window.open(loc, winname, 'width=' + iwidth + ', height=' + iheight + ', top=' + tp + ', left=' + lf + params);
 	WinObjReferer.focus();
@@ -490,11 +513,13 @@ function PopUp(url, width, height, form_name) {
 	if (!form_name) {
 		form_name = 'zbx_popup';
 	}
+
 	var left = (screen.width - (width + 150)) / 2;
 	var top = (screen.height - (height + 150)) / 2;
 
 	var popup = window.open(url, form_name, 'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + ', resizable=yes, scrollbars=yes, location=no, menubar=no');
 	popup.focus();
+
 	return false;
 }
 
@@ -522,9 +547,9 @@ function redirect(uri, method, needle) {
 				action += '&' + key + '=' + args[key];
 				continue;
 			}
+
 			var hInput = document.createElement('input');
 			hInput.setAttribute('type', 'hidden');
-
 			postForm.appendChild(hInput);
 			hInput.setAttribute('name', key);
 			hInput.setAttribute('value', args[key]);
@@ -533,24 +558,8 @@ function redirect(uri, method, needle) {
 		postForm.setAttribute('action', url.getPath() + '?' + action.substr(1));
 		postForm.submit();
 	}
+
 	return false;
-}
-
-function removeListener(element, eventname, expression, bubbling) {
-	bubbling = bubbling || false;
-
-	element = $(element);
-	if (element.removeEventListener) {
-		element.removeEventListener(eventname, expression, bubbling);
-		return true;
-	}
-	else if (element.detachEvent) {
-		element.detachEvent('on' + eventname, expression);
-		return true;
-	}
-	else {
-		return false;
-	}
 }
 
 function showHide(obj, style) {
@@ -614,6 +623,7 @@ function switchElementsClass(obj, class1, class2) {
 	}
 
 	var result = false;
+
 	if (obj.hasClassName(class1)) {
 		obj.removeClassName(class1);
 		obj.className = class2 + ' ' + obj.className;
@@ -628,6 +638,7 @@ function switchElementsClass(obj, class1, class2) {
 		obj.className = class1 + ' ' + obj.className;
 		result = class1;
 	}
+
 	return result;
 }
 

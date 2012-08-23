@@ -100,6 +100,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'excludeSearch'					=> null,
 			'searchWildcardsEnabled'		=> null,
 			// output
+			'expandExpression'              => null,
 			'expandData'					=> null,
 			'output'						=> API_OUTPUT_REFER,
 			'selectGroups'					=> null,
@@ -127,6 +128,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 					$sqlParts['select'][$field] = 't.'.$field;
 				}
 			}
+
+			// ignore the "expandExpression" parameter if the expression is not requested
+			if ($options['expandExpression'] !== null && !str_in_array('expression', $options['output'])) {
+				$options['expandExpression'] = null;
+			}
+
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -625,6 +632,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 						$result[$trigger['triggerid']]['items'][] = array('itemid' => $trigger['itemid']);
 						unset($trigger['itemid']);
+					}
+
+					// expand expression
+					if ($options['expandExpression'] !== null && $trigger['expression']) {
+						$trigger['expression'] = explode_exp($trigger['expression'], false, true);
 					}
 
 					$result[$trigger['triggerid']] += $trigger;
