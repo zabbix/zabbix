@@ -45,7 +45,7 @@ A......... [ZBX-5307] added a validation rule to prevent dependencies from a tri
 A......... [ZBX-5307] fixed inherited trigger dependencies not being validated on hosts (Pavels)
 A......... [ZBX-5307] fixed an undefined index error when importing a trigger, that depends on an unexisting trigger (Pavels)
 A......... [ZBX-5307] fixed errors when importing item prototypes without applications (Pavels)
-..F....... [ZBX-5396] fixed sorting helper function (Toms)
+..F....... [ZBX-5396] fixed in dashboard, entries are not sorted by host groups anymore in "system status", "host status" and "web monitoring" (Toms)
 ..F....... [ZBX-5108] fixed undefined index errors when deleting a templated item from the list (Pavels)
 ....I..... [ZBX-5125] added more validation of duplicates in upgrade patches (1.8 -> 2.0) (dimir)
 ........S. [ZBX-4527] removed length limitation of the alerter script command line (Sasha)
