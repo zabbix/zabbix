@@ -11,6 +11,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+....I..P.. [ZBX-5469] enabled possibility to use more than one application in proxy web monitoring for single host (dimir)
 A.F....... [ZBX-5292] removed validation on empty macros value (Eduard)
 ..F....... [ZBX-5471] fixed error when copy trigger from host to linked template (Vedmak)
 ..F....... [ZBX-5460] fixed links are black and can not been seen in Dark Orange Theme bar text in Configuration -> Hosts -> host (Toms)
