@@ -527,6 +527,7 @@ class CScreenBuilder {
 	/**
 	 * Insert javascript to make time control synchronizes with NOW!
 	 *
+	 * @static
 	 */
 	public static function insertScreenRefreshTime() {
 		zbx_add_post_js('timeControl.refreshTime('.CWebUser::$data['refresh'].');');
