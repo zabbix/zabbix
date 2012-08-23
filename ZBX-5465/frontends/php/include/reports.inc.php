@@ -31,8 +31,6 @@
  * @return CFormTable
  */
 function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $usedHostIds = null){
-	$usedHostIds = (array) $usedHostIds;
-
 	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
