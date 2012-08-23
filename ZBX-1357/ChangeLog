@@ -1,6 +1,7 @@
 Changes for 2.0.3rc1
 
 New features:
+A.F....... [ZBX-1357] American English translation; thanks to Zabbix translators (Richlv)
 A......... [ZBX-2060] implemented the "expandExpression" parameter for the trigger.get and triggerprototype.get methods (Pavels)
 A.F....... [ZBXNEXT-1253] implemented the flicked-free screens (Eduard)
 ........S. [ZBX-5318] added remote commands in expanded {ESC.HISTORY} macro (Sasha)
