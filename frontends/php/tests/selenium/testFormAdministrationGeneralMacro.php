@@ -34,6 +34,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private $newMacro = '{$NEW_MACRO}';
 	private $newValue = 'Value of the new macro';
 
+	private $newEmptyMacro = '{$NEW_EMPTY_MACRO}';
+
 	private $oldGlobalMacroId = 7;
 	private $updMacro = '{$UPD_MACRO}';
 	private $updValue = 'Value of the updated macro';
@@ -233,32 +235,6 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_CreateWrongEmptyValue() {
-		$this->calculateHash();
-
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
-
-		$this->openGlobalMacros();
-
-		$this->click('id=macro_add');
-		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
-
-		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newMacro);
-		$this->input_type('macros['.$countGlobalMacros.'][value]', '');
-
-		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty value for macro "'.$this->newMacro.'".');
-		$this->ok('Cannot add macro.');
-
-		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
-		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), '');
-
-		$this->checkGlobalMacrosOrder();
-
-		$this->verifyHash();
-	}
-
 	public function testFormAdministrationGeneralMacros_CreateWrongEmptyMacro() {
 		$this->calculateHash();
 
@@ -315,6 +291,36 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
 	}
 
+	public function testFormAdministrationGeneralMacros_CreateEmptyValue() {
+		$row = DBfetch(DBselect('SELECT MAX(globalmacroid) AS globalmacroid FROM globalmacro'));
+
+		$this->calculateHash('globalmacroid<='.$row['globalmacroid']);
+
+		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+
+		$this->openGlobalMacros();
+
+		$this->click('id=macro_add');
+		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
+
+		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newEmptyMacro);
+		$this->input_type('macros['.$countGlobalMacros.'][value]', '');
+
+		$this->saveGlobalMacros();
+		$this->ok('Macros updated');
+
+		$this->checkGlobalMacrosOrder();
+
+		$this->verifyHash();
+
+		$count = DBcount(
+			'SELECT globalmacroid FROM globalmacro'.
+			' WHERE macro='.zbx_dbstr($this->newEmptyMacro).
+				' AND value='.zbx_dbstr('')
+		);
+		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
+	}
+
 	public function testFormAdministrationGeneralMacros_CreateDuplicate() {
 		$this->calculateHash();
 
@@ -359,27 +365,6 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), $macro);
 		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
-
-		$this->checkGlobalMacrosOrder(0);
-
-		$this->verifyHash();
-	}
-
-	public function testFormAdministrationGeneralMacros_UpdateWrongEmptyValue() {
-		$this->calculateHash();
-
-		$this->openGlobalMacros();
-
-		$this->input_type('macros[0][macro]', $this->updMacro);
-		$this->input_type('macros[0][value]', '');
-
-		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty value for macro "'.$this->updMacro.'".');
-		$this->ok('Cannot update macro.');
-
-		$this->assertEquals($this->getValue('macros[0][macro]'), $this->updMacro);
-		$this->assertEquals($this->getValue('macros[0][value]'), '');
 
 		$this->checkGlobalMacrosOrder(0);
 
@@ -455,6 +440,41 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 			' WHERE globalmacroid='.$this->oldGlobalMacroId.
 				' AND macro='.zbx_dbstr($this->updMacro).
 				' AND value='.zbx_dbstr($this->updValue)
+		);
+		$this->assertEquals(1, $count,
+				'Chuck Norris: Value of the macro has not been updated in the DB.'.
+				' Perhaps it was saved with different globalmacroid.');
+
+		$this->verifyHash();
+	}
+
+	public function testFormAdministrationGeneralMacros_UpdateEmptyValue() {
+		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
+
+		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+
+		$this->openGlobalMacros();
+
+		for ($i = 0; $i < $countGlobalMacros; $i++) {
+			if ($this->getValue('macros['.$i.'][globalmacroid]') == $this->oldGlobalMacroId) {
+				break;
+			}
+		}
+		$this->assertNotEquals($i, $countGlobalMacros);
+
+		$this->input_type('macros['.$i.'][macro]', $this->updMacro);
+		$this->input_type('macros['.$i.'][value]', '');
+
+		$this->saveGlobalMacros();
+		$this->ok('Macros updated');
+
+		$this->checkGlobalMacrosOrder($i);
+
+		$count = DBcount(
+			'SELECT globalmacroid FROM globalmacro'.
+			' WHERE globalmacroid='.$this->oldGlobalMacroId.
+				' AND macro='.zbx_dbstr($this->updMacro).
+				' AND value='.zbx_dbstr('')
 		);
 		$this->assertEquals(1, $count,
 				'Chuck Norris: Value of the macro has not been updated in the DB.'.
