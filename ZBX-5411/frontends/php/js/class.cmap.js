@@ -502,7 +502,7 @@ ZABBIX.apps.map = (function() {
 				// open link form
 				jQuery('.element-links').delegate('.openlink', 'click', function() {
 					that.currentLinkId = jQuery(this).data('linkid');
-					jQuery('#linksList tr').removeClass('selected');
+					jQuery('table.element-links tr').removeClass('selected');
 					jQuery(this).parent().parent().addClass('selected');
 					var linkData = that.links[that.currentLinkId].getData();
 					that.linkForm.setValues(linkData);
