@@ -22,8 +22,7 @@
 
 /* flags */
 #define ZBX_NOTNULL		0x01
-#define ZBX_HISTORY_TRENDS	0x02
-#define ZBX_PROXY		0x04
+#define ZBX_PROXY		0x02
 
 /* FK flags */
 #define ZBX_FK_CASCADE_DELETE	0x01
