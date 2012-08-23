@@ -349,8 +349,8 @@ class CTriggerDescription {
 						' INNER JOIN items i ON f.itemid=i.itemid'.
 						' INNER JOIN interface n ON i.hostid=n.hostid'.
 						' WHERE '.DBcondition('f.functionid', array_keys($expandIp)).
-						' AND n.main=1'.
-						' AND '.DBcondition('n.type', array_keys($priorities))
+							' AND n.main=1'.
+							' AND '.DBcondition('n.type', array_keys($priorities))
 			);
 			$priority = 0;
 			while ($dbInterface = DBfetch($dbInterfaces)) {
@@ -360,30 +360,32 @@ class CTriggerDescription {
 				$priority = $priorities[$dbInterface['type']];
 				$interface = $dbInterface;
 			}
-			foreach ($expandIp[$interface['functionid']] as $macro => $fNum) {
-				switch ($macro) {
-					case 'IPADDRESS':
-						/* fall through */
-					case 'HOST.IP':
-						$replace = $interface['ip'];
-						break;
-					case 'HOST.DNS':
-						$replace = $interface['dns'];
-						break;
-					case 'HOST.CONN':
-						$replace = $interface['useip'] ? $interface['ip'] : $interface['dns'];
-						break;
-				}
+			if (!empty($interface)) {
+				foreach ($expandIp[$interface['functionid']] as $macro => $fNum) {
+					switch ($macro) {
+						case 'IPADDRESS':
+							/* fall through */
+						case 'HOST.IP':
+							$replace = $interface['ip'];
+							break;
+						case 'HOST.DNS':
+							$replace = $interface['dns'];
+							break;
+						case 'HOST.CONN':
+							$replace = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+							break;
+					}
 
-				if ($fNum == 0 || $fNum == 1) {
-					$m = '{'.$macro.'}';
-					$macroValues[$interface['triggerid']][$m] = $replace;
-					$m = '{'.$macro.'1}';
-					$macroValues[$interface['triggerid']][$m] = $replace;
-				}
-				else {
-					$m = '{'.$macro.$fNum.'}';
-					$macroValues[$interface['triggerid']][$m] = $replace;
+					if ($fNum == 0 || $fNum == 1) {
+						$m = '{'.$macro.'}';
+						$macroValues[$interface['triggerid']][$m] = $replace;
+						$m = '{'.$macro.'1}';
+						$macroValues[$interface['triggerid']][$m] = $replace;
+					}
+					else {
+						$m = '{'.$macro.$fNum.'}';
+						$macroValues[$interface['triggerid']][$m] = $replace;
+					}
 				}
 			}
 		}
@@ -461,6 +463,15 @@ class CTriggerDescription {
 						$macro = zbx_substr($trigger['description'], $macroBegin, $i - $macroBegin + 1);
 						if (isset($macroValues[$macro])) {
 							$replace = $macroValues[$macro];
+						}
+						elseif ($this->isAllowedMacro($macro)) {
+							$replace = '*'._('UNKNOWN').'*';
+						}
+						else {
+							$replace = false;
+						}
+
+						if ($replace) {
 							$trigger['description'] = zbx_substr_replace(
 								$trigger['description'],
 								$replace,
@@ -468,6 +479,7 @@ class CTriggerDescription {
 								zbx_strlen($macro)
 							);
 							$i = $macroBegin + zbx_strlen($replace);
+							$macroBegin = false;
 						}
 					}
 					break;
@@ -509,5 +521,9 @@ class CTriggerDescription {
 	 */
 	protected function resolveItemValueMacro(array $item, array $trigger) {
 		return $this->resolveItemLastvalueMacro($item);
+	}
+
+	protected  function isAllowedMacro($macro) {
+		return preg_match('/{HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|ITEM\.LASTVALUE|ITEM\.VALUE[1-9]?}/', $macro);
 	}
 }
