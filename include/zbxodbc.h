@@ -25,7 +25,7 @@
 #include <sqlext.h>
 #include <sqltypes.h>
 
-typedef char**		ZBX_ODBC_ROW;
+typedef char	**ZBX_ODBC_ROW;
 
 typedef struct zbx_odbc_dbh_s
 {
@@ -43,7 +43,6 @@ typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT;
 int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, const char *db_name, const char *user, const char *pass);
 void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
 
-int	odbc_DBexecute(ZBX_ODBC_DBH *pdbh, const char *query);
 ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query);
 ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
 
