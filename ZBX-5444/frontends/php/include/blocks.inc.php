@@ -860,7 +860,13 @@ function make_latest_issues(array $filter = array()) {
 			$hint = $maintenance['name'].' ['.($host['maintenance_type']
 				? _('Maintenance without data collection')
 				: _('Maintenance with data collection')).']';
-			$mntIco->setHint($hint, '', '', false);
+
+			if (isset($maintenance['description'])) {
+				// double quotes mandatory
+				$hint .= "\n".$maintenance['description'];
+			}
+
+			$mntIco->setHint($hint);
 
 			$hostSpan->addItem($mntIco);
 			$hostName->addClass('left-to-maintenance-icon-abs');

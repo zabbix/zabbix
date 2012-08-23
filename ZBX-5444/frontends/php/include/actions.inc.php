@@ -967,7 +967,6 @@ function get_event_actions_stat_hints($eventid) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_SENT));
 		}
 		$left = new CDiv($alerts['sent'] ? $alert_cnt : SPACE);
-		//$columnLeft->setAttribute('width', '10');
 
 		// center
 		$alerts = DBfetch(DBselect(
@@ -982,7 +981,6 @@ function get_event_actions_stat_hints($eventid) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_NOT_SENT));
 		}
 		$center = new CDiv($alerts['inprogress'] ? $alert_cnt : SPACE);
-		//$columnCenter->setAttribute('width', '10');
 
 		// right
 		$alerts = DBfetch(DBselect(
@@ -997,7 +995,6 @@ function get_event_actions_stat_hints($eventid) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_FAILED));
 		}
 		$right = new CDiv($alerts['failed'] ? $alert_cnt : SPACE);
-		//$columnRight->setAttribute('width', '10');
 
 		$actionCont->addItem(array($left, $center, $right));
 	}
