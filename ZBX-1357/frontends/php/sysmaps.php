@@ -114,61 +114,63 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-	if(isset($_REQUEST['save'])){
+if (isset($_REQUEST['save'])) {
+	$map = array(
+		'name' => $_REQUEST['name'],
+		'width' => $_REQUEST['width'],
+		'height' => $_REQUEST['height'],
+		'backgroundid' => $_REQUEST['backgroundid'],
+		'iconmapid' => $_REQUEST['iconmapid'],
+		'highlight' => get_request('highlight', 0),
+		'markelements' => get_request('markelements', 0),
+		'expandproblem' => get_request('expandproblem', 0),
+		'label_format' => get_request('label_format', 0),
+		'label_type_host' => get_request('label_type_host', 2),
+		'label_type_hostgroup' => get_request('label_type_hostgroup', 2),
+		'label_type_trigger' => get_request('label_type_trigger', 2),
+		'label_type_map' => get_request('label_type_map', 2),
+		'label_type_image' => get_request('label_type_image', 2),
+		'label_string_host' => get_request('label_string_host', ''),
+		'label_string_hostgroup' => get_request('label_string_hostgroup', ''),
+		'label_string_trigger' => get_request('label_string_trigger', ''),
+		'label_string_map' => get_request('label_string_map', ''),
+		'label_string_image' => get_request('label_string_image', ''),
+		'label_type' => $_REQUEST['label_type'],
+		'label_location' => $_REQUEST['label_location'],
+		'show_unack' => get_request('show_unack', 0),
+		'urls' => get_request('urls', array())
+	);
 
-		$map = array(
-			'name' => $_REQUEST['name'],
-			'width' => $_REQUEST['width'],
-			'height' => $_REQUEST['height'],
-			'backgroundid' => $_REQUEST['backgroundid'],
-			'iconmapid' => $_REQUEST['iconmapid'],
-			'highlight' => get_request('highlight', 0),
-			'markelements' => get_request('markelements', 0),
-			'expandproblem' => get_request('expandproblem', 0),
-			'label_format' => get_request('label_format',0),
-			'label_type_host' => get_request('label_type_host',2),
-			'label_type_hostgroup' => get_request('label_type_hostgroup',2),
-			'label_type_trigger' => get_request('label_type_trigger',2),
-			'label_type_map' => get_request('label_type_map',2),
-			'label_type_image' => get_request('label_type_image',2),
-			'label_string_host' => get_request('label_string_host',''),
-			'label_string_hostgroup' => get_request('label_string_hostgroup',''),
-			'label_string_trigger' => get_request('label_string_trigger',''),
-			'label_string_map' => get_request('label_string_map',''),
-			'label_string_image' => get_request('label_string_image',''),
-			'label_type' => $_REQUEST['label_type'],
-			'label_location' => $_REQUEST['label_location'],
-			'show_unack' => get_request('show_unack', 0),
-			'urls' => get_request('urls', array())
-		);
-
-		foreach($map['urls'] as $unum => $url){
-			if(zbx_empty($url['name']) && zbx_empty($url['url']))
-				unset($map['urls'][$unum]);
-		}
-
-		if(isset($_REQUEST['sysmapid'])){
-// TODO check permission by new value.
-			$map['sysmapid'] = $_REQUEST['sysmapid'];
-			$result = API::Map()->update($map);
-
-			add_audit_if($result, AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
-			show_messages($result, _('Network map updated'), _('Cannot update network map'));
-		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
-				access_deny();
-
-			$result = API::Map()->create($map);
-
-			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
-			show_messages($result, _('Network map added'), _('Cannot add network map'));
-		}
-
-		if($result){
-			unset($_REQUEST['form']);
+	foreach ($map['urls'] as $unum => $url) {
+		if (zbx_empty($url['name']) && zbx_empty($url['url'])) {
+			unset($map['urls'][$unum]);
 		}
 	}
+
+	if (isset($_REQUEST['sysmapid'])) {
+		// TODO check permission by new value.
+		$map['sysmapid'] = $_REQUEST['sysmapid'];
+		$result = API::Map()->update($map);
+
+		$auditAction = AUDIT_ACTION_UPDATE;
+		show_messages($result, _('Network map updated'), _('Cannot update network map'));
+	}
+	else {
+		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+			access_deny();
+		}
+
+		$result = API::Map()->create($map);
+
+		$auditAction = AUDIT_ACTION_ADD;
+		show_messages($result, _('Network map added'), _('Cannot add network map'));
+	}
+
+	if ($result) {
+		add_audit($auditAction, AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
+		unset($_REQUEST['form']);
+	}
+}
 	else if((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || ($_REQUEST['go'] == 'delete')){
 		$sysmapids = get_request('maps', array());
 		if(isset($_REQUEST['sysmapid'])){

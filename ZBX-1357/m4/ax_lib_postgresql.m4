@@ -55,9 +55,9 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
             [use PostgreSQL library @<:@default=no@:>@, optionally specify path to pg_config]
         ),
         [
-        if test "$withval" = "no"; then
+        if test "x$withval" = "xno"; then
             want_postgresql="no"
-        elif test "$withval" = "yes"; then
+        elif test "x$withval" = "xyes"; then
             want_postgresql="yes"
         else
             want_postgresql="yes"
@@ -76,13 +76,11 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
     dnl Check PostgreSQL libraries (libpq)
     dnl
 
-    if test "$want_postgresql" = "yes"; then
+    if test "x$want_postgresql" = "xyes"; then
 
-        if test -z "$PG_CONFIG" -o test; then
-            AC_PATH_PROG([PG_CONFIG], [pg_config], [no])
-        fi
+        AC_PATH_PROG([PG_CONFIG], [pg_config], [])
 
-        if test -f "$PG_CONFIG"; then
+        if test -x "$PG_CONFIG"; then
             AC_MSG_CHECKING([for PostgreSQL libraries])
 
             POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"
@@ -140,7 +138,7 @@ PQserverVersion(conn);
 
     postgresql_version_req=ifelse([$1], [], [], [$1])
 
-    if test "$found_postgresql" = "yes"; then
+    if test "x$found_postgresql" = "xyes"; then
 
         dnl Decompose version string of installed PostgreSQL
         dnl and calculate its number representation
