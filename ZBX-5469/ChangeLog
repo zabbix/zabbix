@@ -11,6 +11,8 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A.F....... [ZBX-5292] removed validation on empty macros value (Eduard)
+..F....... [ZBX-5471] fixed error when copy trigger from host to linked template (Vedmak)
 ..F....... [ZBX-5460] fixed links are black and can not been seen in Dark Orange Theme bar text in Configuration -> Hosts -> host (Toms)
 ..F....... [ZBX-5317] fixed adding links for map elements (Vedmak)
 A......... [ZBX-5440] added check for user group mass update function if no user group ids is provided (Toms)
@@ -44,7 +46,7 @@ A......... [ZBX-5307] added a validation rule to prevent dependencies from a tri
 A......... [ZBX-5307] fixed inherited trigger dependencies not being validated on hosts (Pavels)
 A......... [ZBX-5307] fixed an undefined index error when importing a trigger, that depends on an unexisting trigger (Pavels)
 A......... [ZBX-5307] fixed errors when importing item prototypes without applications (Pavels)
-..F....... [ZBX-5396] fixed sorting helper function (Toms)
+..F....... [ZBX-5396] fixed in dashboard, entries are not sorted by host groups anymore in "system status", "host status" and "web monitoring" (Toms)
 ..F....... [ZBX-5108] fixed undefined index errors when deleting a templated item from the list (Pavels)
 ....I..... [ZBX-5125] added more validation of duplicates in upgrade patches (1.8 -> 2.0) (dimir)
 ........S. [ZBX-4527] removed length limitation of the alerter script command line (Sasha)
@@ -951,6 +953,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+A......... [ZBX-5395] fixed {ITEM.LASTVALUE1} and {ITEM.VALUE1} expanding in the trigger.get method (Pavels)
 
 Changes for 1.8.15
 
