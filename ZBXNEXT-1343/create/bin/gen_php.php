@@ -17,8 +17,7 @@ function parse_schema($path) {
 				$str = explode('|', $rest_line);
 				$table = trim($str[0]);
 				$key = trim($str[1]);
-				$type = 'DB::TABLE_TYPE_HISTORY';
-				$schema[$table] = array('key' => $key, 'fields' => array(), 'type' => $type);
+				$schema[$table] = array('key' => $key, 'fields' => array());
 				break;
 			case 'FIELD':
 				$str = explode('|', $rest_line);
@@ -101,7 +100,6 @@ function parse_schema($path) {
 	$str .= 'return array('."\n";
 	foreach ($schema as $table => $data) {
 		$str .= "\t'$table' => array(\n";
-		$str .= "\t\t'type' => {$data['type']},\n";
 		$str .= "\t\t'key' => '{$data['key']}',\n";
 		$str .= "\t\t'fields' => array(\n";
 		foreach ($data['fields'] as $field => $fieldata) {
@@ -121,22 +119,22 @@ function parse_schema($path) {
 	return $str;
 }
 
-	$path_src = isset($argv[1]) ? $argv[1] : DEFAULT_SRC_FILE;
-	if (!is_file($path_src)) {
-		fwrite(STDERR, 'File does not exist: "'.$path_src.'"'."\n");
-		exit(1);
-	}
-	$schema_text = parse_schema($path_src);
-	fwrite(STDOUT, 'File parsed: "'.$path_src.'"'."\n");
+$path_src = isset($argv[1]) ? $argv[1] : DEFAULT_SRC_FILE;
+if (!is_file($path_src)) {
+	fwrite(STDERR, 'File does not exist: "'.$path_src.'"'."\n");
+	exit(1);
+}
+$schema_text = parse_schema($path_src);
+fwrite(STDOUT, 'File parsed: "'.$path_src.'"'."\n");
 
-	$path_dest = isset($argv[2]) ? $argv[2] : DEFAULT_DEST_FILE;
-	$result = file_put_contents($path_dest, $schema_text);
-	if ($result) {
-		fwrite(STDOUT, 'File written: "'.$path_dest.'"'."\n");
-		exit(0);
-	}
-	else {
-		fwrite(STDERR, 'Cannot write file: "'.$path_dest.'"'."\n");
-		exit(1);
-	}
+$path_dest = isset($argv[2]) ? $argv[2] : DEFAULT_DEST_FILE;
+$result = file_put_contents($path_dest, $schema_text);
+if ($result) {
+	fwrite(STDOUT, 'File written: "'.$path_dest.'"'."\n");
+	exit(0);
+}
+else {
+	fwrite(STDERR, 'Cannot write file: "'.$path_dest.'"'."\n");
+	exit(1);
+}
 ?>

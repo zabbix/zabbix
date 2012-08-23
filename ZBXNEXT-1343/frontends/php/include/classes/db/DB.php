@@ -28,9 +28,6 @@ class DB {
 	const SCHEMA_ERROR = 3;
 	const INPUT_ERROR = 4;
 
-	const TABLE_TYPE_CONFIG = 1;
-	const TABLE_TYPE_HISTORY = 2;
-
 	const FIELD_TYPE_INT = 'int';
 	const FIELD_TYPE_CHAR = 'char';
 	const FIELD_TYPE_ID = 'id';
