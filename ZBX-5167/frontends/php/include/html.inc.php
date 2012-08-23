@@ -318,9 +318,6 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	if (isset($elements['applications'])) {
 		$options['selectApplications'] = API_OUTPUT_COUNT;
 	}
-	if (isset($elements['screens'])) {
-		$options['selectScreens'] = API_OUTPUT_COUNT;
-	}
 	if (isset($elements['discoveries'])) {
 		$options['selectDiscoveries'] = API_OUTPUT_COUNT;
 	}
@@ -345,6 +342,15 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$list = new CList(null, 'objectlist');
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		$list->addItem(array('&laquo; ', new CLink(_('Template list'), 'templates.php?templateid='.$dbHost['hostid'].url_param('groupid'))));
+
+		$dbHost['screens'] = API::TemplateScreen()->get(array(
+			'editable' => true,
+			'countOutput' => true,
+			'output' => API_OUTPUT_SHORTEN,
+			'groupCount' => true,
+			'templateids' => $dbHost['hostid']
+		));
+		$dbHost['screens'] = isset($dbHost['screens'][0]['rowscount']) ? $dbHost['screens'][0]['rowscount'] : 0;
 	}
 	else {
 		$list->addItem(array('&laquo; ', new CLink(_('Host list'), 'hosts.php?hostid='.$dbHost['hostid'].url_param('groupid'))));
