@@ -838,20 +838,20 @@ fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
 
 /* maintenance icon */
-.maintenance-icon-inline, .maintenance-icon-abs {
+.icon-maintenance-inline, .icon-maintenance-abs {
 	background-image: url("../images/general/wrench12transp.png");
 	background-repeat: no-repeat;
 	width: 12px;
 }
 
-.maintenance-icon-inline {
+.icon-maintenance-inline {
 	height: 14px;
 	vertical-align: middle;
 	display: inline-block;
 	margin-left: 5px;
 }
 
-.maintenance-icon-abs {
+.icon-maintenance-abs {
 	height: 12px;
 	position: absolute;
 	right: 0px;
@@ -862,7 +862,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 	position: relative;
 }
 
-.left-to-maintenance-icon-abs {
+.left-to-icon-maintenance-abs {
 	margin-right: 17px;
 }
 

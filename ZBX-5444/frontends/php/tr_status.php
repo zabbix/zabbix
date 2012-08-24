@@ -580,26 +580,28 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 			// add maintenance icon with hint if host is in maintenance
 			if($trigger_host['maintenance_status']){
-				$mntIco = new CDiv(null, 'maintenance-icon-inline pointer');
+				$mntIco = new CDiv(null, 'icon-maintenance-inline');
 
-				$maintenanceOptions = array(
+				$maintenances = API::Maintenance()->get(array(
 					'maintenanceids' => $trigger_host['maintenanceid'],
 					'output' => API_OUTPUT_EXTEND,
 					'limit'	=> 1
-				);
-				$maintenances = API::Maintenance()->get($maintenanceOptions);
-				$maintenance = reset($maintenances);
+				));
 
-				$hint = $maintenance['name'].' ['.($trigger_host['maintenance_type']
-					? _('Maintenance without data collection')
-					: _('Maintenance with data collection')).']';
+				if ($maintenance = reset($maintenances)) {
+					$hint = $maintenance['name'].' ['.($trigger_host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
 
-				if (isset($maintenance['description'])) {
-					// double quotes mandatory
-					$hint .= "\n".$maintenance['description'];
+					if (isset($maintenance['description'])) {
+						// double quotes mandatory
+						$hint .= "\n".$maintenance['description'];
+					}
+
+					$mntIco->setHint($hint);
+					$mntIco->addClass('pointer');
 				}
 
-				$mntIco->setHint($hint);
 				$hosts_span ->addItem($mntIco);
 			}
 
