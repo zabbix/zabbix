@@ -829,7 +829,6 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array()) {
 		'allow_all' =>						0,
 		'select_first_host' =>				0,
 		'select_first_host_if_empty' =>		0,
-		'select_host_on_group_switch' =>	0,
 		'do_not_select' =>					0,
 		'do_not_select_if_empty' =>			0,
 		'monitored_hosts' =>				0,
@@ -856,9 +855,6 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array()) {
 	}
 	if ($def_options['deny_all']) {
 		$dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
-	}
-	if ($dd_first_entry == ZBX_DROPDOWN_FIRST_ALL) {
-		$def_options['select_host_on_group_switch'] = 1;
 	}
 
 	$result = array('original' => -1, 'selected' => 0, 'hosts' => array(), 'hostids' => array());
@@ -1017,8 +1013,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array()) {
 		$_REQUEST['hostid'] = $result['selected'] = 0;
 	}
 	elseif ($def_options['select_first_host']
-				|| ($def_options['select_first_host_if_empty'] && $_REQUEST['hostid'] == -1 && is_null($profile_hostid))
-				|| ($def_options['select_host_on_group_switch'] && $_REQUEST['hostid'] != -1 && bccomp($_REQUEST['hostid'], $result['selected']) != 0)) {
+				|| ($def_options['select_first_host_if_empty'] && $_REQUEST['hostid'] == -1 && is_null($profile_hostid))) {
 		$first_hostid = next($hostids);
 		reset($hostids);
 

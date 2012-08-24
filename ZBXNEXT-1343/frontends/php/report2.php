@@ -97,16 +97,16 @@ $_REQUEST['groupid'] = $_REQUEST['filter_groupid'];
 $_REQUEST['hostid'] = $_REQUEST['filter_hostid'];
 // --------------
 
-$config = get_request('config', CProfile::get('web.avail_report.config', 0));
+$config = get_request('config', CProfile::get('web.avail_report.config', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.config', $config, PROFILE_TYPE_INT);
 
 $params = array();
 $options = array('allow_all_hosts', 'with_items');
 
-if (0 == $config) {
+if ($config == AVAILABILITY_REPORT_BY_HOST) {
 	array_push($options, 'monitored_hosts');
 }
-else {
+elseif($config == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	array_push($options, 'templated_hosts');
 }
 
@@ -163,18 +163,14 @@ else if (isset($_REQUEST['hostid'])) {
 	$r_form->setMethod('get');
 
 	$cmbConf = new CComboBox('config', $config, 'submit()');
-	$cmbConf->addItem(0, _('By host'));
-	$cmbConf->addItem(1, _('By trigger template'));
+	$cmbConf->addItem(AVAILABILITY_REPORT_BY_HOST, _('By host'));
+	$cmbConf->addItem(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template'));
 	$r_form->addItem($cmbConf);
 
 	$rep2_wdgt->addHeader(_('Report'), array(
 		_('Mode').SPACE,
 		$r_form
 	));
-// FILTER
-	$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
-	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
-//-------
 
 	$options = array(
 		'output' => array('triggerid', 'description', 'expression', 'value'),
@@ -183,10 +179,11 @@ else if (isset($_REQUEST['hostid'])) {
 		'monitored' => true,
 // Rquired for getting visible host name
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'filter' => array()
+		'filter' => array(),
+		'hostids' => null
 	);
 
-	if (0 == $config) {
+	if ($config == AVAILABILITY_REPORT_BY_HOST) {
 		if ($_REQUEST['groupid'] > 0) {
 			$options['groupids'] = $_REQUEST['groupid'];
 		}
@@ -195,7 +192,8 @@ else if (isset($_REQUEST['hostid'])) {
 			$options['hostids'] = $_REQUEST['hostid'];
 		}
 	}
-	else {
+	elseif ($config == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		// if a template is selected, fetch all of the hosts, that are linked to those templates
 		if ($_REQUEST['hostid'] > 0) {
 			$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
 			$options['hostids'] = zbx_objectValues($hosts, 'hostid');
@@ -212,9 +210,13 @@ else if (isset($_REQUEST['hostid'])) {
 		'description'
 	));
 
-	$table = new CTableInfo(_('No hosts defined.'));
+	// filter
+	$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS, $options['hostids']);
+	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
+
+	$table = new CTableInfo(_('No triggers defined.'));
 	$table->setHeader(array(
-		(($_REQUEST['hostid'] == 0) || (1 == $config)) ? _('Host') : NULL,
+		($_REQUEST['hostid'] == 0) || ($config == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
 		_('Name'),
 		_('Problems'),
 		_('Ok'),
@@ -231,7 +233,7 @@ else if (isset($_REQUEST['hostid'])) {
 		$actions = new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid'].'&triggerid='.$trigger['triggerid']);
 
 		$table->addRow(array(
-			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $trigger['hosts'][0]['name'] : NULL,
+			($_REQUEST['hostid'] == 0) || ($config == AVAILABILITY_REPORT_BY_TEMPLATE) ? $trigger['hosts'][0]['name'] : null,
 			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
 			$true,
 			$false,

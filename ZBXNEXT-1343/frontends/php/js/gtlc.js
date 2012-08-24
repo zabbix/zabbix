@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -121,7 +121,7 @@ var timeControl = {
 			// image
 			if (obj.loadImage) {
 				if (!obj.refresh) {
-					this.addImage(obj.domid);
+					this.addImage(obj.domid, false);
 				}
 			}
 			else if (obj.loadScroll) {
@@ -135,29 +135,26 @@ var timeControl = {
 		}
 	},
 
-	addImage: function(objid) {
+	addImage: function(objid, rebuildListeners) {
 		var obj = this.objectList[objid];
 
-		var img = document.createElement('img');
-		img.className = 'borderless';
-		img.setAttribute('id', obj.domid);
-		img.setAttribute('src', obj.src);
-		$(obj.containerid).appendChild(img);
+		var img = $(obj.domid);
+		if (empty(img)) {
+			img = document.createElement('img');
+			img.setAttribute('id', obj.domid);
+			img.setAttribute('src', obj.src);
+			$(obj.containerid).appendChild(img);
+		}
 
-		if (obj.loadScroll) {
+		if (obj.loadScroll && empty(obj.scroll_listener)) {
 			obj.scroll_listener = this.addScroll.bindAsEventListener(this, obj.domid);
 			addListener(img, 'load', obj.scroll_listener);
 		}
 
-		if (obj.loadSBox) {
+		if (obj.loadSBox && empty(obj.sbox_listener)) {
 			obj.sbox_listener = this.addSBox.bindAsEventListener(this, obj.domid);
 			addListener(img, 'load', obj.sbox_listener);
 			addListener(img, 'load', moveSBoxes);
-
-			if (IE) {
-				// workaround to IE6 & IE7 DOM redraw problem
-				addListener(obj.domid, 'load', function() { setTimeout( function() { $('scrollbar_cntr').show(); }, 500); });
-			}
 		}
 	},
 
@@ -172,7 +169,7 @@ var timeControl = {
 		imgUrl.setArgument('stime', stime);
 		imgUrl = this.getFormattedUrl(objid, imgUrl);
 
-		jQuery('<img />', {id: obj.domid + '_tmp', src: imgUrl.getUrl(), 'class': 'borderless'}).load(function() {
+		jQuery('<img />', {id: obj.domid + '_tmp', src: imgUrl.getUrl()}).load(function() {
 			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 			jQuery('#' + id).replaceWith(jQuery(this));
 			jQuery(this).attr('id', id);
@@ -394,40 +391,6 @@ var timeControl = {
 		return url;
 	}
 };
-
-function datetoarray(unixtime) {
-	var date = new CDate(unixtime * 1000);
-	var dateArray = [];
-
-	dateArray[0] = date.getDate();
-	dateArray[1] = date.getMonth() + 1;
-	dateArray[2] = date.getFullYear();
-	dateArray[3] = date.getHours();
-	dateArray[4] = date.getMinutes();
-	dateArray[5] = date.getSeconds();
-
-	for (var i = 0; i < dateArray.length; i++) {
-		if ((dateArray[i] + '').length < 2) {
-			dateArray[i] = '0' + dateArray[i];
-		}
-	}
-
-	return dateArray;
-}
-
-function onload_update_scroll(id, w, period, stime, timel, bar_stime) {
-	var obj = $(id);
-	if (typeof(obj) == 'undefined' || is_null(obj)) {
-		setTimeout('onload_update_scroll("' + id + '", ' + w + ', ' + period + ', ' + stime + ', ' + timel + ', ' + bar_stime + ');', 1000);
-		return;
-	}
-
-	scrollinit(w, period, stime, timel, bar_stime);
-
-	if (!is_null($('scroll')) && showgraphmenu) {
-		showgraphmenu(id);
-	}
-}
 
 // timeline control core
 var ZBX_TIMELINES = {};
@@ -700,19 +663,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.updateGlobalTimeline();
 
 		this.changed = 1;
-		this.onchange(this.scrollbarid, this.timeline.timelineid, true);
-	},
-
-	barmousedown: function() {
-	},
-
-	scrollmouseout: function() { // u may use this func to attach some function on mouseout from scroll method
-	},
-
-	scrollmouseover: function() { // u may use this func to attach some function on mouseover from scroll method
-	},
-
-	onchange: function() { // executed every time the bar period or bar time is changed (mouse button released)
+		this.onchange(this.scrollbarid, this.timeline.timelineid);
 	},
 
 	updateGlobalTimeline: function() {
@@ -1250,11 +1201,11 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
 
 		// info left
-		var date = datetoarray(userstarttime);
+		var date = this.dateToArray(userstarttime);
 		this.dom.info_left.innerHTML = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
 
 		// info right
-		var date = datetoarray(usertime);
+		var date = this.dateToArray(usertime);
 		var right_info = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
 
 		if (this.timeline.now()) {
@@ -1266,6 +1217,26 @@ var CScrollBar = Class.create(CDebug, {
 		this.setZoomLinksStyle();
 
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
+	},
+
+	dateToArray: function(unixtime) {
+		var date = new CDate(unixtime * 1000);
+		var dateArray = [];
+
+		dateArray[0] = date.getDate();
+		dateArray[1] = date.getMonth() + 1;
+		dateArray[2] = date.getFullYear();
+		dateArray[3] = date.getHours();
+		dateArray[4] = date.getMinutes();
+		dateArray[5] = date.getSeconds();
+
+		for (var i = 0; i < dateArray.length; i++) {
+			if ((dateArray[i] + '').length < 2) {
+				dateArray[i] = '0' + dateArray[i];
+			}
+		}
+
+		return dateArray;
 	},
 
 	//----------------------------------------------------------------
@@ -1662,6 +1633,7 @@ var CScrollBar = Class.create(CDebug, {
 });
 
 var CGhostBox = Class.create(CDebug, {
+
 	box:		null, // resized dom object
 	sideToMove:	null, // 0 - left side, 1 - right side
 	flip:		null, // if flip < 0, ghost is fliped
@@ -1749,7 +1721,7 @@ var CGhostBox = Class.create(CDebug, {
 });
 
 // selection box uppon graphs
-var ZBX_SBOX = {}; // selection box obj reference
+var ZBX_SBOX = {};
 
 function sbox_init(sbid, timeline, domobjectid) {
 	if (!isset(domobjectid, ZBX_SBOX)) {
@@ -1759,29 +1731,21 @@ function sbox_init(sbid, timeline, domobjectid) {
 		throw('Parametrs haven\'t been sent properly.');
 	}
 
-	if (is_null(sbid)) {
-		sbid = ZBX_SBOX.length;
-	}
+	sbid = !is_null(sbid) ? sbid : ZBX_SBOX.length;
 
 	var dims = getDimensions(domobjectid);
-	var width = dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR);
+	var width = (dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR)) - 2;
 
-	// graph borders
-	width -= 2;
-
-	var obj = $(domobjectid);
-	var box = new sbox(sbid, timeline, obj, width, ZBX_SBOX[sbid].height);
+	ZBX_SBOX[sbid].sbox = new sbox(sbid, timeline, domobjectid, width, ZBX_SBOX[sbid].height);
 
 	// listeners
 	addListener(window, 'resize', moveSBoxes);
-
 	if (KQ) {
 		setTimeout('ZBX_SBOX[' + sbid + '].sbox.moveSBoxByObj(' + sbid + ');', 500);
 	}
+	ZBX_SBOX[sbid].sbox.addListeners();
 
-	ZBX_SBOX[sbid].sbox = box;
-
-	return box;
+	return ZBX_SBOX[sbid].sbox;
 }
 
 var sbox = Class.create(CDebug, {
@@ -1800,26 +1764,14 @@ var sbox = Class.create(CDebug, {
 	shifts:				{},		// shifts regarding to main objet
 	px2time:			null,	// seconds in 1px
 	dynamic:			'',		// how page updates, all page/graph only update
+	is_active:			false,
 
-	initialize: function($super, sbid, timelineid, obj, width, height) {
+	initialize: function($super, sbid, timelineid, domobjectid, width, height) {
 		this.sbox_id = sbid;
 		$super('CBOX[' + sbid + ']');
 
-		// for some reason this parameter is need to be initialized due to cross object reference somewhere..
-		this.cobj = {};
-
-		// checks
-		if (is_null(obj)) {
-			throw('Failed to initialize Selection Box with given Object.');
-		}
 		if (!isset(timelineid, ZBX_TIMELINES)) {
 			throw('Failed to initialize Selection Box with given TimeLine.');
-		}
-
-		if (empty(this.dom_obj)) {
-			this.grphobj = obj;
-			this.dom_obj = create_box_on_obj(obj, height);
-			this.moveSBoxByObj();
 		}
 
 		// variable initialization
@@ -1827,21 +1779,115 @@ var sbox = Class.create(CDebug, {
 		this.cobj.width = width;
 		this.cobj.height = height;
 		this.box.width = 0;
+	},
 
-		// listeners
+	addListeners: function() {
+		var sbox = ZBX_SBOX[this.sbox_id].sbox;
+		sbox.clear_params();
+
+		if (sbox.is_active) {
+			return;
+		}
+
+		var obj = $(this.sbox_id);
+
+		if (is_null(obj)) {
+			throw('Failed to initialize Selection Box with given Object.');
+		}
+
+		sbox.grphobj = obj;
+		sbox.dom_obj = this.create_box_container(obj, this.cobj.height, this.sbox_id);
+		sbox.moveSBoxByObj();
+
+		jQuery(sbox.grphobj).off();
+		jQuery(sbox.dom_obj).off();
+
 		if (IE) {
-			addListener(obj, 'mousedown', this.mousedown.bindAsEventListener(this));
-			obj.onmousemove = this.mousemove.bindAsEventListener(this);
-			addListener(obj, 'click', this.ieMouseClick.bindAsEventListener(this));
+			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
+			sbox.grphobj.onmousemove = this.mousemove.bindAsEventListener(this);
+			jQuery(sbox.grphobj).click(jQuery.proxy(sbox.ieMouseClick, this));
+			jQuery(sbox.grphobj).mouseup(jQuery.proxy(sbox.mouseup, this));
 		}
 		else {
-			addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this), false);
-			addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this), true);
-			addListener(this.dom_obj, 'click', function(event) { cancelEvent(event); });
+			jQuery(sbox.dom_obj).mousedown(jQuery.proxy(sbox.mousedown, this));
+			jQuery(sbox.dom_obj).mousemove(jQuery.proxy(sbox.mousemove, this));
+			jQuery(sbox.dom_obj).click(function(event) { cancelEvent(event); });
+			jQuery(sbox.dom_obj).mouseup(jQuery.proxy(sbox.mouseup, this));
 		}
-		addListener(document, 'mouseup', this.mouseup.bindAsEventListener(this), true);
+	},
 
-		ZBX_SBOX[this.sbox_id].mousedown = false;
+	mousedown: function(e) {
+		e = e || window.event;
+
+		if (e.which && e.which != 1) {
+			return false;
+		}
+		else if (e.button && e.button != 1) {
+			return false;
+		}
+
+		Event.stop(e);
+
+		if (!ZBX_SBOX[this.sbox_id].sbox.is_active) {
+			this.optimizeEvent(e);
+
+			deselectAll();
+
+			if (IE) {
+				var posxy = getPosition(this.dom_obj);
+
+				if (this.mouse_event.left < posxy.left || (this.mouse_event.left > (posxy.left + this.dom_obj.offsetWidth))) {
+					return false;
+				}
+				if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
+					return true;
+				}
+			}
+
+			this.create_box();
+
+			ZBX_SBOX[this.sbox_id].sbox.is_active = true;
+		}
+	},
+
+	mousemove: function(e) {
+		e = e || window.event;
+
+		if (IE) {
+			cancelEvent(e);
+		}
+
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
+			this.optimizeEvent(e);
+			this.resizebox();
+		}
+	},
+
+	mouseup: function(e) {
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
+			this.onselect();
+			cancelEvent(e);
+			this.clear_params();
+		}
+	},
+
+	ieMouseClick: function(e) {
+		if (e.which && e.which != 1) {
+			return true;
+		}
+		else if (e.button && e.button != 1) {
+			return true;
+		}
+
+		this.optimizeEvent(e);
+		deselectAll();
+
+		var posxy = getPosition(this.dom_obj);
+		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
+			return true;
+		}
+
+		Event.stop(e);
 	},
 
 	onselect: function() {
@@ -1859,6 +1905,7 @@ var sbox = Class.create(CDebug, {
 
 		// synchronize sbox with timeline and scrollbar
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
+
 		for (var sbid in ZBX_SCROLLBARS) {
 			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
 				continue;
@@ -1868,79 +1915,31 @@ var sbox = Class.create(CDebug, {
 			ZBX_SCROLLBARS[sbid].setBarPosition();
 			ZBX_SCROLLBARS[sbid].setGhostByBar();
 			ZBX_SCROLLBARS[sbid].setTabInfo();
-			ZBX_SCROLLBARS[sbid].onBarChange();
+			ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 		}
 
-		this.onchange(this.sbox_id, this.timeline.timelineid, true);
+		this.onchange(this.sbox_id, this.timeline.timelineid);
 	},
 
-	onchange: function() {
-	},
+	create_box_container: function(obj, height) {
+		var id = jQuery(obj).attr('id') + '_box_on';
 
-	mousedown: function(e) {
-		e = e || window.event;
-		if (e.which && e.which != 1) {
-			return false;
-		}
-		else if (e.button && e.button != 1) {
-			return false;
+		if (jQuery('#' + id).length) {
+			jQuery('#' + id).remove();
 		}
 
-		Event.stop(e);
+		var div = document.createElement('div');
+		div.id = id;
+		div.className = 'box_on';
+		div.style.height = (height + 2) + 'px';
 
-		if (ZBX_SBOX[this.sbox_id].mousedown == false) {
-			this.optimizeEvent(e);
+		jQuery(obj).parent().append(div);
 
-			if (!IE) {
-				deselectAll();
-			}
-
-			if (IE) {
-				var posxy = getPosition(this.dom_obj);
-				if (this.mouse_event.left < posxy.left || (this.mouse_event.left > (posxy.left + this.dom_obj.offsetWidth))) {
-					return false;
-				}
-				if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-					return true;
-				}
-			}
-
-			this.create_box();
-
-			ZBX_SBOX[this.sbox_id].mousedown = true;
-		}
-
-		return false;
-	},
-
-	mousemove: function(e) {
-		e = e || window.event;
-
-		if (IE) {
-			cancelEvent(e);
-		}
-
-		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
-			this.optimizeEvent(e);
-			this.resizebox();
-		}
-	},
-
-	mouseup: function(e) {
-		e = e || window.event;
-
-		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
-			this.onselect();
-			cancelEvent(e);
-			this.clear_params();
-			ZBX_SBOX[this.sbox_id].mousedown = false;
-		}
-
-		return false;
+		return div;
 	},
 
 	create_box: function() {
-		if (is_null(this.dom_box)) {
+		if (!jQuery('#selection_box').length) {
 			this.dom_box = document.createElement('div');
 			this.dom_obj.appendChild(this.dom_box);
 
@@ -1954,16 +1953,15 @@ var sbox = Class.create(CDebug, {
 			this.shifts.left = dims.left;
 			this.shifts.top = dims.top;
 
-			var top = this.mouse_event.top;
+			var top = 0; // we use only x axis
 			var left = this.mouse_event.left - dims.left;
-
-			top = 0; // we use only x axis
 
 			this.dom_box.setAttribute('id', 'selection_box');
 			this.dom_box.style.top = top + 'px';
 			this.dom_box.style.left = left + 'px';
 			this.dom_box.style.height = this.cobj.height + 'px';
 			this.dom_box.style.width = '1px';
+			this.dom_box.style.zIndex = 98;
 
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;
@@ -1976,12 +1974,10 @@ var sbox = Class.create(CDebug, {
 				this.dom_box.onmousemove = this.mousemove.bindAsEventListener(this);
 			}
 		}
-
-		ZBX_SBOX[this.sbox_id].mousedown = false;
 	},
 
 	resizebox: function() {
-		if (ZBX_SBOX[this.sbox_id].mousedown == true) {
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			// fix wrong selection box
 			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
 				this.moveright(this.cobj.width - this.start_event.left - this.cobj.left);
@@ -2028,6 +2024,7 @@ var sbox = Class.create(CDebug, {
 		if (!is_null(this.dom_box)) {
 			this.dom_box.style.width = width + 'px';
 		}
+
 		this.box.width = width;
 	},
 
@@ -2103,7 +2100,11 @@ var sbox = Class.create(CDebug, {
 
 	clear_params: function() {
 		if (!is_null(this.dom_box)) {
-			this.dom_obj.removeChild(this.dom_box);
+			var id = jQuery(this.dom_box).attr('id');
+
+			if (jQuery('#' + id).length) {
+				jQuery('#' + id).remove();
+			}
 		}
 
 		this.mouse_event = {};
@@ -2112,37 +2113,9 @@ var sbox = Class.create(CDebug, {
 		this.shifts = {};
 		this.box = {};
 		this.box.width = 0;
-	},
-
-	ieMouseClick: function(e) {
-		e = e || window.event;
-		if (e.which && e.which != 1) {
-			return true;
-		}
-		else if (e.button && e.button != 1) {
-			return true;
-		}
-
-		this.optimizeEvent(e);
-		deselectAll();
-
-		var posxy = getPosition(this.dom_obj);
-		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-			return true;
-		}
-
-		Event.stop(e);
+		this.is_active = false;
 	}
 });
-
-function create_box_on_obj(obj, height) {
-	var div = document.createElement('div');
-	div.className = 'box_on';
-	div.style.height = (height + 2) + 'px';
-	obj.parentNode.appendChild(div);
-
-	return div;
-}
 
 function moveSBoxes() {
 	for (var key in ZBX_SBOX) {

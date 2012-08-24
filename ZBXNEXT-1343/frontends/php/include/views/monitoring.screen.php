@@ -35,6 +35,10 @@ if (empty($this->data['screens'])) {
 	$screenWidget->addPageHeader(_('SCREENS'), $headerForm);
 	$screenWidget->addItem(BR());
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
+
+	$screenBuilder = new CScreenBuilder();
+	$screenBuilder->insertScreenScrollJs('scrollbar');
+	$screenBuilder->insertProcessObjectsJs();
 }
 elseif (!isset($this->data['screens'][$this->data['elementIdentifier']]) && !$this->data['id_has_been_fetched_from_profile']) {
 	// if screen we are searching for does not exist and was not fetched from profile
