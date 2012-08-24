@@ -12,6 +12,9 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5465] fixed the "Filter by host group" select not being populated in the availability report page filter (Pavels)
+..F....... [ZBX-5465] corrected the labels for the host group and host filter on the "by host" availability report page (Pavels)
+..F....... [ZBX-5465] fixed wrong template being selected when returning to the "by template" availability report from a graph (Pavels)
 .......PS. [ZBX-5485] fixed resolving of {HOST.NAME} macro on proxy in item keys (Sasha)
 ...GI..PS. [ZBX-5386] fixed ODBC items to become unsupported when NULL value returned (dimir)
 ....I..P.. [ZBX-5469] enabled possibility to use more than one application in proxy web monitoring for single host (dimir)

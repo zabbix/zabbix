@@ -907,6 +907,10 @@ define('XML_TIME_DATE_FORMAT', _('H.i'));
 define('LONG_DESCRIPTION',	0);
 define('SHORT_DESCRIPTION',	1);
 
+// availability report modes
+define('AVAILABILITY_REPORT_BY_HOST', 0);
+define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
+
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
 	$_GET = zbx_stripslashes($_GET);
