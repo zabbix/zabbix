@@ -299,26 +299,6 @@ clean:
 	return res;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: evaluate_COUNT                                                   *
- *                                                                            *
- * Purpose: evaluate function 'count' for the item                            *
- *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - up to four comma-separated fields:                *
- *                            (1) number of seconds/values                    *
- *                            (2) value to compare with (optional)            *
- *                            (3) comparison operator (optional)              *
- *                            (4) time shift (optional)                       *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-
 #define OP_EQ	0
 #define OP_NE	1
 #define OP_GT	2
@@ -469,6 +449,25 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_COUNT                                                   *
+ *                                                                            *
+ * Purpose: evaluate function 'count' for the item                            *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - up to four comma-separated fields:                *
+ *                            (1) number of seconds/values                    *
+ *                            (2) value to compare with (optional)            *
+ *                            (3) comparison operator (optional)              *
+ *                            (4) time shift (optional)                       *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_COUNT";
