@@ -27,9 +27,9 @@ class CAlert extends CZBXAPI {
 	protected $tableAlias = 'a';
 
 	/**
-	 * Get Alerts data
+	 * Get Alerts data.
 	 *
-	 * @param _array $options
+	 * @param array $options
 	 * @param array $options['itemids']
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
@@ -42,6 +42,7 @@ class CAlert extends CZBXAPI {
 	 * @param array $options['pattern']
 	 * @param array $options['limit']
 	 * @param array $options['order']
+	 *
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = array()) {
