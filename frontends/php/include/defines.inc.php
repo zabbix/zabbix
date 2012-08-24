@@ -870,6 +870,11 @@ define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
 
+/**
+ * String that is used to substitude macro when it cannot be resolved.
+ */
+define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
+
 // user default theme
 define('THEME_DEFAULT', 'default');
 

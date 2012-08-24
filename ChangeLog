@@ -25,6 +25,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5437] fixed error when templated trigger description contain interface macro (Vedmak)
 ..F....... [ZBX-5411] fixed map element links sorting in element configuration form (Vedmak)
 ..F....... [ZBX-5465] fixed the "Filter by host group" select not being populated in the availability report page filter (Pavels)
 ..F....... [ZBX-5465] corrected the labels for the host group and host filter on the "by host" availability report page (Pavels)

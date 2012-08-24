@@ -986,7 +986,6 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get(array(
 		'triggerids' => $itemTriggerIds,
-		'expandDescription' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'host'),
 		'selectFunctions' => API_OUTPUT_EXTEND,
