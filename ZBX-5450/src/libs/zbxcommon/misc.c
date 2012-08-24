@@ -987,7 +987,8 @@ out:
 		comma[0] = ',';
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of ip6_in_list():%s", zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of ip6_in_list():%s",
+			zbx_result_string(ret));
 
 	return ret;
 }
@@ -1011,7 +1012,7 @@ int	ip_in_list(char *list, char *ip)
 	int	ret = FAIL;
 	char	*start = NULL, *comma = NULL, *dash = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)", list, ip);
+	zabbix_log( LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)", list, ip);
 
 	if (sscanf(ip, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
 	{
@@ -1082,7 +1083,8 @@ out:
 		comma[0] = ',';
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of ip_in_list():%s", zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of ip_in_list():%s",
+			zbx_result_string(ret));
 
 	return ret;
 }
@@ -1103,25 +1105,26 @@ out:
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
-	const char	*__function_name = "int_in_list";
-	char		*start = NULL, *end = NULL, c = '\0';
-	int		i1, i2, ret = FAIL;
+	char	*start = NULL, *end = NULL;
+	int	i1,i2;
+	int	ret = FAIL;
+	char	c = '\0';
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:%d", __function_name, list, value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:%d)", list, value);
 
-	for (start = list; '\0' != *start;)
+	for (start = list; start[0] != '\0';)
 	{
-		end = strchr(start, ',');
+		end=strchr(start, ',');
 
-		if (NULL != end)
+		if (end != NULL)
 		{
-			c = *end;
-			*end = '\0';
+			c=end[0];
+			end[0]='\0';
 		}
 
-		if (2 == sscanf(start, "%d-%d", &i1, &i2))
+		if (sscanf(start,"%d-%d",&i1,&i2) == 2)
 		{
-			if (i1 <= value && value <= i2)
+			if (value>=i1 && value<=i2)
 			{
 				ret = SUCCEED;
 				break;
@@ -1136,19 +1139,24 @@ int	int_in_list(char *list, int value)
 			}
 		}
 
-		if (NULL != end)
+		if (end != NULL)
 		{
-			*end = c;
-			start = end + 1;
+			end[0]=c;
+			start=end+1;
 		}
 		else
+		{
 			break;
+		}
 	}
 
-	if (NULL != end)
-		*end = c;
+	if (end != NULL)
+	{
+		end[0]=c;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of int_in_list():%s",
+			zbx_result_string(ret));
 
 	return ret;
 }
@@ -1661,7 +1669,8 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 		end[0]=c;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of int_in_list():%s", zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of int_in_list():%s",
+			zbx_result_string(ret));
 
 	return ret;
 }
