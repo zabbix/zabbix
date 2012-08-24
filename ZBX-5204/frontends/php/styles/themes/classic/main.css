@@ -71,28 +71,6 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 	color: #383838;
 }
 
-.ui-tabs.ui-widget-content { background: #EEEEEE; }
-.ui-tabs .ui-tabs-nav { border: 0; border-bottom: 1px solid #9F9F9F; }
-.classic .ui-tabs .ui-tabs-nav .ui-state-default,
-.classic .ui-buttonset label.ui-state-default {
-	background: #888888;
-}
-.classic .ui-tabs .ui-tabs-nav .ui-state-default a,
-.classic .ui-buttonset .ui-state-default .ui-button-text {
-	color: #FFFFFF;
-}
-.classic .ui-tabs .ui-tabs-nav .ui-state-hover,
-.classic .ui-buttonset label.ui-state-hover { background: #777; }
-.classic .ui-tabs .ui-tabs-nav .ui-tabs-selected,
-.classic .ui-buttonset label.ui-state-active {
-	background: #EEEEEE;
-}
-.classic .ui-tabs .ui-tabs-nav .ui-tabs-selected a,
-.classic .ui-buttonset .ui-state-active .ui-button-text,
-.classic .control-severity .ui-button.ui-state-hover .ui-button-text {
-	color: #383838;
-}
-
 .classic .ui-state-hover,
 .classic .ui-widget-content .ui-state-hover,
 .classic .ui-widget-header .ui-state-hover,
@@ -120,6 +98,9 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 	color: #FFF;
 	border-color: #9F9F9F;
 }
+
+.ui-tabs.ui-widget-content { background: #EEEEEE; }
+.ui-tabs .ui-tabs-nav { border: 0; border-bottom: 1px solid #9F9F9F; }
 
 table.tableinfo tr.vertical_header td { background-color: #CCC; }
 
