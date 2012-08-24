@@ -580,4 +580,7 @@ void	DBfree_history(char **value);
 int	DBtxn_status();
 int	DBtxn_ongoing();
 
+int	DBtable_exists(const char *table_name);
+int	DBfield_exists(const char *table_name, const char *field_name);
+
 #endif
