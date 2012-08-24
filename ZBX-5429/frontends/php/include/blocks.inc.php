@@ -744,9 +744,10 @@ function make_status_of_zbx() {
 }
 
 /**
- * Create and return a DIV with latest problem triggers
- * @author Aly
+ * Create and return a DIV with latest problem triggers.
+ *
  * @param array $filter
+ *
  * @return CDiv
  */
 function make_latest_issues(array $filter = array()) {

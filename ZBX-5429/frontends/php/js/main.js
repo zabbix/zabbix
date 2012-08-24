@@ -731,8 +731,6 @@ var hintBox = {
 	},
 
 	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
-		cancelEvent(e);
-
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 

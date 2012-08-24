@@ -135,8 +135,6 @@ function show_popup_menu(e, content, width) {
 
 	new popup_menu (content, pos, cursor.x, cursor.y);
 
-	jQuery('.hintbox').trigger('remove');
-
 	return false;
 }
 

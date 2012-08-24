@@ -62,7 +62,7 @@ else {
 }
 
 $help = new CHelp('web.view.php', 'right');
-$help->setHint($hintTable, '', '', true, false, true);
+$help->setHint($hintTable, '', '', true, false);
 
 // header right
 $overviewWidget->addPageHeader(_('OVERVIEW'), array(
