@@ -299,26 +299,6 @@ clean:
 	return res;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: evaluate_COUNT                                                   *
- *                                                                            *
- * Purpose: evaluate function 'count' for the item                            *
- *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - up to four comma-separated fields:                *
- *                            (1) number of seconds/values                    *
- *                            (2) value to compare with (optional)            *
- *                            (3) comparison operator (optional)              *
- *                            (4) time shift (optional)                       *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-
 #define OP_EQ	0
 #define OP_NE	1
 #define OP_GT	2
@@ -469,6 +449,25 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_COUNT                                                   *
+ *                                                                            *
+ * Purpose: evaluate function 'count' for the item                            *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - up to four comma-separated fields:                *
+ *                            (1) number of seconds/values                    *
+ *                            (2) value to compare with (optional)            *
+ *                            (3) comparison operator (optional)              *
+ *                            (4) time shift (optional)                       *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_COUNT";
@@ -554,7 +553,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		if (NULL == h_value[0])
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		else
-			zbx_snprintf(value, MAX_BUFFER_LEN, "%s", h_value[0]);
+			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
 		DBfree_history(h_value);
 	}
 	else
@@ -1975,7 +1974,7 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
 
 	if (0 > (secs = round(atof(value))))
 	{
-		offset += zbx_snprintf(value, max_len, "-");
+		offset += zbx_strlcpy(value, "-", max_len);
 		secs = -secs;
 	}
 
@@ -2021,13 +2020,13 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 
 	if (0 == floor(fabs(secs) * 1000))
 	{
-		zbx_snprintf(value, max_len, "%s", (0 == secs ? "0s" : "< 1ms"));
+		zbx_strlcpy(value, 0 == secs ? "0s" : "< 1ms", max_len);
 		goto clean;
 	}
 
 	if (0 > (secs = round(secs * 1000) / 1000))
 	{
-		offset += zbx_snprintf(value, max_len, "-");
+		offset += zbx_strlcpy(value, "-", max_len);
 		secs = -secs;
 	}
 	else
