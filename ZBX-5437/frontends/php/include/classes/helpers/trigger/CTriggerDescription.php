@@ -22,11 +22,6 @@
 class CTriggerDescription {
 
 	/**
-	 * The text to be used in item value macros for items, that don't have any data.
-	 */
-	const MACRO_ITEM_VALUE_UNKNOWN = 'UNKNOWN';
-
-	/**
 	 * Add one trigger to expand description.
 	 * Trigger array must have 'triggerid', 'description' and 'expression' fields.
 	 *
@@ -465,7 +460,7 @@ class CTriggerDescription {
 							$replace = $macroValues[$macro];
 						}
 						elseif ($this->isAllowedMacro($macro)) {
-							$replace = '*'._('UNKNOWN').'*';
+							$replace = UNRESOLVED_MACRO_STRING;
 						}
 						else {
 							$replace = false;
@@ -501,7 +496,7 @@ class CTriggerDescription {
 			$value = $item['newvalue'].' ('.$item['lastvalue'].')';
 		}
 		else {
-			$value = formatItemValue($item, self::MACRO_ITEM_VALUE_UNKNOWN);
+			$value = formatItemValue($item, UNRESOLVED_MACRO_STRING);
 		}
 
 		return $value;
@@ -523,6 +518,13 @@ class CTriggerDescription {
 		return $this->resolveItemLastvalueMacro($item);
 	}
 
+	/**
+	 * Check if the string is a macro supported in trigger description.
+	 *
+	 * @param string $macro
+	 *
+	 * @return bool
+	 */
 	protected  function isAllowedMacro($macro) {
 		return preg_match('/{HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|ITEM\.LASTVALUE|ITEM\.VALUE[1-9]?}/', $macro);
 	}

@@ -523,8 +523,8 @@ function resolveItemKeyMacros(array $item) {
 		// if item without interface or template item, resolve interface related macros to *UNKNOWN*
 		if (!$interface) {
 			$interface = array(
-				'ip' => _('*UNKNOWN*'),
-				'dns' => _('*UNKNOWN*'),
+				'ip' => UNRESOLVED_MACRO_STRING,
+				'dns' => UNRESOLVED_MACRO_STRING,
 				'useip' => false,
 			);
 		}
