@@ -1,6 +1,7 @@
 Changes for 2.0.3rc1
 
 New features:
+........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
 A.F....... [ZBX-1357] added American English translation; thanks to Zabbix translators (Richlv)
 A......... [ZBX-2060] implemented the "expandExpression" parameter for the trigger.get and triggerprototype.get methods (Pavels)
 A.F....... [ZBXNEXT-1253] implemented the flicked-free screens (Eduard)
@@ -962,6 +963,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
 A......... [ZBX-5395] fixed {ITEM.LASTVALUE1} and {ITEM.VALUE1} expanding in the trigger.get method (Pavels)
 
 Changes for 1.8.15
