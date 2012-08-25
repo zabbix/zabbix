@@ -381,7 +381,7 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 		if (2 == sscanf(s, "%d/%29[^;]s", &flex_delay, flex_period))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", flex_delay, flex_period);
-			
+
 			if (flex_delay < current_delay && SUCCEED == check_time_period(flex_period, now))
 				current_delay = flex_delay;
 		}
@@ -391,7 +391,7 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 		if (NULL == delim)
 			break;
 	}
-	
+
 	if (SEC_PER_YEAR == current_delay)
 		return delay;
 
@@ -442,7 +442,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			flag = (6 == sscanf(s, "%d/%d,%d:%d-%d:%d", &delay, &d1, &h1, &m1, &h2, &m2));
 			d2 = d1;
 		}
-		
+
 		if (0 != flag)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
@@ -1404,36 +1404,41 @@ int	is_int_prefix(const char *c)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint64                                                        *
+ * Function: is_uint64_n                                                      *
  *                                                                            *
  * Purpose: check if the string is 64bit unsigned integer                     *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str   - [IN] string to check                                   *
+ *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
+ *             value - [OUT] a pointer to converted value (optional)          *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - the string is not number or overflow                 *
+ *                FAIL - the string is not a number or overflow               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	is_uint64(const char *str, zbx_uint64_t *value)
+int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 {
-	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
-	register zbx_uint64_t	value_uint64 = 0, c;
+	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	zbx_uint64_t		value_uint64 = 0, c;
 
-	while ('\0' != *str)
+	if ('\0' == *str || 0 == n)
+		return FAIL;
+
+	while ('\0' != *str && 0 < n--)
 	{
-		if (*str >= '0' && *str <= '9')
-		{
-			c = (zbx_uint64_t)(unsigned char)(*str - '0');
-			if ((max_uint64 - c) / 10 >= value_uint64)
-				value_uint64 = value_uint64 * 10 + c;
-			else
-				return FAIL;	/* overflow */
-			str++;
-		}
-		else
+		if (0 == isdigit(*str))
 			return FAIL;	/* not a digit */
+
+		c = (zbx_uint64_t)(unsigned char)(*str - '0');
+
+		if ((max_uint64 - c) / 10 < value_uint64)
+			return FAIL;	/* overflow */
+
+		value_uint64 = value_uint64 * 10 + c;
+
+		str++;
 	}
 
 	if (NULL != value)
@@ -1850,45 +1855,53 @@ int	str2uint(const char *str)
  * Comments: the function automatically processes suffixes 'K','M','G','T'    *
  *                                                                            *
  ******************************************************************************/
-int	str2uint64(char *str, zbx_uint64_t *value)
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
 {
 	size_t		sz;
+	const char	*p;
 	int		ret;
 	zbx_uint64_t	factor = 1;
-	char		c = '\0';
 
-	sz = strlen(str) - 1;
+	sz = strlen(str);
+	p = str + sz - 1;
 
-	if (str[sz] == 'K')
+	if (NULL != strchr(suffixes, *p))
 	{
-		c = str[sz];
-		factor = 1024;
-	}
-	else if (str[sz] == 'M')
-	{
-		c = str[sz];
-		factor = 1024 * 1024;
-	}
-	else if (str[sz] == 'G')
-	{
-		c = str[sz];
-		factor = 1024 * 1024 * 1024;
-	}
-	else if (str[sz] == 'T')
-	{
-		c = str[sz];
-		factor = 1024 * 1024 * 1024;
-		factor *= 1024;
+		switch (*p)
+		{
+			case 'K':
+				factor = ZBX_KIBIBYTE;
+				break;
+			case 'M':
+				factor = ZBX_MEBIBYTE;
+				break;
+			case 'G':
+				factor = ZBX_GIBIBYTE;
+				break;
+			case 'T':
+				factor = ZBX_TEBIBYTE;
+				break;
+			case 's':
+				factor = 1;
+				break;
+			case 'm':
+				factor = SEC_PER_MIN;
+				break;
+			case 'h':
+				factor = SEC_PER_HOUR;
+				break;
+			case 'd':
+				factor = SEC_PER_DAY;
+				break;
+			case 'w':
+				factor = SEC_PER_WEEK;
+				break;
+		}
+		sz--;
 	}
 
-	if ('\0' != c)
-		str[sz] = '\0';
-
-	if (SUCCEED == (ret = is_uint64(str, value)))
+	if (SUCCEED == (ret = is_uint64_n(str, sz, value)))
 		*value *= factor;
-
-	if ('\0' != c)
-		str[sz] = c;
 
 	return ret;
 }
@@ -1916,15 +1929,33 @@ double	str2double(const char *str)
 
 	switch (str[sz])
 	{
-		case 'K': factor = 1024;			break;
-		case 'M': factor = 1024*1024;			break;
-		case 'G': factor = 1024*1024*1024;		break;
-		case 'T': factor = 1024*1024*1024*(double)1024;	break;
-		case 's': factor = 1;				break;
-		case 'm': factor = SEC_PER_MIN;			break;
-		case 'h': factor = SEC_PER_HOUR;		break;
-		case 'd': factor = SEC_PER_DAY;			break;
-		case 'w': factor = SEC_PER_WEEK;		break;
+		case 'K':
+			factor = ZBX_KIBIBYTE;
+			break;
+		case 'M':
+			factor = ZBX_MEBIBYTE;
+			break;
+		case 'G':
+			factor = ZBX_GIBIBYTE;
+			break;
+		case 'T':
+			factor = ZBX_TEBIBYTE;
+			break;
+		case 's':
+			factor = 1;
+			break;
+		case 'm':
+			factor = SEC_PER_MIN;
+			break;
+		case 'h':
+			factor = SEC_PER_HOUR;
+			break;
+		case 'd':
+			factor = SEC_PER_DAY;
+			break;
+		case 'w':
+			factor = SEC_PER_WEEK;
+			break;
 	}
 
 	return atof(str) * factor;

@@ -146,6 +146,7 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
 
+#define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
 /* item types */
@@ -715,7 +716,8 @@ int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-int	is_uint64(const char *str, zbx_uint64_t *value);
+#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
+int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
@@ -770,6 +772,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
 #define ZBX_GIBIBYTE		1073741824
+#define ZBX_TEBIBYTE		__UINT64_C(1099511627776)
 
 #define SEC_PER_MIN		60
 #define SEC_PER_HOUR		3600
@@ -905,7 +908,7 @@ void	zbx_replace_invalid_utf8(char *text);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);
-int	str2uint64(char *str, zbx_uint64_t *value);
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)
