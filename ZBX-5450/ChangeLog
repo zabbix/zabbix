@@ -1,6 +1,7 @@
 Changes for 1.8.16rc1
 
 ........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
+A......... [ZBX-5395] fixed {ITEM.LASTVALUE1} and {ITEM.VALUE1} expanding in the trigger.get method (Pavels)
 
 Changes for 1.8.15
 
