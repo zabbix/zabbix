@@ -1101,7 +1101,7 @@ function updateTriggerValueToUnknownByHostId($hostids) {
  *
  * @param int|array $triggerids triggers to whom add unknown type event
  *
- * @return array
+ * @return array returns created event ids
  */
 function addUnknownEvent($triggerids) {
 	zbx_value2array($triggerids);
@@ -1123,16 +1123,16 @@ function addUnknownEvent($triggerids) {
 			'acknowledged' => 0
 		);
 
-		// does trigger exist in DB
+		// check if trigger exist in DB
 		if (isset($triggers[$event['objectid']])) {
 			if ($event['value'] != $triggers[$event['objectid']]['value']) {
 				$eventid = get_dbid('events', 'eventid');
 
-				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
+				$sql = 'INSERT INTO events2 (eventid,source,object,objectid,clock,value,acknowledged) '.
 						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
 									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
 				if (!DBexecute($sql)) {
-					error(_('Wrong fields for unknown event.'));
+					throw new Exception();
 				}
 
 				$eventids[$eventid] = $eventid;
