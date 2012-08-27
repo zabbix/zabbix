@@ -17,7 +17,7 @@ New features:
 ........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
 A.F....... [ZBX-1357] added American English translation; thanks to Zabbix translators (Richlv)
 A......... [ZBX-2060] implemented the "expandExpression" parameter for the trigger.get and triggerprototype.get methods (Pavels)
-A.F....... [ZBXNEXT-1253] implemented the flicked-free screens (Eduard)
+A.F....... [ZBXNEXT-1253] implemented flicker-free screens (Eduard)
 ........S. [ZBX-5318] added remote commands in expanded {ESC.HISTORY} macro (Sasha)
 A.F....... [ZBX-1357] added Chinese (Taiwan) translation; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-1357] updated Chinese (China), Brazilian Portuguese, German, Japanese, Latvian, Spanish and Russian translations; thanks to Zabbix translators (Richlv)
