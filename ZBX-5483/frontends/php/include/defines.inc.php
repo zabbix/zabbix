@@ -870,6 +870,11 @@ define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
 
+/**
+ * String that is used to substitude macro when it cannot be resolved.
+ */
+define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
+
 // user default theme
 define('THEME_DEFAULT', 'default');
 
@@ -906,6 +911,10 @@ define('XML_TIME_DATE_FORMAT', _('H.i'));
 // actions
 define('LONG_DESCRIPTION',	0);
 define('SHORT_DESCRIPTION',	1);
+
+// availability report modes
+define('AVAILABILITY_REPORT_BY_HOST', 0);
+define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

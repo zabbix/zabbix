@@ -42,11 +42,11 @@ function empty(obj) {
 }
 
 function is_null(obj) {
-	return obj == null;
+	return (obj == null);
 }
 
 function is_number(obj) {
-	return (isNaN(obj)) ? false : (typeof(obj) === 'number');
+	return isNaN(obj) ? false : (typeof(obj) === 'number');
 }
 
 function is_object(obj, instance) {
@@ -56,10 +56,11 @@ function is_object(obj, instance) {
 		}
 	}
 	else {
-		if(typeof(obj) === 'object') {
+		if (typeof(obj) === 'object') {
 			return true;
 		}
 	}
+
 	return false;
 }
 

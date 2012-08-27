@@ -361,7 +361,7 @@ static void	process_updated_records(int nodeid, char *data)
 							}
 						}
 
-						zbx_free(value_esc)
+						zbx_free(value_esc);
 				}
 			}
 
