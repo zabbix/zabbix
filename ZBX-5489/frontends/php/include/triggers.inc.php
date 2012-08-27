@@ -1107,28 +1107,23 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 function addUnknownEvent($triggerids) {
 	zbx_value2array($triggerids);
 
-	$now = time();
-	$events = array();
-	foreach ($triggerids as $triggerid) {
-		$events[] = array(
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'objectid' => $triggerid,
-			'clock' => $now,
-			'value' => TRIGGER_VALUE_UNKNOWN,
-			'acknowledged' => 0
-		);
-	}
-
-	$eventids = array();
-
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $triggerids,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));
 
-	foreach ($events as $event) {
+	$eventids = array();
+	foreach ($triggerids as $triggerid) {
+		$event = array(
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'objectid' => $triggerid,
+			'clock' => time(),
+			'value' => TRIGGER_VALUE_UNKNOWN,
+			'acknowledged' => 0
+		);
+
 		if (isset($triggers[$event['objectid']])) {
 			$trigger = $triggers[$event['objectid']];
 
