@@ -2240,11 +2240,7 @@ int	DBtable_exists(const char *table_name)
 	DB_RESULT	result;
 	int		ret;
 
-#if defined(HAVE_MYSQL)
-	table_name_esc = DBdyn_escape_like_pattern(table_name);
-#else
 	table_name_esc = DBdyn_escape_string(table_name);
-#endif
 
 #if defined(HAVE_IBM_DB2)
 	/* publib.boulder.ibm.com/infocenter/db2luw/v9r7/topic/com.ibm.db2.luw.admin.cmd.doc/doc/r0001967.html */
@@ -2327,9 +2323,10 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	DBfree_result(result);
 #elif defined(HAVE_MYSQL)
-	field_name_esc = DBdyn_escape_like_pattern(field_name);
+	field_name_esc = DBdyn_escape_string(field_name);
 
-	result = DBselect("show columns from %s like '%s'", table_name, field_name_esc);
+	result = DBselect("show columns from %s like '%s'",
+			table_name, field_name_esc, ZBX_SQL_LIKE_ESCAPE_CHAR);
 
 	zbx_free(field_name_esc);
 
@@ -2337,7 +2334,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	DBfree_result(result);
 #elif defined(HAVE_ORACLE)
-	table_name_esc = DBdyn_escape_like_pattern(table_name);
+	table_name_esc = DBdyn_escape_string(table_name);
 	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect(
