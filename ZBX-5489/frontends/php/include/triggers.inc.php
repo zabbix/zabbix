@@ -1097,10 +1097,9 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 }
 
 /**
- * Create unknown event.
+ * Create unknown type event for given triggers.
  *
- * @param int|array $triggerids
- * @param mixed $value
+ * @param int|array $triggerids triggers to whom add unknown type event
  *
  * @return array
  */
@@ -1109,7 +1108,7 @@ function addUnknownEvent($triggerids) {
 
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $triggerids,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('value'),
 		'preservekeys' => true
 	));
 
@@ -1124,10 +1123,9 @@ function addUnknownEvent($triggerids) {
 			'acknowledged' => 0
 		);
 
+		// does trigger exist in DB
 		if (isset($triggers[$event['objectid']])) {
-			$trigger = $triggers[$event['objectid']];
-
-			if ($event['value'] != $trigger['value'] || ($event['value'] == TRIGGER_VALUE_TRUE && $trigger['type'] == TRIGGER_MULT_EVENT_ENABLED)) {
+			if ($event['value'] != $triggers[$event['objectid']]['value']) {
 				$eventid = get_dbid('events', 'eventid');
 
 				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
