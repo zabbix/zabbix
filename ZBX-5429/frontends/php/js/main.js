@@ -821,7 +821,7 @@ var hintBox = {
 		target.hintBoxItem.css({
 			top: top + 'px',
 			left: left + 'px',
-			zIndex: 999
+			zIndex: 100
 		});
 	},
 

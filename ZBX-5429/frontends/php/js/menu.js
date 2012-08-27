@@ -187,7 +187,8 @@ function popup_menu(a_items, a_tpl, x, y) {
 		width: 170,
 		height: 24,
 		hide_delay: 200,
-		expd_delay: 200
+		expd_delay: 200,
+		"z-index": 900
 	};
 
 	// default css
