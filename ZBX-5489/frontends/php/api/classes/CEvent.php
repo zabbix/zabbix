@@ -577,4 +577,40 @@ class CEvent extends CZBXAPI {
 
 		return $result;
 	}
+
+	public function acknowledge($data) {
+		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
+		$eventids = zbx_toHash($eventids);
+
+		$allowedEvents = $this->get(array(
+			'eventids' => $eventids,
+			'output' => API_OUTPUT_REFER,
+			'preservekeys' => true
+		));
+		foreach ($eventids as $eventid) {
+			if (!isset($allowedEvents[$eventid])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		$sql = 'UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids);
+		if (!DBexecute($sql)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
+
+		$time = time();
+		$dataInsert = array();
+		foreach ($eventids as $eventid) {
+			$dataInsert[] = array(
+				'userid' => self::$userData['userid'],
+				'eventid' => $eventid,
+				'clock' => $time,
+				'message'=> $data['message']
+			);
+		}
+
+		DB::insert('acknowledges', $dataInsert);
+
+		return array('eventids' => array_values($eventids));
+	}
 }
