@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/defines.inc.php';
 require_once dirname(__FILE__).'/items.inc.php';
 
@@ -91,6 +91,7 @@ function activate_httptest($httptestid) {
 	}
 
 	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids));
+
 	return $result;
 }
 
@@ -114,6 +115,7 @@ function disable_httptest($httptestid) {
 	}
 
 	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids));
+
 	return $result;
 }
 
@@ -130,6 +132,7 @@ function delete_history_by_httptestid($httptestid) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -143,6 +146,7 @@ function get_httpstep_by_no($httptestid, $no) {
 
 function get_httptests_by_hostid($hostids) {
 	zbx_value2array($hostids);
+
 	return DBselect(
 		'SELECT DISTINCT ht.*'.
 			' FROM httptest ht,applications ap'.
@@ -150,4 +154,18 @@ function get_httptests_by_hostid($hostids) {
 				' AND '.DBcondition('ap.hostid', $hostids)
 	);
 }
-?>
+
+function validateHttpDuplicateSteps($steps) {
+	$isDuplicateStepFound = false;
+
+	foreach ($steps as $index1 => $step1) {
+		foreach ($steps as $index2 => $step2) {
+			if (strcmp($step1['name'], $step2['name']) == 0 && $index1 != $index2) {
+				error(_s('Step with name "%s" already exists.', $step2['name']));
+				$isDuplicateStepFound = true;
+			}
+		}
+	}
+
+	return !$isDuplicateStepFound;
+}

@@ -344,6 +344,9 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	}
 
 	if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
+		// remove duplicate messages
+		$ZBX_MESSAGES = zbx_toHash($ZBX_MESSAGES, 'message');
+
 		if ($page['type'] == PAGE_TYPE_IMAGE) {
 			$msg_font = 2;
 			foreach ($ZBX_MESSAGES as $msg) {
