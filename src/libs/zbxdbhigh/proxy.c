@@ -1594,6 +1594,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
+		total_num++;
+
 		av = &values[value_num];
 
 		memset(av, 0, sizeof(AGENT_VALUE));
@@ -1660,7 +1662,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			process_mass_data(sock, proxy_hostid, values, value_num, &processed);
 
 			clean_agent_values(values, value_num);
-			total_num += value_num;
 			value_num = 0;
 		}
 	}
@@ -1671,7 +1672,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		process_mass_data(sock, proxy_hostid, values, value_num, &processed);
 
 	clean_agent_values(values, value_num);
-	total_num += value_num;
 
 	if (NULL != info)
 	{
