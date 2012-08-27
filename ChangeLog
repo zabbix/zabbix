@@ -26,6 +26,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5429] fixed hintbox displaying when menu is shown (Eduard)
 ..F....... [ZBX-5444] fixed maintenance hint not accessible if user has no permissions (Toms)
 ..F....... [ZBX-5444] added functionality to hints, and now all newlines are converted to <br> tag (Toms)
 ..F....... [ZBX-5444] fixed host in maintenance not highlighted by adding icon to hosts in maintenance (Toms)
