@@ -1263,7 +1263,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
  * @see get_triggers_overview()
  *
  * @param array $triggerHosts	an array with the data about the trigger for each host
- * @param string $hostName	the name of the cells corresponding host
+ * @param string $hostName		the name of the cells corresponding host
  * @param string $screenId
  *
  * @return CCol
@@ -1398,7 +1398,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table);
+			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
 		unset($img, $dep_table, $dependency);
@@ -1418,7 +1418,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table);
+			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
 		unset($img, $dep_table, $dependency);
@@ -1435,11 +1435,12 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	}
 
 	if (isset($tr_ov_menu)) {
-		$tr_ov_menu  = new CPUMenu($tr_ov_menu, 170);
+		$tr_ov_menu = new CPUMenu($tr_ov_menu, 170);
 		$tableColumn->onClick($tr_ov_menu->getOnActionJS());
-		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: \'1px dotted #0C0CF0\', padding: \'0px 2px\'})');
-		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: \'\', padding: \'1px 3px\'})');
+		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: "1px dotted #0C0CF0", padding: "0 2px"})');
+		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: "", padding: "1px 3px"})');
 	}
+
 	return $tableColumn;
 }
 
@@ -1485,8 +1486,8 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
 			$ret['unknown_time'] = 0;
-			$ret['true'] = TRIGGER_VALUE_TRUE == $start_value ? 100 : 0;
-			$ret['false'] = TRIGGER_VALUE_FALSE == $start_value ? 100 : 0;
+			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
+			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
 			$ret['unknown'] = (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 			return $ret;
 		}
@@ -1579,6 +1580,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$ret['false'] = (100 * $false_time) / $total_time;
 		$ret['unknown'] = (100 * $unknown_time) / $total_time;
 	}
+
 	return $ret;
 }
 
