@@ -1063,9 +1063,9 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	return $expr;
 }
 
-function updateTriggerValueToUnknownByHostId($hostIds) {
-	zbx_value2array($hostIds);
-	$triggerIds = array();
+function updateTriggerValueToUnknownByHostId($hostids) {
+	zbx_value2array($hostids);
+	$triggerids = array();
 
 	$result = DBselect(
 		'SELECT DISTINCT t.triggerid'.
@@ -1073,37 +1073,38 @@ function updateTriggerValueToUnknownByHostId($hostIds) {
 		' WHERE h.hostid=i.hostid'.
 			' AND i.itemid=f.itemid'.
 			' AND f.triggerid=t.triggerid'.
-			' AND '.DBcondition('h.hostid', $hostIds).
+			' AND '.DBcondition('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
 	);
 	while ($row = DBfetch($result)) {
-		$triggerIds[] = $row['triggerid'];
+		$triggerids[] = $row['triggerid'];
 	}
 
-	if (!empty($triggerIds)) {
+	if (!empty($triggerids)) {
 		DB::update('triggers', array(
 			'values' => array(
 				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
 				'error' => _s('Host status became "%s"', _('Not monitored'))
 			),
-			'where' => array('triggerid' => $triggerIds)
+			'where' => array('triggerid' => $triggerids)
 		));
-		addEvent($triggerIds, TRIGGER_VALUE_UNKNOWN);
+
+		addUnknownEvent($triggerids);
 	}
 
 	return true;
 }
 
 /**
- * Create event.
+ * Create unknown event.
  *
- * @param string $triggerids
+ * @param int|array $triggerids
  * @param mixed $value
  *
  * @return array
  */
-function addEvent($triggerids, $value) {
+function addUnknownEvent($triggerids) {
 	zbx_value2array($triggerids);
 
 	$now = time();
@@ -1114,7 +1115,7 @@ function addEvent($triggerids, $value) {
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectid' => $triggerid,
 			'clock' => $now,
-			'value' => $value,
+			'value' => TRIGGER_VALUE_UNKNOWN,
 			'acknowledged' => 0
 		);
 	}
@@ -1122,45 +1123,28 @@ function addEvent($triggerids, $value) {
 	$eventids = array();
 
 	$triggers = API::Trigger()->get(array(
-		'triggerids' => zbx_objectValues($events, 'objectid'),
+		'triggerids' => $triggerids,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));
 
-	foreach ($events as $num => $event) {
-		if ($event['object'] != EVENT_OBJECT_TRIGGER) {
-			continue;
-		}
-
+	foreach ($events as $event) {
 		if (isset($triggers[$event['objectid']])) {
 			$trigger = $triggers[$event['objectid']];
 
 			if ($event['value'] != $trigger['value'] || ($event['value'] == TRIGGER_VALUE_TRUE && $trigger['type'] == TRIGGER_MULT_EVENT_ENABLED)) {
-				continue;
+				$eventid = get_dbid('events', 'eventid');
+
+				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
+						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
+									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
+				if (!DBexecute($sql)) {
+					error(_('Wrong fields for unknown event.'));
+				}
+
+				$eventids[$eventid] = $eventid;
 			}
 		}
-
-		unset($events[$num]);
-	}
-
-	foreach ($events as $event) {
-		$eventDbFields = array(
-			'source'		=> null,
-			'object'		=> null,
-			'objectid'		=> null,
-			'clock'			=> time(),
-			'value'			=> 0,
-			'acknowledged'	=> 0
-		);
-
-		$eventid = get_dbid('events', 'eventid');
-		$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
-				'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
-		if (!DBexecute($sql)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
-
-		$eventids[$eventid] = $eventid;
 	}
 
 	return $eventids;
@@ -1171,7 +1155,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 
 	$hosts = API::Host()->get(array(
 		'filter' => array('host' => $expr->data['hosts']),
-		'editable' => $permission == PERM_READ_WRITE ? 1 : null,
+		'editable' => ($permission == PERM_READ_WRITE) ? 1 : null,
 		'output' => array('hostid', 'host'),
 		'templated_hosts' => true,
 		'preservekeys' => true
