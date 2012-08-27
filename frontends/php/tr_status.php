@@ -554,6 +554,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		foreach($trigger['hosts'] as $trigger_host){
 			$host = $hosts[$trigger_host['hostid']];
 
+			$hosts_span = new CDiv(null, 'floatleft');
+
 			// fetch scripts for the host JS menu
 			$menuScripts = array();
 			if (isset($scripts_by_hosts[$trigger_host['hostid']])) {
@@ -566,38 +568,51 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 				}
 			}
 
-			$maint_span = null;
-			if($trigger_host['maintenance_status']){
-				$text = $trigger_host['maintenance_type'] ? _('Maintenance without data collection') : _('Maintenance with data collection');
-				$text = ' ['.$text.']';
-				$maint_span = new CSpan($text, 'orange pointer');
-
-				$maintenanceOptions = array(
-					'maintenanceids' => $trigger_host['maintenanceid'],
-					'output' => API_OUTPUT_EXTEND
-				);
-				$maintenances = API::Maintenance()->get($maintenanceOptions);
-				$maintenance = reset($maintenances);
-
-				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
-
-				$maint_span->setHint($maint_hint);
-			}
-
-			$hosts_span = new CSpan($trigger_host['name'], 'link_menu menu-host');
-			$hosts_span->setAttribute('data-menu', array(
+			$hosts_name = new CSpan($trigger_host['name'], 'link_menu menu-host');
+			$hosts_name->setAttribute('data-menu', array(
 				'scripts' => $menuScripts,
 				'hostid' => $trigger_host['hostid'],
 				'hasScreens' => (bool) $host['screens'],
 				'hasInventory' => (bool) $host['inventory']
 			));
 
+			$hosts_span->addItem($hosts_name);
+
+			// add maintenance icon with hint if host is in maintenance
+			if($trigger_host['maintenance_status']){
+				$mntIco = new CDiv(null, 'icon-maintenance-inline');
+
+				$maintenances = API::Maintenance()->get(array(
+					'maintenanceids' => $trigger_host['maintenanceid'],
+					'output' => API_OUTPUT_EXTEND,
+					'limit'	=> 1
+				));
+
+				if ($maintenance = reset($maintenances)) {
+					$hint = $maintenance['name'].' ['.($trigger_host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
+
+					if (isset($maintenance['description'])) {
+						// double quotes mandatory
+						$hint .= "\n".$maintenance['description'];
+					}
+
+					$mntIco->setHint($hint);
+					$mntIco->addClass('pointer');
+				}
+
+				$hosts_span ->addItem($mntIco);
+			}
+
+			// add comma after hosts, except last
+			if (next($trigger['hosts'])) {
+				$hosts_span->addItem(','.SPACE);
+			}
+
 			$hosts_list[] = $hosts_span;
-			$hosts_list[] = $maint_span;
-			$hosts_list[] = ', ';
 		}
 
-		array_pop($hosts_list);
 		$host = new CCol($hosts_list);
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
