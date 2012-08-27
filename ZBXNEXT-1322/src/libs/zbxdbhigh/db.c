@@ -2236,14 +2236,14 @@ int	DBtxn_ongoing()
 
 int	DBtable_exists(const char *table_name)
 {
-	char		*table_name_dyn;
+	char		*table_name_esc;
 	DB_RESULT	result;
 	int		ret;
 
 #if defined(HAVE_MYSQL)
-	table_name_dyn = DBdyn_escape_like_pattern(table_name);
+	table_name_esc = DBdyn_escape_like_pattern(table_name);
 #else
-	table_name_dyn = DBdyn_escape_string(table_name);
+	table_name_esc = DBdyn_escape_string(table_name);
 #endif
 
 #if defined(HAVE_IBM_DB2)
@@ -2253,33 +2253,33 @@ int	DBtable_exists(const char *table_name)
 			" from syscat.tables"
 			" where tabschema=user"
 				" and lower(tabname)='%s'",
-			table_name_dyn);
+			table_name_esc);
 #elif defined(HAVE_MYSQL)
-	result = DBselect("show tables like '%s'", table_name_dyn);
+	result = DBselect("show tables like '%s'", table_name_esc);
 #elif defined(HAVE_ORACLE)
 	result = DBselect(
 			"select 1"
 			" from tab"
 			" where tabtype='TABLE'"
 				" and lower(tname)='%s'",
-			table_name_dyn);
+			table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
 	result = DBselect(
 			"select 1"
 			" from information_schema.tables"
 			" where table_name='%s'"
 				" and table_schema='public'",
-			table_name_dyn);
+			table_name_esc);
 #elif defined(HAVE_SQLITE3)
 	result = DBselect(
 			"select 1"
 			" from sqlite_master"
 			" where tbl_name='%s'"
 				" and type='table'",
-			table_name_dyn);
+			table_name_esc);
 #endif
 
-	zbx_free(table_name_dyn);
+	zbx_free(table_name_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
@@ -2292,90 +2292,90 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 {
 	DB_RESULT	result;
 #if defined(HAVE_IBM_DB2)
-	char		*table_name_dyn, *field_name_dyn;
+	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_MYSQL)
-	char		*field_name_dyn;
+	char		*field_name_esc;
 	int		ret;
 #elif defined(HAVE_ORACLE)
-	char		*table_name_dyn, *field_name_dyn;
+	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_POSTGRESQL)
-	char		*table_name_dyn, *field_name_dyn;
+	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_SQLITE3)
-	char		*table_name_dyn;
+	char		*table_name_esc;
 	DB_ROW		row;
 	int		ret = FAIL;
 #endif
 
 #if defined(HAVE_IBM_DB2)
-	table_name_dyn = DBdyn_escape_string(table_name);
-	field_name_dyn = DBdyn_escape_string(field_name);
+	table_name_esc = DBdyn_escape_string(table_name);
+	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect(
 			"select 1"
 			" from syscat.columns"
 			" where lower(tabname)='%s'"
 				" and lower(colname)='%s'",
-			table_name_dyn, field_name_dyn);
+			table_name_esc, field_name_esc);
 
-	zbx_free(field_name_dyn);
-	zbx_free(table_name_dyn);
+	zbx_free(field_name_esc);
+	zbx_free(table_name_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
 	DBfree_result(result);
 #elif defined(HAVE_MYSQL)
-	field_name_dyn = DBdyn_escape_like_pattern(field_name);
+	field_name_esc = DBdyn_escape_like_pattern(field_name);
 
-	result = DBselect("show columns from %s like '%s'", table_name, field_name_dyn);
+	result = DBselect("show columns from %s like '%s'", table_name, field_name_esc);
 
-	zbx_free(field_name_dyn);
+	zbx_free(field_name_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
 	DBfree_result(result);
 #elif defined(HAVE_ORACLE)
-	table_name_dyn = DBdyn_escape_like_pattern(table_name);
-	field_name_dyn = DBdyn_escape_string(field_name);
+	table_name_esc = DBdyn_escape_like_pattern(table_name);
+	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect(
 			"select 1"
 			" from col"
 			" where lower(tname)='%s'"
 				" and lower(cname)='%s'",
-			table_name_dyn, field_name_dyn);
+			table_name_esc, field_name_esc);
 
-	zbx_free(field_name_dyn);
-	zbx_free(table_name_dyn);
+	zbx_free(field_name_esc);
+	zbx_free(table_name_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
 	DBfree_result(result);
 #elif defined(HAVE_POSTGRESQL)
-	table_name_dyn = DBdyn_escape_string(table_name);
-	field_name_dyn = DBdyn_escape_string(field_name);
+	table_name_esc = DBdyn_escape_string(table_name);
+	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect(
 			"select 1"
 			" from information_schema.columns"
 			" where table_name='%s'"
 				" and column_name='%s'",
-			table_name_dyn, field_name_dyn);
+			table_name_esc, field_name_esc);
 
-	zbx_free(field_name_dyn);
-	zbx_free(table_name_dyn);
+	zbx_free(field_name_esc);
+	zbx_free(table_name_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
 	DBfree_result(result);
 #elif defined(HAVE_SQLITE3)
-	table_name_dyn = DBdyn_escape_string(table_name);
+	table_name_esc = DBdyn_escape_string(table_name);
 
-	result = DBselect("PRAGMA table_info('%s')", table_name_dyn);
+	result = DBselect("PRAGMA table_info('%s')", table_name_esc);
 
-	zbx_free(table_name_dyn);
+	zbx_free(table_name_esc);
 
 	while (NULL != (row = DBfetch(result)))
 	{
