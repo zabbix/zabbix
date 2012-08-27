@@ -188,6 +188,7 @@ frontends/php/include/views/monitoring.charts.php -text
 frontends/php/include/views/monitoring.history.php -text
 frontends/php/include/views/monitoring.hostscreen.php -text
 frontends/php/include/views/monitoring.maps.php -text
+frontends/php/include/views/monitoring.overview.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text

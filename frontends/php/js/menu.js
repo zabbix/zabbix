@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,40 +9,40 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-// Title: tigra menu
-// Description: See the demo at url
-// URL: http://www.softcomplex.com/products/tigra_menu/
-// Version: 2.0 (commented source)
-// Date: 04-05-2003 (mm-dd-yyyy)
-// Tech. Support: http://www.softcomplex.com/forum/forumdisplay.php?fid=40
-// Notes: This script is free. Visit official site for further details.
-//        This script adapted by Eugene Grigorjev for using as popup menu
-//        of Zabbix software. See http://www.zabbix.com.
-//debugger;
-
-// Getting CSS style property
+/**
+ * Title: tigra menu
+ *
+ * Description: See the demo at url
+ * URL: http://www.softcomplex.com/products/tigra_menu/
+ * Version: 2.0 (commented source)
+ * Date: 04-05-2003 (mm-dd-yyyy)
+ * Tech. Support: http://www.softcomplex.com/forum/forumdisplay.php?fid=40
+ * Notes: This script is free. Visit official site for further details.
+ */
 function get_style(el, styleProp) {
+	var y = null;
+
 	if (el.currentStyle) {
-		var y = el.currentStyle[styleProp];
+		y = el.currentStyle[styleProp];
 	}
 	else if (window.getComputedStyle) {
-		var y = document.defaultView.getComputedStyle(el,null).getPropertyValue(styleProp);
+		y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
 	}
+
 	return y;
 }
 
-// Getting text width in user's browser
 function get_real_text_width(text, id) {
 	var item_type = 'pum_o_submenu';
-	if (id==0) {
+	if (id == 0) {
 		item_type = 'pum_iheader';
 	}
 
@@ -70,12 +70,12 @@ function get_real_text_width(text, id) {
 
 	test_element = document.createElement('a');
 	test_element.setAttribute('class', item_type);
-	test_element.setAttribute('style', 'font-size: '+font_size+'px; visibility: hidden');
+	test_element.setAttribute('style', 'font-size: ' + font_size + 'px; visibility: hidden');
 	test_element.innerHTML = text;
 
 	document.body.appendChild(test_element);
 
-	var tmp_len = test_element.offsetWidth+margin_left+5;
+	var tmp_len = test_element.offsetWidth + margin_left + 5;
 
 	document.body.removeChild(test_element);
 	test_element = null;
@@ -124,12 +124,13 @@ function show_popup_menu(e, content, width) {
 		width = max_width;
 	}
 
-	if (width == 0)
+	if (width == 0) {
 		width = 220;
+	}
 
 	var pos = [
-		{'block_top': -12, 'block_left': -5, 'width': width},
-		{'block_top': 5, 'block_left': width-5, 'width': width}
+		{block_top: -12, block_left: -5, width: width},
+		{block_top: 5, block_left: width - 5, width: width}
 	];
 
 	new popup_menu (content, pos, cursor.x, cursor.y);
@@ -140,20 +141,16 @@ function show_popup_menu(e, content, width) {
 // global collection containing all menus on current page
 var A_MENUS = [];
 
-// menu class
-function popup_menu (a_items, a_tpl, x, y) {
+function popup_menu(a_items, a_tpl, x, y) {
 	// browser check
 	if (!document.body || !document.body.style) {
 		return null;
 	}
-	this.n_scroll_left = get_scroll_pos()[0];
 
-	if (document.body.clientWidth) {
-		this.n_scr_width = document.body.clientWidth;
-	}
-	else {
-		this.n_scr_width = document.width;
-	}
+	this.n_scroll_left = get_scroll_pos()[0];
+	this.n_scr_width = (document.body.clientWidth)
+		? document.body.clientWidth
+		: document.width;
 
 	// store items structure
 	this.a_config = a_items;
@@ -183,24 +180,25 @@ function popup_menu (a_items, a_tpl, x, y) {
 
 	// default level scope description structure
 	this.a_tpl_def = {
-		'block_top' : 0,
-		'block_left' : 0,
-		'top' : 23,
-		'left' : 0,
-		'width' : 170,
-		'height' : 24,
-		'hide_delay' : 200,
-		'expd_delay' : 200
+		block_top: 0,
+		block_left: 0,
+		top: 23,
+		left: 0,
+		width: 170,
+		height: 24,
+		hide_delay: 200,
+		expd_delay: 200,
+		"z-index": 900
 	};
 
 	// default css
 	this.a_css_def = {
-		'outer' : ['pum_o_item'],
-		'inner' : ['pum_i_item']
+		outer: ['pum_o_item'],
+		inner: ['pum_i_item']
 	};
 
 	// assign methods and properties required to emulate parent item
-	this.getprop = function (s_key) {
+	this.getprop = function(s_key) {
 		return this.a_tpl_def[s_key];
 	};
 
@@ -239,7 +237,7 @@ function mitem_get_y_direction() {
 	return this.n_y_direction ? this.n_y_direction : null;
 }
 
-function menu_collapse (n_id) {
+function menu_collapse(n_id) {
 	// cancel item open delay
 	clearTimeout(this.o_showtimer);
 
@@ -274,7 +272,7 @@ function menu_collapse (n_id) {
 	}
 }
 
-function menu_expand (n_id) {
+function menu_expand(n_id) {
 	// expand only when mouse is over some menu item
 	if (this.o_hidetimer) {
 		return null;
@@ -302,7 +300,7 @@ function menu_expand (n_id) {
 	}
 }
 
-function menu_onclick (n_id) {
+function menu_onclick(n_id) {
 	// don't go anywhere if item has no link defined
 	// lookup new item's object
 	if (Boolean(this.a_index[n_id].a_config[1])) {
@@ -313,13 +311,13 @@ function menu_onclick (n_id) {
 		o_item.e_oelement.className = o_item.getstyle(0, 0);
 		o_item.e_ielement.className = o_item.getstyle(1, 0);
 
-		this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS['+ this.n_id +'].collapse(); }', 100);
+		this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS[' + this.n_id + '].collapse(); }', 100);
 		return true;
 	}
 	return false;
 }
 
-function menu_onmouseout (n_id) {
+function menu_onmouseout(n_id) {
 	// lookup new item's object
 	var o_item = this.a_index[n_id];
 
@@ -328,10 +326,10 @@ function menu_onmouseout (n_id) {
 	o_item.e_ielement.className = o_item.getstyle(1, 0);
 
 	// run mouseover timer
-	this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS['+ this.n_id +'].collapse(); }', o_item.getprop('hide_delay'));
+	this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS[' + this.n_id + '].collapse(); }', o_item.getprop('hide_delay'));
 }
 
-function menu_onmouseover (n_id) {
+function menu_onmouseover(n_id) {
 	// cancel mouseoute menu close and item open delay
 	clearTimeout(this.o_hidetimer);
 	this.o_hidetimer = null;
@@ -355,7 +353,7 @@ function menu_onmouseover (n_id) {
 }
 
 // called when mouse button is pressed on menu item
-function menu_onmousedown (n_id) {
+function menu_onmousedown(n_id) {
 	// lookup new item's object
 	var o_item = this.a_index[n_id];
 
@@ -367,7 +365,7 @@ function menu_onmousedown (n_id) {
 }
 
 // menu item Class
-function menu_item (o_parent, n_order) {
+function menu_item(o_parent, n_order) {
 	// store parameters passed to the constructor
 	this.n_depth  = o_parent.n_depth + 1;
 
@@ -500,7 +498,7 @@ function menu_item (o_parent, n_order) {
 		while (x) {
 			newResult = this.e_ielement.scrollWidth - this.getprop('width');
 			nText = jQuery.unescapeHtml(this.e_ielement.innerHTML);
-			this.e_ielement.innerHTML = jQuery.escapeHtml(nText.substring(0, nText.length-10));
+			this.e_ielement.innerHTML = jQuery.escapeHtml(nText.substring(0, nText.length - 10));
 			x--;
 			if (newResult < 1) {
 				this.e_ielement.innerHTML += '...';
@@ -543,7 +541,7 @@ function A_MENUS_onmousedown() {
 }
 
 // reads property from template file, inherits from parent level if not found
-function mitem_getprop (s_key) {
+function mitem_getprop(s_key) {
 	// check if value is defined for current level
 	var s_value = null,
 		a_level = this.o_root.a_tpl[this.n_depth];
@@ -558,7 +556,7 @@ function mitem_getprop (s_key) {
 }
 
 // reads property from template file, inherits from parent level if not found
-function mitem_getstyle (n_pos, n_state) {
+function mitem_getstyle(n_pos, n_state) {
 	var a_css = this.a_css;
 
 	// request recursively from parent levels if not defined
@@ -589,7 +587,7 @@ function mitem_getstyle (n_pos, n_state) {
  * @return {Array}
  */
 function createMenuHeader(label) {
-	return [label, null, null, { outer: 'pum_oheader', inner: 'pum_iheader' }];
+	return [label, null, null, {outer: 'pum_oheader', inner: 'pum_iheader'}];
 }
 
 /**
@@ -605,5 +603,5 @@ function createMenuHeader(label) {
  * @return {Array}
  */
 function createMenuItem(label, action, config) {
-	return [label, action, config, { outer: 'pum_o_item', inner: 'pum_i_item' }];
+	return [label, action, config, {outer: 'pum_o_item', inner: 'pum_i_item'}];
 }
