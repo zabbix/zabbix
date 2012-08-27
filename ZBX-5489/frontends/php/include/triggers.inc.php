@@ -1128,7 +1128,7 @@ function addUnknownEvent($triggerids) {
 			if ($event['value'] != $triggers[$event['objectid']]['value']) {
 				$eventid = get_dbid('events', 'eventid');
 
-				$sql = 'INSERT INTO events2 (eventid,source,object,objectid,clock,value,acknowledged) '.
+				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
 						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
 									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
 				if (!DBexecute($sql)) {
