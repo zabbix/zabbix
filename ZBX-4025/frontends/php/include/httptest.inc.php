@@ -155,19 +155,22 @@ function get_httptests_by_hostid($hostids) {
 	);
 }
 
+/**
+ * cheks for duplicates in HTTP steps
+ *
+ * @param type $steps
+ * @return boolean return true if duplicate found
+ */
 function validateHttpDuplicateSteps($steps) {
-	$isDuplicateStepFound = false;
 
-	$names = array();
+	$set = array();
 	foreach ($steps as $step) {
-		if (in_array($step['name'], $names)) {
+		if (isset($set[$step['name']])) {
 			error(_s('Step with name "%s" already exists.', $step['name']));
-			$isDuplicateStepFound = true;
+			return true;
 		}
-		else {
-			array_push($names, $step['name']);
-		}
+		$set[$step['name']] = 1;
 	}
 
-	return $isDuplicateStepFound;
+	return false;
 }
