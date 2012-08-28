@@ -167,5 +167,5 @@ function validateHttpDuplicateSteps($steps) {
 		}
 	}
 
-	return !$isDuplicateStepFound;
+	return $isDuplicateStepFound;
 }

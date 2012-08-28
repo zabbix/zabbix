@@ -126,16 +126,16 @@ elseif (isset($_REQUEST['close'])) {
 	}
 }
 
+// limit opened application count
 if (count($_REQUEST['applications']) > 25) {
 	$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 }
-
-// limit opened application count
 rm4favorites('web.httpconf.applications');
 foreach ($_REQUEST['applications'] as $application) {
 	add2favorites('web.httpconf.applications', $application);
 }
 
+// add new steps
 if (isset($_REQUEST['new_httpstep'])) {
 	$_REQUEST['steps'] = get_request('steps', array());
 	$_REQUEST['new_httpstep']['no'] = count($_REQUEST['steps']) + 1;
@@ -145,9 +145,7 @@ if (isset($_REQUEST['new_httpstep'])) {
 }
 
 // check for duplicate step names
-if (!empty($_REQUEST['steps'])) {
-	validateHttpDuplicateSteps($_REQUEST['steps']);
-}
+$isDuplicateStepsFound = !empty($_REQUEST['steps']) ? validateHttpDuplicateSteps($_REQUEST['steps']) : false;
 
 if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	$result = false;
@@ -184,7 +182,7 @@ elseif (isset($_REQUEST['save'])) {
 
 		$steps = get_request('steps', array());
 		if (!empty($steps)) {
-			if (!validateHttpDuplicateSteps($steps)) {
+			if ($isDuplicateStepsFound) {
 				throw new Exception();
 			}
 
