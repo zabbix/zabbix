@@ -17,35 +17,43 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/configuration.httpconf.popup.js.php');
 
 $httpPopupWidget = new CWidget();
 
+if (isset($_REQUEST['save']) && isset($_REQUEST['status_codes'])) {
+	$statusCodeValidator = new CStatusCodeValidator();
+	if (!$statusCodeValidator->validate($_REQUEST['status_codes'])) {
+		show_error_message($statusCodeValidator->getError());
+		unset($_REQUEST['save']);
+	}
+}
+
 if (isset($_REQUEST['save'])) {
 	if (!isset($_REQUEST['stepid'])) {
 		insert_js('add_httpstep('.
-			zbx_jsvalue($_REQUEST['dstfrm']).','.
-			zbx_jsvalue($_REQUEST['name']).','.
-			zbx_jsvalue($_REQUEST['timeout']).','.
-			zbx_jsvalue($_REQUEST['url']).','.
-			zbx_jsvalue($_REQUEST['posts']).','.
-			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+					zbx_jsvalue($_REQUEST['dstfrm']).','.
+					zbx_jsvalue($_REQUEST['name']).','.
+					zbx_jsvalue($_REQUEST['timeout']).','.
+					zbx_jsvalue($_REQUEST['url']).','.
+					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['required']).','.
+					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
 	}
 	else {
 		insert_js('update_httpstep('.
-			zbx_jsvalue($_REQUEST['dstfrm']).','.
-			zbx_jsvalue($_REQUEST['list_name']).','.
-			zbx_jsvalue($_REQUEST['stepid']).','.
-			zbx_jsvalue($_REQUEST['name']).','.
-			zbx_jsvalue($_REQUEST['timeout']).','.
-			zbx_jsvalue($_REQUEST['url']).','.
-			zbx_jsvalue($_REQUEST['posts']).','.
-			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+					zbx_jsvalue($_REQUEST['dstfrm']).','.
+					zbx_jsvalue($_REQUEST['list_name']).','.
+					zbx_jsvalue($_REQUEST['stepid']).','.
+					zbx_jsvalue($_REQUEST['name']).','.
+					zbx_jsvalue($_REQUEST['timeout']).','.
+					zbx_jsvalue($_REQUEST['url']).','.
+					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['required']).','.
+					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
 	}
 }
@@ -77,5 +85,5 @@ else {
 
 	$httpPopupWidget->addItem($httpPopupForm);
 }
+
 return $httpPopupWidget;
-?>

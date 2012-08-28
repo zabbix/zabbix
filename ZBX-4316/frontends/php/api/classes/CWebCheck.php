@@ -17,11 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
+
 class CWebCheck extends CZBXAPI {
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
@@ -297,40 +294,27 @@ class CWebCheck extends CZBXAPI {
 
 	public function create($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-		$httpTestsNames = zbx_objectValues($httpTests, 'name');
 
-		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
-		}
-
-		$dbHttpTests = $this->get(array(
-			'filter' => array('name' => $httpTestsNames),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true,
-			'preservekeys' => true
-		));
-		foreach ($dbHttpTests as $httpTest) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $httpTest['name']));
-		}
+		$this->validateCreate($httpTests);
 
 		$httpTestIds = DB::insert('httptest', $httpTests);
 
 		foreach ($httpTests as $wnum => $httpTest) {
-			if (empty($httpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
-			}
 			$httpTest['httptestid'] = $httpTestIds[$wnum];
 
 			$this->createCheckItems($httpTest);
 			$this->createStepsReal($httpTest, $httpTest['steps']);
 		}
+
 		return array('httptestids' => $httpTestIds);
 	}
 
 	public function update($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
+		$this->validateUpdate($httpTests);
+
+		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 		$dbHttpTest = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'httptestids' => $httpTestIds,
@@ -340,32 +324,6 @@ class CWebCheck extends CZBXAPI {
 		));
 
 		foreach ($httpTests as $httpTest) {
-			if (!isset($dbHttpTest[$httpTest['httptestid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
-			}
-
-			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			if (isset($httpTest['name'])) {
-				if (!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTest['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
-				}
-
-				$httpTestExist = $this->get(array(
-					'filter' => array('name' => $httpTest['name']),
-					'preservekeys' => true,
-					'nopermissions' => true,
-					'output' => API_OUTPUT_SHORTEN
-				));
-				$httpTestExist = reset($httpTestExist);
-
-				if ($httpTestExist && (bccomp($httpTestExist['httptestid'], $httpTestExist['httptestid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $httpTest['name']));
-				}
-			}
-
 			DB::update('httptest', array(
 				'values' => $httpTest,
 				'where' => array('httptestid' => $httpTest['httptestid'])
@@ -443,6 +401,7 @@ class CWebCheck extends CZBXAPI {
 				$this->deleteStepsReal($stepidsDelete);
 			}
 		}
+
 		return array('httptestids' => $httpTestIds);
 	}
 
@@ -504,6 +463,68 @@ class CWebCheck extends CZBXAPI {
 		}
 
 		return array('httptestids' => $httpTestIds);
+	}
+
+	protected function validateCreate(array $httpTests) {
+		$httpTestsNames = $this->checkNames($httpTests);
+
+		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.DBcondition('ht.name', $httpTestsNames), 1))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $name['name']));
+		}
+
+		foreach ($httpTests as $httpTest) {
+			if (empty($httpTest['steps'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
+			}
+			$this->checkSteps($httpTest['steps']);
+		}
+	}
+
+	protected function validateUpdate(array $httpTests) {
+		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
+
+		if (!$this->isWritable($httpTestIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
+		}
+
+		$httpTestsNames = $this->checkNames($httpTests);
+
+		$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.
+				DBcondition('ht.name', $httpTestsNames).
+				' AND '.DBcondition('ht.httptestid', $httpTestIds, true), 1));
+		if ($nameExists) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $nameExists['name']));
+		}
+
+		foreach ($httpTests as $httpTest) {
+			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+			if (isset($httpTest['steps'])) {
+				$this->checkSteps($httpTest['steps']);
+			}
+		}
+	}
+
+	protected function checkSteps(array $steps) {
+		$statusCodeValidator = new CStatusCodeValidator();
+
+		foreach ($steps as $step) {
+			if (isset($step['status_codes'])) {
+				if (!$statusCodeValidator->validate($step['status_codes'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $statusCodeValidator->getError());
+				}
+			}
+		}
+	}
+
+	protected function checkNames(array $httpTests) {
+		$httpTestsNames = zbx_objectValues($httpTests, 'name');
+		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+		}
+
+		return $httpTestsNames;
 	}
 
 	protected function createCheckItems($httpTest) {
@@ -766,5 +787,53 @@ class CWebCheck extends CZBXAPI {
 			API::Item()->delete($itemids, true);
 		}
 	}
+
+	/**
+	 * Check if user has read permissions on http test with given ids.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'httptestids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	/**
+	 * Check if user has write permissions on http test with given ids.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'httptestids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
 }
-?>
