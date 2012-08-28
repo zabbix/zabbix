@@ -523,8 +523,8 @@ function resolveItemKeyMacros(array $item) {
 		// if item without interface or template item, resolve interface related macros to *UNKNOWN*
 		if (!$interface) {
 			$interface = array(
-				'ip' => _('*UNKNOWN*'),
-				'dns' => _('*UNKNOWN*'),
+				'ip' => UNRESOLVED_MACRO_STRING,
+				'dns' => UNRESOLVED_MACRO_STRING,
 				'useip' => false,
 			);
 		}
@@ -642,8 +642,10 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 
 /**
  * Retrieve overview table object for items.
+ *
  * @param $hostids
  * @param null $view_style
+ *
  * @return CTableInfo
  */
 function get_items_data_overview($hostids, $view_style) {
@@ -683,7 +685,7 @@ function get_items_data_overview($hostids, $view_style) {
 	while ($row = DBfetch($db_items)) {
 		$descr = itemName($row);
 		$row['hostname'] = $row['hostname'];
-		$hostNames[$row['hostid']] = $row['hostname'];
+		$hostnames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
@@ -706,16 +708,16 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 	}
 
-	if (!isset($hostNames)) {
+	if (!isset($hostnames)) {
 		return $table;
 	}
 
-	order_result($hostNames);
+	order_result($hostnames);
 
 	$css = getUserTheme($USER_DETAILS);
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
-		foreach ($hostNames as $hostname) {
+		foreach ($hostnames as $hostname) {
 			$img = new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css);
 			$img->setAttribute('id', uniqid('do_'));
 			$header = array_merge($header, array($img));
@@ -724,7 +726,7 @@ function get_items_data_overview($hostids, $view_style) {
 
 		foreach ($items as $descr => $ithosts) {
 			$table_row = array(nbsp($descr));
-			foreach ($hostNames as $hostname) {
+			foreach ($hostnames as $hostname) {
 				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
 			}
 			$table->addRow($table_row);
@@ -739,7 +741,7 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($hostNames as $hostid => $hostname) {
+		foreach ($hostnames as $hostid => $hostname) {
 			$host = $hosts[$hostid];
 
 			// host JS menu link
@@ -768,12 +770,9 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 		if ($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE) {
 			$css_class = getSeverityStyle($ithosts[$hostname]['severity']);
 			$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
-			if ($ack['acknowledged'] == 1) {
-				$ack = array(SPACE, new CImg('images/general/tick.png', 'ack'));
-			}
-			else {
-				$ack = null;
-			}
+			$ack = ($ack['acknowledged'] == 1)
+				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
+				: null;
 		}
 		$value = formatItemValue($ithosts[$hostname]);
 
@@ -824,10 +823,10 @@ function get_same_applications_for_host($applications, $hostid) {
 	$child_applications = array();
 	$db_apps = DBselect(
 		'SELECT a1.applicationid'.
-				' FROM applications a1,applications a2'.
-				' WHERE a1.name=a2.name'.
-				' AND a1.hostid='.$hostid.
-				' AND '.DBcondition('a2.applicationid', $applications)
+		' FROM applications a1,applications a2'.
+		' WHERE a1.name=a2.name'.
+			' AND a1.hostid='.$hostid.
+			' AND '.DBcondition('a2.applicationid', $applications)
 	);
 	while ($app = DBfetch($db_apps)) {
 		$child_applications[] = $app['applicationid'];
@@ -853,6 +852,7 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 	while ($db_application = DBfetch($db_applications)) {
 		array_push($result, $db_application['result']);
 	}
+
 	return $result;
 }
 
@@ -869,6 +869,7 @@ function delete_history_by_itemid($itemIds) {
 	if (!$result) {
 		return $result;
 	}
+
 	DBexecute('DELETE FROM history_text WHERE '.DBcondition('itemid', $itemIds));
 	DBexecute('DELETE FROM history_log WHERE '.DBcondition('itemid', $itemIds));
 	DBexecute('DELETE FROM history_uint WHERE '.DBcondition('itemid', $itemIds));
@@ -1034,6 +1035,7 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 			}
 		}
 	}
+
 	return $value;
 }
 

@@ -745,6 +745,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
 #define ZBX_GIBIBYTE		1073741824
+#define ZBX_TEBIBYTE		__UINT64_C(1099511627776)
 
 #define SEC_PER_MIN		60
 #define SEC_PER_HOUR		3600
@@ -882,7 +883,7 @@ char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
 void	dos2unix(char *str);
-int	str2uint64(char *str, zbx_uint64_t *value);
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)

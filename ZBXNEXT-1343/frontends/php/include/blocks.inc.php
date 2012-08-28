@@ -714,9 +714,10 @@ function make_status_of_zbx() {
 }
 
 /**
- * Create and return a DIV with latest problem triggers
- * @author Aly
+ * Create and return a DIV with latest problem triggers.
+ *
  * @param array $filter
+ *
  * @return CDiv
  */
 function make_latest_issues(array $filter = array()) {
@@ -808,24 +809,42 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
-		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+		$hostSpan =  new CDiv(null, 'maintenance-abs-cont');
 
-		// maintenance hint
+		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
+		$hostName = new CSpan($host['name'], 'link_menu menu-host');
+		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+		// add maintenance icon with hint if host is in maintenance
 		if ($host['maintenance_status']) {
+
+			$mntIco = new CDiv(null, 'icon-maintenance-abs');
+
 			// get maintenance
 			$maintenances = API::Maintenance()->get(array(
 				'maintenanceids' => $host['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND
+				'output' => API_OUTPUT_EXTEND,
+				'limit' => 1
 			));
-			$maintenance = reset($maintenances);
+			if ($maintenance = reset($maintenances)) {
+				$hint = $maintenance['name'].' ['.($host['maintenance_type']
+					? _('Maintenance without data collection')
+					: _('Maintenance with data collection')).']';
 
-			$hint = $maintenance['name'].' ['.($host['maintenance_type']
-				? _('Maintenance without data collection')
-				: _('Maintenance with data collection')).']';
-			$hostSpan->setHint($hint, '', '', false);
+				if (isset($maintenance['description'])) {
+					// double quotes mandatory
+					$hint .= "\n".$maintenance['description'];
+				}
+
+				$mntIco->setHint($hint);
+				$mntIco->addClass('pointer');
+			}
+
+			$hostName->addClass('left-to-icon-maintenance-abs');
+			$hostSpan->addItem($mntIco);
 		}
+
+		$hostSpan ->addItem($hostName);
 
 		// unknown triggers
 		$unknown = SPACE;

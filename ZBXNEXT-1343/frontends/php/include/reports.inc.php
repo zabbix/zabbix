@@ -66,10 +66,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 			'monitored_hosts' => true
 		));
 		foreach ($hostGroups as $hostGroup) {
-			$cmbHGrps->addItem(
-				$hostGroup['groupid'],
-				$hostGroup['name']
-			);
+			$cmbHGrps->addItem($hostGroup['groupid'], $hostGroup['name']);
 		}
 
 		if ($PAGE_HOSTS['selected']) {
@@ -85,16 +82,14 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.triggerid=f.triggerid '.
 				' AND h.status='.HOST_STATUS_TEMPLATE.
+				' AND '.DBin_node('t.triggerid').
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
 			' ORDER BY t.description';
 		$result=DBselect($sql);
 
 		while ($row = DBfetch($result)) {
-			$cmbTrigs->addItem(
-				$row['triggerid'],
-				CTriggerHelper::expandDescriptionById($row['triggerid'])
-			);
+			$cmbTrigs->addItem($row['triggerid'], $row['description']);
 		}
 
 		$filterForm->addRow(_('Template trigger'),$cmbTrigs);

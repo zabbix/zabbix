@@ -908,7 +908,7 @@ function get_event_actions_status($eventid) {
 }
 
 function get_event_actions_stat_hints($eventid) {
-	$actionTable = new CTable(' - ');
+	$actionCont = new CDiv(null, 'event-action-cont');
 
 	$alerts = DBfetch(DBselect(
 		'SELECT COUNT(a.alertid) AS cnt'.
@@ -930,8 +930,7 @@ function get_event_actions_stat_hints($eventid) {
 		if ($alerts['sent']) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_SENT));
 		}
-		$columnLeft = new CCol($alerts['sent'] ? $alert_cnt : SPACE);
-		$columnLeft->setAttribute('width', '10');
+		$left = new CDiv($alerts['sent'] ? $alert_cnt : SPACE);
 
 		// center
 		$alerts = DBfetch(DBselect(
@@ -945,8 +944,7 @@ function get_event_actions_stat_hints($eventid) {
 		if ($alerts['inprogress']) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_NOT_SENT));
 		}
-		$columnCenter = new CCol($alerts['inprogress'] ? $alert_cnt : SPACE);
-		$columnCenter->setAttribute('width', '10');
+		$center = new CDiv($alerts['inprogress'] ? $alert_cnt : SPACE);
 
 		// right
 		$alerts = DBfetch(DBselect(
@@ -960,10 +958,12 @@ function get_event_actions_stat_hints($eventid) {
 		if ($alerts['failed']) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_FAILED));
 		}
-		$columnRight = new CCol($alerts['failed'] ? $alert_cnt : SPACE);
-		$columnRight->setAttribute('width', '10');
+		$right = new CDiv($alerts['failed'] ? $alert_cnt : SPACE);
 
-		$actionTable->addRow(array($columnLeft, $columnCenter, $columnRight));
+		$actionCont->addItem(array($left, $center, $right));
 	}
-	return $actionTable;
+	else {
+		$actionCont->addItem('-');
+	}
+	return $actionCont;
 }
