@@ -27,6 +27,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-4482] fixed guest user theme not applied (Toms)
 ..F....... [ZBX-5441] fixed audit logging when adding IT service causing notice message and wrong audit log (Toms)
 ..F....... [ZBX-5204] changed the color of inactive tabs to blue in the classic theme (Pavels)
 ..F....... [ZBX-5393] fixed translation escaping in HTML areas causing some languages to display incorrect text (Toms)
