@@ -13,6 +13,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A.F....... [ZBX-5489] removed API methods CAlert->create(), CAlert->delete(), CEvent->create(), CEvent->delete(), CEvent->deleteByTriggerIDs() (Eduard)
 .......PS. [ZBX-5483] fixed response to requests of the sender with missing fields (Sasha)
 ..F....... [ZBX-5429] fixed hintbox displaying when menu is shown (Eduard)
 ..F....... [ZBX-5444] fixed maintenance hint not accessible if user has no permissions (Toms)
