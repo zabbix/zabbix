@@ -147,18 +147,18 @@ if (isset($_REQUEST['form'])) {
 
 			show_messages($result, _('Service updated'), _('Cannot update service'));
 			$serviceid = $service['serviceid'];
-			$audit_acrion = AUDIT_ACTION_UPDATE;
+			$audit_action = AUDIT_ACTION_UPDATE;
 		}
 		else {
 			$result = API::Service()->create($serviceRequest);
 
 			show_messages($result, _('Service updated'), _('Cannot add service'));
-			$serviceid = $result;
-			$audit_acrion = AUDIT_ACTION_ADD;
+			$serviceid = reset($result['serviceids']);
+			$audit_action = AUDIT_ACTION_ADD;
 		}
 
 		if ($result) {
-			add_audit($audit_acrion, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
+			add_audit($audit_action, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 			unset($_REQUEST['form']);
 		}
 
