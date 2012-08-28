@@ -149,21 +149,23 @@ function get_httptests_by_hostid($hostids) {
 
 	return DBselect(
 		'SELECT DISTINCT ht.*'.
-			' FROM httptest ht,applications ap'.
-			' WHERE ht.applicationid=ap.applicationid'.
-				' AND '.DBcondition('ap.hostid', $hostids)
+		' FROM httptest ht,applications ap'.
+		' WHERE ht.applicationid=ap.applicationid'.
+			' AND '.DBcondition('ap.hostid', $hostids)
 	);
 }
 
 function validateHttpDuplicateSteps($steps) {
 	$isDuplicateStepFound = false;
 
-	foreach ($steps as $index1 => $step1) {
-		foreach ($steps as $index2 => $step2) {
-			if (strcmp($step1['name'], $step2['name']) == 0 && $index1 != $index2) {
-				error(_s('Step with name "%s" already exists.', $step2['name']));
-				$isDuplicateStepFound = true;
-			}
+	$names = array();
+	foreach ($steps as $step) {
+		if (in_array($step['name'], $names)) {
+			error(_s('Step with name "%s" already exists.', $step['name']));
+			$isDuplicateStepFound = true;
+		}
+		else {
+			array_push($names, $step['name']);
 		}
 	}
 
