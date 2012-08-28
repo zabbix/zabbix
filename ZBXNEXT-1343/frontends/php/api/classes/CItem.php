@@ -1318,23 +1318,4 @@ class CItem extends CItemGeneral {
 
 		return $result;
 	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['groupids'] === null &&
-			$options['templateids'] === null &&
-			$options['hostids'] === null &&
-			$options['proxyids'] === null &&
-			$options['itemids'] === null &&
-			$options['interfaceids'] === null &&
-			$options['graphids'] === null &&
-			$options['triggerids'] === null &&
-			$options['applicationids'] === null &&
-			$options['discoveryids'] === null) {
-
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
-	}
 }

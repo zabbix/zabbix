@@ -82,7 +82,6 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.triggerid=f.triggerid '.
 				' AND h.status='.HOST_STATUS_TEMPLATE.
-				' AND '.DBin_node('t.triggerid').
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
 			' ORDER BY t.description';
