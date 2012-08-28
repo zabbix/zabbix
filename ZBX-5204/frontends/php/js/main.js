@@ -682,6 +682,8 @@ var hintBox = {
 	createBox: function(e, target, hintText, width, className, isStatic) {
 		var box = jQuery('<div></div>').addClass('hintbox');
 
+		hintText = hintText.replace(/\n/g, '<br />');
+
 		if (!empty(className)) {
 			box.append(jQuery('<span></span>').addClass(className).html(hintText));
 		}
@@ -797,7 +799,7 @@ var hintBox = {
 
 		// fallback if doesnt't fit verticaly but could fit if aligned to right or left
 		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
-			&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
+				&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
 
 			// align to left if fit
 			if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
@@ -819,9 +821,9 @@ var hintBox = {
 		}
 
 		target.hintBoxItem.css({
-			'top': top + 'px',
-			'left': left + 'px',
-			'zIndex': '999'
+			top: top + 'px',
+			left: left + 'px',
+			zIndex: 100
 		});
 	},
 

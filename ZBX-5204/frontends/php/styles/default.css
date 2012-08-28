@@ -836,3 +836,42 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
+
+/* maintenance icon */
+.icon-maintenance-inline, .icon-maintenance-abs {
+	background-image: url("../images/general/wrench12transp.png");
+	background-repeat: no-repeat;
+	width: 12px;
+}
+
+.icon-maintenance-inline {
+	height: 14px;
+	vertical-align: middle;
+	display: inline-block;
+	margin-left: 5px;
+}
+
+.icon-maintenance-abs {
+	height: 12px;
+	position: absolute;
+	right: 0px;
+	top: 4px;
+}
+
+.maintenance-abs-cont {
+	position: relative;
+}
+
+.left-to-icon-maintenance-abs {
+	margin-right: 17px;
+}
+
+/* event action container */
+.event-action-cont {
+	text-align: center;
+}
+.event-action-cont div{
+	padding: 0 2px 0 2px;
+	display: table-cell;
+	width: 10px;
+}

@@ -100,7 +100,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 		$result = DBend();
 
 		show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
-		add_audit_if($result, AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$slideshow['name'].'" ');
+		if ($result) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$slideshow['name'].'" ');
+		}
 	}
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 }

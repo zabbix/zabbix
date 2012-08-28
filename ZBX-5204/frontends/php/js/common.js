@@ -42,11 +42,11 @@ function empty(obj) {
 }
 
 function is_null(obj) {
-	return obj == null;
+	return (obj == null);
 }
 
 function is_number(obj) {
-	return (isNaN(obj)) ? false : (typeof(obj) === 'number');
+	return isNaN(obj) ? false : (typeof(obj) === 'number');
 }
 
 function is_object(obj, instance) {
@@ -56,10 +56,11 @@ function is_object(obj, instance) {
 		}
 	}
 	else {
-		if(typeof(obj) === 'object') {
+		if (typeof(obj) === 'object') {
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -123,11 +124,10 @@ function SDJ(obj, name) {
 	SDI(debug);
 }
 
-// functions below should be sorted alphabetically
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
-
 	element = $(element);
+
 	if (element.addEventListener) {
 		element.addEventListener(eventname, expression, bubbling);
 		return true;
@@ -139,6 +139,46 @@ function addListener(element, eventname, expression, bubbling) {
 	else {
 		return false;
 	}
+}
+
+function removeListener(element, eventname, expression, bubbling) {
+	bubbling = bubbling || false;
+	element = $(element);
+
+	if (element.removeEventListener) {
+		element.removeEventListener(eventname, expression, bubbling);
+		return true;
+	}
+	else if (element.detachEvent) {
+		element.detachEvent('on' + eventname, expression);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+function cancelEvent(e) {
+	if (!e) {
+		e = window.event;
+	}
+
+	if (e) {
+		if (IE) {
+			e.cancelBubble = true;
+			e.returnValue = false;
+
+			if (IE9) {
+				e.preventDefault();
+			}
+		}
+		else {
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	}
+
+	return false;
 }
 
 function add_variable(o_el, s_name, x_value, s_formname, o_document) {
@@ -175,28 +215,6 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document) {
 	form.appendChild(o_variable);
 
 	return true;
-}
-
-function cancelEvent(e) {
-	if (!e) {
-		e = window.event;
-	}
-
-	if (e) {
-		if (IE) {
-			e.cancelBubble = true;
-			e.returnValue = false;
-			if (IE9) {
-				e.preventDefault();
-			}
-		}
-		else {
-			e.stopPropagation();
-			e.preventDefault();
-		}
-	}
-
-	return false;
 }
 
 function checkAll(form_name, chkMain, shkName) {
@@ -314,22 +332,22 @@ function getDimensions(obj, trueSide) {
 	}
 
 	var dim = {
-		'left':		0,
-		'top':		0,
-		'right':	0,
-		'bottom':	0,
-		'width':	0,
-		'height':	0
+		left:	0,
+		top:	0,
+		right:	0,
+		bottom:	0,
+		width:	0,
+		height:	0
 	};
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
 		var dim = {
-			'left':		parseInt(obj.style.left, 10),
-			'top':		parseInt(obj.style.top, 10),
-			'right':	parseInt(obj.style.right, 10),
-			'bottom':	parseInt(obj.style.bottom, 10),
-			'width':	parseInt(obj.style.width, 10),
-			'height':	parseInt(obj.style.height, 10)
+			left:	parseInt(obj.style.left, 10),
+			top:	parseInt(obj.style.top, 10),
+			right:	parseInt(obj.style.right, 10),
+			bottom:	parseInt(obj.style.bottom, 10),
+			width:	parseInt(obj.style.width, 10),
+			height:	parseInt(obj.style.height, 10)
 		};
 
 		if (!is_number(dim.top)) {
@@ -543,23 +561,6 @@ function redirect(uri, method, needle) {
 	}
 
 	return false;
-}
-
-function removeListener(element, eventname, expression, bubbling) {
-	bubbling = bubbling || false;
-	element = $(element);
-
-	if (element.removeEventListener) {
-		element.removeEventListener(eventname, expression, bubbling);
-		return true;
-	}
-	else if (element.detachEvent) {
-		element.detachEvent('on' + eventname, expression);
-		return true;
-	}
-	else {
-		return false;
-	}
 }
 
 function showHide(obj, style) {

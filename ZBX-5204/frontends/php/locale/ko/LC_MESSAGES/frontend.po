@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-13 21:47+0300\n"
+"POT-Creation-Date: 2012-08-23 12:25+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr ""
 
-#: include/func.inc.php:418
+#: include/func.inc.php:433
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
@@ -437,7 +437,7 @@ msgstr ""
 msgid "Added"
 msgstr "추가"
 
-#: include/items.inc.php:1333 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1330 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr ""
 
@@ -766,7 +766,7 @@ msgstr ""
 msgid "Axis side"
 msgstr ""
 
-#: include/func.inc.php:386
+#: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
 msgstr ""
@@ -939,7 +939,7 @@ msgstr ""
 msgid "CONFIGURATION OF MEDIA TYPES"
 msgstr "연락 방법 설정"
 
-#: sysmap.php:121 sysmaps.php:210
+#: sysmap.php:121 sysmaps.php:212
 msgid "CONFIGURATION OF NETWORK MAPS"
 msgstr "네트워크 맵 설정"
 
@@ -1047,23 +1047,19 @@ msgstr ""
 msgid "Callback"
 msgstr ""
 
-#: api/classes/CTemplate.php:1441
+#: api/classes/CTemplate.php:1411
 msgid "Can't add group"
 msgstr ""
 
-#: api/classes/CTemplate.php:1517 api/classes/CTemplate.php:1527
+#: api/classes/CTemplate.php:1487 api/classes/CTemplate.php:1497
 msgid "Can't link template"
 msgstr ""
 
-#: api/classes/CTemplate.php:1452
+#: api/classes/CTemplate.php:1422
 msgid "Can't remove group"
 msgstr ""
 
-#: api/classes/CTemplate.php:1578
-msgid "Can't unlink groups"
-msgstr ""
-
-#: api/classes/CTemplate.php:1488 api/classes/CTemplate.php:1506
+#: api/classes/CTemplate.php:1458 api/classes/CTemplate.php:1476
 msgid "Can't unlink template"
 msgstr ""
 
@@ -1147,7 +1143,7 @@ msgstr ""
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
 msgstr ""
 
-#: sysmaps.php:165
+#: sysmaps.php:166
 msgid "Cannot add network map"
 msgstr ""
 
@@ -1274,7 +1270,7 @@ msgstr ""
 msgid "Cannot create group without name."
 msgstr ""
 
-#: api/classes/CHost.php:1821
+#: api/classes/CHost.php:1775
 msgid "Cannot create host group."
 msgstr ""
 
@@ -1350,7 +1346,7 @@ msgstr "그룹을 삭제할 수 없습니다"
 msgid "Cannot delete host"
 msgstr "호스트를 삭제할 수 없습니다"
 
-#: api/classes/CHost.php:1832
+#: api/classes/CHost.php:1786
 msgid "Cannot delete host group."
 msgstr ""
 
@@ -1362,7 +1358,7 @@ msgstr ""
 msgid "Cannot delete image"
 msgstr "이미지를 삭제할 수 없습니다"
 
-#: api/classes/CHost.php:1926
+#: api/classes/CHost.php:1880
 msgid "Cannot delete inventory."
 msgstr ""
 
@@ -1382,11 +1378,11 @@ msgstr ""
 msgid "Cannot delete media type"
 msgstr ""
 
-#: sysmaps.php:185
+#: sysmaps.php:187
 msgid "Cannot delete network map"
 msgstr ""
 
-#: nodes.php:94
+#: nodes.php:93
 msgid "Cannot delete node"
 msgstr "노드를 삭제할 수 없습니다"
 
@@ -1407,7 +1403,7 @@ msgstr "시나리오를 삭제할 수 없습니다"
 msgid "Cannot delete screen"
 msgstr ""
 
-#: scripts.php:140 scripts.php:156
+#: scripts.php:139 scripts.php:155
 msgid "Cannot delete script"
 msgstr ""
 
@@ -1433,7 +1429,7 @@ msgstr ""
 msgid "Cannot delete service"
 msgstr "서비스를 삭제할 수 없습니다"
 
-#: slideconf.php:102 slideconf.php:122
+#: slideconf.php:102 slideconf.php:124
 msgid "Cannot delete slide show"
 msgstr ""
 
@@ -1598,7 +1594,7 @@ msgstr ""
 msgid "Cannot format tree."
 msgstr ""
 
-#: api/classes/CTemplate.php:1411
+#: api/classes/CTemplate.php:1381
 msgid "Cannot have empty visible template name"
 msgstr ""
 
@@ -1630,7 +1626,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr ""
 
-#: api/classes/CHost.php:1906
+#: api/classes/CHost.php:1860
 msgid "Cannot link template"
 msgstr ""
 
@@ -1638,27 +1634,23 @@ msgstr ""
 msgid "Cannot logout."
 msgstr ""
 
-#: api/classes/CHost.php:1724
+#: api/classes/CHost.php:1678
 msgid "Cannot mass update host name."
 msgstr ""
 
-#: api/classes/CTemplate.php:1370
+#: api/classes/CTemplate.php:1340
 msgid "Cannot mass update template name"
 msgstr ""
 
-#: api/classes/CUserGroup.php:496
-msgid "Cannot mass update user group names."
-msgstr ""
-
-#: api/classes/CHost.php:1714
+#: api/classes/CHost.php:1668
 msgid "Cannot mass update visible host name."
 msgstr ""
 
-#: api/classes/CTemplate.php:1343
+#: api/classes/CTemplate.php:1313
 msgid "Cannot mass update visible template name"
 msgstr ""
 
-#: api/classes/CTemplate.php:1622
+#: api/classes/CHostGeneral.php:154
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr ""
@@ -1698,39 +1690,39 @@ msgstr ""
 msgid "Cannot unblock users"
 msgstr ""
 
-#: api/classes/CTemplate.php:2184
+#: api/classes/CHostGeneral.php:690
 msgid "Cannot unlink and clear applications"
 msgstr ""
 
-#: api/classes/CTemplate.php:2037
+#: api/classes/CHostGeneral.php:543
 msgid "Cannot unlink and clear discovery rules"
 msgstr ""
 
-#: api/classes/CTemplate.php:2126
+#: api/classes/CHostGeneral.php:632
 msgid "Cannot unlink and clear graph prototypes"
 msgstr ""
 
-#: api/classes/CTemplate.php:2144
+#: api/classes/CHostGeneral.php:650
 msgid "Cannot unlink and clear graphs."
 msgstr ""
 
-#: api/classes/CTemplate.php:2073
+#: api/classes/CHostGeneral.php:579
 msgid "Cannot unlink and clear item prototypes"
 msgstr ""
 
-#: api/classes/CTemplate.php:2055
+#: api/classes/CHostGeneral.php:561
 msgid "Cannot unlink and clear items"
 msgstr ""
 
-#: api/classes/CTemplate.php:1975 api/classes/CTemplate.php:1992
+#: api/classes/CHostGeneral.php:481 api/classes/CHostGeneral.php:498
 msgid "Cannot unlink and clear triggers"
 msgstr ""
 
-#: api/classes/CHost.php:1897
+#: api/classes/CHost.php:1851
 msgid "Cannot unlink template"
 msgstr ""
 
-#: api/classes/CTemplate.php:1929
+#: api/classes/CHostGeneral.php:435
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr ""
@@ -1773,7 +1765,7 @@ msgstr "그래프를 갱신할 수 없습니다"
 msgid "Cannot update group"
 msgstr "그룹을 갱신할 수 없습니다"
 
-#: api/classes/CUserGroup.php:395
+#: api/classes/CUserGroup.php:397
 msgid "Cannot update group."
 msgstr ""
 
@@ -1980,11 +1972,11 @@ msgstr ""
 msgid "Child"
 msgstr "리모트"
 
-#: include/locales.inc.php:45
+#: include/locales.inc.php:46
 msgid "Chinese (zh_CN)"
 msgstr "중국어 (zh_CN)"
 
-#: include/locales.inc.php:46
+#: include/locales.inc.php:47
 msgid "Chinese (zh_TW)"
 msgstr ""
 
@@ -2008,7 +2000,7 @@ msgstr ""
 msgid "Circular reference in templates: %1$s."
 msgstr ""
 
-#: api/classes/CTemplate.php:1793 api/classes/CTemplate.php:1882
+#: api/classes/CHostGeneral.php:325 api/classes/CHostGeneral.php:753
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
@@ -2466,7 +2458,7 @@ msgstr ""
 msgid "Create maintenance period"
 msgstr ""
 
-#: sysmaps.php:206
+#: sysmaps.php:208
 msgid "Create map"
 msgstr ""
 
@@ -2676,7 +2668,7 @@ msgstr ""
 msgid "Custom slides"
 msgstr ""
 
-#: include/locales.inc.php:47
+#: include/locales.inc.php:48
 msgid "Czech (cs_CZ)"
 msgstr ""
 
@@ -2885,7 +2877,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:355
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:121
-#: include/views/monitoring.screen.php:112
+#: include/views/monitoring.screen.php:116
 #: include/views/monitoring.slides.php:83 jsLoader.php:143 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
@@ -3054,7 +3046,7 @@ msgstr ""
 #: include/views/configuration.maintenance.list.php:76
 #: include/views/configuration.screen.list.php:68
 #: include/views/configuration.slideconf.list.php:59
-#: include/views/configuration.triggers.list.php:237 sysmaps.php:299
+#: include/views/configuration.triggers.list.php:237 sysmaps.php:301
 #: templates.php:598
 msgid "Delete selected"
 msgstr "선택 항목 삭제"
@@ -3118,7 +3110,7 @@ msgstr ""
 msgid "Delete selected maintenance periods?"
 msgstr ""
 
-#: sysmaps.php:300
+#: sysmaps.php:302
 msgid "Delete selected maps?"
 msgstr ""
 
@@ -3223,7 +3215,7 @@ msgstr ""
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:2249
+#: api/classes/CHost.php:2156
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
@@ -3560,7 +3552,7 @@ msgstr "디스커버리 상태"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: include/func.inc.php:1670
+#: include/func.inc.php:1685
 msgid "Displaying"
 msgstr ""
 
@@ -3714,7 +3706,7 @@ msgstr "기간"
 msgid "Duration (sec)"
 msgstr ""
 
-#: include/locales.inc.php:48
+#: include/locales.inc.php:49
 msgid "Dutch (nl_NL)"
 msgstr "네덜란드어 (nl_NL)"
 
@@ -3722,7 +3714,7 @@ msgstr "네덜란드어 (nl_NL)"
 msgid "Dynamic item"
 msgstr ""
 
-#: include/func.inc.php:554
+#: include/func.inc.php:569
 msgctxt "Exa short"
 msgid "E"
 msgstr ""
@@ -3747,8 +3739,8 @@ msgstr ""
 #: include/views/configuration.screen.list.php:59
 #: include/views/configuration.triggers.edit.php:77
 #: include/views/js/configuration.sysmaps.js.php:385
-#: include/views/js/configuration.sysmaps.js.php:393 sysmaps.php:268
-#: sysmaps.php:292
+#: include/views/js/configuration.sysmaps.js.php:393 sysmaps.php:270
+#: sysmaps.php:294
 msgid "Edit"
 msgstr "편집"
 
@@ -3801,15 +3793,15 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
 #: api/classes/CGraphPrototype.php:781 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
-#: api/classes/CHost.php:2103 api/classes/CIconMap.php:409
+#: api/classes/CHost.php:2010 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:949 api/classes/CItemPrototype.php:678
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1348 api/classes/CTrigger.php:1437
 #: api/classes/CTrigger.php:1514 api/classes/CTriggerPrototype.php:1037
-#: api/classes/CUserGroup.php:647 api/classes/CUserMacro.php:504
-#: api/classes/CUserMacro.php:658
+#: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:502
+#: api/classes/CUserMacro.php:654
 msgid "Empty input parameter."
 msgstr ""
 
@@ -3822,7 +3814,7 @@ msgstr ""
 msgid "Empty item key \"%1$s\" is used in expression."
 msgstr ""
 
-#: api/classes/CUserMacro.php:890
+#: api/classes/CUserMacro.php:892
 msgid "Empty macro."
 msgstr ""
 
@@ -3836,11 +3828,6 @@ msgstr ""
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
-msgstr ""
-
-#: api/classes/CUserMacro.php:909
-#, php-format
-msgid "Empty value for macro \"%1$s\"."
 msgstr ""
 
 #: include/views/administration.auditlogs.list.php:48
@@ -3955,6 +3942,10 @@ msgstr "활성"
 msgid "English (en_GB)"
 msgstr "영어 (en_GB)"
 
+#: include/locales.inc.php:45
+msgid "English (en_US)"
+msgstr ""
+
 #: include/actions.inc.php:681 include/actions.inc.php:757
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
 #: include/views/administration.auditacts.list.php:76
@@ -4059,7 +4050,7 @@ msgstr ""
 msgid "Every week(s)"
 msgstr ""
 
-#: include/func.inc.php:554
+#: include/func.inc.php:569
 msgid "Exa"
 msgstr ""
 
@@ -4085,7 +4076,7 @@ msgstr ""
 msgid "Execute on"
 msgstr ""
 
-#: include/items.inc.php:1331 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1328 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr ""
 
@@ -4120,7 +4111,7 @@ msgid "Exploded"
 msgstr ""
 
 #: hosts.php:864 include/views/configuration.screen.list.php:66
-#: sysmaps.php:298 templates.php:596
+#: sysmaps.php:300 templates.php:596
 msgid "Export selected"
 msgstr ""
 
@@ -4295,7 +4286,7 @@ msgstr "종료"
 msgid "First"
 msgstr ""
 
-#: include/func.inc.php:1615
+#: include/func.inc.php:1630
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -4318,7 +4309,7 @@ msgstr ""
 msgid "For guest, password must be empty"
 msgstr ""
 
-#: include/items.inc.php:1335 include/views/configuration.item.edit.php:201
+#: include/items.inc.php:1332 include/views/configuration.item.edit.php:201
 msgid "Formula"
 msgstr ""
 
@@ -4326,7 +4317,7 @@ msgstr ""
 msgid "Fourth"
 msgstr ""
 
-#: include/locales.inc.php:49
+#: include/locales.inc.php:50
 msgid "French (fr_FR)"
 msgstr "프랑스어 (fr_FR)"
 
@@ -4386,7 +4377,7 @@ msgstr ""
 msgid "Function supports \"%1$s\" parameters."
 msgstr ""
 
-#: include/func.inc.php:551
+#: include/func.inc.php:566
 msgctxt "Giga short"
 msgid "G"
 msgstr ""
@@ -4417,7 +4408,7 @@ msgstr "일반"
 msgid "Generated in %s sec"
 msgstr ""
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:51
 msgid "German (de_DE)"
 msgstr "독일어 (de_DE)"
 
@@ -4425,7 +4416,7 @@ msgstr "독일어 (de_DE)"
 msgid "Get support"
 msgstr "서포트"
 
-#: include/func.inc.php:551
+#: include/func.inc.php:566
 msgid "Giga"
 msgstr ""
 
@@ -4464,7 +4455,7 @@ msgstr ""
 #: include/views/configuration.maintenance.list.php:79
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:62
-#: include/views/configuration.triggers.list.php:240 sysmaps.php:305
+#: include/views/configuration.triggers.list.php:240 sysmaps.php:307
 #: templates.php:607 tr_status.php:734
 msgid "Go"
 msgstr ""
@@ -4607,7 +4598,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
-#: include/views/conf.import.php:34 include/views/monitoring.charts.php:40
+#: include/views/conf.import.php:34 include/views/monitoring.charts.php:30
 #: popup.php:93 search.php:139 search.php:172 search.php:191 search.php:371
 #: search.php:401 search.php:424 templates.php:447 templates.php:513
 msgid "Graphs"
@@ -4621,7 +4612,7 @@ msgstr ""
 msgid "Graphs deleted"
 msgstr ""
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:52
 msgid "Greek (el_GR)"
 msgstr ""
 
@@ -4629,8 +4620,7 @@ msgstr ""
 msgid "Grid"
 msgstr ""
 
-#: api/classes/CUserGroup.php:508 events.php:295
-#: hostinventoriesoverview.php:79 hostinventories.php:93
+#: events.php:295 hostinventoriesoverview.php:79 hostinventories.php:93
 #: hostinventories.php:158 hosts.php:642 httpmon.php:121
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
@@ -4649,7 +4639,7 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:481
 #: include/views/configuration.triggers.list.php:62
 #: include/views/monitoring.charts.php:25
-#: include/views/monitoring.screen.php:109
+#: include/views/monitoring.screen.php:113
 #: include/views/monitoring.slides.php:78 latest.php:124 overview.php:76
 #: popup.php:501 templates.php:431 tr_status.php:173
 msgid "Group"
@@ -4783,7 +4773,7 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
-#: sysmaps.php:50 sysmaps.php:267
+#: sysmaps.php:50 sysmaps.php:269
 msgid "Height"
 msgstr "높이"
 
@@ -4895,7 +4885,7 @@ msgstr "가로 위치"
 #: include/views/js/configuration.sysmaps.js.php:15
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/monitoring.charts.php:26
-#: include/views/monitoring.screen.php:117
+#: include/views/monitoring.screen.php:121
 #: include/views/monitoring.slides.php:88 items.php:68 items.php:458
 #: items.php:613 items.php:636 jsLoader.php:138 latest.php:125 latest.php:191
 #: popup.php:476 popup.php:513 popup.php:1083 popup.php:1279 popup.php:1484
@@ -4904,7 +4894,7 @@ msgstr "가로 위치"
 msgid "Host"
 msgstr "호스트"
 
-#: api/classes/CHost.php:1740
+#: api/classes/CHost.php:1694
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr ""
@@ -5069,13 +5059,13 @@ msgstr ""
 msgid "Host updated"
 msgstr "호스트를 갱신하였습니다"
 
-#: api/classes/CHost.php:1419 api/classes/CTemplate.php:1391
+#: api/classes/CHost.php:1419 api/classes/CTemplate.php:1361
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr ""
 
 #: api/classes/CHost.php:1425 api/classes/CTemplate.php:1014
-#: api/classes/CTemplate.php:1364
+#: api/classes/CTemplate.php:1334
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr ""
@@ -5150,7 +5140,7 @@ msgstr ""
 msgid "Housekeeper"
 msgstr "데이터 보존 기간"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:53
 msgid "Hungarian (hu_HU)"
 msgstr "헝가리어 (hu_HU)"
 
@@ -5445,7 +5435,7 @@ msgstr ""
 
 #: hosts.php:634 include/views/configuration.screen.list.php:33
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
-#: sysmaps.php:207 templates.php:423
+#: sysmaps.php:209 templates.php:423
 msgid "Import"
 msgstr "가져오기"
 
@@ -5684,12 +5674,12 @@ msgstr ""
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr ""
 
-#: api/classes/CHost.php:1349 api/classes/CHost.php:1720
+#: api/classes/CHost.php:1349 api/classes/CHost.php:1674
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:1396
+#: api/classes/CTemplate.php:1366
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
 msgstr ""
@@ -5949,7 +5939,7 @@ msgstr ""
 msgid "Incorrect parameters for maintenance."
 msgstr ""
 
-#: api/classes/CUserGroup.php:341 api/classes/CUserGroup.php:388
+#: api/classes/CUserGroup.php:341 api/classes/CUserGroup.php:391
 msgid "Incorrect parameters for user group."
 msgstr ""
 
@@ -6091,7 +6081,7 @@ msgstr ""
 msgid "Incorrect trigger function parameters syntax is used."
 msgstr ""
 
-#: include/func.inc.php:1033
+#: include/func.inc.php:1048
 msgid "Incorrect type of asort_by_key."
 msgstr ""
 
@@ -6256,7 +6246,7 @@ msgstr ""
 msgid "Invalid Request."
 msgstr ""
 
-#: api/classes/CUserMacro.php:928
+#: api/classes/CUserMacro.php:927
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr ""
@@ -6268,7 +6258,7 @@ msgstr ""
 
 #: api/classes/CService.php:209 api/classes/CService.php:385
 #: api/classes/CService.php:1471 api/classes/CUserMacro.php:447
-#: api/classes/CUserMacro.php:582 api/rpc/class.cjsonrpc.php:178
+#: api/classes/CUserMacro.php:580 api/rpc/class.cjsonrpc.php:178
 msgid "Invalid method parameters."
 msgstr ""
 
@@ -6318,7 +6308,7 @@ msgstr ""
 msgid "It is not possible to search by user password."
 msgstr ""
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:54
 msgid "Italian (it_IT)"
 msgstr "이탈리아어 (it_IT)"
 
@@ -6531,7 +6521,7 @@ msgstr ""
 msgid "January"
 msgstr ""
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:56
 msgid "Japanese (ja_JP)"
 msgstr "일본어 (ja_JP)"
 
@@ -6553,7 +6543,7 @@ msgstr ""
 msgid "June"
 msgstr ""
 
-#: include/func.inc.php:393 include/func.inc.php:549
+#: include/func.inc.php:408 include/func.inc.php:564
 msgctxt "Kilo short"
 msgid "K"
 msgstr ""
@@ -6610,11 +6600,11 @@ msgstr ""
 msgid "Keyword"
 msgstr ""
 
-#: include/func.inc.php:549
+#: include/func.inc.php:564
 msgid "Kilo"
 msgstr ""
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:55
 msgid "Korean (ko_KR)"
 msgstr ""
 
@@ -6674,7 +6664,7 @@ msgstr "언어"
 msgid "Last"
 msgstr "최근"
 
-#: include/func.inc.php:1655
+#: include/func.inc.php:1670
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -6752,7 +6742,7 @@ msgstr "최근 데이터"
 msgid "Latest events"
 msgstr "최근 이벤트"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:57
 msgid "Latvian (lv_LV)"
 msgstr "라트비아어 (lv_LV)"
 
@@ -6925,7 +6915,7 @@ msgstr ""
 msgid "Lost"
 msgstr ""
 
-#: include/func.inc.php:389 include/func.inc.php:550
+#: include/func.inc.php:404 include/func.inc.php:565
 msgctxt "Mega short"
 msgid "M"
 msgstr ""
@@ -6983,12 +6973,12 @@ msgstr ""
 msgid "Macro \"%1$s\" is not unique."
 msgstr ""
 
-#: api/classes/CUserMacro.php:912
+#: api/classes/CUserMacro.php:911
 #, php-format
 msgid "Macro \"%1$s\" value is too long, it should not exceed 255 chars."
 msgstr ""
 
-#: api/classes/CUserMacro.php:893
+#: api/classes/CUserMacro.php:895
 #, php-format
 msgid "Macro name \"%1$s\" is too long, it should not exceed 64 chars."
 msgstr ""
@@ -7145,7 +7135,7 @@ msgstr ""
 
 #: dashboard.php:274 include/blocks.inc.php:1228 include/menu.inc.php:73
 #: include/menu.inc.php:210 include/views/conf.import.php:36 popup.php:101
-#: sysmaps.php:259
+#: sysmaps.php:261
 msgid "Maps"
 msgstr "맵"
 
@@ -7288,7 +7278,7 @@ msgstr "연락 방법"
 msgid "Media types used by action \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:550
+#: include/func.inc.php:565
 msgid "Mega"
 msgstr ""
 
@@ -7346,7 +7336,7 @@ msgstr ""
 msgid "Method not found."
 msgstr ""
 
-#: include/func.inc.php:546
+#: include/func.inc.php:561
 msgid "Micro"
 msgstr ""
 
@@ -7355,7 +7345,7 @@ msgstr ""
 msgid "Middle"
 msgstr "가운데"
 
-#: include/func.inc.php:547
+#: include/func.inc.php:562
 msgid "Milli"
 msgstr ""
 
@@ -7424,6 +7414,10 @@ msgstr ""
 #: include/graphs.inc.php:322
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
+msgstr ""
+
+#: api/classes/CUserGroup.php:510
+msgid "Missing parameter: usrgrpids."
 msgstr ""
 
 #: include/views/administration.proxy.list.php:46 report2.php:176
@@ -7587,16 +7581,16 @@ msgstr ""
 #: popup.php:1917 popup.php:1940 popup.php:1969 popup.php:1976
 #: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:224
 #: screenconf.php:50 services.php:43 slideconf.php:39 sysmaps.php:48
-#: sysmaps.php:265 trigger_prototypes.php:41 triggers.php:41 tr_status.php:294
+#: sysmaps.php:267 trigger_prototypes.php:41 triggers.php:41 tr_status.php:294
 #: users.php:44
 msgid "Name"
 msgstr "이름"
 
-#: sysmaps.php:165
+#: sysmaps.php:166
 msgid "Network map added"
 msgstr ""
 
-#: sysmaps.php:185
+#: sysmaps.php:187
 msgid "Network map deleted"
 msgstr ""
 
@@ -7679,7 +7673,7 @@ msgstr "새 서비스 시간"
 msgid "Next"
 msgstr "다음"
 
-#: include/func.inc.php:1648
+#: include/func.inc.php:1663
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
@@ -7859,9 +7853,9 @@ msgid "No graph prototypes defined."
 msgstr ""
 
 #: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:103
-#: include/classes/screens/CScreenHistory.php:323
+#: include/classes/screens/CScreenHistory.php:310
 #: include/views/configuration.graph.list.php:71
-#: include/views/monitoring.charts.php:64 popup.php:1334
+#: include/views/monitoring.charts.php:63 popup.php:1334
 msgid "No graphs defined."
 msgstr ""
 
@@ -7870,11 +7864,11 @@ msgstr ""
 msgid "No groups for host \"%s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1706
+#: api/classes/CHost.php:1660
 msgid "No groups for hosts."
 msgstr ""
 
-#: api/classes/CTemplate.php:1335
+#: api/classes/CTemplate.php:1305
 msgid "No groups for template"
 msgstr ""
 
@@ -7892,7 +7886,7 @@ msgstr ""
 msgid "No host IDs given."
 msgstr ""
 
-#: api/classes/CUserMacro.php:925
+#: api/classes/CUserMacro.php:924
 #, php-format
 msgid "No host given for macro \"%1$s\"."
 msgstr ""
@@ -8013,7 +8007,7 @@ msgstr ""
 msgid "No map ID provided for screen element."
 msgstr ""
 
-#: maps.php:125 popup.php:1553 sysmaps.php:262
+#: maps.php:125 popup.php:1553 sysmaps.php:264
 msgid "No maps defined."
 msgstr ""
 
@@ -8120,8 +8114,8 @@ msgstr ""
 #: api/classes/CTriggerPrototype.php:959
 #: api/classes/CTriggerPrototype.php:1051
 #: api/classes/CTriggerPrototype.php:1242
-#: api/classes/CTriggerPrototype.php:1254 api/classes/CUserMacro.php:828
-#: api/classes/CUserMacro.php:941 api/classes/CWebCheck.php:464
+#: api/classes/CTriggerPrototype.php:1254 api/classes/CUserMacro.php:831
+#: api/classes/CUserMacro.php:940 api/classes/CWebCheck.php:464
 #: include/config.inc.php:236
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
@@ -8174,7 +8168,7 @@ msgstr ""
 
 #: include/classes/screens/CScreenBuilder.php:263
 #: include/views/configuration.screen.list.php:46
-#: include/views/monitoring.hostscreen.php:35
+#: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.php:37 popup.php:1740 popup.php:1798
 msgid "No screens defined."
 msgstr ""
@@ -8280,7 +8274,7 @@ msgstr "노드"
 msgid "Node added"
 msgstr "노드를 추가하였습니다"
 
-#: nodes.php:94
+#: nodes.php:93
 msgid "Node deleted"
 msgstr "노드를 삭제하였습니다"
 
@@ -8547,7 +8541,7 @@ msgstr ""
 msgid "One-time downtime"
 msgstr "일시적인 정지 시간"
 
-#: api/classes/CUserGroup.php:330 api/classes/CUserGroup.php:404
+#: api/classes/CUserGroup.php:330 api/classes/CUserGroup.php:407
 msgid "Only Super Admins can add user groups."
 msgstr ""
 
@@ -8567,7 +8561,7 @@ msgstr ""
 msgid "Only Super Admins can create media types."
 msgstr ""
 
-#: api/classes/CUserMacro.php:507
+#: api/classes/CUserMacro.php:505
 msgid "Only Super Admins can delete global macros."
 msgstr ""
 
@@ -8576,7 +8570,7 @@ msgid "Only Super Admins can delete media types."
 msgstr ""
 
 #. GETTEXT: API exception
-#: api/classes/CUserGroup.php:651
+#: api/classes/CUserGroup.php:705
 msgid "Only Super Admins can delete user groups."
 msgstr ""
 
@@ -8592,7 +8586,7 @@ msgstr ""
 msgid "Only Super Admins can update icon maps."
 msgstr ""
 
-#: api/classes/CUserGroup.php:379 api/classes/CUserGroup.php:482
+#: api/classes/CUserGroup.php:382 api/classes/CUserGroup.php:504
 msgid "Only Super Admins can update user groups."
 msgstr ""
 
@@ -8618,6 +8612,10 @@ msgstr ""
 
 #: api/classes/CDRule.php:517
 msgid "Only one check can be unique."
+msgstr ""
+
+#: api/classes/CUserGroup.php:517
+msgid "Only one user group name can be changed at a time."
 msgstr ""
 
 #: api/classes/CProxy.php:610
@@ -8780,7 +8778,7 @@ msgstr "개요"
 msgid "Overview by proxy"
 msgstr ""
 
-#: include/func.inc.php:553
+#: include/func.inc.php:568
 msgctxt "Peta short"
 msgid "P"
 msgstr ""
@@ -9094,7 +9092,7 @@ msgstr ""
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
-#: include/func.inc.php:553
+#: include/func.inc.php:568
 msgid "Peta"
 msgstr ""
 
@@ -9135,7 +9133,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr ""
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:58
 msgid "Polish (pl_PL)"
 msgstr ""
 
@@ -9165,7 +9163,7 @@ msgstr ""
 msgid "Port range"
 msgstr ""
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:59
 msgid "Portuguese (pt_BR)"
 msgstr "포르투갈어 (pt_BR)"
 
@@ -9188,7 +9186,7 @@ msgstr "미리보기"
 msgid "Previous"
 msgstr "이전"
 
-#: include/func.inc.php:1621
+#: include/func.inc.php:1636
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -9418,11 +9416,11 @@ msgstr ""
 msgid "Refresh (in seconds)"
 msgstr "새로 고침(초)"
 
-#: include/func.inc.php:1729
+#: include/func.inc.php:1744
 msgid "Refresh time in seconds"
 msgstr ""
 
-#: include/func.inc.php:1733
+#: include/func.inc.php:1748
 msgid "Refresh time multiplier"
 msgstr ""
 
@@ -9795,7 +9793,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:60
 msgid "Russian (ru_RU)"
 msgstr "러시아어 (ru_RU)"
 
@@ -9809,10 +9807,10 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr ""
 
-#: include/views/monitoring.hostscreen.php:33
+#: include/views/monitoring.hostscreen.php:30
 #: include/views/monitoring.hostscreen.php:39
 #: include/views/monitoring.screen.php:35
-#: include/views/monitoring.screen.php:62
+#: include/views/monitoring.screen.php:66
 msgid "SCREENS"
 msgstr ""
 
@@ -10156,12 +10154,12 @@ msgstr ""
 msgid "Screen updated"
 msgstr "스크린을 갱신하였습니다"
 
-#: include/views/monitoring.screen.php:43
+#: include/views/monitoring.screen.php:47
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
 msgstr ""
 
-#: include/views/monitoring.screen.php:42
+#: include/views/monitoring.screen.php:46
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
 msgstr ""
@@ -10171,7 +10169,7 @@ msgstr ""
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:302
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
-#: include/views/monitoring.screen.php:81
+#: include/views/monitoring.screen.php:85
 #: include/views/monitoring.slides.php:29 popup.php:85 popup.php:109
 #: search.php:135 search.php:207 search.php:372 search.php:405 search.php:428
 #: templates.php:448 templates.php:515
@@ -10182,8 +10180,8 @@ msgstr "스크린"
 #: include/views/administration.mediatypes.edit.php:40
 #: include/views/administration.script.edit.php:50
 #: include/views/administration.script.edit.php:114
-#: include/views/administration.script.list.php:51 scripts.php:137
-#: scripts.php:152
+#: include/views/administration.script.list.php:51 scripts.php:136
+#: scripts.php:151
 msgid "Script"
 msgstr "스크립트"
 
@@ -10196,7 +10194,7 @@ msgstr ""
 msgid "Script added"
 msgstr ""
 
-#: scripts.php:140 scripts.php:156
+#: scripts.php:139 scripts.php:155
 msgid "Script deleted"
 msgstr ""
 
@@ -10706,7 +10704,7 @@ msgstr ""
 msgid "Slide show added"
 msgstr ""
 
-#: slideconf.php:102 slideconf.php:122
+#: slideconf.php:102 slideconf.php:124
 msgid "Slide show deleted"
 msgstr ""
 
@@ -10729,7 +10727,7 @@ msgstr "슬라이드쇼"
 msgid "Slides"
 msgstr "슬라이드"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -10796,7 +10794,7 @@ msgstr ""
 msgid "Source"
 msgstr "소스"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
 msgstr "스페인어 (es_ES)"
 
@@ -10993,7 +10991,7 @@ msgstr ""
 msgid "Surname"
 msgstr "성"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Swedish (sv_SE)"
 msgstr "스웨덴어 (sv_SE)"
 
@@ -11013,7 +11011,7 @@ msgstr ""
 msgid "System status"
 msgstr ""
 
-#: include/func.inc.php:552
+#: include/func.inc.php:567
 msgctxt "Tera short"
 msgid "T"
 msgstr ""
@@ -11094,7 +11092,7 @@ msgstr ""
 msgid "Template"
 msgstr "템플릿"
 
-#: api/classes/CHost.php:1745
+#: api/classes/CHost.php:1699
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr ""
@@ -11113,7 +11111,7 @@ msgstr ""
 msgid "Template added"
 msgstr ""
 
-#: api/classes/CTemplate.php:1885
+#: api/classes/CHostGeneral.php:756
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr ""
 
@@ -11149,23 +11147,23 @@ msgstr ""
 msgid "Template updated"
 msgstr ""
 
-#: api/classes/CTemplate.php:1655 include/hosts.inc.php:1238
+#: api/classes/CHostGeneral.php:187 include/hosts.inc.php:1238
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
 msgstr ""
 
-#: api/classes/CTemplate.php:1644 include/hosts.inc.php:1224
+#: api/classes/CHostGeneral.php:176 include/hosts.inc.php:1224
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr ""
 
-#: api/classes/CHost.php:1435 api/classes/CTemplate.php:1386
+#: api/classes/CHost.php:1435 api/classes/CTemplate.php:1356
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr ""
 
 #: api/classes/CHost.php:1441 api/classes/CTemplate.php:1010
-#: api/classes/CTemplate.php:1359
+#: api/classes/CTemplate.php:1329
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr ""
@@ -11183,12 +11181,12 @@ msgstr ""
 msgid "Templates"
 msgstr "템플릿"
 
-#: api/classes/CTemplate.php:2229
+#: api/classes/CHostGeneral.php:735
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
-#: include/func.inc.php:552
+#: include/func.inc.php:567
 msgid "Tera"
 msgstr ""
 
@@ -11505,12 +11503,12 @@ msgstr ""
 msgid "Trigger form"
 msgstr ""
 
-#: api/classes/CTemplate.php:1751
+#: api/classes/CHostGeneral.php:283
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr ""
 
-#: api/classes/CTemplate.php:1706
+#: api/classes/CHostGeneral.php:238
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr ""
@@ -11770,7 +11768,7 @@ msgstr "사용자 프로파일"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Ukrainian (uk_UA)"
 msgstr ""
 
@@ -11876,7 +11874,7 @@ msgstr ""
 msgid "Unknown resource"
 msgstr "알 수 없는 리소스"
 
-#: include/items.inc.php:943
+#: include/items.inc.php:940
 msgid "Unknown value type"
 msgstr ""
 
@@ -11902,42 +11900,42 @@ msgstr "템플릿과의 링크 삭제"
 msgid "Unlink from templates"
 msgstr ""
 
-#: api/classes/CTemplate.php:2193
+#: api/classes/CHostGeneral.php:699
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:2046
+#: api/classes/CHostGeneral.php:552
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:2153
+#: api/classes/CHostGeneral.php:659
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:2135
+#: api/classes/CHostGeneral.php:641
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:2064
+#: api/classes/CHostGeneral.php:570
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:2082
+#: api/classes/CHostGeneral.php:588
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:1984
+#: api/classes/CHostGeneral.php:490
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:2001
+#: api/classes/CHostGeneral.php:507
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12096,11 +12094,15 @@ msgstr "사용자를 추가하였습니다"
 msgid "User can't change type for himself"
 msgstr ""
 
+#: api/classes/CUserGroup.php:560
+msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
 msgstr ""
 
-#: api/classes/CUserGroup.php:421 api/classes/CUserGroup.php:532
+#: api/classes/CUserGroup.php:424
 msgid "User cannot change status of himself"
 msgstr ""
 
@@ -12121,12 +12123,17 @@ msgstr "사용자를 삭제하였습니다"
 msgid "User group"
 msgstr "사용자 그룹"
 
-#: api/classes/CUserGroup.php:664
+#: api/classes/CUserGroup.php:718
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr ""
 
-#: api/classes/CUserGroup.php:671
+#: api/classes/CUserGroup.php:528
+#, php-format
+msgid "User group \"%s\" already exists."
+msgstr ""
+
+#: api/classes/CUserGroup.php:725
 #, php-format
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr ""
@@ -12503,7 +12510,7 @@ msgstr "연락 허용 시간대"
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
-#: sysmaps.php:49 sysmaps.php:266
+#: sysmaps.php:49 sysmaps.php:268
 msgid "Width"
 msgstr "너비"
 
@@ -12587,8 +12594,8 @@ msgstr ""
 msgid "Wrong fields for linktrigger update"
 msgstr ""
 
-#: api/classes/CUserMacro.php:411 api/classes/CUserMacro.php:459
-#: api/classes/CUserMacro.php:548 api/classes/CUserMacro.php:610
+#: api/classes/CUserMacro.php:411 api/classes/CUserMacro.php:457
+#: api/classes/CUserMacro.php:546 api/classes/CUserMacro.php:606
 #, php-format
 msgid "Wrong fields for macro \"%1$s\"."
 msgstr ""
@@ -12639,7 +12646,7 @@ msgstr ""
 msgid "Wrong fields for user \"%s\"."
 msgstr ""
 
-#: api/classes/CUserMacro.php:896
+#: api/classes/CUserMacro.php:898
 #, php-format
 msgid "Wrong macro \"%1$s\"."
 msgstr ""
@@ -12678,7 +12685,7 @@ msgstr ""
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:556
+#: include/func.inc.php:571
 msgctxt "Yotta short"
 msgid "Y"
 msgstr ""
@@ -12727,7 +12734,7 @@ msgstr ""
 msgid "Y.m.d H:i"
 msgstr ""
 
-#: include/defines.inc.php:901 include/func.inc.php:492
+#: include/defines.inc.php:901 include/func.inc.php:507
 msgid "Y.m.d H:i:s"
 msgstr ""
 
@@ -12749,7 +12756,7 @@ msgstr "연간"
 msgid "Yes"
 msgstr "예"
 
-#: include/func.inc.php:556
+#: include/func.inc.php:571
 msgid "Yotta"
 msgstr ""
 
@@ -12792,10 +12799,6 @@ msgstr ""
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1602
-msgid "You do not have enough rights for operation."
-msgstr ""
-
 #: api/classes/CAlert.php:504 api/classes/CApplication.php:825
 #: api/classes/CApplication.php:836 api/classes/CEvent.php:683
 #: api/classes/CGraph.php:691 api/classes/CGraph.php:702
@@ -12804,18 +12807,18 @@ msgstr ""
 #: api/classes/CHostGroup.php:653 api/classes/CHostGroup.php:711
 #: api/classes/CHostGroup.php:865 api/classes/CHostGroup.php:920
 #: api/classes/CHostGroup.php:986 api/classes/CHostGroup.php:999
-#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1700
-#: api/classes/CHost.php:2030 api/classes/CItem.php:1071
-#: api/classes/CItem.php:1074 api/classes/CItemPrototype.php:812
-#: api/classes/CItemPrototype.php:815 api/classes/CMaintenance.php:624
-#: api/classes/CMaintenance.php:731 api/classes/CMaintenance.php:743
-#: api/classes/CScript.php:295 api/classes/CScript.php:342
-#: api/classes/CScript.php:404 api/classes/CScript.php:454
-#: api/classes/CTemplate.php:974 api/classes/CTemplate.php:1066
-#: api/classes/CTemplate.php:1126 api/classes/CTemplate.php:1271
-#: api/classes/CTemplate.php:1329 api/classes/CTemplate.php:1568
-#: api/classes/CTemplateScreen.php:578 api/classes/CTemplateScreen.php:644
-#: api/classes/CWebCheck.php:344
+#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1600
+#: api/classes/CHost.php:1654 api/classes/CHost.php:1978
+#: api/classes/CItem.php:1071 api/classes/CItem.php:1074
+#: api/classes/CItemPrototype.php:812 api/classes/CItemPrototype.php:815
+#: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
+#: api/classes/CScript.php:342 api/classes/CScript.php:404
+#: api/classes/CScript.php:454 api/classes/CTemplate.php:974
+#: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
+#: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
+#: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:578
+#: api/classes/CTemplateScreen.php:644 api/classes/CWebCheck.php:344
 msgid "You do not have permission to perform this operation."
 msgstr ""
 
@@ -12847,7 +12850,7 @@ msgstr ""
 msgid "Your setup is not configured for distributed monitoring."
 msgstr ""
 
-#: include/func.inc.php:555
+#: include/func.inc.php:570
 msgctxt "Zetta short"
 msgid "Z"
 msgstr ""
@@ -12967,7 +12970,7 @@ msgstr ""
 msgid "Zabbix trapper"
 msgstr "ZABBIX trapper"
 
-#: include/func.inc.php:555
+#: include/func.inc.php:570
 msgid "Zetta"
 msgstr ""
 
@@ -13013,7 +13016,7 @@ msgstr "전체"
 
 #: api/classes/CImage.php:306 api/classes/CImage.php:416
 #: api/classes/CTemplateScreen.php:537 api/classes/CTemplateScreen.php:606
-#: api/classes/CUserGroup.php:345 api/classes/CUserGroup.php:508
+#: api/classes/CUserGroup.php:345
 msgid "already exists"
 msgstr ""
 
@@ -13044,7 +13047,7 @@ msgstr "빨강"
 msgid "avg"
 msgstr "평균"
 
-#: include/func.inc.php:457 jsLoader.php:92
+#: include/func.inc.php:472 jsLoader.php:92
 msgctxt "day short"
 msgid "d"
 msgstr ""
@@ -13064,7 +13067,7 @@ msgstr ""
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
 #: include/acknow.inc.php:46 include/blocks.inc.php:894
 #: include/classes/screens/CScreenEvents.php:62
-#: include/classes/screens/CScreenPlainText.php:87 include/defines.inc.php:882
+#: include/classes/screens/CScreenPlainText.php:90 include/defines.inc.php:882
 #: include/defines.inc.php:883 include/defines.inc.php:889
 #: include/defines.inc.php:890 include/defines.inc.php:891
 #: include/defines.inc.php:899 include/defines.inc.php:900
@@ -13148,11 +13151,11 @@ msgstr ""
 msgid "fixed"
 msgstr ""
 
-#: include/func.inc.php:1680
+#: include/func.inc.php:1695
 msgid "found"
 msgstr ""
 
-#: include/func.inc.php:465 jsLoader.php:93
+#: include/func.inc.php:480 jsLoader.php:93
 msgctxt "hour short"
 msgid "h"
 msgstr ""
@@ -13203,17 +13206,17 @@ msgstr ""
 msgid "like"
 msgstr "포함"
 
-#: include/func.inc.php:547
+#: include/func.inc.php:562
 msgctxt "Milli short"
 msgid "m"
 msgstr ""
 
-#: include/func.inc.php:473 jsLoader.php:94
+#: include/func.inc.php:488 jsLoader.php:94
 msgctxt "minute short"
 msgid "m"
 msgstr ""
 
-#: include/func.inc.php:449 jsLoader.php:90
+#: include/func.inc.php:464 jsLoader.php:90
 msgctxt "month short"
 msgid "m"
 msgstr ""
@@ -13261,7 +13264,7 @@ msgstr ""
 msgid "mm"
 msgstr ""
 
-#: include/func.inc.php:427 include/func.inc.php:483
+#: include/func.inc.php:442 include/func.inc.php:498
 msgctxt "millisecond short"
 msgid "ms"
 msgstr ""
@@ -13321,7 +13324,7 @@ msgid "now"
 msgstr ""
 
 #: include/blocks.inc.php:323 include/blocks.inc.php:664
-#: include/func.inc.php:1677
+#: include/func.inc.php:1692
 msgid "of"
 msgstr "of"
 
@@ -13331,6 +13334,7 @@ msgid "of every"
 msgstr ""
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
+#: include/views/monitoring.hostscreen.php:53
 msgid "on"
 msgstr ""
 
@@ -13366,7 +13370,7 @@ msgstr "root"
 msgid "running"
 msgstr "가동 중"
 
-#: include/func.inc.php:427 include/func.inc.php:478
+#: include/func.inc.php:442 include/func.inc.php:493
 msgctxt "second short"
 msgid "s"
 msgstr ""
@@ -13399,12 +13403,12 @@ msgstr ""
 msgid "show value mappings"
 msgstr ""
 
-#: api/classes/CTemplate.php:1618
+#: api/classes/CHostGeneral.php:150
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr ""
 
-#: include/func.inc.php:1673
+#: include/func.inc.php:1688
 msgid "to"
 msgstr ""
 
@@ -13439,7 +13443,7 @@ msgstr ""
 msgid "whole number"
 msgstr ""
 
-#: include/func.inc.php:441 jsLoader.php:89
+#: include/func.inc.php:456 jsLoader.php:89
 msgctxt "year short"
 msgid "y"
 msgstr ""
@@ -13465,7 +13469,7 @@ msgstr ""
 msgid "yyyy"
 msgstr ""
 
-#: include/func.inc.php:546
+#: include/func.inc.php:561
 msgctxt "Micro short"
 msgid "µ"
 msgstr ""

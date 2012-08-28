@@ -923,16 +923,16 @@ class CMap extends CMapElement {
 			$linkTriggersToDelete = array_merge($linkTriggersToDelete, $dbLinkTriggersDiff['second']);
 		}
 
+		if (!empty($linkTriggersToDelete))
+			$this->deleteLinkTriggers($linkTriggersToDelete);
+
 		if (!empty($linkTriggersToAdd))
 			$this->createLinkTriggers($linkTriggersToAdd);
 
 		if (!empty($linkTriggersToUpdate))
 			$this->updateLinkTriggers($linkTriggersToUpdate);
 
-		if (!empty($linkTriggersToDelete))
-			$this->deleteLinkTriggers($linkTriggersToDelete);
-
-	return array('sysmapids' => $sysmapids);
+		return array('sysmapids' => $sysmapids);
 	}
 
 

@@ -105,11 +105,11 @@ if (!empty($_REQUEST['serviceid'])) {
 if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
 	$result = API::Service()->delete($service['serviceid']);
 	show_messages($result, _('Service deleted'), _('Cannot delete service'));
-	add_audit_if($result, AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
-	unset($service);
 	if ($result) {
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
 		unset($_REQUEST['form']);
 	}
+	unset($service);
 }
 
 if (isset($_REQUEST['form'])) {
