@@ -168,14 +168,14 @@ class CScreenGraph extends CScreenBase {
 			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
-			if ($this->mode == SCREEN_MODE_VIEW) { // used is slide shows
+			if ($this->mode == SCREEN_MODE_SLIDESHOW) {
 				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 			else {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
-			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
+			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault) {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
