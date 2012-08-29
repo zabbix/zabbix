@@ -433,16 +433,17 @@ class CWebCheck extends CZBXAPI {
 			}
 			$stepidsDelete = array_keys($dbSteps);
 
-			if (!empty($stepsCreate)) {
-				$this->createStepsReal($httpTest, $stepsCreate);
+			if (!empty($stepidsDelete)) {
+				$this->deleteStepsReal($stepidsDelete);
 			}
 			if (!empty($stepsUpdate)) {
 				$this->updateStepsReal($httpTest, $stepsUpdate);
 			}
-			if (!empty($stepidsDelete)) {
-				$this->deleteStepsReal($stepidsDelete);
+			if (!empty($stepsCreate)) {
+				$this->createStepsReal($httpTest, $stepsCreate);
 			}
 		}
+
 		return array('httptestids' => $httpTestIds);
 	}
 
