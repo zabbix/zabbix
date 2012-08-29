@@ -36,7 +36,7 @@
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
@@ -254,7 +254,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
@@ -317,7 +317,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
@@ -456,7 +456,7 @@ void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcmp_graphitems(ZBX_GRAPH_ITEMS *gitems1, int gitems1_num,
@@ -494,7 +494,7 @@ clean:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
@@ -697,7 +697,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBclear_parents_from_trigger()
@@ -731,7 +731,7 @@ static void	DBclear_parents_from_trigger()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_service_status(zbx_uint64_t serviceid, int algorithm, zbx_uint64_t triggerid)
@@ -847,7 +847,7 @@ static void	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: recursive function                                               *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
@@ -901,7 +901,7 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBupdate_services_status_all()
@@ -965,7 +965,7 @@ static void	DBupdate_services_status_all()
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
@@ -1000,7 +1000,7 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int triggerids_num)
@@ -1033,7 +1033,7 @@ static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int trigge
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids, int elementids_num)
@@ -1097,7 +1097,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, int *triggerids_num)
@@ -1176,7 +1176,7 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
@@ -1229,7 +1229,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
@@ -1302,7 +1302,7 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
@@ -1465,7 +1465,7 @@ out:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_items(zbx_vector_uint64_t *itemids)
@@ -1560,7 +1560,7 @@ out:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_httptests(zbx_vector_uint64_t *htids)
@@ -1660,7 +1660,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationids_num)
@@ -1734,7 +1734,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1792,7 +1792,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1848,7 +1848,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1905,7 +1905,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1970,7 +1970,7 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t hostid,
@@ -2148,7 +2148,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int trids_num)
@@ -2299,7 +2299,7 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids)
@@ -2376,7 +2376,7 @@ clean:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -2512,7 +2512,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/* Auxiliary function for DBcopy_template_items() */
+/* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
 	DB_RESULT	result;
@@ -2546,7 +2546,7 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -3062,7 +3062,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -3137,7 +3137,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
@@ -3183,7 +3183,7 @@ static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
@@ -3397,7 +3397,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -3475,7 +3475,7 @@ static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
@@ -3553,7 +3553,7 @@ clean:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_host(zbx_uint64_t hostid)
