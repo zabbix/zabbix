@@ -13,6 +13,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+........S. [ZBX-5235] fixed update of a "lifetime" field if link a template to a host (Sasha)
 ..F....... [ZBX-4025] fixed duplicate http step names cheking (Eduard)
 .......PS. [ZBX-5240] fixed unwanted server shutdown if housekeeper cannot access MySQL database (Andris)
 ..F....... [ZBX-4482] fixed guest user theme not applied (Toms)
