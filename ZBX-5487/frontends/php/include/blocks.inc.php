@@ -381,6 +381,7 @@ function make_hoststat_summary($filter) {
 	);
 	$hosts = API::Host()->get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
+	CArrayHelper::sort($hosts, array('name'));
 
 	// get triggers
 	$options = array(
@@ -538,7 +539,7 @@ function make_hoststat_summary($filter) {
 		}
 	}
 
-	foreach ($groups as $gnum => $group) {
+	foreach ($groups as $group) {
 		if (!isset($hosts_data[$group['groupid']])) {
 			continue;
 		}
@@ -1365,6 +1366,11 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 		_('Actions')
 	));
 
+	foreach ($triggers as $tnum => $trigger) {
+		$triggers[$tnum]['clock'] = $trigger['event']['clock'];
+	}
+	CArrayHelper::sort($triggers, array(array('field' => 'clock', 'order' => ZBX_SORT_DOWN)));
+
 	foreach ($triggers as $trigger) {
 		$event = $trigger['event'];
 		$ack = getEventAckState($event, true, true, $ackParams);
@@ -1388,7 +1394,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 			get_node_name_by_elid($trigger['triggerid']),
 			$trigger['hostname'],
 			getSeverityCell($trigger['priority'], $trigger['description']),
-			zbx_date2age($event['clock']),
+			zbx_date2age($trigger['clock']),
 			$unknown,
 			$config['event_ack_enable'] ? $ack : null,
 			$actions
