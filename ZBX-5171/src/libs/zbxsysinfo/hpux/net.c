@@ -34,7 +34,7 @@ void	add_if_name(char **if_list, size_t *if_list_alloc, size_t *if_list_offset, 
 	if (FAIL == str_in_list(*if_list, name, ','))
 	{
 		if ('\0' != **if_list)
-			zbx_strcpy_alloc(if_list, if_list_alloc, if_list_offset, ",");
+			zbx_chrcpy_alloc(if_list, if_list_alloc, if_list_offset, ',');
 
 		zbx_strcpy_alloc(if_list, if_list_alloc, if_list_offset, name);
 	}
@@ -73,17 +73,17 @@ int	get_if_names(char **if_list, size_t *if_list_alloc, size_t *if_list_offset)
 
 	/* check all IPv4 interfaces */
 	ifr = (struct ifreq *)ifc.ifc_req;
-	while((u_char *)ifr < (u_char *)(buffer + ifc.ifc_len))
+	while ((u_char *)ifr < (u_char *)(buffer + ifc.ifc_len))
 	{
 		from = &ifr->ifr_addr;
 
-		if ((from->sa_family != AF_INET6) && (from->sa_family != AF_INET))
+		if (AF_INET6 != from->sa_family && AF_INET != from->sa_family)
 			continue;
 
 		add_if_name(if_list, if_list_alloc, if_list_offset, ifr->ifr_name);
 
 #ifdef _SOCKADDR_LEN
-		ifr = (struct ifreq *)((char *)ifr + sizeof(*ifr) + (from->sa_len > sizeof(*from) ? (from->sa_len - sizeof(*from)) : 0));
+		ifr = (struct ifreq *)((char *)ifr + sizeof(*ifr) + (from->sa_len > sizeof(*from) ? from->sa_len - sizeof(*from) : 0));
 #else
 		ifr++;
 #endif
@@ -117,7 +117,7 @@ next:
 	{
 		from = (struct sockaddr *)&lifr->iflr_addr;
 
-		if ((from->sa_family != AF_INET6) && (from->sa_family != AF_INET))
+		if (AF_INET6 != from->sa_family && AF_INET != from->sa_family)
 			continue;
 
 		add_if_name(if_list, if_list_alloc, if_list_offset, lifr->iflr_name);
