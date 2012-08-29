@@ -137,9 +137,9 @@ INDEX		|1		|druleid
 
 TABLE|applications|applicationid|ZBX_DATA
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0
-FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY	|1|hosts
+FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|templateid	|t_id		|	|NULL		|		|2|applications	|applicationid
+FIELD		|templateid	|t_id		|	|NULL		|			|2|applications	|applicationid
 INDEX		|1		|templateid
 UNIQUE		|2		|hostid,name
 
