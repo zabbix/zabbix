@@ -25,7 +25,7 @@ function getUserTheme($userData) {
 	if (isset($config['default_theme'])) {
 		$css = $config['default_theme'];
 	}
-	if (isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT && $userData['alias'] != ZBX_GUEST_USER) {
+	if (isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT) {
 		$css = $userData['theme'];
 	}
 	if (!isset($css)) {
