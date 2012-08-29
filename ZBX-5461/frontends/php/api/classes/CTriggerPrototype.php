@@ -1127,22 +1127,14 @@ class CTriggerPrototype extends CTriggerGeneral {
 	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
 
-		foreach ($triggers as &$trigger) {
-			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		foreach ($triggers as $num => $trigger) {
+			$triggers[$num]['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		}
-		unset($trigger);
 
 		// insert triggers without expression
-		// we copy array in this way because of references bug in PHP5.1
 		$triggersCopy = $triggers;
-		foreach ($triggers as $triggerArray) {
-			$copy = array();
-			foreach ($triggerArray as $key => $value) {
-				if ($key != 'expression') {
-					$copy[$key] = $value;
-				}
-			}
-			$triggersCopy[] = $copy;
+		for ($i = 0, $size = count($triggersCopy); $i < $size; $i++) {
+			unset($triggersCopy[$i]['expression']);
 		}
 
 		$triggerids = DB::insert('triggers', $triggersCopy);
