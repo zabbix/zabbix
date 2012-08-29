@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,12 +10,12 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; ifnot, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
@@ -291,6 +291,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 		default:
 			$color = $config['severity_color_0'];
 	}
+
 	return $color;
 }
 
@@ -298,6 +299,7 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 	if ($text === null) {
 		$text = getSeverityCaption($severity);
 	}
+
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
@@ -309,6 +311,7 @@ function get_service_status_of_trigger($triggerid) {
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.value='.TRIGGER_VALUE_TRUE;
 	$rows = DBfetch(DBselect($sql, 1));
+
 	return !empty($rows['priority']) ? $rows['priority'] : 0;
 }
 
@@ -366,6 +369,7 @@ function trigger_value2str($value) {
 	if (isset($str_val[$value])) {
 		return $str_val[$value];
 	}
+
 	return _('Unknown');
 }
 
@@ -405,6 +409,7 @@ function discovery_value_style($val) {
 		default:
 			$style = '';
 	}
+
 	return $style;
 }
 
@@ -449,6 +454,7 @@ function getParentHostsByTriggers($triggers) {
 			'nopermissions' => true
 		));
 	}
+
 	return $hosts;
 }
 
@@ -458,6 +464,7 @@ function get_trigger_by_triggerid($triggerid) {
 		return $db_trigger;
 	}
 	error(_s('No trigger with triggerid "%1$s".', $triggerid));
+
 	return false;
 }
 
@@ -525,6 +532,7 @@ function utf8RawUrlDecode($source) {
 			$pos++;
 		}
 	}
+
 	return $decodedStr;
 }
 
@@ -653,6 +661,7 @@ function construct_expression($itemid, $expressions) {
 		error(_('Expression cannot be empty'));
 		return false;
 	}
+
 	$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*)([&|]{1})(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
 	$functions = array('regexp' => 1, 'iregexp' => 1);
 	$expr_array = array();
@@ -741,6 +750,7 @@ function construct_expression($itemid, $expressions) {
 		$tail = substr($complite_expr, $startpos);
 		$complite_expr = $head.'('.$tail.')';
 	}
+
 	return $complite_expr;
 }
 
@@ -869,6 +879,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 			$exp .= $expression[$i];
 		}
 	}
+
 	return $exp;
 }
 
@@ -980,6 +991,7 @@ function triggerExpression($trigger, $html = false) {
 			$exp .= $expression[$i];
 		}
 	}
+
 	return $exp;
 }
 
@@ -1047,12 +1059,13 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 		$expr = str_replace($exprPart['expression'], '{'.$usedItems[$exprPart['expression']].'}', $expr);
 	}
 	$hostnames = array_unique($hostnames);
+
 	return $expr;
 }
 
-function updateTriggerValueToUnknownByHostId($hostIds) {
-	zbx_value2array($hostIds);
-	$triggerIds = array();
+function updateTriggerValueToUnknownByHostId($hostids) {
+	zbx_value2array($hostids);
+	$triggerids = array();
 
 	$result = DBselect(
 		'SELECT DISTINCT t.triggerid'.
@@ -1060,43 +1073,74 @@ function updateTriggerValueToUnknownByHostId($hostIds) {
 		' WHERE h.hostid=i.hostid'.
 			' AND i.itemid=f.itemid'.
 			' AND f.triggerid=t.triggerid'.
-			' AND '.DBcondition('h.hostid', $hostIds).
+			' AND '.DBcondition('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
 	);
 	while ($row = DBfetch($result)) {
-		$triggerIds[] = $row['triggerid'];
+		$triggerids[] = $row['triggerid'];
 	}
 
-	if (!empty($triggerIds)) {
+	if (!empty($triggerids)) {
 		DB::update('triggers', array(
 			'values' => array(
 				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
 				'error' => _s('Host status became "%s"', _('Not monitored'))
 			),
-			'where' => array('triggerid' => $triggerIds)
+			'where' => array('triggerid' => $triggerids)
 		));
-		addEvent($triggerIds, TRIGGER_VALUE_UNKNOWN);
+
+		addUnknownEvent($triggerids);
 	}
+
 	return true;
 }
 
-function addEvent($triggerids, $value) {
+/**
+ * Create unknown type event for given triggers.
+ *
+ * @param int|array $triggerids triggers to whom add unknown type event
+ *
+ * @return array returns created event ids
+ */
+function addUnknownEvent($triggerids) {
 	zbx_value2array($triggerids);
 
-	$now = time();
-	$events = array();
+	$triggers = API::Trigger()->get(array(
+		'triggerids' => $triggerids,
+		'output' => array('value'),
+		'preservekeys' => true
+	));
+
+	$eventids = array();
 	foreach ($triggerids as $triggerid) {
-		$events[] = array(
+		$event = array(
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectid' => $triggerid,
-			'clock' => $now,
-			'value' => $value,
+			'clock' => time(),
+			'value' => TRIGGER_VALUE_UNKNOWN,
 			'acknowledged' => 0
 		);
+
+		// check if trigger exist in DB
+		if (isset($triggers[$event['objectid']])) {
+			if ($event['value'] != $triggers[$event['objectid']]['value']) {
+				$eventid = get_dbid('events', 'eventid');
+
+				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
+						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
+									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
+				if (!DBexecute($sql)) {
+					throw new Exception();
+				}
+
+				$eventids[$eventid] = $eventid;
+			}
+		}
 	}
-	return API::Event()->create($events);
+
+	return $eventids;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
@@ -1104,7 +1148,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 
 	$hosts = API::Host()->get(array(
 		'filter' => array('host' => $expr->data['hosts']),
-		'editable' => $permission == PERM_READ_WRITE ? 1 : null,
+		'editable' => ($permission == PERM_READ_WRITE) ? 1 : null,
 		'output' => array('hostid', 'host'),
 		'templated_hosts' => true,
 		'preservekeys' => true
@@ -1117,6 +1161,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -1132,6 +1177,7 @@ function replace_template_dependencies($deps, $hostid) {
 			$deps[$id] = $db_new_dep['triggerid'];
 		}
 	}
+
 	return $deps;
 }
 
@@ -1254,6 +1300,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 			$triggerTable->addRow($tableColumns);
 		}
 	}
+
 	return $triggerTable;
 }
 
@@ -1263,7 +1310,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
  * @see get_triggers_overview()
  *
  * @param array $triggerHosts	an array with the data about the trigger for each host
- * @param string $hostName	the name of the cells corresponding host
+ * @param string $hostName		the name of the cells corresponding host
  * @param string $screenId
  *
  * @return CCol
@@ -1398,7 +1445,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table);
+			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
 		unset($img, $dep_table, $dependency);
@@ -1418,7 +1465,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table);
+			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
 		unset($img, $dep_table, $dependency);
@@ -1435,11 +1482,12 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	}
 
 	if (isset($tr_ov_menu)) {
-		$tr_ov_menu  = new CPUMenu($tr_ov_menu, 170);
+		$tr_ov_menu = new CPUMenu($tr_ov_menu, 170);
 		$tableColumn->onClick($tr_ov_menu->getOnActionJS());
-		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: \'1px dotted #0C0CF0\', padding: \'0px 2px\'})');
-		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: \'\', padding: \'1px 3px\'})');
+		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: "1px dotted #0C0CF0", padding: "0 2px"})');
+		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: "", padding: "1px 3px"})');
 	}
+
 	return $tableColumn;
 }
 
@@ -1485,8 +1533,8 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
 			$ret['unknown_time'] = 0;
-			$ret['true'] = TRIGGER_VALUE_TRUE == $start_value ? 100 : 0;
-			$ret['false'] = TRIGGER_VALUE_FALSE == $start_value ? 100 : 0;
+			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
+			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
 			$ret['unknown'] = (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 			return $ret;
 		}
@@ -1579,6 +1627,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$ret['false'] = (100 * $false_time) / $total_time;
 		$ret['unknown'] = (100 * $unknown_time) / $total_time;
 	}
+
 	return $ret;
 }
 
@@ -1610,6 +1659,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	else {
 		$options['withUnacknowledgedEvents'] = 1;
 	}
+
 	if ($count_problems) {
 		$options['filter']['value'] = TRIGGER_VALUE_TRUE;
 	}
@@ -1622,6 +1672,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	if (!empty($elements['triggers'])) {
 		$options['triggerids'] = array_unique($elements['triggers']);
 	}
+
 	return API::Trigger()->get($options);
 }
 
@@ -1677,6 +1728,7 @@ function analyze_expression($expression) {
 	$pasedData = parseTriggerExpressions($expression, true);
 	$next = array();
 	$letterNum = 0;
+
 	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $letterNum);
 }
 
@@ -1736,6 +1788,7 @@ function find_divide_pos($expr) {
 			$pos = $i;
 		}
 	}
+
 	return $pos == 0 ? false : $pos;
 }
 
@@ -1762,6 +1815,7 @@ function trim_extra_bracket($expr) {
 			$bak = $expr;
 		} while (($expr = trim_extra_bracket($expr)) != $bak);
 	}
+
 	return $expr;
 }
 
@@ -1914,6 +1968,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 		}
 		array_push($treeList, array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => $levelDetails));
 	}
+
 	return array($outline, $treeList);
 }
 
@@ -1961,6 +2016,7 @@ function expressionHighLevelErrors($expression, $start, $end) {
 			}
 		}
 	}
+
 	return $ret;
 }
 
@@ -1998,6 +2054,7 @@ function find_next_operand($expression, $sStart, $sEnd, &$parts, &$betweenParts,
 		next($parts);
 		$cKey = key($parts);
 	}
+
 	return $position;
 }
 
@@ -2098,6 +2155,7 @@ function rebuild_expression_tree($expression, &$treeLevel, $action, $actionid, $
 			$newExp .= $curLevelVal;
 		}
 	}
+
 	return $newExp;
 }
 
@@ -2261,6 +2319,7 @@ function get_item_function_info($expr) {
 			}
 		}
 	}
+
 	return $result;
 }
 
@@ -2322,6 +2381,7 @@ function parseTriggerExpressions($expressions, $askData = false) {
 		}
 		$data[$str] =& $triggersData[$str];
 	}
+
 	return $askData ? $data : $noErrors;
 }
 
@@ -2468,5 +2528,6 @@ function convert($value) {
 			$value *= 60 * 60 * 24 * 7;
 			break;
 	}
+
 	return $value;
 }

@@ -332,8 +332,9 @@ ZABBIX.apps.map = (function() {
 
 				for (linkid in this.data.links) {
 					link = this.data.links[linkid];
+
 					if (!!selementIds[link.selementid1] && !!selementIds[link.selementid2]
-							|| objectSize(selementIds) === 1 && (!!selementIds[link.selementid1] || !!selementIds[link.selementid2])) {
+							|| (objectSize(selementIds) === 1 && (!!selementIds[link.selementid1] || !!selementIds[link.selementid2]))) {
 						linkIds.push(linkid);
 					}
 				}
@@ -501,7 +502,7 @@ ZABBIX.apps.map = (function() {
 				// open link form
 				jQuery('.element-links').delegate('.openlink', 'click', function() {
 					that.currentLinkId = jQuery(this).data('linkid');
-					jQuery('#linksList tr').removeClass('selected');
+					jQuery('table.element-links tr').removeClass('selected');
 					jQuery(this).parent().parent().addClass('selected');
 					var linkData = that.links[that.currentLinkId].getData();
 					that.linkForm.setValues(linkData);
@@ -1649,9 +1650,10 @@ ZABBIX.apps.map = (function() {
 					rowTpl,
 					list,
 					i,
+					selement,
+					tmp,
 					ln,
 					link,
-					linkedSelementid,
 					linktriggers;
 
 				jQuery('.element-links').hide();
@@ -1673,13 +1675,20 @@ ZABBIX.apps.map = (function() {
 					for (i = 0, ln = links.length; i < ln; i++) {
 						link = this.sysmap.links[links[i]].data;
 
-						// if multiple elements are selected, display element2 as the "to" element
-						// if only one element is selected, display the element on the opposite end
-						if (objectSize(selementIds) > 1 || !!selementIds[link.selementid1]) {
-							linkedSelementid = link.selementid2;
-						}
-						else {
-							linkedSelementid = link.selementid1;
+						// if one element selected and it's not link.selementid1
+						// we need to swap link.selementid1 and link.selementid2
+						// in order that sorting works correctly
+						if (objectSize(selementIds) == 1 && !selementIds[link.selementid1]) {
+							// get currently selected element
+							for (var selementId in this.sysmap.selection.selements) {
+								selement = this.sysmap.selements[selementId];
+							}
+
+							if (selement.id !== link.selementid1) {
+								tmp = link.selementid1;
+								link.selementid1 = selement.id;
+								link.selementid2 = tmp;
+							}
 						}
 
 						linktriggers = [];
@@ -1689,7 +1698,7 @@ ZABBIX.apps.map = (function() {
 
 						list.push({
 							fromElementName: this.sysmap.selements[link.selementid1].data.elementName,
-							toElementName: this.sysmap.selements[linkedSelementid].data.elementName,
+							toElementName: this.sysmap.selements[link.selementid2].data.elementName,
 							linkid: link.linkid,
 							linktriggers: linktriggers.join('\n')
 						});
@@ -1699,24 +1708,32 @@ ZABBIX.apps.map = (function() {
 					list.sort(function(a, b) {
 						var fromElementA = a.fromElementName.toLowerCase();
 						var fromElementB = b.fromElementName.toLowerCase();
+						var toElementA = a.toElementName.toLowerCase();
+						var toElementB = b.toElementName.toLowerCase();
+						var linkIdA = a.linkid;
+						var linkIdB = b.linkid;
 
 						if (fromElementA < fromElementB) {
 							return -1;
 						}
-						if (fromElementA > fromElementB) {
+						else if (fromElementA > fromElementB) {
 							return 1;
 						}
-						if (fromElementA == fromElementB) {
-							var toElementA = a.toElementName.toLowerCase();
-							var toElementB = b.toElementName.toLowerCase();
 
-							if (toElementA < toElementB) {
-								return -1;
-							}
-							if (toElementA > toElementB) {
-								return 1;
-							}
+						if (toElementA < toElementB) {
+							return -1;
 						}
+						else if (toElementA > toElementB) {
+							return 1;
+						}
+
+						if (linkIdA < linkIdB) {
+							return -1;
+						}
+						else if (linkIdA > linkIdB) {
+							return 1;
+						}
+
 						return 0;
 					});
 					for (i = 0, ln = list.length; i < ln; i++) {

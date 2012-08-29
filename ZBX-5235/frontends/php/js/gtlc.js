@@ -392,40 +392,6 @@ var timeControl = {
 	}
 };
 
-function datetoarray(unixtime) {
-	var date = new CDate(unixtime * 1000);
-	var dateArray = [];
-
-	dateArray[0] = date.getDate();
-	dateArray[1] = date.getMonth() + 1;
-	dateArray[2] = date.getFullYear();
-	dateArray[3] = date.getHours();
-	dateArray[4] = date.getMinutes();
-	dateArray[5] = date.getSeconds();
-
-	for (var i = 0; i < dateArray.length; i++) {
-		if ((dateArray[i] + '').length < 2) {
-			dateArray[i] = '0' + dateArray[i];
-		}
-	}
-
-	return dateArray;
-}
-
-function onload_update_scroll(id, w, period, stime, timel, bar_stime) {
-	var obj = $(id);
-	if (typeof(obj) == 'undefined' || is_null(obj)) {
-		setTimeout('onload_update_scroll("' + id + '", ' + w + ', ' + period + ', ' + stime + ', ' + timel + ', ' + bar_stime + ');', 1000);
-		return;
-	}
-
-	scrollinit(w, period, stime, timel, bar_stime);
-
-	if (!is_null($('scroll')) && showgraphmenu) {
-		showgraphmenu(id);
-	}
-}
-
 // timeline control core
 var ZBX_TIMELINES = {};
 
@@ -1235,11 +1201,11 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
 
 		// info left
-		var date = datetoarray(userstarttime);
+		var date = this.dateToArray(userstarttime);
 		this.dom.info_left.innerHTML = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
 
 		// info right
-		var date = datetoarray(usertime);
+		var date = this.dateToArray(usertime);
 		var right_info = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
 
 		if (this.timeline.now()) {
@@ -1251,6 +1217,26 @@ var CScrollBar = Class.create(CDebug, {
 		this.setZoomLinksStyle();
 
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
+	},
+
+	dateToArray: function(unixtime) {
+		var date = new CDate(unixtime * 1000);
+		var dateArray = [];
+
+		dateArray[0] = date.getDate();
+		dateArray[1] = date.getMonth() + 1;
+		dateArray[2] = date.getFullYear();
+		dateArray[3] = date.getHours();
+		dateArray[4] = date.getMinutes();
+		dateArray[5] = date.getSeconds();
+
+		for (var i = 0; i < dateArray.length; i++) {
+			if ((dateArray[i] + '').length < 2) {
+				dateArray[i] = '0' + dateArray[i];
+			}
+		}
+
+		return dateArray;
 	},
 
 	//----------------------------------------------------------------

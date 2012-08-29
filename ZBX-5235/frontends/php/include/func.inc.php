@@ -296,6 +296,21 @@ function zbxDateToTime($strdate) {
 	}
 }
 
+/**
+ * Correcting adding one unix timestamp to another.
+ *
+ * @param int		$sec
+ * @param mixed		$unixtime	Can accept values:
+ *									1) int - unix timestamp,
+ *									2) string - date in YmdHis or YmdHi formats,
+ *									3) null - current unixtime stamp will be used
+ *
+ * @return int
+ */
+function zbxAddSecondsToUnixtime($sec, $unixtime) {
+	return strtotime('+'.$sec.' seconds', zbxDateToTime($unixtime));
+}
+
 /*************** CONVERTING ******************/
 function rgb2hex($color) {
 	$HEX = array(
