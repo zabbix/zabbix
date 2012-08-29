@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
@@ -32,33 +32,33 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'applications' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-	'applicationid' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-	'close' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
-	'open' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
-	'groupid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-	'hostid' =>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})||isset({save})'),
+	'applications' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'applicationid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'close' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
+	'open' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
+	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})||isset({save})'),
 	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'application' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Application')),
-	'name' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Name')),
-	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
-	'status' =>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'isset({save})'),
-	'agent' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'macros' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'steps' => array(T_ZBX_STR, O_OPT, null, null, 'isset({save})', _('Steps')),
-	'authentication' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),'isset({save})'),
-	'http_user' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+	'application' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Application')),
+	'name' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Name')),
+	'delay' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
+	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	'isset({save})'),
+	'agent' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'macros' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'steps' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})', _('Steps')),
+	'authentication' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'), 'isset({save})'),
+	'http_user' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
-	'http_password' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+	'http_password' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
-	'new_httpstep' =>	array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
-	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
-	'sel_step' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 65534), null),
+	'new_httpstep' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'move_up' =>		array(T_ZBX_INT, O_OPT, P_ACT,	BETWEEN(0, 65534), null),
+	'move_down' =>		array(T_ZBX_INT, O_OPT, P_ACT,	BETWEEN(0, 65534), null),
+	'sel_step' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534), null),
 	'group_httptestid' => array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'showdisabled' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
+	'showdisabled' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -66,7 +66,7 @@ $fields = array(
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,		null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 $_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 $_REQUEST['status'] = isset($_REQUEST['status']) ? 0 : 1;
@@ -126,22 +126,28 @@ elseif (isset($_REQUEST['close'])) {
 	}
 }
 
+// limit opened application count
 if (count($_REQUEST['applications']) > 25) {
 	$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 }
-
-// limit opened application count
 rm4favorites('web.httpconf.applications');
 foreach ($_REQUEST['applications'] as $application) {
 	add2favorites('web.httpconf.applications', $application);
 }
 
+// add new steps
 if (isset($_REQUEST['new_httpstep'])) {
 	$_REQUEST['steps'] = get_request('steps', array());
 	$_REQUEST['new_httpstep']['no'] = count($_REQUEST['steps']) + 1;
 	array_push($_REQUEST['steps'], $_REQUEST['new_httpstep']);
+
+	unset($_REQUEST['new_httpstep']);
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
+
+// check for duplicate step names
+$isDuplicateStepsFound = !empty($_REQUEST['steps']) ? validateHttpDuplicateSteps($_REQUEST['steps']) : false;
+
+if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	$result = false;
 	if ($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])) {
 		$result = API::WebCheck()->delete($_REQUEST['httptestid']);
@@ -176,6 +182,10 @@ elseif (isset($_REQUEST['save'])) {
 
 		$steps = get_request('steps', array());
 		if (!empty($steps)) {
+			if ($isDuplicateStepsFound) {
+				throw new Exception();
+			}
+
 			$i = 1;
 			foreach ($steps as $snum => $step) {
 				$steps[$snum]['no'] = $i++;
@@ -324,23 +334,14 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	insert_js('cookie.eraseArray("'.$path.'")');
 }
 
+show_messages();
+
 /*
  * Display
  */
-// make steps with unique names
-$_REQUEST['steps'] = get_request('steps', array());
-foreach ($_REQUEST['steps'] as $s1id => $s1) {
-	foreach ($_REQUEST['steps'] as $s2id => $s2) {
-		if (strcmp($s1['name'], $s2['name']) == 0 && bccomp($s1id,$s2id) != 0) {
-			$_REQUEST['steps'][$s1id] = $_REQUEST['steps'][$s2id];
-			unset($_REQUEST['steps'][$s2id]);
-		}
-	}
-}
-$_REQUEST['steps'] = array_merge(get_request('steps', array()));
-
-$data = array();
-$data['hostid'] = get_request('hostid', 0);
+$data = array(
+	'hostid' => get_request('hostid', 0)
+);
 
 if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$data['groupid'] = get_request('groupid', 0);
@@ -438,5 +439,5 @@ else {
 	$httpView->render();
 	$httpView->show();
 }
+
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
