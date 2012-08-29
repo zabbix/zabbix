@@ -29,12 +29,15 @@
 /* h20000.www2.hp.com/bc/docs/support/SupportManual/c02258083/c02258083.pdf        */
 
 #if HPUX_VERSION < 1131
+
+#define ZBX_IF_SEP	','
+
 void	add_if_name(char **if_list, size_t *if_list_alloc, size_t *if_list_offset, const char *name)
 {
-	if (FAIL == str_in_list(*if_list, name, ','))
+	if (FAIL == str_in_list(*if_list, name, ZBX_IF_SEP))
 	{
 		if ('\0' != **if_list)
-			zbx_chrcpy_alloc(if_list, if_list_alloc, if_list_offset, ',');
+			zbx_chrcpy_alloc(if_list, if_list_alloc, if_list_offset, ZBX_IF_SEP);
 
 		zbx_strcpy_alloc(if_list, if_list_alloc, if_list_offset, name);
 	}
@@ -140,7 +143,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 #endif
 	struct zbx_json		j;
 	int			i;
-	const char		*if_name = NULL;
+	char			*if_name, if_name_end;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -152,11 +155,13 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if (FAIL == get_if_names(&if_list, &if_list_alloc, &if_list_offset))
 		return SYSINFO_RET_FAIL;
-	else if (NULL != if_list)
-		if_name = strtok(if_list, ",");
+
+	if_name = if_list;
 
 	while (NULL != if_name)
 	{
+		if (NULL != (if_name_end = strchr(if_name, ZBX_IF_SEP)))
+			if_name[if_name_end - if_name] = '\0';
 #else
 	for (ni = if_nameindex(), i = 0; 0 != ni[i].if_index; i++)
 	{
@@ -166,7 +171,16 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		zbx_json_addstring(&j, "{#IFNAME}", if_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 #if HPUX_VERSION < 1131
-		if_name = strtok(NULL, ",");
+
+		if (NULL == if_name_end)
+		{
+			if_name = NULL;
+		}
+		else
+		{
+			if_name[if_name_end - if_name] = ZBX_IF_SEP;
+			if_name = if_name_end + 1;
+		}
 #endif
 	}
 
