@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,12 +9,12 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 var ZABBIX = ZABBIX || {};
@@ -215,6 +215,7 @@ ZABBIX.apps.map = (function() {
 				}, this)
 			});
 		};
+
 		CMap.prototype = {
 			save: function() {
 				var url = new Curl(location.href);
@@ -348,8 +349,8 @@ ZABBIX.apps.map = (function() {
 				// MAP PANEL EVENTS
 				// toggle expand macros
 				jQuery('#expand_macros').click(function() {
-					that.data.expand_macros = that.data.expand_macros === '1' ? '0' : '1';
-					jQuery(this).html(that.data.expand_macros === '1' ? locale['S_ON'] : locale['S_OFF']);
+					that.data.expand_macros = (that.data.expand_macros === '1') ? '0' : '1';
+					jQuery(this).html((that.data.expand_macros === '1') ? locale['S_ON'] : locale['S_OFF']);
 					that.updateImage();
 				});
 
@@ -364,14 +365,14 @@ ZABBIX.apps.map = (function() {
 
 				// toggle autoalign
 				jQuery('#gridautoalign').click(function() {
-					that.data.grid_align = that.data.grid_align === '1' ? '0' : '1';
-					jQuery(this).html(that.data.grid_align === '1' ? locale['S_ON'] : locale['S_OFF']);
+					that.data.grid_align = (that.data.grid_align === '1') ? '0' : '1';
+					jQuery(this).html((that.data.grid_align === '1') ? locale['S_ON'] : locale['S_OFF']);
 				});
 
 				// toggle grid visibility
 				jQuery('#gridshow').click(function() {
-					that.data.grid_show = that.data.grid_show === '1' ? '0' : '1';
-					jQuery(this).html(that.data.grid_show === '1' ? locale['S_SHOWN'] : locale['S_HIDDEN']);
+					that.data.grid_show = (that.data.grid_show === '1') ? '0' : '1';
+					jQuery(this).html((that.data.grid_show === '1') ? locale['S_SHOWN'] : locale['S_HIDDEN']);
 					that.updateImage();
 				});
 
@@ -417,9 +418,7 @@ ZABBIX.apps.map = (function() {
 					that.linkForm.updateList(that.selection.selements);
 				});
 
-				/**
-				 * Removes all of the links between the selected elements.
-				 */
+				// removes all of the links between the selected elements
 				jQuery('#linkRemove').click(function() {
 					var linkids;
 
@@ -608,8 +607,10 @@ ZABBIX.apps.map = (function() {
 		};
 
 		/**
-		 * Creates a new Link
+		 * Creates a new Link.
+		 *
 		 * @class represents connector between two Elements
+		 *
 		 * @property {Object} sysmap reference to Map object
 		 * @property {Object} data link db values
 		 * @property {String} id linkid
@@ -623,12 +624,12 @@ ZABBIX.apps.map = (function() {
 
 			if (!linkData) {
 				linkData = {
-					label:		'',
+					label:			'',
 					selementid1:	null,
 					selementid2:	null,
 					linktriggers:	{},
-					drawtype:	0,
-					color:		'00CC00'
+					drawtype:		0,
+					color:			'00CC00'
 				};
 
 				for (selementid in this.sysmap.selection.selements) {
@@ -659,9 +660,11 @@ ZABBIX.apps.map = (function() {
 			// assign by reference
 			this.sysmap.data.links[this.id] = this.data;
 		}
+
 		Link.prototype = {
 			/**
-			 * Updades values in property data
+			 * Updades values in property data.
+			 *
 			 * @param {Object} data
 			 */
 			update: function(data) {
@@ -675,7 +678,7 @@ ZABBIX.apps.map = (function() {
 			},
 
 			/**
-			 * Removes Link object, delete all reference to it
+			 * Removes Link object, delete all reference to it.
 			 */
 			remove: function() {
 				delete this.sysmap.data.links[this.id];
@@ -688,7 +691,8 @@ ZABBIX.apps.map = (function() {
 			},
 
 			/**
-			 * Gets Link data
+			 * Gets Link data.
+			 *
 			 * @returns {Object}
 			 */
 			getData: function() {
@@ -699,6 +703,7 @@ ZABBIX.apps.map = (function() {
 
 		/**
 		 * @class Creates a new Selement
+		 *
 		 * @property {Object} sysmap reference to Map object
 		 * @property {Object} data selement db values
 		 * @property {Boolean} selected if element is now selected by user
@@ -714,6 +719,7 @@ ZABBIX.apps.map = (function() {
 
 			if (!selementData) {
 				selementData = {
+					selementid: getUniqueId(),
 					elementtype: '4', // image
 					elementid: 0,
 					iconid_off: this.sysmap.iconList[0].imageid, // first imageid
@@ -722,12 +728,9 @@ ZABBIX.apps.map = (function() {
 					x: 0,
 					y: 0,
 					urls: {},
-					elementName: this.sysmap.iconList[0].name, // image name
+					elementName: this.sysmap.iconList[0].name, // first image name
 					use_iconmap: '1'
 				};
-
-				// generate unique selementid
-				selementData.selementid = getUniqueId();
 			}
 			else {
 				if (jQuery.isArray(selementData.urls)) {
@@ -760,11 +763,13 @@ ZABBIX.apps.map = (function() {
 			});
 
 			this.updateIcon();
+
 			this.domNode.css({
 				top: this.data.y + 'px',
 				left: this.data.x + 'px'
 			});
 		}
+
 		Selement.prototype = {
 			/**
 			 * Returns element data.
@@ -775,6 +780,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Updates element fields.
+			 *
 			 * @param {Object} data
 			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
 			 */
@@ -834,6 +840,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Updates element position.
+			 *
 			 * @param {Object} coords
 			 */
 			updatePosition: function(coords) {
@@ -859,6 +866,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Toggle element selection.
+			 *
 			 * @param {Boolean} state
 			 */
 			toggleSelect: function(state) {
@@ -875,6 +883,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Align element to map or map grid.
+			 *
 			 * @param {Boolean} doAutoAlign if we should align element to grid
 			 */
 			align: function(doAutoAlign) {
@@ -953,7 +962,6 @@ ZABBIX.apps.map = (function() {
 					width: newWidth,
 					height: newHeight
 				});
-
 			},
 
 			/**
@@ -1005,6 +1013,7 @@ ZABBIX.apps.map = (function() {
 
 		/**
 		 * Form for elements.
+		 *
 		 * @param {Object} formContainer jQuery object
 		 * @param {Object} sysmap
 		 */
@@ -1113,6 +1122,7 @@ ZABBIX.apps.map = (function() {
 			}
 			jQuery('#iconid_on, #iconid_maintenance, #iconid_disabled')
 				.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
+			jQuery('#iconid_on, #iconid_maintenance, #iconid_disabled').val(0);
 
 			// apply jQuery UI elements
 			jQuery('#elementApply, #elementRemove, #elementClose').button();
@@ -1130,6 +1140,7 @@ ZABBIX.apps.map = (function() {
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
+
 		SelementForm.prototype = {
 			/**
 			 * Shows lement form.
@@ -1151,6 +1162,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Adds element urls to form.
+			 *
 			 * @param {Object} urls
 			 */
 			addUrls: function(urls) {
@@ -1176,12 +1188,23 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Set form controls with element fields values.
+			 *
 			 * @param {Object} selement
 			 */
 			setValues: function(selement) {
-				var elementName;
-				for (elementName in selement) {
+				for (var elementName in selement) {
 					jQuery('[name=' + elementName + ']', this.domNode).val([selement[elementName]]);
+				}
+
+				// set default icon state
+				if (empty(selement.iconid_on)) {
+					jQuery('[name=iconid_on]', this.domNode).val(0);
+				}
+				if (empty(selement.iconid_disabled)) {
+					jQuery('[name=iconid_disabled]', this.domNode).val(0);
+				}
+				if (empty(selement.iconid_maintenance)) {
+					jQuery('[name=iconid_maintenance]', this.domNode).val(0);
 				}
 
 				// clear urls
@@ -1202,6 +1225,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Gets form values for element fields.
+			 *
 			 * @retrurns {Object|Boolean}
 			 */
 			getValues: function() {
@@ -1264,6 +1288,7 @@ ZABBIX.apps.map = (function() {
 
 		/**
 		 * Elements mass update form.
+		 *
 		 * @param {Object} formContainer jQuery object
 		 * @param {Object} sysmap
 		 */
@@ -1344,6 +1369,7 @@ ZABBIX.apps.map = (function() {
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
+
 		MassForm.prototype = {
 			/**
 			 * Show mass update form.
@@ -1372,7 +1398,8 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Get values from mass update form that should be updated in all selected elements.
-			 * @returns {Array}
+			 *
+			 * @return array
 			 */
 			getValues: function() {
 				var values = jQuery('#massForm').serializeArray(),
@@ -1457,6 +1484,7 @@ ZABBIX.apps.map = (function() {
 
 		/**
 		 * Form for editin links.
+		 *
 		 * @param {Object} formContainer jQuesry object
 		 * @param {Object} sysmap
 		 */
@@ -1470,6 +1498,7 @@ ZABBIX.apps.map = (function() {
 			// apply jQuery UI elements
 			jQuery('#formLinkApply, #formLinkRemove, #formLinkClose').button();
 		}
+
 		LinkForm.prototype = {
 			/**
 			 * Show form.
@@ -1518,6 +1547,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * update form controls with values from link.
+			 *
 			 * @param {Object} link
 			 */
 			setValues: function(link) {
@@ -1593,6 +1623,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Add triggers to link form.
+			 *
 			 * @param {Object} triggers
 			 */
 			addTriggers: function(triggers) {
@@ -1609,6 +1640,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Add new triggers which were selected in popup to trigger list.
+			 *
 			 * @param {Object} triggers
 			 */
 			addNewTriggers: function(triggers) {
@@ -1642,6 +1674,7 @@ ZABBIX.apps.map = (function() {
 
 			/**
 			 * Updates links list for element.
+			 *
 			 * @param {String} selementIds
 			 */
 			updateList: function(selementIds) {
@@ -1736,6 +1769,7 @@ ZABBIX.apps.map = (function() {
 
 						return 0;
 					});
+
 					for (i = 0, ln = list.length; i < ln; i++) {
 						jQuery(rowTpl.evaluate(list[i])).appendTo(linkTable.find('tbody'));
 					}
@@ -1780,10 +1814,10 @@ ZABBIX.apps.map = (function() {
 	}
 }());
 
-
 /**
  * Function that is executed by popup.php to ass selected values to destination.
  * It uses a sysmap global variable that created in sysmap.php file via 'var sysmap = ZABBIX.apps.map.run();'
+ *
  * @param list link triggers selected in popup
  * @param {String} list.object name of objects which we returned
  * @param {Array} list.values list of link triggers
