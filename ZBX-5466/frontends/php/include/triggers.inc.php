@@ -537,8 +537,10 @@ function utf8RawUrlDecode($source) {
  *
  * This function takes care of copied trigger dependencies.
  * If trigger is copied alongside with trigger on which it depends, then dependencies is replaced directly using new ids,
- * otherwise it will search for potential matching trigger in target host. If matching trigger is found, then id from this
- * trigger is used, if not rise exception.
+ * If there is target host within dependency trigger, algorithm will search for potential matching trigger in target host,
+ * if matching trigger is found, then id from this trigger is used, if not rise exception,
+ * otherwise original dependency will be left.
+ *
  *
  * @param int|array $srcTriggerIds triggers which will be copied to $dstHostIds
  * @param int|array $dstHostIds hosts and templates to whom add triggers, ids not present in DB (host table) will be ignored
@@ -661,8 +663,8 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 							$depTriggerId = $depTrigger['triggerid'];
 						}
 					}
-					// we need to search for $depTrigger trigger
-					else {
+					// we need to search for $depTrigger trigger if target host is within dependency hosts
+					elseif (in_array(array('hostid'=>$newTrigger['srcTriggerContextHostId']), $depTriggers[$depTrigger['triggerid']]['hosts'])) {
 						// get all possible $depTrigger matching triggers by description
 						$targetHostTriggersByDescription = API::Trigger()->get(array(
 							'hostids' => $newTrigger['newTriggerHostId'],
@@ -692,6 +694,11 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 							return false;
 						}
 					}
+					// leave original dependency
+					else {
+						$depTriggerId = $depTrigger['triggerid'];
+					}
+
 
 					$dependencies[] = array(
 						'triggerid' => $newTrigger['newTriggerId'],
