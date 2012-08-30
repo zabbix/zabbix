@@ -92,9 +92,10 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 				" and (clock<%d"
 					" or (id<=" ZBX_FS_UI64 " and clock<%d))",
 			table, maxid,
-			now - CONFIG_PROXY_OFFLINE_BUFFER * 3600,
+			now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR,
 			lastid,
-			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * 3600, minclock + 4 * CONFIG_HOUSEKEEPING_FREQUENCY * 3600));
+			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR,
+					minclock + 4 * CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR));
 
 	DBcommit();
 
@@ -146,7 +147,7 @@ void	main_housekeeper_loop()
 	{
 		start = time(NULL);
 
-		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
+		zabbix_log(LOG_LEVEL_WARNING, "executing housekeeper");
 
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -158,13 +159,12 @@ void	main_housekeeper_loop()
 
 		records = housekeeping_history(start);
 
-		zabbix_log(LOG_LEVEL_WARNING, "Deleted %d records from history [" ZBX_FS_DBL " seconds]",
-				records,
-				zbx_time() - sec);
+		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted %d records from history (spent " ZBX_FS_DBL " seconds)",
+				records, zbx_time() - sec);
 
 		DBclose();
 
-		sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * 3600 - (time(NULL) - start);
+		sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR - (time(NULL) - start);
 
 		zbx_sleep_loop(sleeptime);
 	}
