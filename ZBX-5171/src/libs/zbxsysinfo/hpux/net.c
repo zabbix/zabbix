@@ -136,14 +136,14 @@ end:
 int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if HPUX_VERSION < 1131
-	char			*if_list = NULL;
+	char			*if_list = NULL, *if_name_end;
 	size_t			if_list_alloc = 64, if_list_offset = 0;
 #else
 	struct if_nameindex	*ni;
+	int			i;
 #endif
 	struct zbx_json		j;
-	int			i;
-	char			*if_name, if_name_end;
+	char			*if_name;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -161,7 +161,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	while (NULL != if_name)
 	{
 		if (NULL != (if_name_end = strchr(if_name, ZBX_IF_SEP)))
-			if_name[if_name_end - if_name] = '\0';
+			*if_name_end = '\0';
 #else
 	for (ni = if_nameindex(), i = 0; 0 != ni[i].if_index; i++)
 	{
@@ -172,15 +172,13 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		zbx_json_close(&j);
 #if HPUX_VERSION < 1131
 
-		if (NULL == if_name_end)
+		if (NULL != if_name_end)
 		{
-			if_name = NULL;
-		}
-		else
-		{
-			if_name[if_name_end - if_name] = ZBX_IF_SEP;
+			*if_name_end = ZBX_IF_SEP;
 			if_name = if_name_end + 1;
 		}
+		else
+			if_name = NULL;
 #endif
 	}
 
