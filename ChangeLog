@@ -14,7 +14,6 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
-...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
 ..F....... [ZBX-5487] fixed sorting in dashboard system status and host status widget popups (Vedmak)
 ..F....... [ZBX-5480] fixed icon default state for host elements in map (Eduard)
 ....I..... [ZBX-5479] removed inode item prototype from OS Windows template (Sasha)
@@ -985,7 +984,6 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
-...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
 ........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
 A......... [ZBX-5395] fixed {ITEM.LASTVALUE1} and {ITEM.VALUE1} expanding in the trigger.get method (Pavels)
 
