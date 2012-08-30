@@ -64,9 +64,11 @@ $triggersFormList->addRow(_('Name'), new CTextBox('description', $this->data['de
 $expressionTextBox = new CTextArea(
 	$this->data['expression_field_name'],
 	$this->data['expression_field_value'],
-	ZBX_TEXTAREA_STANDARD_ROWS,
-	ZBX_TEXTAREA_STANDARD_WIDTH,
-	$this->data['expression_field_readonly']
+	array(
+		'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
+		'width' => ZBX_TEXTAREA_STANDARD_WIDTH,
+		'readonly' => $this->data['expression_field_readonly']
+	)
 );
 if ($this->data['expression_field_readonly'] == 'yes') {
 	$triggersForm->addVar('expression', $this->data['expression']);
@@ -241,7 +243,6 @@ if ($this->data['input_method'] == IM_TREE) {
 $triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', ($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no', null, 1));
 $triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
 $triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
-
 $triggersFormList->addRow(_('Severity'), getSeverityControl($this->data['priority']));
 
 // append status to form list
