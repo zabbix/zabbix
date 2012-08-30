@@ -28,6 +28,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5487] fixed sorting in dashboard system status and host status widget popups (Vedmak)
 ..F....... [ZBX-5480] fixed icon default state for host elements in map (Eduard)
 ....I..... [ZBX-5479] removed inode item prototype from OS Windows template (Sasha)
 ........S. [ZBX-5235] fixed update of a "lifetime" field if link a template to a host (Sasha)
