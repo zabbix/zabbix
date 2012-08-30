@@ -25,6 +25,13 @@ class CWebCheck extends CZBXAPI {
 	private $history = 30;
 	private $trends = 90;
 
+	/**
+	 * Get data about web scenarios.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -292,6 +299,13 @@ class CWebCheck extends CZBXAPI {
 		return $result;
 	}
 
+	/**
+	 * Create web scenario.
+	 *
+	 * @param $httpTests
+	 *
+	 * @return array
+	 */
 	public function create($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
 
@@ -309,6 +323,13 @@ class CWebCheck extends CZBXAPI {
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Update web scenario.
+	 *
+	 * @param $httpTests
+	 *
+	 * @return array
+	 */
 	public function update($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
 
@@ -405,6 +426,13 @@ class CWebCheck extends CZBXAPI {
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Delete web scenario.
+	 *
+	 * @param $httpTestIds
+	 *
+	 * @return array|bool
+	 */
 	public function delete($httpTestIds) {
 		if (empty($httpTestIds)) {
 			return true;
@@ -465,6 +493,13 @@ class CWebCheck extends CZBXAPI {
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Validate web scenario parameters for create method.
+	 *  - check if web scenario with same name already exists
+	 *  - check if web scenario has at least one step
+	 *
+	 * @param array $httpTests
+	 */
 	protected function validateCreate(array $httpTests) {
 		$httpTestsNames = $this->checkNames($httpTests);
 
@@ -480,6 +515,14 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Validate web scenario parameters for update method.
+	 *  - check permissions
+	 *  - check if web scenario with same name already exists
+	 *  - check that each web scenario object has httptestid defined
+	 *
+	 * @param array $httpTests
+	 */
 	protected function validateUpdate(array $httpTests) {
 		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
@@ -506,6 +549,12 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Check web scenario steps.
+	 *  - check status_codes field
+	 *
+	 * @param array $steps
+	 */
 	protected function checkSteps(array $steps) {
 		foreach ($steps as $step) {
 			if (isset($step['status_codes'])) {
@@ -547,6 +596,13 @@ class CWebCheck extends CZBXAPI {
 	}
 
 
+	/**
+	 * Check web scenario names.
+	 *
+	 * @param array $httpTests
+	 *
+	 * @return array|null
+	 */
 	protected function checkNames(array $httpTests) {
 		$httpTestsNames = zbx_objectValues($httpTests, 'name');
 		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
@@ -556,6 +612,11 @@ class CWebCheck extends CZBXAPI {
 		return $httpTestsNames;
 	}
 
+	/**
+	 * Create items required for web scenario.
+	 *
+	 * @param $httpTest
+	 */
 	protected function createCheckItems($httpTest) {
 		$checkitems = array(
 			array(
@@ -624,6 +685,12 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Create web scenario steps with items.
+	 *
+	 * @param $httpTest
+	 * @param $websteps
+	 */
 	protected function createStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
@@ -718,6 +785,12 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Update web scenario steps.
+	 *
+	 * @param $httpTest
+	 * @param $websteps
+	 */
 	protected function updateStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
@@ -798,6 +871,11 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Delete web scenario steps.
+	 *
+	 * @param $webstepids
+	 */
 	protected function deleteStepsReal($webstepids) {
 		$itemids = array();
 		$dbStepItems = DBselect(
