@@ -538,8 +538,7 @@ function utf8RawUrlDecode($source) {
  * This function takes care of copied trigger dependencies.
  * If trigger is copied alongside with trigger on which it depends, then dependencies is replaced directly using new ids,
  * otherwise it will search for potential matching trigger in target host. If matching trigger is found, then id from this
- * trigger is used, if not use original dependency trigger id.
- * Rise exception if matching trigger has not been found and dependency trigger has only single host.
+ * trigger is used, if not rise exception.
  *
  * @param int|array $srcTriggerIds triggers which will be copied to $dstHostIds
  * @param int|array $dstHostIds hosts and templates to whom add triggers, ids not present in DB (host table) will be ignored
@@ -555,13 +554,27 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_REFER
 	);
+	if ($srcHostId) {
+		$srcHost = API::Host()->get(array(
+			'output' => array('host'),
+			'hostids' => $srcHostId,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'templated_hosts' => true
+		));
+
+		// if provided $srcHostId doesn't match any record in DB, return false
+		if (!($srcHost = reset($srcHost))) {
+			return false;
+		}
+	}
 	// if no $srcHostId provided we will need trigger host 'host'
-	if (!$srcHostId) {
+	else {
 		$options['selectHosts'] = array('host');
 	}
-	$db_srcTriggers = API::Trigger()->get($options);
+	$dbSrcTriggers = API::Trigger()->get($options);
 
-	$db_dstHosts = API::Host()->get(array(
+	$dbDstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host'),
 		'hostids' => $dstHostIds,
 		'preservekeys' => true,
@@ -570,32 +583,11 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	));
 
 	$newTriggers = array();
-	$httpTriggerIds = array();
 	// create each trigger for each host
-	foreach ($db_dstHosts as $dstHost) {
-		foreach ($db_srcTriggers as $srcTrigger) {
-
-			// we don't copy triggers with HTTP items, because HTTP items needs web scenarios,
-			// but if we create web scenarios, thouse triggers are created automatically
-			if (httpItemExists($srcTrigger['items'])) {
-				$httpTriggerIds[$srcTrigger['triggerid']] = $srcTrigger['triggerid'];
-				continue;
-			}
-
+	foreach ($dbDstHosts as $dstHost) {
+		foreach ($dbSrcTriggers as $srcTrigger) {
 			// if $srcHostId provided, get host 'host' for explode_exp()
 			if ($srcHostId != 0) {
-				$srcHost = API::Host()->get(array(
-					'output' => array('host'),
-					'hostids' => $srcHostId,
-					'preservekeys' => true,
-					'nopermissions' => true,
-					'templated_hosts' => true
-				));
-
-				// if provided $srcHostId doesn't match any record in DB, return false
-				if (!($srcHost = reset($srcHost))) {
-					return false;
-				}
 				$host = $srcHost['host'];
 				$srcTriggerContextHostId = $srcHostId;
 			}
@@ -631,9 +623,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 
 	$depIds = array();
-	foreach ($db_srcTriggers as $trigger) {
-		if ($trigger['dependencies']) {
-			foreach ($trigger['dependencies'] as $depTrigger) {
+	foreach ($dbSrcTriggers as $srcTrigger) {
+		if ($srcTrigger['dependencies']) {
+			foreach ($srcTrigger['dependencies'] as $depTrigger) {
 				$depIds[] = $depTrigger['triggerid'];
 			}
 		}
@@ -649,23 +641,13 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	// map dependencies to the new trigger IDs and save
 	if ($newTriggers) {
 		$dependencies = array();
-		foreach ($db_srcTriggers as $trigger) {
-			if ($trigger['dependencies']) {
+		foreach ($dbSrcTriggers as $srcTrigger) {
+			if ($srcTrigger['dependencies']) {
 				// get coresponding created trigger id
-				if (isset($newTriggers[$trigger['triggerid']])) {
-					$newTrigger = $newTriggers[$trigger['triggerid']];
-				}
-				// skip not added triggers with web items
-				else {
-					continue;
-				}
+				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
 
-				foreach ($trigger['dependencies'] as $depTrigger) {
-					// skip dependencies on triggers not added becouse of having web items
-					if (isset($httpTriggerIds[$depTrigger['triggerid']])) {
-						continue;
-					}
 
+				foreach ($srcTrigger['dependencies'] as $depTrigger) {
 					// we have added $depTrigger trigger, and we know corresponding trigger id for newly created trigger
 					if (isset($newTriggers[$depTrigger['triggerid']])) {
 
@@ -697,23 +679,17 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 							if ($expr2 == $expr1) {
 								// matching trigger has been found
 								$depTriggerId = $potentialTargetTrigger['triggerid'];
+								break;
 							}
 						}
-						// matching trigger wasn't found
+						// if matching trigger wasn't found rise exception
 						if (is_null($depTriggerId)) {
-							// if trigger has several hosts, then leave original dependency
-							if (count($depTriggers[$depTrigger['triggerid']]['hosts']) > 1) {
-								$depTriggerId = $depTrigger['triggerid'];
-							}
-							// if trigger has only one host, rise exception
-							else {
-								$expr1 = explode_exp($trigger['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
-								$expr2 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
-								error(_s('Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
-									$trigger['description'], $expr1,
-									$depTriggers[$depTrigger['triggerid']]['description'], $expr2));
-								return false;
-							}
+							$expr1 = explode_exp($srcTrigger['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
+							$expr2 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
+							error(_s('Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
+								$srcTrigger['description'], $expr1,
+								$depTriggers[$depTrigger['triggerid']]['description'], $expr2));
+							return false;
 						}
 					}
 
