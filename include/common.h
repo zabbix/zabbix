@@ -857,6 +857,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_MONTH		(30 * SEC_PER_DAY)
 #define SEC_PER_YEAR		(365 * SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
+
+#define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
+
 double	zbx_time();
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time();
