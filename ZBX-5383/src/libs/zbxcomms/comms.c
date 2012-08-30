@@ -177,14 +177,8 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  *                                                                            *
  ******************************************************************************/
 #if defined(_WINDOWS)
-#define ZBX_TCP_START()					\
-							\
-	do						\
-	{						\
-		if (FAIL == tcp_started)		\
-			tcp_started = zbx_tcp_start();	\
-	}						\
-	while (0)
+
+#define ZBX_TCP_START() { if (FAIL == tcp_started) tcp_started = zbx_tcp_start(); }
 
 int	tcp_started = FAIL;	/* winXX threads require tcp_started not to be static */
 
@@ -203,7 +197,7 @@ static int	zbx_tcp_start()
 }
 
 #else
-#	define ZBX_TCP_START()
+#	define ZBX_TCP_START() {}
 #endif	/* _WINDOWS */
 
 /******************************************************************************
