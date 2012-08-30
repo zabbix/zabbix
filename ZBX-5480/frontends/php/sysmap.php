@@ -57,54 +57,53 @@ check_fields($fields);
  */
 if (isset($_REQUEST['favobj'])) {
 	$json = new CJSON();
-	if ('sysmap' == $_REQUEST['favobj']) {
+	if ($_REQUEST['favobj'] == 'sysmap' && $_REQUEST['action'] == 'save') {
 		$sysmapid = get_request('sysmapid', 0);
 
-		if ($_REQUEST['action'] == 'save') {
-			@ob_start();
+		@ob_start();
 
-			try {
-				DBstart();
+		try {
+			DBstart();
 
-				$sysmap = API::Map()->get(array(
-					'sysmapids' => $sysmapid,
-					'editable' => true,
-					'output' => API_OUTPUT_SHORTEN
-				));
-				$sysmap = reset($sysmap);
-				if ($sysmap === false) {
-					throw new Exception(_('Access denied!')."\n\r");
-				}
-
-				$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
-				$sysmapUpdate['sysmapid'] = $sysmapid;
-
-				$result = API::Map()->update($sysmapUpdate);
-
-				if ($result !== false) {
-					echo 'if (Confirm("'._('Map is saved! Return?').'")) { location.href = "sysmaps.php"; }';
-				}
-				else {
-					throw new Exception(_('Map save operation failed.')."\n\r");
-				}
-
-				DBend(true);
-			}
-			catch (Exception $e) {
-				DBend(false);
-				$msg = array($e->getMessage());
-				foreach (clear_messages() as $errMsg) {
-					$msg[] = $errMsg['type'].': '.$errMsg['message'];
-				}
-
-				ob_clean();
-
-				echo 'alert('.zbx_jsvalue(implode("\n\r", $msg)).');';
+			$sysmap = API::Map()->get(array(
+				'sysmapids' => $sysmapid,
+				'editable' => true,
+				'output' => API_OUTPUT_SHORTEN
+			));
+			$sysmap = reset($sysmap);
+			if ($sysmap === false) {
+				throw new Exception(_('Access denied!')."\n\r");
 			}
 
-			@ob_flush();
-			exit();
+			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
+			$sysmapUpdate['sysmapid'] = $sysmapid;
+
+			$result = API::Map()->update($sysmapUpdate);
+
+			if ($result !== false) {
+				echo 'if (Confirm("'._('Map is saved! Return?').'")) { location.href = "sysmaps.php"; }';
+			}
+			else {
+				throw new Exception(_('Map save operation failed.')."\n\r");
+			}
+
+			DBend(true);
 		}
+		catch (Exception $e) {
+			DBend(false);
+			$msg = array($e->getMessage());
+			foreach (clear_messages() as $errMsg) {
+				$msg[] = $errMsg['type'].': '.$errMsg['message'];
+			}
+
+			ob_clean();
+
+			echo 'alert('.zbx_jsvalue(implode("\n\r", $msg)).');';
+		}
+
+		@ob_flush();
+		exit();
+
 	}
 }
 
