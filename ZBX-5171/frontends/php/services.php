@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/services.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
@@ -81,8 +81,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 	exit();
 }
 
-// get triggers and check permissions
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+// check permissions
 if (!empty($_REQUEST['serviceid'])) {
 	$service = API::Service()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -106,11 +105,11 @@ if (!empty($_REQUEST['serviceid'])) {
 if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
 	$result = API::Service()->delete($service['serviceid']);
 	show_messages($result, _('Service deleted'), _('Cannot delete service'));
-	add_audit_if($result, AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
-	unset($service);
 	if ($result) {
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
 		unset($_REQUEST['form']);
 	}
+	unset($service);
 }
 
 if (isset($_REQUEST['form'])) {
@@ -148,18 +147,18 @@ if (isset($_REQUEST['form'])) {
 
 			show_messages($result, _('Service updated'), _('Cannot update service'));
 			$serviceid = $service['serviceid'];
-			$audit_acrion = AUDIT_ACTION_UPDATE;
+			$audit_action = AUDIT_ACTION_UPDATE;
 		}
 		else {
 			$result = API::Service()->create($serviceRequest);
 
 			show_messages($result, _('Service updated'), _('Cannot add service'));
-			$serviceid = $result;
-			$audit_acrion = AUDIT_ACTION_ADD;
+			$serviceid = reset($result['serviceids']);
+			$audit_action = AUDIT_ACTION_ADD;
 		}
 
 		if ($result) {
-			add_audit($audit_acrion, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
+			add_audit($audit_action, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 			unset($_REQUEST['form']);
 		}
 
@@ -237,7 +236,9 @@ if (isset($_REQUEST['pservices'])) {
 	}
 
 	foreach ($parentServices as $key => $childService) {
-		$parentServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-';
+		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
+			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+			: '-';
 	}
 
 	$data['db_pservices'] = $parentServices;
@@ -274,7 +275,9 @@ if (isset($_REQUEST['cservices'])) {
 	}
 
 	foreach ($childServices as $key => $childService) {
-		$childServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-';
+		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
+			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+			: '-';
 	}
 
 	$data['db_cservices'] = $childServices;
@@ -331,7 +334,9 @@ if (isset($_REQUEST['form'])) {
 				$data['children'][] = array(
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
-					'trigger' => !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-',
+					'trigger' => !empty($childService['triggerid'])
+							? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
 				);
@@ -380,14 +385,16 @@ else {
 		'output' => array('name', 'serviceid', 'algorithm'),
 		'selectParent' => API_OUTPUT_EXTEND,
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
-		'selectTrigger' => array('description', 'triggerid'),
+		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
-	$triggers = expandTriggerDescriptions(zbx_toHash($triggers, 'triggerid'));
+
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+
 	foreach ($services as &$service) {
 		if ($service['trigger']) {
 			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
@@ -415,4 +422,3 @@ else {
 }
 
 include_once('include/page_footer.php');
-?>

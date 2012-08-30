@@ -238,7 +238,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
 
-					substitute_simple_macros(NULL, NULL, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
 							&item.snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, MACRO_TYPE_SNMP_OID, NULL, 0);
 
@@ -249,11 +249,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 						item.snmpv3_authpassphrase = strdup(dcheck->snmpv3_authpassphrase);
 						item.snmpv3_privpassphrase = strdup(dcheck->snmpv3_privpassphrase);
 
-						substitute_simple_macros(NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
 								&item.snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
 								&item.snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
 								&item.snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 					}
 

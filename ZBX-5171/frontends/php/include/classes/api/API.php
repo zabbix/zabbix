@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 class API {
 
 	const RETURN_TYPE_API = 'api';
@@ -66,6 +65,7 @@ class API {
 		'script' => 'CScript',
 		'template' => 'CTemplate',
 		'templatescreen' => 'CTemplateScreen',
+		'templatescreenitem' => 'CTemplateScreenItem',
 		'trigger' => 'CTrigger',
 		'triggerexpression' => 'CTriggerExpression',
 		'triggerprototype' => 'CTriggerPrototype',
@@ -359,6 +359,13 @@ class API {
 	 */
 	public static function TemplateScreen() {
 		return self::getObject('templatescreen');
+	}
+
+	/**
+	 * @return CTemplateScreenItem
+	 */
+	public static function TemplateScreenItem() {
+		return self::getObject('templatescreenitem');
 	}
 
 	/**

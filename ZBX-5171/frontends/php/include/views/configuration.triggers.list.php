@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 $triggersWidget = new CWidget();
 
@@ -118,10 +117,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 			if (!empty($this->data['parent_discoveryid'])) {
 				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $real_host['hostid']);
-				$description[] = new CLink($real_host['host'], 'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
+				$description[] = new CLink($real_host['name'], 'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 			}
 			else {
-				$description[] = new CLink($real_host['name'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+				$description[] = new CLink($real_host['name'], 'triggers.php?hostid='.$real_host['hostid'], 'unknown');
 			}
 			$description[] = ':'.SPACE;
 		}
@@ -249,4 +248,3 @@ $triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data[
 $triggersWidget->addItem($triggersForm);
 
 return $triggersWidget;
-?>

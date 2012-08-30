@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
@@ -32,9 +32,6 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-//---------------------------------- CHECKS ------------------------------------
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
@@ -151,8 +148,8 @@ if(isset($_REQUEST['save_trigger'])){
 		}
 
 		if($result){
-			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, _('Trigger')." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
-			unset($_REQUEST["sform"]);
+			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, _('Trigger').' ['.$triggerid.'] ['.$trigger['description'].']');
+			unset($_REQUEST['sform']);
 
 			zbx_add_post_js('closeForm("items.php");');
 			require_once dirname(__FILE__).'/include/page_footer.php';
@@ -325,11 +322,11 @@ if(isset($_REQUEST['sform'])){
 
 	foreach($expressions as $id => $expr){
 
-		$imgup = new CImg('images/general/arrowup.gif','up',12,14);
+		$imgup = new CImg('images/general/arrow_up.png','up',12,14);
 		$imgup->setAttribute('onclick','javascript:  element_up("logtr'.$id.'");');
 		$imgup->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
-		$imgdn = new CImg('images/general/arrowdown.gif','down',12,14);
+		$imgdn = new CImg('images/general/arrow_down.png','down',12,14);
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
@@ -381,4 +378,3 @@ if(isset($_REQUEST['sform'])){
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

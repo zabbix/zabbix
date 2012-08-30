@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 
-$page['file']	= 'chart4.php';
-$page['type']	= PAGE_TYPE_IMAGE;
+$page['file'] = 'chart4.php';
+$page['type'] = PAGE_TYPE_IMAGE;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -43,7 +43,8 @@ if (!isset($_REQUEST['triggerid'])) {
 $db_data = API::Trigger()->get(array(
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_EXTEND,
-	'nodeids' => get_current_nodeid(true)
+	'nodeids' => get_current_nodeid(true),
+	'expandDescription' => true
 ));
 if (empty($db_data)) {
 	access_deny();
@@ -86,10 +87,7 @@ $y = imagesy($im);
 imagefilledrectangle($im, 0, 0, $x, $y, $white);
 imagerectangle($im, 0, 0, $x - 1, $y - 1, $black);
 
-$str = expand_trigger_description_by_data($db_data);
-
-$d = zbx_date2str('Y');
-$str = _s('%1$s (year %2$s)', $str, $d);
+$str = _s('%1$s (year %2$s)', $db_data['description'], zbx_date2str('Y'));
 $x = imagesx($im) / 2 - imagefontwidth(4) * zbx_strlen($str) / 2;
 imageText($im, 10, 0, $x, 14, $darkred, $str);
 
@@ -187,4 +185,3 @@ imageOut($im);
 imagedestroy($im);
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

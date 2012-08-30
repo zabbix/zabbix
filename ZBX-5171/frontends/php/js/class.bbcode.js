@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 var BBCode = {
 	opentags: null, // open tag stack
 	crlf2br: null, // convert CRLF to <br>?

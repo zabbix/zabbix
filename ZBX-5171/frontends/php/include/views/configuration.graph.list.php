@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
+$pageFilter = $this->data['pageFilter'];
 $graphWidget = new CWidget();
 
 // create new graph button
@@ -48,8 +48,8 @@ else {
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'), $createForm);
 
 	$filterForm = new CForm('get');
-	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+	$filterForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+	$filterForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 
 	$graphWidget->addHeader(_('Graphs'), $filterForm);
 
@@ -81,22 +81,17 @@ $graphTable->setHeader(array(
 foreach ($this->data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
-	$hostidParam = '';
 	$hostList = null;
 	if (empty($this->data['hostid'])) {
 		$hostList = array();
 		foreach ($graph['hosts'] as $host) {
 			$hostList[$host['name']] = $host['name'];
-			$hostidParam = '&hostid='.$host['hostid'];
 		}
 
 		foreach ($graph['templates'] as $template) {
 			$hostList[$template['name']] = $template['name'];
 		}
 		$hostList = implode(', ', $hostList);
-	}
-	else {
-		$hostidParam = url_param('hostid');
 	}
 
 	$isCheckboxEnabled = true;
@@ -107,7 +102,7 @@ foreach ($this->data['graphs'] as $graph) {
 		$name[] = new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid'], 'unknown');
 		$name[] = ':'.SPACE;
 		$name[] = new CLink($graph['name'],
-			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').$hostidParam);
+			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$pageFilter->hostid);
 
 		$isCheckboxEnabled = false;
 	}
@@ -119,7 +114,7 @@ foreach ($this->data['graphs'] as $graph) {
 		$isCheckboxEnabled = false;
 	}
 	else {
-		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').$hostidParam);
+		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$pageFilter->hostid);
 	}
 
 	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);

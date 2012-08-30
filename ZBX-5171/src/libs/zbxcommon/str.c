@@ -34,8 +34,7 @@
  ******************************************************************************/
 static void	app_title()
 {
-	printf("%s v%s (revision %s) (%s)\n", title_message,
-			ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
+	printf("%s v%s (revision %s) (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
 }
 
 /******************************************************************************
@@ -2643,6 +2642,30 @@ const char	*zbx_nodetype_string(unsigned char nodetype)
 			return "slave";
 		default:
 			return "unknown";
+	}
+}
+
+const char	*zbx_alert_type_string(unsigned char type)
+{
+	switch (type)
+	{
+		case ALERT_TYPE_MESSAGE:
+			return "message";
+		default:
+			return "script";
+	}
+}
+
+const char	*zbx_alert_status_string(unsigned char type, unsigned char status)
+{
+	switch (status)
+	{
+		case ALERT_STATUS_SENT:
+			return (ALERT_TYPE_MESSAGE == type ? "sent" : "executed");
+		case ALERT_STATUS_NOT_SENT:
+			return "in progress";
+		default:
+			return "failed";
 	}
 }
 

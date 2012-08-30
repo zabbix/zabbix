@@ -75,7 +75,7 @@ class CCanvas {
 	}
 
 	public function drawLine($x1, $y1, $x2, $y2, $color, $drawtype) {
-		MyDrawLine($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color), $drawtype);
+		myDrawLine($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color), $drawtype);
 	}
 
 	public function drawText($fontsize, $angle, $x, $y, $color, $string) {
@@ -126,4 +126,3 @@ class CCanvas {
 		$this->colors['orange'] = imagecolorallocate($this->canvas, 238, 96, 0);
 	}
 }
-

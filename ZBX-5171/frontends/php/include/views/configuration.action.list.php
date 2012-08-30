@@ -60,7 +60,7 @@ foreach ($this->data['actions'] as $action) {
 		$conditions[] = array(get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']), BR());
 	}
 
-	sortOperations($action['operations']);
+	sortOperations($action['eventsource'], $action['operations']);
 	$operations = array();
 	foreach ($action['operations'] as $operation) {
 		$operations[] = get_operation_desc(SHORT_DESCRIPTION, $operation);

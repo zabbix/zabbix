@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * Add value map with mappings.
  *
@@ -59,7 +59,7 @@ function updateValueMap(array $valueMap, array $mappings) {
 	unset($valueMap['valuemapid']);
 
 	// check existance
-	if(!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
+	if (!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
 		throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $valueMapId));
 	}
 
@@ -227,8 +227,8 @@ function getValueMapMappings($valueMapId) {
 
 	$dbMappings = DBselect(
 		'SELECT m.mappingid,m.value,m.newvalue'.
-				' FROM mappings m'.
-				' WHERE m.valuemapid='.$valueMapId
+		' FROM mappings m'.
+		' WHERE m.valuemapid='.$valueMapId
 	);
 	while ($mapping = DBfetch($dbMappings)) {
 		$mappings[$mapping['mappingid']] = $mapping;
@@ -242,7 +242,7 @@ function getValueMapMappings($valueMapId) {
  * If value map or mapping is not found unchanged value returned,
  * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
  *
- * @param string $value	  value that mapping should be applied to
+ * @param string $value	     value that mapping should be applied to
  * @param int    $valueMapId value map id which should be used
  *
  * @return string
@@ -253,20 +253,21 @@ function applyValueMap($value, $valueMapId) {
 	}
 
 	static $valueMaps = array();
+
 	if (isset($valueMaps[$valueMapId][$value])) {
 		return $valueMaps[$valueMapId][$value];
 	}
 
-	$db_mappings = DBselect(
+	$dbMappings = DBselect(
 		'SELECT m.newvalue'.
-			' FROM mappings m'.
-			' WHERE m.valuemapid='.$valueMapId.
+		' FROM mappings m'.
+		' WHERE m.valuemapid='.$valueMapId.
 			' AND m.value='.zbx_dbstr($value)
 	);
-	if ($mapping = DBfetch($db_mappings)) {
+	if ($mapping = DBfetch($dbMappings)) {
 		$valueMaps[$valueMapId][$value] = $mapping['newvalue'].' '.'('.$value.')';
 		return $valueMaps[$valueMapId][$value];
 	}
+
 	return $value;
 }
-?>

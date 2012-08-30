@@ -43,7 +43,7 @@ extern unsigned char	process_type;
  * Parameters: alert - alert details                                          *
  *             mediatype - media details                                      *
  *                                                                            *
- * Return value: SUCCESS - action executed sucessfully                        *
+ * Return value: SUCCESS - action executed successfully                       *
  *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -86,9 +86,13 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
-		char	cmd[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
+		char	*cmd = NULL, *send_to, *subject, *message, *output = NULL;
+		size_t	cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 
-		zbx_snprintf(cmd, sizeof(cmd), "%s/%s", CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
+		cmd = zbx_malloc(cmd, cmd_alloc);
+
+		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s",
+				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
 		if (0 == access(cmd, X_OK))
 		{
@@ -96,8 +100,8 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 			subject = zbx_dyn_escape_string(alert->subject, "\"\\");
 			message = zbx_dyn_escape_string(alert->message, "\"\\");
 
-			zbx_snprintf(cmd, sizeof(cmd), "%s/%s \"%s\" \"%s\" \"%s\"",
-					CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, send_to, subject, message);
+			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\" \"%s\" \"%s\"",
+					send_to, subject, message);
 
 			zbx_free(send_to);
 			zbx_free(subject);
@@ -113,6 +117,8 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 		}
 		else
 			zbx_snprintf(error, max_error_len, "%s: %s", cmd, zbx_strerror(errno));
+
+		zbx_free(cmd);
 	}
 	else
 	{

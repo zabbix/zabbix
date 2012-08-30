@@ -17,15 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
-class CIFrame extends CTag{
+
+class CIFrame extends CTag {
 
 	public function __construct($src = null, $width = '100%', $height = '100%', $scrolling = 'no', $id = 'iframe') {
 		parent::__construct('iframe', 'yes');
 
-		$this->tag_start= '';
+		$this->tag_start = '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
@@ -80,4 +79,3 @@ class CIFrame extends CTag{
 		$this->setAttribute('scrolling', $value);
 	}
 }
-?>

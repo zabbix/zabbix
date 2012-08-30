@@ -123,17 +123,23 @@ class CArrayHelper {
 	 */
 	protected static function compare($a, $b) {
 		foreach (self::$fields as $field) {
-			if (!(isset($a[$field['field']]) && isset($b[$field['field']]))) {
-				return 0;
+			// if field is not set or is null, treat it as smallest string
+			// strnatcasecmp() has unexpected behaviour with null values
+			if (!isset($a[$field['field']]) && !isset($b[$field['field']])) {
+				$cmp = 0;
+			}
+			elseif (!isset($a[$field['field']])) {
+				$cmp = -1;
+			}
+			elseif (!isset($b[$field['field']])) {
+				$cmp = 1;
+			}
+			else {
+				$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
 			}
 
-			if ($a[$field['field']] != $b[$field['field']]) {
-				if ($field['order'] == ZBX_SORT_UP) {
-					return strnatcasecmp($a[$field['field']], $b[$field['field']]);
-				}
-				else {
-					return strnatcasecmp($b[$field['field']], $a[$field['field']]);
-				}
+			if ($cmp != 0) {
+				return $cmp * ($field['order'] == ZBX_SORT_UP?1:-1);
 			}
 		}
 		return 0;

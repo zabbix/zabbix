@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function unset_request($key) {
 	unset($_GET[$key], $_POST[$key], $_REQUEST[$key]);
 }
@@ -227,41 +227,6 @@ function validate_port_list($str) {
 			}
 		}
 	}
-	return true;
-}
-
-function validate_period(&$str) {
-	$str = trim($str, ';');
-	$out = '';
-	$periods = explode(';', $str);
-	foreach ($periods as $period) {
-		// arr[idx]		1	2	3	4	5	6
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $arr)) {
-			return false;
-		}
-		// check week day
-		if ($arr[1] > $arr[2]) {
-			return false;
-		}
-		// check hour
-		if ($arr[3] > 23 || $arr[3] < 0 || $arr[5] > 24 || $arr[5] < 0) {
-			return false;
-		}
-		// check min
-		if ($arr[4] > 59 || $arr[4] < 0 || $arr[6] > 59 || $arr[6] < 0) {
-			return false;
-		}
-		// check max time 24:00
-		if (($arr[5]*100 + $arr[6]) > 2400) {
-			return false;
-		}
-		// check time period
-		if (($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) {
-			return false;
-		}
-		$out .= sprintf('%d-%d,%02d:%02d-%02d:%02d', $arr[1], $arr[2], $arr[3], $arr[4], $arr[5], $arr[6]).';';
-	}
-	$str = $out;
 	return true;
 }
 
@@ -581,7 +546,7 @@ function check_fields(&$fields, $show_messages = true) {
 		'print' =>		array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
 		'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
 		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'start' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
+		'page' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
 		'ddreset' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null)
 	);
 	$fields = zbx_array_merge($system_fields, $fields);
@@ -641,5 +606,3 @@ function validateUserMacro($value) {
 function validateMaxTime($time) {
 	return $time <= 2147464800; // 2038.01.19 00:00
 }
-
-?>

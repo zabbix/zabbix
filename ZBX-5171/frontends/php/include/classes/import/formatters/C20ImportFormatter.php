@@ -88,6 +88,9 @@ class C20ImportFormatter extends CImportFormatter {
 					$host['inventory_mode'] = $host['inventory']['inventory_mode'];
 					unset($host['inventory']['inventory_mode']);
 				}
+				else {
+					$host['inventory_mode'] = HOST_INVENTORY_DISABLED;
+				}
 
 				$hostsData[] = CArrayHelper::getByKeys($host, array(
 					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
@@ -131,7 +134,7 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['items'])) {
 					foreach ($host['items'] as $item) {
-						$item = $this->renameItemFields($item);
+						$item = $this->formatItem($item);
 						$itemsData[$host['host']][$item['key_']] = $item;
 					}
 				}
@@ -141,7 +144,7 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['items'])) {
 					foreach ($template['items'] as $item) {
-						$item = $this->renameItemFields($item);
+						$item = $this->formatItem($item);
 						$itemsData[$template['template']][$item['key_']] = $item;
 					}
 				}
@@ -168,7 +171,7 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
-				if (!empty($host['discovery_rules'])) {
+				if (!empty($template['discovery_rules'])) {
 					foreach ($template['discovery_rules'] as $item) {
 						$item = $this->formatDiscoveryRule($item);
 
@@ -228,12 +231,20 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (!empty($this->data['maps'])) {
 			foreach ($this->data['maps'] as $map) {
-				if (!empty($map['selements'])) {
-					$map['selements'] = array_values($map['selements']);
+				CArrayHelper::convertFieldToArray($map, 'selements');
+				foreach ($map['selements'] as &$selement) {
+					CArrayHelper::convertFieldToArray($selement, 'urls');
 				}
-				if (!empty($map['links'])) {
-					$map['links'] = array_values($map['links']);
+				unset($selement);
+
+				CArrayHelper::convertFieldToArray($map, 'links');
+				foreach ($map['links'] as &$link) {
+					CArrayHelper::convertFieldToArray($link, 'linktriggers');
 				}
+				unset($link);
+
+				CArrayHelper::convertFieldToArray($map, 'urls');
+
 				$mapsData[] = $map;
 			}
 		}
@@ -272,6 +283,23 @@ class C20ImportFormatter extends CImportFormatter {
 	}
 
 	/**
+	 * Format item.
+	 *
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	protected function formatItem(array $item) {
+		$item = $this->renameItemFields($item);
+
+		if (empty($item['applications'])) {
+			$item['applications'] = array();
+		}
+
+		return $item;
+	}
+
+	/**
 	 * Format discovery rule.
 	 *
 	 * @param array $discoveryRule
@@ -284,8 +312,12 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($discoveryRule['item_prototypes'])) {
 			foreach ($discoveryRule['item_prototypes'] as &$prototype) {
 				$prototype = $this->renameItemFields($prototype);
+				CArrayHelper::convertFieldToArray($prototype, 'applications');
 			}
 			unset($prototype);
+		}
+		else {
+			$discoveryRule['item_prototypes'] = array();
 		}
 
 		if (!empty($discoveryRule['trigger_prototypes'])) {
@@ -294,12 +326,18 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			unset($trigger);
 		}
+		else {
+			$discoveryRule['trigger_prototypes'] = array();
+		}
 
 		if (!empty($discoveryRule['graph_prototypes'])) {
 			foreach ($discoveryRule['graph_prototypes'] as &$graph) {
 				$graph = $this->renameGraphFields($graph);
 			}
 			unset($graph);
+		}
+		else {
+			$discoveryRule['graph_prototypes'] = array();
 		}
 
 		return $discoveryRule;

@@ -325,7 +325,9 @@ function delete_node($nodeid) {
 			DBexecute('UPDATE nodes SET masterid=NULL WHERE masterid='.$nodeid) &&
 			DBexecute('DELETE FROM nodes WHERE nodeid='.$nodeid)
 		);
-		error(_('Please be aware that database still contains data related to the deleted node.'));
+		if ($nodetype != ZBX_NODE_MASTER) {
+			error(_('Please be aware that database still contains data related to the deleted node.'));
+		}
 	}
 	return $result;
 }

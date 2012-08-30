@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.0.1rc2])
+AM_INIT_AUTOMAKE([zabbix],[2.0.3rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1186,8 +1186,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LIBCURL_LDFLAGS}"
 	AGENT_LIBS="${AGENT_LIBS} ${LIBCURL_LIBS}"
 
-	have_odbc="no"
-
 	dnl Checking for iODBC support
 	LIBIODBC_CHECK_CONFIG([no])
 	if test "x$want_iodbc" = "xyes"; then
@@ -1208,7 +1206,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		if test "x$found_unixodbc" = "xyes"; then
 			have_odbc="unixODBC"
 		else
-			AC_MSG_ERROR([unixODBC library not found])
+			AC_MSG_ERROR($found_unixodbc)
 		fi
 	fi
 
@@ -1316,7 +1314,7 @@ if test "x$java" = "xyes"; then
 	fi
 fi
 
-AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
+AM_CONDITIONAL(JABBER, test "x$found_jabber" = "xyes")
 AM_CONDITIONAL(WITH_ODBC, test "x$have_odbc" != "xno")
 
 found_ldap="no"
@@ -1474,6 +1472,7 @@ echo "  Server details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    ODBC:                  ${have_odbc}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
 

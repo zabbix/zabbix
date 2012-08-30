@@ -4,7 +4,7 @@
 			<span class="bold"> #{name} </span>
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="javascript: removeDCheckRow(#{dcheckid});" />
+			<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="javascript: removeDCheckRow(#{dcheckid});" />
 		</td>
 	</tr>
 </script>
@@ -63,10 +63,10 @@
 				</tr>
 				</tbody>
 			</table>
-			<input type="button" id="add_new_dcheck" name="add_new_dcheck" value="<?php echo _('Add'); ?>"
+			<input type="button" id="add_new_dcheck" name="add_new_dcheck" value=<?php echo Chtml::encode(_('Add')); ?>
 				class="input button link_menu">
 			&nbsp;&nbsp;
-			<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" value="<?php echo _('Cancel'); ?>"
+			<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" value=<?php echo Chtml::encode(_('Cancel')); ?>
 				class="input button link_menu">
 		</div>
 	</div>
@@ -117,28 +117,28 @@
 
 	function discoveryCheckTypeToString(svcPort) {
 		var defPorts = {};
-		defPorts[ZBX_SVC.ftp] = '<?php echo _('FTP'); ?>';
-		defPorts[ZBX_SVC.http] = '<?php echo _('HTTP'); ?>';
-		defPorts[ZBX_SVC.https] = '<?php echo _('HTTPS'); ?>';
-		defPorts[ZBX_SVC.icmp] = '<?php echo _('ICMP ping'); ?>';
-		defPorts[ZBX_SVC.imap] = '<?php echo _('IMAP'); ?>';
-		defPorts[ZBX_SVC.tcp] = '<?php echo _('TCP'); ?>';
-		defPorts[ZBX_SVC.ldap] = '<?php echo _('LDAP'); ?>';
-		defPorts[ZBX_SVC.nntp] = '<?php echo _('NNTP'); ?>';
-		defPorts[ZBX_SVC.pop] = '<?php echo _('POP'); ?>';
-		defPorts[ZBX_SVC.snmpv1] = '<?php echo _('SNMPv1 agent'); ?>';
-		defPorts[ZBX_SVC.snmpv2] = '<?php echo _('SNMPv2 agent'); ?>';
-		defPorts[ZBX_SVC.snmpv3] = '<?php echo _('SNMPv3 agent'); ?>';
-		defPorts[ZBX_SVC.smtp] = '<?php echo _('SMTP'); ?>';
-		defPorts[ZBX_SVC.ssh] = '<?php echo _('SSH'); ?>';
-		defPorts[ZBX_SVC.telnet] = '<?php echo _('Telnet'); ?>';
-		defPorts[ZBX_SVC.agent] = '<?php echo _('Zabbix agent'); ?>';
+		defPorts[ZBX_SVC.ftp] = <?php echo CJs::encodeJson(_('FTP')); ?>;
+		defPorts[ZBX_SVC.http] = <?php echo CJs::encodeJson(_('HTTP')); ?>;
+		defPorts[ZBX_SVC.https] = <?php echo CJs::encodeJson(_('HTTPS')); ?>;
+		defPorts[ZBX_SVC.icmp] = <?php echo CJs::encodeJson(_('ICMP ping')); ?>;
+		defPorts[ZBX_SVC.imap] = <?php echo CJs::encodeJson(_('IMAP')); ?>;
+		defPorts[ZBX_SVC.tcp] = <?php echo CJs::encodeJson(_('TCP')); ?>;
+		defPorts[ZBX_SVC.ldap] = <?php echo CJs::encodeJson(_('LDAP')); ?>;
+		defPorts[ZBX_SVC.nntp] = <?php echo CJs::encodeJson(_('NNTP')); ?>;
+		defPorts[ZBX_SVC.pop] = <?php echo CJs::encodeJson(_('POP')); ?>;
+		defPorts[ZBX_SVC.snmpv1] = <?php echo CJs::encodeJson(_('SNMPv1 agent')); ?>;
+		defPorts[ZBX_SVC.snmpv2] = <?php echo CJs::encodeJson(_('SNMPv2 agent')); ?>;
+		defPorts[ZBX_SVC.snmpv3] = <?php echo CJs::encodeJson(_('SNMPv3 agent')); ?>;
+		defPorts[ZBX_SVC.smtp] = <?php echo CJs::encodeJson(_('SMTP')); ?>;
+		defPorts[ZBX_SVC.ssh] = <?php echo CJs::encodeJson(_('SSH')); ?>;
+		defPorts[ZBX_SVC.telnet] = <?php echo CJs::encodeJson(_('Telnet')); ?>;
+		defPorts[ZBX_SVC.agent] = <?php echo CJs::encodeJson(_('Zabbix agent')); ?>;
 
 		if (typeof(svcPort) == 'undefined') {
 			return defPorts;
 		}
 		svcPort = parseInt(svcPort, 10);
-		return isset(svcPort, defPorts) ? defPorts[svcPort] : <?php echo _('Unknown'); ?>;
+		return isset(svcPort, defPorts) ? defPorts[svcPort] : <?php echo CJs::encodeJson(_('Unknown')); ?>;
 	}
 
 	function toggleInputs(id, state) {
@@ -232,7 +232,7 @@
 		toggleInputs('newCheckKeyRow', isset(dcheckType, keyRowTypes));
 
 		if (isset(dcheckType, keyRowTypes)) {
-			var caption = (dcheckType == ZBX_SVC.agent) ? '<?php echo _('Key'); ?>' : '<?php echo _('SNMP OID'); ?>';
+			var caption = (dcheckType == ZBX_SVC.agent) ? <?php echo CJs::encodeJson(_('Key')); ?> : <?php echo CJs::encodeJson(_('SNMP OID')); ?>;
 			jQuery('#newCheckKeyRow label').text(caption);
 		}
 		toggleInputs('newCheckCommunityRow', isset(dcheckType, ComRowTypes));
@@ -283,7 +283,7 @@
 						|| ZBX_CHECKLIST[dcheckid]['snmpv3_securitylevel'] === dCheck['snmpv3_securitylevel'])
 					&& (typeof dCheck['snmpv3_securityname'] == 'undefined'
 						|| ZBX_CHECKLIST[dcheckid]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])) {
-				alert('<?php echo _('Check already exists.'); ?>');
+				alert(<?php echo CJs::encodeJson(_('Check already exists.')); ?>);
 				return null;
 			}
 		}
@@ -304,11 +304,11 @@
 			case ZBX_SVC.snmpv1:
 			case ZBX_SVC.snmpv2:
 				if (dCheck.snmp_community == '') {
-					validationErrors.push('<?php echo _('Incorrect SNMP community.'); ?>');
+					validationErrors.push(<?php echo CJs::encodeJson(_('Incorrect SNMP community.')); ?>);
 				}
 			case ZBX_SVC.snmpv3:
 				if (dCheck.key_ == '') {
-					validationErrors.push('<?php echo _('Incorrect SNMP OID.'); ?>');
+					validationErrors.push(<?php echo CJs::encodeJson(_('Incorrect SNMP OID.')); ?>);
 				}
 				break;
 		}

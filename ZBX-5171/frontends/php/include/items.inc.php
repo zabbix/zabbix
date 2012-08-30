@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * Convert windows events type constant in to the string representation
  *
@@ -523,8 +523,8 @@ function resolveItemKeyMacros(array $item) {
 		// if item without interface or template item, resolve interface related macros to *UNKNOWN*
 		if (!$interface) {
 			$interface = array(
-				'ip' => _('*UNKNOWN*'),
-				'dns' => _('*UNKNOWN*'),
+				'ip' => UNRESOLVED_MACRO_STRING,
+				'dns' => UNRESOLVED_MACRO_STRING,
 				'useip' => false,
 			);
 		}
@@ -642,15 +642,16 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 
 /**
  * Retrieve overview table object for items.
+ *
  * @param $hostids
  * @param null $view_style
+ *
  * @return CTableInfo
  */
 function get_items_data_overview($hostids, $view_style) {
 	global $USER_DETAILS;
 
 	$table = new CTableInfo(_('No items defined.'));
-
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
@@ -668,9 +669,11 @@ function get_items_data_overview($hostids, $view_style) {
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
-		'monitored_hosts' => true,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
+		'monitored_hosts' => true,
+		'hostids' => $hostids,
+		'with_monitored_items' => true,
 		'preservekeys' => true
 	));
 	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
@@ -682,7 +685,7 @@ function get_items_data_overview($hostids, $view_style) {
 	while ($row = DBfetch($db_items)) {
 		$descr = itemName($row);
 		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
-		$hostNames[$row['hostid']] = $row['hostname'];
+		$hostnames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
@@ -691,37 +694,39 @@ function get_items_data_overview($hostids, $view_style) {
 					|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $row['tr_value'] == TRIGGER_VALUE_TRUE)
 						&& $row['priority'] > $items[$descr][$row['hostname']]['severity']))) {
 			$items[$descr][$row['hostname']] = array(
-				'itemid'	=> $row['itemid'],
-				'value_type'=> $row['value_type'],
-				'lastvalue'	=> $row['lastvalue'],
-				'lastclock'	=> $row['lastclock'],
-				'units'		=> $row['units'],
-				'name'		=> $row['name'],
+				'itemid' => $row['itemid'],
+				'value_type' => $row['value_type'],
+				'lastvalue' => $row['lastvalue'],
+				'lastclock' => $row['lastclock'],
+				'units' => $row['units'],
+				'name' => $row['name'],
 				'valuemapid' => $row['valuemapid'],
-				'severity'	=> $row['priority'],
-				'tr_value'	=> $row['tr_value'],
-				'triggerid'	=> $row['triggerid']
+				'severity' => $row['priority'],
+				'tr_value' => $row['tr_value'],
+				'triggerid' => $row['triggerid']
 			);
 		}
 	}
 
-	if (!isset($hostNames)) {
+	if (!isset($hostnames)) {
 		return $table;
 	}
 
-	order_result($hostNames);
+	order_result($hostnames);
 
 	$css = getUserTheme($USER_DETAILS);
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
-		foreach ($hostNames as $hostname) {
-			$header = array_merge($header, array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
+		foreach ($hostnames as $hostname) {
+			$img = new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css);
+			$img->setAttribute('id', uniqid('do_'));
+			$header = array_merge($header, array($img));
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($items as $descr => $ithosts) {
 			$table_row = array(nbsp($descr));
-			foreach ($hostNames as $hostname) {
+			foreach ($hostnames as $hostname) {
 				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
 			}
 			$table->addRow($table_row);
@@ -730,11 +735,13 @@ function get_items_data_overview($hostids, $view_style) {
 	else {
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
-			$header = array_merge($header, array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css)));
+			$img = new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css);
+			$img->setAttribute('id', uniqid('do_'));
+			$header = array_merge($header, array($img));
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($hostNames as $hostid => $hostname) {
+		foreach ($hostnames as $hostid => $hostname) {
 			$host = $hosts[$hostid];
 
 			// host JS menu link
@@ -749,6 +756,7 @@ function get_items_data_overview($hostids, $view_style) {
 			$table->addRow($table_row);
 		}
 	}
+
 	return $table;
 }
 
@@ -762,14 +770,11 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 		if ($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE) {
 			$css_class = getSeverityStyle($ithosts[$hostname]['severity']);
 			$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
-			if ($ack['acknowledged'] == 1) {
-				$ack = array(SPACE, new CImg('images/general/tick.png', 'ack'));
-			}
-			else {
-				$ack = null;
-			}
+			$ack = ($ack['acknowledged'] == 1)
+				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
+				: null;
 		}
-		$value = format_lastvalue($ithosts[$hostname]);
+		$value = formatItemValue($ithosts[$hostname]);
 
 		$it_ov_menu = array(
 			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
@@ -800,11 +805,12 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 	$value_col = new CCol(array($value, $ack), $css_class);
 
 	if (isset($it_ov_menu)) {
-		$it_ov_menu  = new CPUMenu($it_ov_menu, 170);
+		$it_ov_menu = new CPUMenu($it_ov_menu, 170);
 		$value_col->onClick($it_ov_menu->getOnActionJS());
 		unset($it_ov_menu);
 	}
-	array_push($table_row,$value_col);
+	array_push($table_row, $value_col);
+
 	return $table_row;
 }
 
@@ -817,10 +823,10 @@ function get_same_applications_for_host($applications, $hostid) {
 	$child_applications = array();
 	$db_apps = DBselect(
 		'SELECT a1.applicationid'.
-				' FROM applications a1,applications a2'.
-				' WHERE a1.name=a2.name'.
-				' AND a1.hostid='.$hostid.
-				' AND '.DBcondition('a2.applicationid', $applications)
+		' FROM applications a1,applications a2'.
+		' WHERE a1.name=a2.name'.
+			' AND a1.hostid='.$hostid.
+			' AND '.DBcondition('a2.applicationid', $applications)
 	);
 	while ($app = DBfetch($db_apps)) {
 		$child_applications[] = $app['applicationid'];
@@ -846,6 +852,7 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 	while ($db_application = DBfetch($db_applications)) {
 		array_push($result, $db_application['result']);
 	}
+
 	return $result;
 }
 
@@ -862,6 +869,7 @@ function delete_history_by_itemid($itemIds) {
 	if (!$result) {
 		return $result;
 	}
+
 	DBexecute('DELETE FROM history_text WHERE '.DBcondition('itemid', $itemIds));
 	DBexecute('DELETE FROM history_log WHERE '.DBcondition('itemid', $itemIds));
 	DBexecute('DELETE FROM history_uint WHERE '.DBcondition('itemid', $itemIds));
@@ -886,27 +894,54 @@ function delete_trends_by_itemid($itemIds) {
 	return $r1 && $r2;
 }
 
-function format_lastvalue($db_item) {
-	if (!isset($db_item['lastvalue']) || $db_item['lastclock'] == 0) {
-		return '-';
+/**
+ * Format item lastvalue.
+ * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
+ * value.
+ *
+ * @param array $item
+ * @param string $unknownString the text to be used if the item has no data
+ *
+ * @return string
+ */
+function formatItemValue(array $item, $unknownString = '-') {
+	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
+		return $unknownString;
 	}
-	if ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$lastvalue=convert_units($db_item['lastvalue'], $db_item['units']);
+
+	$value = formatItemValueType($item);
+	if ($item['valuemapid'] > 0) {
+		$value = applyValueMap($value, $item['valuemapid']);
 	}
-	elseif ($db_item['value_type'] == ITEM_VALUE_TYPE_STR || $db_item['value_type'] == ITEM_VALUE_TYPE_TEXT || $db_item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		$lastvalue = $db_item['lastvalue'];
-		if (zbx_strlen($lastvalue) > 20) {
-			$lastvalue = zbx_substr($lastvalue, 0, 20).' ...';
+
+	return $value;
+}
+
+/**
+ * Format item lastvalue depending on it's value type.
+ *
+ * @param array $item
+ *
+ * @return string
+ */
+function formatItemValueType(array $item) {
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		$value = convert_units($item['lastvalue'], $item['units']);
+	}
+	elseif ($item['value_type'] == ITEM_VALUE_TYPE_STR
+			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
+			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+		$value = $item['lastvalue'];
+		if (zbx_strlen($value) > 20) {
+			$value = zbx_substr($value, 0, 20).' ...';
 		}
-		$lastvalue = nbsp(htmlspecialchars($lastvalue));
+		$value = nbsp(htmlspecialchars($value));
 	}
 	else {
-		$lastvalue = _('Unknown value type');
+		$value = _('Unknown value type');
 	}
-	if ($db_item['valuemapid'] > 0) {
-		$lastvalue = applyValueMap($lastvalue, $db_item['valuemapid']);
-	}
-	return $lastvalue;
+
+	return $value;
 }
 
 /*
@@ -935,8 +970,6 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 			$table = 'history_log';
 			break;
 	}
-
-	$config = select_config();
 
 	if ($last == 0) {
 		$sql = 'SELECT value'.
@@ -1002,6 +1035,7 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 			}
 		}
 	}
+
 	return $value;
 }
 
@@ -1302,4 +1336,3 @@ function getParamFieldLabelByType($itemType) {
 			return 'params';
 	}
 }
-?>

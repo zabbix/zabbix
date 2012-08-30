@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CProfile {
 
@@ -87,6 +86,11 @@ class CProfile {
 	}
 
 	public static function get($idx, $default_value = null, $idx2 = 0) {
+		// no user data available, just return the default value
+		if (!CWebUser::$data) {
+			return $default_value;
+		}
+
 		if (is_null(self::$profiles)) {
 			self::init();
 		}
@@ -231,8 +235,9 @@ function update_config($configs) {
 	$update = array();
 
 	if (isset($configs['work_period'])) {
-		if (!validate_period($configs['work_period'])) {
-			error(_s('Incorrect working time: "%s".', $configs['work_period']));
+		$timePeriodValidator = new CTimePeriodValidator();
+		if (!$timePeriodValidator->validate($configs['work_period'])) {
+			error(_('Incorrect working time.'));
 			return false;
 		}
 	}
@@ -489,4 +494,3 @@ function infavorites($favobj, $favid, $source = null) {
 	}
 	return false;
 }
-?>

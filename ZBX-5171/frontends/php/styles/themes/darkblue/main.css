@@ -79,8 +79,8 @@ a.history:hover, a.history:active { color: #B0D5EC; }
 a.disabled, a.disabled:visited, a.disabled:active { color: #EE0000; }
 a.disabled:hover { color: #CC4444; }
 
-a.on:link, a.on:visited, a.on:active { color: #EE0000; }
-a.on:hover { color: #CC4444; }
+a.on:link, a.on:visited, a.on:active, .ui-widget-content a.on { color: #EE0000; }
+a.on:hover, .ui-widget-content a.on:hover { color: #CC4444; }
 
 .unknown, a.unknown { color: #999999; }
 a.unknown:hover { color: #BBB; }
@@ -458,8 +458,8 @@ div.zabbix_logo{ background-image:url('../../../images/general/zabbix_bb.png'); 
 .iconjmxavailable{ background-image: url('../../../images/general/jmx_available_bb.png'); }
 .iconipmiavailable{ background-image: url('../../../images/general/ipmi_available_bb.png'); }
 .sla_green{ background-image: url('../../../images/gradients/sla_blue15.png'); }
-.icon_sortup{ background-image: url('../../../images/general/sort_up_blue.gif'); }
-.icon_sortdown{ background-image: url('../../../images/general/sort_down_blue.gif'); }
+.icon_sortup{ background-image: url('../../../images/general/sort_up_blue.png'); }
+.icon_sortdown{ background-image: url('../../../images/general/sort_down_blue.png'); }
 
 .menu_icon:hover{ background-color: #77B7DA; }
 div.iconmenu_b{ background-color: transparent; }

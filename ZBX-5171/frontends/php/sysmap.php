@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -30,98 +30,93 @@ $page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js');
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'sysmapid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,NULL),
-		'selementid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		NULL),
-		'sysmap'=>		array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
+$fields=array(
+	'sysmapid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,NULL),
+	'selementid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		NULL),
+	'sysmap'=>		array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
 
 // actions
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+	'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+	'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+	'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 
 // other
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+	'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+	'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
 
 // ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,	NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  null,	NULL),
-		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,	null),
+	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,	NULL),
+	'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  null,	NULL),
+	'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,	null),
 
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	NOT_EMPTY,		NULL),
+	'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	NOT_EMPTY,		NULL),
 
-		'selements'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
-		'links'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
-	);
+	'selements'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+	'links'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+);
 
-	check_fields($fields);
+check_fields($fields);
 
-?>
-<?php
+
 // ACTION /////////////////////////////////////////////////////////////////////////////
-	if (isset($_REQUEST['favobj'])) {
-		$json = new CJSON();
-		if ('sysmap' == $_REQUEST['favobj']) {
-			$sysmapid = get_request('sysmapid', 0);
+if (isset($_REQUEST['favobj'])) {
+	$json = new CJSON();
+	if ('sysmap' == $_REQUEST['favobj']) {
+		$sysmapid = get_request('sysmapid', 0);
 
-			switch ($_REQUEST['action']) {
-				case 'save':
-					@ob_start();
-					try {
-						DBstart();
+		switch ($_REQUEST['action']) {
+			case 'save':
+				@ob_start();
+				try {
+					DBstart();
 
-						$options = array(
-							'sysmapids' => $sysmapid,
-							'editable' => true,
-							'output' => API_OUTPUT_SHORTEN,
-						);
-						$sysmap = API::Map()->get($options);
-						$sysmap = reset($sysmap);
-						if ($sysmap === false) throw new Exception(_('Access denied!')."\n\r");
+					$options = array(
+						'sysmapids' => $sysmapid,
+						'editable' => true,
+						'output' => API_OUTPUT_SHORTEN,
+					);
+					$sysmap = API::Map()->get($options);
+					$sysmap = reset($sysmap);
+					if ($sysmap === false) throw new Exception(_('Access denied!')."\n\r");
 
-						$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
-						$sysmapUpdate['sysmapid'] = $sysmapid;
+					$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
+					$sysmapUpdate['sysmapid'] = $sysmapid;
 
-						$result = API::Map()->update($sysmapUpdate);
+					$result = API::Map()->update($sysmapUpdate);
 
-						if ($result !== false)
-							print('if(Confirm("'._('Map is saved! Return?').'")){ location.href = "sysmaps.php"; }');
-						else
-							throw new Exception(_('Map save operation failed.')."\n\r");
+					if ($result !== false)
+						print('if(Confirm("'._('Map is saved! Return?').'")){ location.href = "sysmaps.php"; }');
+					else
+						throw new Exception(_('Map save operation failed.')."\n\r");
 
-						DBend(true);
-					}
-					catch (Exception $e) {
-						DBend(false);
-						$msg = array($e->getMessage());
-						foreach (clear_messages() as $errMsg) $msg[] = $errMsg['type'].': '.$errMsg['message'];
+					DBend(true);
+				}
+				catch (Exception $e) {
+					DBend(false);
+					$msg = array($e->getMessage());
+					foreach (clear_messages() as $errMsg) $msg[] = $errMsg['type'].': '.$errMsg['message'];
 
-						ob_clean();
+					ob_clean();
 
-						print('alert('.zbx_jsvalue(implode("\n\r", $msg)).');');
-					}
-					@ob_flush();
-					exit();
-					break;
-			}
+					print('alert('.zbx_jsvalue(implode("\n\r", $msg)).');');
+				}
+				@ob_flush();
+				exit();
+				break;
 		}
 	}
+}
 
-	if (PAGE_TYPE_HTML != $page['type']) {
-		require_once dirname(__FILE__).'/include/page_footer.php';
-		exit();
-	}
+if (PAGE_TYPE_HTML != $page['type']) {
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit();
+}
 
 // include JS + templates
 include('include/views/js/configuration.sysmaps.js.php');
-
-?>
-<?php
 
 show_table_header(_('CONFIGURATION OF NETWORK MAPS'));
 
@@ -227,11 +222,17 @@ add_elementNames($sysmap['selements']);
 
 foreach ($sysmap['links'] as &$link) {
 	foreach ($link['linktriggers'] as $lnum => $linktrigger) {
-		$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
-		if ($host = DBfetch($hosts)) {
-			$description = $host['name'].':'.expand_trigger_description_simple($linktrigger['triggerid']);
-		}
-		$link['linktriggers'][$lnum]['desc_exp'] = $description;
+		$dbTrigger = API::Trigger()->get(array(
+			'triggerids' => $linktrigger['triggerid'],
+			'output' => array('description', 'expression'),
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'expandDescription' => true
+		));
+		$dbTrigger = reset($dbTrigger);
+		$host = reset($dbTrigger['hosts']);
+
+		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].':'.$dbTrigger['description'];
 	}
 	order_result($link['linktriggers'], 'desc_exp');
 }
@@ -264,4 +265,3 @@ zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
 ), true).');');
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

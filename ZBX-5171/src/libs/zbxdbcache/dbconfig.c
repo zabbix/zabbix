@@ -2221,7 +2221,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x01))
 				{
 					addr = zbx_strdup(NULL, interface->ip);
-					substitute_simple_macros(NULL, NULL, &host, NULL, &addr,
+					substitute_simple_macros(NULL, NULL, &host, NULL, NULL, &addr,
 							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->ip, addr);
 					zbx_free(addr);
@@ -2230,7 +2230,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x02))
 				{
 					addr = zbx_strdup(NULL, interface->dns);
-					substitute_simple_macros(NULL, NULL, &host, NULL, &addr,
+					substitute_simple_macros(NULL, NULL, &host, NULL, NULL, &addr,
 							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->dns, addr);
 					zbx_free(addr);
@@ -3043,7 +3043,7 @@ static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE 
 		dst_interface->main = 0;
 	}
 
-	dst_interface->addr = NULL;
+	dst_interface->addr = (1 == dst_interface->useip ? dst_interface->ip_orig : dst_interface->dns_orig);
 	dst_interface->port = 0;
 }
 
@@ -3390,7 +3390,7 @@ void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
 
 	for (i = 0; i < num; i++)
 	{
-		if (SUCCEED != errcodes)
+		if (SUCCEED != errcodes[i])
 			continue;
 
 		zbx_free(functions[i].function);

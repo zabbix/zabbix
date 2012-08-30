@@ -41,63 +41,63 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hosts' =>				array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groups' =>				array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'hostids' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groupids' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form})&&({form}=="update")'),
-	'host' =>				array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({save})', _('Host name')),
-	'visiblename' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
-	'proxy_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({save})'),
-	'status' =>				array(T_ZBX_INT, O_OPT, null,			IN('0,1,3'), 'isset({save})'),
-	'newgroup' =>			array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'interfaces' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY, 'isset({save})', _('Agent or SNMP or JMX or IPMI interface')),
-	'mainInterfaces' =>		array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
-	'templates' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	null),
-	'templates_rem' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'clear_templates' =>	array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
-	'ipmi_authtype' =>		array(T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null),
-	'ipmi_privilege' =>		array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null),
-	'ipmi_username' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'ipmi_password' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'mass_replace_tpls' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'mass_clear_tpls' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'inventory_mode' =>		array(T_ZBX_INT, O_OPT, null,
+	'hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'groups' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'applications' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
+	'host' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
+	'visiblename' =>	array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
+	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		'isset({save})'),
+	'status' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,3'),	'isset({save})'),
+	'newgroup' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Agent or SNMP or JMX or IPMI interface')),
+	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
+	'templates' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	null),
+	'templates_rem' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'clear_templates' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
+	'ipmi_authtype' =>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(-1, 6), null),
+	'ipmi_privilege' =>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 5),	null),
+	'ipmi_username' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'ipmi_password' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'mass_replace_tpls' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'mass_clear_tpls' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'inventory_mode' =>	array(T_ZBX_INT, O_OPT, null,
 		IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC), null),
-	'host_inventory' =>		array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null),
-	'macros_rem' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'macros' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
-	'macro_new' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		'isset({macro_add})'),
-	'value_new' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		'isset({macro_add})'),
-	'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
-	'visible' =>			array(T_ZBX_STR, O_OPT, null,			null,		null),
+	'host_inventory' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null),
+	'macros_rem' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'macros' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'macro_new' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		'isset({macro_add})'),
+	'value_new' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		'isset({macro_add})'),
+	'macro_add' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'massupdate' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'visible' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'add_to_group' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
+	'go' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'add_to_group' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
 	'delete_from_group' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
-	'unlink' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'unlink' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'unlink_and_clear' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'masssave' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'full_clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
-	'form_refresh' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
+	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'masssave' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'clone' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'full_clone' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	// filter
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_ACT,			null,		null),
-	'filter_host' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'filter_ip' =>			array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'filter_dns' =>			array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'filter_port' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
+	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_ACT,		null,		null),
+	'filter_host' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'filter_ip' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'filter_port' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	// ajax
-	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,			null,		null),
-	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,			NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,			NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,		null,		null),
+	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,		NOT_EMPTY,	'isset({favobj})'),
+	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,		NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -343,21 +343,11 @@ elseif (isset($_REQUEST['save'])) {
 			$interfaces[$inum]['main'] = 0;
 		}
 
-		if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT])) {
-			$mainAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT];
-			$interfaces[$mainAgentId]['main'] = '1';
-		}
-		if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP])) {
-			$snmpAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP];
-			$interfaces[$snmpAgentId]['main'] = '1';
-		}
-		if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX])) {
-			$ipmiAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX];
-			$interfaces[$ipmiAgentId]['main'] = '1';
-		}
-		if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI])) {
-			$jmxAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI];
-			$interfaces[$jmxAgentId]['main'] = '1';
+		$interfaceTypes = array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI);
+		foreach ($interfaceTypes as $type) {
+			if (isset($_REQUEST['mainInterfaces'][$type])) {
+				$interfaces[$_REQUEST['mainInterfaces'][$type]]['main'] = '1';
+			}
 		}
 
 		// ignore empty new macros, i.e., macros rows that have not been filled
@@ -553,6 +543,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 
 	show_messages($go_result, _('Host status updated'), _('Cannot update host status'));
 }
+
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	$url = new CUrl();
 	$path = $url->getPath();
@@ -629,9 +620,7 @@ elseif (isset($_REQUEST['form'])) {
 
 	if ($hostid = get_request('hostid', 0)) {
 		$hosts_wdgt->addItem(get_header_host_table('', $_REQUEST['hostid']));
-		$hosts_wdgt->setRootClass('host-edit');
 	}
-	$hosts_wdgt->setRootClass('host-list');
 
 	$hostForm = new CView('configuration.host.edit');
 	$hosts_wdgt->addItem($hostForm->render());

@@ -244,6 +244,8 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	MIB_IFTABLE	*pIfTable = NULL;
 	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
+	LPTSTR		wdescr;
+	LPSTR		utf8_descr;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -271,13 +273,18 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		pIfRow.dwIndex = pIfTable->table[i].dwIndex;
 		if (NO_ERROR != (dwRetVal = GetIfEntry(&pIfRow)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "GetIfEntry failed with error: %s",
-					strerror_from_system(dwRetVal));
+			zabbix_log(LOG_LEVEL_DEBUG, "GetIfEntry failed with error: %s", strerror_from_system(dwRetVal));
 			continue;
 		}
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "{#IFNAME}", pIfRow.bDescr, ZBX_JSON_TYPE_STRING);
+
+		wdescr = zbx_acp_to_unicode(pIfRow.bDescr);
+		utf8_descr = zbx_unicode_to_utf8(wdescr);
+		zbx_json_addstring(&j, "{#IFNAME}", utf8_descr, ZBX_JSON_TYPE_STRING);
+		zbx_free(utf8_descr);
+		zbx_free(wdescr);
+
 		zbx_json_close(&j);
 	}
 

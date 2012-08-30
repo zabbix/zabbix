@@ -328,8 +328,17 @@ foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'su
  */
 $result = false;
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
+	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
-	array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
+
+	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
+		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
+		unset($_REQUEST['new_delay_flex']);
+	}
+	else {
+		error($timePeriodValidator->getError());
+		show_messages(false, null, _('Invalid time period'));
+	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = false;
@@ -608,41 +617,30 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	show_messages($go_result, _('History cleared'), $go_result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
-	global $USER_DETAILS;
-
-	$go_result = true;
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 	$group_itemid = $_REQUEST['group_itemid'];
 
-	$db_items = DBselect(
-		'SELECT h.name AS hostname,i.itemid,i.name,i.key_,i.templateid,i.type'.
-		' FROM items i,hosts h'.
-		' WHERE '.DBcondition('i.itemid', $group_itemid).
-			' AND h.hostid=i.hostid'.
-			' AND '.DBcondition('h.hostid', $available_hosts)
-	);
-	while ($item = DBfetch($db_items)) {
-		if ($item['templateid'] != ITEM_TYPE_ZABBIX) {
-			unset($group_itemid[$item['itemid']]);
-			error(_('Item').SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE._('Cannot delete item').SPACE.
-				'('._('Templated item').')');
-			continue;
-		}
-		elseif($item['type'] == ITEM_TYPE_HTTPTEST) {
-			unset($group_itemid[$item['itemid']]);
-			error(_('Item').SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE._('Cannot delete item').SPACE.
-				'('._('Web item').')');
-			continue;
-		}
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
-			_('Host').' ['.$item['hostname'].']');
-	}
+	$itemsToDelete = API::Item()->get(array(
+		'output' => array('key_', 'itemid'),
+		'selectHosts' => array('name'),
+		'itemids' => $group_itemid,
+		'preservekeys' => true
+	));
 
-	$go_result &= !empty($group_itemid);
+	$go_result = API::Item()->delete($group_itemid);
+
 	if ($go_result) {
-		$go_result = API::Item()->delete($group_itemid);
+		foreach ($itemsToDelete as $item) {
+			$host = reset($item['hosts']);
+
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
+				_('Host').' ['.$host['name'].']');
+		}
+
+		show_messages(true, _('Items deleted'));
 	}
-	show_messages($go_result, _('Items deleted'), _('Cannot delete items'));
+	else {
+		show_messages(false, null, _('Cannot delete items'));
+	}
 }
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
 	$url = new CUrl();
@@ -988,7 +986,6 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get(array(
 		'triggerids' => $itemTriggerIds,
-		'expandDescription' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'host'),
 		'selectFunctions' => API_OUTPUT_EXTEND,

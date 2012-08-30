@@ -386,14 +386,11 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	for (i = 0; i < num; i++)
 	{
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		rc = substitute_key_macros(&items[i].key, &items[i].host, NULL, MACRO_TYPE_ITEM_KEY,
+		rc = substitute_key_macros(&items[i].key, &items[i], NULL, MACRO_TYPE_ITEM_KEY,
 				error, sizeof(error));
 
 		if (SUCCEED == rc)
 		{
-			items[i].interface.addr = (1 == items[i].interface.useip ?
-					items[i].interface.ip_orig : items[i].interface.dns_orig);
-
 			rc = parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
 					&interval, &size, &timeout, &type, error, sizeof(error));
 		}

@@ -31,7 +31,6 @@ extern char	*CONFIG_JAVA_GATEWAY;
 extern int	CONFIG_JAVA_GATEWAY_PORT;
 
 int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result);
-void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, zbx_timespec_t *timespecs, int num);
+void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num);
 
 #endif

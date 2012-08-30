@@ -169,7 +169,7 @@ if ($this->data['input_method'] == IM_TREE) {
 				}
 				else {
 					$allowedTesting = false;
-					$errorImg = new CImg('images/general/error_icon.png', 'expression_errors');
+					$errorImg = new CImg('images/general/error2.png', 'expression_errors');
 					$errorTexts = array();
 					if (is_array($e['expression']['levelErrors'])) {
 						foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {

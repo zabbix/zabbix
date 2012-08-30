@@ -20,6 +20,9 @@
 #include "common.h"
 #include "stats.h"
 #include "cpustat.h"
+#ifdef _WINDOWS
+#	include "perfstat.h"
+#endif
 #include "mutexs.h"
 #include "log.h"
 

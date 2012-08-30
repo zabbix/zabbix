@@ -187,7 +187,7 @@ class API_JSON_User extends CZabbixTest {
 		}
 	}
 
-	public function testUser_Authenticate_ResetAttemptsAfterSuccesfullAuth() {
+	public function testUser_Authenticate_ResetAttemptsAfterSuccessfulAuth() {
 		// TODO
 		$this->markTestIncomplete();
 	}

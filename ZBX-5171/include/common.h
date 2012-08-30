@@ -22,6 +22,7 @@
 
 #include "sysinc.h"
 #include "zbxtypes.h"
+#include "version.h"
 
 #ifdef DEBUG
 #	include "threads.h"
@@ -119,11 +120,6 @@
 
 #define ON	1
 #define OFF	0
-
-#define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"20 June 2012"
-#define	ZABBIX_VERSION		"2.0.1rc2"
-#define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
 #	define	ZBX_SERVICE_NAME_LEN	64
@@ -440,6 +436,7 @@ typedef enum
 	ALERT_STATUS_SENT,
 	ALERT_STATUS_FAILED
 } zbx_alert_status_t;
+const char	*zbx_alert_status_string(unsigned char type, unsigned char status);
 
 /* escalation statuses */
 typedef enum
@@ -458,6 +455,7 @@ typedef enum
 	ALERT_TYPE_MESSAGE = 0,
 	ALERT_TYPE_COMMAND
 } zbx_alert_type_t;
+const char	*zbx_alert_type_string(unsigned char type);
 
 /* item statuses */
 typedef enum
@@ -710,18 +708,28 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 #define zbx_free(ptr)		\
+				\
+do				\
+{				\
 	if (ptr)		\
 	{			\
 		free(ptr);	\
 		ptr = NULL;	\
-	}
+	}			\
+}				\
+while (0)
 
 #define zbx_fclose(file)	\
+				\
+do				\
+{				\
 	if (file)		\
 	{			\
 		fclose(file);	\
 		file = NULL;	\
-	}
+	}			\
+}				\
+while (0)
 
 #define THIS_SHOULD_NEVER_HAPPEN	zbx_error("ERROR [file:%s,line:%d] "				\
 							"Something impossible has just happened.",	\
@@ -840,6 +848,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
 #define ZBX_GIBIBYTE		1073741824
+#define ZBX_TEBIBYTE		__UINT64_C(1099511627776)
 
 #define SEC_PER_MIN		60
 #define SEC_PER_HOUR		3600
@@ -979,7 +988,7 @@ char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
 void	dos2unix(char *str);
-int	str2uint64(char *str, zbx_uint64_t *value);
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)

@@ -100,8 +100,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'excludeSearch'					=> null,
 			'searchWildcardsEnabled'		=> null,
 			// output
+			'expandExpression'              => null,
 			'expandData'					=> null,
-			'expandDescription'				=> null,
 			'output'						=> API_OUTPUT_REFER,
 			'selectGroups'					=> null,
 			'selectHosts'					=> null,
@@ -128,6 +128,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 					$sqlParts['select'][$field] = 't.'.$field;
 				}
 			}
+
+			// ignore the "expandExpression" parameter if the expression is not requested
+			if ($options['expandExpression'] !== null && !str_in_array('expression', $options['output'])) {
+				$options['expandExpression'] = null;
+			}
+
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -628,6 +634,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 						unset($trigger['itemid']);
 					}
 
+					// expand expression
+					if ($options['expandExpression'] !== null && $trigger['expression']) {
+						$trigger['expression'] = explode_exp($trigger['expression'], false, true);
+					}
+
 					$result[$trigger['triggerid']] += $trigger;
 				}
 			}
@@ -857,154 +868,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-		// expandDescription
-		if (!is_null($options['expandDescription'])) {
-			foreach ($result as $tnum => $trigger) {
-				preg_match_all('/\$([1-9])/u', $trigger['description'], $numbers);
-				preg_match_all('~{[0-9]+}[+\-\*/<>=#]?[\(]*(?P<val>[+\-0-9]+)[\)]*~u', $trigger['expression'], $matches);
-
-				foreach ($numbers[1] as $i) {
-					$rep = isset($matches['val'][$i - 1]) ? $matches['val'][$i - 1] : '';
-					$result[$tnum]['description'] = str_replace('$'.($i), $rep, $result[$tnum]['description']);
-				}
-			}
-
-			$functionids = array();
-			$triggersToExpandHosts = array();
-			$triggersToExpandItems = array();
-			$triggersToExpandItems2 = array();
-			foreach ($result as $tnum => $trigger) {
-				preg_match_all('/{HOST\.NAME([1-9]?)}/u', $trigger['description'], $hnums);
-				if (!empty($hnums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($hnums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandHosts[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{HOSTNAME([1-9]?)}/u', $trigger['description'], $hnums);
-				if (!empty($hnums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($hnums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandHosts[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{HOST\.HOST([1-9]?)}/u', $trigger['description'], $hnums);
-				if (!empty($hnums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($hnums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandHosts[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{ITEM\.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
-				if (!empty($inums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($inums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandItems[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{ITEM\.VALUE([1-9]?)}/u', $trigger['description'], $inums);
-				if (!empty($inums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($inums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandItems2[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-			}
-
-			if (!empty($functionids)) {
-				$dbFuncs = DBselect(
-					'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name,i.lastvalue'.
-					' FROM functions f,items i,hosts h'.
-					' WHERE f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status<>'.HOST_STATUS_TEMPLATE.
-						' AND '.DBcondition('f.functionid', $functionids)
-				);
-				while ($func = DBfetch($dbFuncs)) {
-					if (isset($triggersToExpandHosts[$func['triggerid']][$func['functionid']])) {
-						$fnum = $triggersToExpandHosts[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
-							$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME}', $func['name'], $result[$func['triggerid']]['description']);
-							$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST}', $func['host'], $result[$func['triggerid']]['description']);
-						}
-
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
-						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
-						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
-					}
-
-					if (isset($triggersToExpandItems[$func['triggerid']][$func['functionid']])) {
-						$fnum = $triggersToExpandItems[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-						}
-
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-					}
-
-					if (isset($triggersToExpandItems2[$func['triggerid']][$func['functionid']])) {
-						$fnum = $triggersToExpandItems2[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-						}
-
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-					}
-				}
-			}
-
-			foreach ($result as $tnum => $trigger) {
-				if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)) {
-					$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'triggerid' => $trigger['triggerid']));
-
-					$search = array_keys($macros);
-					$values = array_values($macros);
-
-					$result[$tnum]['description'] = str_replace($search, $values, $trigger['description']);
-				}
-			}
-		}
-
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1068,8 +931,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-		foreach ($createdTriggers as $trigger) {
-			$trigger['expression'] = explode_exp($trigger['expression']);
+		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
 		}
 
@@ -1335,7 +1197,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			if ($expressionChanged) {
-				delete_function_by_triggerid($trigger['triggerid']);
+				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
 
 				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {

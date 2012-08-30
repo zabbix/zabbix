@@ -36,6 +36,7 @@ class czbxrpc{
 // list of methods which does not require authentication
 		$withoutAuth = array(
 			'user.login' => 1,
+			'user.logout' => 1,
 			'user.checkAuthentication' => 1,
 			'apiinfo.version' => 1
 		);
@@ -111,11 +112,11 @@ class czbxrpc{
 			return array('result' => $result);
 		}
 		catch (Exception $e) {
-			if ($e instanceof DBException) {
-				$code = ZBX_API_ERROR_INTERNAL;
+			if ($e instanceof APIException) {
+				$code = $e->getCode();
 			}
 			else {
-				$code = $e->getCode();
+				$code = ZBX_API_ERROR_INTERNAL;
 			}
 
 			API::setReturnRPC();

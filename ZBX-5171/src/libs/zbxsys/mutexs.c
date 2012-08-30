@@ -21,7 +21,7 @@
 #include "mutexs.h"
 #include "log.h"
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 #	if !HAVE_SEMUN
 		union semun
 		{
@@ -184,33 +184,30 @@ lbl_return:
  ******************************************************************************/
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
-#if defined(_WINDOWS)
-	if (!*mutex)
+#ifndef _WINDOWS
+	struct sembuf	sem_lock;
+#endif
+
+	if (ZBX_MUTEX_NULL == *mutex)
 		return;
 
+#ifdef _WINDOWS
 	if (WAIT_OBJECT_0 != WaitForSingleObject(*mutex, INFINITE))
 	{
 		zbx_error("[file:'%s',line:%d] lock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
 		exit(FAIL);
 	}
-
 #else
-	struct sembuf	sem_lock;
-
 	sem_lock.sem_num = *mutex;
 	sem_lock.sem_op = -1;
 	sem_lock.sem_flg = SEM_UNDO;
-
-	if (!*mutex)
-		return;
 
 	while (-1 == semop(ZBX_SEM_LIST_ID, &sem_lock, 1))
 	{
 		if (EINTR != errno)
 		{
-			zbx_error("[file:'%s',line:%d] lock failed: %s",
-					filename, line, zbx_strerror(errno));
+			zbx_error("[file:'%s',line:%d] lock failed: %s", filename, line, zbx_strerror(errno));
 			exit(FAIL);
 		}
 	}
@@ -230,10 +227,14 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
  ******************************************************************************/
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
-#if defined(_WINDOWS)
-	if (!*mutex)
+#ifndef _WINDOWS
+	struct sembuf	sem_unlock;
+#endif
+
+	if (ZBX_MUTEX_NULL == *mutex)
 		return;
 
+#ifdef _WINDOWS
 	if (0 == ReleaseMutex(*mutex))
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s",
@@ -241,21 +242,15 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 		exit(FAIL);
 	}
 #else
-	struct sembuf	sem_unlock;
-
 	sem_unlock.sem_num = *mutex;
 	sem_unlock.sem_op = 1;
 	sem_unlock.sem_flg = SEM_UNDO;
-
-	if (!*mutex)
-		return;
 
 	while (-1 == semop(ZBX_SEM_LIST_ID, &sem_unlock, 1))
 	{
 		if (EINTR != errno)
 		{
-			zbx_error("[file:'%s',line:%d] unlock failed: %s",
-					filename, line, zbx_strerror(errno));
+			zbx_error("[file:'%s',line:%d] unlock failed: %s", filename, line, zbx_strerror(errno));
 			exit(FAIL);
 		}
 	}
@@ -277,8 +272,8 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
  ******************************************************************************/
 int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
-#if defined(_WINDOWS)
-	if (!*mutex)
+#ifdef _WINDOWS
+	if (ZBX_MUTEX_NULL == *mutex)
 		return ZBX_MUTEX_OK;
 
 	if (0 == CloseHandle(*mutex))

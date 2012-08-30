@@ -1,6 +1,6 @@
 <script language="JavaScript" type="text/javascript">
 	function add_var_to_opener_obj(obj, name, value) {
-		new_variable = window.opener.document.createElement('input');
+		var new_variable = window.opener.document.createElement('input');
 		new_variable.type = 'hidden';
 		new_variable.name = name;
 		new_variable.value = value;
@@ -13,6 +13,7 @@
 			close_window();
 			return false;
 		}
+
 		add_var_to_opener_obj(form, 'new_httpstep[name]', name);
 		add_var_to_opener_obj(form, 'new_httpstep[timeout]', timeout);
 		add_var_to_opener_obj(form, 'new_httpstep[url]', url);
@@ -31,6 +32,7 @@
 			close_window();
 			return false;
 		}
+
 		add_var_to_opener_obj(form, list_name + '[' + stepid + '][name]', name);
 		add_var_to_opener_obj(form, list_name + '[' + stepid + '][timeout]', timeout);
 		add_var_to_opener_obj(form, list_name + '[' + stepid + '][url]', url);

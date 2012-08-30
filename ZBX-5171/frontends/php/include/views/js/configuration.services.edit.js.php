@@ -77,7 +77,7 @@
 			var td = document.createElement('td');
 			var inputRemove = document.createElement('input');
 			inputRemove.setAttribute('type', 'button');
-			inputRemove.setAttribute('value', '<?php echo _('Remove'); ?>');
+			inputRemove.setAttribute('value', <?php echo CJs::encodeJson(_('Remove')); ?>);
 			inputRemove.setAttribute('class', 'link_menu');
 			inputRemove.setAttribute('onclick', 'javascript: removeDependentChild(\'' + serviceid + '\');');
 

@@ -838,7 +838,7 @@ static void	process_maintenance()
  ******************************************************************************/
 void	main_timer_loop()
 {
-	int	now, nextcheck, sleeptime, maintenance = 1;
+	int	now, nextcheck, sleeptime;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -846,24 +846,23 @@ void	main_timer_loop()
 
 	for (;;)
 	{
+		now = time(NULL);
+		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
+		sleeptime = nextcheck - now;
+
+		zbx_sleep_loop(sleeptime);
+
 		zbx_setproctitle("%s [processing time functions]", get_process_type_string(process_type));
 
 		process_time_functions();
 
-		if (1 == maintenance)
+		/* we process maintenance at every 00 sec */
+		/* process time functions can take long time */
+		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
 		{
 			zbx_setproctitle("%s [processing maintenance periods]", get_process_type_string(process_type));
 
 			process_maintenance();
 		}
-
-		now = time(NULL);
-		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
-		sleeptime = nextcheck - now;
-
-		/* process maintenance every minute */
-		maintenance = (0 == nextcheck % SEC_PER_MIN ? 1 : 0);
-
-		zbx_sleep_loop(sleeptime);
 	}
 }

@@ -42,7 +42,7 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
+	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
 	{
 		if ('#' == *parameter)
 		{
@@ -82,7 +82,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
+	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
 clean:
 	if (SUCCEED == res)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);
@@ -299,26 +299,6 @@ clean:
 	return res;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: evaluate_COUNT                                                   *
- *                                                                            *
- * Purpose: evaluate function 'count' for the item                            *
- *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - up to four comma-separated fields:                *
- *                            (1) number of seconds/values                    *
- *                            (2) value to compare with (optional)            *
- *                            (3) comparison operator (optional)              *
- *                            (4) time shift (optional)                       *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-
 #define OP_EQ	0
 #define OP_NE	1
 #define OP_GT	2
@@ -336,8 +316,9 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_UINT64:
+			if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_uint64))
+				return FAIL;
 			ZBX_STR2UINT64(value_uint64, value);
-			ZBX_STR2UINT64(arg2_uint64, arg2);
 
 			switch (op)
 			{
@@ -369,8 +350,10 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
+			if (SUCCEED != is_double_suffix(arg2))
+				return FAIL;
+			arg2_double = str2double(arg2);
 			value_double = atof(value);
-			arg2_double = atof(arg2);
 
 			switch (op)
 			{
@@ -423,8 +406,6 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 			}
-
-			break;
 	}
 
 	return FAIL;
@@ -468,6 +449,25 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_COUNT                                                   *
+ *                                                                            *
+ * Purpose: evaluate function 'count' for the item                            *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - up to four comma-separated fields:                *
+ *                            (1) number of seconds/values                    *
+ *                            (2) value to compare with (optional)            *
+ *                            (3) comparison operator (optional)              *
+ *                            (4) time shift (optional)                       *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_COUNT";

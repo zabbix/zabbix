@@ -62,19 +62,14 @@
 			$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 			$data['user_groups']	= zbx_toHash($userGroup);
 
-			$user_medias = array();
-			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
-			while ($db_media = DBfetch($db_medias)) {
-				$user_medias[] = array(
-					'mediaid' => $db_media['mediaid'],
-					'mediatypeid' => $db_media['mediatypeid'],
-					'period' => $db_media['period'],
-					'sendto' => $db_media['sendto'],
-					'severity' => $db_media['severity'],
-					'active' => $db_media['active']
-				);
+			$data['user_medias'] = array();
+			$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
+					' FROM media m'.
+					' WHERE m.userid='.$userid
+			);
+			while ($dbMedium = DBfetch($dbMedia)) {
+				$data['user_medias'][] = $dbMedium;
 			}
-			$data['user_medias'] = $user_medias;
 
 			if ($data['autologout'] > 0) {
 				$_REQUEST['autologout'] = $data['autologout'];
@@ -121,16 +116,22 @@
 		}
 
 		// set media types
-		$data['media_types'] = array();
-		$media_type_ids = array();
-		foreach ($data['user_medias'] as $media) {
-			$media_type_ids[$media['mediatypeid']] = 1;
-		}
-		if (count($media_type_ids) > 0) {
-			$db_media_types = DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE mt.mediatypeid IN ('.implode(',', array_keys($media_type_ids)).')');
-			while ($db_media_type = DBfetch($db_media_types)) {
-				$data['media_types'][$db_media_type['mediatypeid']] = $db_media_type['description'];
+		if (!empty($data['user_medias'])) {
+			$mediaTypeDescriptions = array();
+			$dbMediaTypes = DBselect(
+				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
+					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
+			);
+			while ($dbMediaType = DBfetch($dbMediaTypes)) {
+				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
 			}
+
+			foreach ($data['user_medias'] as &$media) {
+				$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']];
+			}
+			unset($media);
+
+			CArrayHelper::sort($data['user_medias'], array('description', 'sendto'));
 		}
 
 		// set user rights
@@ -447,7 +448,7 @@
 		$dataTypeInput->setEnabled('no');
 
 		// filter table
-		$table = new CTable('', 'filter filter-item');
+		$table = new CTable('', 'filter');
 		$table->setCellPadding(0);
 		$table->setCellSpacing(0);
 
@@ -900,6 +901,7 @@
 			'new_application' => get_request('new_application', ''),
 			'applications' => get_request('applications', array()),
 			'delay_flex' => get_request('delay_flex', array()),
+			'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
 			'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
@@ -1193,17 +1195,9 @@
 			'go' => get_request('go', 'massupdate'),
 			'g_triggerid' => get_request('g_triggerid', array()),
 			'priority' => get_request('priority', 0),
-			'config' => select_config()
+			'config' => select_config(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
@@ -1241,21 +1235,19 @@
 			'url' => get_request('url', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array()
+			'templates' => array(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger
-			$data['trigger'] = get_trigger_by_triggerid($data['triggerid']);
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('hostid'),
+				'triggerids' => $data['triggerid']
+			);
+			$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+			$data['trigger'] = reset($trigger);
 			if (!empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
 			}
@@ -1264,17 +1256,23 @@
 			$tmp_triggerid = $data['triggerid'];
 			do {
 				$db_triggers = DBfetch(DBselect(
-					'SELECT t.triggerid,t.templateid,h.name'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid='.$tmp_triggerid.
-						' AND h.hostid=i.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'
+					'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
+					' FROM triggers t'.
+						' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
+						' LEFT JOIN items i ON f.itemid=i.itemid'.
+						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+					' WHERE t.triggerid='.$tmp_triggerid
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$link = empty($data['parent_discoveryid'])
-						? 'triggers.php?form=update&triggerid='.$db_triggers['triggerid']
-						: 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$data['parent_discoveryid'];
+					// parent trigger prototype link
+					if ($data['parent_discoveryid']) {
+						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					}
+					// parent trigger link
+					else {
+						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
+					}
 
 					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
 					$data['templates'][] = SPACE.RARR.SPACE;
@@ -1285,6 +1283,12 @@
 			array_shift($data['templates']);
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
+
+			// if no host has been selected for the navigation panel, use the first trigger host
+			if (!$data['hostid']) {
+				$hosts = reset($data['trigger']['hosts']);
+				$data['hostid'] = $hosts['hostid'];
+			}
 		}
 
 		if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {
@@ -1379,8 +1383,13 @@
 		$new_timeperiod = get_request('new_timeperiod', array());
 		$new = is_array($new_timeperiod);
 
-		if (is_array($new_timeperiod) && isset($new_timeperiod['id'])) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+		if (is_array($new_timeperiod)) {
+			if (isset($new_timeperiod['id'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+			}
+			if (isset($new_timeperiod['timeperiodid'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[timeperiodid]', $new_timeperiod['timeperiodid']));
+			}
 		}
 		if (!is_array($new_timeperiod)) {
 			$new_timeperiod = array();

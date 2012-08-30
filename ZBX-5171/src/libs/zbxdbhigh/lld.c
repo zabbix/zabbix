@@ -857,6 +857,13 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_free(error_esc);
 	}
 
+	if (new_triggers < triggers->values_num)
+	{
+		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		DBexecute("%s", sql4);
+		zbx_free(sql4);
+	}
+
 	if (0 != new_functions)
 	{
 #ifdef HAVE_MULTIROW_INSERT
@@ -866,13 +873,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 		DBexecute("%s", sql3);
 		zbx_free(sql3);
-	}
-
-	if (new_triggers < triggers->values_num)
-	{
-		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
-		DBexecute("%s", sql4);
-		zbx_free(sql4);
 	}
 }
 
@@ -1503,9 +1503,9 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_graph                                                 *
+ * Function: DBlld_graph_exists                                               *
  *                                                                            *
- * Purpose: add or update graph                                               *
+ * Purpose: check if graph exists                                             *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1673,6 +1673,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, sz, del_gitems_alloc = 0;
+		int	idx;
 
 		sql = zbx_malloc(sql, sql_alloc);
 
@@ -1687,17 +1688,21 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 		DBget_graphitems(sql, &graph->del_gitems, &del_gitems_alloc, &graph->del_gitems_num);
 
-		for (i = graph->del_gitems_num - 1; i >= 0; i--)
+		/* Run through graph items that must exist removing them from */
+		/* del_items. What's left in del_items will be removed later. */
+		for (i = 0; i < graph->gitems_num; i++)
 		{
-			if (NULL != (gitem = bsearch(&graph->del_gitems[i].itemid, graph->gitems, graph->gitems_num,
+			if (NULL != (gitem = bsearch(&graph->gitems[i].itemid, graph->del_gitems, graph->del_gitems_num,
 					sizeof(ZBX_GRAPH_ITEMS), ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				gitem->gitemid = graph->del_gitems[i].gitemid;
+				graph->gitems[i].gitemid = gitem->gitemid;
 
 				graph->del_gitems_num--;
 
-				if (0 != (sz = (graph->del_gitems_num - i) * sizeof(ZBX_GRAPH_ITEMS)))
-					memmove(&graph->del_gitems[i], &graph->del_gitems[i + 1], sz);
+				idx = (int)(gitem - graph->del_gitems);
+
+				if (0 != (sz = (graph->del_gitems_num - idx) * sizeof(ZBX_GRAPH_ITEMS)))
+					memmove(&graph->del_gitems[idx], &graph->del_gitems[idx + 1], sz);
 			}
 		}
 		zbx_free(sql);
@@ -2214,7 +2219,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 		db_error = zbx_strdup(db_error, row[4]);
 
 		lifetime_str = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, &hostid, NULL, NULL, &lifetime_str, MACRO_TYPE_LLD_LIFETIME, NULL, 0);
+		substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, &lifetime_str, MACRO_TYPE_LLD_LIFETIME, NULL, 0);
 		if (SUCCEED != is_ushort(lifetime_str, &lifetime))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"

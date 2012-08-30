@@ -104,7 +104,7 @@ if (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot remove macro.'));
 			}
 			foreach ($globalMacros as $macro) {
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro.SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
 			}
 		}
 

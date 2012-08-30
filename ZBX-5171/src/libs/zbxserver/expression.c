@@ -85,7 +85,7 @@ static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *m
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_uint64_t *functionid)
@@ -341,7 +341,7 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *           Use zbx_free_numbers to free allocated memory                    *
  *                                                                            *
  ******************************************************************************/
@@ -427,7 +427,7 @@ static void	zbx_free_numbers(char ***numbers, int count)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *           replace ONLY $1-9 macros NOT {HOSTNAME}                          *
  *                                                                            *
  ******************************************************************************/
@@ -713,9 +713,9 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_interface_value_by_hostid                                  *
+ * Function: DBget_interface_value                                            *
  *                                                                            *
- * Purpose: request interface value by hostid and request                     *
+ * Purpose: request interface value by hostid                                 *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -730,20 +730,29 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 #define ZBX_REQUEST_HOST_IPADDRESS	1
 #define ZBX_REQUEST_HOST_DNS		2
 #define ZBX_REQUEST_HOST_CONN		3
-static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int request)
+static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int request, unsigned char agent_only)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	type, useip, pr, last_pr = INTERFACE_TYPE_COUNT;
+	char		sql[14];
 	int		ret = FAIL;
+
+	if (0 == agent_only)
+	{
+		zbx_snprintf(sql, sizeof(sql), " in (%d,%d,%d,%d)",
+				INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX);
+	}
+	else
+		zbx_snprintf(sql, sizeof(sql), "=%d", INTERFACE_TYPE_AGENT);
 
 	result = DBselect(
 			"select type,useip,ip,dns"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
-				" and type in (%d,%d,%d,%d)"
+				" and type%s"
 				" and main=1",
-			hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX);
+			hostid, sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -807,8 +816,8 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 	const char	*__function_name = "DBget_trigger_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DC_HOST		dc_host;
-	char		*key = NULL;
+	DC_ITEM		dc_item;
+	char		*key = NULL, *addr = NULL;
 	zbx_uint64_t	functionid, proxy_hostid, hostid;
 	int		ret = FAIL;
 
@@ -818,11 +827,13 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 		goto fail;
 
 	result = DBselect(
-			"select i.name,i.key_,i.description,h.hostid,h.host,h.proxy_hostid,h.name,i.itemid"
-			" from hosts h,items i,functions f"
-			" where h.hostid=i.hostid"
-				" and i.itemid=f.itemid"
-				" and f.functionid=" ZBX_FS_UI64,
+			"select h.hostid,h.proxy_hostid,h.host,h.name,i.itemid,i.name,i.key_,i.description"
+				",ii.ip,ii.dns,ii.useip,ii.type,ii.main"
+			" from items i"
+				" join hosts h on h.hostid=i.hostid"
+				" join functions f on f.itemid=i.itemid"
+					" and f.functionid=" ZBX_FS_UI64
+				" left join interface ii on ii.interfaceid=i.interfaceid",
 			functionid);
 
 	if (NULL != (row = DBfetch(result)))
@@ -830,36 +841,66 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 		switch (request)
 		{
 			case ZBX_REQUEST_HOST_HOST:
-				*replace_to = zbx_strdup(*replace_to, row[4]);
+				*replace_to = zbx_strdup(*replace_to, row[2]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_HOST_NAME:
-				*replace_to = zbx_strdup(*replace_to, row[6]);
+				*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_HOST_IPADDRESS:
 			case ZBX_REQUEST_HOST_DNS:
 			case ZBX_REQUEST_HOST_CONN:
-				ZBX_STR2UINT64(hostid, row[3]);
-				ret = DBget_interface_value_by_hostid(hostid, replace_to, request);
+				ZBX_STR2UINT64(hostid, row[0]);
+				ret = DBget_interface_value(hostid, replace_to, request, 0);
 				break;
 			case ZBX_REQUEST_ITEM_ID:
-				*replace_to = zbx_strdup(*replace_to, row[7]);
+				*replace_to = zbx_strdup(*replace_to, row[4]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
-				memset(&dc_host, 0, sizeof(dc_host));
-				ZBX_STR2UINT64(dc_host.hostid, row[3]);
-				strscpy(dc_host.host, row[4]);
+				memset(&dc_item, 0, sizeof(dc_item));
+				ZBX_STR2UINT64(dc_item.host.hostid, row[0]);
+				strscpy(dc_item.host.host, row[2]);
+				strscpy(dc_item.host.name, row[3]);
 
-				key = zbx_strdup(key, row[1]);
-				substitute_key_macros(&key, &dc_host, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+				if (SUCCEED != DBis_null(row[11]))	/* interface type */
+				{
+					dc_item.interface.type = (unsigned char)atoi(row[11]);
+					dc_item.interface.addr = ('1' == *row[10] ? dc_item.interface.ip_orig :
+							dc_item.interface.dns_orig);
+
+					if ('1' != *row[12] || INTERFACE_TYPE_AGENT == dc_item.interface.type)
+					{
+						addr = zbx_strdup(addr, row[8]);	/* ip */
+						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
+								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						strscpy(dc_item.interface.ip_orig, addr);
+						zbx_free(addr);
+
+						addr = zbx_strdup(addr, row[9]);	/* dns */
+						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
+								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						strscpy(dc_item.interface.dns_orig, addr);
+						zbx_free(addr);
+					}
+					else
+					{
+						strscpy(dc_item.interface.ip_orig, row[8]);
+						strscpy(dc_item.interface.dns_orig, row[9]);
+					}
+				}
+				else
+					dc_item.interface.type = INTERFACE_TYPE_UNKNOWN;
+
+				key = zbx_strdup(key, row[6]);
+				substitute_key_macros(&key, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
 					*replace_to = zbx_strdup(*replace_to, row[0]);
-					item_description(replace_to, key, dc_host.hostid);
+					item_description(replace_to, key, dc_item.host.hostid);
 					zbx_free(key);
 				}
 				else /* ZBX_REQUEST_ITEM_KEY */
@@ -870,15 +911,15 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_KEY_ORIG:
-				*replace_to = zbx_strdup(*replace_to, row[1]);
+				*replace_to = zbx_strdup(*replace_to, row[6]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_DESCRIPTION:
-				*replace_to = zbx_strdup(*replace_to, row[2]);
+				*replace_to = zbx_strdup(*replace_to, row[7]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_DBROW2UINT64(proxy_hostid, row[5]);
+				ZBX_DBROW2UINT64(proxy_hostid, row[1]);
 
 				if (0 == proxy_hostid)
 				{
@@ -1363,70 +1404,84 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*buf = NULL;
+	char		*buf = NULL, *p;
 	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
-	int		status, esc_step;
+	int		esc_step;
+	unsigned char	type, status;
 	time_t		now;
-	zbx_uint64_t	userid;
+	zbx_uint64_t	userid, eventid;
 
 	buf = zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
+	eventid = (NULL != escalation ? escalation->eventid : event->eventid);
+
 	if (NULL != escalation && escalation->eventid == event->eventid)
 	{
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-				"Problem started: %s %s Age: %s\n",
-				zbx_date2str(event->clock),
-				zbx_time2str(event->clock),
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
+				zbx_date2str(event->clock), zbx_time2str(event->clock),
 				zbx_age2str(time(NULL) - event->clock));
 	}
 	else
 	{
-		result = DBselect("select clock from events where eventid=" ZBX_FS_UI64,
-				escalation != NULL ? escalation->eventid : event->eventid);
+		result = DBselect("select clock from events where eventid=" ZBX_FS_UI64, eventid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
 			now = (time_t)atoi(row[0]);
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-					"Problem started: %s %s Age: %s\n",
-					zbx_date2str(now),
-					zbx_time2str(now),
-					zbx_age2str(time(NULL) - now));
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
+					zbx_date2str(now), zbx_time2str(now), zbx_age2str(time(NULL) - now));
 		}
-
 		DBfree_result(result);
 	}
 
-	result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error,a.esc_step,a.userid"
+	result = DBselect("select a.clock,a.alerttype,a.status,mt.description,a.sendto"
+				",a.error,a.esc_step,a.userid,a.message"
 			" from alerts a"
-			" left join media_type m on m.mediatypeid=a.mediatypeid"
-			" where a.eventid=" ZBX_FS_UI64 " and a.alerttype=%d order by a.clock",
-			escalation != NULL ? escalation->eventid : event->eventid,
-			ALERT_TYPE_MESSAGE);
+			" left join media_type mt"
+				" on mt.mediatypeid=a.mediatypeid"
+			" where a.eventid=" ZBX_FS_UI64
+			" order by a.clock",
+			eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		now		= atoi(row[0]);
-		status		= atoi(row[1]);
-		esc_step	= atoi(row[5]);
-		ZBX_DBROW2UINT64(userid, row[6]);
+		now = atoi(row[0]);
+		type = (unsigned char)atoi(row[1]);
+		status = (unsigned char)atoi(row[2]);
+		esc_step = atoi(row[6]);
+		ZBX_DBROW2UINT64(userid, row[7]);
 
-		if (esc_step != 0)
+		if (0 != esc_step)
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%d. ", esc_step);
 
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-				"%s %s %-11s %s %s \"%s\" %s\n",
-				zbx_date2str(now),
-				zbx_time2str(now),
-				(status == ALERT_STATUS_NOT_SENT ? "in progress" :
-					(status == ALERT_STATUS_SENT ? "sent" : "failed")),
-				SUCCEED == DBis_null(row[2]) ? "" : row[2],
-				row[3],
-				zbx_user_string(userid),
-				row[4]);
-	}
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s",
+				zbx_date2str(now), zbx_time2str(now),	/* date, time */
+				zbx_alert_type_string(type),		/* alert type */
+				zbx_alert_status_string(type, status));	/* alert status */
 
+		if (ALERT_TYPE_COMMAND == type)
+		{
+			if (NULL != (p = strchr(row[8], ':')))
+			{
+				*p = '\0';
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " \"%s\"", row[8]);	/* host */
+				*p = ':';
+			}
+		}
+		else
+		{
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s %s \"%s\"",
+					SUCCEED == DBis_null(row[3]) ? "" : row[3],	/* media type description */
+					row[4],						/* send to */
+					zbx_user_string(userid));			/* alert user */
+		}
+
+		if (ALERT_STATUS_FAILED == status)
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s", row[5]);	/* alert error */
+
+		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
+	}
 	DBfree_result(result);
 
 	if (NULL != escalation && escalation->r_eventid == event->eventid)
@@ -2094,7 +2149,7 @@ fail:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host,
+int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item,
 		DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char	*__function_name = "substitute_simple_macros";
@@ -2159,8 +2214,9 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					if (0 != event->trigger.triggerid)
 					{
 						replace_to = zbx_strdup(replace_to, event->trigger.description);
-						substitute_simple_macros(event, hostid, dc_host, escalation, &replace_to,
-								MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+						substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+								&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION,
+								error, maxerrlen);
 					}
 					else
 						ret = FAIL;
@@ -2266,8 +2322,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					if (0 != event->trigger.triggerid)
 					{
 						replace_to = zbx_strdup(replace_to, event->trigger.url);
-						substitute_simple_macros(event, hostid, dc_host, escalation, &replace_to,
-								MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
+						substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+								&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 					}
 					else
 						ret = FAIL;
@@ -2481,7 +2537,37 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 			}
 		}
-		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_INTERFACE_ADDR))
+		else if (macro_type & MACRO_TYPE_ITEM_KEY)
+		{
+			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
+			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				replace_to = zbx_strdup(replace_to, dc_item->host.host);
+			else if (0 == strcmp(m, MVAR_HOST_NAME))
+				replace_to = zbx_strdup(replace_to, dc_item->host.name);
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			{
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+					replace_to = zbx_strdup(replace_to, dc_item->interface.ip_orig);
+				else
+					ret = FAIL;
+			}
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+			{
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+					replace_to = zbx_strdup(replace_to, dc_item->interface.dns_orig);
+				else
+					ret = FAIL;
+			}
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+			{
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+					replace_to = zbx_strdup(replace_to, dc_item->interface.addr);
+				else
+					ret = FAIL;
+			}
+		}
+		else if (macro_type & MACRO_TYPE_INTERFACE_ADDR)
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
@@ -2489,15 +2575,45 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
-			else if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT)))
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
-				if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
+						dc_host->hostid, INTERFACE_TYPE_AGENT)))
+				{
 					replace_to = zbx_strdup(replace_to, interface.ip_orig);
-				else if	(0 == strcmp(m, MVAR_HOST_DNS))
-					replace_to = zbx_strdup(replace_to, interface.dns_orig);
-				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_strdup(replace_to, 1 == interface.useip ? interface.ip_orig : interface.dns_orig);
+				}
 			}
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
+						dc_host->hostid, INTERFACE_TYPE_AGENT)))
+				{
+					replace_to = zbx_strdup(replace_to, interface.dns_orig);
+				}
+			}
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
+						dc_host->hostid, INTERFACE_TYPE_AGENT)))
+				{
+					replace_to = zbx_strdup(replace_to, interface.addr);
+				}
+			}
+		}
+		else if (macro_type & MACRO_TYPE_INTERFACE_ADDR_DB)
+		{
+			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				replace_to = zbx_strdup(replace_to, dc_host->host);
+			else if (0 == strcmp(m, MVAR_HOST_NAME))
+				replace_to = zbx_strdup(replace_to, dc_host->name);
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_IPADDRESS, 1);
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_DNS, 1);
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_CONN, 1);
 		}
 		else if (macro_type & (MACRO_TYPE_INTERFACE_PORT | MACRO_TYPE_LLD_LIFETIME))
 		{
@@ -2539,16 +2655,12 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
-			else if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface, dc_host->hostid, INTERFACE_TYPE_AGENT)))
-			{
-				if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
-					replace_to = zbx_strdup(replace_to, interface.ip_orig);
-				else if	(0 == strcmp(m, MVAR_HOST_DNS))
-					replace_to = zbx_strdup(replace_to, interface.dns_orig);
-				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_strdup(replace_to,
-							1 == interface.useip ? interface.ip_orig : interface.dns_orig);
-			}
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_IPADDRESS, 0);
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_DNS, 0);
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_CONN, 0);
 		}
 
 		if (FAIL == ret)
@@ -3047,7 +3159,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		zbx_remove_whitespace(tr->expression);
 
-		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, &tr->expression,
+		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, NULL, &tr->expression,
 				MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 		{
 			tr->new_error = zbx_strdup(tr->new_error, err);
@@ -3197,11 +3309,12 @@ static void	quote_key_param(char **param, int forced)
  *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
  *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
  *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
+ *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]           *
  *           echo.sh["{$MACRO}"]     | a,b         | echo.sh["a,b"]           *
  *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type,
+int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *jp_row, int macro_type,
 		char *error, size_t maxerrlen)
 {
 	const char	*__function_name = "substitute_key_macros";
@@ -3246,7 +3359,7 @@ int	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *
 			(*data)[i] = c;
 
 			if (NULL == jp_row)
-				substitute_simple_macros(NULL, NULL, dc_host, NULL, &param, macro_type, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL, &param, macro_type, NULL, 0);
 			else
 				substitute_discovery_macros(&param, jp_row);
 
@@ -3329,7 +3442,7 @@ int	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, NULL, dc_host, NULL,
+							substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
 									&param, macro_type, NULL, 0);
 						}
 						else
@@ -3361,7 +3474,7 @@ int	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, NULL, dc_host, NULL,
+							substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
 									&param, macro_type, NULL, 0);
 						}
 						else

@@ -138,10 +138,20 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 	else {
 		// caption
 		$caption = new CLink($service['name'], '#', 'service-conf-menu');
+
+		// service is deletable only if it has no hard dependency
+		$deletable = true;
+		foreach ($service['dependencies'] as $dep) {
+			if ($dep['soft'] == 0) {
+				$deletable = false;
+				break;
+			}
+		}
+
 		$caption->setAttribute('data-menu', array(
 			'serviceid' => $service['serviceid'],
 			'name' => $service['name'],
-			'hasDependencies' => (bool) $service['dependencies']
+			'deletable' => $deletable
 		));
 
 		$serviceNode = array(

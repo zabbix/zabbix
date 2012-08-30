@@ -404,6 +404,7 @@ class CService extends CZBXAPI {
 
 		$this->checkForHardlinkedDependencies($dependencies);
 		$this->checkThatParentsDontHaveTriggers($dependencies);
+		$this->checkForCircularityInDependencies($dependencies);
 	}
 
 	/**
@@ -1345,21 +1346,21 @@ class CService extends CZBXAPI {
 	 */
 	protected function checkForHardlinkedDependencies(array $dependencies) {
 		// only check hard dependencies
-		$softDepServiceIds = array();
+		$hardDepServiceIds = array();
 		foreach ($dependencies as $dependency) {
 			if (!$dependency['soft']) {
-				$softDepServiceIds[] = $dependency['dependsOnServiceid'];
+				$hardDepServiceIds[] = $dependency['dependsOnServiceid'];
 			}
 		}
 
-		if ($softDepServiceIds) {
+		if ($hardDepServiceIds) {
 			// look for at least one hardlinked service among the given
-			$softDepServiceIds = array_unique($softDepServiceIds);
+			$hardDepServiceIds = array_unique($hardDepServiceIds);
 			$dep = API::getApi()->select('services_links', array(
 				'output' => array('servicedownid'),
 				'filter' => array(
 					'soft' => 0,
-					'servicedownid' => $softDepServiceIds
+					'servicedownid' => $hardDepServiceIds
 				),
 				'limit' => 1
 			));
@@ -1397,6 +1398,61 @@ class CService extends CZBXAPI {
 			if ($parentService = DBfetch($query)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $parentService['name']));
+			}
+		}
+	}
+
+	/**
+	 * Checks that dependencies will not create cycles in service dependencies.
+	 *
+	 * @throws APIException if at least one cycle is possible
+	 *
+	 * @param array $depsToValid	dpendency list to be validated
+	 *
+	 * @return void
+	 */
+	protected function checkForCircularityInDependencies($depsToValid) {
+		$dbDeps = API::getApi()->select('services_links', array(
+			'output' => array('serviceupid', 'servicedownid')
+		));
+
+		// create existing dependency acyclic graph
+		$arr = array();
+		foreach ($dbDeps as $dbDep) {
+			if (!isset($arr[$dbDep['serviceupid']])) {
+				$arr[$dbDep['serviceupid']] = array();
+			}
+			$arr[$dbDep['serviceupid']][$dbDep['servicedownid']] = $dbDep['servicedownid'];
+		}
+
+		// chech for circularity and add dependencies to the graph
+		foreach ($depsToValid as $dep) {
+			$this->DFCircularitySearch($dep['serviceid'], $dep['dependsOnServiceid'], $arr);
+			$arr[$dep['serviceid']][$dep['dependsOnServiceid']] = $dep['dependsOnServiceid'];
+		}
+
+	}
+
+	/**
+	 * Depth First Search recursive function to find circularity and rise exception.
+	 *
+	 * @throws APIException if cycle is possible
+	 *
+	 * @param int $id	dependency from id
+	 * @param int $depId	dependency to id
+	 * @param ref $arr	reference to graph structure. Structure is associative array with keys as "from id"
+	 *			and values as arrays with keys and values as "to id".
+	 *
+	 * @return void
+	 */
+	protected function dfCircularitySearch($id, $depId, &$arr) {
+		if ($id == $depId) {
+			// cycle found
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Services form a circular dependency.'));
+		}
+		if (isset($arr[$depId])) {
+			foreach ($arr[$depId] as $dep) {
+				$this->DFCircularitySearch($id, $dep, $arr);
 			}
 		}
 	}

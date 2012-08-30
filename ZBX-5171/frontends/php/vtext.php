@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,6 +79,5 @@ imagecolortransparent($newImage, $white);
 imageOut($newImage);
 imagedestroy($newImage);
 imagedestroy($im);
-
 
 require_once dirname(__FILE__).'/include/page_footer.php';

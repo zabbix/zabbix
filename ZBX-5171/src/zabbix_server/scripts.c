@@ -52,10 +52,8 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
-
 	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
 	{
@@ -94,12 +92,11 @@ fail:
 	return ret;
 }
 
+#ifdef HAVE_OPENIPMI
 static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_ipmi_command";
-	int		ret = FAIL;
-#ifdef HAVE_OPENIPMI
-	int		val;
+	int		val, ret;
 	char		*port = NULL;
 	DC_ITEM		item;
 
@@ -115,10 +112,8 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 		goto fail;
 	}
 
-	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
-
 	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
 	{
@@ -133,25 +128,27 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 	}
 fail:
 	zbx_free(port);
-#else
-	zbx_strlcpy(error, "support for IPMI commands was not compiled in", max_error_len);
-#endif	/* HAVE_OPENIPMI */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
+#endif
 
 static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, char **result,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
-	int		ret = FAIL;
+	int		ret;
 	AGENT_RESULT	agent_result;
 	DC_ITEM		item;
 	int             (*function)();
 
+#ifdef HAVE_SSH2
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
+#else
+	assert(ZBX_SCRIPT_TYPE_TELNET == script->type);
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -165,13 +162,13 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		goto fail;
 	}
 
-	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 	item.username = script->username;
 	item.publickey = script->publickey;
 	item.privatekey = script->privatekey;
 	item.password = script->password;
 
-	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &script->port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
+			&script->port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
 	if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
 	{
@@ -179,21 +176,20 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		goto fail;
 	}
 
+#ifdef HAVE_SSH2
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
-#ifdef HAVE_SSH2
 		item.key = zbx_dsprintf(item.key, "ssh.run[,,%s]", script->port);
 		function = get_value_ssh;
-#else
-		zbx_strlcpy(error, "Support for SSH scripts was not compiled in", max_error_len);
-		goto fail;
-#endif	/* HAVE_SSH2 */
 	}
 	else
 	{
+#endif
 		item.key = zbx_dsprintf(item.key, "telnet.run[,,%s]", script->port);
 		function = get_value_telnet;
+#ifdef HAVE_SSH2
 	}
+#endif
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	item.params = zbx_strdup(item.params, script->command);
 
@@ -346,20 +342,31 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 			}
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
+#ifdef HAVE_OPENIPMI
 			if (SUCCEED == (ret = zbx_execute_ipmi_command(host, script->command, error, max_error_len)))
+			{
 				if (NULL != result)
 					*result = zbx_strdup(*result, "IPMI command successfully executed");
+			}
+#else
+			zbx_strlcpy(error, "Support for IPMI commands was not compiled in", max_error_len);
+#endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->publickey,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->privatekey,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
+#ifdef HAVE_SSH2
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+#else
+			zbx_strlcpy(error, "Support for SSH script was not compiled in", max_error_len);
+			break;
+#endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->username,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, host, NULL, &script->password,
-					MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+					&script->password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 			ret = zbx_execute_script_on_terminal(host, script, result, error, max_error_len);
 			break;
@@ -373,8 +380,8 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 
 			if (SUCCEED == check_script_permissions(groupid, host->hostid, error, max_error_len))
 			{
-				substitute_simple_macros(NULL, NULL, host, NULL, &script->command,
-						MACRO_TYPE_SCRIPT, NULL, 0);
+				substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+						&script->command, MACRO_TYPE_SCRIPT, NULL, 0);
 
 				ret = zbx_execute_script(host, script, result, error, max_error_len);	/* recursion */
 			}

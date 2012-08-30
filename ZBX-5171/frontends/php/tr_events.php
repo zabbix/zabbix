@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/acknow.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
@@ -34,8 +34,7 @@ $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once 'include/page_header.php';
-?>
-<?php
+
 define('PAGE_SIZE', 100);
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -74,7 +73,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 $options = array(
 	'triggerids' => $_REQUEST['triggerid'],
 	'expandData' => 1,
-	'expandDescription' => 1,
 	'selectHosts' => API_OUTPUT_EXTEND,
 	'output' => API_OUTPUT_EXTEND
 );
@@ -100,7 +98,7 @@ $tr_event_wdgt = new CWidget();
 $tr_event_wdgt->setClass('header');
 
 // Main widget header
-$text = array(_('EVENTS').': "'.$trigger['description'].'"');
+$text = array(_('EVENTS').': "'.CTriggerHelper::expandDescription($trigger).'"');
 
 $fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 $tr_event_wdgt->addHeader($text, $fs_icon);
@@ -151,4 +149,3 @@ $tr_event_wdgt->addItem($ieTab);
 $tr_event_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
