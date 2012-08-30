@@ -23,14 +23,6 @@ include('include/views/js/configuration.httpconf.popup.js.php');
 
 $httpPopupWidget = new CWidget();
 
-if (isset($_REQUEST['save']) && isset($_REQUEST['status_codes'])) {
-	$statusCodeValidator = new CStatusCodeValidator();
-	if (!$statusCodeValidator->validate($_REQUEST['status_codes'])) {
-		show_error_message($statusCodeValidator->getError());
-		unset($_REQUEST['save']);
-	}
-}
-
 if (isset($_REQUEST['save'])) {
 	if (!isset($_REQUEST['stepid'])) {
 		insert_js('add_httpstep('.

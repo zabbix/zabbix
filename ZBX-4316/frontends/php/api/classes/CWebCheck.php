@@ -507,16 +507,45 @@ class CWebCheck extends CZBXAPI {
 	}
 
 	protected function checkSteps(array $steps) {
-		$statusCodeValidator = new CStatusCodeValidator();
-
 		foreach ($steps as $step) {
 			if (isset($step['status_codes'])) {
-				if (!$statusCodeValidator->validate($step['status_codes'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $statusCodeValidator->getError());
-				}
+				$this->checkStatusCode($step['status_codes']);
 			}
 		}
 	}
+
+	/**
+	 * Validate http response code reange.
+	 * Range can contain ',' and '-'
+	 * Range can be empty string.
+	 *
+	 * Examples: '100-199, 301, 404, 500-550'
+	 *
+	 * @param string $statusCodeRange
+	 *
+	 * @return bool
+	 */
+	protected  function checkStatusCode($statusCodeRange) {
+		if ($statusCodeRange == '') {
+			return true;
+		}
+
+		foreach (explode(',', $statusCodeRange) as $range) {
+			$range = explode('-', $range);
+			if (count($range) > 2) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
+			}
+
+			foreach ($range as $value) {
+				if (!is_numeric($value)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $value));
+				}
+			}
+		}
+
+		return true;
+	}
+
 
 	protected function checkNames(array $httpTests) {
 		$httpTestsNames = zbx_objectValues($httpTests, 'name');
