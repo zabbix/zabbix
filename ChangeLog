@@ -28,6 +28,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5490] fixed textarea maxlength validation (Eduard)
 A......... [ZBX-5461] fixed error when create trigger prototype on PHP 5.1 (Vedmak)
 ..F....... [ZBX-5487] fixed sorting in dashboard system status and host status widget popups (Vedmak)
 ..F....... [ZBX-5480] fixed icon default state for host elements in map (Eduard)

@@ -87,7 +87,7 @@ $triggerEditable = !empty($triggerEditable);
 
 $frmComent = new CFormTable(_('Comments').' for "'.$trigger['description'].'"');
 $frmComent->addVar('triggerid', $_REQUEST['triggerid']);
-$frmComent->addRow(_('Comments'), new CTextArea('comments', $trigger['comments'], 25, ZBX_TEXTAREA_BIG_WIDTH, !$triggerEditable));
+$frmComent->addRow(_('Comments'), new CTextArea('comments', $trigger['comments'], array('rows' => 25, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'readonly' => !$triggerEditable)));
 
 if ($triggerEditable) {
 	$frmComent->addItemToBottomRow(new CSubmit('save', _('Save')));
