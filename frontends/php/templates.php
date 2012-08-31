@@ -278,7 +278,7 @@ elseif (isset($_REQUEST['save'])) {
 				'output' => API_OUTPUT_REFER
 			));
 			$result = true;
-			foreach ($db_graphs as $gnum => $db_graph) {
+			foreach ($db_graphs as $db_graph) {
 				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 			}
 			if (!$result) {
