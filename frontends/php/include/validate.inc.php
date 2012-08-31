@@ -337,11 +337,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_INT_RANGE) {
 		if (!is_int_range($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not integer range.', $field));
+				info(_s('Critical error. Field "%1$s" is not integer list or range.', $field));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field "%1$s" is not integer range.', $field));
+				info(_s('Warning. Field "%1$s" is not integer list or range.', $field));
 				return ZBX_VALID_WARNING;
 			}
 		}
