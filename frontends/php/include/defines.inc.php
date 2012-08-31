@@ -525,7 +525,7 @@ define('SCREEN_SORT_TRIGGERS_RECIPIENT_DESC',		12);
 
 define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
-define('SCREEN_MODE_VIEW',		2);
+define('SCREEN_MODE_SLIDESHOW',		2);
 define('SCREEN_MODE_JS',		3);
 
 define('SCREEN_TYPE_NORMAL',	0);
