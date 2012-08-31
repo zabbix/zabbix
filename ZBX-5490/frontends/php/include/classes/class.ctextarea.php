@@ -96,11 +96,13 @@ class CTextArea extends CTag {
 			insert_js('
 				if (!CR && !GK) {
 					jQuery("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
-						if (jQuery(this).val().length > jQuery(this).attr("maxlength")) {
-							jQuery(this).val(jQuery(this).val().substr(0, jQuery(this).attr("maxlength")));
+						var elem = jQuery(this);
+						if (elem.val().length > elem.attr("maxlength")) {
+							elem.val(elem.val().substr(0, elem.attr("maxlength")));
 						}
 					});
-				}', true);
+				}',
+			true);
 		}
 	}
 }
