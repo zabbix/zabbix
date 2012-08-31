@@ -267,7 +267,7 @@ class CProfiler {
 	 * @return int
 	 */
 	private function getMemoryPeak() {
-		if (version_compare(PHP_VERSION, '5.2.0') >= 0) {
+		if (function_exists("memory_get_peak_usage")) {
 			return memory_get_peak_usage(true);
 		}
 		else {
