@@ -132,7 +132,7 @@ class CScreenBase {
 	 */
 	public function __construct(array $options = array()) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
-		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
+		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;

@@ -211,7 +211,9 @@ jQuery(function($) {
 						}
 
 						// rebuild listener
-						ZBX_SBOX[id].sbox.addListeners();
+						if (!empty(ZBX_SBOX[id])) {
+							ZBX_SBOX[id].sbox.addListeners();
+						}
 
 						screen.isRefreshing = false;
 
