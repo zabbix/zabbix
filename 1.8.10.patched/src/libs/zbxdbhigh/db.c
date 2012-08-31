@@ -469,15 +469,15 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
  *                                                                            *
  ******************************************************************************/
 int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, const char *error, int new_value, const char *new_error, int lastchange,
-		unsigned char *add_event)
+		unsigned char type, int value, const char *error, int new_value, const char *new_error,
+		const zbx_timespec_t *ts, unsigned char *add_event)
 {
 	const char	*__function_name = "DBget_trigger_update_sql";
 	char		*new_error_esc;
 	int		generate_event, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " old:%d new:%d now:%d",
-			__function_name, triggerid, value, new_value, lastchange);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d new_value:%d",
+			__function_name, triggerid, value, new_value);
 
 	*add_event = 0;
 
@@ -495,7 +495,7 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 				*sql = zbx_malloc(*sql, *sql_alloc);
 			}
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 42, "update triggers set lastchange=%d", lastchange);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 42, "update triggers set lastchange=%d", ts->sec);
 
 			if (value != new_value)
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 18, ",value=%d", new_value);
@@ -602,6 +602,7 @@ void	DBupdate_triggers_status_after_restart()
 	const char		*trigger_error;
 	char			*sql = NULL;
 	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_timespec_t		ts;
 	unsigned char		add_event;
 	DB_TRIGGER_UPDATE	*tr = NULL;
 	int			tr_alloc = 0, tr_num = 0;
@@ -673,9 +674,12 @@ void	DBupdate_triggers_status_after_restart()
 		if (-1 == min_nextcheck || min_nextcheck >= now)
 			continue;
 
+		ts.sec = min_nextcheck;
+		ts.ns = 0;
+
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, trigger_type,
 				trigger_value, trigger_error, TRIGGER_VALUE_UNKNOWN, "Zabbix was restarted.",
-				min_nextcheck, &add_event))
+				&ts, &add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 
@@ -691,7 +695,7 @@ void	DBupdate_triggers_status_after_restart()
 			}
 
 			tr[tr_num].triggerid = triggerid;
-			tr[tr_num].lastchange = min_nextcheck;
+			tr[tr_num].timespec = ts;
 			tr_num++;
 		}
 	}
@@ -713,7 +717,7 @@ void	DBupdate_triggers_status_after_restart()
 		for (i = 0; i < tr_num; i++)
 		{
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
-					tr[i].lastchange, TRIGGER_VALUE_UNKNOWN, 0, 0);
+					&tr[i].timespec, TRIGGER_VALUE_UNKNOWN, 0, 0);
 		}
 	}
 
@@ -1806,9 +1810,13 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	autoreg_hostid;
+	zbx_timespec_t	ts;
 	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+
+	ts.sec = now;
+	ts.ns = 0;
 
 	if (0 != proxy_hostid)
 	{
@@ -1850,9 +1858,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 		}
 		DBfree_result(result);
 
-		/* Processing event */
 		process_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-				autoreg_hostid, now, TRIGGER_VALUE_TRUE, 0, 0);
+				autoreg_hostid, &ts, TRIGGER_VALUE_TRUE, 0, 0);
 	}
 
 	zbx_free(host_esc);
@@ -2011,7 +2018,7 @@ static const char	*get_table_by_value_type(unsigned char value_type)
  *                                                                            *
  ******************************************************************************/
 char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
-		const char *field_name, int last_n)
+		zbx_timespec_t *ts, const char *field_name, int last_n)
 {
 	const char	*__function_name = "DBget_history";
 	char		sql[512];
@@ -2019,7 +2026,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		**h_value = NULL;
-	int		h_alloc = 1, h_num = 0;
+	int		h_alloc = 1, h_num = 0, retry = 0;
 	const char	*func[] = {"min", "avg", "max", "sum", "count"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2027,6 +2034,11 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	if (NULL == field_name)
 		field_name = "value";
 
+	if (ZBX_DB_GET_HIST_VALUE == function)
+		h_alloc = (0 == last_n ? 128 : last_n);
+
+	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
+retry:
 	switch (function)
 	{
 		case ZBX_DB_GET_HIST_MIN:
@@ -2042,7 +2054,6 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 			offset = zbx_snprintf(sql, sizeof(sql), "select max(%s)-min(%s)", field_name, field_name);
 			break;
 		case ZBX_DB_GET_HIST_VALUE:
-			h_alloc = (0 == last_n ? 128 : last_n);
 			offset = zbx_snprintf(sql, sizeof(sql), "select %s", field_name);
 			break;
 		default:
@@ -2052,32 +2063,49 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
 			get_table_by_value_type(value_type), itemid);
-	if (0 != clock_from)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
-	if (0 != clock_to)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<=%d", clock_to);
+
+	if (NULL == ts)
+	{
+		if (0 != clock_from)
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
+		if (0 != clock_to)
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<=%d", clock_to);
+	}
+	else if (0 == retry)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns=%d", ts->sec, ts->ns);
+	else if (1 == retry)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns<%d", ts->sec, ts->ns);
+	else
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<%d", ts->sec);
 
 	if (0 != last_n)
 	{
-		switch (value_type)
+		if (NULL == ts)
 		{
-			case ITEM_VALUE_TYPE_FLOAT:
-			case ITEM_VALUE_TYPE_UINT64:
-			case ITEM_VALUE_TYPE_STR:
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-						" order by itemid,clock desc");
-				break;
-			default:
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-						" order by id desc");
-				break;
+			switch (value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+				case ITEM_VALUE_TYPE_UINT64:
+				case ITEM_VALUE_TYPE_STR:
+					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+							" order by itemid,clock desc");
+					break;
+				default:
+					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+							" order by id desc");
+					break;
+			}
 		}
+		else if (0 != retry)
+		{
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+					" order by itemid,clock desc,ns desc");
+		}
+
 		result = DBselectN(sql, last_n);
 	}
 	else
 		result = DBselect("%s", sql);
-
-	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
 
 	while (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
@@ -2091,9 +2119,15 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	}
 	DBfree_result(result);
 
+	if (NULL != ts && 0 == h_num && 2 > retry)
+	{
+		retry++;
+		goto retry;
+	}
+
 	h_value[h_num] = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() h_num:%d", __function_name, h_num);
 
 	return h_value;
 }

@@ -172,6 +172,7 @@ int	CONFIG_ENABLE_LOG		= 1;
 
 /* From table config */
 int	CONFIG_REFRESH_UNSUPPORTED	= 0;
+int	CONFIG_NS_SUPPORT		= 0;
 
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
@@ -539,11 +540,14 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
+	result = DBselect("select refresh_unsupported,ns_support from config where 1=1" DB_NODE,
 			DBnode_local("configid"));
 
 	if (NULL != (row = DBfetch(result)))
+	{
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
+		CONFIG_NS_SUPPORT = atoi(row[1]);
+	}
 	DBfree_result(result);
 
 	if (0 != CONFIG_NODEID)

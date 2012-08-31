@@ -918,6 +918,58 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_history_value                                              *
+ *                                                                            *
+ * Purpose: retrieve value by clock                                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_history_value(zbx_uint64_t itemid, unsigned char value_type, char **replace_to,
+		const char *field_name, int clock, int ns)
+{
+	int		ret = FAIL;
+	char		**h_value;
+	zbx_timespec_t	ts;
+
+	if (0 == CONFIG_NS_SUPPORT)
+	{
+		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, clock, NULL, field_name, 1);
+
+		if (NULL != h_value[0])
+		{
+			*replace_to = zbx_strdup(*replace_to, h_value[0]);
+			ret = SUCCEED;
+		}
+		DBfree_history(h_value);
+
+		return ret;
+	}
+
+	ts.sec = clock;
+	ts.ns = ns;
+
+	h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, &ts, field_name, 1);
+
+	if (NULL != h_value[0])
+	{
+		*replace_to = zbx_strdup(*replace_to, h_value[0]);
+		ret = SUCCEED;
+	}
+	DBfree_history(h_value);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_history_log_value                                          *
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
@@ -933,7 +985,7 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
  *                                                                            *
  ******************************************************************************/
 static int	DBget_history_log_value(DB_TRIGGER *trigger, char **replace_to,
-		int N_functionid, const char *field_name)
+		int N_functionid, const char *fieldname, int clock, int ns)
 {
 	const char	*__function_name = "DBget_history_log_value";
 	DB_RESULT	result;
@@ -956,20 +1008,12 @@ static int	DBget_history_log_value(DB_TRIGGER *trigger, char **replace_to,
 	{
 		zbx_uint64_t	itemid;
 		unsigned char	value_type;
-		char		**h_value;
 
 		if (ITEM_VALUE_TYPE_LOG == (value_type = (unsigned char)atoi(row[1])))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
 
-			h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, field_name, 1);
-
-			if (NULL != h_value[0])
-			{
-				*replace_to = zbx_strdup(*replace_to, h_value[0]);
-				ret = SUCCEED;
-			}
-			DBfree_history(h_value);
+			ret = DBget_history_value(itemid, value_type, replace_to, fieldname, clock, ns);
 		}
 	}
 	DBfree_result(result);
@@ -1031,7 +1075,7 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 		{
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_TEXT:
-				h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, 1);
+				h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, NULL, 1);
 
 				if (NULL != h_value[0])
 					*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
@@ -1083,7 +1127,7 @@ fail:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid, int clock)
+static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid, int clock, int ns)
 {
 	const char	*__function_name = "DBget_item_value";
 	DB_RESULT	result;
@@ -1107,32 +1151,26 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 	{
 		zbx_uint64_t	itemid, valuemapid;
 		unsigned char	value_type;
-		char		**h_value;
 		char		tmp[MAX_STRING_LEN];
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = (unsigned char)atoi(row[1]);
 		ZBX_STR2UINT64(valuemapid, row[2]);
 
-		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, clock, NULL, 1);
-
-		if (NULL != h_value[0])
+		if (SUCCEED == (ret = DBget_history_value(itemid, value_type, value, "value", clock, ns)))
 		{
 			switch (value_type)
 			{
-				case ITEM_VALUE_TYPE_LOG:
-				case ITEM_VALUE_TYPE_TEXT:
-					*value = zbx_strdup(*value, h_value[0]);
-					break;
 				case ITEM_VALUE_TYPE_STR:
-					strscpy(tmp, h_value[0]);
+					strscpy(tmp, *value);
 
 					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
 
 					*value = zbx_strdup(*value, tmp);
 					break;
-				default:
-					strscpy(tmp, h_value[0]);
+				case ITEM_VALUE_TYPE_FLOAT:
+				case ITEM_VALUE_TYPE_UINT64:
+					strscpy(tmp, *value);
 
 					if (ITEM_VALUE_TYPE_FLOAT == value_type)
 						del_zeroes(tmp);
@@ -1141,10 +1179,10 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 
 					*value = zbx_strdup(*value, tmp);
 					break;
+				default:
+					;
 			}
-			ret = SUCCEED;
 		}
-		DBfree_history(h_value);
 	}
 	DBfree_result(result);
 fail:
@@ -1752,38 +1790,39 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue(&event->trigger, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-					ret = DBget_item_value(&event->trigger, &replace_to, N_functionid, event->clock);
+					ret = DBget_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
-									N_functionid, "timestamp")))
+									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to, zbx_date2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
-									N_functionid, "timestamp")))
+									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to, zbx_time2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
-									N_functionid, "timestamp")))
+									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SOURCE))
-					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid, "source");
+					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid, "source", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SEVERITY))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
-									N_functionid, "severity")))
+									N_functionid, "severity", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to,
 								zbx_item_logtype_string((zbx_item_logtype_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
-					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid, "severity");
+					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid, "severity", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_EVENTID))
-					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid, "logeventid");
+					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid, "logeventid", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_DATE))
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
 				else if (0 == strcmp(m, MVAR_TIME))
@@ -1974,7 +2013,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue(&event->trigger, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-					ret = DBget_item_value(&event->trigger, &replace_to, N_functionid, event->clock);
+					ret = DBget_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 					zbxmacros_get_value_by_triggerid(macros, event->objectid, m, &replace_to);
 			}
@@ -2167,7 +2207,7 @@ typedef struct
 	zbx_uint64_t		triggerid;
 	char			function[FUNCTION_FUNCTION_LEN_MAX];
 	char			parameter[FUNCTION_PARAMETER_LEN_MAX];
-	int			lastchange;
+	zbx_timespec_t		timespec;
 	char			*value;
 	char			*error;
 	zbx_vector_uint64_t	functionids;
@@ -2235,7 +2275,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 			func->triggerid = triggerid;
 			strscpy(func->function, row[2]);
 			strscpy(func->parameter, row[3]);
-			func->lastchange = 0;
+			func->timespec.sec = 0;
+			func->timespec.ns = 0;
 			func->value = NULL;
 			func->error = NULL;
 			zbx_vector_uint64_create(&func->functionids);
@@ -2245,7 +2286,7 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 				if (func->triggerid != tr[i].triggerid)
 					continue;
 
-				func->lastchange = tr[i].lastchange;
+				func->timespec = tr[i].timespec;
 				break;
 			}
 
@@ -2335,7 +2376,7 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			if (NULL != func->error)
 				continue;
 
-			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->lastchange))
+			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->timespec.sec))
 			{
 				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
 						item.host_name, item.key, func->function, func->parameter);

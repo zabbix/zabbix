@@ -286,7 +286,7 @@ typedef struct
 	char		*expression;
 	char		*error;
 	char		*new_error;
-	int		lastchange;
+	zbx_timespec_t	timespec;
 	int		value;
 	int		new_value;
 	unsigned char	type;
@@ -303,6 +303,7 @@ typedef struct
 	int		source;
 	int		object;
 	int		clock;
+	int		ns;
 	int		value;
 	int		acknowledged;
 	int		skip_actions;
@@ -337,6 +338,7 @@ typedef struct
 	int			history;
 	int			trends;
 	int			lastclock;
+	int			lastns;
 	char			*lastvalue[2];
 	int			prevorgvalue_null;
 	history_value_t		prevorgvalue;
@@ -542,8 +544,8 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
 int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, const char *error, int new_value, const char *new_error, int lastchange,
-		unsigned char *add_event);
+		unsigned char type, int value, const char *error, int new_value, const char *new_error,
+		const zbx_timespec_t *ts, unsigned char *add_event);
 
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
@@ -604,7 +606,8 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample);
 #define ZBX_DB_GET_HIST_COUNT	4
 #define ZBX_DB_GET_HIST_DELTA	5
 #define ZBX_DB_GET_HIST_VALUE	6
-char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to, const char *field_name, int last_n);
+char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
+		zbx_timespec_t *ts, const char *field_name, int last_n);
 void	DBfree_history(char **value);
 
 #endif
