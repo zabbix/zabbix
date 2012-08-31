@@ -28,6 +28,10 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5466] fixed dependency adding when copying triggers to host and when full cloning host (Toms)
+..F....... [ZBX-5466] removed that triggers with HTTP items not copied when copying triggers to hosts (Toms)
+A......... [ZBX-5466] improved warning message for trigger circular dependencies (Toms)
+A......... [ZBX-5466] fixed warning message which missed template name, when linking template to a host, when there were dependencies from that template to other template which were not linked to that host (Toms)
 A.F....... [ZBX-4316] improved message for web step status code validation error, added validation in api (Vedmak)
 ..F....... [ZBX-5445] fixed hint not removed in dashboard when widget content is refreshed (Vedmak)
 ..F....... [ZBX-5490] fixed textarea maxlength validation (Eduard)
