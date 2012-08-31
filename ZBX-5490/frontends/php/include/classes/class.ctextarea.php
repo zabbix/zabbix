@@ -89,14 +89,18 @@ class CTextArea extends CTag {
 	public function setMaxlength($maxlength) {
 		$this->attr('maxlength', $maxlength);
 
-		// firefox and google chrome has own implementation of maxlength validation on textarea
-		insert_js('
-			if (!CR && !GK) {
-				jQuery("#'.$this->getName().'").bind("paste contextmenu change keydown keypress keyup", function() {
-					if (jQuery(this).val().length > '.$maxlength.') {
-						jQuery(this).val(jQuery(this).val().substr(0, '.$maxlength.'));
-					}
-				});
-			}', true);
+		if (!defined('IS_TEXTAREA_MAXLENGTH_JS_INSERTED')) {
+			define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', true);
+
+			// firefox and google chrome has own implementation of maxlength validation on textarea
+			insert_js('
+				if (!CR && !GK) {
+					jQuery("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
+						if (jQuery(this).val().length > jQuery(this).attr("maxlength")) {
+							jQuery(this).val(jQuery(this).val().substr(0, jQuery(this).attr("maxlength")));
+						}
+					});
+				}', true);
+		}
 	}
 }
