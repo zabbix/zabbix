@@ -89,7 +89,7 @@ class CScreenChart extends CScreenBase {
 			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
-			if ($this->mode == SCREEN_MODE_VIEW) { // used is slide shows
+			if ($this->mode == SCREEN_MODE_SLIDESHOW) {
 				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 			else {
