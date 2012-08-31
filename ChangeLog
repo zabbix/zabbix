@@ -28,6 +28,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5198] fixed usage of 'memory_get_peak_usage' function appeared in PHP5.2 (Vedmak)
 ..F....... [ZBX-5466] fixed dependency adding when copying triggers to host and when full cloning host (Toms)
 ..F....... [ZBX-5466] removed that triggers with HTTP items not copied when copying triggers to hosts (Toms)
 A......... [ZBX-5466] improved warning message for trigger circular dependencies (Toms)
