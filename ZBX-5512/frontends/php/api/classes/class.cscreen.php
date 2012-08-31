@@ -358,9 +358,11 @@ class CScreen extends CZBXAPI{
 			foreach ($restr as $r) {
 				foreach($r['resourceids'] as $resourceid){
 					foreach ($r['types'] as $type) {
-						foreach($screen_item_map[$type][$resourceid] as $screenid => $val) {
-							unset($result[$screenid]);
-							unset($screens_items[$val]);
+						if (!empty($screen_item_map[$type][$resourceid])) {
+							foreach($screen_item_map[$type][$resourceid] as $screenid => $val) {
+								unset($result[$screenid]);
+								unset($screens_items[$val]);
+							}
 						}
 					}
 				}
