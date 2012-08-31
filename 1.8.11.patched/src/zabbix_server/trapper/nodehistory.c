@@ -170,11 +170,14 @@ fail:
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
 	const char	*r;
-	int		f, source = 0, object = 0, clock = 0, value = 0, acknowledged = 0;
+	int		f, source = 0, object = 0, value = 0, acknowledged = 0;
 	zbx_uint64_t	eventid = 0, objectid = 0;
+	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
 
+	ts.sec = 0;
+	ts.ns = 0;
 	r = record;
 
 	for (f = 0; 0 != table->fields[f].name; f++)
@@ -193,14 +196,16 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 		else if (0 == strcmp(table->fields[f].name, "objectid"))
 			ZBX_STR2UINT64(objectid, buffer);
 		else if (0 == strcmp(table->fields[f].name, "clock"))
-			clock = atoi(buffer);
+			ts.sec = atoi(buffer);
+		else if (0 == strcmp(table->fields[f].name, "ns"))
+			ts.ns = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "value"))
 			value = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
 			acknowledged = atoi(buffer);
 	}
 
-	return process_event(eventid, source, object, objectid, clock, value, acknowledged, 0);
+	return process_event(eventid, source, object, objectid, &ts, value, acknowledged, 0);
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
 			CONFIG_NODEID, sender_nodeid, nodeid, record);
