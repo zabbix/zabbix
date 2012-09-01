@@ -33,7 +33,12 @@
  ******************************************************************************/
 static void	discovery_add_event(int object, zbx_uint64_t objectid, int now, int value)
 {
-	process_event(0, EVENT_SOURCE_DISCOVERY, object, objectid, now, value, 0, 0);
+	zbx_timespec_t	ts;
+
+	ts.sec = now;
+	ts.ns = 0;
+
+	process_event(0, EVENT_SOURCE_DISCOVERY, object, objectid, &ts, value, 0, 0);
 }
 
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
