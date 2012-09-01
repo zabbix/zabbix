@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 11:46+0300\n"
-"PO-Revision-Date: 2012-08-23 01:24+0200\n"
+"POT-Creation-Date: 2012-09-01 11:51+0300\n"
+"PO-Revision-Date: 2012-08-28 15:21+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -5321,12 +5321,12 @@ msgstr "Tipo do texto do ícone"
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.iconmap.list.php:23
 msgid "Icon map"
-msgstr ""
+msgstr "Mapeamento de ícone"
 
 #: api/classes/CIconMap.php:421
 #, php-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr ""
+msgstr "O mapeamento de ícone \"%1$s\" não pode ser apagado. Ele é usado no mapa \"%2$s\"."
 
 #: api/classes/CIconMap.php:528
 #, php-format
@@ -5341,22 +5341,22 @@ msgstr ""
 #: api/classes/CIconMap.php:276 api/classes/CIconMap.php:353
 #, php-format
 msgid "Icon map \"%s\" already exists."
-msgstr ""
+msgstr "O mapeamento de ícone \"%s\" já existe."
 
 #: api/classes/CIconMap.php:538
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
-msgstr ""
+msgstr "O mapeamento de ícone \"%s\" não pode ter  expressão de mapeamento vazia."
 
 #: api/classes/CIconMap.php:542
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
-msgstr ""
+msgstr "O mapeamento de ícone \"%s\" não pode mapear com uma expressão global que não existe."
 
 #: api/classes/CIconMap.php:546
 #, php-format
 msgid "Icon map \"%s\" has incorrect expression."
-msgstr ""
+msgstr "O mapeamento de ícone \"%s\" possui uma expressão inválida."
 
 #: api/classes/CIconMap.php:499 api/classes/CIconMap.php:504
 #, php-format
@@ -5365,19 +5365,19 @@ msgstr ""
 
 #: adm.iconmapping.php:65
 msgid "Icon map created"
-msgstr ""
+msgstr "Mapeamento de ícones criado."
 
 #: adm.iconmapping.php:79
 msgid "Icon map deleted"
-msgstr ""
+msgstr "Mapeamento de ícones apagado"
 
 #: api/classes/CIconMap.php:256 api/classes/CIconMap.php:316
 msgid "Icon map name cannot be empty."
-msgstr ""
+msgstr "O nome do mapeamento de ícones não pode ser vazio."
 
 #: adm.iconmapping.php:60
 msgid "Icon map updated"
-msgstr ""
+msgstr "Mapeamento de ícone atualizado"
 
 #: api/classes/CIconMap.php:340
 #, php-format
@@ -5390,7 +5390,7 @@ msgstr ""
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:82
 #: adm.valuemapping.php:118 adm.workingtime.php:60
 msgid "Icon mapping"
-msgstr ""
+msgstr "Mapeamento de ícone"
 
 #: api/classes/CIconMap.php:552
 #, php-format
@@ -6315,11 +6315,11 @@ msgstr "Inventário"
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
-msgstr ""
+msgstr "Campo do inventário"
 
 #: include/views/configuration.host.massupdate.php:182
 msgid "Inventory mode"
-msgstr ""
+msgstr "Modo de inventário"
 
 #: include/views/administration.users.list.php:59
 msgid "Is online?"
@@ -12405,11 +12405,11 @@ msgstr ""
 #: include/views/configuration.host.edit.php:174
 #: include/views/configuration.template.edit.php:120
 msgid "Visible name"
-msgstr ""
+msgstr "Nome de exibição"
 
 #: api/classes/CHost.php:1364
 msgid "Visible name cannot be empty if host name is missing."
-msgstr ""
+msgstr "O nome de exibição não pode ser nulo se o nome do host não for informado."
 
 #: jsLoader.php:124
 msgctxt "Wednesday short"
