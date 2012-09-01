@@ -1009,6 +1009,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+A......... [ZBX-5512] fixed undefined index in screens (Eduard)
 ...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
 ........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
 A......... [ZBX-5395] fixed {ITEM.LASTVALUE1} and {ITEM.VALUE1} expanding in the trigger.get method (Pavels)
