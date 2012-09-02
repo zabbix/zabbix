@@ -242,7 +242,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 			ZBX_STR2UINT64(itemid, row[0]);
 			value_type = (unsigned char)atoi(row[1]);
 
-			h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, 0);
+			h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, NULL, 0);
 
 			if (NULL != h_value[0])
 				evaluate_one(&d, &num, grp_func, h_value[0], value_type);
