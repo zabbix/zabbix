@@ -29,6 +29,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+....I..... [ZBX-5509] fixed upgrade patch to execute it on MySQL 5.0.28 or earlier (Sasha)
 ...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
 ..F....... [ZBX-5198] fixed usage of 'memory_get_peak_usage' function appeared in PHP5.2 (Vedmak)
 ..F....... [ZBX-5466] fixed dependency adding when copying triggers to host and when full cloning host (Toms)
