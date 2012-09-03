@@ -175,16 +175,13 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
-			'selectScreens' => API_OUTPUT_REFER,
 			'preservekeys' => true
 		));
 
 		// merge host groups with all groups
 		$templateGroups = array();
-		$templateScreenIds = array();
 		foreach ($templates as &$template) {
 			$templateGroups += zbx_toHash($template['groups'], 'groupid');
-			$templateScreenIds = array_merge($templateScreenIds, zbx_objectValues($template['screens'], 'screenid'));
 
 			$template['screens'] = array();
 			$template['applications'] = array();
@@ -211,8 +208,9 @@ class CConfigurationExport {
 
 		// screens
 		$screens = API::TemplateScreen()->get(array(
-			'screenids' => $templateScreenIds,
+			'templateids' => $this->options['templates'],
 			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'noInheritance' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
