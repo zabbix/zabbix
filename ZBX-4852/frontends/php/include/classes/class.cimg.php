@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ class CImg extends CTag {
 		}
 
 		insert_js(
-			'jQuery(\''.$this->toString().'\').load(function() {
+			'jQuery("'.$this->toString().'").load(function() {
 				var parent = jQuery("#'.$id.'preloader").parent();
 				jQuery("#'.$id.'preloader").remove();
 				jQuery(parent).append(jQuery(this));

@@ -100,6 +100,7 @@ class CTag extends CObject {
 	public function endToString() {
 		$res = ($this->paired === 'yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
 		$res .= $this->tag_end;
+
 		return $res;
 	}
 
@@ -110,6 +111,7 @@ class CTag extends CObject {
 		if ($destroy) {
 			$this->destroy();
 		}
+
 		return $res;
 	}
 
@@ -129,6 +131,7 @@ class CTag extends CObject {
 		if (!is_string($value)) {
 			return $this->error('Incorrect value for SetName "'.$value.'".');
 		}
+
 		return $this->setAttribute('name', $value);
 	}
 
@@ -136,6 +139,7 @@ class CTag extends CObject {
 		if (isset($this->attributes['name'])) {
 			return $this->attributes['name'];
 		}
+
 		return null;
 	}
 
@@ -146,6 +150,7 @@ class CTag extends CObject {
 		else {
 			$this->attributes['class'] .= ' '.$cssClass;
 		}
+
 		return $this->attributes['class'];
 	}
 
@@ -177,7 +182,7 @@ class CTag extends CObject {
 	/**
 	 * Sets multiple HTML attributes.
 	 *
-	 * @param array $attributes     defined as array(attributeName1 => value1, attributeName2 => value2, ...)
+	 * @param array $attributes		defined as array(attributeName1 => value1, attributeName2 => value2, ...)
 	 */
 	public function setAttributes(array $attributes) {
 		foreach ($attributes as $name => $value) {
@@ -201,13 +206,15 @@ class CTag extends CObject {
 		if (empty($text)) {
 			return false;
 		}
+
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		$this->addAction('onmouseover', 'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
+		$this->addAction('onmouseover', 'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$width.'", "'.$class.'");');
 		if ($byClick) {
-			$this->addAction('onclick', 'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
+			$this->addAction('onclick', 'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$width.'", "'.$class.'");');
 		}
+
 		return true;
 	}
 
@@ -244,6 +251,7 @@ class CTag extends CObject {
 	public function getForm($method = 'post', $action = null, $enctype = null) {
 		$form = new CForm($method, $action, $enctype);
 		$form->addItem($this);
+
 		return $form;
 	}
 
@@ -254,8 +262,8 @@ class CTag extends CObject {
 	/**
 	 * Sanitizes a string according to the given strategy before outputting it to the browser.
 	 *
-	 * @param string $value
-	 * @param int $strategy
+	 * @param string	$value
+	 * @param int		$strategy
 	 *
 	 * @return string
 	 */

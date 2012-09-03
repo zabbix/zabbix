@@ -74,7 +74,7 @@ class CHostGroup extends CZBXAPI {
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'with_applications'		=> null,
+			'with_applications'			=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -131,9 +131,6 @@ class CHostGroup extends CZBXAPI {
 						' AND ugg.userid='.$userid.
 						' AND rr.permission<'.$permission.')';
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// groupids
 		if (!is_null($options['groupids'])) {
@@ -315,10 +312,10 @@ class CHostGroup extends CZBXAPI {
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'EXISTS (SELECT DISTINCT i.itemid'.
+			$sqlParts['where'][] = 'EXISTS (SELECT 1'.
 											' FROM items i,graphs_items gi'.
 											' WHERE i.hostid=hg.hostid'.
-												' AND i.itemid=gi.itemid)';
+												' AND i.itemid=gi.itemid '.zbx_limit(1).')';
 		}
 
 		if (!is_null($options['with_applications'])) {
@@ -368,35 +365,8 @@ class CHostGroup extends CZBXAPI {
 
 		$groupids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('g.groupid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($group = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -438,7 +408,7 @@ class CHostGroup extends CZBXAPI {
 							$result[$group['groupid']]['graphs'] = array();
 						}
 						$result[$group['groupid']]['graphs'][] = array('graphid' => $group['graphid']);
-						unset($group['hostid']);
+						unset($group['graphid']);
 					}
 
 					// maintenanceids
@@ -470,7 +440,7 @@ class CHostGroup extends CZBXAPI {
 		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'groupids' => $groupids,
 				'preservekeys' => true
 			);
@@ -522,7 +492,7 @@ class CHostGroup extends CZBXAPI {
 		// adding templates
 		if (!is_null($options['selectTemplates'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'groupids' => $groupids,
 				'preservekeys' => true
 			);
@@ -723,7 +693,7 @@ class CHostGroup extends CZBXAPI {
 	 *
 	 * @return boolean
 	 */
-	public function delete(array $groupids) {
+	public function delete($groupids) {
 		if (empty($groupids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -1105,5 +1075,19 @@ class CHostGroup extends CZBXAPI {
 		));
 
 		return count($ids) == $count;
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['groupids'] === null &&
+				$options['hostids'] === null &&
+				$options['templateids'] === null &&
+				$options['graphids'] === null &&
+				$options['triggerids'] === null) {
+
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }

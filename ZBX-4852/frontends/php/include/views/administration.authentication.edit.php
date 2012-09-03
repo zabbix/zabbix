@@ -75,7 +75,7 @@ $authenticationForm->addItem($authenticationTab);
 // create save button
 $saveButton = new CSubmit('save', _('Save'));
 if ($this->data['is_authentication_type_changed']) {
-	$saveButton->addAction('onclick', 'javascript: if (Confirm(\''._('Switching authentication method will reset all current sessions! Continue?').'\')) { jQuery(\'#authenticationForm\').submit(); return true; } else { return false; }');
+	$saveButton->addAction('onclick', 'javascript: if (Confirm(\''._('Switching authentication method will reset all but this sessions! Continue?').'\')) { jQuery(\'#authenticationForm\').submit(); return true; } else { return false; }');
 }
 else {
 	if ($this->data['config'] != ZBX_AUTH_LDAP) {

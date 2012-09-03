@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function event_source2str($sourceid) {
 	switch ($sourceid) {
 		case EVENT_SOURCE_TRIGGERS:
@@ -42,6 +42,7 @@ function get_tr_event_by_eventid($eventid) {
 function get_events_unacknowledged($db_element, $value_trigger = null, $value_event = null, $ack = false) {
 	$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 	get_map_elements($db_element, $elements);
+
 	if (empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])) {
 		return 0;
 	}
@@ -68,7 +69,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	}
 	$triggerids = API::Trigger()->get($options);
 
-	$options = array(
+	return API::Event()->get(array(
 		'countOutput' => 1,
 		'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => array(
@@ -77,9 +78,8 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 			'acknowledged' => $ack ? 1 : 0
 		),
 		'object' => EVENT_OBJECT_TRIGGER,
-		'nopermissions' => 1
-	);
-	return API::Event()->get($options);
+		'nopermissions' => true
+	));
 }
 
 function get_next_event($currentEvent, array $eventList = array(), $showUnknown = false) {
@@ -112,13 +112,14 @@ function make_event_details($event, $trigger) {
 	$config = select_config();
 	$table = new CTableInfo();
 
-	$table->addRow(array(_('Event'), expand_trigger_description_by_data(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
+	$table->addRow(array(_('Event'), CEventHelper::expandDescription(array_merge($trigger, $event))));
 	$table->addRow(array(_('Time'), zbx_date2str(_('d M Y H:i:s'), $event['clock'])));
 
 	if ($config['event_ack_enable']) {
 		$ack = getEventAckState($event, true);
 		$table->addRow(array(_('Acknowledged'), $ack));
 	}
+
 	return $table;
 }
 
@@ -191,6 +192,7 @@ function make_small_eventlist($startEvent) {
 			$actions
 		));
 	}
+
 	return $table;
 }
 
@@ -245,12 +247,12 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 			$ack
 		));
 	}
+
 	return $table;
 }
 
-function getEventAckState($event, $isBackurl = false, $isLink = true, $params = array()) {
+function getEventAckState($event, $backUrl = false, $isLink = true, $params = array()) {
 	$config = select_config();
-	global $page;
 
 	if (!$config['event_ack_enable']) {
 		return null;
@@ -261,8 +263,14 @@ function getEventAckState($event, $isBackurl = false, $isLink = true, $params = 
 	}
 
 	if ($isLink) {
-		if ($isBackurl) {
-			$backurl = '&backurl='.$page['file'];
+		if (!empty($backUrl)) {
+			if (is_bool($backUrl)) {
+				global $page;
+				$backurl = '&backurl='.$page['file'];
+			}
+			else {
+				$backurl = '&backurl='.$backUrl;
+			}
 		}
 		else {
 			$backurl = '';
@@ -294,6 +302,7 @@ function getEventAckState($event, $isBackurl = false, $isLink = true, $params = 
 			$ack = array(new CSpan(_('Yes'), 'off'), ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
 		}
 	}
+
 	return $ack;
 }
 
@@ -355,6 +364,7 @@ function getLastEvents($options) {
 		if (!isset($triggers[$event['objectid']])) {
 			continue;
 		}
+
 		$events[$enum]['trigger'] = $triggers[$event['objectid']];
 		$events[$enum]['host'] = reset($events[$enum]['trigger']['hosts']);
 		$sortClock[$enum] = $event['clock'];
@@ -362,10 +372,9 @@ function getLastEvents($options) {
 
 		//expanding description for the state where event was
 		$merged_event = array_merge($event, $triggers[$event['objectid']]);
-		$events[$enum]['trigger']['description'] = expand_trigger_description_by_data($merged_event, ZBX_FLAG_EVENT);
+		$events[$enum]['trigger']['description'] = CEventHelper::expandDescription($merged_event);
 	}
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
 
 	return $events;
 }
-?>

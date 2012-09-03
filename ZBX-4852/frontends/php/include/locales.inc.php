@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,9 @@ function set_zbx_locales() {
 
 	$ZBX_LOCALES = array(
 		'en_GB' => _('English (en_GB)'),
+		'en_US' => _('English (en_US)'),
 		'zh_CN' => _('Chinese (zh_CN)'),
+		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
 		'nl_NL' => _('Dutch (nl_NL)'),
 		'fr_FR' => _('French (fr_FR)'),
@@ -65,13 +67,13 @@ function set_zbx_locales() {
 }
 
 /**
- * Return an array of locale name variants based of language.
+ * Return an array of locale name variants based on language.
  *
  * @param string $language in format 'ru_RU', 'en_EN' and so on
  * @return array a list of possible locale names
  */
 function zbx_locale_variants($language) {
-	if (stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false) {
+	if ((stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false) || (stristr($_SERVER['SERVER_SOFTWARE'], 'win64') !== false)) {
 		return zbx_locale_variants_win($language);
 	}
 	else {
@@ -127,25 +129,28 @@ function zbx_locale_variants_win($language) {
 	// windows locales are written like language[_country[.charset]]
 	// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
 	$winLanguageName = array(
-		'en_gb' => 'english',
-		'zh_cn' => 'chinese',
-		'cs_cz' => 'czech',
-		'nl_nl' => 'dutch',
-		'fr_fr' => 'french',
-		'de_de' => 'german',
-		'hu_hu' => 'hungarian',
-		'it_it' => 'italian',
-		'ko_kr' => 'korean',
-		'ja_jp' => 'japanese',
-		'lv_lv' => 'latvian',
-		'pl_pl' => 'polish',
-		'pt_br' => 'portuguese',
-		'ru_ru' => 'russian',
-		'sk_sk' => 'slovak',
-		'es_es' => 'spanish',
-		'sv_se' => 'swedish',
-		'uk_ua' => 'ukrainian'
+		'en_gb' => array('English_United States.1252', 'english-uk'),
+		'en_us' => array('English_United States.1252', 'english-usa'),
+		'zh_cn' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
+		'zh_tw' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
+		'cs_cz' => array('Czech_Czech Republic.1250', 'czech'),
+		'nl_nl' => array('Dutch_Netherlands.1252', 'dutch'),
+		'fr_fr' => array('French_France.1252', 'french'),
+		'de_de' => array('German_Germany.1252', 'german'),
+		'hu_hu' => array('Hungarian_Hungary.1250', 'hungarian'),
+		'it_it' => array('Italian_Italy.1252', 'italian'),
+		'ko_kr' => array('Korean_Korea.949', 'korean'),
+		'ja_jp' => array('Japanese_Japan.932', 'japanese'),
+		'lv_lv' => array('Latvian_Latvia.1257', 'latvian'),
+		'pl_pl' => array('Polish_Poland.1250', 'polish'),
+		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese'),
+		'ru_ru' => array('Russian_Russia.1251', 'russian'),
+		'sk_sk' => array('Slovak_Slovakia.1250', 'slovak'),
+		'es_es' => array('Spanish_Spain.1252', 'spanish'),
+		'sv_se' => array('Swedish_Sweden.1252', 'swedish'),
+		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian'),
+		'el_gr' => array('Greek_Greece.1253', 'greek')
 	);
-	return array($winLanguageName[strtolower($language)]);
+	return $winLanguageName[strtolower($language)];
 }
 ?>

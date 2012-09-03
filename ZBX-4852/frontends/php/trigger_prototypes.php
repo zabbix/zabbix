@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
@@ -29,11 +29,11 @@ $page['file'] = 'trigger_prototypes.php';
 $page['hist_arg'] = array('parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'parent_discoveryid' => array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -100,7 +100,6 @@ if (get_request('parent_discoveryid')) {
 	if (!$discovery_rule) {
 		access_deny();
 	}
-	$_REQUEST['hostid'] = $discovery_rule['hostid'];
 
 	if (isset($_REQUEST['triggerid'])) {
 		$triggerPrototype = API::TriggerPrototype()->get(array(
@@ -354,4 +353,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

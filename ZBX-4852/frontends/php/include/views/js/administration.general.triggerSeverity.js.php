@@ -9,12 +9,12 @@ $schema = DB::getSchema('config');
 
 		jQuery("#resetDefaults").click(function(){
 
-			jQuery('#dialog').text("<?php echo _('Reset all names and colours to default values?'); ?>");
+			jQuery('#dialog').text(<?php echo CJs::encodeJson(_('Reset all names and colours to default values?')); ?>);
 			var w = jQuery('#dialog').outerWidth()+20;
 
 			jQuery('#dialog').dialog({
 				buttons: [
-					{text: '<?php echo _('Reset defaults');?>', click: function(){
+					{text: <?php echo CJs::encodeJson(_('Reset defaults')); ?>, click: function(){
 						jQuery('#severity_name_0').val("<?php echo $schema['fields']['severity_name_0']['default']; ?>");
 						jQuery('#severity_name_1').val("<?php echo $schema['fields']['severity_name_1']['default']; ?>");
 						jQuery('#severity_name_2').val("<?php echo $schema['fields']['severity_name_2']['default']; ?>");
@@ -35,7 +35,7 @@ $schema = DB::getSchema('config');
 						jQuery('#severity_color_5').change();
 						jQuery(this).dialog("destroy");
 					} },
-					{text: '<?php echo _('Cancel');?>', click: function(){
+					{text: <?php echo CJs::encodeJson(_('Cancel')); ?>, click: function(){
 						jQuery(this).dialog("destroy");
 					}}
 				],
@@ -45,7 +45,7 @@ $schema = DB::getSchema('config');
 				resizable: false,
 				minWidth: 200,
 				minHeight: 100,
-				title: '<?php echo _('Reset confirmation');?>',
+				title: <?php echo CJs::encodeJson(_('Reset confirmation')); ?>,
 				close: function(){ jQuery(this).dialog('destroy'); }
 			});
 

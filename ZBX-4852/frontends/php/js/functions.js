@@ -177,7 +177,7 @@ function add_logexpr() {
 	td.setAttribute(IE ? 'cssText' : 'style', 'white-space: nowrap;');
 
 	var img = document.createElement('img');
-	img.setAttribute('src', 'images/general/arrowup.gif');
+	img.setAttribute('src', 'images/general/arrow_up.png');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'up');
 
@@ -190,7 +190,7 @@ function add_logexpr() {
 	td.appendChild(document.createTextNode(' '));
 
 	var img = document.createElement('img');
-	img.setAttribute('src', 'images/general/arrowdown.gif');
+	img.setAttribute('src', 'images/general/arrow_down.png');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'down');
 
@@ -577,7 +577,7 @@ function create_page_menu(e, id) {
 
 // triggers js menu
 function create_mon_trigger_menu(e, args, items) {
-	var tr_menu = [['Triggers', null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}], ['Events', 'events.php?triggerid=' + args[0].triggerid + '&nav_time=' + args[0].lastchange, null]];
+	var tr_menu = [[t('Triggers'), null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}], [t('Events'), 'events.php?triggerid=' + args[0].triggerid + '&nav_time=' + args[0].lastchange, null]];
 	if (args.length > 1 && !is_null(args[1])) {
 		tr_menu.push(args[1]);
 	}
@@ -612,15 +612,15 @@ function create_mon_trigger_menu(e, args, items) {
 	var history_section_caption = '';
 	// we have chars and numbers, or we have none (probably 'value_type' key was not set)
 	if (has_char_items == has_int_items) {
-		history_section_caption = locale['S_HISTORY_AND_SIMPLE_GRAPHS'];
+		history_section_caption = t('History and simple graphs');
 	}
 	// we have only character items, so 'history' should be shown
 	else if (has_char_items) {
-		history_section_caption = locale['S_HISTORY'];
+		history_section_caption = t('History');
 	}
 	// we have only numeric items, so 'simple graphs' should be shown
 	else {
-		history_section_caption = locale['S_SIMPLE_GRAPHS'];
+		history_section_caption = t('Simple graphs');
 	}
 
 	tr_menu.push([history_section_caption, null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}]);
@@ -797,4 +797,64 @@ function getNextColor(paletteType) {
 				+ ('0' + parseInt(b, 10).toString(16)).slice(-2);
 
 	return hexColor.toUpperCase();
+}
+
+/**
+ * Used for php ctweenbox object.
+ * Moves item from 'from' select to 'to' select and adds or removes hidden fields to 'formname' for posting data.
+ * Moving perserves alphabetical order.
+ *
+ * @formname string	form name where hidden fields will be added
+ * @objname string	unique name for hidden field naming
+ * @from string		from select id
+ * @to string		to select id
+ * @action string	action to perform with hidden field
+ *
+ * @return true
+ */
+function moveListBoxSelectedItem(formname, objname, from, to, action) {
+	to = jQuery('#' + to);
+
+	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
+		var notApp = true;
+		to.find('option').each(function(j, toel) {
+			if (toel.innerHTML.toLowerCase() > fromel.innerHTML.toLowerCase()) {
+				jQuery(toel).before(fromel);
+				notApp = false;
+				return false;
+			}
+		});
+		if (notApp) {
+			to.append(fromel);
+		}
+		fromel = jQuery(fromel);
+		if (action.toLowerCase() == 'add') {
+			jQuery(document.forms[formname]).append("<input name='" + objname + '[' + fromel.val() + ']'
+				+ "' id='" + objname + '_' + fromel.val() + "' value='" + fromel.val() + "' hidden>");
+		}
+		else if (action.toLowerCase() == 'rmv') {
+			jQuery('#' + objname + '_' + fromel.val()).remove();
+		}
+	});
+
+	return true;
+}
+
+/**
+ * Returns the number of properties of an object.
+ *
+ * @param obj
+ *
+ * @return int
+ */
+function objectSize(obj) {
+	var size = 0, key;
+
+	for (key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			size++;
+		}
+	}
+
+	return size;
 }

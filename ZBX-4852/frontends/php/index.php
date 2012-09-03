@@ -32,31 +32,28 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'name' =>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,	'isset({enter})', _('Username')),
-	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({enter})'),
-	'sessionid' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
-	'enter' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'autologin' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'name' =>	array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,		'isset({enter})',	_('Username')),
+	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'),
+	'sessionid' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
+	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535),	null),
+	'enter' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'autologin' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,			null)
 );
 check_fields($fields);
 
 // logout
 if (isset($_REQUEST['reconnect'])) {
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
-
 	CWebUser::logout(get_cookie('zbx_sessionid'));
-	clear_messages(1);
 }
 
 $config = select_config();
 
 if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-	if (!empty($_SERVER['PHP_AUTH_USER'])) {
+	if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
 		$_REQUEST['enter'] = _('Sign in');
 		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
-		$_REQUEST['password'] = 'zabbix';
 	}
 	else {
 		access_deny();
@@ -96,6 +93,7 @@ else {
 if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	switch ($config['authentication_type']) {
 		case ZBX_AUTH_HTTP:
+			echo _('User name does not match with DB');
 			break;
 		case ZBX_AUTH_LDAP:
 		case ZBX_AUTH_INTERNAL:

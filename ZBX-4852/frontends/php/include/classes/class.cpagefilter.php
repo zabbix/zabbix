@@ -483,21 +483,22 @@ class CPageFilter {
 	}
 
 	public function getGraphsCB($withNode = false) {
-		$cmb = new CComboBox('graphid', $this->graphid, 'javascript: submit();');
 		$items = $this->graphs;
 		if ($withNode) {
 			foreach ($items as $id => $item) {
-				$items[$id] = get_node_name_by_elid($id, null, ': ') . $item;
+				$items[$id] = get_node_name_by_elid($id, null, ': ').$item;
 			}
 		}
 
 		natcasesort($items);
 		$items = array(0 => _('not selected')) + $items;
 
+		$graphComboBox = new CComboBox('graphid', $this->graphid, 'javascript: submit();');
 		foreach ($items as $id => $name) {
-			$cmb->addItem($id, $name);
+			$graphComboBox->addItem($id, $name);
 		}
-		return $cmb;
+
+		return $graphComboBox;
 	}
 
 	public function getTriggerCB($withNode = false) {

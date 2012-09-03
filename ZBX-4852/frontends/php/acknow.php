@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/acknow.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
@@ -30,8 +30,8 @@ $page['hist_arg'] = array('eventid');
 
 ob_start();
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+
 $_REQUEST['go'] = get_request('go', null);
 $bulk = ($_REQUEST['go'] == 'bulkacknowledge');
 
@@ -78,8 +78,7 @@ if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQU
 
 $bulk = !isset($_REQUEST['eventid']);
 $_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
-?>
-<?php
+
 if (!$bulk) {
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
@@ -121,7 +120,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	if ($result) {
 		$event_acknowledged = true;
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, _('Acknowledge added').
-			' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : (expand_trigger_description_by_data($event_trigger)).']'.
+			' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : $event_trigger.']'.
 			' ['.$_REQUEST['message'].']');
 	}
 
@@ -142,9 +141,8 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	}
 }
 ob_end_flush();
-?>
-<?php
-$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expand_trigger_description_by_data($event_trigger);
+
+$msg = $bulk ? ' BULK ACKNOWLEDGE ' : CTriggerHelper::expandDescription($event_trigger);
 show_table_header(array(_('ALARM ACKNOWLEDGES').': ', $msg));
 echo SBR;
 
@@ -207,11 +205,12 @@ elseif (isset($_REQUEST['events'])) {
 	}
 }
 
-$frmMsg->addRow(_('Message'), new CTextArea('message', '', ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_BIG_WIDTH));
+$frmMsg->addRow(_('Message'), new CTextArea('message', '', array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'maxlength' => 255)));
 $frmMsg->addItemToBottomRow(new CSubmit('saveandreturn', $btn_txt2));
-$bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
+if (!$bulk) {
+	$frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
+}
 $frmMsg->addItemToBottomRow(new CButtonCancel(url_param('backurl').url_param('eventid').url_param('triggerid').url_param('screenid')));
 $frmMsg->show(false);
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

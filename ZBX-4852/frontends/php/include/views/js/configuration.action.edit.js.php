@@ -6,7 +6,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="removeOpGroupRow(#{groupid});" />
+	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpGroupRow(#{groupid});" />
 </td>
 </tr>
 </script>
@@ -18,7 +18,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="removeOpTemplateRow(#{templateid});" />
+	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpTemplateRow(#{templateid});" />
 </td>
 </tr>
 </script>
@@ -31,7 +31,7 @@
 	<span>#{name}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
+	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
 </td>
 </tr>
 </script>
@@ -43,7 +43,7 @@
 	<span>#{alias}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="removeOpmsgUserRow(#{userid});" />
+	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpmsgUserRow(#{userid});" />
 </td>
 </tr>
 </script>
@@ -57,7 +57,7 @@
 	<span>#{name}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
+	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
 </td>
 </tr>
 </script>
@@ -71,7 +71,7 @@
 	<span>#{name}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
+	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
 </td>
 </tr>
 </script>
@@ -84,23 +84,23 @@
 	<td><?php echo _('Target'); ?></td>
 	<td>
 		<select name="opCmdTarget" class="input select">
-			<option value="0"><?php echo _('Current host'); ?></option>
-			<option value="1"><?php echo _('Host'); ?></option>
-			<option value="2"><?php echo _('Host group'); ?></option>
+			<option value="0"><?php echo Chtml::encode(_('Current host')); ?></option>
+			<option value="1"><?php echo Chtml::encode(_('Host')); ?></option>
+			<option value="2"><?php echo Chtml::encode(_('Host group')); ?></option>
 		</select>
 		<div id="opCmdTargetSelect" class="inlineblock">
 			<input name="action" type="hidden" value="#{action}" />
 			<input name="opCmdId" type="hidden" value="#{opcmdid}" />
 			<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
 			<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
-			<input type="button" class="input link_menu" name="select" value="<?php echo _('Select'); ?>" />
+			<input type="button" class="input link_menu" name="select" value=<?php echo Chtml::encode(_('Select')); ?> />
 		</div>
 	</td>
 </tr>
 <tr>
 	<td colspan="2">
 		<input type="button" class="input link_menu" name="save" value="#{operationName}" />&nbsp;
-		<input type="button" class="input link_menu" name="cancel" value="<?php echo _('Cancel'); ?>" />
+		<input type="button" class="input link_menu" name="cancel" value=<?php echo Chtml::encode(_('Cancel')); ?> />
 	</td>
 </tr>
 </tbody></table>
@@ -111,18 +111,18 @@
 <script type="text/x-jquery-tmpl" id="operationTypesTPL">
 <tr id="operationTypeScriptElements" class="hidden">
 <td>
-	<?php echo _('Execute on'); ?>
+	<?php echo Chtml::encode(_('Execute on')); ?>
 </td>
 <td>
 	<div class="objectgroup inlineblock border_dotted ui-corner-all" id="uniqList">
 		<div>
 			<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
-			<label for="execute_on_agent"><?php echo _('Zabbix agent'); ?></label>
+			<label for="execute_on_agent"><?php echo Chtml::encode(_('Zabbix agent')); ?></label>
 		</div>
 
 		<div>
 			<input type="radio" id="execute_on_server" name="execute_on" value="1" class="input radio">
-			<label for="execute_on_server"><?php echo _('Zabbix server'); ?></label>
+			<label for="execute_on_server"><?php echo Chtml::encode(_('Zabbix server')); ?></label>
 		</div>
 	</div>
 </td>
@@ -200,7 +200,7 @@
 				case 'groupid':
 					tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
-					value.objectCaption = '<?php echo _('Host group').': '; ?>';
+					value.objectCaption = <?php echo CJs::encodeJson(_('Host group').': '); ?>;
 
 					container = jQuery('#opCmdListFooter');
 					if (jQuery('#opCmdGroupRow_' + value.groupid).length == 0) {
@@ -211,10 +211,10 @@
 					tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
 					if (value.hostid.toString() != '0') {
-						value.objectCaption = '<?php echo _('Host').': '; ?>';
+						value.objectCaption = <?php echo CJs::encodeJson(_('Host').': '); ?>;
 					}
 					else {
-						value.name = '<?php echo _('Current host'); ?>';
+						value.name = <?php echo CJs::encodeJson(_('Current host')); ?>;
 					}
 
 					container = jQuery('#opCmdListFooter');
@@ -272,7 +272,7 @@
 		objectTPL.objectid = 0;
 		objectTPL.name = '';
 		objectTPL.target = 0;
-		objectTPL.operationName = '<?php echo _('Add'); ?>';
+		objectTPL.operationName = <?php echo CJs::encodeJson(_('Add')); ?>;
 
 		tpl = new Template(jQuery('#opcmdEditFormTPL').html());
 		jQuery('#opCmdList').after(tpl.evaluate(objectTPL));
@@ -301,7 +301,7 @@
 			object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 
 			if (empty(object.name)) {
-				alert('<?php echo _('You did not specify host group for operation.'); ?>');
+				alert(<?php echo CJs::encodeJson(_('You did not specify host group for operation.')); ?>);
 				return true;
 			}
 
@@ -316,7 +316,7 @@
 			object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
 
 			if (object.target.toString() != '0' && empty(object.name)) {
-				alert('<?php echo _('You did not specify host for operation.'); ?>');
+				alert(<?php echo CJs::encodeJson(_('You did not specify host for operation.')); ?>);
 				return true;
 			}
 
@@ -441,16 +441,16 @@
 				str = '';
 
 			if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_AND; ?>) {
-				groupOperator = '<?php echo _('and'); ?>';
-				globalOperator = '<?php echo _('and'); ?>';
+				groupOperator = <?php echo CJs::encodeJson(_('and')); ?>;
+				globalOperator = <?php echo CJs::encodeJson(_('and')); ?>;
 			}
 			else if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_OR; ?>) {
-				groupOperator = '<?php echo _('or'); ?>';
-				globalOperator = '<?php echo _('or'); ?>';
+				groupOperator = <?php echo CJs::encodeJson(_('or')); ?>;
+				globalOperator = <?php echo CJs::encodeJson(_('or')); ?>;
 			}
 			else {
-				groupOperator = '<?php echo _('or'); ?>';
-				globalOperator = '<?php echo _('and'); ?>';
+				groupOperator = <?php echo CJs::encodeJson(_('or')); ?>;
+				globalOperator = <?php echo CJs::encodeJson(_('and')); ?>;
 			}
 
 			var conditionTypeHold = '';

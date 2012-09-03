@@ -211,12 +211,8 @@ class DB {
 	 */
 	protected static function getPk($tableName) {
 		$schema = self::getSchema($tableName);
-		if (strpos($schema['key'], ',') !== false) {
-			return explode(',', $schema['key']);
-		}
-		else {
-			return $schema['key'];
-		}
+
+		return $schema['key'];
 	}
 
 	/**
@@ -384,7 +380,7 @@ class DB {
 	 * @param array  $values pair of fieldname => fieldvalue
 	 * @param bool   $getids
 	 *
-	 * @return array of ids
+	 * @return array    an array of ids with the keys preserved
 	 */
 	public static function insert($table, $values, $getids = true) {
 		if (empty($values)) {
@@ -480,36 +476,122 @@ class DB {
 	 * @static
 	 *
 	 * @param string $tableName
-	 * @param mixed $pk         A single PK value or an associative array of values,
-	 *                          e.g. array('field1' => 'value1', 'field2' => 'value2')
+	 * @param string $pk
 	 * @param array $values
 	 *
 	 * @return bool
 	 */
 	public static function updateByPk($tableName, $pk, array $values) {
-		$dbPkNames = self::getPk($tableName);
-
-		if (is_array($pk)) {
-			if (!is_array($dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has a simple primary key, composite is given.', $tableName));
-			}
-
-			if (!array_equal(array_keys($pk), $dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Incorrect primary keys for table "%1$s".', $tableName));
-			}
-		}
-		else {
-			if (is_array($dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has a composite primary key, simple is given.', $tableName));
-			}
-
-			$pk = array($dbPkNames => $pk);
-		}
-
 		return self::update($tableName, array(
-			'where' => $pk,
+			'where' => array(self::getPk($tableName) => $pk),
 			'values' => $values
 		));
+	}
+
+	/**
+	 * Saves the given records to the database. If the record has the primary key set, it is updated, otherwise - a new
+	 * record is inserted. For new records the newly generated PK is added to the result.
+	 *
+	 * @static
+	 *
+	 * @param $tableName
+	 * @param $data
+	 *
+	 * @return array    the same records, that have been passed with the primary keys set for new records
+	 */
+	public static function save($tableName, array $data) {
+		$pk = self::getPk($tableName);
+
+		$newRecords = array();
+		foreach ($data as $key => $record) {
+			// if the pk is set - update the record
+			if (isset($record[$pk])) {
+				self::updateByPk($tableName, $record[$pk], $record);
+			}
+			// if no pk is set, create the record later
+			else {
+				$newRecords[$key] = $data[$key];
+			}
+		}
+
+		// insert the new records
+		if ($newRecords) {
+			$newIds = self::insert($tableName, $newRecords);
+			foreach ($newIds as $key => $id) {
+				$data[$key][$pk] = $id;
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Replaces the records given in $oldRecords with the ones in $newRecords.
+	 *
+	 * If a record with the same primary key as a new one already exists in the old records, the record is updated
+	 * only if they are different. For new records the newly generated PK is added to the result. Old records that are
+	 * not present in the new records are deleted.
+	 *
+	 * All of the records must have the primary key defined.
+	 *
+	 * @static
+	 *
+	 * @param $tableName
+	 * @param array $oldRecords
+	 * @param array $newRecords
+	 *
+	 * @return array    the new records, that have been passed with the primary keys set for newly inserted records
+	 */
+	public static function replace($tableName, array $oldRecords, array $newRecords) {
+		$pk = self::getPk($tableName);
+		$oldRecords = zbx_toHash($oldRecords, $pk);
+
+		$modifiedRecords = array();
+		foreach ($newRecords as $record) {
+			// if it's a new or modified record - save it later
+			if (!isset($record[$pk]) || self::recordModified($tableName, $oldRecords[$record[$pk]], $record)) {
+				$modifiedRecords[] = $record;
+			}
+
+			// remove the existing records from the collection, the remaining ones will be deleted
+			if(isset($record[$pk])) {
+				unset($oldRecords[$record[$pk]]);
+			}
+		}
+
+		// save modified records
+		if ($modifiedRecords) {
+			$modifiedRecords = self::save($tableName, $modifiedRecords);
+		}
+
+		// delete remaining records
+		if ($oldRecords) {
+			DB::delete($tableName, array(
+				$pk => array_keys($oldRecords)
+			));
+		}
+
+		return $modifiedRecords;
+	}
+
+	/**
+	 * Compares the fields, that are present in both records, and returns true if any of the values differ.
+	 *
+	 * @static
+	 * @param $tableName
+	 * @param array $oldRecord
+	 * @param array $newRecord
+	 *
+	 * @return bool
+	 */
+	public static function recordModified($tableName, array $oldRecord, array $newRecord) {
+		foreach ($oldRecord as $field => $value) {
+			if (self::hasField($tableName, $field) && isset($newRecord[$field]) && $value != $newRecord[$field]) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

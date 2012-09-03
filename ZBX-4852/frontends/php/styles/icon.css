@@ -62,24 +62,36 @@
 .filterclosed{
 	height: 9px;
 	width: 9px;
-	background-image: url('../images/general/closed.gif');
+	background-image: url('../images/general/plus.png');
 	background-repeat:no-repeat;
 	cursor:pointer;
 }
 
-.filteropened{
+.filteropened {
 	height: 9px;
 	width: 9px;
-	background: url('../images/general/opened.gif') no-repeat;
+	background: url('../images/general/minus.png') no-repeat;
 	cursor:pointer;
 	margin: 0 1px;
 }
 
-.status_icon { display: inline-block; vertical-align: middle; height: 14px; width: 14px; background-repeat:no-repeat; cursor:pointer; margin: 0 1px 0 1px;	}
+.status_icon {
+	display: inline-block;
+	vertical-align: middle;
+	height: 14px;
+	width: 14px;
+	background-repeat:no-repeat;
+	cursor:pointer;
+	margin: 0 1px 0 1px;
+}
 
-.iconerror			{ background-image: url('../images/general/error_icon.png');}
+.status_icon_extra {
+	margin-top:-2px;
+}
+
+.iconerror			{ background-image: url('../images/general/error2.png');}
 .iconok				{ background-image: url('../images/general/ok_icon.png');}
-.iconwarning		{ background-image: url('../images/general/warning_icon.png');}
+.iconwarning		{ background-image: url('../images/general/warning.png');}
 .iconunknown		{ background-image: url('../images/general/unknown_icon.png');}
 .iconzbxunknown		{ background-image: url('../images/general/zabbix_unknown.png');}
 .iconzbxavailable	{ background-image: url('../images/general/zabbix_available.png');}
@@ -113,14 +125,16 @@
 .icon_sortup{
 	height: 16px;
 	width: 19px;
-	background: url('../images/general/sort_up.gif') no-repeat;
+	background: url('../images/general/sort_up.png') no-repeat;
 	cursor: pointer;
+	display:inline-block;
 }
 .icon_sortdown{
 	height: 16px;
 	width: 19px;
-	background: url('../images/general/sort_down.gif') no-repeat;
+	background: url('../images/general/sort_down.png') no-repeat;
 	cursor: pointer;
+	display:inline-block;
 }
 .default_cursor{
 	cursor: default !important;

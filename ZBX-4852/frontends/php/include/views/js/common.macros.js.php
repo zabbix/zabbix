@@ -11,7 +11,7 @@
 			<input class="input text" type="text" id="macros_#{macroNum}_value" name="macros[#{macroNum}][value]" size="40" maxlength="255" placeholder="value">
 		</td>
 		<td>
-			<input class="input link_menu macroRemove" type="button" id="macros_#{macroNum}_remove" name="macros_#{macroNum}_remove" value="<?php echo _('Remove'); ?>">
+			<input class="input link_menu macroRemove" type="button" id="macros_#{macroNum}_remove" name="macros_#{macroNum}_remove" value=<?php echo Chtml::encode(_('Remove')); ?>>
 		</td>
 	</tr>
 
@@ -50,7 +50,7 @@
 			var removedCount = jQuery(this).data('removedCount');
 
 			if (removedCount) {
-				return confirm('<?php echo _('Are you sure you want to delete'); ?> '+removedCount+' <?php echo _('macro(s)') ?>?');
+				return confirm(<?php echo CJs::encodeJson(_('Are you sure you want to delete')); ?> + ' ' + removedCount + ' ' + <?php echo CJs::encodeJson(_('macro(s)')); ?>+'?');
 			}
 		});
 	});

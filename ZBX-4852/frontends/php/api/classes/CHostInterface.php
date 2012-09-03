@@ -563,23 +563,14 @@ class CHostInterface extends CZBXAPI {
 				}
 			}
 
-			if (isset($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS parameter "%s" provided.', $interface['dns']));
+			if (isset($interface['dns'])) {
+				$this->checkDns($interface);
 			}
-
-			if (isset($interface['ip']) && !zbx_empty($interface['ip'])) {
-				if (!validate_ip($interface['ip'], $arr)
-						&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
-						&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));
-				}
+			if (isset($interface['ip'])) {
+				$this->checkIp($interface);
 			}
-
-			if (!isset($interface['port'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
-			}
-			elseif (!validatePortNumberOrMacro($interface['port'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided.', $interface['port']));
+			if (isset($interface['port']) || $method == 'create') {
+				$this->checkPort($interface);
 			}
 
 			if ($update) {
@@ -695,6 +686,36 @@ class CHostInterface extends CZBXAPI {
 		return array('interfaceids' => $interfaceids);
 	}
 
+	protected function validateMassRemove(array $data) {
+		// check permissions
+		$this->checkHostPermissions($data['hostids']);
+
+		// check interfaces
+		foreach ($data['interfaces'] as $interface) {
+			if (!isset($interface['dns']) || !isset($interface['ip']) || !isset($interface['port'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
+			$this->checkDns($interface);
+			$this->checkIp($interface);
+			$this->checkPort($interface);
+
+			// check main interfaces
+			$interfacesToRemove = API::getApi()->select($this->tableName(), array(
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'hostid' => $data['hostids'],
+					'ip' => $interface['ip'],
+					'dns' => $interface['dns'],
+					'port' => $interface['port']
+				)
+			));
+			if ($interfacesToRemove) {
+				$this->checkMainInterfacesOnDelete(zbx_objectValues($interfacesToRemove, 'interfaceid'));
+			}
+		}
+	}
+
 	/**
 	 * Remove Hosts from Hostinterfaces
 	 *
@@ -706,23 +727,21 @@ class CHostInterface extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function massRemove(array $data) {
-		$interfaces = zbx_toArray($data['interfaces']);
-		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
+		$data['interfaces'] = zbx_toArray($data['interfaces']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$hostids = zbx_toArray($data['hostids']);
+		$this->validateMassRemove($data);
 
-		$this->checkInput($interfaces, __FUNCTION__);
-
-		foreach ($interfaces as $inum => $interface) {
+		foreach ($data['interfaces'] as $interface) {
 			DB::delete('interface', array(
-				'hostid' => $hostids,
+				'hostid' => $data['hostids'],
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
 				'port' => $interface['port']
 			));
 		}
 
-		return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => zbx_objectValues($data['interfaces'], 'interfaceid'));
 	}
 
 	/**
@@ -732,6 +751,7 @@ class CHostInterface extends CZBXAPI {
 	 */
 	public function replaceHostInterfaces(array $host) {
 		if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
+			$host['interfaces'] = zbx_toArray($host['interfaces']);
 			$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
 
 			$interfacesToDelete = API::HostInterface()->get(array(
@@ -775,6 +795,64 @@ class CHostInterface extends CZBXAPI {
 			if (!empty($interfacesToDelete)) {
 				$this->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
 			}
+		}
+	}
+
+	/**
+	 * Validates the "dns" field.
+	 *
+	 * @throws APIException if the field is invalid.
+	 *
+	 * @param array $interface
+	 */
+	protected function checkDns(array $interface) {
+		if (!empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS parameter "%s" provided.', $interface['dns']));
+		}
+	}
+
+	/**
+	 * Validates the "ip" field.
+	 *
+	 * @throws APIException if the field is invalid.
+	 *
+	 * @param array $interface
+	 */
+	protected function checkIp(array $interface) {
+		if (!empty($interface['ip']) && (!validate_ip($interface['ip'], $arr)
+			&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
+			&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip']))) {
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));
+		}
+	}
+
+	/**
+	 * Validates the "port" field.
+	 *
+	 * @throws APIException if the field is empty or invalid.
+	 *
+	 * @param array $interface
+	 */
+	protected function checkPort(array $interface) {
+		if (!isset($interface['port']) || zbx_empty($interface['port'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
+		}
+		elseif (!validatePortNumberOrMacro($interface['port'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided.', $interface['port']));
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given hosts. Assumes the "hostid" field is valid.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts
+	 *
+	 * @param array $hostIds    an array of host IDs
+	 */
+	protected function checkHostPermissions(array $hostIds) {
+		if (!API::Host()->isWritable($hostIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 

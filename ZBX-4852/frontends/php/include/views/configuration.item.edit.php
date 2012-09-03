@@ -92,12 +92,12 @@ else {
 // append key to form list
 $itemFormList->addRow(_('Key'), array(
 	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
-	!$this->data['limited']
-	? new CButton('keyButton', _('Select'),
-		'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
-			'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
-		'formlist')
-	: null
+	!$this->data['limited'] && !$this->data['is_discovery_rule']
+		? new CButton('keyButton', _('Select'),
+			'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
+				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
+			'formlist')
+		: null
 ));
 
 // append interfaces to form list
@@ -184,7 +184,7 @@ $itemFormList->addRow(_('Password'),
 	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
-	new CTextArea('params_es', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_es', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_executed_script'
 );
 $itemFormList->addRow(_('Additional parameters'),
@@ -192,14 +192,13 @@ $itemFormList->addRow(_('Additional parameters'),
 		!empty($this->data['params'])
 			? $this->data['params']
 			: 'DSN=<database source name>'."\n".'user=<user name>'."\n".'password=<password>'."\n".'sql=<query>',
-		ZBX_TEXTAREA_STANDARD_ROWS,
-		ZBX_TEXTAREA_STANDARD_WIDTH
+		array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 	false,
 	'label_params'
 );
 $itemFormList->addRow(_('Formula'),
-	new CTextArea('params_f', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_f', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_formula'
 );
 
@@ -305,11 +304,11 @@ $itemFormList->addRow(
 	array(
 		_('Interval (in sec)'),
 		SPACE,
-		new CNumericBox('new_delay_flex[delay]', 50, 5),
+		new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5),
 		SPACE,
 		_('Period'),
 		SPACE,
-		new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
+		new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 		SPACE,
 		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 	),
@@ -454,9 +453,16 @@ if (!empty($this->data['itemid'])) {
 		);
 	}
 	if (!$this->data['limited']) {
-		array_push($buttons, new CButtonDelete(_('Delete selected item?'),
-			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
-		);
+		if ($this->data['is_discovery_rule']) {
+			array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
+			);
+		}
+		else {
+			array_push($buttons, new CButtonDelete(_('Delete item?'),
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
+			);
+		}
 	}
 }
 array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));

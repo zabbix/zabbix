@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-require_once('include/views/js/general.script.confirm.js.php');
+
+
+require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
 
 $screenWidget = new CWidget();
-
-$scrollDiv = new CDiv();
-$scrollDiv->setAttribute('id', 'scrollbar_cntr');
-$screenWidget->addFlicker($scrollDiv, CProfile::get('web.screens.filter.state', 1));
+$screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.screens.filter.state', 1));
 
 // header form
 $configComboBox = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -38,6 +35,10 @@ if (empty($this->data['screens'])) {
 	$screenWidget->addPageHeader(_('SCREENS'), $headerForm);
 	$screenWidget->addItem(BR());
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
+
+	$screenBuilder = new CScreenBuilder();
+	$screenBuilder->insertScreenScrollJs('scrollbar');
+	$screenBuilder->insertProcessObjectsJs();
 }
 elseif (!isset($this->data['screens'][$this->data['elementIdentifier']]) && !$this->data['id_has_been_fetched_from_profile']) {
 	// if screen we are searching for does not exist and was not fetched from profile
@@ -57,7 +58,7 @@ else {
 	}
 
 	// if elementid is used to fetch an element, saving it in profile
-	if ($this->data['fullscreen'] != 2 && !$this->data['use_screen_name']) {
+	if (!$this->data['use_screen_name']) {
 		CProfile::update('web.screens.elementid', $screen['screenid'] , PROFILE_TYPE_ID);
 	}
 
@@ -73,6 +74,7 @@ else {
 
 	// append screens combobox to page header
 	$headerForm = new CForm('get');
+	$headerForm->setName('headerForm');
 	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
 
 	$elementsComboBox = new CComboBox('elementid', $screen['screenid'], 'submit()');
@@ -82,7 +84,7 @@ else {
 	}
 	$headerForm->addItem(array(_('Screens').SPACE, $elementsComboBox));
 
-	if ($this->data['fullscreen'] != 2 && check_dynamic_items($screen['screenid'], 0)) {
+	if (check_dynamic_items($screen['screenid'], 0)) {
 		global $ZBX_WITH_ALL_NODES;
 
 		if (!isset($_REQUEST['hostid'])) {
@@ -104,7 +106,7 @@ else {
 		validate_group_with_host($PAGE_GROUPS, $PAGE_HOSTS);
 
 		// groups
-		$groupsComboBox = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
+		$groupsComboBox = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
 		foreach ($PAGE_GROUPS['groups'] as $groupid => $name) {
 			$groupsComboBox->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
 		}
@@ -112,7 +114,7 @@ else {
 
 		// hosts
 		$PAGE_HOSTS['hosts']['0'] = _('Default');
-		$hostsComboBox = new CComboBox('hostid', $PAGE_HOSTS['selected'], 'javascript: submit();');
+		$hostsComboBox = new CComboBox('hostid', $PAGE_HOSTS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
 		foreach ($PAGE_HOSTS['hosts'] as $hostid => $name) {
 			$hostsComboBox->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 		}
@@ -120,38 +122,23 @@ else {
 	}
 	$screenWidget->addHeader($screen['name'], $headerForm);
 
-	$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
-	$element = get_screen($screen, 0, $effectiveperiod);
+	// append screens to widget
+	$screenBuilder = new CScreenBuilder(array(
+		'screen' => $screen,
+		'mode' => SCREEN_MODE_PREVIEW,
+		'profileIdx' => 'web.screens',
+		'profileIdx2' => $screen['screenid'],
+		'groupid' => get_request('groupid'),
+		'hostid' => get_request('hostid'),
+		'period' => $this->data['period'],
+		'stime' => $this->data['stime']
+	));
+	$screenWidget->addItem($screenBuilder->show());
 
-	// create time control
-	if ($this->data['fullscreen'] != 2) {
-		$timeline = array(
-			'period' => $effectiveperiod,
-			'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
-		);
+	$screenBuilder->insertScreenScrollJs($screen['screenid']);
+	$screenBuilder->insertProcessObjectsJs();
 
-		if (!empty($this->data['stime'])) {
-			$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
-		}
-
-		$objData = array(
-			'id' => $screen['screenid'],
-			'domid' => 'screen_scroll',
-			'loadSBox' => 0,
-			'loadImage' => 0,
-			'loadScroll' => 1,
-			'scrollWidthByImage' => 0,
-			'dynamic' => 0,
-			'mainObject' => 1,
-			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
-		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
-		zbx_add_post_js('timeControl.processObjects();');
-	}
-	$screenWidget->addItem($element);
 	$screenWidget->addItem(BR());
 }
 
 return $screenWidget;
-?>

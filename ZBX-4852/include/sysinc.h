@@ -70,6 +70,12 @@
 
 #ifdef HAVE_PDH_H
 #	include <pdh.h>
+#	ifndef PDH_MAX_COUNTER_NAME
+#		define PDH_MAX_COUNTER_NAME	1024	/* maximum counter name length */
+#	endif
+#	ifndef PDH_MAX_COUNTER_PATH
+#		define PDH_MAX_COUNTER_PATH	2048	/* maximum full counter path length */
+#	endif
 #endif
 
 #ifdef HAVE_PDHMSG_H

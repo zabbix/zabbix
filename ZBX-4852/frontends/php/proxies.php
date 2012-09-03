@@ -99,18 +99,15 @@ elseif (isset($_REQUEST['delete'])) {
 			'output' => API_OUTPUT_EXTEND
 		));
 
-		DBstart();
 		$result = API::Proxy()->delete(array('proxyid' => $_REQUEST['proxyid']));
-		$result = DBend($result);
 
 		if ($result) {
+			unset($_REQUEST['form'], $_REQUEST['proxyid']);
 			$proxy = reset($proxies);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].' ] ['.$proxy['proxyid'].']');
 		}
 
 		show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
-
-		unset($_REQUEST['form'], $_REQUEST['proxyid']);
 	}
 	unset($_REQUEST['delete']);
 }

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
 ** Class for wrapping JSON encoding/decoding functionality.
 **
@@ -33,6 +33,7 @@
 ** @license http://opensource.org/licenses/bsd-license.php BSD
 **/
 class CJSON {
+
 	/**
 	 *
 	 * User-defined configuration, primarily of use in unit testing.
@@ -59,8 +60,8 @@ class CJSON {
 	 */
 	protected $_config = array(
 		'bypass_ext' => false,
-		'bypass_mb'  => false,
-		'noerror'	=> false
+		'bypass_mb' => false,
+		'noerror' => false
 	);
 
 	/**
@@ -134,7 +135,7 @@ class CJSON {
 	 */
 	public function encode($valueToEncode, $deQuote = array(), $forceObject = false) {
 		mb_internal_encoding('ASCII');
-		if (!$this->_config['bypass_ext'] && function_exists('json_encode')) {
+		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')) {
 
 			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
@@ -149,7 +150,7 @@ class CJSON {
 		}
 		else {
 			// fall back to php-only method
-			self::$forceObject = $forceObject ? JSON_FORCE_OBJECT : null;
+			self::$forceObject = $forceObject ? true : null;
 			$encoded = $this->_json_encode($valueToEncode);
 		}
 
@@ -372,7 +373,6 @@ class CJSON {
 				return '"'.$ascii.'"';
 			case 'array':
 				/*
-				 *
 				 * As per JSON spec ifany array key is not an integer
 				 * we must treat the the whole array as an object. We
 				 * also try to catch a sparsely populated associative
@@ -882,9 +882,9 @@ class CJSON {
 	 * These modes can be pushed on the "pushdown automata" (PDA) stack.
 	 * @constant
 	 */
-	const MODE_DONE	 = 1;
-	const MODE_KEY	  = 2;
-	const MODE_OBJECT   = 3;
+	const MODE_DONE		= 1;
+	const MODE_KEY		= 2;
+	const MODE_OBJECT	= 3;
 	const MODE_ARRAY	= 4;
 
 	/**
@@ -1129,4 +1129,3 @@ class CJSON {
 		return true;
 	}
 }
-?>

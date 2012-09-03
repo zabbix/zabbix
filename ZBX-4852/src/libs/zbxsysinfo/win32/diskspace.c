@@ -94,6 +94,11 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		zbx_json_addobject(&j, NULL);
 
 		utf8 = zbx_unicode_to_utf8(p);
+
+		/* remove trailing backslash */
+		if ('A' <= utf8[0] && utf8[0] <= 'Z' && ':' == utf8[1] && '\\' == utf8[2] && '\0' == utf8[3])
+			utf8[2] = '\0';
+
 		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8);
 

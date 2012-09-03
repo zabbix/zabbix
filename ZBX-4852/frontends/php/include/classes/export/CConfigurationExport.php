@@ -159,7 +159,7 @@ class CConfigurationExport {
 	 */
 	protected function gatherGroups() {
 		$this->data['groups'] = API::HostGroup()->get(array(
-			'hostids' => $this->options['groups'],
+			'groupids' => $this->options['groups'],
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND
 		));

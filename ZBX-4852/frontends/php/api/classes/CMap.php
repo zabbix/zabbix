@@ -113,9 +113,6 @@ class CMap extends CMapElement {
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// sysmapids
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
@@ -153,35 +150,8 @@ class CMap extends CMapElement {
 
 		$sysmapids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('s.sysmapid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($sysmap = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $sysmap['rowscount'];
@@ -953,16 +923,16 @@ class CMap extends CMapElement {
 			$linkTriggersToDelete = array_merge($linkTriggersToDelete, $dbLinkTriggersDiff['second']);
 		}
 
+		if (!empty($linkTriggersToDelete))
+			$this->deleteLinkTriggers($linkTriggersToDelete);
+
 		if (!empty($linkTriggersToAdd))
 			$this->createLinkTriggers($linkTriggersToAdd);
 
 		if (!empty($linkTriggersToUpdate))
 			$this->updateLinkTriggers($linkTriggersToUpdate);
 
-		if (!empty($linkTriggersToDelete))
-			$this->deleteLinkTriggers($linkTriggersToDelete);
-
-	return array('sysmapids' => $sysmapids);
+		return array('sysmapids' => $sysmapids);
 	}
 
 
@@ -1047,6 +1017,15 @@ class CMap extends CMapElement {
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['sysmapids'] === null) {
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }
 ?>

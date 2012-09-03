@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -36,8 +36,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 if ($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 	access_deny();
 }
-?>
-<?php
+
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'password1' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
@@ -65,8 +64,7 @@ $fields = array(
 	'form_refresh'=>		array(T_ZBX_STR, O_OPT, null, null, null)
 );
 check_fields($fields);
-?>
-<?php
+
 $_REQUEST['autologin'] = get_request('autologin', 0);
 
 // secondary actions
@@ -193,4 +191,3 @@ $usersView->render();
 $usersView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

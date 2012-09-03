@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/administration.users.edit.js.php');
 global $ZBX_LOCALES, $USER_DETAILS;
 
@@ -92,16 +92,16 @@ $languageComboBox = new CComboBox('lang', $this->data['lang']);
 $languages_unable_set = 0;
 foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 	// checking if this locale exists in the system. The only way of doing it is to try and set one
-	// trying to set only the LC_MESSAGES locale to avoid changing LC_NUMERIC
-	$locale_exists = setlocale(LC_MESSAGES, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
-	$selected = ($loc_id == $USER_DETAILS['lang']) ? true : null;
+	// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
+	$locale_exists = setlocale(LC_MONETARY , zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
+	$selected = ($loc_id == $this->data['lang']) ? true : null;
 	$languageComboBox->addItem($loc_id, $loc_name, $selected, $locale_exists);
 
 	if ($locale_exists != 'yes') {
 		$languages_unable_set++;
 	}
 }
-setlocale(LC_MESSAGES, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
+setlocale(LC_MONETARY, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
 $lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
 $userFormList->addRow(_('Language'), array($languageComboBox, SPACE, new CSpan($lang_hint, 'red wrap')));
 
@@ -149,18 +149,18 @@ if (uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE
 
 		$mediaTableInfo->addRow(array(
 			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
-			new CSpan($this->data['media_types'][$media['mediatypeid']], 'nowrap'),
+			new CSpan($media['description'], 'nowrap'),
 			new CSpan($media['sendto'], 'nowrap'),
 			new CSpan($media['period'], 'nowrap'),
 			media_severity2str($media['severity']),
 			$status,
-			new CButton('edit_media', _('Edit'), 'javascript: return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
+			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
 		);
 	}
 
 	$userMediaFormList->addRow(_('Media'),
 		array($mediaTableInfo,
-			new CButton('add_media', _('Add'), 'javascript: return PopUp("popup_media.php?dstfrm='.$userForm->getName().'", 550, 400);', 'link_menu'),
+			new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'", 550, 400);', 'link_menu'),
 			SPACE,
 			SPACE,
 			count($this->data['user_medias']) > 0 ? new CSubmit('del_user_media', _('Delete selected'), null, 'link_menu') : null
@@ -334,5 +334,5 @@ else {
 
 // append form to widget
 $userWidget->addItem($userForm);
+
 return $userWidget;
-?>

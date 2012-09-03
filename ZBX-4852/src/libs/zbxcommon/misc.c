@@ -2030,45 +2030,53 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
  * Comments: the function automatically processes suffixes K, M, G, T         *
  *                                                                            *
  ******************************************************************************/
-int	str2uint64(char *str, zbx_uint64_t *value)
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
 {
 	size_t		sz;
+	const char	*p;
 	int		ret;
 	zbx_uint64_t	factor = 1;
-	char		c = '\0';
 
-	sz = strlen(str) - 1;
+	sz = strlen(str);
+	p = str + sz - 1;
 
-	if (str[sz] == 'K')
+	if (NULL != strchr(suffixes, *p))
 	{
-		c = str[sz];
-		factor = ZBX_KIBIBYTE;
-	}
-	else if (str[sz] == 'M')
-	{
-		c = str[sz];
-		factor = ZBX_MEBIBYTE;
-	}
-	else if (str[sz] == 'G')
-	{
-		c = str[sz];
-		factor = ZBX_GIBIBYTE;
-	}
-	else if (str[sz] == 'T')
-	{
-		c = str[sz];
-		factor = ZBX_GIBIBYTE;
-		factor *= ZBX_KIBIBYTE;
+		switch (*p)
+		{
+			case 'K':
+				factor = ZBX_KIBIBYTE;
+				break;
+			case 'M':
+				factor = ZBX_MEBIBYTE;
+				break;
+			case 'G':
+				factor = ZBX_GIBIBYTE;
+				break;
+			case 'T':
+				factor = ZBX_TEBIBYTE;
+				break;
+			case 's':
+				factor = 1;
+				break;
+			case 'm':
+				factor = SEC_PER_MIN;
+				break;
+			case 'h':
+				factor = SEC_PER_HOUR;
+				break;
+			case 'd':
+				factor = SEC_PER_DAY;
+				break;
+			case 'w':
+				factor = SEC_PER_WEEK;
+				break;
+		}
+		sz--;
 	}
 
-	if ('\0' != c)
-		str[sz] = '\0';
-
-	if (SUCCEED == (ret = is_uint64(str, value)))
+	if (SUCCEED == (ret = is_uint64_n(str, sz, value)))
 		*value *= factor;
-
-	if ('\0' != c)
-		str[sz] = c;
 
 	return ret;
 }
@@ -2091,8 +2099,10 @@ int	str2uint64(char *str, zbx_uint64_t *value)
  ******************************************************************************/
 double	str2double(const char *str)
 {
-	size_t	sz = strlen(str) - 1;
+	size_t	sz;
 	double	factor = 1;
+
+	sz = strlen(str) - 1;
 
 	switch (str[sz])
 	{
@@ -2106,7 +2116,7 @@ double	str2double(const char *str)
 			factor = ZBX_GIBIBYTE;
 			break;
 		case 'T':
-			factor = ZBX_GIBIBYTE * (double)ZBX_KIBIBYTE;
+			factor = ZBX_TEBIBYTE;
 			break;
 		case 's':
 			break;
@@ -2122,8 +2132,6 @@ double	str2double(const char *str)
 		case 'w':
 			factor = SEC_PER_WEEK;
 			break;
-		default:
-			;
 	}
 
 	return atof(str) * factor;
@@ -2139,7 +2147,7 @@ double	str2double(const char *str)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_hostname_char(char c)
@@ -2163,7 +2171,7 @@ int	is_hostname_char(char c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_key_char(char c)
@@ -2187,7 +2195,7 @@ int	is_key_char(char c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: in trigger function allowed characters: 'a-z'                    *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_function_char(char c)
@@ -2208,7 +2216,7 @@ int	is_function_char(char c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: allowed characters in macro names: '0-9A-Z._'                    *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_macro_char(char c)
@@ -2284,7 +2292,7 @@ void	make_hostname(char *host)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 unsigned char	get_interface_type_by_item_type(unsigned char type)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,21 +17,26 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
+require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
+
 $screenWidget = new CWidget();
 $screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
 $screenWidget->addHeader($this->data['screen']['name']);
-$screenWidget->addItem(BR());
 if (!empty($this->data['screen']['templateid'])) {
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
 }
+$screenWidget->addItem(BR());
 
-$screenTable = get_screen($this->data['screen'], 1);
-zbx_add_post_js('init_screen("'.$this->data['screenid'].'", "iframe", "'.$this->data['screenid'].'");');
-zbx_add_post_js('timeControl.processObjects();');
+$screenBuilder = new CScreenBuilder(array(
+	'isFlickerfree' => false,
+	'screen' => $this->data['screen'],
+	'mode' => SCREEN_MODE_EDIT
+));
+$screenWidget->addItem($screenBuilder->show());
 
-// append form to widget
-$screenWidget->addItem($screenTable);
+$screenBuilder->insertInitScreenJs($this->data['screenid']);
+$screenBuilder->insertProcessObjectsJs();
+
 return $screenWidget;
-?>

@@ -153,15 +153,4 @@ abstract class CImportFormatter {
 	 * @return array
 	 */
 	abstract public function getTemplateScreens();
-
-	/**
-	 * Rename items, discovery rules, item prototypes fields.
-	 *
-	 * @param array $item
-	 *
-	 * @return array
-	 */
-	protected function renameItemFields(array $item) {
-		return $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
-	}
 }

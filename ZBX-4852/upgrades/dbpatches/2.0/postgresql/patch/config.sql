@@ -30,7 +30,7 @@ ALTER TABLE ONLY config
 	ADD server_check_interval integer DEFAULT '60' NOT NULL;
 
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT EXISTS (SELECT 1 FROM usrgrp WHERE usrgrp.usrgrpid=config.alert_usrgrpid);
-UPDATE config SET discovery_groupid=NULL WHERE NOT EXISTS (SELECT 1 FROM groups WHERE groups.groupid=config.discovery_groupid);
+UPDATE config SET discovery_groupid=(SELECT MIN(groupid) FROM groups) WHERE NOT EXISTS (SELECT 1 FROM groups WHERE groups.groupid=config.discovery_groupid);
 
 UPDATE config SET default_theme='darkblue' WHERE default_theme='css_bb.css';
 UPDATE config SET default_theme='originalblue' WHERE default_theme IN ('css_ob.css', 'default.css');

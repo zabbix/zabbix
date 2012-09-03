@@ -19,28 +19,31 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.0.1rc1');
+define('ZABBIX_VERSION',		'2.0.3rc1');
 define('ZABBIX_API_VERSION',	'1.4');
 
-define('ZBX_LOGIN_ATTEMPTS',			5);
-define('ZBX_LOGIN_BLOCK',				30); // sec
+define('ZABBIX_COPYRIGHT_FROM', '2001');
+define('ZABBIX_COPYRIGHT_TO', '2012');
 
-define('ZBX_MIN_PERIOD',				3600); // 1 hour
-define('ZBX_MAX_PERIOD',				63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
-define('ZBX_PERIOD_DEFAULT',			3600); // 1 hour
+define('ZBX_LOGIN_ATTEMPTS',	5);
+define('ZBX_LOGIN_BLOCK',		30); // sec
 
-define('ZBX_WIDGET_ROWS',				20);
+define('ZBX_MIN_PERIOD',		3600); // 1 hour
+define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
+define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 
-define('ZBX_FONTPATH',					realpath('fonts')); // where to search for font (GD > 2.0.18)
-define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans'); // font file name
-define('ZBX_GRAPH_LEGEND_HEIGHT',		120); // when graph height is less then this value, some legend will not show up
+define('ZBX_WIDGET_ROWS', 20);
 
-define('ZBX_SCRIPT_TIMEOUT',			60); // in seconds
-define('ZBX_SCRIPT_BYTES_LIMIT',		1048576); // 1048576 is 1MB in bytes
+define('ZBX_FONTPATH',				realpath('fonts')); // where to search for font (GD > 2.0.18)
+define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
+define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
-define('GRAPH_YAXIS_SIDE_DEFAULT',		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
+define('ZBX_SCRIPT_TIMEOUT',		60); // in seconds
+define('ZBX_SCRIPT_BYTES_LIMIT',	1048576); // 1048576 is 1MB in bytes
 
-define('ZBX_MAX_IMAGE_SIZE',			1048576); // 1024 * 1024
+define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
+
+define('ZBX_MAX_IMAGE_SIZE', 1048576); // 1024 * 1024
 
 define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
 define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
@@ -49,7 +52,7 @@ define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
 // for partitioned DB installs!!
-define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
+define('ZBX_HISTORY_DATA_UPKEEP', -1); // in days; -1: disabled, 0: always use trends
 
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
@@ -89,23 +92,23 @@ define('ZBX_AUTH_HTTP',		2);
 define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
-define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
-define('ZBX_DB_SQLITE3',		'SQLITE3');
+define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
+define('ZBX_DB_SQLITE3',	'SQLITE3');
 
-define('PAGE_TYPE_HTML',			0);
-define('PAGE_TYPE_IMAGE',			1);
-define('PAGE_TYPE_XML',				2);
-define('PAGE_TYPE_JS',				3);	// javascript
-define('PAGE_TYPE_CSS',				4);
-define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
-define('PAGE_TYPE_JSON',			6);	// simple JSON
-define('PAGE_TYPE_JSON_RPC',		7);	// api call
-define('PAGE_TYPE_TEXT_FILE',		8);	// api call
-define('PAGE_TYPE_TEXT',			9); // simple text
-define('PAGE_TYPE_CSV',				10); // CSV format
+define('PAGE_TYPE_HTML',		0);
+define('PAGE_TYPE_IMAGE',		1);
+define('PAGE_TYPE_XML',			2);
+define('PAGE_TYPE_JS',			3); // javascript
+define('PAGE_TYPE_CSS',			4);
+define('PAGE_TYPE_HTML_BLOCK',	5); // simple block of html (as text)
+define('PAGE_TYPE_JSON',		6); // simple JSON
+define('PAGE_TYPE_JSON_RPC',	7); // api call
+define('PAGE_TYPE_TEXT_FILE',	8); // api call
+define('PAGE_TYPE_TEXT',		9); // simple text
+define('PAGE_TYPE_CSV',			10); // CSV format
 
-define('ZBX_SESSION_ACTIVE',		0);
-define('ZBX_SESSION_PASSIVE',		1);
+define('ZBX_SESSION_ACTIVE',	0);
+define('ZBX_SESSION_PASSIVE',	1);
 
 define('ZBX_DROPDOWN_FIRST_NONE',	0);
 define('ZBX_DROPDOWN_FIRST_ALL',	1);
@@ -119,9 +122,9 @@ define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
 
-define('O_MAND',			0);
-define('O_OPT',				1);
-define('O_NO',				2);
+define('O_MAND',	0);
+define('O_OPT',		1);
+define('O_NO',		2);
 
 define('P_SYS',				1);
 define('P_UNSET_EMPTY',		2);
@@ -129,9 +132,9 @@ define('P_ACT',				16);
 define('P_NZERO',			32);
 
 //	misc parameters
-define('IMAGE_FORMAT_PNG',		'PNG');
-define('IMAGE_FORMAT_JPEG',		'JPEG');
-define('IMAGE_FORMAT_TEXT',		'JPEG');
+define('IMAGE_FORMAT_PNG',	'PNG');
+define('IMAGE_FORMAT_JPEG',	'JPEG');
+define('IMAGE_FORMAT_TEXT',	'JPEG');
 
 define('IMAGE_TYPE_UNKNOWN',		0);
 define('IMAGE_TYPE_ICON',			1);
@@ -142,16 +145,16 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ITEM_CONVERT_SHORT_UNITS',	2); // - to short units
 define('ITEM_CONVERT_LONG_UNITS',	3); // - to long units
 
-define('ZBX_SORT_UP',			'ASC');
-define('ZBX_SORT_DOWN',			'DESC');
+define('ZBX_SORT_UP',	'ASC');
+define('ZBX_SORT_DOWN',	'DESC');
 
-define('AUDIT_ACTION_ADD',			0);
-define('AUDIT_ACTION_UPDATE',		1);
-define('AUDIT_ACTION_DELETE',		2);
-define('AUDIT_ACTION_LOGIN',		3);
-define('AUDIT_ACTION_LOGOUT',		4);
-define('AUDIT_ACTION_ENABLE',		5);
-define('AUDIT_ACTION_DISABLE',		6);
+define('AUDIT_ACTION_ADD',		0);
+define('AUDIT_ACTION_UPDATE',	1);
+define('AUDIT_ACTION_DELETE',	2);
+define('AUDIT_ACTION_LOGIN',	3);
+define('AUDIT_ACTION_LOGOUT',	4);
+define('AUDIT_ACTION_ENABLE',	5);
+define('AUDIT_ACTION_DISABLE',	6);
 
 define('AUDIT_RESOURCE_USER',			0);
 define('AUDIT_RESOURCE_ZABBIX_CONFIG',	2);
@@ -227,8 +230,8 @@ define('HOST_MAINTENANCE_STATUS_ON',	1);
 define('INTERFACE_SECONDARY',	0);
 define('INTERFACE_PRIMARY',		1);
 
-define('INTERFACE_USE_DNS',		0);
-define('INTERFACE_USE_IP',		1);
+define('INTERFACE_USE_DNS',	0);
+define('INTERFACE_USE_IP',	1);
 
 define('INTERFACE_TYPE_ANY',		-1);
 define('INTERFACE_TYPE_UNKNOWN',	0);
@@ -255,8 +258,8 @@ define('TIMEPERIOD_TYPE_WEEKLY',	3);
 define('TIMEPERIOD_TYPE_MONTHLY',	4);
 define('TIMEPERIOD_TYPE_YEARLY',	5);
 
-define('SYSMAP_LABEL_ADVANCED_OFF',		0);
-define('SYSMAP_LABEL_ADVANCED_ON',		1);
+define('SYSMAP_LABEL_ADVANCED_OFF',	0);
+define('SYSMAP_LABEL_ADVANCED_ON',	1);
 
 define('MAP_LABEL_TYPE_LABEL',		0);
 define('MAP_LABEL_TYPE_IP',			1);
@@ -265,10 +268,10 @@ define('MAP_LABEL_TYPE_STATUS',		3);
 define('MAP_LABEL_TYPE_NOTHING',	4);
 define('MAP_LABEL_TYPE_CUSTOM',		5);
 
-define('MAP_LABEL_LOC_BOTTOM',		0);
-define('MAP_LABEL_LOC_LEFT',		1);
-define('MAP_LABEL_LOC_RIGHT',		2);
-define('MAP_LABEL_LOC_TOP',			3);
+define('MAP_LABEL_LOC_BOTTOM',	0);
+define('MAP_LABEL_LOC_LEFT',	1);
+define('MAP_LABEL_LOC_RIGHT',	2);
+define('MAP_LABEL_LOC_TOP',		3);
 
 define('SYSMAP_ELEMENT_TYPE_HOST',		0);
 define('SYSMAP_ELEMENT_TYPE_MAP',		1);
@@ -276,11 +279,11 @@ define('SYSMAP_ELEMENT_TYPE_TRIGGER',	2);
 define('SYSMAP_ELEMENT_TYPE_HOST_GROUP',3);
 define('SYSMAP_ELEMENT_TYPE_IMAGE',		4);
 
-define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP', 0);
-define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS', 1);
+define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP',				0);
+define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS',	1);
 
-define('SYSMAP_ELEMENT_AREA_TYPE_FIT', 0);
-define('SYSMAP_ELEMENT_AREA_TYPE_CUSTOM', 1);
+define('SYSMAP_ELEMENT_AREA_TYPE_FIT',		0);
+define('SYSMAP_ELEMENT_AREA_TYPE_CUSTOM',	1);
 
 define('SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID', 0);
 
@@ -289,23 +292,23 @@ define('SYSMAP_ELEMENT_ICON_OFF',			1);
 define('SYSMAP_ELEMENT_ICON_MAINTENANCE',	3);
 define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 
-define('SYSMAP_HIGHLIGHT_OFF',		0);
-define('SYSMAP_HIGHLIGHT_ON',		1);
+define('SYSMAP_HIGHLIGHT_OFF',	0);
+define('SYSMAP_HIGHLIGHT_ON',	1);
 
-define('SYSMAP_EXPANDPROBLEM_OFF',		0);
-define('SYSMAP_EXPANDPROBLEM_ON',		1);
+define('SYSMAP_EXPANDPROBLEM_OFF',	0);
+define('SYSMAP_EXPANDPROBLEM_ON',	1);
 
-define('SYSMAP_MARKELEMENTS_OFF',		0);
-define('SYSMAP_MARKELEMENTS_ON',		1);
+define('SYSMAP_MARKELEMENTS_OFF',	0);
+define('SYSMAP_MARKELEMENTS_ON',	1);
 
-define('SYSMAP_GRID_SHOW_ON',		1);
-define('SYSMAP_GRID_SHOW_OFF',		0);
+define('SYSMAP_GRID_SHOW_ON',	1);
+define('SYSMAP_GRID_SHOW_OFF',	0);
 
 define('SYSMAP_EXPAND_MACROS_OFF',	0);
 define('SYSMAP_EXPAND_MACROS_ON',	1);
 
-define('SYSMAP_GRID_ALIGN_ON',		1);
-define('SYSMAP_GRID_ALIGN_OFF',		0);
+define('SYSMAP_GRID_ALIGN_ON',	1);
+define('SYSMAP_GRID_ALIGN_OFF',	0);
 
 define('ZBX_ITEM_DELAY_DEFAULT', 30);
 
@@ -353,7 +356,7 @@ define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
 define('ITEM_STATUS_NOTSUPPORTED',	3);
 
-define('ITEM_TYPE_SNMPTRAP',			17);
+define('ITEM_TYPE_SNMPTRAP', 17);
 
 define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',	0);
 define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',		1);
@@ -387,10 +390,10 @@ define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
 define('SERVICE_SLA', 99.05);
 
-define('SERVICE_SHOW_SLA_OFF', 0);
-define('SERVICE_SHOW_SLA_ON',  1);
+define('SERVICE_SHOW_SLA_OFF',	0);
+define('SERVICE_SHOW_SLA_ON',	1);
 
-define('SERVICE_STATUS_OK',  0);
+define('SERVICE_STATUS_OK', 0);
 
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
@@ -398,15 +401,15 @@ define('TRIGGER_MULT_EVENT_ENABLED',	1);
 define('TRIGGER_STATUS_ENABLED',	0);
 define('TRIGGER_STATUS_DISABLED',	1);
 
-define('TRIGGER_VALUE_FALSE',		0);
-define('TRIGGER_VALUE_TRUE',		1);
-define('TRIGGER_VALUE_UNKNOWN',		2); // only in "events" table
+define('TRIGGER_VALUE_FALSE',	0);
+define('TRIGGER_VALUE_TRUE',	1);
+define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
-define('TRIGGER_VALUE_FLAG_NORMAL',	0);
-define('TRIGGER_VALUE_FLAG_UNKNOWN',1);
+define('TRIGGER_VALUE_FLAG_NORMAL',		0);
+define('TRIGGER_VALUE_FLAG_UNKNOWN',	1);
 
 define('TRIGGER_VALUE_CHANGED_NO',	0);
-define('TRIGGER_VALUE_CHANGED_YES',	1);
+define('TRIGGER_VALUE_CHANGED_YES', 1);
 
 define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -414,20 +417,19 @@ define('TRIGGER_SEVERITY_WARNING',			2);
 define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
-
 define('TRIGGER_SEVERITY_COUNT',			6);
 
-define('ALERT_MAX_RETRIES',		3);
+define('ALERT_MAX_RETRIES', 3);
 
-define('ALERT_STATUS_NOT_SENT',		0);
-define('ALERT_STATUS_SENT',			1);
-define('ALERT_STATUS_FAILED',		2);
+define('ALERT_STATUS_NOT_SENT', 0);
+define('ALERT_STATUS_SENT',		1);
+define('ALERT_STATUS_FAILED',	2);
 
-define('ALERT_TYPE_MESSAGE',		0);
-define('ALERT_TYPE_COMMAND',		1);
+define('ALERT_TYPE_MESSAGE',	0);
+define('ALERT_TYPE_COMMAND',	1);
 
-define('MEDIA_TYPE_STATUS_ACTIVE',	0);
-define('MEDIA_TYPE_STATUS_DISABLED',1);
+define('MEDIA_TYPE_STATUS_ACTIVE',		0);
+define('MEDIA_TYPE_STATUS_DISABLED',	1);
 
 define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
@@ -486,9 +488,7 @@ define('LOGFILE_SEVERITY_DISASTER',			5);
 define('LOGFILE_SEVERITY_AUDIT_SUCCESS',	6);
 define('LOGFILE_SEVERITY_AUDIT_FAILURE',	7);
 
-define('SCREEN_SIMPLE_ITEM',		0);
-define('SCREEN_DYNAMIC_ITEM',		1);
-
+// screen
 define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
 define('SCREEN_RESOURCE_MAP',				2);
@@ -506,15 +506,35 @@ define('SCREEN_RESOURCE_EVENTS',			13);
 define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
 define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
+define('SCREEN_RESOURCE_HISTORY',			17);
+define('SCREEN_RESOURCE_CHART',				18);
+
+define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
+define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
+define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',		2);
+define('SCREEN_SORT_TRIGGERS_TIME_ASC',				3);
+define('SCREEN_SORT_TRIGGERS_TIME_DESC',			4);
+define('SCREEN_SORT_TRIGGERS_TYPE_ASC',				5);
+define('SCREEN_SORT_TRIGGERS_TYPE_DESC',			6);
+define('SCREEN_SORT_TRIGGERS_STATUS_ASC',			7);
+define('SCREEN_SORT_TRIGGERS_STATUS_DESC',			8);
+define('SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC',		9);
+define('SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC',	10);
+define('SCREEN_SORT_TRIGGERS_RECIPIENT_ASC',		11);
+define('SCREEN_SORT_TRIGGERS_RECIPIENT_DESC',		12);
+
+define('SCREEN_MODE_PREVIEW',	0);
+define('SCREEN_MODE_EDIT',		1);
+define('SCREEN_MODE_SLIDESHOW',		2);
+define('SCREEN_MODE_JS',		3);
 
 define('SCREEN_TYPE_NORMAL',	0);
 define('SCREEN_TYPE_TEMPLATED',	1);
 
-define('DEFAULT_LATEST_ISSUES_CNT', 20);
+define('SCREEN_SIMPLE_ITEM',	0);
+define('SCREEN_DYNAMIC_ITEM',	1);
 
-define('SCREEN_SORT_TRIGGERS_DATE_DESC',		0);
-define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',	1);
-define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',	2);
+define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
 // alignes
 define('HALIGN_DEFAULT',	0);
@@ -557,11 +577,11 @@ define('PROFILE_TYPE_ARRAY_ID',		4);
 define('PROFILE_TYPE_ARRAY_INT',	5);
 define('PROFILE_TYPE_ARRAY_STR',	6);
 
-define('CALC_FNC_MIN',	1);
-define('CALC_FNC_AVG',	2);
-define('CALC_FNC_MAX',	4);
-define('CALC_FNC_ALL',	7);
-define('CALC_FNC_LST',	9);
+define('CALC_FNC_MIN', 1);
+define('CALC_FNC_AVG', 2);
+define('CALC_FNC_MAX', 4);
+define('CALC_FNC_ALL', 7);
+define('CALC_FNC_LST', 9);
 
 define('SERVICE_TIME_TYPE_UPTIME',				0);
 define('SERVICE_TIME_TYPE_DOWNTIME',			1);
@@ -574,18 +594,18 @@ define('USER_TYPE_SUPER_ADMIN',		3);
 define('ZBX_NOT_INTERNAL_GROUP',	0);
 define('ZBX_INTERNAL_GROUP',		1);
 
-define('GROUP_STATUS_DISABLED',		1);
-define('GROUP_STATUS_ENABLED',		0);
+define('GROUP_STATUS_DISABLED', 1);
+define('GROUP_STATUS_ENABLED',	0);
 
 // IMPORTANT!!! by priority DESC
 define('GROUP_GUI_ACCESS_SYSTEM',	0);
-define('GROUP_GUI_ACCESS_INTERNAL',	1);
-define('GROUP_GUI_ACCESS_DISABLED',	2);
+define('GROUP_GUI_ACCESS_INTERNAL', 1);
+define('GROUP_GUI_ACCESS_DISABLED', 2);
 
-define('GROUP_API_ACCESS_DISABLED',	0);
+define('GROUP_API_ACCESS_DISABLED', 0);
 define('GROUP_API_ACCESS_ENABLED',	1);
 
-define('GROUP_DEBUG_MODE_DISABLED',	0);
+define('GROUP_DEBUG_MODE_DISABLED', 0);
 define('GROUP_DEBUG_MODE_ENABLED',	1);
 
 define('PERM_MAX',			3);
@@ -594,7 +614,6 @@ define('PERM_READ_ONLY',	2);
 define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
-define('PERM_RES_STRING_LINE',	0); // return string of nodes id - '1,2,3,4,5'
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
 define('PERM_RES_DATA_ARRAY',	2);
 
@@ -663,16 +682,16 @@ define('GRAPH_TYPE_COLUMN',			7);
 define('GRAPH_TYPE_BAR_STACKED',	8);
 define('GRAPH_TYPE_COLUMN_STACKED',	9);
 
-define('GRAPH_3D_ANGLE',			70);
+define('GRAPH_3D_ANGLE', 70);
 
-define('GRAPH_STACKED_ALFA',		15); // 0..100 transparency
+define('GRAPH_STACKED_ALFA', 15); // 0..100 transparency
 
 define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
 
 define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR', '000');
 
-define('ZBX_MAX_TREND_DIFF',		3600);
+define('ZBX_MAX_TREND_DIFF', 3600);
 
 define('ZBX_GRAPH_MAX_SKIP_CELL',	16);
 define('ZBX_GRAPH_MAX_SKIP_DELAY',	4);
@@ -688,16 +707,16 @@ define('DRULE_STATUS_DISABLED',		1);
 define('DSVC_STATUS_ACTIVE',		0);
 define('DSVC_STATUS_DISABLED',		1);
 
-define('SVC_SSH',	0);
-define('SVC_LDAP',	1);
-define('SVC_SMTP',	2);
-define('SVC_FTP',	3);
-define('SVC_HTTP',	4);
-define('SVC_POP',	5);
-define('SVC_NNTP',	6);
-define('SVC_IMAP',	7);
-define('SVC_TCP',	8);
-define('SVC_AGENT',	9);
+define('SVC_SSH',		0);
+define('SVC_LDAP',		1);
+define('SVC_SMTP',		2);
+define('SVC_FTP',		3);
+define('SVC_HTTP',		4);
+define('SVC_POP',		5);
+define('SVC_NNTP',		6);
+define('SVC_IMAP',		7);
+define('SVC_TCP',		8);
+define('SVC_AGENT',		9);
 define('SVC_SNMPv1',	10);
 define('SVC_SNMPv2c',	11);
 define('SVC_ICMPPING',	12);
@@ -705,12 +724,12 @@ define('SVC_SNMPv3',	13);
 define('SVC_HTTPS',		14);
 define('SVC_TELNET',	15);
 
-define('DHOST_STATUS_ACTIVE',		0);
-define('DHOST_STATUS_DISABLED',		1);
+define('DHOST_STATUS_ACTIVE',	0);
+define('DHOST_STATUS_DISABLED', 1);
 
-define('IM_FORCED',		0);
-define('IM_ESTABLISHED',1);
-define('IM_TREE',		2);
+define('IM_FORCED',			0);
+define('IM_ESTABLISHED',	1);
+define('IM_TREE',			2);
 
 define('EXPRESSION_TYPE_INCLUDED',		0);
 define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
@@ -718,9 +737,9 @@ define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 define('EXPRESSION_TYPE_TRUE',			3);
 define('EXPRESSION_TYPE_FALSE',			4);
 
-define('HOST_INVENTORY_DISABLED',		-1);
-define('HOST_INVENTORY_MANUAL',			0);
-define('HOST_INVENTORY_AUTOMATIC',		1);
+define('HOST_INVENTORY_DISABLED',	-1);
+define('HOST_INVENTORY_MANUAL',		0);
+define('HOST_INVENTORY_AUTOMATIC',	1);
 
 define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
@@ -746,9 +765,9 @@ define('REGEXP_EXCLUDE', 1);
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
-define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
+define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
+define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*[KMGTsmhdw]?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
@@ -828,7 +847,7 @@ define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
 define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
 define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
 
-define('DAY_IN_YEAR',	365);
+define('DAY_IN_YEAR', 365);
 
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
@@ -850,6 +869,11 @@ define('NO_TRIM',	'NO_TRIM');
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
+
+/**
+ * String that is used to substitude macro when it cannot be resolved.
+ */
+define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
 
 // user default theme
 define('THEME_DEFAULT', 'default');
@@ -887,6 +911,10 @@ define('XML_TIME_DATE_FORMAT', _('H.i'));
 // actions
 define('LONG_DESCRIPTION',	0);
 define('SHORT_DESCRIPTION',	1);
+
+// availability report modes
+define('AVAILABILITY_REPORT_BY_HOST', 0);
+define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

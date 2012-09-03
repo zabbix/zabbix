@@ -80,7 +80,7 @@ class Curl {
 			if ($atIndex !== false) {
 				$credentials = zbx_substring($this->host, 0, $atIndex);
 
-				$colonIndex = zbx_strpos(credentials, ':');
+				$colonIndex = zbx_strpos($credentials, ':');
 				if ($colonIndex !== false) {
 					$this->username = zbx_substring($credentials, 0, $colonIndex);
 					$this->password = substr($credentials, $colonIndex);
@@ -282,7 +282,7 @@ class Curl {
 
 	// returns the file part of $this url, i.e. everything after the host name.
 	public function getFile() {
-		$url .= $this->path ? $this->path : '';
+		$url = $this->path ? $this->path : '';
 		$url .= $this->query ? '?'.$this->query : '';
 		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
 		return $url;

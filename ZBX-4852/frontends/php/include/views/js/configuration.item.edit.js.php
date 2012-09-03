@@ -123,10 +123,10 @@
 
 	function setAuthTypeLabel() {
 		if (jQuery('#authtype').val() == 1) {
-			jQuery('#row_password label').html('<?php echo _('Key passphrase'); ?>');
+			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Key passphrase')); ?>);
 		}
 		else {
-			jQuery('#row_password label').html('<?php echo _('Password'); ?>');
+			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Password')); ?>);
 		}
 	}
 

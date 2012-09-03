@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once 'include/config.inc.php';
 require_once 'include/graphs.inc.php';
 
@@ -29,14 +29,16 @@ require_once 'include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'graphid' =>	array(T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null),
-	'period' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
-	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
-	'border' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
-	'width' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
-	'height' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
-	'graph3d' =>	array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
-	'legend' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null)
+	'graphid' =>		array(T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null),
+	'screenid' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
+	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'updateProfile' =>	array(T_ZBX_STR, O_OPT, P_NZERO,	null,		null),
+	'border' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
+	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
+	'height' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
+	'graph3d' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
+	'legend' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null)
 );
 check_fields($fields);
 
@@ -60,19 +62,22 @@ else {
 }
 
 $host = reset($db_data['hosts']);
-navigation_bar_calc();
 
 /*
  * Display
  */
-$graph = new CPie($db_data['graphtype']);
+$timeline = CScreenBase::calculateTime(array(
+	'profileIdx' => get_request('profileIdx', 'web.screens'),
+	'profileIdx2' => get_request('screenid', get_request('graphid')),
+	'updateProfile' => get_request('updateProfile', true),
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
+));
 
-if (isset($_REQUEST['period'])) {
-	$graph->setPeriod($_REQUEST['period']);
-}
-if (isset($_REQUEST['stime'])) {
-	$graph->setSTime($_REQUEST['stime']);
-}
+$graph = new CPie($db_data['graphtype']);
+$graph->setPeriod($timeline['period']);
+$graph->setSTime($timeline['stime']);
+
 if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
 }
@@ -89,7 +94,7 @@ if ($height <= 0) {
 
 $graph->setWidth($width);
 $graph->setHeight($height);
-$graph->setHeader($host['host'].':'.$db_data['name']);
+$graph->setHeader($host['host'].': '.$db_data['name']);
 
 if ($db_data['show_3d']) {
 	$graph->switchPie3D();
@@ -100,7 +105,7 @@ $result = DBselect(
 	'SELECT gi.*'.
 	' FROM graphs_items gi'.
 	' WHERE gi.graphid='.$db_data['graphid'].
-	' ORDER BY gi.sortorder, gi.itemid DESC'
+	' ORDER BY gi.sortorder,gi.itemid DESC'
 );
 while ($db_data = DBfetch($result)) {
 	$graph->addItem(
@@ -113,4 +118,3 @@ while ($db_data = DBfetch($result)) {
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

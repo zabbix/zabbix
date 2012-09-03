@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,57 +21,62 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
+$requestType = get_request('type', PAGE_TYPE_JSON);
+if ($requestType == PAGE_TYPE_JSON) {
+	$http_request = new CHTTP_request();
+	$json = new CJSON();
+	$data = $json->decode($http_request->body(), true);
+}
+else {
+	$data = $_REQUEST;
+}
+
 $page['title'] = 'RPC';
 $page['file'] = 'jsrpc.php';
 $page['hist_arg'] = array();
-$page['type'] = detect_page_type(PAGE_TYPE_JSON);
+$page['type'] = detect_page_type($requestType);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$http_request = new CHTTP_request();
-$data = $http_request->body();
-
-$json = new CJSON();
-$data = $json->decode($data, true);
-
 if (!is_array($data)) {
-	fatal_error('Wrong RPC call to JS RPC');
+	fatal_error('Wrong RPC call to JS RPC!');
 }
-if (!isset($data['method']) || !isset($data['params'])) {
-	fatal_error('Wrong RPC call to JS RPC');
+if (!isset($data['method'])) {
+	fatal_error('Wrong RPC call to JS RPC!');
 }
-if (!is_array($data['params'])) {
-	fatal_error('Wrong RPC call to JS RPC');
+if ($requestType == PAGE_TYPE_JSON && (!isset($data['params']) || !is_array($data['params']))) {
+	fatal_error('Wrong RPC call to JS RPC!');
 }
 
 $result = array();
 switch ($data['method']) {
 	case 'host.get':
-		$search = $data['params']['search'];
-
 		$result = API::Host()->get(array(
 			'startSearch' => 1,
-			'search' => $search,
+			'search' => $data['params']['search'],
 			'output' => array('hostid', 'host', 'name'),
 			'sortfield' => 'name',
 			'limit' => 15
 		));
 		break;
+
 	case 'message.mute':
 		$msgsettings = getMessageSettings();
 		$msgsettings['sounds.mute'] = 1;
 		updateMessageSettings($msgsettings);
 		break;
+
 	case 'message.unmute':
 		$msgsettings = getMessageSettings();
 		$msgsettings['sounds.mute'] = 0;
 		updateMessageSettings($msgsettings);
 		break;
+
 	case 'message.settings':
 		$result = getMessageSettings();
 		break;
+
 	case 'message.get':
-		$params = $data['params'];
 		$msgsettings = getMessageSettings();
 
 		// if no severity is selected, show nothing
@@ -80,10 +85,10 @@ switch ($data['method']) {
 		}
 
 		// timeout
-		$timeOut = (time() - $msgsettings['timeout']);
+		$timeOut = time() - $msgsettings['timeout'];
 		$lastMsgTime = 0;
-		if (isset($params['messageLast']['events'])) {
-			$lastMsgTime = $params['messageLast']['events']['time'];
+		if (isset($data['params']['messageLast']['events'])) {
+			$lastMsgTime = $data['params']['messageLast']['events']['time'];
 		}
 
 		$options = array(
@@ -140,20 +145,19 @@ switch ($data['method']) {
 		}
 		array_multisort($sortClock, SORT_ASC, $sortEvent, SORT_ASC, $result);
 		break;
+
 	case 'message.closeAll':
-		$params = $data['params'];
 		$msgsettings = getMessageSettings();
-		switch (strtolower($params['caption'])) {
+		switch (strtolower($data['params']['caption'])) {
 			case 'events':
-				$msgsettings['last.clock'] = (int)$params['time'] + 1;
+				$msgsettings['last.clock'] = (int) $data['params']['time'] + 1;
 				updateMessageSettings($msgsettings);
 				break;
 		}
 		break;
-	case 'zabbix.status':
-		$config = select_config();
-		$session = Z::getInstance()->getSession();
 
+	case 'zabbix.status':
+		$session = Z::getInstance()->getSession();
 		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + SERVER_CHECK_INTERVAL) <= time()) {
 			$session['serverCheckResult'] = zabbixIsRunning();
 			$session['serverCheckTime'] = time();
@@ -164,17 +168,69 @@ switch ($data['method']) {
 			'message' => $session['serverCheckResult'] ? '' : _('Zabbix server is not running: the information displayed may not be current.')
 		);
 		break;
+
+	case 'screen.get':
+		$options = array(
+			'pageFile' => !empty($data['pageFile']) ? $data['pageFile'] : null,
+			'mode' => !empty($data['mode']) ? $data['mode'] : null,
+			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
+			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
+			'groupid' => !empty($data['groupid']) ? $data['groupid'] : null,
+			'hostid' => !empty($data['hostid']) ? $data['hostid'] : null,
+			'period' => !empty($data['period']) ? $data['period'] : null,
+			'stime' => !empty($data['stime']) ? $data['stime'] : null,
+			'profileIdx' => !empty($data['profileIdx']) ? $data['profileIdx'] : null,
+			'profileIdx2' => !empty($data['profileIdx2']) ? $data['profileIdx2'] : null,
+			'updateProfile' => isset($data['updateProfile']) ? $data['updateProfile'] : null
+		);
+		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
+			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
+			$options['action'] = !empty($data['action']) ? $data['action'] : null;
+			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
+			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
+			$options['mark_color'] = !empty($data['mark_color']) ? $data['mark_color'] : null;
+		}
+		elseif ($options['resourcetype'] == SCREEN_RESOURCE_CHART) {
+			$options['graphid'] = !empty($data['graphid']) ? $data['graphid'] : null;
+			$options['profileIdx2'] = $options['graphid'];
+		}
+
+		$screenBase = CScreenBuilder::getScreen($options);
+		if (!empty($screenBase)) {
+			$screen = $screenBase->get();
+		}
+
+		if (!empty($screen)) {
+			if ($options['mode'] == SCREEN_MODE_JS) {
+				$result = $screen;
+			}
+			else {
+				if (is_object($screen)) {
+					$result = $screen->toString();
+				}
+			}
+		}
+		else {
+			$result = '';
+		}
+		break;
+
 	default:
-		fatal_error('Wrong RPC call to JS RPC');
+		fatal_error('Wrong RPC call to JS RPC!');
 }
 
-if (isset($data['id'])) {
-	$rpcResp = array(
-		'jsonrpc' => '2.0',
-		'result' => $result,
-		'id' => $data['id']
-	);
-	echo $json->encode($rpcResp);
+if ($requestType == PAGE_TYPE_JSON) {
+	if (isset($data['id'])) {
+		$rpcResp = array(
+			'jsonrpc' => '2.0',
+			'result' => $result,
+			'id' => $data['id']
+		);
+		echo $json->encode($rpcResp);
+	}
+}
+elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
+	echo $result;
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

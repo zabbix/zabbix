@@ -35,7 +35,7 @@ class CGraphPrototype extends CGraphGeneral {
 		parent::__construct();
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with template host cannot contain items from other hosts.')
+			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with templated items cannot contain items from other hosts.')
 		));
 	}
 
@@ -907,6 +907,7 @@ class CGraphPrototype extends CGraphGeneral {
 			// Y axis MIN value < Y axis MAX value
 			if (($graph['graphtype'] == GRAPH_TYPE_NORMAL || $graph['graphtype'] == GRAPH_TYPE_STACKED)
 					&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
+					&& $graph['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED
 					&& $graph['yaxismin'] >= $graph['yaxismax']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MAX value must be greater than Y axis MIN value.'));
 			}
@@ -985,6 +986,13 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 
 		return true;
+	}
+
+	protected function createReal($graph) {
+		// mark the graph as a graph prototype
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+
+		return parent::createReal($graph);
 	}
 
 }

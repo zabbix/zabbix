@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ if (!isset($DB)) {
  */
 function DBconnect(&$error) {
 	global $DB;
+
 	if (isset($DB['DB'])) {
 		$error=_('Cannot create another database connection.');
 		return false;
@@ -89,11 +90,11 @@ function DBconnect(&$error) {
 				break;
 			case ZBX_DB_POSTGRESQL:
 				$pg_connection_string =
-					(!empty($DB['SERVER']) ? 'host=\''.$DB['SERVER'].'\' ' : '').
-					'dbname=\''.$DB['DATABASE'].'\' '.
-					(!empty($DB['USER']) ? 'user=\''.$DB['USER'].'\' ' : '').
-					(!empty($DB['PASSWORD']) ? 'password=\''.$DB['PASSWORD'].'\' ' : '').
-					(!empty($DB['PORT']) ? 'port='.$DB['PORT'] : '');
+					(!empty($DB['SERVER']) ? 'host=\''.pg_connect_escape($DB['SERVER']).'\' ' : '').
+					'dbname=\''.pg_connect_escape($DB['DATABASE']).'\' '.
+					(!empty($DB['USER']) ? 'user=\''.pg_connect_escape($DB['USER']).'\' ' : '').
+					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
+					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
 				$DB['DB']= pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
@@ -181,6 +182,7 @@ function DBconnect(&$error) {
 
 function DBclose() {
 	global $DB;
+
 	$result = false;
 
 	if (isset($DB['DB']) && !empty($DB['DB'])) {
@@ -239,6 +241,7 @@ function DBloadfile($file, &$error) {
 
 function DBstart() {
 	global $DB;
+
 	$result = false;
 
 	if ($DB['TRANSACTIONS'] != 0) {
@@ -282,6 +285,7 @@ function DBstart() {
  */
 function DBend($doCommit = true) {
 	global $DB;
+
 	$result = false;
 
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
@@ -309,6 +313,7 @@ function DBend($doCommit = true) {
 
 function DBcommit() {
 	global $DB;
+
 	$result = false;
 
 	switch ($DB['TYPE']) {
@@ -337,6 +342,7 @@ function DBcommit() {
 
 function DBrollback() {
 	global $DB;
+
 	$result = false;
 
 	switch ($DB['TYPE']) {
@@ -389,6 +395,7 @@ function DBrollback() {
  */
 function &DBselect($query, $limit = null, $offset = 0) {
 	global $DB;
+
 	$result = false;
 
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
@@ -481,6 +488,7 @@ function &DBselect($query, $limit = null, $offset = 0) {
 
 function DBexecute($query, $skip_error_messages = 0) {
 	global $DB;
+
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
 		return false;
 	}
@@ -549,6 +557,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 
 function DBfetch(&$cursor) {
 	global $DB;
+
 	$result = false;
 
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
@@ -592,6 +601,14 @@ function DBfetch(&$cursor) {
 			if (!$result = $cursor->fetchArray(SQLITE3_ASSOC)) {
 				unset($cursor);
 			}
+			else {
+				// cast all of the values to string to be consistent with other DB drivers: all of them return
+				// only strings.
+				foreach ($result as &$value) {
+					$value = (string) $value;
+				}
+				unset($value);
+			}
 			if ($DB['TRANSACTIONS'] == 0) {
 				unlock_sqlite3_access();
 			}
@@ -623,6 +640,10 @@ if (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_MYSQL) {
 	function zbx_dbcast_2bigint($field) {
 		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 	function zbx_dbstr($var) {
@@ -637,6 +658,10 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 
 	function zbx_dbcast_2bigint($field) {
 		return ' CAST('.$field.' AS BIGINT) ';
+	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
@@ -653,6 +678,15 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
 	function zbx_dbcast_2bigint($field) {
 		return ' CAST('.$field.' AS NUMBER(20)) ';
 	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
+	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
 	function zbx_dbstr($var) {
@@ -667,6 +701,15 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
 
 	function zbx_dbcast_2bigint($field) {
 		return ' CAST('.$field.' AS BIGINT) ';
+	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
@@ -685,10 +728,15 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 	function zbx_dbcast_2bigint($field) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+	}
 }
 
 function zbx_dbconcat($params) {
 	global $DB;
+
 	switch ($DB['TYPE']) {
 		case ZBX_DB_SQLITE3:
 			return implode(' || ', $params);
@@ -699,6 +747,7 @@ function zbx_dbconcat($params) {
 
 function zbx_sql_mod($x, $y) {
 	global $DB;
+
 	switch ($DB['TYPE']) {
 		case ZBX_DB_SQLITE3:
 			return ' (('.$x.') % ('.$y.'))';
@@ -709,6 +758,7 @@ function zbx_sql_mod($x, $y) {
 
 function DBid2nodeid($id_name) {
 	global $DB;
+
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
 			$result = '('.$id_name.' div 100000000000000)';
@@ -1085,6 +1135,7 @@ function DBfetchArrayAssoc($cursor, $field) {
  */
 function init_sqlite3_access() {
 	global $DB;
+
 	$DB['SEM_ID'] = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
 }
 
@@ -1095,6 +1146,7 @@ function init_sqlite3_access() {
  */
 function lock_sqlite3_access() {
 	global $DB;
+
 	sem_acquire($DB['SEM_ID']);
 }
 
@@ -1105,6 +1157,7 @@ function lock_sqlite3_access() {
  */
 function unlock_sqlite3_access() {
 	global $DB;
+
 	sem_release($DB['SEM_ID']);
 }
 
@@ -1118,4 +1171,15 @@ function unlock_sqlite3_access() {
  */
 function idcmp($id1, $id2) {
 	return $id1 === $id2;
+}
+
+/**
+ * Escapes the value to be used in the PostgreSQL connection string for the pg_connect() function.
+ *
+ * @param $string
+ *
+ * @return string
+ */
+function pg_connect_escape($string) {
+	return addcslashes($string, "'\\");
 }

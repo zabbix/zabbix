@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/screens.inc.php';
@@ -27,12 +27,10 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
 $page['hist_arg'] = array('elementid', 'screenname');
-$page['scripts'] = array('class.calendar.js', 'gtlc.js');
+$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-if (PAGE_TYPE_HTML == $page['type']) {
-	define('ZBX_PAGE_DO_REFRESH', 1);
-}
+define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -48,7 +46,7 @@ $fields = array(
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), null),
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	null),
@@ -116,17 +114,16 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $data = array(
 	'fullscreen' => get_request('fullscreen'),
+	'period' => get_request('period'),
 	'stime' => get_request('stime'),
+	'elementid' => get_request('elementid', false),
 
 	// whether we should use screen name to fetch a screen (if this is false, elementid is used)
-	'use_screen_name' => isset($_REQUEST['screenname']),
-
-	// getting element id from GET parameters
-	'elementid' => get_request('elementid', false)
+	'use_screen_name' => isset($_REQUEST['screenname'])
 );
 
 // if none is provided
-if ($data['elementid'] === false && !$data['use_screen_name']) {
+if (empty($data['elementid']) && !$data['use_screen_name']) {
 	// get element id saved in profile from the last visit
 	$data['elementid'] = CProfile::get('web.screens.elementid', null);
 
@@ -160,4 +157,3 @@ $screenView->render();
 $screenView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

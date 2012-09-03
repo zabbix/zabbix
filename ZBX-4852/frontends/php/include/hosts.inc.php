@@ -627,13 +627,11 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	$_REQUEST['hostid'] = get_request('hostid', -1);
 
 	if (is_null($nodeid)) {
-		if (!$def_options['only_current_node']) {
-			$nodeid = get_current_nodeid();
-		}
-		else {
-			$nodeid = get_current_nodeid(false);
-		}
+		$nodeid = (!$def_options['only_current_node'])
+			? get_current_nodeid()
+			: get_current_nodeid(false);
 	}
+
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid, AVAILABLE_NOCACHE);
 
 	// nodes
@@ -673,40 +671,49 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 		$def_sql['from'][] = 'hosts_groups hg';
 
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid)';
+		$def_sql['where'][] = 'EXISTS (SELECT 1'.
+										' FROM items i'.
+										' WHERE hg.hostid=i.hostid '.zbx_limit(1).')';
 	}
 	elseif ($def_options['with_monitored_items']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+		$def_sql['where'][] = 'EXISTS (SELECT 1'.
+										' FROM items i'.
+										' WHERE hg.hostid=i.hostid'.
+											' AND i.status='.ITEM_STATUS_ACTIVE.' '.zbx_limit(1).')';
 	}
 	elseif ($def_options['with_historical_items']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		$def_sql['where'][] = 'EXISTS (SELECT 1'.
+										' FROM items i'.
+										' WHERE hg.hostid=i.hostid'.
+											' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+											' AND i.lastvalue IS NOT NULL '.zbx_limit(1).')';
 	}
 
 	// triggers
 	if ($def_options['with_triggers']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT t.triggerid'.
+		$def_sql['where'][] = 'EXISTS (SELECT 1'.
 										' FROM items i,functions f,triggers t'.
 										' WHERE i.hostid=hg.hostid'.
 											' AND f.itemid=i.itemid'.
-											' AND t.triggerid=f.triggerid)';
+											' AND t.triggerid=f.triggerid '.zbx_limit(1).')';
 	}
 	elseif ($def_options['with_monitored_triggers']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT t.triggerid'.
+		$def_sql['where'][] = 'EXISTS (SELECT 1'.
 										' FROM items i,functions f,triggers t'.
 										' WHERE i.hostid=hg.hostid'.
 											' AND i.status='.ITEM_STATUS_ACTIVE.
 											' AND i.itemid=f.itemid'.
 											' AND f.triggerid=t.triggerid'.
-											' AND t.status='.TRIGGER_STATUS_ENABLED.')';
+											' AND t.status='.TRIGGER_STATUS_ENABLED.' '.zbx_limit(1).')';
 	}
 
 	// httptests
@@ -714,28 +721,28 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 		$def_sql['from'][] = 'hosts_groups hg';
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
 		$def_sql['where'][] = 'EXISTS (SELECT a.applicationid'.
-									' FROM applications a,httptest ht'.
-									' WHERE a.hostid=hg.hostid'.
-										' AND ht.applicationid=a.applicationid)';
+										' FROM applications a,httptest ht'.
+										' WHERE a.hostid=hg.hostid'.
+											' AND ht.applicationid=a.applicationid '.zbx_limit(1).')';
 	}
 	elseif ($def_options['with_monitored_httptests']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT a.applicationid'.
+		$def_sql['where'][] = 'EXISTS (SELECT 1'.
 										' FROM applications a,httptest ht'.
 										' WHERE a.hostid=hg.hostid'.
 											' AND ht.applicationid=a.applicationid'.
-											' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+											' AND ht.status='.HTTPTEST_STATUS_ACTIVE.' '.zbx_limit(1).')';
 	}
 
 	// graphs
 	if ($def_options['with_graphs']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT DISTINCT i.itemid'.
+		$def_sql['where'][] = 'EXISTS (SELECT 1'.
 										' FROM items i,graphs_items gi'.
 										' WHERE i.hostid=hg.hostid'.
-											' AND i.itemid=gi.itemid)';
+											' AND i.itemid=gi.itemid '.zbx_limit(1).')';
 	}
 
 	$def_sql['order'][] = 'g.name';
@@ -743,12 +750,9 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	foreach ($sql as $key => $value) {
 		zbx_value2array($value);
 
-		if (isset($def_sql[$key])) {
-			$def_sql[$key] = zbx_array_merge($def_sql[$key], $value);
-		}
-		else {
-			$def_sql[$key] = $value;
-		}
+		$def_sql[$key] = (!empty($def_sql[$key]))
+			? zbx_array_merge($def_sql[$key], $value)
+			: $value;
 	}
 
 	$def_sql['select'] = array_unique($def_sql['select']);
@@ -782,6 +786,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	while ($group = DBfetch($res)) {
 		$groups[$group['groupid']] = $group['name'];
 		$groupids[$group['groupid']] = $group['groupid'];
+
 		if (bccomp($_REQUEST['groupid'], $group['groupid']) == 0) {
 			$result['selected'] = $group['groupid'];
 		}
@@ -800,12 +805,9 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 		$first_groupid = next($groupids);
 		reset($groupids);
 
-		if ($first_groupid !== false) {
-			$_REQUEST['groupid'] = $result['selected'] = $first_groupid;
-		}
-		else {
-			$_REQUEST['groupid'] = $result['selected'] = 0;
-		}
+		$_REQUEST['groupid'] = ($first_groupid !== false)
+			? $result['selected'] = $first_groupid
+			: $result['selected'] = 0;
 	}
 	else {
 		if ($config['dropdown_first_remember']) {
@@ -823,6 +825,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 			$_REQUEST['groupid'] = $result['selected'];
 		}
 	}
+
 	return $result;
 }
 
@@ -850,7 +853,6 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		'allow_all' =>						0,
 		'select_first_host' =>				0,
 		'select_first_host_if_empty' =>		0,
-		'select_host_on_group_switch' =>	0,
 		'do_not_select' =>					0,
 		'do_not_select_if_empty' =>			0,
 		'monitored_hosts' =>				0,
@@ -878,9 +880,6 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	}
 	if ($def_options['deny_all']) {
 		$dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
-	}
-	if ($dd_first_entry == ZBX_DROPDOWN_FIRST_ALL) {
-		$def_options['select_host_on_group_switch'] = 1;
 	}
 
 	$result = array('original' => -1, 'selected' => 0, 'hosts' => array(), 'hostids' => array());
@@ -1068,8 +1067,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		$_REQUEST['hostid'] = $result['selected'] = 0;
 	}
 	elseif ($def_options['select_first_host']
-				|| ($def_options['select_first_host_if_empty'] && $_REQUEST['hostid'] == -1 && is_null($profile_hostid))
-				|| ($def_options['select_host_on_group_switch'] && $_REQUEST['hostid'] != -1 && bccomp($_REQUEST['hostid'], $result['selected']) != 0)) {
+				|| ($def_options['select_first_host_if_empty'] && $_REQUEST['hostid'] == -1 && is_null($profile_hostid))) {
 		$first_hostid = next($hostids);
 		reset($hostids);
 

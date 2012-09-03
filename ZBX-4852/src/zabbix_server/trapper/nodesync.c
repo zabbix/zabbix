@@ -28,26 +28,6 @@
 static char	*buf = NULL, *tmp = NULL;
 static size_t	buf_alloc = 128, tmp_alloc = 16;
 
-static void	make_delete_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const ZBX_TABLE *table, zbx_uint64_t *ids, int *ids_num)
-{
-	if (NULL == table)
-		return;
-
-	if (0 == *ids_num)
-		return;
-
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from %s where", table->table);
-
-	DBadd_condition_alloc(sql, sql_alloc, sql_offset, table->recid, ids, *ids_num);
-
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
-
-	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
-
-	*ids_num = 0;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: process_deleted_records                                          *
@@ -63,45 +43,56 @@ static void	make_delete_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	process_deleted_records(int nodeid, char *data, int sender_nodetype)
+static void	process_deleted_records(int nodeid, char *data)
 {
 	const char	*__function_name = "process_deleted_records";
+
+typedef struct
+{
+	const ZBX_TABLE		*table;
+	zbx_vector_uint64_t	recids;
+	void			*next;
+}
+zbx_records_t;
+
 	char		*r, *lf;
-	const ZBX_TABLE	*table = NULL;
-	zbx_uint64_t	recid, *ids = NULL;
-	int		ids_alloc = 0, ids_num = 0;
+	zbx_uint64_t	recid;
 	char		*sql = NULL;
 	size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_records_t	*first = NULL, *rec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (r = data; '\0' != *r;)
 	{
 		if (NULL != (lf = strchr(r, '\n')))
 			*lf = '\0';
 
-		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* table name */
 
-		if (NULL == table || 0 != strcmp(table->table, buf))
+		if (NULL == first || 0 != strcmp(first->table->table, buf))
 		{
-			make_delete_sql(&sql, &sql_alloc, &sql_offset, table, ids, &ids_num);
+			rec = zbx_malloc(NULL, sizeof(zbx_records_t));
 
-			if (NULL == (table = DBget_table(buf)))
+			if (NULL == (rec->table = DBget_table(buf)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find table [%s]", __function_name, buf);
+				zbx_free(rec);
 				goto next;
 			}
+
+			zbx_vector_uint64_create(&rec->recids);
+			rec->next = first;
+			first = rec;
 		}
 
-		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* record id */
 		ZBX_STR2UINT64(recid, buf);
 
-		if ('2' == *r)	/* NODE_CONFIGLOG_OP_DELETE */
-			uint64_array_add(&ids, &ids_alloc, &ids_num, recid, 64);
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* operation type */
+
+		if ('2' == *buf)	/* deleted record */
+			zbx_vector_uint64_append(&rec->recids, recid);
 next:
 		if (lf != NULL)
 		{
@@ -112,14 +103,40 @@ next:
 			break;
 	}
 
-	make_delete_sql(&sql, &sql_alloc, &sql_offset, table, ids, &ids_num);
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (rec = first; NULL != rec; rec = rec->next)
+	{
+		if (0 == rec->recids.values_num)
+			continue;
+
+		zbx_vector_uint64_sort(&rec->recids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", rec->table->table);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, rec->table->recid,
+				rec->recids.values, rec->recids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
+
+	while (NULL != first)
+	{
+		rec = first;
+		first = rec->next;
+
+		zbx_vector_uint64_destroy(&rec->recids);
+		zbx_free(rec);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -139,7 +156,7 @@ next:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
+static void	process_updated_records(int nodeid, char *data)
 {
 	const char	*__function_name = "process_updated_records";
 	char		*r, *lf, *value_esc;
@@ -344,7 +361,7 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 							}
 						}
 
-						zbx_free(value_esc)
+						zbx_free(value_esc);
 				}
 			}
 
@@ -439,18 +456,10 @@ next:
  *                                                                            *
  * Function: process_checksum                                                 *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static void	process_checksum(int nodeid, char *data, int sender_nodetype)
+static void	process_checksum(int nodeid, char *data, unsigned char sender_nodetype)
 {
 	const char	*__function_name = "process_checksum";
 	char		*r, *lf;
@@ -465,40 +474,45 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 		if (NULL != (lf = strchr(r, '\n')))
 			*lf = '\0';
 
-		/* table name */
-		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* table name */
 
 		if (NULL == table || 0 != strcmp(table->table, buf))
+		{
 			if (NULL == (table = DBget_table(buf)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find table [%s]", __function_name, buf);
 				goto next;
 			}
+		}
 
-		/* record id */
-		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* record id */
 		ZBX_STR2UINT64(recid, buf);
 
-		if ('0' == *r)	/* NODE_CONFIGLOG_OP_UPDATE */
-		{
-			zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* operation type */
 
+		if ('0' == *buf)	/* NODE_CONFIGLOG_OP_UPDATE */
+		{
+			*tmp = '\0';
 			tmp_offset = 0;
+
 			while (NULL != r)
 			{
 				/* field name */
 				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
-
-				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "%s,", buf);
+				if (0 != tmp_offset)
+					zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ',');
+				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, buf);
+				/* field type */
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+				/* value */
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 			}
-			if (tmp_offset != 0)
-				tmp[--tmp_offset] = '\0';
 
 			if (SUCCEED == calculate_checksums(nodeid, table->table, recid))
 				update_checksums(nodeid, sender_nodetype, SUCCEED, table->table, recid, tmp);
 		}
 next:
-		if (lf != NULL)
+		if (NULL != lf)
 		{
 			*lf++ = '\n';
 			r = lf;
@@ -530,7 +544,8 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 {
 	const char	*r;
 	char		*lf;
-	int		sender_nodetype, datalen, res = SUCCEED;
+	int		datalen, res = SUCCEED;
+	unsigned char	sender_nodetype;
 
 	datalen = strlen(data);
 
@@ -576,8 +591,7 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received configuration changes from %s node %d for node %d datalen %d",
-				CONFIG_NODEID, (sender_nodetype == ZBX_NODE_SLAVE) ? "slave" : "master",
-				*sender_nodeid, *nodeid, datalen);
+				CONFIG_NODEID, zbx_nodetype_string(sender_nodetype), *sender_nodeid, *nodeid, datalen);
 
 		DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
 				*nodeid,
@@ -590,8 +604,8 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 
 			buf = zbx_malloc(buf, buf_alloc);
 
-			process_updated_records(*nodeid, data, sender_nodetype);
-			process_deleted_records(*nodeid, data, sender_nodetype);
+			process_updated_records(*nodeid, data);
+			process_deleted_records(*nodeid, data);
 			process_checksum(*nodeid, data, sender_nodetype);
 
 			zbx_free(buf);

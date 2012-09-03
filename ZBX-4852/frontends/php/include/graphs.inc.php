@@ -176,9 +176,9 @@ function get_hosts_by_graphid($graphid) {
 	);
 }
 
-/*
+/**
  * Description:
- *     Return the time of the 1st appearance of items included in graph in trends
+ *	Return the time of the 1st appearance of items included in graph in trends
  * Comment:
  *	sql is split to many sql's to optimize search on history tables
  */
@@ -196,9 +196,9 @@ function get_min_itemclock_by_graphid($graphid) {
 	return get_min_itemclock_by_itemid($itemids);
 }
 
-/*
+/**
  * Description:
- *     Return the time of the 1st appearance of item in trends
+ *	Return the time of the 1st appearance of item in trends
  */
 function get_min_itemclock_by_itemid($itemids) {
 	zbx_value2array($itemids);
@@ -374,18 +374,19 @@ function copy_graph_to_host($graphid, $hostid) {
 }
 
 function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
-	if (!is_null($idx)) {
+	if (!empty($idx)) {
 		if ($update) {
-			if (isset($_REQUEST['period']) && $_REQUEST['period'] >= ZBX_MIN_PERIOD) {
+			if (!empty($_REQUEST['period']) && $_REQUEST['period'] >= ZBX_MIN_PERIOD) {
 				CProfile::update($idx.'.period', $_REQUEST['period'], PROFILE_TYPE_INT, $idx2);
 			}
-			if (isset($_REQUEST['stime'])) {
+			if (!empty($_REQUEST['stime'])) {
 				CProfile::update($idx.'.stime', $_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
 		}
 		$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
 		$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime', null, $idx2));
 	}
+
 	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
 	$_REQUEST['stime'] = get_request('stime', null);
 
@@ -404,7 +405,7 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 		$_REQUEST['period'] = ZBX_MAX_PERIOD;
 	}
 
-	if (isset($_REQUEST['stime'])) {
+	if (!empty($_REQUEST['stime'])) {
 		$time = zbxDateToTime($_REQUEST['stime']);
 		if (($time + $_REQUEST['period']) > time()) {
 			$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
@@ -413,6 +414,7 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	else {
 		$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
 	}
+
 	return $_REQUEST['period'];
 }
 

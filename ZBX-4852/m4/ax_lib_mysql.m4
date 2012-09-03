@@ -78,12 +78,9 @@ AC_DEFUN([AX_LIB_MYSQL],
 
     if test "$want_mysql" = "yes"; then
 
-        if test -z "$MYSQL_CONFIG" -o test; then
-            AC_PATH_PROG([MYSQL_CONFIG], [mysql_config], [no])
-        fi
+        AC_PATH_PROG([MYSQL_CONFIG], [mysql_config], [])
 
-        if test -f "$MYSQL_CONFIG"; then
-dnl            AC_MSG_CHECKING([for MySQL libraries])
+        if test -x "$MYSQL_CONFIG"; then
 
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
 
@@ -142,10 +139,8 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
 			[Define to 1 if MySQL libraries are available])
 
             found_mysql="yes"
-dnl            AC_MSG_RESULT([yes])
         else
             found_mysql="no"
-dnl            AC_MSG_RESULT([no])
         fi
     fi
 

@@ -106,6 +106,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
+			$this->rootDir.'/include/classes/validators',
 			$this->rootDir.'/include/classes/export',
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
@@ -113,8 +114,10 @@ class ZBase {
 			$this->rootDir.'/include/classes/import/importers',
 			$this->rootDir.'/include/classes/import/readers',
 			$this->rootDir.'/include/classes/import/formatters',
+			$this->rootDir.'/include/classes/screens',
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/include/classes/helpers',
+			$this->rootDir.'/include/classes/helpers/trigger',
 			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/rpc'

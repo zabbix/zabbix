@@ -22,38 +22,119 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormHostGroup extends CWebTest {
-	public $hostgroup = 'Test Group';
+	private $nameSize = 50;
+	private $nameMaxLength = 64;
 
-	public function testFormHostGroup_Create() {
+	private $hostGroup = 'Test Group';
 
+
+	public function testFormHostGroup_CheckLayout() {
 		$this->login('hostgroups.php');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('name', $this->hostgroup);
+
+		$this->ok('CONFIGURATION OF HOST GROUPS');
+		$this->ok('Host group');
+		$this->ok(array('Group name', 'Hosts', 'Hosts in', 'Other hosts | Group'));
+
+		$this->assertElementPresent('name');
+		$this->assertElementPresent('twb_groupid');
+		$this->assertElementPresent('hosts_left');
+		$this->assertElementPresent('add');
+		$this->assertElementPresent('remove');
+		$this->assertElementPresent('hosts_right');
+		$this->assertElementPresent('save');
+		$this->assertElementNotPresent('clone');
+		$this->assertElementNotPresent('delete');
+		$this->assertElementPresent('cancel');
+
+		$this->assertAttribute("//input[@id='name']/@size", $this->nameSize);
+		$this->assertAttribute("//input[@id='name']/@maxlength", $this->nameMaxLength);
+	}
+
+	public function testFormHostGroup_CreateEmpty() {
+		$this->login('hostgroups.php');
+		$this->button_click('form');
+		$this->wait();
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "name": cannot be empty.');
+	}
+
+	public function testFormHostGroup_Create() {
+		$this->login('hostgroups.php');
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', $this->hostGroup);
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group added');
 	}
 
+	public function testFormHostGroup_CreateDuplicate() {
+		$this->login('hostgroups.php');
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', $this->hostGroup);
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot add group');
+		$this->ok('Host group "'.$this->hostGroup.'" already exists.');
+	}
+
+	public function testFormHostGroup_UpdateEmpty() {
+		$this->login('hostgroups.php');
+		$this->click('link='.$this->hostGroup);
+		$this->wait();
+
+		$this->input_type('name', '');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "name": cannot be empty.');
+	}
+
+	public function testFormHostGroup_UpdateDuplicate() {
+		$hostGroup = DBfetch(DBselect(
+			'SELECT name FROM groups'.
+			' WHERE name<>'.zbx_dbstr($this->hostGroup), 1
+		));
+
+		$this->login('hostgroups.php');
+		$this->click('link='.$this->hostGroup);
+		$this->wait();
+
+		$this->input_type('name', $hostGroup['name']);
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot update group');
+		$this->ok('Host group "'.$hostGroup['name'].'" already exists.');
+	}
+
 	public function testFormHostGroup_Update() {
 		$this->login('hostgroups.php');
-		$this->click('link='.$this->hostgroup);
+		$this->click('link='.$this->hostGroup);
 		$this->wait();
-		$this->input_type('name', $this->hostgroup.'2');
+
+		$this->input_type('name', $this->hostGroup.' 2');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group updated');
 	}
 
 	public function testFormHostGroup_Delete() {
-		$this->chooseOkOnNextConfirmation();
-
 		$this->login('hostgroups.php');
-		$this->click('link='.$this->hostgroup.'2');
+		$this->click('link='.$this->hostGroup.' 2');
 		$this->wait();
-		$this->button_click('delete');
+
+		$this->chooseOkOnNextConfirmation();
+		$this->click('delete');
+		$this->waitForConfirmation();
 		$this->wait();
-		$this->getConfirmation();
 		$this->ok('Group deleted');
 	}
 }

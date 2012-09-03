@@ -207,7 +207,6 @@ if (isset($_REQUEST['form'])) {
 	$data['form'] = get_request('form');
 	$data['form_refresh'] = get_request('form_refresh', 0);
 	$data['groupid'] = get_request('groupid', 0);
-	$data['hostid'] = get_request('hostid', 0);
 
 	if (!empty($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
 		$db_application = DBfetch(DBselect('SELECT s.name,s.hostid FROM applications s WHERE s.applicationid='.$data['applicationid']));
@@ -218,6 +217,9 @@ if (isset($_REQUEST['form'])) {
 		$data['appname'] = get_request('appname', '');
 		$data['apphostid'] = get_request('apphostid', get_request('hostid', 0));
 	}
+
+	// select the host for the navigation panel
+	$data['hostid'] = get_request('hostid') ? get_request('hostid') : $data['apphostid'];
 
 	// get application hostid
 	$db_host = get_host_by_hostid($data['apphostid'], 1);

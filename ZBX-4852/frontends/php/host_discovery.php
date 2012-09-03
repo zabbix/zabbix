@@ -247,7 +247,7 @@ elseif (($_REQUEST['go'] == 'activate' || ($_REQUEST['go'] == 'disable')) && iss
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
 	$go_result = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
-	show_messages($go_result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
+	show_messages($go_result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	$url = new CUrl();

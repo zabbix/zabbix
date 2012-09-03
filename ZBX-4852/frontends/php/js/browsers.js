@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf('opera') != -1) && window.opera;
 var IE = (agt.indexOf('msie') != -1) && document.all && !OP;
@@ -30,9 +32,7 @@ var KQ = (agt.indexOf('khtml') != -1) && !WK;
 var GK = (agt.indexOf('gecko') != -1) && !KQ && !WK;
 var MC = (agt.indexOf('mac') != -1);
 
-/*
- * Redirect outdated browser to warning page
- */
+// redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
 	if (IE6 || IE7) {
 		window.location.replace('browserwarning.php');

@@ -85,9 +85,9 @@ foreach ($data['discoveries'] as $discovery) {
 	$discoveryTable->addRow(array(
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
 		$description,
-		array(new CLink(_('Item prototypes'), 'disc_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
-		array(new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
-		array(new CLink(_('Graph prototypes'), 'graphs.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
+		array(new CLink(_('Item prototypes'), 'disc_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
+		array(new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
+		array(new CLink(_('Graph prototypes'), 'graphs.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
 		$discovery['key_'],
 		$discovery['delay'],
 		item_type2str($discovery['type']),
@@ -99,15 +99,15 @@ foreach ($data['discoveries'] as $discovery) {
 // create go buttons
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('activate', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected items?'));
+$goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected items?'));
+$goOption->setAttribute('confirm', _('Disable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected items?'));
+$goOption->setAttribute('confirm', _('Delete selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');

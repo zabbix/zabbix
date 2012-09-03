@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of working time');
@@ -39,13 +39,9 @@ check_fields($fields);
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	$configs = array(
-		'work_period' => get_request('work_period')
-	);
-	$result = update_config($configs);
+	$result = update_config(array('work_period' => get_request('work_period')));
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
-
 	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _s('Working time "%1$s".', get_request('work_period')));
 	}
@@ -90,4 +86,3 @@ $cnf_wdgt->addItem($workingTimeForm->render());
 $cnf_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

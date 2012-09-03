@@ -175,7 +175,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 				if (TYPE_INT == cfg[i].type)
 				{
-					if (FAIL == str2uint64(value, &var))
+					if (FAIL == str2uint64(value, "KMGT", &var))
 						goto incorrect_config;
 
 					if ((cfg[i].min && var < cfg[i].min) || (cfg[i].max && var > cfg[i].max))

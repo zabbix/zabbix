@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,28 +10,26 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
-?>
-<?php
+
 /**
- * Class containing methods for operations with Alerts
+ * Class containing methods for operations with Alerts.
  */
 class CAlert extends CZBXAPI {
 
 	protected $tableName = 'alerts';
-
 	protected $tableAlias = 'a';
 
 	/**
-	 * Get Alerts data
+	 * Get Alerts data.
 	 *
-	 * @param _array $options
+	 * @param array $options
 	 * @param array $options['itemids']
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
@@ -44,6 +42,7 @@ class CAlert extends CZBXAPI {
 	 * @param array $options['pattern']
 	 * @param array $options['limit']
 	 * @param array $options['order']
+	 *
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = array()) {
@@ -113,7 +112,7 @@ class CAlert extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
+		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -133,19 +132,19 @@ class CAlert extends CZBXAPI {
 			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sqlParts['where'][] = 'ug.userid='.$userid;
 			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS( '.
-										' SELECT ff.triggerid'.
-										' FROM functions ff,items ii'.
-										' WHERE ff.triggerid=e.objectid'.
-											' AND ff.itemid=ii.itemid'.
-											' AND EXISTS('.
-												' SELECT hgg.groupid'.
-												' FROM hosts_groups hgg,rights rr,users_groups gg'.
-												' WHERE hgg.hostid=ii.hostid'.
-													' AND rr.id=hgg.groupid'.
-													' AND rr.groupid=gg.usrgrpid'.
-													' AND gg.userid='.$userid.
-													' AND rr.permission<'.$permission.'))';
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				' SELECT ff.triggerid'.
+				' FROM functions ff,items ii'.
+				' WHERE ff.triggerid=e.objectid'.
+					' AND ff.itemid=ii.itemid'.
+					' AND EXISTS ('.
+						' SELECT hgg.groupid'.
+						' FROM hosts_groups hgg,rights rr,users_groups gg'.
+						' WHERE hgg.hostid=ii.hostid'.
+							' AND rr.id=hgg.groupid'.
+							' AND rr.groupid=gg.usrgrpid'.
+							' AND gg.userid='.$userid.
+							' AND rr.permission<'.$permission.'))';
 		}
 
 		// nodeids
@@ -268,7 +267,7 @@ class CAlert extends CZBXAPI {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT a.alertid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT a.alertid) AS rowscount');
 		}
 
 		// sorting
@@ -377,7 +376,7 @@ class CAlert extends CZBXAPI {
 		}
 
 		/*
-		 * Adding Objects
+		 * Adding objects
 		 */
 		$hosts = array();
 		$users = array();
@@ -385,22 +384,20 @@ class CAlert extends CZBXAPI {
 
 		// adding hosts
 		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
 				'hostids' => $hostids,
-				'preservekeys' => 1
-			);
-			$hosts = API::Host()->get($objParams);
+				'preservekeys' => true
+			));
 		}
 
 		// adding users
 		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+			$users = API::User()->get(array(
 				'output' => $options['selectUsers'],
 				'userids' => $userids,
-				'preservekeys' => 1
-			);
-			$users = API::User()->get($objParams);
+				'preservekeys' => true
+			));
 		}
 
 		// adding mediatypes
@@ -427,89 +424,7 @@ class CAlert extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
-
-/**
- * Add alerts
- *
- * @param _array $alerts multidimensional array with alerts data
- * @param array $alerts[0,...]['expression']
- * @param array $alerts[0,...]['description']
- * @param array $alerts[0,...]['type'] OPTIONAL
- * @param array $alerts[0,...]['priority'] OPTIONAL
- * @param array $alerts[0,...]['status'] OPTIONAL
- * @param array $alerts[0,...]['comments'] OPTIONAL
- * @param array $alerts[0,...]['url'] OPTIONAL
- * @return boolean
- */
-	public function create($alerts) {
-		$alerts = zbx_toArray($alerts);
-		$alertids = array();
-
-			foreach ($alerts as $anum => $alert) {
-				$alertDbFields = array(
-					'actionid'		=> null,
-					'eventid'		=> null,
-					'userid'		=> null,
-					'clock'			=> time(),
-					'mediatypeid'	=> 0,
-					'sendto'		=> null,
-					'subject'		=> '',
-					'message'		=> '',
-					'status'		=> ALERT_STATUS_NOT_SENT,
-					'retries'		=> 0,
-					'error'			=> '',
-					'nextcheck'		=> null,
-					'esc_step'		=> 0,
-					'alerttype'		=> ALERT_TYPE_MESSAGE
-				);
-
-				if (!check_db_fields($alertDbFields, $alert)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Alert');
-				}
-
-				$alertid = get_dbid('alerts', 'alertid');
-				$sql = 'INSERT INTO alerts '.
-						'(alertid, actionid, eventid, userid, mediatypeid, clock, sendto, subject, message, status, retries, error, nextcheck, esc_step, alerttype) '.
-						' VALUES ('.$alertid.','.$alert['actionid'].','.$alert['eventid'].','.$alert['userid'].','.$alert['mediatypeid'].','.
-									$alert['clock'].','.zbx_dbstr($alert['sendto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
-									$alert['status'].','.$alert['retries'].','.zbx_dbstr($alert['error']).','.$alert['nextcheck'].','.
-									$alert['esc_step'].','.$alert['alerttype'].' )';
-				if (!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-				$alertids[] = $alertid;
-			}
-
-			return array('alertids'=>$alertids);
-	}
-
-	/**
-	 * Delete alerts
-	 *
-	 * @param array $alertids
-	 * @return boolean
-	 */
-	public function delete($alertids) {
-		$delAlerts = $this->get(array(
-			'alertids' => zbx_objectValues($alerts, 'alertid'),
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		foreach ($alertids as $alertid) {
-			if (!isset($delAlerts[$alertid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		if (!DBexecute('DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
-
-		return array('alertids' => $alertids);
-	}
 }
-?>

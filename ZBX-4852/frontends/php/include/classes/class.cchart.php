@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CChart extends CGraphDraw {
 
@@ -473,7 +472,7 @@ class CChart extends CGraphDraw {
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY,
 					'color' => getSeverityColor($trigger['priority']),
-					'description' => _('Trigger').': '.expand_trigger_description_by_data($trigger),
+					'description' => _('Trigger').': '.CTriggerHelper::expandDescription($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
 				));
 				++$cnt;
@@ -2379,4 +2378,3 @@ class CChart extends CGraphDraw {
 		imageOut($this->im);
 	}
 }
-?>
