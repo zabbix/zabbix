@@ -396,7 +396,7 @@ BEGIN
 END$
 DELIMITER ;
 
-CALL zbx_convert_operations;
+CALL zbx_convert_operations();
 
 DROP TABLE t_operations;
 DROP TABLE t_opconditions;
