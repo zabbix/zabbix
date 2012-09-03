@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -587,7 +587,7 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 
 		$newItems = array();
-		foreach ($chdHosts as $hostid => $host) {
+		foreach ($chdHosts as $hostId => $host) {
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
 			// skip items not from parent templates of current host
@@ -599,12 +599,11 @@ abstract class CItemGeneral extends CZBXAPI {
 			}
 
 			// check existing items to decide insert or update
-			$exItems = $this->get(array(
+			$exItems = API::Item()->get(array(
 				'output' => array('itemid', 'type', 'key_', 'flags', 'templateid'),
-				'hostids' => $hostid,
-				'filter' => array('flags' => null),
+				'hostids' => $hostId,
 				'preservekeys' => true,
-				'nopermissions' => true,
+				'nopermissions' => true
 			));
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
