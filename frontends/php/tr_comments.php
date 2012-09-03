@@ -80,7 +80,7 @@ show_table_header(_('TRIGGER COMMENTS'));
 // if user has no permissions to edit comments, no "save" button for him
 $triggerEditable = API::Trigger()->get(array(
 	'editable' => true,
-	'trigegrids' => $_REQUEST['triggerid'],
+	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_SHORTEN
 ));
 $triggerEditable = !empty($triggerEditable);
