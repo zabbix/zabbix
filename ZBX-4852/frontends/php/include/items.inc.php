@@ -1005,16 +1005,13 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 	return $value;
 }
 
-/*
- * Purpose: check if current time is within given period
+/**
+ * Check if current time is within given period
  *
- * Parameters: period - [IN] time period in format [wd[-wd2],hh:mm-hh:mm]
- *             now    - [IN] timestamp for comparison
+ * @param array $period              time period format: "wd[-wd2],hh:mm-hh:mm"
+ * @param int $now                   current timestamp
  *
- * Return value: false - out of period, true - within the period
- *
- * Comments:
- *        !!! Don't forget sync code with C !!!
+ * @return bool                      true - within in a period, false - out of period
  */
 function checkTimePriod($period, $now) {
 	if (sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2) != 6) {
@@ -1050,29 +1047,14 @@ function getItemDelay($delay, $flexIntervals) {
 	return $minDelay;
 }
 
-/*
- * Function: getCurrentDelay
+/**
+ * Return delay value that is currently applicable
  *
- * Purpose: return delay value that is currently applicable
+ * @param int $delay                 default delay
+ * @param array $arrOfFlexIntervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
+ * @param int $now                   current timestamp
  *
- * Parameters: delay         - [IN] default delay
- *             flexIntervals - [IN] separated flexible intervals
- *
- *                                   +------------[;]<----------+
- *                                   |                          |
- *                                 ->+-[d/wd[-wd2],hh:mm-hh:mm]-+
- *
- *                                 d       - delay (0-n)
- *                                 wd, wd2 - day of week (1-7)
- *                                 hh      - hours (0-24)
- *                                 mm      - minutes (0-59)
- *
- *             now           - [IN] current time
- *
- * Return value: delay value - either default or minimum delay value
- *                             out of all applicable intervals
- *
- * Author: Alexander Vladishev
+ * @return int                       delay for a current timestamp
  */
 function getCurrentDelay($delay, array $arrOfFlexIntervals, $now) {
 	if (empty($arrOfFlexIntervals)) {
@@ -1097,27 +1079,14 @@ function getCurrentDelay($delay, array $arrOfFlexIntervals, $now) {
 	return $currentDelay == 0 ? SEC_PER_YEAR : $currentDelay;
 }
 
-/*
- * Function: getNextDelayInterval
+/**
+ * Return time of next flexible interval
  *
- * Purpose: return time of next flexible interval
+ * @param array $arrOfFlexIntervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
+ * @param int $now                   current timestamp
+ * @param int $nextInterval          timestamp of a next interval
  *
- * Parameters: flexIntervals - [IN] separated flexible intervals
- *
- *                                   +------------[;]<----------+
- *                                   |                          |
- *                                 ->+-[d/wd[-wd2],hh:mm-hh:mm]-+
- *
- *                                 d       - delay (0-n)
- *                                 wd, wd2 - day of week (1-7)
- *                                 hh      - hours (0-24)
- *                                 mm      - minutes (0-59)
- *
- *             now           - [IN] current time
- *
- * Return value: start of next interval
- *
- * Author: Alexei Vladishev, Alexander Vladishev
+ * @return bool                      false if no flexible intervals defined
  */
 function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 	if (empty($arrOfFlexIntervals)) {
@@ -1184,18 +1153,29 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 }
 
 /**
- * Calculate nextcheck timestamp for item
+ * Calculate nextcheck timestamp for an item
  *
- * @param $interfaceId
- * @param $itemId
- * @param $itemType
- * @param $delay
- * @param $flexIntervals
- * @param $now
+ * the parameter $flexIntervals accepts data in a format:
  *
- * @author Alexander Vladishev
+ *           +------------[;]<----------+
+ *           |                          |
+ *         ->+-[d/wd[-wd2],hh:mm-hh:mm]-+
+ *
+ *         d       - delay (0-n)
+ *         wd, wd2 - day of week (1-7)
+ *         hh      - hours (0-24)
+ *         mm      - minutes (0-59)
+ *
+ * @param string $interfaceid
+ * @param string $itemid
+ * @param int $itemType
+ * @param int $delay                 default delay
+ * @param string $flexIntervals      flexible intervals
+ * @param int $now                   current timestamp
+ *
+ * @return array
  */
-function calculateItemNextcheck($interfaceId, $itemId, $itemType, $delay, $flexIntervals, $now) {
+function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexIntervals, $now) {
 	if ($delay == 0) {
 		$delay = SEC_PER_YEAR;
 	}
@@ -1213,7 +1193,7 @@ function calculateItemNextcheck($interfaceId, $itemId, $itemType, $delay, $flexI
 		$tmax = $now + SEC_PER_YEAR;
 		$try = 0;
 
-		$shift = ($itemType == ITEM_TYPE_JMX) ? $interfaceId : $itemId;
+		$shift = ($itemType == ITEM_TYPE_JMX) ? $interfaceid : $itemid;
 
 		while ($t < $tmax) {
 			/* calculate 'nextcheck' value for the current interval */
