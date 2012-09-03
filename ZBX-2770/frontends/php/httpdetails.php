@@ -239,14 +239,14 @@ $graphsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get(
 $graphsWidget->addItem(SPACE);
 
 $graphTable = new CTableInfo();
-$graphTable->setAttribute('id', 'graph');
+$graphTable->attr('id', 'graph');
 
 $graphContainer = new CCol();
-$graphContainer->setAttribute('id', 'graph_1');
+$graphContainer->attr('id', 'graph_1');
 $graphTable->addRow(array(bold(_('Speed')), $graphContainer));
 
 $graphContainer = new CCol();
-$graphContainer->setAttribute('id', 'graph_2');
+$graphContainer->attr('id', 'graph_2');
 $graphTable->addRow(array(bold(_('Response time')), $graphContainer));
 
 $graphsWidget->addItem($graphTable);

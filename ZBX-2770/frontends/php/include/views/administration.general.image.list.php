@@ -48,7 +48,7 @@ foreach ($this->data['images'] as $number => $image) {
 	$name = new CLink($image['name'], 'adm.images.php?form=update'.'&imageid='.$image['imageid']);
 
 	$imgColumn = new CCol();
-	$imgColumn->setAttribute('align', 'center');
+	$imgColumn->attr('align', 'center');
 	$imgColumn->addItem(array($img, BR(), $name), 'center');
 
 	$imageRow->addItem($imgColumn);

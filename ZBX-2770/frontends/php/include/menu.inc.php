@@ -388,10 +388,10 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 
 		$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
-		$mmenu_entry->setAttribute('id', $label);
-		$mmenu_entry->addAction('onclick', 'javascript: redirect(\''.$menu_url.'\');');
-		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver(\''.$label.'\');');
-		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+		$mmenu_entry->attr('id', $label);
+		$mmenu_entry->onClick('redirect(\''.$menu_url.'\');');
+		$mmenu_entry->onMouseOver('MMenu.mouseOver(\''.$label.'\');');
+		$mmenu_entry->onMouseOut('MMenu.mouseOut();');
 		array_push($main_menu, $mmenu_entry);
 	}
 

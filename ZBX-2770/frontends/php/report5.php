@@ -145,7 +145,7 @@ foreach ($triggers as $trigger) {
 	$menus = "show_popup_menu(event,[['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
 	$hostSpan = new CSpan($trigger['hostname'], 'link_menu');
-	$hostSpan->setAttribute('onclick', $menus);
+	$hostSpan->attr('onclick', $menus);
 
 	$tr_conf_link = 'null';
 	if ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -154,7 +154,7 @@ foreach ($triggers as $trigger) {
 
 
 	$tr_desc = new CSpan($trigger['description'], 'link_menu');
-	$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
+	$tr_desc->onClick("create_mon_trigger_menu(event, ".
 			" [{'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$trigger['lastchange']."'},".$tr_conf_link."],".
 			zbx_jsvalue($trigger['items'], true).");");
 

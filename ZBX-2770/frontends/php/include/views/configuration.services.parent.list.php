@@ -50,7 +50,7 @@ $servicesParentTable->addRow(array(array($prefix, $description), _('Note'), '-')
 // others
 foreach ($this->data['db_pservices'] as $db_service) {
 	$description = new CSpan($db_service['name'], 'link');
-	$description->setAttribute('onclick', 'javascript:
+	$description->attr('onclick', 'javascript:
 		jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
 		jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
 		jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue($db_service['serviceid']).');
@@ -60,7 +60,7 @@ foreach ($this->data['db_pservices'] as $db_service) {
 	$servicesParentTable->addRow(array(array($prefix, $description), serviceAlgorythm($db_service['algorithm']), $db_service['trigger']));
 }
 $column = new CCol(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
-$column->setAttribute('style', 'text-align:right;');
+$column->attr('style', 'text-align:right;');
 $servicesParentTable->setFooter($column);
 
 // append table to form

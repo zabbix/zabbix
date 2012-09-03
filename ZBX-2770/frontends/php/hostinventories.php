@@ -126,7 +126,7 @@ else{
 			array(bold(_('Field:')), $inventoryFieldsComboBox),
 			array(
 				$exactComboBox,
-				new CTextBox('filter_field_value', $_REQUEST['filter_field_value'], 20)
+				new CTextBox('filter_field_value', $_REQUEST['filter_field_value'])
 			),
 		),
 	));
@@ -138,15 +138,15 @@ else{
 	$reset->useJQueryStyle();
 
 	$div_buttons = new CDiv(array($filter, SPACE, $reset));
-	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+	$div_buttons->attr('style', 'padding: 4px 0px;');
 
 	$footer_col = new CCol($div_buttons, 'controls');
 
 	$filter_table->addRow($footer_col);
 
 	$filter_form = new CForm('get');
-	$filter_form->setAttribute('name','zbx_filter');
-	$filter_form->setAttribute('id','zbx_filter');
+	$filter_form->attr('name','zbx_filter');
+	$filter_form->attr('id','zbx_filter');
 	$filter_form->addItem($filter_table);
 	$hostinvent_wdgt->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
 	$hostinvent_wdgt->addHeaderRowNumber();

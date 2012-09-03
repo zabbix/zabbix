@@ -137,7 +137,7 @@ if (empty($this->data['parent_discoveryid'])) {
 }
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected graphs?'));
+$goOption->attr('confirm', _('Delete selected graphs?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');

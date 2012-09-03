@@ -29,7 +29,7 @@ $form->addVar('regexpid', $this->data['regexpid']);
 
 // Expressions tab
 $exprTab = new CFormList('exprTab');
-$exprTab->addRow(_('Name'), new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, null, 128));
+$exprTab->addRow(_('Name'), new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, false, 128));
 
 $exprTable = new CTable(null, 'formElementTable formWideTable');
 $exprTable->attr('id', 'exprTable');

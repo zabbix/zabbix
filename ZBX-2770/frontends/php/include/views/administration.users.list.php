@@ -134,15 +134,15 @@ foreach ($this->data['users'] as $user) {
 $goComboBox = new CComboBox('go');
 
 $goOption = new CComboItem('unblock', _('Unblock selected'));
-$goOption->setAttribute('confirm', _('Unblock selected users?'));
+$goOption->attr('confirm', _('Unblock selected users?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected users?'));
+$goOption->attr('confirm', _('Delete selected users?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 
 // append table to form

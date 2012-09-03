@@ -48,7 +48,7 @@ foreach ($titles as $key => $title) {
 				continue;
 			}
 
-			$cbExist->setAttribute('onclick', 'if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
+			$cbExist->attr('onclick', 'if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
 		}
 	}
 

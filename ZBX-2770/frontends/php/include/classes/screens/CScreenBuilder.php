@@ -290,7 +290,7 @@ class CScreenBuilder {
 				'screenconf.php?config=0&form=update&screenid='.$this->screen['screenid']),
 				($this->mode == SCREEN_MODE_PREVIEW || $this->mode == SCREEN_MODE_SLIDESHOW) ? 'screen_view' : 'screen_edit'
 		);
-		$screenTable->setAttribute('id', 'iframe');
+		$screenTable->attr('id', 'iframe');
 
 		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
@@ -298,7 +298,7 @@ class CScreenBuilder {
 
 			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
 				$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
-				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
+				$icon->onClick('location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
 
 				array_push($newColumns, new CCol($icon));
 			}
@@ -313,7 +313,7 @@ class CScreenBuilder {
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
 				$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
-				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
+				$icon->onClick('location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
 
 				array_push($newColumns, new CCol($icon));
 			}
@@ -440,9 +440,9 @@ class CScreenBuilder {
 
 				if ($this->mode == SCREEN_MODE_EDIT && !$isEditForm) {
 					$item = new CDiv($item, 'draggable');
-					$item->setAttribute('id', 'position_'.$r.'_'.$c);
-					$item->setAttribute('data-xcoord', $c);
-					$item->setAttribute('data-ycoord', $r);
+					$item->attr('id', 'position_'.$r.'_'.$c);
+					$item->dataAttr('xcoord', $c);
+					$item->dataAttr('ycoord', $r);
 				}
 
 				// colspan/rowspan
@@ -466,7 +466,7 @@ class CScreenBuilder {
 					$removeRowLink = 'javascript: if (Confirm("'._('This screen-row is not empty. Delete it?').'")) {'.
 						' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'"; }';
 				}
-				$icon->addAction('onclick', $removeRowLink);
+				$icon->onClick($removeRowLink);
 				array_push($newColumns, new CCol($icon));
 			}
 			$screenTable->addRow(new CRow($newColumns));
@@ -475,7 +475,7 @@ class CScreenBuilder {
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
-			$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
+			$icon->onClick('location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
 			$newColumns = array(new CCol($icon));
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
@@ -487,7 +487,7 @@ class CScreenBuilder {
 				else {
 					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";';
 				}
-				$icon->addAction('onclick', $removeColumnLink);
+				$icon->onClick($removeColumnLink);
 
 				array_push($newColumns, new CCol($icon));
 			}

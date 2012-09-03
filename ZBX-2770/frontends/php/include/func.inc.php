@@ -1556,7 +1556,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 		}
 	}
 	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
-	$col->setAttribute('onclick', $script);
+	$col->attr('onclick', $script);
 
 	return $col;
 }

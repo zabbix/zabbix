@@ -127,27 +127,27 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 $goComboBox = new CComboBox('go');
 
 $goOption = new CComboItem('enable_status', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected groups?'));
+$goOption->attr('confirm', _('Enable selected groups?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable_status', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected groups?'));
+$goOption->attr('confirm', _('Disable selected groups?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('enable_debug', _('Enable DEBUG'));
-$goOption->setAttribute('confirm', _('Enable debug mode in selected groups?'));
+$goOption->attr('confirm', _('Enable debug mode in selected groups?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable_debug', _('Disable DEBUG'));
-$goOption->setAttribute('confirm', _('Disable debug mode in selected groups?'));
+$goOption->attr('confirm', _('Disable debug mode in selected groups?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected groups?'));
+$goOption->attr('confirm', _('Delete selected groups?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 // append table to form

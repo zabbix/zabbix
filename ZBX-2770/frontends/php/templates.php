@@ -596,16 +596,16 @@ else {
 	$goBox->addItem('export', _('Export selected'));
 
 	$goOption = new CComboItem('delete', _('Delete selected'));
-	$goOption->setAttribute('confirm', _('Delete selected templates?'));
+	$goOption->attr('confirm', _('Delete selected templates?'));
 	$goBox->addItem($goOption);
 
 	$goOption = new CComboItem('delete_and_clear', _('Delete selected with linked elements'));
-	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
+	$goOption->attr('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
 	$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
-	$goButton->setAttribute('id', 'goButton');
+	$goButton->attr('id', 'goButton');
 
 	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 

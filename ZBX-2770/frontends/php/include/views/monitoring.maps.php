@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/js/monitoring.maps.js.php';
 
 $mapWidget = new CWidget('hat_maps');
 $mapTable = new CTable(_('No maps defined.'), 'map map-container');
-$mapTable->setAttribute('style', 'margin-top: 4px;');
+$mapTable->attr('style', 'margin-top: 4px;');
 
 $icon = $fsIcon = null;
 

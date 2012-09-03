@@ -168,9 +168,9 @@ else {
 	if ($tree) {
 		// creates form for choosing a preset interval
 		$r_form = new CForm();
-		$r_form->setAttribute('class', 'nowrap');
+		$r_form->attr('class', 'nowrap');
 		$r_form->setMethod('get');
-		$r_form->setAttribute('name', 'period_choice');
+		$r_form->attr('name', 'period_choice');
 		$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$period_combo = new CComboBox('period', $period, 'javascript: submit();');

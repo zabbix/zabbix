@@ -103,6 +103,7 @@ class ZBase {
 		return array(
 			$this->rootDir.'/include/classes',
 			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',

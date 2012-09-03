@@ -67,7 +67,7 @@ if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) &
 			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
 			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
 		);
-		$option->setAttribute('data-interfacetype', $interface['type']);
+		$option->dataAttr('interfacetype', $interface['type']);
 		$interfaceGroups[$interface['type']]->addItem($option);
 	}
 	foreach ($interfaceGroups as $interfaceGroup) {
@@ -75,11 +75,11 @@ if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) &
 	}
 
 	$span = new CSpan(_('No interface found'), 'red');
-	$span->setAttribute('id', 'interface_not_defined');
-	$span->setAttribute('style', 'display: none;');
+	$span->attr('id', 'interface_not_defined');
+	$span->attr('style', 'display: none;');
 
 	$interfaceVisBox = new CVisibilityBox('interface_visible', get_request('interface_visible'), 'interfaceDiv', _('Original'));
-	$interfaceVisBox->setAttribute('data-multiple-interface-types', $this->data['multiple_interface_types']);
+	$interfaceVisBox->dataAttr('multiple-interface-types', $this->data['multiple_interface_types']);
 	$itemFormList->addRow(
 		array(_('Host interface'), SPACE, $interfaceVisBox),
 		new CDiv(array($interfacesComboBox, $span), null, 'interfaceDiv'),
@@ -266,8 +266,8 @@ $itemFormList->addRow(
 
 // append delay flex to form list
 $delayFlexTable = new CTable(_('No flexible intervals defined.'), 'formElementTable');
-$delayFlexTable->setAttribute('style', 'min-width: 310px;');
-$delayFlexTable->setAttribute('id', 'delayFlexTable');
+$delayFlexTable->attr('style', 'min-width: 310px;');
+$delayFlexTable->attr('id', 'delayFlexTable');
 $delayFlexTable->setHeader(array(_('Interval'), _('Period'), _('Action')));
 $i = 0;
 $this->data['maxReached'] = false;
@@ -283,7 +283,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		$delayFlex['period'],
 		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
 	));
-	$row->setAttribute('id', 'delayFlex_'.$i);
+	$row->attr('id', 'delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 
 	// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256
@@ -390,7 +390,7 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 	$valueMapsComboBox->addItem($valuemap['valuemapid'], get_node_name_by_elid($valuemap['valuemapid'], null, ': ').$valuemap['name']);
 }
 $valueMapLink = new CLink(_('show value mappings'), 'adm.valuemapping.php');
-$valueMapLink->setAttribute('target', '_blank');
+$valueMapLink->attr('target', '_blank');
 
 $itemFormList->addRow(
 	array(

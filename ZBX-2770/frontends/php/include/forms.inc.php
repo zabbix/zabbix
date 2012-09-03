@@ -171,9 +171,9 @@
 			$lists['node']['read_only']	= new CListBox('nodes_read', null, 10);
 			$lists['node']['deny']		= new CListBox('nodes_deny', null, 10);
 
-			$lists['node']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-			$lists['node']['deny']->setAttribute('style', 'background: #EBEFF2;');
+			$lists['node']['read_write']->attr('style', 'background: #EBEFF2;');
+			$lists['node']['read_only']->attr('style', 'background: #EBEFF2;');
+			$lists['node']['deny']->attr('style', 'background: #EBEFF2;');
 
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 			foreach ($nodes as $node) {
@@ -198,9 +198,9 @@
 		$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
 		$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
-		$lists['group']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['group']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['group']['deny']->setAttribute('style', 'background: #EBEFF2;');
+		$lists['group']['read_write']->attr('style', 'background: #EBEFF2;');
+		$lists['group']['read_only']->attr('style', 'background: #EBEFF2;');
+		$lists['group']['deny']->attr('style', 'background: #EBEFF2;');
 
 		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
@@ -225,9 +225,9 @@
 		$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
 		$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
 
-		$lists['host']['read_write']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['host']['read_only']->setAttribute('style', 'background: #EBEFF2;');
-		$lists['host']['deny']->setAttribute('style', 'background: #EBEFF2;');
+		$lists['host']['read_write']->attr('style', 'background: #EBEFF2;');
+		$lists['host']['read_only']->attr('style', 'background: #EBEFF2;');
+		$lists['host']['deny']->attr('style', 'background: #EBEFF2;');
 
 		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
@@ -350,8 +350,8 @@
 		$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
 		$form = new CForm('get');
-		$form->setAttribute('name', 'zbx_filter');
-		$form->setAttribute('id', 'zbx_filter');
+		$form->attr('name', 'zbx_filter');
+		$form->attr('id', 'zbx_filter');
 		$form->addVar('filter_hostid', get_request('filter_hostid', get_request('hostid', 0)));
 		$form->addVar('subfilter_hosts', $subfilter_hosts);
 		$form->addVar('subfilter_apps', $subfilter_apps);
@@ -367,7 +367,7 @@
 		// type select
 		$fTypeVisibility = array();
 		$cmbType = new CComboBox('filter_type', $filter_type);
-		$cmbType->setAttribute('id', 'filter_type');
+		$cmbType->attr('id', 'filter_type');
 		$cmbType->addItem(-1, _('all'));
 		foreach (array('filter_delay_label', 'filter_delay') as $vItem) {
 			zbx_subarray_push($fTypeVisibility, -1, $vItem);
@@ -433,19 +433,19 @@
 
 		// update interval
 		$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').': '));
-		$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
+		$updateIntervalLabel->attr('id', 'filter_delay_label');
 
 		$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
-		$updateIntervalInput->setEnabled('no');
+		$updateIntervalInput->setEnabled(false);
 
 		// data type
 		$dataTypeLabel = new CSpan(bold(_('Data type').': '));
-		$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
+		$dataTypeLabel->attr('id', 'filter_data_type_label');
 
 		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);;
 		$dataTypeInput->addItem(-1, _('all'));
 		$dataTypeInput->addItems(item_data_type2str());
-		$dataTypeInput->setEnabled('no');
+		$dataTypeInput->setEnabled(false);
 
 		// filter table
 		$table = new CTable('', 'filter');
@@ -454,31 +454,31 @@
 
 		// SNMP community
 		$snmpCommunityLabel = new CSpan(array(bold(_('SNMP community')), SPACE._('like').': '));
-		$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
+		$snmpCommunityLabel->attr('id', 'filter_snmp_community_label');
 
 		$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
-		$snmpCommunityField->setEnabled('no');
+		$snmpCommunityField->setEnabled(false);
 
 		// SNMPv3 security name
 		$snmpSecurityLabel = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
-		$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
+		$snmpSecurityLabel->attr('id', 'filter_snmpv3_securityname_label');
 
 		$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
-		$snmpSecurityField->setEnabled('no');
+		$snmpSecurityField->setEnabled(false);
 
 		// SNMP OID
 		$snmpOidLabel = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').': '));
-		$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
+		$snmpOidLabel->attr('id', 'filter_snmp_oid_label');
 
 		$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
-		$snmpOidField->setEnabled('no');
+		$snmpOidField->setEnabled(false);
 
 		// port
 		$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').': '));
-		$portLabel->setAttribute('id', 'filter_port_label');
+		$portLabel->attr('id', 'filter_port_label');
 
 		$portField = new CNumericBox('filter_port', $filter_port, 5, null, true);
-		$portField->setEnabled('no');
+		$portField->setEnabled(false);
 
 		// row 1
 		$table->addRow(array(
@@ -574,7 +574,7 @@
 		$filter->useJQueryStyle('main');
 
 		$div_buttons = new CDiv(array($filter, SPACE, $reset));
-		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+		$div_buttons->attr('style', 'padding: 4px 0px;');
 
 		$footer = new CCol($div_buttons, 'controls', 8);
 
@@ -1343,7 +1343,7 @@
 				$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
 				$data['expression_macro_button'] = new CButton('insert_macro', _('Insert macro'), 'return call_ins_macro_menu(event);', 'formlist');
 				if ($data['limited'] == 'yes') {
-					$data['expression_macro_button']->setAttribute('disabled', 'disabled');
+					$data['expression_macro_button']->setEnabled(false);
 				}
 			}
 			else {
@@ -1608,7 +1608,7 @@
 			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
 			$clndr_icon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
-			$clndr_icon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_timeperiod_date"].clndr.clndrshow(pos.top, pos.left);');
+			$clndr_icon->onClick('var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_timeperiod_date"].clndr.clndrshow(pos.top, pos.left);');
 			$start_date = zbxDateToTime($new_timeperiod['start_date']);
 
 			$tblPeriod->addRow(array(_('Date'), array(

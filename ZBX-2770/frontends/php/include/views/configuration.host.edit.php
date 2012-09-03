@@ -166,11 +166,11 @@ if ($_REQUEST['groupid'] > 0) {
 }
 
 $hostTB = new CTextBox('host', $host, ZBX_TEXTBOX_STANDARD_SIZE);
-$hostTB->setAttribute('maxlength', 64);
+$hostTB->attr('maxlength', 64);
 $hostList->addRow(_('Host name'), $hostTB);
 
 $visiblenameTB = new CTextBox('visiblename', $visiblename, ZBX_TEXTBOX_STANDARD_SIZE);
-$visiblenameTB->setAttribute('maxlength', 64);
+$visiblenameTB->attr('maxlength', 64);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 $grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
@@ -187,11 +187,11 @@ $hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
 global $USER_DETAILS;
 $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
-$newgroupTB->setAttribute('maxlength', 64);
+$newgroupTB->attr('maxlength', 64);
 $tmp_label = _('New host group');
 if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only superadmins can create group)');
-	$newgroupTB->setReadonly(true);
+	$newgroupTB->setReadOnly(true);
 }
 $hostList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
 
@@ -207,8 +207,8 @@ zbx_add_post_js($script);
 
 // table for agent interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
-$ifTab->setAttribute('id', 'agentInterfaces');
-$ifTab->setAttribute('data-type', 'agent');
+$ifTab->attr('id', 'agentInterfaces');
+$ifTab->dataAttr('type', 'agent');
 
 // headers with sizes
 $iconLabel = new CCol(SPACE, 'interface-drag-control');
@@ -224,9 +224,9 @@ $helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of t
 $helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
 $col = new CCol($helpTextWhenDragInterfaceAgent);
-$col->setAttribute('colspan', 6);
+$col->attr('colspan', 6);
 $buttonRow = new CRow(array($buttonCol, $col));
-$buttonRow->setAttribute('id', 'agentIterfacesFooter');
+$buttonRow->attr('id', 'agentIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
@@ -234,16 +234,16 @@ $hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectg
 
 // table for SNMP interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
-$ifTab->setAttribute('id', 'SNMPInterfaces');
-$ifTab->setAttribute('data-type', 'snmp');
+$ifTab->attr('id', 'SNMPInterfaces');
+$ifTab->dataAttr('type', 'snmp');
 
 $helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
 $helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
 $col = new CCol($helpTextWhenDragInterfaceSNMP);
-$col->setAttribute('colspan', 6);
+$col->attr('colspan', 6);
 $buttonRow = new CRow(array($buttonCol, $col));
-$buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
+$buttonRow->attr('id', 'SNMPIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
@@ -251,30 +251,30 @@ $hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgr
 
 // table for JMX interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
-$ifTab->setAttribute('id', 'JMXInterfaces');
-$ifTab->setAttribute('data-type', 'jmx');
+$ifTab->attr('id', 'JMXInterfaces');
+$ifTab->dataAttr('type', 'jmx');
 $helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 $helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
 $col = new CCol($helpTextWhenDragInterfaceJMX);
-$col->setAttribute('colspan', 6);
+$col->attr('colspan', 6);
 $buttonRow = new CRow(array($buttonCol, $col));
-$buttonRow->setAttribute('id', 'JMXIterfacesFooter');
+$buttonRow->attr('id', 'JMXIterfacesFooter');
 $ifTab->addRow($buttonRow);
 
 $hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
 // table for IPMI interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
-$ifTab->setAttribute('id', 'IPMIInterfaces');
-$ifTab->setAttribute('data-type', 'ipmi');
+$ifTab->attr('id', 'IPMIInterfaces');
+$ifTab->dataAttr('type', 'ipmi');
 $helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 $helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
 $col = new CCol($helpTextWhenDragInterfaceIPMI);
-$col->setAttribute('colspan', 6);
+$col->attr('colspan', 6);
 $buttonRow = new CRow(array($buttonCol, $col));
-$buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
+$buttonRow->attr('id', 'IPMIIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 $hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
@@ -313,7 +313,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($applicationsList);
 
 		$listBox = new CListBox('applications', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($applicationsList);
 		$hostList->addRow(_('Applications'), $listBox);
 	}
@@ -333,7 +333,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($itemsList);
 
 		$listBox = new CListBox('items', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($itemsList);
 		$hostList->addRow(_('Items'), $listBox);
 	}
@@ -364,7 +364,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 			order_result($triggersList);
 
 			$listBox = new CListBox('triggers', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->attr('disabled', 'disabled');
 			$listBox->addItems($triggersList);
 			$hostList->addRow(_('Triggers'), $listBox);
 		}
@@ -395,7 +395,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 			order_result($graphsList);
 
 			$listBox = new CListBox('graphs', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->attr('disabled', 'disabled');
 			$listBox->addItems($graphsList);
 			$hostList->addRow(_('Graphs'), $listBox);
 		}
@@ -418,7 +418,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
 
 		$listBox = new CListBox('discoveryRules', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($discoveryRuleList);
 		$hostList->addRow(_('Discovery rules'), $listBox);
 	}
@@ -438,7 +438,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($prototypeList);
 
 		$listBox = new CListBox('itemsPrototypes', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($prototypeList);
 		$hostList->addRow(_('Item prototypes'), $listBox);
 	}
@@ -465,7 +465,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 			order_result($prototypeList);
 
 			$listBox = new CListBox('triggerprototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->attr('disabled', 'disabled');
 			$listBox->addItems($prototypeList);
 			$hostList->addRow(_('Trigger prototypes'), $listBox);
 		}
@@ -489,7 +489,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($prototypeList);
 
 		$listBox = new CListBox('graphPrototypes', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($prototypeList);
 		$hostList->addRow(_('Graph prototypes'), $listBox);
 	}
@@ -529,13 +529,13 @@ $ipmiList = new CFormList('ipmilist');
 
 $cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
 $cmbIPMIAuthtype->addItems(ipmiAuthTypes());
-$cmbIPMIAuthtype->setAttribute('size', 7);
+$cmbIPMIAuthtype->attr('size', 7);
 $cmbIPMIAuthtype->addStyle('width: 170px;');
 $ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
 
 $cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
 $cmbIPMIPrivilege->addItems(ipmiPrivileges());
-$cmbIPMIPrivilege->setAttribute('size', 5);
+$cmbIPMIPrivilege->attr('size', 5);
 $cmbIPMIPrivilege->addStyle('width: 170px;');
 $ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
 $ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $ipmi_username, ZBX_TEXTBOX_SMALL_SIZE));
@@ -590,23 +590,23 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	else {
 		$fieldLength = $hostInventoryTable['fields'][$inventoryInfo['db_field']]['length'];
 		$input = new CTextBox('host_inventory['.$inventoryInfo['db_field'].']', $host_inventory[$inventoryInfo['db_field']]);
-		$input->setAttribute('maxlength', $fieldLength);
+		$input->attr('maxlength', $fieldLength);
 		$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
 	}
 	if ($inventory_mode == HOST_INVENTORY_DISABLED) {
-		$input->setAttribute('disabled', 'disabled');
+		$input->attr('disabled', 'disabled');
 	}
 
 	// link to populating item at the right side (if any)
 	if (isset($hostItemsToInventory[$inventoryNo])) {
 		$itemName = itemName($hostItemsToInventory[$inventoryNo]);
 		$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToInventory[$inventoryNo]['itemid']);
-		$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s".', $itemName));
+		$populatingLink->attr('title', _s('This field is automatically populated by item "%s".', $itemName));
 		$populatingItemCell = array(' &larr; ', $populatingLink);
 
 		$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
 		if ($inventory_mode == HOST_INVENTORY_AUTOMATIC) {
-			$input->setAttribute('disabled', 'disabled');
+			$input->attr('disabled', 'disabled');
 		}
 	}
 	else {

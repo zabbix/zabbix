@@ -81,7 +81,7 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 		$actionLinks = '-';
 	}
 	$actionColumn = new CCol($actionLinks);
-	$actionColumn->setAttribute('style', 'white-space: normal;');
+	$actionColumn->attr('style', 'white-space: normal;');
 
 	$statusLink = 'media_types.php?go='.(($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
 		'&mediatypeids'.SQUAREBRACKETS.'='.$mediatype['mediatypeid'];
@@ -107,19 +107,19 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 // create go button
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('activate', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected media types?'));
+$goOption->attr('confirm', _('Enable selected media types?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected media types?'));
+$goOption->attr('confirm', _('Disable selected media types?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected media types?'));
+$goOption->attr('confirm', _('Delete selected media types?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "mediatypeids";');
 
 // append table to form

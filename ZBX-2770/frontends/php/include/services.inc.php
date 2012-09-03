@@ -102,7 +102,7 @@ function get_service_childs($serviceid, $soft = 0) {
 function createServiceConfigurationTree(array $services, &$tree, array $parentService = array(), array $service = array(), array $dependency = array()) {
 	if (!$service) {
 		$caption = new CLink(_('root'), '#', 'service-conf-menu');
-		$caption->setAttribute('data-menu', array(
+		$caption->dataAttr('menu', array(
 			'serviceid' => 0,
 			'name' => _('root'),
 			'hasDependencies' => true
@@ -148,7 +148,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 			}
 		}
 
-		$caption->setAttribute('data-menu', array(
+		$caption->dataAttr('menu', array(
 			'serviceid' => $service['serviceid'],
 			'name' => $service['name'],
 			'deletable' => $deletable
@@ -282,12 +282,12 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			$chart1 = null;
 			if ($widthGreen > 0) {
 				$chart1 = new CDiv(null, 'sla-bar-part sla-green');
-				$chart1->setAttribute('style', 'width: '.$widthGreen.'px;');
+				$chart1->attr('style', 'width: '.$widthGreen.'px;');
 			}
 			$chart2 = null;
 			if ($widthRed > 0) {
 				$chart2 = new CDiv(null, 'sla-bar-part sla-red');
-				$chart2->setAttribute('style', 'width: '.$widthRed.'px;');
+				$chart2->attr('style', 'width: '.$widthRed.'px;');
 			}
 			$bar = new CLink(array(
 				$chart1,
@@ -296,7 +296,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				new CDiv('100%', 'sla-bar-legend sla-bar-legend-end')
 			), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
 			$bar = new CDiv($bar, 'sla-bar');
-			$bar->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
+			$bar->attr('title', _s('Only the last 20%% of the indicator is displayed.'));
 
 			$slaBar = array(
 				$bar,

@@ -125,7 +125,7 @@ function getActionMapBySysmap($sysmap) {
 			$menuData['hasScreens'] = (bool) $host['screens'];
 			$menuData['isMonitored'] = $hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED;
 		}
-		$area->setAttribute('data-menu', $menuData);
+		$area->dataAttr('menu', $menuData);
 
 		$action_map->addItem($area);
 	}

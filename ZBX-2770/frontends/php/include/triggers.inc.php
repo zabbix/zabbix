@@ -353,7 +353,7 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 		$timeSinceLastChange = time() - $triggerLastChange;
 		if ($blinks && $timeSinceLastChange < $config['blink_period']) {
 			$object->addClass('blink'); // elements with this class will blink
-			$object->setAttribute('data-time-to-blink', $config['blink_period'] - $timeSinceLastChange);
+			$object->dataAttr('time-to-blink', $config['blink_period'] - $timeSinceLastChange);
 		}
 	}
 	else {
@@ -1365,7 +1365,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 
 			// host js link
 			$hostSpan = new CSpan(nbsp($hostName), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array()));
+			$hostSpan->dataAttr('menu', hostMenuData($host, ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array()));
 
 			$tableColumns = array($hostSpan);
 			foreach ($triggers as $triggerHosts) {
@@ -1506,7 +1506,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		$triggerid = !empty($triggerHosts[$hostName]['triggerid']) ? $triggerHosts[$hostName]['triggerid'] : 0;
 
 		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
+		$dep_table->attr('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Depends on').':'));
 
 		$dependency = false;
@@ -1518,7 +1518,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
-			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
+			$img->attr('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
@@ -1526,7 +1526,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 
 		// triggers that depend on this
 		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
+		$dep_table->attr('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
 
 		$dependency = false;
@@ -1538,7 +1538,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
-			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
+			$img->attr('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
@@ -1552,14 +1552,14 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		$tableColumn = new CCol(SPACE, $css_class.' hosts');
 	}
 	if (isset($style)) {
-		$tableColumn->setAttribute('style', $style);
+		$tableColumn->attr('style', $style);
 	}
 
 	if (isset($tr_ov_menu)) {
 		$tr_ov_menu = new CPUMenu($tr_ov_menu, 170);
 		$tableColumn->onClick($tr_ov_menu->getOnActionJS());
-		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: "1px dotted #0C0CF0", padding: "0 2px"})');
-		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: "", padding: "1px 3px"})');
+		$tableColumn->onMouseOver('jQuery(this).css({border: "1px dotted #0C0CF0", padding: "0 2px"})');
+		$tableColumn->onMouseOut('jQuery(this).css({border: "", padding: "1px 3px"})');
 	}
 
 	return $tableColumn;
@@ -1773,7 +1773,7 @@ function make_trigger_details($trigger) {
 	// host js link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->attr('data-menu', hostMenuData($host, $scripts));
+	$hostSpan->dataAttr('menu', hostMenuData($host, $scripts));
 
 	// get visible name of the first host
 	$table->addRow(array(_('Host'), $hostSpan));
@@ -2017,8 +2017,8 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 		$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum'] - $treeLevel['openSymbolNum'] + 1));
 		if (!defined('NO_LINK_IN_TESTING')) {
 			$url =  new CSpan($expValue, 'link');
-			$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
-			$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
+			$url->attr('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
+			$url->attr('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
 		}
 		else {
 			$url = new CSpan($expValue);

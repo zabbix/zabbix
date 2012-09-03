@@ -34,7 +34,7 @@ $headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
 $overviewWidget->addHeader(_('Overview'), $headerForm);
 
 $hintTable = new CTableInfo();
-$hintTable->setAttribute('style', 'width: 200px');
+$hintTable->attr('style', 'width: 200px');
 
 if ($this->data['type'] == SHOW_TRIGGERS) {
 	$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('Disabled')));
@@ -51,7 +51,7 @@ if ($this->data['type'] == SHOW_TRIGGERS) {
 	$config = select_config();
 	if ($config['blink_period'] > 0) {
 		$col = new CCol(SPACE, 'not_classified');
-		$col->setAttribute('style', 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;');
+		$col->attr('style', 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;');
 		$hintTable->addRow(array($col, _s('Age less than %s', convertUnitsS($config['blink_period']))));
 	}
 

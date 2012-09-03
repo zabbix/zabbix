@@ -51,7 +51,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // test data (create table, create check fields)
 
 	$data_table = new CTable(null, 'tableinfo');
-	$data_table->setAttribute('id', 'data_list');
+	$data_table->attr('id', 'data_list');
 
 	$data_table->setHeader(array(_('Expression Variable Elements'), _('Result type'), _('Value')));
 
@@ -87,7 +87,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
 
 			if(!is_array($info) && isset($definedErrorPhrases[$info])) {
-				$control->setAttribute('disabled', 'disabled');
+				$control->attr('disabled', 'disabled');
 				$allowedTesting = false;
 			}
 
@@ -123,7 +123,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 /* result */
 	$res_table = new CTable(null, 'tableinfo');
-	$res_table->setAttribute('id', 'result_list');
+	$res_table->attr('id', 'result_list');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
 	$res_table->setHeader(array(_('Expression'), _('Result')));
@@ -141,7 +141,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$style = ($result == 'TRUE') ? 'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
 
 		$col = new CCol($result);
-		$col->setAttribute('style', $style);
+		$col->attr('style', $style);
 		$res_table->addRow(new CRow(array($e['list'], $col)));
 	}
 
@@ -155,14 +155,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$style = ($result == 'TRUE') ? 'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
 
 	$col = new CCol($result);
-	$col->setAttribute('style', $style);
+	$col->attr('style', $style);
 	$res_table->setFooter(array($outline, $col), $res_table->headerClass);
 
 	$frm_test->addRow(_('Result'), $res_table);
 
 // action buttons
 	$btn_test = new CSubmit('test_expression', _('Test'));
-	if(!$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
+	if(!$allowedTesting) $btn_test->attr('disabled', 'disabled');
 	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);
 

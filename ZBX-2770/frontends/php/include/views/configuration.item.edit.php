@@ -80,7 +80,7 @@ $itemFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_T
 if ($this->data['limited']) {
 	$itemForm->addVar('type', $this->data['type']);
 	$itemFormList->addRow(_('Type'),
-		new CTextBox('typename', item_type2str($this->data['type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
+		new CTextBox('typename', item_type2str($this->data['type']), ZBX_TEXTBOX_STANDARD_SIZE, true)
 	);
 }
 else {
@@ -117,7 +117,7 @@ if (!empty($this->data['interfaces'])) {
 			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
 			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
 		);
-		$option->setAttribute('data-interfacetype', $interface['type']);
+		$option->dataAttr('interfacetype', $interface['type']);
 		$interfaceGroups[$interface['type']]->addItem($option);
 	}
 	foreach ($interfaceGroups as $interfaceGroup) {
@@ -125,8 +125,8 @@ if (!empty($this->data['interfaces'])) {
 	}
 
 	$span = new CSpan(_('No interface found'), 'red');
-	$span->setAttribute('id', 'interface_not_defined');
-	$span->setAttribute('style', 'display: none;');
+	$span->attr('id', 'interface_not_defined');
+	$span->attr('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), array($interfacesComboBox, $span), false, 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
@@ -136,11 +136,11 @@ $itemFormList->addRow(_('SNMP OID'),
 	false, 'row_snmp_oid'
 );
 $itemFormList->addRow(_('SNMP community'),
-	new CTextBox('snmp_community', $this->data['snmp_community'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmp_community', $this->data['snmp_community'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmp_community'
 );
 $itemFormList->addRow(_('SNMPv3 security name'),
-	new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmpv3_securityname'
 );
 
@@ -151,15 +151,15 @@ $securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPri
 $securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
 $itemFormList->addRow(_('SNMPv3 security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
 $itemFormList->addRow(_('SNMPv3 auth passphrase'),
-	new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmpv3_authpassphrase'
 );
 $itemFormList->addRow(_('SNMPv3 priv passphrase'),
-	new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmpv3_privpassphrase'
 );
 $itemFormList->addRow(_('Port'),
-	new CTextBox('port', $this->data['port'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_port'
+	new CTextBox('port', $this->data['port'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_port'
 );
 $itemFormList->addRow(_('IPMI sensor'),
 	new CTextBox('ipmi_sensor', $this->data['ipmi_sensor'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited'], 128),
@@ -172,16 +172,16 @@ $authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
 $authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, false, 'row_authtype');
 $itemFormList->addRow(_('User name'),
-	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_username'
+	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_username'
 );
 $itemFormList->addRow(_('Public key file'),
-	new CTextBox('publickey', $this->data['publickey'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_publickey'
+	new CTextBox('publickey', $this->data['publickey'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_publickey'
 );
 $itemFormList->addRow(_('Private key file'),
-	new CTextBox('privatekey', $this->data['privatekey'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false,  'row_privatekey'
+	new CTextBox('privatekey', $this->data['privatekey'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false,  'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
-	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_password'
+	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
 	new CTextArea('params_es', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
@@ -240,13 +240,13 @@ if (!$this->data['is_discovery_rule']) {
 		$itemForm->addVar('multiplier', $this->data['multiplier']);
 
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes':'no');
-		$multiplierCheckBox->setAttribute('disabled', 'disabled');
-		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
+		$multiplierCheckBox->attr('disabled', 'disabled');
+		$multiplierCheckBox->attr('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
 		if ($this->data['multiplier']) {
 			$multiplier[] = SPACE;
 			$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, 1);
-			$formulaTextBox->setAttribute('style', 'text-align: right;');
+			$formulaTextBox->attr('style', 'text-align: right;');
 			$multiplier[] = $formulaTextBox;
 		}
 	}
@@ -254,11 +254,11 @@ if (!$this->data['is_discovery_rule']) {
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
 			'var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }', 1
 		);
-		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
+		$multiplierCheckBox->attr('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
 		$multiplier[] = SPACE;
 		$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
-		$formulaTextBox->setAttribute('style', 'text-align: right;');
+		$formulaTextBox->attr('style', 'text-align: right;');
 		$multiplier[] = $formulaTextBox;
 	}
 	$itemFormList->addRow(_('Use custom multiplier'), $multiplier, false, 'row_multiplier');
@@ -267,8 +267,8 @@ $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $t
 
 // append delay flex to form list
 $delayFlexTable = new CTable(_('No flexible intervals defined.'), 'formElementTable');
-$delayFlexTable->setAttribute('style', 'min-width: 310px;');
-$delayFlexTable->setAttribute('id', 'delayFlexTable');
+$delayFlexTable->attr('style', 'min-width: 310px;');
+$delayFlexTable->attr('id', 'delayFlexTable');
 $delayFlexTable->setHeader(array(_('Interval'), _('Period'), _('Action')));
 $i = 0;
 $this->data['maxReached'] = false;
@@ -284,7 +284,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		$delayFlex['period'],
 		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
 	));
-	$row->setAttribute('id', 'delayFlex_'.$i);
+	$row->attr('id', 'delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 
 	// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256
@@ -376,7 +376,7 @@ else {
 		}
 	}
 	$link = new CLink(_('show value mappings'), 'adm.valuemapping.php');
-	$link->setAttribute('target', '_blank');
+	$link->attr('target', '_blank');
 	$itemFormList->addRow(_('Show value'), array($valuemapComboBox, SPACE, $link), null, 'row_valuemap');
 	$itemFormList->addRow(_('Allowed hosts'),
 		new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),

@@ -134,7 +134,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		if (is_numeric($this->data['percent_left'])) {
 			$this->data['percent_left'] = sprintf('%2.2f', $this->data['percent_left']);
 		}
-		$percentLeftTextBox = new CTextBox('percent_left', $this->data['percent_left'], 5, 'no', 6);
+		$percentLeftTextBox = new CTextBox('percent_left', $this->data['percent_left'], 5, false, 6);
 		$percentLeftCheckbox = new CCheckBox('visible[percent_left]', 1, 'javascript: showHideVisible("percent_left");', 1);
 
 		if (strcmp($this->data['percent_left'], '0.00') == 0) {
@@ -146,7 +146,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		if (is_numeric($this->data['percent_right'])) {
 			$this->data['percent_right'] = sprintf('%2.2f', $this->data['percent_right']);
 		}
-		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 5, 'no', 6);
+		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 5, false, 6);
 		$percentRightCheckbox = new CCheckBox('visible[percent_right]', 1, 'javascript: showHideVisible("percent_right");', 1);
 
 		if (strcmp($this->data['percent_right'], '0.00') == 0) {
@@ -179,7 +179,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				$ymin_name = $min_host['name'].': '.itemName($min_item);
 			}
 
-			$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, 'yes');
+			$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, true);
 			$yaxisMinData[] = new CButton('yaxis_min', _('Select'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&dstfld1=ymin_itemid'.
@@ -237,7 +237,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		if (!empty($this->data['items'])) {
-			$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, 'yes');
+			$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, true);
 			$yaxisMaxData[] = new CButton('yaxis_max', _('Select'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&dstfld1=ymax_itemid'.

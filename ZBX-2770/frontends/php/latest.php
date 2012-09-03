@@ -130,10 +130,10 @@ $latest_wdgt->addHeader(_('Items'), $r_form);
 /************************* FILTER **************************/
 /***********************************************************/
 $filterForm = new CFormTable(null, null, 'get');
-$filterForm->setAttribute('name','zbx_filter');
-$filterForm->setAttribute('id','zbx_filter');
+$filterForm->attr('name','zbx_filter');
+$filterForm->attr('id','zbx_filter');
 
-$filterForm->addRow(_('Show items with name like'), new CTextBox('select',$_REQUEST['select'],20));
+$filterForm->addRow(_('Show items with name like'), new CTextBox('select',$_REQUEST['select']));
 $filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $_REQUEST['show_without_data'], null, 1));
 
 $reset = new CButton("filter_rst", _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
@@ -380,7 +380,7 @@ foreach ($db_apps as $appid => $db_app) {
 	// host JS menu link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	$hostSpan->dataAttr('menu', hostMenuData($host, $scripts));
 
 	$table->addRow(array(
 		$link,
@@ -553,7 +553,7 @@ foreach ($db_hosts as $hostid => $db_host) {
 	// host JS menu link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	$hostSpan->dataAttr('menu', hostMenuData($host, $scripts));
 
 	$table->addRow(array(
 		$link,

@@ -69,7 +69,7 @@ check_fields($fields);
 	show_table_header(permission2str($permission),$frmTitle);
 
 	$form = new CForm();
-	$form->setAttribute('id', 'groups');
+	$form->attr('id', 'groups');
 
 	$table = new CTableInfo(_('No resources defined.'));
 	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),_('Name'))));

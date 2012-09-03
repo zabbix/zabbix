@@ -114,7 +114,7 @@ require_once 'include/page_header.php';
 		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
 			_('Caption')), new CTextBox('caption',$caption,32));
 
-		$txtCondVal = new CTextBox('name',$caption,50,'yes');
+		$txtCondVal = new CTextBox('name',$caption,50,true);
 
 		$btnSelect = new CSubmit('btn1',_('Select'),
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().

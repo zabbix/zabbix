@@ -138,7 +138,7 @@ if ($resourcetype == SCREEN_RESOURCE_GRAPH) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Graph name'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	));
 }
@@ -189,7 +189,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	));
 }
@@ -217,7 +217,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_MAP) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -271,7 +271,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	));
 	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 2));
@@ -300,7 +300,7 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 
 		$screenFormList->addVar('resourceid', $id);
 		$screenFormList->addRow(_('Group'), array(
-			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 			new CButton('select', _('Select'),
 				'javascript: return PopUp("popup.php?srctbl=host_group&srcfld1=groupid&srcfld2=name'.
 					'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -324,7 +324,7 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 
 		$screenFormList->addVar('resourceid', $id);
 		$screenFormList->addRow(_('Host'), array(
-			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 			new CButton('select', _('Select'),
 				'javascript: return PopUp("popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name'.
 					'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -397,7 +397,7 @@ elseif (in_array($resourcetype, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Group'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=overview&srcfld1=groupid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -441,7 +441,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_SCREEN) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -479,7 +479,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_HOSTS_INFO || $resourcetype == SCREEN_R
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Group'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=host_group_scr&srcfld1=groupid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -528,7 +528,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_CLOCK) {
 			);
 		}
 		$screenFormList->addRow(_('Parameter'), array(
-			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 			$selectButton
 		));
 	}
@@ -612,7 +612,7 @@ if ($this->data['screen']['templateid'] == 0 && in_array($resourcetype, array(SC
 
 // append tabs to form
 $screenTab = new CTabView();
-$screenTab->setAttribute('style', 'text-align: left;');
+$screenTab->attr('style', 'text-align: left;');
 $screenTab->addTab('screenTab', _('Screen cell configuration'), $screenFormList);
 $screenForm->addItem($screenTab);
 

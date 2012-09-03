@@ -114,14 +114,14 @@ require_once 'include/page_header.php';
 			_('Caption')), new CTextBox('caption',$caption,42));
 
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-		$clndr_icon->addAction('onclick','javascript: '.
+		$clndr_icon->onClick(
 											'var pos = getPosition(this); '.
 											'pos.top+=10; '.
 											'pos.left+=16; '.
 											"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 		$reporttimetab = new CTable(null,'calendar');
-		$reporttimetab->setAttribute('width','10%');
+		$reporttimetab->attr('width','10%');
 
 		$reporttimetab->setCellPadding(0);
 		$reporttimetab->setCellSpacing(0);
@@ -145,7 +145,7 @@ require_once 'include/page_header.php';
 						'"avail_report_since",'.
 						'"report_timesince");');
 
-		$clndr_icon->addAction('onclick','javascript: '.
+		$clndr_icon->onClick(
 											'var pos = getPosition(this); '.
 											'pos.top+=10; '.
 											'pos.left+=16; '.

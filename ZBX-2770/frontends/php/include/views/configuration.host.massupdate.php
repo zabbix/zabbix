@@ -51,7 +51,7 @@ $hostFormList->addRow(
 		SPACE,
 		new CVisibilityBox('visible[newgroup]', isset($this->data['visible']['newgroup']), 'newgroup', _('Original'))
 	),
-	new CTextBox('newgroup', $this->data['newgroup'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('newgroup', $this->data['newgroup'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	null, null, 'new'
 );
 
@@ -86,8 +86,8 @@ $hostFormList->addRow(
 $templatesFormList = new CFormList('templatesFormList');
 // append templates table to from list
 $templatesTable = new CTable(_('No templates defined.'), 'formElementTable');
-$templatesTable->setAttribute('style', 'min-width: 500px;');
-$templatesTable->setAttribute('id', 'template_table');
+$templatesTable->attr('style', 'min-width: 500px;');
+$templatesTable->attr('id', 'template_table');
 $templatesTable->setHeader(array(_('Name'), _('Action')));
 
 foreach ($this->data['templates'] as $templateid => $templateName) {
@@ -97,7 +97,7 @@ foreach ($this->data['templates'] as $templateid => $templateName) {
 		$templateName,
 		new CButton('remove', _('Remove'), 'javascript: removeTemplate("'.$templateid.'");', 'link_menu')
 	));
-	$row->setAttribute('id', 'template_row_'.$templateid);
+	$row->attr('id', 'template_row_'.$templateid);
 	$templatesTable->addRow($row);
 }
 $templatesDiv = new CDiv(
@@ -121,7 +121,7 @@ $templatesDiv = new CDiv(
 	),
 	'objectgroup inlineblock border_dotted ui-corner-all'
 );
-$templatesDiv->setAttribute('id', 'templates_div');
+$templatesDiv->attr('id', 'templates_div');
 
 $templatesFormList->addRow(
 	array(
@@ -203,7 +203,7 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 		else {
 			$fieldLength = $hostInventoryTable['fields'][$field]['length'];
 			$fieldInput = new CTextBox('host_inventory['.$field.']', $this->data['host_inventory'][$field]);
-			$fieldInput->setAttribute('maxlength', $fieldLength);
+			$fieldInput->attr('maxlength', $fieldLength);
 			$fieldInput->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
 		}
 

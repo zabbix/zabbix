@@ -84,7 +84,7 @@ class CScreenClock extends CScreenBase {
 		$item->setTimeOffset($timeOffset);
 
 		$flashclockOverDiv = new CDiv(null, 'flashclock');
-		$flashclockOverDiv->setAttribute('style', 'width: '.$this->screenitem['width'].'px; height: '.$this->screenitem['height'].'px;');
+		$flashclockOverDiv->attr('style', 'width: '.$this->screenitem['width'].'px; height: '.$this->screenitem['height'].'px;');
 
 		return $this->getOutput(array($item, $flashclockOverDiv));
 	}

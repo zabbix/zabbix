@@ -648,10 +648,10 @@ else {
 	// filter
 	$filter_table = new CTable('', 'filter');
 	$filter_table->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
-		array(bold(_('Port').': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
+		array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'])),
+		array(array(bold(_('DNS')), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'])),
+		array(array(bold(_('IP')), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'])),
+		array(bold(_('Port').': '), new CTextBox('filter_port', $_REQUEST['filter_port']))
 	));
 
 	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
@@ -661,13 +661,13 @@ else {
 	$reset->useJQueryStyle();
 
 	$div_buttons = new CDiv(array($filter, SPACE, $reset));
-	$div_buttons->setAttribute('style', 'padding: 4px 0;');
+	$div_buttons->attr('style', 'padding: 4px 0;');
 
 	$filter_table->addRow(new CCol($div_buttons, 'center', 4));
 
 	$filter_form = new CForm('get');
-	$filter_form->setAttribute('name', 'zbx_filter');
-	$filter_form->setAttribute('id', 'zbx_filter');
+	$filter_form->attr('name', 'zbx_filter');
+	$filter_form->attr('id', 'zbx_filter');
 	$filter_form->addItem($filter_table);
 
 	$hosts_wdgt->addFlicker($filter_form, CProfile::get('web.hosts.filter.state', 0));
@@ -865,19 +865,19 @@ else {
 	$goBox->addItem('massupdate', _('Mass update'));
 
 	$goOption = new CComboItem('activate', _('Enable selected'));
-	$goOption->setAttribute('confirm', _('Enable selected hosts?'));
+	$goOption->attr('confirm', _('Enable selected hosts?'));
 	$goBox->addItem($goOption);
 
 	$goOption = new CComboItem('disable', _('Disable selected'));
-	$goOption->setAttribute('confirm', _('Disable selected hosts?'));
+	$goOption->attr('confirm', _('Disable selected hosts?'));
 	$goBox->addItem($goOption);
 
 	$goOption = new CComboItem('delete', _('Delete selected'));
-	$goOption->setAttribute('confirm', _('Delete selected hosts?'));
+	$goOption->attr('confirm', _('Delete selected hosts?'));
 	$goBox->addItem($goOption);
 
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
-	$goButton->setAttribute('id', 'goButton');
+	$goButton->attr('id', 'goButton');
 	zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 	// footer

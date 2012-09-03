@@ -206,7 +206,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$checkBox->setEnabled(empty($trigger['discoveryRule']));
 
 	$expressionColumn = new CCol(triggerExpression($trigger, true));
-	$expressionColumn->setAttribute('style', 'white-space: normal;');
+	$expressionColumn->attr('style', 'white-space: normal;');
 
 	$triggersTable->addRow(array(
 		$checkBox,
@@ -223,10 +223,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 // create go button
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('activate', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected triggers?'));
+$goOption->attr('confirm', _('Enable selected triggers?'));
 $goComboBox->addItem($goOption);
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected triggers?'));
+$goOption->attr('confirm', _('Disable selected triggers?'));
 $goComboBox->addItem($goOption);
 $goOption = new CComboItem('massupdate', _('Mass update'));
 $goComboBox->addItem($goOption);
@@ -235,10 +235,10 @@ if (empty($this->data['parent_discoveryid'])) {
 	$goComboBox->addItem($goOption);
 }
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected triggers?'));
+$goOption->attr('confirm', _('Delete selected triggers?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
 // append table to form

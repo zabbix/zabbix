@@ -55,7 +55,7 @@ $msg = isset($_REQUEST['warning_msg']) ? $_REQUEST['warning_msg'] : _('Zabbix is
 
 $warning = new CWarning(_('Zabbix').SPACE.ZABBIX_VERSION, $msg);
 $warning->setAlignment('center');
-$warning->setAttribute('style', 'margin-top: 100px;');
+$warning->attr('style', 'margin-top: 100px;');
 $warning->setPaddings(SPACE);
 $warning->setButtons(new CButton('retry', _('Retry'), 'javascript: document.location.reload();', 'formlist'));
 $warning->show();

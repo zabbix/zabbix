@@ -92,7 +92,7 @@ class CScreenSimpleGraph extends CScreenBase {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].
 						'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile);
 			}
-			$item->setAttribute('id', $containerid);
+			$item->attr('id', $containerid);
 
 			return $this->getOutput($item);
 		}

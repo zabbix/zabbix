@@ -719,7 +719,7 @@ function get_items_data_overview($hostids, $view_style) {
 		$header = array(new CCol(_('Items'), 'center'));
 		foreach ($hostnames as $hostname) {
 			$img = new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css);
-			$img->setAttribute('id', uniqid('do_'));
+			$img->attr('id', uniqid('do_'));
 			$header = array_merge($header, array($img));
 		}
 		$table->setHeader($header, 'vertical_header');
@@ -736,7 +736,7 @@ function get_items_data_overview($hostids, $view_style) {
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$img = new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css);
-			$img->setAttribute('id', uniqid('do_'));
+			$img->attr('id', uniqid('do_'));
 			$header = array_merge($header, array($img));
 		}
 		$table->setHeader($header, 'vertical_header');
@@ -747,7 +747,7 @@ function get_items_data_overview($hostids, $view_style) {
 			// host JS menu link
 			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
 			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+			$hostSpan->dataAttr('menu', hostMenuData($host, $scripts));
 
 			$table_row = array(new CCol($hostSpan));
 			foreach ($items as $ithosts) {

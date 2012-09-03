@@ -42,7 +42,7 @@ if (!empty($this->data['applicationid'])) {
 $applicationFormList = new CFormList('applicationFormList');
 if (empty($this->data['applicationid'])) {
 	$applicationFormList->addRow(_('Host'), array(
-		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('btn1', _('Select'),
 			'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name'.
 				'&dstfrm='.$applicationForm->getName().'&dstfld1=apphostid&dstfld2=hostname'.
@@ -54,7 +54,7 @@ if (empty($this->data['applicationid'])) {
 else {
 	// cannot change host for existing application
 	$applicationFormList->addRow(_('Host'), array(
-		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 	));
 }
 $applicationFormList->addRow(_('Name'), new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE));

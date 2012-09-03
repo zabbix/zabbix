@@ -104,10 +104,10 @@ class CsetupWizard extends CForm {
 		$left->addItem(new CDiv($this->getList(), 'left_menu'));
 
 		$link1 = new CLink('www.zabbix.com', 'http://www.zabbix.com/', null, null, true);
-		$link1->setAttribute('target', '_blank');
+		$link1->attr('target', '_blank');
 
 		$link2 = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
-		$link2->setAttribute('target', '_blank');
+		$link2->attr('target', '_blank');
 
 		$licence = new CDiv(array($link1, BR(), ' Licensed under ', $link2), 'setup_wizard_licence');
 		$left->addItem($licence);

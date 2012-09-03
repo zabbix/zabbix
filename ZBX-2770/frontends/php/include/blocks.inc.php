@@ -556,7 +556,7 @@ function make_hoststat_summary($filter) {
 		if ($filter['extAck']) {
 			if ($hosts_data[$group['groupid']]['lastUnack']) {
 				$table_inf = new CTableInfo();
-				$table_inf->setAttribute('style', 'width: 400px;');
+				$table_inf->attr('style', 'width: 400px;');
 				$table_inf->setHeader(array(
 					_('Host'),
 					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
@@ -603,7 +603,7 @@ function make_hoststat_summary($filter) {
 		// if hostgroup contains problematic hosts, hint should be built
 		if ($hosts_data[$group['groupid']]['problematic']) {
 			$table_inf = new CTableInfo();
-			$table_inf->setAttribute('style', 'width: 400px;');
+			$table_inf->attr('style', 'width: 400px;');
 			$table_inf->setHeader(array(
 				_('Host'),
 				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
@@ -696,7 +696,7 @@ function make_status_of_zbx() {
 		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
 	));
 	$title = new CSpan(_('Number of hosts (monitored/not monitored/templates)'));
-	$title->setAttribute('title', 'asdad');
+	$title->attr('title', 'asdad');
 	$table->addRow(array(_('Number of hosts (monitored/not monitored/templates)'), $status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'], 'off'), ' / ',
@@ -705,7 +705,7 @@ function make_status_of_zbx() {
 		)
 	));
 	$title = new CSpan(_('Number of items (monitored/disabled/not supported)'));
-	$title->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
+	$title->attr('title', _('Only items assigned to enabled hosts are counted'));
 	$table->addRow(array($title, $status['items_count'],
 		array(
 			new CSpan($status['items_count_monitored'], 'off'), ' / ',
@@ -714,7 +714,7 @@ function make_status_of_zbx() {
 		)
 	));
 	$title = new CSpan(_('Number of triggers (enabled/disabled)[problem/unknown/ok]'));
-	$title->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
+	$title->attr('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
 	$table->addRow(array($title, $status['triggers_count'],
 		array(
 			$status['triggers_count_enabled'], ' / ',
@@ -845,7 +845,7 @@ function make_latest_issues(array $filter = array()) {
 
 		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
 		$hostName = new CSpan($host['name'], 'link_menu menu-host');
-		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts));
+		$hostName->dataAttr('menu', hostMenuData($host, $scripts));
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($host['maintenance_status']) {
@@ -1355,7 +1355,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 	$config = select_config();
 
 	$popupTable = new CTableInfo();
-	$popupTable->setAttribute('style', 'width: 400px;');
+	$popupTable->attr('style', 'width: 400px;');
 	$popupTable->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host'),

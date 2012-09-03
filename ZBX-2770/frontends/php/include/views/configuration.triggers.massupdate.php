@@ -58,7 +58,7 @@ $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
 $severityDiv = getSeverityControl();
-$severityDiv->setAttribute('id', 'priority_div');
+$severityDiv->attr('id', 'priority_div');
 
 $triggersFormList->addRow(
 	array(
@@ -72,8 +72,8 @@ $triggersFormList->addRow(
 // append dependencies to form list
 if (empty($this->data['parent_discoveryid'])) {
 	$dependenciesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-	$dependenciesTable->setAttribute('style', 'min-width: 500px;');
-	$dependenciesTable->setAttribute('id', 'dependenciesTable');
+	$dependenciesTable->attr('style', 'min-width: 500px;');
+	$dependenciesTable->attr('id', 'dependenciesTable');
 	$dependenciesTable->setHeader(array(
 		_('Name'),
 		_('Action')
@@ -86,7 +86,7 @@ if (empty($this->data['parent_discoveryid'])) {
 			$dependency['host'].': '.$dependency['description'],
 			new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');', 'link_menu')
 		));
-		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
+		$row->attr('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
 	}
 
@@ -102,7 +102,7 @@ if (empty($this->data['parent_discoveryid'])) {
 		),
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	);
-	$dependenciesDiv->setAttribute('id', 'dependencies_div');
+	$dependenciesDiv->attr('id', 'dependencies_div');
 
 	$triggersFormList->addRow(
 		array(

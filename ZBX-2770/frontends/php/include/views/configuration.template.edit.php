@@ -112,11 +112,11 @@ $templateList = new CFormList('hostlist');
 
 // FORM ITEM : Template name text box [  ]
 $template_nameTB = new CTextBox('template_name', $host, 54);
-$template_nameTB->setAttribute('maxlength', 64);
+$template_nameTB->attr('maxlength', 64);
 $templateList->addRow(_('Template name'), $template_nameTB);
 
 $visiblenameTB = new CTextBox('visiblename', $visiblename, 54);
-$visiblenameTB->setAttribute('maxlength', 64);
+$visiblenameTB->attr('maxlength', 64);
 $templateList->addRow(_('Visible name'), $visiblenameTB);
 
 // FORM ITEM : Groups tween box [  ] [  ]
@@ -137,11 +137,11 @@ $templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other group
 // FORM ITEM : new group text box [  ]
 global $USER_DETAILS;
 $newgroupTB = new CTextBox('newgroup', $newgroup);
-$newgroupTB->setAttribute('maxlength', 64);
+$newgroupTB->attr('maxlength', 64);
 $tmp_label = _('New group');
 if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only superadmins can create group)');
-	$newgroupTB->setReadonly(true);
+	$newgroupTB->setReadOnly(true);
 }
 $templateList->addRow(array(
 	new CLabel($tmp_label, 'newgroup'),
@@ -214,7 +214,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($applicationsList);
 
 		$listBox = new CListBox('applications', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($applicationsList);
 		$templateList->addRow(_('Applications'), $listBox);
 	}
@@ -234,7 +234,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($itemsList);
 
 		$listBox = new CListBox('items', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($itemsList);
 
 		$templateList->addRow(_('Items'), $listBox);
@@ -255,7 +255,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($triggersList);
 
 		$listBox = new CListBox('triggers', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($triggersList);
 
 		$templateList->addRow(_('Triggers'), $listBox);
@@ -276,7 +276,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		order_result($graphsList);
 
 		$listBox = new CListBox('graphs', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($graphsList);
 
 		$templateList->addRow(_('Graphs'), $listBox);
@@ -297,7 +297,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
 
 		$listBox = new CListBox('discoveryRules', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->attr('disabled', 'disabled');
 		$listBox->addItems($discoveryRuleList);
 
 		$templateList->addRow(_('Discovery rules'), $listBox);
@@ -317,7 +317,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 			order_result($prototypeList);
 
 			$listBox = new CListBox('itemsPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->attr('disabled', 'disabled');
 			$listBox->addItems($prototypeList);
 
 			$templateList->addRow(_('Item prototypes'), $listBox);
@@ -338,7 +338,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 			order_result($prototypeList);
 
 			$listBox = new CListBox('triggerprototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->attr('disabled', 'disabled');
 			$listBox->addItems($prototypeList);
 
 			$templateList->addRow(_('Trigger prototypes'), $listBox);
@@ -359,7 +359,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 			order_result($prototypeList);
 
 			$listBox = new CListBox('graphPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->attr('disabled', 'disabled');
 			$listBox->addItems($prototypeList);
 
 			$templateList->addRow(_('Graph prototypes'), $listBox);

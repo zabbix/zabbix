@@ -31,11 +31,11 @@ $valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
 $valueMappingFormList = new CFormList('valueMappingFormList');
 
 // Name
-$valueMappingFormList->addRow(_('Name'), new CTextBox('mapname', $this->data['mapname'], 40, null, 64));
+$valueMappingFormList->addRow(_('Name'), new CTextBox('mapname', $this->data['mapname'], 40, false, 64));
 
 // Mappings
 $mappingsTable = new CTable(SPACE, 'formElementTable');
-$mappingsTable->setAttribute('id', 'mappingsTable');
+$mappingsTable->attr('id', 'mappingsTable');
 $mappingsTable->addRow(array(_('Value'), SPACE, _('Mapped to'), SPACE));
 $addCol = new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'));
 $addCol->setColSpan(4);

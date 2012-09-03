@@ -74,7 +74,7 @@ foreach ($iconMaps as $iconMap) {
 	$iconMappingComboBox->addItem($iconMap['iconmapid'], $iconMap['name']);
 }
 $iconMappingsLink = new CLink(_('show icon mappings'), 'adm.iconmapping.php');
-$iconMappingsLink->setAttribute('target', '_blank');
+$iconMappingsLink->attr('target', '_blank');
 $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPACE, $iconMappingsLink));
 
 // append multiple checkboxs
@@ -141,13 +141,13 @@ $selectShowUnack->addItems(array(
 ));
 $selectShowUnack->setEnabled($config['event_ack_enable']);
 if (!$config['event_ack_enable']) {
-	$selectShowUnack->setAttribute('title', _('Acknowledging disabled'));
+	$selectShowUnack->attr('title', _('Acknowledging disabled'));
 }
 $sysmapList->addRow(_('Problem display'), $selectShowUnack);
 
 // create url table
 $urlTable = new CTable(_('No URLs defined.'), 'formElementTable');
-$urlTable->setAttribute('style', 'min-width: 500px;');
+$urlTable->attr('style', 'min-width: 500px;');
 $urlTable->setHeader(array(_('Name'), _('URL'), _('Element'), SPACE));
 if (empty($this->data['urls'])) {
 	$this->data['urls'][] = array('name' => '', 'url' => '', 'elementtype' => 0);
@@ -159,10 +159,10 @@ foreach ($this->data['urls'] as $url) {
 	$urlEtype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
 	$urlEtype->addItems(sysmap_element_types());
 	$removeButton = new CSpan(_('Remove'), 'link_menu');
-	$removeButton->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
+	$removeButton->onClick('$("urlEntry_'.$i.'").remove();');
 
 	$urlRow = new CRow(array($urlLabel, $urlLink, $urlEtype, $removeButton));
-	$urlRow->setAttribute('id', 'urlEntry_'.$i);
+	$urlRow->attr('id', 'urlEntry_'.$i);
 
 	$urlTable->addRow($urlRow);
 	$i++;
@@ -170,22 +170,22 @@ foreach ($this->data['urls'] as $url) {
 
 // append empty template row to url table
 $tplUrlLabel = new CTextBox('urls[#{id}][name]', '', 32);
-$tplUrlLabel->setAttribute('disabled', 'disabled');
+$tplUrlLabel->attr('disabled', 'disabled');
 $tplUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
-$tplUrlLink->setAttribute('disabled', 'disabled');
+$tplUrlLink->attr('disabled', 'disabled');
 $tplUrlEtype = new CCombobox('urls[#{id}][elementtype]');
-$tplUrlEtype->setAttribute('disabled', 'disabled');
+$tplUrlEtype->attr('disabled', 'disabled');
 $tplUrlEtype->addItems(sysmap_element_types());
 $tplRemoveButton = new CSpan(_('Remove'), 'link_menu');
-$tplRemoveButton->addAction('onclick', '$("entry_#{id}").remove();');
+$tplRemoveButton->onClick('$("entry_#{id}").remove();');
 $tplUrlRow = new CRow(array($tplUrlLabel, $tplUrlLink, $tplUrlEtype, $tplRemoveButton));
 $tplUrlRow->addStyle('display: none');
-$tplUrlRow->setAttribute('id', 'urlEntryTpl');
+$tplUrlRow->attr('id', 'urlEntryTpl');
 $urlTable->addRow($tplUrlRow);
 
 // append "add" button to url table
 $addButton = new CSpan(_('Add'), 'link_menu');
-$addButton->addAction('onclick', 'cloneRow("urlEntryTpl", '.$i.')');
+$addButton->onClick('cloneRow("urlEntryTpl", '.$i.')');
 $addButtonColumn = new CCol($addButton);
 $addButtonColumn->setColSpan(4);
 $urlTable->addRow($addButtonColumn);

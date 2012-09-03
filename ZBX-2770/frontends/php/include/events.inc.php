@@ -209,7 +209,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		$table->setHeader(array(_('Time'), _('Status'), _('Duration'), _('Age')));
 	}
 
-	$table->setAttribute('style', 'width: 400px;');
+	$table->attr('style', 'width: 400px;');
 
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,

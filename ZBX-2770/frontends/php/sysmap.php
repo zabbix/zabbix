@@ -142,24 +142,24 @@ echo SBR;
 
 // elements
 $el_add = new CIcon(_('Add element'), 'iconplus');
-$el_add->setAttribute('id', 'selementAdd');
+$el_add->attr('id', 'selementAdd');
 $el_rmv = new CIcon(_('Remove element'), 'iconminus');
-$el_rmv->setAttribute('id', 'selementRemove');
+$el_rmv->attr('id', 'selementRemove');
 
 // connectors
 $cn_add = new CIcon(_('Add link'), 'iconplus');
-$cn_add->setAttribute('id', 'linkAdd');
+$cn_add->attr('id', 'linkAdd');
 $cn_rmv = new CIcon(_('Remove link'), 'iconminus');
-$cn_rmv->setAttribute('id', 'linkRemove');
+$cn_rmv->attr('id', 'linkRemove');
 
 $expandMacros = new CSpan(($sysmap['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off'), 'whitelink');
-$expandMacros->setAttribute('id', 'expand_macros');
+$expandMacros->attr('id', 'expand_macros');
 
 $gridShow = new CSpan(($sysmap['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden'), 'whitelink');
-$gridShow->setAttribute('id', 'gridshow');
+$gridShow->attr('id', 'gridshow');
 
 $gridAutoAlign = new CSpan(($sysmap['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'), 'whitelink');
-$gridAutoAlign->setAttribute('id', 'gridautoalign');
+$gridAutoAlign->attr('id', 'gridautoalign');
 
 $possibleGridSizes = array(
 	20 => '20x20',
@@ -172,13 +172,13 @@ $gridSize = new CComboBox('gridsize', $sysmap['grid_size']);
 $gridSize->addItems($possibleGridSizes);
 
 $gridAlignAll = new CSubmit('gridalignall', _('Align icons'));
-$gridAlignAll->setAttribute('id', 'gridalignall');
+$gridAlignAll->attr('id', 'gridalignall');
 
 $gridForm = new CDiv(array($gridSize, $gridAlignAll));
-$gridForm->setAttribute('id', 'gridalignblock');
+$gridForm->attr('id', 'gridalignblock');
 
 $saveButton = new CSubmit('save', _('Save'));
-$saveButton->setAttribute('id', 'sysmap_save');
+$saveButton->attr('id', 'sysmap_save');
 
 $menuRow = array(
 	_s('Map "%s"', $sysmap['name']),
@@ -202,14 +202,14 @@ $elcn_tab->addRow($menuRow);
 show_table_header($elcn_tab);
 
 $sysmap_img = new CImg('images/general/tree/zero.gif', 'Sysmap');
-$sysmap_img->setAttribute('id', 'sysmap_img', $sysmap['width'], $sysmap['height']);
+$sysmap_img->attr('id', 'sysmap_img', $sysmap['width'], $sysmap['height']);
 
 $table = new CTable();
 $table->addRow($sysmap_img);
 $table->Show();
 
 $container = new CDiv();
-$container->setAttribute('id', 'sysmap_cnt');
+$container->attr('id', 'sysmap_cnt');
 $container->Show();
 
 insert_show_color_picker_javascript();

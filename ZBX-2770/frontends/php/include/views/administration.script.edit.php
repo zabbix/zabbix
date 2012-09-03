@@ -40,7 +40,7 @@ if ($this->get('scriptid')) {
 
 // name
 $nameTB = new CTextBox('name', $this->get('name'));
-$nameTB->setAttribute('maxlength', 255);
+$nameTB->attr('maxlength', 255);
 $nameTB->addStyle('width: 50em;');
 $scriptTab->addRow(_('Name'), $nameTB);
 
@@ -102,12 +102,12 @@ $scriptTab->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation'), a
 
 $confirmationTB = new CTextBox('confirmation', $this->get('confirmation'));
 $confirmationTB->addStyle('width: 50em;');
-$confirmationTB->setAttribute('maxlength', 255);
+$confirmationTB->attr('maxlength', 255);
 
 $testLink = new CButton('testConfirmation', _('Test confirmation'), null, 'link_menu');
 
 $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
-$confirmationLabel->setAttribute('id', 'confirmationLabel');
+$confirmationLabel->attr('id', 'confirmationLabel');
 $scriptTab->addRow($confirmationLabel, array($confirmationTB, SPACE, $testLink));
 
 $scriptView = new CTabView();

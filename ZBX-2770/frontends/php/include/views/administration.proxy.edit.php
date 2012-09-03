@@ -33,7 +33,7 @@ if (!empty($this->data['proxyid'])) {
 
 // create form list
 $proxyFormList = new CFormList('proxyFormList');
-$proxyFormList->addRow(_('Proxy name'), new CTextBox('host', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
+$proxyFormList->addRow(_('Proxy name'), new CTextBox('host', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64));
 
 // append status to form list
 $statusBox = new CComboBox('status', $this->data['status'], 'submit()');
@@ -61,10 +61,10 @@ if ($this->data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$connectByComboBox->useJQueryStyle();
 
 	$interfaceTable->addRow(array(
-		new CTextBox('interfaces[0][ip]', $this->data['interface']['ip'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 39),
-		new CTextBox('interfaces[0][dns]', $this->data['interface']['dns'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64),
+		new CTextBox('interfaces[0][ip]', $this->data['interface']['ip'], ZBX_TEXTBOX_SMALL_SIZE, false, 39),
+		new CTextBox('interfaces[0][dns]', $this->data['interface']['dns'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
 		$connectByComboBox,
-		new CTextBox('interfaces[0][port]', $this->data['interface']['port'], 18, 'no', 64)
+		new CTextBox('interfaces[0][port]', $this->data['interface']['port'], 18, false, 64)
 	));
 	$proxyFormList->addRow(_('Interface'), new CDiv($interfaceTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 }

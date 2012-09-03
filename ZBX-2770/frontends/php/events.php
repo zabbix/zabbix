@@ -319,8 +319,8 @@ $filterForm = null;
 
 if (EVENT_SOURCE_TRIGGERS == $source) {
 	$filterForm = new CFormTable(null, null, 'get'); //,'events.php?filter_set=1','POST',null,'sform');
-	$filterForm->setAttribute('name', 'zbx_filter');
-	$filterForm->setAttribute('id', 'zbx_filter');
+	$filterForm->attr('name', 'zbx_filter');
+	$filterForm->attr('id', 'zbx_filter');
 
 	$filterForm->addVar('triggerid', get_request('triggerid'));
 	$filterForm->addVar('stime', get_request('stime'));
@@ -348,7 +348,7 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 	$row = new CRow(array(
 		new CCol(_('Trigger'), 'form_row_l'),
 		new CCol(array(
-			new CTextBox('trigger', $trigger, 96, 'yes'),
+			new CTextBox('trigger', $trigger, 96, true),
 			new CButton("btn1", _('Select'), "return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');", 'T')
 		), 'form_row_r')
 	));
@@ -372,7 +372,7 @@ $events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0
 
 
 $scroll_div = new CDiv();
-$scroll_div->setAttribute('id', 'scrollbar_cntr');
+$scroll_div->attr('id', 'scrollbar_cntr');
 $events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state', 0));
 // }}} FILTER
 
@@ -699,7 +699,7 @@ else {
 				)));
 
 				$tr_desc = new CSpan($description, 'pointer');
-				$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
+				$tr_desc->onClick("create_mon_trigger_menu(event, ".
 						" [{'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}],".
 						zbx_jsvalue($items, true).");");
 
@@ -723,7 +723,7 @@ else {
 				// host JS menu link
 				$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 				$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-				$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+				$hostSpan->dataAttr('menu', hostMenuData($host, $scripts));
 
 				$table->addRow(array(
 					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),

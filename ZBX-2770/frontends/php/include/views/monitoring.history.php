@@ -73,8 +73,8 @@ array_unshift($header['right'], $actionForm, SPACE);
 if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlatest') {
 	if (isset($this->data['iv_string'][$this->data['item']['value_type']])) {
 		$filterForm = new CFormTable(null, null, 'get');
-		$filterForm->setAttribute('name', 'zbx_filter');
-		$filterForm->setAttribute('id', 'zbx_filter');
+		$filterForm->attr('name', 'zbx_filter');
+		$filterForm->attr('id', 'zbx_filter');
 		$filterForm->addVar('action', $this->data['action']);
 		$filterForm->addVar('itemid', zbx_toHash($_REQUEST['itemid']));
 

@@ -29,7 +29,7 @@ $scriptsWidget->addHeaderRowNumber();
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
-$scriptsForm->setAttribute('id', 'scripts');
+$scriptsForm->attr('id', 'scripts');
 
 $scriptsTable = new CTableInfo(_('No scripts defined.'));
 $scriptsTable->setHeader(array(
@@ -87,11 +87,11 @@ foreach ($this->data['scripts'] as $script) {
 // create go buttons
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected scripts?'));
+$goOption->attr('confirm', _('Delete selected scripts?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
 
 // append table to form

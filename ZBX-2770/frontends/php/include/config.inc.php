@@ -328,13 +328,13 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 				$row = array();
 
 				$msg_col = new CCol(bold($msg), 'msg_main msg');
-				$msg_col->setAttribute('id', 'page_msg');
+				$msg_col->attr('id', 'page_msg');
 				$row[] = $msg_col;
 
 				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
 					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
-					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
+					$msg_details->attr('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
+					$msg_details->attr('title', _('Maximize').'/'._('Minimize'));
 					array_unshift($row, new CCol($msg_details, 'clr'));
 				}
 				$msg_tab->addRow($row);
@@ -380,15 +380,15 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			$msg_count = count($ZBX_MESSAGES);
 			if ($msg_count > $msg_show) {
 				$msg_count = $msg_show * 16;
-				$lst_error->setAttribute('style', 'height: '.$msg_count.'px;');
+				$lst_error->attr('style', 'height: '.$msg_count.'px;');
 			}
 			$tab = new CTable(null, ($bool ? 'msgok' : 'msgerr'));
 			$tab->setCellPadding(0);
 			$tab->setCellSpacing(0);
-			$tab->setAttribute('id', 'msg_messages');
-			$tab->setAttribute('style', 'width: 100%;');
+			$tab->attr('id', 'msg_messages');
+			$tab->attr('style', 'width: 100%;');
 			if (isset($msg_tab) && $bool) {
-				$tab->setAttribute('style', 'display: none;');
+				$tab->attr('style', 'display: none;');
 			}
 			$tab->addRow(new CCol($lst_error, 'msg'));
 			$tab->show();

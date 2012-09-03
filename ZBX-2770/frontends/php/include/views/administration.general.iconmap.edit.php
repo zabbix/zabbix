@@ -24,11 +24,11 @@ include('include/views/js/administration.general.iconmap.js.php');
 $iconMapTab = new CFormList('scriptsTab');
 
 $TBname = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
-$TBname->setAttribute('maxlength', 64);
+$TBname->attr('maxlength', 64);
 $iconMapTab->addRow(_('Name'), $TBname);
 
 $iconMapTable = new CTable();
-$iconMapTable->setAttribute('id', 'iconMapTable');
+$iconMapTable->attr('id', 'iconMapTable');
 
 $iconMapForm = new CForm();
 $iconMapForm->addVar('form', 1);
@@ -50,14 +50,14 @@ foreach ($this->data['iconmap']['mappings'] as $iconmappingid => $mapping) {
 	$profileLinksComboBox->addItems($this->data['inventoryList']);
 
 	$expressionTextBox = new CTextBox('iconmap[mappings]['.$iconmappingid.'][expression]', $mapping['expression']);
-	$expressionTextBox->setAttribute('maxlength', 64);
+	$expressionTextBox->attr('maxlength', 64);
 
 	$iconsComboBox = new CComboBox('iconmap[mappings]['.$iconmappingid.'][iconid]', $mapping['iconid']);
 	$iconsComboBox->addClass('mappingIcon');
 	$iconsComboBox->addItems($this->data['iconList']);
 
 	$iconPreviewImage = new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
-	$iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
+	$iconPreviewImage->dataAttr('image-full', 'imgstore.php?iconid='.$mapping['iconid']);
 
 	$row = new CRow(array(
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
@@ -68,7 +68,7 @@ foreach ($this->data['iconmap']['mappings'] as $iconmappingid => $mapping) {
 		$iconPreviewImage,
 		new CButton('remove', _('Remove'), '', 'link_menu removeMapping'),
 	), 'sortable');
-	$row->setAttribute('id', 'iconmapidRow_'.$iconmappingid);
+	$row->attr('id', 'iconmapidRow_'.$iconmappingid);
 	$iconMapTable->addRow($row);
 }
 
@@ -81,19 +81,19 @@ $numSpan->addClass('rowNum');
 
 $profileLinksComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]');
 $profileLinksComboBox->addItems($this->data['inventoryList']);
-$profileLinksComboBox->setAttribute('disabled', 'disabled');
+$profileLinksComboBox->attr('disabled', 'disabled');
 
 $expressionTextBox = new CTextBox('iconmap[mappings][#{iconmappingid}][expression]');
-$expressionTextBox->setAttribute('maxlength', 64);
-$expressionTextBox->setAttribute('disabled', 'disabled');
+$expressionTextBox->attr('maxlength', 64);
+$expressionTextBox->attr('disabled', 'disabled');
 
 $iconsComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', $firstIconId);
 $iconsComboBox->addClass('mappingIcon');
 $iconsComboBox->addItems($this->data['iconList']);
-$iconsComboBox->setAttribute('disabled', 'disabled');
+$iconsComboBox->attr('disabled', 'disabled');
 
 $iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId.'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
-$iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$firstIconId);
+$iconPreviewImage->dataAttr('image-full', 'imgstore.php?iconid='.$firstIconId);
 
 // row template
 $hiddenRowTemplate = new CRow(array(
@@ -105,7 +105,7 @@ $hiddenRowTemplate = new CRow(array(
 	$iconPreviewImage,
 	new CButton('remove', _('Remove'), '', 'link_menu removeMapping'),
 ), 'hidden');
-$hiddenRowTemplate->setAttribute('id', 'rowTpl');
+$hiddenRowTemplate->attr('id', 'rowTpl');
 $iconMapTable->addRow($hiddenRowTemplate);
 
 // add row button
@@ -122,7 +122,7 @@ $iconsComboBox->addClass('mappingIcon');
 $iconsComboBox->addItems($this->data['iconList']);
 
 $iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
-$iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
+$iconPreviewImage->dataAttr('image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
 $col = new CCol(_('Default'));
 $col->setColSpan(4);

@@ -30,7 +30,7 @@ $imageCb->addItem(IMAGE_TYPE_BACKGROUND, _('Background'));
 
 // append form list
 $imageFormList = new CFormList('imageFormList');
-$imageFormList->addRow(_('Name'), new CTextBox('name', $this->data['imagename'], 64, 'no', 64));
+$imageFormList->addRow(_('Name'), new CTextBox('name', $this->data['imagename'], 64, false, 64));
 $imageFormList->addRow(_('Type'), $imageCb);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 if (!empty($this->data['imageid'])) {

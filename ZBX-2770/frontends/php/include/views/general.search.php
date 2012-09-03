@@ -22,7 +22,7 @@
 	$searchForm = new CForm('get','search.php');
 
 	$searchBox = new CTextBox('search', get_request('search'));
-	$searchBox->setAttribute('autocomplete', 'off');
+	$searchBox->attr('autocomplete', 'off');
 	$searchBox->addClass('search');
 	$searchForm->addItem($searchBox);
 

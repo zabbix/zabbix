@@ -51,15 +51,15 @@ $httpFormList->addRow(_('Application'), array(
 		'formlist'
 	)
 ));
-$httpFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
+$httpFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64));
 
 // append authentication to form list
 $authenticationComboBox = new CComboBox('authentication', $this->data['authentication'], 'submit();');
 $authenticationComboBox->addItems(httptest_authentications());
 $httpFormList->addRow(_('Authentication'), $authenticationComboBox);
 if (in_array($this->data['authentication'], array(HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM))) {
-	$httpFormList->addRow(_('User'), new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
-	$httpFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
+	$httpFormList->addRow(_('User'), new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64));
+	$httpFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64));
 }
 
 $httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
@@ -122,8 +122,8 @@ $httpFormList->addRow(_('Active'), new CCheckBox('status', $this->data['status']
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = new CTable(_('No steps defined.'), 'formElementTable');
-$stepsTable->setAttribute('style', 'min-width: 500px;');
-$stepsTable->setAttribute('id', 'httpStepTable');
+$stepsTable->attr('style', 'min-width: 500px;');
+$stepsTable->attr('id', 'httpStepTable');
 $stepsTable->setHeader(array(
 	new CCol(SPACE, null, null, '15'),
 	new CCol(SPACE, null, null, '15'),
@@ -155,11 +155,11 @@ foreach ($this->data['steps'] as $stepid => $step) {
 
 	$numSpan = new CSpan($i++.':');
 	$numSpan->addClass('rowNum');
-	$numSpan->setAttribute('id', 'current_step_'.$stepid);
+	$numSpan->attr('id', 'current_step_'.$stepid);
 
 	$name = new CSpan($step['name'], 'link');
-	$name->setAttribute('id', 'name_'.$stepid);
-	$name->setAttribute('name_step', $stepid);
+	$name->attr('id', 'name_'.$stepid);
+	$name->attr('name_step', $stepid);
 	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&list_name=steps&stepid="+jQuery(this).attr("name_step")+"'.
 		url_param($step['name'], false, 'name').
 		url_param($step['timeout'], false, 'timeout').
@@ -179,7 +179,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 
 	$removeButton = new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);', 'link_menu');
-	$removeButton->setAttribute('remove_step', $stepid);
+	$removeButton->attr('remove_step', $stepid);
 
 	$row = new CRow(array(
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
@@ -191,12 +191,12 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['status_codes'],
 		$removeButton
 	), 'sortable');
-	$row->setAttribute('id', 'steps_'.$stepid);
+	$row->attr('id', 'steps_'.$stepid);
 	$stepsTable->addRow($row);
 }
 
 $tmpColumn = new CCol(new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 410);', 'link_menu'), null, 8);
-$tmpColumn->setAttribute('style', 'vertical-align: middle;');
+$tmpColumn->attr('style', 'vertical-align: middle;');
 $stepsTable->addRow(new CRow($tmpColumn));
 
 $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));

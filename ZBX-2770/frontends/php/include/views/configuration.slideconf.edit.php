@@ -40,8 +40,8 @@ $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay',
 
 // append slide table
 $slideTable = new CTableInfo(_('No slides defined.'), 'formElementTable');
-$slideTable->setAttribute('style', 'min-width: 500px;');
-$slideTable->setAttribute('id', 'slideTable');
+$slideTable->attr('style', 'min-width: 500px;');
+$slideTable->attr('id', 'slideTable');
 $slideTable->setHeader(array(
 	new CCol(SPACE, null, null, '15'),
 	new CCol(SPACE, null, null, '15'),
@@ -61,10 +61,10 @@ foreach ($this->data['slides'] as $step => $slides) {
 	}
 
 	$delay = new CNumericBox('slides['.$step.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, 'no', true, false);
-	$delay->setAttribute('placeholder', _('default'));
+	$delay->attr('placeholder', _('default'));
 
 	$removeButton = new CButton('remove_'.$step, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
-	$removeButton->setAttribute('remove_slide', $step);
+	$removeButton->attr('remove_slide', $step);
 
 	$row = new CRow(
 		array(
@@ -90,7 +90,7 @@ $addButtonColumn = new CCol(
 	null,
 	5
 );
-$addButtonColumn->setAttribute('style', 'vertical-align: middle;');
+$addButtonColumn->attr('style', 'vertical-align: middle;');
 $slideTable->addRow(new CRow($addButtonColumn, null, 'screenListFooter'));
 
 $slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblock border_dotted ui-corner-all'));

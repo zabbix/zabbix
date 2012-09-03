@@ -296,13 +296,13 @@ else {
 	$goBox = new CComboBox('go');
 	$goBox->addItem('export', _('Export selected'));
 	$goOption = new CComboItem('delete', _('Delete selected'));
-	$goOption->setAttribute('confirm', _('Delete selected maps?'));
+	$goOption->attr('confirm', _('Delete selected maps?'));
 
 	$goBox->addItem($goOption);
 
 	// goButton name is necessary!!!
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
-	$goButton->setAttribute('id', 'goButton');
+	$goButton->attr('id', 'goButton');
 
 	zbx_add_post_js('chkbxRange.pageGoName = "maps";');
 

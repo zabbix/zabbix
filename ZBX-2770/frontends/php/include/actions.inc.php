@@ -818,7 +818,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$tab_hint = new CTableInfo(_('No actions found.'));
-	$tab_hint->setAttribute('style', 'width: 300px;');
+	$tab_hint->attr('style', 'width: 300px;');
 	$tab_hint->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,
 		_('User'),
@@ -931,10 +931,10 @@ function get_event_actions_status($eventid) {
 		}
 		else {
 			$tdl = new CCol($alerts['sent'] ? new CSpan($alerts['sent'], 'green') : SPACE);
-			$tdl->setAttribute('width', '10');
+			$tdl->attr('width', '10');
 
 			$tdr = new CCol($alerts['failed'] ? new CSpan($alerts['failed'], 'red') : SPACE);
-			$tdr->setAttribute('width', '10');
+			$tdr->attr('width', '10');
 
 			$status = new CRow(array($tdl, $tdr));
 		}

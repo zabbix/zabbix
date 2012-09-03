@@ -240,10 +240,10 @@ class CScreenHistory extends CScreenBase {
 							$int_color = ($max_color - $min_color) / count($this->itemid);
 							$int_color *= array_search($data['itemid'], array($this->itemid));
 							$int_color += $min_color;
-							$newRow->setAttribute('style', 'background-color: '.sprintf("#%X%X%X", $int_color, $int_color, $int_color));
+							$newRow->attr('style', 'background-color: '.sprintf("#%X%X%X", $int_color, $int_color, $int_color));
 						}
 						elseif (!is_null($color)) {
-							$newRow->setAttribute('class', $color);
+							$newRow->attr('class', $color);
 						}
 
 						$historyTable->addRow($newRow);
@@ -309,7 +309,7 @@ class CScreenHistory extends CScreenBase {
 
 			$historyTable = new CTableInfo(_('No graphs defined.'), 'chart');
 			$graphContainer = new CCol();
-			$graphContainer->setAttribute('id', $containerid);
+			$graphContainer->attr('id', $containerid);
 			$historyTable->addRow($graphContainer);
 			$output[] = $historyTable;
 		}

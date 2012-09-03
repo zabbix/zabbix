@@ -130,7 +130,7 @@ function create_hat($caption, $items, $addicons = null, $id = null, $state = nul
 		$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
 	}
 	$td_l = new CCol(SPACE);
-	$td_l->setAttribute('width', '100%');
+	$td_l->attr('width', '100%');
 
 	$icons_row = array($td_l);
 	if (!is_null($addicons)) {
@@ -144,7 +144,7 @@ function create_hat($caption, $items, $addicons = null, $id = null, $state = nul
 
 	if (!is_null($state)) {
 		$icon = new CIcon(_('Show').'/'._('Hide'), $state ? 'arrowup' : 'arrowdown', "change_hat_state(this,'".$id."');");
-		$icon->setAttribute('id', $id.'_icon');
+		$icon->attr('id', $id.'_icon');
 		$icons_row[] = $icon;
 	}
 	else {
@@ -152,19 +152,19 @@ function create_hat($caption, $items, $addicons = null, $id = null, $state = nul
 	}
 
 	$icon_tab = new CTable();
-	$icon_tab->setAttribute('width', '100%');
+	$icon_tab->attr('width', '100%');
 	$icon_tab->addRow($icons_row);
 
 	$table = new CTable();
-	$table->setAttribute('width', '100%');
+	$table->attr('width', '100%');
 	$table->setCellPadding(0);
 	$table->setCellSpacing(0);
 	$table->addRow(get_table_header($caption, $icon_tab));
 
 	$div = new CDiv($items);
-	$div->setAttribute('id', $id);
+	$div->attr('id', $id);
 	if (!$state) {
-		$div->setAttribute('style', 'display: none;');
+		$div->attr('style', 'display: none;');
 	}
 	$table->addRow($div);
 	return $table;
@@ -208,7 +208,7 @@ function get_table_header($col1, $col2 = SPACE) {
 		}
 	}
 	$td_l = new CCol(SPACE, 'header_r');
-	$td_l->setAttribute('width', '100%');
+	$td_l->attr('width', '100%');
 	$right_row = array($td_l);
 
 	if (!is_null($col2)) {
@@ -222,7 +222,7 @@ function get_table_header($col1, $col2 = SPACE) {
 	}
 
 	$right_tab = new CTable(null, 'nowrap');
-	$right_tab->setAttribute('width', '100%');
+	$right_tab->attr('width', '100%');
 	$right_tab->addRow($right_row);
 
 	$table = new CTable(null, 'header maxwidth ui-widget-header ui-corner-all');
@@ -230,7 +230,7 @@ function get_table_header($col1, $col2 = SPACE) {
 	$table->setCellPadding(1);
 
 	$td_r = new CCol($right_tab, 'header_r right');
-	$td_r->setAttribute('align', 'right');
+	$td_r->attr('align', 'right');
 
 	$table->addRow(array(new CCol($col1, 'header_l left'), $td_r));
 	return $table;
@@ -258,7 +258,7 @@ function get_icon($name, $params = array()) {
 					'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");'
 				);
 			}
-			$icon->setAttribute('id', 'addrm_fav');
+			$icon->attr('id', 'addrm_fav');
 			break;
 		case 'fullscreen':
 			$url = new Curl();
@@ -555,8 +555,8 @@ function getSeverityControl($selectedSeverity = TRIGGER_SEVERITY_NOT_CLASSIFIED)
 		$controls[] = new CRadioButton('priority', $severity, null, 'severity_'.$severity, $selectedSeverity == $severity);
 
 		$label = new CLabel($caption, 'severity_'.$severity, 'severity_label_'.$severity);
-		$label->attr('data-severity', $severity);
-		$label->attr('data-severity-style', getSeverityStyle($severity));
+		$label->dataAttr('severity', $severity);
+		$label->dataAttr('severity-style', getSeverityStyle($severity));
 		$controls[] = $label;
 
 	}

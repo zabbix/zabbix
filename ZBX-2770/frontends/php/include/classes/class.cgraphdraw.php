@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/../items.inc.php';
 require_once dirname(__FILE__).'/../hosts.inc.php';
 
@@ -312,4 +312,3 @@ class CGraphDraw {
 		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);
 	}
 }
-?>

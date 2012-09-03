@@ -183,8 +183,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 /***********************************************************/
 
 	$filterForm = new CFormTable(null, null, 'get');//,'tr_status.php?filter_set=1','POST',null,'sform');
-	$filterForm->setAttribute('name', 'zbx_filter');
-	$filterForm->setAttribute('id', 'zbx_filter');
+	$filterForm->attr('name', 'zbx_filter');
+	$filterForm->attr('id', 'zbx_filter');
 
 	$filterForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 	$filterForm->addVar('groupid', $_REQUEST['groupid']);
@@ -226,7 +226,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$action = 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()';
 	$sts_change_days_cb = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
-	if(!$_REQUEST['status_change']) $sts_change_days_cb->setAttribute('disabled', 'disabled');
+	if(!$_REQUEST['status_change']) $sts_change_days_cb->attr('disabled', 'disabled');
     $sts_change_days_cb->addStyle('vertical-align: middle;');
 
 	$cbd = new CCheckBox('status_change', $_REQUEST['status_change'], $action, 1);
@@ -273,7 +273,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$whow_hide_all = new CDiv(SPACE, 'filterclosed');
-		$whow_hide_all->setAttribute('id', $switcherName);
+		$whow_hide_all->attr('id', $switcherName);
 	}
 	else{
 		$whow_hide_all = null;
@@ -492,7 +492,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 
 		$description = new CSpan($trigger['description'], 'link_menu');
-		$description->addAction('onclick',
+		$description->onClick(
 			"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."],".
 			zbx_jsvalue($items, true).");"
@@ -500,8 +500,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 		if($_REQUEST['show_details']){
 			$font = new CTag('font', 'yes');
-			$font->setAttribute('color', '#000');
-			$font->setAttribute('size', '-2');
+			$font->attr('color', '#000');
+			$font->attr('size', '-2');
 			$font->addItem(explode_exp($trigger['expression'], true, true));
 			$description = array($description, BR(), $font);
 		}
@@ -509,7 +509,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 // DEPENDENCIES {{{
 		if(!empty($trigger['dependencies'])){
 			$dep_table = new CTableInfo();
-			$dep_table->setAttribute('style', 'width: 200px;');
+			$dep_table->attr('style', 'width: 200px;');
 			$dep_table->addRow(bold(_('Depends on').':'));
 
 			foreach($trigger['dependencies'] as $dep){
@@ -517,7 +517,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			}
 
 			$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
-			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
+			$img->attr('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
 			$description = array($img, SPACE, $description);
@@ -525,7 +525,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 		$dependency = false;
 		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
+		$dep_table->attr('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
 		if (!empty($triggerids_down[$trigger['triggerid']])) {
 			$depTriggers = CTriggerHelper::batchExpandDescriptionById($triggerids_down[$trigger['triggerid']]);
@@ -538,7 +538,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 		if($dependency){
 			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
-			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
+			$img->attr('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
 			$description = array($img,SPACE,$description);
@@ -569,7 +569,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			}
 
 			$hosts_name = new CSpan($trigger_host['name'], 'link_menu menu-host');
-			$hosts_name->setAttribute('data-menu', array(
+			$hosts_name->dataAttr('menu', array(
 				'scripts' => $menuScripts,
 				'hostid' => $trigger_host['hostid'],
 				'hasScreens' => (bool) $host['screens'],
@@ -644,7 +644,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 		if(($show_events != EVENTS_OPTION_NOEVENT) && !empty($trigger['events'])){
 			$open_close = new CDiv(SPACE, 'filterclosed');
-			$open_close->setAttribute('data-switcherid', $trigger['triggerid']);
+			$open_close->dataAttr('switcherid', $trigger['triggerid']);
 		}
 		else if($show_events == EVENTS_OPTION_NOEVENT){
 			$open_close = null;
@@ -730,7 +730,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 					is_show_all_nodes() ? SPACE : null,
 					$empty_col
 				), 'odd_row');
-				$row->setAttribute('data-parentid', $trigger['triggerid']);
+				$row->dataAttr('parentid', $trigger['triggerid']);
 				$row->addStyle('display: none;');
 				$table->addRow($row);
 
@@ -747,7 +747,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 // goButton name is necessary!!!
 		$goButton = new CSubmit('goButton', _('Go').' (0)');
-		$goButton->setAttribute('id', 'goButton');
+		$goButton->attr('id', 'goButton');
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
 

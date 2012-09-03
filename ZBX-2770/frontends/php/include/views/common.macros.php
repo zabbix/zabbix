@@ -21,17 +21,17 @@
 include dirname(__FILE__).'/js/common.macros.js.php';
 
 $macrosTable = new CTable(SPACE, 'formElementTable');
-$macrosTable->setAttribute('id', 'tbl_macros');
+$macrosTable->attr('id', 'tbl_macros');
 $macrosTable->addRow(array(_('Macro'), SPACE, _('Value'), SPACE));
 
 // fields
 $macros = array_values($this->data['macros']);
 foreach ($macros as $macroid => $macro) {
-	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30, 'no', 64);
-	$text1->setAttribute('placeholder', '{$MACRO}');
-	$text1->setAttribute('style', 'text-transform:uppercase;');
-	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, 'no', 255);
-	$text2->setAttribute('placeholder', _('value'));
+	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30, false, 64);
+	$text1->attr('placeholder', '{$MACRO}');
+	$text1->attr('style', 'text-transform:uppercase;');
+	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, false, 255);
+	$text2->attr('placeholder', _('value'));
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');
 
@@ -51,10 +51,10 @@ foreach ($macros as $macroid => $macro) {
 $addButton = new CButton('macro_add', _('Add'), null, 'link_menu');
 
 $buttonColumn = new CCol($addButton);
-$buttonColumn->setAttribute('colspan', 5);
+$buttonColumn->attr('colspan', 5);
 
 $buttonRow = new CRow();
-$buttonRow->setAttribute('id', 'row_new_macro');
+$buttonRow->attr('id', 'row_new_macro');
 $buttonRow->addItem($buttonColumn);
 
 $macrosTable->addRow($buttonRow);

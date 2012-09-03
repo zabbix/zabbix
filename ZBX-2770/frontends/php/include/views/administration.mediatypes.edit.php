@@ -31,7 +31,7 @@ $mediaTypeForm->addVar('mediatypeid', $this->data['mediatypeid']);
 
 // create form list
 $mediaTypeFormList = new CFormList('mediaTypeFormList');
-$mediaTypeFormList->addRow(_('Name'), new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 100));
+$mediaTypeFormList->addRow(_('Name'), new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, false, 100));
 
 // append type to form list
 $cmbType = new CComboBox('type', $this->data['type'], 'submit()');

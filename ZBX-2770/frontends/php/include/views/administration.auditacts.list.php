@@ -24,7 +24,7 @@ $auditWidget = new CWidget();
 // header
 $configForm = new CForm('get');
 $configComboBox = new CComboBox('config', 'auditacts.php');
-$configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
+$configComboBox->attr('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configComboBox->addItem('auditlogs.php', _('Logs'));
 $configComboBox->addItem('auditacts.php', _('Actions'));
 $configForm->addItem($configComboBox);
@@ -34,14 +34,14 @@ $auditWidget->addHeaderRowNumber();
 
 // create filter
 $filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
+$filterForm->attr('name', 'zbx_filter');
+$filterForm->attr('id', 'zbx_filter');
 $filterTable = new CTable('', 'filter');
 $filterTable->addRow(array(
 	array(
 		bold(_('Recipient')),
 		SPACE,
-		new CTextBox('alias', $this->data['alias'], 20),
+		new CTextBox('alias', $this->data['alias']),
 		new CButton('btn1', _('Select'), 'return PopUp(\'popup.php?dstfrm='.$filterForm->getName().
 			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1\');', 'T')
 	)
@@ -51,7 +51,7 @@ $filterButton->useJQueryStyle('main');
 $resetButton = new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();');
 $resetButton->useJQueryStyle();
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
-$buttonsDiv->setAttribute('style', 'padding: 4px 0px;');
+$buttonsDiv->attr('style', 'padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($buttonsDiv, 'controls'));
 $filterForm->addItem($filterTable);

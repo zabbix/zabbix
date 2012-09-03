@@ -74,10 +74,10 @@ foreach ($this->data['maintenances'] as $maintenance) {
 // create go button
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected maintenance periods?'));
+$goOption->attr('confirm', _('Delete selected maintenance periods?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 
 // append table to form

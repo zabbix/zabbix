@@ -42,7 +42,7 @@ else {
 
 	$refreshIcon = new CIcon(_('Menu'), 'iconmenu');
 	if (!empty($this->data['screen'])) {
-		$refreshIcon->addAction('onclick', 'javascript: create_page_menu(event, "hat_slides");');
+		$refreshIcon->onClick('create_page_menu(event, "hat_slides");');
 	}
 
 	$slideWidget->addPageHeader(
@@ -89,7 +89,7 @@ else {
 		}
 
 		$scrollDiv = new CDiv();
-		$scrollDiv->setAttribute('id', 'scrollbar_cntr');
+		$scrollDiv->attr('id', 'scrollbar_cntr');
 		$slideWidget->addFlicker($scrollDiv, CProfile::get('web.slides.filter.state', 1));
 		$slideWidget->addFlicker(BR(), CProfile::get('web.slides.filter.state', 1));
 

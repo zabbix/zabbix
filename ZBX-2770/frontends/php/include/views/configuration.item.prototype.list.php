@@ -102,19 +102,19 @@ foreach ($this->data['items'] as $item) {
 // create go buttons
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Enable selected items?'));
+$goOption->attr('confirm', _('Enable selected items?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected items?'));
+$goOption->attr('confirm', _('Disable selected items?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected items?'));
+$goOption->attr('confirm', _('Delete selected items?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 
 // append table to form

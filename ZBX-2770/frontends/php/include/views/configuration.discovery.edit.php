@@ -79,7 +79,7 @@ $discoveryForm->addItem($discoveryTabs);
 // append buttons to form
 $deleteButton = new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid'));
 if (empty($this->data['druleid'])) {
-	$deleteButton->setAttribute('disabled', 'disabled');
+	$deleteButton->attr('disabled', 'disabled');
 }
 $discoveryForm->addItem(makeFormFooter(
 	array(new CSubmit('save', _('Save'))),

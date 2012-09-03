@@ -32,8 +32,8 @@
  */
 function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $usedHostIds = null){
 	$filterForm = new CFormTable();
-	$filterForm->setAttribute('name','zbx_filter');
-	$filterForm->setAttribute('id','zbx_filter');
+	$filterForm->attr('name','zbx_filter');
+	$filterForm->attr('id','zbx_filter');
 
 	$filterForm->addVar('config',$config);
 	$filterForm->addVar('filter_timesince',date('YmdHis', $_REQUEST['filter_timesince']));
@@ -108,14 +108,14 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 
 //*
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick','javascript: '.
+	$clndr_icon->onClick(
 										'var pos = getPosition(this); '.
 										'pos.top+=10; '.
 										'pos.left+=16; '.
 										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 	$filtertimetab = new CTable(null,'calendar');
-	$filtertimetab->setAttribute('width','10%');
+	$filtertimetab->attr('width','10%');
 
 	$filtertimetab->setCellPadding(0);
 	$filtertimetab->setCellSpacing(0);
@@ -138,7 +138,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 					'"avail_report_since",'.
 					'"filter_timesince");');
 
-	$clndr_icon->AddAction('onclick','javascript: '.
+	$clndr_icon->onClick(
 										'var pos = getPosition(this); '.
 										'pos.top+=10; '.
 										'pos.left+=16; '.
@@ -192,8 +192,8 @@ function bar_report_form(){
 	$report_timetill = $_REQUEST['report_timetill'];
 
 	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->setAttribute('name','zbx_report');
-	$reportForm->setAttribute('id','zbx_report');
+	$reportForm->attr('name','zbx_report');
+	$reportForm->attr('id','zbx_report');
 
 	if(isset($_REQUEST['report_show']) && !empty($items))
 		$reportForm->addVar('report_show','show');
@@ -219,14 +219,14 @@ function bar_report_form(){
 //*
 
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick','javascript: '.
+	$clndr_icon->onClick(
 										'var pos = getPosition(this); '.
 										'pos.top+=10; '.
 										'pos.left+=16; '.
 										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 	$reporttimetab = new CTable(null,'calendar');
-	$reporttimetab->setAttribute('width','10%');
+	$reporttimetab->attr('width','10%');
 
 	$reporttimetab->setCellPadding(0);
 	$reporttimetab->setCellSpacing(0);
@@ -249,7 +249,7 @@ function bar_report_form(){
 					'"avail_report_since",'.
 					'"report_timesince");');
 
-	$clndr_icon->addAction('onclick','javascript: '.
+	$clndr_icon->onClick(
 										'var pos = getPosition(this); '.
 										'pos.top+=10; '.
 										'pos.left+=16; '.
@@ -332,8 +332,7 @@ function bar_report_form(){
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
 
-	$reset = new CButton('reset',_('Reset'));
-	$reset->setType('reset');
+	$reset = new CButtonReset('reset',_('Reset'));
 	$reportForm->addItemToBottomRow($reset);
 
 return $reportForm;
@@ -354,8 +353,8 @@ function bar_report_form2(){
 	$showlegend = get_request('showlegend',0);
 
 	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->setAttribute('name','zbx_report');
-	$reportForm->setAttribute('id','zbx_report');
+	$reportForm->attr('name','zbx_report');
+	$reportForm->attr('id','zbx_report');
 
 //	$reportForm->setMethod('post');
 	if(isset($_REQUEST['report_show']) && !empty($items))
@@ -398,7 +397,7 @@ function bar_report_form2(){
 							'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
-			$caption->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
+			$caption->onClick("return PopUp('".$edit_link."',840,340,'period_form');");
 
 			$periods_table->addRow(array(
 					new CCheckBox('group_pid['.$pid.']'),
@@ -470,8 +469,7 @@ function bar_report_form2(){
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
 
-	$reset = new CButton('reset',_('Reset'));
-	$reset->setType('reset');
+	$reset = new CButtonReset('reset',_('Reset'));
 	$reportForm->addItemToBottomRow($reset);
 
 return $reportForm;
@@ -500,8 +498,8 @@ function bar_report_form3(){
 	$palettetype = get_request('palettetype',0);
 
 	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->setAttribute('name','zbx_report');
-	$reportForm->setAttribute('id','zbx_report');
+	$reportForm->attr('name','zbx_report');
+	$reportForm->attr('id','zbx_report');
 
 //	$reportForm->setMethod('post');
 	if(isset($_REQUEST['report_show']) && !empty($items))
@@ -551,7 +549,7 @@ function bar_report_form3(){
 	}
 
 	$td_groups = new CCol(array(_('Group'),SPACE,$cmbGroups));
-	$td_groups->setAttribute('style','text-align: right;');
+	$td_groups->attr('style','text-align: right;');
 
 	$host_tb = new CTweenBox($reportForm,'hostids',$hostids,10);
 
@@ -588,14 +586,14 @@ function bar_report_form3(){
 // PERIOD
 
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick','javascript: '.
+	$clndr_icon->onClick(
 										'var pos = getPosition(this); '.
 										'pos.top+=10; '.
 										'pos.left+=16; '.
 										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 	$reporttimetab = new CTable(null,'calendar');
-	$reporttimetab->setAttribute('width','10%');
+	$reporttimetab->attr('width','10%');
 
 	$reporttimetab->setCellPadding(0);
 	$reporttimetab->setCellSpacing(0);
@@ -618,7 +616,7 @@ function bar_report_form3(){
 					'"avail_report_since",'.
 					'"report_timesince");');
 
-	$clndr_icon->addAction('onclick','javascript: '.
+	$clndr_icon->onClick(
 										'var pos = getPosition(this); '.
 										'pos.top+=10; '.
 										'pos.left+=16; '.
@@ -682,8 +680,8 @@ function bar_report_form3(){
 	$itemidVar = new CVar('items[0][itemid]', $itemid, 'items_0_itemid');
 	$reportForm->addItem($itemidVar);
 
-	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
-	$txtCondVal->setAttribute('id', 'items_0_description');
+	$txtCondVal = new CTextBox('items[0][description]',$description,50,true);
+	$txtCondVal->attr('id', 'items_0_description');
 
 	$btnSelect = new CButton('btn1', _('Select'),
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
@@ -708,8 +706,7 @@ function bar_report_form3(){
 	$reportForm->addRow(_('Palette') , array($paletteCmb,$paletteTypeCmb));
 	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
 
-	$reset = new CButton('reset', _('Reset'));
-	$reset->setType('reset');
+	$reset = new CButtonReset('reset', _('Reset'));
 	$reportForm->addItemToBottomRow($reset);
 
 	return $reportForm;

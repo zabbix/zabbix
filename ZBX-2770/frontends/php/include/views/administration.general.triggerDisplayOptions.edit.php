@@ -101,13 +101,13 @@ $triggerDOFormList->addRow(BR());
 // Display OK triggers
 $okPeriodTextBox = new CTextBox('ok_period', $this->data['ok_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
-$okPeriodTextBox->setAttribute('maxlength', '6');
+$okPeriodTextBox->attr('maxlength', '6');
 $triggerDOFormList->addRow(_('Display OK triggers for'), array($okPeriodTextBox, SPACE, _('seconds')));
 
 // Triggers blink on status change
 $okPeriodTextBox = new CTextBox('blink_period', $this->data['blink_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
-$okPeriodTextBox->setAttribute('maxlength', '6');
+$okPeriodTextBox->attr('maxlength', '6');
 $triggerDOFormList->addRow(_('On status change triggers blink for'), array($okPeriodTextBox, SPACE, _('seconds')));
 
 $severityView = new CTabView();

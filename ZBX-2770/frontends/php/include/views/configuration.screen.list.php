@@ -66,11 +66,11 @@ if (empty($this->data['templateid'])) {
 	$goComboBox->addItem('export', _('Export selected'));
 }
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected screens?'));
+$goOption->attr('confirm', _('Delete selected screens?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 
 // append table to form

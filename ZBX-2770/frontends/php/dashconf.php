@@ -120,7 +120,7 @@ if (!isset($_REQUEST['form_refresh'])) {
 
 $dashForm = new CForm();
 $dashForm->setName('dashconf');
-$dashForm->setAttribute('id', 'dashform');
+$dashForm->attr('id', 'dashform');
 
 $form_refresh = get_request('form_refresh', 0);
 $dashForm->addVar('form_refresh', ++$form_refresh);
@@ -158,11 +158,11 @@ $dashForm->addVar('filterEnable', $filterEnable);
 
 if ($filterEnable) {
 	$cbFilter = new CSpan(_('Enabled'), 'green underline pointer');
-	$cbFilter->setAttribute('onclick', "create_var('".$dashForm->getName()."', 'filterEnable', 0, true);");
+	$cbFilter->attr('onclick', "create_var('".$dashForm->getName()."', 'filterEnable', 0, true);");
 }
 else {
 	$cbFilter = new CSpan(_('Disabled'), 'red underline pointer');
-	$cbFilter->setAttribute('onclick', "$('dashform').enable(); create_var('".$dashForm->getName()."', 'filterEnable', 1, true);");
+	$cbFilter->attr('onclick', "$('dashform').enable(); create_var('".$dashForm->getName()."', 'filterEnable', 1, true);");
 }
 
 $dashList->addRow(_('Dashboard filter'), $cbFilter);
@@ -174,7 +174,7 @@ $cmbGroups->addItem(0, _('All'));
 $cmbGroups->addItem(1, _('Selected'));
 
 if (!$filterEnable) {
-	$cmbGroups->setAttribute('disabled', 'disabled');
+	$cmbGroups->attr('disabled', 'disabled');
 }
 
 $dashList->addRow(_('Host groups'), $cmbGroups);
@@ -199,13 +199,13 @@ if ($grpswitch == 1) {
 	CArrayHelper::sort($groups, $sortFields);
 
 	$lstGroups = new CListBox('del_groups[]', null, 15);
-	$lstGroups->setAttribute('style', 'width: 200px;');
+	$lstGroups->attr('style', 'width: 200px;');
 	foreach ($groups as $gnum => $group) {
 		$lstGroups->addItem($group['groupid'], $group['nodename'].$group['name']);
 	}
 
 	if (!$filterEnable) {
-		$lstGroups->setAttribute('disabled', 'disabled');
+		$lstGroups->attr('disabled', 'disabled');
 	}
 
 	$addButton = new CButton('add', _('Add'), "return PopUp('popup_right.php?dstfrm=".$dashForm->getName()."&permission=".PERM_READ_WRITE."',450,450);");
@@ -221,7 +221,7 @@ if ($grpswitch == 1) {
 // SPACE added to extend CB width in Chrome
 $cbMain = new CCheckBox('maintenance', $maintenance, null, '1');
 if (!$filterEnable) {
-	$cbMain->setAttribute('disabled', 'disabled');
+	$cbMain->attr('disabled', 'disabled');
 }
 
 $dashList->addRow(_('Hosts'), array($cbMain, _('Show hosts in maintenance')));
@@ -257,7 +257,7 @@ $cb->addItems(array(
 ));
 $cb->setEnabled($filterEnable && $config['event_ack_enable']);
 if (!$config['event_ack_enable']) {
-	$cb->setAttribute('title', _('Event acknowledging disabled'));
+	$cb->attr('title', _('Event acknowledging disabled'));
 }
 $dashList->addRow(_('Problem display'), $cb);
 //-----

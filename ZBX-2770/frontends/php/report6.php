@@ -170,7 +170,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$rep_tab->setCellPadding(3);
 	$rep_tab->setCellSpacing(3);
 
-	$rep_tab->setAttribute('border',0);
+	$rep_tab->attr('border',0);
 
 // --------------
 	switch($config){
@@ -204,13 +204,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 
 	$outer_table = new CTable();
-	$outer_table->setAttribute('border',0);
-	$outer_table->setAttribute('width','100%');
+	$outer_table->attr('border',0);
+	$outer_table->attr('width','100%');
 
 	$outer_table->setCellPadding(1);
 	$outer_table->setCellSpacing(1);
 	$tmp_row = new CRow($rep_tab);
-	$tmp_row->setAttribute('align','center');
+	$tmp_row->attr('align','center');
 	$outer_table->addRow($tmp_row);
 
 	$rep6_wdgt->addItem($outer_table);

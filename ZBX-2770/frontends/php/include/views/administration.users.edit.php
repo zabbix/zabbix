@@ -63,7 +63,7 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	else {
 		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
 		if ($this->data['alias'] == ZBX_GUEST_USER) {
-			$passwdButton->setAttribute('disabled', 'disabled');
+			$passwdButton->attr('disabled', 'disabled');
 		}
 		$userFormList->addRow(_('Password'), $passwdButton);
 	}
@@ -114,7 +114,7 @@ $userFormList->addRow(_('Theme'), $themeComboBox);
 $autologoutCheckBox = new CCheckBox('autologout_visible', ($this->data['autologout'] == 0) ? 'no' : 'yes');
 $autologoutTextBox = new CNumericBox('autologout', ($this->data['autologout'] == 0) ? '900' : $this->data['autologout'], 4);
 if (!$this->data['autologout']) {
-	$autologoutTextBox->setAttribute('disabled', 'disabled');
+	$autologoutTextBox->attr('disabled', 'disabled');
 }
 $userFormList->addRow(_('Auto-login'), new CCheckBox('autologin', $this->data['autologin'], null, 1));
 $userFormList->addRow(_('Auto-logout (min 90 seconds)'), array($autologoutCheckBox, $autologoutTextBox));
@@ -297,7 +297,7 @@ if (!$this->data['is_profile']) {
 	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
 	$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
 	if (isset($this->data['userid']) && bccomp($USER_DETAILS['userid'], $this->data['userid']) == 0) {
-		$userTypeComboBox->setEnabled('disabled');
+		$userTypeComboBox->setEnabled(false);
 		$permissionsFormList->addRow(_('User type'), array($userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))));
 		$userForm->addVar('user_type', $this->data['user_type']);
 	}
@@ -323,7 +323,7 @@ else {
 	if (!$this->data['is_profile']) {
 		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid').url_param('config'));
 		if (bccomp($USER_DETAILS['userid'], $this->data['userid']) == 0) {
-			$deleteButton->setAttribute('disabled', 'disabled');
+			$deleteButton->attr('disabled', 'disabled');
 		}
 		$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array($deleteButton, new CButtonCancel(url_param('config')))));
 	}

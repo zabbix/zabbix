@@ -222,10 +222,10 @@ if (isset($_REQUEST['print'])) {
 	$req->setArgument('print', null);
 
 	$link = new CLink(bold('&laquo;'._('BACK')), $req->getUrl(), 'small_font', null, 'nosid');
-	$link->setAttribute('style', 'padding-left: 10px;');
+	$link->attr('style', 'padding-left: 10px;');
 
 	$printview = new CDiv($link, 'printless');
-	$printview->setAttribute('style', 'border: 1px #333 dotted;');
+	$printview->attr('style', 'border: 1px #333 dotted;');
 	$printview->show();
 }
 
@@ -251,7 +251,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 						" if (this.state == 'none') { this.state = 'block'; }".
 						" else { this.state = 'none'; }".
 						" showHideByName('zbx_gebug_info', this.state);";
-			$debug->setAttribute('onclick', 'javascript: '.$d_script);
+			$debug->attr('onclick', 'javascript: '.$d_script);
 			array_push($page_header_r_col, $debug, '|');
 		}
 
@@ -304,7 +304,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		if (!empty($available_nodes)) {
 			$node_form = new CForm('get');
 			$node_form->cleanItems();
-			$node_form->setAttribute('id', 'node_form');
+			$node_form->attr('id', 'node_form');
 
 			// create ComboBox with selected nodes
 			$nodesComboBox = null;
@@ -322,7 +322,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 				' pos.top += 20;'.
 				" \$('div_node_tree').setStyle({top: pos.top + 'px'});";
 			$button_show_tree = new CButton('show_node_tree', _('Select Nodes'), $jscript);
-			$button_show_tree->setAttribute('id', 'button_show_tree');
+			$button_show_tree->attr('id', 'button_show_tree');
 
 			// create node tree
 			$node_tree = array();
@@ -336,7 +336,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			foreach ($available_nodes as $node) {
 				$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);
 				$combo_select_node = new CCheckbox('selected_nodes['.$node['nodeid'].']', $checked, null, $node['nodeid']);
-				$combo_select_node->setAttribute('style', 'margin: 1px 4px 2px 4px;');
+				$combo_select_node->attr('style', 'margin: 1px 4px 2px 4px;');
 
 				// if no parent for node, link it to root (0)
 				if (!isset($available_nodes[$node['masterid']])) {
@@ -356,7 +356,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$div_node_tree = new CDiv();
 			$div_node_tree->addItem($node_tree->getHTML());
 			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display: 'none'});"));
-			$div_node_tree->setAttribute('id', 'div_node_tree');
+			$div_node_tree->attr('id', 'div_node_tree');
 			$div_node_tree->addStyle('display: none');
 
 			if (!is_null($nodesComboBox)) {
@@ -386,11 +386,11 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	// 1st level menu
 	$table = new CTable(null, 'maxwidth');
 	$r_col = new CCol($node_form, 'right');
-	$r_col->setAttribute('style', 'line-height: 1.8em;');
+	$r_col->attr('style', 'line-height: 1.8em;');
 	$table->addRow(array($menu_table, $r_col));
 
 	$page_menu = new CDiv(null, 'textwhite');
-	$page_menu->setAttribute('id', 'mmenu');
+	$page_menu->attr('id', 'mmenu');
 	$page_menu->addItem($table);
 
 	// 2nd level menu
@@ -416,24 +416,24 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		array_pop($sub_menu_row);
 
 		$sub_menu_div = new CDiv($sub_menu_row);
-		$sub_menu_div->setAttribute('id', 'sub_'.$label);
-		$sub_menu_div->addAction('onmouseover', 'javascript: MMenu.submenu_mouseOver();');
-		$sub_menu_div->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+		$sub_menu_div->attr('id', 'sub_'.$label);
+		$sub_menu_div->onMouseOver('MMenu.submenu_mouseOver();');
+		$sub_menu_div->onMouseOut('MMenu.mouseOut();');
 
 		if (isset($page['menu']) && $page['menu'] == $label) {
 			$menu_selected = true;
-			$sub_menu_div->setAttribute('style', 'display: block;');
+			$sub_menu_div->attr('style', 'display: block;');
 			insert_js('MMenu.def_label = '.zbx_jsvalue($label));
 		}
 		else {
-			$sub_menu_div->setAttribute('style', 'display: none;');
+			$sub_menu_div->attr('style', 'display: none;');
 		}
 		$menu_divs[] = $sub_menu_div;
 	}
 
 	$sub_menu_div = new CDiv(SPACE);
-	$sub_menu_div->setAttribute('id', 'sub_empty');
-	$sub_menu_div->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
+	$sub_menu_div->attr('id', 'sub_empty');
+	$sub_menu_div->attr('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
 
 	$menu_divs[] = $sub_menu_div;
 	$search_div = null;

@@ -159,7 +159,7 @@ foreach ($this->data['drules'] as $drule) {
 				$time = $h_data['services'][$name]['time'];
 
 				$hintTable = new CTableInfo();
-				$hintTable->setAttribute('style', 'width: auto;');
+				$hintTable->attr('style', 'width: auto;');
 
 				if ($class == 'active') {
 					$hintTable->setHeader(_('Uptime'));

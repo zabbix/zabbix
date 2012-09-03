@@ -91,8 +91,8 @@ foreach ($this->data['action']['conditions'] as $condition) {
 
 	$label = num2letter($i);
 	$labelSpan = new CSpan('('.$label.')', 'label');
-	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
-	$labelSpan->setAttribute('data-label', $label);
+	$labelSpan->dataAttr('conditiontype', $condition['conditiontype']);
+	$labelSpan->dataAttr('label', $label);
 
 	$conditionTable->addRow(
 		array(
@@ -134,7 +134,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('group', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('group', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$actionForm->getName().
@@ -147,7 +147,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_TEMPLATE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('hostname', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('hostname', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=host_templates&srcfld1=templateid&srcfld2=name'.
@@ -160,7 +160,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('hostname', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('hostname', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name'.
@@ -173,7 +173,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_TRIGGER:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('trigger', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('trigger', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$actionForm->getName().
@@ -207,7 +207,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_NODE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('node', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('node', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=nodes&srcfld1=nodeid&srcfld2=name'.
@@ -220,7 +220,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
@@ -232,7 +232,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DCHECK:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
@@ -244,7 +244,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
-			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
@@ -412,7 +412,7 @@ if (!empty($this->data['new_operation'])) {
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$stepNumericBox = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
-		$stepNumericBox->addAction('onchange', 'javascript:'.$stepNumericBox->getAttribute('onchange').' if(this.value == 0) this.value=1;');
+		$stepNumericBox->onClick($stepNumericBox->getAttr('onchange').' if(this.value == 0) this.value=1;');
 
 		$stepTable = new CTable();
 		$stepTable->addRow(array(_('From'), $stepNumericBox), 'indent_both');
@@ -472,7 +472,7 @@ if (!empty($this->data['new_operation'])) {
 			$usrgrpList = new CTable(null, 'formElementTable');
 			$usrgrpList->setHeader(array(_('User group'), _('Action')));
 			$usrgrpList->attr('style', 'min-width: 310px;');
-			$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
+			$usrgrpList->attr('id', 'opmsgUsrgrpList');
 
 			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1", 450, 450)', 'link_menu');
 			$addUsrgrpBtn->attr('id', 'addusrgrpbtn');
@@ -481,7 +481,7 @@ if (!empty($this->data['new_operation'])) {
 			$userList = new CTable(null, 'formElementTable');
 			$userList->setHeader(array(_('User'), _('Action')));
 			$userList->attr('style', 'min-width: 310px;');
-			$userList->setAttribute('id', 'opmsgUserList');
+			$userList->attr('id', 'opmsgUserList');
 
 			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=alias&multiselect=1", 450, 450)', 'link_menu');
 			$addUserBtn->attr('id', 'adduserbtn');
@@ -637,7 +637,7 @@ if (!empty($this->data['new_operation'])) {
 
 			// target list
 			$cmdList = new CDiv($cmdList, 'objectgroup border_dotted ui-corner-all inlineblock');
-			$cmdList->setAttribute('id', 'opCmdList');
+			$cmdList->attr('id', 'opCmdList');
 			$newOperationsTable->addRow(array(_('Target list'), $cmdList), 'indent_top');
 
 			// type
@@ -742,7 +742,7 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$groupList = new CTable();
-			$groupList->setAttribute('id', 'opGroupList');
+			$groupList->attr('id', 'opGroupList');
 
 			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&multiselect=1&reference=dsc_groupid",450,450)', 'link_menu');
 			$groupList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opGroupListFooter'));
@@ -775,7 +775,7 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$templateList = new CTable();
-			$templateList->setAttribute('id', 'opTemplateList');
+			$templateList->attr('id', 'opTemplateList');
 
 			$addUsrgrpBtn = new CButton('add', _('Add'),
 				'return PopUp("popup.php?srctbl=host_templates&srcfld1=templateid&srcfld2=name'.
@@ -884,7 +884,7 @@ if (!empty($this->data['new_operation'])) {
 				_('Type of calculation'),
 				array(
 					$calcTypeComboBox,
-					new CTextBox('preview', $grouped_opconditions, ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
+					new CTextBox('preview', $grouped_opconditions, ZBX_TEXTBOX_STANDARD_SIZE, true)
 				)
 			));
 		}

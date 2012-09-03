@@ -44,7 +44,7 @@ $servicesFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], Z
 
 // append parent link to form list
 $servicesFormList->addRow(_('Parent service'), array(
-	new CTextBox('parent_name', $this->data['parentname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes', 128),
+	new CTextBox('parent_name', $this->data['parentname'], ZBX_TEXTBOX_STANDARD_SIZE, true, 128),
 	new CButton('select_parent', _('Change'), "javascript: openWinCentered('services.php?pservices=1".url_param('serviceid')."', 'ZBX_Services_List', 740, 420, 'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');", 'formlist')
 ));
 
@@ -55,26 +55,26 @@ $servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox)
 
 // append SLA to form list
 $showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
-$goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, 'no', 8);
+$goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, false, 8);
 if (!$this->data['showsla']) {
-	$goodslaTextBox->setAttribute('disabled', 'disabled');
+	$goodslaTextBox->attr('disabled', 'disabled');
 }
 $servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), array($showslaCheckbox, $goodslaTextBox));
 
 // append trigger to form list
 $servicesFormList->addRow(_('Trigger'), array(
-	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 	new CButton('btn1', _('Select'), "return PopUp('popup.php?"."dstfrm=".$servicesForm->getName()."&dstfld1=triggerid".
 		"&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1&with_triggers=1');", 'formlist')
 ));
-$servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, 'no', 3));
+$servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, false, 3));
 
 /*
  * Dependencies tab
  */
 $servicesChildTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-$servicesChildTable->setAttribute('style', 'min-width:500px;');
-$servicesChildTable->setAttribute('id', 'service_children');
+$servicesChildTable->attr('style', 'min-width:500px;');
+$servicesChildTable->attr('id', 'service_children');
 $servicesChildTable->setHeader(array(_('Services'), _('Soft'), _('Trigger'), _('Action')));
 foreach ($this->data['children'] as $child) {
 	$row = new CRow(array(
@@ -93,7 +93,7 @@ foreach ($this->data['children'] as $child) {
 		!empty($child['trigger']) ? $child['trigger'] : '-',
 		new CButton('remove', _('Remove'), 'javascript: removeDependentChild(\''.$child['serviceid'].'\');', 'link_menu')
 	));
-	$row->setAttribute('id', 'children_'.$child['serviceid']);
+	$row->attr('id', 'children_'.$child['serviceid']);
 	$servicesChildTable->addRow($row);
 }
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
@@ -111,7 +111,7 @@ $servicesDependenciesFormList->addRow(
  */
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = new CTable(_('No times defined. Work 24x7.'), 'formElementTable');
-$servicesTimeTable->setAttribute('style', 'min-width:500px;');
+$servicesTimeTable->attr('style', 'min-width:500px;');
 $servicesTimeTable->setHeader(array(_('Type'), _('Interval'), _('Note'), _('Action')));
 
 $i = 0;
@@ -145,7 +145,7 @@ foreach ($this->data['times'] as $serviceTime) {
 		htmlspecialchars($serviceTime['note']),
 		new CButton('remove', _('Remove'), 'javascript: removeTime(\''.$i.'\');', 'link_menu')
 	));
-	$row->setAttribute('id', 'times_'.$i);
+	$row->attr('id', 'times_'.$i);
 	$servicesTimeTable->addRow($row);
 	$i++;
 }
@@ -170,38 +170,38 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	$timeCalendarTable = new CTable();
 
 	$calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
-	$calendarIcon->addAction('onclick', "javascript: var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_since'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_till'].clndr.clndrhide();");
+	$calendarIcon->onClick("var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_since'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_till'].clndr.clndrhide();");
 
 	// downtime since
 	$noteTextBox = new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE);
-	$noteTextBox->setAttribute('placeholder', _('short description'));
+	$noteTextBox->attr('placeholder', _('short description'));
 	$downtimeSinceDay = new CNumericBox('downtime_since_day', $downtimeSince > 0 ? date('d', $downtimeSince) : '', 2);
-	$downtimeSinceDay->setAttribute('placeholder', _('dd'));
+	$downtimeSinceDay->attr('placeholder', _('dd'));
 	$downtimeSinceMonth = new CNumericBox('downtime_since_month', $downtimeSince > 0 ? date('m', $downtimeSince) : '', 2);
-	$downtimeSinceMonth->setAttribute('placeholder', _('mm'));
+	$downtimeSinceMonth->attr('placeholder', _('mm'));
 	$downtimeSinceYear = new CNumericBox('downtime_since_year', $downtimeSince > 0 ? date('Y', $downtimeSince) : '', 4);
-	$downtimeSinceYear->setAttribute('placeholder', _('yyyy'));
+	$downtimeSinceYear->attr('placeholder', _('yyyy'));
 	$downtimeSinceHour = new CNumericBox('downtime_since_hour', $downtimeSince > 0 ? date('H', $downtimeSince) : '', 2);
-	$downtimeSinceHour->setAttribute('placeholder', _('hh'));
+	$downtimeSinceHour->attr('placeholder', _('hh'));
 	$downtimeSinceMinute = new CNumericBox('downtime_since_minute', $downtimeSince > 0 ? date('i', $downtimeSince) : '', 2);
-	$downtimeSinceMinute->setAttribute('placeholder', _('mm'));
+	$downtimeSinceMinute->attr('placeholder', _('mm'));
 
 	$timeCalendarTable->addRow(array(_('Note'), $noteTextBox));
 	$timeCalendarTable->addRow(array(_('From'), new CCol(array($downtimeSinceDay, '/', $downtimeSinceMonth, '/', $downtimeSinceYear, SPACE, $downtimeSinceHour, ':', $downtimeSinceMinute, $calendarIcon))));
 	zbx_add_post_js('create_calendar(null, ["downtime_since_day", "downtime_since_month", "downtime_since_year", "downtime_since_hour", "downtime_since_minute"], "downtime_since", "new_service_time_from");');
 
 	// downtime till
-	$calendarIcon->addAction('onclick', "javascript: var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_till'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_since'].clndr.clndrhide();");
+	$calendarIcon->onClick("var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_till'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_since'].clndr.clndrhide();");
 	$downtimeTillDay = new CNumericBox('downtime_till_day', $downtimeTill > 0 ? date('d', $downtimeTill) : '', 2);
-	$downtimeTillDay->setAttribute('placeholder', _('dd'));
+	$downtimeTillDay->attr('placeholder', _('dd'));
 	$downtimeTillMonth = new CNumericBox('downtime_till_month', $downtimeTill > 0 ? date('m', $downtimeTill) : '', 2);
-	$downtimeTillMonth->setAttribute('placeholder', _('mm'));
+	$downtimeTillMonth->attr('placeholder', _('mm'));
 	$downtimeTillYear = new CNumericBox('downtime_till_year', $downtimeTill > 0 ? date('Y', $downtimeTill) : '', 4);
-	$downtimeTillYear->setAttribute('placeholder', _('yyyy'));
+	$downtimeTillYear->attr('placeholder', _('yyyy'));
 	$downtimeTillHour = new CNumericBox('downtime_till_hour', $downtimeTill > 0 ? date('H', $downtimeTill) : '', 2);
-	$downtimeTillHour->setAttribute('placeholder', _('hh'));
+	$downtimeTillHour->attr('placeholder', _('hh'));
 	$downtimeTillMinute = new CNumericBox('downtime_till_minute', $downtimeTill > 0 ? date('i', $downtimeTill) : '', 2);
-	$downtimeTillMinute->setAttribute('placeholder', _('mm'));
+	$downtimeTillMinute->attr('placeholder', _('mm'));
 
 	$timeCalendarTable->addRow(array(_('Till'), new CCol(array($downtimeTillDay, '/', $downtimeTillMonth, '/', $downtimeTillYear, SPACE, $downtimeTillHour, ':', $downtimeTillMinute, $calendarIcon))));
 	zbx_add_post_js('create_calendar(null, ["downtime_till_day", "downtime_till_month", "downtime_till_year", "downtime_till_hour", "downtime_till_minute"], "downtime_till", "new_service_time_to");');
@@ -219,16 +219,16 @@ else {
 	}
 	$timeFromHourTextBox = new CTextBox('new_service_time[from_hour]', isset($_REQUEST['new_service_time']['from_hour'])
 			? $_REQUEST['new_service_time']['from_hour'] : '', 2, 'no', 2);
-	$timeFromHourTextBox->setAttribute('placeholder', _('hh'));
+	$timeFromHourTextBox->attr('placeholder', _('hh'));
 	$timeFromMinuteTextBox = new CTextBox('new_service_time[from_minute]', isset($_REQUEST['new_service_time']['from_minute'])
 			? $_REQUEST['new_service_time']['from_minute'] : '', 2, 'no', 2);
-	$timeFromMinuteTextBox->setAttribute('placeholder', _('mm'));
+	$timeFromMinuteTextBox->attr('placeholder', _('mm'));
 	$timeToHourTextBox = new CTextBox('new_service_time[to_hour]', isset($_REQUEST['new_service_time']['to_hour'])
 			? $_REQUEST['new_service_time']['to_hour'] : '', 2, 'no', 2);
-	$timeToHourTextBox->setAttribute('placeholder', _('hh'));
+	$timeToHourTextBox->attr('placeholder', _('hh'));
 	$timeToMinuteTextBox = new CTextBox('new_service_time[to_minute]', isset($_REQUEST['new_service_time']['to_minute'])
 			? $_REQUEST['new_service_time']['to_minute'] : '', 2, 'no', 2);
-	$timeToMinuteTextBox->setAttribute('placeholder', _('mm'));
+	$timeToMinuteTextBox->attr('placeholder', _('mm'));
 
 	$serviceTimeTable->addRow(array(_('From'), $weekFromComboBox, new CCol(array(_('Time'), SPACE, $timeFromHourTextBox, ' : ', $timeFromMinuteTextBox))));
 	$serviceTimeTable->addRow(array(_('Till'), $weekToComboBox, new CCol(array(_('Time'), SPACE, $timeToHourTextBox, ' : ', $timeToMinuteTextBox))));
