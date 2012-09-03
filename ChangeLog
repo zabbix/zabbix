@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5463] fixed inability to login if http auth is enabled and frontend access is set to internal (Vedmak)
 ...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 64 MB (Andris)
 ..F....... [ZBX-5167] fixed incorrect screen count on the templated screen configuration page (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
