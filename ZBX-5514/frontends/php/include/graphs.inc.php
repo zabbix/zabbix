@@ -268,14 +268,12 @@ function get_min_itemclock_by_itemid($itemids) {
 				$sql_from = 'history';
 		}
 
-		$res = DBselect(
+		$dbMin = DBfetch(DBselect(
 			'SELECT MIN(ht.clock) AS min_clock'.
 			' FROM '.$sql_from.' ht'.
 			' WHERE '.DBcondition('ht.itemid', $itemids)
-		);
-		while ($min_tmp = DBfetch($res)) {
-			$min = empty($min) ? $min_tmp['min_clock'] : min($min, $min_tmp['min_clock']);
-		}
+		));
+		$min = empty($min) ? $dbMin['min_clock'] : min($min, $dbMin['min_clock']);
 	}
 
 	return empty($min) ? $result : $min;
