@@ -283,7 +283,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
-				$res = calculate_item_nextcheck(0, 0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
+				$res = calculateItemNextcheck(0, 0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
 				if ($res['delay'] == SEC_PER_YEAR) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Item will not be refreshed. Please enter a correct update interval.'));
