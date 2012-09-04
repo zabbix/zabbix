@@ -481,8 +481,6 @@
 	}
 
 	jQuery(document).ready(function() {
-		setTimeout(function() {jQuery('#name').focus()}, 10);
-
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
