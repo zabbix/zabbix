@@ -236,7 +236,7 @@ function access_deny() {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
 	else {
-		$url = new CUrl($_SERVER['REQUEST_URI']);
+		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);
 		$url = urlencode($url->toString());
 
@@ -255,6 +255,7 @@ function access_deny() {
 		));
 		$warning->show();
 	}
+
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
