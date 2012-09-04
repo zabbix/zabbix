@@ -1,6 +1,5 @@
 * text=auto !eol
 /ChangeLog.legend -text
-/api -text
 bin/win32/zabbix_agentd.exe -text
 bin/win32/zabbix_get.exe -text
 bin/win32/zabbix_sender.exe -text
