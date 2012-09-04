@@ -236,9 +236,9 @@ function access_deny() {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
 	else {
-		$url = new CUrl($_SERVER['REQUEST_URI']);
+		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);
-		$url = (strpos($_SERVER['REQUEST_URI'], 'index.php') > 0) ? '' : '?request='.urlencode($url->toString());
+		$url = urlencode($url->toString());
 
 		$warning = new CWarning(_('You are not logged in.'), array(
 			_('You cannot view this URL as a'),
@@ -250,7 +250,7 @@ function access_deny() {
 			_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 		));
 		$warning->setButtons(array(
-			new CButton('login', _('Login'), 'javascript: document.location = "index.php'.$url.'";', 'formlist'),
+			new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
 			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
 		));
 		$warning->show();
