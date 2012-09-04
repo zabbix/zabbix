@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,12 +10,12 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
@@ -533,14 +533,15 @@ function get_status() {
 	$status['zabbix_server'] = zabbixIsRunning() ? _('Yes') : _('No');
 
 	// triggers
-	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
-			' FROM triggers t'.
-				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
-				' INNER JOIN items i ON f.itemid=i.itemid'.
-				' INNER JOIN hosts h ON i.hostid=h.hostid'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-			' GROUP BY t.status,t.value');
+	$dbTriggers = DBselect(
+		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
+		' FROM triggers t'.
+			' INNER JOIN functions f ON t.triggerid=f.triggerid'.
+			' INNER JOIN items i ON f.itemid=i.itemid'.
+			' INNER JOIN hosts h ON i.hostid=h.hostid'.
+		' WHERE i.status='.ITEM_STATUS_ACTIVE.
+			' AND h.status='.HOST_STATUS_MONITORED.
+		' GROUP BY t.status,t.value');
 	while ($dbTrigger = DBfetch($dbTriggers)) {
 		switch ($dbTrigger['status']) {
 			case TRIGGER_STATUS_ENABLED:
@@ -566,12 +567,13 @@ function get_status() {
 	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items
-	$dbItems = DBselect('SELECT COUNT(*) AS cnt,i.status'.
-			' FROM items i'.
-				' INNER JOIN hosts h ON i.hostid=h.hostid'.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
-			' GROUP BY i.status');
+	$dbItems = DBselect(
+		'SELECT COUNT(*) AS cnt,i.status'.
+		' FROM items i'.
+			' INNER JOIN hosts h ON i.hostid=h.hostid'.
+		' WHERE h.status='.HOST_STATUS_MONITORED.
+			' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
+		' GROUP BY i.status');
 	while ($dbItem = DBfetch($dbItems)) {
 		switch ($dbItem['status']) {
 			case ITEM_STATUS_ACTIVE:
@@ -589,10 +591,11 @@ function get_status() {
 		+ $status['items_count_not_supported'];
 
 	// hosts
-	$dbHosts = DBselect('SELECT COUNT(*) AS cnt,h.status'.
-			' FROM hosts h'.
-			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
-			' GROUP BY h.status');
+	$dbHosts = DBselect(
+		'SELECT COUNT(*) AS cnt,h.status'.
+		' FROM hosts h'.
+		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
+		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:

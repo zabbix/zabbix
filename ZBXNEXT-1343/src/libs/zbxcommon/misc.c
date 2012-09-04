@@ -2111,7 +2111,7 @@ double	str2double(const char *str)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_hostname_char(char c)
@@ -2135,7 +2135,7 @@ int	is_hostname_char(char c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_key_char(char c)
@@ -2159,7 +2159,7 @@ int	is_key_char(char c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: in trigger function allowed characters: 'a-z'                    *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_function_char(char c)
@@ -2180,7 +2180,7 @@ int	is_function_char(char c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: allowed characters in macro names: '0-9A-Z._'                    *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	is_macro_char(char c)
@@ -2256,7 +2256,7 @@ void	make_hostname(char *host)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 unsigned char	get_interface_type_by_item_type(unsigned char type)

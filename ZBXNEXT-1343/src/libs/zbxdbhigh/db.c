@@ -824,7 +824,7 @@ double	DBget_requiredperformance()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* !!! Don't forget sync code with PHP !!! */
+	/* !!! Don't forget to sync the code with PHP !!! */
 	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
 			" where h.hostid=i.hostid and h.status=%d and i.status=%d and i.delay<>0",
 			HOST_STATUS_MONITORED,
