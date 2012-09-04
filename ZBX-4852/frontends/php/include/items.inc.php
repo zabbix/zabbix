@@ -1050,7 +1050,7 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 function checkTimePeriod($period, $now) {
 	if (sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2) != 6) {
 		if (sscanf($period, '%d,%d:%d-%d:%d', $d1, $h1, $m1, $h2, $m2) != 5) {
-			// Delay period format is wrong - skip
+			// delay period format is wrong - skip
 			return false;
 		}
 		$d2 = $d1;
@@ -1224,8 +1224,7 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 		$nextcheck = $now + $delay;
 	}
 	else {
-		// Try to find the nearest 'nextcheck' value with condition
-		// 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
+		// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
 
 		$arrOfFlexIntervals = explode(';', $flexIntervals);
 		$t = $now;
@@ -1251,7 +1250,7 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 				}
 			}
 
-			// 'nextcheck' < end of the current interval?
+			// 'nextcheck' < end of the current interval ?
 			// the end of the current interval is the beginning of the next interval - 1
 			if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextcheck >= $nextInterval) {
 				// 'nextcheck' is beyond the current interval
