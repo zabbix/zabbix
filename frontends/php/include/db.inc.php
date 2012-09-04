@@ -675,6 +675,10 @@ if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 	function zbx_dbstr($var){
@@ -688,6 +692,10 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS BIGINT) ';
+	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
@@ -703,6 +711,15 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS NUMBER(20)) ';
 	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
+	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == 'IBM_DB2') {
 	function zbx_dbstr($var){
@@ -717,6 +734,15 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == 'IBM_DB2') {
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
+	}
 }
 else {
 	function zbx_dbstr($var){
@@ -730,6 +756,10 @@ else {
 
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS BIGINT) ';
+	}
+
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
 
@@ -835,9 +865,12 @@ else {
 		$nodeid = get_current_nodeid(false);
 
 		$found = false;
+
+		$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+		$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+
 		do{
-			$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+
 
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 			if(!is_resource($db_select)) return false;
@@ -849,12 +882,6 @@ else {
 					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 				}
 				else{
-/*					$ret1 = $row["id"];
-					if($ret1 >= $max) {
-						"Maximum number of id's was exceeded"
-					}
-//*/
-
 					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',".$row['id'].')');
 				}
 				continue;

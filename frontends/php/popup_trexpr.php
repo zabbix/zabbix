@@ -328,13 +328,13 @@
 	$expr_type = $function.'['.$operator.']';
 
 	if($itemid){
-		$options = array(
+		$item_data = CItem::get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $itemid,
+			'nodeids' => id2nodeid($itemid),
 			'webitems' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND
-		);
-		$item_data = CItem::get($options);
+		));
 		$item_data = reset($item_data);
 		$item_key = $item_data['key_'];
 
@@ -450,14 +450,15 @@ if(form){
 
 
 	//If user has already selected an item
-	if (isset($_REQUEST['itemid'])){
+	$selectedItemId = get_request('itemid');
+	if ($selectedItemId) {
 		//getting type of return value for the item user selected
-		$options = array(
-			'itemids' => array($_REQUEST['itemid']),
+		$selectedItems = CItem::get(array(
+			'itemids' => array($selectedItemId),
+			'nodeids' => id2nodeid($selectedItemId),
 			'output' => API_OUTPUT_EXTEND
-		);
-		$selectedItems = CItem::get($options);
-		if($selectedItem = reset($selectedItems)){
+		));
+		if($selectedItem = reset($selectedItems)) {
 			$itemValueType = $selectedItem['value_type'];
 		}
 	}

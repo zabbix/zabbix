@@ -43,7 +43,7 @@ include_once 'include/page_header.php';
 
 		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,	null,			null),
-		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
+		'itemid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID.NOT_ZERO,	'isset({save})'),
 		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
 		'axisside'=>	array(T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT),	null),
@@ -87,7 +87,6 @@ include_once 'include/page_header.php';
 			$_REQUEST['color']."',".
 			$_REQUEST['calc_fnc'].",".
 			$_REQUEST['axisside'].");\n");
-
 	}
 	else{
 		echo SBR;
@@ -107,12 +106,6 @@ include_once 'include/page_header.php';
 		$calc_fnc	= get_request('calc_fnc',	2);
 		$axisside	= get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
-		$description = '';
-		if($itemid > 0){
-			$description = get_item_by_itemid($itemid);
-			$description = item_description($description);
-		}
-
 		$frmGItem->addVar('gid',$gid);
 		$frmGItem->addVar('config',$config);
 		$frmGItem->addVar('list_name',$list_name);
@@ -121,9 +114,7 @@ include_once 'include/page_header.php';
 		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT),
 			S_CAPTION), new CTextBox('caption',$caption,32));
 
-//		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
-
-		$txtCondVal = new CTextBox('description',$description,50,'yes');
+		$txtCondVal = new CTextBox('description',$caption,50,'yes');
 
 		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().

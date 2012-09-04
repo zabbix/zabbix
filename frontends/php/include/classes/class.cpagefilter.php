@@ -10,7 +10,7 @@ class CPageFilter{
 
 // profiles idx
 	private $_profileIdx = array();
-	
+
 	private $_profileIds = array();
 	private $_requestIds = array();
 
@@ -443,7 +443,7 @@ options = array(
 		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode);
 	}
 
-	public function getGraphsCB($withNode=false){		
+	public function getGraphsCB($withNode=false){
 		$cmb = new CComboBox('graphid', $this->graphid, 'javascript: submit();');
 		$items = $this->graphs;
 

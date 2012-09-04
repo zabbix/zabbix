@@ -28,7 +28,7 @@
 	}
 
 	function get_tr_event_by_eventid($eventid){
-		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
+		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type,t.expression '.
 				' FROM events e,triggers t '.
 				' WHERE e.eventid='.$eventid.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
@@ -255,7 +255,9 @@ function make_event_details($eventid){
 
 	$table = new CTableInfo();
 
-	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
+	$description = expand_trigger_description_by_data(zbx_array_merge($event, array('clock'=>$event['clock'])),ZBX_FLAG_EVENT);
+	$table->AddRow(array(S_EVENT, $description));
+//	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
 	$table->AddRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
 
 	$nextEvent = get_next_event($event);

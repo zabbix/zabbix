@@ -1269,7 +1269,7 @@
 	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		'Two elements should be selected',
 	'S_DELETE_SELECTED_ELEMENTS_Q'=>		'Delete selected elements?',
 	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		'Please select two elements',
-	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	'Delete Links between selected elements?',
+	'S_DELETE_LINK_BETWEEN_SELECTED_ELEMENTS_Q'=>	'Delete the link between the selected elements?',
 	'S_NO_LINKS'=>					'No links',
 	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>'Wrong type of arguments passed to function',
 	'S_NEW_ELEMENT'=>				'New element',
@@ -1629,7 +1629,7 @@
 
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
-	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
+	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot update slideshow',
 	'S_SLIDESHOW_ADDED'=>			'Slideshow added',
 	'S_CANNOT_ADD_SLIDESHOW'=>		'Cannot add slideshow',
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
@@ -2220,6 +2220,8 @@
 	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	'is not a float or counter or macro for function',
 	'S_ITEM_KEY_MUST_BE_USED_IN_TRIGGER_EXPRESSION'=>	'An item key must be used in trigger expression',
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',
+	'S_TRIGGER_EXPRESSION_CANT_MIX_TEMPLATES_HOSTS' =>	'Incorrect trigger expression. Trigger expression elements cannot not belong to a template and a host simultaneously.',
+	'S_TRIGGER_BELONGS_TO_TEMPLATES_WITH_DIFFERENT_LINKS' =>	'Trigger belongs to templates with different linkages.',
 	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		'You can not use template hosts in mixed expressions.',
 	'S_ADDED_TRIGGER'=>					'Added new trigger',
 	'S_TO_HOST_SMALL'=>					'to host',

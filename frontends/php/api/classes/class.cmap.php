@@ -654,7 +654,7 @@ COpt::memoryPick();
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for map');
 				break;
 			}
-// Existance
+// existence
 			$options = array(
 				'filter' => array(
 					'name' => $map['name']

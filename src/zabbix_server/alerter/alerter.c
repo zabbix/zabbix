@@ -44,7 +44,7 @@ extern unsigned char	process_type;
  * Parameters: alert - alert details                                          *
  *             mediatype - media details                                      *
  *                                                                            *
- * Return value: SUCCESS - action executed sucessfully                        *
+ * Return value: SUCCESS - action executed successfully                       *
  *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -87,26 +87,34 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
-		char	full_path[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
+		char	*cmd = NULL, *send_to, *subject, *message, *output = NULL;
+		int	cmd_alloc, cmd_offset = 0;
 
 		send_to = zbx_dyn_escape_string(alert->sendto, "\"\\");
 		subject = zbx_dyn_escape_string(alert->subject, "\"\\");
 		message = zbx_dyn_escape_string(alert->message, "\"\\");
 
-		zbx_snprintf(full_path, sizeof(full_path), "%s/%s \"%s\" \"%s\" \"%s\"",
+		cmd_alloc = strlen(CONFIG_ALERT_SCRIPTS_PATH) + strlen(mediatype->exec_path) + strlen(send_to) +
+				strlen(subject) + strlen(message) + 11;
+
+		cmd = zbx_malloc(cmd, cmd_alloc);
+
+		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, cmd_alloc, "%s/%s \"%s\" \"%s\" \"%s\"",
 				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, send_to, subject, message);
 
 		zbx_free(send_to);
 		zbx_free(subject);
 		zbx_free(message);
 
-		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
+		if (SUCCEED == (res = zbx_execute(cmd, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
 			zbx_free(output);
 		}
 		else
 			res = FAIL;
+
+		zbx_free(cmd);
 	}
 	else
 	{

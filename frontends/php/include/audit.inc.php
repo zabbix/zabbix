@@ -70,7 +70,7 @@
 	function add_audit($action,$resourcetype,$details){
 		global $USER_DETAILS;
 
-		if(!isset($USER_DETAILS['userid']))	check_authorisation();
+		if(!isset($USER_DETAILS['userid'])) return false;
 
 		$auditid = get_dbid('auditlog','auditid');
 

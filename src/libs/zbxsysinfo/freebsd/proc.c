@@ -101,8 +101,7 @@ int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		proc_ok, comm_ok,
 		mib[4], mibs;
 
-	double	value = 0.0,
-		memsize = 0;
+	double	value, memsize = 0;
 	int	proccount = 0;
 
 	size_t	sz;
@@ -164,7 +163,11 @@ int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	}
 	else
 	{
+#if(__FreeBSD_version > 500000)
+		mib[2] = KERN_PROC_PROC;
+#else
 		mib[2] = KERN_PROC_ALL;
+#endif
 		mib[3] = 0;
 		mibs = 3;
 	}
@@ -184,11 +187,6 @@ int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	for (i = 0; i < count; i++)
 	{
-#if(__FreeBSD_version > 500000)
-		if (proc[i].ki_flag & P_KTHREAD)	/* skip a system thread */
-			continue;
-#endif
-
 		proc_ok = 0;
 		comm_ok = 0;
 		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
@@ -306,7 +304,11 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	}
 	else
 	{
+#if(__FreeBSD_version > 500000)
+		mib[2] = KERN_PROC_PROC;
+#else
 		mib[2] = KERN_PROC_ALL;
+#endif
 		mib[3] = 0;
 		mibs = 3;
 	}
@@ -326,11 +328,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	for (i = 0; i < count; i++)
 	{
-#if(__FreeBSD_version > 500000)
-		if (proc[i].ki_flag & P_KTHREAD)	/* skip a system thread */
-			continue;
-#endif
-
 		proc_ok = 0;
 		stat_ok = 0;
 		comm_ok = 0;

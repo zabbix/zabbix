@@ -23,6 +23,10 @@
 #include "cfg.h"
 #include "alias.h"
 
+#if defined(WITH_AGENT_METRICS)
+#	include "agent/agent.h"
+#endif
+
 #if defined(WITH_COMMON_METRICS)
 #	include "common/common.h"
 #endif
@@ -126,28 +130,27 @@ void	init_metrics()
 	register int	i;
 
 	commands = malloc(sizeof(ZBX_METRIC));
-	commands[0].key=NULL;
+	commands[0].key = NULL;
 
-#if defined(WITH_COMMON_METRICS)
-	for(i=0;parameters_common[i].key!=0;i++)
-	{
+#ifdef WITH_AGENT_METRICS
+	for (i = 0; NULL != parameters_agent[i].key; i++)
+		add_metric(&parameters_agent[i]);
+#endif
+
+#ifdef WITH_COMMON_METRICS
+	for (i = 0; NULL != parameters_common[i].key; i++)
 		add_metric(&parameters_common[i]);
-	}
-#endif /* USE_COMMON_METRICS */
+#endif
 
-#if defined(WITH_SPECIFIC_METRICS)
-	for(i=0;parameters_specific[i].key!=0;i++)
-	{
+#ifdef WITH_SPECIFIC_METRICS
+	for (i = 0; NULL != parameters_specific[i].key; i++)
 		add_metric(&parameters_specific[i]);
-	}
-#endif /* USE_SPECIFIC_METRICS */
+#endif
 
-#if defined(WITH_SIMPLE_METRICS)
-	for(i=0;parameters_simple[i].key!=0;i++)
-	{
+#ifdef WITH_SIMPLE_METRICS
+	for (i = 0; NULL != parameters_simple[i].key; i++)
 		add_metric(&parameters_simple[i]);
-	}
-#endif /* USE_SIMPLE_METRICS */
+#endif
 }
 
 void	free_metrics()

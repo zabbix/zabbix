@@ -2151,5 +2151,17 @@
 	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS'=>			'Usage incorrect des crochets. \'%s\' trouvé après le crochet final.',
 	'S_INVALID_KEY_FORMAT'=>			'Format de clé invalide',
 
+	'S_VALUE_MAP_WITH_NAME_EXISTS' => 'Impossible d\'ajouter ou mettre à jour la table de correspndance. Une table de correspondance nommée "%s" existe déjà',
+	'S_APPLICATION_IS_NOT_AVAILABLE_ON' =>		'L\'application avec l\'ID "%1$s" n\'est pas disponible sur "%2$s"',
+	'S_CHART4_HEADER_TITLE_PART1'=>		'',
+	'S_CHART5_HEADER_TITLE_PART1'=>		'',
+	'S_INCORRECT_URL'=>			'URL incorrecte.',
+
+	'S_SCRIPT_ERROR_BIG'=>			'Raisons possibles: 1. IP/DNS du serveur incorrecte dans "zabbix.conf.php"; 2. un environnement de sécurité tel que SELinux bloque la connexion; 3. Le démon Zabbix server n\'est pas actif.',
+	'S_NOT_RUN' => 'Connexion au serveur Zabbix "%s" refusée. Raisons possibles: 1. IP/DNS du serveur incorrecte dans "zabbix.conf.php"; 2. un environnement de sécurité tel que SELinux bloque la connexion; 3. Le démon Zabbix server n\'est pas actif; 4. Un parefeu bloque la connexion TCP.',
+	'S_IP_NOT_AVAILABLE' => 'Serveur Zabbix "%s" injoignable. Raisons possibles: 1. IP/DNS du serveur incorrecte dans "zabbix.conf.php"; 2. configuration réseau incorrecte.',
+	'S_TIME_OUT' => 'Délai d\'attente au serveur Zabbix "%s" expiré. Raisons possibles: 1. IP/DNS du serveur incorrecte dans "zabbix.conf.php"; 2. Un parefeu bloque la connexion TCP.',
+	'S_WRONG_DNS' => 'Connexion au serveur Zabbix "%s" échouée. Raisons possibles: 1. IP/DNS du serveur incorrecte dans "zabbix.conf.php"; 2. Configuration DNS du serveur incorrecte',
+	'S_REPLACE_TRIGGER_DEPENDENCIES'=>	'Remplacer les dépendances du déclencheur',
 	);
 ?>

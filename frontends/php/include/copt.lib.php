@@ -192,7 +192,9 @@ if(defined('USE_PROFILING')){
 			global $var_list;
 			global $USER_DETAILS;
 
-			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.8 * 1024 * 1024);
+			if (is_null(self::$max_memory_bytes)) {
+				self::$max_memory_bytes = str2mem(ini_get('memory_limit')) * 0.8;
+			}
 			if((!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))
 				|| self::$memory_limit_reached){
 				return false;

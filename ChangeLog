@@ -1,10 +1,74 @@
+Changes for 1.8.16rc1
+
+A......... [ZBX-5505] fixed incorrect sql query building using limits (Eduard)
+A......... [ZBX-5512] fixed undefined index in screens (Eduard)
+...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
+........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
+A......... [ZBX-5395] fixed {ITEM.LASTVALUE1} and {ITEM.VALUE1} expanding in the trigger.get method (Pavels)
+
+Changes for 1.8.15
+
+1.8.15rc1 was released as 1.8.15 without any changes
+
+Changes for 1.8.15rc1
+
+........S. [ZBX-4527] removed limitation of alerter script command line (Sasha)
+........S. [ZBX-5367] fixed assignment of elements to a maintenance mode by a timer process (Sasha)
+..F....... [ZBX-5348] fixed validation of itemid parameter for popup_bitem.php (Vedmak)
+....I..... [ZBX-5357] fixed typos in help_items item key descriptions (Richlv)
+..F....... [ZBX-5319] fixed incorrect calculation of action escalation steps delay (Vedmak)
+A......... [ZBX-5264] fixed 'undefined variable: nodeids [api/classes/class.cscreen.php:286]' (Toms)
+..F....... [ZBX-5316] fixed incorrect screen items can be deleted when deleting hosts (Vedmak)
+..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
+..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
+..F....... [ZBX-3245] fixed trigger item selection pop up not working with items from child nodes (Pavels)
+A......... [ZBX-4929] optimized host group SQL queries (Eduard)
+
+Changes for 1.8.14
+
+1.8.14rc1 was released as 1.8.14 without any changes
+
+Changes for 1.8.14rc1
+
+A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
+..F....... [ZBX-5147] fixed profiler lib not supporting G suffix for memory_limit option (Vedmak)
+...G...... [ZBX-5027] added file size check to log monitoring to report error if it's over 2 GB (dimir)
+.......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
+.......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
+.......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
+A......... [ZBX-5091] fixed usermacro.get templateids filter (Vedmak)
+..F....... [ZBX-4031] fixed error message when deleting a link in a map (Pavels)
+..F....... [ZBX-5006] fixed memory leak; thanks to Mike Brady (Toms)
+A.F....... [ZBX-5032] fixed media type selection in user properties (Eduard)
+..F....... [ZBX-5014] fixed error in distributed mode setup for guest user (Vedmak)
+..F....... [ZBX-4984] fixed export including graphs and triggers with web items (Vedmak)
+.......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
+...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
+..F....... [ZBX-4918] fixed value mapping when resolving {ITEM.LASTVALUE} and {ITEM.VALUE} macros (Vedmak)
+A......... [ZBX-4917] fixed slow screens for non-Super-Admins (Toms)
+
+Changes for 1.8.13
+
+1.8.13rc1 was released as 1.8.13 without any changes
+
 Changes for 1.8.13rc1
 
-....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
+A.F....... [ZBX-4685] fixed hangup when users login at the same time (Toms)
+....I..... [ZBX-4810] fixed the ifInOctets and ifOutOctets items in the Dell_PowerConnect_5224, Template_Dell_PowerConnect_5324, Template_C3750-48TS and Template_Cisco_PIX515E templates (Sasha)
+...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
+.......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
+........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
+A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
+..F....... [ZBX-4900] improved performance of the 'Status of Zabbix' dashboard widget (Vedmak)
+...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
+...G...... [ZBX-4907] fixed processing of system.swap.in/out[,sectors/count] under Linux (Sasha)
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
+..F....... [ZBX-4849] implemented a check that a trigger expression doesn't use items from both hosts and templates at the same time (Pavels)
+....I..... [ZBX-3929] removed deprecated Switch module from the gen.pl script (Sasha)
 
 Changes for 1.8.12
 
-1.8.12rc1 was released as 1.8.12 without any changes
+1.8.12rc2 was released as 1.8.12 without any changes
 
 Changes for 1.8.12rc2
 
@@ -13,14 +77,14 @@ Changes for 1.8.12rc2
 
 Changes for 1.8.12rc1
 
-...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
+...GI..... [ZBXNEXT-584] added support of multiple servers in active check mode; thanks to Takanori Suzuki (Sasha)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBX-4795] fixed group creation for child nodes (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
 A.F....... [ZBX-4813] fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
 ..F....... [ZBX-2873] fixed colors in dark theme (Vedmak)
 ..F....... [ZBX-3152] fixed global messages being shown even if all severities are unchecked (Vedmak)
-...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes longer than 15 characters (Sasha)
+...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with process names longer than 15 characters (Sasha)
 ..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
 .......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)

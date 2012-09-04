@@ -212,11 +212,10 @@ class CUserMacro extends CZBXAPI{
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
-			$sql_parts['from']['macros_templates'] = 'macros_templates ht';
+			$sql_parts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
-			$sql_parts['where']['hht'] = 'hm.hostid=ht.macroid';
+			$sql_parts['where']['hmht'] = 'hm.hostid=ht.hostid';
 		}
-
 
 // search
 		if(is_array($options['search'])){
@@ -494,7 +493,7 @@ class CUserMacro extends CZBXAPI{
 			if(empty($hostmacroids))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
 
-// permissions + existance
+// permissions + existence
 			$options = array(
 				'hostmacroids' => $hostmacroids,
 				'editable' => 1,
@@ -612,7 +611,7 @@ class CUserMacro extends CZBXAPI{
 
 			self::validate($globalmacros);
 
-// permissions + existance
+// permissions + existence
 			$options = array(
 				'filter' => array('macro' => zbx_objectValues($globalmacros, 'macro')),
 				'globalmacro' => 1,
@@ -673,7 +672,7 @@ class CUserMacro extends CZBXAPI{
 			if(empty($globalmacros))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 
-// permissions + existance
+// permissions + existence
 			$options = array(
 				'filter' => array('macro' => $globalmacros),
 				'globalmacro' => 1,
@@ -1038,7 +1037,7 @@ class CUserMacro extends CZBXAPI{
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
 		$macros = array_unique($macros);
-		
+
 		$result = array();
 
 		$obj_options = array(
@@ -1050,8 +1049,8 @@ class CUserMacro extends CZBXAPI{
 			'templated_hosts' => true,
 		);
 		$hosts = CHost::get($obj_options);
-		$hostids = array_keys($hosts);	
-		
+		$hostids = array_keys($hosts);
+
 		do{
 			$obj_options = array(
 				'hostids' => $hostids,

@@ -285,14 +285,21 @@ include_once('include/page_header.php');
 <?php
 	$frmTitle = new CForm();
 
-	if($monitored_hosts)
+	if ($monitored_hosts) {
 		$frmTitle->addVar('monitored_hosts', 1);
+	}
 
-	if($real_hosts)
+	if ($real_hosts) {
 		$frmTitle->addVar('real_hosts', 1);
+	}
 
-	if($value_types)
+	if ($value_types) {
 		$frmTitle->addVar('value_types', $value_types);
+	}
+
+	if (get_request('screenid')) {
+		$frmTitle->addVar('screenid', get_request('screenid'));
+	}
 
 	// adding param to a form, so that it would remain when page is refreshed
 	$frmTitle->addVar('dstfrm', $dstfrm);

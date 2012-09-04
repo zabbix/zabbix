@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"24 April 2012"
-#define	ZABBIX_VERSION		"1.8.13rc1"
+#define	ZABBIX_REVDATE		"20 August 2012"
+#define	ZABBIX_VERSION		"1.8.16rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -146,6 +146,7 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
 
+#define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
 /* item types */
@@ -715,7 +716,8 @@ int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-int	is_uint64(const char *str, zbx_uint64_t *value);
+#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
+int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
@@ -770,6 +772,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
 #define ZBX_GIBIBYTE		1073741824
+#define ZBX_TEBIBYTE		__UINT64_C(1099511627776)
 
 #define SEC_PER_MIN		60
 #define SEC_PER_HOUR		3600
@@ -778,6 +781,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_MONTH		(30 * SEC_PER_DAY)
 #define SEC_PER_YEAR		(365 * SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
+
+#define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
+
 double	zbx_time();
 double	zbx_current_time();
 
@@ -822,9 +828,10 @@ char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
 
-int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
-		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
-		char *source, int source_len, char *severity, int severity_len);
+int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
+		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
+		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
+		char *severity, size_t severity_len);
 
 int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 
@@ -904,7 +911,7 @@ void	zbx_replace_invalid_utf8(char *text);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);
-int	str2uint64(char *str, zbx_uint64_t *value);
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)
@@ -912,6 +919,7 @@ int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+int	zbx_is_regular_file(const char *path);
 
 int	MAIN_ZABBIX_ENTRY();
 

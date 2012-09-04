@@ -20,26 +20,32 @@
 #include "common.h"
 #include "base64.h"
 
-int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
-		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
-		char *source, int source_len, char *severity, int severity_len)
+int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
+		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
+		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
+		char *severity, size_t severity_len)
 {
 	int	i, ret = SUCCEED;
 	char	*data_b64 = NULL;
 
-	assert(key);
-	assert(host);
-	assert(data);
-	assert(lastlogsize);
-	assert(timestamp);
-	assert(source);
-	assert(severity);
+	assert(host && 0 != host_len);
+	assert(key && 0 != key_len);
+	assert(data && 0 != data_len);
+	assert(lastlogsize && 0 != lastlogsize_len);
+	assert(timestamp && 0 != timestamp_len);
+	assert(source && 0 != source_len);
+	assert(severity && 0 != severity_len);
 
 	if (SUCCEED == xml_get_data_dyn(xml, "host", &data_b64))
 	{
 		str_base64_decode(data_b64, host, host_len - 1, &i);
 		host[i] = '\0';
 		xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*host = '\0';
+		ret = FAIL;
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "key", &data_b64))
@@ -48,12 +54,22 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 		key[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
+	else
+	{
+		*key = '\0';
+		ret = FAIL;
+	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "data", &data_b64))
 	{
 		str_base64_decode(data_b64, data, data_len - 1, &i);
 		data[i] = '\0';
 		xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*data = '\0';
+		ret = FAIL;
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "lastlogsize", &data_b64))
@@ -62,6 +78,8 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 		lastlogsize[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
+	else
+		*lastlogsize = '\0';
 
 	if (SUCCEED == xml_get_data_dyn(xml, "timestamp", &data_b64))
 	{
@@ -69,6 +87,8 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 		timestamp[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
+	else
+		*timestamp = '\0';
 
 	if (SUCCEED == xml_get_data_dyn(xml, "source", &data_b64))
 	{
@@ -76,6 +96,8 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 		source[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
+	else
+		*source = '\0';
 
 	if (SUCCEED == xml_get_data_dyn(xml, "severity", &data_b64))
 	{
@@ -83,6 +105,8 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 		severity[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
+	else
+		*severity = '\0';
 
 	return ret;
 }

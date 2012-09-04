@@ -20,8 +20,6 @@
 #include "common.h"
 #include "base64.h"
 
-#define MAX_B64_SIZE 64*1024
-
 static char base64_set [] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -249,7 +247,7 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  * Purpose	:  Decode a base64 string into a string
  *
  * Parameters	:  p_b64str (in)	- the base64 string to decode
- *		   p_str (out)		- the encoded str to return
+ *		   p_str (out)		- the decoded str to return
  *		   p_str_maxsize (in)	- the size of p_str buffer
  *		   p_out_size (out)	- the size (len) of the str decoded
  *
@@ -258,66 +256,82 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size)
+void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size)
 {
 	const char	*p;
-	char		*o, from1, from2, from3, from4;
-	unsigned char	to1, to2, to3, to4;
-	char		str_clean[MAX_B64_SIZE];/* str_clean is the string after removing
-						 * the non-base64 characters
-						 */
+	char		from[4];
+	unsigned char	to[4];
+	int		i = 0, j = 0;
+	int		lasti = -1;	/* index of the last filled-in element of from[] */
+	int		finished = 0;
+
 	assert(p_b64str);
 	assert(p_str);
 	assert(p_out_size);
 	assert(maxsize > 0);
 
 	*p_out_size = 0;
+	p = p_b64str;
 
-	/* Clean-up input string */
-	for (p = p_b64str, o = str_clean; *p != '\0'; p++ )
-		if (is_base64(*p))
-			*o++ = *p;
-	*o = '\0';
-
-	for (o = str_clean; *o != '\0';)
+	while (1)
 	{
-		from1 = *o++;
-		from2 = from3 = from4 = 'A';
-
-		if (*o != '\0')
+		if ('\0' != *p)
 		{
-			from2 = *o++;
-			if (*o != '\0')
+			/* skip non-base64 characters */
+			if (0 == is_base64(*p))
 			{
-				from3 = *o++;
-				if (*o != '\0')
-					from4 = *o++;
+				p++;
+				continue;
 			}
+
+			/* collect up to 4 characters */
+			from[i] = *p++;
+			lasti = i;
+			if (i < 3)
+			{
+				i++;
+				continue;
+			}
+			else
+				i = 0;
+		}
+		else	/* no more data to read */
+		{
+			finished = 1;
+			for (j = lasti + 1; j < 4; j++)
+				from[j] = 'A';
 		}
 
-		to1 = char_base64_decode(from1);
-		to2 = char_base64_decode(from2);
-		to3 = char_base64_decode(from3);
-		to4 = char_base64_decode(from4);
+		if (-1 != lasti)
+		{
+			/* decode a 4-character block */
+			for (j = 0; j < 4; j++)
+				to[j] = char_base64_decode(from[j]);
 
-		*p_str++ = ((to1 << 2) | (to2 >> 4));
-		if (++(*p_out_size) == maxsize)
+			if (1 <= lasti)	/* from[0], from[1] available */
+			{
+				*p_str++ = ((to[0] << 2) | (to[1] >> 4));
+				if (++(*p_out_size) == maxsize)
+					break;
+			}
+
+			if (2 <= lasti && '=' != from[2])	/* from[2] available */
+			{
+				*p_str++ = (((to[1] & 0xf) << 4) | (to[2] >> 2));
+				if (++(*p_out_size) == maxsize)
+					break;
+			}
+
+			if (3 == lasti && '=' != from[3])	/* from[3] available */
+			{
+				*p_str++ = (((to[2] & 0x3) << 6) | to[3]);
+				if (++(*p_out_size) == maxsize)
+					break;
+			}
+			lasti = -1;
+		}
+
+		if (1 == finished)
 			break;
-
-		if (from3 != '=')
-		{
-			*p_str++ = (((to2 & 0xf) << 4) | (to3 >> 2));
-			if (++(*p_out_size) == maxsize)
-				break;
-		}
-
-		if (from4 != '=')
-		{
-			*p_str++ =  (((to3 & 0x3) << 6) | to4);
-			if (++(*p_out_size) == maxsize)
-				break;
-		}
 	}
-
-	return;
 }

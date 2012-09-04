@@ -46,8 +46,6 @@ $page['file']	= 'index.php';
 	$sessionid = get_cookie('zbx_sessionid', null);
 
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
-		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
-
 		CUser::logout($sessionid);
 
 		redirect('index.php');
@@ -81,8 +79,6 @@ $page['file']	= 'index.php';
 
 		if($login){
 			$url = is_null($request) ? $USER_DETAILS['url'] : $request;
-
-			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, $USER_DETAILS['userid'], '', null,null,null);
 			redirect($url);
 			exit();
 		}

@@ -243,9 +243,6 @@ function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 //SDI('Cache!!! '."[$userid][$perm][$perm_res]");
 		return $available_hosts[$userid][$perm][$perm_res][$nodeid_str];
 	}
-//SDI('NOOOO Cache!!!'."[$userid][$perm][$perm_res]");
-COpt::counter_up('perm_host['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
-COpt::counter_up('perm');
 
 	$where = array();
 
@@ -333,9 +330,6 @@ function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=n
 	$userid =& $user_data['userid'];
 	if(!isset($userid)) fatal_error(S_INCORRECT_USER_DATA_IN.SPACE.'"get_accessible_groups_by_user"');
 	$user_type =& $user_data['type'];
-
-COpt::counter_up('perm_group['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
-COpt::counter_up('perm');
 
 	$processed = array();
 	$where = array();

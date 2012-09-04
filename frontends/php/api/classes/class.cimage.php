@@ -255,7 +255,7 @@ class CImage extends CZBXAPI{
 	}
 
 /**
- * Check image existance
+ * Check image existence
  *
  * @param array $images
  * @param array $images['name']
