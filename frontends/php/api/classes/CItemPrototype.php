@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,29 +10,26 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * @package API
  */
-
 class CItemPrototype extends CItemGeneral{
 
 	protected $tableName = 'items';
-
 	protected $tableAlias = 'i';
 
-
-/**
- * Get Itemprototype data
- */
+	/**
+	 * Get Itemprototype data
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -821,13 +818,13 @@ class CItemPrototype extends CItemGeneral{
 				$selectFields[] = $key;
 			}
 		}
-		$options = array(
+
+		$items = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'selectApplications' => API_OUTPUT_REFER,
-			'output' => $selectFields,
-		);
-		$items = $this->get($options);
+			'output' => $selectFields
+		));
 
 		foreach ($items as $inum => $item) {
 			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
@@ -845,13 +842,16 @@ class CItemPrototype extends CItemGeneral{
 
 		// fetch the corresponding discovery rules for the child items
 		$ruleids = array();
-		$sql = 'SELECT i.itemid as ruleid, id.itemid, i.hostid '.
-			' FROM items i, item_discovery id '.
-			' WHERE i.templateid=id.parent_itemid '.
-			' AND '.DBcondition('id.itemid', zbx_objectValues($items, 'itemid'));
-		$dbResult = DBselect($sql);
+		$dbResult = DBselect(
+			'SELECT i.itemid AS ruleid,id.itemid,i.hostid'.
+			' FROM items i,item_discovery id'.
+			' WHERE i.templateid=id.parent_itemid'.
+				' AND '.DBcondition('id.itemid', zbx_objectValues($items, 'itemid'))
+		);
 		while ($rule = DBfetch($dbResult)) {
-			if (!isset($ruleids[$rule['itemid']])) $ruleids[$rule['itemid']] = array();
+			if (!isset($ruleids[$rule['itemid']])) {
+				$ruleids[$rule['itemid']] = array();
+			}
 			$ruleids[$rule['itemid']][$rule['hostid']] = $rule['ruleid'];
 		}
 
@@ -884,4 +884,3 @@ class CItemPrototype extends CItemGeneral{
 		$this->inherit(array_merge($insertItems, $updateItems));
 	}
 }
-?>
