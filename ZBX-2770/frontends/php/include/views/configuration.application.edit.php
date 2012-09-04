@@ -57,7 +57,9 @@ else {
 		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 	));
 }
-$applicationFormList->addRow(_('Name'), new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE));
+$nameTextBox = new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE);
+$nameTextBox->attr('autofocus', 'autofocus');
+$applicationFormList->addRow(_('Name'), $nameTextBox);
 
 // append tabs to form
 $applicationTab = new CTabView();

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $imageForm = new CForm('post', null, 'multipart/form-data');
 $imageForm->setName('imageForm');
 $imageForm->addVar('form', $this->data['form']);
@@ -30,7 +30,9 @@ $imageCb->addItem(IMAGE_TYPE_BACKGROUND, _('Background'));
 
 // append form list
 $imageFormList = new CFormList('imageFormList');
-$imageFormList->addRow(_('Name'), new CTextBox('name', $this->data['imagename'], 64, 'no', 64));
+$nameTextBox = new CTextBox('name', $this->data['imagename'], 64, 'no', 64);
+$nameTextBox->attr('autofocus', 'autofocus');
+$imageFormList->addRow(_('Name'), $nameTextBox);
 $imageFormList->addRow(_('Type'), $imageCb);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 if (!empty($this->data['imageid'])) {
@@ -56,5 +58,4 @@ else {
 }
 
 return $imageForm;
-?>
 

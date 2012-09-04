@@ -598,3 +598,38 @@ function getAvailabilityTable($host) {
 
 	return $ad;
 }
+
+/**
+ * Create array with all inputs required for date selection and calendar.
+ *
+ * @param string $name
+ * @param int    $date
+ *
+ * @return array
+ */
+function createDateSelector($name, $date) {
+	$calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
+	$calendarIcon->onClick('var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
+			'_calendar"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_till"].clndr.clndrhide();');
+
+	$day = new CNumericBox($name.'_day', $date > 0 ? date('d', $date) : '', 2);
+	$day->attr('placeholder', _('dd'));
+	$month = new CNumericBox($name.'_month', $date > 0 ? date('m', $date) : '', 2);
+	$month->attr('placeholder', _('mm'));
+	$year = new CNumericBox($name.'_year', $date > 0 ? date('Y', $date) : '', 4);
+	$year->attr('placeholder', _('yyyy'));
+	$hour = new CNumericBox($name.'_hour', $date > 0 ? date('H', $date) : '', 2);
+	$hour->attr('placeholder', _('hh'));
+	$minute = new CNumericBox($name.'_minute', $date > 0 ? date('i', $date) : '', 2);
+	$minute->attr('placeholder', _('mm'));
+
+	$fields = array($day, '/', $month, '/', $year, SPACE, $hour, ':', $minute, $calendarIcon);
+
+	zbx_add_post_js('create_calendar(null,'.
+		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.
+		'"'.$name.'_calendar",'.
+		'"'.$name.'");'
+	);
+
+	return $fields;
+}
