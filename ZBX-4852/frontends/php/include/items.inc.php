@@ -1143,12 +1143,15 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 		$sec1 = SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1;
 		$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
 
-		if ($d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2) {	/* current period */
+		// current period
+		if ($d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2) {
 			if ($next == 0 || $next > $now - $sec + $sec2) {
-				$next = $now - $sec + $sec2;	/* the next second after the current interval's upper bound */
+				// the next second after the current interval's upper bound
+				$next = $now - $sec + $sec2;
 			}
 		}
-		elseif ($d1 <= $day && $d2 >= $day && $sec < $sec1) {				/* will be active today */
+		// will be active today
+		elseif ($d1 <= $day && $d2 >= $day && $sec < $sec1) {
 			if ($next == 0 || $next > $now - $sec + $sec1) {
 				$next = $now - $sec + $sec1;
 			}
@@ -1156,12 +1159,14 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 		else {
 			$nextDay = ($day + 1 <= 7) ? $day + 1 : 1;
 
-			if ($d1 <= $nextDay && $nextDay <= $d2) {						/* will be active tomorrow */
+			// will be active tomorrow
+			if ($d1 <= $nextDay && $nextDay <= $d2) {
 				if ($next == 0 || $next > $now - $sec + SEC_PER_DAY + $sec1) {
 					$next = $now - $sec + SEC_PER_DAY + $sec1;
 				}
 			}
-			else {															/* later in the future */
+			// later in the future
+			else {
 				$dayDiff = -1;
 
 				if ($day < $d1) {
@@ -1219,8 +1224,8 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 		$nextcheck = $now + $delay;
 	}
 	else {
-		/* Try to find the nearest 'nextcheck' value with condition */
-		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR */
+		// Try to find the nearest 'nextcheck' value with condition
+		// 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
 
 		$arrOfFlexIntervals = explode(';', $flexIntervals);
 		$t = $now;
@@ -1230,7 +1235,7 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 		$shift = ($itemType == ITEM_TYPE_JMX) ? $interfaceid : $itemid;
 
 		while ($t < $tmax) {
-			/* calculate 'nextcheck' value for the current interval */
+			// calculate 'nextcheck' value for the current interval
 			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
 
 			$nextcheck = $currentDelay * floor($t / $currentDelay) + ($shift % $currentDelay);
@@ -1246,10 +1251,10 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 				}
 			}
 
-			/* 'nextcheck' < end of the current interval ? */
-			/* the end of the current interval is the beginning of the next interval - 1 */
+			// 'nextcheck' < end of the current interval?
+			// the end of the current interval is the beginning of the next interval - 1
 			if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextcheck >= $nextInterval) {
-				/* 'nextcheck' is beyond the current interval */
+				// 'nextcheck' is beyond the current interval
 				$t = $nextInterval;
 				$try++;
 			}
