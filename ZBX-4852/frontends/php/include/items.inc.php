@@ -1047,7 +1047,7 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
  *
  * @return bool                      true - within in a period, false - out of period
  */
-function checkTimePriod($period, $now) {
+function checkTimePeriod($period, $now) {
 	if (sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2) != 6) {
 		if (sscanf($period, '%d,%d:%d-%d:%d', $d1, $h1, $m1, $h2, $m2) != 5) {
 			// Delay period format is wrong - skip
@@ -1101,7 +1101,7 @@ function getCurrentDelay($delay, array $arrOfFlexIntervals, $now) {
 		if (sscanf($flexInterval, '%d/%29s', $flexDelay, $flexPeriod) != 2) {
 			continue;
 		}
-		if ($flexDelay < $currentDelay && checkTimePriod($flexPeriod, $now)) {
+		if ($flexDelay < $currentDelay && checkTimePeriod($flexPeriod, $now)) {
 			$currentDelay = $flexDelay;
 		}
 	}
