@@ -30,6 +30,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A......... [ZBX-5510] fixed item name selecting using group filter (Eduard)
 ..F....... [ZBX-2939] fixed login button link in http auth mode (Eduard)
 ..F....... [ZBX-5406] fixed error when export template with another template with screens linked to it (Vedmak)
 ....I..... [ZBX-5509] fixed upgrade patch to execute it on MySQL 5.0.28 or earlier (Sasha)
