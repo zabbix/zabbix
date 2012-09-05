@@ -15,6 +15,25 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 
 Bug fixes:
 ...G...... [ZBX-5473] fixed agent crash under FreeBSD and Linux when started with -p or -t vfs.dev.read/write (Sasha)
+..F....... [ZBX-5513] fixed http authentication without directly passing password (Eduard)
+..F....PS. [ZBX-4852] fixed calculation of update interval if flexible intervals are used (Andris, Sasha)
+A......... [ZBX-5434] fixed linking template items to host validation (Eduard)
+..F....... [ZBX-5514] fixed sql query in get_min_itemclock_by_itemid function (Eduard)
+A......... [ZBX-5510] fixed item name selecting using group filter (Eduard)
+..F....... [ZBX-2939] fixed login button link in http auth mode (Eduard)
+..F....... [ZBX-5406] fixed error when export template with another template with screens linked to it (Vedmak)
+....I..... [ZBX-5509] fixed upgrade patch to execute it on MySQL 5.0.28 or earlier (Sasha)
+...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
+..F....... [ZBX-5198] fixed usage of 'memory_get_peak_usage' function appeared in PHP5.2 (Vedmak)
+..F....... [ZBX-5466] fixed dependency adding when copying triggers to host and when full cloning host (Toms)
+..F....... [ZBX-5466] removed that triggers with HTTP items not copied when copying triggers to hosts (Toms)
+A......... [ZBX-5466] improved warning message for trigger circular dependencies (Toms)
+A......... [ZBX-5466] fixed warning message which missed template name, when linking template to a host, when there were dependencies from that template to other template which were not linked to that host (Toms)
+A.F....... [ZBX-4316] improved message for web step status code validation error, added validation in api (Vedmak)
+..F....... [ZBX-5445] fixed hint not removed in dashboard when widget content is refreshed (Vedmak)
+..F....... [ZBX-5490] fixed textarea maxlength validation (Eduard)
+A......... [ZBX-5461] fixed error when create trigger prototype on PHP 5.1 (Vedmak)
+..F....... [ZBX-5487] fixed sorting in dashboard system status and host status widget popups (Vedmak)
 ..F....... [ZBX-5480] fixed icon default state for host elements in map (Eduard)
 ....I..... [ZBX-5479] removed inode item prototype from OS Windows template (Sasha)
 ........S. [ZBX-5235] fixed update of a "lifetime" field if link a template to a host (Sasha)
@@ -984,6 +1003,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+A......... [ZBX-5512] fixed undefined index in screens (Eduard)
+...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
 ........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
 A......... [ZBX-5395] fixed {ITEM.LASTVALUE1} and {ITEM.VALUE1} expanding in the trigger.get method (Pavels)
 
