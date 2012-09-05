@@ -26,26 +26,26 @@ $httpPopupWidget = new CWidget();
 if (isset($_REQUEST['save'])) {
 	if (!isset($_REQUEST['stepid'])) {
 		insert_js('add_httpstep('.
-			zbx_jsvalue($_REQUEST['dstfrm']).','.
-			zbx_jsvalue($_REQUEST['name']).','.
-			zbx_jsvalue($_REQUEST['timeout']).','.
-			zbx_jsvalue($_REQUEST['url']).','.
-			zbx_jsvalue($_REQUEST['posts']).','.
-			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+					zbx_jsvalue($_REQUEST['dstfrm']).','.
+					zbx_jsvalue($_REQUEST['name']).','.
+					zbx_jsvalue($_REQUEST['timeout']).','.
+					zbx_jsvalue($_REQUEST['url']).','.
+					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['required']).','.
+					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
 	}
 	else {
 		insert_js('update_httpstep('.
-			zbx_jsvalue($_REQUEST['dstfrm']).','.
-			zbx_jsvalue($_REQUEST['list_name']).','.
-			zbx_jsvalue($_REQUEST['stepid']).','.
-			zbx_jsvalue($_REQUEST['name']).','.
-			zbx_jsvalue($_REQUEST['timeout']).','.
-			zbx_jsvalue($_REQUEST['url']).','.
-			zbx_jsvalue($_REQUEST['posts']).','.
-			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+					zbx_jsvalue($_REQUEST['dstfrm']).','.
+					zbx_jsvalue($_REQUEST['list_name']).','.
+					zbx_jsvalue($_REQUEST['stepid']).','.
+					zbx_jsvalue($_REQUEST['name']).','.
+					zbx_jsvalue($_REQUEST['timeout']).','.
+					zbx_jsvalue($_REQUEST['url']).','.
+					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['required']).','.
+					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
 	}
 }

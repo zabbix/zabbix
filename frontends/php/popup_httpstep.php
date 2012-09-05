@@ -46,6 +46,7 @@ $fields = array(
 );
 check_fields($fields);
 
+
 // render view
 $httpPopupView = new CView('configuration.httpconf.popup');
 if (!empty($httpPopupView)) {

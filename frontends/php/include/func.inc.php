@@ -779,7 +779,9 @@ function zbx_array_push(&$array, $add) {
  *         'd' => 3,
  *         'c' => 2,
  *     )
+ *
  * @param array $array
+ *
  * @return array
  */
 function zbx_arrayFindDuplicates(array $array) {
@@ -1475,6 +1477,7 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  * @param array $a
  * @param array $b
  * @param bool $strict
+ *
  * @return bool
  */
 function array_equal(array $a, array $b, $strict=false) {
