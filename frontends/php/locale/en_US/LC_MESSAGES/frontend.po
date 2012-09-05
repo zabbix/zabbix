@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apache 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:32+0300\n"
-"PO-Revision-Date: 2012-08-23 17:31+0200\n"
-"Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
+"POT-Creation-Date: 2012-09-05 21:33+0300\n"
+"PO-Revision-Date: 2012-09-01 12:19+0200\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -1109,7 +1109,7 @@ msgstr "Cannot add dependency from a host to a template."
 #: include/triggers.inc.php:699
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1998,7 +1998,7 @@ msgstr "Chinese (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "Circular dependencies are not allowed."
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -2612,7 +2612,7 @@ msgstr "Critical error. Field \"%1$s\" is not decimal number."
 #: include/validate.inc.php:340
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Critical error. Field \"%1$s\" is not integer list or range."
 
 #: include/validate.inc.php:353
 #, php-format
@@ -6304,12 +6304,12 @@ msgstr "Invalid params."
 #: api/classes/CWebCheck.php:590
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "Invalid response code \"%1$s\"."
 
 #: api/classes/CWebCheck.php:585
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "Invalid response code range \"%1$s\"."
 
 #: items.php:340
 msgid "Invalid time period"
@@ -10982,7 +10982,7 @@ msgstr "Step of scenario"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "Step with name \"%s\" already exists."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
@@ -12463,7 +12463,7 @@ msgstr "Warning. Field \"%1$s\" is not a decimal number."
 #: include/validate.inc.php:344
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Warning. Field \"%1$s\" is not integer list or range."
 
 #: include/validate.inc.php:357
 #, php-format

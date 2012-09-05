@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:32+0300\n"
-"PO-Revision-Date: 2012-08-23 11:43+0200\n"
+"POT-Creation-Date: 2012-09-05 21:33+0300\n"
+"PO-Revision-Date: 2012-09-01 12:54+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -415,7 +415,7 @@ msgstr "Pievienot saiti"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Pievienot trūkstošos"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
@@ -778,7 +778,7 @@ msgstr ""
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
@@ -1015,7 +1015,7 @@ msgstr ""
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "LIETOTĀJU GRUPU KONFIGURĀCIJA"
 
 #: include/views/administration.usergroups.list.php:31
 #: include/views/administration.users.list.php:31
@@ -1074,7 +1074,7 @@ msgstr ""
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "Kanāda (136 simboli)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:254
 #: include/forms.inc.php:1677 include/forms.inc.php:1980
@@ -1282,7 +1282,7 @@ msgstr ""
 
 #: api/classes/CHostGroup.php:616
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "Grupu bez vārda nav iespējams pievienot."
 
 #: api/classes/CHost.php:1763
 msgid "Cannot create host group."
@@ -1519,7 +1519,7 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:210
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Nevar atrast grupu \"%1$s\", kas ir izmantota kartē \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:483
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
@@ -2307,7 +2307,7 @@ msgstr ""
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr ""
+msgstr "Lietotāju grupu konfigurācija"
 
 #: users.php:29
 msgid "Configuration of users"
@@ -2536,7 +2536,7 @@ msgstr "Izveidot lietotāju"
 
 #: include/views/administration.usergroups.list.php:30
 msgid "Create user group"
-msgstr ""
+msgstr "Izveidot lietotāju gupu"
 
 #: adm.valuemapping.php:129
 msgid "Create value map"
@@ -4676,7 +4676,7 @@ msgstr "Grupa"
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
 msgid "Group \"%1$s\" does not exist."
-msgstr ""
+msgstr "Grupa \"%1$s\" nepastāv."
 
 #: include/classes/import/importers/CHostImporter.php:135
 #, php-format

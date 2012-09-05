@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:32+0300\n"
+"POT-Creation-Date: 2012-09-05 21:33+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -210,7 +210,7 @@ msgstr "已加知悉"
 
 #: acknow.php:150 acknow.php:178
 msgid "Acknowledge alarm by"
-msgstr "知悉警報因"
+msgstr "知悉警報以"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
@@ -867,12 +867,12 @@ msgstr "授權的組態"
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr "發現規則的組態"
+msgstr "探索規則的組態"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr "發現規則的組態"
+msgstr "探索規則的組態"
 
 #: include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:31
@@ -1101,11 +1101,11 @@ msgstr "無法新增自主機到模板的相依關係"
 #: include/triggers.inc.php:699
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "無法自觸發器\"%1$s:%2$s\" 新增相依關係到不存在的觸發器\"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
-msgstr "無法新增自動發現的規則"
+msgstr "無法新增自動探索的規則"
 
 #: graphs.php:226
 msgid "Cannot add graph"
@@ -1269,7 +1269,7 @@ msgstr "無法創建另外資料庫連線."
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
-msgstr "無法創建發現規則"
+msgstr "無法創建探索規則"
 
 #: api/classes/CHostGroup.php:616
 msgid "Cannot create group without name."
@@ -1321,11 +1321,11 @@ msgstr "無法刪除相依關係"
 #: api/classes/CDiscoveryRule.php:624 discoveryconf.php:135
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
-msgstr "無法删除發現規則"
+msgstr "無法删除探索規則"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
-msgstr "無法刪除發現規則"
+msgstr "無法刪除探索規則"
 
 #: graphs.php:237
 msgid "Cannot delete graph"
@@ -1663,17 +1663,17 @@ msgstr "不能傳遞重複的模板IDs給連結: %s."
 #: include/classes/db/DB.php:615
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr "不能完成沒有where條件的刪除(delete)語法於資料表 \"%1$s\" 上."
+msgstr "不能完成沒有where條件的刪除(delete)陳述式於資料表 \"%1$s\" 上."
 
 #: include/classes/db/DB.php:438
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr "不能完成沒有值的更新(update)語法於資料表 \"%1$s\" 上."
+msgstr "不能完成沒有值的更新(update)陳述式於資料表 \"%1$s\" 上."
 
 #: include/classes/db/DB.php:449
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr "不能完成沒有條件的更新(update)語法於資料表 \"%1$s\" 上."
+msgstr "不能完成沒有條件的更新(update)陳述式於資料表 \"%1$s\" 上."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
@@ -1685,7 +1685,7 @@ msgstr "無法重新命名訪客用戶."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
-msgstr "無法儲存未檢驗的發現規則"
+msgstr "無法儲存未檢驗的探索規則"
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
@@ -1701,7 +1701,7 @@ msgstr "無法斷連和清除監測應用"
 
 #: api/classes/CHostGeneral.php:546
 msgid "Cannot unlink and clear discovery rules"
-msgstr "無法斷連和清除發現規則"
+msgstr "無法斷連和清除探索規則"
 
 #: api/classes/CHostGeneral.php:635
 msgid "Cannot unlink and clear graph prototypes"
@@ -1756,7 +1756,7 @@ msgstr "無法更新調試模式"
 
 #: discoveryconf.php:116 host_discovery.php:229
 msgid "Cannot update discovery rule"
-msgstr "無法更新發現規則"
+msgstr "無法更新探索規則"
 
 #: usergrps.php:225
 msgid "Cannot update frontend access"
@@ -1987,7 +1987,7 @@ msgstr "中文 (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "不容許迴圈式相依關係."
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -2188,11 +2188,11 @@ msgstr "認證的組態"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
-msgstr "發現的組態"
+msgstr "探索的組態"
 
 #: host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr "發現規則的組態"
+msgstr "探索規則的組態"
 
 #: graphs.php:27
 msgid "Configuration of graphs"
@@ -2435,7 +2435,7 @@ msgstr "創建應用集"
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:29
 msgid "Create discovery rule"
-msgstr "創建發現規則"
+msgstr "創建探索規則"
 
 #: include/views/configuration.graph.list.php:40
 msgid "Create graph"
@@ -2546,7 +2546,7 @@ msgstr "已創建: 應用集 \"%1$s\" 於 \"%2$s\"."
 #: api/classes/CDiscoveryRule.php:889
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "已創建: 發現規則 \"%1$s\" 於 \"%2$s\"."
+msgstr "已創建: 探索規則 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CItem.php:868
 #, php-format
@@ -2601,7 +2601,7 @@ msgstr "關鍵錯誤. 欄位 \"%1$s\" 十進位數字."
 #: include/validate.inc.php:340
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "關鍵錯誤. 欄位\"%1$s\"不是整數列表或範圍."
 
 #: include/validate.inc.php:353
 #, php-format
@@ -2715,7 +2715,7 @@ msgstr "關閉"
 
 #: include/triggers.inc.php:380
 msgid "DISCOVERED"
-msgstr "發現到的"
+msgstr "探索到的"
 
 #: include/menu.inc.php:248
 msgid "DM"
@@ -2977,7 +2977,7 @@ msgstr "刪除目前的動作?"
 #: include/views/configuration.discovery.edit.php:80
 #: include/views/configuration.item.edit.php:457
 msgid "Delete discovery rule?"
-msgstr "刪除發現規則?"
+msgstr "刪除探索規則?"
 
 #: include/views/configuration.triggers.edit.php:156 jsLoader.php:102
 #: tr_logform.php:334
@@ -3086,7 +3086,7 @@ msgstr "删除所選的應用集?"
 #: include/views/configuration.discovery.list.php:76
 #: include/views/configuration.host.discovery.list.php:110
 msgid "Delete selected discovery rules?"
-msgstr "删除所選的發現規則?"
+msgstr "删除所選的探索規則?"
 
 #: jsLoader.php:148
 msgid "Delete selected elements?"
@@ -3228,7 +3228,7 @@ msgstr "已刪除: 應用集 \"%1$s\" 於 \"%2$s\"."
 #: api/classes/CDiscoveryRule.php:654
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "已刪除: 發現規則 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 探索規則 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CGraph.php:799
 #, php-format
@@ -3410,7 +3410,7 @@ msgstr "停用所選的應用集?"
 #: include/views/configuration.discovery.list.php:72
 #: include/views/configuration.host.discovery.list.php:106
 msgid "Disable selected discovery rules?"
-msgstr "停用所選的發現規則?"
+msgstr "停用所選的探索規則?"
 
 #: include/views/administration.usergroups.list.php:134
 msgid "Disable selected groups?"
@@ -3467,38 +3467,38 @@ msgstr "災難"
 
 #: include/discovery.inc.php:151
 msgid "Discovered"
-msgstr "已發現到的"
+msgstr "已探索到的"
 
 #: include/views/monitoring.discovery.php:42
 msgid "Discovered device"
-msgstr "已發現到的裝置"
+msgstr "已探索到的裝置"
 
 #: events.php:307 hosts.php:687 hosts.php:767 include/events.inc.php:27
 #: include/html.inc.php:387 include/menu.inc.php:78 include/menu.inc.php:215
 #: include/views/configuration.action.list.php:34 templates.php:449
 #: templates.php:517
 msgid "Discovery"
-msgstr "發現"
+msgstr "探索"
 
 #: include/views/configuration.discovery.edit.php:46
 msgid "Discovery by proxy"
-msgstr "由系統代理程式發現"
+msgstr "由系統代理程式探索"
 
 #: include/actions.inc.php:51
 msgid "Discovery check"
-msgstr "發現檢查"
+msgstr "探索檢查"
 
 #: popup.php:131
 msgid "Discovery checks"
-msgstr "發現檢查"
+msgstr "探索檢查"
 
 #: include/html.inc.php:385
 msgid "Discovery list"
-msgstr "發現清單"
+msgstr "探索清單"
 
 #: include/actions.inc.php:52
 msgid "Discovery object"
-msgstr "發現物件"
+msgstr "探索物件"
 
 #: include/actions.inc.php:50 include/audit.inc.php:44
 #: include/blocks.inc.php:1075 include/forms.inc.php:1010
@@ -3506,39 +3506,39 @@ msgstr "發現物件"
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
-msgstr "發現規則"
+msgstr "探索規則"
 
 #: api/classes/CDiscoveryRule.php:972
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "發現規則 \"%1$s\"已存在於 \"%2$s\",繼承自其它的模板."
+msgstr "探索規則 \"%1$s\"已存在於 \"%2$s\",繼承自其它的模板."
 
 #: api/classes/CDiscoveryRule.php:959
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr "發現規則\"%1$s:%2$s\" 有不正確的存活時間: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用戶巨集)"
+msgstr "探索規則\"%1$s:%2$s\" 有不正確的存活時間: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用戶巨集)"
 
 #: api/classes/CDRule.php:596
 #, php-format
 msgid "Discovery rule \"%s\" already exists."
-msgstr "發現規則\"%s\"已存在."
+msgstr "探索規則\"%s\"已存在."
 
 #: api/classes/CDRule.php:664
 #, php-format
 msgid "Discovery rule [%s] already exists"
-msgstr "發現規則[%s]已存在"
+msgstr "探索規則[%s]已存在"
 
 #: discoveryconf.php:121 host_discovery.php:233
 msgid "Discovery rule created"
-msgstr "發現規則已創建"
+msgstr "探索規則已創建"
 
 #: discoveryconf.php:135 host_discovery.php:166
 msgid "Discovery rule deleted"
-msgstr "發現規則已删除"
+msgstr "探索規則已删除"
 
 #: discoveryconf.php:115 host_discovery.php:229
 msgid "Discovery rule updated"
-msgstr "發現規則已更新"
+msgstr "探索規則已更新"
 
 #: include/html.inc.php:496 include/html.inc.php:500
 #: include/views/configuration.host.discovery.list.php:33
@@ -3547,27 +3547,27 @@ msgstr "發現規則已更新"
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:35
 #: popup.php:127
 msgid "Discovery rules"
-msgstr "發現規則"
+msgstr "探索規則"
 
 #: host_discovery.php:246
 msgid "Discovery rules activated"
-msgstr "發現規則已使作用中"
+msgstr "探索規則已使作用中"
 
 #: discoveryconf.php:163 host_discovery.php:250
 msgid "Discovery rules deleted"
-msgstr "發現規則已删除"
+msgstr "探索規則已删除"
 
 #: host_discovery.php:246
 msgid "Discovery rules disabled"
-msgstr "發現規則已停用"
+msgstr "探索規則已停用"
 
 #: discoveryconf.php:153
 msgid "Discovery rules updated"
-msgstr "發現規則已更新"
+msgstr "探索規則已更新"
 
 #: dashboard.php:334 include/actions.inc.php:56
 msgid "Discovery status"
-msgstr "發現狀態"
+msgstr "探索狀態"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 msgid "Display OK triggers for"
@@ -3580,7 +3580,7 @@ msgstr "顯示"
 #: search.php:219 search.php:321 search.php:446
 #, php-format
 msgid "Displaying %1$s of %2$s found"
-msgstr "顯示 已發現的 %2$s中的%1$s"
+msgstr "顯示 已探索的 %2$s中的%1$s"
 
 #: report6.php:159
 msgid "Distribution of values for multiple items"
@@ -3912,7 +3912,7 @@ msgstr "啟用所選的應用集"
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:102
 msgid "Enable selected discovery rules?"
-msgstr "啟用所選的發現規則?"
+msgstr "啟用所選的探索規則?"
 
 #: include/views/administration.usergroups.list.php:130
 msgid "Enable selected groups?"
@@ -3965,7 +3965,7 @@ msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "英語(en_US)"
 
 #: include/actions.inc.php:681 include/actions.inc.php:757
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
@@ -4702,11 +4702,11 @@ msgstr "群組已刪除"
 
 #: include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
-msgstr "發現出的主機的群組"
+msgstr "探索到的主機的群組"
 
 #: adm.other.php:69
 msgid "Group for discovered hosts."
-msgstr "發現出的主機的群組"
+msgstr "探索到的主機的群組"
 
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
@@ -5165,7 +5165,7 @@ msgstr "清理器"
 
 #: include/locales.inc.php:53
 msgid "Hungarian (hu_HU)"
-msgstr "Hungary (hu_HU)"
+msgstr "匈牙利(hu_HU)"
 
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
@@ -5226,7 +5226,7 @@ msgstr "IPMI端點代理程式"
 
 #: include/views/configuration.host.massupdate.php:139
 msgid "IPMI authentication algorithm"
-msgstr "IPMI認證語法"
+msgstr "IPMI認證演算法"
 
 #: include/views/configuration.host.edit.php:280
 msgid "IPMI interfaces"
@@ -5553,19 +5553,19 @@ msgstr "不正確的可接受SLA予服務\"%1$s\"."
 
 #: api/classes/CAction.php:1737
 msgid "Incorrect action condition discovery check."
-msgstr "不正確的動作條件發現檢查."
+msgstr "不正確的動作條件探索檢查."
 
 #: api/classes/CAction.php:1792
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "不正確的動作條件發現檢查. 發現檢查不存在或您沒有存取權."
+msgstr "不正確的動作條件探索檢查. 探索檢查不存在或您沒有存取權."
 
 #: api/classes/CAction.php:1789
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "不正確的動作條件發現規則. 發現規則不存在或您沒有存取權."
+msgstr "不正確的動作條件探索規則. 探索規則不存在或您沒有存取權."
 
 #: api/classes/CAction.php:1749
 msgid "Incorrect action condition discovery status."
-msgstr "不正確的動作條件發現狀態."
+msgstr "不正確的動作條件探索狀態."
 
 #: api/classes/CAction.php:1777
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
@@ -5743,7 +5743,7 @@ msgstr "錯誤的表示式"
 #: include/classes/db/DB.php:456 include/classes/db/DB.php:622
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr "不正確的欄位名稱\"%1$s\"或用於資料表\"%2$s\"的where語法的值."
+msgstr "不正確的欄位名稱\"%1$s\"或用於資料表\"%2$s\"的where陳述式的值."
 
 #: api/classes/CMap.php:550
 msgid "Incorrect fields for sysmap"
@@ -6292,12 +6292,12 @@ msgstr "無效的參數."
 #: api/classes/CWebCheck.php:590
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "無效的回應編碼 \"%1$s\"."
 
 #: api/classes/CWebCheck.php:585
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "無效的回應編碼範圍 \"%1$s\"."
 
 #: items.php:340
 msgid "Invalid time period"
@@ -6431,7 +6431,7 @@ msgstr "項目將不會被刷新. 請輸入正確的更新區間."
 #: api/classes/CItemGeneral.php:362
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
-msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為發現規則."
+msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為探索規則."
 
 #: api/classes/CItemGeneral.php:368
 #, php-format
@@ -6793,7 +6793,7 @@ msgstr "左側"
 #: include/reports.inc.php:209 include/reports.inc.php:372
 #: include/reports.inc.php:521
 msgid "Legend"
-msgstr "Legend"
+msgstr "圖例"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:332
 #: include/views/js/configuration.sysmaps.js.php:408
@@ -6808,7 +6808,7 @@ msgstr "連結"
 #: include/views/js/configuration.sysmaps.js.php:309
 #: include/views/js/configuration.sysmaps.js.php:349
 msgid "Link indicators"
-msgstr "Link indicators"
+msgstr "連結指示器"
 
 #: api/classes/CMap.php:636
 #, php-format
@@ -7451,7 +7451,7 @@ msgstr "缺少主機\"%2$s\"的鍵值 \"%1$s\"."
 
 #: api/classes/CUserGroup.php:510
 msgid "Missing parameter: usrgrpids."
-msgstr ""
+msgstr "缺少參數: usrgrpids."
 
 #: include/views/administration.proxy.list.php:46 report2.php:176
 msgid "Mode"
@@ -7807,7 +7807,7 @@ msgstr "沒有數據收集"
 #: include/classes/screens/CScreenPlainText.php:36
 #: include/classes/screens/CScreenPlainText.php:56
 msgid "No data defined."
-msgstr ""
+msgstr "無已定義的資料"
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -7827,20 +7827,20 @@ msgstr "沒有細節"
 
 #: include/views/monitoring.discovery.php:38
 msgid "No discoveries defined."
-msgstr "沒有已定義的發現."
+msgstr "沒有已定義的探索."
 
 #: popup.php:1916
 msgid "No discovery checks defined."
-msgstr "沒有已定義的發現檢查."
+msgstr "沒有已定義的探索檢查."
 
 #: api/classes/CDiscoveryRule.php:672
 msgid "No discovery rule IDs given."
-msgstr "沒有所稱的發現規則ID"
+msgstr "沒有所稱的探索規則ID"
 
 #: include/views/configuration.discovery.list.php:37
 #: include/views/configuration.host.discovery.list.php:43 popup.php:1900
 msgid "No discovery rules defined."
-msgstr "沒有已定義的發現規則."
+msgstr "沒有已定義的探索規則."
 
 #: jsLoader.php:169
 msgid "No elements selected!"
@@ -8649,7 +8649,7 @@ msgstr "只能一個檢查可為唯一."
 
 #: api/classes/CUserGroup.php:517
 msgid "Only one user group name can be changed at a time."
-msgstr ""
+msgstr "每次僅有一個用戶群組可以被改變."
 
 #: api/classes/CProxy.php:610
 msgid "Only super admins can delete proxies."
@@ -9012,7 +9012,7 @@ msgstr "預期的是秒參數或用戶巨集, 得到的是\"%1$s\""
 
 #: include/views/configuration.item.edit.php:53
 msgid "Parent discovery rules"
-msgstr "上層發現規則"
+msgstr "上層探索規則"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graph"
@@ -9328,7 +9328,7 @@ msgstr "主機\"%2$s\"的系統代理程式\"%1$s\"不存在."
 #: api/classes/CProxy.php:628
 #, php-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr "系統代理程式\"%1$s\"是用在發現規則\"%2$s\"上."
+msgstr "系統代理程式\"%1$s\"是用在探索規則\"%2$s\"上."
 
 #: api/classes/CProxy.php:369
 #, php-format
@@ -9420,11 +9420,11 @@ msgstr "接收者"
 
 #: include/views/configuration.screen.constructor.edit.php:365
 msgid "Recipient (ascending)"
-msgstr ""
+msgstr "接收者(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:364
 msgid "Recipient (descending)"
-msgstr ""
+msgstr "接收者(降冪)"
 
 #: include/actions.inc.php:679 include/classes/screens/CScreenActions.php:78
 #: include/classes/screens/CScreenActions.php:83
@@ -9751,11 +9751,11 @@ msgstr "可試次數"
 
 #: include/views/configuration.screen.constructor.edit.php:363
 msgid "Retries left (ascending)"
-msgstr ""
+msgstr "剩餘可試數(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:362
 msgid "Retries left (descending)"
-msgstr ""
+msgstr "剩餘可試數(降冪)"
 
 #: include/setup.inc.php:228 include/setup.inc.php:456 warning.php:60
 msgid "Retry"
@@ -9970,12 +9970,12 @@ msgstr "SQL計數: %s (selects: %s | 執行: %s)"
 #: include/classes/db/DB.php:632
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\""
-msgstr "SQL語法執行已失敗: \"%1$s\""
+msgstr "SQL陳述式執行已失敗: \"%1$s\""
 
 #: include/classes/db/DB.php:412 include/classes/db/DB.php:467
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\"."
-msgstr "SQL語法執行已失敗: \"%1$s\"."
+msgstr "SQL陳述式執行已失敗: \"%1$s\"."
 
 #: include/discovery.inc.php:57
 #: include/views/configuration.action.edit.php:647
@@ -9989,7 +9989,7 @@ msgstr "SSH 端點代理程式"
 
 #: include/views/monitoring.discovery.php:30
 msgid "STATUS OF DISCOVERY"
-msgstr "發現的狀態"
+msgstr "探索的狀態"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127 tr_status.php:178
@@ -10886,11 +10886,11 @@ msgstr "狀態"
 
 #: include/views/configuration.screen.constructor.edit.php:361
 msgid "Status (ascending)"
-msgstr ""
+msgstr "狀態(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:360
 msgid "Status (descending)"
-msgstr ""
+msgstr "狀態(降冪)"
 
 #: include/views/configuration.services.child.list.php:39
 #: include/views/configuration.services.parent.list.php:36 services.php:409
@@ -10899,7 +10899,7 @@ msgstr "狀態統計"
 
 #: include/views/configuration.services.edit.php:54
 msgid "Status calculation algorithm"
-msgstr "狀態計算語法"
+msgstr "狀態計算演算法"
 
 #: include/views/configuration.httpconf.edit.php:134
 msgid "Status codes"
@@ -10916,11 +10916,11 @@ msgstr "Zabbix狀態"
 
 #: discovery.php:25
 msgid "Status of discovery"
-msgstr "發現的狀態"
+msgstr "探索的狀態"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr ""
+msgstr "主機群組觸發器的狀態"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
@@ -10965,7 +10965,7 @@ msgstr "方案的步驟"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "名為\"%s\"的步驟已存在."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
@@ -11272,7 +11272,7 @@ msgstr[0] "此圖片是用於對應%2$s."
 #: include/views/configuration.item.list.php:100
 #, php-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "已無法發現此項目了, 將刪除於%1$s (在%2$s在%3$s)."
+msgstr "已無法探索此項目了, 將刪除於%1$s (在%2$s在%3$s)."
 
 #: queue.php:121
 msgid "The queue is empty"
@@ -11362,11 +11362,11 @@ msgstr "時間"
 
 #: include/views/configuration.screen.constructor.edit.php:357
 msgid "Time (ascending)"
-msgstr ""
+msgstr "時間(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:356
 msgid "Time (descending)"
-msgstr ""
+msgstr "時間(降冪)"
 
 #: include/actions.inc.php:47
 msgid "Time period"
@@ -11725,11 +11725,11 @@ msgstr "類型(OK)"
 
 #: include/views/configuration.screen.constructor.edit.php:359
 msgid "Type (ascending)"
-msgstr ""
+msgstr "類型(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:358
 msgid "Type (descending)"
-msgstr ""
+msgstr "類型(降冪)"
 
 #: include/views/configuration.action.edit.php:116
 #: include/views/configuration.action.edit.php:884
@@ -11892,7 +11892,7 @@ msgstr "未知的操作"
 
 #: include/services.inc.php:370
 msgid "Unknown calculation algorithm of service status"
-msgstr "未知的服務狀態計算語法"
+msgstr "未知的服務狀態計算演算法"
 
 #: api/classes/CTriggerExpression.php:90
 msgid "Unknown function."
@@ -11948,7 +11948,7 @@ msgstr "斷連: 應用程式\"%1$s\"於\"%2$s\"."
 #: api/classes/CHostGeneral.php:555
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "未連結的: 發現規則\"%1$s\"於\"%2$s\"."
+msgstr "未連結的: 探索規則\"%1$s\"於\"%2$s\"."
 
 #: api/classes/CHostGeneral.php:662
 #, php-format
@@ -12052,7 +12052,7 @@ msgstr "已更新: 應用程式\"%1$s\"於\"%2$s\"."
 #: api/classes/CDiscoveryRule.php:933
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "已更新: 發現規則\"%1$s\"於\"%2$s\"."
+msgstr "已更新: 探索規則\"%1$s\"於\"%2$s\"."
 
 #: api/classes/CItem.php:919
 #, php-format
@@ -12136,7 +12136,7 @@ msgstr "用戶不能自行改變類型"
 
 #: api/classes/CUserGroup.php:560
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "用戶不能將自己加進一個取消的群組或已取消圖形介面存取權的群組."
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
@@ -12171,7 +12171,7 @@ msgstr "用戶群組\"%1$s\"被用於腳本\"%2$s\"."
 #: api/classes/CUserGroup.php:528
 #, php-format
 msgid "User group \"%s\" already exists."
-msgstr ""
+msgstr "用戶群組\"%s\"已存在."
 
 #: api/classes/CUserGroup.php:725
 #, php-format
@@ -12443,7 +12443,7 @@ msgstr "警告. 欄位\"%1$s\"不是十進位數字"
 #: include/validate.inc.php:344
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "警告. 欄位\"%1$s\"不是整數列表或範圍."
 
 #: include/validate.inc.php:357
 #, php-format
