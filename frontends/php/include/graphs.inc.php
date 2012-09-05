@@ -225,87 +225,88 @@
 	return get_min_itemclock_by_itemid($itemids);
 	}
 
-/*
- * Function: get_min_itemclock_by_itemid
+/**
+ * Return the time of the 1st appearance of item in trends.
  *
- * Description:
- *     Return the time of the 1st appearance of item in trends
+ * @param array|int $itemids
  *
- * Author:
- *     Aly
- *
+ * @return int (unixtime)
  */
-	function get_min_itemclock_by_itemid($itemids){
-		zbx_value2array($itemids);
-		$min = null;
-		$result = time() - 86400*365;
+function get_min_itemclock_by_itemid($itemids) {
+	zbx_value2array($itemids);
+	$min = null;
+	$result = time() - SEC_PER_YEAR;
 
-		$items_by_type = array(
-			ITEM_VALUE_TYPE_FLOAT => array(),
-			ITEM_VALUE_TYPE_STR =>  array(),
-			ITEM_VALUE_TYPE_LOG => array(),
-			ITEM_VALUE_TYPE_UINT64 => array(),
-			ITEM_VALUE_TYPE_TEXT => array()
-		);
+	$items_by_type = array(
+		ITEM_VALUE_TYPE_FLOAT => array(),
+		ITEM_VALUE_TYPE_STR =>  array(),
+		ITEM_VALUE_TYPE_LOG => array(),
+		ITEM_VALUE_TYPE_UINT64 => array(),
+		ITEM_VALUE_TYPE_TEXT => array()
+	);
 
-		$sql = 'SELECT i.itemid, i.value_type '.
-				' FROM items i '.
-				' WHERE '.DBcondition('i.itemid', $itemids);
-		$db_result = DBselect($sql);
+	$dbItems = DBselect(
+		'SELECT i.itemid,i.value_type'.
+		' FROM items i'.
+		' WHERE '.DBcondition('i.itemid', $itemids)
+	);
 
-		while($item = DBfetch($db_result)) {
-			$items_by_type[$item['value_type']][$item['itemid']] = $item['itemid'];
-		}
-
-// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
-// get max trends and history values for such type items to find out in what tables to look for data
-		$sql_from = 'history';
-		$sql_from_num = '';
-		if(!empty($items_by_type[ITEM_VALUE_TYPE_FLOAT]) || !empty($items_by_type[ITEM_VALUE_TYPE_UINT64])) {
-			$itemids_numeric = zbx_array_merge($items_by_type[ITEM_VALUE_TYPE_FLOAT], $items_by_type[ITEM_VALUE_TYPE_UINT64]);
-			$sql = 'SELECT MAX(i.history) as history, MAX(i.trends) as trends FROM items i WHERE '.DBcondition('i.itemid', $itemids_numeric);
-
-			if($table_for_numeric = DBfetch(DBselect($sql))){
-				$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
-				$result = time() - (86400 * max($table_for_numeric['history'],$table_for_numeric['trends']));
-			}
-		}
-
-		foreach($items_by_type as $type => $items) {
-			if(empty($items)) continue;
-			switch($type) {
-				case ITEM_VALUE_TYPE_FLOAT: // 0
-					$sql_from = $sql_from_num;
-				break;
-				case ITEM_VALUE_TYPE_STR: // 1
-					$sql_from = 'history_str';
-				break;
-				case ITEM_VALUE_TYPE_LOG: // 2
-					$sql_from = 'history_log';
-				break;
-				case ITEM_VALUE_TYPE_UINT64: // 3
-					$sql_from = $sql_from_num.'_uint';
-				break;
-				case ITEM_VALUE_TYPE_TEXT: // 4
-					$sql_from = 'history_text';
-				break;
-				default:
-					$sql_from = 'history';
-			}
-
-			$sql = 'SELECT ht.itemid, MIN(ht.clock) as min_clock '.
-					' FROM '.$sql_from.' ht '.
-					' WHERE '.DBcondition('ht.itemid', $itemids).
-					' GROUP BY ht.itemid';
-			$res = DBselect($sql);
-			while($min_tmp = DBfetch($res)){
-				$min = (is_null($min)) ? $min_tmp['min_clock'] : min($min, $min_tmp['min_clock']);
-			}
-		}
-		$result = is_null($min)?$result:$min;
-
-	return $result;
+	while ($item = DBfetch($dbItems)) {
+		$items_by_type[$item['value_type']][$item['itemid']] = $item['itemid'];
 	}
+
+	// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
+	// get max trends and history values for such type items to find out in what tables to look for data
+	$sql_from = 'history';
+	$sql_from_num = '';
+
+	if (!empty($items_by_type[ITEM_VALUE_TYPE_FLOAT]) || !empty($items_by_type[ITEM_VALUE_TYPE_UINT64])) {
+		$itemids_numeric = zbx_array_merge($items_by_type[ITEM_VALUE_TYPE_FLOAT], $items_by_type[ITEM_VALUE_TYPE_UINT64]);
+
+		$sql = 'SELECT MAX(i.history) AS history,MAX(i.trends) AS trends'.
+				' FROM items i'.
+				' WHERE '.DBcondition('i.itemid', $itemids_numeric);
+		if ($table_for_numeric = DBfetch(DBselect($sql))) {
+			$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
+			$result = time() - (SEC_PER_DAY * max($table_for_numeric['history'], $table_for_numeric['trends']));
+		}
+	}
+
+	foreach ($items_by_type as $type => $items) {
+		if (empty($items)) {
+			continue;
+		}
+
+		switch($type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				$sql_from = $sql_from_num;
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				$sql_from = 'history_str';
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				$sql_from = 'history_log';
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				$sql_from = $sql_from_num.'_uint';
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				$sql_from = 'history_text';
+				break;
+			default:
+				$sql_from = 'history';
+		}
+
+		$dbMin = DBfetch(DBselect(
+			'SELECT MIN(ht.clock) AS min_clock'.
+			' FROM '.$sql_from.' ht'.
+			' WHERE '.DBcondition('ht.itemid', $itemids)
+		));
+		$min = empty($min) ? $dbMin['min_clock'] : min($min, $dbMin['min_clock']);
+	}
+
+	return empty($min) ? $result : $min;
+}
 
 	function get_graph_by_graphid($graphid){
 
