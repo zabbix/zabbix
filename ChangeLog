@@ -1020,6 +1020,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+..F....... [ZBX-5514] fixed sql query in get_min_itemclock_by_itemid function (Eduard)
+A......... [ZBX-5505] fixed incorrect sql query building using limits (Eduard)
 A......... [ZBX-5512] fixed undefined index in screens (Eduard)
 ...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
 ........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
