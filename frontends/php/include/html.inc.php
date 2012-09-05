@@ -602,15 +602,21 @@ function getAvailabilityTable($host) {
 /**
  * Create array with all inputs required for date selection and calendar.
  *
- * @param string $name
- * @param int    $date
+ * @param string      $name
+ * @param int         $date
+ * @param string|null $relatedCalendar name of the calendar which must be closed when this calendar opens
  *
  * @return array
  */
-function createDateSelector($name, $date) {
+function createDateSelector($name, $date, $relatedCalendar = null) {
 	$calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
-	$calendarIcon->onClick('var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
-			'_calendar"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_till"].clndr.clndrhide();');
+	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
+		'_calendar"].clndr.clndrshow(pos.top, pos.left);';
+	if ($relatedCalendar) {
+		$onClick .= ' CLNDR["'.$relatedCalendar.'_calendar"].clndr.clndrhide();';
+	}
+
+	$calendarIcon->onClick($onClick);
 
 	$day = new CNumericBox($name.'_day', $date > 0 ? date('d', $date) : '', 2);
 	$day->attr('placeholder', _('dd'));

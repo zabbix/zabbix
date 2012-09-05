@@ -44,8 +44,8 @@ $maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
 $maintenanceForm->addVar('active_since', date('YmdHi', $this->data['active_since']));
 $maintenanceForm->addVar('active_till', date('YmdHi', $this->data['active_till']));
 
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $this->data['active_since']));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $this->data['active_till']));
+$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $this->data['active_since'], 'active_till'));
+$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $this->data['active_till'], 'active_since'));
 $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
 
 /*
