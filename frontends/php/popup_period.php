@@ -113,64 +113,15 @@ require_once 'include/page_header.php';
 		$frmPd->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
 			_('Caption')), new CTextBox('caption',$caption,42));
 
-		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-		$clndr_icon->addAction('onclick','javascript: '.
-											'var pos = getPosition(this); '.
-											'pos.top+=10; '.
-											'pos.left+=16; '.
-											"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
+		$reporttimetab = new CTable(null, 'calendar');
 
-		$reporttimetab = new CTable(null,'calendar');
-		$reporttimetab->setAttribute('width','10%');
+		$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
+		array_unshift($timeSinceRow, _('From'));
+		$reporttimetab->addRow($timeSinceRow);
 
-		$reporttimetab->setCellPadding(0);
-		$reporttimetab->setCellSpacing(0);
-
-		$reporttimetab->addRow(array(
-			_('From'),
-			new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
-			'/',
-			new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
-			'/',
-			new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
-			SPACE,
-			new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
-			':',
-			new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
-			$clndr_icon
-		));
-
-		zbx_add_post_js('create_calendar(null,'.
-						'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
-						'"avail_report_since",'.
-						'"report_timesince");');
-
-		$clndr_icon->addAction('onclick','javascript: '.
-											'var pos = getPosition(this); '.
-											'pos.top+=10; '.
-											'pos.left+=16; '.
-											"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
-
-		$reporttimetab->addRow(array(
-			_('Till'),
-			new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
-			'/',
-			new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
-			'/',
-			new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
-			SPACE,
-			new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
-			':',
-			new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
-			$clndr_icon
-		));
-
-		zbx_add_post_js('create_calendar(null,'.
-						'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
-						'"avail_report_till",'.
-						'"report_timetill");'
-						);
-
+		$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
+		array_unshift($timeTillRow, _('Till'));
+		$reporttimetab->addRow($timeTillRow);
 
 		$frmPd->addRow(_('Period'), $reporttimetab);
 //*/
