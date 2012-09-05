@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/configuration.services.edit.js.php');
 global $ZBX_MESSAGES;
 
@@ -40,7 +40,9 @@ if (isset($this->data['service'])) {
 
 // create form list
 $servicesFormList = new CFormList('servicesFormList');
-$servicesFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 128));
+$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 128);
+$nameTextBox->attr('autofocus', 'autofocus');
+$servicesFormList->addRow(_('Name'), $nameTextBox);
 
 // append parent link to form list
 $servicesFormList->addRow(_('Parent service'), array(
@@ -169,43 +171,12 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	// create calendar table
 	$timeCalendarTable = new CTable();
 
-	$calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
-	$calendarIcon->addAction('onclick', "javascript: var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_since'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_till'].clndr.clndrhide();");
-
 	// downtime since
 	$noteTextBox = new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 	$noteTextBox->setAttribute('placeholder', _('short description'));
-	$downtimeSinceDay = new CNumericBox('downtime_since_day', $downtimeSince > 0 ? date('d', $downtimeSince) : '', 2);
-	$downtimeSinceDay->setAttribute('placeholder', _('dd'));
-	$downtimeSinceMonth = new CNumericBox('downtime_since_month', $downtimeSince > 0 ? date('m', $downtimeSince) : '', 2);
-	$downtimeSinceMonth->setAttribute('placeholder', _('mm'));
-	$downtimeSinceYear = new CNumericBox('downtime_since_year', $downtimeSince > 0 ? date('Y', $downtimeSince) : '', 4);
-	$downtimeSinceYear->setAttribute('placeholder', _('yyyy'));
-	$downtimeSinceHour = new CNumericBox('downtime_since_hour', $downtimeSince > 0 ? date('H', $downtimeSince) : '', 2);
-	$downtimeSinceHour->setAttribute('placeholder', _('hh'));
-	$downtimeSinceMinute = new CNumericBox('downtime_since_minute', $downtimeSince > 0 ? date('i', $downtimeSince) : '', 2);
-	$downtimeSinceMinute->setAttribute('placeholder', _('mm'));
-
 	$timeCalendarTable->addRow(array(_('Note'), $noteTextBox));
-	$timeCalendarTable->addRow(array(_('From'), new CCol(array($downtimeSinceDay, '/', $downtimeSinceMonth, '/', $downtimeSinceYear, SPACE, $downtimeSinceHour, ':', $downtimeSinceMinute, $calendarIcon))));
-	zbx_add_post_js('create_calendar(null, ["downtime_since_day", "downtime_since_month", "downtime_since_year", "downtime_since_hour", "downtime_since_minute"], "downtime_since", "new_service_time_from");');
-
-	// downtime till
-	$calendarIcon->addAction('onclick', "javascript: var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_till'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_since'].clndr.clndrhide();");
-	$downtimeTillDay = new CNumericBox('downtime_till_day', $downtimeTill > 0 ? date('d', $downtimeTill) : '', 2);
-	$downtimeTillDay->setAttribute('placeholder', _('dd'));
-	$downtimeTillMonth = new CNumericBox('downtime_till_month', $downtimeTill > 0 ? date('m', $downtimeTill) : '', 2);
-	$downtimeTillMonth->setAttribute('placeholder', _('mm'));
-	$downtimeTillYear = new CNumericBox('downtime_till_year', $downtimeTill > 0 ? date('Y', $downtimeTill) : '', 4);
-	$downtimeTillYear->setAttribute('placeholder', _('yyyy'));
-	$downtimeTillHour = new CNumericBox('downtime_till_hour', $downtimeTill > 0 ? date('H', $downtimeTill) : '', 2);
-	$downtimeTillHour->setAttribute('placeholder', _('hh'));
-	$downtimeTillMinute = new CNumericBox('downtime_till_minute', $downtimeTill > 0 ? date('i', $downtimeTill) : '', 2);
-	$downtimeTillMinute->setAttribute('placeholder', _('mm'));
-
-	$timeCalendarTable->addRow(array(_('Till'), new CCol(array($downtimeTillDay, '/', $downtimeTillMonth, '/', $downtimeTillYear, SPACE, $downtimeTillHour, ':', $downtimeTillMinute, $calendarIcon))));
-	zbx_add_post_js('create_calendar(null, ["downtime_till_day", "downtime_till_month", "downtime_till_year", "downtime_till_hour", "downtime_till_minute"], "downtime_till", "new_service_time_to");');
-
+	$timeCalendarTable->addRow(array(_('From'), createDateSelector('new_service_time_from', $downtimeSince, 'new_service_time_to')));
+	$timeCalendarTable->addRow(array(_('Till'), createDateSelector('new_service_time_to', $downtimeTill, 'new_service_time_from')));
 	$serviceTimeTable->addRow($timeCalendarTable);
 }
 else {
@@ -276,5 +247,5 @@ $servicesForm->addItem(makeFormFooter(
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);
+
 return $servicesWidget;
-?>
