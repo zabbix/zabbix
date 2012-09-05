@@ -17,11 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
+
 class CTriggerPrototype extends CTriggerGeneral {
 
 	protected $tableName = 'triggers';
@@ -1130,10 +1127,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
 
-		foreach ($triggers as &$trigger) {
-			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		foreach ($triggers as $num => $trigger) {
+			$triggers[$num]['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		}
-		unset($trigger);
 
 		// insert triggers without expression
 		$triggersCopy = $triggers;
@@ -1270,4 +1266,3 @@ class CTriggerPrototype extends CTriggerGeneral {
 		return true;
 	}
 }
-?>

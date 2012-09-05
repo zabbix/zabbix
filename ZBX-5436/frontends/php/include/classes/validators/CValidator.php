@@ -26,7 +26,7 @@ abstract class CValidator {
 	 *
 	 * @var array
 	 */
-	private $errors = array();
+	private $error;
 	protected $options = array();
 
 	public function __construct(array $options = array()) {
@@ -48,9 +48,7 @@ abstract class CValidator {
 	 * @return string
 	 */
 	public function getError() {
-		$error = reset($this->errors);
-
-		return $error;
+		return $this->error;
 	}
 
 	/**
@@ -58,8 +56,8 @@ abstract class CValidator {
 	 *
 	 * @param $error
 	 */
-	protected function addError($error) {
-		$this->errors[] = $error;
+	protected function setError($error) {
+		$this->error = $error;
 	}
 
 	protected function initOptions() {}

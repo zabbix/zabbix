@@ -119,7 +119,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 	else if (NULL != name)
 	{
 		alias_name = zbx_dsprintf(NULL, "__UserPerfCounter[%s]", name);
-		result = add_alias(name, alias_name);
+		add_alias(name, alias_name);
 		zbx_free(alias_name);
 	}
 

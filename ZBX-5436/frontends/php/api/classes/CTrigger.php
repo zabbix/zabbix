@@ -1856,7 +1856,7 @@ class CTrigger extends CTriggerGeneral {
 				$upTriggerids = array();
 				while ($upTrigger = DBfetch($dbUpTriggers)) {
 					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular dependencies are not allowed.'));
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
 				}

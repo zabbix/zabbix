@@ -36,7 +36,7 @@ class CTimePeriodValidator extends CValidator {
 	 */
 	public function validate($periods) {
 		if (zbx_empty($periods)) {
-			$this->addError(_('Empty time period.'));
+			$this->setError(_('Empty time period.'));
 			return false;
 		}
 
@@ -79,23 +79,23 @@ class CTimePeriodValidator extends CValidator {
 		$time2RegExp = '(?P<hour2>20|21|22|23|24|[0-1]\d|\d):(?P<min2>[0-5]\d)';
 
 		if (!preg_match('#^'.$daysRegExp.','.$time1RegExp.'-'.$time2RegExp.'$#', $period, $matches)) {
-			$this->addError(_s('Incorrect time period "%1$s".', $period));
+			$this->setError(_s('Incorrect time period "%1$s".', $period));
 			return false;
 		}
 
 		if ($matches['hour2'] == '24' && $matches['min2'] != 0) {
-			$this->addError(_s('Incorrect time period "%1$s".', $period));
+			$this->setError(_s('Incorrect time period "%1$s".', $period));
 			return false;
 		}
 
 		if (!zbx_empty($matches['day2']) && ($matches['day1'] > $matches['day2'])) {
-			$this->addError(_s('Incorrect time period "%1$s" start day must be less or equal to end day.', $period));
+			$this->setError(_s('Incorrect time period "%1$s" start day must be less or equal to end day.', $period));
 			return false;
 		}
 
 		if (($matches['hour1'] > $matches['hour2'])
 				|| (($matches['hour1'] == $matches['hour2']) && ($matches['min1'] >= $matches['min2']))) {
-			$this->addError(_s('Incorrect time period "%1$s" start time must be less than end time.', $period));
+			$this->setError(_s('Incorrect time period "%1$s" start time must be less than end time.', $period));
 			return false;
 		}
 

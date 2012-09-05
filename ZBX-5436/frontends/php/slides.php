@@ -10,12 +10,12 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
@@ -68,11 +68,6 @@ if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.slides.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
-	elseif ($_REQUEST['favobj'] == 'timeline') {
-		if (isset($_REQUEST['elementid']) && isset($_REQUEST['period'])) {
-			navigation_bar_calc('web.slides', $_REQUEST['elementid'], true);
-		}
-	}
 	elseif (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
 		$result = false;
 		if ($_REQUEST['favaction'] == 'add') {
@@ -86,7 +81,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = rm4favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo 'jQuery("#addrm_fav").title = "'._('Add to').' '._('Favourites').'";'."\n".
-					'jQuery("#addrm_fav").click(function() { add2favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'") });'."\n";
+					'jQuery("#addrm_fav").click(function() { add2favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'"); });'."\n";
 			}
 		}
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
@@ -115,17 +110,18 @@ if (isset($_REQUEST['favobj'])) {
 						'output' => API_OUTPUT_EXTEND,
 						'selectScreenItems' => API_OUTPUT_EXTEND
 					));
-					$cur_screen = reset($screens);
+					$currentScreen = reset($screens);
 
 					$screenBuilder = new CScreenBuilder(array(
 						'isFlickerfree' => false,
-						'screen' => $cur_screen,
-						'mode' => SCREEN_MODE_VIEW,
+						'screen' => $currentScreen,
+						'mode' => SCREEN_MODE_SLIDESHOW,
 						'profileIdx' => 'web.slides',
 						'profileIdx2' => $elementid,
 						'period' => get_request('period'),
 						'stime' => get_request('stime')
 					));
+
 					echo $screenBuilder->show()->toString();
 
 					$refresh = ($screen['delay'] > 0) ? $screen['delay'] : $slideshow['delay'];
@@ -171,8 +167,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
+$data = array(
+	'slideshows' => array()
+);
+
 // get slideshows
-$data['slideshows'] = array();
 $db_slideshows = DBselect(
 	'SELECT s.slideshowid,s.name'.
 	' FROM slideshows s'.

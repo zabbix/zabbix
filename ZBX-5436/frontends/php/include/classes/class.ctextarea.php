@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -28,24 +28,40 @@ class CTextArea extends CTag {
 	 */
 	protected $encStrategy = self::ENC_ALL;
 
-	public function __construct($name = 'textarea', $value = '', $rows = ZBX_TEXTAREA_STANDARD_ROWS, $width = ZBX_TEXTAREA_STANDARD_WIDTH, $readonly = false) {
+	/**
+	 * Init textarea.
+	 *
+	 * @param string	$name
+	 * @param string	$value
+	 * @param array		$options
+	 * @param int		$options['rows']
+	 * @param int		$options['width']
+	 * @param int		$options['maxlength']
+	 * @param boolean	$options['readonly']
+	 */
+	public function __construct($name = 'textarea', $value = '', $options = array()) {
 		parent::__construct('textarea', 'yes');
 		$this->attr('class', 'input');
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
-		$this->attr('rows', $rows);
-		$this->setReadonly($readonly);
+		$this->attr('rows', !empty($options['rows']) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
+		$this->setReadonly(!empty($options['readonly']));
 		$this->addItem($value);
 
 		// set width
-		if ($width == ZBX_TEXTAREA_STANDARD_WIDTH) {
+		if (empty($options['width']) || $options['width'] == ZBX_TEXTAREA_STANDARD_WIDTH) {
 			$this->addClass('textarea_standard');
 		}
-		elseif ($width == ZBX_TEXTAREA_BIG_WIDTH) {
+		elseif ($options['width'] == ZBX_TEXTAREA_BIG_WIDTH) {
 			$this->addClass('textarea_big');
 		}
 		else {
-			$this->attr('style', 'width: '.$width.'px;');
+			$this->attr('style', 'width: '.$options['width'].'px;');
+		}
+
+		// set maxlength
+		if (!empty($options['maxlength'])) {
+			$this->setMaxlength($options['maxlength']);
 		}
 	}
 
@@ -68,5 +84,25 @@ class CTextArea extends CTag {
 
 	public function setCols($value) {
 		$this->attr('cols', $value);
+	}
+
+	public function setMaxlength($maxlength) {
+		$this->attr('maxlength', $maxlength);
+
+		if (!defined('IS_TEXTAREA_MAXLENGTH_JS_INSERTED')) {
+			define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', true);
+
+			// firefox and google chrome has own implementation of maxlength validation on textarea
+			insert_js('
+				if (!CR && !GK) {
+					jQuery("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
+						var elem = jQuery(this);
+						if (elem.val().length > elem.attr("maxlength")) {
+							elem.val(elem.val().substr(0, elem.attr("maxlength")));
+						}
+					});
+				}',
+			true);
+		}
 	}
 }

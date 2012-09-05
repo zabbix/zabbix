@@ -543,28 +543,20 @@ function utf8RawUrlDecode($source) {
  * $srcHostId parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the
  * $srcHostId parameter is passed, the given host will be replaced with the destination host.
  *
- * @param string|array $srcTriggerIds
- * @param string|array $dstHostIds
- * @param string $srcHostId
+ * This function takes care of copied trigger dependencies.
+ * If trigger is copied alongside with trigger on which it depends, then dependencies is replaced directly using new ids,
+ * If there is target host within dependency trigger, algorithm will search for potential matching trigger in target host,
+ * if matching trigger is found, then id from this trigger is used, if not rise exception,
+ * otherwise original dependency will be left.
+ *
+ *
+ * @param int|array $srcTriggerIds triggers which will be copied to $dstHostIds
+ * @param int|array $dstHostIds hosts and templates to whom add triggers, ids not present in DB (host table) will be ignored
+ * @param int $srcHostId host id in which context trigger with multiple hosts will be treated
  *
  * @return bool
  */
 function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
-	if ($srcHostId) {
-		$options = array(
-			'output' => array('hostid', 'host'),
-			'hostids' => $srcHostId,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'templated_hosts' => true
-		);
-		$srcHosts = API::Host()->get($options);
-		if (empty($srcHosts)) {
-			return false;
-		}
-		$srcHost = reset($srcHosts);
-	}
-
 	$options = array(
 		'triggerids' => $srcTriggerIds,
 		'output' => array('triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'),
@@ -572,12 +564,27 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_REFER
 	);
-	if (!$srcHostId) {
-		$options['selectHosts'] = array('hostid', 'host');
-	}
-	$db_srcTriggers = API::Trigger()->get($options);
+	if ($srcHostId) {
+		$srcHost = API::Host()->get(array(
+			'output' => array('host'),
+			'hostids' => $srcHostId,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'templated_hosts' => true
+		));
 
-	$db_dstHosts = API::Host()->get(array(
+		// if provided $srcHostId doesn't match any record in DB, return false
+		if (!($srcHost = reset($srcHost))) {
+			return false;
+		}
+	}
+	// if no $srcHostId provided we will need trigger host 'host'
+	else {
+		$options['selectHosts'] = array('host');
+	}
+	$dbSrcTriggers = API::Trigger()->get($options);
+
+	$dbDstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host'),
 		'hostids' => $dstHostIds,
 		'preservekeys' => true,
@@ -585,25 +592,27 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'templated_hosts' => true
 	));
 
-	$newTriggerIds = array();
-	$httpTriggerIds = array();
-	foreach ($db_dstHosts as $dstHost) {
-		foreach ($db_srcTriggers as $srcTrigger) {
-			if (httpItemExists($srcTrigger['items'])) {
-				$httpTriggerIds[$srcTrigger['triggerid']] = $srcTrigger['triggerid'];
-				continue;
-			}
-
+	$newTriggers = array();
+	// create each trigger for each host
+	foreach ($dbDstHosts as $dstHost) {
+		foreach ($dbSrcTriggers as $srcTrigger) {
+			// if $srcHostId provided, get host 'host' for explode_exp()
 			if ($srcHostId != 0) {
 				$host = $srcHost['host'];
+				$srcTriggerContextHostId = $srcHostId;
 			}
+			// if $srcHostId not provided, use source trigger first host 'host'
 			else {
+				// if we have multiple hosts in trigger expression and we haven't pointed ($srcHostId) which host to replace, call error
 				if (count($srcTrigger['hosts']) > 1) {
-					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.', $srcTrigger['description'], explode_exp($srcTrigger['expression'])));
+					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.',
+						$srcTrigger['description'], explode_exp($srcTrigger['expression'])));
 					return false;
 				}
 				$host = $srcTrigger['hosts'][0]['host'];
+				$srcTriggerContextHostId = $srcTrigger['hosts'][0]['hostid'];
 			}
+			// get expression for the new trigger to be added
 			$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $host, $dstHost['host']);
 
 			// the dependencies must be added after all triggers are created
@@ -612,35 +621,100 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 			if (!$result = API::Trigger()->create($srcTrigger)) {
 				return false;
 			}
-			$newTriggerIds[$srcTrigger['triggerid']] = reset($result['triggerids']);
+
+			$newTriggers[$srcTrigger['triggerid']] = array(
+				'newTriggerId' =>reset($result['triggerids']),
+				'newTriggerHostId' =>  $dstHost['hostid'],
+				'newTriggerHost' =>  $dstHost['host'],
+				'srcTriggerContextHostId' => $srcTriggerContextHostId,
+				'srcTriggerContextHost' => $host
+			);
 		}
 	}
 
-	// map dependencies to the new trigger IDs and save
-	if ($newTriggerIds) {
-		$dependencies = array();
-		foreach ($db_srcTriggers as $trigger) {
-			$triggerId = $trigger['triggerid'];
-			$triggerId = (isset($newTriggerIds[$triggerId])) ? $newTriggerIds[$triggerId] : $triggerId;
+	$depIds = array();
+	foreach ($dbSrcTriggers as $srcTrigger) {
+		if ($srcTrigger['dependencies']) {
+			foreach ($srcTrigger['dependencies'] as $depTrigger) {
+				$depIds[] = $depTrigger['triggerid'];
+			}
+		}
+	}
+	$depTriggers = API::Trigger()->get(array(
+		'triggerids' => $depIds,
+		'output' => API_OUTPUT_EXTEND,
+		'nopermissions' => true,
+		'selectHosts' => array('hostid'),
+		'preservekeys' => true
+	));
 
-			if ($trigger['dependencies']) {
-				foreach ($trigger['dependencies'] as $depTrigger) {
-					// skip dependencies on triggers containing web items
-					if (isset($httpTriggerIds[$depTrigger['triggerid']])) {
-						continue;
+	// map dependencies to the new trigger IDs and save
+	if ($newTriggers) {
+		$dependencies = array();
+		foreach ($dbSrcTriggers as $srcTrigger) {
+			if ($srcTrigger['dependencies']) {
+				// get coresponding created trigger id
+				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
+
+
+				foreach ($srcTrigger['dependencies'] as $depTrigger) {
+					// we have added $depTrigger trigger, and we know corresponding trigger id for newly created trigger
+					if (isset($newTriggers[$depTrigger['triggerid']])) {
+
+						// dependency is within same host
+						// according to $srcHostId parameter or dep trigger has single host
+						if ($newTrigger['srcTriggerContextHostId'] == $newTriggers[$depTrigger['triggerid']]['srcTriggerContextHostId']) {
+							$depTriggerId = $newTriggers[$depTrigger['triggerid']]['newTriggerId'];
+						}
+						// dependency is to trigger from another host
+						else {
+							$depTriggerId = $depTrigger['triggerid'];
+						}
+					}
+					// we need to search for $depTrigger trigger if target host is within dependency hosts
+					elseif (in_array(array('hostid'=>$newTrigger['srcTriggerContextHostId']), $depTriggers[$depTrigger['triggerid']]['hosts'])) {
+						// get all possible $depTrigger matching triggers by description
+						$targetHostTriggersByDescription = API::Trigger()->get(array(
+							'hostids' => $newTrigger['newTriggerHostId'],
+							'output' => array('hosts', 'triggerid', 'expression'),
+							'filter' => array('description' => $depTriggers[$depTrigger['triggerid']]['description']),
+							'preservekeys' => true
+						));
+
+						// compare exploded expressions for exact match
+						$expr1 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression']);
+						$depTriggerId = null;
+						foreach ($targetHostTriggersByDescription as $potentialTargetTrigger) {
+							$expr2 = explode_exp($potentialTargetTrigger['expression'], false, false, $newTrigger['newTriggerHost'], $newTrigger['srcTriggerContextHost']);
+							if ($expr2 == $expr1) {
+								// matching trigger has been found
+								$depTriggerId = $potentialTargetTrigger['triggerid'];
+								break;
+							}
+						}
+						// if matching trigger wasn't found rise exception
+						if (is_null($depTriggerId)) {
+							$expr1 = explode_exp($srcTrigger['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
+							$expr2 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
+							error(_s('Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
+								$srcTrigger['description'], $expr1,
+								$depTriggers[$depTrigger['triggerid']]['description'], $expr2));
+							return false;
+						}
+					}
+					// leave original dependency
+					else {
+						$depTriggerId = $depTrigger['triggerid'];
 					}
 
-					$depTriggerId = $depTrigger['triggerid'];
-					$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
 
 					$dependencies[] = array(
-						'triggerid' => $triggerId,
+						'triggerid' => $newTrigger['newTriggerId'],
 						'dependsOnTriggerid' => $depTriggerId
 					);
 				}
 			}
 		}
-
 		if ($dependencies) {
 			if (!API::Trigger()->addDependencies($dependencies)) {
 				return false;

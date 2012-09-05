@@ -350,12 +350,9 @@ class CItem extends CItemGeneral {
 
 		// group
 		if (!is_null($options['group'])) {
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['name'] = 'g.name';
-			}
 			$sqlParts['from']['groups'] = 'groups g';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['ghg'] = 'g.groupid = hg.groupid';
+			$sqlParts['where']['ghg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sqlParts['where'][] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
 		}
