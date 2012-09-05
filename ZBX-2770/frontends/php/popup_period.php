@@ -115,11 +115,11 @@ require_once 'include/page_header.php';
 
 		$reporttimetab = new CTable(null, 'calendar');
 
-		$timeSinceRow = createDateSelector('report_timesince', $report_timesince);
+		$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
 		array_unshift($timeSinceRow, _('From'));
 		$reporttimetab->addRow($timeSinceRow);
 
-		$timeTillRow = createDateSelector('report_timetill', $report_timetill);
+		$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
 		array_unshift($timeTillRow, _('Till'));
 		$reporttimetab->addRow($timeTillRow);
 

@@ -109,11 +109,11 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 //*
 	$filtertimetab = new CTable(null,'calendar');
 
-	$timeSinceRow = createDateSelector('filter_timesince', $_REQUEST['filter_timesince']);
+	$timeSinceRow = createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill');
 	array_unshift($timeSinceRow, _('From'));
 	$filtertimetab->addRow($timeSinceRow);
 
-	$timeTillRow = createDateSelector('filter_timetill', $_REQUEST['filter_timetill']);
+	$timeTillRow = createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince');
 	array_unshift($timeTillRow, _('Till'));
 	$filtertimetab->addRow($timeTillRow);
 
@@ -171,11 +171,11 @@ function bar_report_form(){
 
 	$reporttimetab = new CTable(null,'calendar');
 
-	$timeSinceRow = createDateSelector('report_timesince', $report_timesince);
+	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
 	array_unshift($timeSinceRow, _('From'));
 	$reporttimetab->addRow($timeSinceRow);
 
-	$timeTillRow = createDateSelector('report_timetill', $report_timetill);
+	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
 	array_unshift($timeTillRow, _('Till'));
 	$reporttimetab->addRow($timeTillRow);
 
@@ -484,11 +484,11 @@ function bar_report_form3(){
 // PERIOD
 	$reporttimetab = new CTable(null,'calendar');
 
-	$timeSinceRow = createDateSelector('report_timesince', $report_timesince);
+	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
 	array_unshift($timeSinceRow, _('From'));
 	$reporttimetab->addRow($timeSinceRow);
 
-	$timeTillRow = createDateSelector('report_timetill', $report_timetill);
+	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
 	array_unshift($timeTillRow, _('Till'));
 	$reporttimetab->addRow($timeTillRow);
 

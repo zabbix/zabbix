@@ -61,7 +61,7 @@ jQuery(function($) {
 		return false;
 	});
 
-	if (IE || OP) {
+	if (IE || KQ) {
 		setTimeout(function () {$('[autofocus]').focus()}, 10);
 	}
 });

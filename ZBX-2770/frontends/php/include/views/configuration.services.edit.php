@@ -175,8 +175,8 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	$noteTextBox = new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 	$noteTextBox->setAttribute('placeholder', _('short description'));
 	$timeCalendarTable->addRow(array(_('Note'), $noteTextBox));
-	$timeCalendarTable->addRow(array(_('From'), createDateSelector('new_service_time_from', $downtimeSince)));
-	$timeCalendarTable->addRow(array(_('Till'), createDateSelector('new_service_time_to', $downtimeTill)));
+	$timeCalendarTable->addRow(array(_('From'), createDateSelector('new_service_time_from', $downtimeSince, 'new_service_time_to')));
+	$timeCalendarTable->addRow(array(_('Till'), createDateSelector('new_service_time_to', $downtimeTill, 'new_service_time_from')));
 	$serviceTimeTable->addRow($timeCalendarTable);
 }
 else {
