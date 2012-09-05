@@ -56,7 +56,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (3 < num_param(param))
@@ -97,7 +97,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (2 < num_param(param))
