@@ -35,7 +35,9 @@ if (!empty($this->data['slideshowid'])) {
 
 // create slide form list
 $slideFormList = new CFormList('slideFormList');
-$slideFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
+$nameTextBox->attr('autofocus', 'autofocus');
+$slideFormList->addRow(_('Name'), $nameTextBox);
 $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, 'no', false, false));
 
 // append slide table
