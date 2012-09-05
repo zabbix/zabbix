@@ -32,6 +32,3 @@ dist-hook:
 	cp $(srcdir)/dbpatches/2.0/mysql/rc4_rc5.sql $(distdir)/dbpatches/2.0/mysql/
 	cp $(srcdir)/dbpatches/2.0/oracle/rc4_rc5.sql $(distdir)/dbpatches/2.0/oracle/
 	cp $(srcdir)/dbpatches/2.0/postgresql/rc4_rc5.sql $(distdir)/dbpatches/2.0/postgresql/
-	mkdir $(distdir)/dbpatches/2.2
-	mkdir $(distdir)/dbpatches/2.2/postgresql
-	cat $(srcdir)/dbpatches/2.2/postgresql/patch/* >$(distdir)/dbpatches/2.2/postgresql/patch.sql

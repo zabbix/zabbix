@@ -578,7 +578,3 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/p
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
-upgrades/dbpatches/2.2/ibm_db2/patch/profiles.sql -text
-upgrades/dbpatches/2.2/mysql/patch/profiles.sql -text
-upgrades/dbpatches/2.2/oracle/patch/profiles.sql -text
-upgrades/dbpatches/2.2/postgresql/patch/profiles.sql -text
