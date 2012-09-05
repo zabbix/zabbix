@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 11:46+0300\n"
+"POT-Creation-Date: 2012-09-05 21:32+0300\n"
 "PO-Revision-Date: 2012-06-20 11:12+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -434,7 +434,7 @@ msgstr "ホストグループに追加"
 msgid "Added"
 msgstr "追加"
 
-#: include/items.inc.php:1332 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1324 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "追加パラメータ"
 
@@ -1272,7 +1272,7 @@ msgstr "ディスカバリルールを作成できません"
 msgid "Cannot create group without name."
 msgstr "名前がないグループは作成できません。"
 
-#: api/classes/CHost.php:1775
+#: api/classes/CHost.php:1763
 msgid "Cannot create host group."
 msgstr "ホストグループを作成できません。"
 
@@ -1332,7 +1332,7 @@ msgstr "グラフを削除できません"
 msgid "Cannot delete graph prototype."
 msgstr "グラフのプロトタイプを削除できません。"
 
-#: api/classes/CItem.php:1005
+#: api/classes/CItem.php:1002
 msgid "Cannot delete graph."
 msgstr "グラフを削除できません"
 
@@ -1348,7 +1348,7 @@ msgstr "グループを削除できません"
 msgid "Cannot delete host"
 msgstr "ホストを削除できません"
 
-#: api/classes/CHost.php:1786
+#: api/classes/CHost.php:1774
 msgid "Cannot delete host group."
 msgstr "ホストグループを削除できません"
 
@@ -1360,7 +1360,7 @@ msgstr "アイコンのマッピングを削除できません"
 msgid "Cannot delete image"
 msgstr "イメージを削除できません"
 
-#: api/classes/CHost.php:1880
+#: api/classes/CHost.php:1867
 msgid "Cannot delete inventory."
 msgstr "インベントリを削除できません"
 
@@ -1443,7 +1443,7 @@ msgstr "テンプレートを削除できません"
 msgid "Cannot delete templated graphs."
 msgstr "テンプレートのグラフを削除できません。"
 
-#: api/classes/CItem.php:969
+#: api/classes/CItem.php:966
 msgid "Cannot delete templated item."
 msgstr "テンプレートのアイテムを削除できません"
 
@@ -1460,7 +1460,7 @@ msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません"
 msgid "Cannot delete trigger"
 msgstr "トリガーを削除できません"
 
-#: api/classes/CItem.php:1021
+#: api/classes/CItem.php:1018
 msgid "Cannot delete trigger."
 msgstr "トリガーを削除できません"
 
@@ -1628,7 +1628,7 @@ msgstr "ビューファイル\"%s\"を読み込めません。"
 msgid "Cannot insert user media."
 msgstr "ユーザーメディアを追加できません"
 
-#: api/classes/CHost.php:1860
+#: api/classes/CHost.php:1846
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
 
@@ -1636,7 +1636,7 @@ msgstr "テンプレートをリンクできません"
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
-#: api/classes/CHost.php:1678
+#: api/classes/CHost.php:1670
 msgid "Cannot mass update host name."
 msgstr "ホスト名を一括更新できません"
 
@@ -1644,7 +1644,7 @@ msgstr "ホスト名を一括更新できません"
 msgid "Cannot mass update template name"
 msgstr "テンプレート名を一括更新できません"
 
-#: api/classes/CHost.php:1668
+#: api/classes/CHost.php:1660
 msgid "Cannot mass update visible host name."
 msgstr "ホストの表示名は一括更新できません。"
 
@@ -1652,7 +1652,7 @@ msgstr "ホストの表示名は一括更新できません。"
 msgid "Cannot mass update visible template name"
 msgstr "テンプレートの表示名を一括更新できません"
 
-#: api/classes/CHostGeneral.php:154
+#: api/classes/CHostGeneral.php:157
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "テンプレートIDの重複のためリンク%sを作成できません。"
@@ -1692,39 +1692,39 @@ msgstr "インターフェイスのためのホストを切り替えできませ
 msgid "Cannot unblock users"
 msgstr "ユーザーのブロックを解除できません"
 
-#: api/classes/CHostGeneral.php:690
+#: api/classes/CHostGeneral.php:693
 msgid "Cannot unlink and clear applications"
 msgstr "アプリケーションのリンク削除と削除が行えません"
 
-#: api/classes/CHostGeneral.php:543
+#: api/classes/CHostGeneral.php:546
 msgid "Cannot unlink and clear discovery rules"
 msgstr "ディスカバリルールのリンク削除と削除が行えません"
 
-#: api/classes/CHostGeneral.php:632
+#: api/classes/CHostGeneral.php:635
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "グラフのプロトタイプのリンク削除と削除が行えません"
 
-#: api/classes/CHostGeneral.php:650
+#: api/classes/CHostGeneral.php:653
 msgid "Cannot unlink and clear graphs."
 msgstr "グラフのリンク削除と削除が行えません"
 
-#: api/classes/CHostGeneral.php:579
+#: api/classes/CHostGeneral.php:582
 msgid "Cannot unlink and clear item prototypes"
 msgstr "アイテムのプロトタイプのリンク削除と削除が行えません"
 
-#: api/classes/CHostGeneral.php:561
+#: api/classes/CHostGeneral.php:564
 msgid "Cannot unlink and clear items"
 msgstr "アイテムのリンク削除と削除が行えません"
 
-#: api/classes/CHostGeneral.php:481 api/classes/CHostGeneral.php:498
+#: api/classes/CHostGeneral.php:484 api/classes/CHostGeneral.php:501
 msgid "Cannot unlink and clear triggers"
 msgstr "トリガーのリンク削除と削除が行えません"
 
-#: api/classes/CHost.php:1851
+#: api/classes/CHost.php:1837
 msgid "Cannot unlink template"
 msgstr "テンプレートのリンクを削除できません"
 
-#: api/classes/CHostGeneral.php:435
+#: api/classes/CHostGeneral.php:438
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "トリガー\"%s\"のリンクを削除できません。ホストにリンクされたテンプレートのアイテムを利用しています。"
@@ -2006,7 +2006,7 @@ msgstr "スクリーン%1$sに循環参照が存在します。"
 msgid "Circular reference in templates: %1$s."
 msgstr "テンプレート%1$sに循環参照が存在します。"
 
-#: api/classes/CHostGeneral.php:325 api/classes/CHostGeneral.php:753
+#: api/classes/CHostGeneral.php:332 api/classes/CHostGeneral.php:756
 msgid "Circular template linkage is not allowed."
 msgstr "テンプレートの循環リンクは行えません。"
 
@@ -2545,12 +2545,12 @@ msgstr "作成: \"%2$s\"のアプリケーション\"%1$s\"。"
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のディスカバリルール\"%1$s\"。"
 
-#: api/classes/CItem.php:871
+#: api/classes/CItem.php:868
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のアイテム\"%1$s\"。"
 
-#: api/classes/CItemPrototype.php:601
+#: api/classes/CItemPrototype.php:598
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
@@ -3232,17 +3232,17 @@ msgstr "削除: \"%2$s\"のディスカバリルール\"%1$s\"。"
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のグラフ\"%1$s\"。"
 
-#: api/classes/CHost.php:2156
+#: api/classes/CHost.php:2139
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "削除: ホスト\"%1$s\"。"
 
-#: api/classes/CItem.php:1060
+#: api/classes/CItem.php:1057
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のアイテム\"%1$s\"。"
 
-#: api/classes/CItemPrototype.php:801
+#: api/classes/CItemPrototype.php:798
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
@@ -3325,7 +3325,7 @@ msgid "Description"
 msgstr "説明"
 
 #: include/actions.inc.php:825 include/blocks.inc.php:687
-#: include/config.inc.php:335
+#: include/config.inc.php:336
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3685,12 +3685,12 @@ msgstr "ドロップダウンの1つ目の項目 \"%1$s\""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "ドロップダウンの選択を記憶する \"%1$s\""
 
-#: api/classes/CHost.php:1353
+#: api/classes/CHost.php:1349
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "ホストが重複しています。同じホスト名\"%s\"を持つホスト設定がすでに存在しています。"
 
-#: api/classes/CHost.php:1385
+#: api/classes/CHost.php:1381
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "ホストが重複しています。同じホストの表示名\"%s\"を持つホストがすでに存在しています。"
@@ -3737,7 +3737,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/config.inc.php:302
+#: include/config.inc.php:303
 msgid "ERROR"
 msgstr "エラー"
 
@@ -3811,8 +3811,8 @@ msgstr "条件式のホスト名が空白です。"
 #: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
 #: api/classes/CGraphPrototype.php:781 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
-#: api/classes/CHost.php:2010 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:949 api/classes/CItemPrototype.php:678
+#: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
+#: api/classes/CItem.php:946 api/classes/CItemPrototype.php:675
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -4094,7 +4094,7 @@ msgstr "SQL実行エラー [%2$s]内の[%1$s]。"
 msgid "Execute on"
 msgstr "次で実行"
 
-#: include/items.inc.php:1330 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1322 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "実行するスクリプト"
 
@@ -4327,7 +4327,7 @@ msgstr "例外の更新間隔"
 msgid "For guest, password must be empty"
 msgstr "ゲストのパスワードは空白である必要があります"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1326 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "式"
 
@@ -4913,7 +4913,7 @@ msgstr "横位置"
 msgid "Host"
 msgstr "ホスト"
 
-#: api/classes/CHost.php:1694
+#: api/classes/CHost.php:1683
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "ホスト\"%1$s\"はすでに存在しています。"
@@ -5071,7 +5071,7 @@ msgstr "ホストテンプレート"
 msgid "Host time"
 msgstr "ホスト時間"
 
-#: api/classes/CHost.php:1569
+#: api/classes/CHost.php:1561
 msgid "Host update failed."
 msgstr "ホストの更新に失敗しました"
 
@@ -5079,12 +5079,12 @@ msgstr "ホストの更新に失敗しました"
 msgid "Host updated"
 msgstr "ホストを更新しました"
 
-#: api/classes/CHost.php:1419 api/classes/CTemplate.php:1361
+#: api/classes/CHost.php:1411 api/classes/CTemplate.php:1361
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "同じホスト名\"%s\"を持つホストがすでに存在します。"
 
-#: api/classes/CHost.php:1425 api/classes/CTemplate.php:1014
+#: api/classes/CHost.php:1417 api/classes/CTemplate.php:1014
 #: api/classes/CTemplate.php:1334
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
@@ -5694,7 +5694,7 @@ msgstr "プロキシ名\"%s\"に不正な文字列が使用されています。
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "テンプレート名[%1$s]に不正な文字列が使用されています"
 
-#: api/classes/CHost.php:1349 api/classes/CHost.php:1674
+#: api/classes/CHost.php:1345 api/classes/CHost.php:1666
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "ホスト名\"%s\"に不正な文字列が使用されています。"
@@ -5754,12 +5754,12 @@ msgstr "トリガーの設定が正しくありません。"
 msgid "Incorrect file upload."
 msgstr "アップロードされたファイルが正しくありません。"
 
-#: api/classes/CItemGeneral.php:744
+#: api/classes/CItemGeneral.php:743
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "例外の更新間隔\"%1$s\"の設定が正しくありません。"
 
-#: api/classes/CItemGeneral.php:733
+#: api/classes/CItemGeneral.php:732
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "アイテム\"%1$s\"の例外の更新間隔の設定が正しくありません。例外の更新間隔の設定は文字列のみ利用できます。"
@@ -5815,7 +5815,7 @@ msgstr "インターフェースのIPパラメータ\"%s\"が正しくありま�
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "インターフェースのポート\"%s\"が正しくありません。"
 
-#: api/classes/CHost.php:1283
+#: api/classes/CHost.php:1279
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "インベントリのフィールド\"%s\"が正しくありません。"
@@ -6356,7 +6356,7 @@ msgstr "アイテム"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "アイテム\"%1$s\"は\"%2$s\"にすでに存在します (他のテンプレートからの継承)。"
 
-#: api/classes/CItem.php:1243
+#: api/classes/CItem.php:1240
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "アイテム\"%1$s\"はフィールド番号が存在しないホストインベントリ\"%2$d\"を自動設定することができません。0 (自動設定しない)から%3$dの間で設定してください。"
@@ -6450,7 +6450,7 @@ msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にす�
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不明なアイテムとしてすでに存在します。"
 
-#: api/classes/CItemGeneral.php:710
+#: api/classes/CItemGeneral.php:709
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
@@ -7231,7 +7231,7 @@ msgid "Max count of events per trigger to show"
 msgstr "トリガーあたりのイベント表示の最大数"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:337
+#: include/config.inc.php:338
 msgid "Maximize"
 msgstr "最大化"
 
@@ -7241,13 +7241,13 @@ msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "アカウント名は最大%2$d文字です。\"%3$s\"は%1$d文字あります。"
 
-#: api/classes/CHost.php:1339
+#: api/classes/CHost.php:1335
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "ホスト名は最大%2$d文字です。\"%3$s\"は%1$d文字あります。"
 
-#: api/classes/CHost.php:1375
+#: api/classes/CHost.php:1371
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7384,7 +7384,7 @@ msgid "Min severity"
 msgstr "最小の深刻度"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:337
+#: include/config.inc.php:338
 msgid "Minimize"
 msgstr "最小化"
 
@@ -7441,7 +7441,7 @@ msgstr "ホスト\"%2$s\"のアイテム\"%1$s\"が存在しません。"
 msgid "Missing items for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"のアイテムが存在しません。"
 
-#: include/graphs.inc.php:322
+#: include/graphs.inc.php:321
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "ホスト\"%2$s\"にはキー\"%1$s\"が設定されていません。"
@@ -7712,7 +7712,7 @@ msgstr "次へ"
 msgid "Next check"
 msgstr "次のチェック"
 
-#: events.php:752 include/config.inc.php:554 include/events.inc.php:285
+#: events.php:752 include/config.inc.php:555 include/events.inc.php:285
 #: include/events.inc.php:299 include/forms.inc.php:1892
 #: include/triggers.inc.php:1784
 #: include/views/administration.users.list.php:75
@@ -7873,7 +7873,7 @@ msgstr "例外の更新間隔は設定されていません。"
 msgid "No graph ID provided for screen element."
 msgstr "スクリーンの要素にグラフIDが設定されていません。"
 
-#: include/graphs.inc.php:290
+#: include/graphs.inc.php:289
 #, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "グラフID\"%s\"のグラフアイテムがありません。"
@@ -7889,12 +7889,12 @@ msgstr "グラフのプロトタイプが設定されていません。"
 msgid "No graphs defined."
 msgstr "グラフが設定されていません。"
 
-#: api/classes/CHost.php:1303 api/classes/CHost.php:1317
+#: api/classes/CHost.php:1299 api/classes/CHost.php:1313
 #, php-format
 msgid "No groups for host \"%s\"."
 msgstr "ホスト\"%s\"にグループが設定されていません。"
 
-#: api/classes/CHost.php:1660
+#: api/classes/CHost.php:1652
 msgid "No groups for hosts."
 msgstr "ホストにグループが設定されていません。"
 
@@ -7981,7 +7981,7 @@ msgstr "インターフェースが見つかりません。"
 msgid "No interfaces defined."
 msgstr "インターフェースが設定されていません。"
 
-#: api/classes/CHost.php:1307 api/classes/CHost.php:1329
+#: api/classes/CHost.php:1303 api/classes/CHost.php:1325
 #, php-format
 msgid "No interfaces for host \"%s\"."
 msgstr "ホスト\"%s\"にインターフェースが設定されていません。"
@@ -8126,11 +8126,11 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CGraph.php:885 api/classes/CGraphPrototype.php:930
 #: api/classes/CHostInterface.php:511 api/classes/CHostInterface.php:527
 #: api/classes/CHostInterface.php:659 api/classes/CHostInterface.php:855
-#: api/classes/CHost.php:1290 api/classes/CHost.php:1322
+#: api/classes/CHost.php:1286 api/classes/CHost.php:1318
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:175 api/classes/CItemGeneral.php:207
-#: api/classes/CItem.php:966 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:963 api/classes/CItemPrototype.php:692
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -10711,7 +10711,7 @@ msgstr "ラック設置場所"
 msgid "Site state / province"
 msgstr "県"
 
-#: include/graphs.inc.php:353
+#: include/graphs.inc.php:352
 #, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "ホスト\"%2$s\"へのグラフ\"%1$s\"のコピーをスキップしました。"
@@ -11031,8 +11031,8 @@ msgid "Swedish (sv_SE)"
 msgstr "スウェーデン語 (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
-msgid "Switching authentication method will reset all but this sessions! Continue?"
-msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます。実行しますか？"
+msgid "Switching authentication method will reset all except this session! Continue?"
+msgstr ""
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"
@@ -11127,7 +11127,7 @@ msgstr ""
 msgid "Template"
 msgstr "テンプレート"
 
-#: api/classes/CHost.php:1699
+#: api/classes/CHost.php:1688
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr "テンプレート\"%1$s\"はそでに存在します。"
@@ -11146,7 +11146,7 @@ msgstr "テンプレート\"%s\"はすでに存在します。"
 msgid "Template added"
 msgstr "テンプレートを追加しました"
 
-#: api/classes/CHostGeneral.php:756
+#: api/classes/CHostGeneral.php:759
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "テンプレートは複数のテンプレートとリンクすることはできません(他のテンプレート経由でも不可)。"
 
@@ -11182,22 +11182,22 @@ msgstr "テンプレートトリガー"
 msgid "Template updated"
 msgstr "テンプレートを更新しました"
 
-#: api/classes/CHostGeneral.php:187 include/hosts.inc.php:1233
+#: api/classes/CHostGeneral.php:191 include/hosts.inc.php:1233
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
 msgstr "アプリケーション\"%1$s\"を持つテンプレートがすでにホストにリンクされています。"
 
-#: api/classes/CHostGeneral.php:176 include/hosts.inc.php:1219
+#: api/classes/CHostGeneral.php:179 include/hosts.inc.php:1219
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "キー\"%1$s\"を持つアイテムを含むテンプレートがすでにホストにリンクされています。"
 
-#: api/classes/CHost.php:1435 api/classes/CTemplate.php:1356
+#: api/classes/CHost.php:1427 api/classes/CTemplate.php:1356
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "同じ名前\"%s\"を持つテンプレートがすでに存在します。"
 
-#: api/classes/CHost.php:1441 api/classes/CTemplate.php:1010
+#: api/classes/CHost.php:1433 api/classes/CTemplate.php:1010
 #: api/classes/CTemplate.php:1329
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
@@ -11216,7 +11216,7 @@ msgstr "テンプレートのアイテム"
 msgid "Templates"
 msgstr "テンプレート"
 
-#: api/classes/CHostGeneral.php:735
+#: api/classes/CHostGeneral.php:738
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除しました。"
@@ -11539,12 +11539,12 @@ msgstr "トリガー条件式には少なくとも1つ以上のホストとア�
 msgid "Trigger form"
 msgstr "トリガーフォーム"
 
-#: api/classes/CHostGeneral.php:283
+#: api/classes/CHostGeneral.php:285
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr "トリガーはホストにリンクされていないテンプレート\"%1$s\"に含まれるアイテムを利用しています。"
 
-#: api/classes/CHostGeneral.php:238
+#: api/classes/CHostGeneral.php:236
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "テンプレート\"%1$s\"のトリガーはテンプレート\"%2$s\"のトリガーと依存関係が設定されています。"
@@ -11675,7 +11675,7 @@ msgstr "火曜"
 msgid "Two elements should be selected"
 msgstr "2つの要素を選択する必要があります"
 
-#: api/classes/CItem.php:1304
+#: api/classes/CItem.php:1301
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "2つのアイテム(\"%1$s\"と\"%2$s\")から1つのホストのインベントリフィールド\"%3$s\"を自動的に設定することはできません。"
@@ -11800,7 +11800,7 @@ msgstr "USA (160文字)"
 msgid "USER PROFILE"
 msgstr "ユーザープロファイル"
 
-#: include/config.inc.php:746
+#: include/config.inc.php:747
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -11937,42 +11937,42 @@ msgstr "テンプレートとのリンクを解除"
 msgid "Unlink from templates"
 msgstr "テンプレートとのリンクを解除"
 
-#: api/classes/CHostGeneral.php:699
+#: api/classes/CHostGeneral.php:702
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のアプリケーション\"%1$s\"。"
 
-#: api/classes/CHostGeneral.php:552
+#: api/classes/CHostGeneral.php:555
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のディスカバリルール\"%1$s\"。"
 
-#: api/classes/CHostGeneral.php:659
+#: api/classes/CHostGeneral.php:662
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のグラフ\"%1$s\"。"
 
-#: api/classes/CHostGeneral.php:641
+#: api/classes/CHostGeneral.php:644
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のグラフのプロトタイプ\"%1$s\"。"
 
-#: api/classes/CHostGeneral.php:570
+#: api/classes/CHostGeneral.php:573
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のアイテム\"%1$s\"。"
 
-#: api/classes/CHostGeneral.php:588
+#: api/classes/CHostGeneral.php:591
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
-#: api/classes/CHostGeneral.php:490
+#: api/classes/CHostGeneral.php:493
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のトリガー\"%1$s\"。"
 
-#: api/classes/CHostGeneral.php:507
+#: api/classes/CHostGeneral.php:510
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "リンク削除: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
@@ -12051,12 +12051,12 @@ msgstr "更新: \"%2$s\"のアプリケーション\"%1$s\"。"
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のディスカバリルール\"%1$s\"。"
 
-#: api/classes/CItem.php:922
+#: api/classes/CItem.php:919
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のアイテム\"%1$s\"。"
 
-#: api/classes/CItemPrototype.php:651
+#: api/classes/CItemPrototype.php:648
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
@@ -12393,7 +12393,7 @@ msgstr "ビューは描画されませんでした。"
 msgid "Visible name"
 msgstr "表示名"
 
-#: api/classes/CHost.php:1364
+#: api/classes/CHost.php:1360
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "ホスト名を設定しない場合、表示名は必須項目です。"
 
@@ -12477,13 +12477,13 @@ msgstr "警告。フィールド\"%1$s\"の値が正しくありません: 空�
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "警告。フィールド\"%1$s\"の値が正しくありません: %2$sから%3$sの間で設定してください。"
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:401
+#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] "警告。表示できる最大の期間は%1$s日です。"
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:394
+#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -12614,7 +12614,7 @@ msgstr "サービス\"%1$s\"の依存関係のフィールドが正しくあり�
 msgid "Wrong fields for element."
 msgstr "要素の設定が正しくありません。"
 
-#: api/classes/CHost.php:1276
+#: api/classes/CHost.php:1272
 #, php-format
 msgid "Wrong fields for host \"%s\"."
 msgstr "ホスト\"%s\"の設定が正しくありません。"
@@ -12786,7 +12786,7 @@ msgid "Yearly"
 msgstr "毎年"
 
 #: events.php:752 include/blocks.inc.php:695
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:554
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:555
 #: include/events.inc.php:288 include/events.inc.php:302
 #: include/forms.inc.php:1892 include/triggers.inc.php:1784
 #: include/views/administration.users.list.php:74
@@ -12843,10 +12843,10 @@ msgstr "アクションのグローバルスクリプト\"%s\"のターゲット
 #: api/classes/CHostGroup.php:653 api/classes/CHostGroup.php:711
 #: api/classes/CHostGroup.php:865 api/classes/CHostGroup.php:920
 #: api/classes/CHostGroup.php:986 api/classes/CHostGroup.php:999
-#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1600
-#: api/classes/CHost.php:1654 api/classes/CHost.php:1978
-#: api/classes/CItem.php:1071 api/classes/CItem.php:1074
-#: api/classes/CItemPrototype.php:812 api/classes/CItemPrototype.php:815
+#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1592
+#: api/classes/CHost.php:1646 api/classes/CHost.php:1960
+#: api/classes/CItem.php:1068 api/classes/CItem.php:1071
+#: api/classes/CItemPrototype.php:809 api/classes/CItemPrototype.php:812
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
 #: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
 #: api/classes/CScript.php:342 api/classes/CScript.php:404
@@ -13442,7 +13442,7 @@ msgstr "アイコンのマッピングを表示"
 msgid "show value mappings"
 msgstr "値のマッピングの表示"
 
-#: api/classes/CHostGeneral.php:150
+#: api/classes/CHostGeneral.php:153
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "テンプレートID\"%1$s\"が%2$s回利用されています"
