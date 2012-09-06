@@ -660,8 +660,8 @@ static int	get_values(unsigned char poller_type)
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 			case ITEM_TYPE_DB_MONITOR:
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL, NULL,
-						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i].host, NULL,
+						&items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
