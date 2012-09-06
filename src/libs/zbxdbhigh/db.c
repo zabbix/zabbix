@@ -209,6 +209,23 @@ void	DBrollback()
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBend                                                            *
+ *                                                                            *
+ * Purpose: commit or rollback a transaction depending on a parameter value   *
+ *                                                                            *
+ * Comments: do nothing if DB does not support transactions                   *
+ *                                                                            *
+ ******************************************************************************/
+void	DBend(int ret)
+{
+	if (SUCCEED == ret)
+		DBtxn_operation(zbx_db_commit);
+	else
+		DBtxn_operation(zbx_db_rollback);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBexecute                                                        *
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
