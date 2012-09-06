@@ -353,7 +353,17 @@ sub process_field
 			$fk_flags = "0";
 		}
 
-		print "\t\t{\"${name}\",\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
+		if ($default eq "")
+		{
+			$default = "NULL";
+		}
+		else
+		{
+			s/'//g for ($default);
+			$default = "\"$default\""
+		}
+
+		print "\t\t{\"${name}\",\t${default},\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
 	}
 	else
 	{
@@ -451,6 +461,20 @@ sub process_field
 			}
 		}
 
+		if ($output{"database"} eq "mysql")
+		{
+			@text_fields = ('blob', 'longblob', 'text', 'longtext');
+			$default = "" if (grep /$output{$type_short}/, @text_fields);
+
+			$name = "`${name}`";
+		}
+
+		if ($output{"database"} eq "ibm_db2")
+		{
+			@text_fields = ('blob');
+			$default = "" if (grep /$output{$type_short}/, @text_fields);
+		}
+
 		if ($default ne "")
 		{
 			if ($output{"database"} eq "ibm_db2")
@@ -460,28 +484,6 @@ sub process_field
 			else
 			{
 				$default = "DEFAULT $default";
-			}
-		}
-
-		if ($output{"database"} eq "mysql")
-		{
-			@text_fields = ('blob', 'longblob', 'text', 'longtext');
-
-			if (grep /$output{$type_short}/, @text_fields)
-			{
-				$default = "";
-			}
-
-			$name = "`${name}`";
-		}
-
-		if ($output{"database"} eq "ibm_db2")
-		{
-			@text_fields = ('blob');
-
-			if (grep /$output{$type_short}/, @text_fields)
-			{
-				$default = "";
 			}
 		}
 

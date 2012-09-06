@@ -226,9 +226,9 @@ function checkDbVersion(&$error) {
 			break;
 	}
 
-	$version = DBfetch(DBselect("SELECT dv.mandatory, dv.optional FROM dbversion dv"));
+	$version = DBfetch(DBselect('SELECT dv.mandatory,dv.optional FROM dbversion dv'));
 	if ($version['required'] < ZABBIX_DB_VERSION) {
-		$error = _('The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required version: %d. Contact your system administrator.',
+		$error = _('The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator.',
 			$version['required'], $version['optional'], ZABBIX_DB_VERSION);
 		return false;
 	}
