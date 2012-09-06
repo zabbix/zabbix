@@ -113,6 +113,7 @@ $templateList = new CFormList('hostlist');
 // FORM ITEM : Template name text box [  ]
 $template_nameTB = new CTextBox('template_name', $host, 54);
 $template_nameTB->setAttribute('maxlength', 64);
+$template_nameTB->attr('autofocus', 'autofocus');
 $templateList->addRow(_('Template name'), $template_nameTB);
 
 $visiblenameTB = new CTextBox('visiblename', $visiblename, 54);

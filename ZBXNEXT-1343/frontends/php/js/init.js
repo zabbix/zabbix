@@ -18,26 +18,26 @@
  **/
 
 
-jQuery(function() {
+jQuery(function($) {
 
 	cookie.init();
 
 	// search
-	if (jQuery('#search').length) {
+	if ($('#search').length) {
 		createSuggest('search');
 	}
 
 	/**
 	 * Handles host pop up menus.
 	 */
-	jQuery(document).on('click', '.menu-host', function(event) {
-		var menuData = jQuery(this).data('menu');
+	$(document).on('click', '.menu-host', function(event) {
+		var menuData = $(this).data('menu');
 		var menu = [];
 
 		// add scripts
 		if (menuData.scripts.length) {
 			menu.push(createMenuHeader(t('Scripts')));
-			jQuery.each(menuData.scripts, function(i, script) {
+			$.each(menuData.scripts, function(i, script) {
 				menu.push(createMenuItem(script.name, function () {
 					executeScript(menuData.hostid, script.scriptid, script.confirmation);
 					return false;
@@ -60,4 +60,8 @@ jQuery(function() {
 
 		return false;
 	});
+
+	if (IE || KQ) {
+		setTimeout(function () {$('[autofocus]').focus()}, 10);
+	}
 });

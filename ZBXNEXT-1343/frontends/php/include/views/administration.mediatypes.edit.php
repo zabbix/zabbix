@@ -31,7 +31,9 @@ $mediaTypeForm->addVar('mediatypeid', $this->data['mediatypeid']);
 
 // create form list
 $mediaTypeFormList = new CFormList('mediaTypeFormList');
-$mediaTypeFormList->addRow(_('Name'), new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 100));
+$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 100);
+$nameTextBox->attr('autofocus', 'autofocus');
+$mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
 $cmbType = new CComboBox('type', $this->data['type'], 'submit()');

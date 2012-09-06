@@ -31,7 +31,9 @@ $valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
 $valueMappingFormList = new CFormList('valueMappingFormList');
 
 // Name
-$valueMappingFormList->addRow(_('Name'), new CTextBox('mapname', $this->data['mapname'], 40, null, 64));
+$nameTextBox = new CTextBox('mapname', $this->data['mapname'], 40, null, 64);
+$nameTextBox->attr('autofocus', 'autofocus');
+$valueMappingFormList->addRow(_('Name'), $nameTextBox);
 
 // Mappings
 $mappingsTable = new CTable(SPACE, 'formElementTable');

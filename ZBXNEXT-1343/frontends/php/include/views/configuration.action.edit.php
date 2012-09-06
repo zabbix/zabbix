@@ -38,7 +38,9 @@ if (!empty($this->data['actionid'])) {
  * Action tab
  */
 $actionFormList = new CFormList('actionlist');
-$actionFormList->addRow(_('Name'), new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+$nameTextBox = new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
+$nameTextBox->attr('autofocus', 'autofocus');
+$actionFormList->addRow(_('Name'), $nameTextBox);
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$actionFormList->addRow(_('Default operation step duration'), array(
