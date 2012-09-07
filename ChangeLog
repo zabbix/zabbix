@@ -32,6 +32,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A......... [ZBX-954] fixed missing doublequote in import error message when a network map references non-existent trigger (Richlv)
 ...G...... [ZBX-5473] fixed agent crash under FreeBSD and Linux when started with -p or -t vfs.dev.read/write (Sasha)
 ..F....... [ZBX-5513] fixed HTTP authentication without directly passing password (Eduard)
 ..F....PS. [ZBX-4852] fixed calculation of update interval if flexible intervals are used (Andris, Sasha)
