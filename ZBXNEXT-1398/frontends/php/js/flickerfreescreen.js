@@ -157,6 +157,8 @@ jQuery(function($) {
 					dataType: 'html',
 					success: function(data) {
 						$('#flickerfreescreen_' + id).html(data);
+						$($('#flickerfreescreen_' + id).find('table')[0]).css({position: 'relative', zIndex: 2});
+
 						screen.isRefreshing = false;
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -169,6 +171,8 @@ jQuery(function($) {
 						screen.isReRefreshRequire = false;
 						flickerfreeScreen.refresh(id, false);
 					}
+
+					flickerfreeScreen.screenShadow(id);
 				});
 			}
 		},
@@ -184,8 +188,7 @@ jQuery(function($) {
 
 				$('#flickerfreescreen_' + id).find('img').each(function() {
 					var workImg = $(this);
-					var doId = '#' + $(this).attr('id');
-					var chartUrl = new Curl($(this).attr('src'));
+					var chartUrl = new Curl(workImg.attr('src'));
 					chartUrl.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
 					chartUrl.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? +screen.updateProfile : null);
 					chartUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
@@ -194,17 +197,20 @@ jQuery(function($) {
 
 					// img
 					$('<img />', {
-						id: $(this).attr('id') + '_tmp',
-						calss: $(doId).attr('class'),
-						border: $(doId).attr('border'),
-						usemap: $(doId).attr('usemap'),
-						alt: $(doId).attr('alt'),
-						name: $(doId).attr('name')
-					}).attr('src', chartUrl.getUrl()).load(function() {
-						var doId = $(this).attr('id').substring(0, $(this).attr('id').indexOf('_tmp'));
+						id: workImg.attr('id') + '_tmp',
+						class: workImg.attr('class'),
+						border: workImg.attr('border'),
+						usemap: workImg.attr('usemap'),
+						alt: workImg.attr('alt'),
+						name: workImg.attr('name')
+					})
+					.attr('src', chartUrl.getUrl())
+					.css({position: 'relative', zIndex: 2})
+					.load(function() {
+						var elem = $(this);
+						elem.attr('id', elem.attr('id').substring(0, elem.attr('id').indexOf('_tmp')));
 
-						$(this).attr('id', doId);
-						$(workImg).replaceWith($(this));
+						workImg.replaceWith(elem);
 
 						if (typeof(successAction) !== 'undefined') {
 							successAction();
@@ -221,9 +227,47 @@ jQuery(function($) {
 							screen.isReRefreshRequire = false;
 							flickerfreeScreen.refresh(id, false);
 						}
+
+						flickerfreeScreen.screenShadow(id);
 					});
 				});
 			}
+		},
+
+		screenShadow: function(id) {
+			var elem = $('#flickerfreescreen_' + id);
+			elem.css({position: 'relative'});
+
+			// find screen item
+			var item = elem.find('table');
+			if (item.length < 1) {
+				item = elem.find('img');
+			}
+			if (item.length > 0) {
+				item = $(item[0]);
+			}
+			else {
+				return;
+			}
+
+			// create shadow
+			if (elem.find('.flickerfreescreen_shadow').length == 0) {
+				elem.append($('<div>', {class: 'flickerfreescreen_shadow'})
+					.html('&nbsp;')
+					.css({
+						top: item.position().top,
+						left: item.position().left,
+						width: item.width(),
+						height: item.height(),
+						position: 'absolute',
+						zIndex: 1,
+						'background-color': '#000000'
+					})
+				);
+			}
+
+			// fade screen
+			elem.find(item.prop('nodeName')).fadeTo(2000, 0.8);
 		},
 
 		refreshProfile: function(id, ajaxUrl) {

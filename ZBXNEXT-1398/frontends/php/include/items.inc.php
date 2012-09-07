@@ -652,6 +652,7 @@ function get_items_data_overview($hostids, $view_style) {
 	global $USER_DETAILS;
 
 	$table = new CTableInfo(_('No items defined.'));
+	$table->makeVerticalRotation();
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
@@ -733,11 +734,9 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 	}
 	else {
-		$header = array(new CCol(_('Hosts'), 'center'));
+		$header = array(new CCol(_('Hosts'), 'vertical_rotation'));
 		foreach ($items as $descr => $ithosts) {
-			$img = new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css);
-			$img->setAttribute('id', uniqid('do_'));
-			$header = array_merge($header, array($img));
+			$header[] = new CCol($descr, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
