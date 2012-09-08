@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apache 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-08 12:32+0300\n"
-"PO-Revision-Date: 2012-09-01 12:19+0200\n"
+"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"PO-Revision-Date: 2012-09-05 20:50+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
@@ -11048,7 +11048,7 @@ msgstr "Swedish (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "Switching authentication method will reset all except this session! Continue?"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"

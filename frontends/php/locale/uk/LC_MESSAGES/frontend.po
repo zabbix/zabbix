@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-08 12:32+0300\n"
-"PO-Revision-Date: 2012-05-15 23:07+0200\n"
+"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"PO-Revision-Date: 2012-09-08 02:39+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -11,14 +11,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" має бути між 1970.01.01 та 2038.01.18."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -667,11 +667,11 @@ msgstr "В (час:хвилина)"
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Має бути вибрано як мінімум один вузел мережі або група вузлів мережі. "
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Має бути створено як мінімум один період обслуговування."
 
 #: include/classes/class.frontendsetup.php:291
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -1110,7 +1110,7 @@ msgstr "Не вдалося додати залежність від вузла 
 #: include/triggers.inc.php:699
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Не вдалось додати залежність від тригера \"%1$s:%2$s\" до неіснуючого тригера \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1134,7 +1134,7 @@ msgstr "Не вдалося додати картинку"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Не вдалось додати картинку."
 
 #: disc_prototypes.php:277 items.php:438 screenedit.php:180
 msgid "Cannot add item"
@@ -1142,7 +1142,7 @@ msgstr "Не вдалося додати елемент даних"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Не вдалось додати макрос."
 
 #: maintenance.php:108
 msgid "Cannot add maintenance"
@@ -1308,7 +1308,7 @@ msgstr "Не вдалося створити новий елемент"
 
 #: include/classes/import/CXmlImport18.php:1707
 msgid "Cannot create screen."
-msgstr ""
+msgstr "Не вдалось додати комплексний екран."
 
 #: api/classes/CUser.php:370
 #, php-format
@@ -1334,7 +1334,7 @@ msgstr "Не вдалося видалити правило виявлення"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "Не вдалось додати плавила виявлення."
 
 #: graphs.php:237
 msgid "Cannot delete graph"
@@ -1405,12 +1405,11 @@ msgid "Cannot delete proxy"
 msgstr "Не вдалося видалити проксі"
 
 #: adm.regexps.php:117
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Не вдалося видалити регулярний вираз"
-msgstr[1] "Не вдалося видалити регулярний вираз"
-msgstr[2] "Не вдалося видалити регулярний вираз"
+msgstr[1] "Не вдалося видалити регулярні вирази"
+msgstr[2] "Не вдалося видалити регулярні вирази"
 
 #: httpconf.php:155
 msgid "Cannot delete scenario"
@@ -1489,7 +1488,7 @@ msgstr "Не вдалося видалити користувача"
 
 #: api/classes/CUser.php:786
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "Не вдалось видалити метод повідомлень."
 
 #: adm.valuemapping.php:78
 msgid "Cannot delete value map"
@@ -1507,7 +1506,7 @@ msgstr "Не вдалося активувати метод повідомлен
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалось знайти фонове зображення \"%1$s\" використовуване в карті мережі \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1664
@@ -1551,12 +1550,12 @@ msgstr "Не вдалося знайти інтерфейс вузла мере�
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалось знайти іконку \"%1$s\" використовувану в карті мережі \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалось знайти призначення іконок \"%1$s\" використовуване в карті мережі \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1677
@@ -1573,7 +1572,7 @@ msgstr "Не вдалося знайти карту мережі \"%1$s\" вик
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалось знайти карту мережі \"%1$s\" використовувану в карті мережі \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
@@ -1597,7 +1596,7 @@ msgstr "Не вдалося знайти комплексний екран \"%1$
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалось знайти тригер \"%1$s\" використовуваний в карті мережі \"%2$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -1641,7 +1640,7 @@ msgstr "Не вдалося включити файлу вигляду \"%s\"."
 
 #: api/classes/CUser.php:815
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "Не вдалось вставити метод повідомлення користувача."
 
 #: api/classes/CHost.php:1846
 msgid "Cannot link template"
@@ -1693,7 +1692,7 @@ msgstr "Не вдалося видалити макрос."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "Не вдалось перейменувати гостьового користувача."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -1808,7 +1807,7 @@ msgstr "Не вдалося оновити картинку"
 
 #: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
-msgstr ""
+msgstr "Не вдалось оновити фонове зображення."
 
 #: disc_prototypes.php:273 items.php:434 screenedit.php:173
 msgid "Cannot update item"
@@ -1820,7 +1819,7 @@ msgstr "Не вдалося оновити елементи даних"
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr ""
+msgstr "Не вдалось оновити макрос."
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
@@ -1865,7 +1864,7 @@ msgstr "Не вдалося оновити комплексний екран"
 
 #: include/classes/import/CXmlImport18.php:1699
 msgid "Cannot update screen."
-msgstr ""
+msgstr "Не вдалось оновити комплексний екран."
 
 #: scripts.php:110
 msgid "Cannot update script"
@@ -1898,7 +1897,7 @@ msgstr "Не вдалося оновити дані користувача"
 
 #: api/classes/CUser.php:807
 msgid "Cannot update user media."
-msgstr ""
+msgstr "Не вдалось оновити метод повідомлень користувача."
 
 #: profile.php:110 users.php:125
 msgid "Cannot update user. Both passwords must be equal."
@@ -1995,16 +1994,16 @@ msgstr "Китайська (zh_CN)"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "Китайська (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "Утворюючі кільце залежності не дозволені."
 
 #: api/classes/CMapElement.php:533
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr "Замикаючий в кільце зв'язок не може бути створений для елемента карти мережі \"%s\"."
+msgstr "Утворюючий кільце зв'язок не може бути створений для елемента карти мережі \"%s\"."
 
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
@@ -2023,11 +2022,11 @@ msgstr "Посилання, утворююче кільце, в шаблонах
 
 #: api/classes/CHostGeneral.php:332 api/classes/CHostGeneral.php:756
 msgid "Circular template linkage is not allowed."
-msgstr ""
+msgstr "Приєднання шаблону, утворююче кільце, не дозволено."
 
 #: include/classes/core/ZBase.php:134
 msgid "Classic"
-msgstr ""
+msgstr "Класична"
 
 #: jsLoader.php:160
 msgid "Clear"
@@ -2420,7 +2419,7 @@ msgstr "Копіювати вибране в ..."
 #: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
-msgstr ""
+msgstr "Коректний вхід \"%s\"."
 
 #: api/classes/CImage.php:485
 msgid "Could not save image!"
@@ -2613,7 +2612,7 @@ msgstr "Критична помилка. Поле \"%1$s\" не є десятк�
 #: include/validate.inc.php:340
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Критична помилка. Поле \"%1$s\" не є списком цілих чисел або діапазоном."
 
 #: include/validate.inc.php:353
 #, php-format
@@ -2930,7 +2929,7 @@ msgstr "Повідомлення по замовчуванню"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
-msgstr ""
+msgstr "Тривалість кроку операції по замовчуванню."
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
@@ -3014,7 +3013,7 @@ msgstr "Видалити призначення іконок?"
 
 #: include/views/configuration.item.edit.php:462
 msgid "Delete item?"
-msgstr ""
+msgstr "Видалити елемент даних?"
 
 #: jsLoader.php:101 tr_logform.php:350
 msgid "Delete keyword?"
@@ -3739,7 +3738,7 @@ msgstr "Тривалість"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Duration (sec)"
-msgstr ""
+msgstr "Тривалість (сек)"
 
 #: include/locales.inc.php:49
 msgid "Dutch (nl_NL)"
@@ -3863,7 +3862,7 @@ msgstr "Пусті параметри"
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
-msgstr ""
+msgstr "Пустий період часу."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -3979,7 +3978,7 @@ msgstr "Англійська (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "Англійська (en_US)"
 
 #: include/actions.inc.php:681 include/actions.inc.php:757
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
@@ -4550,12 +4549,12 @@ msgstr "Графік \"%1$s\" не може бути успадковано. Н�
 #: include/classes/import/CXmlImport18.php:1560
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Графік \"%1$s\" пропущено - правило користувача."
 
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Графік \"%1$s\" з елементами даних із шаблону не може містити елементи даних з інших вузлів мережі."
 
 #: graphs.php:226
 msgid "Graph added"
@@ -4580,7 +4579,7 @@ msgstr "Назва графіку"
 #: api/classes/CGraphPrototype.php:38
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Прототип графіку \"%1$s\" з елементами даних із шаблону не може містити елементи даних з інших вузлів мережі."
 
 #: api/classes/CGraphPrototype.php:843
 #, php-format
@@ -4938,7 +4937,7 @@ msgstr "Вузел мережі \"%1$s\" вже існує."
 #: api/classes/CProxy.php:645
 #, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
-msgstr ""
+msgstr "Вузел мережі \"%1$s\" під спостереженням через проксі \"%2$s\"."
 
 #: api/classes/CTemplate.php:1004
 #, php-format
@@ -5001,7 +5000,7 @@ msgstr "Група вузлів мережі"
 #: api/classes/CHostGroup.php:619 api/classes/CHostGroup.php:672
 #, php-format
 msgid "Host group \"%1$s\" already exists."
-msgstr ""
+msgstr "Група вузлів мережі \"%1$s\" вже існує."
 
 #: include/views/js/configuration.sysmaps.js.php:31
 msgid "Host group elements"
@@ -5281,7 +5280,7 @@ msgstr "Залежності послуги ІТ"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"
-msgstr ""
+msgstr "Батьківська послуга ІТ"
 
 #: include/menu.inc.php:83 include/menu.inc.php:219
 #: include/views/configuration.services.list.php:26 srv_status.php:26
@@ -5622,7 +5621,7 @@ msgstr "Некоректний тип умови дії."
 
 #: api/classes/CAction.php:960
 msgid "Incorrect action conditionid."
-msgstr ""
+msgstr "Некоректний id умови дії."
 
 #: api/classes/CAction.php:1585
 msgid "Incorrect action operation command type."

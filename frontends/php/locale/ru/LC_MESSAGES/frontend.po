@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-08 12:32+0300\n"
-"PO-Revision-Date: 2012-08-25 07:46+0200\n"
+"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"PO-Revision-Date: 2012-09-08 07:51+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1110,7 +1110,7 @@ msgstr "Не удалось добавить зависимость от узл�
 #: include/triggers.inc.php:699
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Не удалось добавить зависимость от триггера \"%1$s:%2$s\" к несуществующему триггеру \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1506,7 +1506,7 @@ msgstr "Не удалось включить способ оповещения"
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr "Не удалось найти фоновое изображение \"%1$s\" используемое на карте сети  \"%2$s\"."
+msgstr "Не удалось найти фоновое изображение \"%1$s\" используемое на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1664
@@ -1998,7 +1998,7 @@ msgstr "Китайский (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "Кольцевые зависимости не разрешены."
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -2612,7 +2612,7 @@ msgstr "Критическая ошибка. Поле \"%1$s\" не являет
 #: include/validate.inc.php:340
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Критическая ошибка. Поле \"%1$s\" не является списком целых чисел или диапазоном."
 
 #: include/validate.inc.php:353
 #, php-format
@@ -5621,7 +5621,7 @@ msgstr "Некорректный тип условия действия."
 
 #: api/classes/CAction.php:960
 msgid "Incorrect action conditionid."
-msgstr "Некорректный conditionid действия."
+msgstr "Некорректный id условия действия."
 
 #: api/classes/CAction.php:1585
 msgid "Incorrect action operation command type."
@@ -6305,12 +6305,12 @@ msgstr "Ошибочные параметры."
 #: api/classes/CWebCheck.php:590
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "Ошибочный код ответа \"%1$s\" ."
 
 #: api/classes/CWebCheck.php:585
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "Ошибочный диапазон кода ответа \"%1$s\" ."
 
 #: items.php:340
 msgid "Invalid time period"
@@ -7834,7 +7834,7 @@ msgstr "Нет заданных данных."
 #: api/classes/CHostInterface.php:1007
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
-msgstr "Нет интерфейса по умолчанию для \"%1$s\" типа у \"%2$s\"."
+msgstr "Нет интерфейса по умолчанию \"%1$s\" типа у узла сети \"%2$s\"."
 
 #: include/views/configuration.services.edit.php:75
 #: include/views/configuration.triggers.edit.php:269
@@ -10990,7 +10990,7 @@ msgstr "Шаг сценария"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "Шаг с именем \"%s\"  уже существует."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
@@ -11060,7 +11060,7 @@ msgstr "Swedish (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "Переключение метода аутентификации сбросит все сессии исключая эту! Продолжить?"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"
@@ -12474,7 +12474,7 @@ msgstr "Предупреждение. Поле \"%1$s\" не является д
 #: include/validate.inc.php:344
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Предупреждение. Поле \"%1$s\" не является списком целых чисел или диапазоном."
 
 #: include/validate.inc.php:357
 #, php-format
