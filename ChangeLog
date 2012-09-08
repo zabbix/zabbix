@@ -26,7 +26,7 @@ A......... [ZBX-2060] implemented the "expandExpression" parameter for the trigg
 A.F....... [ZBXNEXT-1253] implemented flicker-free screens (Eduard)
 ........S. [ZBX-5318] added remote commands in expanded {ESC.HISTORY} macro (Sasha)
 A.F....... [ZBX-1357] added Chinese (Taiwan) translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated Chinese (China), Brazilian Portuguese, German, Japanese, Latvian, Spanish and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China), Brazilian Portuguese, French, German, Japanese, Latvian, Spanish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-583] added the maintenance filter to the trigger status page (Pavels)
 A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the maintenance.get method (Pavels)
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
