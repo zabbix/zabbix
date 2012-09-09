@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-09-08 12:35+0300\n"
-"PO-Revision-Date: 2012-09-08 07:51+0200\n"
-"Last-Translator: dotneft <dotneft@gmail.com>\n"
+"PO-Revision-Date: 2012-09-09 02:23+0200\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -5670,7 +5670,7 @@ msgstr "Некорректный пользователь для операци�
 
 #: api/classes/CAction.php:985
 msgid "Incorrect action operationid."
-msgstr "Некорректный operationid действия."
+msgstr "Некорректный id операции действия."
 
 #: api/classes/CService.php:1125
 #, php-format
@@ -6180,12 +6180,12 @@ msgstr "Некорректное рабочее время."
 #: include/classes/import/CXmlImport18.php:1588
 #, php-format
 msgid "Incorrect y max item for graph \"%1$s\"."
-msgstr "Некорректный y макс элемент данных для графика \"%1$s\"."
+msgstr "Некорректный элемент данных для Y макс. в графике \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1575
 #, php-format
 msgid "Incorrect y min item for graph \"%1$s\"."
-msgstr "Некорректный y мин элемент данных для графика \"%1$s\"."
+msgstr "Некорректный элемент данных для Y мин. в графике \"%1$s\"."
 
 #: include/blocks.inc.php:834 include/blocks.inc.php:1364
 #: include/classes/class.cformlist.php:65 tr_status.php:287
@@ -6305,12 +6305,12 @@ msgstr "Ошибочные параметры."
 #: api/classes/CWebCheck.php:590
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr "Ошибочный код ответа \"%1$s\" ."
+msgstr "Ошибочный код ответа \"%1$s\"."
 
 #: api/classes/CWebCheck.php:585
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr "Ошибочный диапазон кода ответа \"%1$s\" ."
+msgstr "Ошибочный диапазон кода ответа \"%1$s\"."
 
 #: items.php:340
 msgid "Invalid time period"
@@ -6344,7 +6344,7 @@ msgstr "Проблема"
 
 #: api/classes/CUser.php:172
 msgid "It is not possible to filter by user password."
-msgstr "Невозможно отфильтровать по паролям пользователей."
+msgstr "Невозможно отфильтровать по паролю пользователя."
 
 #: include/page_header.php:262
 msgid "It is not possible to logout from HTTP authentication."
@@ -6352,7 +6352,7 @@ msgstr "Невозможно выполнить выход с HTTP аутент�
 
 #: api/classes/CUserMedia.php:212 api/classes/CUser.php:180
 msgid "It is not possible to search by user password."
-msgstr "Невозможно выполнить поиск по паролям пользователей."
+msgstr "Невозможно выполнить поиск по паролю пользователя."
 
 #: include/locales.inc.php:54
 msgid "Italian (it_IT)"
@@ -6444,27 +6444,27 @@ msgstr "Элемент данных не обновлен. Пожалуйста,
 #: api/classes/CItemGeneral.php:362
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
-msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как правило обнаружения."
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\" как правило обнаружения."
 
 #: api/classes/CItemGeneral.php:368
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных созданный из прототипа элемента данных."
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\" как элемент данных созданный из прототипа элемента данных."
 
 #: api/classes/CItemGeneral.php:365
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
-msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как прототип элемента данных."
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\" как прототип элемента данных."
 
 #: api/classes/CItemGeneral.php:359
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
-msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных."
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\" как элемент данных."
 
 #: api/classes/CItemGeneral.php:371
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
-msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как неизвестный элемент данных."
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\" как неизвестный элемент данных."
 
 #: api/classes/CItemGeneral.php:709
 #, php-format
@@ -7528,7 +7528,7 @@ msgstr "Более 10 минут"
 #: api/classes/CGraph.php:924 api/classes/CGraphPrototype.php:980
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
-msgstr "Более чем один график с  именем \"%1$s\" у узла сети."
+msgstr "Более чем один график с именем \"%1$s\" у узла сети."
 
 #: report5.php:24
 msgid "Most busy triggers top 100"
@@ -10990,7 +10990,7 @@ msgstr "Шаг сценария"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr "Шаг с именем \"%s\"  уже существует."
+msgstr "Шаг с именем \"%s\" уже существует."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
