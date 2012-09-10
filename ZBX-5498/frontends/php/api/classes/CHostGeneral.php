@@ -320,16 +320,14 @@ abstract class CHostGeneral extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
+		$appManager = new ApplicationsManager();
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
 				}
 
-				API::Application()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
-				));
+				$appManager->link($templateid, $targetid);
 
 				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetid,
