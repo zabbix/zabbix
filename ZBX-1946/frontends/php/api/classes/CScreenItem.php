@@ -143,14 +143,30 @@ class CScreenItem extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateCreate(array $screenItems) {
+		foreach ($screenItems as $screenItem) {
+			if (empty($screenItem['screenid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+		}
+
+		$screenIds = zbx_objectValues($screenItems, 'screenid');
+
 		// fetch the items we're updating
 		$dbScreenItems = $this->get(array(
-			'screenids' => zbx_objectValues($screenItems, 'screenid'),
+			'screenids' => $screenIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
 
+		$screens = API::Screen()->get(array(
+			'output' => array('screenid', 'hsize', 'vsize'),
+			'screenids' => $screenIds,
+			'preservekeys' => true
+		));
+
 		foreach($screenItems as $screenItem) {
+			$screen = $screens[$screenItem['screenid']];
+
 			// check duplicate resource in cell
 			if (isset($screenItem['x']) && isset($screenItem['y'])) {
 				foreach ($dbScreenItems as $dbScreenItem) {
@@ -161,6 +177,11 @@ class CScreenItem extends CZBXAPI {
 					}
 				}
 			}
+
+			$this->checkSpan($screenItem);
+			$this->checkSpanInBounds($screenItem, $screen);
+			$this->checkSpan($screenItem, SCREEN_AXIS_Y);
+			$this->checkSpanInBounds($screenItem, $screen, SCREEN_AXIS_Y);
 		}
 
 		// validate input
@@ -209,11 +230,29 @@ class CScreenItem extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 		}
+		$screenItemIds = zbx_objectValues($screenItems, 'screenitemid');
 
+		$screens = API::Screen()->get(array(
+			'output' => array('screenid', 'hsize', 'vsize'),
+			'screenitemids' => $screenItemIds,
+			'preservekeys' => true
+		));
+
+		$screenItems = $this->extendObjects($this->tableName(), $screenItems, array('screenid', 'x', 'y', 'rowspan', 'colspan'));
+
+		foreach ($screenItems as $screenItem) {
+			$screen = $screens[$screenItem['screenid']];
+
+			$this->checkSpan($screenItem);
+			$this->checkSpanInBounds($screenItem, $screen);
+			$this->checkSpan($screenItem, SCREEN_AXIS_Y);
+			$this->checkSpanInBounds($screenItem, $screen, SCREEN_AXIS_Y);
+		}
+
+		// old validation
 		// fetch the items we're updating
-		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
 		$dbScreenItems = $this->get(array(
-			'screenitemids' => $screenItemids,
+			'screenitemids' => $screenItemIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
@@ -533,6 +572,56 @@ class CScreenItem extends CZBXAPI {
 	 */
 	protected function isValidResourceType($resourceType) {
 		return in_array($resourceType, self::$resourceTypes);
+	}
+
+	/**
+	 * Checks that the span for the given axis is valid.
+	 *
+	 * @throws APIException if the span is not an integer or missing
+	 *
+	 * @param array $screenItem
+	 * @param string $axis      SCREEN_AXIS_X or SCREEN_AXIS_Y
+	 *
+	 * @return void
+	 */
+	protected function checkSpan(array $screenItem, $axis = SCREEN_AXIS_X) {
+		$key = ($axis == SCREEN_AXIS_Y) ? 'rowspan' : 'colspan';
+		if (zbx_empty($screenItem[$key]) || !zbx_is_int($screenItem[$key])) {
+			if ($axis == SCREEN_AXIS_Y) {
+				$error = _('Incorrect row span provided for screen element.');
+			}
+			else {
+				$error = _('Incorrect column span provided for screen element.');
+			}
+			self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		}
+	}
+
+	/**
+	 * Checks that the span for the given axis fits into the size of the screen.
+	 *
+	 * @throws APIException if the span is bigger then the free space on the screen
+	 *
+	 * @param array $screenItem
+	 * @param array $screen
+	 * @param string $axis      SCREEN_AXIS_X or SCREEN_AXIS_Y
+	 *
+	 * @return void
+	 */
+	protected function checkSpanInBounds(array $screenItem, array $screen, $axis = SCREEN_AXIS_X) {
+		$itemCoord = ($axis == SCREEN_AXIS_Y) ? $screenItem['y'] : $screenItem['x'];
+		$itemSpan = ($axis == SCREEN_AXIS_Y) ? $screenItem['rowspan'] : $screenItem['colspan'];
+		$screenSize = ($axis == SCREEN_AXIS_Y) ? $screen['hsize'] : $screen['vsize'];
+
+		if ($itemSpan > $screenSize - $itemCoord) {
+			if ($axis == SCREEN_AXIS_Y) {
+				$error = _('Screen elements row span is too big.');
+			}
+			else {
+				$error = _('Screen elements column span is too big.');
+			}
+			self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		}
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
