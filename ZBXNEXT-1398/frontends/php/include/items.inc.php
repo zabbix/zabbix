@@ -651,8 +651,6 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 function get_items_data_overview($hostids, $view_style) {
 	global $USER_DETAILS;
 
-	$table = new CTableInfo(_('No items defined.'));
-	$table->makeVerticalRotation();
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
@@ -709,32 +707,30 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 	}
 
-	if (!isset($hostnames)) {
+	$table = new CTableInfo(_('No items defined.'));
+	if (empty($hostnames)) {
 		return $table;
 	}
-
+	$table->makeVerticalRotation();
 	order_result($hostnames);
 
-	$css = getUserTheme($USER_DETAILS);
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
 		foreach ($hostnames as $hostname) {
-			$img = new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css);
-			$img->setAttribute('id', uniqid('do_'));
-			$header = array_merge($header, array($img));
+			$header[] = new CCol($hostname, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($items as $descr => $ithosts) {
-			$table_row = array(nbsp($descr));
+			$tableRow = array(nbsp($descr));
 			foreach ($hostnames as $hostname) {
-				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
+				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
 			}
-			$table->addRow($table_row);
+			$table->addRow($tableRow);
 		}
 	}
 	else {
-		$header = array(new CCol(_('Hosts'), 'vertical_rotation'));
+		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');
 		}
@@ -743,16 +739,16 @@ function get_items_data_overview($hostids, $view_style) {
 		foreach ($hostnames as $hostid => $hostname) {
 			$host = $hosts[$hostid];
 
-			// host JS menu link
+			// host js menu link
 			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
 			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
 			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 
-			$table_row = array(new CCol($hostSpan));
+			$tableRow = array(new CCol($hostSpan));
 			foreach ($items as $ithosts) {
-				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
+				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
 			}
-			$table->addRow($table_row);
+			$table->addRow($tableRow);
 		}
 	}
 

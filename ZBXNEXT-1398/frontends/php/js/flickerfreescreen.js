@@ -198,7 +198,7 @@ jQuery(function($) {
 					// img
 					$('<img />', {
 						id: workImg.attr('id') + '_tmp',
-						class: workImg.attr('class'),
+						'class': workImg.attr('class'),
 						border: workImg.attr('border'),
 						usemap: workImg.attr('usemap'),
 						alt: workImg.attr('alt'),
@@ -252,7 +252,7 @@ jQuery(function($) {
 
 			// create shadow
 			if (elem.find('.flickerfreescreen_shadow').length == 0) {
-				elem.append($('<div>', {class: 'flickerfreescreen_shadow'})
+				elem.append($('<div>', {'class': 'flickerfreescreen_shadow'})
 					.html('&nbsp;')
 					.css({
 						top: item.position().top,

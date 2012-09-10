@@ -45,23 +45,31 @@ class CTableInfo extends CTable {
 						var cellsToRotate = $(".vertical_rotation", this);
 						var betterCells = [];
 
+						// insert spans
 						cellsToRotate.each(function () {
 							var cell = $(this),
-								newText = cell.text(),
+								text = cell.text();
+							cell.text("").append($("<span>", {text: text}));
+						});
+
+						cellsToRotate.each(function () {
+							var cell = $(this),
+								span = cell.children(),
 								height = cell.height(),
-								width = cell.width(),
-								widthCss = (width / 2) + "px " + (width / 2) + "px";
+								width = span.width(),
+								transform = (width / 2) + "px " + (width / 2) + "px";
 
-							var divInner = $("<div>", {text: newText, class: "rotated"})
+							var divInner = $("<div>", {"class": "vertical_rotation_inner"})
 								.css({
-									"transform-origin": widthCss,
-									"-webkit-transform-origin": widthCss,
-									"-moz-transform-origin": widthCss,
-									"-ms-transform-origin": widthCss,
-									"-o-transform-origin": widthCss
-								});
-							var div = $("<div>", {height: width, width: height}).append(divInner);
+									"transform-origin": transform,
+									"-webkit-transform-origin": transform,
+									"-moz-transform-origin": transform,
+									"-ms-transform-origin": transform,
+									"-o-transform-origin": transform
+								})
+								.append(span.text());
 
+							var div = $("<div>", {height: width, width: height, "class": "vertical_rotation_outer"}).append(divInner);
 							betterCells.push(div);
 						});
 
@@ -70,6 +78,7 @@ class CTableInfo extends CTable {
 						});
 					};
 				});
+
 				jQuery(document).ready(function() {
 					jQuery(".'.$this->getAttribute('class').'").makeVerticalRotation();
 				});'
