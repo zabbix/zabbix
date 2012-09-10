@@ -125,19 +125,46 @@ class CScreenItem extends CZBXAPI {
 	public function create(array $screenItems) {
 		$screenItems = zbx_toArray($screenItems);
 
+		$this->validateCreate($screenItems);
+
+		// insert items
+		$screenItemids = DB::insert($this->tableName(), $screenItems);
+
+		return array('screenitemids' => $screenItemids);
+	}
+
+	/**
+	 * Validates the input parameters for the create() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screenItems
+	 *
+	 * @return void
+	 */
+	protected function validateCreate(array $screenItems) {
+		// fetch the items we're updating
 		$dbScreenItems = $this->get(array(
 			'screenids' => zbx_objectValues($screenItems, 'screenid'),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
 
+		foreach($screenItems as $screenItem) {
+			// check duplicate resource in cell
+			if (isset($screenItem['x']) && isset($screenItem['y'])) {
+				foreach ($dbScreenItems as $dbScreenItem) {
+					if ($dbScreenItem['screenid'] == $screenItem['screenid']
+						&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
+						&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exists.'));
+					}
+				}
+			}
+		}
+
 		// validate input
-		$this->checkInput($screenItems, $dbScreenItems, array('check_duplicate_resource_in_cell' => true));
-
-		// insert items
-		$screenItemids = DB::insert($this->tableName(), $screenItems);
-
-		return array('screenitemids' => $screenItemids);
+		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
 	/**
@@ -150,16 +177,7 @@ class CScreenItem extends CZBXAPI {
 	public function update(array $screenItems) {
 		$screenItems = zbx_toArray($screenItems);
 
-		// fetch the items we're updating
-		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
-		$dbScreenItems = $this->get(array(
-			'screenitemids' => $screenItemids,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		// validate input
-		$this->checkInput($screenItems, $dbScreenItems);
+		$this->validateUpdate($screenItems);
 
 		// update items
 		$update = array();
@@ -174,6 +192,34 @@ class CScreenItem extends CZBXAPI {
 		DB::update($this->tableName(), $update);
 
 		return array('screenitemids' => zbx_objectValues($screenItems, 'screenitemid'));
+	}
+
+	/**
+	 * Validates the input parameters for the update() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screenItems
+	 *
+	 * @return void
+	 */
+	protected function validateUpdate(array $screenItems) {
+		foreach ($screenItems as $screenItem) {
+			if (empty($screenItem['screenitemid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+		}
+
+		// fetch the items we're updating
+		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
+		$dbScreenItems = $this->get(array(
+			'screenitemids' => $screenItemids,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		// validate input
+		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
 	/**
@@ -318,10 +364,8 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @param array $screenItems	An array of screen items to validate
 	 * @param array $dbScreenItems	An array of screen items $screenItems should be matched against
-	 * @param array $options		An array of check options:
-	 *		"check_duplicate_resource_in_cell" - defines if will processed validation on duplicate resource in same cell
 	 */
-	protected function checkInput(array $screenItems, array $dbScreenItems = array(), array $options = array()) {
+	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
 		$hostgroups = array();
 		$hosts = array();
 		$graphs = array();
@@ -338,17 +382,6 @@ class CScreenItem extends CZBXAPI {
 			// check resource type
 			if (!$this->isValidResourceType($screenItem['resourcetype'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
-			}
-
-			// check duplicate resource in cell
-			if (!empty($options['check_duplicate_resource_in_cell']) && isset($screenItem['x']) && isset($screenItem['y'])) {
-				foreach ($dbScreenItems as $dbScreenItem) {
-					if ($dbScreenItem['screenid'] == $screenItem['screenid']
-							&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
-							&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exists.'));
-					}
-				}
 			}
 
 			// perform resource type specific validation
