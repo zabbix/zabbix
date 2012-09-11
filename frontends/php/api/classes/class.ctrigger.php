@@ -488,7 +488,7 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
-			$sql_parts['where']['group'] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
+			$sql_parts['where']['group'] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 // host
@@ -504,7 +504,7 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-			$sql_parts['where']['host'] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
+			$sql_parts['where']['host'] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
 // only_true
