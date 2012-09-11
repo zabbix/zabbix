@@ -134,9 +134,6 @@ elseif (isset($_REQUEST['save'])) {
 		if (!isset($messages['enabled'])) {
 			$messages['enabled'] = 0;
 		}
-		if (!isset($messages['sounds.recovery'])) {
-			$messages['sounds.recovery'] = 0;
-		}
 		if (!isset($messages['triggers.recovery'])) {
 			$messages['triggers.recovery'] = 0;
 		}
