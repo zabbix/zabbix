@@ -341,8 +341,8 @@ function closeForm(page) {
 	}
 
 	if (IE) {
-		// close current popup after 1s, wait when opener window is refreshed (IE7 issue)
-		window.setTimeout(function() { window.self.close() }, 1000);
+		// close current popup after 1s, wait when opener window is refreshed
+		window.setTimeout(function() { window.self.close(); }, 1000);
 	}
 	else {
 		window.self.close();

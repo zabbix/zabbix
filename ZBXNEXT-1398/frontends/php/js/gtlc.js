@@ -1257,7 +1257,7 @@ var CScrollBar = Class.create(CDebug, {
 		if (IE) {
 			document.selection.empty();
 		}
-		else if (!KQ) {
+		else {
 			var sel = window.getSelection();
 			sel.removeAllRanges();
 		}
@@ -1740,9 +1740,6 @@ function sbox_init(sbid, timeline, domobjectid) {
 
 	// listeners
 	addListener(window, 'resize', moveSBoxes);
-	if (KQ) {
-		setTimeout('ZBX_SBOX[' + sbid + '].sbox.moveSBoxByObj(' + sbid + ');', 500);
-	}
 	ZBX_SBOX[sbid].sbox.addListeners();
 
 	return ZBX_SBOX[sbid].sbox;

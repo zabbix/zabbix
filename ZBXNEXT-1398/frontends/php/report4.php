@@ -49,10 +49,10 @@ $_REQUEST['media_type'] = $media_type;
 $media_types = array();
 
 $db_media_types = DBselect(
-	'SELECT * '.
-	' FROM media_type '.
-	' WHERE '.DBin_node('mediatypeid').
-	' ORDER BY description'
+	'SELECT mt.*'.
+	' FROM media_type mt'.
+	' WHERE '.DBin_node('mt.mediatypeid').
+	' ORDER BY mt.description'
 );
 while ($media_type_data = DBfetch($db_media_types)) {
 	$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
