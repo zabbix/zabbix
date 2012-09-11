@@ -94,12 +94,12 @@
 			$data['user_medias']	= get_request('user_medias', array());
 
 			// set messages
-			$data['messages'] 		= get_request('messages', array());
+			$data['messages'] = get_request('messages', array());
 			if (!isset($data['messages']['enabled'])) {
 				$data['messages']['enabled'] = 0;
 			}
 			if (!isset($data['messages']['sounds.recovery'])) {
-				$data['messages']['sounds.recovery'] = 0;
+				$data['messages']['sounds.recovery'] = 'alarm_ok.wav';
 			}
 			if (!isset($data['messages']['triggers.recovery'])) {
 				$data['messages']['triggers.recovery'] = 0;
