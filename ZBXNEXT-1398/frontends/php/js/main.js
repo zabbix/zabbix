@@ -53,10 +53,11 @@ if (!Array.prototype.indexOf) {
 	}
 }
 
-/*
- * Page refresh
+/**
+ * Page refresh.
  */
 var PageRefresh = {
+
 	delay:		null, // refresh timeout
 	delayLeft:	null, // left till refresh
 	timeout:	null, // link to timeout
@@ -99,13 +100,14 @@ var PageRefresh = {
 	}
 };
 
-/*
- * Main menu
+/**
+ * Main menu.
  */
 var MMenu = {
-	menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
+
+	menus:			{empty: 0, view: 0, cm: 0, reports: 0, config: 0, admin: 0},
 	def_label:		null,
-	sub_active: 	false,
+	sub_active:		false,
 	timeout_reset:	null,
 	timeout_change:	null,
 
@@ -151,10 +153,11 @@ var MMenu = {
 	}
 };
 
-/*
- * Automatic checkbox range selection
+/**
+ * Automatic checkbox range selection.
  */
 var chkbxRange = {
+
 	startbox:		null,	// start checkbox obj
 	startbox_name:	null,	// start checkbox name
 	chkboxes:		{},		// ckbx list
@@ -373,22 +376,23 @@ var chkbxRange = {
 	}
 };
 
-/*
- * Audio Control System
+/**
+ * Audio control system.
  */
 var AudioList = {
+
 	list:		{}, // audio files options
 	dom:		{}, // dom objects links
 	standart:	{
-		'embed': {
-			'enablejavascript': 'true',
-			'autostart': 'false',
-			'loop': 0
+		embed: {
+			enablejavascript: 'true',
+			autostart: 'false',
+			loop: 0
 		},
-		'audio': {
-			'autobuffer': 'autobuffer',
-			'autoplay': null,
-			'controls': null
+		audio: {
+			autobuffer: 'autobuffer',
+			autoplay: null,
+			controls: null
 		}
 	},
 
@@ -522,7 +526,7 @@ var AudioList = {
 			this.endLoop(audiofile);
 		}
 		this.list[audiofile].loop = parseInt(loop, 10);
-		this.list[audiofile].onEnded = this.loop.bind(this, audiofile, {'repeat' : 0});
+		this.list[audiofile].onEnded = this.loop.bind(this, audiofile, {repeat: 0});
 		addListener(this.dom[audiofile], 'ended', this.list[audiofile].onEnded);
 	},
 
@@ -604,31 +608,28 @@ var AudioList = {
 	}
 };
 
-/*
- * Replace standard blink functionality
- */
 /**
  * Sets HTML elements to blink.
  * Example of usage:
- *      <span class="blink" data-time-to-blink="60">test 1</span>
- *      <span class="blink" data-time-to-blink="30">test 2</span>
- *      <span class="blink">test 3</span>
- *      <script type="text/javascript">
- *          jQuery(document).ready(function(
- *              jqBlink.blink();
- *          ));
- *      </script>
+ *		<span class="blink" data-time-to-blink="60">test 1</span>
+ *		<span class="blink" data-time-to-blink="30">test 2</span>
+ *		<span class="blink">test 3</span>
+ *		<script type="text/javascript">
+ *			jQuery(document).ready(function(
+ *				jqBlink.blink();
+ *			));
+ *		</script>
  * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
  * If 'data-seconds-to-blink' is omitted, element will blink forever.
- * @author Konstantin Buravcov
  */
 var jqBlink = {
+
 	shown: false, // are objects currently shown or hidden?
 	blinkInterval: 1000, // how fast will they blink (ms)
 	secondsSinceInit: 0,
 
 	/**
-	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
+	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms.
 	 */
 	blink: function() {
 		var objects = jQuery('.blink');
@@ -650,7 +651,7 @@ var jqBlink = {
 	},
 
 	/**
-	 * Check all currently found objects and exclude ones that should stop blinking by now
+	 * Check all currently found objects and exclude ones that should stop blinking by now.
 	 */
 	filterOutNonBlinking: function(objects) {
 		var that = this;
@@ -674,7 +675,7 @@ var jqBlink = {
 	}
 };
 
-/*
+/**
  * HintBox class.
  */
 var hintBox = {
@@ -847,8 +848,8 @@ var hintBox = {
 	}
 };
 
-/*
- * Color picker
+/**
+ * Color picker.
  */
 function hide_color_picker() {
 	if (!color_picker) {
@@ -906,8 +907,8 @@ function set_color_by_name(id, color) {
 	set_color(color);
 }
 
-/*
- * Zabbix ajax requests
+/**
+ * Zabbix ajax requests.
  */
 function add2favorites(favobj, favid) {
 	if ('undefined' == typeof(Ajax)) {
@@ -919,9 +920,9 @@ function add2favorites(favobj, favid) {
 	}
 
 	var params = {
-		'favobj': favobj,
-		'favid': favid,
-		'favaction': 'add'
+		favobj: favobj,
+		favid: favid,
+		favaction: 'add'
 	};
 
 	send_params(params);
@@ -937,10 +938,10 @@ function rm4favorites(favobj, favid, menu_rowid) {
 	}
 
 	var params = {
-		'favobj': favobj,
-		'favid': favid,
-		'favcnt': menu_rowid,
-		'favaction': 'remove'
+		favobj: favobj,
+		favid: favid,
+		favcnt: menu_rowid,
+		favaction: 'remove'
 	};
 
 	send_params(params);
@@ -962,14 +963,14 @@ function change_flicker_state(divid) {
 	}
 
 	var params = {
-		'favaction': 'flop',
-		'favobj': 'filter',
-		'favref': divid,
-		'favstate': filter_state
+		favaction: 'flop',
+		favobj: 'filter',
+		favref: divid,
+		favstate: filter_state
 	};
 	send_params(params);
 
-	// selection box position
+	// set position to gtlc box
 	if (typeof(moveSBoxes) != 'undefined') {
 		moveSBoxes();
 	}
@@ -994,10 +995,10 @@ function changeHatStateUI(icon, divid) {
 	}
 
 	var params = {
-		'favaction': 'flop',
-		'favobj': 'hat',
-		'favref': divid,
-		'favstate': hat_state
+		favaction: 'flop',
+		favobj: 'hat',
+		favref: divid,
+		favstate: hat_state
 	};
 
 	send_params(params);
@@ -1018,10 +1019,10 @@ function change_hat_state(icon, divid) {
 	}
 
 	var params = {
-		'favaction': 'flop',
-		'favobj': 'hat',
-		'favref': divid,
-		'favstate': hat_state
+		favaction: 'flop',
+		favobj: 'hat',
+		favref: divid,
+		favstate: hat_state
 	};
 
 	send_params(params);
@@ -1036,10 +1037,10 @@ function send_params(params) {
 	url.setQuery('?output=ajax');
 
 	new Ajax.Request(url.getUrl(), {
-			'method': 'post',
-			'parameters': params,
-			'onSuccess': function() { },
-			'onFailure': function() {
+			method: 'post',
+			parameters: params,
+			onSuccess: function() { },
+			onFailure: function() {
 				document.location = url.getPath() + '?' + Object.toQueryString(params);
 			}
 		}
@@ -1072,9 +1073,9 @@ function switch_mute(icon) {
 	sound_state = (sound_state == 'iconmute') ? 1 : 0;
 
 	var params = {
-		'favobj': 'sound',
-		'favref': 'sound',
-		'favstate': sound_state
+		favobj: 'sound',
+		favref: 'sound',
+		favstate: sound_state
 	};
 
 	send_params(params);
