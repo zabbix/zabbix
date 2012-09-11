@@ -20,6 +20,7 @@
 
 
 include('include/views/js/administration.users.edit.js.php');
+
 global $ZBX_LOCALES, $USER_DETAILS;
 
 $userWidget = new CWidget();
