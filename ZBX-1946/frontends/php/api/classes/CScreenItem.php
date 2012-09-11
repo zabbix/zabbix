@@ -599,10 +599,10 @@ class CScreenItem extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkSpansInBounds(array $screenItem, array $screen) {
-		if ($screenItem['rowspan'] > $screen['hsize'] - $screenItem['y']) {
+		if ($screenItem['rowspan'] > $screen['vsize'] - $screenItem['y']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements row span is too big.'));
 		}
-		if ($screenItem['colspan'] > $screen['vsize'] - $screenItem['x']) {
+		if ($screenItem['colspan'] > $screen['hsize'] - $screenItem['x']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements column span is too big.'));
 		}
 	}

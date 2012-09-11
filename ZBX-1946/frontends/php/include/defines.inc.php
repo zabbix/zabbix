@@ -489,9 +489,6 @@ define('LOGFILE_SEVERITY_AUDIT_SUCCESS',	6);
 define('LOGFILE_SEVERITY_AUDIT_FAILURE',	7);
 
 // screen
-define('SCREEN_AXIS_X', 'x');
-define('SCREEN_AXIS_Y', 'y');
-
 define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
 define('SCREEN_RESOURCE_MAP',				2);
