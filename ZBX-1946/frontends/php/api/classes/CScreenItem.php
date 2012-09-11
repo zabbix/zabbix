@@ -152,13 +152,13 @@ class CScreenItem extends CZBXAPI {
 		$screenIds = zbx_objectValues($screenItems, 'screenid');
 
 		// fetch the items we're updating
-		$dbScreenItems = $this->get(array(
+		$dbScreenItems = API::getApi()->select('screens_items', array(
 			'screenids' => $screenIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
 
-		$screens = API::Screen()->get(array(
+		$screens = API::getApi()->select('screens', array(
 			'output' => array('screenid', 'hsize', 'vsize'),
 			'screenids' => $screenIds,
 			'preservekeys' => true
@@ -230,7 +230,7 @@ class CScreenItem extends CZBXAPI {
 		}
 		$screenItemIds = zbx_objectValues($screenItems, 'screenitemid');
 
-		$screens = API::Screen()->get(array(
+		$screens = API::getApi()->select('screens', array(
 			'output' => array('screenid', 'hsize', 'vsize'),
 			'screenitemids' => $screenItemIds,
 			'preservekeys' => true
@@ -247,7 +247,7 @@ class CScreenItem extends CZBXAPI {
 
 		// old validation
 		// fetch the items we're updating
-		$dbScreenItems = $this->get(array(
+		$dbScreenItems = API::getApi()->select('screens_items', array(
 			'screenitemids' => $screenItemIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
