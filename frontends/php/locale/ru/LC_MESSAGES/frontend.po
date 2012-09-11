@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-11 13:19+0300\n"
-"PO-Revision-Date: 2012-07-23 16:14+0200\n"
+"POT-Creation-Date: 2012-09-11 13:22+0300\n"
+"PO-Revision-Date: 2012-08-25 07:44+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -5420,7 +5420,7 @@ msgstr "Иконки"
 
 #: include/views/js/adm.regexprs.edit.js.php:226
 msgid "Identical expression already exists"
-msgstr ""
+msgstr "Идентичное выражение уже существует"
 
 #: include/config.inc.php:250
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -7761,7 +7761,7 @@ msgstr "Для элемента комплексного экрана не ук�
 
 #: include/views/configuration.sysmap.edit.php:151
 msgid "No URLs defined."
-msgstr "URL'ы не заданы."
+msgstr "URLы не заданы."
 
 #: include/forms.inc.php:269
 msgid "No accessible resources"
@@ -11279,7 +11279,7 @@ msgstr "Тестовые данные"
 
 #: include/views/administration.general.regularexpressions.edit.php:71
 msgid "Test expressions"
-msgstr ""
+msgstr "Тест выражений"
 
 #: adm.regexps.php:38
 #: include/views/administration.general.regularexpressions.edit.php:68
@@ -11834,7 +11834,7 @@ msgstr "URL C"
 #: include/views/js/configuration.sysmaps.js.php:162
 #: include/views/js/monitoring.maps.js.php:57 report5.php:143
 msgid "URLs"
-msgstr "URL'ы"
+msgstr "URLы"
 
 #: include/views/administration.mediatypes.edit.php:89
 msgid "USA (160 characters)"
@@ -13205,7 +13205,7 @@ msgstr "по умолчанию"
 
 #: include/views/js/adm.regexprs.edit.js.php:130
 msgid "delimiter"
-msgstr ""
+msgstr "разделитель"
 
 #: jsLoader.php:87
 msgid "dynamic"
