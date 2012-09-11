@@ -3,7 +3,7 @@ Changes for 2.1.0
 New features:
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
 ..F....... [ZBX-5180] maintenance periods form redesign (Vedmak)
-.......PS. [ZBXNEXT-1335] pingers works without connection to a database (Sasha)
+.......PS. [ZBXNEXT-1335] pingers work without connection to a database (Sasha)
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
