@@ -354,7 +354,7 @@ class CItem extends CItemGeneral {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['ghg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
+			$sqlParts['where'][] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 		// host
@@ -364,7 +364,7 @@ class CItem extends CItemGeneral {
 			}
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-			$sqlParts['where'][] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
+			$sqlParts['where'][] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
 		// application
@@ -376,7 +376,7 @@ class CItem extends CItemGeneral {
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where']['aia'] = 'a.applicationid = ia.applicationid';
 			$sqlParts['where']['iai'] = 'ia.itemid=i.itemid';
-			$sqlParts['where'][] = ' UPPER(a.name)='.zbx_dbstr(zbx_strtoupper($options['application']));
+			$sqlParts['where'][] = ' a.name='.zbx_dbstr($options['application']);
 		}
 
 		// with_triggers
