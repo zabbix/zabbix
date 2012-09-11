@@ -178,10 +178,8 @@ class CScreenItem extends CZBXAPI {
 				}
 			}
 
-			$this->checkSpan($screenItem);
-			$this->checkSpanInBounds($screenItem, $screen);
-			$this->checkSpan($screenItem, SCREEN_AXIS_Y);
-			$this->checkSpanInBounds($screenItem, $screen, SCREEN_AXIS_Y);
+			$this->checkSpans($screenItem);
+			$this->checkSpansInBounds($screenItem, $screen);
 		}
 
 		// validate input
@@ -243,10 +241,8 @@ class CScreenItem extends CZBXAPI {
 		foreach ($screenItems as $screenItem) {
 			$screen = $screens[$screenItem['screenid']];
 
-			$this->checkSpan($screenItem);
-			$this->checkSpanInBounds($screenItem, $screen);
-			$this->checkSpan($screenItem, SCREEN_AXIS_Y);
-			$this->checkSpanInBounds($screenItem, $screen, SCREEN_AXIS_Y);
+			$this->checkSpans($screenItem);
+			$this->checkSpansInBounds($screenItem, $screen);
 		}
 
 		// old validation
@@ -575,52 +571,39 @@ class CScreenItem extends CZBXAPI {
 	}
 
 	/**
-	 * Checks that the span for the given axis is valid.
+	 * Checks that the row and column spans are valid.
 	 *
-	 * @throws APIException if the span is not an integer or missing
+	 * @throws APIException if the any of the spans is not an integer or missing
 	 *
 	 * @param array $screenItem
-	 * @param string $axis      SCREEN_AXIS_X or SCREEN_AXIS_Y
 	 *
 	 * @return void
 	 */
-	protected function checkSpan(array $screenItem, $axis = SCREEN_AXIS_X) {
-		$key = ($axis == SCREEN_AXIS_Y) ? 'rowspan' : 'colspan';
-		if (zbx_empty($screenItem[$key]) || !zbx_is_int($screenItem[$key])) {
-			if ($axis == SCREEN_AXIS_Y) {
-				$error = _('Incorrect row span provided for screen element.');
-			}
-			else {
-				$error = _('Incorrect column span provided for screen element.');
-			}
-			self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+	protected function checkSpans(array $screenItem) {
+		if (zbx_empty($screenItem['rowspan']) || !zbx_is_int($screenItem['rowspan'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect row span provided for screen element.'));
+		}
+		if (zbx_empty($screenItem['colspan']) || !zbx_is_int($screenItem['colspan'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect column span provided for screen element.'));
 		}
 	}
 
 	/**
-	 * Checks that the span for the given axis fits into the size of the screen.
+	 * Checks that the row and column spans fit into the size of the screen.
 	 *
-	 * @throws APIException if the span is bigger then the free space on the screen
+	 * @throws APIException if the any of the spans is bigger then the free space on the screen
 	 *
 	 * @param array $screenItem
 	 * @param array $screen
-	 * @param string $axis      SCREEN_AXIS_X or SCREEN_AXIS_Y
 	 *
 	 * @return void
 	 */
-	protected function checkSpanInBounds(array $screenItem, array $screen, $axis = SCREEN_AXIS_X) {
-		$itemCoord = ($axis == SCREEN_AXIS_Y) ? $screenItem['y'] : $screenItem['x'];
-		$itemSpan = ($axis == SCREEN_AXIS_Y) ? $screenItem['rowspan'] : $screenItem['colspan'];
-		$screenSize = ($axis == SCREEN_AXIS_Y) ? $screen['hsize'] : $screen['vsize'];
-
-		if ($itemSpan > $screenSize - $itemCoord) {
-			if ($axis == SCREEN_AXIS_Y) {
-				$error = _('Screen elements row span is too big.');
-			}
-			else {
-				$error = _('Screen elements column span is too big.');
-			}
-			self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+	protected function checkSpansInBounds(array $screenItem, array $screen) {
+		if ($screenItem['rowspan'] > $screen['hsize'] - $screenItem['y']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements row span is too big.'));
+		}
+		if ($screenItem['colspan'] > $screen['vsize'] - $screenItem['x']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements column span is too big.'));
 		}
 	}
 
