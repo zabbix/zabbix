@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -34,7 +34,7 @@ var MC = (agt.indexOf('mac') != -1);
 
 // redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
-	if (IE6 || IE7) {
+	if (IE6 || IE7 || KQ) {
 		window.location.replace('browserwarning.php');
 	}
 }
