@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5560] fixed recovery sound saved incorrectly in user profile (Vedmak)
 ..F....... [ZBX-2770] added autofocus for first fields in frontend forms (Vedmak)
 ..F....... [ZBX-5463] fixed inability to login if http auth is enabled and frontend access is set to internal (Vedmak)
 ...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 64 MB (Andris)
