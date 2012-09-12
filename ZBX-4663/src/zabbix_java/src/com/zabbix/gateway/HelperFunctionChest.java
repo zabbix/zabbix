@@ -19,6 +19,8 @@
 
 package com.zabbix.gateway;
 
+import java.util.ArrayList;
+
 class HelperFunctionChest
 {
 	public static <T> boolean arrayContains(T[] array, T key)
@@ -28,5 +30,51 @@ class HelperFunctionChest
 				return true;
 
 		return false;
+	}
+
+	public static int separatorIndex(String input)
+	{
+		int substrPos, inputPos = 0;
+		String substr = input;
+
+		while ((substrPos = substr.indexOf('.')) != -1)
+		{
+			if (substr.charAt(substrPos - 1) != '\\')
+				return inputPos + substrPos;
+
+			substrPos++;
+			substr = substr.substring(substrPos);
+
+			inputPos += substrPos;
+		}
+
+		return -1;
+	}
+
+	public static String unescapeUserInput(String input)
+	{
+		byte[] inputByteArray = input.getBytes(), outputByteArray;
+		ArrayList<Byte> outputByteList = new ArrayList<Byte>();
+		int i;
+
+		for (i = 0; i < inputByteArray.length; i++)
+		{
+			if (i + 1 < inputByteArray.length && inputByteArray[i] == '\\' &&
+					(inputByteArray[i + 1] == '\\' || inputByteArray[i + 1] == '.'))
+				i++;
+
+			outputByteList.add(inputByteArray[i]);
+		}
+
+		outputByteArray = new byte[outputByteList.size()];
+
+		i = 0;
+		for (Byte b : outputByteList)
+		{
+			outputByteArray[i] = b;
+			i++;
+		}
+
+		return new String(outputByteArray);
 	}
 }
