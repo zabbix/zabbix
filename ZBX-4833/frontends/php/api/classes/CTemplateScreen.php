@@ -652,4 +652,106 @@ class CTemplateScreen extends CScreen {
 
 		return array('screenids' => $screenids);
 	}
+
+	function copy($data) {
+		$screenIds = $data['screenIds'];
+		$templateIds = $data['templateIds'];
+
+		// check permissions on screens
+		$screens = $this->get(array(
+			'screenids' => $screenIds,
+			'output' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+		foreach ($screenIds as $screenId) {
+			if (!isset($screens[$screenId])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		// check permissions on templates
+		if (!API::Template()->isWritable($templateIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// check if screen with same name exists
+		$existingScreens = $this->get(array(
+			'filter' => array(
+				'name' => zbx_objectValues('name', $screens),
+				'templateid' => $templateIds
+			),
+			'output' => array('name', 'templateid'),
+			'preservekeys' => true
+		));
+		foreach ($existingScreens as $existingScreen) {
+			$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$existingScreen['templateid']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists on template "%1$2".',
+				$existingScreen['name'], $template['name']));
+		}
+
+
+		foreach ($templateIds as $templateId) {
+			$resourceGraphIds = array();
+			$resourceItemIds = array();
+			foreach ($screens as &$screen) {
+				$screen['templateid'] = $templateId;
+
+				foreach ($screen['screenitems'] as $screenItem) {
+					if ($screenItem['resourceid']) {
+						switch ($screenItem['resourcetype']) {
+							case SCREEN_RESOURCE_GRAPH:
+								$resourceGraphIds[] = $screenItem['resourceid'];
+								break;
+							default:
+								$resourceItemIds[] = $screenItem['resourceid'];
+						}
+					}
+				}
+			}
+			unset($screen);
+
+			$resourceItemsMap = getSameScreenResourceItemIdsForTemplate($resourceItemIds, $templateId);
+			$resourceGraphsMap = getSameScreenResourceGraphIdsForTemplate($resourceGraphIds, $templateId);
+
+			$insertScreenItems = array();
+			$newScreenIds = DB::insert('screens', $screens);
+			foreach ($screens as $snum => $screen) {
+				foreach ($screen['screenitems'] as $screenItem) {
+					$screenItem['screenid'] = $newScreenIds[$snum];
+
+					$rid = $screenItem['resourceid'];
+
+					switch ($screenItem['resourcetype']) {
+						case SCREEN_RESOURCE_GRAPH:
+							if ($rid && !isset($resourceGraphsMap[$rid])) {
+								$graph = DBfetch(DBselect('SELECT g.name FROM graphs g WHERE g.graphid='.$rid));
+								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$templateId));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" does not exist on template "%1$2".',
+									$graph['name'], $template['name']));
+							}
+
+							$screenItem['resourceid'] = $resourceGraphsMap[$rid];
+							break;
+						default:
+							if ($rid && !isset($resourceItemsMap[$rid])) {
+								$item = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.$rid));
+								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$templateId));
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" does not exist on template "%1$2".',
+									$item['name'], $template['name']));
+							}
+
+							$screenItem['resourceid'] = $resourceItemsMap[$rid];
+					}
+
+
+					$insertScreenItems[] = $screenItem;
+				}
+			}
+
+			DB::insert('screens_items', $insertScreenItems);
+		}
+
+		return true;
+	}
 }

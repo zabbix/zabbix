@@ -319,3 +319,39 @@ function check_dynamic_items($elid, $config = 0) {
 	}
 	return false;
 }
+
+function getSameScreenResourceItemIdsForTemplate(array $resourceIds, $templateId) {
+	$result = array();
+
+	$dbItems = DBselect(
+		'SELECT src.itemid as srcid,dest.itemid as destid'.
+			' FROM items dest,items src'.
+			' WHERE dest.key_=src.key_'.
+				' AND dest.hostid='.$templateId.
+				' AND '.DBcondition('src.itemid', $resourceIds)
+	);
+	while ($dbItem = DBfetch($dbItems)) {
+		$result[$dbItem['srcid']] = $dbItem['destid'];
+	}
+
+	return $result;
+}
+
+function getSameScreenResourceGraphIdsForTemplate(array $resourceIds, $templateId) {
+	$result = array();
+
+	$dbItems = DBselect(
+		'SELECT src.graphid as srcid,dest.graphid as destid'.
+				' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
+				' WHERE dest.name=src.name'.
+				' AND destgi.graphid=dest.graphid'.
+				' AND destgi.itemid=desti.itemid'.
+				' AND desti.hostid='.$templateId.
+				' AND '.DBcondition('src.graphid', $resourceIds)
+	);
+	while ($dbItem = DBfetch($dbItems)) {
+		$result[$dbItem['srcid']] = $dbItem['destid'];
+	}
+
+	return $result;
+}
