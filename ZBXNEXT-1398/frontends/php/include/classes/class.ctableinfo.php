@@ -52,6 +52,7 @@ class CTableInfo extends CTable {
 							cell.text("").append($("<span>", {text: text}));
 						});
 
+						// rotate cells
 						cellsToRotate.each(function () {
 							var cell = $(this),
 								span = cell.children(),
@@ -69,12 +70,21 @@ class CTableInfo extends CTable {
 								})
 								.append(span.text());
 
-							var div = $("<div>", {height: width, width: height, "class": "vertical_rotation_outer"}).append(divInner);
+							var div = $("<div>", {height: width, width: height}).append(divInner);
 							betterCells.push(div);
 						});
-
 						cellsToRotate.each(function (i) {
 							$(this).html(betterCells[i]);
+						});
+
+						// align text to cell center
+						cellsToRotate.each(function () {
+							var cell = $(this),
+								width = cell.width();
+
+							if (width > 30) {
+								cell.children().css({position: "relative", left: (width / 2 - 10)});
+							}
 						});
 					};
 				});

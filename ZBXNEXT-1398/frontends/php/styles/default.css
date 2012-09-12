@@ -441,10 +441,9 @@ table.tableinfo tr.header td.hover_grey { white-space: nowrap; word-spacing: 0; 
 table.tableinfo tr.vertical_header td { padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center; }
 table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { cursor: pointer; }
-table.tableinfo tr.vertical_header td.vertical_rotation { white-space: nowrap; }
-table.tableinfo tr.vertical_header td.vertical_rotation .vertical_rotation_outer { text-align: left; }
+table.tableinfo tr.vertical_header td.vertical_rotation { white-space: nowrap; align: center;}
 table.tableinfo tr.vertical_header td.vertical_rotation .vertical_rotation_inner {
-	transform: rotate(270deg); -webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg);
+	transform: rotate(270deg); -webkit-transform: rotate(270deg); -o-transform: rotate(270deg); filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
 	writing-mode: tb-rl; white-space: nowrap;
 }
 table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; padding-left: 5px; }
@@ -850,25 +849,21 @@ fieldset legend { margin: 0.2em 0.5em; }
 	background-repeat: no-repeat;
 	width: 12px;
 }
-
 .icon-maintenance-inline {
 	height: 14px;
 	vertical-align: middle;
 	display: inline-block;
 	margin-left: 5px;
 }
-
 .icon-maintenance-abs {
 	height: 12px;
 	position: absolute;
 	right: 0;
 	top: 4px;
 }
-
 .maintenance-abs-cont {
 	position: relative;
 }
-
 .left-to-icon-maintenance-abs {
 	margin-right: 17px;
 }
@@ -885,4 +880,5 @@ fieldset legend { margin: 0.2em 0.5em; }
 
 /* flickerfreescreen */
 .flickerfreescreen { position: relative; }
-.flickerfreescreen .shadow { position: relative; background-color: #000000; position: absolute; z-index: 1; }
+.flickerfreescreen .shadow { background-color: #000000; position: absolute; z-index: 1; }
+.flickerfreescreen .offline { width: 32px; height: 32px; background: url("../images/general/database_error.png"); position: absolute; z-index: 3; }
