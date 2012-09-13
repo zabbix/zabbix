@@ -326,10 +326,10 @@ jQuery(function($) {
 
 	window.flickerfreeScreenShadow = {
 
-		timeout: 1000, // 30 seconds
+		timeout: 1, // in seconds
 		timers: [],
 
-		start: function(id) {
+		start: function(id) {cdump(this.timeout);
 			if (empty(this.timers[id])) {
 				this.timers[id] = {};
 				this.timers[id].timeout = null;
@@ -338,7 +338,7 @@ jQuery(function($) {
 			var timer = this.timers[id];
 
 			clearTimeout(timer.timeout);
-			timer.timeout = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
+			timer.timeout = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout * 1000);
 		},
 
 		end: function(id) {

@@ -76,6 +76,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$post_script .= 'PageRefresh.init('.(CWebUser::$data['refresh'] * 1000).');'."\n";
 	}
 
+	if (in_array('flickerfreescreen.js', $page['scripts'])) {
+		$post_script .= 'window.flickerfreeScreenShadow.timeout = '.SCREEN_REFRESH_TIMEOUT.';'."\n";
+	}
+
 	// the chkbxRange.init() method must be called after the inserted post scripts
 	$post_script .= "chkbxRange.init();\n";
 	$post_script .= '});'."\n";
