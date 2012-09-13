@@ -3,10 +3,11 @@ Changes for 2.1.0
 New features:
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
 ..F....... [ZBX-5180] maintenance periods form redesign (Vedmak)
-.......PS. [ZBXNEXT-1335] pingers works without connection to a database (Sasha)
+.......PS. [ZBXNEXT-1335] pingers work without connection to a database (Sasha)
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5560] fixed recovery sound saved incorrectly in user profile (Vedmak)
 ..F....... [ZBX-2770] added autofocus for first fields in frontend forms (Vedmak)
 ..F....... [ZBX-5463] fixed inability to login if http auth is enabled and frontend access is set to internal (Vedmak)
 ...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 64 MB (Andris)
@@ -26,12 +27,13 @@ A......... [ZBX-2060] implemented the "expandExpression" parameter for the trigg
 A.F....... [ZBXNEXT-1253] implemented flicker-free screens (Eduard)
 ........S. [ZBX-5318] added remote commands in expanded {ESC.HISTORY} macro (Sasha)
 A.F....... [ZBX-1357] added Chinese (Taiwan) translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated Chinese (China), Brazilian Portuguese, German, Japanese, Latvian, Spanish and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China), Brazilian Portuguese, French, German, Japanese, Latvian, Polish, Spanish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-583] added the maintenance filter to the trigger status page (Pavels)
 A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the maintenance.get method (Pavels)
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+A......... [ZBX-954] fixed missing doublequote in import error message when a network map references non-existent trigger (Richlv)
 ...G...... [ZBX-5473] fixed agent crash under FreeBSD and Linux when started with -p or -t vfs.dev.read/write (Sasha)
 ..F....... [ZBX-5513] fixed HTTP authentication without directly passing password (Eduard)
 ..F....PS. [ZBX-4852] fixed calculation of update interval if flexible intervals are used (Andris, Sasha)
@@ -1021,6 +1023,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+A......... [ZBX-4097] changed the "application", "host" and "group" parameters for item.get and trigger.get to be case sensitive (Pavels)
 ..F....... [ZBX-5514] fixed sql query in get_min_itemclock_by_itemid function (Eduard)
 A......... [ZBX-5505] fixed incorrect sql query building using limits (Eduard)
 A......... [ZBX-5512] fixed undefined index in screens (Eduard)
