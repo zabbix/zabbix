@@ -440,7 +440,7 @@ class DB {
 
 		$fields = array_keys($values[0]);
 
-		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ';
+		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).','.($getids ? $tableSchema['key'] : '').') VALUES ';
 
 		foreach ($values as $key => $row) {
 			if ($getids) {

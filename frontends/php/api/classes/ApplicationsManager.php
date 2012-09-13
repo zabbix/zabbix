@@ -97,57 +97,47 @@ class ApplicationsManager {
 	public function link($templateId, $hostIds) {
 		$hostIds = zbx_toArray($hostIds);
 
-		// to reduce sql count select applications both from template and hosts in one sql (function call)
-		// after that get template apps, remove them from hostApps list and convert to hash by applicationid
-		$hostIds[] = $templateId;
-		$hostApps = $this->getApplicationMapsByHosts($hostIds);
-		$applications = $hostApps[$templateId]['byName'];
-		unset($hostApps[$templateId]);
-		$applications = zbx_toHash($applications, 'applicationid');
-		$this->linkApplications($applications, $hostApps);
+		$applications = array();
+		$dbCursor = DBselect('SELECT a.applicationid, a.name, a.hostid, a.templateid'.
+				' FROM applications a'.
+				' WHERE a.hostid='.zbx_dbstr($templateId));
+		while ($dbApp = DBfetch($dbCursor)) {
+			$applications[] = $dbApp;
+		}
+
+		$this->inherit($applications, $hostIds);
 
 		return true;
 	}
 
 	/**
-	 * Inherit template applications.
-	 * In case applications are on template, we need to inherit them on child hosts,
+	 * Inherit passed applications to hosts.
+	 * If $hostIds is empty that means that we need to inherit all $applications to hosts which are linked to templates
+	 * where $applications belong.
+	 *
+	 * Usual use case is:
+	 *   inherit is called with some $hostIds passed
+	 *   new applications are created/apdated
+	 *   inherit is called again with created/apdated applications but empty $hostIds
+	 *   if any of new applications belongs to template, inherit it to all hosts linked to tah template
 	 *
 	 * @param array $applications
-	 */
-	public function inherit(array $applications) {
-		$hostIds = $this->getChildHostsFroApplications($applications);
-		if (!$hostIds) {
-			return;
-		}
-
-		$hostApps = $this->getApplicationMapsByHosts($hostIds);
-
-		$this->linkApplications($applications, $hostApps);
-	}
-
-	/**
-	 * Link passed applications to hosts.
-	 * $hostApps is hosts hash with apps byname and byTemplateId, this structure received from getApplicationMapsByHosts method.
-	 *
-	 * @param array $applications
-	 * @param array $hostApps
+	 * @param array $hostIds
 	 *
 	 * @return bool
 	 */
-	protected function linkApplications(array $applications, array $hostApps) {
-		$preparedApps = $this->prepareInheritedApps($applications, $hostApps);
-
-		if (!empty($preparedApps['create'])) {
-			$this->create($preparedApps['create'], true);
+	public function inherit(array $applications, array $hostIds = array()) {
+		if (empty($hostIds)) {
+			$hostIds = $this->getChildHostsFroApplications($applications);
 		}
-		if (!empty($preparedApps['update'])) {
-			$this->update($preparedApps['update']);
+		if (empty($hostIds)) {
+			return true;
 		}
 
-		$inheritedApplications = array_merge($preparedApps['create'], $preparedApps['update']);
+		$preparedApps = $this->prepareInheritedApps($applications, $hostIds);
+		$inheritedApps = $this->save($preparedApps);
 
-		$this->inherit($inheritedApplications);
+		$this->inherit($inheritedApps);
 
 		return true;
 	}
@@ -169,6 +159,54 @@ class ApplicationsManager {
 		}
 
 		return empty($hostIds) ? false : $hostIds;
+	}
+
+	/**
+	 * Generate apps data for inheritance.
+	 * Using passed parameters decide if new application must be created on host or existing one must be updated.
+	 *
+	 * @param array $applications which we need to inherit
+	 * @param array $hostIds
+	 *
+	 * @throws Exception
+	 * @return array with keys 'create' and 'update'
+	 */
+	protected function prepareInheritedApps(array $applications, array $hostIds) {
+		$hostApps = $this->getApplicationMapsByHosts($hostIds);
+		$result = array();
+
+		foreach ($applications as $application) {
+			$appId = $application['applicationid'];
+			foreach ($hostApps as $hostId => $hostApp) {
+				$exApplication = null;
+				// update by templateid
+				if (isset($hostApp['byTemplateId'][$appId])) {
+					$exApplication = $hostApp['byTemplateId'][$appId];
+				}
+
+				// update by name
+				if (isset($hostApp['byName'][$application['name']])) {
+					$exApplication = $hostApp['byName'][$application['name']];
+					if ($exApplication['templateid'] > 0 && !idcmp($exApplication['templateid'], $appId)) {
+						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
+						throw new Exception(_s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
+					}
+				}
+
+				$newApplication = $application;
+				$newApplication['hostid'] = $hostId;
+				$newApplication['templateid'] = $appId;
+				if ($exApplication) {
+					$newApplication['applicationid'] = $exApplication['applicationid'];
+				}
+				else {
+					unset($newApplication['applicationid']);
+				}
+				$result[] = $newApplication;
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -205,53 +243,32 @@ class ApplicationsManager {
 	}
 
 	/**
-	 * Generate apps data for inheritance.
-	 * Using passed parameters decide if new application must be created on host or existing one must be updated.
-	 *
-	 * @param array $applications which we need to inherit
-	 * @param array $hostApps     hash with apps already existing on hosts
-	 *
-	 * @throws Exception
-	 * @return array with keys 'create' and 'update'
+	 * Save applications. If application has applicationid it gets updated otherwise new one is created.
+	 * @param array $applications
 	 */
-	protected function prepareInheritedApps(array $applications, array $hostApps) {
-		$result = array(
-			'create' => array(),
-			'update' => array()
-		);
+	protected function save(array $applications) {
+		$appsCreate = array();
+		$appsUpdate = array();
 
-		foreach ($applications as $application) {
-			$appId = $application['applicationid'];
-			foreach ($hostApps as $hostId => $hostApp) {
-				$exApplication = null;
-				// update by templateid
-				if (isset($hostApp['byTemplateId'][$appId])) {
-					$exApplication = $hostApp['byTemplateId'][$appId];
-				}
-
-				// update by name
-				if (isset($hostApp['byName'][$application['name']])) {
-					$exApplication = $hostApp['byName'][$application['name']];
-					if ($exApplication['templateid'] > 0 && !idcmp($exApplication['templateid'], $application['applicationid'])) {
-						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
-						throw new Exception(_s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
-					}
-				}
-
-				$newApplication = $application;
-				$newApplication['hostid'] = $hostId;
-				$newApplication['templateid'] = $application['applicationid'];
-
-				if ($exApplication) {
-					$newApplication['applicationid'] = $exApplication['applicationid'];
-					$result['update'][] = $newApplication;
-				}
-				else {
-					$result['create'][] = $newApplication;
-				}
+		foreach ($applications as $app) {
+			if (isset($app['applicationid'])) {
+				$appsUpdate[] = $app;
+			}
+			else {
+				$appsCreate[] = $app;
 			}
 		}
 
-		return $result;
+		if (!empty($appsCreate)) {
+			$newApps = $this->create($appsCreate, true);
+			foreach ($newApps as $num => $newApp) {
+				$applications[$num]['applicationid'] = $newApp['applicationid'];
+			}
+		}
+		if (!empty($appsUpdate)) {
+			$this->update($appsUpdate);
+		}
+
+		return $applications;
 	}
 }
