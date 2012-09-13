@@ -333,6 +333,7 @@ jQuery(function($) {
 			if (empty(this.timers[id])) {
 				this.timers[id] = {};
 				this.timers[id].timeout = null;
+				this.timers[id].ready = false;
 			}
 			var timer = this.timers[id];
 
@@ -369,11 +370,21 @@ jQuery(function($) {
 
 		createShadow: function(id) {
 			var elem = $('#flickerfreescreen_' + id),
-				item = window.flickerfreeScreenShadow.findScreenItem(elem);
+				item = window.flickerfreeScreenShadow.findScreenItem(elem),
+				timer = this.timers[id];
 			if (empty(item)) {
 				return;
 			}
 
+			// don't show shadow if image not loaded first time with the page
+			if (item.prop('nodeName') == 'IMG' && !timer.ready && typeof(item.get(0).complete) == 'boolean') {
+				if (!item.get(0).complete) {
+					return;
+				}
+				else {
+					timer.ready = true;
+				}
+			}
 			// create shadow
 			if (elem.find('.shadow').length == 0) {
 				item.css({position: 'relative', zIndex: 2});
@@ -387,15 +398,15 @@ jQuery(function($) {
 						height: item.height()
 					})
 				);
-				elem.append($('<img>', {'class': 'offline', alt: 'Disconnected', title: 'Disconnected'})
+				elem.append($('<img>', {'class': 'offline'})
 					.css({
-						top: item.position().top + 14,
-						left: item.position().left + 14
+						top: item.position().top + 1,
+						left: item.position().left + 2
 					})
 				);
 
 				// fade screen
-				elem.find(item.prop('nodeName')).fadeTo(2000, 0.8);
+				elem.find(item.prop('nodeName')).fadeTo(2000, 0.6);
 			}
 		},
 

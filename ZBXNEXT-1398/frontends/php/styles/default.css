@@ -881,4 +881,5 @@ fieldset legend { margin: 0.2em 0.5em; }
 /* flickerfreescreen */
 .flickerfreescreen { position: relative; }
 .flickerfreescreen .shadow { background-color: #000000; position: absolute; z-index: 1; }
-.flickerfreescreen .offline { width: 32px; height: 32px; background: url("../images/general/database_error.png"); position: absolute; z-index: 3; }
+.flickerfreescreen .offline { width: 24px; height: 24px; background: url("../images/general/loader.gif"); border:0; position: absolute; z-index: 3; }
+
