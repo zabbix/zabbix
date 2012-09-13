@@ -329,7 +329,7 @@ jQuery(function($) {
 		timeout: 1, // in seconds
 		timers: [],
 
-		start: function(id) {cdump(this.timeout);
+		start: function(id) {
 			if (empty(this.timers[id])) {
 				this.timers[id] = {};
 				this.timers[id].timeout = null;
