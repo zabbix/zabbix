@@ -20,11 +20,7 @@
 
 
 /**
- * File containing CTemplateScreen class for API.
- * @package API
- */
-/**
- * Class containing methods for operations with Screens
+ * Class containing methods for operations with template screens.
  */
 class CTemplateScreen extends CScreen {
 
@@ -420,51 +416,53 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
-		// creating copies of templated screens (inheritance)
-		// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
-		$screenNum = 0;
-		$vrtResult = array();
+		if (is_null($options['countOutput']) || (!is_null($options['countOutput']) && !is_null($options['groupCount']))) {
+			// creating copies of templated screens (inheritance)
+			// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
+			$screenNum = 0;
+			$vrtResult = array();
 
-		foreach ($result as $screen) {
-			if (is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])) {
-				$screenNum++;
-				$vrtResult[$screenNum] = $screen;
-				$vrtResult[$screenNum]['hostid'] = $screen['templateid'];
-			}
-			if (!isset($templatesChain[$screen['templateid']])) {
-				continue;
-			}
-
-			foreach ($templatesChain[$screen['templateid']] as $hostid) {
-				if (!isset($options['hostids'][$hostid])) {
+			foreach ($result as $screen) {
+				if (is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])) {
+					$screenNum++;
+					$vrtResult[$screenNum] = $screen;
+					$vrtResult[$screenNum]['hostid'] = $screen['templateid'];
+				}
+				if (!isset($templatesChain[$screen['templateid']])) {
 					continue;
 				}
 
-				$screenNum++;
-				$vrtResult[$screenNum] = $screen;
-				$vrtResult[$screenNum]['hostid'] = $hostid;
-
-				if (!isset($vrtResult[$screenNum]['screenitems'])) {
-					continue;
-				}
-
-				foreach ($vrtResult[$screenNum]['screenitems'] as &$screenitem) {
-					switch ($screenitem['resourcetype']) {
-						case SCREEN_RESOURCE_GRAPH:
-							$graphName = $tplGraphs[$screenitem['resourceid']]['name'];
-							$screenitem['real_resourceid'] = $realGraphs[$hostid][$graphName]['graphid'];
-							break;
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$itemKey = $tplItems[$screenitem['resourceid']]['key_'];
-							$screenitem['real_resourceid'] = $realItems[$hostid][$itemKey]['itemid'];
-							break;
+				foreach ($templatesChain[$screen['templateid']] as $hostid) {
+					if (!isset($options['hostids'][$hostid])) {
+						continue;
 					}
+
+					$screenNum++;
+					$vrtResult[$screenNum] = $screen;
+					$vrtResult[$screenNum]['hostid'] = $hostid;
+
+					if (!isset($vrtResult[$screenNum]['screenitems'])) {
+						continue;
+					}
+
+					foreach ($vrtResult[$screenNum]['screenitems'] as &$screenitem) {
+						switch ($screenitem['resourcetype']) {
+							case SCREEN_RESOURCE_GRAPH:
+								$graphName = $tplGraphs[$screenitem['resourceid']]['name'];
+								$screenitem['real_resourceid'] = $realGraphs[$hostid][$graphName]['graphid'];
+								break;
+							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$itemKey = $tplItems[$screenitem['resourceid']]['key_'];
+								$screenitem['real_resourceid'] = $realItems[$hostid][$itemKey]['itemid'];
+								break;
+						}
+					}
+					unset($screenitem);
 				}
-				unset($screenitem);
 			}
+			$result = array_values($vrtResult);
 		}
-		$result = array_values($vrtResult);
 
 		if (!is_null($options['countOutput'])) {
 			return $result;
@@ -618,8 +616,35 @@ class CTemplateScreen extends CScreen {
 			}
 			unset($screen);
 
-			$resourceItemsMap = getSameScreenResourceItemIdsForTemplate($resourceItemIds, $templateId);
-			$resourceGraphsMap = getSameScreenResourceGraphIdsForTemplate($resourceGraphIds, $templateId);
+
+			// get same items on destination template
+			$resourceItemsMap = array();
+			$dbItems = DBselect(
+				'SELECT src.itemid as srcid,dest.itemid as destid'.
+						' FROM items dest,items src'.
+						' WHERE dest.key_=src.key_'.
+						' AND dest.hostid='.$templateId.
+						' AND '.DBcondition('src.itemid', $resourceItemIds)
+			);
+			while ($dbItem = DBfetch($dbItems)) {
+				$resourceItemsMap[$dbItem['srcid']] = $dbItem['destid'];
+			}
+
+			// get same graphs on destination template
+			$resourceGraphsMap = array();
+			$dbItems = DBselect(
+				'SELECT src.graphid as srcid,dest.graphid as destid'.
+						' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
+						' WHERE dest.name=src.name'.
+						' AND destgi.graphid=dest.graphid'.
+						' AND destgi.itemid=desti.itemid'.
+						' AND desti.hostid='.$templateId.
+						' AND '.DBcondition('src.graphid', $resourceGraphIds)
+			);
+			while ($dbItem = DBfetch($dbItems)) {
+				$resourceGraphsMap[$dbItem['srcid']] = $dbItem['destid'];
+			}
+
 
 			$newScreenIds = DB::insert('screens', $screens);
 
@@ -756,14 +781,13 @@ class CTemplateScreen extends CScreen {
 	 *
 	 * @param array $data
 	 */
-
 	protected function validateCopy(array $data) {
 		$screenIds = $data['screenIds'];
 		$templateIds = $data['templateIds'];
 
 		$screens = $this->get(array(
 			'screenids' => $screenIds,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('screenid', 'name'),
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -781,10 +805,10 @@ class CTemplateScreen extends CScreen {
 		// check if screen with same name exists
 		$existingScreens = $this->get(array(
 			'filter' => array(
-				'name' => zbx_objectValues('name', $screens),
+				'name' => zbx_objectValues($screens, 'name'),
 				'templateid' => $templateIds
 			),
-			'output' => array('name', 'templateid'),
+			'output' => array('screenid', 'name', 'templateid'),
 			'preservekeys' => true
 		));
 		foreach ($existingScreens as $existingScreen) {
