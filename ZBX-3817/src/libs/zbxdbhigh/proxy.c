@@ -1336,9 +1336,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	DC_ITEM				*dc_items;
 	int				*errcodes, records = 0;
 	zbx_history_data_t		*hd;
-	double				sec;
 
-	sec = zbx_time();
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == string_buffer)
@@ -1435,8 +1433,6 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	zbx_free(dc_items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
-
-	zabbix_log(LOG_LEVEL_WARNING, "%s() %f seconds (%d records)", __function_name, zbx_time() - sec, records);
 
 	return records;
 }
