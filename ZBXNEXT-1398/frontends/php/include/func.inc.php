@@ -292,7 +292,7 @@ function zbxDateToTime($strdate) {
 		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
-		return !empty($strdate) ? $strdate : time();
+		return (!empty($strdate) && is_numeric($strdate)) ? $strdate : time();
 	}
 }
 
@@ -308,6 +308,7 @@ function zbxDateToTime($strdate) {
  * @return int
  */
 function zbxAddSecondsToUnixtime($sec, $unixtime) {
+
 	return strtotime('+'.$sec.' seconds', zbxDateToTime($unixtime));
 }
 

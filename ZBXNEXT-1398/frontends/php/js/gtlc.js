@@ -241,8 +241,22 @@ var timeControl = {
 			throw('timeControl: Object is not declared "' + objid + '".');
 		}
 
-		var usertime = ZBX_TIMELINES[timelineid].usertime();
-		var period = ZBX_TIMELINES[timelineid].period();
+		var usertime = ZBX_TIMELINES[timelineid].usertime(),
+			period = ZBX_TIMELINES[timelineid].period();
+		if (isNaN(usertime) || isNaN(period)) {
+			// clean sbox'es
+			for (var objid in this.objectList) {
+				if (empty(this.objectList[objid])) {
+					continue;
+				}
+
+				if (isset(objid, ZBX_SBOX)) {
+					ZBX_SBOX[objid].sbox.clear_params();
+				}
+			}
+
+			return;
+		}
 
 		if (ZBX_TIMELINES[timelineid].now() || ZBX_TIMELINES[timelineid].isNow()) {
 			usertime += 31536000; // 31536000 = 86400 * 365 = 1 year
@@ -1194,8 +1208,12 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setTabInfo: function() {
-		var period = this.timeline.period();
-		var usertime = this.timeline.usertime();
+		var period = this.timeline.period(),
+			usertime = this.timeline.usertime();
+		if (isNaN(period) || isNaN(usertime)) {
+			return;
+		}
+
 		var userstarttime = usertime - period;
 
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
@@ -1220,15 +1238,8 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	dateToArray: function(unixtime) {
-		var date = new CDate(unixtime * 1000);
-		var dateArray = [];
-
-		dateArray[0] = date.getDate();
-		dateArray[1] = date.getMonth() + 1;
-		dateArray[2] = date.getFullYear();
-		dateArray[3] = date.getHours();
-		dateArray[4] = date.getMinutes();
-		dateArray[5] = date.getSeconds();
+		var date = new CDate(unixtime * 1000),
+			dateArray = [date.getDate(), date.getMonth() + 1, date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds()];
 
 		for (var i = 0; i < dateArray.length; i++) {
 			if ((dateArray[i] + '').length < 2) {
