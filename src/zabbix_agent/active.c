@@ -270,9 +270,7 @@ static int	parse_list_of_checks(char *str)
 			mtime = 0;
 		}
 		else
-		{
 			mtime = atoi(tmp);
-		}
 
 		add_check(name, key_orig, delay, lastlogsize, mtime);
 	}

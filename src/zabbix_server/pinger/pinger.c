@@ -172,6 +172,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 		}
 	}
 
+	dc_flush_history();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -416,6 +418,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	}
 
 	DCconfig_clean_items(items, NULL, num);
+
+	dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, *icmp_items_count);
 }
