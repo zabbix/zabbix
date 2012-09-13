@@ -138,6 +138,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	DCconfig_clean_items(items, NULL, num);
 	zbx_free(items);
 
+	dc_flush_history();
+
 	return ret;
 }
 
