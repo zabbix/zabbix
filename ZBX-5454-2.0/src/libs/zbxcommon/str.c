@@ -2961,12 +2961,12 @@ size_t	zbx_strlen_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Function     :  zbx_utf8_char_len                                          *
+ * Function: zbx_utf8_char_len                                                *
  *                                                                            *
- * Purpose      :  Returns the size (in bytes) of an UTF-8 encoded character  *
- *                 or 0 if the character is not a valid UTF-8.                *
+ * Purpose: Returns the size (in bytes) of an UTF-8 encoded character or 0    *
+ *          if the character is not a valid UTF-8.                            *
  *                                                                            *
- * Parameters:  :  text (in)    - pointer to the 1st byte of UTF-8 character  *
+ * Parameters: text - [IN] pointer to the 1st byte of UTF-8 character         *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_utf8_char_len(const char *text)

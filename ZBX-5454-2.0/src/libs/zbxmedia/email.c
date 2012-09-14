@@ -25,86 +25,77 @@
 #include "zbxmedia.h"
 
 /* number of characters per line when wrapping Base64 data in Email */
-#define ZBX_EMAIL_B64_MAXLINE	76
+#define ZBX_EMAIL_B64_MAXLINE			76
 
 /* number of characters per "encoded-word" in RFC-2047 message header */
-#define ZBX_EMAIL_B64_MAXWORD_RFC2047	75
+#define ZBX_EMAIL_B64_MAXWORD_RFC2047		75
 
-/*------------------------------------------------------------------------
- *
- * Function	:  str_base64_encode_rfc2047
- *
- * Purpose	:  Encode a string into a base64 string as required by
- *                 rfc2047. Used for encoding e-mail headers.
- *
- * Parameters:	:  src (in)		- a string to encode
- *		:  p_base64 (out)	- a pointer to the encoded string
- *		:  src_len (in)		- size (length) of input string
- *
- * Comments	:  allocates memory!
- *
- * Based on the patch sybmitted by Jairo Eduardo Lopez Fuentes Nacarino
- *
- *----------------------------------------------------------------------*/
-void str_base64_encode_rfc2047(const char *src, char **p_base64, int src_len)
+/* multiple 'encoded-word's should be separated by <CR><LF><SPACE> */
+#define ZBX_EMAIL_ENCODED_WORD_SEPARATOR	"\r\n "
+
+/******************************************************************************
+ *                                                                            *
+ * Function: str_base64_encode_rfc2047                                        *
+ *                                                                            *
+ * Purpose: Encode a string into a base64 string as required by rfc2047.      *
+ *          Used for encoding e-mail headers.                                 *
+ *                                                                            *
+ * Parameters: src      - [IN] a null-terminated UTF-8 string to encode       *
+ *             p_base64 - [OUT] a pointer to the encoded string               *
+ *                                                                            *
+ * Comments: Based on the patch sybmitted by                                  *
+ *           Jairo Eduardo Lopez Fuentes Nacarino                             *
+ *                                                                            *
+ ******************************************************************************/
+void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 {
-	const char	*word_sep = "\r\n ";	/* "encoded-word" separator */
-	const int	word_sep_len = 3;
-
-	const char	*p0;		/* pointer in src to start encoding from */
-	const char	*p1;		/* pointer in src: 1st byte of UTF-8 character */
-	size_t		c_len;		/* length of UTF-8 character sequence */
-	int		word_1 = 1;	/* First word ? */
-
-	char	*subj = NULL;		/* encoded RFC2047 compliant subject */
-	size_t	subj_alloc = 0;		/* allocated memory size for subject */
-	size_t	subj_offset = 0;	/* offset for writing into subject */
+	const char	*p0;			/* pointer in src to start encoding from */
+	const char	*p1;			/* pointer in src: 1st byte of UTF-8 character */
+	size_t		c_len;			/* length of UTF-8 character sequence */
+	size_t		p_base64_alloc;		/* allocated memory size for subject */
+	size_t		p_base64_offset = 0;	/* offset for writing into subject */
 
 	assert(src);
-	assert(NULL == *p_base64);	/* do not accept already allocated memory */
+	assert(NULL == *p_base64);		/* do not accept already allocated memory */
 
-	subj_alloc = ZBX_EMAIL_B64_MAXWORD_RFC2047 + word_sep_len + 1;
-	subj = zbx_malloc(NULL, subj_alloc);
-	zbx_snprintf_alloc(&subj, &subj_alloc, &subj_offset, "");
+	p_base64_alloc = ZBX_EMAIL_B64_MAXWORD_RFC2047 + sizeof(ZBX_EMAIL_ENCODED_WORD_SEPARATOR);
+	*p_base64 = zbx_malloc(NULL, p_base64_alloc);
+	**p_base64 = '\0';
 
-	for (p0 = src; p0 < src + src_len; p0 = p1)
+	for (p0 = src; '\0' != *p0; p0 = p1)
 	{
-		char *b64_buf = NULL;
-
-		/* Max length of line is 76 characters (without line separator).*/
-		/* Max length of "encoded-word" is 75 characters (without word separator).*/
-		/* 3 characters are taken by word separator "<CR><LF><Space>" which also includes the line separator.*/
-		/* 12 characters are taken by header "=?UTF-8?B?" and trailer "?=".*/
-		/* That leaves 60 characters for Base54 line */
-		/* or (60/4)*3 = 45 bytes before encoding. */
-		for (p1 = p0, c_len = 0; 46 > p1 + c_len - p0 && p1 + c_len <= src + src_len;)
+		/* Max length of line is 76 characters (without line separator). */
+		/* Max length of "encoded-word" is 75 characters (without word separator). */
+		/* 3 characters are taken by word separator "<CR><LF><Space>" which also includes the line separator. */
+		/* 12 characters are taken by header "=?UTF-8?B?" and trailer "?=". */
+		/* So, one "encoded-word" can hold up to 63 characters of Base64-encoded string. */
+		/* Encoding 45 bytes produces a 61 byte long Base64-encoded string which meets the limit. */
+		/* Encoding 46 bytes produces a 65 byte long Base64-encoded string which exceeds the limit. */
+		for (p1 = p0, c_len = 0; '\0' != *p1; p1 += c_len)
 		{
-			p1 += c_len;
-			if (0 == (c_len = zbx_utf8_char_len(p1)))
-				break;	/* invalid UTF-8 */
+			/* an invalid UTF-8 character or length of a string more than 45 bytes */
+			if (0 == (c_len = zbx_utf8_char_len(p1)) || 45 < p1 - p0 + c_len)
+				break;
 		}
 
-		if ( 0 < p1 - p0)
+		if (0 < p1 - p0)
 		{
-			str_base64_encode_dyn(p0, &b64_buf, p1 - p0);
+			/* 12 characters are taken by header "=?UTF-8?B?" and trailer "?=" plus '\0' */
+			char	b64_buf[ZBX_EMAIL_B64_MAXWORD_RFC2047 - 12 + 1];
 
-			if (1 == word_1)	/* first word ? */
+			str_base64_encode(p0, b64_buf, p1 - p0);
+
+			if (0 != p_base64_offset)	/* it not a first word ? */
 			{
-				zbx_snprintf_alloc(&subj, &subj_alloc, &subj_offset, "=?UTF-8?B?%s?=", b64_buf);
-				word_1 = 0;
-			}
-			else	/* not the 1st word */
-			{
-				zbx_snprintf_alloc(&subj, &subj_alloc, &subj_offset, "%s=?UTF-8?B?%s?=",
-						word_sep, b64_buf);
+				zbx_strcpy_alloc(p_base64, &p_base64_alloc, &p_base64_offset,
+						ZBX_EMAIL_ENCODED_WORD_SEPARATOR);
 			}
 
-			zbx_free(b64_buf);
+			zbx_snprintf_alloc(p_base64, &p_base64_alloc, &p_base64_offset, "=?UTF-8?B?%s?=", b64_buf);
 		}
 		else
 			break;
 	}
-	*p_base64 = subj;
 }
 
 /******************************************************************************
@@ -275,34 +266,12 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	if (FAIL == is_ascii_string(localsubject))
 	{
-		int	len;
+		/* split subject into multiple RFC 2047 "encoded-words" */
+		str_base64_encode_rfc2047(localsubject, &base64);
+		zbx_free(localsubject);
 
-		/* Encode the whole subject line to Base64 and see if it fits the max length.*/
-		/* Based on the patch sybmitted by Jairo Eduardo Lopez Fuentes Nacarino.*/
-		zbx_replace_invalid_utf8(localsubject);
-		str_base64_encode_dyn(localsubject, &base64, strlen(localsubject));
-		len = strlen(base64);
-
-		if (ZBX_EMAIL_B64_MAXLINE < len + 12)	/* 12 is the length of "=?UTF-8?B??="*/
-		{
-			/* split subject into multiple RFC 2047 "encoded-words" */
-			zbx_free(base64);
-			str_base64_encode_rfc2047(localsubject, &base64, strlen(localsubject));
-			zbx_free(localsubject);
-
-			localsubject = base64;
-			base64 = NULL;
-		}
-		else
-		{
-			zbx_free(localsubject);
-
-			len += 13;	/* 12 is the length of "=?UTF-8?B??=" + 1 (terminating '\0') */
-			localsubject = zbx_malloc(NULL, len);
-
-			zbx_snprintf(localsubject, len, "=?UTF-8?B?%s?=", base64);
-			zbx_free(base64);
-		}
+		localsubject = base64;
+		base64 = NULL;
 	}
 
 	/* prepare body */
