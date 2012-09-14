@@ -1950,33 +1950,29 @@ var sbox = Class.create(CDebug, {
 		if (!jQuery('#selection_box').length) {
 			this.dom_box = document.createElement('div');
 			this.dom_obj.appendChild(this.dom_box);
-
 			this.dom_period_span = document.createElement('span');
 			this.dom_box.appendChild(this.dom_period_span);
-
 			this.dom_period_span.setAttribute('id', 'period_span');
 			this.dom_period_span.innerHTML = this.period;
 
 			var dims = getDimensions(this.dom_obj);
+
 			this.shifts.left = dims.left;
 			this.shifts.top = dims.top;
 
-			var top = 0; // we use only x axis
-			var left = this.mouse_event.left - dims.left;
+			this.box.top = 0; // we use only x axis
+			this.box.left = this.mouse_event.left - dims.left;
+			this.box.height = this.cobj.height;
 
 			this.dom_box.setAttribute('id', 'selection_box');
-			this.dom_box.style.top = top + 'px';
-			this.dom_box.style.left = left + 'px';
+			this.dom_box.style.top = this.box.top + 'px';
+			this.dom_box.style.left = this.box.left + 'px';
 			this.dom_box.style.height = this.cobj.height + 'px';
 			this.dom_box.style.width = '1px';
 			this.dom_box.style.zIndex = 98;
 
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;
-
-			this.box.top = top;
-			this.box.left = left;
-			this.box.height = this.cobj.height;
 
 			if (IE) {
 				this.dom_box.onmousemove = this.mousemove.bindAsEventListener(this);
@@ -2081,13 +2077,15 @@ var sbox = Class.create(CDebug, {
 		if (dims.width > 0) {
 			this.dom_obj.style.width = dims.width + 'px';
 		}
+
 		this.cobj.top = posxy.top + ZBX_SBOX[this.sbox_id].shiftT;
 		this.cobj.left = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
 	},
 
 	optimizeEvent: function(e) {
 		if (e.pageX || e.pageY) {
-			this.mouse_event.left = e.pageX;
+			// absolute left shift
+			this.mouse_event.left = e.pageX - jQuery('#flickerfreescreen_' + jQuery(this.grphobj).attr('id')).position().left;
 			this.mouse_event.top = e.pageY;
 		}
 		else if (e.clientX || e.clientY) {
@@ -2126,17 +2124,17 @@ var sbox = Class.create(CDebug, {
 });
 
 function moveSBoxes() {
-	for (var key in ZBX_SBOX) {
-		if (empty(ZBX_SBOX[key]) || !isset('sbox', ZBX_SBOX[key])) {
+	for (var sbid in ZBX_SBOX) {
+		if (empty(ZBX_SBOX[sbid]) || !isset('sbox', ZBX_SBOX[sbid])) {
 			continue;
 		}
 
-		ZBX_SBOX[key].sbox.moveSBoxByObj();
+		ZBX_SBOX[sbid].sbox.moveSBoxByObj();
 	}
 }
 
 /**
- * optimization:
+ * Optimization:
  *
  * 86400 = 24 * 60 * 60
  * 31536000 = 365 * 86400
