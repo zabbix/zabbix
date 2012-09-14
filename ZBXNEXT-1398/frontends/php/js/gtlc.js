@@ -1751,6 +1751,8 @@ function sbox_init(sbid, timeline, domobjectid) {
 
 	// listeners
 	addListener(window, 'resize', moveSBoxes);
+	addListener(window, 'mouseup', mouseupSBoxes);
+
 	ZBX_SBOX[sbid].sbox.addListeners();
 
 	return ZBX_SBOX[sbid].sbox;
@@ -2130,6 +2132,16 @@ function moveSBoxes() {
 		}
 
 		ZBX_SBOX[sbid].sbox.moveSBoxByObj();
+	}
+}
+
+function mouseupSBoxes(e) {
+	for (var sbid in ZBX_SBOX) {
+		if (empty(ZBX_SBOX[sbid]) || !isset('sbox', ZBX_SBOX[sbid])) {
+			continue;
+		}
+
+		ZBX_SBOX[sbid].sbox.mouseup(e);
 	}
 }
 
