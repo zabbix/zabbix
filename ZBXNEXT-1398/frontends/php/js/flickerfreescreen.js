@@ -321,7 +321,7 @@ jQuery(function($) {
 			if (screen.isFlickerfree && screen.refreshInterval > 0) {
 				this.screens[screen.id].timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(screen.id, true); }, this.screens[screen.id].refreshInterval);
 			}
-		},
+		}
 	};
 
 	window.flickerfreeScreenShadow = {

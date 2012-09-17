@@ -245,13 +245,13 @@ var timeControl = {
 			period = ZBX_TIMELINES[timelineid].period();
 		if (isNaN(usertime) || isNaN(period)) {
 			// clean sbox'es
-			for (var objid in this.objectList) {
-				if (empty(this.objectList[objid])) {
+			for (var objectId in this.objectList) {
+				if (empty(this.objectList[objectId])) {
 					continue;
 				}
 
-				if (isset(objid, ZBX_SBOX)) {
-					ZBX_SBOX[objid].sbox.clear_params();
+				if (isset(objectId, ZBX_SBOX)) {
+					ZBX_SBOX[objectId].sbox.clear_params();
 				}
 			}
 
@@ -2137,11 +2137,9 @@ function moveSBoxes() {
 
 function mouseupSBoxes(e) {
 	for (var sbid in ZBX_SBOX) {
-		if (empty(ZBX_SBOX[sbid]) || !isset('sbox', ZBX_SBOX[sbid])) {
-			continue;
+		if (!empty(ZBX_SBOX[sbid]) && isset('sbox', ZBX_SBOX[sbid])) {
+			ZBX_SBOX[sbid].sbox.mouseup(e);
 		}
-
-		ZBX_SBOX[sbid].sbox.mouseup(e);
 	}
 }
 

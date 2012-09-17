@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,7 +32,8 @@ $screenWidget->addItem(BR());
 $screenBuilder = new CScreenBuilder(array(
 	'isFlickerfree' => false,
 	'screen' => $this->data['screen'],
-	'mode' => SCREEN_MODE_EDIT
+	'mode' => SCREEN_MODE_EDIT,
+	'updateProfile' => false
 ));
 $screenWidget->addItem($screenBuilder->show());
 
