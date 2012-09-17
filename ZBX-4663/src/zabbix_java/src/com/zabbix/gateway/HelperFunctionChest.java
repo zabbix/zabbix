@@ -34,18 +34,19 @@ class HelperFunctionChest
 
 	public static int separatorIndex(String input)
 	{
-		int substrPos, inputPos = 0;
-		String substr = input;
+		byte[] inputByteArray = input.getBytes();
+		int i, inputLength = inputByteArray.length;
 
-		while (-1 != (substrPos = substr.indexOf('.')))
+		for (i = 0; i < inputLength; i++)
 		{
-			if ('\\' != substr.charAt(substrPos - 1))
-				return inputPos + substrPos;
-
-			substrPos++;
-			substr = substr.substring(substrPos);
-
-			inputPos += substrPos;
+			if ('\\' == inputByteArray[i])
+			{
+				if (i + 1 < inputLength &&
+						('\\' == inputByteArray[i + 1] || '.' == inputByteArray[i + 1]))
+					i++;
+			}
+			else if ('.' == inputByteArray[i])
+				return i;
 		}
 
 		return -1;
@@ -55,11 +56,11 @@ class HelperFunctionChest
 	{
 		byte[] inputByteArray = input.getBytes(), outputByteArray;
 		ArrayList<Byte> outputByteList = new ArrayList<Byte>();
-		int i;
+		int i, inputLength = inputByteArray.length;
 
-		for (i = 0; i < inputByteArray.length; i++)
+		for (i = 0; i < inputLength; i++)
 		{
-			if (i + 1 < inputByteArray.length && '\\' == inputByteArray[i] &&
+			if ('\\' == inputByteArray[i] && i + 1 < inputLength &&
 					('\\' == inputByteArray[i + 1] || '.' == inputByteArray[i + 1]))
 			{
 				i++;

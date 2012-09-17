@@ -126,8 +126,6 @@ class JMXItemChecker extends ItemChecker
 			String fieldNames = "";
 			int sep;
 
-			logger.trace("looking for the value of '{},{}'", objectName, attributeName);
-
 			//
 			// Attribute name and composite data field names are separated by dots. On the other hand the
 			// name may contain a dot too. In this case user needs to escape it with a backslash. Also the
