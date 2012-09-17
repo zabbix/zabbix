@@ -37,9 +37,9 @@ class HelperFunctionChest
 		int substrPos, inputPos = 0;
 		String substr = input;
 
-		while ((substrPos = substr.indexOf('.')) != -1)
+		while (-1 != (substrPos = substr.indexOf('.')))
 		{
-			if (substr.charAt(substrPos - 1) != '\\')
+			if ('\\' != substr.charAt(substrPos - 1))
 				return inputPos + substrPos;
 
 			substrPos++;
@@ -59,9 +59,11 @@ class HelperFunctionChest
 
 		for (i = 0; i < inputByteArray.length; i++)
 		{
-			if (i + 1 < inputByteArray.length && inputByteArray[i] == '\\' &&
-					(inputByteArray[i + 1] == '\\' || inputByteArray[i + 1] == '.'))
+			if (i + 1 < inputByteArray.length && '\\' == inputByteArray[i] &&
+					('\\' == inputByteArray[i + 1] || '.' == inputByteArray[i + 1]))
+			{
 				i++;
+			}
 
 			outputByteList.add(inputByteArray[i]);
 		}
