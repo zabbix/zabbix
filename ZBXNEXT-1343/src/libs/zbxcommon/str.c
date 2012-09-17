@@ -2453,14 +2453,12 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
 }
 
-const char	*zbx_permission_string(int perm)
+const char	*zbx_permission_string(unsigned char perm)
 {
 	switch (perm)
 	{
 		case PERM_DENY:
 			return "dn";
-		case PERM_READ_LIST:
-			return "rl";
 		case PERM_READ_ONLY:
 			return "ro";
 		case PERM_READ_WRITE:

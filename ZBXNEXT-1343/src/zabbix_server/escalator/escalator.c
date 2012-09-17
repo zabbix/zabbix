@@ -102,7 +102,8 @@ static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 	const char	*__function_name = "get_host_permission";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		user_type = -1, perm = PERM_DENY;
+	int		user_type = -1;
+	unsigned char	perm = PERM_DENY;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -119,7 +120,7 @@ static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 
 	if (USER_TYPE_SUPER_ADMIN == user_type)
 	{
-		perm = PERM_MAX;
+		perm = PERM_READ_WRITE;
 		goto out;
 	}
 
@@ -133,7 +134,7 @@ static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 			hostid, userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
-		perm = atoi(row[0]);
+		perm = (unsigned char)atoi(row[0]);
 
 	DBfree_result(result);
 out:

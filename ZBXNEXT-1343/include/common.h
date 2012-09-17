@@ -545,16 +545,10 @@ typedef enum
 	USER_TYPE_SUPER_ADMIN
 } zbx_user_type_t;
 
-typedef enum
-{
-	PERM_DENY = 0,
-	PERM_READ_LIST,
-	PERM_READ_ONLY,
-	PERM_READ_WRITE,
-	PERM_MAX = 3
-} zbx_user_permission_t;
-
-const char	*zbx_permission_string(int perm);
+#define PERM_DENY	0
+#define PERM_READ_ONLY	2
+#define PERM_READ_WRITE	3
+const char	*zbx_permission_string(unsigned char perm);
 
 typedef struct
 {
