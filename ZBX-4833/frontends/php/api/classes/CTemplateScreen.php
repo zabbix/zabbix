@@ -584,8 +584,8 @@ class CTemplateScreen extends CScreen {
 	}
 
 	function copy($data) {
-		$screenIds = $data['screenIds'];
-		$templateIds = $data['templateIds'];
+		$screenIds = $data['screenIds'] = zbx_toArray($data['screenIds']);
+		$templateIds = $data['templateIds'] = zbx_toArray($data['templateIds']);
 
 		$this->validateCopy($data);
 
@@ -787,7 +787,7 @@ class CTemplateScreen extends CScreen {
 
 		$screens = $this->get(array(
 			'screenids' => $screenIds,
-			'output' => array('screenid', 'name'),
+			'output' => array('screenid', 'name', 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		));

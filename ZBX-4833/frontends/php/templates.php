@@ -310,7 +310,7 @@ elseif (isset($_REQUEST['save'])) {
 			if ($screens) {
 				$screensCopied = API::TemplateScreen()->copy(array(
 					'screenIds' => zbx_objectValues($screens, 'screenid'),
-					'templateIds' => array($templateid)
+					'templateIds' => $templateid
 				));
 				if (!$screensCopied) {
 					throw new Exception();
