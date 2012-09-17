@@ -199,7 +199,7 @@
 		$lists['host']['read_only']->setAttribute('style', 'background: #EBEFF2;');
 		$lists['host']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
-		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type);
 
 		foreach ($hosts as $host) {
 			switch($host['permission']) {

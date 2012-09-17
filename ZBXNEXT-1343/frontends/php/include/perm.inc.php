@@ -247,15 +247,11 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 	$rights[i]['permission']= permission for resource
 	$rights[i]['id']	= resource id
 */
-function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res = null) {
-	if ($perm == PERM_READ_LIST) {
-		$perm = PERM_READ_ONLY;
-	}
-
+function get_accessible_hosts_by_rights(&$rights, $user_type) {
 	$result = array();
 	$res_perm = array();
 
-	foreach ($rights as $id => $right) {
+	foreach ($rights as $right) {
 		$res_perm[$right['id']] = $right['permission'];
 	}
 
@@ -300,17 +296,11 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 			}
 		}
 
-		if ($host_data['permission'] < $perm) {
+		if ($host_data['permission'] < PERM_DENY) {
 			continue;
 		}
 
-		switch ($perm_res) {
-			case PERM_RES_DATA_ARRAY:
-				$result[$host_data['hostid']] = $host_data;
-				break;
-			default:
-				$result[$host_data['hostid']] = $host_data['hostid'];
-		}
+		$result[$host_data['hostid']] = $host_data;
 	}
 
 	return $result;
