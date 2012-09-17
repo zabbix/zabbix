@@ -1,3 +1,11 @@
+Changes for 2.0.4
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.3rc1
 
 New features:
