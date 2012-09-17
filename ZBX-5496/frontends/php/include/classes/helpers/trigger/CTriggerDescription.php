@@ -347,15 +347,17 @@ class CTriggerDescription {
 							' AND n.main=1'.
 							' AND '.DBcondition('n.type', array_keys($priorities))
 			);
-			$priority = 0;
+			// macro should be resolved to interface with highest priority ($priorities)
+			$interfaces = array();
 			while ($dbInterface = DBfetch($dbInterfaces)) {
-				if ($priority >= $priorities[$dbInterface['type']]) {
+				if (isset($interfaces[$dbInterface['functionid']])
+						&& $priorities[$interfaces[$dbInterface['functionid']]['type']] > $priorities[$dbInterface['functionid']['type']]) {
 					continue;
 				}
-				$priority = $priorities[$dbInterface['type']];
-				$interface = $dbInterface;
+				$interfaces[$dbInterface['functionid']] = $dbInterface;
 			}
-			if (!empty($interface)) {
+
+			foreach ($interfaces as $interface) {
 				foreach ($expandIp[$interface['functionid']] as $macro => $fNum) {
 					switch ($macro) {
 						case 'IPADDRESS':
