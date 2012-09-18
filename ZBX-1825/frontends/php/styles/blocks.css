@@ -339,7 +339,7 @@ div.calendar input.calendar_textbox {
 	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;
 	margin: 0;
 }
-.pum_oheader:hover { cursor:pointer; text-decoration: none; }
+.pum_oheader:hover { text-decoration: none; }
 .pum_iheader { color: #FFFFFF; font-weight: bold; margin: 3px 0 0 8px; }
 
 /**************** HINT BOX *****************/
