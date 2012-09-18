@@ -586,7 +586,7 @@ class FrontendSetup {
 			'current' => $current ? _('no') : _('yes'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Need to disable session auto start (configuration option "session.auto_start")')
+			'error' => _('Let\'s make that "PHP session auto start must be disabled (PHP directive "session.auto_start")')
 		);
 
 		return $result;
