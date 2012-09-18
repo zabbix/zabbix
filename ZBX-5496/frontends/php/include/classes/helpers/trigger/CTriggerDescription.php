@@ -468,7 +468,7 @@ class CTriggerDescription {
 							$replace = false;
 						}
 
-						if ($replace) {
+						if ($replace !== false) {
 							$trigger['description'] = zbx_substr_replace(
 								$trigger['description'],
 								$replace,
