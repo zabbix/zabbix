@@ -65,7 +65,6 @@ class CTableInfo extends CTable {
 									"transform-origin": transform,
 									"-webkit-transform-origin": transform,
 									"-moz-transform-origin": transform,
-									"-ms-transform-origin": transform,
 									"-o-transform-origin": transform
 								})
 								.append(span.text());
