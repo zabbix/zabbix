@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/administration.general.valuemapping.edit.js.php');
 
 $valueMappingForm = new CForm();
@@ -72,4 +72,3 @@ else {
 }
 
 return $valueMappingForm;
-?>
