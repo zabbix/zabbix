@@ -17,50 +17,57 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
-class czbxrpc{
+
+class czbxrpc {
 
 	public static $useExceptions = false;
 	private static $transactionStarted = false;
 
 
-	public static function call($method, $params, $sessionid=null) {
-// List of methods without params
+	public static function call($method, $params, $sessionid = null) {
+		// List of methods without params
 		$notifications = array(
-			'apiinfo.version' => 1
+			'apiinfo.version' => 1,
+			'user.logout' => 1
 		);
-//-----
 
-// list of methods which does not require authentication
+		if (is_null($params) && !isset($notifications[$method])) {
+			return array(
+				'error' => ZBX_API_ERROR_PARAMETERS,
+				'data' => _('Empty parameters')
+			);
+		}
+
+		// list of methods which does not require authentication
 		$withoutAuth = array(
 			'user.login' => 1,
-			'user.logout' => 1,
 			'user.checkAuthentication' => 1,
 			'apiinfo.version' => 1
 		);
-//-----
-
-		if (is_null($params) && !isset($notifications[$method])) {
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => _('Empty parameters'));
-		}
-
-// Authentication {{{
+		// Authentication
 		if (!isset($withoutAuth[$method]) || !zbx_empty($sessionid)) {
-// compatibility mode
-			if ($method == 'user.authenticate') $method = 'user.login';
+			// compatibility mode
+			if ($method == 'user.authenticate') {
+				$method = 'user.login';
+			}
 
 			if (!zbx_empty($sessionid)) {
 				$usr = self::callAPI('user.checkAuthentication', $sessionid);
-				if (!isset($usr['result']))
-					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
+				if (!isset($usr['result'])) {
+					return array(
+						'error' => ZBX_API_ERROR_NO_AUTH,
+						'data' => _('Not authorized')
+					);
+				}
 			}
 			elseif (!isset($withoutAuth[$method])) {
-				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
+				return array(
+					'error' => ZBX_API_ERROR_NO_AUTH,
+					'data' => _('Not authorized')
+				);
 			}
 		}
-// }}} Authentication
 
 		return self::callAPI($method, $params);
 	}
@@ -81,30 +88,36 @@ class czbxrpc{
 		}
 	}
 
-	private static function callJSON($method, $params) {
-		// http bla bla
-	}
-
 	private static function callAPI($method, $params) {
-		if (is_array($params))
+		if (is_array($params)) {
 			unset($params['nopermissions']);
+		}
 
 		list($resource, $action) = explode('.', $method);
 
 		$class_name = API::getObjectClassName($resource);
 		if (!class_exists($class_name)) {
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
+			return array(
+				'error' => ZBX_API_ERROR_PARAMETERS,
+				'data' => 'Resource ('.$resource.') does not exist'
+			);
 		}
 
 		if (!method_exists($class_name, $action)) {
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
+			return array(
+				'error' => ZBX_API_ERROR_PARAMETERS,
+				'data' => 'Action ('.$action.') does not exist'
+			);
 		}
 
-		try{
+		try {
 			self::transactionBegin();
 			API::setReturnAPI();
 
-			$result = call_user_func(array(API::getObject($resource), $action), $params);
+			$result = call_user_func(array(
+				API::getObject($resource),
+				$action
+			), $params);
 
 			API::setReturnRPC();
 			self::transactionEnd(true);
@@ -140,6 +153,4 @@ class czbxrpc{
 			}
 		}
 	}
-
 }
-?>

@@ -867,10 +867,10 @@ class CUser extends CZBXAPI {
 		}
 	}
 
-	public function logout(array $data) {
+	public function logout() {
 		global $ZBX_LOCALNODEID;
 
-		$sessionId = $data['sessionId'];
+		$sessionId = CWebUser::$data['sessionid'];
 
 		$session = DBfetch(DBselect(
 			'SELECT s.userid'.
