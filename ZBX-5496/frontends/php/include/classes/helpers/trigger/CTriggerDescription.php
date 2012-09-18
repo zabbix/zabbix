@@ -351,7 +351,7 @@ class CTriggerDescription {
 			$interfaces = array();
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				if (isset($interfaces[$dbInterface['functionid']])
-						&& $priorities[$interfaces[$dbInterface['functionid']]['type']] > $priorities[$dbInterface['functionid']['type']]) {
+						&& $priorities[$interfaces[$dbInterface['functionid']]['type']] > $priorities[$dbInterface['type']]) {
 					continue;
 				}
 				$interfaces[$dbInterface['functionid']] = $dbInterface;
