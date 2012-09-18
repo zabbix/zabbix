@@ -1,3 +1,11 @@
+Changes for 2.0.2rc2
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-5414] fixed handling of an incorrect username/password of SNMPv3 checks (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.3rc1
 
 New features:
