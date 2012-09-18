@@ -38,7 +38,7 @@ zbx_history_field_t;
 
 typedef struct
 {
-	const char		*table, *lastfieldname;
+	const char		*table, *lastidfield;
 	zbx_history_field_t	fields[ZBX_MAX_FIELDS];
 }
 zbx_history_table_t;
@@ -1170,16 +1170,16 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	proxy_get_lastid(const char *table_name, const char *lastfieldname, zbx_uint64_t *lastid)
+static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zbx_uint64_t *lastid)
 {
 	const char	*__function_name = "proxy_get_lastid";
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() field:'%s.%s'", __function_name, table_name, lastfieldname);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() field:'%s.%s'", __function_name, table_name, lastidfield);
 
 	result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
-			table_name, lastfieldname);
+			table_name, lastidfield);
 
 	if (NULL == (row = DBfetch(result)))
 		*lastid = 0;
@@ -1197,29 +1197,29 @@ static void	proxy_get_lastid(const char *table_name, const char *lastfieldname, 
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	proxy_set_lastid(const char *table_name, const char *lastfieldname, const zbx_uint64_t lastid)
+static void	proxy_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
 {
 	const char	*__function_name = "proxy_set_lastid";
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s:" ZBX_FS_UI64 "]",
-			__function_name, table_name, lastfieldname, lastid);
+			__function_name, table_name, lastidfield, lastid);
 
 	result = DBselect("select 1 from ids where table_name='%s' and field_name='%s'",
-			table_name, lastfieldname);
+			table_name, lastidfield);
 
 	if (NULL == (row = DBfetch(result)))
 	{
 		DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
 				"values (0,'%s','%s'," ZBX_FS_UI64 ")",
-				table_name, lastfieldname, lastid);
+				table_name, lastidfield, lastid);
 	}
 	else
 	{
 		DBexecute("update ids set nextid=" ZBX_FS_UI64
 				" where table_name='%s' and field_name='%s'",
-				lastid, table_name, lastfieldname);
+				lastid, table_name, lastidfield);
 	}
 	DBfree_result(result);
 
@@ -1233,17 +1233,19 @@ void	proxy_set_hist_lastid(const zbx_uint64_t lastid)
 
 void	proxy_set_dhis_lastid(const zbx_uint64_t lastid)
 {
-	proxy_set_lastid(dht.table, dht.lastfieldname, lastid);
+	proxy_set_lastid(dht.table, dht.lastidfield, lastid);
 }
 
 void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
 {
-	proxy_set_lastid(areg.table, areg.lastfieldname, lastid);
+	proxy_set_lastid(areg.table, areg.lastidfield, lastid);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: proxy_get_history_data_simple                                    *
+ *                                                                            *
+ * Purpose: Get history data from the database.                               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1262,7 +1264,7 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 
 	*lastid = 0;
 
-	proxy_get_lastid(ht->table, ht->lastfieldname, &id);
+	proxy_get_lastid(ht->table, ht->lastidfield, &id);
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select id");
 
@@ -1302,6 +1304,9 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 /******************************************************************************
  *                                                                            *
  * Function: proxy_get_history_data                                           *
+ *                                                                            *
+ * Purpose: Get history data from the database. Get items configuration from  *
+ *          cache to speed things up.                                         *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
