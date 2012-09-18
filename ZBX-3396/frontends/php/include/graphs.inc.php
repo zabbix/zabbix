@@ -709,51 +709,8 @@ function imageTextSize($fontsize, $angle, $string) {
 		$result['baseline'] = $ar[1];
 	}
 	else {
-		switch($fontsize) {
-			case 5:
-				$fontsize = 1;
-				break;
-			case 6:
-				$fontsize = 1;
-				break;
-			case 7:
-				$fontsize = 2;
-				break;
-			case 8:
-				$fontsize = 2;
-				break;
-			case 9:
-				$fontsize = 3;
-				break;
-			case 10:
-				$fontsize = 3;
-				break;
-			case 11:
-				$fontsize = 4;
-				break;
-			case 12:
-				$fontsize = 4;
-				break;
-			case 13:
-				$fontsize = 5;
-				break;
-			case 14:
-				$fontsize = 5;
-				break;
-			default:
-				$fontsize = 2;
-				break;
-		}
-
-		if ($angle) {
-			$result['width'] = imagefontheight($fontsize);
-			$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
-		}
-		else {
-			$result['height'] = imagefontheight($fontsize);
-			$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
-		}
-		$result['baseline'] = 0;
+		show_error_message(_('PHP gd FreeType support missing'));
+		return false;
 	}
 
 	return $result;
