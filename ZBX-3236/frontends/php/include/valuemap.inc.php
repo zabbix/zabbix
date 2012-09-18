@@ -122,9 +122,6 @@ function checkValueMapMappings(array $mappings) {
 	}
 
 	foreach ($mappings as $mapping) {
-		if (!zbx_is_int($mapping['value'])) {
-			throw new Exception(_('Value maps are used to create a mapping between numeric values and string representations.'));
-		}
 		if (zbx_empty($mapping['newvalue'])) {
 			throw new Exception(_('Value cannot be mapped to empty string.'));
 		}
