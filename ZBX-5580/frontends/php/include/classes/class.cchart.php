@@ -1571,7 +1571,7 @@ class CChart extends CGraphDraw {
 	 */
 	protected function getYStepMarkerValueOffset($yAxis, $stepNumber) {
 		$step = $this->gridStep[$yAxis];
-		$minY = $this->m_minY[$yAxis];
+		$minY = abs($this->m_minY[$yAxis]);
 
 		$offset = 0;
 		if ($stepNumber > 0 && $minY) {
