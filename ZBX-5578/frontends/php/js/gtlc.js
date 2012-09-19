@@ -241,8 +241,22 @@ var timeControl = {
 			throw('timeControl: Object is not declared "' + objid + '".');
 		}
 
-		var usertime = ZBX_TIMELINES[timelineid].usertime();
-		var period = ZBX_TIMELINES[timelineid].period();
+		var usertime = ZBX_TIMELINES[timelineid].usertime(),
+			period = ZBX_TIMELINES[timelineid].period();
+		if (isNaN(usertime) || isNaN(period)) {
+			// clean sbox'es
+			for (var objectId in this.objectList) {
+				if (empty(this.objectList[objectId])) {
+					continue;
+				}
+
+				if (isset(objectId, ZBX_SBOX)) {
+					ZBX_SBOX[objectId].sbox.clear_params();
+				}
+			}
+
+			return;
+		}
 
 		if (ZBX_TIMELINES[timelineid].now() || ZBX_TIMELINES[timelineid].isNow()) {
 			usertime += 31536000; // 31536000 = 86400 * 365 = 1 year
@@ -328,6 +342,7 @@ var timeControl = {
 		ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
 		ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
 		ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
+		ZBX_SBOX[obj.domid].additionShiftL = 0;
 
 		var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
 		sbox.onchange = this.objectUpdate.bind(this);
@@ -1194,8 +1209,12 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setTabInfo: function() {
-		var period = this.timeline.period();
-		var usertime = this.timeline.usertime();
+		var period = this.timeline.period(),
+			usertime = this.timeline.usertime();
+		if (isNaN(period) || isNaN(usertime)) {
+			return;
+		}
+
 		var userstarttime = usertime - period;
 
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
@@ -1220,15 +1239,8 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	dateToArray: function(unixtime) {
-		var date = new CDate(unixtime * 1000);
-		var dateArray = [];
-
-		dateArray[0] = date.getDate();
-		dateArray[1] = date.getMonth() + 1;
-		dateArray[2] = date.getFullYear();
-		dateArray[3] = date.getHours();
-		dateArray[4] = date.getMinutes();
-		dateArray[5] = date.getSeconds();
+		var date = new CDate(unixtime * 1000),
+			dateArray = [date.getDate(), date.getMonth() + 1, date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds()];
 
 		for (var i = 0; i < dateArray.length; i++) {
 			if ((dateArray[i] + '').length < 2) {
@@ -1257,7 +1269,7 @@ var CScrollBar = Class.create(CDebug, {
 		if (IE) {
 			document.selection.empty();
 		}
-		else if (!KQ) {
+		else {
 			var sel = window.getSelection();
 			sel.removeAllRanges();
 		}
@@ -1740,9 +1752,8 @@ function sbox_init(sbid, timeline, domobjectid) {
 
 	// listeners
 	addListener(window, 'resize', moveSBoxes);
-	if (KQ) {
-		setTimeout('ZBX_SBOX[' + sbid + '].sbox.moveSBoxByObj(' + sbid + ');', 500);
-	}
+	addListener(window, 'mouseup', mouseupSBoxes);
+
 	ZBX_SBOX[sbid].sbox.addListeners();
 
 	return ZBX_SBOX[sbid].sbox;
@@ -1789,6 +1800,7 @@ var sbox = Class.create(CDebug, {
 			return;
 		}
 
+
 		var obj = $(this.sbox_id);
 
 		if (is_null(obj)) {
@@ -1805,7 +1817,7 @@ var sbox = Class.create(CDebug, {
 		if (IE) {
 			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
 			sbox.grphobj.onmousemove = this.mousemove.bindAsEventListener(this);
-			jQuery(sbox.grphobj).click(jQuery.proxy(sbox.ieMouseClick, this));
+			jQuery('#flickerfreescreen_' + this.sbox_id).find('a').click(jQuery.proxy(sbox.ieMouseClick, this));
 			jQuery(sbox.grphobj).mouseup(jQuery.proxy(sbox.mouseup, this));
 		}
 		else {
@@ -1826,24 +1838,11 @@ var sbox = Class.create(CDebug, {
 			return false;
 		}
 
-		Event.stop(e);
+		cancelEvent(e);
 
 		if (!ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			this.optimizeEvent(e);
-
 			deselectAll();
-
-			if (IE) {
-				var posxy = getPosition(this.dom_obj);
-
-				if (this.mouse_event.left < posxy.left || (this.mouse_event.left > (posxy.left + this.dom_obj.offsetWidth))) {
-					return false;
-				}
-				if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-					return true;
-				}
-			}
-
 			this.create_box();
 
 			ZBX_SBOX[this.sbox_id].sbox.is_active = true;
@@ -1887,13 +1886,13 @@ var sbox = Class.create(CDebug, {
 			return true;
 		}
 
-		Event.stop(e);
+		cancelEvent(e);
 	},
 
 	onselect: function() {
 		this.px2time = this.timeline.period() / this.cobj.width;
 		var userstarttime = this.timeline.usertime() - this.timeline.period();
-		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
+		userstarttime += Math.round((this.box.left - (ZBX_SBOX[this.sbox_id].additionShiftL - this.shifts.left)) * this.px2time);
 		var new_period = this.calcperiod();
 
 		if (this.start_event.left < this.mouse_event.left) {
@@ -1942,33 +1941,29 @@ var sbox = Class.create(CDebug, {
 		if (!jQuery('#selection_box').length) {
 			this.dom_box = document.createElement('div');
 			this.dom_obj.appendChild(this.dom_box);
-
 			this.dom_period_span = document.createElement('span');
 			this.dom_box.appendChild(this.dom_period_span);
-
 			this.dom_period_span.setAttribute('id', 'period_span');
 			this.dom_period_span.innerHTML = this.period;
 
 			var dims = getDimensions(this.dom_obj);
+
 			this.shifts.left = dims.left;
 			this.shifts.top = dims.top;
 
-			var top = 0; // we use only x axis
-			var left = this.mouse_event.left - dims.left;
+			this.box.top = 0; // we use only x axis
+			this.box.left = this.mouse_event.left - dims.left;
+			this.box.height = this.cobj.height;
 
 			this.dom_box.setAttribute('id', 'selection_box');
-			this.dom_box.style.top = top + 'px';
-			this.dom_box.style.left = left + 'px';
+			this.dom_box.style.top = this.box.top + 'px';
+			this.dom_box.style.left = this.box.left + 'px';
 			this.dom_box.style.height = this.cobj.height + 'px';
 			this.dom_box.style.width = '1px';
 			this.dom_box.style.zIndex = 98;
 
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;
-
-			this.box.top = top;
-			this.box.left = left;
-			this.box.height = this.cobj.height;
 
 			if (IE) {
 				this.dom_box.onmousemove = this.mousemove.bindAsEventListener(this);
@@ -1977,31 +1972,29 @@ var sbox = Class.create(CDebug, {
 	},
 
 	resizebox: function() {
-		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
-			// fix wrong selection box
-			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-				this.moveright(this.cobj.width - this.start_event.left - this.cobj.left);
-			}
-			else if (this.mouse_event.left < this.cobj.left) {
-				this.moveleft(this.cobj.left, this.start_event.left - this.cobj.left);
+		// fix wrong selection box
+		if (this.mouse_event.left > (this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL)) {
+			this.moveright(this.cobj.width - this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL);
+		}
+		else if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
+			this.moveleft(ZBX_SBOX[this.sbox_id].additionShiftL, this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL);
+		}
+		else {
+			var width = this.validateW(this.mouse_event.left - this.start_event.left);
+			var left = this.mouse_event.left - this.shifts.left;
+
+			if (width > 0) {
+				this.moveright(width);
 			}
 			else {
-				var width = this.validateW(this.mouse_event.left - this.start_event.left);
-				var left = this.mouse_event.left - this.shifts.left;
-
-				if (width > 0) {
-					this.moveright(width);
-				}
-				else {
-					this.moveleft(left, width);
-				}
+				this.moveleft(left, width);
 			}
+		}
 
-			this.period = this.calcperiod();
+		this.period = this.calcperiod();
 
-			if (!is_null(this.dom_box)) {
-				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
-			}
+		if (!is_null(this.dom_box)) {
+			this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
 		}
 	},
 
@@ -2043,10 +2036,10 @@ var sbox = Class.create(CDebug, {
 	},
 
 	validateW: function(w) {
-		if ((this.start_event.left - this.cobj.left + w) > this.cobj.width) {
+		if ((this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL + w) > this.cobj.width) {
 			w = 0;
 		}
-		if (this.mouse_event.left < this.cobj.left) {
+		if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
 			w = 0;
 		}
 
@@ -2073,13 +2066,15 @@ var sbox = Class.create(CDebug, {
 		if (dims.width > 0) {
 			this.dom_obj.style.width = dims.width + 'px';
 		}
+
 		this.cobj.top = posxy.top + ZBX_SBOX[this.sbox_id].shiftT;
-		this.cobj.left = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
+		ZBX_SBOX[this.sbox_id].additionShiftL = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
 	},
 
 	optimizeEvent: function(e) {
 		if (e.pageX || e.pageY) {
-			this.mouse_event.left = e.pageX;
+			// absolute left shift
+			this.mouse_event.left = e.pageX - jQuery('#flickerfreescreen_' + jQuery(this.grphobj).attr('id')).position().left;
 			this.mouse_event.top = e.pageY;
 		}
 		else if (e.clientX || e.clientY) {
@@ -2090,11 +2085,11 @@ var sbox = Class.create(CDebug, {
 		this.mouse_event.left = parseInt(this.mouse_event.left);
 		this.mouse_event.top = parseInt(this.mouse_event.top);
 
-		if (this.mouse_event.left < this.cobj.left) {
-			this.mouse_event.left = this.cobj.left;
+		if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
+			this.mouse_event.left = ZBX_SBOX[this.sbox_id].additionShiftL;
 		}
-		else if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-			this.mouse_event.left = this.cobj.width + this.cobj.left;
+		else if (this.mouse_event.left > (this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL)) {
+			this.mouse_event.left = this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL;
 		}
 	},
 
@@ -2118,17 +2113,25 @@ var sbox = Class.create(CDebug, {
 });
 
 function moveSBoxes() {
-	for (var key in ZBX_SBOX) {
-		if (empty(ZBX_SBOX[key]) || !isset('sbox', ZBX_SBOX[key])) {
+	for (var sbid in ZBX_SBOX) {
+		if (empty(ZBX_SBOX[sbid]) || !isset('sbox', ZBX_SBOX[sbid])) {
 			continue;
 		}
 
-		ZBX_SBOX[key].sbox.moveSBoxByObj();
+		ZBX_SBOX[sbid].sbox.moveSBoxByObj();
+	}
+}
+
+function mouseupSBoxes(e) {
+	for (var sbid in ZBX_SBOX) {
+		if (!empty(ZBX_SBOX[sbid]) && isset('sbox', ZBX_SBOX[sbid])) {
+			ZBX_SBOX[sbid].sbox.mouseup(e);
+		}
 	}
 }
 
 /**
- * optimization:
+ * Optimization:
  *
  * 86400 = 24 * 60 * 60
  * 31536000 = 365 * 86400
@@ -2169,8 +2172,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		}
 	}
 
-	var str = '';
-	str += (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
+	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
 	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
 	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
 	str += (isExtend && isTsDouble)

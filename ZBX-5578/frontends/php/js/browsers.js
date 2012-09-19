@@ -18,23 +18,24 @@
 **/
 
 
-var agt = navigator.userAgent.toLowerCase();
-var OP = (agt.indexOf('opera') != -1) && window.opera;
-var IE = (agt.indexOf('msie') != -1) && document.all && !OP;
-var IE9 = (agt.indexOf('msie 9.0') != -1) && document.all && !OP;
-var IE8 = (agt.indexOf('msie 8.0') != -1) && document.all && !OP;
-var IE7 = (agt.indexOf('msie 7.0') != -1) && document.all && !OP;
-var IE6 = (agt.indexOf('msie 6.0') != -1) && document.all && !OP;
-var CR = (agt.indexOf('chrome') != -1);
-var SF = (agt.indexOf('safari') != -1) && !CR;
-var WK = (agt.indexOf('applewebkit') != -1);
-var KQ = (agt.indexOf('khtml') != -1) && !WK;
-var GK = (agt.indexOf('gecko') != -1) && !KQ && !WK;
-var MC = (agt.indexOf('mac') != -1);
+var agt = navigator.userAgent.toLowerCase(),
+	OP = (agt.indexOf('opera') != -1) && window.opera,
+	IE = (agt.indexOf('msie') != -1) && document.all && !OP,
+	IE10 = (agt.indexOf('msie 10.0') != -1) && document.all && !OP,
+	IE9 = (agt.indexOf('msie 9.0') != -1) && document.all && !OP,
+	IE8 = (agt.indexOf('msie 8.0') != -1) && document.all && !OP,
+	IE7 = (agt.indexOf('msie 7.0') != -1) && document.all && !OP,
+	IE6 = (agt.indexOf('msie 6.0') != -1) && document.all && !OP,
+	CR = (agt.indexOf('chrome') != -1),
+	SF = (agt.indexOf('safari') != -1) && !CR,
+	WK = (agt.indexOf('applewebkit') != -1),
+	KQ = (agt.indexOf('khtml') != -1) && !WK,
+	GK = (agt.indexOf('gecko') != -1) && !KQ && !WK,
+	MC = (agt.indexOf('mac') != -1);
 
 // redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
-	if (IE6 || IE7) {
+	if (IE6 || IE7 || KQ) {
 		window.location.replace('browserwarning.php');
 	}
 }

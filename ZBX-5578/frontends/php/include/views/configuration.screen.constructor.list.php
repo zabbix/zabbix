@@ -32,7 +32,8 @@ $screenWidget->addItem(BR());
 $screenBuilder = new CScreenBuilder(array(
 	'isFlickerfree' => false,
 	'screen' => $this->data['screen'],
-	'mode' => SCREEN_MODE_EDIT
+	'mode' => SCREEN_MODE_EDIT,
+	'updateProfile' => false
 ));
 $screenWidget->addItem($screenBuilder->show());
 
