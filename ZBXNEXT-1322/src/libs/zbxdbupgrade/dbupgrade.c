@@ -324,6 +324,9 @@ int	DBcheck_version()
 
 		DBend(ret);
 
+		if (SUCCEED != ret)
+			break;
+
 		current++;
 		completed = (int)(100.0 * current / total);
 		if (last_completed != completed)
@@ -331,9 +334,6 @@ int	DBcheck_version()
 			zabbix_log(LOG_LEVEL_WARNING, "completed %d%% of database upgrade", completed);
 			last_completed = completed;
 		}
-
-		if (SUCCEED != ret)
-			break;
 	}
 
 	if (SUCCEED == ret)
