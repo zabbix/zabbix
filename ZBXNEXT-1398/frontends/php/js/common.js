@@ -163,7 +163,7 @@ function cancelEvent(e) {
 		e = window.event;
 	}
 
-	if (e) {
+	if (!empty(e)) {
 		if (IE) {
 			e.cancelBubble = true;
 			e.returnValue = false;

@@ -82,7 +82,7 @@ class CTableInfo extends CTable {
 								width = cell.width();
 
 							if (width > 30) {
-								cell.children().css({position: "relative", left: (width / 2 - 10)});
+								cell.children().css({position: "relative", left: (width / 2 - 12)});
 							}
 						});
 					};
@@ -90,6 +90,10 @@ class CTableInfo extends CTable {
 
 				jQuery(document).ready(function() {
 					jQuery(".'.$this->getAttribute('class').'").makeVerticalRotation();
+
+					if (IE8) {
+						jQuery(".vertical_rotation_inner").css("filter", "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)");
+					}
 				});'
 			, true);
 		}

@@ -342,6 +342,7 @@ var timeControl = {
 		ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
 		ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
 		ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
+		ZBX_SBOX[obj.domid].additionShiftL = 0;
 
 		var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
 		sbox.onchange = this.objectUpdate.bind(this);
@@ -1815,7 +1816,7 @@ var sbox = Class.create(CDebug, {
 		if (IE) {
 			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
 			sbox.grphobj.onmousemove = this.mousemove.bindAsEventListener(this);
-			jQuery(sbox.grphobj).click(jQuery.proxy(sbox.ieMouseClick, this));
+			jQuery('#flickerfreescreen_' + this.sbox_id).find('a').click(jQuery.proxy(sbox.ieMouseClick, this));
 			jQuery(sbox.grphobj).mouseup(jQuery.proxy(sbox.mouseup, this));
 		}
 		else {
@@ -1836,24 +1837,11 @@ var sbox = Class.create(CDebug, {
 			return false;
 		}
 
-		Event.stop(e);
+		cancelEvent(e);
 
 		if (!ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			this.optimizeEvent(e);
-
 			deselectAll();
-
-			if (IE) {
-				var posxy = getPosition(this.dom_obj);
-
-				if (this.mouse_event.left < posxy.left || (this.mouse_event.left > (posxy.left + this.dom_obj.offsetWidth))) {
-					return false;
-				}
-				if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-					return true;
-				}
-			}
-
 			this.create_box();
 
 			ZBX_SBOX[this.sbox_id].sbox.is_active = true;
@@ -1897,13 +1885,13 @@ var sbox = Class.create(CDebug, {
 			return true;
 		}
 
-		Event.stop(e);
+		cancelEvent(e);
 	},
 
 	onselect: function() {
 		this.px2time = this.timeline.period() / this.cobj.width;
 		var userstarttime = this.timeline.usertime() - this.timeline.period();
-		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
+		userstarttime += Math.round((this.box.left - (ZBX_SBOX[this.sbox_id].additionShiftL - this.shifts.left)) * this.px2time);
 		var new_period = this.calcperiod();
 
 		if (this.start_event.left < this.mouse_event.left) {
@@ -1983,31 +1971,29 @@ var sbox = Class.create(CDebug, {
 	},
 
 	resizebox: function() {
-		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
-			// fix wrong selection box
-			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-				this.moveright(this.cobj.width - this.start_event.left - this.cobj.left);
-			}
-			else if (this.mouse_event.left < this.cobj.left) {
-				this.moveleft(this.cobj.left, this.start_event.left - this.cobj.left);
+		// fix wrong selection box
+		if (this.mouse_event.left > (this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL)) {
+			this.moveright(this.cobj.width - this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL);
+		}
+		else if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
+			this.moveleft(ZBX_SBOX[this.sbox_id].additionShiftL, this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL);
+		}
+		else {
+			var width = this.validateW(this.mouse_event.left - this.start_event.left);
+			var left = this.mouse_event.left - this.shifts.left;
+
+			if (width > 0) {
+				this.moveright(width);
 			}
 			else {
-				var width = this.validateW(this.mouse_event.left - this.start_event.left);
-				var left = this.mouse_event.left - this.shifts.left;
-
-				if (width > 0) {
-					this.moveright(width);
-				}
-				else {
-					this.moveleft(left, width);
-				}
+				this.moveleft(left, width);
 			}
+		}
 
-			this.period = this.calcperiod();
+		this.period = this.calcperiod();
 
-			if (!is_null(this.dom_box)) {
-				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
-			}
+		if (!is_null(this.dom_box)) {
+			this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
 		}
 	},
 
@@ -2049,10 +2035,10 @@ var sbox = Class.create(CDebug, {
 	},
 
 	validateW: function(w) {
-		if ((this.start_event.left - this.cobj.left + w) > this.cobj.width) {
+		if ((this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL + w) > this.cobj.width) {
 			w = 0;
 		}
-		if (this.mouse_event.left < this.cobj.left) {
+		if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
 			w = 0;
 		}
 
@@ -2081,7 +2067,7 @@ var sbox = Class.create(CDebug, {
 		}
 
 		this.cobj.top = posxy.top + ZBX_SBOX[this.sbox_id].shiftT;
-		this.cobj.left = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
+		ZBX_SBOX[this.sbox_id].additionShiftL = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
 	},
 
 	optimizeEvent: function(e) {
@@ -2098,11 +2084,11 @@ var sbox = Class.create(CDebug, {
 		this.mouse_event.left = parseInt(this.mouse_event.left);
 		this.mouse_event.top = parseInt(this.mouse_event.top);
 
-		if (this.mouse_event.left < this.cobj.left) {
-			this.mouse_event.left = this.cobj.left;
+		if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
+			this.mouse_event.left = ZBX_SBOX[this.sbox_id].additionShiftL;
 		}
-		else if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-			this.mouse_event.left = this.cobj.width + this.cobj.left;
+		else if (this.mouse_event.left > (this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL)) {
+			this.mouse_event.left = this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL;
 		}
 	},
 
