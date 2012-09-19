@@ -1043,28 +1043,15 @@ class CXmlImport18 {
 // }}} HOST GROUPS
 
 
-				// MACROS
+// MACROS
 				$macros = $xpath->query('macros/macro', $host);
 				if ($macros->length > 0) {
-					$newMacros = array();
+					$host_db['macros'] = array();
 					foreach ($macros as $macro) {
-						$formattedMacro = self::mapXML2arr($macro, XML_TAG_MACRO);
-						$newMacros[$formattedMacro['macro']] = $formattedMacro;
+						$host_db['macros'][] = self::mapXML2arr($macro, XML_TAG_MACRO);
 					}
-
-					if ($current_host) {
-						$dbMacros = DBselect('SELECT hm.hostmacroid,hm.macro'.
-							' FROM hostmacro hm'.
-							' WHERE hm.hostid='.$current_host['hostid'].
-								' AND '.DBcondition('hm.macro', array_keys($newMacros)));
-						while ($dbMacro = DBfetch($dbMacros)) {
-							$newMacros[$dbMacro['macro']]['hostmacroid'] = $dbMacro['hostmacroid'];
-						}
-					}
-
-					$host_db['macros'] = $newMacros;
 				}
-
+// }}} MACROS
 
 				// host inventory
 				if ($old_version_input) {
