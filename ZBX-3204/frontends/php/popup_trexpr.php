@@ -144,7 +144,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'diff' => array(
-		'description' => 'N {OP} X, where X is 1 - if last and previous values differs, 0 - otherwise.',
+		'description' => 'N {OP} 1 - if last and previous values differs, 0 - otherwise.',
 		'operators' => $limited_operators,
 		'allowed_types' => $allowed_types_any
 	),
@@ -172,7 +172,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'str' => array(
-		'description' => 'Find string T last value. N {OP} X, where X is 1 - if found, 0 - otherwise',
+		'description' => 'Find string T last value. N {OP} 1 - if found, 0 - otherwise',
 		'operators' => $limited_operators,
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_str
@@ -205,25 +205,25 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'fuzzytime' => array(
-		'description' => 'N {OP} X, where X is 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise',
+		'description' => 'N {OP} 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise',
 		'operators' => $limited_operators,
 		'params' => $param1_sec_count_no_timeshift,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'regexp' => array(
-		'description' => 'N {OP} X, where X is 1 - last value matches regular expression V for last T seconds, 0 - otherwise.',
+		'description' => 'N {OP} 1 - last value matches regular expression V for last T seconds, 0 - otherwise.',
 		'operators' => $limited_operators,
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'iregexp' => array(
-		'description' => 'N {OP} X, where X is 1 - last value matches regular expression V for last T seconds, 0 - otherwise. (non case-sensitive)',
+		'description' => 'N {OP} 1 - last value matches regular expression V for last T seconds, 0 - otherwise. (non case-sensitive)',
 		'operators' => $limited_operators,
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'logeventid' => array(
-		'description' => 'N {OP} X, where X is 1 - last Event ID matches regular expression T, 0 - otherwise.',
+		'description' => 'N {OP} 1 - last Event ID matches regular expression T, 0 - otherwise.',
 		'operators' => $limited_operators,
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
@@ -234,7 +234,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource' => array(
-		'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T, 0 - otherwise.',
+		'description' => 'N {OP} 1 - last log source of the last log entry matches T, 0 - otherwise.',
 		'operators' => $limited_operators,
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
@@ -250,7 +250,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata' => array(
-		'description' => 'N {OP} X, where X is 1 - no data received during period of T seconds, 0 - otherwise',
+		'description' => 'N {OP} 1 - no data received during period of T seconds, 0 - otherwise',
 		'operators' => $operators,
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
