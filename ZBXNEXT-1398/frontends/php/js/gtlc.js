@@ -198,26 +198,24 @@ var timeControl = {
 
 		if (this.refreshInterval > 0) {
 			for (var sbid in ZBX_SCROLLBARS) {
-				if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-					continue;
-				}
+				if (!empty(ZBX_SCROLLBARS[sbid]) && !empty(ZBX_SCROLLBARS[sbid].timeline)) {
+					var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
 
-				var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
+					// timeline
+					if (ZBX_TIMELINES[timelineid].isNow()) {
+						ZBX_TIMELINES[timelineid].setNow();
+					}
+					else {
+						ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
+					}
 
-				// timeline
-				if (ZBX_TIMELINES[timelineid].isNow()) {
-					ZBX_TIMELINES[timelineid].setNow();
+					// scrollbar
+					ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
+					ZBX_SCROLLBARS[sbid].setBarPosition();
+					ZBX_SCROLLBARS[sbid].setGhostByBar();
+					ZBX_SCROLLBARS[sbid].setTabInfo();
+					ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 				}
-				else {
-					ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
-				}
-
-				// scrollbar
-				ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
-				ZBX_SCROLLBARS[sbid].setBarPosition();
-				ZBX_SCROLLBARS[sbid].setGhostByBar();
-				ZBX_SCROLLBARS[sbid].setTabInfo();
-				ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 			}
 
 			this.timeTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.refreshInterval);
@@ -226,11 +224,9 @@ var timeControl = {
 
 	isNow: function() {
 		for (var sbid in ZBX_SCROLLBARS) {
-			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-				continue;
+			if (!empty(ZBX_SCROLLBARS[sbid]) && !empty(ZBX_SCROLLBARS[sbid].timeline)) {
+				return ZBX_TIMELINES[ZBX_SCROLLBARS[sbid].timeline.timelineid].isNow();
 			}
-
-			return ZBX_TIMELINES[ZBX_SCROLLBARS[sbid].timeline.timelineid].isNow();
 		}
 
 		return null;
@@ -246,11 +242,7 @@ var timeControl = {
 		if (isNaN(usertime) || isNaN(period)) {
 			// clean sbox'es
 			for (var objectId in this.objectList) {
-				if (empty(this.objectList[objectId])) {
-					continue;
-				}
-
-				if (isset(objectId, ZBX_SBOX)) {
+				if (!empty(this.objectList[objectId]) && isset(objectId, ZBX_SBOX)) {
 					ZBX_SBOX[objectId].sbox.clear_params();
 				}
 			}
@@ -277,13 +269,9 @@ var timeControl = {
 			flickerfreeScreen.refreshAll(period, date.getZBXDate(), ZBX_TIMELINES[timelineid].isNow());
 
 			// update related objects
-			for (var objid in this.objectList) {
-				if (empty(this.objectList[objid])) {
-					continue;
-				}
-
-				if (isset(objid, ZBX_SBOX)) {
-					ZBX_SBOX[objid].sbox.timeline = ZBX_TIMELINES[timelineid];
+			for (var objectId in this.objectList) {
+				if (!empty(this.objectList[objectId]) && isset(objectId, ZBX_SBOX)) {
+					ZBX_SBOX[objectId].sbox.timeline = ZBX_TIMELINES[timelineid];
 				}
 			}
 		}
@@ -296,21 +284,19 @@ var timeControl = {
 
 		// update time control
 		for (var objid in this.objectList) {
-			if (empty(this.objectList[objid])) {
-				continue;
-			}
+			if (!empty(this.objectList[objid])) {
+				this.objectList[objid].timeline.period(period);
+				this.objectList[objid].timeline.usertime(usertime);
 
-			this.objectList[objid].timeline.period(period);
-			this.objectList[objid].timeline.usertime(usertime);
+				if (isset(objid, ZBX_SCROLLBARS)) {
+					ZBX_SCROLLBARS[objid].setBarPosition();
+					ZBX_SCROLLBARS[objid].setGhostByBar();
+					ZBX_SCROLLBARS[objid].setTabInfo();
+				}
 
-			if (isset(objid, ZBX_SCROLLBARS)) {
-				ZBX_SCROLLBARS[objid].setBarPosition();
-				ZBX_SCROLLBARS[objid].setGhostByBar();
-				ZBX_SCROLLBARS[objid].setTabInfo();
-			}
-
-			if (isset(objid, ZBX_SBOX)) {
-				ZBX_SBOX[objid].sbox.timeline = this.objectList[objid].timeline;
+				if (isset(objid, ZBX_SBOX)) {
+					ZBX_SBOX[objid].sbox.timeline = this.objectList[objid].timeline;
+				}
 			}
 		}
 
@@ -1382,10 +1368,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.nav_links.appendChild(tmp_laquo);
 
 		for (var i = 0; i < moves.length; i++) {
-			if (!isset(i, moves) || !is_number(moves[i])) {
-				continue;
-			}
-			if ((timeline / moves[i]) < 1) {
+			if (!isset(i, moves) || !is_number(moves[i]) || (timeline / moves[i]) < 1) {
 				continue;
 			}
 
@@ -1412,21 +1395,19 @@ var CScrollBar = Class.create(CDebug, {
 		var period = this.timeline.period();
 
 		for (var i = 0; i < this.dom.linklist.length; i++) {
-			if (!isset(i, this.dom.linklist) || empty(this.dom.linklist[i])) {
-				continue;
-			}
+			if (isset(i, this.dom.linklist) && !empty(this.dom.linklist[i])) {
+				var linkzoom = this.dom.linklist[i].getAttribute('zoom');
 
-			var linkzoom = this.dom.linklist[i].getAttribute('zoom');
-
-			if (linkzoom == period) {
-				this.dom.linklist[i].style.textDecoration = 'none';
-				this.dom.linklist[i].style.fontWeight = 'bold';
-				this.dom.linklist[i].style.fontSize = '11px';
-			}
-			else {
-				this.dom.linklist[i].style.textDecoration = 'underline';
-				this.dom.linklist[i].style.fontWeight = 'normal';
-				this.dom.linklist[i].style.fontSize = '10px';
+				if (linkzoom == period) {
+					this.dom.linklist[i].style.textDecoration = 'none';
+					this.dom.linklist[i].style.fontWeight = 'bold';
+					this.dom.linklist[i].style.fontSize = '11px';
+				}
+				else {
+					this.dom.linklist[i].style.textDecoration = 'underline';
+					this.dom.linklist[i].style.fontWeight = 'normal';
+					this.dom.linklist[i].style.fontSize = '10px';
+				}
 			}
 		}
 
@@ -1800,6 +1781,7 @@ var sbox = Class.create(CDebug, {
 			return;
 		}
 
+
 		var obj = $(this.sbox_id);
 
 		if (is_null(obj)) {
@@ -1905,15 +1887,13 @@ var sbox = Class.create(CDebug, {
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 
 		for (var sbid in ZBX_SCROLLBARS) {
-			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-				continue;
+			if (!empty(ZBX_SCROLLBARS[sbid]) && !empty(ZBX_SCROLLBARS[sbid].timeline)) {
+				ZBX_SCROLLBARS[sbid].timeline = this.timeline;
+				ZBX_SCROLLBARS[sbid].setBarPosition();
+				ZBX_SCROLLBARS[sbid].setGhostByBar();
+				ZBX_SCROLLBARS[sbid].setTabInfo();
+				ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 			}
-
-			ZBX_SCROLLBARS[sbid].timeline = this.timeline;
-			ZBX_SCROLLBARS[sbid].setBarPosition();
-			ZBX_SCROLLBARS[sbid].setGhostByBar();
-			ZBX_SCROLLBARS[sbid].setTabInfo();
-			ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 		}
 
 		this.onchange(this.sbox_id, this.timeline.timelineid);
@@ -2113,11 +2093,9 @@ var sbox = Class.create(CDebug, {
 
 function moveSBoxes() {
 	for (var sbid in ZBX_SBOX) {
-		if (empty(ZBX_SBOX[sbid]) || !isset('sbox', ZBX_SBOX[sbid])) {
-			continue;
+		if (!empty(ZBX_SBOX[sbid]) && isset('sbox', ZBX_SBOX[sbid])) {
+			ZBX_SBOX[sbid].sbox.moveSBoxByObj();
 		}
-
-		ZBX_SBOX[sbid].sbox.moveSBoxByObj();
 	}
 }
 
@@ -2171,8 +2149,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		}
 	}
 
-	var str = '';
-	str += (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
+	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
 	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
 	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
 	str += (isExtend && isTsDouble)
