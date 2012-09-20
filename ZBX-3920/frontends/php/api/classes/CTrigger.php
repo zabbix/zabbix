@@ -1451,6 +1451,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
+		$this->checkDependencyDuplicates($triggers);
 	}
 
 	/**
@@ -1950,6 +1951,36 @@ class CTrigger extends CTriggerGeneral {
 						);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Checks if the given dependencies contain duplicates.
+	 *
+	 * @throws APIException     if the given dependencies contain duplicates
+	 *
+	 * @param array $triggers
+	 */
+	protected function checkDependencyDuplicates(array $triggers) {
+		foreach ($triggers as $trigger) {
+			do {
+				$dbUpTriggers = DBselect(
+					'SELECT triggerid_up'.
+					' FROM trigger_depends'.
+					' WHERE triggerid_down='.zbx_dbstr($trigger['triggerid'])
+				);
+				while ($upTrigger = DBfetch($dbUpTriggers)) {
+					// existing dependencies from DB added into array with user selected dependencies
+					$trigger['dependencies'][] = $upTrigger['triggerid_up'];
+				}
+			} while (!empty($upTriggerids));
+			$UnqTriggers  = array_unique($trigger['dependencies']);
+			$DplTriggers  = array_diff_assoc($trigger['dependencies'], $UnqTriggers);
+			if($DplTriggers){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', reset($DplTriggers), $trigger['triggerid'])
+				);
 			}
 		}
 	}
