@@ -61,7 +61,7 @@ foreach ($this->data['functions'] as $id => $f) {
 	foreach ($f['operators'] as $op => $txt_op) {
 		// if user has selected an item, we are filtering out the triggers that can't work with it
 		if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
-			$functionComboBox->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
+			$functionComboBox->addItem($id.'['.$op.']', str_replace('%1$s', $txt_op, $f['description']));
 		}
 	}
 }
