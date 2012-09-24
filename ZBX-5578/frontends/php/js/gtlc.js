@@ -1741,6 +1741,10 @@ function sbox_init(sbid, timeline, domobjectid) {
 	addListener(window, 'resize', moveSBoxes);
 	addListener(window, 'mouseup', mouseupSBoxes);
 
+	if (IE8) {
+		addListener(document, 'mouseup', mouseupSBoxes);
+	}
+
 	ZBX_SBOX[sbid].sbox.addListeners();
 
 	return ZBX_SBOX[sbid].sbox;
@@ -1804,7 +1808,6 @@ var sbox = Class.create(CDebug, {
 			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
 			sbox.grphobj.onmousemove = this.mousemove.bindAsEventListener(this);
 			jQuery('#flickerfreescreen_' + this.sbox_id).find('a').attr('onclick', 'javascript: return ZBX_SBOX["' + this.sbox_id + '"].sbox.ieMouseClick();');
-			jQuery(sbox.grphobj).mouseup(jQuery.proxy(sbox.mouseup, this));
 		}
 		else {
 			jQuery(sbox.dom_obj).mousedown(jQuery.proxy(sbox.mousedown, this));
@@ -1822,6 +1825,14 @@ var sbox = Class.create(CDebug, {
 		}
 		else if (e.button && e.button != 1) {
 			return false;
+		}
+
+		this.optimizeEvent(e);
+		deselectAll();
+
+		var posxy = getPosition(this.dom_obj);
+		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
+			return true;
 		}
 
 		cancelEvent(e);
@@ -1884,6 +1895,14 @@ var sbox = Class.create(CDebug, {
 	ieMouseClick: function(e) {
 		if (!e) {
 			e = window.event;
+		}
+
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
+			this.optimizeEvent(e);
+			deselectAll();
+			this.mouseup(e);
+
+			return cancelEvent(e);
 		}
 
 		if (e.which && e.which != 1) {
