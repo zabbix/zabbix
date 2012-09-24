@@ -859,7 +859,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 .colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
-<<<<<<< .working
 fieldset legend { margin: 0.2em 0.5em; }
 
 /* maintenance icon */
@@ -900,3 +899,6 @@ fieldset legend { margin: 0.2em 0.5em; }
 	display: table-cell;
 	width: 10px;
 }
+
+/* flickerfreescreen */
+.flickerfreescreen { position: relative; }
