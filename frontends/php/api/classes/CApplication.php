@@ -501,7 +501,17 @@ class CApplication extends CZBXAPI {
 		$applications = $appManager->create($applications);
 		$appManager->inherit($applications);
 
-		return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
+		$applicationIds = zbx_objectValues($applications, 'applicationid');
+		// TODO: REMOVE info
+		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
+				' FROM applications a'.
+				' INNER JOIN hosts h ON h.hostid=a.hostid'.
+				' WHERE '.DBcondition('a.applicationid', $applicationIds));
+		while ($app = DBfetch($dbCursor)) {
+			info(_s('Created: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
+		}
+
+		return array('applicationids' => $applicationIds);
 	}
 
 	/**
@@ -519,7 +529,17 @@ class CApplication extends CZBXAPI {
 		$appManager->update($applications);
 		$appManager->inherit($applications);
 
-		return array('applicationids' => zbx_objectValues($applications, 'applicationids'));
+		$applicationIds = zbx_objectValues($applications, 'applicationid');
+		// TODO: REMOVE info
+		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
+				' FROM applications a'.
+				' INNER JOIN hosts h ON h.hostid=a.hostid'.
+				' WHERE '.DBcondition('a.applicationid', $applicationIds));
+		while ($app = DBfetch($dbCursor)) {
+			info(_s('Updated: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
+		}
+
+		return array('applicationids' => $applicationIds);
 	}
 
 	/**

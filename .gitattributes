@@ -7,8 +7,8 @@ bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
 create/src/data.tmpl -text
-frontends/php/api/classes/ApplicationsManager.php -text
 frontends/php/api/classes/CTemplateScreenItem.php -text
+frontends/php/api/classes/managers/ApplicationsManager.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
