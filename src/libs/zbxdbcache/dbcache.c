@@ -976,13 +976,14 @@ exit:
 
 static int	DBchk_double(double value)
 {
+#ifndef HAVE_CASSANDRA
 	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
 	const double	pg_min_numeric = -1e12;
 	const double	pg_max_numeric = 1e12;
 
 	if (value <= pg_min_numeric || value >= pg_max_numeric)
 		return FAIL;
-
+#endif
 	return SUCCEED;
 }
 
