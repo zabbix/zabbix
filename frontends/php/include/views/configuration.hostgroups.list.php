@@ -66,7 +66,7 @@ foreach ($this->data['groups'] as $group) {
 			break;
 		}
 
-		$url = 'templates.php?form=update&templateid='.$template['hostid'].'&groupid='.$group['groupid'];
+		$url = 'templates.php?form=update&templateid='.$template['templateid'].'&groupid='.$group['groupid'];
 		$hosts_output[] = new CLink($template['name'], $url, 'unknown');
 		$hosts_output[] = ', ';
 	}
