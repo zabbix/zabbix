@@ -37,6 +37,9 @@ function empty(obj) {
 	if (is_string(obj) && obj === '') {
 		return true;
 	}
+	if (typeof(obj) == 'undefined') {
+		return true;
+	}
 
 	return is_array(obj) && obj.length == 0;
 }
