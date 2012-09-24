@@ -1115,7 +1115,14 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC
 	if (1 != update_inventory)
 		return;
 
-	zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
+	switch (h->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_STR:
+			zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
+			break;
+	}
 
 	inventory_field_len = DBget_inventory_field_len(inventory_link);
 	value_esc = DBdyn_escape_string_len(value, inventory_field_len);

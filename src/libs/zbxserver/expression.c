@@ -1372,8 +1372,6 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 					zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
 					ZBX_STRDUP(*value, tmp);
 					break;
-				default:
-					;
 			}
 		}
 	}
