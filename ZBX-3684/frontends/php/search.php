@@ -376,7 +376,7 @@ if ($admin) {
 	$table->setHeader($header);
 
 	foreach ($templates as $tnum => $template) {
-		$templateid = $template['hostid'];
+		$templateid = $template['templateid'];
 
 		$group = reset($template['groups']);
 		$link = 'groupid='.$group['groupid'].'&hostid='.$templateid.'&switch_node='.id2nodeid($templateid);
