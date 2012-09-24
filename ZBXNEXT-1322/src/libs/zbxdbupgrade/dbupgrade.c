@@ -259,13 +259,13 @@ int	DBcheck_version()
 
 	if (SUCCEED != DBtable_exists(dbversion_table_name))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" doesn't exists",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" doesn't exist",
 				__function_name, dbversion_table_name);
 
 		if (SUCCEED != DBfield_exists("config", "server_check_interval"))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot upgrade database: the database doesn't"
-					" correspond to 2.0 structure. Exiting ...");
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot upgrade database: the database must"
+					" correspond to version 2.0 or later. Exiting ...");
 			goto out;
 		}
 
