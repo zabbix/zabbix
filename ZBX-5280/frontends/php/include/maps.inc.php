@@ -242,7 +242,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 			$sql = 'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name'.
 					' FROM interface hi,hosts h'.
 					' WHERE hi.hostid=h.hostid'.
-						' AND hi.hostid='.$selement['elementid'];
+						' AND hi.main=1 AND hi.hostid='.$selement['elementid'];
 			$hostsByNr[1] = DBfetch(DBselect($sql));
 		}
 		// get trigger host list if element is trigger
@@ -252,7 +252,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND f.triggerid='.$selement['elementid'];
+						' AND hi.main=1 AND f.triggerid='.$selement['elementid'];
 
 			$res = DBselect($sql);
 			while ($dbHost = DBfetch($res)) {
