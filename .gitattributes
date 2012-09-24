@@ -552,6 +552,7 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxdbupgrade/Makefile.am -text
 src/libs/zbxdbupgrade/dbupgrade.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
