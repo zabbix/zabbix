@@ -140,10 +140,10 @@ class CScreenGraph extends CScreenBase {
 			$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($resourceid));
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&legend='.$legend.'&graph3d='.$graph3d;
-			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
-			}
+				.'&legend='.$legend.'&graph3d='.$graph3d.'&updateProfile='.(int) $this->updateProfile;
+			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
+				? '&period=3600&stime='.date('YmdHis', time())
+				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
@@ -157,10 +157,10 @@ class CScreenGraph extends CScreenBase {
 				}
 			}
 
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
-			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
-			}
+			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'].'&updateProfile='.(int) $this->updateProfile;
+			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
+				? '&period=3600&stime='.date('YmdHis', time())
+				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 
 		// output

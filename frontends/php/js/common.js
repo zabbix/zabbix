@@ -163,7 +163,7 @@ function cancelEvent(e) {
 		e = window.event;
 	}
 
-	if (e) {
+	if (!empty(e)) {
 		if (IE) {
 			e.cancelBubble = true;
 			e.returnValue = false;
@@ -318,7 +318,7 @@ function deselectAll() {
 	if (IE) {
 		document.selection.empty();
 	}
-	else if (!KQ) {
+	else {
 		var sel = window.getSelection();
 		sel.removeAllRanges();
 	}
@@ -427,15 +427,7 @@ function get_bodywidth() {
 	var w = parseInt(document.body.scrollWidth);
 	var w2 = parseInt(document.body.offsetWidth);
 
-	if (KQ) {
-		w = (w2 < w) ? w2 : w;
-		w -=16;
-	}
-	else {
-		w = (w2 < w) ? w2 : w;
-	}
-
-	return w;
+	return (w2 < w) ? w2 : w;
 }
 
 function get_cursor_position(e) {
