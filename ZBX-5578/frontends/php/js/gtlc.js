@@ -1739,11 +1739,7 @@ function sbox_init(sbid, timeline, domobjectid) {
 
 	// listeners
 	addListener(window, 'resize', moveSBoxes);
-	addListener(window, 'mouseup', mouseupSBoxes);
-
-	if (IE8) {
-		addListener(document, 'mouseup', mouseupSBoxes);
-	}
+	addListener(document, 'mouseup', mouseupSBoxes);
 
 	ZBX_SBOX[sbid].sbox.addListeners();
 
