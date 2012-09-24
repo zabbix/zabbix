@@ -198,26 +198,24 @@ var timeControl = {
 
 		if (this.refreshInterval > 0) {
 			for (var sbid in ZBX_SCROLLBARS) {
-				if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-					continue;
-				}
+				if (!empty(ZBX_SCROLLBARS[sbid]) && !empty(ZBX_SCROLLBARS[sbid].timeline)) {
+					var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
 
-				var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
+					// timeline
+					if (ZBX_TIMELINES[timelineid].isNow()) {
+						ZBX_TIMELINES[timelineid].setNow();
+					}
+					else {
+						ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
+					}
 
-				// timeline
-				if (ZBX_TIMELINES[timelineid].isNow()) {
-					ZBX_TIMELINES[timelineid].setNow();
+					// scrollbar
+					ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
+					ZBX_SCROLLBARS[sbid].setBarPosition();
+					ZBX_SCROLLBARS[sbid].setGhostByBar();
+					ZBX_SCROLLBARS[sbid].setTabInfo();
+					ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 				}
-				else {
-					ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
-				}
-
-				// scrollbar
-				ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
-				ZBX_SCROLLBARS[sbid].setBarPosition();
-				ZBX_SCROLLBARS[sbid].setGhostByBar();
-				ZBX_SCROLLBARS[sbid].setTabInfo();
-				ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 			}
 
 			this.timeTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.refreshInterval);
@@ -226,11 +224,9 @@ var timeControl = {
 
 	isNow: function() {
 		for (var sbid in ZBX_SCROLLBARS) {
-			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-				continue;
+			if (!empty(ZBX_SCROLLBARS[sbid]) && !empty(ZBX_SCROLLBARS[sbid].timeline)) {
+				return ZBX_TIMELINES[ZBX_SCROLLBARS[sbid].timeline.timelineid].isNow();
 			}
-
-			return ZBX_TIMELINES[ZBX_SCROLLBARS[sbid].timeline.timelineid].isNow();
 		}
 
 		return null;
@@ -241,8 +237,18 @@ var timeControl = {
 			throw('timeControl: Object is not declared "' + objid + '".');
 		}
 
-		var usertime = ZBX_TIMELINES[timelineid].usertime();
-		var period = ZBX_TIMELINES[timelineid].period();
+		var usertime = ZBX_TIMELINES[timelineid].usertime(),
+			period = ZBX_TIMELINES[timelineid].period();
+		if (isNaN(usertime) || isNaN(period)) {
+			// clean sbox'es
+			for (var objectId in this.objectList) {
+				if (!empty(this.objectList[objectId]) && isset(objectId, ZBX_SBOX)) {
+					ZBX_SBOX[objectId].sbox.clear_params();
+				}
+			}
+
+			return;
+		}
 
 		if (ZBX_TIMELINES[timelineid].now() || ZBX_TIMELINES[timelineid].isNow()) {
 			usertime += 31536000; // 31536000 = 86400 * 365 = 1 year
@@ -263,13 +269,9 @@ var timeControl = {
 			flickerfreeScreen.refreshAll(period, date.getZBXDate(), ZBX_TIMELINES[timelineid].isNow());
 
 			// update related objects
-			for (var objid in this.objectList) {
-				if (empty(this.objectList[objid])) {
-					continue;
-				}
-
-				if (isset(objid, ZBX_SBOX)) {
-					ZBX_SBOX[objid].sbox.timeline = ZBX_TIMELINES[timelineid];
+			for (var objectId in this.objectList) {
+				if (!empty(this.objectList[objectId]) && isset(objectId, ZBX_SBOX)) {
+					ZBX_SBOX[objectId].sbox.timeline = ZBX_TIMELINES[timelineid];
 				}
 			}
 		}
@@ -282,21 +284,19 @@ var timeControl = {
 
 		// update time control
 		for (var objid in this.objectList) {
-			if (empty(this.objectList[objid])) {
-				continue;
-			}
+			if (!empty(this.objectList[objid])) {
+				this.objectList[objid].timeline.period(period);
+				this.objectList[objid].timeline.usertime(usertime);
 
-			this.objectList[objid].timeline.period(period);
-			this.objectList[objid].timeline.usertime(usertime);
+				if (isset(objid, ZBX_SCROLLBARS)) {
+					ZBX_SCROLLBARS[objid].setBarPosition();
+					ZBX_SCROLLBARS[objid].setGhostByBar();
+					ZBX_SCROLLBARS[objid].setTabInfo();
+				}
 
-			if (isset(objid, ZBX_SCROLLBARS)) {
-				ZBX_SCROLLBARS[objid].setBarPosition();
-				ZBX_SCROLLBARS[objid].setGhostByBar();
-				ZBX_SCROLLBARS[objid].setTabInfo();
-			}
-
-			if (isset(objid, ZBX_SBOX)) {
-				ZBX_SBOX[objid].sbox.timeline = this.objectList[objid].timeline;
+				if (isset(objid, ZBX_SBOX)) {
+					ZBX_SBOX[objid].sbox.timeline = this.objectList[objid].timeline;
+				}
 			}
 		}
 
@@ -328,6 +328,7 @@ var timeControl = {
 		ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
 		ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
 		ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
+		ZBX_SBOX[obj.domid].additionShiftL = 0;
 
 		var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
 		sbox.onchange = this.objectUpdate.bind(this);
@@ -781,22 +782,23 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setBarPosition: function(rightSide, periodWidth, setTimeLine) {
-		if ('undefined' == typeof(periodWidth)) {
+		if (empty(periodWidth)) {
 			var periodWidth =  null;
 		}
-		if ('undefined' == typeof(rightSide)) {
+		if (empty(rightSide)) {
 			var rightSide = null;
 		}
-		if ('undefined' == typeof(setTimeLine)) {
+		if (empty(setTimeLine)) {
 			var setTimeLine = false;
 		}
 
+		var width = 0;
 		if (is_null(periodWidth)) {
-			var width = Math.round(this.timeline.period() / this.px2sec);
+			width = Math.round(this.timeline.period() / this.px2sec);
 			periodWidth = width;
 		}
 		else {
-			var width = periodWidth;
+			width = periodWidth;
 		}
 
 		if (is_null(rightSide)) {
@@ -833,6 +835,11 @@ var CScrollBar = Class.create(CDebug, {
 
 			// actual bar dimensions shouldn't be over side limits
 			rightSide = right;
+		}
+
+		// validate
+		if (!is_number(width) || !is_number(right) || !is_number(rightSide) || !is_number(periodWidth)) {
+			return;
 		}
 
 		// set actual bar position
@@ -1194,8 +1201,12 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setTabInfo: function() {
-		var period = this.timeline.period();
-		var usertime = this.timeline.usertime();
+		var period = this.timeline.period(),
+			usertime = this.timeline.usertime();
+		if (isNaN(period) || isNaN(usertime)) {
+			return;
+		}
+
 		var userstarttime = usertime - period;
 
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
@@ -1220,15 +1231,8 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	dateToArray: function(unixtime) {
-		var date = new CDate(unixtime * 1000);
-		var dateArray = [];
-
-		dateArray[0] = date.getDate();
-		dateArray[1] = date.getMonth() + 1;
-		dateArray[2] = date.getFullYear();
-		dateArray[3] = date.getHours();
-		dateArray[4] = date.getMinutes();
-		dateArray[5] = date.getSeconds();
+		var date = new CDate(unixtime * 1000),
+			dateArray = [date.getDate(), date.getMonth() + 1, date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds()];
 
 		for (var i = 0; i < dateArray.length; i++) {
 			if ((dateArray[i] + '').length < 2) {
@@ -1257,7 +1261,7 @@ var CScrollBar = Class.create(CDebug, {
 		if (IE) {
 			document.selection.empty();
 		}
-		else if (!KQ) {
+		else {
 			var sel = window.getSelection();
 			sel.removeAllRanges();
 		}
@@ -1370,10 +1374,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.nav_links.appendChild(tmp_laquo);
 
 		for (var i = 0; i < moves.length; i++) {
-			if (!isset(i, moves) || !is_number(moves[i])) {
-				continue;
-			}
-			if ((timeline / moves[i]) < 1) {
+			if (!isset(i, moves) || !is_number(moves[i]) || (timeline / moves[i]) < 1) {
 				continue;
 			}
 
@@ -1400,21 +1401,19 @@ var CScrollBar = Class.create(CDebug, {
 		var period = this.timeline.period();
 
 		for (var i = 0; i < this.dom.linklist.length; i++) {
-			if (!isset(i, this.dom.linklist) || empty(this.dom.linklist[i])) {
-				continue;
-			}
+			if (isset(i, this.dom.linklist) && !empty(this.dom.linklist[i])) {
+				var linkzoom = this.dom.linklist[i].getAttribute('zoom');
 
-			var linkzoom = this.dom.linklist[i].getAttribute('zoom');
-
-			if (linkzoom == period) {
-				this.dom.linklist[i].style.textDecoration = 'none';
-				this.dom.linklist[i].style.fontWeight = 'bold';
-				this.dom.linklist[i].style.fontSize = '11px';
-			}
-			else {
-				this.dom.linklist[i].style.textDecoration = 'underline';
-				this.dom.linklist[i].style.fontWeight = 'normal';
-				this.dom.linklist[i].style.fontSize = '10px';
+				if (linkzoom == period) {
+					this.dom.linklist[i].style.textDecoration = 'none';
+					this.dom.linklist[i].style.fontWeight = 'bold';
+					this.dom.linklist[i].style.fontSize = '11px';
+				}
+				else {
+					this.dom.linklist[i].style.textDecoration = 'underline';
+					this.dom.linklist[i].style.fontWeight = 'normal';
+					this.dom.linklist[i].style.fontSize = '10px';
+				}
 			}
 		}
 
@@ -1740,9 +1739,8 @@ function sbox_init(sbid, timeline, domobjectid) {
 
 	// listeners
 	addListener(window, 'resize', moveSBoxes);
-	if (KQ) {
-		setTimeout('ZBX_SBOX[' + sbid + '].sbox.moveSBoxByObj(' + sbid + ');', 500);
-	}
+	addListener(document, 'mouseup', mouseupSBoxes);
+
 	ZBX_SBOX[sbid].sbox.addListeners();
 
 	return ZBX_SBOX[sbid].sbox;
@@ -1805,8 +1803,7 @@ var sbox = Class.create(CDebug, {
 		if (IE) {
 			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
 			sbox.grphobj.onmousemove = this.mousemove.bindAsEventListener(this);
-			jQuery(sbox.grphobj).click(jQuery.proxy(sbox.ieMouseClick, this));
-			jQuery(sbox.grphobj).mouseup(jQuery.proxy(sbox.mouseup, this));
+			jQuery('#flickerfreescreen_' + this.sbox_id).find('a').attr('onclick', 'javascript: return ZBX_SBOX["' + this.sbox_id + '"].sbox.ieMouseClick();');
 		}
 		else {
 			jQuery(sbox.dom_obj).mousedown(jQuery.proxy(sbox.mousedown, this));
@@ -1826,24 +1823,19 @@ var sbox = Class.create(CDebug, {
 			return false;
 		}
 
-		Event.stop(e);
+		this.optimizeEvent(e);
+		deselectAll();
+
+		var posxy = getPosition(this.dom_obj);
+		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
+			return true;
+		}
+
+		cancelEvent(e);
 
 		if (!ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			this.optimizeEvent(e);
-
 			deselectAll();
-
-			if (IE) {
-				var posxy = getPosition(this.dom_obj);
-
-				if (this.mouse_event.left < posxy.left || (this.mouse_event.left > (posxy.left + this.dom_obj.offsetWidth))) {
-					return false;
-				}
-				if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-					return true;
-				}
-			}
-
 			this.create_box();
 
 			ZBX_SBOX[this.sbox_id].sbox.is_active = true;
@@ -1859,19 +1851,56 @@ var sbox = Class.create(CDebug, {
 
 		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
 			this.optimizeEvent(e);
-			this.resizebox();
+
+			// resize
+			if (this.mouse_event.left > (this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL)) {
+				this.moveright(this.cobj.width - this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL);
+			}
+			else if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
+				this.moveleft(ZBX_SBOX[this.sbox_id].additionShiftL, this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL);
+			}
+			else {
+				var width = this.validateW(this.mouse_event.left - this.start_event.left);
+				var left = this.mouse_event.left - this.shifts.left;
+
+				if (width > 0) {
+					this.moveright(width);
+				}
+				else {
+					this.moveleft(left, width);
+				}
+			}
+
+			this.period = this.calcperiod();
+
+			if (!is_null(this.dom_box)) {
+				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
+			}
 		}
 	},
 
 	mouseup: function(e) {
 		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
-			this.onselect();
 			cancelEvent(e);
+
+			this.onselect();
 			this.clear_params();
 		}
 	},
 
 	ieMouseClick: function(e) {
+		if (!e) {
+			e = window.event;
+		}
+
+		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
+			this.optimizeEvent(e);
+			deselectAll();
+			this.mouseup(e);
+
+			return cancelEvent(e);
+		}
+
 		if (e.which && e.which != 1) {
 			return true;
 		}
@@ -1887,13 +1916,15 @@ var sbox = Class.create(CDebug, {
 			return true;
 		}
 
-		Event.stop(e);
+		this.mouseup(e);
+
+		return cancelEvent(e);
 	},
 
 	onselect: function() {
 		this.px2time = this.timeline.period() / this.cobj.width;
 		var userstarttime = this.timeline.usertime() - this.timeline.period();
-		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
+		userstarttime += Math.round((this.box.left - (ZBX_SBOX[this.sbox_id].additionShiftL - this.shifts.left)) * this.px2time);
 		var new_period = this.calcperiod();
 
 		if (this.start_event.left < this.mouse_event.left) {
@@ -1907,15 +1938,13 @@ var sbox = Class.create(CDebug, {
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 
 		for (var sbid in ZBX_SCROLLBARS) {
-			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-				continue;
+			if (!empty(ZBX_SCROLLBARS[sbid]) && !empty(ZBX_SCROLLBARS[sbid].timeline)) {
+				ZBX_SCROLLBARS[sbid].timeline = this.timeline;
+				ZBX_SCROLLBARS[sbid].setBarPosition();
+				ZBX_SCROLLBARS[sbid].setGhostByBar();
+				ZBX_SCROLLBARS[sbid].setTabInfo();
+				ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 			}
-
-			ZBX_SCROLLBARS[sbid].timeline = this.timeline;
-			ZBX_SCROLLBARS[sbid].setBarPosition();
-			ZBX_SCROLLBARS[sbid].setGhostByBar();
-			ZBX_SCROLLBARS[sbid].setTabInfo();
-			ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
 		}
 
 		this.onchange(this.sbox_id, this.timeline.timelineid);
@@ -1942,23 +1971,23 @@ var sbox = Class.create(CDebug, {
 		if (!jQuery('#selection_box').length) {
 			this.dom_box = document.createElement('div');
 			this.dom_obj.appendChild(this.dom_box);
-
 			this.dom_period_span = document.createElement('span');
 			this.dom_box.appendChild(this.dom_period_span);
-
 			this.dom_period_span.setAttribute('id', 'period_span');
 			this.dom_period_span.innerHTML = this.period;
 
 			var dims = getDimensions(this.dom_obj);
+
 			this.shifts.left = dims.left;
 			this.shifts.top = dims.top;
 
-			var top = 0; // we use only x axis
-			var left = this.mouse_event.left - dims.left;
+			this.box.top = 0; // we use only x axis
+			this.box.left = this.mouse_event.left - dims.left;
+			this.box.height = this.cobj.height;
 
 			this.dom_box.setAttribute('id', 'selection_box');
-			this.dom_box.style.top = top + 'px';
-			this.dom_box.style.left = left + 'px';
+			this.dom_box.style.top = this.box.top + 'px';
+			this.dom_box.style.left = this.box.left + 'px';
 			this.dom_box.style.height = this.cobj.height + 'px';
 			this.dom_box.style.width = '1px';
 			this.dom_box.style.zIndex = 98;
@@ -1966,41 +1995,8 @@ var sbox = Class.create(CDebug, {
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;
 
-			this.box.top = top;
-			this.box.left = left;
-			this.box.height = this.cobj.height;
-
 			if (IE) {
 				this.dom_box.onmousemove = this.mousemove.bindAsEventListener(this);
-			}
-		}
-	},
-
-	resizebox: function() {
-		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
-			// fix wrong selection box
-			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-				this.moveright(this.cobj.width - this.start_event.left - this.cobj.left);
-			}
-			else if (this.mouse_event.left < this.cobj.left) {
-				this.moveleft(this.cobj.left, this.start_event.left - this.cobj.left);
-			}
-			else {
-				var width = this.validateW(this.mouse_event.left - this.start_event.left);
-				var left = this.mouse_event.left - this.shifts.left;
-
-				if (width > 0) {
-					this.moveright(width);
-				}
-				else {
-					this.moveleft(left, width);
-				}
-			}
-
-			this.period = this.calcperiod();
-
-			if (!is_null(this.dom_box)) {
-				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
 			}
 		}
 	},
@@ -2043,10 +2039,10 @@ var sbox = Class.create(CDebug, {
 	},
 
 	validateW: function(w) {
-		if ((this.start_event.left - this.cobj.left + w) > this.cobj.width) {
+		if ((this.start_event.left - ZBX_SBOX[this.sbox_id].additionShiftL + w) > this.cobj.width) {
 			w = 0;
 		}
-		if (this.mouse_event.left < this.cobj.left) {
+		if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
 			w = 0;
 		}
 
@@ -2073,28 +2069,30 @@ var sbox = Class.create(CDebug, {
 		if (dims.width > 0) {
 			this.dom_obj.style.width = dims.width + 'px';
 		}
+
 		this.cobj.top = posxy.top + ZBX_SBOX[this.sbox_id].shiftT;
-		this.cobj.left = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
+		ZBX_SBOX[this.sbox_id].additionShiftL = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
 	},
 
 	optimizeEvent: function(e) {
-		if (e.pageX || e.pageY) {
-			this.mouse_event.left = e.pageX;
+		if (!empty(e.pageX) && !empty(e.pageY)) {
+			this.mouse_event.left = e.pageX - jQuery('#flickerfreescreen_' + jQuery(this.grphobj).attr('id')).position().left;
 			this.mouse_event.top = e.pageY;
 		}
-		else if (e.clientX || e.clientY) {
-			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+		else if (!empty(e.clientX) && !empty(e.clientY)) {
+			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - jQuery('#flickerfreescreen_' + jQuery(this.grphobj).attr('id')).position().left;
 			this.mouse_event.top = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 		}
-
-		this.mouse_event.left = parseInt(this.mouse_event.left);
-		this.mouse_event.top = parseInt(this.mouse_event.top);
-
-		if (this.mouse_event.left < this.cobj.left) {
-			this.mouse_event.left = this.cobj.left;
+		else {
+			this.mouse_event.left = parseInt(this.mouse_event.left);
+			this.mouse_event.top = parseInt(this.mouse_event.top);
 		}
-		else if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-			this.mouse_event.left = this.cobj.width + this.cobj.left;
+
+		if (this.mouse_event.left < ZBX_SBOX[this.sbox_id].additionShiftL) {
+			this.mouse_event.left = ZBX_SBOX[this.sbox_id].additionShiftL;
+		}
+		else if (this.mouse_event.left > (this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL)) {
+			this.mouse_event.left = this.cobj.width + ZBX_SBOX[this.sbox_id].additionShiftL;
 		}
 	},
 
@@ -2118,17 +2116,23 @@ var sbox = Class.create(CDebug, {
 });
 
 function moveSBoxes() {
-	for (var key in ZBX_SBOX) {
-		if (empty(ZBX_SBOX[key]) || !isset('sbox', ZBX_SBOX[key])) {
-			continue;
+	for (var sbid in ZBX_SBOX) {
+		if (!empty(ZBX_SBOX[sbid]) && isset('sbox', ZBX_SBOX[sbid])) {
+			ZBX_SBOX[sbid].sbox.moveSBoxByObj();
 		}
+	}
+}
 
-		ZBX_SBOX[key].sbox.moveSBoxByObj();
+function mouseupSBoxes(e) {
+	for (var sbid in ZBX_SBOX) {
+		if (!empty(ZBX_SBOX[sbid]) && isset('sbox', ZBX_SBOX[sbid])) {
+			ZBX_SBOX[sbid].sbox.mouseup(e);
+		}
 	}
 }
 
 /**
- * optimization:
+ * Optimization:
  *
  * 86400 = 24 * 60 * 60
  * 31536000 = 365 * 86400
@@ -2169,8 +2173,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		}
 	}
 
-	var str = '';
-	str += (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
+	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
 	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
 	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
 	str += (isExtend && isTsDouble)
