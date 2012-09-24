@@ -237,26 +237,52 @@ function resolveMapLabelMacrosAll(array $selement) {
 					|| zbx_strpos($label, 'IPADDRESS') !== false /* deprecated */
 					|| zbx_strpos($label, 'HOST.CONN') !== false)) {
 
+		// priorities of interface types doesn't match interface type ids in DB
+		$priorities = array(
+			INTERFACE_TYPE_AGENT => 4,
+			INTERFACE_TYPE_SNMP => 3,
+			INTERFACE_TYPE_JMX => 2,
+			INTERFACE_TYPE_IPMI => 1
+		);
+
 		// get host host if element is host
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$sql = 'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name'.
+			$res = DBselect('SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,hi.type AS interfacetype'.
 					' FROM interface hi,hosts h'.
 					' WHERE hi.hostid=h.hostid'.
-						' AND hi.main=1 AND hi.hostid='.$selement['elementid'];
-			$hostsByNr[1] = DBfetch(DBselect($sql));
+						' AND hi.main=1 AND hi.hostid='.$selement['elementid']);
+
+			// process interface priorities
+			$tmpPriority = 0;
+			while ($dbHost = DBfetch($res)) {
+				if  ($priorities[$dbHost['interfacetype']] > $tmpPriority) {
+					$resHost = $dbHost;
+					$tmpPriority = $priorities[$dbHost['interfacetype']];
+				}
+			}
+
+			$hostsByNr[1] = $resHost;
 		}
 		// get trigger host list if element is trigger
 		else {
-			$sql = 'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name, f.functionid' .
+			$res = DBselect('SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,f.functionid,hi.type AS interfacetype' .
 					' FROM interface hi,items i,functions f,hosts h'.
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND hi.main=1 AND f.triggerid='.$selement['elementid'];
+						' AND hi.main=1 AND f.triggerid='.$selement['elementid']);
 
-			$res = DBselect($sql);
+			// process interface priorities, build $hostsByFunctionId array
+			$tmpFunctionId = -1;
 			while ($dbHost = DBfetch($res)) {
-				$hostsByFunctionId[$dbHost['functionid']] = $dbHost;
+				if ($dbHost['functionid'] != $tmpFunctionId) {
+					$tmpPriority = 0;
+					$tmpFunctionId = $dbHost['functionid'];
+				}
+				if  ($priorities[$dbHost['interfacetype']] > $tmpPriority) {
+					$hostsByFunctionId[$dbHost['functionid']] = $dbHost;
+					$tmpPriority = $priorities[$dbHost['interfacetype']];
+				}
 			}
 
 			// get all function ids from expression and link host data against position in expression
