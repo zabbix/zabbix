@@ -117,8 +117,8 @@ class ApplicationsManager {
 	 *
 	 * Usual use case is:
 	 *   inherit is called with some $hostIds passed
-	 *   new applications are created/apdated
-	 *   inherit is called again with created/apdated applications but empty $hostIds
+	 *   new applications are created/updated
+	 *   inherit is called again with created/updated applications but empty $hostIds
 	 *   if any of new applications belongs to template, inherit it to all hosts linked to tah template
 	 *
 	 * @param array $applications
@@ -128,7 +128,7 @@ class ApplicationsManager {
 	 */
 	public function inherit(array $applications, array $hostIds = array()) {
 		if (empty($hostIds)) {
-			$hostIds = $this->getChildHostsFroApplications($applications);
+			$hostIds = $this->getChildHostsFromApplications($applications);
 		}
 		if (empty($hostIds)) {
 			return true;
@@ -147,9 +147,9 @@ class ApplicationsManager {
 	 *
 	 * @param array $applications
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
-	protected function getChildHostsFroApplications(array $applications) {
+	protected function getChildHostsFromApplications(array $applications) {
 		$hostIds = array();
 		$dbCursor = DBselect('SELECT ht.hostid'.
 				' FROM hosts_templates ht'.
@@ -158,7 +158,7 @@ class ApplicationsManager {
 			$hostIds[] = $dbHost['hostid'];
 		}
 
-		return empty($hostIds) ? false : $hostIds;
+		return $hostIds;
 	}
 
 	/**
@@ -172,7 +172,7 @@ class ApplicationsManager {
 	 * @return array with keys 'create' and 'update'
 	 */
 	protected function prepareInheritedApps(array $applications, array $hostIds) {
-		$hostApps = $this->getApplicationMapsByHosts($hostIds);
+		$hostApps = $this->getApplicationMapsByHostIds($hostIds);
 		$result = array();
 
 		foreach ($applications as $application) {
@@ -210,7 +210,7 @@ class ApplicationsManager {
 	}
 
 	/**
-	 * Get hosts appllications for each passed hosts.
+	 * Get hosts applications for each passed hosts.
 	 * Each host has two hashes with applications, one with name keys other with templateid keys.
 	 *
 	 * Resulting structure is:
@@ -225,7 +225,7 @@ class ApplicationsManager {
 	 *
 	 * @return array
 	 */
-	protected function getApplicationMapsByHosts(array $hostIds) {
+	protected function getApplicationMapsByHostIds(array $hostIds) {
 		$hostApps = array();
 		foreach ($hostIds as $hostid) {
 			$hostApps[$hostid] = array('byName' => array(), 'byTemplateId' => array());
@@ -243,8 +243,11 @@ class ApplicationsManager {
 	}
 
 	/**
-	 * Save applications. If application has applicationid it gets updated otherwise new one is created.
+	 * Save applications. If application has applicationid it gets updated otherwise a new one is created.
+	 *
 	 * @param array $applications
+	 *
+	 * @return array
 	 */
 	protected function save(array $applications) {
 		$appsCreate = array();
