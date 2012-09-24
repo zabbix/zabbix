@@ -45,6 +45,15 @@ class ApplicationsManager {
 			$applications[$anum]['applicationid'] = $applicationids[$anum];
 		}
 
+		// TODO: REMOVE info
+		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
+				' FROM applications a'.
+				' INNER JOIN hosts h ON h.hostid=a.hostid'.
+				' WHERE '.DBcondition('a.applicationid', $applicationids));
+		while ($app = DBfetch($dbCursor)) {
+			info(_s('Created: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
+		}
+
 		return $applications;
 	}
 
@@ -64,6 +73,15 @@ class ApplicationsManager {
 			);
 		}
 		DB::update('applications', $update);
+
+		// TODO: REMOVE info
+		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
+				' FROM applications a'.
+				' INNER JOIN hosts h ON h.hostid=a.hostid'.
+				' WHERE '.DBcondition('a.applicationid', zbx_objectValues($applications, 'applicationid')));
+		while ($app = DBfetch($dbCursor)) {
+			info(_s('Updated: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
+		}
 
 		return $applications;
 	}
