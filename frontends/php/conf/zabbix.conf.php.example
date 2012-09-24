@@ -11,6 +11,10 @@ $DB["PASSWORD"]			= 'zabbix_password';
 // SCHEMA is relevant only for IBM_DB2 database
 $DB["SCHEMA"]			= '';
 
+$DB['USE_CASSANDRA']		= true;
+$DB['CASSANDRA_IP']			= array('localhost:9160');
+$DB['CASSANDRA_KEYSPACE']	= 'zabbix';
+
 $ZBX_SERVER				= 'localhost';
 $ZBX_SERVER_PORT		= '10051';
 $ZBX_SERVER_NAME		= '';
