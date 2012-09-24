@@ -305,16 +305,9 @@ class CTriggerDescription {
 							break;
 					}
 
-					if ($fNum == 0 || $fNum == 1) {
-						$m = '{'.$macro.'}';
-						$macroValues[$func['triggerid']][$m] = $replace;
-						$m = '{'.$macro.'1}';
-						$macroValues[$func['triggerid']][$m] = $replace;
-					}
-					else {
-						$m = '{'.$macro.$fNum.'}';
-						$macroValues[$func['triggerid']][$m] = $replace;
-					}
+					$m = '{'.$macro.($fNum?$fNum:'').'}';
+					$macroValues[$func['triggerid']][$m] = $replace;
+
 				}
 			}
 		}
@@ -371,16 +364,9 @@ class CTriggerDescription {
 							break;
 					}
 
-					if ($fNum == 0 || $fNum == 1) {
-						$m = '{'.$macro.'}';
-						$macroValues[$interface['triggerid']][$m] = $replace;
-						$m = '{'.$macro.'1}';
-						$macroValues[$interface['triggerid']][$m] = $replace;
-					}
-					else {
-						$m = '{'.$macro.$fNum.'}';
-						$macroValues[$interface['triggerid']][$m] = $replace;
-					}
+					$m = '{'.$macro.($fNum?$fNum:'').'}';
+					$macroValues[$interface['triggerid']][$m] = $replace;
+
 				}
 			}
 		}
@@ -418,16 +404,9 @@ class CTriggerDescription {
 							break;
 					}
 
-					if ($fNum == 0 || $fNum == 1) {
-						$m = '{'.$macro.'}';
-						$macroValues[$func['triggerid']][$m] = $replace;
-						$m = '{'.$macro.'1}';
-						$macroValues[$func['triggerid']][$m] = $replace;
-					}
-					else {
-						$m = '{'.$macro.$fNum.'}';
-						$macroValues[$func['triggerid']][$m] = $replace;
-					}
+					$m = '{'.$macro.($fNum?$fNum:'').'}';
+					$macroValues[$func['triggerid']][$m] = $replace;
+
 				}
 			}
 		}
