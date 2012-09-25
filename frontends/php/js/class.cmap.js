@@ -516,9 +516,14 @@ ZABBIX.apps.map = (function($) {
 					that.updateImage();
 				});
 				$('#formLinkApply').click(function() {
-					var linkData = that.linkForm.getValues();
-					that.links[that.currentLinkId].update(linkData)
-					that.linkForm.updateList(that.selection.selements);
+					try {
+						var linkData = that.linkForm.getValues();
+						that.links[that.currentLinkId].update(linkData);
+						that.linkForm.updateList(that.selection.selements);
+					}
+					catch (err) {
+						alert(err);
+					}
 				});
 				$('#formLinkClose').click(function() {
 					that.linkForm.hide();
@@ -1528,20 +1533,30 @@ ZABBIX.apps.map = (function($) {
 					i,
 					ln,
 					linkTriggerPattern = /^linktrigger_(\w+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
+					colorPattern = /^[0-9a-f]{6}$/i,
 					linkTrigger;
 
 				for (i = 0, ln = values.length; i < ln; i++) {
 					linkTrigger = linkTriggerPattern.exec(values[i].name);
 					if (linkTrigger !== null) {
+
+						if (linkTrigger[2] == 'color' && !colorPattern.match(values[i].value.toString())) {
+							throw sprintf(t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'), values[i].value);
+						}
+
 						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
 							data.linktriggers[linkTrigger[1]] = {};
 						}
 						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
 					}
 					else {
+						if (values[i].name == 'color' && !colorPattern.match(values[i].value.toString())) {
+							throw sprintf(t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'), values[i].value);
+						}
 						data[values[i].name] = values[i].value.toString();
 					}
 				}
+
 				return data;
 			},
 
