@@ -127,14 +127,12 @@ class ApplicationsManager {
 	 * @return bool
 	 */
 	public function inherit(array $applications, array $hostIds = array()) {
-		if (empty($hostIds)) {
-			$hostIds = $this->getChildHostsFromApplications($applications);
-		}
-		if (empty($hostIds)) {
+		$hostsTemapltesMap = $this->getChildHostsFromApplications($applications, $hostIds);
+		if (empty($hostsTemapltesMap)) {
 			return true;
 		}
 
-		$preparedApps = $this->prepareInheritedApps($applications, $hostIds);
+		$preparedApps = $this->prepareInheritedApps($applications, $hostsTemapltesMap);
 		$inheritedApps = $this->save($preparedApps);
 
 		$this->inherit($inheritedApps);
@@ -143,22 +141,32 @@ class ApplicationsManager {
 	}
 
 	/**
-	 * Get hosts that are linked with templates which passed applications belongs to.
+	 * Get array with hosts that are linked with templates which passed applications belongs to as key and templateid that host
+	 * is linked to as value.
+	 * If second parameter $hostIds is not empty, result should contain only passed host ids.
+	 *
+	 * For example we have template T1 with application A1 linked to host H1 and H2.
+	 * When we pass A1 to this function it should return array like:
+	 *     array(H1_id => T1_id, H2_id => T1_id);
 	 *
 	 * @param array $applications
+	 * @param array $hostIds
 	 *
 	 * @return array
 	 */
-	protected function getChildHostsFromApplications(array $applications) {
-		$hostIds = array();
-		$dbCursor = DBselect('SELECT ht.hostid'.
+	protected function getChildHostsFromApplications(array $applications, array $hostIds = array()) {
+		$hostsTemapltesMap = array();
+
+		$sqlWhere = empty($hostIds) ? '' : ' AND '.DBcondition('ht.hostid', $hostIds);
+		$dbCursor = DBselect('SELECT ht.templateid, ht.hostid'.
 				' FROM hosts_templates ht'.
-				' WHERE '.DBcondition('ht.templateid', array_unique(zbx_objectValues($applications, 'hostid'))));
+				' WHERE '.DBcondition('ht.templateid', array_unique(zbx_objectValues($applications, 'hostid'))).
+				$sqlWhere);
 		while ($dbHost = DBfetch($dbCursor)) {
-			$hostIds[] = $dbHost['hostid'];
+			$hostsTemapltesMap[$dbHost['hostid']] = $dbHost['templateid'];
 		}
 
-		return $hostIds;
+		return $hostsTemapltesMap;
 	}
 
 	/**
@@ -166,18 +174,23 @@ class ApplicationsManager {
 	 * Using passed parameters decide if new application must be created on host or existing one must be updated.
 	 *
 	 * @param array $applications which we need to inherit
-	 * @param array $hostIds
+	 * @param array $hostsTemapltesMap
 	 *
 	 * @throws Exception
-	 * @return array with keys 'create' and 'update'
+	 * @return array with applications, existing apps have 'applicationid' key.
 	 */
-	protected function prepareInheritedApps(array $applications, array $hostIds) {
-		$hostApps = $this->getApplicationMapsByHostIds($hostIds);
-		$result = array();
+	protected function prepareInheritedApps(array $applications, array $hostsTemapltesMap) {
+		$hostApps = $this->getApplicationMapsByHostIds(array_keys($hostsTemapltesMap));
 
+		$result = array();
 		foreach ($applications as $application) {
 			$appId = $application['applicationid'];
 			foreach ($hostApps as $hostId => $hostApp) {
+				// if application template is not linked to host we skip it
+				if ($hostsTemapltesMap[$hostId] != $application['hostid']) {
+					continue;
+				}
+
 				$exApplication = null;
 				// update by templateid
 				if (isset($hostApp['byTemplateId'][$appId])) {

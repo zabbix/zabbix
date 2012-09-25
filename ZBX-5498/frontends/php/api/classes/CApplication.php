@@ -408,6 +408,10 @@ class CApplication extends CZBXAPI {
 	}
 
 	public function checkInput(&$applications, $method) {
+		if (empty($applications)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');

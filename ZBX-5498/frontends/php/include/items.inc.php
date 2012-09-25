@@ -354,6 +354,10 @@ function copyApplications($srcHostId, $dstHostId) {
 		'output' => API_OUTPUT_EXTEND,
 		'inherited' => false
 	));
+	if (empty($apps_to_clone)) {
+		return true;
+	}
+
 	foreach ($apps_to_clone as &$app) {
 		$app['hostid'] = $dstHostId;
 		unset($app['applicationid'], $app['templateid']);
