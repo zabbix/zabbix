@@ -22,7 +22,7 @@
 /**
  * Class to perform low level application related actions.
  */
-class ApplicationsManager {
+class CApplicationManager {
 
 	/**
 	 * Create new application.
