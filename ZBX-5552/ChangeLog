@@ -1,9 +1,10 @@
-Changes for 2.0.3rc2
+changes for 2.0.3rc2
 
 Bug fixes:
+...G...... [ZBX-5552] fixed processing of vm.memory.size[total] under FreeBSD (Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 2.0.3rc1
+changes for 2.0.3rc1
 
 New features:
 ...GI..... [ZBX-5171] got rid of agent ipv6 library dependency on older HP-UX machines (dimir)
