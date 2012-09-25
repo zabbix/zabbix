@@ -501,7 +501,7 @@ class CApplication extends CZBXAPI {
 		$applications = zbx_toArray($applications);
 		$this->checkInput($applications, __FUNCTION__);
 
-		$appManager = new ApplicationsManager();
+		$appManager = new CApplicationManager();
 		$applications = $appManager->create($applications);
 		$appManager->inherit($applications);
 
@@ -519,7 +519,7 @@ class CApplication extends CZBXAPI {
 		$applications = zbx_toArray($applications);
 		$this->checkInput($applications, __FUNCTION__);
 
-		$appManager = new ApplicationsManager();
+		$appManager = new CApplicationManager();
 		$appManager->update($applications);
 		$appManager->inherit($applications);
 
