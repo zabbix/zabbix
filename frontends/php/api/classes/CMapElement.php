@@ -553,16 +553,20 @@ abstract class CMapElement extends CZBXAPI {
 			);
 		}
 
+		$colorValidator = new CColorValidator();
 		foreach ($links as $link) {
 			if (!check_db_fields($linkDbFields, $link)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for map link'));
 			}
 
-
+			if (isset($link['color']) && !$colorValidator->validate($link['color'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
+			}
 
 			if ($update || $delete) {
-				if (!isset($dbLinks[$link['linkid']]))
+				if (!isset($dbLinks[$link['linkid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
 			}
 		}
 
@@ -769,36 +773,39 @@ abstract class CMapElement extends CZBXAPI {
 	protected function createLinkTriggers($linktriggers) {
 		$linktriggers = zbx_toArray($linktriggers);
 
-		$linktriggerDbFields = array(
-			'linkid' => null,
-			'triggerid' => null,
-			'drawtype' => 0,
-			'color' => 'DD0000'
-		);
-
-		foreach ($linktriggers as $linktrigger) {
-			if (!check_db_fields($linktriggerDbFields, $linktrigger))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger'));
-		}
+		$this->validateCreateLinkTriggers($linktriggers);
 
 		$linktriggerids = DB::insert('sysmaps_link_triggers', $linktriggers);
 
 		return array('linktriggerids' => $linktriggerids);
 	}
 
+	protected function validateCreateLinkTriggers(array $linkTriggers) {
+		$linktriggerDbFields = array(
+			'linkid' => null,
+			'triggerid' => null,
+		);
+
+		$colorValidator = new CColorValidator();
+		foreach ($linkTriggers as $linkTrigger) {
+			if (!check_db_fields($linktriggerDbFields, $linkTrigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger'));
+			}
+
+			if (isset($linkTrigger['color']) && !$colorValidator->validate($linkTrigger['color'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
+			}
+		}
+	}
+
 	protected function updateLinkTriggers($linktriggers) {
 		$linktriggers = zbx_toArray($linktriggers);
-		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
+		$this->validateUpdateLinkTriggers($linktriggers);
 
-		$linktriggerDbFields = array(
-			'linktriggerid' => null
-		);
+		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
 
 		$updateLinkTriggers = array();
 		foreach ($linktriggers as $linktrigger) {
-			if (!check_db_fields($linktriggerDbFields, $linktrigger))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger update'));
-
 			$updateLinkTriggers[] = array(
 				'values' => $linktrigger,
 				'where' => array('linktriggerid'=>$linktrigger['linktriggerid'])
@@ -810,21 +817,43 @@ abstract class CMapElement extends CZBXAPI {
 		return array('linktriggerids' => $linktriggerids);
 	}
 
-	protected function deleteLinkTriggers($linktriggers) {
-		$linktriggers = zbx_toArray($linktriggers);
-		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
-
+	protected function validateUpdateLinkTriggers(array $linkTriggers) {
 		$linktriggerDbFields = array(
 			'linktriggerid' => null
 		);
 
-		foreach ($linktriggers as $linktrigger) {
-			if (!check_db_fields($linktriggerDbFields, $linktrigger))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger delete'));
+		$colorValidator = new CColorValidator();
+		foreach ($linkTriggers as $linkTrigger) {
+			if (!check_db_fields($linktriggerDbFields, $linkTrigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger update'));
+			}
+
+			if (isset($linkTrigger['color']) && !$colorValidator->validate($linkTrigger['color'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
+			}
 		}
+	}
+
+	protected function deleteLinkTriggers($linktriggers) {
+		$linktriggers = zbx_toArray($linktriggers);
+		$this->validateDeleteLinkTriggers($linktriggers);
+
+		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
 
 		DB::delete('sysmaps_link_triggers', array('linktriggerid' => $linktriggerids));
 
 		return array('linktriggerids' => $linktriggerids);
+	}
+
+	protected function validateDeleteLinkTriggers(array $linkTriggers) {
+		$linktriggerDbFields = array(
+			'linktriggerid' => null
+		);
+
+		foreach ($linkTriggers as $linkTrigger) {
+			if (!check_db_fields($linktriggerDbFields, $linkTrigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger delete'));
+			}
+		}
 	}
 }
