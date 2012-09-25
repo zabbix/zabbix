@@ -61,12 +61,12 @@ $data['pageFilter'] = new CPageFilter(array(
 	'groups' => array(
 		'monitored_hosts' => true,
 		'with_monitored_items' => true,
-		'with_monitored_triggers' => ($data['type'] == SHOW_TRIGGERS)
+		'with_monitored_triggers' => ($data['type'] == SHOW_TRIGGERS)?true:null
 	),
 	'hosts' => array(
 		'monitored_hosts' => true,
 		'with_monitored_items' => true,
-		'with_monitored_triggers' => ($data['type'] == SHOW_TRIGGERS)
+		'with_monitored_triggers' => ($data['type'] == SHOW_TRIGGERS)?true:null
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null)
