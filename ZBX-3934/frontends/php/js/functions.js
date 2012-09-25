@@ -858,3 +858,35 @@ function objectSize(obj) {
 
 	return size;
 }
+
+/**
+ * Replace placeholders like %<number>$s with arguments.
+ * Can be used like usual sprintf but only for %<number>$s placeholders.
+ *
+ * @param string
+ *
+ * @return string
+ */
+function sprintf(string) {
+	var placeHolders,
+		position,
+		replace;
+
+	if (typeof string !== 'string') {
+		throw Error('Invalid input type. String required, got ' + typeof string);
+	}
+
+	placeHolders = string.match(/%\d\$s/g);
+	for (var l = placeHolders.length - 1; l >= 0; l--) {
+		position = placeHolders[l][1];
+		replace = arguments[position];
+
+		if (typeof replace === 'undefined') {
+			throw Error('Placeholder for non-existing parameter');
+		}
+
+		string = string.replace(placeHolders[l], replace)
+	}
+
+	return string;
+}
