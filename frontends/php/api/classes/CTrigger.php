@@ -1634,6 +1634,8 @@ class CTrigger extends CTriggerGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, reset($expressionData->errors));
 				}
 
+				// if the templates used in the expresseion have changed, delete all inherited triggers
+				// and recreate them later
 				$oldExpressionData = new CTriggerExpression(array('expression' => $oldExpression));
 				if (!array_equal($oldExpressionData->data['hosts'], $expressionData->data['hosts'])) {
 					$sql = 'SELECT t.triggerid'.
