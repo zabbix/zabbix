@@ -8,6 +8,7 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3934] unified color codes validation in frontend (Vedmak)
 A......... [ZBX-3684] fixed template.get method returns excessive 'hostid' field (Vedmak)
 A......... [ZBX-5498] improved performance of template linkage operations in API (Vedmak)
 A......... [ZBX-5498] applications api refactoring (Vedmak)

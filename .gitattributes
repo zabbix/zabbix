@@ -185,6 +185,7 @@ frontends/php/include/classes/screens/CScreenSystemStatus.php -text
 frontends/php/include/classes/screens/CScreenTriggersInfo.php -text
 frontends/php/include/classes/screens/CScreenTriggersOverview.php -text
 frontends/php/include/classes/screens/CScreenUrl.php -text
+frontends/php/include/classes/validators/CColorValidator.php -text
 frontends/php/include/views/js/monitoring.history.js.php -text
 frontends/php/include/views/monitoring.charts.php -text
 frontends/php/include/views/monitoring.history.php -text
