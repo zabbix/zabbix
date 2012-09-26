@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,7 +32,7 @@ if (empty($this->data['screen']) || empty($this->data['host'])) {
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
 
 	$screenBuilder = new CScreenBuilder();
-	$screenBuilder->insertScreenScrollJs('scrollbar');
+	$screenBuilder->insertScreenScrollJs($screenBuilder->timeline);
 	$screenBuilder->insertProcessObjectsJs();
 }
 else {
@@ -64,7 +64,7 @@ else {
 		'profileIdx2' => $this->data['screen']['screenid']
 	));
 	$screenWidget->addItem($screenBuilder->show());
-	$screenBuilder->insertScreenScrollJs($this->data['screen']['screenid']);
+	$screenBuilder->insertScreenScrollJs($screenBuilder->timeline);
 	$screenBuilder->insertProcessObjectsJs();
 }
 

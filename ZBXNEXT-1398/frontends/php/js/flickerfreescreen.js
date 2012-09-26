@@ -121,7 +121,7 @@ jQuery(function($) {
 				screen.timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(id, true); }, screen.refreshInterval);
 
 				// refresh time
-				clearTimeout(timeControl.timeTimeout);
+				clearTimeout(timeControl.timeRefreshTimeout);
 				timeControl.refreshTime();
 			}
 		},
@@ -221,7 +221,7 @@ jQuery(function($) {
 
 						// rebuild listener
 						if (!empty(ZBX_SBOX[id])) {
-							ZBX_SBOX[id].sbox.addListeners();
+							ZBX_SBOX[id].addListeners();
 						}
 
 						screen.isRefreshing = false;
@@ -271,7 +271,7 @@ jQuery(function($) {
 				return true;
 			}
 
-			var isNow = timeControl.isNow();
+			var isNow = timeControl.timeline.isNow();
 			if (!is_null(isNow)) {
 				return isNow;
 			}
@@ -283,10 +283,8 @@ jQuery(function($) {
 		},
 
 		getCalculatedSTime: function(screen) {
-			if (typeof(timeControl.objectList[screen.id]) != 'undefined'
-					&& !empty(timeControl.objectList[screen.id].sliderMaximumTimePeriod)
-					&& screen.timeline.period >= timeControl.objectList[screen.id].sliderMaximumTimePeriod) {
-				return new CDate(timeControl.objectList[screen.id].timeline.starttime() * 1000).getZBXDate();
+			if (!empty(timeControl.timeline) && screen.timeline.period >= timeControl.timeline.maxperiod) {
+				return new CDate(timeControl.timeline.starttime() * 1000).getZBXDate();
 			}
 
 			return (screen.timeline.isNow || screen.timeline.isNow == 1)

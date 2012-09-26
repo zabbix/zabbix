@@ -327,24 +327,18 @@ class CScreenHistory extends CScreenBase {
 
 			if (!empty($this->dataId)) {
 				$timeControlData['id'] = $this->getDataId();
-				$timeControlData['domid'] = $this->getDataId();
 				$timeControlData['containerid'] = $containerid;
 				$timeControlData['src'] = $src;
 				$timeControlData['objDims'] = $graphDims;
 				$timeControlData['loadSBox'] = 1;
 				$timeControlData['loadImage'] = 1;
 				$timeControlData['loadScroll'] = 1;
-				$timeControlData['scrollWidthByImage'] = 1;
 				$timeControlData['dynamic'] = 1;
 			}
 			else {
 				$this->dataId = 'historyGraph';
 				$timeControlData['id'] = $this->getDataId();
-				$timeControlData['domid'] = $this->getDataId();
-				$timeControlData['loadSBox'] = 0;
-				$timeControlData['loadImage'] = 0;
 				$timeControlData['loadScroll'] = 1;
-				$timeControlData['dynamic'] = 0;
 				$timeControlData['mainObject'] = 1;
 			}
 
