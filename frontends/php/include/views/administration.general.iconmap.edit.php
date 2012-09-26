@@ -17,14 +17,15 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/administration.general.iconmap.js.php');
 
 $iconMapTab = new CFormList('scriptsTab');
 
 $TBname = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
 $TBname->setAttribute('maxlength', 64);
+$TBname->attr('autofocus', 'autofocus');
 $iconMapTab->addRow(_('Name'), $TBname);
 
 $iconMapTable = new CTable();
@@ -145,4 +146,3 @@ if (isset($this->data['iconmapid'])) {
 $iconMapForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));
 
 return $iconMapForm;
-?>

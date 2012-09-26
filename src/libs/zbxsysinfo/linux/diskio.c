@@ -229,6 +229,12 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	else
 		return SYSINFO_RET_FAIL;
 
+	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
+	{
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_FAIL;
+	}
+
 	if ('\0' == *devname)
 		*kernel_devname = '\0';
 	else if (SUCCEED != get_kernel_devname(devname, kernel_devname, sizeof(kernel_devname)))

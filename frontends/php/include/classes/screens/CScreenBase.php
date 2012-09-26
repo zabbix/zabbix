@@ -238,8 +238,8 @@ class CScreenBase {
 		}
 
 		return ($this->mode == SCREEN_MODE_EDIT)
-			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getScreenId())
-			: new CDiv($item, null, $this->getScreenId());
+			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), 'flickerfreescreen', $this->getScreenId())
+			: new CDiv($item, 'flickerfreescreen', $this->getScreenId());
 	}
 
 	/**
