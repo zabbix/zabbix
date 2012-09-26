@@ -502,26 +502,21 @@ class CScreenBuilder {
 	/**
 	 * Insert javascript to create scroll in time control.
 	 *
-	 * @param string	$id
-	 * @param array		$timeline
+	 * @param array $timeline
+	 * @param string $profileIdx
 	 */
-	public function insertScreenScrollJs($id) {
+	public static function insertScreenScrollJs($timeline, $profileIdx = '') {
 		$timeControlData = array(
-			'id' => $id,
-			'domid' => 'screen_scroll',
-			'loadSBox' => 0,
-			'loadImage' => 0,
+			'id' => 'scrollbar',
 			'loadScroll' => 1,
-			'scrollWidthByImage' => 0,
-			'dynamic' => 0,
 			'mainObject' => 1,
-			'periodFixed' => CProfile::get($this->profileIdx.'.timelinefixed', 1),
+			'periodFixed' => CProfile::get($profileIdx.'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
-		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
+		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 
-		$this->insertScreenRefreshTime();
+		CScreenBuilder::insertScreenRefreshTime();
 	}
 
 	/**
@@ -530,7 +525,7 @@ class CScreenBuilder {
 	 * @static
 	 */
 	public static function insertScreenRefreshTime() {
-		zbx_add_post_js('timeControl.refreshTime('.CWebUser::$data['refresh'].');');
+		zbx_add_post_js('timeControl.useTimeRefresh('.CWebUser::$data['refresh'].');');
 	}
 
 	/**

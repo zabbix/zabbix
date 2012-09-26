@@ -111,7 +111,7 @@ else {
 			'params'=> array('lastupdate' => time())
 		)));
 
-		$screenBuilder->insertScreenScrollJs($this->data['elementid']);
+		$screenBuilder->insertScreenScrollJs($screenBuilder->timeline, $screenBuilder->profileIdx);
 		$screenBuilder->insertProcessObjectsJs();
 
 		$slideWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));

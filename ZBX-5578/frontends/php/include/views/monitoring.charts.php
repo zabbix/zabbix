@@ -53,13 +53,15 @@ if (!empty($this->data['graphid'])) {
 		'profileIdx2' => $this->data['graphid']
 	));
 	$chartsWidget->addItem($screen->get());
+
+	CScreenBuilder::insertScreenScrollJs($screen->timeline, $screen->profileIdx);
 	CScreenBuilder::insertProcessObjectsJs();
-	CScreenBuilder::insertScreenRefreshTime();
 }
 else {
 	$screen = new CScreenBuilder();
-	$screen->insertScreenScrollJs('scrollbar');
-	$screen->insertProcessObjectsJs();
+	CScreenBuilder::insertScreenScrollJs($screen->timeline);
+	CScreenBuilder::insertProcessObjectsJs();
+
 	$chartsWidget->addItem(new CTableInfo(_('No graphs defined.')));
 }
 
