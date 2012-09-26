@@ -212,7 +212,7 @@ jQuery(function($) {
 
 						// rebuild listener
 						if (!empty(ZBX_SBOX[id])) {
-							ZBX_SBOX[id].sbox.addListeners();
+							ZBX_SBOX[id].addListeners();
 						}
 
 						screen.isRefreshing = false;
