@@ -719,7 +719,12 @@ class CChart extends CGraphDraw {
 		}
 
 		foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
-			$dec = bcpow(10, $num);
+			if ($this->items[0]['units'] == 'B') {
+				$dec = bcpow(8, $num);
+			}
+			else {
+				$dec = bcpow(10, $num);
+			}
 			foreach (array(1, 2, 5) as $int) {
 				$intervals[] = bcmul($int, $dec);
 			}
