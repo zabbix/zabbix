@@ -1,0 +1,30 @@
+/* CSS Document */
+
+
+P 			{	font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
+P:link 		{	color:black; text-decoration: underline; }
+P:visited 	{	color:black; text-decoration: none; }
+P:hover 	{	color:black; text-decoration: none;}
+P:active 	{	color:black; text-decoration: none;}
+
+p.uppercase	{	text-transform: uppercase;}
+p.margin	{	margin-left: 10pt;}
+
+p.msgerror	{	color: #CC0000; }
+p.msgok		{	color: #22AA44;	}
+
+p.info{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	border: 1px dashed #000000;
+	color:#000000;
+	background-color: #FFFFFF;
+}
+
+p.error{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	border: 1px dashed #000000;
+	color:#AA0000;
+	background-color: #FEFEFE;
+}
