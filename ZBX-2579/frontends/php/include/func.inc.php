@@ -644,7 +644,7 @@ function convertFunctionValue($value) {
 				$value = bcmul($value, '604800');
 				break;
 			case 'K':
-				$value = bcmul($value, '1000');
+				$value = bcmul($value, '1024');
 				break;
 			case 'M':
 				$value = bcmul($value, '1048576');
