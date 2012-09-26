@@ -640,8 +640,8 @@ elseif ($srctbl == 'templates') {
 
 	$dbTemplates = API::Template()->get($options);
 	foreach ($dbTemplates as $host) {
-		$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['name']);
-		$chk->setEnabled(!isset($existed_templates[$host['hostid']]) && !isset($excludeids[$host['hostid']]));
+		$chk = new CCheckBox('templates['.$host['templateid'].']', isset($templates[$host['templateid']]), null, $host['name']);
+		$chk->setEnabled(!isset($existed_templates[$host['templateid']]) && !isset($excludeids[$host['templateid']]));
 		$table->addRow(array(array($chk, $host['name'])));
 	}
 
