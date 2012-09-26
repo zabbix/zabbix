@@ -236,7 +236,7 @@ function getValueMapMappings($valueMapId) {
 
 /**
  * Get mapping for value.
- * If there is now mapping return false.
+ * If there is no mapping return false.
  *
  * @param string $value	     value that mapping should be applied to
  * @param int    $valueMapId value map id which should be used
