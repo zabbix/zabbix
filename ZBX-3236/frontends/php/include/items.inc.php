@@ -910,17 +910,24 @@ function formatItemValue(array $item, $unknownString = '-') {
 	}
 
 	$value = formatItemValueType($item);
-	if ($item['valuemapid'] > 0) {
-		$value = applyValueMap($value, $item['valuemapid']);
-	}
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_STR
 			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
 			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+
+		$mapping = getMappedValue($value, $item['valuemapid']);
+
 		if (zbx_strlen($value) > 20) {
-			$value = zbx_substr($value, 0, 20).' ...';
+			$value = zbx_substr($value, 0, 20).'...';
 		}
 		$value = nbsp(htmlspecialchars($value));
+
+		if ($mapping !== false) {
+			$value = $mapping.' ('.$value.')';
+		}
+	}
+	else {
+		$value = applyValueMap($value, $item['valuemapid']);
 	}
 
 	return $value;
