@@ -1338,15 +1338,12 @@ function zbx_toObject($value, $field) {
 }
 
 function zbx_toArray($value) {
-	if (is_null($value)) {
+	if ($value === null) {
 		return $value;
 	}
-	$result = array();
 
-	if (!is_array($value)) {
-		$result = array($value);
-	}
-	else {
+	$result = array();
+	if (is_array($value)) {
 		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
 
@@ -1356,6 +1353,9 @@ function zbx_toArray($value) {
 		elseif (!empty($value)) {
 			$result = array($value);
 		}
+	}
+	else {
+		$result = array($value);
 	}
 
 	return $result;
