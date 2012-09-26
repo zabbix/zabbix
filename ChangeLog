@@ -8,6 +8,8 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5498] improved performance of template linkage operations in API (Vedmak)
+A......... [ZBX-5498] applications api refactoring (Vedmak)
 ..F....... [ZBX-5560] fixed recovery sound saved incorrectly in user profile (Vedmak)
 ..F....... [ZBX-2770] added autofocus for first fields in frontend forms (Vedmak)
 ..F....... [ZBX-5463] fixed inability to login if http auth is enabled and frontend access is set to internal (Vedmak)

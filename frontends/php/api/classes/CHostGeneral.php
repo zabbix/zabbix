@@ -219,12 +219,15 @@ abstract class CHostGeneral extends CZBXAPI {
 			}
 
 			$sql = 'SELECT DISTINCT h.host'.
-					' FROM trigger_depends td,functions f,items i,hosts h'.
-					' WHERE ('.DBcondition('td.triggerid_down', $triggerids).' AND f.triggerid=td.triggerid_up)'.
-						' AND i.itemid=f.itemid'.
-						' AND h.hostid=i.hostid'.
-						' AND '.DBcondition('h.hostid', $commonTemplateIds, true).
-						' AND h.status='.HOST_STATUS_TEMPLATE;
+				' FROM trigger_depends td,functions f,items i,hosts h'.
+				' WHERE ('.
+					DBcondition('td.triggerid_down', $triggerids).
+					' AND f.triggerid=td.triggerid_up'.
+				' )'.
+				' AND i.itemid=f.itemid'.
+				' AND h.hostid=i.hostid'.
+				' AND '.DBcondition('h.hostid', $commonTemplateIds, true).
+				' AND h.status='.HOST_STATUS_TEMPLATE;
 			if ($dbDepHost = DBfetch(DBselect($sql))) {
 				$tmpTpls = API::Template()->get(array(
 					'templateids' => $templateid,
@@ -252,21 +255,16 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		// add template linkages, if problems rollback later
+		$hostsLinkageInserts = array();
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
 				}
-
-				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
-				$sql = 'INSERT INTO hosts_templates VALUES ('.implode(', ', $values).')';
-				$result = DBexecute($sql);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
-				}
+				$hostsLinkageInserts[] = array('hostid' => $targetid, 'templateid' => $templateid);
 			}
 		}
+		DB::insert('hosts_templates', $hostsLinkageInserts);
 
 		// check if all trigger templates are linked to host.
 		// we try to find template that is not linked to hosts ($targetids)
@@ -332,16 +330,14 @@ abstract class CHostGeneral extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
+		$appManager = new CApplicationManager();
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
 				}
 
-				API::Application()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
-				));
+				$appManager->link($templateid, $targetid);
 
 				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetid,
@@ -742,13 +738,14 @@ abstract class CHostGeneral extends CZBXAPI {
 	/**
 	 * Searches for cycles and double linkages in graph.
 	 *
-	 * @exception rises exception if cycle or double linkage is found
+	 * @throw APIException rises exception if cycle or double linkage is found
 	 *
 	 * @param array $graph - array with keys as parent ids and values as arrays with child ids
 	 * @param int $current - cursor for recursive DFS traversal, starting point for algorithm
 	 * @param array $path - should be passed empty array for DFS
 	 * @param array $visited - there will be stored visited graph node ids
-	 * @return false
+	 *
+	 * @return boolean
 	 */
 	protected function checkCircularAndDoubleLinkage($graph, $current, &$path, &$visited) {
 		if (isset($path[$current])) {
