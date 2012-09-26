@@ -412,9 +412,9 @@ int	check_time_period(const char *period, time_t now)
 			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
 
 			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
-			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2;	/* do not include upper bound */
 
-			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)
+			if (d1 <= day && day <= d2 && sec1 <= sec && sec < sec2)
 			{
 				ret = SUCCEED;
 				break;
@@ -536,14 +536,15 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
 
 			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
-			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2;	/* do not include upper bound */
 
-			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* current period */
+			if (d1 <= day && day <= d2 && sec1 <= sec && sec < sec2)	/* current period */
 			{
 				if (0 == next || next > now - sec + sec2)
-					next = now - sec + sec2;
+					next = now - sec + sec2;	/* the next second after the */
+									/* current interval's upper bound */
 			}
-			else if (day >= d1 && day <= d2 && sec < sec1)			/* will be active today */
+			else if (d1 <= day && day <= d2 && sec < sec1)			/* will be active today */
 			{
 				if (0 == next || next > now - sec + sec1)
 					next = now - sec + sec1;
@@ -552,31 +553,32 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			{
 				int	next_day;
 
-				next_day = (day + 1 <= 7 ? day + 1 : 1);
+				next_day = (7 >= day + 1 ? day + 1 : 1);
 
-				if (next_day >= d1 && next_day <= d2)                   /* will be active tomorrow */
+				if (d1 <= next_day && next_day <= d2)			/* will be active tomorrow */
 				{
 					if (0 == next || next > now - sec + SEC_PER_DAY + sec1)
 						next = now - sec + SEC_PER_DAY + sec1;
 				}
-				else                                                    /* later in the future */
+				else							/* later in the future */
 				{
-					int day_diff = -1;
+					int	day_diff = -1;
 
 					if (day < d1)
 						day_diff = d1 - day;
 					if (day >= d2)
 						day_diff = (d1 + 7) - day;
-					if (day >= d1 && day < d2)
+					if (d1 <= day && day < d2)
 					{
 						/* should never happen */
-						zabbix_log(LOG_LEVEL_ERR,
-								"could not deduce day difference [%s, day=%d, time=%02d:%02d:%02d]",
+						zabbix_log(LOG_LEVEL_ERR, "could not deduce day difference"
+								" [%s, day=%d, time=%02d:%02d:%02d]",
 								s, day, tm->tm_hour, tm->tm_min, tm->tm_sec);
 						day_diff = -1;
 					}
 
-					if (-1 != day_diff && (0 == next || next > now - sec + SEC_PER_DAY * day_diff + sec1))
+					if (-1 != day_diff &&
+							(0 == next || next > now - sec + SEC_PER_DAY * day_diff + sec1))
 						next = now - sec + SEC_PER_DAY * day_diff + sec1;
 				}
 			}
@@ -622,7 +624,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
 		int delay, const char *flex_intervals, time_t now, int *effective_delay)
 {
-	int	nextcheck;
+	int	nextcheck = 0;
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
@@ -634,36 +636,50 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 	}
 	else
 	{
-		int		current_delay;
-		time_t		next_interval;
+		int		current_delay = SEC_PER_YEAR, try = 0;
+		time_t		next_interval, t, tmax;
 		zbx_uint64_t	shift;
 
-		current_delay = get_current_delay(delay, flex_intervals, now);
+		/* Try to find the nearest 'nextcheck' value with condition */
+		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR */
 
-		if (FAIL != get_next_delay_interval(flex_intervals, now, &next_interval) && now + current_delay > next_interval)
-		{
-			/* next check falls out of the current interval */
-			do
-			{
-				current_delay = get_current_delay(delay, flex_intervals, next_interval + 1);
+		t = now;
+		tmax = now + SEC_PER_YEAR;
 
-				/* as soon as item check in the interval is not forbidden with delay=0, use it */
-				if (SEC_PER_YEAR != current_delay)
-					break;
-
-				get_next_delay_interval(flex_intervals, next_interval + 1, &next_interval);
-			}
-			while (next_interval - now < SEC_PER_WEEK);	/* checking the nearest week for delay!=0 */
-
-			now = next_interval;
-		}
-
-		delay = current_delay;
 		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
-		nextcheck = delay * (int)(now / (time_t)delay) + (int)(shift % (zbx_uint64_t)delay);
 
-		while (nextcheck <= now)
-			nextcheck += delay;
+		while (t < tmax)
+		{
+			/* calculate 'nextcheck' value for the current interval */
+			current_delay = get_current_delay(delay, flex_intervals, t);
+
+			nextcheck = current_delay * (int)(t / (time_t)current_delay) +
+					(int)(shift % (zbx_uint64_t)current_delay);
+
+			if (0 == try)
+			{
+				while (nextcheck <= t)
+					nextcheck += current_delay;
+			}
+			else
+			{
+				while (nextcheck < t)
+					nextcheck += current_delay;
+			}
+
+			/* 'nextcheck' < end of the current interval ? */
+			/* the end of the current interval is the beginning of the next interval - 1 */
+			if (FAIL != get_next_delay_interval(flex_intervals, t, &next_interval) &&
+					nextcheck >= next_interval)
+			{
+				/* 'nextcheck' is beyond the current interval */
+				t = next_interval;
+				try++;
+			}
+			else
+				break;	/* nextcheck is within the current interval */
+		}
+		delay = current_delay;
 	}
 
 	if (NULL != effective_delay)

@@ -50,7 +50,9 @@ $graphFormList = new CFormList('graphFormList');
 if (!empty($this->data['templates'])) {
 	$graphFormList->addRow(_('Parent graph'), $this->data['templates']);
 }
-$graphFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
+$nameTextBox->attr('autofocus', 'autofocus');
+$graphFormList->addRow(_('Name'), $nameTextBox);
 $graphFormList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
 $graphFormList->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5));
 

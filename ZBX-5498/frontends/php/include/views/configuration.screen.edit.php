@@ -36,7 +36,9 @@ $screenForm->addVar('templateid', $this->data['templateid']);
 
 // create screen form list
 $screenFormList = new CFormList('screenFormList');
-$screenFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
+$nameTextBox->attr('autofocus', 'autofocus');
+$screenFormList->addRow(_('Name'), $nameTextBox);
 $screenFormList->addRow(_('Columns'), new CNumericBox('hsize', $this->data['hsize'], 3));
 $screenFormList->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize'], 3));
 

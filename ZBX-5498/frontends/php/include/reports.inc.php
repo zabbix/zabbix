@@ -107,64 +107,15 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 	}
 
 //*
-	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick','javascript: '.
-										'var pos = getPosition(this); '.
-										'pos.top+=10; '.
-										'pos.left+=16; '.
-										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
-
 	$filtertimetab = new CTable(null,'calendar');
-	$filtertimetab->setAttribute('width','10%');
 
-	$filtertimetab->setCellPadding(0);
-	$filtertimetab->setCellSpacing(0);
+	$timeSinceRow = createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill');
+	array_unshift($timeSinceRow, _('From'));
+	$filtertimetab->addRow($timeSinceRow);
 
-	$filtertimetab->addRow(array(
-		_('From'),
-		new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
-		'/',
-		new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
-		'/',
-		new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
-		SPACE,
-		new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
-		':',
-		new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
-		$clndr_icon
-	));
-	zbx_add_post_js('create_calendar(null,'.
-					'["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],'.
-					'"avail_report_since",'.
-					'"filter_timesince");');
-
-	$clndr_icon->AddAction('onclick','javascript: '.
-										'var pos = getPosition(this); '.
-										'pos.top+=10; '.
-										'pos.left+=16; '.
-										"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
-
-	$filtertimetab->AddRow(array(
-		_('Till'),
-		new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
-		'/',
-		new CNumericBox('filter_till_month',(($_REQUEST['filter_timetill']>0)?date('m',$_REQUEST['filter_timetill']):''),2),
-		'/',
-		new CNumericBox('filter_till_year',(($_REQUEST['filter_timetill']>0)?date('Y',$_REQUEST['filter_timetill']):''),4),
-		SPACE,
-		new CNumericBox('filter_till_hour',(($_REQUEST['filter_timetill']>0)?date('H',$_REQUEST['filter_timetill']):''),2),
-		':',
-		new CNumericBox('filter_till_minute',(($_REQUEST['filter_timetill']>0)?date('i',$_REQUEST['filter_timetill']):''),2),
-		$clndr_icon
-	));
-	zbx_add_post_js('create_calendar(null,'.
-			'["filter_till_day","filter_till_month","filter_till_year","filter_till_hour","filter_till_minute"],'.
-			'"avail_report_till",'.
-			'"filter_timetill");');
-
-	zbx_add_post_js('addListener($("filter_icon"),"click",CLNDR[\'avail_report_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_since\'].clndr));'.
-					'addListener($("filter_icon"),"click",CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
-					);
+	$timeTillRow = createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince');
+	array_unshift($timeTillRow, _('Till'));
+	$filtertimetab->addRow($timeTillRow);
 
 	$filterForm->addRow(_('Period'), $filtertimetab);
 
@@ -218,70 +169,15 @@ function bar_report_form(){
 
 //*
 
-	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick','javascript: '.
-										'var pos = getPosition(this); '.
-										'pos.top+=10; '.
-										'pos.left+=16; '.
-										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
-
 	$reporttimetab = new CTable(null,'calendar');
-	$reporttimetab->setAttribute('width','10%');
 
-	$reporttimetab->setCellPadding(0);
-	$reporttimetab->setCellSpacing(0);
+	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
+	array_unshift($timeSinceRow, _('From'));
+	$reporttimetab->addRow($timeSinceRow);
 
-	$reporttimetab->addRow(array(
-		_('From'),
-		new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
-		'/',
-		new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
-		'/',
-		new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
-		SPACE,
-		new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
-		':',
-		new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
-		$clndr_icon
-	));
-	zbx_add_post_js('create_calendar(null,'.
-					'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
-					'"avail_report_since",'.
-					'"report_timesince");');
-
-	$clndr_icon->addAction('onclick','javascript: '.
-										'var pos = getPosition(this); '.
-										'pos.top+=10; '.
-										'pos.left+=16; '.
-										"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
-
-	$reporttimetab->addRow(array(
-		_('Till'),
-		new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
-		'/',
-		new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
-		'/',
-		new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
-		SPACE,
-		new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
-		':',
-		new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
-		$clndr_icon
-	));
-
-	zbx_add_post_js('create_calendar(null,'.
-					'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
-					'"avail_report_till",'.
-					'"report_timetill");'
-					);
-
-	zbx_add_post_js('addListener($("filter_icon"),'.
-						'"click",'.
-						'CLNDR[\'avail_report_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_since\'].clndr));'.
-					'addListener($("filter_icon"),'.
-						'"click",'.
-						'CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
-					);
+	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
+	array_unshift($timeTillRow, _('Till'));
+	$reporttimetab->addRow($timeTillRow);
 
 	$reportForm->addRow(_('Period'), $reporttimetab);
 //*/
@@ -586,71 +482,15 @@ function bar_report_form3(){
 // ----------
 //*/
 // PERIOD
-
-	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick','javascript: '.
-										'var pos = getPosition(this); '.
-										'pos.top+=10; '.
-										'pos.left+=16; '.
-										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
-
 	$reporttimetab = new CTable(null,'calendar');
-	$reporttimetab->setAttribute('width','10%');
 
-	$reporttimetab->setCellPadding(0);
-	$reporttimetab->setCellSpacing(0);
+	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
+	array_unshift($timeSinceRow, _('From'));
+	$reporttimetab->addRow($timeSinceRow);
 
-	$reporttimetab->addRow(array(
-		_('From'),
-		new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
-		'/',
-		new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
-		'/',
-		new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
-		SPACE,
-		new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
-		':',
-		new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
-		$clndr_icon
-	));
-	zbx_add_post_js('create_calendar(null,'.
-					'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
-					'"avail_report_since",'.
-					'"report_timesince");');
-
-	$clndr_icon->addAction('onclick','javascript: '.
-										'var pos = getPosition(this); '.
-										'pos.top+=10; '.
-										'pos.left+=16; '.
-										"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
-
-	$reporttimetab->addRow(array(
-		_('Till'),
-		new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
-		'/',
-		new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
-		'/',
-		new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
-		SPACE,
-		new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
-		':',
-		new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
-		$clndr_icon
-	));
-
-	zbx_add_post_js('create_calendar(null,'.
-					'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
-					'"avail_report_till",'.
-					'"report_timetill");'
-					);
-
-	zbx_add_post_js('addListener($("filter_icon"),'.
-						'"click",'.
-						'CLNDR[\'avail_report_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_since\'].clndr));'.
-					'addListener($("filter_icon"),'.
-						'"click",'.
-						'CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
-					);
+	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
+	array_unshift($timeTillRow, _('Till'));
+	$reporttimetab->addRow($timeTillRow);
 
 	$reportForm->addRow(_('Period'), $reporttimetab);
 
