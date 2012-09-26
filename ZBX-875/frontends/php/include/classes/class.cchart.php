@@ -2233,6 +2233,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
+		// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
 		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] - $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT])<=10) {
 			$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]*0.95;
 			$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]*1.05;
