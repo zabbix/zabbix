@@ -1006,7 +1006,7 @@ function zbx_substr_replace($string, $replacement, $start, $length = null) {
 function str_replace_first($search, $replace, $subject) {
 	$pos = zbx_strpos($subject, $search);
 	if ($pos !== false) {
-		$subject = substr_replace($subject, $replace, $pos, zbx_strlen($search));
+		$subject = zbx_substr_replace($subject, $replace, $pos, zbx_strlen($search));
 	}
 	return $subject;
 }
