@@ -1871,8 +1871,8 @@ class CTrigger extends CTriggerGeneral {
 
 			// check duplicate dependency
 			$AllTriggers = array_merge($trigger['dependencies'], $DwnTriggerids);
-			$UnqTriggers = array_unique($trigger['dependencies']);
-			$DplTriggers = array_diff_assoc($trigger['dependencies'], $UnqTriggers);
+			$UnqTriggers = array_unique($AllTriggers);
+			$DplTriggers = array_diff_assoc($AllTriggers, $UnqTriggers);
 			if ($DplTriggers) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', reset($DplTriggers), $trigger['triggerid'])
