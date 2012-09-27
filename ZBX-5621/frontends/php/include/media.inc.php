@@ -41,19 +41,14 @@ function media_type2str($type = null) {
 }
 
 function media_severity2str($severity) {
-	$mapping = array(
-		0 => array('letter' => zbx_substr(getSeverityCaption(0),0,1), 'style' => (($severity & 1)  ? 'enabled' : NULL)),
-		1 => array('letter' => zbx_substr(getSeverityCaption(1),0,1), 'style' => (($severity & 2)  ? 'enabled' : NULL)),
-		2 => array('letter' => zbx_substr(getSeverityCaption(2),0,1), 'style' => (($severity & 4)  ? 'enabled' : NULL)),
-		3 => array('letter' => zbx_substr(getSeverityCaption(3),0,1), 'style' => (($severity & 8)  ? 'enabled' : NULL)),
-		4 => array('letter' => zbx_substr(getSeverityCaption(4),0,1), 'style' => (($severity & 16) ? 'enabled' : NULL)),
-		5 => array('letter' => zbx_substr(getSeverityCaption(5),0,1), 'style' => (($severity & 32) ? 'enabled' : NULL))
-	);
+	$result = array();
+	foreach (getSeverityCaption() as $i => $caption) {
+		$style = ($severity & (1 << $i)) ? 'enabled' : null;
 
-	foreach ($mapping as $id => $map) {
-		$result[$id] = new CSpan($map['letter'], $map['style']);
-		$result[$id]->setHint(getSeverityCaption($id).' ('.(isset($map['style']) ? 'on' : 'off').')');
+		$result[$i] = new CSpan(zbx_substr($caption, 0, 1), $style);
+		$result[$i]->setHint($caption.' ('.(isset($map['style']) ? 'on' : 'off').')');
 	}
+
 	return $result;
 }
 ?>
