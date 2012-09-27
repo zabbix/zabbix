@@ -1599,6 +1599,7 @@ var sbox = Class.create(CDebug, {
 	px2time:			null,	// seconds in 1px
 	dynamic:			'',		// how page updates, all page/graph only update
 	is_active:			false,	// flag show is sbox is selected, must be unique among all
+	is_activeIE:		false,
 
 	initialize: function($super, id) {
 		var tc = timeControl.objectList[id],
@@ -1670,6 +1671,7 @@ var sbox = Class.create(CDebug, {
 			this.createBox();
 
 			this.is_active = true;
+			this.is_activeIE = true;
 		}
 	},
 
@@ -1721,6 +1723,30 @@ var sbox = Class.create(CDebug, {
 	ieMouseClick: function(e) {
 		if (!e) {
 			e = window.event;
+		}
+
+		if (this.is_activeIE) {
+			this.optimizeEvent(e);
+			deselectAll();
+			this.mouseUp(e);
+			this.is_activeIE = false;
+
+			return cancelEvent(e);
+		}
+
+		if (e.which && e.which != 1) {
+			return true;
+		}
+		else if (e.button && e.button != 1) {
+			return true;
+		}
+
+		this.optimizeEvent(e);
+		deselectAll();
+
+		var posxy = getPosition(this.dom_obj);
+		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
+			return true;
 		}
 
 		this.mouseUp(e);
