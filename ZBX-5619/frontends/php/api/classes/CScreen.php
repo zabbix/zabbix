@@ -561,8 +561,12 @@ class CScreen extends CZBXAPI {
 			'preservekeys' => true
 		));
 
-		foreach ($screenItems as &$screenItem) {
-			$screenItem['screenid'] = $screenid;
+		if (!empty($screenItems)) {
+			foreach ($screenItems as &$screenItem) {
+				$screenItem['screenid'] = $screenid;
+			}
+		} else {
+			$screenItems = array();
 		}
 		$result = API::ScreenItem()->updateByPosition($screenItems);
 

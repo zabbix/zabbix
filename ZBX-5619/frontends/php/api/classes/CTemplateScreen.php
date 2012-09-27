@@ -541,7 +541,7 @@ class CTemplateScreen extends CScreen {
 		$screenids = DB::insert('screens', $screens);
 
 		foreach ($screens as $snum => $screen) {
-			if (isset($screen['screenitems'])) {
+			if (!empty($screen['screenitems'])) {
 				foreach ($screen['screenitems'] as $screenitem) {
 					$screenitem['screenid'] = $screenids[$snum];
 					$insertScreenItems[] = $screenitem;

@@ -199,20 +199,21 @@ class CScreenItem extends CZBXAPI {
 		// substitute the items in the given positions with the ones in the database
 		$updateItems = array();
 		$createItems = array();
-		foreach ($screenItems as $screenItem) {
-			$key = $screenItem['screenid'].'_'.$screenItem['x'].'_'.$screenItem['y'];
+		if (!empty($screenItems)) {
+			foreach ($screenItems as $screenItem) {
+				$key = $screenItem['screenid'].'_'.$screenItem['x'].'_'.$screenItem['y'];
 
-			// an item in the given position exists, update it
-			if (isset($screenItemMap[$key])) {
-				$screenItem['screenitemid'] = $screenItemMap[$key];
-				$updateItems[] = $screenItem;
-			}
-			// the given cell is free, create a new screen item
-			else {
-				$createItems[] = $screenItem;
+				// an item in the given position exists, update it
+				if (isset($screenItemMap[$key])) {
+					$screenItem['screenitemid'] = $screenItemMap[$key];
+					$updateItems[] = $screenItem;
+				}
+				// the given cell is free, create a new screen item
+				else {
+					$createItems[] = $screenItem;
+				}
 			}
 		}
-
 		// save items
 		$updateItemids = array();
 		$createItemids = array();
