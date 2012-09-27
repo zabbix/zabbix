@@ -26,7 +26,7 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.3rc2
 
 Bug fixes:
-..F....... [ZBX-5612] fixed can't view item data overview when host group doesn't have any triggers (Toms)
+..F....... [ZBX-5612] fixed inability to view item data overview when host group doesn't have any triggers (Toms)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.3rc1
