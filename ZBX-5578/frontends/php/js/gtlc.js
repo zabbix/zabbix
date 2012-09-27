@@ -21,12 +21,15 @@
 // graphs timeline controls (gtlc)
 var timeControl = {
 
+	// data
 	objectList: {},
+	timeline: null,
+	scrollbar: null,
+
+	// options
 	refreshPage: true,
 	timeRefreshInterval: 0,
 	timeRefreshTimeout: null,
-	timeline: null,
-	scrollbar: null,
 
 	addObject: function(id, time, objData) {
 		this.objectList[id] = {
@@ -315,10 +318,13 @@ var CTimeLine = Class.create(CDebug, {
 			starttime = endtime - (3 * this.minperiod);
 		}
 
-		this.starttime(starttime);
+		this._starttime = starttime;
+		this._endtime = endtime;
+		this._usertime = usertime;
+		this._period = period;
+
+		// re-validate params
 		this.endtime(endtime);
-		this.usertime(usertime);
-		this.period(period);
 		this.maxperiod = maximumPeriod;
 		this.isNow(isNow);
 	},
@@ -353,6 +359,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(period)) {
 			return this._period;
 		}
+
 		if ((this._usertime - period) < this._starttime) {
 			period = this._usertime - this._starttime;
 		}
@@ -368,6 +375,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(usertime)) {
 			return this._usertime;
 		}
+
 		if ((usertime - this._period) < this._starttime) {
 			usertime = this._starttime + this._period;
 		}
@@ -385,6 +393,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(starttime)) {
 			return this._starttime;
 		}
+
 		this._starttime = starttime;
 
 		return this._starttime;
@@ -394,6 +403,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(endtime)) {
 			return this._endtime;
 		}
+
 		if (endtime < (this._starttime + this._period * 3)) {
 			endtime = this._starttime + this._period * 3;
 		}
@@ -1044,6 +1054,8 @@ var CScrollBar = Class.create(CDebug, {
 	setTabInfo: function() {
 		var period = timeControl.timeline.period(),
 			usertime = timeControl.timeline.usertime();
+
+		// secure browser from incorrect user actions
 		if (isNaN(period) || isNaN(usertime)) {
 			return;
 		}

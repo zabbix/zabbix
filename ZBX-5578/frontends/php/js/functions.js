@@ -887,7 +887,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 
 	var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
 	var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
-	var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
+	//var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
 
 	if (isTsDouble) {
 		if (months.toString().length == 1) {
@@ -902,9 +902,9 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		if (hours.toString().length == 1) {
 			hours = '0' + hours;
 		}
-		if (minutes.toString().length == 1) {
+		/*if (minutes.toString().length == 1) {
 			minutes = '0' + minutes;
-		}
+		}*/
 	}
 
 	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
@@ -916,7 +916,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 			? ''
 			: days + locale['S_DAY_SHORT'] + ' ';
 	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
-	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
+	//str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
 
 	return str;
 }
