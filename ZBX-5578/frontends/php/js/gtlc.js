@@ -1711,29 +1711,6 @@ var sbox = Class.create(CDebug, {
 			e = window.event;
 		}
 
-		if (this.is_active) {
-			this.optimizeEvent(e);
-			deselectAll();
-			this.mouseUp(e);
-
-			return cancelEvent(e);
-		}
-
-		if (e.which && e.which != 1) {
-			return true;
-		}
-		else if (e.button && e.button != 1) {
-			return true;
-		}
-
-		this.optimizeEvent(e);
-		deselectAll();
-
-		var posxy = getPosition(this.dom_obj);
-		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-			return true;
-		}
-
 		this.mouseUp(e);
 
 		return cancelEvent(e);
