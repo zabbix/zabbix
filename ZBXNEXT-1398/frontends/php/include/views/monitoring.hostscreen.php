@@ -32,8 +32,9 @@ if (empty($this->data['screen']) || empty($this->data['host'])) {
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
 
 	$screenBuilder = new CScreenBuilder();
-	$screenBuilder->insertScreenScrollJs($screenBuilder->timeline);
-	$screenBuilder->insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline
+	));
 }
 else {
 	$screenWidget->addPageHeader(_('SCREENS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
@@ -64,8 +65,11 @@ else {
 		'profileIdx2' => $this->data['screen']['screenid']
 	));
 	$screenWidget->addItem($screenBuilder->show());
-	$screenBuilder->insertScreenScrollJs($screenBuilder->timeline);
-	$screenBuilder->insertProcessObjectsJs();
+
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline,
+		'profileIdx' => $screenBuilder->profileIdx
+	));
 }
 
 return $screenWidget;

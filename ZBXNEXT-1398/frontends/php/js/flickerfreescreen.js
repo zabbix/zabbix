@@ -267,7 +267,7 @@ jQuery(function($) {
 		},
 
 		isRefreshAllowed: function (screen, isSelfRefresh) {
-			if (isSelfRefresh == false) {
+			if (isSelfRefresh == false || empty(timeControl.timeline)) {
 				return true;
 			}
 

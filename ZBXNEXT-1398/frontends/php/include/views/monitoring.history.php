@@ -174,10 +174,13 @@ else {
 
 	$historyWidget->addItem($screen->get());
 
-	if (str_in_array($this->data['action'], array('showvalues', 'showgraph'))) {
+	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph') {
 		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
-		CScreenBuilder::insertScreenScrollJs($screen->timeline, $screen->profileIdx);
-		CScreenBuilder::insertProcessObjectsJs();
+
+		CScreenBuilder::insertScreenStandardJs(array(
+			'timeline' => $screen->timeline,
+			'profileIdx' => $screen->profileIdx
+		));
 	}
 }
 

@@ -37,8 +37,9 @@ if (empty($this->data['screens'])) {
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
 
 	$screenBuilder = new CScreenBuilder();
-	$screenBuilder->insertScreenScrollJs($screenBuilder->timeline);
-	$screenBuilder->insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline
+	));
 }
 elseif (!isset($this->data['screens'][$this->data['elementIdentifier']]) && !$this->data['id_has_been_fetched_from_profile']) {
 	// if screen we are searching for does not exist and was not fetched from profile
@@ -135,8 +136,10 @@ else {
 	));
 	$screenWidget->addItem($screenBuilder->show());
 
-	$screenBuilder->insertScreenScrollJs($screenBuilder->timeline, $screenBuilder->profileIdx);
-	$screenBuilder->insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline,
+		'profileIdx' => $screenBuilder->profileIdx
+	));
 
 	$screenWidget->addItem(BR());
 }

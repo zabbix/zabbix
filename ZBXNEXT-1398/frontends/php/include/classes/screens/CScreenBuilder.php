@@ -502,21 +502,25 @@ class CScreenBuilder {
 	/**
 	 * Insert javascript to create scroll in time control.
 	 *
-	 * @param array $timeline
-	 * @param string $profileIdx
+	 * @static
+	 *
+	 * @param array $options
+	 * @param array $options['timeline']
+	 * @param string $options['profileIdx']
 	 */
-	public static function insertScreenScrollJs($timeline, $profileIdx = '') {
+	public static function insertScreenScrollJs(array $options = array()) {
+		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline'];
+		$options['profileIdx'] = empty($options['profileIdx']) ? '' : $options['profileIdx'];
+
 		$timeControlData = array(
 			'id' => 'scrollbar',
 			'loadScroll' => 1,
 			'mainObject' => 1,
-			'periodFixed' => CProfile::get($profileIdx.'.timelinefixed', 1),
+			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
-		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
-
-		CScreenBuilder::insertScreenRefreshTime();
+		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($options['timeline']).', '.zbx_jsvalue($timeControlData).');');
 	}
 
 	/**
@@ -524,7 +528,7 @@ class CScreenBuilder {
 	 *
 	 * @static
 	 */
-	public static function insertScreenRefreshTime() {
+	public static function insertScreenRefreshTimeJs() {
 		zbx_add_post_js('timeControl.useTimeRefresh('.CWebUser::$data['refresh'].');');
 	}
 
@@ -546,5 +550,20 @@ class CScreenBuilder {
 	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');
+	}
+
+	/**
+	 * Insert javascript for standard screens.
+	 *
+	 * @param array $options
+	 * @param array $options['timeline']
+	 * @param string $options['profileIdx']
+	 *
+	 * @static
+	 */
+	public static function insertScreenStandardJs(array $options = array()) {
+		CScreenBuilder::insertScreenScrollJs($options);
+		CScreenBuilder::insertScreenRefreshTimeJs();
+		CScreenBuilder::insertProcessObjectsJs();
 	}
 }
