@@ -54,13 +54,16 @@ if (!empty($this->data['graphid'])) {
 	));
 	$chartsWidget->addItem($screen->get());
 
-	CScreenBuilder::insertScreenScrollJs($screen->timeline, $screen->profileIdx);
-	CScreenBuilder::insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screen->timeline,
+		'profileIdx' => $screen->profileIdx
+	));
 }
 else {
 	$screen = new CScreenBuilder();
-	CScreenBuilder::insertScreenScrollJs($screen->timeline);
-	CScreenBuilder::insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screen->timeline
+	));
 
 	$chartsWidget->addItem(new CTableInfo(_('No graphs defined.')));
 }

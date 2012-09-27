@@ -332,13 +332,11 @@ class CScreenHistory extends CScreenBase {
 				$timeControlData['objDims'] = $graphDims;
 				$timeControlData['loadSBox'] = 1;
 				$timeControlData['loadImage'] = 1;
-				$timeControlData['loadScroll'] = 1;
 				$timeControlData['dynamic'] = 1;
 			}
 			else {
 				$this->dataId = 'historyGraph';
 				$timeControlData['id'] = $this->getDataId();
-				$timeControlData['loadScroll'] = 1;
 				$timeControlData['mainObject'] = 1;
 			}
 
@@ -349,7 +347,6 @@ class CScreenHistory extends CScreenBase {
 			}
 			else {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
-				zbx_add_post_js('timeControl.processObjects();');
 			}
 		}
 

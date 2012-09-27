@@ -214,22 +214,24 @@ var timeControl = {
 	},
 
 	refreshTime: function() {
-		// timeline
-		if (this.timeline.isNow()) {
-			this.timeline.setNow();
-		}
-		else {
-			this.timeline.refreshEndtime();
-		}
+		if (this.timeRefreshInterval > 0) {
+			// timeline
+			if (this.timeline.isNow()) {
+				this.timeline.setNow();
+			}
+			else {
+				this.timeline.refreshEndtime();
+			}
 
-		// scrollbar
-		this.scrollbar.setBarPosition();
-		this.scrollbar.setGhostByBar();
-		this.scrollbar.setTabInfo();
-		this.scrollbar.resetIsNow();
+			// scrollbar
+			this.scrollbar.setBarPosition();
+			this.scrollbar.setGhostByBar();
+			this.scrollbar.setTabInfo();
+			this.scrollbar.resetIsNow();
 
-		// plan next time update
-		this.timeRefreshTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
+			// plan next time update
+			this.timeRefreshTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
+		}
 	},
 
 	objectUpdate: function() {
