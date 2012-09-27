@@ -36,7 +36,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->checkTitle('Configuration of media types');
 
 		$this->ok(array('Media types', 'CONFIGURATION OF MEDIA TYPES', 'Displaying'));
-		$this->ok(array('Description', 'Type', 'Details'));
+		$this->ok(array('Name', 'Type', 'Details'));
 		$this->ok($mediatype['description']);
 		if ($mediatype['type'] == MEDIA_TYPE_EMAIL) $this->ok('Email');
 		if ($mediatype['type'] == MEDIA_TYPE_JABBER) $this->ok('Jabber');

@@ -132,7 +132,7 @@ require_once 'include/page_header.php';
 		}
 
 		while($row = DBfetch($result)){
-			$res = calculate_item_nextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			$res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if(0 != $row['proxy_hostid']){
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 			}
@@ -194,7 +194,7 @@ require_once 'include/page_header.php';
 		}
 
 		while($row = DBfetch($result)){
-			$res = calculate_item_nextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			$res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if(0 != $row['proxy_hostid']){
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 			}
@@ -251,7 +251,7 @@ require_once 'include/page_header.php';
 		));
 
 		while($row = DBfetch($result)){
-			$res = calculate_item_nextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			$res = calculateItemNextcheck($row['interfaceid'], $row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if(0 != $row['proxy_hostid']){
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
 			}

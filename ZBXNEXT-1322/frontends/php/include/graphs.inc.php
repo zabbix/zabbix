@@ -197,8 +197,11 @@ function get_min_itemclock_by_graphid($graphid) {
 }
 
 /**
- * Description:
- *	Return the time of the 1st appearance of item in trends
+ * Return the time of the 1st appearance of item in trends.
+ *
+ * @param array|int $itemids
+ *
+ * @return int (unixtime)
  */
 function get_min_itemclock_by_itemid($itemids) {
 	zbx_value2array($itemids);
@@ -265,19 +268,15 @@ function get_min_itemclock_by_itemid($itemids) {
 				$sql_from = 'history';
 		}
 
-		$res = DBselect(
-			'SELECT ht.itemid,MIN(ht.clock) AS min_clock'.
+		$dbMin = DBfetch(DBselect(
+			'SELECT MIN(ht.clock) AS min_clock'.
 			' FROM '.$sql_from.' ht'.
-			' WHERE '.DBcondition('ht.itemid', $itemids).
-			' GROUP BY ht.itemid'
-		);
-		while ($min_tmp = DBfetch($res)) {
-			$min = (is_null($min)) ? $min_tmp['min_clock'] : min($min, $min_tmp['min_clock']);
-		}
+			' WHERE '.DBcondition('ht.itemid', $itemids)
+		));
+		$min = empty($min) ? $dbMin['min_clock'] : min($min, $dbMin['min_clock']);
 	}
-	$result = is_null($min) ? $result : $min;
 
-	return $result;
+	return empty($min) ? $result : $min;
 }
 
 function get_graph_by_graphid($graphid) {

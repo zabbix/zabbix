@@ -132,7 +132,7 @@ class CScreenBase {
 	 */
 	public function __construct(array $options = array()) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
-		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
+		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;
@@ -238,8 +238,8 @@ class CScreenBase {
 		}
 
 		return ($this->mode == SCREEN_MODE_EDIT)
-			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getScreenId())
-			: new CDiv($item, null, $this->getScreenId());
+			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), 'flickerfreescreen', $this->getScreenId())
+			: new CDiv($item, 'flickerfreescreen', $this->getScreenId());
 	}
 
 	/**
@@ -320,14 +320,16 @@ class CScreenBase {
 		$isNow = false;
 
 		if (!empty($options['stime'])) {
-			if (zbxDateToTime($options['stime']) > $time) {
+			$stimeUnix = zbxDateToTime($options['stime']);
+
+			if ($stimeUnix > $time || zbxAddSecondsToUnixtime($options['period'], $stimeUnix) > $time) {
 				$stimeNow = $options['stime'];
 				$options['stime'] = date('YmdHis', $time - $options['period']);
 				$usertime = date('YmdHis', $time);
 				$isNow = true;
 			}
 			else {
-				$usertime = date('YmdHis', zbxDateToTime($options['stime']) + $options['period']);
+				$usertime = date('YmdHis', zbxAddSecondsToUnixtime($options['period'], $stimeUnix));
 				$isNow = false;
 			}
 
@@ -342,7 +344,7 @@ class CScreenBase {
 				if ($isNow) {
 					$options['stime'] = date('YmdHis', $time - $options['period']);
 					$usertime = date('YmdHis', $time);
-					$stimeNow = date('YmdHis', zbxDateToTime($options['stime']) + 31536000); // 31536000 = 86400 * 365 = 1 year
+					$stimeNow = date('YmdHis', zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
 
 					if ($options['updateProfile']) {
 						CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
@@ -350,14 +352,14 @@ class CScreenBase {
 				}
 				else {
 					$options['stime'] = CProfile::get($options['profileIdx'].'.stime', null, $options['profileIdx2']);
-					$usertime = date('YmdHis', zbxDateToTime($options['stime']) + $options['period']);
+					$usertime = date('YmdHis', zbxAddSecondsToUnixtime($options['period'], $options['stime']));
 				}
 			}
 
 			if (empty($options['stime'])) {
 				$options['stime'] = date('YmdHis', $time - $options['period']);
 				$usertime = date('YmdHis', $time);
-				$stimeNow = date('YmdHis', zbxDateToTime($options['stime']) + 31536000); // 31536000 = 86400 * 365 = 1 year
+				$stimeNow = date('YmdHis', zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
 				$isNow = true;
 
 				if ($options['updateProfile'] && !empty($options['profileIdx'])) {
@@ -391,7 +393,7 @@ class CScreenBase {
 	 * @param boolean	$options['isNow']
 	 */
 	public static function debugTime(array $time = array()) {
-		echo 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
+		return 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
 				'starttime='.date('F j, Y, g:i a', zbxDateToTime($time['starttime'])).', ('.$time['starttime'].')<br/>'.
 				'stime='.date('F j, Y, g:i a', zbxDateToTime($time['stime'])).', ('.$time['stime'].')<br/>'.
 				'stimeNow='.date('F j, Y, g:i a', zbxDateToTime($time['stimeNow'])).', ('.$time['stimeNow'].')<br/>'.

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,14 +122,14 @@ class CUserMacro extends CZBXAPI {
 			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sqlParts['where'][] = 'ug.userid='.$userid;
 			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS('.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
 				' SELECT hgg.groupid'.
 				' FROM hosts_groups hgg,rights rr,users_groups gg'.
 				' WHERE hgg.hostid=hg.hostid'.
-				' AND rr.id=hgg.groupid'.
-				' AND rr.groupid=gg.usrgrpid'.
-				' AND gg.userid='.$userid.
-				' AND rr.permission<'.$permission.')';
+					' AND rr.id=hgg.groupid'.
+					' AND rr.groupid=gg.usrgrpid'.
+					' AND gg.userid='.$userid.
+					' AND rr.permission<'.$permission.')';
 		}
 
 		// nodeids
@@ -452,9 +452,7 @@ class CUserMacro extends CZBXAPI {
 
 		foreach ($globalMacros as $globalMacro) {
 			$this->checkMacro($globalMacro);
-			if (isset($globalMacro['value'])) {
-				$this->checkValue($globalMacro);
-			}
+			$this->checkValue($globalMacro);
 			$this->checkUnsupportedFields('globalmacro', $globalMacro,
 				_s('Wrong fields for macro "%1$s".', $globalMacro['macro']));
 		}
@@ -603,9 +601,7 @@ class CUserMacro extends CZBXAPI {
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkMacro($hostMacro);
 			$this->checkHostId($hostMacro);
-			if (isset($hostMacro['value'])) {
-				$this->checkValue($hostMacro);
-			}
+			$this->checkValue($hostMacro);
 			$this->checkUnsupportedFields('hostmacro', $hostMacro,
 				_s('Wrong fields for macro "%1$s".', $hostMacro['macro']));
 		}
@@ -687,7 +683,13 @@ class CUserMacro extends CZBXAPI {
 		return array('hostmacroids' => $hostMacroIds);
 	}
 
-// TODO: should be private
+	/**
+	 * Get macros
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
 	public function getMacros($data) {
 		$macros = $data['macros'];
 		$itemid = isset($data['itemid']) ? $data['itemid'] : null;
@@ -698,26 +700,24 @@ class CUserMacro extends CZBXAPI {
 
 		$result = array();
 
-		$objOptions = array(
+		$hosts = API::Host()->get(array(
 			'itemids' => $itemid,
 			'triggerids' => $triggerid,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'output' => API_OUTPUT_SHORTEN,
-			'templated_hosts' => true,
-		);
-		$hosts = API::Host()->get($objOptions);
+			'templated_hosts' => true
+		));
 		$hostids = array_keys($hosts);
 
-		do{
-			$objOptions = array(
+		do {
+			$hostMacros = $this->get(array(
 				'hostids' => $hostids,
 				'macros' => $macros,
 				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1,
-				'preservekeys' => 1,
-			);
-			$hostMacros = $this->get($objOptions);
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
 			order_result($hostMacros, 'hostid');
 
 			foreach ($macros as $mnum => $macro) {
@@ -731,26 +731,24 @@ class CUserMacro extends CZBXAPI {
 			}
 
 			if (!empty($macros)) {
-				$objOptions = array(
+				$hosts = API::Template()->get(array(
 					'hostids' => $hostids,
-					'nopermissions' => 1,
-					'preservekeys' => 1,
-					'output' => API_OUTPUT_SHORTEN,
-				);
-				$hosts = API::Template()->get($objOptions);
+					'nopermissions' => true,
+					'preservekeys' => true,
+					'output' => API_OUTPUT_SHORTEN
+				));
 				$hostids = array_keys($hosts);
 			}
-		}while (!empty($macros) && !empty($hostids));
+		} while (!empty($macros) && !empty($hostids));
 
 
 		if (!empty($macros)) {
-			$objOptions = array(
+			$gmacros = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
-				'globalmacro' => 1,
-				'nopermissions' => 1,
+				'globalmacro' => true,
+				'nopermissions' => true,
 				'macros' => $macros
-			);
-			$gmacros = $this->get($objOptions);
+			));
 
 			foreach ($macros as $macro) {
 				foreach ($gmacros as $mid => $gmacro) {
@@ -786,7 +784,10 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		if ($single) $triggers = reset($triggers);
+		if ($single) {
+			$triggers = reset($triggers);
+		}
+
 		return $triggers;
 	}
 
@@ -809,7 +810,9 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		if ($single) $items = $items[0];
+		if ($single) {
+			$items = $items[0];
+		}
 
 		return $items;
 	}
@@ -865,7 +868,6 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-
 		if ($macrosToAdd) {
 			$this->create($macrosToAdd);
 		}
@@ -902,13 +904,10 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $macro
 	 *
-	 * @throws APIException if the field is empty or too long.
+	 * @throws APIException if the field is too long.
 	 */
 	protected function checkValue(array $macro) {
-		if (!isset($macro['value']) || zbx_empty($macro['value'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty value for macro "%1$s".', $macro['macro']));
-		}
-		if (zbx_strlen($macro['value']) > 255) {
+		if (isset($macro['value']) && zbx_strlen($macro['value']) > 255) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 255 chars.', $macro['macro']));
 		}
 	}
@@ -956,6 +955,7 @@ class CUserMacro extends CZBXAPI {
 		foreach ($macros as $macro) {
 			// global macros don't have hostid
 			$hostid = isset($macro['hostid']) ? $macro['hostid'] : 1;
+
 			if (isset($existingMacros[$hostid][$macro['macro']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 			}
@@ -989,7 +989,7 @@ class CUserMacro extends CZBXAPI {
 					|| !isset($hostMacro['hostmacroid']));
 
 				if ($hostMacro['macro'] == $dbHostMacro['macro'] && bccomp($hostMacro['hostid'], $dbHostMacro['hostid']) == 0
-					&& $differentMacros) {
+						&& $differentMacros) {
 
 					$hosts = API::getApi()->select('hosts', array(
 						'output' => array('name'),

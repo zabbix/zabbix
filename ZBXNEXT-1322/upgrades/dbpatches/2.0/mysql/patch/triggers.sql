@@ -70,7 +70,7 @@ BEGIN
 END$
 DELIMITER ;
 
-CALL zbx_convert_events;
+CALL zbx_convert_events();
 
 DROP PROCEDURE zbx_convert_events;
 

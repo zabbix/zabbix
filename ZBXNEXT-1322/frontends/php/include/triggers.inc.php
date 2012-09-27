@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,12 +10,12 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; ifnot, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
@@ -291,6 +291,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 		default:
 			$color = $config['severity_color_0'];
 	}
+
 	return $color;
 }
 
@@ -298,6 +299,7 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 	if ($text === null) {
 		$text = getSeverityCaption($severity);
 	}
+
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
@@ -309,6 +311,7 @@ function get_service_status_of_trigger($triggerid) {
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.value='.TRIGGER_VALUE_TRUE;
 	$rows = DBfetch(DBselect($sql, 1));
+
 	return !empty($rows['priority']) ? $rows['priority'] : 0;
 }
 
@@ -366,6 +369,7 @@ function trigger_value2str($value) {
 	if (isset($str_val[$value])) {
 		return $str_val[$value];
 	}
+
 	return _('Unknown');
 }
 
@@ -405,6 +409,7 @@ function discovery_value_style($val) {
 		default:
 			$style = '';
 	}
+
 	return $style;
 }
 
@@ -449,6 +454,7 @@ function getParentHostsByTriggers($triggers) {
 			'nopermissions' => true
 		));
 	}
+
 	return $hosts;
 }
 
@@ -458,6 +464,7 @@ function get_trigger_by_triggerid($triggerid) {
 		return $db_trigger;
 	}
 	error(_s('No trigger with triggerid "%1$s".', $triggerid));
+
 	return false;
 }
 
@@ -525,6 +532,7 @@ function utf8RawUrlDecode($source) {
 			$pos++;
 		}
 	}
+
 	return $decodedStr;
 }
 
@@ -535,28 +543,20 @@ function utf8RawUrlDecode($source) {
  * $srcHostId parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the
  * $srcHostId parameter is passed, the given host will be replaced with the destination host.
  *
- * @param string|array $srcTriggerIds
- * @param string|array $dstHostIds
- * @param string $srcHostId
+ * This function takes care of copied trigger dependencies.
+ * If trigger is copied alongside with trigger on which it depends, then dependencies is replaced directly using new ids,
+ * If there is target host within dependency trigger, algorithm will search for potential matching trigger in target host,
+ * if matching trigger is found, then id from this trigger is used, if not rise exception,
+ * otherwise original dependency will be left.
+ *
+ *
+ * @param int|array $srcTriggerIds triggers which will be copied to $dstHostIds
+ * @param int|array $dstHostIds hosts and templates to whom add triggers, ids not present in DB (host table) will be ignored
+ * @param int $srcHostId host id in which context trigger with multiple hosts will be treated
  *
  * @return bool
  */
 function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
-	if ($srcHostId) {
-		$options = array(
-			'output' => array('hostid', 'host'),
-			'hostids' => $srcHostId,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'templated_hosts' => true
-		);
-		$srcHosts = API::Host()->get($options);
-		if (empty($srcHosts)) {
-			return false;
-		}
-		$srcHost = reset($srcHosts);
-	}
-
 	$options = array(
 		'triggerids' => $srcTriggerIds,
 		'output' => array('triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'),
@@ -564,12 +564,27 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_REFER
 	);
-	if (!$srcHostId) {
-		$options['selectHosts'] = array('hostid', 'host');
-	}
-	$db_srcTriggers = API::Trigger()->get($options);
+	if ($srcHostId) {
+		$srcHost = API::Host()->get(array(
+			'output' => array('host'),
+			'hostids' => $srcHostId,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'templated_hosts' => true
+		));
 
-	$db_dstHosts = API::Host()->get(array(
+		// if provided $srcHostId doesn't match any record in DB, return false
+		if (!($srcHost = reset($srcHost))) {
+			return false;
+		}
+	}
+	// if no $srcHostId provided we will need trigger host 'host'
+	else {
+		$options['selectHosts'] = array('host');
+	}
+	$dbSrcTriggers = API::Trigger()->get($options);
+
+	$dbDstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host'),
 		'hostids' => $dstHostIds,
 		'preservekeys' => true,
@@ -577,25 +592,27 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'templated_hosts' => true
 	));
 
-	$newTriggerIds = array();
-	$httpTriggerIds = array();
-	foreach ($db_dstHosts as $dstHost) {
-		foreach ($db_srcTriggers as $srcTrigger) {
-			if (httpItemExists($srcTrigger['items'])) {
-				$httpTriggerIds[$srcTrigger['triggerid']] = $srcTrigger['triggerid'];
-				continue;
-			}
-
+	$newTriggers = array();
+	// create each trigger for each host
+	foreach ($dbDstHosts as $dstHost) {
+		foreach ($dbSrcTriggers as $srcTrigger) {
+			// if $srcHostId provided, get host 'host' for explode_exp()
 			if ($srcHostId != 0) {
 				$host = $srcHost['host'];
+				$srcTriggerContextHostId = $srcHostId;
 			}
+			// if $srcHostId not provided, use source trigger first host 'host'
 			else {
+				// if we have multiple hosts in trigger expression and we haven't pointed ($srcHostId) which host to replace, call error
 				if (count($srcTrigger['hosts']) > 1) {
-					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.', $srcTrigger['description'], explode_exp($srcTrigger['expression'])));
+					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.',
+						$srcTrigger['description'], explode_exp($srcTrigger['expression'])));
 					return false;
 				}
 				$host = $srcTrigger['hosts'][0]['host'];
+				$srcTriggerContextHostId = $srcTrigger['hosts'][0]['hostid'];
 			}
+			// get expression for the new trigger to be added
 			$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $host, $dstHost['host']);
 
 			// the dependencies must be added after all triggers are created
@@ -604,35 +621,100 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 			if (!$result = API::Trigger()->create($srcTrigger)) {
 				return false;
 			}
-			$newTriggerIds[$srcTrigger['triggerid']] = reset($result['triggerids']);
+
+			$newTriggers[$srcTrigger['triggerid']] = array(
+				'newTriggerId' =>reset($result['triggerids']),
+				'newTriggerHostId' =>  $dstHost['hostid'],
+				'newTriggerHost' =>  $dstHost['host'],
+				'srcTriggerContextHostId' => $srcTriggerContextHostId,
+				'srcTriggerContextHost' => $host
+			);
 		}
 	}
 
-	// map dependencies to the new trigger IDs and save
-	if ($newTriggerIds) {
-		$dependencies = array();
-		foreach ($db_srcTriggers as $trigger) {
-			$triggerId = $trigger['triggerid'];
-			$triggerId = (isset($newTriggerIds[$triggerId])) ? $newTriggerIds[$triggerId] : $triggerId;
+	$depIds = array();
+	foreach ($dbSrcTriggers as $srcTrigger) {
+		if ($srcTrigger['dependencies']) {
+			foreach ($srcTrigger['dependencies'] as $depTrigger) {
+				$depIds[] = $depTrigger['triggerid'];
+			}
+		}
+	}
+	$depTriggers = API::Trigger()->get(array(
+		'triggerids' => $depIds,
+		'output' => API_OUTPUT_EXTEND,
+		'nopermissions' => true,
+		'selectHosts' => array('hostid'),
+		'preservekeys' => true
+	));
 
-			if ($trigger['dependencies']) {
-				foreach ($trigger['dependencies'] as $depTrigger) {
-					// skip dependencies on triggers containing web items
-					if (isset($httpTriggerIds[$depTrigger['triggerid']])) {
-						continue;
+	// map dependencies to the new trigger IDs and save
+	if ($newTriggers) {
+		$dependencies = array();
+		foreach ($dbSrcTriggers as $srcTrigger) {
+			if ($srcTrigger['dependencies']) {
+				// get coresponding created trigger id
+				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
+
+
+				foreach ($srcTrigger['dependencies'] as $depTrigger) {
+					// we have added $depTrigger trigger, and we know corresponding trigger id for newly created trigger
+					if (isset($newTriggers[$depTrigger['triggerid']])) {
+
+						// dependency is within same host
+						// according to $srcHostId parameter or dep trigger has single host
+						if ($newTrigger['srcTriggerContextHostId'] == $newTriggers[$depTrigger['triggerid']]['srcTriggerContextHostId']) {
+							$depTriggerId = $newTriggers[$depTrigger['triggerid']]['newTriggerId'];
+						}
+						// dependency is to trigger from another host
+						else {
+							$depTriggerId = $depTrigger['triggerid'];
+						}
+					}
+					// we need to search for $depTrigger trigger if target host is within dependency hosts
+					elseif (in_array(array('hostid'=>$newTrigger['srcTriggerContextHostId']), $depTriggers[$depTrigger['triggerid']]['hosts'])) {
+						// get all possible $depTrigger matching triggers by description
+						$targetHostTriggersByDescription = API::Trigger()->get(array(
+							'hostids' => $newTrigger['newTriggerHostId'],
+							'output' => array('hosts', 'triggerid', 'expression'),
+							'filter' => array('description' => $depTriggers[$depTrigger['triggerid']]['description']),
+							'preservekeys' => true
+						));
+
+						// compare exploded expressions for exact match
+						$expr1 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression']);
+						$depTriggerId = null;
+						foreach ($targetHostTriggersByDescription as $potentialTargetTrigger) {
+							$expr2 = explode_exp($potentialTargetTrigger['expression'], false, false, $newTrigger['newTriggerHost'], $newTrigger['srcTriggerContextHost']);
+							if ($expr2 == $expr1) {
+								// matching trigger has been found
+								$depTriggerId = $potentialTargetTrigger['triggerid'];
+								break;
+							}
+						}
+						// if matching trigger wasn't found rise exception
+						if (is_null($depTriggerId)) {
+							$expr1 = explode_exp($srcTrigger['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
+							$expr2 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
+							error(_s('Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
+								$srcTrigger['description'], $expr1,
+								$depTriggers[$depTrigger['triggerid']]['description'], $expr2));
+							return false;
+						}
+					}
+					// leave original dependency
+					else {
+						$depTriggerId = $depTrigger['triggerid'];
 					}
 
-					$depTriggerId = $depTrigger['triggerid'];
-					$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
 
 					$dependencies[] = array(
-						'triggerid' => $triggerId,
+						'triggerid' => $newTrigger['newTriggerId'],
 						'dependsOnTriggerid' => $depTriggerId
 					);
 				}
 			}
 		}
-
 		if ($dependencies) {
 			if (!API::Trigger()->addDependencies($dependencies)) {
 				return false;
@@ -653,6 +735,7 @@ function construct_expression($itemid, $expressions) {
 		error(_('Expression cannot be empty'));
 		return false;
 	}
+
 	$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*)([&|]{1})(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
 	$functions = array('regexp' => 1, 'iregexp' => 1);
 	$expr_array = array();
@@ -741,6 +824,7 @@ function construct_expression($itemid, $expressions) {
 		$tail = substr($complite_expr, $startpos);
 		$complite_expr = $head.'('.$tail.')';
 	}
+
 	return $complite_expr;
 }
 
@@ -869,6 +953,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 			$exp .= $expression[$i];
 		}
 	}
+
 	return $exp;
 }
 
@@ -980,6 +1065,7 @@ function triggerExpression($trigger, $html = false) {
 			$exp .= $expression[$i];
 		}
 	}
+
 	return $exp;
 }
 
@@ -1047,12 +1133,13 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 		$expr = str_replace($exprPart['expression'], '{'.$usedItems[$exprPart['expression']].'}', $expr);
 	}
 	$hostnames = array_unique($hostnames);
+
 	return $expr;
 }
 
-function updateTriggerValueToUnknownByHostId($hostIds) {
-	zbx_value2array($hostIds);
-	$triggerIds = array();
+function updateTriggerValueToUnknownByHostId($hostids) {
+	zbx_value2array($hostids);
+	$triggerids = array();
 
 	$result = DBselect(
 		'SELECT DISTINCT t.triggerid'.
@@ -1060,43 +1147,74 @@ function updateTriggerValueToUnknownByHostId($hostIds) {
 		' WHERE h.hostid=i.hostid'.
 			' AND i.itemid=f.itemid'.
 			' AND f.triggerid=t.triggerid'.
-			' AND '.DBcondition('h.hostid', $hostIds).
+			' AND '.DBcondition('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
 	);
 	while ($row = DBfetch($result)) {
-		$triggerIds[] = $row['triggerid'];
+		$triggerids[] = $row['triggerid'];
 	}
 
-	if (!empty($triggerIds)) {
+	if (!empty($triggerids)) {
 		DB::update('triggers', array(
 			'values' => array(
 				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
 				'error' => _s('Host status became "%s"', _('Not monitored'))
 			),
-			'where' => array('triggerid' => $triggerIds)
+			'where' => array('triggerid' => $triggerids)
 		));
-		addEvent($triggerIds, TRIGGER_VALUE_UNKNOWN);
+
+		addUnknownEvent($triggerids);
 	}
+
 	return true;
 }
 
-function addEvent($triggerids, $value) {
+/**
+ * Create unknown type event for given triggers.
+ *
+ * @param int|array $triggerids triggers to whom add unknown type event
+ *
+ * @return array returns created event ids
+ */
+function addUnknownEvent($triggerids) {
 	zbx_value2array($triggerids);
 
-	$now = time();
-	$events = array();
+	$triggers = API::Trigger()->get(array(
+		'triggerids' => $triggerids,
+		'output' => array('value'),
+		'preservekeys' => true
+	));
+
+	$eventids = array();
 	foreach ($triggerids as $triggerid) {
-		$events[] = array(
+		$event = array(
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectid' => $triggerid,
-			'clock' => $now,
-			'value' => $value,
+			'clock' => time(),
+			'value' => TRIGGER_VALUE_UNKNOWN,
 			'acknowledged' => 0
 		);
+
+		// check if trigger exist in DB
+		if (isset($triggers[$event['objectid']])) {
+			if ($event['value'] != $triggers[$event['objectid']]['value']) {
+				$eventid = get_dbid('events', 'eventid');
+
+				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
+						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
+									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
+				if (!DBexecute($sql)) {
+					throw new Exception();
+				}
+
+				$eventids[$eventid] = $eventid;
+			}
+		}
 	}
-	return API::Event()->create($events);
+
+	return $eventids;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
@@ -1104,7 +1222,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 
 	$hosts = API::Host()->get(array(
 		'filter' => array('host' => $expr->data['hosts']),
-		'editable' => $permission == PERM_READ_WRITE ? 1 : null,
+		'editable' => ($permission == PERM_READ_WRITE) ? 1 : null,
 		'output' => array('hostid', 'host'),
 		'templated_hosts' => true,
 		'preservekeys' => true
@@ -1117,6 +1235,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -1132,6 +1251,7 @@ function replace_template_dependencies($deps, $hostid) {
 			$deps[$id] = $db_new_dep['triggerid'];
 		}
 	}
+
 	return $deps;
 }
 
@@ -1254,6 +1374,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 			$triggerTable->addRow($tableColumns);
 		}
 	}
+
 	return $triggerTable;
 }
 
@@ -1263,7 +1384,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
  * @see get_triggers_overview()
  *
  * @param array $triggerHosts	an array with the data about the trigger for each host
- * @param string $hostName	the name of the cells corresponding host
+ * @param string $hostName		the name of the cells corresponding host
  * @param string $screenId
  *
  * @return CCol
@@ -1398,7 +1519,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table);
+			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
 		unset($img, $dep_table, $dependency);
@@ -1418,7 +1539,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		if ($dependency) {
 			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table);
+			$img->setHint($dep_table, '', '', false);
 			array_push($desc, $img);
 		}
 		unset($img, $dep_table, $dependency);
@@ -1435,11 +1556,12 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	}
 
 	if (isset($tr_ov_menu)) {
-		$tr_ov_menu  = new CPUMenu($tr_ov_menu, 170);
+		$tr_ov_menu = new CPUMenu($tr_ov_menu, 170);
 		$tableColumn->onClick($tr_ov_menu->getOnActionJS());
-		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: \'1px dotted #0C0CF0\', padding: \'0px 2px\'})');
-		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: \'\', padding: \'1px 3px\'})');
+		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: "1px dotted #0C0CF0", padding: "0 2px"})');
+		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: "", padding: "1px 3px"})');
 	}
+
 	return $tableColumn;
 }
 
@@ -1485,8 +1607,8 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
 			$ret['unknown_time'] = 0;
-			$ret['true'] = TRIGGER_VALUE_TRUE == $start_value ? 100 : 0;
-			$ret['false'] = TRIGGER_VALUE_FALSE == $start_value ? 100 : 0;
+			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
+			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
 			$ret['unknown'] = (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 			return $ret;
 		}
@@ -1579,6 +1701,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$ret['false'] = (100 * $false_time) / $total_time;
 		$ret['unknown'] = (100 * $unknown_time) / $total_time;
 	}
+
 	return $ret;
 }
 
@@ -1610,6 +1733,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	else {
 		$options['withUnacknowledgedEvents'] = 1;
 	}
+
 	if ($count_problems) {
 		$options['filter']['value'] = TRIGGER_VALUE_TRUE;
 	}
@@ -1622,6 +1746,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	if (!empty($elements['triggers'])) {
 		$options['triggerids'] = array_unique($elements['triggers']);
 	}
+
 	return API::Trigger()->get($options);
 }
 
@@ -1677,6 +1802,7 @@ function analyze_expression($expression) {
 	$pasedData = parseTriggerExpressions($expression, true);
 	$next = array();
 	$letterNum = 0;
+
 	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $letterNum);
 }
 
@@ -1736,6 +1862,7 @@ function find_divide_pos($expr) {
 			$pos = $i;
 		}
 	}
+
 	return $pos == 0 ? false : $pos;
 }
 
@@ -1762,6 +1889,7 @@ function trim_extra_bracket($expr) {
 			$bak = $expr;
 		} while (($expr = trim_extra_bracket($expr)) != $bak);
 	}
+
 	return $expr;
 }
 
@@ -1914,6 +2042,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 		}
 		array_push($treeList, array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => $levelDetails));
 	}
+
 	return array($outline, $treeList);
 }
 
@@ -1961,6 +2090,7 @@ function expressionHighLevelErrors($expression, $start, $end) {
 			}
 		}
 	}
+
 	return $ret;
 }
 
@@ -1998,6 +2128,7 @@ function find_next_operand($expression, $sStart, $sEnd, &$parts, &$betweenParts,
 		next($parts);
 		$cKey = key($parts);
 	}
+
 	return $position;
 }
 
@@ -2098,6 +2229,7 @@ function rebuild_expression_tree($expression, &$treeLevel, $action, $actionid, $
 			$newExp .= $curLevelVal;
 		}
 	}
+
 	return $newExp;
 }
 
@@ -2261,6 +2393,7 @@ function get_item_function_info($expr) {
 			}
 		}
 	}
+
 	return $result;
 }
 
@@ -2322,6 +2455,7 @@ function parseTriggerExpressions($expressions, $askData = false) {
 		}
 		$data[$str] =& $triggersData[$str];
 	}
+
 	return $askData ? $data : $noErrors;
 }
 
@@ -2468,5 +2602,6 @@ function convert($value) {
 			$value *= 60 * 60 * 24 * 7;
 			break;
 	}
+
 	return $value;
 }

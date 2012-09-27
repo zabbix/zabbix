@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function get_last_event_by_triggerid($triggerid) {
 	$dbEvents = DBfetch(DBselect(
@@ -29,6 +28,7 @@ function get_last_event_by_triggerid($triggerid) {
 		' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC',
 		1
 	));
+
 	return !empty($dbEvents) ? $dbEvents : false;
 }
 
@@ -48,10 +48,10 @@ function make_acktab_by_eventid($event) {
 				new CCol(zbx_nl2br($ack['message']), 'wraptext')
 			));
 		}
+
 		return $table;
 	}
 	else {
 		return null;
 	}
 }
-?>

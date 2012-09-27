@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $discoveryWidget = new CWidget();
@@ -35,7 +35,9 @@ if (!empty($this->data['druleid'])) {
 
 // create form list
 $discoveryFormList = new CFormList('discoveryFormList');
-$discoveryFormList->addRow(_('Name'), new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+$nameTextBox = new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
+$nameTextBox->attr('autofocus', 'autofocus');
+$discoveryFormList->addRow(_('Name'), $nameTextBox);
 
 // append proxy to form list
 $proxyComboBox = new CComboBox('proxy_hostid', $this->data['drule']['proxy_hostid']);
@@ -91,5 +93,5 @@ $discoveryForm->addItem(makeFormFooter(
 ));
 
 $discoveryWidget->addItem($discoveryForm);
+
 return $discoveryWidget;
-?>

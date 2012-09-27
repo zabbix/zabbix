@@ -78,9 +78,8 @@ if (isset($_REQUEST['save'])) {
 		$audit_action = AUDIT_ACTION_ADD;
 	}
 
-	add_audit_if($result, $audit_action, AUDIT_RESOURCE_NODE, 'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
-
 	if ($result) {
+		add_audit($audit_action, AUDIT_RESOURCE_NODE, 'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
 		unset($_REQUEST['form']);
 	}
 }
@@ -93,9 +92,8 @@ elseif (isset($_REQUEST['delete'])) {
 
 	show_messages($result, _('Node deleted'), _('Cannot delete node'));
 
-	add_audit_if($result, AUDIT_ACTION_DELETE, AUDIT_RESOURCE_NODE, 'Node ['.$node['name'].'] id ['.$node['nodeid'].']');
-
 	if ($result) {
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_NODE, 'Node ['.$node['name'].'] id ['.$node['nodeid'].']');
 		unset($_REQUEST['form'], $node);
 	}
 }

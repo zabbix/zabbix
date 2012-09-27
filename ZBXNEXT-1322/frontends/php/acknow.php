@@ -205,9 +205,11 @@ elseif (isset($_REQUEST['events'])) {
 	}
 }
 
-$frmMsg->addRow(_('Message'), new CTextArea('message', '', ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_BIG_WIDTH));
+$frmMsg->addRow(_('Message'), new CTextArea('message', '', array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'maxlength' => 255)));
 $frmMsg->addItemToBottomRow(new CSubmit('saveandreturn', $btn_txt2));
-$bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
+if (!$bulk) {
+	$frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
+}
 $frmMsg->addItemToBottomRow(new CButtonCancel(url_param('backurl').url_param('eventid').url_param('triggerid').url_param('screenid')));
 $frmMsg->show(false);
 

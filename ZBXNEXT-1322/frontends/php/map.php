@@ -51,7 +51,7 @@ $maps = API::Map()->get(array(
 	'preservekeys' => true
 ));
 $map = reset($maps);
-if (!$map) {
+if (empty($map)) {
 	access_deny();
 }
 
