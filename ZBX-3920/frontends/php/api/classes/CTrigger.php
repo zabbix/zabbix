@@ -1860,7 +1860,7 @@ class CTrigger extends CTriggerGeneral {
 					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular dependencies are not allowed.'));
 					}
-					if($upTrigger['triggerid_down'] == $trigger['triggerid']) {
+					if ($upTrigger['triggerid_down'] == $trigger['triggerid']) {
 						$DwnTriggerids[] = $upTrigger['triggerid_up'];
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
@@ -1870,10 +1870,10 @@ class CTrigger extends CTriggerGeneral {
 			} while (!empty($upTriggerids));
 
 			// check duplicate dependency
-			$AllTriggers = array_merge ($trigger['dependencies'], $DwnTriggerids);
+			$AllTriggers = array_merge($trigger['dependencies'], $DwnTriggerids);
 			$UnqTriggers = array_unique($trigger['dependencies']);
 			$DplTriggers = array_diff_assoc($trigger['dependencies'], $UnqTriggers);
-			if($DplTriggers) {
+			if ($DplTriggers) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', reset($DplTriggers), $trigger['triggerid'])
 				);
