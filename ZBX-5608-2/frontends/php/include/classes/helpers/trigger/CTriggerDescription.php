@@ -337,15 +337,17 @@ class CTriggerDescription {
 						' WHERE '.DBcondition('f.functionid', array_keys($expandIp)).
 							' AND n.main=1'
 			);
-			$priority = 0;
+			// macro should be resolved to interface with highest priority ($priorities)
+			$interfaces = array();
 			while ($dbInterface = DBfetch($dbInterfaces)) {
-				if ($priority >= $priorities[$dbInterface['type']]) {
+				if (isset($interfaces[$dbInterface['functionid']])
+						&& $priorities[$interfaces[$dbInterface['functionid']]['type']] > $priorities[$dbInterface['type']]) {
 					continue;
 				}
-				$priority = $priorities[$dbInterface['type']];
-				$interface = $dbInterface;
+				$interfaces[$dbInterface['functionid']] = $dbInterface;
 			}
-			if (!empty($interface)) {
+
+			foreach ($interfaces as $interface) {
 				foreach ($expandIp[$interface['functionid']] as $macro => $fNums) {
 					switch ($macro) {
 						case 'IPADDRESS':
@@ -438,7 +440,7 @@ class CTriggerDescription {
 							$replace = false;
 						}
 
-						if ($replace) {
+						if ($replace !== false) {
 							$trigger['description'] = zbx_substr_replace(
 								$trigger['description'],
 								$replace,
@@ -465,11 +467,11 @@ class CTriggerDescription {
 	 * @return string
 	 */
 	protected function resolveItemLastvalueMacro(array $item) {
-		if ($item['newvalue']) {
-			$value = $item['newvalue'].' ('.$item['lastvalue'].')';
+		if (is_null($item['newvalue'])) {
+			$value = formatItemValue($item, UNRESOLVED_MACRO_STRING);
 		}
 		else {
-			$value = formatItemValue($item, UNRESOLVED_MACRO_STRING);
+			$value = $item['newvalue'].' ('.$item['lastvalue'].')';
 		}
 
 		return $value;
