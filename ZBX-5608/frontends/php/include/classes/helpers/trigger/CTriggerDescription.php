@@ -108,38 +108,45 @@ class CTriggerDescription {
 		$macroValues = array();
 
 		$functions = array();
+		$functionsByMacros = array();
+		// key is macros type, value is coressponding regex
+		$macroRegex = array(
+			'host' => 'HOSTNAME|HOST\.HOST|HOST\.NAME',
+			'interface' => 'IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN',
+			'item' => 'ITEM\.LASTVALUE|ITEM\.VALUE'
+		);
 
 		foreach ($triggers as $triggerId => $trigger) {
 			$triggers[$triggerId]['description'] = $this->expandReferenceMacros($trigger);
 
+			// get function ids used in trigger expression
 			$triggerFunctionsByPos = $this->findFunctions($trigger['expression']);
 			foreach ($triggerFunctionsByPos as $funcId) {
 				$functions[$funcId] = 1;
 			}
 
-			$macroRegex = array(
-				'host' => 'HOSTNAME|HOST\.HOST|HOST\.NAME',
-				'interface' => 'IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN',
-				'item' => 'ITEM\.LASTVALUE|ITEM\.VALUE'
-			);
-
-			$functionsByMacros = array();
+			// build up structure [macroType][trigegrId][macro][position] = functionId
+			// example: ['host'][12345]['HOST.NAME'][2] = 4433
 			foreach ($macroRegex as $type => $regex) {
 				preg_match_all('/{('.$regex.')([1-9]?)}/', $trigger['description'], $matches);
-				$functionsByMacros[$type] = array();
+				$functionsByMacros[$type][$triggerId] = array();
 				foreach ($matches[1] as $key => $macro) {
 					$pos = ($matches[2][$key])?$matches[2][$key]:0;
-					$functionsByMacros[$type][$macro][$pos] = $triggerFunctionsByPos[$pos];
+					if (isset($triggerFunctionsByPos[$pos])) {
+						$functionsByMacros[$type][$triggerId][$macro][$pos] = $triggerFunctionsByPos[$pos];
+					}
 				}
 			}
 
 			$macroValues[$triggerId] = $this->expandUserMacros($trigger);
 		}
 
+		// map function ids from $functionsByMacros with actual values
 		$macroValues = $this->expandHostMacros($functionsByMacros['host'], $functions, $macroValues);
 		$macroValues = $this->expandHostInterfaceMacros($functionsByMacros['interface'], $functions, $macroValues);
 		$macroValues = $this->expandItemMacros($functionsByMacros['item'], $functions, $triggers, $macroValues);
 
+		// place actual values from $macroValues into trigger description
 		foreach ($triggers as $triggerId => $trigger) {
 			$triggers[$triggerId] = $this->replaceMacroValues($trigger, $macroValues[$triggerId]);
 		}
@@ -222,39 +229,6 @@ class CTriggerDescription {
 	}
 
 	/**
-	 * Find host data related macros in trigger description.
-	 *
-	 * @param string $description
-	 *
-	 * @return array
-	 */
-	protected function findHostMacros($description) {
-		return $this->findMacrosInDescription('HOSTNAME|HOST\.HOST|HOST\.NAME', $description);
-	}
-
-	/**
-	 * Find interface data related macros in trigger description.
-	 *
-	 * @param string $description
-	 *
-	 * @return array
-	 */
-	protected function findIpMacros($description) {
-		return $this->findMacrosInDescription('IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN', $description);
-	}
-
-	/**
-	 * Find item data related macros in trigger description.
-	 *
-	 * @param string $description
-	 *
-	 * @return array
-	 */
-	protected function findItemMacros($description) {
-		return $this->findMacrosInDescription('ITEM\.LASTVALUE|ITEM\.VALUE', $description);
-	}
-
-	/**
 	 * Find macros in trigger description.
 	 *
 	 * @param string $macrosPattern string with macros pattern for reg. expression
@@ -298,10 +272,12 @@ class CTriggerDescription {
 
 			// macro to db field mapping
 			$macroToKey = array('HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name');
-			foreach ($functionsByMacros as $macro => $funcIdList) {
-				foreach ($funcIdList as $pos => $funcId) {
-					$macroValues[$functionsById[$funcId]['triggerid']]['{'.$macro.($pos?$pos:'').'}']
-								= $functionsById[$funcId][$macroToKey[$macro]];
+			foreach ($functionsByMacros as $macros) {
+				foreach ($macros as $macro => $funcIdList) {
+					foreach ($funcIdList as $pos => $funcId) {
+						$macroValues[$functionsById[$funcId]['triggerid']]['{'.$macro.($pos?$pos:'').'}']
+									= $functionsById[$funcId][$macroToKey[$macro]];
+					}
 				}
 			}
 
@@ -348,16 +324,18 @@ class CTriggerDescription {
 				'IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns',
 				'HOST.CONN' => array('useip', 'dns', 'ip')
 			);
-			foreach ($functionsByMacros as $macro => $funcIdList) {
-				foreach ($funcIdList as $pos => $funcId) {
-					if (is_array($macroToKey[$macro])) {
-						$key = $functionsById[$funcId][$macroToKey[$macro][0]] ? $macroToKey[$macro][2] : $macroToKey[$macro][1];
+			foreach ($functionsByMacros as $macros) {
+				foreach ($macros as $macro => $funcIdList) {
+					foreach ($funcIdList as $pos => $funcId) {
+						if (is_array($macroToKey[$macro])) {
+							$key = $functionsById[$funcId][$macroToKey[$macro][0]] ? $macroToKey[$macro][2] : $macroToKey[$macro][1];
+						}
+						else {
+							$key = $macroToKey[$macro];
+						}
+						$macroValues[$functionsById[$funcId]['triggerid']]['{'.$macro.($pos?$pos:'').'}']
+								= $functionsById[$funcId][$key];
 					}
-					else {
-						$key = $macroToKey[$macro];
-					}
-					$macroValues[$functionsById[$funcId]['triggerid']]['{'.$macro.($pos?$pos:'').'}']
-							= $functionsById[$funcId][$key];
 				}
 			}
 		}
@@ -378,8 +356,8 @@ class CTriggerDescription {
 	 *
 	 * @return array $macroValues with extra data
 	 */
-	protected function expandItemMacros(array $functionsByItemMacros, array $functions, array $triggers, array $macroValues = array()) {
-		if (!empty($functionsByItemMacros)) {
+	protected function expandItemMacros(array $functionsByMacros, array $functions, array $triggers, array $macroValues = array()) {
+		if (!empty($functionsByMacros)) {
 			$dbFuncs = DBselect(
 				'SELECT DISTINCT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
 						' FROM functions f'.
@@ -393,19 +371,21 @@ class CTriggerDescription {
 				$functionsById[$func['functionid']] = $func;
 			}
 
-			foreach ($functionsByItemMacros as $macro => $funcIdList) {
-				foreach ($funcIdList as $pos => $funcId) {
-					switch ($macro) {
-						case 'ITEM.LASTVALUE':
-							$replace = $this->resolveItemLastvalueMacro($functionsById[$funcId]);
-							break;
-						case 'ITEM.VALUE':
-							// trigger data is used for event macros only
-							$replace = $this->resolveItemValueMacro($functionsById[$funcId], $triggers[$functionsById[$funcId]['triggerid']]);
-							break;
+			foreach ($functionsByMacros as $macros) {
+				foreach ($macros as $macro => $funcIdList) {
+					foreach ($funcIdList as $pos => $funcId) {
+						switch ($macro) {
+							case 'ITEM.LASTVALUE':
+								$replace = $this->resolveItemLastvalueMacro($functionsById[$funcId]);
+								break;
+							case 'ITEM.VALUE':
+								// trigger data is used for event macros only
+								$replace = $this->resolveItemValueMacro($functionsById[$funcId], $triggers[$functionsById[$funcId]['triggerid']]);
+								break;
+						}
+						$macroValues[$functionsById[$funcId]['triggerid']]['{'.$macro.($pos?$pos:'').'}']
+									= $replace;
 					}
-					$macroValues[$functionsById[$funcId]['triggerid']]['{'.$macro.($pos?$pos:'').'}']
-								= $replace;
 				}
 			}
 		}
