@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $mediaTypeWidget = new CWidget();
 
 // create new media type button
@@ -36,7 +36,7 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo(_('No media types defined.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
-	make_sorting_header(_('Description'), 'description'),
+	make_sorting_header(_('Name'), 'description'),
 	make_sorting_header(_('Type'), 'type'),
 	_('Status'),
 	_('Used in actions'),
@@ -127,5 +127,5 @@ $mediaTypeForm->addItem(array($this->data['paging'], $mediaTypeTable, $this->dat
 
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm);
+
 return $mediaTypeWidget;
-?>

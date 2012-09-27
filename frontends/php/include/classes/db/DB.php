@@ -416,6 +416,53 @@ class DB {
 	}
 
 	/**
+	 * Insert batch data into DB
+	 *
+	 * @param string $table
+	 * @param array  $values pair of fieldname => fieldvalue
+	 * @param bool   $getids
+	 *
+	 * @return array    an array of ids with the keys preserved
+	 */
+	public static function insertBatch($table, $values, $getids = true) {
+		if (empty($values)) {
+			return true;
+		}
+		$resultIds = array();
+
+		if ($getids) {
+			$id = self::reserveIds($table, count($values));
+		}
+
+		$tableSchema = self::getSchema($table);
+
+		$values = self::addMissingFields($tableSchema, $values);
+
+		$fields = array_keys($values[0]);
+
+		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).','.($getids ? $tableSchema['key'] : '').') VALUES ';
+
+		foreach ($values as $key => $row) {
+			if ($getids) {
+				$resultIds[$key] = $id;
+				$row[$tableSchema['key']] = $id;
+				$id = bcadd($id, 1, 0);
+			}
+
+			self::checkValueTypes($table, $row);
+
+			$sql .= '('.implode(',', array_values($row)).'),';
+		}
+		$sql[zbx_strlen($sql) - 1] = ' ';
+
+		if (!DBexecute($sql)) {
+			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+		}
+
+		return $resultIds;
+	}
+
+	/**
 	 * Update data in DB
 	 *
 	 * @param string $table

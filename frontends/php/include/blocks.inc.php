@@ -381,6 +381,7 @@ function make_hoststat_summary($filter) {
 	);
 	$hosts = API::Host()->get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
+	CArrayHelper::sort($hosts, array('name'));
 
 	// get triggers
 	$options = array(
@@ -538,7 +539,7 @@ function make_hoststat_summary($filter) {
 		}
 	}
 
-	foreach ($groups as $gnum => $group) {
+	foreach ($groups as $group) {
 		if (!isset($hosts_data[$group['groupid']])) {
 			continue;
 		}
@@ -744,9 +745,10 @@ function make_status_of_zbx() {
 }
 
 /**
- * Create and return a DIV with latest problem triggers
- * @author Aly
+ * Create and return a DIV with latest problem triggers.
+ *
  * @param array $filter
+ *
  * @return CDiv
  */
 function make_latest_issues(array $filter = array()) {
@@ -761,7 +763,7 @@ function make_latest_issues(array $filter = array()) {
 		'groupids' => $filter['groupids'],
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
+		'withLastEventUnacknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -839,24 +841,42 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
-		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+		$hostSpan =  new CDiv(null, 'maintenance-abs-cont');
 
-		// maintenance hint
+		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
+		$hostName = new CSpan($host['name'], 'link_menu menu-host');
+		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+		// add maintenance icon with hint if host is in maintenance
 		if ($host['maintenance_status']) {
+
+			$mntIco = new CDiv(null, 'icon-maintenance-abs');
+
 			// get maintenance
 			$maintenances = API::Maintenance()->get(array(
 				'maintenanceids' => $host['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND
+				'output' => API_OUTPUT_EXTEND,
+				'limit' => 1
 			));
-			$maintenance = reset($maintenances);
+			if ($maintenance = reset($maintenances)) {
+				$hint = $maintenance['name'].' ['.($host['maintenance_type']
+					? _('Maintenance without data collection')
+					: _('Maintenance with data collection')).']';
 
-			$hint = $maintenance['name'].' ['.($host['maintenance_type']
-				? _('Maintenance without data collection')
-				: _('Maintenance with data collection')).']';
-			$hostSpan->setHint($hint, '', '', false);
+				if (isset($maintenance['description'])) {
+					// double quotes mandatory
+					$hint .= "\n".$maintenance['description'];
+				}
+
+				$mntIco->setHint($hint);
+				$mntIco->addClass('pointer');
+			}
+
+			$hostName->addClass('left-to-icon-maintenance-abs');
+			$hostSpan->addItem($mntIco);
 		}
+
+		$hostSpan ->addItem($hostName);
 
 		// unknown triggers
 		$unknown = SPACE;
@@ -869,7 +889,7 @@ function make_latest_issues(array $filter = array()) {
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'triggerids' => $trigger['triggerid'],
-			'acknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
+			'acknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE,
@@ -1346,6 +1366,11 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 		_('Actions')
 	));
 
+	foreach ($triggers as $tnum => $trigger) {
+		$triggers[$tnum]['clock'] = $trigger['event']['clock'];
+	}
+	CArrayHelper::sort($triggers, array(array('field' => 'clock', 'order' => ZBX_SORT_DOWN)));
+
 	foreach ($triggers as $trigger) {
 		$event = $trigger['event'];
 		$ack = getEventAckState($event, true, true, $ackParams);
@@ -1369,7 +1394,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 			get_node_name_by_elid($trigger['triggerid']),
 			$trigger['hostname'],
 			getSeverityCell($trigger['priority'], $trigger['description']),
-			zbx_date2age($event['clock']),
+			zbx_date2age($trigger['clock']),
 			$unknown,
 			$config['event_ack_enable'] ? $ack : null,
 			$actions

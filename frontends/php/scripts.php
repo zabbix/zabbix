@@ -121,9 +121,8 @@ elseif (isset($_REQUEST['save'])) {
 
 		$scriptid = isset($result['scriptids']) ? reset($result['scriptids']) : null;
 
-		add_audit_if($result, $audit_action, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
-
 		if ($result) {
+			add_audit($audit_action, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
 			unset($_REQUEST['action'], $_REQUEST['form'], $_REQUEST['scriptid']);
 		}
 	}

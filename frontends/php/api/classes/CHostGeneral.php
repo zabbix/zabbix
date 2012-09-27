@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -77,6 +77,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		$ids = array('hostids' => $hostIds, 'templateids' => $templateIds);
+
 		return array($this->pkOption() => $ids[$this->pkOption()]);
 	}
 
@@ -140,9 +141,11 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * @return bool
 	 */
 	protected function link(array $templateids, array $targetids) {
-		if (empty($templateids)) return;
+		if (empty($templateids)) {
+			return;
+		}
 
-		//check if someone passed duplicate templates in the same query
+		// check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateids);
 		if (!zbx_empty($templateIdDuplicates)) {
 			$duplicatesFound = array();
@@ -151,37 +154,38 @@ abstract class CHostGeneral extends CZBXAPI {
 			}
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot pass duplicate template IDs for the linkage: %s.', implode(", ", $duplicatesFound))
+				_s('Cannot pass duplicate template IDs for the linkage: %s.', implode(', ', $duplicatesFound))
 			);
 		}
-
 
 		// check if any templates linked to targets have more than one unique item key/application
 		foreach ($targetids as $targetid) {
 			$linkedTpls = $this->get(array(
-				'nopermissions' => 1,
+				'nopermissions' => true,
 				'output' => API_OUTPUT_SHORTEN,
 				'hostids' => $targetid
 			));
 			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
 
-			$sql = 'SELECT key_,count(itemid) as cnt'.
+			$res = DBselect(
+				'SELECT key_,COUNT(itemid) AS cnt'.
 				' FROM items'.
 				' WHERE'.DBcondition('hostid', $allids).
 				' GROUP BY key_'.
-				' HAVING count(itemid)>1';
-			$res = DBselect($sql);
+				' HAVING COUNT(itemid)>1'
+			);
 			if ($dbCnt = DBfetch($res)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($dbCnt['key_'])));
 			}
 
-			$sql = 'SELECT name,count(applicationid) as cnt'.
+			$res = DBselect(
+				'SELECT name,COUNT(applicationid) AS cnt'.
 				' FROM applications'.
 				' WHERE '.DBcondition('hostid', $allids).
 				' GROUP BY name'.
-				' HAVING count(applicationid)>1';
-			$res = DBselect($sql);
+				' HAVING COUNT(applicationid)>1'
+			);
 			if ($dbCnt = DBfetch($res)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Template with application "%1$s" already linked to host.', htmlspecialchars($dbCnt['name'])));
@@ -205,7 +209,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			}
 		}
 
-		// Check if there are any template with triggers which depends on triggers in templates which will be not linked
+		// check if there are any template with triggers which depends on triggers in templates which will be not linked
 		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateids));
 		foreach ($templateids as $templateid) {
 			$triggerids = array();
@@ -217,21 +221,18 @@ abstract class CHostGeneral extends CZBXAPI {
 			$sql = 'SELECT DISTINCT h.host'.
 				' FROM trigger_depends td,functions f,items i,hosts h'.
 				' WHERE ('.
-				DBcondition('td.triggerid_down', $triggerids).
-				' AND f.triggerid=td.triggerid_up'.
+					DBcondition('td.triggerid_down', $triggerids).
+					' AND f.triggerid=td.triggerid_up'.
 				' )'.
 				' AND i.itemid=f.itemid'.
 				' AND h.hostid=i.hostid'.
 				' AND '.DBcondition('h.hostid', $commonTemplateIds, true).
 				' AND h.status='.HOST_STATUS_TEMPLATE;
-
 			if ($dbDepHost = DBfetch(DBselect($sql))) {
-				$options = array(
+				$tmpTpls = API::Template()->get(array(
 					'templateids' => $templateid,
 					'output'=> API_OUTPUT_EXTEND
-				);
-
-				$tmpTpls = $this->get($options);
+				));
 				$tmpTpl = reset($tmpTpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -241,8 +242,8 @@ abstract class CHostGeneral extends CZBXAPI {
 
 		$res = DBselect(
 			'SELECT hostid,templateid'.
-				' FROM hosts_templates'.
-				' WHERE '.DBcondition('hostid', $targetids).
+			' FROM hosts_templates'.
+			' WHERE '.DBcondition('hostid', $targetids).
 				' AND '.DBcondition('templateid', $templateids)
 		);
 		$linked = array();
@@ -254,29 +255,28 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		// add template linkages, if problems rollback later
+		$hostsLinkageInserts = array();
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
 				}
-
-				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
-				$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
-				$result = DBexecute($sql);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
-				}
+				$hostsLinkageInserts[] = array('hostid' => $targetid, 'templateid' => $templateid);
 			}
 		}
+		DB::insert('hosts_templates', $hostsLinkageInserts);
 
 		// check if all trigger templates are linked to host.
 		// we try to find template that is not linked to hosts ($targetids)
 		// and exists trigger which reference that template and template from ($templateids)
-		$sql = 'SELECT DISTINCT h.host FROM functions f,items i,triggers t,hosts h'.
-			' WHERE f.itemid=i.itemid AND f.triggerid=t.triggerid AND i.hostid=h.hostid AND h.status='.HOST_STATUS_TEMPLATE.
-			' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.DBcondition('ht.hostid', $targetids).')'.
-			' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.DBcondition('ii.hostid', $templateids). ')';
+		$sql = 'SELECT DISTINCT h.host'.
+				' FROM functions f,items i,triggers t,hosts h'.
+				' WHERE f.itemid=i.itemid'.
+					' AND f.triggerid=t.triggerid'.
+					' AND i.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.DBcondition('ht.hostid', $targetids).')'.
+					' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.DBcondition('ii.hostid', $templateids). ')';
 		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
@@ -287,10 +287,11 @@ abstract class CHostGeneral extends CZBXAPI {
 		// check template linkage circularity
 		$res = DBselect(
 			'SELECT ht.hostid,ht.templateid'.
-				' FROM hosts_templates ht,hosts h '.
-				' WHERE ht.hostid=h.hostid '.
+			' FROM hosts_templates ht,hosts h '.
+			' WHERE ht.hostid=h.hostid '.
 				' AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
 		);
+
 		// build linkage graph and prepare list for $rootList generation
 		$graph = array();
 		$hasParentList = array();
@@ -306,6 +307,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			$all[$row['templateid']] = $row['templateid'];
 			$all[$row['hostid']] = $row['hostid'];
 		}
+
 		// get list of templates without parents
 		$rootList = array();
 		foreach ($hasChildList as $parentId) {
@@ -313,28 +315,29 @@ abstract class CHostGeneral extends CZBXAPI {
 				$rootList[] = $parentId;
 			}
 		}
-		$visited = array();
+
 		// search cycles and double linkages in rooted parts of graph
+		$visited = array();
 		foreach ($rootList as $root) {
 			$path = array();
+
 			// raise exception on cycle or double linkage
 			$this->checkCircularAndDoubleLinkage($graph, $root, $path, $visited);
 		}
+
 		// there is still possible cycles without root
 		if (count($visited) < count($all)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
+		$appManager = new CApplicationManager();
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
 				}
 
-				API::Application()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
-				));
+				$appManager->link($templateid, $targetid);
 
 				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetid,
@@ -405,14 +408,10 @@ abstract class CHostGeneral extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function unlink($templateids, $targetids=null, $clear=false) {
-
-		if ($clear) {
-			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY);
-		}
-		else{
-			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
-		}
+	protected function unlink($templateids, $targetids = null, $clear = false) {
+		$flags = ($clear)
+			? array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY)
+			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
 
 		/* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
@@ -739,13 +738,14 @@ abstract class CHostGeneral extends CZBXAPI {
 	/**
 	 * Searches for cycles and double linkages in graph.
 	 *
-	 * @exception rises exception if cycle or double linkage is found
+	 * @throw APIException rises exception if cycle or double linkage is found
 	 *
 	 * @param array $graph - array with keys as parent ids and values as arrays with child ids
 	 * @param int $current - cursor for recursive DFS traversal, starting point for algorithm
 	 * @param array $path - should be passed empty array for DFS
 	 * @param array $visited - there will be stored visited graph node ids
-	 * @return false
+	 *
+	 * @return boolean
 	 */
 	protected function checkCircularAndDoubleLinkage($graph, $current, &$path, &$visited) {
 		if (isset($path[$current])) {

@@ -314,7 +314,12 @@ if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname
 		$hostid = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 	}
 	$hostid = reset($hostid);
-	$hostid = $hostid ? $hostid['hostid'] : 0;
+	if ($hostid) {
+		$hostid = isset($hostid['hostid']) ? $hostid['hostid'] : $hostid['templateid'];
+	}
+	else {
+		$hostid = 0;
+	}
 }
 
 // subfilters
@@ -986,7 +991,6 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get(array(
 		'triggerids' => $itemTriggerIds,
-		'expandDescription' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'host'),
 		'selectFunctions' => API_OUTPUT_EXTEND,

@@ -167,6 +167,7 @@ if ($_REQUEST['groupid'] > 0) {
 
 $hostTB = new CTextBox('host', $host, ZBX_TEXTBOX_STANDARD_SIZE);
 $hostTB->setAttribute('maxlength', 64);
+$hostTB->setAttribute('autofocus', 'autofocus');
 $hostList->addRow(_('Host name'), $hostTB);
 
 $visiblenameTB = new CTextBox('visiblename', $visiblename, ZBX_TEXTBOX_STANDARD_SIZE);

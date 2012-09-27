@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $mediaTypeWidget = new CWidget();
 $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
 
@@ -31,7 +31,9 @@ $mediaTypeForm->addVar('mediatypeid', $this->data['mediatypeid']);
 
 // create form list
 $mediaTypeFormList = new CFormList('mediaTypeFormList');
-$mediaTypeFormList->addRow(_('Description'), new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 100));
+$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 100);
+$nameTextBox->attr('autofocus', 'autofocus');
+$mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
 $cmbType = new CComboBox('type', $this->data['type'], 'submit()');
@@ -95,7 +97,7 @@ $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STAT
 
 // append form list to tab
 $mediaTypeTab = new CTabView();
-$mediaTypeTab->addTab('mediaTypeTab', _('Media'), $mediaTypeFormList);
+$mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 
 // append tab to form
 $mediaTypeForm->addItem($mediaTypeTab);
@@ -113,4 +115,3 @@ else {
 $mediaTypeWidget->addItem($mediaTypeForm);
 
 return $mediaTypeWidget;
-?>

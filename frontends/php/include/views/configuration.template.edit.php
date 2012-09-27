@@ -113,6 +113,7 @@ $templateList = new CFormList('hostlist');
 // FORM ITEM : Template name text box [  ]
 $template_nameTB = new CTextBox('template_name', $host, 54);
 $template_nameTB->setAttribute('maxlength', 64);
+$template_nameTB->attr('autofocus', 'autofocus');
 $templateList->addRow(_('Template name'), $template_nameTB);
 
 $visiblenameTB = new CTextBox('visiblename', $visiblename, 54);
@@ -280,26 +281,6 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$listBox->addItems($graphsList);
 
 		$templateList->addRow(_('Graphs'), $listBox);
-	}
-
-	// template screens
-	$templateScreens = API::TemplateScreen()->get(array(
-		'templateids' => $templateid,
-		'noInheritance' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'preservekeys' => true
-	));
-	if (!empty($templateScreens)) {
-		$screensList = array();
-		foreach ($templateScreens as $tplScreenId => $templateScreen) {
-			$screensList[$tplScreenId] = $templateScreen['name'];
-		}
-		order_result($screensList);
-
-		$listBox = new CListBox('screens', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($screensList);
-		$templateList->addRow(_('Screens'), $listBox);
 	}
 
 // Discovery rules

@@ -163,7 +163,7 @@ var CDoll = Class.create(CDebug,{
 		this._domid = obj4update.domid;
 		$super('CDoll[' + this._domid + ']');
 
-		this._domobj = $(this._domid);
+		this._domobj = jQuery('#'+this._domid);
 		this.url(obj4update.url);
 		this.frequency(obj4update.frequency);
 		this.lastupdate(obj4update.lastupdate);
@@ -340,7 +340,7 @@ var CDoll = Class.create(CDebug,{
 			return false;
 		}
 		else {
-			this._domobj.update(resp.responseText);
+			this._domobj.html(resp.responseText);
 		}
 
 		this._ready = true;

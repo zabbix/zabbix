@@ -210,6 +210,11 @@ jQuery(function($) {
 							successAction();
 						}
 
+						// rebuild listener
+						if (!empty(ZBX_SBOX[id])) {
+							ZBX_SBOX[id].sbox.addListeners();
+						}
+
 						screen.isRefreshing = false;
 
 						if (screen.isReRefreshRequire) {

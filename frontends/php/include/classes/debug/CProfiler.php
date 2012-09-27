@@ -142,7 +142,7 @@ class CProfiler {
 				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']).'<br>';
 		}
 
-		$debug_str .= _s('Peak memory usage: %s', mem2str(memory_get_peak_usage(true))).'<br>';
+		$debug_str .= _s('Peak memory usage: %s', mem2str($this->getMemoryPeak())).'<br>';
 		$debug_str .= _s('Memory limit: %s', ini_get('memory_limit')).'<br>';
 
 		$debug_str .= '<br>';
@@ -259,5 +259,19 @@ class CProfiler {
 			$file,
 			$line
 		);
+	}
+
+	/**
+	 * Return memory used by PHP.
+	 *
+	 * @return int
+	 */
+	private function getMemoryPeak() {
+		if (function_exists("memory_get_peak_usage")) {
+			return memory_get_peak_usage(true);
+		}
+		else {
+			return memory_get_usage(true);
+		}
 	}
 }

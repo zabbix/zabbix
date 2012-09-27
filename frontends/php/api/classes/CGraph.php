@@ -817,8 +817,9 @@ class CGraph extends CGraphGeneral {
 	 */
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
+		$colorValidator = new CColorValidator();
 
-		foreach ($graphs as $gnum => $graph) {
+		foreach ($graphs as $graph) {
 			// graph fields
 			$fields = array('name' => null);
 			if (!$update && !check_db_fields($fields, $graph)) {
@@ -838,8 +839,8 @@ class CGraph extends CGraphGeneral {
 				}
 
 				// check color
-				if (!preg_match('/^[A-F0-9]{6}$/i', $gitem['color'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect colour "%1$s".', $gitem['color']));
+				if (!$colorValidator->validate($gitem['color'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
 				}
 
 				// assigning with key preservs unique itemids

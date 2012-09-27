@@ -88,36 +88,36 @@ function getActionMapBySysmap($sysmap) {
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
 	$hosts = API::Host()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'hostids' => $hostids,
-			'output' => array('status'),
-			'nopermissions' => true,
-			'preservekeys' => true,
-			'selectScreens' => API_OUTPUT_COUNT,
+		'nodeids' => get_current_nodeid(true),
+		'hostids' => $hostids,
+		'output' => array('status'),
+		'nopermissions' => true,
+		'preservekeys' => true,
+		'selectScreens' => API_OUTPUT_COUNT,
 	));
 
 	foreach ($sysmap['selements'] as $elem) {
 		$back = get_png_by_selement($map_info[$elem['selementid']]);
 		$area = new CArea(
-				array(
-						$elem['x'],
-						$elem['y'],
-						$elem['x'] + imagesx($back),
-						$elem['y'] + imagesy($back)
-				),
-				'', '', 'rect'
+			array(
+				$elem['x'],
+				$elem['y'],
+				$elem['x'] + imagesx($back),
+				$elem['y'] + imagesy($back)
+			),
+			'', '', 'rect'
 		);
 		$area->addClass('menu-map');
 
 		// pop up menu
 		order_result($elem['urls'], 'name');
 		$menuData = array(
-				'urls' => array_values($elem['urls']),
-				'elementId' => $elem['elementid'],
-				'elementType' => $elem['elementtype'],
-				'scripts' => array(),
-				'hasScreens' => false,
-				'isMonitored' => false
+			'urls' => array_values($elem['urls']),
+			'elementId' => $elem['elementid'],
+			'elementType' => $elem['elementtype'],
+			'scripts' => array(),
+			'hasScreens' => false,
+			'isMonitored' => false
 		);
 		if ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$host = $hosts[$elem['elementid']];
@@ -159,7 +159,7 @@ function get_icon_center_by_selement($element, $info, $map) {
 	return array($x, $y);
 }
 
-function MyDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
+function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	if ($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE) {
 		imageline($image, $x1, $y1, $x2, $y2, $color);
 		if (abs($x1 - $x2) < abs($y1 - $y2)) {
@@ -214,8 +214,10 @@ function convertColor($im, $color) {
 }
 
 /**
- * Resolve macros and return expanded map label
+ * Resolve macros and return expanded map label.
+ *
  * @param array $selement
+ *
  * @return string
  */
 function resolveMapLabelMacrosAll(array $selement) {
@@ -237,15 +239,15 @@ function resolveMapLabelMacrosAll(array $selement) {
 			$sql = 'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name'.
 					' FROM interface hi,hosts h'.
 					' WHERE hi.hostid=h.hostid'.
-					' AND hi.hostid='.$selement['elementid'];
+						' AND hi.hostid='.$selement['elementid'];
 		}
 		else {
 			$sql = 'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name' .
 					' FROM interface hi,items i,functions f,hosts h'.
 					' WHERE h.hostid=hi.hostid'.
-					' AND hi.hostid=i.hostid'.
-					' AND i.itemid=f.itemid'.
-					' AND f.triggerid='.$selement['elementid'];
+						' AND hi.hostid=i.hostid'.
+						' AND i.itemid=f.itemid'.
+						' AND f.triggerid='.$selement['elementid'];
 		}
 		$db_host = DBfetch(DBselect($sql));
 	}
@@ -308,16 +310,14 @@ function resolveMapLabelMacrosAll(array $selement) {
 			}
 			break;
 	}
+
 	return $label;
 }
 
 function resolveMapLabelMacros($label, $replaceHost = null) {
-	if (null === $replaceHost) {
-		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
-	}
-	else {
-		$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}|{HOST.HOST}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
-	}
+	$pattern = (null === $replaceHost)
+		? '/{'.ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu"
+		: '/{('.ZBX_PREG_HOST_FORMAT."|{HOSTNAME}|{HOST.HOST}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
 
 	preg_match_all($pattern, $label, $matches);
 
@@ -343,6 +343,7 @@ function resolveMapLabelMacros($label, $replaceHost = null) {
 		$parameter = convertFunctionValue(reset($trigExpr->data['functionParams']));
 
 		$item = API::Item()->get(array(
+			'webitems' => true,
 			'filter' => array(
 				'host' => $itemHost,
 				'key_' => $key,
@@ -350,7 +351,9 @@ function resolveMapLabelMacros($label, $replaceHost = null) {
 			),
 			'output' => API_OUTPUT_EXTEND
 		));
+
 		$item = reset($item);
+
 		if (!$item) {
 			$label = str_replace($expr, '???', $label);
 			continue;
@@ -412,6 +415,7 @@ function resolveMapLabelMacros($label, $replaceHost = null) {
 			}
 		}
 	}
+
 	return $label;
 }
 
@@ -557,7 +561,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 		$info['info']['unack'] = array(
 			'msg' => _('PROBLEM'),
-			'color' => $i['priority'] > 3 ? $colors['Red'] : $colors['Dark Red']
+			'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
 		);
 	}
 	elseif ($i['trigger_disabled']) {
@@ -619,7 +623,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = array(
 				'msg' => $msg,
-				'color' => $i['priority'] > 3 ? $colors['Red'] : $colors['Dark Red']
+				'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
 			);
 		}
 
@@ -650,7 +654,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		$info['info']['maintenance'] = array(
 			'msg' => _('MAINTENANCE').' ('.$i['maintenance_title'].')',
-			'color' => $colors['Orange'],
+			'color' => $colors['Orange']
 		);
 	}
 	elseif ($i['disabled']) {
@@ -666,7 +670,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['unknown'] = array(
 			'msg' => _('OK'),
-			'color' => $colors['Dark Green'],
+			'color' => $colors['Dark Green']
 		);
 	}
 
@@ -1327,7 +1331,8 @@ function drawMapConnectors(&$im, $map, $map_info, $drawAll = false) {
 				}
 			}
 		}
-		MyDrawLine($im, $x1, $y1, $x2, $y2, $color, $drawtype);
+
+		myDrawLine($im, $x1, $y1, $x2, $y2, $color, $drawtype);
 	}
 }
 
@@ -1803,11 +1808,10 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 
 		$hl_color = null;
 		$st_color = null;
-		if (!isset($_REQUEST['noselements']) && (($map['highlight'] % 2) == SYSMAP_HIGHLIGHT_ON)) {
+		if (!isset($_REQUEST['noselements']) && ($map['highlight'] % 2) == SYSMAP_HIGHLIGHT_ON) {
 			if ($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) {
 				$hl_color = true;
 			}
-
 			if ($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) {
 				$st_color = true;
 			}
@@ -1816,16 +1820,17 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 			}
 		}
 
-		if (in_array($selement['elementtype'],
-			array(SYSMAP_ELEMENT_TYPE_HOST_GROUP, SYSMAP_ELEMENT_TYPE_MAP)) && !is_null($hl_color)) {
+		if (in_array($selement['elementtype'], array(SYSMAP_ELEMENT_TYPE_HOST_GROUP, SYSMAP_ELEMENT_TYPE_MAP))
+				&& !is_null($hl_color)) {
 			$st_color = null;
 		}
 		elseif (!is_null($st_color)) {
 			$hl_color = null;
 		}
 
-		$label_location = (is_null($selement['label_location']) || ($selement['label_location'] < 0))
-				? $map['label_location'] : $selement['label_location'];
+		$label_location = (is_null($selement['label_location']) || $selement['label_location'] < 0)
+			? $map['label_location']
+			: $selement['label_location'];
 
 		$label = array();
 		if ($selement['label_type'] == MAP_LABEL_TYPE_IP && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
@@ -1844,6 +1849,7 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 		else {
 			$label = array_merge($label_lines[$selementid], $status_lines[$selementid]);
 		}
+
 		if (empty($label)) {
 			continue;
 		}
@@ -1936,9 +1942,7 @@ function populateFromMapAreas(array &$map) {
 
 	foreach ($map['selements'] as $selement) {
 		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-			$area = array(
-				'selementids' => array(),
-			);
+			$area = array('selementids' => array());
 
 			$origSelement = $selement;
 
