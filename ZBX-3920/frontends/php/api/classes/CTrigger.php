@@ -1846,38 +1846,40 @@ class CTrigger extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
 			}
 
-			// check circular dependency
+			// check duplicate dependency in array
+			$UnqTriggers = array_unique($trigger['dependencies']);
+			$DplTriggers = array_diff_assoc($trigger['dependencies'], $UnqTriggers);
+			if ($DplTriggers) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', reset($DplTriggers), $trigger['triggerid'])
+				);
+			}
+
+			// check circular and duplicate dependency in DB
 			do {
 				$dbUpTriggers = DBselect(
 					'SELECT td.triggerid_up,
 							td.triggerid_down'.
 					' FROM trigger_depends td'.
-					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds)
+					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds).'
+							OR'.DBcondition('td.triggerid_up', $downTriggerIds)
 				);
 				$upTriggerids = array();
 				$DwnTriggerids = array();
 				while ($upTrigger = DBfetch($dbUpTriggers)) {
-					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
+					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0 && in_array($upTrigger['triggerid_down'],$trigger['dependencies'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular dependencies are not allowed.'));
 					}
-					if ($upTrigger['triggerid_down'] == $trigger['triggerid']) {
-						$DwnTriggerids[] = $upTrigger['triggerid_up'];
+					if ($upTrigger['triggerid_down'] == $trigger['triggerid'] && in_array($upTrigger['triggerid_up'],$trigger['dependencies'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', $upTrigger['triggerid_up'], $trigger['triggerid'])
+						);
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
 				}
 				$downTriggerIds = $upTriggerids;
 
 			} while (!empty($upTriggerids));
-
-			// check duplicate dependency
-			$AllTriggers = array_merge($trigger['dependencies'], $DwnTriggerids);
-			$UnqTriggers = array_unique($AllTriggers);
-			$DplTriggers = array_diff_assoc($AllTriggers, $UnqTriggers);
-			if ($DplTriggers) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', reset($DplTriggers), $trigger['triggerid'])
-				);
-			}
 
 			// fetch all templates that are used in dependencies
 			$triggerDependencyTemplates = API::Template()->get(array(
