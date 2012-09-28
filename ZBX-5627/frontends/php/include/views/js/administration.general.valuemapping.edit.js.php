@@ -11,7 +11,7 @@
 			<input class="input" type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" size="30" maxlength="64">
 		</td>
 		<td>
-			<input class="input link_menu removeMapping" type="button" value=<?php echo Chtml::encode(_('Remove')); ?>>
+			<input class="input link_menu removeMapping" type="button" value="<?php echo Chtml::encode(_('Remove')); ?>">
 		</td>
 	</tr>
 

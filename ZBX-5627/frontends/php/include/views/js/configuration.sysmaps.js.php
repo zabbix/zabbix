@@ -180,8 +180,8 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="elementApply" class="element-edit-control" type="button" name="apply" value=<?php echo Chtml::encode(_('Apply')); ?>>
-					<input id="elementRemove" class="element-edit-control" type="button" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?>>
+					<input id="elementApply" class="element-edit-control" type="button" name="apply" value="<?php echo Chtml::encode(_('Apply')); ?>">
+					<input id="elementRemove" class="element-edit-control" type="button" name="remove" value="<?php echo Chtml::encode(_('Remove')); ?>">
 					<input id="elementClose" type="button" name="close" value=<?php echo Chtml::encode(_('Close')); ?>>
 				</td>
 			</tr>
@@ -269,8 +269,8 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="massApply" class="element-edit-control" type="button" name="apply" value=<?php echo Chtml::encode(_('Apply')); ?>>
-					<input id="massRemove" class="element-edit-control" type="button" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?>>
+					<input id="massApply" class="element-edit-control" type="button" name="apply" value="<?php echo Chtml::encode(_('Apply')); ?>">
+					<input id="massRemove" class="element-edit-control" type="button" name="remove" value="<?php echo Chtml::encode(_('Remove')); ?>">
 					<input id="massClose" type="button" name="close" value=<?php echo Chtml::encode(_('Close')); ?>>
 				</td>
 			</tr>
@@ -370,9 +370,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="formLinkApply" type="button" value=<?php echo Chtml::encode(_('Apply')); ?>>
-					<input id="formLinkRemove" type="button" value=<?php echo Chtml::encode(_('Remove')); ?>>
-					<input id="formLinkClose" type="button" value=<?php echo Chtml::encode(_('Close')); ?>>
+					<input id="formLinkApply" type="button" value="<?php echo Chtml::encode(_('Apply')); ?>">
+					<input id="formLinkRemove" type="button" value="<?php echo Chtml::encode(_('Remove')); ?>">
+					<input id="formLinkClose" type="button" value="<?php echo Chtml::encode(_('Close')); ?>">
 				</td>
 			</tr>
 			</tbody>
