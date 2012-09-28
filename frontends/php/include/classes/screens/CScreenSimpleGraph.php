@@ -36,14 +36,10 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		// get time control
 		$timeControlData = array(
-			'id' => $resourceid,
-			'domid' => $this->getDataId(),
+			'id' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
-			'loadSBox' => 0,
 			'loadImage' => 1,
-			'loadScroll' => 0,
-			'dynamic' => 0,
 			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
