@@ -67,7 +67,7 @@ class CComboBox extends CTag {
 		}
 		else {
 			$title = false;
-			if (zbx_strlen($caption) > 44) {
+			if (zbx_strlen($caption) > 44 && !preg_match("/selectShorten/", $this->getAttribute('class'))) {
 				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
 				$title = true;
 			}
