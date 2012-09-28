@@ -1,10 +1,7 @@
 <script type="text/x-jquery-tmpl" id="mappingRow">
-
 	<tr>
 		<td>
-			<input class="input" type="text" name="mappings[#{mappingNum}][value]" value="#{value}" size="20" maxlength="64"
-					title=<?php echo Chtml::encode(_('Only whole numbers')); ?> pattern="-?[0-9]+"
-					placeholder=<?php echo Chtml::encode(_('whole number')); ?>>
+			<input class="input" type="text" name="mappings[#{mappingNum}][value]" value="#{value}" size="20" maxlength="64">
 		</td>
 		<td>&rArr;</td>
 		<td>
