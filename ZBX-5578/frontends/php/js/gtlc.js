@@ -322,10 +322,10 @@ var CTimeLine = Class.create(CDebug, {
 		this._endtime = endtime;
 		this._usertime = usertime;
 		this._period = period;
-
-		// re-validate params
-		this.endtime(endtime);
 		this.maxperiod = maximumPeriod;
+
+		// re-validate
+		this.period(period);
 		this.isNow(isNow);
 	},
 
@@ -404,9 +404,6 @@ var CTimeLine = Class.create(CDebug, {
 			return this._endtime;
 		}
 
-		if (endtime < (this._starttime + this._period * 3)) {
-			endtime = this._starttime + this._period * 3;
-		}
 		this._endtime = endtime;
 
 		return this._endtime;
