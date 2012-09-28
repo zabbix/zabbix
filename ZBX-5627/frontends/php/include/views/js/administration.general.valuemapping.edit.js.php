@@ -3,15 +3,15 @@
 	<tr>
 		<td>
 			<input class="input" type="text" name="mappings[#{mappingNum}][value]" value="#{value}" size="20" maxlength="64"
-					title="<?php echo Chtml::encode(_('Only whole numbers')); ?>" pattern="-?[0-9]+"
-					placeholder="<?php echo Chtml::encode(_('whole number')); ?>">
+					title="<?php echo CHtml::encode(_('Only whole numbers')); ?>" pattern="-?[0-9]+"
+					placeholder="<?php echo CHtml::encode(_('whole number')); ?>">
 		</td>
 		<td>&rArr;</td>
 		<td>
 			<input class="input" type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" size="30" maxlength="64">
 		</td>
 		<td>
-			<input class="input link_menu removeMapping" type="button" value="<?php echo Chtml::encode(_('Remove')); ?>">
+			<input class="input link_menu removeMapping" type="button" value="<?php echo CHtml::encode(_('Remove')); ?>">
 		</td>
 	</tr>
 
