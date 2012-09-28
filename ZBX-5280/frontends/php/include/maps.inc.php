@@ -270,7 +270,8 @@ function resolveMapLabelMacrosAll(array $selement) {
 					' WHERE h.hostid=hi.hostid'.
 						' AND hi.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND hi.main=1 AND f.triggerid='.$selement['elementid']);
+						' AND hi.main=1 AND f.triggerid='.$selement['elementid'].
+					' ORDER BY f.functionid');
 
 			// process interface priorities, build $hostsByFunctionId array
 			$tmpFunctionId = -1;
