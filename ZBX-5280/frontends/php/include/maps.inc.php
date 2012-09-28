@@ -261,7 +261,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 				}
 			}
 
-			$hostsByNr[1] = $resHost;
+			$hostsByNr[''] = $resHost;
 		}
 		// get trigger host list if element is trigger
 		else {
@@ -293,11 +293,11 @@ function resolveMapLabelMacrosAll(array $selement) {
 					$hostsByNr[$i + 1] = $hostsByFunctionId[$functionid];
 				}
 			}
-		}
 
-		// for macro without numeric index
-		if (isset($hostsByNr[1])) {
-			$hostsByNr[''] = $hostsByNr[1];
+			// for macro without numeric index
+			if (isset($hostsByNr[1])) {
+				$hostsByNr[''] = $hostsByNr[1];
+			}
 		}
 
 		// resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}
