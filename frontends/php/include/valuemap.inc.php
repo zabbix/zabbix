@@ -122,9 +122,6 @@ function checkValueMapMappings(array $mappings) {
 	}
 
 	foreach ($mappings as $mapping) {
-		if (!zbx_is_int($mapping['value'])) {
-			throw new Exception(_('Value maps are used to create a mapping between numeric values and string representations.'));
-		}
 		if (zbx_empty($mapping['newvalue'])) {
 			throw new Exception(_('Value cannot be mapped to empty string.'));
 		}
@@ -238,6 +235,40 @@ function getValueMapMappings($valueMapId) {
 }
 
 /**
+ * Get mapping for value.
+ * If there is no mapping return false.
+ *
+ * @param string $value	     value that mapping should be applied to
+ * @param int    $valueMapId value map id which should be used
+ *
+ * @return string|bool
+ */
+function getMappedValue($value, $valueMapId) {
+	static $valueMaps = array();
+
+	if ($valueMapId < 1) {
+		return false;
+	}
+
+	if (isset($valueMaps[$valueMapId][$value])) {
+		return $valueMaps[$valueMapId][$value];
+	}
+
+	$dbMappings = DBselect(
+		'SELECT m.newvalue'.
+			' FROM mappings m'.
+			' WHERE m.valuemapid='.$valueMapId.
+			' AND m.value='.zbx_dbstr($value)
+	);
+	if ($mapping = DBfetch($dbMappings)) {
+		$valueMaps[$valueMapId][$value] = $mapping['newvalue'];
+		return $mapping['newvalue'];
+	}
+
+	return false;
+}
+
+/**
  * Apply value mapping to value.
  * If value map or mapping is not found unchanged value returned,
  * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
@@ -248,26 +279,7 @@ function getValueMapMappings($valueMapId) {
  * @return string
  */
 function applyValueMap($value, $valueMapId) {
-	if ($valueMapId < 1) {
-		return $value;
-	}
+	$mapping = getMappedValue($value, $valueMapId);
 
-	static $valueMaps = array();
-
-	if (isset($valueMaps[$valueMapId][$value])) {
-		return $valueMaps[$valueMapId][$value];
-	}
-
-	$dbMappings = DBselect(
-		'SELECT m.newvalue'.
-		' FROM mappings m'.
-		' WHERE m.valuemapid='.$valueMapId.
-			' AND m.value='.zbx_dbstr($value)
-	);
-	if ($mapping = DBfetch($dbMappings)) {
-		$valueMaps[$valueMapId][$value] = $mapping['newvalue'].' '.'('.$value.')';
-		return $valueMaps[$valueMapId][$value];
-	}
-
-	return $value;
+	return $mapping === false ? $value : $mapping['newvalue'].' ('.$value.')';
 }
