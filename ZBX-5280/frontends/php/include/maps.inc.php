@@ -245,7 +245,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 			INTERFACE_TYPE_IPMI => 1
 		);
 
-		// get host host if element is host
+		// get host data if element is host
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$res = DBselect('SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,hi.type AS interfacetype'.
 					' FROM interface hi,hosts h'.
@@ -389,7 +389,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 			foreach ($replaceHosts as $i => $host) {
 				$macroTmp = $macro;
 				// repalce only macro in first position
-				$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST.HOST'.$i.'}):(.*)}/Uu', '{'.$host['host'].':$2}', $macro);
+				$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
 				// only one simple macro possible inside functional macro
 				if ($macro != $macroTmp) {
 					break;
@@ -429,7 +429,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 
 		// do function type (last, min, max, avg) related actions
 		if (0 == strcmp($function, 'last')) {
-			if (null === $item['lastvalue']) {
+			if ($item['lastclock'] == 0) {
 				$label = str_replace($expr, '('._('no data').')', $label);
 			}
 			else {
@@ -450,7 +450,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				ITEM_VALUE_TYPE_FLOAT => 'history',
 				ITEM_VALUE_TYPE_UINT64 => 'history_uint'
 			);
-			if (!array_key_exists($item['value_type'], $history_table)) {
+			if (!isset($history_table[$item['value_type']])) {
 				$label = str_replace($expr, '???', $label);
 				continue;
 			}
@@ -462,7 +462,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				' WHERE clock>'.(time() - $parameter).
 				' AND itemid='.$item['itemid']
 			);
-			if (null === ($row = DBfetch($result)) || null === $row['value']) {
+			if (null === ($row = DBfetch($result))) {
 				$label = str_replace($expr, '('._('no data').')', $label);
 			}
 			else {
