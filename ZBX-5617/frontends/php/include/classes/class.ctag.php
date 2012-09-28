@@ -154,6 +154,16 @@ class CTag extends CObject {
 		return $this->attributes['class'];
 	}
 
+	public function hasClass($cssClass) {
+		$ChkClass=explode(' ', $this->getAttribute('class'));
+		if (in_array($cssClass, $ChkClass)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public function attr($name, $value) {
 		if (!is_null($value)) {
 			$this->setAttribute($name, $value);
