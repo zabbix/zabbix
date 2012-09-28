@@ -4,7 +4,7 @@
 		<td>
 			<input class="input" type="text" name="mappings[#{mappingNum}][value]" value="#{value}" size="20" maxlength="64"
 					title="<?php echo CHtml::encode(_('Only whole numbers')); ?>" pattern="-?[0-9]+"
-					placeholder="<?php echo CHtml::encode(_('whole number')); ?>">
+					placeholder="<<?php echo CHtml::encode(_('whole number')); ?>>">
 		</td>
 		<td>&rArr;</td>
 		<td>
