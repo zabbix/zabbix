@@ -220,7 +220,7 @@ function convertColor($im, $color) {
  * @param string $selement['label'] label to expand
  * @param int $selement['elementtype'] type of element: trigger, host, ...
  * @param int $selement['elementid'] element id in DB
- * @param string $selement['expression'] if type is trigger, then trigger expression
+ * @param string $selement['elementExpressionTrigger'] if type is trigger, then trigger expression
  *
  * @return string expanded label
  */
@@ -286,15 +286,19 @@ function resolveMapLabelMacrosAll(array $selement) {
 			}
 
 			// get all function ids from expression and link host data against position in expression
-			preg_match_all('/\{([0-9]+)\}/', $selement['expression'], $matches);
+			preg_match_all('/\{([0-9]+)\}/', $selement['elementExpressionTrigger'], $matches);
 			$hostsByNr = array();
 			foreach ($matches[1] as $i => $functionid) {
-				$hostsByNr[$i + 1] = $hostsByFunctionId[$functionid];
+				if (isset($hostsByFunctionId[$functionid])) {
+					$hostsByNr[$i + 1] = $hostsByFunctionId[$functionid];
+				}
 			}
 		}
 
 		// for macro without numeric index
-		$hostsByNr[''] = $hostsByNr[1];
+		if (isset($hostsByNr[1])) {
+			$hostsByNr[''] = $hostsByNr[1];
+		}
 
 		// resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}
 		$label = resolveMapLabelMacros($label, $hostsByNr);
@@ -579,7 +583,7 @@ function add_elementNames(&$selements) {
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
 				$selements[$snum]['elementName'] = $hostname['name'].':'.
 						CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
-				$selements[$snum]['expression'] = $triggers[$selement['elementid']]['expression'];
+				$selements[$snum]['elementExpressionTrigger'] = $triggers[$selement['elementid']]['expression'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 				$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
