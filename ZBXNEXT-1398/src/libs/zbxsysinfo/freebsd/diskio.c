@@ -163,6 +163,12 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	else
 		return SYSINFO_RET_FAIL;
 
+	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
+	{
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_FAIL;
+	}
+
 	if (NULL == (device = collector_diskdevice_get(pd)))
 	{
 		if (FAIL == get_diskstat(pd, dstats))	/* validate device name */

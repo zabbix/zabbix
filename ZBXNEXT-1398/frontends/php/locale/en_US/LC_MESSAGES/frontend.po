@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apache 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 11:46+0300\n"
-"PO-Revision-Date: 2012-08-23 17:31+0200\n"
-"Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
+"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"PO-Revision-Date: 2012-09-05 20:50+0200\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -445,7 +445,7 @@ msgstr "Add to host groups"
 msgid "Added"
 msgstr "Added"
 
-#: include/items.inc.php:1332 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1324 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "Additional parameters"
 
@@ -1109,7 +1109,7 @@ msgstr "Cannot add dependency from a host to a template."
 #: include/triggers.inc.php:699
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1283,7 +1283,7 @@ msgstr "Cannot create discovery rule"
 msgid "Cannot create group without name."
 msgstr "Cannot create group without name."
 
-#: api/classes/CHost.php:1775
+#: api/classes/CHost.php:1763
 msgid "Cannot create host group."
 msgstr "Cannot create host group."
 
@@ -1343,7 +1343,7 @@ msgstr "Cannot delete graph"
 msgid "Cannot delete graph prototype."
 msgstr "Cannot delete graph prototype."
 
-#: api/classes/CItem.php:1005
+#: api/classes/CItem.php:1002
 msgid "Cannot delete graph."
 msgstr "Cannot delete graph."
 
@@ -1359,7 +1359,7 @@ msgstr "Cannot delete group"
 msgid "Cannot delete host"
 msgstr "Cannot delete host"
 
-#: api/classes/CHost.php:1786
+#: api/classes/CHost.php:1774
 msgid "Cannot delete host group."
 msgstr "Cannot delete host group."
 
@@ -1371,7 +1371,7 @@ msgstr "Cannot delete icon map"
 msgid "Cannot delete image"
 msgstr "Cannot delete image"
 
-#: api/classes/CHost.php:1880
+#: api/classes/CHost.php:1867
 msgid "Cannot delete inventory."
 msgstr "Cannot delete inventory."
 
@@ -1455,7 +1455,7 @@ msgstr "Cannot delete template"
 msgid "Cannot delete templated graphs."
 msgstr "Cannot delete templated graphs."
 
-#: api/classes/CItem.php:969
+#: api/classes/CItem.php:966
 msgid "Cannot delete templated item."
 msgstr "Cannot delete templated item."
 
@@ -1472,7 +1472,7 @@ msgstr "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgid "Cannot delete trigger"
 msgstr "Cannot delete trigger"
 
-#: api/classes/CItem.php:1021
+#: api/classes/CItem.php:1018
 msgid "Cannot delete trigger."
 msgstr "Cannot delete trigger."
 
@@ -1590,15 +1590,11 @@ msgstr "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr "Cannot find trigger \"%1$s\" used in map %2$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -1642,7 +1638,7 @@ msgstr "Cannot include view file \"%s\"."
 msgid "Cannot insert user media."
 msgstr "Cannot insert user media."
 
-#: api/classes/CHost.php:1860
+#: api/classes/CHost.php:1846
 msgid "Cannot link template"
 msgstr "Cannot link template"
 
@@ -1650,7 +1646,7 @@ msgstr "Cannot link template"
 msgid "Cannot logout."
 msgstr "Cannot logout."
 
-#: api/classes/CHost.php:1678
+#: api/classes/CHost.php:1670
 msgid "Cannot mass update host name."
 msgstr "Cannot mass update host name."
 
@@ -1658,7 +1654,7 @@ msgstr "Cannot mass update host name."
 msgid "Cannot mass update template name"
 msgstr "Cannot mass update template name"
 
-#: api/classes/CHost.php:1668
+#: api/classes/CHost.php:1660
 msgid "Cannot mass update visible host name."
 msgstr "Cannot mass update visible host name."
 
@@ -1666,7 +1662,7 @@ msgstr "Cannot mass update visible host name."
 msgid "Cannot mass update visible template name"
 msgstr "Cannot mass update visible template name"
 
-#: api/classes/CHostGeneral.php:154
+#: api/classes/CHostGeneral.php:157
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Cannot pass duplicate template IDs for the linkage: %s."
@@ -1706,39 +1702,39 @@ msgstr "Cannot switch host for interface."
 msgid "Cannot unblock users"
 msgstr "Cannot unblock users"
 
-#: api/classes/CHostGeneral.php:690
+#: api/classes/CHostGeneral.php:693
 msgid "Cannot unlink and clear applications"
 msgstr "Cannot unlink and clear applications"
 
-#: api/classes/CHostGeneral.php:543
+#: api/classes/CHostGeneral.php:546
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Cannot unlink and clear discovery rules"
 
-#: api/classes/CHostGeneral.php:632
+#: api/classes/CHostGeneral.php:635
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Cannot unlink and clear graph prototypes"
 
-#: api/classes/CHostGeneral.php:650
+#: api/classes/CHostGeneral.php:653
 msgid "Cannot unlink and clear graphs."
 msgstr "Cannot unlink and clear graphs."
 
-#: api/classes/CHostGeneral.php:579
+#: api/classes/CHostGeneral.php:582
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Cannot unlink and clear item prototypes"
 
-#: api/classes/CHostGeneral.php:561
+#: api/classes/CHostGeneral.php:564
 msgid "Cannot unlink and clear items"
 msgstr "Cannot unlink and clear items"
 
-#: api/classes/CHostGeneral.php:481 api/classes/CHostGeneral.php:498
+#: api/classes/CHostGeneral.php:484 api/classes/CHostGeneral.php:501
 msgid "Cannot unlink and clear triggers"
 msgstr "Cannot unlink and clear triggers"
 
-#: api/classes/CHost.php:1851
+#: api/classes/CHost.php:1837
 msgid "Cannot unlink template"
 msgstr "Cannot unlink template"
 
-#: api/classes/CHostGeneral.php:435
+#: api/classes/CHostGeneral.php:438
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
@@ -1998,7 +1994,7 @@ msgstr "Chinese (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "Circular dependencies are not allowed."
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -2020,7 +2016,7 @@ msgstr "Circular reference in screens: %1$s."
 msgid "Circular reference in templates: %1$s."
 msgstr "Circular reference in templates: %1$s."
 
-#: api/classes/CHostGeneral.php:325 api/classes/CHostGeneral.php:753
+#: api/classes/CHostGeneral.php:332 api/classes/CHostGeneral.php:756
 msgid "Circular template linkage is not allowed."
 msgstr "Circular template linkage is not allowed."
 
@@ -2559,12 +2555,12 @@ msgstr "Created: Application \"%1$s\" on \"%2$s\"."
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CItem.php:871
+#: api/classes/CItem.php:868
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Created: Item \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:601
+#: api/classes/CItemPrototype.php:598
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Created: Item prototype \"%1$s\" on \"%2$s\"."
@@ -2612,7 +2608,7 @@ msgstr "Critical error. Field \"%1$s\" is not decimal number."
 #: include/validate.inc.php:340
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Critical error. Field \"%1$s\" is not integer list or range."
 
 #: include/validate.inc.php:353
 #, php-format
@@ -3247,17 +3243,17 @@ msgstr "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Deleted: Graph \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHost.php:2156
+#: api/classes/CHost.php:2139
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Deleted: Host \"%1$s\"."
 
-#: api/classes/CItem.php:1060
+#: api/classes/CItem.php:1057
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Deleted: Item \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:801
+#: api/classes/CItemPrototype.php:798
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
@@ -3340,7 +3336,7 @@ msgid "Description"
 msgstr "Description"
 
 #: include/actions.inc.php:825 include/blocks.inc.php:687
-#: include/config.inc.php:335
+#: include/config.inc.php:336
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3700,12 +3696,12 @@ msgstr "Dropdown first entry \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Dropdown remember selected \"%1$s\"."
 
-#: api/classes/CHost.php:1353
+#: api/classes/CHost.php:1349
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Duplicate host. Host with the same host name \"%s\" already exists in data."
 
-#: api/classes/CHost.php:1385
+#: api/classes/CHost.php:1381
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Duplicate host. Host with the same visible name \"%s\" already exists in data."
@@ -3752,7 +3748,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/config.inc.php:302
+#: include/config.inc.php:303
 msgid "ERROR"
 msgstr "ERROR"
 
@@ -3826,8 +3822,8 @@ msgstr "Empty host name provided in expression."
 #: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
 #: api/classes/CGraphPrototype.php:781 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
-#: api/classes/CHost.php:2010 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:949 api/classes/CItemPrototype.php:678
+#: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
+#: api/classes/CItem.php:946 api/classes/CItemPrototype.php:675
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -4109,7 +4105,7 @@ msgstr "Execute SQL error [%1$s] in [%2$s]."
 msgid "Execute on"
 msgstr "Execute on"
 
-#: include/items.inc.php:1330 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1322 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Executed script"
 
@@ -4342,7 +4338,7 @@ msgstr "Flexible intervals"
 msgid "For guest, password must be empty"
 msgstr "For guest, password must be empty"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1326 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "Formula"
 
@@ -4928,7 +4924,7 @@ msgstr "Horizontal align"
 msgid "Host"
 msgstr "Host"
 
-#: api/classes/CHost.php:1694
+#: api/classes/CHost.php:1683
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" already exists."
@@ -5086,7 +5082,7 @@ msgstr "Host template"
 msgid "Host time"
 msgstr "Host time"
 
-#: api/classes/CHost.php:1569
+#: api/classes/CHost.php:1561
 msgid "Host update failed."
 msgstr "Host update failed."
 
@@ -5094,12 +5090,12 @@ msgstr "Host update failed."
 msgid "Host updated"
 msgstr "Host updated"
 
-#: api/classes/CHost.php:1419 api/classes/CTemplate.php:1361
+#: api/classes/CHost.php:1411 api/classes/CTemplate.php:1361
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Host with the same name \"%s\" already exists."
 
-#: api/classes/CHost.php:1425 api/classes/CTemplate.php:1014
+#: api/classes/CHost.php:1417 api/classes/CTemplate.php:1014
 #: api/classes/CTemplate.php:1334
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
@@ -5709,7 +5705,7 @@ msgstr "Incorrect characters used for Proxy name \"%s\"."
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Incorrect characters used for Template name [ %1$s ]"
 
-#: api/classes/CHost.php:1349 api/classes/CHost.php:1674
+#: api/classes/CHost.php:1345 api/classes/CHost.php:1666
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Incorrect characters used for host name \"%s\"."
@@ -5769,12 +5765,12 @@ msgstr "Incorrect fields for trigger."
 msgid "Incorrect file upload."
 msgstr "Incorrect file upload."
 
-#: api/classes/CItemGeneral.php:744
+#: api/classes/CItemGeneral.php:743
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Incorrect flexible interval \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:733
+#: api/classes/CItemGeneral.php:732
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
@@ -5830,7 +5826,7 @@ msgstr "Incorrect interface IP parameter \"%s\" provided."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Incorrect interface port \"%s\" provided."
 
-#: api/classes/CHost.php:1283
+#: api/classes/CHost.php:1279
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Incorrect inventory field \"%s\"."
@@ -6304,12 +6300,12 @@ msgstr "Invalid params."
 #: api/classes/CWebCheck.php:590
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "Invalid response code \"%1$s\"."
 
 #: api/classes/CWebCheck.php:585
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "Invalid response code range \"%1$s\"."
 
 #: items.php:340
 msgid "Invalid time period"
@@ -6371,7 +6367,7 @@ msgstr "Item"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 
-#: api/classes/CItem.php:1243
+#: api/classes/CItem.php:1240
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
@@ -6465,7 +6461,7 @@ msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 
-#: api/classes/CItemGeneral.php:710
+#: api/classes/CItemGeneral.php:709
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\"."
@@ -7247,7 +7243,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Max count of events per trigger to show"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:337
+#: include/config.inc.php:338
 msgid "Maximize"
 msgstr "Maximize"
 
@@ -7258,14 +7254,14 @@ msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characte
 msgstr[0] "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgstr[1] "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
 
-#: api/classes/CHost.php:1339
+#: api/classes/CHost.php:1335
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgstr[1] "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 
-#: api/classes/CHost.php:1375
+#: api/classes/CHost.php:1371
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7403,7 +7399,7 @@ msgid "Min severity"
 msgstr "Min severity"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:337
+#: include/config.inc.php:338
 msgid "Minimize"
 msgstr "Minimize"
 
@@ -7460,7 +7456,7 @@ msgstr "Missing item \"%1$s\" for host \"%2$s\"."
 msgid "Missing items for graph \"%1$s\"."
 msgstr "Missing items for graph \"%1$s\"."
 
-#: include/graphs.inc.php:322
+#: include/graphs.inc.php:321
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Missing key \"%1$s\" for host \"%2$s\"."
@@ -7731,7 +7727,7 @@ msgstr "Next"
 msgid "Next check"
 msgstr "Next check"
 
-#: events.php:752 include/config.inc.php:554 include/events.inc.php:285
+#: events.php:752 include/config.inc.php:555 include/events.inc.php:285
 #: include/events.inc.php:299 include/forms.inc.php:1892
 #: include/triggers.inc.php:1784
 #: include/views/administration.users.list.php:75
@@ -7892,7 +7888,7 @@ msgstr "No flexible intervals defined."
 msgid "No graph ID provided for screen element."
 msgstr "No graph ID provided for screen element."
 
-#: include/graphs.inc.php:290
+#: include/graphs.inc.php:289
 #, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "No graph item with graphid \"%s\"."
@@ -7908,12 +7904,12 @@ msgstr "No graph prototypes defined."
 msgid "No graphs defined."
 msgstr "No graphs defined."
 
-#: api/classes/CHost.php:1303 api/classes/CHost.php:1317
+#: api/classes/CHost.php:1299 api/classes/CHost.php:1313
 #, php-format
 msgid "No groups for host \"%s\"."
 msgstr "No groups for host \"%s\"."
 
-#: api/classes/CHost.php:1660
+#: api/classes/CHost.php:1652
 msgid "No groups for hosts."
 msgstr "No groups for hosts."
 
@@ -8000,7 +7996,7 @@ msgstr "No interface found."
 msgid "No interfaces defined."
 msgstr "No interfaces defined."
 
-#: api/classes/CHost.php:1307 api/classes/CHost.php:1329
+#: api/classes/CHost.php:1303 api/classes/CHost.php:1325
 #, php-format
 msgid "No interfaces for host \"%s\"."
 msgstr "No interfaces for host \"%s\"."
@@ -8145,11 +8141,11 @@ msgstr "No permissions for system access."
 #: api/classes/CGraph.php:885 api/classes/CGraphPrototype.php:930
 #: api/classes/CHostInterface.php:511 api/classes/CHostInterface.php:527
 #: api/classes/CHostInterface.php:659 api/classes/CHostInterface.php:855
-#: api/classes/CHost.php:1290 api/classes/CHost.php:1322
+#: api/classes/CHost.php:1286 api/classes/CHost.php:1318
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:175 api/classes/CItemGeneral.php:207
-#: api/classes/CItem.php:966 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:963 api/classes/CItemPrototype.php:692
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -10731,7 +10727,7 @@ msgstr "Site rack location"
 msgid "Site state / province"
 msgstr "Site state / province"
 
-#: include/graphs.inc.php:353
+#: include/graphs.inc.php:352
 #, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
@@ -10982,7 +10978,7 @@ msgstr "Step of scenario"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "Step with name \"%s\" already exists."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
@@ -11051,8 +11047,8 @@ msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
-msgid "Switching authentication method will reset all but this sessions! Continue?"
-msgstr "Switching authentication method will reset all but this sessions! Continue?"
+msgid "Switching authentication method will reset all except this session! Continue?"
+msgstr "Switching authentication method will reset all except this session! Continue?"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"
@@ -11147,7 +11143,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: api/classes/CHost.php:1699
+#: api/classes/CHost.php:1688
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Template \"%1$s\" already exists."
@@ -11166,7 +11162,7 @@ msgstr "Template \"%s\" already exists."
 msgid "Template added"
 msgstr "Template added"
 
-#: api/classes/CHostGeneral.php:756
+#: api/classes/CHostGeneral.php:759
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Template cannot be linked to another template more than once even through other templates."
 
@@ -11202,22 +11198,22 @@ msgstr "Template trigger"
 msgid "Template updated"
 msgstr "Template updated"
 
-#: api/classes/CHostGeneral.php:187 include/hosts.inc.php:1233
+#: api/classes/CHostGeneral.php:191 include/hosts.inc.php:1233
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
 msgstr "Template with application \"%1$s\" already linked to host."
 
-#: api/classes/CHostGeneral.php:176 include/hosts.inc.php:1219
+#: api/classes/CHostGeneral.php:179 include/hosts.inc.php:1219
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "Template with item key \"%1$s\" already linked to host."
 
-#: api/classes/CHost.php:1435 api/classes/CTemplate.php:1356
+#: api/classes/CHost.php:1427 api/classes/CTemplate.php:1356
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Template with the same name \"%s\" already exists."
 
-#: api/classes/CHost.php:1441 api/classes/CTemplate.php:1010
+#: api/classes/CHost.php:1433 api/classes/CTemplate.php:1010
 #: api/classes/CTemplate.php:1329
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
@@ -11236,7 +11232,7 @@ msgstr "Templated items"
 msgid "Templates"
 msgstr "Templates"
 
-#: api/classes/CHostGeneral.php:735
+#: api/classes/CHostGeneral.php:738
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
@@ -11562,12 +11558,12 @@ msgstr "Trigger expression must contain at least one host:key reference."
 msgid "Trigger form"
 msgstr "Trigger form"
 
-#: api/classes/CHostGeneral.php:283
+#: api/classes/CHostGeneral.php:285
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr "Trigger has items from template \"%1$s\" that is not linked to host."
 
-#: api/classes/CHostGeneral.php:238
+#: api/classes/CHostGeneral.php:236
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
@@ -11698,7 +11694,7 @@ msgstr "Tuesday"
 msgid "Two elements should be selected"
 msgstr "Two elements should be selected"
 
-#: api/classes/CItem.php:1304
+#: api/classes/CItem.php:1301
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
@@ -11823,7 +11819,7 @@ msgstr "USA (160 characters)"
 msgid "USER PROFILE"
 msgstr "USER PROFILE"
 
-#: include/config.inc.php:746
+#: include/config.inc.php:747
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -11960,42 +11956,42 @@ msgstr "Unlink from template"
 msgid "Unlink from templates"
 msgstr "Unlink from templates"
 
-#: api/classes/CHostGeneral.php:699
+#: api/classes/CHostGeneral.php:702
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Application \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:552
+#: api/classes/CHostGeneral.php:555
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:659
+#: api/classes/CHostGeneral.php:662
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:641
+#: api/classes/CHostGeneral.php:644
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:570
+#: api/classes/CHostGeneral.php:573
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Item \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:588
+#: api/classes/CHostGeneral.php:591
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:490
+#: api/classes/CHostGeneral.php:493
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:507
+#: api/classes/CHostGeneral.php:510
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
@@ -12074,12 +12070,12 @@ msgstr "Updated: Application \"%1$s\" on \"%2$s\"."
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CItem.php:922
+#: api/classes/CItem.php:919
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Updated: Item \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:651
+#: api/classes/CItemPrototype.php:648
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Updated: Item prototype \"%1$s\" on \"%2$s\"."
@@ -12416,7 +12412,7 @@ msgstr "View is not rendered."
 msgid "Visible name"
 msgstr "Visible name"
 
-#: api/classes/CHost.php:1364
+#: api/classes/CHost.php:1360
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Visible name cannot be empty if host name is missing."
 
@@ -12463,7 +12459,7 @@ msgstr "Warning. Field \"%1$s\" is not a decimal number."
 #: include/validate.inc.php:344
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Warning. Field \"%1$s\" is not integer list or range."
 
 #: include/validate.inc.php:357
 #, php-format
@@ -12500,14 +12496,14 @@ msgstr "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:401
+#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] "Warning. Maximum time period to display is %1$s day."
 msgstr[1] "Warning. Maximum time period to display is %1$s days."
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:394
+#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -12639,7 +12635,7 @@ msgstr "Wrong fields for dependency for service \"%1$s\"."
 msgid "Wrong fields for element."
 msgstr "Wrong fields for element."
 
-#: api/classes/CHost.php:1276
+#: api/classes/CHost.php:1272
 #, php-format
 msgid "Wrong fields for host \"%s\"."
 msgstr "Wrong fields for host \"%s\"."
@@ -12811,7 +12807,7 @@ msgid "Yearly"
 msgstr "Yearly"
 
 #: events.php:752 include/blocks.inc.php:695
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:554
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:555
 #: include/events.inc.php:288 include/events.inc.php:302
 #: include/forms.inc.php:1892 include/triggers.inc.php:1784
 #: include/views/administration.users.list.php:74
@@ -12868,10 +12864,10 @@ msgstr "You did not specify targets for action operation global script \"%s\"."
 #: api/classes/CHostGroup.php:653 api/classes/CHostGroup.php:711
 #: api/classes/CHostGroup.php:865 api/classes/CHostGroup.php:920
 #: api/classes/CHostGroup.php:986 api/classes/CHostGroup.php:999
-#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1600
-#: api/classes/CHost.php:1654 api/classes/CHost.php:1978
-#: api/classes/CItem.php:1071 api/classes/CItem.php:1074
-#: api/classes/CItemPrototype.php:812 api/classes/CItemPrototype.php:815
+#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1592
+#: api/classes/CHost.php:1646 api/classes/CHost.php:1960
+#: api/classes/CItem.php:1068 api/classes/CItem.php:1071
+#: api/classes/CItemPrototype.php:809 api/classes/CItemPrototype.php:812
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
 #: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
 #: api/classes/CScript.php:342 api/classes/CScript.php:404
@@ -13467,7 +13463,7 @@ msgstr "show icon mappings"
 msgid "show value mappings"
 msgstr "show value mappings"
 
-#: api/classes/CHostGeneral.php:150
+#: api/classes/CHostGeneral.php:153
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "template ID \"%1$s\" is passed %2$s times"

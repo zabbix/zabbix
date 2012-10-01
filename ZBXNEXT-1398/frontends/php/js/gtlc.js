@@ -21,12 +21,15 @@
 // graphs timeline controls (gtlc)
 var timeControl = {
 
+	// data
 	objectList: {},
+	timeline: null,
+	scrollbar: null,
+
+	// options
 	refreshPage: true,
 	timeRefreshInterval: 0,
 	timeRefreshTimeout: null,
-	timeline: null,
-	scrollbar: null,
 
 	addObject: function(id, time, objData) {
 		this.objectList[id] = {
@@ -315,11 +318,14 @@ var CTimeLine = Class.create(CDebug, {
 			starttime = endtime - (3 * this.minperiod);
 		}
 
-		this.starttime(starttime);
-		this.endtime(endtime);
-		this.usertime(usertime);
-		this.period(period);
+		this._starttime = starttime;
+		this._endtime = endtime;
+		this._usertime = usertime;
+		this._period = period;
 		this.maxperiod = maximumPeriod;
+
+		// re-validate
+		this.period(period);
 		this.isNow(isNow);
 	},
 
@@ -353,6 +359,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(period)) {
 			return this._period;
 		}
+
 		if ((this._usertime - period) < this._starttime) {
 			period = this._usertime - this._starttime;
 		}
@@ -368,6 +375,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(usertime)) {
 			return this._usertime;
 		}
+
 		if ((usertime - this._period) < this._starttime) {
 			usertime = this._starttime + this._period;
 		}
@@ -385,6 +393,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(starttime)) {
 			return this._starttime;
 		}
+
 		this._starttime = starttime;
 
 		return this._starttime;
@@ -394,9 +403,7 @@ var CTimeLine = Class.create(CDebug, {
 		if (empty(endtime)) {
 			return this._endtime;
 		}
-		if (endtime < (this._starttime + this._period * 3)) {
-			endtime = this._starttime + this._period * 3;
-		}
+
 		this._endtime = endtime;
 
 		return this._endtime;
@@ -1044,6 +1051,8 @@ var CScrollBar = Class.create(CDebug, {
 	setTabInfo: function() {
 		var period = timeControl.timeline.period(),
 			usertime = timeControl.timeline.usertime();
+
+		// secure browser from incorrect user actions
 		if (isNaN(period) || isNaN(usertime)) {
 			return;
 		}
@@ -1587,6 +1596,7 @@ var sbox = Class.create(CDebug, {
 	px2time:			null,	// seconds in 1px
 	dynamic:			'',		// how page updates, all page/graph only update
 	is_active:			false,	// flag show is sbox is selected, must be unique among all
+	is_activeIE:		false,
 
 	initialize: function($super, id) {
 		var tc = timeControl.objectList[id],
@@ -1658,6 +1668,7 @@ var sbox = Class.create(CDebug, {
 			this.createBox();
 
 			this.is_active = true;
+			this.is_activeIE = true;
 		}
 	},
 
@@ -1711,10 +1722,11 @@ var sbox = Class.create(CDebug, {
 			e = window.event;
 		}
 
-		if (this.is_active) {
+		if (this.is_activeIE) {
 			this.optimizeEvent(e);
 			deselectAll();
 			this.mouseUp(e);
+			this.is_activeIE = false;
 
 			return cancelEvent(e);
 		}

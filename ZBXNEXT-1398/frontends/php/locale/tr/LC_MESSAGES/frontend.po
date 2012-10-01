@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 11:46+0300\n"
+"POT-Creation-Date: 2012-09-08 12:32+0300\n"
 "PO-Revision-Date: 2012-03-21 08:20+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -440,7 +440,7 @@ msgstr "Konak gruplarına ekle"
 msgid "Added"
 msgstr "Eklendi"
 
-#: include/items.inc.php:1332 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1324 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "Ek parametreler"
 
@@ -1278,7 +1278,7 @@ msgstr ""
 msgid "Cannot create group without name."
 msgstr ""
 
-#: api/classes/CHost.php:1775
+#: api/classes/CHost.php:1763
 msgid "Cannot create host group."
 msgstr ""
 
@@ -1338,7 +1338,7 @@ msgstr "Grafik silinemedi"
 msgid "Cannot delete graph prototype."
 msgstr ""
 
-#: api/classes/CItem.php:1005
+#: api/classes/CItem.php:1002
 msgid "Cannot delete graph."
 msgstr ""
 
@@ -1354,7 +1354,7 @@ msgstr "Grup silinemedi"
 msgid "Cannot delete host"
 msgstr "Konak silienemedi"
 
-#: api/classes/CHost.php:1786
+#: api/classes/CHost.php:1774
 msgid "Cannot delete host group."
 msgstr ""
 
@@ -1366,7 +1366,7 @@ msgstr ""
 msgid "Cannot delete image"
 msgstr "Resim silienemedi"
 
-#: api/classes/CHost.php:1880
+#: api/classes/CHost.php:1867
 msgid "Cannot delete inventory."
 msgstr ""
 
@@ -1451,7 +1451,7 @@ msgstr "Şablon silienemedi"
 msgid "Cannot delete templated graphs."
 msgstr ""
 
-#: api/classes/CItem.php:969
+#: api/classes/CItem.php:966
 msgid "Cannot delete templated item."
 msgstr ""
 
@@ -1468,7 +1468,7 @@ msgstr ""
 msgid "Cannot delete trigger"
 msgstr "Tetik silienemedi"
 
-#: api/classes/CItem.php:1021
+#: api/classes/CItem.php:1018
 msgid "Cannot delete trigger."
 msgstr ""
 
@@ -1586,14 +1586,10 @@ msgstr ""
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
 msgstr ""
 
 #: srv_status.php:190
@@ -1638,7 +1634,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr ""
 
-#: api/classes/CHost.php:1860
+#: api/classes/CHost.php:1846
 msgid "Cannot link template"
 msgstr "Şablon bağlantısı yapılamaz"
 
@@ -1646,7 +1642,7 @@ msgstr "Şablon bağlantısı yapılamaz"
 msgid "Cannot logout."
 msgstr "Oturum kapatılamadı."
 
-#: api/classes/CHost.php:1678
+#: api/classes/CHost.php:1670
 msgid "Cannot mass update host name."
 msgstr ""
 
@@ -1654,7 +1650,7 @@ msgstr ""
 msgid "Cannot mass update template name"
 msgstr "Şablon ismi toplu olarak güncellenmedi"
 
-#: api/classes/CHost.php:1668
+#: api/classes/CHost.php:1660
 msgid "Cannot mass update visible host name."
 msgstr ""
 
@@ -1662,7 +1658,7 @@ msgstr ""
 msgid "Cannot mass update visible template name"
 msgstr "Görünen şablon ismi toplu olarak güncellenmedi"
 
-#: api/classes/CHostGeneral.php:154
+#: api/classes/CHostGeneral.php:157
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr ""
@@ -1702,39 +1698,39 @@ msgstr ""
 msgid "Cannot unblock users"
 msgstr "Kullanıcıların bloklaması kaldırılamadı"
 
-#: api/classes/CHostGeneral.php:690
+#: api/classes/CHostGeneral.php:693
 msgid "Cannot unlink and clear applications"
 msgstr "Uygulamaların bağlantısı kaldırılıp, temizlenemiyor"
 
-#: api/classes/CHostGeneral.php:543
+#: api/classes/CHostGeneral.php:546
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Keşif kurallarının bağlantısı kaldırılıp, temizlenemiyor"
 
-#: api/classes/CHostGeneral.php:632
+#: api/classes/CHostGeneral.php:635
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Grafik prototi̇pleri̇ni̇n bağlantısı kaldırılıp, temizlenemiyor"
 
-#: api/classes/CHostGeneral.php:650
+#: api/classes/CHostGeneral.php:653
 msgid "Cannot unlink and clear graphs."
 msgstr "Grafiklerin bağlantısı kaldırılıp, temizlenemiyor"
 
-#: api/classes/CHostGeneral.php:579
+#: api/classes/CHostGeneral.php:582
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Öğe prototi̇pleri̇ni̇n bağlantısı kaldırılıp, temizlenemiyor"
 
-#: api/classes/CHostGeneral.php:561
+#: api/classes/CHostGeneral.php:564
 msgid "Cannot unlink and clear items"
 msgstr "Öğelerin bağlantısı kaldırılıp, temizlenemiyor"
 
-#: api/classes/CHostGeneral.php:481 api/classes/CHostGeneral.php:498
+#: api/classes/CHostGeneral.php:484 api/classes/CHostGeneral.php:501
 msgid "Cannot unlink and clear triggers"
 msgstr "Tetiklerin bağlantısı kaldırılıp, temizlenemiyor"
 
-#: api/classes/CHost.php:1851
+#: api/classes/CHost.php:1837
 msgid "Cannot unlink template"
 msgstr "Şablonun bağlantısı kaldırılamadı"
 
-#: api/classes/CHostGeneral.php:435
+#: api/classes/CHostGeneral.php:438
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr ""
@@ -2016,7 +2012,7 @@ msgstr ""
 msgid "Circular reference in templates: %1$s."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:325 api/classes/CHostGeneral.php:753
+#: api/classes/CHostGeneral.php:332 api/classes/CHostGeneral.php:756
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
@@ -2544,12 +2540,12 @@ msgstr ""
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:871
+#: api/classes/CItem.php:868
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemPrototype.php:601
+#: api/classes/CItemPrototype.php:598
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3232,17 +3228,17 @@ msgstr ""
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:2156
+#: api/classes/CHost.php:2139
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:1060
+#: api/classes/CItem.php:1057
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemPrototype.php:801
+#: api/classes/CItemPrototype.php:798
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3325,7 +3321,7 @@ msgid "Description"
 msgstr "Açıklama"
 
 #: include/actions.inc.php:825 include/blocks.inc.php:687
-#: include/config.inc.php:335
+#: include/config.inc.php:336
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3685,12 +3681,12 @@ msgstr ""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1353
+#: api/classes/CHost.php:1349
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr ""
 
-#: api/classes/CHost.php:1385
+#: api/classes/CHost.php:1381
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr ""
@@ -3737,7 +3733,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/config.inc.php:302
+#: include/config.inc.php:303
 msgid "ERROR"
 msgstr "HATA"
 
@@ -3811,8 +3807,8 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
 #: api/classes/CGraphPrototype.php:781 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
-#: api/classes/CHost.php:2010 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:949 api/classes/CItemPrototype.php:678
+#: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
+#: api/classes/CItem.php:946 api/classes/CItemPrototype.php:675
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -4094,7 +4090,7 @@ msgstr ""
 msgid "Execute on"
 msgstr ""
 
-#: include/items.inc.php:1330 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1322 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Çalıştırılmış betik"
 
@@ -4327,7 +4323,7 @@ msgstr ""
 msgid "For guest, password must be empty"
 msgstr "Misafir için parola boş olmak zorunda"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1326 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "Formül"
 
@@ -4913,7 +4909,7 @@ msgstr "Yatay hizalama"
 msgid "Host"
 msgstr "Konak"
 
-#: api/classes/CHost.php:1694
+#: api/classes/CHost.php:1683
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr ""
@@ -5071,7 +5067,7 @@ msgstr "Konak şablonu"
 msgid "Host time"
 msgstr "Konak zamanı"
 
-#: api/classes/CHost.php:1569
+#: api/classes/CHost.php:1561
 msgid "Host update failed."
 msgstr ""
 
@@ -5079,12 +5075,12 @@ msgstr ""
 msgid "Host updated"
 msgstr "Konak güncellendi"
 
-#: api/classes/CHost.php:1419 api/classes/CTemplate.php:1361
+#: api/classes/CHost.php:1411 api/classes/CTemplate.php:1361
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "\"%s\" ismli konak zaten var."
 
-#: api/classes/CHost.php:1425 api/classes/CTemplate.php:1014
+#: api/classes/CHost.php:1417 api/classes/CTemplate.php:1014
 #: api/classes/CTemplate.php:1334
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
@@ -5694,7 +5690,7 @@ msgstr "Vekil ismi \"%s\" içinde geçersiz karakterler kullanılmış."
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Şablon ismi [ %1$s ] içinde geçersiz karakterler kullanılmış"
 
-#: api/classes/CHost.php:1349 api/classes/CHost.php:1674
+#: api/classes/CHost.php:1345 api/classes/CHost.php:1666
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr ""
@@ -5754,12 +5750,12 @@ msgstr ""
 msgid "Incorrect file upload."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:744
+#: api/classes/CItemGeneral.php:743
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:733
+#: api/classes/CItemGeneral.php:732
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr ""
@@ -5815,7 +5811,7 @@ msgstr ""
 msgid "Incorrect interface port \"%s\" provided."
 msgstr ""
 
-#: api/classes/CHost.php:1283
+#: api/classes/CHost.php:1279
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr ""
@@ -6356,7 +6352,7 @@ msgstr "Öğe"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: api/classes/CItem.php:1243
+#: api/classes/CItem.php:1240
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr ""
@@ -6450,7 +6446,7 @@ msgstr ""
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:710
+#: api/classes/CItemGeneral.php:709
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -7232,7 +7228,7 @@ msgid "Max count of events per trigger to show"
 msgstr ""
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:337
+#: include/config.inc.php:338
 msgid "Maximize"
 msgstr "Ekranı kapla"
 
@@ -7243,14 +7239,14 @@ msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characte
 msgstr[0] "Maksimum rumuz uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
 msgstr[1] "Maksimum rumuz uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
 
-#: api/classes/CHost.php:1339
+#: api/classes/CHost.php:1335
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "Maksimum konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
 msgstr[1] "Maksimum konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
 
-#: api/classes/CHost.php:1375
+#: api/classes/CHost.php:1371
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7388,7 +7384,7 @@ msgid "Min severity"
 msgstr "Min önem derecesi"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:337
+#: include/config.inc.php:338
 msgid "Minimize"
 msgstr "Küçült"
 
@@ -7445,7 +7441,7 @@ msgstr ""
 msgid "Missing items for graph \"%1$s\"."
 msgstr ""
 
-#: include/graphs.inc.php:322
+#: include/graphs.inc.php:321
 #, php-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr ""
@@ -7716,7 +7712,7 @@ msgstr ""
 msgid "Next check"
 msgstr "Sonraki kontrol"
 
-#: events.php:752 include/config.inc.php:554 include/events.inc.php:285
+#: events.php:752 include/config.inc.php:555 include/events.inc.php:285
 #: include/events.inc.php:299 include/forms.inc.php:1892
 #: include/triggers.inc.php:1784
 #: include/views/administration.users.list.php:75
@@ -7877,7 +7873,7 @@ msgstr ""
 msgid "No graph ID provided for screen element."
 msgstr ""
 
-#: include/graphs.inc.php:290
+#: include/graphs.inc.php:289
 #, php-format
 msgid "No graph item with graphid \"%s\"."
 msgstr ""
@@ -7893,12 +7889,12 @@ msgstr ""
 msgid "No graphs defined."
 msgstr ""
 
-#: api/classes/CHost.php:1303 api/classes/CHost.php:1317
+#: api/classes/CHost.php:1299 api/classes/CHost.php:1313
 #, php-format
 msgid "No groups for host \"%s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1660
+#: api/classes/CHost.php:1652
 msgid "No groups for hosts."
 msgstr ""
 
@@ -7985,7 +7981,7 @@ msgstr ""
 msgid "No interfaces defined."
 msgstr ""
 
-#: api/classes/CHost.php:1307 api/classes/CHost.php:1329
+#: api/classes/CHost.php:1303 api/classes/CHost.php:1325
 #, php-format
 msgid "No interfaces for host \"%s\"."
 msgstr ""
@@ -8130,11 +8126,11 @@ msgstr "Sistem erişimi için izin yok."
 #: api/classes/CGraph.php:885 api/classes/CGraphPrototype.php:930
 #: api/classes/CHostInterface.php:511 api/classes/CHostInterface.php:527
 #: api/classes/CHostInterface.php:659 api/classes/CHostInterface.php:855
-#: api/classes/CHost.php:1290 api/classes/CHost.php:1322
+#: api/classes/CHost.php:1286 api/classes/CHost.php:1318
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:175 api/classes/CItemGeneral.php:207
-#: api/classes/CItem.php:966 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:963 api/classes/CItemPrototype.php:692
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -10717,7 +10713,7 @@ msgstr "Site kabin lokasyonu"
 msgid "Site state / province"
 msgstr "Site eyalet/il"
 
-#: include/graphs.inc.php:353
+#: include/graphs.inc.php:352
 #, php-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr ""
@@ -11037,7 +11033,7 @@ msgid "Swedish (sv_SE)"
 msgstr ""
 
 #: include/views/administration.authentication.edit.php:78
-msgid "Switching authentication method will reset all but this sessions! Continue?"
+msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr ""
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
@@ -11133,7 +11129,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Şablon"
 
-#: api/classes/CHost.php:1699
+#: api/classes/CHost.php:1688
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr ""
@@ -11152,7 +11148,7 @@ msgstr "\"%s\" şablonu zaten var."
 msgid "Template added"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:756
+#: api/classes/CHostGeneral.php:759
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr ""
 
@@ -11188,22 +11184,22 @@ msgstr "Şablon tetik"
 msgid "Template updated"
 msgstr "Şablon güncellendi"
 
-#: api/classes/CHostGeneral.php:187 include/hosts.inc.php:1233
+#: api/classes/CHostGeneral.php:191 include/hosts.inc.php:1233
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:176 include/hosts.inc.php:1219
+#: api/classes/CHostGeneral.php:179 include/hosts.inc.php:1219
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr ""
 
-#: api/classes/CHost.php:1435 api/classes/CTemplate.php:1356
+#: api/classes/CHost.php:1427 api/classes/CTemplate.php:1356
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "\"%s\" ile aynı isimli şablon zaten var."
 
-#: api/classes/CHost.php:1441 api/classes/CTemplate.php:1010
+#: api/classes/CHost.php:1433 api/classes/CTemplate.php:1010
 #: api/classes/CTemplate.php:1329
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
@@ -11222,7 +11218,7 @@ msgstr "Şablonlanmış öğeler"
 msgid "Templates"
 msgstr "Şablonlar"
 
-#: api/classes/CHostGeneral.php:735
+#: api/classes/CHostGeneral.php:738
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
@@ -11548,12 +11544,12 @@ msgstr ""
 msgid "Trigger form"
 msgstr "tetik biçimi"
 
-#: api/classes/CHostGeneral.php:283
+#: api/classes/CHostGeneral.php:285
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:238
+#: api/classes/CHostGeneral.php:236
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr ""
@@ -11684,7 +11680,7 @@ msgstr "Salı"
 msgid "Two elements should be selected"
 msgstr "İki eleman seçilmeli"
 
-#: api/classes/CItem.php:1304
+#: api/classes/CItem.php:1301
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr ""
@@ -11809,7 +11805,7 @@ msgstr "USA(160 karakter)"
 msgid "USER PROFILE"
 msgstr "KULLANICI PROFİLİ"
 
-#: include/config.inc.php:746
+#: include/config.inc.php:747
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -11946,42 +11942,42 @@ msgstr "Şablon ile bağlantıyı kaldır"
 msgid "Unlink from templates"
 msgstr "Şablonlar ile bağlantıyı kaldır"
 
-#: api/classes/CHostGeneral.php:699
+#: api/classes/CHostGeneral.php:702
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:552
+#: api/classes/CHostGeneral.php:555
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:659
+#: api/classes/CHostGeneral.php:662
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:641
+#: api/classes/CHostGeneral.php:644
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:570
+#: api/classes/CHostGeneral.php:573
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:588
+#: api/classes/CHostGeneral.php:591
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:490
+#: api/classes/CHostGeneral.php:493
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:507
+#: api/classes/CHostGeneral.php:510
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12060,12 +12056,12 @@ msgstr ""
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:922
+#: api/classes/CItem.php:919
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemPrototype.php:651
+#: api/classes/CItemPrototype.php:648
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12402,7 +12398,7 @@ msgstr "Görünüm işlenmemiş"
 msgid "Visible name"
 msgstr "Görünen isim"
 
-#: api/classes/CHost.php:1364
+#: api/classes/CHost.php:1360
 msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
@@ -12486,14 +12482,14 @@ msgstr ""
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:401
+#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:394
+#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -12625,7 +12621,7 @@ msgstr ""
 msgid "Wrong fields for element."
 msgstr ""
 
-#: api/classes/CHost.php:1276
+#: api/classes/CHost.php:1272
 #, php-format
 msgid "Wrong fields for host \"%s\"."
 msgstr ""
@@ -12797,7 +12793,7 @@ msgid "Yearly"
 msgstr "Yıllık"
 
 #: events.php:752 include/blocks.inc.php:695
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:554
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:555
 #: include/events.inc.php:288 include/events.inc.php:302
 #: include/forms.inc.php:1892 include/triggers.inc.php:1784
 #: include/views/administration.users.list.php:74
@@ -12854,10 +12850,10 @@ msgstr "\"%s\" eylem işlem genel betiği için hedef belirtmemişsiniz."
 #: api/classes/CHostGroup.php:653 api/classes/CHostGroup.php:711
 #: api/classes/CHostGroup.php:865 api/classes/CHostGroup.php:920
 #: api/classes/CHostGroup.php:986 api/classes/CHostGroup.php:999
-#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1600
-#: api/classes/CHost.php:1654 api/classes/CHost.php:1978
-#: api/classes/CItem.php:1071 api/classes/CItem.php:1074
-#: api/classes/CItemPrototype.php:812 api/classes/CItemPrototype.php:815
+#: api/classes/CHostGroup.php:1013 api/classes/CHost.php:1592
+#: api/classes/CHost.php:1646 api/classes/CHost.php:1960
+#: api/classes/CItem.php:1068 api/classes/CItem.php:1071
+#: api/classes/CItemPrototype.php:809 api/classes/CItemPrototype.php:812
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
 #: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
 #: api/classes/CScript.php:342 api/classes/CScript.php:404
@@ -13450,7 +13446,7 @@ msgstr ""
 msgid "show value mappings"
 msgstr "değer eşlemelerini göster"
 
-#: api/classes/CHostGeneral.php:150
+#: api/classes/CHostGeneral.php:153
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "\"%1$s\" şablon ismi  %2$s defa geçti"

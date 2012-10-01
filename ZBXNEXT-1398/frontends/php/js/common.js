@@ -171,7 +171,7 @@ function cancelEvent(e) {
 			e.cancelBubble = true;
 			e.returnValue = false;
 
-			if (IE9) {
+			if (IE9 && e.preventDefault) {
 				e.preventDefault();
 			}
 		}
