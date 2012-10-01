@@ -27,6 +27,7 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.3rc2
 
 Bug fixes:
+.......PS. [ZBX-5625] fixed resolving of host and template-level macros in SNMP OID field (Sasha)
 ..F....... [ZBX-5627] fixed missed placeholder brackets in multiple pages (Eduard, Pavels)
 ..F....... [ZBX-5578] fixed multiple IE issues in screens (Eduard)
 ..F....... [ZBX-5612] fixed inability to view item data overview when host group doesn't have any triggers (Toms)
