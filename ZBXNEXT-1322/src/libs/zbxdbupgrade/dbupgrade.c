@@ -217,10 +217,25 @@ static int	DBpatch_02010002()
 
 static int	DBpatch_02010003()
 {
-	return DBmodify_proxy_table_id_field("proxy_dhistory");
+	return DBmodify_proxy_table_id_field("proxy_history");
 }
 
 static int	DBpatch_02010004()
+{
+	return DBmodify_proxy_table_id_field("history_str_sync");
+}
+
+static int	DBpatch_02010005()
+{
+	return DBmodify_proxy_table_id_field("history_sync");
+}
+
+static int	DBpatch_02010006()
+{
+	return DBmodify_proxy_table_id_field("history_uint_sync");
+}
+
+static int	DBpatch_02010007()
 {
 	const char	*strings[] = {"period", "stime", "timelinefixed", NULL};
 	int		i;
@@ -246,7 +261,10 @@ int	DBcheck_version()
 		{DBpatch_02010001, 2010001, 0, 1},
 		{DBpatch_02010002, 2010002, 0, 1},
 		{DBpatch_02010003, 2010003, 0, 1},
-		{DBpatch_02010004, 2010004, 0, 0},
+		{DBpatch_02010004, 2010004, 0, 1},
+		{DBpatch_02010005, 2010005, 0, 1},
+		{DBpatch_02010006, 2010006, 0, 1},
+		{DBpatch_02010007, 2010007, 0, 0},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";
