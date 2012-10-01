@@ -354,18 +354,18 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
 #ifdef HAVE_SSH2
-			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+			substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
 					&script->publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+			substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
 					&script->privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 #else
 			zbx_strlcpy(error, "Support for SSH script was not compiled in", max_error_len);
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+			substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
 					&script->username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+			substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
 					&script->password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 			ret = zbx_execute_script_on_terminal(host, script, result, error, max_error_len);
