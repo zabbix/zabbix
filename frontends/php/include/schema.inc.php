@@ -2181,7 +2181,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '10',
+				'default' => '60',
 			),
 		),
 	),
@@ -5481,7 +5481,7 @@ return array(
 		),
 	),
 	'item_discovery' => array(
-		'type' => DB::TABLE_TYPE_CONFIG,
+		'type' => DB::TABLE_TYPE_HISTORY,
 		'key' => 'itemdiscoveryid',
 		'fields' => array(
 			'itemdiscoveryid' => array(
@@ -5723,23 +5723,4 @@ return array(
 			),
 		),
 	),
-	'dbversion' => array(
-		'type' => DB::TABLE_TYPE_HISTORY,
-		'key' => '',
-		'fields' => array(
-			'mandatory' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'optional' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-		),
-	),
 );
-?>

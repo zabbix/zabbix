@@ -4,7 +4,6 @@ DIST_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxdb \
-	zbxdbupgrade \
 	zbxmemory \
 	zbxalgo \
 	zbxmedia \
@@ -27,7 +26,6 @@ if PROXY
 PROXY_SUBDIRS = \
 	zbxcommshigh \
 	zbxdb \
-	zbxdbupgrade \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxmemory \
@@ -40,7 +38,6 @@ if SERVER
 SERVER_SUBDIRS = \
 	zbxcommshigh \
 	zbxdb \
-	zbxdbupgrade \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxmemory \
