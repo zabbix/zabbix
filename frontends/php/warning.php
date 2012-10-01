@@ -17,15 +17,15 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
+?>
+<?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Warning');
 $page['file'] = 'warning.php';
 
 define('ZBX_PAGE_DO_REFRESH', 1);
-if (!defined('PAGE_HEADER_LOADED') && !defined('ZBX_PAGE_NO_MENU')) {
+if (!defined('PAGE_HEADER_LOADED')) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
@@ -34,6 +34,7 @@ $refresh_rate = 30; // seconds
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'warning_msg' =>	array(T_ZBX_STR, O_OPT, null,			null, null),
+	'message' =>		array(T_ZBX_STR, O_OPT, null,			null, null),
 	'retry' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null)
 );
@@ -63,3 +64,4 @@ zbx_add_post_js('setTimeout("document.location.reload();", '.($refresh_rate * 10
 echo SBR;
 
 require_once dirname(__FILE__).'/include/page_footer.php';
+?>

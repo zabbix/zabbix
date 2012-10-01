@@ -118,7 +118,10 @@ sub process_row
 
 	foreach (@array)
 	{
-		$values = "$values," if ($first == 0);
+		if ($first == 0)
+		{
+			$values = "$values,";
+		}
 		$first = 0;
 
 		# remove leading and trailing spaces
