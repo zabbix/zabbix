@@ -291,6 +291,12 @@ class CScreenBase {
 			$options['profileIdx2'] = 0;
 		}
 
+		// show only latest data without update is set only period
+		if (!empty($options['period']) && empty($options['stime'])) {
+			$options['updateProfile'] = false;
+			$options['profileIdx'] = '';
+		}
+
 		// period
 		if (empty($options['period'])) {
 			$options['period'] = !empty($options['profileIdx'])
