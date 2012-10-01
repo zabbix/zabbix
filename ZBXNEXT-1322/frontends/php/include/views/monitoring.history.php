@@ -142,28 +142,8 @@ $screen = CScreenBuilder::getScreen(array(
 	'plaintext' => $this->data['plaintext']
 ));
 
-// append graph to widget
-if (!$this->data['plaintext']) {
-	$right = new CTable();
-	$right->addRow($header['right']);
-
-	$historyWidget->addPageHeader($header['left'], $right);
-	$historyWidget->addItem(SPACE);
-
-	if (isset($this->data['iv_string'][$this->data['item']['value_type']])) {
-		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
-	}
-
-	$historyWidget->addItem($screen->get());
-
-	if (str_in_array($this->data['action'], array('showvalues', 'showgraph'))) {
-		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
-		CScreenBuilder::insertScreenRefreshTime();
-	}
-}
-
 // append plaintext to widget
-else {
+if ($this->data['plaintext']) {
 	$plaintextSpan = new CSpan(null, 'textblackwhite');
 
 	foreach ($headerPlaintext as $text) {
@@ -178,6 +158,30 @@ else {
 	}
 	$plaintextSpan->addItem($pre);
 	$historyWidget->addItem($plaintextSpan);
+}
+
+// append graph to widget
+else {
+	$right = new CTable();
+	$right->addRow($header['right']);
+
+	$historyWidget->addPageHeader($header['left'], $right);
+	$historyWidget->addItem(SPACE);
+
+	if (isset($this->data['iv_string'][$this->data['item']['value_type']])) {
+		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
+	}
+
+	$historyWidget->addItem($screen->get());
+
+	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph') {
+		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
+
+		CScreenBuilder::insertScreenStandardJs(array(
+			'timeline' => $screen->timeline,
+			'profileIdx' => $screen->profileIdx
+		));
+	}
 }
 
 return $historyWidget;

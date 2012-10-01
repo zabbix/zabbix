@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
 ..F....... [ZBX-875] fixed duplicate Y-scale (Oleg)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
@@ -23,6 +24,15 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.3rc2
+
+Bug fixes:
+.......PS. [ZBX-5625] fixed resolving of host and template-level macros in SNMP OID field (Sasha)
+..F....... [ZBX-5627] fixed missed placeholder brackets in multiple pages (Eduard, Pavels)
+..F....... [ZBX-5578] fixed multiple IE issues in screens (Eduard)
+..F....... [ZBX-5612] fixed inability to view item data overview when host group doesn't have any triggers (Toms)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.3rc1
 
 New features:
@@ -39,7 +49,6 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
-..F....... [ZBX-5612] fixed can't view item data overview when host group doesn't have any triggers (Toms)
 ..F....... [ZBX-5578] fixed graph inner interval selection in screens (Eduard)
 A......... [ZBX-954] fixed missing doublequote in import error message when a network map references non-existent trigger (Richlv)
 ...G...... [ZBX-5473] fixed agent crash under FreeBSD and Linux when started with -p or -t vfs.dev.read/write (Sasha)

@@ -11,7 +11,7 @@
 			<input class="input text" type="text" id="macros_#{macroNum}_value" name="macros[#{macroNum}][value]" size="40" maxlength="255" placeholder="value">
 		</td>
 		<td>
-			<input class="input link_menu macroRemove" type="button" id="macros_#{macroNum}_remove" name="macros_#{macroNum}_remove" value=<?php echo Chtml::encode(_('Remove')); ?>>
+			<input class="input link_menu macroRemove" type="button" id="macros_#{macroNum}_remove" name="macros_#{macroNum}_remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
 		</td>
 	</tr>
 

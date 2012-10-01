@@ -895,7 +895,7 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 					dc_item.interface.type = INTERFACE_TYPE_UNKNOWN;
 
 				key = zbx_strdup(key, row[6]);
-				substitute_key_macros(&key, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+				substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
@@ -1372,8 +1372,6 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 					zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
 					ZBX_STRDUP(*value, tmp);
 					break;
-				default:
-					;
 			}
 		}
 	}
@@ -2615,7 +2613,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_CONN, 1);
 		}
-		else if (macro_type & (MACRO_TYPE_INTERFACE_PORT | MACRO_TYPE_LLD_LIFETIME))
+		else if (macro_type & (MACRO_TYPE_INTERFACE_PORT | MACRO_TYPE_LLD_LIFETIME | MACRO_TYPE_ITEM_FIELD |
+				MACRO_TYPE_FUNCTION_PARAMETER | MACRO_TYPE_SNMP_OID))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
@@ -2623,16 +2622,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					DCget_user_macro(hostid, 1, m, &replace_to);
 				else
 					DCget_user_macro(NULL, 0, m, &replace_to);
-			}
-		}
-		else if (macro_type & (MACRO_TYPE_ITEM_FIELD | MACRO_TYPE_SNMP_OID))
-		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-			{
-				if (NULL == dc_host)
-					DCget_user_macro(NULL, 0, m, &replace_to);
-				else
-					DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_ITEM_EXPRESSION)
@@ -2643,11 +2632,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
 					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
-		}
-		else if (macro_type & MACRO_TYPE_FUNCTION_PARAMETER)
-		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-				DCget_user_macro(hostid, 1, m, &replace_to);
 		}
 		else if (macro_type & MACRO_TYPE_SCRIPT)
 		{
@@ -3314,8 +3298,8 @@ static void	quote_key_param(char **param, int forced)
  *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *jp_row, int macro_type,
-		char *error, size_t maxerrlen)
+int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	const char	*__function_name = "substitute_key_macros";
 
@@ -3359,7 +3343,10 @@ int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *
 			(*data)[i] = c;
 
 			if (NULL == jp_row)
-				substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL, &param, macro_type, NULL, 0);
+			{
+				substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
+						&param, macro_type, NULL, 0);
+			}
 			else
 				substitute_discovery_macros(&param, jp_row);
 
@@ -3442,7 +3429,7 @@ int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
+							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
 									&param, macro_type, NULL, 0);
 						}
 						else
@@ -3474,7 +3461,7 @@ int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
+							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
 									&param, macro_type, NULL, 0);
 						}
 						else
