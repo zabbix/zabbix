@@ -390,42 +390,42 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'fuzzytime[=]' => array(
-		'description' =>  _('N = 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise'),
+		'description' =>  _('Timestamp does not differ from Zabbix server time for more than T seconds - then N = 1, 0 - otherwise'),
 		'params' => $param1_sec_count_no_timeshift,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'fuzzytime[#]' => array(
-		'description' =>  _('N NOT 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise'),
+		'description' =>  _('Timestamp does not differ from Zabbix server time for more than T seconds - then N NOT 1, 0 - otherwise'),
 		'params' => $param1_sec_count_no_timeshift,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'regexp[=]' => array(
-		'description' =>  _('N = 1 - last value matches regular expression V for last T seconds, 0 - otherwise'),
+		'description' =>  _('Check regular expression V in last (most recent) value of a period T. N = 1 - if matches, 0 - otherwise'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'regexp[#]' => array(
-		'description' =>  _('N NOT 1 - last value matches regular expression V for last T seconds, 0 - otherwise'),
+		'description' =>  _('Check regular expression V in last (most recent) value of a period T. N NOT 1 - if matches, 0 - otherwise'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'iregexp[=]' => array(
-		'description' =>  _('N = 1 - last value matches regular expression V for last T seconds, 0 - otherwise. (non case-sensitive)'),
+		'description' =>  _('Check regular expression V in last (most recent) value of a period T. N = 1 - if matches, 0 - otherwise. (non case-sensitive)'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'iregexp[#]' => array(
-		'description' =>  _('N NOT 1 - last value matches regular expression V for last T seconds, 0 - otherwise. (non case-sensitive)'),
+		'description' =>  _('Check regular expression V in last (most recent) value of a period T. N NOT 1 - if matches, 0 - otherwise. (non case-sensitive)'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'logeventid[=]' => array(
-		'description' =>  _('N = 1 - last Event ID matches regular expression T, 0 - otherwise'),
+		'description' =>  _('Event ID of the last log entry matches regular expression T - then N = 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logeventid[#]' => array(
-		'description' =>  _('N NOT 1 - last Event ID matches regular expression T, 0 - otherwise'),
+		'description' =>  _('Event ID of the last log entry matches regular expression T - then N NOT 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
@@ -446,22 +446,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[<]' => array(
-		'description' =>  _('N < 1 - last log source of the last log entry matches T, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matches parameter T - then N < 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[>]' => array(
-		'description' =>  _('N > 1 - last log source of the last log entry matches T, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matches parameter T - then N > 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[=]' => array(
-		'description' =>  _('N = 1 - last log source of the last log entry matches T, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matches parameter T - then N = 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[#]' => array(
-		'description' =>  _('N NOT 1 - last log source of the last log entry matches T, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matches parameter T - then N NOT 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
@@ -498,22 +498,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[<]' => array(
-		'description' =>  _('N < 1 - no data received during period of T seconds, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T - then N < 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[>]' => array(
-		'description' =>  _('N > 1 - no data received during period of T seconds, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T - then N > 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[=]' => array(
-		'description' =>  _('N = 1 - no data received during period of T seconds, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T - then N = 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[#]' => array(
-		'description' =>  _('N NOT 1 - no data received during period of T seconds, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T - then N NOT 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	)
