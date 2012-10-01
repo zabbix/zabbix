@@ -2629,10 +2629,10 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
-				if (NULL == dc_host)
+				if (NULL == dc_item)
 					DCget_user_macro(NULL, 0, m, &replace_to);
 				else
-					DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+					DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_ITEM_EXPRESSION)
