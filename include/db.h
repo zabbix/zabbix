@@ -466,6 +466,7 @@ int		DBis_null(const char *field);
 void		DBbegin();
 void		DBcommit();
 void		DBrollback();
+void		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
@@ -579,5 +580,8 @@ void	DBfree_history(char **value);
 
 int	DBtxn_status();
 int	DBtxn_ongoing();
+
+int	DBtable_exists(const char *table_name);
+int	DBfield_exists(const char *table_name, const char *field_name);
 
 #endif

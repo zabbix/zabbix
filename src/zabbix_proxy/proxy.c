@@ -23,6 +23,7 @@
 #include "pid.h"
 #include "db.h"
 #include "dbcache.h"
+#include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
@@ -574,6 +575,8 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	DBinit();
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
 
 	init_database_cache();
 	init_configuration_cache();
