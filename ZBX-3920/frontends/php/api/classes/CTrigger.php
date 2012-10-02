@@ -1451,6 +1451,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
+		$this->checkDependencyDuplicates($triggers);
 	}
 
 	/**
@@ -1846,34 +1847,17 @@ class CTrigger extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
 			}
 
-			// check duplicate dependency in array
-			$UnqTriggers = array_unique($trigger['dependencies']);
-			$DplTriggers = array_diff_assoc($trigger['dependencies'], $UnqTriggers);
-			if ($DplTriggers) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', reset($DplTriggers), $trigger['triggerid'])
-				);
-			}
-
-			// check circular and duplicate dependency in DB
+			// check circular dependency
 			do {
 				$dbUpTriggers = DBselect(
-					'SELECT td.triggerid_up,
-							td.triggerid_down'.
+					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
-					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds).'
-							OR'.DBcondition('td.triggerid_up', $downTriggerIds)
+					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds)
 				);
 				$upTriggerids = array();
-				$DwnTriggerids = array();
 				while ($upTrigger = DBfetch($dbUpTriggers)) {
-					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0 && in_array($upTrigger['triggerid_down'],$trigger['dependencies'])) {
+					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular dependencies are not allowed.'));
-					}
-					if ($upTrigger['triggerid_down'] == $trigger['triggerid'] && in_array($upTrigger['triggerid_up'],$trigger['dependencies'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', $upTrigger['triggerid_up'], $trigger['triggerid'])
-						);
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
 				}
@@ -1967,6 +1951,34 @@ class CTrigger extends CTriggerGeneral {
 						);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Checks if the given dependencies contain duplicates.
+	 *
+	 * @throws APIException     if the given dependencies contain duplicates
+	 *
+	 * @param array $triggers
+	 */
+	protected function checkDependencyDuplicates(array $triggers) {
+		foreach ($triggers as $trigger) {
+			$dbUpTriggers = DBselect(
+				'SELECT triggerid_up'.
+				' FROM trigger_depends'.
+				' WHERE triggerid_down='.zbx_dbstr($trigger['triggerid'])
+			);
+			while ($upTrigger = DBfetch($dbUpTriggers)) {
+				// existing dependencies from DB added into array with user selected dependencies
+				$trigger['dependencies'][] = $upTrigger['triggerid_up'];
+			}
+			$unqTriggers = array_unique($trigger['dependencies']);
+			$dplTriggers = array_diff_assoc($trigger['dependencies'], $unqTriggers);
+			if ($dplTriggers) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate dependencies "%1$s" for dependencies "%2$s".', reset($dplTriggers), $trigger['triggerid'])
+				);
 			}
 		}
 	}
