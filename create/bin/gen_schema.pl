@@ -199,8 +199,10 @@ sub newstate
 
 	if ($state eq "field")
 	{
-		if ($output{"type"} eq "sql" && $new eq "index") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
-		if ($output{"type"} eq "sql" && $new eq "table") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
+		if ($output{"type"} eq "sql" && ($new eq "index" || $new eq "table" || $new eq "row"))
+		{
+			print "${pkey}${eol}\n)$output{'table_options'};${eol}\n";
+		}
 		if ($new eq "field") { print ",${eol}\n"; }
 	}
 
@@ -351,7 +353,17 @@ sub process_field
 			$fk_flags = "0";
 		}
 
-		print "\t\t{\"${name}\",\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
+		if ($default eq "")
+		{
+			$default = "NULL";
+		}
+		else
+		{
+			s/'//g for ($default);
+			$default = "\"$default\""
+		}
+
+		print "\t\t{\"${name}\",\t${default},\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
 	}
 	else
 	{
@@ -449,6 +461,20 @@ sub process_field
 			}
 		}
 
+		if ($output{"database"} eq "mysql")
+		{
+			@text_fields = ('blob', 'longblob', 'text', 'longtext');
+			$default = "" if (grep /$output{$type_short}/, @text_fields);
+
+			$name = "`${name}`";
+		}
+
+		if ($output{"database"} eq "ibm_db2")
+		{
+			@text_fields = ('blob');
+			$default = "" if (grep /$output{$type_short}/, @text_fields);
+		}
+
 		if ($default ne "")
 		{
 			if ($output{"database"} eq "ibm_db2")
@@ -458,28 +484,6 @@ sub process_field
 			else
 			{
 				$default = "DEFAULT $default";
-			}
-		}
-
-		if ($output{"database"} eq "mysql")
-		{
-			@text_fields = ('blob', 'longblob', 'text', 'longtext');
-
-			if (grep /$output{$type_short}/, @text_fields)
-			{
-				$default = "";
-			}
-
-			$name = "`${name}`";
-		}
-
-		if ($output{"database"} eq "ibm_db2")
-		{
-			@text_fields = ('blob');
-
-			if (grep /$output{$type_short}/, @text_fields)
-			{
-				$default = "";
 			}
 		}
 
@@ -529,6 +533,81 @@ sub process_index
 	}
 }
 
+sub process_row
+{
+	my $line = $_[0];
+
+	newstate("row");
+
+	my @array = split(/\|/, $line);
+
+	my $first = 1;
+	my $values = "(";
+
+	foreach (@array)
+	{
+		$values = "$values," if ($first == 0);
+		$first = 0;
+
+		# remove leading and trailing spaces
+		$_ =~ s/^\s+//;
+		$_ =~ s/\s+$//;
+
+		if ($_ eq 'NULL')
+		{
+			$values = "$values$_";
+		}
+		else
+		{
+			my $modifier = '';
+
+			# escape backslashes
+			if (/\\/)
+			{
+				if ($output{'database'} eq 'postgresql')
+				{
+					$_ =~ s/\\/\\\\/g;
+					$modifier = 'E';
+				}
+				elsif ($output{'database'} eq 'mysql')
+				{
+					$_ =~ s/\\/\\\\/g;
+				}
+			}
+
+			# escape single quotes
+			if (/'/)
+			{
+				if ($output{'database'} eq 'mysql')
+				{
+					$_ =~ s/'/\\'/g;
+				}
+				else
+				{
+					$_ =~ s/'/''/g;
+				}
+			}
+
+			$_ =~ s/&pipe;/|/g;
+
+			if ($output{'database'} eq 'mysql' || $output{'database'} eq 'oracle')
+			{
+				$_ =~ s/&eol;/\\r\\n/g;
+			}
+			else
+			{
+				$_ =~ s/&eol;/\x0D\x0A/g;
+			}
+
+			$values = "$values$modifier'$_'";
+		}
+	}
+
+	$values = "$values)";
+
+	print "INSERT INTO $table_name VALUES $values;${eol}\n";
+}
+
 sub usage
 {
 	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
@@ -564,6 +643,7 @@ sub process
 			elsif ($type eq 'INDEX')	{ process_index($line, 0); }
 			elsif ($type eq 'TABLE')	{ process_table($line); }
 			elsif ($type eq 'UNIQUE')	{ process_index($line, 1); }
+			elsif ($type eq 'ROW' && $output{"type"} ne "code")		{ process_row($line); }
 		}
 	}
 

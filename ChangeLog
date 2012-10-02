@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F.I..PS. [ZBXNEXT-1322] automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
 ..F....... [ZBX-875] fixed duplicate Y-scale (Oleg)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
