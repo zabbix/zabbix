@@ -851,15 +851,17 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	zbx_vector_ptr_destroy(&tables);
 
-	DBend(ret);
-
-	if (SUCCEED != ret)
+	if (SUCCEED == ret)
+	{
+		DBcommit();
+		DCsync_configuration();
+	}
+	else
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
+		DBrollback();
 	}
-	else
-		DCsync_configuration();
 
 	zbx_free(error);
 
