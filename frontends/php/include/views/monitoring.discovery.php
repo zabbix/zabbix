@@ -17,9 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-global $USER_DETAILS;
+
 
 $discoveryWidget = new CWidget('hat_discovery');
 
@@ -44,7 +42,7 @@ $header = array(
 	new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 );
 
-$css = getUserTheme($USER_DETAILS);
+$css = getUserTheme(CWebUser::$data);
 foreach ($this->data['services'] as $name => $foo) {
 	$header[] = new CImg('vtext.php?text='.urlencode($name).'&theme='.$css);
 }
@@ -182,4 +180,3 @@ foreach ($this->data['drules'] as $drule) {
 
 $discoveryWidget->addItem($discoveryTable);
 return $discoveryWidget;
-?>

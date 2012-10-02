@@ -19,28 +19,6 @@
 **/
 
 
-if (!isset($DB)) {
-	$DB = array();
-	if (isset($DB_TYPE)) {
-		$DB['TYPE'] = $DB_TYPE;
-	}
-	if (isset($DB_SERVER)) {
-		$DB['SERVER'] = $DB_SERVER;
-	}
-	if (isset($DB_PORT)) {
-		$DB['PORT'] = $DB_PORT;
-	}
-	if (isset($DB_DATABASE)) {
-		$DB['DATABASE'] = $DB_DATABASE;
-	}
-	if (isset($DB_USER)) {
-		$DB['USER'] = $DB_USER;
-	}
-	if (isset($DB_PASSWORD)) {
-		$DB['PASSWORD'] = $DB_PASSWORD;
-	}
-}
-
 /**
  * Creates global database connection
  *
@@ -416,7 +394,7 @@ function DBrollback() {
  * @param integer $offset return starting from $offset record
  * @return resource or object, False if failed
  */
-function &DBselect($query, $limit = null, $offset = 0) {
+function DBselect($query, $limit = null, $offset = 0) {
 	global $DB;
 
 	$result = false;
@@ -578,7 +556,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
-function DBfetch(&$cursor) {
+function DBfetch($cursor) {
 	global $DB;
 
 	$result = false;

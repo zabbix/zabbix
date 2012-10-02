@@ -136,11 +136,10 @@ foreach ($all_groups as $gnum => $group) {
 $templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
-global $USER_DETAILS;
 $newgroupTB = new CTextBox('newgroup', $newgroup);
 $newgroupTB->setAttribute('maxlength', 64);
 $tmp_label = _('New group');
-if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
+if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only superadmins can create group)');
 	$newgroupTB->setReadonly(true);
 }

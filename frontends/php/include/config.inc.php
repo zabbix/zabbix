@@ -20,194 +20,30 @@
 
 
 require_once dirname(__FILE__).'/classes/core/Z.php';
-Z::getInstance()->run();
 
 require_once dirname(__FILE__).'/debug.inc.php';
 require_once dirname(__FILE__).'/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/defines.inc.php';
 require_once dirname(__FILE__).'/func.inc.php';
 require_once dirname(__FILE__).'/html.inc.php';
+require_once dirname(__FILE__).'/perm.inc.php';
+require_once dirname(__FILE__).'/audit.inc.php';
+require_once dirname(__FILE__).'/js.inc.php';
+require_once dirname(__FILE__).'/users.inc.php';
+// include validation
+require_once dirname(__FILE__).'/validate.inc.php';
+
+Z::getInstance()->run();
 
 CProfiler::getInstance()->start();
 
 require_once dirname(__FILE__).'/profiles.inc.php';
-require_once dirname(__FILE__).'/../conf/maintenance.inc.php';
 
-// abc sorting
-require_once dirname(__FILE__).'/acknow.inc.php';
-require_once dirname(__FILE__).'/actions.inc.php';
-require_once dirname(__FILE__).'/discovery.inc.php';
-require_once dirname(__FILE__).'/events.inc.php';
-require_once dirname(__FILE__).'/graphs.inc.php';
-require_once dirname(__FILE__).'/hosts.inc.php';
-require_once dirname(__FILE__).'/httptest.inc.php';
-require_once dirname(__FILE__).'/ident.inc.php';
-require_once dirname(__FILE__).'/images.inc.php';
-require_once dirname(__FILE__).'/items.inc.php';
-require_once dirname(__FILE__).'/maintenances.inc.php';
-require_once dirname(__FILE__).'/maps.inc.php';
-require_once dirname(__FILE__).'/media.inc.php';
-require_once dirname(__FILE__).'/nodes.inc.php';
-require_once dirname(__FILE__).'/services.inc.php';
-require_once dirname(__FILE__).'/sounds.inc.php';
-require_once dirname(__FILE__).'/triggers.inc.php';
-require_once dirname(__FILE__).'/users.inc.php';
-require_once dirname(__FILE__).'/valuemap.inc.php';
 
-global $USER_DETAILS, $USER_RIGHTS, $ZBX_PAGE_POST_JS, $page;
-global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
+global $ZBX_PAGE_POST_JS, $page;
 global $ZBX_SERVER, $ZBX_SERVER_PORT;
-global $ZBX_LOCALES;
 
 $page = array();
-$USER_DETAILS = array();
-$USER_RIGHTS = array();
-$ZBX_LOCALNODEID = 0;
-$ZBX_LOCMASTERID = 0;
-$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
-$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).DIRECTORY_SEPARATOR.basename($ZBX_CONFIGURATION_FILE);
-
-// include tactical overview modules
-require_once dirname(__FILE__).'/locales.inc.php';
-require_once dirname(__FILE__).'/perm.inc.php';
-require_once dirname(__FILE__).'/audit.inc.php';
-require_once dirname(__FILE__).'/js.inc.php';
-
-// include validation
-require_once dirname(__FILE__).'/validate.inc.php';
-
-function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-	$pathLength = strlen(__FILE__);
-
-	$pathLength -= 22;
-	$errfile = substr($errfile, $pathLength);
-
-	error($errstr.' ['.$errfile.':'.$errline.']');
-}
-
-/*
- * start initialization
- */
-set_error_handler('zbx_err_handler');
-unset($show_setup);
-
-if (defined('ZBX_DENY_GUI_ACCESS')) {
-	if (isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)) {
-		$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
-		if (!str_in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
-			$DENY_GUI = true;
-		}
-	}
-	else {
-		$DENY_GUI = true;
-	}
-}
-
-if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)) {
-	$config = new CConfigFile($ZBX_CONFIGURATION_FILE);
-	if ($config->load()) {
-		$config->makeGlobal();
-	}
-	else {
-		$show_warning = true;
-		define('ZBX_DISTRIBUTED', false);
-		if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
-			define('ZBX_PAGE_NO_AUTHORIZATION', true);
-		}
-		error($config->error);
-	}
-
-	require_once dirname(__FILE__).'/db.inc.php';
-
-	if (!isset($show_warning)) {
-		$error = '';
-		if (!DBconnect($error)) {
-			$_REQUEST['warning_msg'] = $error;
-
-			define('ZBX_DISTRIBUTED', false);
-			if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
-				define('ZBX_PAGE_NO_AUTHORIZATION', true);
-			}
-			$show_warning = true;
-		}
-		else {
-			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
-
-			// init LOCAL NODE ID
-			if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
-				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
-				$ZBX_LOCMASTERID = $local_node_data['masterid'];
-				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
-				define('ZBX_DISTRIBUTED', true);
-			}
-			else {
-				define('ZBX_DISTRIBUTED', false);
-			}
-			unset($local_node_data);
-		}
-		unset($error);
-	}
-}
-else {
-	if (file_exists($ZBX_CONFIGURATION_FILE)) {
-		ob_start();
-		include $ZBX_CONFIGURATION_FILE;
-		ob_end_clean();
-	}
-
-	require_once dirname(__FILE__).'/db.inc.php';
-
-	if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
-		define('ZBX_PAGE_NO_AUTHORIZATION', true);
-	}
-	define('ZBX_DISTRIBUTED', false);
-	$show_setup = true;
-}
-
-if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
-	if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
-		include('index.php');
-		exit();
-	}
-
-	if (function_exists('bindtextdomain')) {
-		// initializing gettext translations depending on language selected by user
-		$locales = zbx_locale_variants(CWebUser::$data['lang']);
-		$locale_found = false;
-		foreach ($locales as $locale) {
-			putenv('LC_ALL='.$locale);
-			putenv('LANG='.$locale);
-			putenv('LANGUAGE='.$locale);
-
-			if (setlocale(LC_ALL, $locale)) {
-				$locale_found = true;
-				CWebUser::$data['locale'] = $locale;
-				break;
-			}
-		}
-
-		if (!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb') {
-			error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
-		}
-		bindtextdomain('frontend', 'locale');
-		bind_textdomain_codeset('frontend', 'UTF-8');
-		textdomain('frontend');
-	}
-	else {
-		error('Your PHP has no gettext support. Zabbix translations are not available.');
-	}
-
-	// numeric Locale to default
-	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
-}
-else {
-	CWebUser::setDefault();
-}
-
-set_zbx_locales();
-
-// init mb strings if it's available
-init_mbstrings();
 
 // ajax - do not need warnings or errors
 if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYPE_HTML <> detect_page_type()) {

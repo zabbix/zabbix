@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CConfigFile {
 
@@ -43,94 +42,88 @@ class CConfigFile {
 	}
 
 	public function load() {
-		try{
-			if (!file_exists($this->configFile)) {
-				self::exception('Config file does not exist.');
-			}
-
-			ob_start();
-			include($this->configFile);
-			ob_end_clean();
-
-			// config file in plain php is bad
-			$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
-			if (!isset($DB['TYPE']) && !isset($DB_TYPE)) {
-				self::exception('DB type is not set.');
-			}
-			elseif (isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs)) {
-				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
-			}
-			elseif (isset($DB_TYPE) && !isset($DB['TYPE']) && !in_array($DB_TYPE, $dbs)) {
-				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
-			}
-			elseif (!isset($DB['DATABASE']) && !isset($DB_DATABASE)) {
-				self::exception('DB database is not set.');
-			}
-
-			$this->setDefaults();
-
-			if (isset($DB['TYPE'])) {
-				$this->config['DB']['TYPE'] = $DB['TYPE'];
-			}
-			elseif (isset($DB_TYPE)) {
-				$this->config['DB']['TYPE'] = $DB_TYPE;
-			}
-
-			if (isset($DB['DATABASE'])) {
-				$this->config['DB']['DATABASE'] = $DB['DATABASE'];
-			}
-			elseif (isset($DB_DATABASE)) {
-				$this->config['DB']['DATABASE'] = $DB_DATABASE;
-			}
-
-			if (isset($DB['SERVER'])) {
-				$this->config['DB']['SERVER'] = $DB['SERVER'];
-			}
-			elseif (isset($DB_SERVER)) {
-				$this->config['DB']['SERVER'] = $DB_SERVER;
-			}
-
-			if (isset($DB['PORT'])) {
-				$this->config['DB']['PORT'] = $DB['PORT'];
-			}
-			elseif (isset($DB_PORT)) {
-				$this->config['DB']['PORT'] = $DB_PORT;
-			}
-
-			if (isset($DB['USER'])) {
-				$this->config['DB']['USER'] = $DB['USER'];
-			}
-			elseif (isset($DB_USER)) {
-				$this->config['DB']['USER'] = $DB_USER;
-			}
-
-			if (isset($DB['PASSWORD'])) {
-				$this->config['DB']['PASSWORD'] = $DB['PASSWORD'];
-			}
-			elseif (isset($DB_PASSWORD)) {
-				$this->config['DB']['PASSWORD'] = $DB_PASSWORD;
-			}
-
-			if (isset($DB['SCHEMA'])) {
-				$this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
-			}
-
-			if (isset($ZBX_SERVER)) {
-				$this->config['ZBX_SERVER'] = $ZBX_SERVER;
-			}
-			if (isset($ZBX_SERVER_PORT)) {
-				$this->config['ZBX_SERVER_PORT'] = $ZBX_SERVER_PORT;
-			}
-			if (isset($ZBX_SERVER_NAME)) {
-				$this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
-			}
-
-			return true;
+		if (!file_exists($this->configFile)) {
+			self::exception('Config file does not exist.');
 		}
-		catch (Exception $e) {
-			$this->error = $e->getMessage();
-			return false;
+
+		ob_start();
+		include($this->configFile);
+		ob_end_clean();
+
+		// config file in plain php is bad
+		$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
+		if (!isset($DB['TYPE']) && !isset($DB_TYPE)) {
+			self::exception('DB type is not set.');
 		}
+		elseif (isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs)) {
+			self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+		}
+		elseif (isset($DB_TYPE) && !isset($DB['TYPE']) && !in_array($DB_TYPE, $dbs)) {
+			self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+		}
+		elseif (!isset($DB['DATABASE']) && !isset($DB_DATABASE)) {
+			self::exception('DB database is not set.');
+		}
+
+		$this->setDefaults();
+
+		if (isset($DB['TYPE'])) {
+			$this->config['DB']['TYPE'] = $DB['TYPE'];
+		}
+		elseif (isset($DB_TYPE)) {
+			$this->config['DB']['TYPE'] = $DB_TYPE;
+		}
+
+		if (isset($DB['DATABASE'])) {
+			$this->config['DB']['DATABASE'] = $DB['DATABASE'];
+		}
+		elseif (isset($DB_DATABASE)) {
+			$this->config['DB']['DATABASE'] = $DB_DATABASE;
+		}
+
+		if (isset($DB['SERVER'])) {
+			$this->config['DB']['SERVER'] = $DB['SERVER'];
+		}
+		elseif (isset($DB_SERVER)) {
+			$this->config['DB']['SERVER'] = $DB_SERVER;
+		}
+
+		if (isset($DB['PORT'])) {
+			$this->config['DB']['PORT'] = $DB['PORT'];
+		}
+		elseif (isset($DB_PORT)) {
+			$this->config['DB']['PORT'] = $DB_PORT;
+		}
+
+		if (isset($DB['USER'])) {
+			$this->config['DB']['USER'] = $DB['USER'];
+		}
+		elseif (isset($DB_USER)) {
+			$this->config['DB']['USER'] = $DB_USER;
+		}
+
+		if (isset($DB['PASSWORD'])) {
+			$this->config['DB']['PASSWORD'] = $DB['PASSWORD'];
+		}
+		elseif (isset($DB_PASSWORD)) {
+			$this->config['DB']['PASSWORD'] = $DB_PASSWORD;
+		}
+
+		if (isset($DB['SCHEMA'])) {
+			$this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
+		}
+
+		if (isset($ZBX_SERVER)) {
+			$this->config['ZBX_SERVER'] = $ZBX_SERVER;
+		}
+		if (isset($ZBX_SERVER_PORT)) {
+			$this->config['ZBX_SERVER_PORT'] = $ZBX_SERVER_PORT;
+		}
+		if (isset($ZBX_SERVER_NAME)) {
+			$this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
+		}
+
+		return true;
 	}
 
 	public function makeGlobal() {
@@ -214,4 +207,3 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		}
 	}
 }
-?>

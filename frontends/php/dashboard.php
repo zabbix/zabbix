@@ -289,7 +289,7 @@ $refresh_tab = array(
 $rightColumn = array();
 
 // status of zbx
-if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
+if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_stszbx'));
 	$zbxStatus = new CUIWidget('hat_stszbx', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_stszbx.state', 1));
 	$zbxStatus->setHeader(_('Status of Zabbix'), array($refresh_menu));

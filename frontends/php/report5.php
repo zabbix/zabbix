@@ -37,7 +37,7 @@ check_fields($fields);
 $rprt_wdgt = new CWidget();
 
 $_REQUEST['period'] = get_request('period', 'day');
-$admin_links = ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN || $USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN);
+$admin_links = (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN);
 
 $form = new CForm('get');
 
@@ -148,7 +148,7 @@ foreach ($triggers as $trigger) {
 	$hostSpan->setAttribute('onclick', $menus);
 
 	$tr_conf_link = 'null';
-	if ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$tr_conf_link = "['"._('Configuration of trigger')."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 	}
 
