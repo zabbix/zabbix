@@ -45,6 +45,11 @@ class ZBase {
 	protected $session;
 
 	/**
+	 * @var array of config data from zabbix config file
+	 */
+	protected $config;
+
+	/**
 	 * Returns the current instance of Z.
 	 *
 	 * @static
@@ -66,6 +71,8 @@ class ZBase {
 		$this->rootDir = $this->findRootDir();
 
 		$this->registerAutoloader();
+
+		$this->init();
 	}
 
 	/**
@@ -150,5 +157,117 @@ class ZBase {
 		}
 
 		return $this->session;
+	}
+
+	protected function init() {
+		$this->setErrorHandler();
+		$this->setMaintenanceMode();
+		$this->loadConfigFile();
+		$this->initDB();
+		$this->initNodes();
+		$this->authenticateUser();
+	}
+
+	protected function setErrorHandler() {
+		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+			$pathLength = strlen(__FILE__);
+
+			$pathLength -= 22;
+			$errfile = substr($errfile, $pathLength);
+
+			error($errstr.' ['.$errfile.':'.$errline.']');
+		}
+
+		set_error_handler('zbx_err_handler');
+	}
+
+	protected function setMaintenanceMode() {
+		require_once $this->getRootDir() . '/conf/maintenance.inc.php';
+
+		if (defined('ZBX_DENY_GUI_ACCESS')) {
+			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+					? $_SERVER['HTTP_X_FORWARDED_FOR']
+					: $_SERVER['REMOTE_ADDR'];
+			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
+				require_once $this->getRootDir() . '/warning.php';
+			}
+		}
+	}
+
+	protected function loadConfigFile() {
+		$configFile = $this->getRootDir() . '/conf/zabbix.conf.php';
+		$config = new CConfigFile($configFile);
+		$config->load();
+		$this->config = $config->config;
+	}
+
+	protected function initDB() {
+		// $DB is used in db.inc.php file
+		$DB = $this->config['DB'];
+		require_once $this->getRootDir() . '/include/db.inc.php';
+
+		$error = null;
+		if (!DBconnect($error)) {
+			throw new DBException($error);
+		}
+	}
+
+	protected function initNodes() {
+		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_NODES;
+
+		require_once $this->getRootDir() . '/include/nodes.inc.php';
+
+		if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
+			$ZBX_LOCALNODEID = $local_node_data['nodeid'];
+			$ZBX_LOCMASTERID = $local_node_data['masterid'];
+			$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
+			define('ZBX_DISTRIBUTED', true);
+		}
+		else {
+			define('ZBX_DISTRIBUTED', false);
+		}
+	}
+
+	protected function initLocales() {
+		require_once $this->getRootDir() . '/include/locales.inc.php';
+
+		init_mbstrings();
+
+		if (function_exists('bindtextdomain')) {
+			// initializing gettext translations depending on language selected by user
+			$locales = zbx_locale_variants(CWebUser::$data['lang']);
+			$locale_found = false;
+			foreach ($locales as $locale) {
+				putenv('LC_ALL='.$locale);
+				putenv('LANG='.$locale);
+				putenv('LANGUAGE='.$locale);
+
+				if (setlocale(LC_ALL, $locale)) {
+					$locale_found = true;
+					CWebUser::$data['locale'] = $locale;
+					break;
+				}
+			}
+
+			if (!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb') {
+				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
+			}
+			bindtextdomain('frontend', 'locale');
+			bind_textdomain_codeset('frontend', 'UTF-8');
+			textdomain('frontend');
+		}
+		else {
+			error('Your PHP has no gettext support. Zabbix translations are not available.');
+		}
+
+		// numeric Locale to default
+		setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
+	}
+
+	protected function authenticateUser() {
+		if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
+//			throw new Exception('User not authenticated');
+			CWebUser::setDefault();
+		}
 	}
 }

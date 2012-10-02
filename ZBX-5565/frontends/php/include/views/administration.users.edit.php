@@ -21,8 +21,6 @@
 
 include('include/views/js/administration.users.edit.js.php');
 
-global $ZBX_LOCALES, $USER_DETAILS;
-
 $userWidget = new CWidget();
 if ($this->data['is_profile']) {
 	$userWidget->addPageHeader(_('USER PROFILE').' : '.$this->data['name'].' '.$this->data['surname']);
@@ -93,7 +91,7 @@ if (!$this->data['is_profile']) {
 // append languages to form list
 $languageComboBox = new CComboBox('lang', $this->data['lang']);
 $languages_unable_set = 0;
-foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
+foreach (getLocales() as $loc_id => $loc_name) {
 	// checking if this locale exists in the system. The only way of doing it is to try and set one
 	// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
 	$locale_exists = setlocale(LC_MONETARY , zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
@@ -104,7 +102,7 @@ foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 		$languages_unable_set++;
 	}
 }
-setlocale(LC_MONETARY, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
+setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang'])); // restoring original locale
 $lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
 $userFormList->addRow(_('Language'), array($languageComboBox, SPACE, new CSpan($lang_hint, 'red wrap')));
 
@@ -128,7 +126,7 @@ $userFormList->addRow(_('URL (after login)'), new CTextBox('url', $this->data['u
 /*
  * Media tab
  */
-if (uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
+if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
@@ -299,7 +297,7 @@ if (!$this->data['is_profile']) {
 	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_USER, user_type2str(USER_TYPE_ZABBIX_USER));
 	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
 	$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
-	if (isset($this->data['userid']) && bccomp($USER_DETAILS['userid'], $this->data['userid']) == 0) {
+	if (isset($this->data['userid']) && bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 		$userTypeComboBox->setEnabled('disabled');
 		$permissionsFormList->addRow(_('User type'), array($userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))));
 		$userForm->addVar('user_type', $this->data['user_type']);
@@ -325,7 +323,7 @@ if (empty($this->data['userid'])) {
 else {
 	if (!$this->data['is_profile']) {
 		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid').url_param('config'));
-		if (bccomp($USER_DETAILS['userid'], $this->data['userid']) == 0) {
+		if (bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 			$deleteButton->setAttribute('disabled', 'disabled');
 		}
 		$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array($deleteButton, new CButtonCancel(url_param('config')))));

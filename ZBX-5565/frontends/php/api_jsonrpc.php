@@ -17,21 +17,17 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 define('ZBX_RPC_REQUEST', 1);
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $allowed_content = array(
-	'application/json-rpc'		=> 'json-rpc',
-	'application/json'			=> 'json-rpc',
-	'application/jsonrequest'	=> 'json-rpc',
-//	'application/xml-rpc'		=> 'xml-rpc',
-//	'application/xml'			=> 'xml-rpc',
-//	'application/xmlrequest'	=> 'xml-rpc'
-				);
-?>
-<?php
+	'application/json-rpc' => 'json-rpc',
+	'application/json' => 'json-rpc',
+	'application/jsonrequest' => 'json-rpc',
+);
+
 
 $http_request = new CHTTP_request();
 $content_type = $http_request->header('Content-Type');
@@ -39,21 +35,17 @@ $content_type = explode(';', $content_type);
 $content_type = $content_type[0];
 
 
-if(!isset($allowed_content[$content_type])){
+if (!isset($allowed_content[$content_type])) {
 	header('HTTP/1.0 412 Precondition Failed');
 	exit();
 }
 
 $data = $http_request->body();
 
-if($allowed_content[$content_type] == 'json-rpc'){
+if ($allowed_content[$content_type] == 'json-rpc') {
 	header('Content-Type: application/json');
 
 	$jsonRpc = new CJSONrpc($data);
 
 	print($jsonRpc->execute());
 }
-else if($allowed_content[$content_type] == 'xml-rpc'){
-
-}
-?>

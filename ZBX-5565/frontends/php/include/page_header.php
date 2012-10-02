@@ -19,9 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/config.inc.php';
-require_once dirname(__FILE__).'/perm.inc.php';
-
 if (!isset($page['type'])) {
 	$page['type'] = PAGE_TYPE_HTML;
 }
@@ -41,8 +38,6 @@ if (!defined('ZBX_PAGE_NO_THEME')) {
 	define('ZBX_PAGE_NO_THEME', false);
 }
 
-// init CURRENT NODE ID
-init_nodes();
 switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();

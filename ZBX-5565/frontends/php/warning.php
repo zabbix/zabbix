@@ -48,8 +48,6 @@ CWebUser::$data['refresh'] = $refresh_rate;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-unset($USER_DETAILS);
-
 $msg = isset($_REQUEST['warning_msg']) ? $_REQUEST['warning_msg'] : _('Zabbix is temporarily unavailable!');
 
 $warning = new CWarning(_('Zabbix').SPACE.ZABBIX_VERSION, $msg);
