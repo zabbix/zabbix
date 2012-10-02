@@ -25,10 +25,32 @@ jQuery(function($) {
 
 		screens: [],
 
+		add: function(screen) {
+			// switch off time control refreshing using full page refresh
+			timeControl.refreshPage = false;
+
+			// init screen item
+			this.screens[screen.id] = screen;
+			this.screens[screen.id].refreshInterval = (screen.refreshInterval > 0) ? screen.refreshInterval * 1000 : 0;
+			this.screens[screen.id].isRefreshing = false;
+			this.screens[screen.id].isReRefreshRequire = false;
+			this.screens[screen.id].error = 0;
+
+			// init refresh plan
+			if (screen.isFlickerfree && screen.refreshInterval > 0) {
+				this.screens[screen.id].timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].refreshInterval);
+			}
+		},
+
 		refresh: function(id, isSelfRefresh) {
 			var screen = this.screens[id];
-			if (empty(screen.resourcetype)) {
+
+			if (empty(screen.id)) {
 				return;
+			}
+
+			if (empty(isSelfRefresh)) {
+				isSelfRefresh = false;
 			}
 
 			var ajaxUrl = new Curl('jsrpc.php');
@@ -50,13 +72,13 @@ jQuery(function($) {
 			// SCREEN_RESOURCE_GRAPH
 			// SCREEN_RESOURCE_SIMPLE_GRAPH
 			if (screen.resourcetype == 0 || screen.resourcetype == 1) {
-				if (this.isRefreshAllowed(screen, isSelfRefresh)) {
+				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					this.refreshImg(id, function() {
 						$('#flickerfreescreen_' + id).find('a').each(function() {
-							var chartUrl = new Curl($(this).attr('href'));
-							chartUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
-							chartUrl.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
-							$(this).attr('href', chartUrl.getUrl());
+							var url = new Curl($(this).attr('href'));
+							url.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+							url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
+							$(this).attr('href', url.getUrl());
 						});
 					});
 				}
@@ -69,14 +91,14 @@ jQuery(function($) {
 
 			// SCREEN_RESOURCE_CHART
 			else if (screen.resourcetype == 18) {
-				if (this.isRefreshAllowed(screen, isSelfRefresh)) {
+				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					this.refreshImg(id);
 				}
 			}
 
 			// SCREEN_RESOURCE_HISTORY
 			else if (screen.resourcetype == 17) {
-				if (this.isRefreshAllowed(screen, isSelfRefresh)) {
+				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					if (screen.data.action == 'showgraph') {
 						this.refreshImg(id);
 					}
@@ -105,7 +127,7 @@ jQuery(function($) {
 
 			// SCREEN_RESOURCE_PLAIN_TEXT
 			else if (screen.resourcetype == 3) {
-				if (this.isRefreshAllowed(screen, isSelfRefresh)) {
+				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					this.refreshHtml(id, ajaxUrl);
 				}
 			}
@@ -118,9 +140,9 @@ jQuery(function($) {
 			// set next refresh execution time
 			if (screen.isFlickerfree && screen.refreshInterval > 0) {
 				clearTimeout(screen.timeout);
-				screen.timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(id, true); }, screen.refreshInterval);
+				screen.timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(id); }, screen.refreshInterval);
 
-				// refresh time
+				// refresh time control actual time
 				clearTimeout(timeControl.timeRefreshTimeout);
 				timeControl.refreshTime();
 			}
@@ -128,17 +150,17 @@ jQuery(function($) {
 
 		refreshAll: function(period, stime, isNow) {
 			for (var id in this.screens) {
-				if (empty(this.screens[id]) || empty(this.screens[id].resourcetype)) {
-					continue;
+				var screen = this.screens[id];
+
+				if (!empty(screen.id)) {
+					screen.timeline.period = period;
+					screen.timeline.stime = stime;
+					screen.timeline.isNow = isNow;
+
+					// restart refresh execution starting from Now
+					clearTimeout(screen.timeout);
+					this.refresh(id, true);
 				}
-
-				this.screens[id].timeline.period = period;
-				this.screens[id].timeline.stime = stime;
-				this.screens[id].timeline.isNow = isNow;
-
-				// restart refresh execution starting from now
-				clearTimeout(this.screens[id].timeout);
-				this.refresh(id, false);
 			}
 		},
 
@@ -173,7 +195,7 @@ jQuery(function($) {
 				$.when(ajaxRequest).always(function() {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
-						window.flickerfreeScreen.refresh(id, false);
+						window.flickerfreeScreen.refresh(id, true);
 					}
 				});
 			}
@@ -187,51 +209,73 @@ jQuery(function($) {
 			}
 			else {
 				screen.isRefreshing = true;
+				screen.error = 0;
 
 				window.flickerfreeScreenShadow.start(id);
 
 				$('#flickerfreescreen_' + id).find('img').each(function() {
-					var workImg = $(this);
-					var chartUrl = new Curl(workImg.attr('src'));
-					chartUrl.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
-					chartUrl.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? + screen.updateProfile : null);
-					chartUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
-					chartUrl.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
-					chartUrl.setArgument('curtime', new CDate().getTime());
+					var domImg = $(this);
 
-					// img
+					var url = new Curl(domImg.attr('src'));
+					url.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
+					url.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? + screen.updateProfile : null);
+					url.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
+					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
+					url.setArgument('curtime', new CDate().getTime());
+
+					// create temp image in buffer
 					$('<img />', {
-						id: workImg.attr('id') + '_tmp',
-						'class': workImg.attr('class'),
-						border: workImg.attr('border'),
-						usemap: workImg.attr('usemap'),
-						alt: workImg.attr('alt'),
-						name: workImg.attr('name')
+						id: domImg.attr('id') + '_tmp',
+						'class': domImg.attr('class'),
+						border: domImg.attr('border'),
+						usemap: domImg.attr('usemap'),
+						alt: domImg.attr('alt'),
+						name: domImg.attr('name')
 					})
-					.attr('src', chartUrl.getUrl())
-					.load(function() {
-						var elem = $(this);
-						elem.attr('id', elem.attr('id').substring(0, elem.attr('id').indexOf('_tmp')));
+					.attr('src', url.getUrl())
+					.error(function() {
+						screen.error++;
 
-						workImg.replaceWith(elem);
+						screen.isRefreshing = false;
 
-						if (typeof(successAction) !== 'undefined') {
-							successAction();
+						// retry load image
+						if (screen.error < 10) {
+							window.flickerfreeScreen.refresh(id, true);
 						}
-
-						// rebuild listener
-						if (!empty(ZBX_SBOX[id])) {
-							ZBX_SBOX[id].addListeners();
+					})
+					.load(function() {
+						if (screen.error > 0) {
+							return;
 						}
 
 						screen.isRefreshing = false;
 
+						// re-refresh image
 						if (screen.isReRefreshRequire) {
 							screen.isReRefreshRequire = false;
-							window.flickerfreeScreen.refresh(id, false);
+							window.flickerfreeScreen.refresh(id, true);
 						}
+						else {
+							var bufferImg = $(this);
 
-						window.flickerfreeScreenShadow.end(id);
+							// set id
+							bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
+
+							// set loaded image from buffer to dom
+							domImg.replaceWith(bufferImg);
+
+							// callback function on success
+							if (!empty(successAction)) {
+								successAction();
+							}
+
+							// rebuild timeControl sbox listeners
+							if (!empty(ZBX_SBOX[id])) {
+								ZBX_SBOX[id].addListeners();
+							}
+
+							window.flickerfreeScreenShadow.end(id);
+						}
 					});
 				});
 			}
@@ -245,6 +289,7 @@ jQuery(function($) {
 			}
 			else {
 				screen.isRefreshing = true;
+
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
 					type: 'post',
@@ -260,26 +305,14 @@ jQuery(function($) {
 				$.when(ajaxRequest).always(function() {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
-						window.flickerfreeScreen.refresh(id, false);
+						window.flickerfreeScreen.refresh(id, true);
 					}
 				});
 			}
 		},
 
-		isRefreshAllowed: function (screen, isSelfRefresh) {
-			if (isSelfRefresh == false || empty(timeControl.timeline)) {
-				return true;
-			}
-
-			var isNow = timeControl.timeline.isNow();
-			if (!is_null(isNow)) {
-				return isNow;
-			}
-			else if (screen.timeline.isNow || screen.timeline.isNow == 1) {
-				return true;
-			}
-
-			return false;
+		isRefreshAllowed: function (screen) {
+			return !empty(timeControl.timeline) ? timeControl.timeline.isNow() : true;
 		},
 
 		getCalculatedSTime: function(screen) {
@@ -306,19 +339,6 @@ jQuery(function($) {
 			$('form[name=' + formName + ']').append('<input type="hidden" name="period" value="' + period + '" />');
 			$('form[name=' + formName + ']').append('<input type="hidden" name="stime" value="' + stime + '" />');
 			$('form[name=' + formName + ']').submit();
-		},
-
-		add: function(screen) {
-			timeControl.refreshPage = false;
-
-			this.screens[screen.id] = screen;
-			this.screens[screen.id].refreshInterval = (screen.refreshInterval > 0) ? screen.refreshInterval * 1000 : 0;
-			this.screens[screen.id].isRefreshing = false;
-			this.screens[screen.id].isReRefreshRequire = false;
-
-			if (screen.isFlickerfree && screen.refreshInterval > 0) {
-				this.screens[screen.id].timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(screen.id, true); }, this.screens[screen.id].refreshInterval);
-			}
 		}
 	};
 
@@ -333,28 +353,18 @@ jQuery(function($) {
 				this.timers[id].timeout = null;
 				this.timers[id].ready = false;
 			}
-			var timer = this.timers[id];
 
-			clearTimeout(timer.timeout);
-			timer.timeout = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout * 1000);
+			clearTimeout(this.timers[id].timeout);
+			this.timers[id].timeout = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout * 1000);
 		},
 
 		end: function(id) {
-			var timer = this.timers[id];
-			if (empty(timer)) {
-				return;
-			}
-
-			clearTimeout(timer.timeout);
+			clearTimeout(this.timers[id].timeout);
 			this.removeShadow(id);
 		},
 
 		validate: function(id) {
-			var screen = window.flickerfreeScreen.screens[id],
-				timer = this.timers[id];
-			if (empty(screen) || empty(timer)) {
-				return;
-			}
+			var screen = window.flickerfreeScreen.screens[id];
 
 			if (screen.isRefreshing) {
 				this.createShadow(id);
@@ -383,6 +393,7 @@ jQuery(function($) {
 					timer.ready = true;
 				}
 			}
+
 			// create shadow
 			if (elem.find('.shadow').length == 0) {
 				item.css({position: 'relative', zIndex: 2});
@@ -396,15 +407,26 @@ jQuery(function($) {
 						height: item.height()
 					})
 				);
-				elem.append($('<img>', {'class': 'offline'})
-					.css({
-						top: item.position().top + 1,
-						left: item.position().left + 2
-					})
-				);
 
 				// fade screen
 				elem.find(item.prop('nodeName')).fadeTo(2000, 0.6);
+
+				// show loading icon..
+				elem.append($('<div>', {'class': 'loading'})
+					.css({
+						top: item.position().top + Math.round(item.height() / 2) - 12,
+						left: item.position().left + Math.round(item.width() / 2) - 12
+					})
+				);
+				elem.find('.loading').activity({
+					segments: 12,
+					steps: 3,
+					opacity: 0.3,
+					width: 2,
+					space: 0,
+					length: 5,
+					color: '#0b0b0b'
+				});
 			}
 		},
 
@@ -416,8 +438,8 @@ jQuery(function($) {
 			}
 
 			elem.find(item.prop('nodeName')).fadeIn(0);
+			elem.find('.loading').remove();
 			elem.find('.shadow').remove();
-			elem.find('.offline').remove();
 		},
 
 		moveShadows: function() {
