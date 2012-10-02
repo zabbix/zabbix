@@ -122,7 +122,7 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 	if (!isset($show_warning)) {
 		$error = '';
 		if (!DBconnect($error)) {
-			$_REQUEST['warning_msg'] = $error;
+			$_REQUEST['message'] = $error;
 
 			define('ZBX_DISTRIBUTED', false);
 			if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
