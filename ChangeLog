@@ -4,6 +4,7 @@ New features:
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+...G...... [ZBX-5552] fixed processing of vm.memory.size[total] under FreeBSD (Sasha)
 .......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
 
 --------------------------------------------------------------------------------
