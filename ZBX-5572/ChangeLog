@@ -1,9 +1,24 @@
-Changes for 2.0.4
+Changes for 2.0.4rc1
 
 New features:
+........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
 .......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.3
+
+2.0.3rc2 was released as 2.0.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.3rc2
+
+Bug fixes:
+.......PS. [ZBX-5625] fixed resolving of host and template-level macros in SNMP OID field (Sasha)
+..F....... [ZBX-5627] fixed missed placeholder brackets in multiple pages (Eduard, Pavels)
+..F....... [ZBX-5578] fixed multiple IE issues in screens (Eduard)
+..F....... [ZBX-5612] fixed inability to view item data overview when host group doesn't have any triggers (Toms)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.3rc1
@@ -22,6 +37,7 @@ A......... [ZBX-5351] implemented the "selectTimeperiods" parameter for the main
 ..F....... [ZBX-4972] added the ability to edit map links in the element mass update form (Pavels)
 
 Bug fixes:
+..F....... [ZBX-5578] fixed graph inner interval selection in screens (Eduard)
 A......... [ZBX-954] fixed missing doublequote in import error message when a network map references non-existent trigger (Richlv)
 ...G...... [ZBX-5473] fixed agent crash under FreeBSD and Linux when started with -p or -t vfs.dev.read/write (Sasha)
 ..F....... [ZBX-5513] fixed HTTP authentication without directly passing password (Eduard)

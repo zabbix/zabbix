@@ -265,7 +265,7 @@ static int	DBlld_compare_trigger_items(zbx_uint64_t triggerid, struct zbx_json_p
 	while (NULL != (row = DBfetch(result)))
 	{
 		old_key = zbx_strdup(old_key, row[0]);
-		substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		substitute_key_macros(&old_key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 		if (0 == strcmp(old_key, row[1]))
 		{
@@ -304,7 +304,7 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
 	if (NULL != jp_row)
 	{
 		key = zbx_strdup(key, tmpl_key);
-		substitute_key_macros(&key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 		key_esc = DBdyn_escape_string_len(key, ITEM_KEY_LEN);
 	}
 	else
@@ -382,7 +382,7 @@ static void	DBlld_get_trigger_functions(zbx_uint64_t triggerid, struct zbx_json_
 		zbx_vector_ptr_append(functions, function);
 
 		if (NULL != jp_row && 0 != (function->flags & ZBX_FLAG_DISCOVERY_CHILD))
-			substitute_key_macros(&function->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+			substitute_key_macros(&function->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	}
 	DBfree_result(result);
 
@@ -1029,7 +1029,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	item = zbx_calloc(NULL, 1, sizeof(zbx_lld_item_t));
 	item->key = zbx_strdup(NULL, key_proto);
-	substitute_key_macros(&item->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 	key_esc = DBdyn_escape_string_len(item->key, ITEM_KEY_LEN);
 
@@ -1059,7 +1059,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 			char	*old_key = NULL;
 
 			old_key = zbx_strdup(old_key, row[1]);
-			substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+			substitute_key_macros(&old_key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			if (0 == strcmp(old_key, row[2]))
 				ZBX_STR2UINT64(item->itemid, row[0]);
@@ -1084,7 +1084,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	substitute_discovery_macros(&item->name, jp_row);
 
 	item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
-	substitute_key_macros(&item->snmp_oid, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+	substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
 
 	item->params = zbx_strdup(NULL, params_proto);
 	if (ITEM_TYPE_DB_MONITOR == type || ITEM_TYPE_SSH == type ||
