@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"POT-Creation-Date: 2012-10-03 23:23+0300\n"
 "PO-Revision-Date: 2012-09-09 23:31+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2908,7 +2908,7 @@ msgstr "Десятковий"
 #: include/views/configuration.action.edit.php:355
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:121
-#: include/views/monitoring.screen.php:116
+#: include/views/monitoring.screen.php:117
 #: include/views/monitoring.slides.php:83 jsLoader.php:143 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
@@ -4316,6 +4316,10 @@ msgstr "Фільтр по імені"
 msgid "Finish"
 msgstr "Завершити"
 
+#: include/locales.inc.php:50
+msgid "Finnish (fi_FI)"
+msgstr ""
+
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
 msgstr "Перший"
@@ -4351,7 +4355,7 @@ msgstr "Формула"
 msgid "Fourth"
 msgstr "Четвертий"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:51
 msgid "French (fr_FR)"
 msgstr "Французька (fr_FR)"
 
@@ -4442,7 +4446,7 @@ msgstr "Загальні парам."
 msgid "Generated in %s sec"
 msgstr "Згенеровано за %s сек."
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:52
 msgid "German (de_DE)"
 msgstr "Німецька (de_DE)"
 
@@ -4646,7 +4650,7 @@ msgstr "Графіки скопійовано"
 msgid "Graphs deleted"
 msgstr "Графіки видалено"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:53
 msgid "Greek (el_GR)"
 msgstr "Грецька (el_GR)"
 
@@ -4674,7 +4678,7 @@ msgstr "Сітка"
 #: include/views/configuration.triggers.list.php:62
 #: include/views/monitoring.charts.php:25
 #: include/views/monitoring.overview.php:31
-#: include/views/monitoring.screen.php:113
+#: include/views/monitoring.screen.php:114
 #: include/views/monitoring.slides.php:78 latest.php:124 popup.php:501
 #: templates.php:431 tr_status.php:173
 msgid "Group"
@@ -4920,7 +4924,7 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/js/configuration.sysmaps.js.php:15
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/monitoring.charts.php:26
-#: include/views/monitoring.screen.php:121
+#: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:88 items.php:68 items.php:458
 #: items.php:613 items.php:636 jsLoader.php:138 latest.php:125 latest.php:191
 #: popup.php:476 popup.php:513 popup.php:1083 popup.php:1279 popup.php:1484
@@ -5176,7 +5180,7 @@ msgstr "Годин"
 msgid "Housekeeper"
 msgstr "Очистка історії"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:54
 msgid "Hungarian (hu_HU)"
 msgstr "Угорська (hu_HU)"
 
@@ -6354,7 +6358,7 @@ msgstr "Неможливо виконувати вихід з HTTP аутент�
 msgid "It is not possible to search by user password."
 msgstr "Неможливо виконувати пошук по паролю користувача."
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:55
 msgid "Italian (it_IT)"
 msgstr "Італійська (it_IT)"
 
@@ -6567,7 +6571,7 @@ msgstr "Січ"
 msgid "January"
 msgstr "Січень"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:57
 msgid "Japanese (ja_JP)"
 msgstr "Японська (ja_JP)"
 
@@ -6650,7 +6654,7 @@ msgstr "Ключове слово"
 msgid "Kilo"
 msgstr "Кіло"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:56
 msgid "Korean (ko_KR)"
 msgstr "Корейська (ko_KR)"
 
@@ -6790,7 +6794,7 @@ msgstr "Останні дані"
 msgid "Latest events"
 msgstr "Останні події"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:58
 msgid "Latvian (lv_LV)"
 msgstr "Латвійська (lv_LV)"
 
@@ -6882,7 +6886,7 @@ msgid "List is empty"
 msgstr "Список пустий"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
-#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:117
+#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:119
 msgid "Loading..."
 msgstr "Завантаження..."
 
@@ -7906,10 +7910,10 @@ msgstr "Немає елемента графіку з graphid \"%s\"."
 msgid "No graph prototypes defined."
 msgstr "Прототипів графіків не визначено."
 
-#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:103
+#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:97
 #: include/classes/screens/CScreenHistory.php:310
 #: include/views/configuration.graph.list.php:71
-#: include/views/monitoring.charts.php:63 popup.php:1334
+#: include/views/monitoring.charts.php:68 popup.php:1334
 msgid "No graphs defined."
 msgstr "Графіків не визначено."
 
@@ -8241,7 +8245,7 @@ msgid "No slide shows defined."
 msgstr "Слайд-шоу не визначено."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:120 popup.php:1681
+#: include/views/monitoring.slides.php:122 popup.php:1681
 msgid "No slides defined."
 msgstr "Слайдів не визначено."
 
@@ -9147,6 +9151,10 @@ msgstr "Права доступу"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Права доступу можуть бути призначені тільки групам користувачів."
 
+#: include/locales.inc.php:59
+msgid "Persian (fa_IR)"
+msgstr ""
+
 #: include/func.inc.php:568
 msgid "Peta"
 msgstr "Пета"
@@ -9188,7 +9196,7 @@ msgstr "Будь-ласка введіть текст підтвердження
 msgid "Please select two elements"
 msgstr "Будь-ласка, оберіть два елементи"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Polish (pl_PL)"
 msgstr "Польська (pl_PL)"
 
@@ -9218,7 +9226,7 @@ msgstr "Порт не може бути порожнім для інтерфей
 msgid "Port range"
 msgstr "Діапазон портів"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Portuguese (pt_BR)"
 msgstr "Португальська (pt_BR)"
 
@@ -9850,7 +9858,7 @@ msgstr "Виконати віддалені команди в групах ву�
 msgid "Run remote commands on hosts"
 msgstr "Виконати віддалені команди на вузлах мережі"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "Russian (ru_RU)"
 msgstr "Російська (ru_RU)"
 
@@ -9865,9 +9873,9 @@ msgid "S"
 msgstr "Нд"
 
 #: include/views/monitoring.hostscreen.php:30
-#: include/views/monitoring.hostscreen.php:39
+#: include/views/monitoring.hostscreen.php:40
 #: include/views/monitoring.screen.php:35
-#: include/views/monitoring.screen.php:66
+#: include/views/monitoring.screen.php:67
 msgid "SCREENS"
 msgstr "КОМПЛЕКСНІ ЕКРАНИ"
 
@@ -10052,7 +10060,7 @@ msgstr "Субота"
 #: include/views/administration.general.other.edit.php:48
 #: include/views/administration.general.triggerDisplayOptions.edit.php:120
 #: include/views/administration.general.triggerSeverity.edit.php:76
-#: include/views/administration.general.valuemapping.edit.php:61
+#: include/views/administration.general.valuemapping.edit.php:60
 #: include/views/administration.general.workingtime.edit.php:34
 #: include/views/administration.mediatypes.edit.php:104
 #: include/views/administration.node.edit.php:91
@@ -10211,12 +10219,12 @@ msgstr "Комплексний екран повинен містити як м�
 msgid "Screen updated"
 msgstr "Комплексний екран оновлено"
 
-#: include/views/monitoring.screen.php:47
+#: include/views/monitoring.screen.php:48
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
 msgstr "Комплексний екран з ID \"%s\" не існує."
 
-#: include/views/monitoring.screen.php:46
+#: include/views/monitoring.screen.php:47
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
 msgstr "Комплексний екран з іменем \"%s\" не існує."
@@ -10225,7 +10233,7 @@ msgstr "Комплексний екран з іменем \"%s\" не існує
 #: include/html.inc.php:488 include/menu.inc.php:68 include/menu.inc.php:201
 #: include/views/configuration.screen.list.php:38
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
-#: include/views/monitoring.screen.php:85
+#: include/views/monitoring.screen.php:86
 #: include/views/monitoring.slides.php:29 popup.php:85 popup.php:109
 #: search.php:135 search.php:207 search.php:372 search.php:405 search.php:428
 #: templates.php:448 templates.php:515
@@ -10783,7 +10791,7 @@ msgstr "Слайдшоу"
 msgid "Slides"
 msgstr "Слайди"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "Slovak (sk_SK)"
 msgstr "Словацька (sk_SK)"
 
@@ -10850,7 +10858,7 @@ msgstr "Сортування по полю \"%s\" не дозволено."
 msgid "Source"
 msgstr "Джерело"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Spanish (es_ES)"
 msgstr "Іспанська (es_ES)"
 
@@ -11052,7 +11060,7 @@ msgstr "Підтримка"
 msgid "Surname"
 msgstr "Прізвище"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Swedish (sv_SE)"
 msgstr "Шведська (sv_SE)"
 
@@ -11836,7 +11844,7 @@ msgstr "ПРОФІЛЬ КОРИСТУВАЧА"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Ukrainian (uk_UA)"
 msgstr "Українська (uk_UA)"
 
@@ -12378,7 +12386,7 @@ msgstr "Перетворення значень з valuemapid \"%1$s\" не іс
 #: adm.triggerdisplayingoptions.php:82 adm.triggerdisplayoptions.php:82
 #: adm.triggerseverities.php:85 adm.valuemapping.php:121
 #: adm.valuemapping.php:177 adm.workingtime.php:63
-#: include/views/administration.general.valuemapping.edit.php:57
+#: include/views/administration.general.valuemapping.edit.php:56
 msgid "Value mapping"
 msgstr "Перетворення значень"
 
@@ -12509,7 +12517,7 @@ msgstr "Попередження. Некоректне значення поля
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Попередження. Некоректне значення для поля \"%1$s\": має бути між %2$s та %3$s."
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
+#: include/classes/screens/CScreenBase.php:313 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
@@ -12517,7 +12525,7 @@ msgstr[0] "Попередження. Максимальний період ча�
 msgstr[1] "Попередження. Максимальний період часу для відображення %1$s дні."
 msgstr[2] "Попередження. Максимальний період часу для відображення %1$s днів."
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
+#: include/classes/screens/CScreenBase.php:308 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -13409,7 +13417,7 @@ msgid "of every"
 msgstr "в кожен(ні)"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
-#: include/views/monitoring.hostscreen.php:53
+#: include/views/monitoring.hostscreen.php:54
 msgid "on"
 msgstr "в"
 
