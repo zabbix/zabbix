@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:32+0300\n"
+"POT-Creation-Date: 2012-09-08 12:32+0300\n"
 "PO-Revision-Date: 2012-06-02 20:32+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1590,15 +1590,11 @@ msgstr "Δεν βρίσκω οθόνη \"%1$s\" χρησιμοποιούμενη
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr ""
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr "Δεν βρίσκω έναυσμα \"%1$s\" χρησιμοποιούμενο στον χάρτη %2$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."

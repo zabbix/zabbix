@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:32+0300\n"
+"POT-Creation-Date: 2012-09-08 12:32+0300\n"
 "PO-Revision-Date: 2012-06-20 11:12+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -801,7 +801,7 @@ msgstr "Bind DN"
 #: authentication.php:49
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Bind password"
 
 #: include/classes/core/ZBase.php:136
 msgid "Black & Blue"
@@ -1098,7 +1098,7 @@ msgstr "ホストからテンプレートへの依存関係は作成できませ
 #: include/triggers.inc.php:699
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "トリガー\"%1$s:%2$s\"から存在しないトリガー\"%3$s:%4$s\"への依存関係を追加できません。"
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1578,14 +1578,10 @@ msgstr "スクリーン\"%2$s\"で利用されているスクリーン\"%1$s\"�
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr "マップ\"%2$s\"で利用されているトリガー\"%1$s\"が見つかりません。"
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
 msgstr "マップ\"%2$s\"で利用されているトリガー\"%1$s\"が見つかりません。"
 
 #: srv_status.php:190
@@ -1984,7 +1980,7 @@ msgstr "中国語 (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "循環する依存関係は設定できません。"
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -2598,7 +2594,7 @@ msgstr "クリティカルエラー。フィールド\"%1$s\"は10進数では�
 #: include/validate.inc.php:340
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "クリティカルエラー。フィールド\"%1$s\"はリストや指定された範囲内の整数値ではありません。"
 
 #: include/validate.inc.php:353
 #, php-format
@@ -2772,7 +2768,7 @@ msgstr "データ"
 #: include/classes/class.cchart.php:2372 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "Data from %1$s. Generated in %2$s sec."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
@@ -3617,7 +3613,7 @@ msgstr "条件式を置き換えますか？"
 
 #: jsLoader.php:130
 msgid "Done"
-msgstr ""
+msgstr "Done"
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:334
 #: include/views/js/configuration.sysmaps.js.php:410 jsLoader.php:146
@@ -3735,7 +3731,7 @@ msgstr "ダイナミックアイテム"
 #: include/func.inc.php:569
 msgctxt "Exa short"
 msgid "E"
-msgstr ""
+msgstr "E"
 
 #: include/config.inc.php:303
 msgid "ERROR"
@@ -3962,7 +3958,7 @@ msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "英語 (en_US)"
 
 #: include/actions.inc.php:681 include/actions.inc.php:757
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
@@ -4484,7 +4480,7 @@ msgstr "次のページへ移動"
 
 #: include/views/configuration.httpconf.edit.php:97
 msgid "Google Chrome"
-msgstr ""
+msgstr "Google Chrome"
 
 #: include/graphs.inc.php:75
 msgid "Gradient line"
@@ -4733,12 +4729,12 @@ msgstr "メンテナンス対象のホストグループ"
 
 #: include/defines.inc.php:909
 msgid "H.i"
-msgstr ""
+msgstr "H.i"
 
 #: include/classes/class.cchart.php:1242 include/classes/class.cchart.php:1301
 #: include/page_header.php:485
 msgid "H:i"
-msgstr ""
+msgstr "H:i"
 
 #: include/blocks.inc.php:337 include/blocks.inc.php:675
 #: include/blocks.inc.php:743 include/blocks.inc.php:942
@@ -4773,7 +4769,7 @@ msgstr "HTTP認証"
 #: include/discovery.inc.php:72
 #: include/views/js/configuration.discovery.edit.js.php:122
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: include/hosts.inc.php:250
 msgid "HW architecture"
@@ -6241,7 +6237,7 @@ msgstr "内部エラー。"
 
 #: include/views/configuration.httpconf.edit.php:69
 msgid "Internet Explorer"
-msgstr ""
+msgstr "Internet Explorer"
 
 #: include/forms.inc.php:861
 #: include/views/configuration.host.discovery.list.php:56
@@ -6289,12 +6285,12 @@ msgstr "パラメータが正しくありません。"
 #: api/classes/CWebCheck.php:590
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "レスポンスコード\"%1$s\"が正しくありません。"
 
 #: api/classes/CWebCheck.php:585
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "レスポンスコードの範囲\"%1$s\"が正しくありません。"
 
 #: items.php:340
 msgid "Invalid time period"
@@ -6505,7 +6501,7 @@ msgstr "アイテムを更新しました"
 
 #: include/hosts.inc.php:474 include/items.inc.php:184
 msgid "JMX"
-msgstr ""
+msgstr "JMX"
 
 #: include/items.inc.php:91
 msgid "JMX agent"
@@ -7448,7 +7444,7 @@ msgstr "ホスト\"%2$s\"にはキー\"%1$s\"が設定されていません。"
 
 #: api/classes/CUserGroup.php:510
 msgid "Missing parameter: usrgrpids."
-msgstr ""
+msgstr "パラメータが設定されていません: usrgrpids。"
 
 #: include/views/administration.proxy.list.php:46 report2.php:176
 msgid "Mode"
@@ -7515,7 +7511,7 @@ msgstr "移動"
 
 #: include/views/configuration.httpconf.edit.php:76
 msgid "Mozilla Firefox"
-msgstr ""
+msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1783
 msgid "Multiple PROBLEM events"
@@ -7804,7 +7800,7 @@ msgstr "データ収集なし"
 #: include/classes/screens/CScreenPlainText.php:36
 #: include/classes/screens/CScreenPlainText.php:56
 msgid "No data defined."
-msgstr ""
+msgstr "データが設定されていません。"
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -8646,7 +8642,7 @@ msgstr "ユニークかどうかだけチェックします。"
 
 #: api/classes/CUserGroup.php:517
 msgid "Only one user group name can be changed at a time."
-msgstr ""
+msgstr "同時には1つのユーザーグループ名しか変更できません。"
 
 #: api/classes/CProxy.php:610
 msgid "Only super admins can delete proxies."
@@ -8667,7 +8663,7 @@ msgstr "整数のみ"
 
 #: include/views/configuration.httpconf.edit.php:85
 msgid "Opera"
-msgstr ""
+msgstr "Opera"
 
 #: actionconf.php:243
 #, php-format
@@ -8820,7 +8816,7 @@ msgstr "ダッシュボード"
 
 #: include/classes/class.frontendsetup.php:315
 msgid "PHP bcmath"
-msgstr ""
+msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:319
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
@@ -8828,7 +8824,7 @@ msgstr "PHP bcmathモジュールが存在しません (PHPのconfigure時のパ
 
 #: include/classes/class.frontendsetup.php:546
 msgid "PHP ctype"
-msgstr ""
+msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:550
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
@@ -8840,7 +8836,7 @@ msgstr "PHPデータベースサポート"
 
 #: include/classes/class.frontendsetup.php:379
 msgid "PHP gd"
-msgstr ""
+msgstr "PHP gd"
 
 #: include/classes/class.frontendsetup.php:455
 msgid "PHP gd FreeType support"
@@ -8872,7 +8868,7 @@ msgstr "PHP GDモジュールが存在しません (PHPのconfigure時のパラ�
 
 #: include/classes/class.frontendsetup.php:584
 msgid "PHP gettext"
-msgstr ""
+msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:588
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
@@ -8880,7 +8876,7 @@ msgstr "PHP gettextモジュールが存在しません (PHPのconfigure時の�
 
 #: include/classes/class.frontendsetup.php:479
 msgid "PHP libxml"
-msgstr ""
+msgstr "PHP libxml"
 
 #: include/classes/class.frontendsetup.php:483
 msgid "PHP libxml extension missing"
@@ -8888,7 +8884,7 @@ msgstr "PHP libxmlモジュールが存在しません"
 
 #: include/classes/class.frontendsetup.php:334
 msgid "PHP mbstring"
-msgstr ""
+msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:338
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
@@ -8916,7 +8912,7 @@ msgstr "PHP upload_max_filesizeオプション"
 
 #: include/classes/class.frontendsetup.php:565
 msgid "PHP session"
-msgstr ""
+msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:569
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
@@ -8924,7 +8920,7 @@ msgstr "PHP sessionモジュールが存在しません (PHPのconfigure時の�
 
 #: include/classes/class.frontendsetup.php:353
 msgid "PHP sockets"
-msgstr ""
+msgstr "PHP sockets"
 
 #: include/classes/class.frontendsetup.php:357
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)"
@@ -8932,7 +8928,7 @@ msgstr "PHP socketsモジュールが存在しません (PHPのconfigure時の�
 
 #: include/classes/class.frontendsetup.php:211
 msgid "PHP time zone"
-msgstr ""
+msgstr "PHP time zone"
 
 #: include/classes/class.frontendsetup.php:97
 msgid "PHP version"
@@ -8940,7 +8936,7 @@ msgstr "PHPバージョン"
 
 #: include/classes/class.frontendsetup.php:517
 msgid "PHP xmlreader"
-msgstr ""
+msgstr "PHP xmlreader"
 
 #: include/classes/class.frontendsetup.php:521
 msgid "PHP xmlreader extension missing"
@@ -8948,7 +8944,7 @@ msgstr "PHP xmlreaderモジュールが存在しません"
 
 #: include/classes/class.frontendsetup.php:498
 msgid "PHP xmlwriter"
-msgstr ""
+msgstr "PHP xmlwriter"
 
 #: include/classes/class.frontendsetup.php:502
 msgid "PHP xmlwriter extension missing"
@@ -9417,11 +9413,11 @@ msgstr "送信先"
 
 #: include/views/configuration.screen.constructor.edit.php:365
 msgid "Recipient (ascending)"
-msgstr ""
+msgstr "受信者 (昇順)"
 
 #: include/views/configuration.screen.constructor.edit.php:364
 msgid "Recipient (descending)"
-msgstr ""
+msgstr "受信者 (降順)"
 
 #: include/actions.inc.php:679 include/classes/screens/CScreenActions.php:78
 #: include/classes/screens/CScreenActions.php:83
@@ -9748,11 +9744,11 @@ msgstr "リトライの残り回数"
 
 #: include/views/configuration.screen.constructor.edit.php:363
 msgid "Retries left (ascending)"
-msgstr ""
+msgstr "リトライ残り回数 (昇順)"
 
 #: include/views/configuration.screen.constructor.edit.php:362
 msgid "Retries left (descending)"
-msgstr ""
+msgstr "リトライ残り回数 (降順)"
 
 #: include/setup.inc.php:228 include/setup.inc.php:456 warning.php:60
 msgid "Retry"
@@ -9889,7 +9885,7 @@ msgstr "SMTPサーバー"
 
 #: include/hosts.inc.php:471 include/items.inc.php:183
 msgid "SNMP"
-msgstr ""
+msgstr "SNMP"
 
 #: include/views/js/configuration.discovery.edit.js.php:36
 msgid "SNMP Key"
@@ -10003,7 +9999,7 @@ msgstr "Zabbixサーバーの状態"
 
 #: include/views/configuration.httpconf.edit.php:91
 msgid "Safari"
-msgstr ""
+msgstr "Safari"
 
 #: include/func.inc.php:200
 msgid "Sat"
@@ -10846,7 +10842,7 @@ msgstr "標準のアイテム"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Start in"
-msgstr ""
+msgstr "Start in"
 
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
@@ -10883,11 +10879,11 @@ msgstr "ステータス"
 
 #: include/views/configuration.screen.constructor.edit.php:361
 msgid "Status (ascending)"
-msgstr ""
+msgstr "ステータス (昇順)"
 
 #: include/views/configuration.screen.constructor.edit.php:360
 msgid "Status (descending)"
-msgstr ""
+msgstr "ステータス (降順)"
 
 #: include/views/configuration.services.child.list.php:39
 #: include/views/configuration.services.parent.list.php:36 services.php:409
@@ -10917,7 +10913,7 @@ msgstr "ディスカバリのステータス"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr ""
+msgstr "ホストグループのトリガーステータス"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
@@ -10962,7 +10958,7 @@ msgstr "シナリオのステップ"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "\"%s\"の名前を持つステップがすでに存在します。"
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
@@ -10982,7 +10978,7 @@ msgstr "保存時の計算"
 
 #: include/hosts.inc.php:42
 msgid "Straight"
-msgstr ""
+msgstr "Straight"
 
 #: include/views/configuration.screen.constructor.edit.php:550
 msgid "Style"
@@ -11032,7 +11028,7 @@ msgstr "スウェーデン語 (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"
@@ -11117,7 +11113,7 @@ msgstr "ターゲットタイプ"
 #: include/views/configuration.action.edit.php:648
 #: include/views/js/configuration.discovery.edit.js.php:134
 msgid "Telnet"
-msgstr ""
+msgstr "Telnet"
 
 #: include/audit.inc.php:51 include/forms.inc.php:540
 #: include/forms.inc.php:841 include/html.inc.php:364
@@ -11359,11 +11355,11 @@ msgstr "時間"
 
 #: include/views/configuration.screen.constructor.edit.php:357
 msgid "Time (ascending)"
-msgstr ""
+msgstr "時間 (昇順)"
 
 #: include/views/configuration.screen.constructor.edit.php:356
 msgid "Time (descending)"
-msgstr ""
+msgstr "時間 (降順)"
 
 #: include/actions.inc.php:47
 msgid "Time period"
@@ -11655,7 +11651,7 @@ msgstr "表示するトリガーの深刻度"
 
 #: queue.php:289
 msgid "Truncated"
-msgstr ""
+msgstr "Truncated"
 
 #: include/classes/class.cpagefilter.php:55
 #, php-format
@@ -11722,11 +11718,11 @@ msgstr "タイプ (正常)"
 
 #: include/views/configuration.screen.constructor.edit.php:359
 msgid "Type (ascending)"
-msgstr ""
+msgstr "タイプ (昇順)"
 
 #: include/views/configuration.screen.constructor.edit.php:358
 msgid "Type (descending)"
-msgstr ""
+msgstr "タイプ (降順)"
 
 #: include/views/configuration.action.edit.php:116
 #: include/views/configuration.action.edit.php:884
@@ -11776,15 +11772,15 @@ msgstr "ログイン後のURL"
 
 #: include/hosts.inc.php:275
 msgid "URL A"
-msgstr ""
+msgstr "URL A"
 
 #: include/hosts.inc.php:280
 msgid "URL B"
-msgstr ""
+msgstr "URL B"
 
 #: include/hosts.inc.php:285
 msgid "URL C"
-msgstr ""
+msgstr "URL C"
 
 #: include/views/configuration.sysmap.edit.php:194
 #: include/views/js/configuration.sysmaps.js.php:162
@@ -12133,7 +12129,7 @@ msgstr "ユーザーは自身のユーザータイプを変更できません"
 
 #: api/classes/CUserGroup.php:560
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
@@ -12168,7 +12164,7 @@ msgstr "ユーザーグループ\"%1$s\"はスクリプト\"%2$s\"に利用さ�
 #: api/classes/CUserGroup.php:528
 #, php-format
 msgid "User group \"%s\" already exists."
-msgstr ""
+msgstr "ユーザーグループ\"%s\"はすでに存在します。"
 
 #: api/classes/CUserGroup.php:725
 #, php-format
@@ -12440,7 +12436,7 @@ msgstr "警告。フィールド\"%1$s\"は10進数ではありません。"
 #: include/validate.inc.php:344
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "警告。フィールド\"%1$s\"はリストや指定された範囲内の整数値ではありません。"
 
 #: include/validate.inc.php:357
 #, php-format
@@ -12902,12 +12898,12 @@ msgstr "Zabbix"
 #: include/page_footer.php:98
 #, php-format
 msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %s Copyright %s-%s by Zabbix SIA"
 
 #: include/views/general.login.php:47
 #, php-format
 msgid "Zabbix %s Copyright 2001-2012 by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %s Copyright 2001-2012 by Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
@@ -13020,7 +13016,7 @@ msgstr "ズーム"
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127
 msgid "[H:i:s]"
-msgstr ""
+msgstr "[H:i:s]"
 
 #: include/func.inc.php:133
 #, php-format
@@ -13065,19 +13061,19 @@ msgstr "すでに存在します"
 #: include/views/js/configuration.action.edit.js.php:445
 #: include/views/js/configuration.action.edit.js.php:453
 msgid "and"
-msgstr ""
+msgstr "and"
 
 #: include/views/monitoring.history.php:117
 msgid "as Blue"
-msgstr ""
+msgstr "as Blue"
 
 #: include/views/monitoring.history.php:116
 msgid "as Green"
-msgstr ""
+msgstr "as Green"
 
 #: include/views/monitoring.history.php:115
 msgid "as Red"
-msgstr ""
+msgstr "as Red"
 
 #: include/classes/class.cchart.php:1752 include/classes/class.cchart.php:1774
 #: include/graphs.inc.php:95
@@ -13089,7 +13085,7 @@ msgstr "平均"
 #: include/func.inc.php:472 jsLoader.php:92
 msgctxt "day short"
 msgid "d"
-msgstr ""
+msgstr "d"
 
 #: include/defines.inc.php:902 include/maintenances.inc.php:57
 #: include/page_header.php:484 include/views/configuration.item.list.php:101
@@ -13149,7 +13145,7 @@ msgstr "日"
 #: include/views/configuration.services.edit.php:179
 #: include/views/configuration.services.edit.php:196
 msgid "dd"
-msgstr ""
+msgstr "dd"
 
 #: include/setup.inc.php:353 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
@@ -13175,11 +13171,11 @@ msgstr "esc_step_fromとesc_step_toは両方設定する必要があります。
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:74
 msgid "every"
-msgstr ""
+msgstr "every"
 
 #: hostinventories.php:123
 msgid "exactly"
-msgstr ""
+msgstr "exactly"
 
 #: include/actions.inc.php:780
 #: include/views/administration.auditacts.list.php:89
@@ -13206,7 +13202,7 @@ msgstr "h"
 #: include/views/configuration.services.edit.php:222
 #: include/views/configuration.services.edit.php:228
 msgid "hh"
-msgstr ""
+msgstr "hh"
 
 #: api/classes/CMap.php:580
 msgid "host"
@@ -13230,7 +13226,7 @@ msgstr "期間中"
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
-msgstr ""
+msgstr "is"
 
 #: include/classes/class.cchart.php:1750 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13301,12 +13297,12 @@ msgstr "最小60秒"
 #: include/views/configuration.services.edit.php:225
 #: include/views/configuration.services.edit.php:231
 msgid "mm"
-msgstr ""
+msgstr "mm"
 
 #: include/func.inc.php:442 include/func.inc.php:498
 msgctxt "millisecond short"
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
@@ -13325,7 +13321,7 @@ msgstr "有効なLDAPユーザーが必要です"
 #: include/classes/class.frontendsetup.php:566
 #: include/classes/class.frontendsetup.php:585
 msgid "no"
-msgstr ""
+msgstr "no"
 
 #: include/blocks.inc.php:1382 include/classes/class.cchart.php:1803
 #: include/classes/class.cpie.php:320 include/maps.inc.php:384
@@ -13449,7 +13445,7 @@ msgstr "テンプレートID\"%1$s\"が%2$s回利用されています"
 
 #: include/func.inc.php:1691
 msgid "to"
-msgstr ""
+msgstr "to"
 
 #: api/classes/CMap.php:581
 msgid "trigger"
@@ -13468,7 +13464,7 @@ msgstr "値"
 #: jsLoader.php:91
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #: include/maintenances.inc.php:74
 msgid "week"
@@ -13485,7 +13481,7 @@ msgstr "整数"
 #: include/func.inc.php:456 jsLoader.php:89
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "y"
 
 #: include/classes/class.frontendsetup.php:316
 #: include/classes/class.frontendsetup.php:335
@@ -13499,16 +13495,16 @@ msgstr ""
 #: include/classes/class.frontendsetup.php:566
 #: include/classes/class.frontendsetup.php:585
 msgid "yes"
-msgstr ""
+msgstr "yes"
 
 #: include/views/configuration.maintenance.edit.php:52
 #: include/views/configuration.maintenance.edit.php:67
 #: include/views/configuration.services.edit.php:183
 #: include/views/configuration.services.edit.php:200
 msgid "yyyy"
-msgstr ""
+msgstr "yyyy"
 
 #: include/func.inc.php:561
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"

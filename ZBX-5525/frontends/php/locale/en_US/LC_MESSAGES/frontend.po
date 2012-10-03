@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apache 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:33+0300\n"
-"PO-Revision-Date: 2012-09-01 12:19+0200\n"
+"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"PO-Revision-Date: 2012-09-05 20:50+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
@@ -1590,15 +1590,11 @@ msgstr "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr "Cannot find trigger \"%1$s\" used in map %2$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -11052,7 +11048,7 @@ msgstr "Swedish (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "Switching authentication method will reset all except this session! Continue?"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"

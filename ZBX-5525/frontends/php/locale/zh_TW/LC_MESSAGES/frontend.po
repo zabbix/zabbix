@@ -5,16 +5,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:33+0300\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
+"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"PO-Revision-Date: 2012-09-06 16:03+0200\n"
+"Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
-"Language: zh\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Country: CHINA\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
@@ -1581,14 +1581,10 @@ msgstr "無法找到用在篩選 \"%2$s\"中的篩選\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr "無法找到用在拓墣圖 \"%2$s\"中的觸發器\"%1$s\"."
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
 msgstr "無法找到用在拓墣圖 \"%2$s\"中的觸發器\"%1$s\"."
 
 #: srv_status.php:190
@@ -11035,7 +11031,7 @@ msgstr "瑞士(sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "切換認證方法將重設除了此連線期之外的所有連線!繼續嗎?"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"

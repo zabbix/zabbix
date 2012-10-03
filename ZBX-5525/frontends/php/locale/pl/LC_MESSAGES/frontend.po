@@ -2,16 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:32+0300\n"
-"PO-Revision-Date: 2012-05-01 13:23+0200\n"
-"Last-Translator: Lukasz <lucas.urbaniak@gmail.com>\n"
+"POT-Creation-Date: 2012-09-08 12:32+0300\n"
+"PO-Revision-Date: 2012-09-10 11:14+0200\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
@@ -1593,14 +1593,10 @@ msgstr ""
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
 msgstr ""
 
 #: srv_status.php:190
@@ -13159,11 +13155,11 @@ msgstr "d.m"
 #: include/classes/class.cchart.php:1261 include/classes/class.cchart.php:1276
 #: include/classes/class.cchart.php:1295
 msgid "d.m H:i"
-msgstr "d.m G:m"
+msgstr "d.m G:i"
 
 #: include/defines.inc.php:908
 msgid "d.m.y"
-msgstr "d.m.r"
+msgstr "d.m.y"
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:112
 msgid "day"
