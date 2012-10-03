@@ -2,15 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-03 23:23+0300\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"POT-Creation-Date: 2012-10-03 23:31+0300\n"
+"PO-Revision-Date: 2012-09-24 22:24+0200\n"
+"Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
@@ -89,11 +90,11 @@ msgstr ""
 
 #: include/forms.inc.php:538 include/forms.inc.php:553
 msgid "(in days)"
-msgstr ""
+msgstr "(napokban)"
 
 #: include/forms.inc.php:435
 msgid "(in sec)"
-msgstr ""
+msgstr "(másodpercekben)"
 
 #: include/views/configuration.action.edit.php:434
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -151,7 +152,7 @@ msgstr "500 legfrissebb érték"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
-msgstr ""
+msgstr "kézikönyv"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
@@ -187,12 +188,12 @@ msgstr ""
 
 #: sysmap.php:75
 msgid "Access denied!"
-msgstr ""
+msgstr "Hozzáférés megtagadva !"
 
 #: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "A felhasználói fiók letiltva %s másodpercre"
 
 #: events.php:566 events.php:579 include/actions.inc.php:189
 #: include/blocks.inc.php:835 include/blocks.inc.php:1365
@@ -322,7 +323,7 @@ msgstr "Aktív"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Aktív"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:587
 #: include/views/configuration.maintenance.edit.php:58
@@ -408,11 +409,11 @@ msgstr "Kapcsolat felvétele"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Hiányzó hozzáadása"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
-msgstr ""
+msgstr "Prototípus hozzáadása"
 
 #: jsLoader.php:177
 msgid "Add service"
@@ -425,7 +426,7 @@ msgstr "Hozzáadás"
 #: charts.php:82 history.php:94 host_screen.php:88 include/html.inc.php:256
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr ""
+msgstr "Hozzáadás a kedvencekhez"
 
 #: include/actions.inc.php:502
 msgid "Add to host group"
@@ -573,7 +574,7 @@ msgstr "Alkalmazás törölve"
 
 #: api/rpc/class.cjsonrpc.php:185
 msgid "Application error."
-msgstr ""
+msgstr "Alkalmazás hiba."
 
 #: applications.php:96
 msgid "Application updated"
@@ -611,7 +612,7 @@ msgstr ""
 
 #: include/func.inc.php:221
 msgid "Apr"
-msgstr ""
+msgstr "Ápr."
 
 #: include/forms.inc.php:1547 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:113
@@ -624,7 +625,7 @@ msgstr ""
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Biztosan törölni szeretnéd"
 
 #: include/views/js/configuration.sysmaps.js.php:48
 msgid "Area size"
@@ -697,7 +698,7 @@ msgstr "Authentikáció"
 
 #: include/views/configuration.host.edit.php:534
 msgid "Authentication algorithm"
-msgstr ""
+msgstr "Authentikációs algoritmus"
 
 #: include/views/configuration.action.edit.php:673
 #: include/views/configuration.item.edit.php:173
@@ -12254,7 +12255,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:541
 #: include/views/general.login.php:61 index.php:35
 msgid "Username"
-msgstr ""
+msgstr "Felhasználónév"
 
 #: include/menu.inc.php:257
 #: include/views/administration.usergroups.edit.php:53
@@ -12329,12 +12330,12 @@ msgstr ""
 #: include/valuemap.inc.php:37 include/valuemap.inc.php:70
 #, php-format
 msgid "Value map \"%1$s\" already exists."
-msgstr ""
+msgstr "A(z) \"%1$s\" érték-hozzárendelés már létezik."
 
 #: adm.valuemapping.php:68
 #, php-format
 msgid "Value map \"%1$s\"."
-msgstr ""
+msgstr "Érték-hozzárendelés - \"%1$s\""
 
 #: adm.valuemapping.php:61
 msgid "Value map added"
@@ -12597,7 +12598,7 @@ msgstr "Triggerek nélkül"
 
 #: include/views/configuration.item.list.php:53
 msgid "Wizard"
-msgstr ""
+msgstr "Varázsló"
 
 #: adm.gui.php:95 adm.housekeeper.php:74 adm.iconmapping.php:100
 #: adm.images.php:134 adm.macros.php:165 adm.other.php:107 adm.regexps.php:193
@@ -12779,7 +12780,7 @@ msgstr ""
 
 #: include/defines.inc.php:898
 msgid "Y.m.d"
-msgstr ""
+msgstr "É.h.n"
 
 #: include/defines.inc.php:897
 msgid "Y.m.d H:i"
@@ -13010,7 +13011,7 @@ msgstr ""
 
 #: include/setup.inc.php:370
 msgid "Zabbix server name"
-msgstr ""
+msgstr "Zabbix szerver neve"
 
 #: include/setup.inc.php:369
 msgid "Zabbix server port"
@@ -13165,7 +13166,7 @@ msgstr ""
 #: include/setup.inc.php:353 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
 msgid "default"
-msgstr ""
+msgstr "alapértelmezett"
 
 #: jsLoader.php:87
 msgid "dynamic"
@@ -13371,7 +13372,7 @@ msgstr "nincs elküldve"
 
 #: jsLoader.php:88
 msgid "now"
-msgstr ""
+msgstr "most"
 
 #: include/blocks.inc.php:323 include/blocks.inc.php:665
 #: include/func.inc.php:1695
@@ -13470,11 +13471,11 @@ msgstr ""
 #: include/classes/class.frontendsetup.php:375
 #: include/classes/class.frontendsetup.php:475
 msgid "unknown"
-msgstr ""
+msgstr "ismeretlen"
 
 #: include/views/common.macros.php:34
 msgid "value"
-msgstr ""
+msgstr "érték"
 
 #: jsLoader.php:91
 msgctxt "week short"

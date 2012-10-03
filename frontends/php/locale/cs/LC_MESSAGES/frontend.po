@@ -2,23 +2,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-03 23:23+0300\n"
-"PO-Revision-Date: 2012-04-05 23:44+0200\n"
-"Last-Translator: Jakub <lauda.jakub@gmail.com>\n"
+"POT-Creation-Date: 2012-10-03 23:31+0300\n"
+"PO-Revision-Date: 2012-09-12 12:19+0200\n"
+"Last-Translator: jiri <jiri.pavliska@elvac.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" musí být v intervalu od 1970.01.01 do 2038.01.18."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."

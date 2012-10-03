@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-03 23:23+0300\n"
-"PO-Revision-Date: 2012-09-09 02:23+0200\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2012-10-03 23:31+0300\n"
+"PO-Revision-Date: 2012-09-28 16:24+0200\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -7453,11 +7453,11 @@ msgstr "Минут"
 
 #: api/classes/CGraph.php:837 api/classes/CGraphPrototype.php:882
 msgid "Missing \"itemid\" field for item."
-msgstr "Пропущено поле \"itemid\" для элемента данных."
+msgstr "Отсутствует поле \"itemid\" для элемента данных."
 
 #: api/classes/CGraph.php:825 api/classes/CGraphPrototype.php:870
 msgid "Missing \"name\" field for graph."
-msgstr "Пропущено поле \"name\" для графика."
+msgstr "Отсутствует поле \"name\" для графика."
 
 #: include/classes/import/CXmlImport18.php:1579
 #: include/classes/import/CXmlImport18.php:1592
@@ -8651,7 +8651,7 @@ msgstr "Только Супер-Администраторы могут обно
 
 #: api/classes/CUser.php:684
 msgid "Only Zabbix Admins can add user media."
-msgstr "Только Супер-Администраторы могут добавлять пользователям оповещения."
+msgstr "Только Супер-Администраторы могут добавлять оповещения пользователям."
 
 #: api/classes/CUser.php:752
 msgid "Only Zabbix Admins can change user media."
@@ -8881,11 +8881,11 @@ msgstr "Отсутствует поддержка PHP gd FreeType"
 
 #: include/classes/class.frontendsetup.php:434
 msgid "PHP gd JPEG image support missing"
-msgstr "Отсутствует поддержка изображений PHP gd JPEG"
+msgstr "Отсутствует поддержка изображений JPEG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:430
 msgid "PHP gd JPEG support"
-msgstr "Поддержка PHP gd JPEG"
+msgstr "Поддержка JPEG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:408
 msgid "PHP gd PNG image support missing"
@@ -12437,7 +12437,7 @@ msgstr "Видимое имя"
 
 #: api/classes/CHost.php:1360
 msgid "Visible name cannot be empty if host name is missing."
-msgstr "Видимое имя не может быть пустым, если имя узла сети не заполнено."
+msgstr "Видимое имя не может быть пустым, если имя узла сети отсутствует."
 
 #: jsLoader.php:124
 msgctxt "Wednesday short"
@@ -12741,12 +12741,12 @@ msgstr "X"
 #: include/reports.inc.php:207 include/reports.inc.php:369
 #: include/reports.inc.php:518
 msgid "X label"
-msgstr "Подпись к оси X"
+msgstr "Подпись оси X"
 
 #: include/classes/import/readers/CXmlImportReader.php:48
 #, php-format
 msgid "XML file contains error %1$s:"
-msgstr "Файл XML содержит ошибку %1$s:"
+msgstr "XML файл содержит ошибку %1$s:"
 
 #: include/classes/import/CXmlImport18.php:403
 #: include/classes/import/CXmlImport18.php:406
@@ -12798,7 +12798,7 @@ msgstr "Расположение оси Y"
 #: include/reports.inc.php:208 include/reports.inc.php:370
 #: include/reports.inc.php:519
 msgid "Y label"
-msgstr "Подпись к оси Y"
+msgstr "Подпись оси Y"
 
 #: include/defines.inc.php:891 include/defines.inc.php:892
 msgid "Y-m-d H:i:s"
@@ -13014,8 +13014,8 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
-"Не удалось найти Zabbix сервер \"%s\". Возможные причины:\n"
-"1. Некорректные IP/DNS сервера в \"zabbix.conf.php\";\n"
+"Не удалось обнаружить Zabbix сервер \"%s\". Возможные причины:\n"
+"1. Некорректный IP/DNS сервер в \"zabbix.conf.php\";\n"
 "2. Некорректная настройка сети.\n"
 
 #: include/blocks.inc.php:696
@@ -13041,7 +13041,7 @@ msgstr "Zabbix сервер запущен"
 #: adm.gui.php:75
 #, php-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr "Интервал проверки работы Zabbix сервера составляет \"%1$s\"."
+msgstr "Интервал проверки работоспособности Zabbix сервера \"%1$s\"."
 
 #: include/setup.inc.php:370
 msgid "Zabbix server name"

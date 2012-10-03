@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-03 23:23+0300\n"
-"PO-Revision-Date: 2011-10-04 17:17+0200\n"
+"POT-Creation-Date: 2012-10-03 23:31+0300\n"
+"PO-Revision-Date: 2012-09-21 16:01+0200\n"
 "Last-Translator: Marcel <maco@blava.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
@@ -201,7 +201,7 @@ msgstr "Prístup zamietnutý!"
 #: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr "Konto je blokované na %s sekúnd."
+msgstr "Konto je zablokované na %s sekúnd"
 
 #: events.php:566 events.php:579 include/actions.inc.php:189
 #: include/blocks.inc.php:835 include/blocks.inc.php:1365
@@ -225,7 +225,7 @@ msgstr "Potvrdiť alarm podľa"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Potvrdit a navrat"
 
 #: tr_status.php:203
 msgid "Acknowledge status"
@@ -237,11 +237,11 @@ msgstr "Potvrdené"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr "Potvrdiť OK udalosti"
+msgstr "Potvrdene OK udalosti"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Potvrdiť PROBLÉMové udalosti"
+msgstr "Potvrdene PROBLÉMové udalosti"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
@@ -302,6 +302,7 @@ msgid "Action deleted"
 msgstr "Akcia bola vymazaná"
 
 #: include/views/configuration.action.edit.php:399
+#, fuzzy
 msgid "Action operations"
 msgstr "Operácie akcie"
 
@@ -331,7 +332,7 @@ msgstr "Aktívny"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Aktivny"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:587
 #: include/views/configuration.maintenance.edit.php:58
@@ -405,7 +406,7 @@ msgstr "Pridať prvok"
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Najprv pridajte do grafu polozku"
 
 #: include/actions.inc.php:283 include/actions.inc.php:498
 msgid "Add host"
@@ -417,7 +418,7 @@ msgstr "Pridať linku"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Pridat chybajuce"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
@@ -434,15 +435,15 @@ msgstr "Pridať do"
 #: charts.php:82 history.php:94 host_screen.php:88 include/html.inc.php:256
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr ""
+msgstr "Pridat do oblubenych"
 
 #: include/actions.inc.php:502
 msgid "Add to host group"
-msgstr "Pridať do skupiny zariadení"
+msgstr "Pridať do skupiny"
 
 #: include/actions.inc.php:309 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
-msgstr "Pridať do skupín zariadení"
+msgstr "Pridať do skupín"
 
 #: auditlogs.php:134
 msgid "Added"
@@ -486,11 +487,11 @@ msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Rozhrania agenta"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agent alebo SNMP alebo JMX alebo IPMI rozhranie"
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:893 users.php:43
@@ -558,19 +559,19 @@ msgid "Application"
 msgstr "Aplikácia"
 
 #: api/classes/CApplication.php:787
-#, php-format
+#, fuzzy, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Aplikacia \"%1$s\" uz existuje pre hosta \"%2$s\"."
 
 #: api/classes/CApplication.php:482
-#, php-format
+#, fuzzy, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Aplikacia \"%1$s\" uz existuje."
 
 #: api/classes/CApplication.php:626
-#, php-format
+#, fuzzy, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Aplikacie \"%1$s\" ja pouzita v scenari \"%2$s\" a nemoze byt vymazana."
 
 #: applications.php:103
 msgid "Application added"
@@ -589,9 +590,9 @@ msgid "Application updated"
 msgstr "Aplikácia bola aktualizovaná"
 
 #: api/classes/CItemGeneral.php:319
-#, php-format
+#, fuzzy, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Aplikacia s ID \"%1$s\" nie je na \"%2$s\" dostupna."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:821
 #: include/html.inc.php:397 include/html.inc.php:401
@@ -656,30 +657,30 @@ msgid "As plain text"
 msgstr "Ako obyčajný text"
 
 #: include/hosts.inc.php:155
-#, fuzzy
 msgid "Asset tag"
-msgstr "Majetková nálepka"
+msgstr "Inventarne cislo"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
-#, fuzzy
 msgid "At"
 msgstr "O"
 
 #: include/forms.inc.php:1652
+#, fuzzy
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "O (hodina:minuta)"
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Minimalne jeden host, alebo skupina, musia byt oznacene."
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Minimalne jedna planovana odstavka musi byt vytvorena."
 
 #: include/classes/class.frontendsetup.php:291
+#, fuzzy
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Minimalne jedna z MySQL, PostgreSQL, Oracle, SQLite3 alebo IBM DB2 musi byt podporovana."
 
 #: include/menu.inc.php:270
 msgid "Audit"
@@ -687,11 +688,11 @@ msgstr "Audit"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Akcie auditu"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Logy auditu"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -717,8 +718,9 @@ msgid "Authentication method"
 msgstr "Metódy prihlasovania"
 
 #: authentication.php:158 authentication.php:159
+#, fuzzy
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Metoda prihlasovania zmenena na HTTP"
 
 #: authentication.php:122 authentication.php:123
 msgid "Authentication method changed to LDAP"
@@ -730,15 +732,15 @@ msgstr "Metóda prihlasovania bola zmenená na Zabbix internal"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
-msgstr "Auto registrácia"
+msgstr "Automaticka registrácia"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr ""
+msgstr "Automaticke prihlasenie"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
-msgstr "Auto-odhlásenie (min 90 sekúnd)"
+msgstr "Automaticke odhlásenie (minimalne 90 sekúnd)"
 
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.host.massupdate.php:179
@@ -772,8 +774,9 @@ msgid "Average"
 msgstr "Priemer"
 
 #: include/reports.inc.php:671
+#, fuzzy
 msgid "Average by"
-msgstr "Priemery podľa"
+msgstr "Priemer podľa"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -782,7 +785,7 @@ msgstr "Strana osi"
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
@@ -803,9 +806,8 @@ msgstr "Stĺpcové grafy"
 
 #: authentication.php:39
 #: include/views/administration.authentication.edit.php:59
-#, fuzzy
 msgid "Base DN"
-msgstr "Base DN"
+msgstr "Korenovy DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
@@ -840,12 +842,13 @@ msgstr "Hrubá čiara"
 
 #: include/items.inc.php:128
 msgid "Boolean"
-msgstr ""
+msgstr "Logicka hodnota"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
 #: include/views/js/configuration.sysmaps.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:227
+#, fuzzy
 msgid "Bottom"
 msgstr "Spodný"
 
@@ -868,7 +871,7 @@ msgstr "Podľa šablóny spúšťača"
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "KONFIGURACIA AKCII"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -877,7 +880,7 @@ msgstr "KONFIGURÁCIA APLIKÁCIÍ"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "KONFIGURACIA PRIHLASOVANIA"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
@@ -902,7 +905,7 @@ msgstr "NASTAVENIA GRAFOV"
 
 #: adm.gui.php:103
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "KONFIGURACIA GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -911,7 +914,7 @@ msgstr "NASTAVENIA SKUPÍN HOSTOV"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "KONFIGURACIA HOSTOV"
 
 #: adm.housekeeper.php:82
 msgid "CONFIGURATION OF HOUSEKEEPER"
@@ -923,7 +926,7 @@ msgstr ""
 
 #: adm.images.php:145
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "KONFIGURACIA OBRAZKOV"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
@@ -943,7 +946,7 @@ msgstr "NASTAVENIE POLOŽIEK"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "NASTAVENIE MAKIER"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -971,7 +974,7 @@ msgstr "NASTAVENIA PROXY SERVEROV"
 
 #: adm.regexps.php:204
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "NASTAVENIE REGEXPov"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
@@ -994,7 +997,7 @@ msgstr "CONFIGURATION OF SLIDE SHOWS"
 
 #: templates.php:408 templates.php:428
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "NASTAVENIE SABLON"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"

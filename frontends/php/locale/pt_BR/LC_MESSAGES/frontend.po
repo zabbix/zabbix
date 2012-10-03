@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-03 23:23+0300\n"
-"PO-Revision-Date: 2012-08-28 15:21+0200\n"
+"POT-Creation-Date: 2012-10-03 23:31+0300\n"
+"PO-Revision-Date: 2012-09-21 21:28+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -918,7 +918,7 @@ msgstr "CONFIGURAÇÃO DE IMAGENS"
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE SERVIÇOS DE TI"
 
 #: disc_prototypes.php:313
 #: include/views/configuration.item.prototype.list.php:29
@@ -11004,7 +11004,7 @@ msgstr "Estilo"
 
 #: include/forms.inc.php:864
 msgid "Subfilter [affects only filtered data!]"
-msgstr ""
+msgstr "Subfiltro [afeta apenas os dados filtrados!]"
 
 #: include/actions.inc.php:350 include/actions.inc.php:359
 #: include/actions.inc.php:365 include/actions.inc.php:719
