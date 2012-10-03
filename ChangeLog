@@ -24,6 +24,11 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.3
+
+2.0.3rc2 was released as 2.0.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.3rc2
 
 Bug fixes:
