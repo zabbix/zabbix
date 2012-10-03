@@ -1739,7 +1739,8 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_ITEM_LOG_SEVERITY		"{ITEM.LOG.SEVERITY}"
 #define MVAR_ITEM_LOG_NSEVERITY		"{ITEM.LOG.NSEVERITY}"
 #define MVAR_ITEM_LOG_EVENTID		"{ITEM.LOG.EVENTID}"
-#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
+#define MVAR_TRIGGER_DESCRIPTION	"{TRIGGER.DESCRIPTION}"
+#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"		/* deprecated */
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
 #define MVAR_TRIGGER_EXPRESSION		"{TRIGGER.EXPRESSION}"
@@ -2229,7 +2230,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					else
 						ret = FAIL;
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
+				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
+						0 == strcmp(m, MVAR_TRIGGER_COMMENT))	/* deprecated */
 				{
 					if (0 != event->trigger.triggerid)
 						replace_to = zbx_strdup(replace_to, event->trigger.comments);
