@@ -663,7 +663,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	zbx_lld_function_t	*function;
 	zbx_uint64_t		triggerid = 0, triggerdiscoveryid = 0, functionid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
-				*description_esc, *error_esc;
+				*description_esc, *error_esc = NULL;
 	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
 				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
