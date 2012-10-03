@@ -1,3 +1,11 @@
+Changes for 2.0.4
+
+New features:
+........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 2.0.3
 
 2.0.3rc2 was released as 2.0.3 without any changes
