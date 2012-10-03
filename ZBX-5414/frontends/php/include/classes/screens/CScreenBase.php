@@ -238,8 +238,8 @@ class CScreenBase {
 		}
 
 		return ($this->mode == SCREEN_MODE_EDIT)
-			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getScreenId())
-			: new CDiv($item, null, $this->getScreenId());
+			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), 'flickerfreescreen', $this->getScreenId())
+			: new CDiv($item, 'flickerfreescreen', $this->getScreenId());
 	}
 
 	/**
@@ -289,6 +289,12 @@ class CScreenBase {
 		}
 		if (empty($options['profileIdx2'])) {
 			$options['profileIdx2'] = 0;
+		}
+
+		// show only latest data without update is set only period
+		if (!empty($options['period']) && empty($options['stime'])) {
+			$options['updateProfile'] = false;
+			$options['profileIdx'] = '';
 		}
 
 		// period
