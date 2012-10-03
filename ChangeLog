@@ -4,6 +4,7 @@ New features:
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-5414] fixed handling of an incorrect username/password of SNMPv3 checks (Sasha)
 ...G...... [ZBX-5609] fixed defaults for parameters of vfs.dev.read/write items in "zabbix_agentd -p" (Sasha)
 ...G...... [ZBX-5552] fixed processing of vm.memory.size[total] under FreeBSD (Sasha)
 .......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
