@@ -501,7 +501,7 @@ function convertUnitsS($value) {
 	return rtrim($value);
 }
 
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -548,6 +548,9 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
 		default:
 			$step = 1000;
+	}
+	if ($byteStep) {
+		$step = 1024;
 	}
 
 	// init intervals

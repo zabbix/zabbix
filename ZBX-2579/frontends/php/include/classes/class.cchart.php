@@ -718,18 +718,35 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
-			if ($this->items[0]['units'] == 'B' || $this->items[0]['units'] == 'Bps') {
-				$dec = bcpow(8, $num);
+		for ($item = 0; $item < $this->num; $item++) {
+			if (($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps')
+					&& $this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				$leftBase8 = true;
 			}
-			else {
-				$dec = bcpow(10, $num);
-			}
-			foreach (array(1, 2, 5) as $int) {
-				$intervals[] = bcmul($int, $dec);
+			if (($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps')
+					&& $this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				$rightBase8 = true;
 			}
 		}
 
+		if($leftBase8 || $rightBase8) {
+			$intervalsBase8 = $intervals;
+			foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
+				$dec = bcpow(8, $num);
+				foreach (array(1, 2, 5) as $int) {
+					$intervalsBase8[] = bcmul($int, $dec);
+				}
+			}
+		}
+		if(!$leftBase8 || !$rightBase8) {
+			$intervalsBase10 = $intervals;
+			foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
+				$dec = bcpow(10, $num);
+				foreach (array(1, 2, 5) as $int) {
+					$intervalsBase10[] = bcmul($int, $dec);
+				}
+			}
+		}
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
 		foreach ($sides as $snum => $side) {
 			if (!isset($this->axis_valuetype[$side])) {
@@ -775,6 +792,18 @@ class CChart extends CGraphDraw {
 
 		$dist = bcmul(5, bcpow(10, 18));
 
+		if ($leftBase8 && $side == GRAPH_YAXIS_SIDE_LEFT) {
+			$intervals = $intervalsBase8;
+		}
+		elseif (!$leftBase8 && $side == GRAPH_YAXIS_SIDE_LEFT) {
+			$intervals = $intervalsBase10;
+		}
+		elseif ($rightBase8 && $side == GRAPH_YAXIS_SIDE_RIGHT) {
+			$intervals = $intervalsBase8;
+		}
+		elseif (!$rightBase8 && $side == GRAPH_YAXIS_SIDE_RIGHT) {
+			$intervals = $intervalsBase10;
+		}
 		$interval = 0;
 		foreach ($intervals as $int) {
 			// we must get a positive number
@@ -795,6 +824,18 @@ class CChart extends CGraphDraw {
 
 		$dist = bcmul(5, bcpow(10, 18));
 
+		if ($leftBase8 && $other_side == GRAPH_YAXIS_SIDE_LEFT) {
+			$intervals = $intervalsBase8;
+		}
+		elseif (!$leftBase8 && $other_side == GRAPH_YAXIS_SIDE_LEFT) {
+			$intervals = $intervalsBase10;
+		}
+		elseif ($rightBase8 && $other_side == GRAPH_YAXIS_SIDE_RIGHT) {
+			$intervals = $intervalsBase8;
+		}
+		elseif (!$rightBase8 && $other_side == GRAPH_YAXIS_SIDE_RIGHT) {
+			$intervals = $intervalsBase10;
+		}
 		$interval_other_side = 0;
 		foreach ($intervals as $int) {
 			// we must get a positive number
@@ -1342,11 +1383,14 @@ class CChart extends CGraphDraw {
 		$unitsLong = null;
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
+					$byteStep = true;
+				}
 				if (is_null($units)) {
 					$units = $this->items[$item]['units'];
 				}
 				elseif ($this->items[$item]['units'] != $units) {
-					$units = false;
+					$units = '';
 				}
 			}
 		}
@@ -1395,7 +1439,7 @@ class CChart extends CGraphDraw {
 			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
 			}
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -1416,7 +1460,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
 		$dims = imageTextSize(8, 0, $str);
 		imageText(
 			$this->im,
@@ -1452,11 +1496,14 @@ class CChart extends CGraphDraw {
 		$unitsLong = null;
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
+					$byteStep = true;
+				}
 				if (is_null($units)) {
 					$units = $this->items[$item]['units'];
 				}
 				elseif ($this->items[$item]['units'] != $units) {
-					$units = false;
+					$units = '';
 				}
 			}
 		}
@@ -1506,7 +1553,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
 
 			// marker Y coordinate
 			$dims = imageTextSize(8, 0, $str);
@@ -1526,7 +1573,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
 		imageText(
 			$this->im,
 			8,
@@ -2238,16 +2285,10 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
-		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] - $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT])<=10) {
-			$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]*0.95;
-			$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]*1.05;
-		}
-
-		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] - $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT])<=10) {
-			$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]*0.95;
-			$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]*1.05;
-		}
+		$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] *= 0.99;
+		$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] *= 1.01;
+		$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] *= 0.99;
+		$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] *= 1.01;
 
 		$this->calcMinMaxInterval();
 		$this->updateShifts();
