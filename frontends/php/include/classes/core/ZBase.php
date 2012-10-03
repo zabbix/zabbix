@@ -22,6 +22,9 @@
 require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
+	const EXEC_MODE_DEFAULT = 'default';
+	const EXEC_MODE_API = 'api';
+	const EXEC_MODE_SETUP = 'setup';
 
 	/**
 	 * An instance of the current Z object.
@@ -67,12 +70,12 @@ class ZBase {
 	/**
 	 * Initializes the application.
 	 */
-	public function run() {
+	public function run($mode = self::EXEC_MODE_DEFAULT) {
 		$this->rootDir = $this->findRootDir();
 
 		$this->registerAutoloader();
 
-		$this->init();
+		$this->init($mode);
 	}
 
 	/**
@@ -159,13 +162,22 @@ class ZBase {
 		return $this->session;
 	}
 
-	protected function init() {
-		$this->setErrorHandler();
-		$this->setMaintenanceMode();
-		$this->loadConfigFile();
-		$this->initDB();
-		$this->initNodes();
-		$this->authenticateUser();
+	protected function init($mode) {
+		switch ($mode) {
+			case self::EXEC_MODE_DEFAULT:
+				$this->setErrorHandler();
+				$this->setMaintenanceMode();
+				$this->loadConfigFile();
+				$this->initDB();
+				$this->initNodes();
+				$this->authenticateUser();
+				$this->initLocales();
+				break;
+			case self::EXEC_MODE_API:
+				break;
+			case self::EXEC_MODE_SETUP:
+				break;
+		}
 	}
 
 	protected function setErrorHandler() {
@@ -189,7 +201,7 @@ class ZBase {
 					? $_SERVER['HTTP_X_FORWARDED_FOR']
 					: $_SERVER['REMOTE_ADDR'];
 			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
-				require_once $this->getRootDir() . '/warning.php';
+				throw new Exception($_REQUEST['warning_msg']);
 			}
 		}
 	}
@@ -214,8 +226,6 @@ class ZBase {
 
 	protected function initNodes() {
 		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_NODES;
-
-		require_once $this->getRootDir() . '/include/nodes.inc.php';
 
 		if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
 			$ZBX_LOCALNODEID = $local_node_data['nodeid'];

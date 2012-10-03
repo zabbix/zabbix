@@ -918,7 +918,7 @@ define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // if magic quotes on, then get rid of them
-if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
+if (get_magic_quotes_gpc()) {
 	$_GET = zbx_stripslashes($_GET);
 	$_POST = zbx_stripslashes($_POST);
 	$_COOKIE = zbx_stripslashes($_COOKIE);
