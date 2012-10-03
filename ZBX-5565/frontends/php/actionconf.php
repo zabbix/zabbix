@@ -21,6 +21,8 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/actions.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Configuration of actions');
 $page['file'] = 'actionconf.php';

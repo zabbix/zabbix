@@ -21,12 +21,15 @@
 
 class CConfigFile {
 
+	const CONFIG_NOT_FOUND = 1;
+	const CONFIG_ERROR = 2;
+
 	public $configFile = null;
 	public $config = array();
 	public $error = '';
 
-	private static function exception($error) {
-		throw new Exception($error);
+	private static function exception($error, $code = self::CONFIG_ERROR) {
+		throw new ConfigFileException($error, $code);
 	}
 
 	public function __construct($file = null) {
@@ -43,7 +46,7 @@ class CConfigFile {
 
 	public function load() {
 		if (!file_exists($this->configFile)) {
-			self::exception('Config file does not exist.');
+			self::exception('Config file does not exist.', self::CONFIG_NOT_FOUND);
 		}
 
 		ob_start();
