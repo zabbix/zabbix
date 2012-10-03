@@ -28,6 +28,7 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.4rc1
 
 New features:
+A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
