@@ -65,7 +65,7 @@ catch (DBException $e) {
 catch (ConfigFileException $e) {
 	switch ($e->getCode()) {
 		case CConfigFile::CONFIG_NOT_FOUND:
-			require_once dirname(__FILE__).'/../setup.php';
+			redirect('setup.php');
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:

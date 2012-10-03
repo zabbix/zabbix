@@ -137,7 +137,7 @@ ul.messages li.info { color: #000000; list-style: url("../images/general/warning
 ul.messages li.error {
 	color: #D40000;
 	list-style: url("../images/general/error3.png") inside;
-	white-space: pre;
+	white-space: pre-wrap;
 }
 
 /* form */
