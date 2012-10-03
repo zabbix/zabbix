@@ -1,4 +1,4 @@
-Changes for 2.0.4
+Changes for 2.0.4rc1
 
 New features:
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
