@@ -176,6 +176,8 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				break;
 			case self::EXEC_MODE_SETUP:
+				$this->setErrorHandler();
+				$this->setMaintenanceMode();
 				break;
 		}
 	}
@@ -194,7 +196,7 @@ class ZBase {
 	}
 
 	protected function setMaintenanceMode() {
-		require_once $this->getRootDir() . '/conf/maintenance.inc.php';
+		require_once $this->getRootDir().'/conf/maintenance.inc.php';
 
 		if (defined('ZBX_DENY_GUI_ACCESS')) {
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
@@ -207,7 +209,7 @@ class ZBase {
 	}
 
 	protected function loadConfigFile() {
-		$configFile = $this->getRootDir() . '/conf/zabbix.conf.php';
+		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($configFile);
 		$config->load();
 		$this->config = $config->config;
@@ -216,7 +218,7 @@ class ZBase {
 	protected function initDB() {
 		// $DB is used in db.inc.php file
 		$DB = $this->config['DB'];
-		require_once $this->getRootDir() . '/include/db.inc.php';
+		require_once $this->getRootDir().'/include/db.inc.php';
 
 		$error = null;
 		if (!DBconnect($error)) {
@@ -239,7 +241,7 @@ class ZBase {
 	}
 
 	protected function initLocales() {
-		require_once $this->getRootDir() . '/include/locales.inc.php';
+		require_once $this->getRootDir().'/include/locales.inc.php';
 
 		init_mbstrings();
 
