@@ -399,9 +399,9 @@ static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int 
 	int		f, res = FAIL;
 	zbx_uint64_t	itemid = 0;
 	char		*value_esc;
-	int		clock, value_type = -1;
-	double		value_double;
-	zbx_uint64_t	value_uint64;
+	int		clock = 0, value_type = -1;
+	double		value_double = 0;
+	zbx_uint64_t	value_uint64 = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_items()");
 
