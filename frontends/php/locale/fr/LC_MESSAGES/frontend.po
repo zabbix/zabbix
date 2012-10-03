@@ -1,10 +1,10 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 1.9\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-03 23:23+0300\n"
-"PO-Revision-Date: 2012-09-09 14:44+0200\n"
-"Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
+"PO-Revision-Date: 2012-10-03 23:18+0200\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -4310,7 +4310,7 @@ msgstr "Terminé"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Finnish (fi_FI)"
 
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"

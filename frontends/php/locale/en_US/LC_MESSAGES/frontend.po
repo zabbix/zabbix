@@ -1,15 +1,9 @@
-# English translations for apache package.
-# Copyright (C) 2012 Zabbix SIA
-# This file is distributed under the same license as the apache package.
-# Automatically generated, 2012.
-# root <mikhail.dobrinin@redprairie.com>, 2012.
-# Mikhail Dobrinin <mikhail.dobrinin@redprairie.com>, 2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: apache 2\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-03 23:23+0300\n"
-"PO-Revision-Date: 2012-09-05 20:50+0200\n"
+"PO-Revision-Date: 2012-10-03 23:19+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
@@ -4313,7 +4307,7 @@ msgstr "Finish"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Finnish (fi_FI)"
 
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
@@ -9144,7 +9138,7 @@ msgstr "Permissions can be assigned for user groups only."
 
 #: include/locales.inc.php:59
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Persian (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
