@@ -31,14 +31,16 @@ jQuery(function($) {
 
 			// init screen item
 			this.screens[screen.id] = screen;
-			this.screens[screen.id].refreshInterval = (screen.refreshInterval > 0) ? screen.refreshInterval * 1000 : 0;
+			this.screens[screen.id].interval = (screen.interval > 0) ? screen.interval * 1000 : 0;
+			this.screens[screen.id].timestamp = 0;
+			this.screens[screen.id].timestampResponsiveness = 0;
 			this.screens[screen.id].isRefreshing = false;
 			this.screens[screen.id].isReRefreshRequire = false;
 			this.screens[screen.id].error = 0;
 
 			// init refresh plan
-			if (screen.isFlickerfree && screen.refreshInterval > 0) {
-				this.screens[screen.id].timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].refreshInterval);
+			if (screen.isFlickerfree && screen.interval > 0) {
+				this.screens[screen.id].timeoutHandler = window.setTimeout(function() { window.flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].interval);
 			}
 		},
 
@@ -57,6 +59,7 @@ jQuery(function($) {
 			ajaxUrl.setArgument('type', 9); // PAGE_TYPE_TEXT
 			ajaxUrl.setArgument('method', 'screen.get');
 			ajaxUrl.setArgument('mode', screen.mode);
+			ajaxUrl.setArgument('timestamp', new CDate().getTime());
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
 			ajaxUrl.setArgument('pageFile', screen.pageFile);
 			ajaxUrl.setArgument('screenid', screen.screenid);
@@ -138,12 +141,12 @@ jQuery(function($) {
 			}
 
 			// set next refresh execution time
-			if (screen.isFlickerfree && screen.refreshInterval > 0) {
-				clearTimeout(screen.timeout);
-				screen.timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(id); }, screen.refreshInterval);
+			if (screen.isFlickerfree && screen.interval > 0) {
+				clearTimeout(screen.timeoutHandler);
+				screen.timeoutHandler = window.setTimeout(function() { window.flickerfreeScreen.refresh(id); }, screen.interval);
 
 				// refresh time control actual time
-				clearTimeout(timeControl.timeRefreshTimeout);
+				clearTimeout(timeControl.timeRefreshTimeoutHandler);
 				timeControl.refreshTime();
 			}
 		},
@@ -158,7 +161,7 @@ jQuery(function($) {
 					screen.timeline.isNow = isNow;
 
 					// restart refresh execution starting from Now
-					clearTimeout(screen.timeout);
+					clearTimeout(screen.timeoutHandler);
 					this.refresh(id, true);
 				}
 			}
@@ -168,10 +171,11 @@ jQuery(function($) {
 			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
-				screen.isReRefreshRequire = true;
+				this.calculateReRefresh(id);
 			}
 			else {
 				screen.isRefreshing = true;
+				screen.timestampResponsiveness = new CDate().getTime();
 
 				window.flickerfreeScreenShadow.start(id);
 
@@ -180,12 +184,15 @@ jQuery(function($) {
 					type: 'post',
 					data: {},
 					dataType: 'html',
-					success: function(data) {
-						$('#flickerfreescreen_' + id).html(data);
+					success: function(html) {
+						if ($('#flickerfreescreen_' + id).data('timestamp') < $(html).data('timestamp')) {
+							$('#flickerfreescreen_' + id).replaceWith(html);
 
-						screen.isRefreshing = false;
+							screen.isRefreshing = false;
+							screen.timestamp = $(html).data('timestamp');
 
-						window.flickerfreeScreenShadow.end(id);
+							window.flickerfreeScreenShadow.end(id);
+						}
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
 						screen.isRefreshing = false;
@@ -205,11 +212,12 @@ jQuery(function($) {
 			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
-				screen.isReRefreshRequire = true;
+				this.calculateReRefresh(id);
 			}
 			else {
 				screen.isRefreshing = true;
 				screen.error = 0;
+				screen.timestampResponsiveness = new CDate().getTime();
 
 				window.flickerfreeScreenShadow.start(id);
 
@@ -230,12 +238,12 @@ jQuery(function($) {
 						border: domImg.attr('border'),
 						usemap: domImg.attr('usemap'),
 						alt: domImg.attr('alt'),
-						name: domImg.attr('name')
+						name: domImg.attr('name'),
+						'data-timestamp': new CDate().getTime()
 					})
 					.attr('src', url.getUrl())
 					.error(function() {
 						screen.error++;
-
 						screen.isRefreshing = false;
 
 						// retry load image
@@ -243,7 +251,7 @@ jQuery(function($) {
 							window.flickerfreeScreen.refresh(id, true);
 						}
 					})
-					.load(function() {
+					.load(function(request) {
 						if (screen.error > 0) {
 							return;
 						}
@@ -258,23 +266,27 @@ jQuery(function($) {
 						else {
 							var bufferImg = $(this);
 
-							// set id
-							bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
+							if (bufferImg.data('timestamp') > screen.timestamp) {
+								screen.timestamp = bufferImg.data('timestamp');
 
-							// set loaded image from buffer to dom
-							domImg.replaceWith(bufferImg);
+								// set id
+								bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
 
-							// callback function on success
-							if (!empty(successAction)) {
-								successAction();
+								// set loaded image from buffer to dom
+								domImg.replaceWith(bufferImg);
+
+								// callback function on success
+								if (!empty(successAction)) {
+									successAction();
+								}
+
+								// rebuild timeControl sbox listeners
+								if (!empty(ZBX_SBOX[id])) {
+									ZBX_SBOX[id].addListeners();
+								}
+
+								window.flickerfreeScreenShadow.end(id);
 							}
-
-							// rebuild timeControl sbox listeners
-							if (!empty(ZBX_SBOX[id])) {
-								ZBX_SBOX[id].addListeners();
-							}
-
-							window.flickerfreeScreenShadow.end(id);
 						}
 					});
 				});
@@ -285,16 +297,18 @@ jQuery(function($) {
 			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
-				screen.isReRefreshRequire = true;
+				this.calculateReRefresh(id);
 			}
 			else {
 				screen.isRefreshing = true;
+				screen.timestampResponsiveness = new CDate().getTime();
 
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
 					type: 'post',
 					data: {},
 					success: function(data) {
+						screen.timestamp = new CDate().getTime();
 						screen.isRefreshing = false;
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -311,7 +325,24 @@ jQuery(function($) {
 			}
 		},
 
-		isRefreshAllowed: function (screen) {
+		calculateReRefresh: function(id) {
+			var screen = this.screens[id];
+
+			if (screen.timestamp + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()
+					&& screen.timestampResponsiveness + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()) {
+				// take of beasy flags
+				screen.isRefreshing = false;
+				screen.isReRefreshRequire = false;
+
+				// refresh anyway
+				window.flickerfreeScreen.refresh(id, true);
+			}
+			else {
+				screen.isReRefreshRequire = true;
+			}
+		},
+
+		isRefreshAllowed: function(screen) {
 			return !empty(timeControl.timeline) ? timeControl.timeline.isNow() : true;
 		},
 
@@ -326,7 +357,8 @@ jQuery(function($) {
 		},
 
 		submitForm: function(formName) {
-			var period, stime;
+			var period = '',
+				stime = '';
 
 			for (var id in this.screens) {
 				if (!empty(this.screens[id])) {
@@ -344,22 +376,23 @@ jQuery(function($) {
 
 	window.flickerfreeScreenShadow = {
 
-		timeout: 1, // in seconds
+		timeout: 30000,
+		responsiveness: 10000,
 		timers: [],
 
 		start: function(id) {
 			if (empty(this.timers[id])) {
 				this.timers[id] = {};
-				this.timers[id].timeout = null;
+				this.timers[id].timeoutHandler = null;
 				this.timers[id].ready = false;
 			}
 
-			clearTimeout(this.timers[id].timeout);
-			this.timers[id].timeout = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout * 1000);
+			clearTimeout(this.timers[id].timeoutHandler);
+			this.timers[id].timeoutHandler = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
 		},
 
 		end: function(id) {
-			clearTimeout(this.timers[id].timeout);
+			clearTimeout(this.timers[id].timeoutHandler);
 			this.removeShadow(id);
 		},
 
@@ -404,7 +437,9 @@ jQuery(function($) {
 						top: item.position().top,
 						left: item.position().left,
 						width: item.width(),
-						height: item.height()
+						height: item.height(),
+						position: 'absolute',
+						zIndex: 1
 					})
 				);
 
@@ -414,6 +449,10 @@ jQuery(function($) {
 				// show loading icon..
 				elem.append($('<div>', {'class': 'loading'})
 					.css({
+						width: '24px',
+						height: '24px',
+						position: 'absolute',
+						zIndex: 3,
 						top: item.position().top + Math.round(item.height() / 2) - 12,
 						left: item.position().left + Math.round(item.width() / 2) - 12
 					})
@@ -463,12 +502,24 @@ jQuery(function($) {
 		},
 
 		findScreenItem: function(elem) {
-			var item = elem.find('table');
-			if (item.length < 1) {
-				item = elem.find('img');
-			}
+			var item = elem.children(':first'),
+				tag;
 
-			return (item.length > 0) ? $(item[0]) : null;
+			if (!empty(item)) {
+				tag = item.prop('nodeName');
+
+				if (tag == 'TABLE' || tag == 'DIV') {
+					return item;
+				}
+				else {
+					item = item.find('img');
+
+					return (item.length > 0) ? $(item[0]) : null;
+				}
+			}
+			else {
+				return null;
+			}
 		}
 	};
 

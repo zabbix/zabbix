@@ -77,7 +77,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	}
 
 	if (in_array('flickerfreescreen.js', $page['scripts'])) {
-		$post_script .= 'window.flickerfreeScreenShadow.timeout = '.SCREEN_REFRESH_TIMEOUT.';'."\n";
+		$post_script .= 'window.flickerfreeScreenShadow.timeout = '.SCREEN_REFRESH_TIMEOUT.' * 1000;'."\n";
+		$post_script .= 'window.flickerfreeScreenShadow.responsiveness = '.SCREEN_REFRESH_RESPONSIVENESS.' * 1000;'."\n";
 	}
 
 	// the chkbxRange.init() method must be called after the inserted post scripts

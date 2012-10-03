@@ -29,7 +29,7 @@ var timeControl = {
 	// options
 	refreshPage: true,
 	timeRefreshInterval: 0,
-	timeRefreshTimeout: null,
+	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
 		this.objectList[id] = {
@@ -233,7 +233,7 @@ var timeControl = {
 			this.scrollbar.resetIsNow();
 
 			// plan next time update
-			this.timeRefreshTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
+			this.timeRefreshTimeoutHandler = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
 		}
 	},
 
