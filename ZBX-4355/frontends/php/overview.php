@@ -60,13 +60,11 @@ CProfile::update('web.overview.type', $data['type'], PROFILE_TYPE_INT);
 $data['pageFilter'] = new CPageFilter(array(
 	'groups' => array(
 		'monitored_hosts' => true,
-		'with_monitored_items' => true,
-		'with_monitored_triggers' => ($data['type'] == SHOW_TRIGGERS)
+		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	),
 	'hosts' => array(
 		'monitored_hosts' => true,
-		'with_monitored_items' => true,
-		'with_monitored_triggers' => ($data['type'] == SHOW_TRIGGERS)
+		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null)

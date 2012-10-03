@@ -6,7 +6,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpGroupRow(#{groupid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpGroupRow(#{groupid});" />
 </td>
 </tr>
 </script>
@@ -18,7 +18,7 @@
 	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpTemplateRow(#{templateid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpTemplateRow(#{templateid});" />
 </td>
 </tr>
 </script>
@@ -31,7 +31,7 @@
 	<span>#{name}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
 </td>
 </tr>
 </script>
@@ -43,7 +43,7 @@
 	<span>#{alias}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpmsgUserRow(#{userid});" />
+	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow(#{userid});" />
 </td>
 </tr>
 </script>
@@ -57,7 +57,7 @@
 	<span>#{name}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
 </td>
 </tr>
 </script>
@@ -71,7 +71,7 @@
 	<span>#{name}</span>
 </td>
 <td>
-	<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
+	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
 </td>
 </tr>
 </script>
@@ -84,23 +84,23 @@
 	<td><?php echo _('Target'); ?></td>
 	<td>
 		<select name="opCmdTarget" class="input select">
-			<option value="0"><?php echo Chtml::encode(_('Current host')); ?></option>
-			<option value="1"><?php echo Chtml::encode(_('Host')); ?></option>
-			<option value="2"><?php echo Chtml::encode(_('Host group')); ?></option>
+			<option value="0"><?php echo CHtml::encode(_('Current host')); ?></option>
+			<option value="1"><?php echo CHtml::encode(_('Host')); ?></option>
+			<option value="2"><?php echo CHtml::encode(_('Host group')); ?></option>
 		</select>
 		<div id="opCmdTargetSelect" class="inlineblock">
 			<input name="action" type="hidden" value="#{action}" />
 			<input name="opCmdId" type="hidden" value="#{opcmdid}" />
 			<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
 			<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
-			<input type="button" class="input link_menu" name="select" value=<?php echo Chtml::encode(_('Select')); ?> />
+			<input type="button" class="input link_menu" name="select" value="<?php echo CHtml::encode(_('Select')); ?>" />
 		</div>
 	</td>
 </tr>
 <tr>
 	<td colspan="2">
 		<input type="button" class="input link_menu" name="save" value="#{operationName}" />&nbsp;
-		<input type="button" class="input link_menu" name="cancel" value=<?php echo Chtml::encode(_('Cancel')); ?> />
+		<input type="button" class="input link_menu" name="cancel" value="<?php echo CHtml::encode(_('Cancel')); ?>" />
 	</td>
 </tr>
 </tbody></table>
@@ -111,18 +111,18 @@
 <script type="text/x-jquery-tmpl" id="operationTypesTPL">
 <tr id="operationTypeScriptElements" class="hidden">
 <td>
-	<?php echo Chtml::encode(_('Execute on')); ?>
+	<?php echo CHtml::encode(_('Execute on')); ?>
 </td>
 <td>
 	<div class="objectgroup inlineblock border_dotted ui-corner-all" id="uniqList">
 		<div>
 			<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
-			<label for="execute_on_agent"><?php echo Chtml::encode(_('Zabbix agent')); ?></label>
+			<label for="execute_on_agent"><?php echo CHtml::encode(_('Zabbix agent')); ?></label>
 		</div>
 
 		<div>
 			<input type="radio" id="execute_on_server" name="execute_on" value="1" class="input radio">
-			<label for="execute_on_server"><?php echo Chtml::encode(_('Zabbix server')); ?></label>
+			<label for="execute_on_server"><?php echo CHtml::encode(_('Zabbix server')); ?></label>
 		</div>
 	</div>
 </td>
@@ -481,8 +481,6 @@
 	}
 
 	jQuery(document).ready(function() {
-		setTimeout(function() {jQuery('#name').focus()}, 10);
-
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();

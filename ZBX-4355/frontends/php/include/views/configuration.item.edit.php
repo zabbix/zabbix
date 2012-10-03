@@ -74,7 +74,10 @@ if (!$this->data['is_discovery_rule']) {
 		));
 	}
 }
-$itemFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']));
+
+$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
+$nameTextBox->attr('autofocus', 'autofocus');
+$itemFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
 if ($this->data['limited']) {
@@ -184,7 +187,7 @@ $itemFormList->addRow(_('Password'),
 	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
-	new CTextArea('params_es', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_es', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_executed_script'
 );
 $itemFormList->addRow(_('Additional parameters'),
@@ -192,14 +195,13 @@ $itemFormList->addRow(_('Additional parameters'),
 		!empty($this->data['params'])
 			? $this->data['params']
 			: 'DSN=<database source name>'."\n".'user=<user name>'."\n".'password=<password>'."\n".'sql=<query>',
-		ZBX_TEXTAREA_STANDARD_ROWS,
-		ZBX_TEXTAREA_STANDARD_WIDTH
+		array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 	false,
 	'label_params'
 );
 $itemFormList->addRow(_('Formula'),
-	new CTextArea('params_f', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_f', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_formula'
 );
 
@@ -631,6 +633,9 @@ if (!$this->data['is_discovery_rule']) {
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_LOG, 'logtimefmt');
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'valuemapid');
+	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'valuemapid');
+	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'row_valuemap');
+	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'valuemap_name');
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'row_valuemap');
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'valuemap_name');
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'valuemapid');

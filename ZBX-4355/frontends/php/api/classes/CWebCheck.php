@@ -17,17 +17,21 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
+
 class CWebCheck extends CZBXAPI {
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
 	private $history = 30;
 	private $trends = 90;
 
+	/**
+	 * Get data about web scenarios.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -295,42 +299,43 @@ class CWebCheck extends CZBXAPI {
 		return $result;
 	}
 
+	/**
+	 * Create web scenario.
+	 *
+	 * @param $httpTests
+	 *
+	 * @return array
+	 */
 	public function create($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-		$httpTestsNames = zbx_objectValues($httpTests, 'name');
 
-		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
-		}
-
-		$dbHttpTests = $this->get(array(
-			'filter' => array('name' => $httpTestsNames),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true,
-			'preservekeys' => true
-		));
-		foreach ($dbHttpTests as $httpTest) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $httpTest['name']));
-		}
+		$this->validateCreate($httpTests);
 
 		$httpTestIds = DB::insert('httptest', $httpTests);
 
 		foreach ($httpTests as $wnum => $httpTest) {
-			if (empty($httpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
-			}
 			$httpTest['httptestid'] = $httpTestIds[$wnum];
 
 			$this->createCheckItems($httpTest);
 			$this->createStepsReal($httpTest, $httpTest['steps']);
 		}
+
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Update web scenario.
+	 *
+	 * @param $httpTests
+	 *
+	 * @return array
+	 */
 	public function update($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
+		$this->validateUpdate($httpTests);
+
+		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 		$dbHttpTest = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'httptestids' => $httpTestIds,
@@ -340,32 +345,6 @@ class CWebCheck extends CZBXAPI {
 		));
 
 		foreach ($httpTests as $httpTest) {
-			if (!isset($dbHttpTest[$httpTest['httptestid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
-			}
-
-			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			if (isset($httpTest['name'])) {
-				if (!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTest['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
-				}
-
-				$httpTestExist = $this->get(array(
-					'filter' => array('name' => $httpTest['name']),
-					'preservekeys' => true,
-					'nopermissions' => true,
-					'output' => API_OUTPUT_SHORTEN
-				));
-				$httpTestExist = reset($httpTestExist);
-
-				if ($httpTestExist && (bccomp($httpTestExist['httptestid'], $httpTestExist['httptestid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $httpTest['name']));
-				}
-			}
-
 			DB::update('httptest', array(
 				'values' => $httpTest,
 				'where' => array('httptestid' => $httpTest['httptestid'])
@@ -447,6 +426,13 @@ class CWebCheck extends CZBXAPI {
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Delete web scenario.
+	 *
+	 * @param $httpTestIds
+	 *
+	 * @return array|bool
+	 */
 	public function delete($httpTestIds) {
 		if (empty($httpTestIds)) {
 			return true;
@@ -507,6 +493,130 @@ class CWebCheck extends CZBXAPI {
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Validate web scenario parameters for create method.
+	 *  - check if web scenario with same name already exists
+	 *  - check if web scenario has at least one step
+	 *
+	 * @param array $httpTests
+	 */
+	protected function validateCreate(array $httpTests) {
+		$httpTestsNames = $this->checkNames($httpTests);
+
+		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.DBcondition('ht.name', $httpTestsNames), 1))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $name['name']));
+		}
+
+		foreach ($httpTests as $httpTest) {
+			if (empty($httpTest['steps'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
+			}
+			$this->checkSteps($httpTest['steps']);
+		}
+	}
+
+	/**
+	 * Validate web scenario parameters for update method.
+	 *  - check permissions
+	 *  - check if web scenario with same name already exists
+	 *  - check that each web scenario object has httptestid defined
+	 *
+	 * @param array $httpTests
+	 */
+	protected function validateUpdate(array $httpTests) {
+		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
+
+		if (!$this->isWritable($httpTestIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
+		}
+
+		$httpTestsNames = $this->checkNames($httpTests);
+
+		$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.
+				DBcondition('ht.name', $httpTestsNames).
+				' AND '.DBcondition('ht.httptestid', $httpTestIds, true), 1));
+		if ($nameExists) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $nameExists['name']));
+		}
+
+		foreach ($httpTests as $httpTest) {
+			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+			if (isset($httpTest['steps'])) {
+				$this->checkSteps($httpTest['steps']);
+			}
+		}
+	}
+
+	/**
+	 * Check web scenario steps.
+	 *  - check status_codes field
+	 *
+	 * @param array $steps
+	 */
+	protected function checkSteps(array $steps) {
+		foreach ($steps as $step) {
+			if (isset($step['status_codes'])) {
+				$this->checkStatusCode($step['status_codes']);
+			}
+		}
+	}
+
+	/**
+	 * Validate http response code reange.
+	 * Range can contain ',' and '-'
+	 * Range can be empty string.
+	 *
+	 * Examples: '100-199, 301, 404, 500-550'
+	 *
+	 * @param string $statusCodeRange
+	 *
+	 * @return bool
+	 */
+	protected  function checkStatusCode($statusCodeRange) {
+		if ($statusCodeRange == '') {
+			return true;
+		}
+
+		foreach (explode(',', $statusCodeRange) as $range) {
+			$range = explode('-', $range);
+			if (count($range) > 2) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
+			}
+
+			foreach ($range as $value) {
+				if (!is_numeric($value)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $value));
+				}
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Check web scenario names.
+	 *
+	 * @param array $httpTests
+	 *
+	 * @return array|null
+	 */
+	protected function checkNames(array $httpTests) {
+		$httpTestsNames = zbx_objectValues($httpTests, 'name');
+		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+		}
+
+		return $httpTestsNames;
+	}
+
+	/**
+	 * Create items required for web scenario.
+	 *
+	 * @param $httpTest
+	 */
 	protected function createCheckItems($httpTest) {
 		$checkitems = array(
 			array(
@@ -575,6 +685,12 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Create web scenario steps with items.
+	 *
+	 * @param $httpTest
+	 * @param $websteps
+	 */
 	protected function createStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
@@ -669,6 +785,12 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Update web scenario steps.
+	 *
+	 * @param $httpTest
+	 * @param $websteps
+	 */
 	protected function updateStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
@@ -749,6 +871,11 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Delete web scenario steps.
+	 *
+	 * @param $webstepids
+	 */
 	protected function deleteStepsReal($webstepids) {
 		$itemids = array();
 		$dbStepItems = DBselect(
@@ -767,5 +894,53 @@ class CWebCheck extends CZBXAPI {
 			API::Item()->delete($itemids, true);
 		}
 	}
+
+	/**
+	 * Check if user has read permissions on http test with given ids.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'httptestids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	/**
+	 * Check if user has write permissions on http test with given ids.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'httptestids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
 }
-?>

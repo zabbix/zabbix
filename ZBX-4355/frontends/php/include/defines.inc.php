@@ -19,8 +19,9 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.1.0');
-define('ZABBIX_API_VERSION',	'1.4');
+define('ZABBIX_VERSION',     '2.1.0');
+define('ZABBIX_API_VERSION', '1.4');
+define('ZABBIX_DB_VERSION',	 2010006);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO', '2012');
@@ -525,7 +526,7 @@ define('SCREEN_SORT_TRIGGERS_RECIPIENT_DESC',		12);
 
 define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
-define('SCREEN_MODE_VIEW',		2);
+define('SCREEN_MODE_SLIDESHOW',		2);
 define('SCREEN_MODE_JS',		3);
 
 define('SCREEN_TYPE_NORMAL',	0);

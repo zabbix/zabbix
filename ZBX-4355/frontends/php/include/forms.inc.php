@@ -94,12 +94,12 @@
 			$data['user_medias']	= get_request('user_medias', array());
 
 			// set messages
-			$data['messages'] 		= get_request('messages', array());
+			$data['messages'] = get_request('messages', array());
 			if (!isset($data['messages']['enabled'])) {
 				$data['messages']['enabled'] = 0;
 			}
 			if (!isset($data['messages']['sounds.recovery'])) {
-				$data['messages']['sounds.recovery'] = 0;
+				$data['messages']['sounds.recovery'] = 'alarm_ok.wav';
 			}
 			if (!isset($data['messages']['triggers.recovery'])) {
 				$data['messages']['triggers.recovery'] = 0;
@@ -1607,24 +1607,9 @@
 			$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
 			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-			$clndr_icon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
-			$clndr_icon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_timeperiod_date"].clndr.clndrshow(pos.top, pos.left);');
 			$start_date = zbxDateToTime($new_timeperiod['start_date']);
 
-			$tblPeriod->addRow(array(_('Date'), array(
-				new CNumericBox('new_timeperiod_day', ($start_date > 0) ? date('d', $start_date) : '', 2),
-				'/',
-				new CNumericBox('new_timeperiod_month', ($start_date > 0) ? date('m', $start_date) : '', 2),
-				'/',
-				new CNumericBox('new_timeperiod_year', ($start_date > 0) ? date('Y', $start_date) : '', 4),
-				SPACE,
-				new CNumericBox('new_timeperiod_hour', ($start_date > 0) ? date('H', $start_date) : '', 2),
-				':',
-				new CNumericBox('new_timeperiod_minute', ($start_date > 0) ? date('i', $start_date) : '', 2),
-				$clndr_icon
-			)));
-			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');
-
+			$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $start_date)));
 		}
 
 		if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {

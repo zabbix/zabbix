@@ -132,7 +132,7 @@ class CScreenBase {
 	 */
 	public function __construct(array $options = array()) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
-		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
+		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;
@@ -238,8 +238,8 @@ class CScreenBase {
 		}
 
 		return ($this->mode == SCREEN_MODE_EDIT)
-			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getScreenId())
-			: new CDiv($item, null, $this->getScreenId());
+			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), 'flickerfreescreen', $this->getScreenId())
+			: new CDiv($item, 'flickerfreescreen', $this->getScreenId());
 	}
 
 	/**
@@ -289,6 +289,12 @@ class CScreenBase {
 		}
 		if (empty($options['profileIdx2'])) {
 			$options['profileIdx2'] = 0;
+		}
+
+		// show only latest data without update is set only period
+		if (!empty($options['period']) && empty($options['stime'])) {
+			$options['updateProfile'] = false;
+			$options['profileIdx'] = '';
 		}
 
 		// period

@@ -278,7 +278,7 @@ elseif (isset($_REQUEST['save'])) {
 				'output' => API_OUTPUT_REFER
 			));
 			$result = true;
-			foreach ($db_graphs as $gnum => $db_graph) {
+			foreach ($db_graphs as $db_graph) {
 				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 			}
 			if (!$result) {
@@ -514,7 +514,7 @@ else {
 			' ('.$template['graphs'].')');
 		$screens = array(new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']),
 			' ('.$template['screens'].')');
-		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$template['hostid']),
+		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$template['templateid']),
 			' ('.$template['discoveries'].')');
 
 
@@ -559,15 +559,15 @@ else {
 			switch($linked_to_host['status']){
 				case HOST_STATUS_NOT_MONITORED:
 					$style = 'on';
-					$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$_REQUEST['groupid'];
+					$url = 'hosts.php?form=update&hostid='.$linked_to_host['objectid'].'&groupid='.$_REQUEST['groupid'];
 				break;
 				case HOST_STATUS_TEMPLATE:
 					$style = 'unknown';
-					$url = 'templates.php?form=update&templateid='.$linked_to_host['hostid'];
+					$url = 'templates.php?form=update&templateid='.$linked_to_host['objectid'];
 				break;
 				default:
 					$style = null;
-					$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$_REQUEST['groupid'];
+					$url = 'hosts.php?form=update&hostid='.$linked_to_host['objectid'].'&groupid='.$_REQUEST['groupid'];
 				break;
 			}
 

@@ -87,6 +87,10 @@ function DBconnect(&$error) {
 						DBexecute('SET NAMES utf8');
 					}
 				}
+
+				if ($result) {
+					$dbBackend = new MysqlDbBackend();
+				}
 				break;
 			case ZBX_DB_POSTGRESQL:
 				$pg_connection_string =
@@ -107,6 +111,9 @@ function DBconnect(&$error) {
 						DBexecute('set bytea_output = escape');
 					}
 				}
+				if ($result) {
+					$dbBackend = new PostgresqlDbBackend();
+				}
 				break;
 			case ZBX_DB_ORACLE:
 				$connect = '';
@@ -125,6 +132,9 @@ function DBconnect(&$error) {
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database';
 					$result = false;
+				}
+				if ($result) {
+					$dbBackend = new OracleDbBackend();
 				}
 				break;
 			case ZBX_DB_DB2:
@@ -150,6 +160,9 @@ function DBconnect(&$error) {
 						DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
 					}
 				}
+				if ($result) {
+					$dbBackend = new Db2DbBackend();
+				}
 				break;
 			case ZBX_DB_SQLITE3:
 				if (file_exists($DB['DATABASE'])) {
@@ -168,15 +181,25 @@ function DBconnect(&$error) {
 					$error = 'Missing database';
 					$result = false;
 				}
+				if ($result) {
+					$dbBackend = new SqliteDbBackend();
+				}
 				break;
 			default:
 				$error = 'Unsupported database';
 				$result = false;
 		}
 	}
+
+	if ($result && !$dbBackend->checkDbVersion()) {
+		$error = $dbBackend->getError();
+		$result = false;
+	}
+
 	if (false == $result) {
 		$DB['DB'] = null;
 	}
+
 	return $result;
 }
 
@@ -1170,7 +1193,7 @@ function unlock_sqlite3_access() {
  * @return bool
  */
 function idcmp($id1, $id2) {
-	return $id1 === $id2;
+	return (string) $id1 === (string) $id2;
 }
 
 /**

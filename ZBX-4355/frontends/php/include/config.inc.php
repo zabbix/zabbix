@@ -122,7 +122,7 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 	if (!isset($show_warning)) {
 		$error = '';
 		if (!DBconnect($error)) {
-			$_REQUEST['message'] = $error;
+			$_REQUEST['warning_msg'] = $error;
 
 			define('ZBX_DISTRIBUTED', false);
 			if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
@@ -236,7 +236,7 @@ function access_deny() {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
 	else {
-		$url = new CUrl($_SERVER['REQUEST_URI']);
+		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);
 		$url = urlencode($url->toString());
 
@@ -255,6 +255,7 @@ function access_deny() {
 		));
 		$warning->show();
 	}
+
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 

@@ -88,43 +88,33 @@ else {
 			$slideForm->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
 		}
 
+		$scrollDiv = new CDiv();
+		$scrollDiv->setAttribute('id', 'scrollbar_cntr');
+		$slideWidget->addFlicker($scrollDiv, CProfile::get('web.slides.filter.state', 1));
+		$slideWidget->addFlicker(BR(), CProfile::get('web.slides.filter.state', 1));
+
 		// js menu
 		insert_js('var page_menu='.zbx_jsvalue($this->data['menu']).";\n".'var page_submenu='.zbx_jsvalue($this->data['submenu']).";\n");
 
 		// get timeline
-		$timeline = CScreenBase::calculateTime(array(
+		$screenBuilder = new CScreenBuilder(array(
 			'profileIdx' => 'web.slides',
 			'profileIdx2' => $this->data['elementid'],
 			'period' => get_request('period'),
 			'stime' => get_request('stime')
 		));
 
-		$refresh_tab = array(array(
+		add_doll_objects(array(array(
 			'id' => 'hat_slides',
 			'frequency' => $this->data['element']['delay'] * $this->data['refresh_multiplier'],
-			'url' => 'slides.php?elementid='.$this->data['elementid'].'&period='.$timeline['period'].'&stime='.$timeline['stime'].url_param('groupid').url_param('hostid'),
+			'url' => 'slides.php?elementid='.$this->data['elementid'].url_param('groupid').url_param('hostid'),
 			'params'=> array('lastupdate' => time())
+		)));
+
+		CScreenBuilder::insertScreenStandardJs(array(
+			'timeline' => $screenBuilder->timeline,
+			'profileIdx' => $screenBuilder->profileIdx
 		));
-		add_doll_objects($refresh_tab);
-
-		$scrollDiv = new CDiv();
-		$scrollDiv->setAttribute('id', 'scrollbar_cntr');
-		$slideWidget->addFlicker($scrollDiv, CProfile::get('web.slides.filter.state', 1));
-		$slideWidget->addFlicker(BR(), CProfile::get('web.slides.filter.state', 1));
-
-		$objData = array(
-			'id' => $this->data['elementid'],
-			'loadSBox' => 0,
-			'loadImage' => 0,
-			'loadScroll' => 1,
-			'scrollWidthByImage' => 0,
-			'dynamic' => 0,
-			'mainObject' => 1,
-			'periodFixed' => CProfile::get('web.slides.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
-		zbx_add_post_js('timeControl.addObject("iframe", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
-		CScreenBuilder::insertProcessObjectsJs();
 
 		$slideWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 	}

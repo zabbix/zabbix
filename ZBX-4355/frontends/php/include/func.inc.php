@@ -292,7 +292,7 @@ function zbxDateToTime($strdate) {
 		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
-		return !empty($strdate) ? $strdate : time();
+		return (!empty($strdate) && is_numeric($strdate)) ? $strdate : time();
 	}
 }
 
@@ -779,7 +779,9 @@ function zbx_array_push(&$array, $add) {
  *         'd' => 3,
  *         'c' => 2,
  *     )
+ *
  * @param array $array
+ *
  * @return array
  */
 function zbx_arrayFindDuplicates(array $array) {
@@ -1336,15 +1338,12 @@ function zbx_toObject($value, $field) {
 }
 
 function zbx_toArray($value) {
-	if (is_null($value)) {
+	if ($value === null) {
 		return $value;
 	}
-	$result = array();
 
-	if (!is_array($value)) {
-		$result = array($value);
-	}
-	else {
+	$result = array();
+	if (is_array($value)) {
 		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
 
@@ -1354,6 +1353,9 @@ function zbx_toArray($value) {
 		elseif (!empty($value)) {
 			$result = array($value);
 		}
+	}
+	else {
+		$result = array($value);
 	}
 
 	return $result;
@@ -1475,6 +1477,7 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  * @param array $a
  * @param array $b
  * @param bool $strict
+ *
  * @return bool
  */
 function array_equal(array $a, array $b, $strict=false) {

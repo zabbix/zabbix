@@ -40,10 +40,6 @@ function is_int_range($value) {
 	return true;
 }
 
-function is_hex_color($value) {
-	return preg_match('/^([0-9,A-F]{6})$/i', $value);
-}
-
 function BETWEEN($min, $max, $var = null) {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
 }
@@ -337,11 +333,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_INT_RANGE) {
 		if (!is_int_range($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not integer range.', $field));
+				info(_s('Critical error. Field "%1$s" is not integer list or range.', $field));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field "%1$s" is not integer range.', $field));
+				info(_s('Warning. Field "%1$s" is not integer list or range.', $field));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -392,15 +388,18 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 
-	if ($type == T_ZBX_CLR && !is_hex_color($var)) {
-		$var = 'FFFFFF';
-		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not a colour.', $field));
-			return ZBX_VALID_ERROR;
-		}
-		else {
-			info(_s('Warning. Field "%1$s" is not a colour.', $caption));
-			return ZBX_VALID_WARNING;
+	if ($type == T_ZBX_CLR) {
+		$colorValidator = new CColorValidator();
+		if (!$colorValidator->validate($var)) {
+			$var = 'FFFFFF';
+			if ($flags & P_SYS) {
+				info(_s('Critical error. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $field));
+				return ZBX_VALID_ERROR;
+			}
+			else {
+				info(_s('Warning. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
+				return ZBX_VALID_WARNING;
+			}
 		}
 	}
 	return ZBX_VALID_OK;
