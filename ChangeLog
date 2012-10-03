@@ -31,6 +31,7 @@ New features:
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+.D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
 .......PS. [ZBX-5414] fixed handling of an incorrect username/password of SNMPv3 checks (Sasha)
 ...G...... [ZBX-5609] fixed defaults for parameters of vfs.dev.read/write items in "zabbix_agentd -p" (Sasha)
 ...G...... [ZBX-5552] fixed processing of vm.memory.size[total] under FreeBSD (Sasha)
@@ -1058,6 +1059,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+.D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
 A......... [ZBX-4097] changed the "application", "host" and "group" parameters for item.get and trigger.get to be case sensitive (Pavels)
 ..F....... [ZBX-5514] fixed sql query in get_min_itemclock_by_itemid function (Eduard)
 A......... [ZBX-5505] fixed incorrect sql query building using limits (Eduard)
