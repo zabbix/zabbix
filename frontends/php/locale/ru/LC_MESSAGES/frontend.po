@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-09-11 13:22+0300\n"
-"PO-Revision-Date: 2012-08-25 07:44+0200\n"
+"PO-Revision-Date: 2012-09-12 14:51+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -18,7 +19,7 @@ msgstr ""
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" должно быть между 1970.01.01 и 2038.01.18."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -670,11 +671,11 @@ msgstr "В (час:минута)"
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Должен быть выбран по крайней мере один узел сети или одна группа."
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Должен быть создан по крайней мере один период обслуживания."
 
 #: include/classes/class.frontendsetup.php:291
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -1115,6 +1116,8 @@ msgstr "Не удалось добавить зависимость от узл�
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr ""
+"Не удалось добавить зависимость от триггера \"%1$s:%2$s\" к несуществующему "
+"триггеру \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1511,6 +1514,8 @@ msgstr "Не удалось включить способ оповещения"
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr ""
+"Не удалось найти фоновое изображение \"%1$s\" используемое на карте сети \"%"
+"2$s\"."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1664
@@ -1554,12 +1559,12 @@ msgstr "Не удалось найти интерфейс у узла сети \
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1677
@@ -1576,7 +1581,7 @@ msgstr "Не удалось найти карту сети \"%1$s\" исполь
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не удалось найти карту сети \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
@@ -1600,7 +1605,7 @@ msgstr "Не удалось найти комплексный экран \"%1$s\
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Не удалось найти триггер \"%1$s\" используемый на карте сети \"%2$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -1999,11 +2004,11 @@ msgstr "Chinese (zh_CN)"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "Китайский (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "Кольцевые зависимости не разрешены."
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -2618,6 +2623,8 @@ msgstr "Критическая ошибка. Поле \"%1$s\" не являет
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr ""
+"Критическая ошибка. Поле \"%1$s\" не является списком целых чисел или "
+"диапазоном."
 
 #: include/validate.inc.php:353
 #, php-format
@@ -3975,7 +3982,7 @@ msgstr "English (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "Английский (en_US)"
 
 #: include/actions.inc.php:681 include/actions.inc.php:757
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
@@ -6306,12 +6313,12 @@ msgstr "Ошибочные параметры."
 #: api/classes/CWebCheck.php:590
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "Ошибочный код ответа \"%1$s\"."
 
 #: api/classes/CWebCheck.php:585
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "Ошибочный диапазон кода ответа \"%1$s\"."
 
 #: items.php:340
 msgid "Invalid time period"
@@ -6874,11 +6881,11 @@ msgstr "Присоединен к"
 
 #: include/views/js/configuration.sysmaps.js.php:303
 msgid "Links between the selected elements"
-msgstr ""
+msgstr "Индикаторы связей между выбранными элементами"
 
 #: include/views/js/configuration.sysmaps.js.php:292
 msgid "Links for the selected element"
-msgstr ""
+msgstr "Индикаторы связей для выбранного элемента"
 
 #: include/classes/class.clist.php:33
 msgid "List is empty"
@@ -7069,6 +7076,7 @@ msgstr "Обслуживание \"%s\" уже существует."
 #: api/classes/CMaintenance.php:484 api/classes/CMaintenance.php:597
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr ""
+"Значение обслуживания \"Активно с\" не может быть больше чем \"Активно до\"."
 
 #: maintenance.php:106
 msgid "Maintenance added"
@@ -7080,7 +7088,7 @@ msgstr "Обслуживание удалено"
 
 #: include/views/configuration.maintenance.edit.php:107
 msgid "Maintenance period"
-msgstr ""
+msgstr "Период обслуживания"
 
 #: include/forms.inc.php:1626
 msgid "Maintenance period length"
@@ -7478,7 +7486,7 @@ msgstr "Отсутствует ключ \"%1$s\" для узла сети \"%2$s
 
 #: api/classes/CUserGroup.php:510
 msgid "Missing parameter: usrgrpids."
-msgstr ""
+msgstr "Пропущенный параметр: usrgrpids."
 
 #: include/views/administration.proxy.list.php:46 report2.php:176
 msgid "Mode"
@@ -7829,7 +7837,7 @@ msgstr "Без сбора данных"
 #: include/classes/screens/CScreenPlainText.php:36
 #: include/classes/screens/CScreenPlainText.php:56
 msgid "No data defined."
-msgstr ""
+msgstr "Нет заданных данных."
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -8380,7 +8388,7 @@ msgstr "Без элементов данных из шаблона"
 #: api/classes/CTrigger.php:1906
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
-msgstr ""
+msgstr "Не все шаблоны соединены с \"%s\"."
 
 #: api/classes/CUser.php:449
 msgid "Not allowed to set password for user \"guest\"."
@@ -8671,7 +8679,7 @@ msgstr "Только одна проверка может быть уникал�
 
 #: api/classes/CUserGroup.php:517
 msgid "Only one user group name can be changed at a time."
-msgstr ""
+msgstr "Только одно имя группы пользователей может быть изменено единовременно."
 
 #: api/classes/CProxy.php:610
 msgid "Only super admins can delete proxies."
@@ -9442,11 +9450,11 @@ msgstr "Получатель"
 
 #: include/views/configuration.screen.constructor.edit.php:365
 msgid "Recipient (ascending)"
-msgstr ""
+msgstr "Получатель (в порядке возрастания)"
 
 #: include/views/configuration.screen.constructor.edit.php:364
 msgid "Recipient (descending)"
-msgstr ""
+msgstr "Получатель (в порядке убывания)"
 
 #: include/actions.inc.php:679 include/classes/screens/CScreenActions.php:78
 #: include/classes/screens/CScreenActions.php:83
@@ -9778,11 +9786,11 @@ msgstr "Попыток"
 
 #: include/views/configuration.screen.constructor.edit.php:363
 msgid "Retries left (ascending)"
-msgstr ""
+msgstr "Количество попыток (в порядке возрастания)"
 
 #: include/views/configuration.screen.constructor.edit.php:362
 msgid "Retries left (descending)"
-msgstr ""
+msgstr "Количество попыток (в порядке убывания)"
 
 #: include/setup.inc.php:228 include/setup.inc.php:456 warning.php:60
 msgid "Retry"
@@ -10914,11 +10922,11 @@ msgstr "Состояние"
 
 #: include/views/configuration.screen.constructor.edit.php:361
 msgid "Status (ascending)"
-msgstr ""
+msgstr "Состояние (в порядке возрастания)"
 
 #: include/views/configuration.screen.constructor.edit.php:360
 msgid "Status (descending)"
-msgstr ""
+msgstr "Состояние (в порядке убывания)"
 
 #: include/views/configuration.services.child.list.php:39
 #: include/views/configuration.services.parent.list.php:36 services.php:409
@@ -10948,7 +10956,7 @@ msgstr "Состояние обнаружения"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr ""
+msgstr "Состояние триггеров группы узлов сети"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
@@ -10993,7 +11001,7 @@ msgstr "Шаг сценария"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "Шаг с именем \"%s\" уже существует."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:319
 #: include/views/configuration.httpconf.edit.php:204
@@ -11064,6 +11072,8 @@ msgstr "Swedish (sv_SE)"
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr ""
+"Переключение метода аутентификации сбросит все сессии исключая эту! "
+"Продолжить?"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:111
 msgid "System default"
@@ -11403,11 +11413,11 @@ msgstr "Время"
 
 #: include/views/configuration.screen.constructor.edit.php:357
 msgid "Time (ascending)"
-msgstr ""
+msgstr "Время (в порядке возрастания)"
 
 #: include/views/configuration.screen.constructor.edit.php:356
 msgid "Time (descending)"
-msgstr ""
+msgstr "Время (в порядке убывания)"
 
 #: include/actions.inc.php:47
 msgid "Time period"
@@ -11522,7 +11532,7 @@ msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 #: include/classes/import/CConfigurationImport.php:967
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", который не существует."
 
 #: api/classes/CTriggerPrototype.php:1012
 #, php-format
@@ -11552,7 +11562,7 @@ msgstr "Триггер добавлен"
 
 #: api/classes/CTrigger.php:1949
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
-msgstr ""
+msgstr "Триггер не может зависеть от триггера, который унаследован от него."
 
 #: tr_comments.php:26
 msgid "Trigger comments"
@@ -11766,11 +11776,11 @@ msgstr "Тип (ОК)"
 
 #: include/views/configuration.screen.constructor.edit.php:359
 msgid "Type (ascending)"
-msgstr ""
+msgstr "Тип (в порядке возрастания)"
 
 #: include/views/configuration.screen.constructor.edit.php:358
 msgid "Type (descending)"
-msgstr ""
+msgstr "Тип (в порядке убывания)"
 
 #: include/views/configuration.action.edit.php:118
 #: include/views/configuration.action.edit.php:886
@@ -12179,6 +12189,8 @@ msgstr "Пользователь не может изменить тип сам�
 #: api/classes/CUserGroup.php:560
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr ""
+"Пользователь не может добавить себя в отключенную группу или в группу с "
+"отключенным доступом к Веб-интерфейсу."
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
@@ -12213,7 +12225,7 @@ msgstr "Группа пользователей \"%1$s\" используетс�
 #: api/classes/CUserGroup.php:528
 #, php-format
 msgid "User group \"%s\" already exists."
-msgstr ""
+msgstr "Группа пользователей \"%s\" уже существует."
 
 #: api/classes/CUserGroup.php:725
 #, php-format
@@ -12486,6 +12498,7 @@ msgstr "Предупреждение. Поле \"%1$s\" не является д
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr ""
+"Предупреждение. Поле \"%1$s\" не является списком целых чисел или диапазоном."
 
 #: include/validate.inc.php:357
 #, php-format
