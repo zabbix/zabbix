@@ -56,6 +56,7 @@ function set_zbx_locales() {
 		'ko_KR' => _('Korean (ko_KR)'),
 		'ja_JP' => _('Japanese (ja_JP)'),
 		'lv_LV' => _('Latvian (lv_LV)'),
+		'fa_IR' => _('Persian (fa_IR)'),
 		'pl_PL' => _('Polish (pl_PL)'),
 		'pt_BR' => _('Portuguese (pt_BR)'),
 		'ru_RU' => _('Russian (ru_RU)'),
