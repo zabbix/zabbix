@@ -31,6 +31,7 @@ New features:
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.3
