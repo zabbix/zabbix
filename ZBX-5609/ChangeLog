@@ -1,12 +1,26 @@
 Changes for 2.0.4rc1
 
+New features:
+........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
+
 Bug fixes:
 ...G...... [ZBX-5609] fixed defaults for parameters of vfs.dev.read/write items in "zabbix_agentd -p" (Sasha)
+...G...... [ZBX-5552] fixed processing of vm.memory.size[total] under FreeBSD (Sasha)
+.......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.3
+
+2.0.3rc2 was released as 2.0.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.3rc2
 
 Bug fixes:
+.......PS. [ZBX-5625] fixed resolving of host and template-level macros in SNMP OID field (Sasha)
+..F....... [ZBX-5627] fixed missed placeholder brackets in multiple pages (Eduard, Pavels)
+..F....... [ZBX-5578] fixed multiple IE issues in screens (Eduard)
+..F....... [ZBX-5612] fixed inability to view item data overview when host group doesn't have any triggers (Toms)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.3rc1
