@@ -267,8 +267,8 @@ DB_DSERVICE;
 typedef struct
 {
 	zbx_uint64_t	triggerid;
-	char		description[TRIGGER_DESCRIPTION_LEN * 4 + 1];
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	char		*description;
+	char		*expression;
 	char		*url;
 	char		*comments;
 	unsigned char	priority;
