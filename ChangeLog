@@ -8,6 +8,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-5046] fixed error message when delete globalmacro if macro doesn't exist (Oleg)
 ..F....... [ZBX-5595] Disabled "housekeeper" table updates when deleting a discovery rule or an item prototype (Oleg)
 ..F....... [ZBX-5596] Login form input field width fix (Oleg)
 ..F....... [ZBX-5629] fixed javascript error if user media contains doublequote (Oleg)
