@@ -867,13 +867,15 @@ class CUser extends CZBXAPI {
 		}
 	}
 
-	public function logout($sessionid) {
+	public function logout() {
 		global $ZBX_LOCALNODEID;
 
+		$sessionId = CWebUser::$data['sessionid'];
+
 		$session = DBfetch(DBselect(
-			'SELECT s.*'.
+			'SELECT s.userid'.
 			' FROM sessions s'.
-			' WHERE s.sessionid='.zbx_dbstr($sessionid).
+			' WHERE s.sessionid='.zbx_dbstr($sessionId).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID)
 		));
@@ -882,7 +884,7 @@ class CUser extends CZBXAPI {
 		}
 
 		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
-		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionId));
 
 		return true;
 	}
