@@ -369,9 +369,9 @@ int	DBcheck_version()
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Current database version (mandatory/optional): %08d/%08d",
+	zabbix_log(LOG_LEVEL_INFORMATION, "current database version (mandatory/optional): %08d/%08d",
 			db_mandatory, db_optional);
-	zabbix_log(LOG_LEVEL_INFORMATION, "Required mandatory version: %08d", required);
+	zabbix_log(LOG_LEVEL_INFORMATION, "required mandatory version: %08d", required);
 
 	ret = SUCCEED;
 
