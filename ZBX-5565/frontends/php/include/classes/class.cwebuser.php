@@ -67,8 +67,9 @@ class CWebUser {
 		}
 	}
 
-	public static function logout($sessionid) {
-		self::$data = API::User()->logout($sessionid);
+	public static function logout() {
+		self::$data['sessionid'] = get_cookie('zbx_sessionid');
+		self::$data = API::User()->logout();
 		zbx_unsetcookie('zbx_sessionid');
 	}
 

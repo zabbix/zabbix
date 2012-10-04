@@ -10,6 +10,7 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+...G...... [ZBX-4355] fixed response on check inodes on file systems not supporting them (Sasha)
 ..F....... [ZBX-3934] unified color codes validation in frontend (Vedmak)
 A......... [ZBX-3684] fixed template.get method returns excessive 'hostid' field (Vedmak)
 A......... [ZBX-5498] improved performance of template linkage operations in API (Vedmak)
@@ -22,6 +23,37 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.4rc1
+
+New features:
+..F....... [ZBX-5556] action recovery message body can now be empty (Vedmak)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Hungarian, Italian, Polish, Slovak and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBXNEXT-1426] added initial Persian translation (Richlv)
+A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
+........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
+
+Bug fixes:
+..F....... [ZBX-4833] screens are now cloned correctly when full clone template (Vedmak)
+..F....... [ZBX-5547] fixed server name and other parameters in frontend setup are not escaped (Vedmak)
+..F....... [ZBX-3347] fixed error when create item with new application that already exists (Vedmak)
+A......... [ZBX-3907] fixed api user.logout method (Vedmak)
+..F....... [ZBX-4983] fixed import of 1.8 templates if they contain already existing host macros (Vedmak)
+..F....... [ZBX-5579] in monitoring->triggers if trigger has no events, acknowledge column display 'no events' instead of 'Acknowledged' (Vedmak)
+..F....... [ZBX-4247] fixed error when trigger expression items has same trigger expression like parameter in key (Vedmak)
+..F....... [ZBX-5606] removed 'units' and 'store value' fields for character data items (Vedmak)
+..F....... [ZBX-5608] fixed incorrect macro resolving in trigger descriptions if expression has duplicate functions (Vedmak)
+.D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
+.......PS. [ZBX-5414] fixed handling of an incorrect username/password of SNMPv3 checks (Sasha)
+...G...... [ZBX-5609] fixed defaults for parameters of vfs.dev.read/write items in "zabbix_agentd -p" (Sasha)
+...G...... [ZBX-5552] fixed processing of vm.memory.size[total] under FreeBSD (Sasha)
+.......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.3
+
+2.0.3rc2 was released as 2.0.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.3rc2
@@ -1040,6 +1072,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+.D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
 A......... [ZBX-4097] changed the "application", "host" and "group" parameters for item.get and trigger.get to be case sensitive (Pavels)
 ..F....... [ZBX-5514] fixed sql query in get_min_itemclock_by_itemid function (Eduard)
 A......... [ZBX-5505] fixed incorrect sql query building using limits (Eduard)

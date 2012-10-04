@@ -165,21 +165,21 @@ class CConfigFile {
 // Zabbix GUI configuration file
 global $DB;
 
-$DB[\'TYPE\']			= \''.$this->config['DB']['TYPE'].'\';
-$DB[\'SERVER\']			= \''.$this->config['DB']['SERVER'].'\';
-$DB[\'PORT\']			= \''.$this->config['DB']['PORT'].'\';
-$DB[\'DATABASE\']		= \''.$this->config['DB']['DATABASE'].'\';
-$DB[\'USER\']			= \''.$this->config['DB']['USER'].'\';
-$DB[\'PASSWORD\']		= \''.$this->config['DB']['PASSWORD'].'\';
+$DB[\'TYPE\']     = \''.addcslashes($this->config['DB']['TYPE'], "'\\").'\';
+$DB[\'SERVER\']   = \''.addcslashes($this->config['DB']['SERVER'], "'\\").'\';
+$DB[\'PORT\']     = \''.addcslashes($this->config['DB']['PORT'], "'\\").'\';
+$DB[\'DATABASE\'] = \''.addcslashes($this->config['DB']['DATABASE'], "'\\").'\';
+$DB[\'USER\']     = \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
+$DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 
 // SCHEMA is relevant only for IBM_DB2 database
-$DB[\'SCHEMA\']			= \''.$this->config['DB']['SCHEMA'].'\';
+$DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
-$ZBX_SERVER				= \''.$this->config['ZBX_SERVER'].'\';
-$ZBX_SERVER_PORT		= \''.$this->config['ZBX_SERVER_PORT'].'\';
-$ZBX_SERVER_NAME		= \''.$this->config['ZBX_SERVER_NAME'].'\';
+$ZBX_SERVER      = \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
+$ZBX_SERVER_PORT = \''.addcslashes($this->config['ZBX_SERVER_PORT'], "'\\").'\';
+$ZBX_SERVER_NAME = \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
 
-$IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 ?>
 ';
 	}
