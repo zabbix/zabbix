@@ -34,6 +34,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-3907] fixed api user.logout method (Vedmak)
 ..F....... [ZBX-4983] fixed import of 1.8 templates if they contain already existing host macros (Vedmak)
 ..F....... [ZBX-5579] in monitoring->triggers if trigger has no events, acknowledge column display 'no events' instead of 'Acknowledged' (Vedmak)
 ..F....... [ZBX-4247] fixed error when trigger expression items has same trigger expression like parameter in key (Vedmak)
