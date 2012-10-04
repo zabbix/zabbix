@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 1.9\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-08 12:32+0300\n"
-"PO-Revision-Date: 2011-10-04 17:17+0200\n"
+"POT-Creation-Date: 2012-10-03 23:31+0300\n"
+"PO-Revision-Date: 2012-09-21 16:01+0200\n"
 "Last-Translator: Marcel <maco@blava.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
@@ -201,7 +201,7 @@ msgstr "Prístup zamietnutý!"
 #: api/classes/CUser.php:917
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr "Konto je blokované na %s sekúnd."
+msgstr "Konto je zablokované na %s sekúnd"
 
 #: events.php:566 events.php:579 include/actions.inc.php:189
 #: include/blocks.inc.php:835 include/blocks.inc.php:1365
@@ -225,7 +225,7 @@ msgstr "Potvrdiť alarm podľa"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Potvrdit a navrat"
 
 #: tr_status.php:203
 msgid "Acknowledge status"
@@ -237,11 +237,11 @@ msgstr "Potvrdené"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr "Potvrdiť OK udalosti"
+msgstr "Potvrdene OK udalosti"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Potvrdiť PROBLÉMové udalosti"
+msgstr "Potvrdene PROBLÉMové udalosti"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
@@ -302,6 +302,7 @@ msgid "Action deleted"
 msgstr "Akcia bola vymazaná"
 
 #: include/views/configuration.action.edit.php:399
+#, fuzzy
 msgid "Action operations"
 msgstr "Operácie akcie"
 
@@ -331,7 +332,7 @@ msgstr "Aktívny"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Aktivny"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:587
 #: include/views/configuration.maintenance.edit.php:58
@@ -405,7 +406,7 @@ msgstr "Pridať prvok"
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Najprv pridajte do grafu polozku"
 
 #: include/actions.inc.php:283 include/actions.inc.php:498
 msgid "Add host"
@@ -417,7 +418,7 @@ msgstr "Pridať linku"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Pridat chybajuce"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
@@ -434,15 +435,15 @@ msgstr "Pridať do"
 #: charts.php:82 history.php:94 host_screen.php:88 include/html.inc.php:256
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr ""
+msgstr "Pridat do oblubenych"
 
 #: include/actions.inc.php:502
 msgid "Add to host group"
-msgstr "Pridať do skupiny zariadení"
+msgstr "Pridať do skupiny"
 
 #: include/actions.inc.php:309 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
-msgstr "Pridať do skupín zariadení"
+msgstr "Pridať do skupín"
 
 #: auditlogs.php:134
 msgid "Added"
@@ -486,11 +487,11 @@ msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Rozhrania agenta"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agent alebo SNMP alebo JMX alebo IPMI rozhranie"
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:893 users.php:43
@@ -558,19 +559,19 @@ msgid "Application"
 msgstr "Aplikácia"
 
 #: api/classes/CApplication.php:787
-#, php-format
+#, fuzzy, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Aplikacia \"%1$s\" uz existuje pre hosta \"%2$s\"."
 
 #: api/classes/CApplication.php:482
-#, php-format
+#, fuzzy, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Aplikacia \"%1$s\" uz existuje."
 
 #: api/classes/CApplication.php:626
-#, php-format
+#, fuzzy, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Aplikacie \"%1$s\" ja pouzita v scenari \"%2$s\" a nemoze byt vymazana."
 
 #: applications.php:103
 msgid "Application added"
@@ -589,9 +590,9 @@ msgid "Application updated"
 msgstr "Aplikácia bola aktualizovaná"
 
 #: api/classes/CItemGeneral.php:319
-#, php-format
+#, fuzzy, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Aplikacia s ID \"%1$s\" nie je na \"%2$s\" dostupna."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:821
 #: include/html.inc.php:397 include/html.inc.php:401
@@ -656,30 +657,30 @@ msgid "As plain text"
 msgstr "Ako obyčajný text"
 
 #: include/hosts.inc.php:155
-#, fuzzy
 msgid "Asset tag"
-msgstr "Majetková nálepka"
+msgstr "Inventarne cislo"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
-#, fuzzy
 msgid "At"
 msgstr "O"
 
 #: include/forms.inc.php:1652
+#, fuzzy
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "O (hodina:minuta)"
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Minimalne jeden host, alebo skupina, musia byt oznacene."
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Minimalne jedna planovana odstavka musi byt vytvorena."
 
 #: include/classes/class.frontendsetup.php:291
+#, fuzzy
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Minimalne jedna z MySQL, PostgreSQL, Oracle, SQLite3 alebo IBM DB2 musi byt podporovana."
 
 #: include/menu.inc.php:270
 msgid "Audit"
@@ -687,11 +688,11 @@ msgstr "Audit"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Akcie auditu"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Logy auditu"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -717,8 +718,9 @@ msgid "Authentication method"
 msgstr "Metódy prihlasovania"
 
 #: authentication.php:158 authentication.php:159
+#, fuzzy
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Metoda prihlasovania zmenena na HTTP"
 
 #: authentication.php:122 authentication.php:123
 msgid "Authentication method changed to LDAP"
@@ -730,15 +732,15 @@ msgstr "Metóda prihlasovania bola zmenená na Zabbix internal"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
-msgstr "Auto registrácia"
+msgstr "Automaticka registrácia"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr ""
+msgstr "Automaticke prihlasenie"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
-msgstr "Auto-odhlásenie (min 90 sekúnd)"
+msgstr "Automaticke odhlásenie (minimalne 90 sekúnd)"
 
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.host.massupdate.php:179
@@ -772,8 +774,9 @@ msgid "Average"
 msgstr "Priemer"
 
 #: include/reports.inc.php:671
+#, fuzzy
 msgid "Average by"
-msgstr "Priemery podľa"
+msgstr "Priemer podľa"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -782,7 +785,7 @@ msgstr "Strana osi"
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
@@ -803,9 +806,8 @@ msgstr "Stĺpcové grafy"
 
 #: authentication.php:39
 #: include/views/administration.authentication.edit.php:59
-#, fuzzy
 msgid "Base DN"
-msgstr "Base DN"
+msgstr "Korenovy DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
@@ -840,12 +842,13 @@ msgstr "Hrubá čiara"
 
 #: include/items.inc.php:128
 msgid "Boolean"
-msgstr ""
+msgstr "Logicka hodnota"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
 #: include/views/js/configuration.sysmaps.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:227
+#, fuzzy
 msgid "Bottom"
 msgstr "Spodný"
 
@@ -868,7 +871,7 @@ msgstr "Podľa šablóny spúšťača"
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "KONFIGURACIA AKCII"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -877,7 +880,7 @@ msgstr "KONFIGURÁCIA APLIKÁCIÍ"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "KONFIGURACIA PRIHLASOVANIA"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
@@ -902,7 +905,7 @@ msgstr "NASTAVENIA GRAFOV"
 
 #: adm.gui.php:103
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "KONFIGURACIA GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -911,7 +914,7 @@ msgstr "NASTAVENIA SKUPÍN HOSTOV"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "KONFIGURACIA HOSTOV"
 
 #: adm.housekeeper.php:82
 msgid "CONFIGURATION OF HOUSEKEEPER"
@@ -923,7 +926,7 @@ msgstr ""
 
 #: adm.images.php:145
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "KONFIGURACIA OBRAZKOV"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
@@ -943,7 +946,7 @@ msgstr "NASTAVENIE POLOŽIEK"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "NASTAVENIE MAKIER"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -971,7 +974,7 @@ msgstr "NASTAVENIA PROXY SERVEROV"
 
 #: adm.regexps.php:204
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "NASTAVENIE REGEXPov"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
@@ -994,7 +997,7 @@ msgstr "CONFIGURATION OF SLIDE SHOWS"
 
 #: templates.php:408 templates.php:428
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "NASTAVENIE SABLON"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"
@@ -2905,7 +2908,7 @@ msgstr "Decimal"
 #: include/views/configuration.action.edit.php:355
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:121
-#: include/views/monitoring.screen.php:116
+#: include/views/monitoring.screen.php:117
 #: include/views/monitoring.slides.php:83 jsLoader.php:143 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
@@ -4315,6 +4318,10 @@ msgstr "Filtrovať podľa mena"
 msgid "Finish"
 msgstr "Ukočiť"
 
+#: include/locales.inc.php:50
+msgid "Finnish (fi_FI)"
+msgstr ""
+
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
 msgstr "Prvý"
@@ -4350,7 +4357,7 @@ msgstr "Formula"
 msgid "Fourth"
 msgstr "Štvrtý"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:51
 msgid "French (fr_FR)"
 msgstr "French (fr_FR)"
 
@@ -4441,7 +4448,7 @@ msgstr "General"
 msgid "Generated in %s sec"
 msgstr ""
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:52
 msgid "German (de_DE)"
 msgstr "German (de_DE)"
 
@@ -4645,7 +4652,7 @@ msgstr "Graphs copied"
 msgid "Graphs deleted"
 msgstr "Graphs deleted"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:53
 msgid "Greek (el_GR)"
 msgstr ""
 
@@ -4673,7 +4680,7 @@ msgstr "Grid"
 #: include/views/configuration.triggers.list.php:62
 #: include/views/monitoring.charts.php:25
 #: include/views/monitoring.overview.php:31
-#: include/views/monitoring.screen.php:113
+#: include/views/monitoring.screen.php:114
 #: include/views/monitoring.slides.php:78 latest.php:124 popup.php:501
 #: templates.php:431 tr_status.php:173
 msgid "Group"
@@ -4919,7 +4926,7 @@ msgstr "Horizontal align"
 #: include/views/js/configuration.sysmaps.js.php:15
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/monitoring.charts.php:26
-#: include/views/monitoring.screen.php:121
+#: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:88 items.php:68 items.php:458
 #: items.php:613 items.php:636 jsLoader.php:138 latest.php:125 latest.php:191
 #: popup.php:476 popup.php:513 popup.php:1083 popup.php:1279 popup.php:1484
@@ -5175,7 +5182,7 @@ msgstr "Hours"
 msgid "Housekeeper"
 msgstr "Housekeeper"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:54
 msgid "Hungarian (hu_HU)"
 msgstr "Hungarian (hu_HU)"
 
@@ -6353,7 +6360,7 @@ msgstr ""
 msgid "It is not possible to search by user password."
 msgstr ""
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:55
 msgid "Italian (it_IT)"
 msgstr "Italian (it_IT)"
 
@@ -6566,7 +6573,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Január"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:57
 msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
@@ -6649,7 +6656,7 @@ msgstr "Keyword"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:56
 msgid "Korean (ko_KR)"
 msgstr "Korean (ko_KR)"
 
@@ -6789,7 +6796,7 @@ msgstr "Posledné dáta"
 msgid "Latest events"
 msgstr "Latest events"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:58
 msgid "Latvian (lv_LV)"
 msgstr "Latvian (lv_LV)"
 
@@ -6881,7 +6888,7 @@ msgid "List is empty"
 msgstr ""
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
-#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:117
+#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:119
 msgid "Loading..."
 msgstr "Loading..."
 
@@ -7905,10 +7912,10 @@ msgstr ""
 msgid "No graph prototypes defined."
 msgstr ""
 
-#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:103
+#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:97
 #: include/classes/screens/CScreenHistory.php:310
 #: include/views/configuration.graph.list.php:71
-#: include/views/monitoring.charts.php:63 popup.php:1334
+#: include/views/monitoring.charts.php:68 popup.php:1334
 msgid "No graphs defined."
 msgstr ""
 
@@ -8240,7 +8247,7 @@ msgid "No slide shows defined."
 msgstr ""
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:120 popup.php:1681
+#: include/views/monitoring.slides.php:122 popup.php:1681
 msgid "No slides defined."
 msgstr ""
 
@@ -9148,6 +9155,10 @@ msgstr ""
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
+#: include/locales.inc.php:59
+msgid "Persian (fa_IR)"
+msgstr ""
+
 #: include/func.inc.php:568
 msgid "Peta"
 msgstr "Peta"
@@ -9189,7 +9200,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Please select two elements"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Polish (pl_PL)"
 msgstr "Polish (pl_PL)"
 
@@ -9219,7 +9230,7 @@ msgstr ""
 msgid "Port range"
 msgstr ""
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Portuguese (pt_BR)"
 msgstr "Portuguese (pt_BR)"
 
@@ -9852,7 +9863,7 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
@@ -9867,9 +9878,9 @@ msgid "S"
 msgstr ""
 
 #: include/views/monitoring.hostscreen.php:30
-#: include/views/monitoring.hostscreen.php:39
+#: include/views/monitoring.hostscreen.php:40
 #: include/views/monitoring.screen.php:35
-#: include/views/monitoring.screen.php:66
+#: include/views/monitoring.screen.php:67
 msgid "SCREENS"
 msgstr "SCREENS"
 
@@ -10054,7 +10065,7 @@ msgstr "Sobota"
 #: include/views/administration.general.other.edit.php:48
 #: include/views/administration.general.triggerDisplayOptions.edit.php:120
 #: include/views/administration.general.triggerSeverity.edit.php:76
-#: include/views/administration.general.valuemapping.edit.php:61
+#: include/views/administration.general.valuemapping.edit.php:60
 #: include/views/administration.general.workingtime.edit.php:34
 #: include/views/administration.mediatypes.edit.php:104
 #: include/views/administration.node.edit.php:91
@@ -10213,12 +10224,12 @@ msgstr ""
 msgid "Screen updated"
 msgstr "Screen updated"
 
-#: include/views/monitoring.screen.php:47
+#: include/views/monitoring.screen.php:48
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
 msgstr ""
 
-#: include/views/monitoring.screen.php:46
+#: include/views/monitoring.screen.php:47
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
 msgstr ""
@@ -10227,7 +10238,7 @@ msgstr ""
 #: include/html.inc.php:488 include/menu.inc.php:68 include/menu.inc.php:201
 #: include/views/configuration.screen.list.php:38
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
-#: include/views/monitoring.screen.php:85
+#: include/views/monitoring.screen.php:86
 #: include/views/monitoring.slides.php:29 popup.php:85 popup.php:109
 #: search.php:135 search.php:207 search.php:372 search.php:405 search.php:428
 #: templates.php:448 templates.php:515
@@ -10785,7 +10796,7 @@ msgstr "Slide shows"
 msgid "Slides"
 msgstr "Slides"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
@@ -10852,7 +10863,7 @@ msgstr ""
 msgid "Source"
 msgstr "Zdroj"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Spanish (es_ES)"
 msgstr ""
 
@@ -11055,7 +11066,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Surname"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
@@ -11839,7 +11850,7 @@ msgstr "USER PROFILE"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 
@@ -12382,7 +12393,7 @@ msgstr ""
 #: adm.triggerdisplayingoptions.php:82 adm.triggerdisplayoptions.php:82
 #: adm.triggerseverities.php:85 adm.valuemapping.php:121
 #: adm.valuemapping.php:177 adm.workingtime.php:63
-#: include/views/administration.general.valuemapping.edit.php:57
+#: include/views/administration.general.valuemapping.edit.php:56
 msgid "Value mapping"
 msgstr "Value mapping"
 
@@ -12513,7 +12524,7 @@ msgstr ""
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
+#: include/classes/screens/CScreenBase.php:313 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
@@ -12521,7 +12532,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
+#: include/classes/screens/CScreenBase.php:308 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -13411,7 +13422,7 @@ msgid "of every"
 msgstr "z každého"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
-#: include/views/monitoring.hostscreen.php:53
+#: include/views/monitoring.hostscreen.php:54
 #, fuzzy
 msgid "on"
 msgstr "v"

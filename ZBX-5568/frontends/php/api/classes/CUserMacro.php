@@ -868,11 +868,11 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		if ($macrosToAdd) {
-			$this->create($macrosToAdd);
-		}
 		if ($macroIdsToDelete) {
 			$this->delete($macroIdsToDelete);
+		}
+		if ($macrosToAdd) {
+			$this->create($macrosToAdd);
 		}
 		if ($macrosToUpdate) {
 			$this->update($macrosToUpdate);
@@ -1061,12 +1061,12 @@ class CUserMacro extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if all of the host macros with globalmacroids given in $globalMacroIds are present in $globalMacros.
+	 * Checks if all of the global macros with globalmacroids given in $globalMacroIds are present in $globalMacros.
 	 * Assumes the "globalmacroids" field is valid.
 	 *
 	 * @param array $globalMacroIds
 	 *
-	 * @throws APIException if any of the host macros is not present in $globalMacros
+	 * @throws APIException if any of the global macros is not present in $globalMacros
 	 */
 	protected function checkIfGlobalMacrosExist(array $globalMacroIds) {
 		$globalMacros = API::getApi()->select('globalmacro', array(
@@ -1076,7 +1076,7 @@ class CUserMacro extends CZBXAPI {
 		$globalMacros = zbx_toHash($globalMacros, 'globalmacroid');
 		foreach ($globalMacroIds as $globalMacroId) {
 			if (!isset($globalMacros[$globalMacroId])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro with hostmacroid "%1$s" does not exist.', $globalMacroId));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro with globalmacroid "%1$s" does not exist.', $globalMacroId));
 			}
 		}
 	}
