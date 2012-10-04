@@ -768,30 +768,6 @@ class CItemPrototype extends CItemGeneral{
 			DB::delete('items', array('itemid' => $prototypeids));
 
 
-// HOUSEKEEPER {{{
-			$itemDataTables = array(
-				'trends',
-				'trends_uint',
-				'history_text',
-				'history_log',
-				'history_uint',
-				'history_str',
-				'history',
-			);
-
-			$insert = array();
-			foreach ($prototypeids as $id => $prototypeid) {
-				foreach ($itemDataTables as $table) {
-					$insert[] = array(
-						'tablename' => $table,
-						'field' => 'itemid',
-						'value' => $prototypeid,
-					);
-				}
-			}
-			DB::insert('housekeeper', $insert);
-// }}} HOUSEKEEPER
-
 // TODO: remove info from API
 			foreach ($delItemPrototypes as $item) {
 				$host = reset($item['hosts']);
