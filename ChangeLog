@@ -1,6 +1,7 @@
 Changes for 2.0.4rc1
 
 New features:
+.....J.... [ZBX-4663] added possibility to use dots in JMX attribute names (dimir)
 ..F....... [ZBX-5556] action recovery message body can now be empty (Vedmak)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Hungarian, Italian, Polish, Slovak and Russian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBXNEXT-1426] added initial Persian translation (Richlv)
