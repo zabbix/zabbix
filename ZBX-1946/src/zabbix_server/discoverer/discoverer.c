@@ -240,7 +240,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
 							&item.snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-					substitute_key_macros(&item.snmp_oid, NULL, NULL, MACRO_TYPE_SNMP_OID, NULL, 0);
+					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL,
+							MACRO_TYPE_SNMP_OID, NULL, 0);
 
 					if (ITEM_TYPE_SNMPv3 == item.type)
 					{

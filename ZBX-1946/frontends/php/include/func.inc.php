@@ -292,7 +292,7 @@ function zbxDateToTime($strdate) {
 		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
-		return !empty($strdate) ? $strdate : time();
+		return (!empty($strdate) && is_numeric($strdate)) ? $strdate : time();
 	}
 }
 
@@ -1001,6 +1001,14 @@ function zbx_substr_replace($string, $replacement, $start, $length = null) {
 	else {
 		return substr_replace($string, $replacement, $start, $length);
 	}
+}
+
+function str_replace_first($search, $replace, $subject) {
+	$pos = zbx_strpos($subject, $search);
+	if ($pos !== false) {
+		$subject = zbx_substr_replace($subject, $replace, $pos, zbx_strlen($search));
+	}
+	return $subject;
 }
 
 /************* SELECT *************/

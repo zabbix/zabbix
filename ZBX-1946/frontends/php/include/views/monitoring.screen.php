@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -37,8 +37,9 @@ if (empty($this->data['screens'])) {
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
 
 	$screenBuilder = new CScreenBuilder();
-	$screenBuilder->insertScreenScrollJs('scrollbar');
-	$screenBuilder->insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline
+	));
 }
 elseif (!isset($this->data['screens'][$this->data['elementIdentifier']]) && !$this->data['id_has_been_fetched_from_profile']) {
 	// if screen we are searching for does not exist and was not fetched from profile
@@ -135,8 +136,10 @@ else {
 	));
 	$screenWidget->addItem($screenBuilder->show());
 
-	$screenBuilder->insertScreenScrollJs($screen['screenid']);
-	$screenBuilder->insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline,
+		'profileIdx' => $screenBuilder->profileIdx
+	));
 
 	$screenWidget->addItem(BR());
 }
