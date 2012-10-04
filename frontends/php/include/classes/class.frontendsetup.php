@@ -82,6 +82,7 @@ class FrontendSetup {
 		$result[] = $this->checkPhpXmlReader();
 		$result[] = $this->checkPhpCtype();
 		$result[] = $this->checkPhpSession();
+		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
 
 		return $result;
@@ -567,6 +568,25 @@ class FrontendSetup {
 			'required' => null,
 			'result' => $current,
 			'error' => _('PHP session extension missing (PHP configuration parameter --enable-session)')
+		);
+
+		return $result;
+	}
+
+	/**
+	 * Checks for PHP session auto start.
+	 *
+	 * @return array
+	 */
+	public function checkPhpSessionAutoStart() {
+		$current = !ini_get('session.auto_start');
+
+		$result = array(
+			'name' => _('PHP session auto start'),
+			'current' => $current ? _('no') : _('yes'),
+			'required' => null,
+			'result' => $current,
+			'error' => _('PHP session auto start must be disabled (PHP directive "session.auto_start")')
 		);
 
 		return $result;
