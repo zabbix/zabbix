@@ -10,6 +10,7 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5617] fixed class bug in triggers (Oleg)
 A.F....... [ZBX-5046] fixed error message when delete globalmacro if macro doesn't exist (Oleg)
 ..F....... [ZBX-5595] Disabled "housekeeper" table updates when deleting a discovery rule or an item prototype (Oleg)
 ..F....... [ZBX-5596] Login form input field width fix (Oleg)
