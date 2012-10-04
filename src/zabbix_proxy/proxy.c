@@ -637,7 +637,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_CONFSYNCER, CONFIG_CONFSYNCER_FORKS);
 
-		main_proxyconfig_loop(proxy_num);
+		main_proxyconfig_loop();
 	}
 	else if (proxy_num <= (proxy_count += CONFIG_HEARTBEAT_FORKS))
 	{

@@ -364,7 +364,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$triggerids = zbx_objectValues($triggers, 'triggerid');
 
-	if($config['event_ack_enable']){
+	if ($config['event_ack_enable']) {
 		$options = array(
 			'countOutput' => true,
 			'groupCount' => true,
@@ -377,12 +377,41 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			),
 			'nopermissions' => true
 		);
+		// get all unacknowledged events, if trigger has unacknowledged even => it has events
 		$event_counts = API::Event()->get($options);
-		foreach ($triggers as $tnum => $trigger) {
-			$triggers[$tnum]['event_count'] = 0;
-		}
 		foreach ($event_counts as $event_count) {
+			$triggers[$event_count['objectid']]['hasEvents'] = true;
 			$triggers[$event_count['objectid']]['event_count'] = $event_count['rowscount'];
+		}
+
+		// gather ids of triggers which don't have unack. events
+		$triggerIdsWithoutUnackEvents = array();
+		foreach ($triggers as $tnum => $trigger) {
+			if (!isset($trigger['hasEvents'])) {
+				$triggerIdsWithoutUnackEvents[] = $trigger['triggerid'];
+			}
+			if (!isset($trigger['event_count'])) {
+				$triggers[$tnum]['event_count'] = 0;
+			}
+		}
+		if (!empty($triggerIdsWithoutUnackEvents)) {
+			$options = array(
+				'countOutput' => true,
+				'groupCount' => true,
+				'triggerids' => $triggerIdsWithoutUnackEvents,
+				'filter' => array(
+					'object' => EVENT_OBJECT_TRIGGER,
+				),
+				'nopermissions' => true
+			);
+			// for triggers without unack. events we try to select any event
+			$allEventCounts = API::Event()->get($options);
+			$allEventCounts = zbx_toHash($allEventCounts, 'objectid');
+			foreach ($triggers as $tnum => $trigger) {
+				if (!isset($trigger['hasEvents'])) {
+					$triggers[$tnum]['hasEvents'] = isset($allEventCounts[$trigger['triggerid']]);
+				}
+			}
 		}
 	}
 
@@ -630,11 +659,16 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
-			if($trigger['event_count']){
-				$to_ack = new CCol(array(new CLink(_('Acknowledge'), 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
+			if ($trigger['hasEvents']) {
+				if($trigger['event_count']){
+					$to_ack = new CCol(array(new CLink(_('Acknowledge'), 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
+				}
+				else{
+					$to_ack = new CCol(_('Acknowledged'), 'off');
+				}
 			}
-			else{
-				$to_ack = new CCol(_('Acknowledged'), 'off');
+			else {
+				$to_ack = new CCol(_('No events'), 'unknown');
 			}
 		}
 		else{

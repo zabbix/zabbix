@@ -70,7 +70,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	zbx_uint64_t	total, free, used;
 	double		pfree, pused;
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
@@ -82,7 +82,6 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	if (SYSINFO_RET_OK != get_fs_size_stat(fsname, &total, &free, &used, &pfree, &pused))
 		return SYSINFO_RET_FAIL;
 
-	/* default parameter */
 	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 		SET_UI64_RESULT(result, total);
 	else if (0 == strcmp(mode, "free"))
