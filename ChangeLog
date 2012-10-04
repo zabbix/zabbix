@@ -8,6 +8,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-1946] fixed being able to create screen items with spans exceeding the size of the screen (Pavels)
 A.F....... [ZBX-5619] Fixed errors when importing a template with an empty screen (Oleg)
 ..F....... [ZBX-3803] added session auto start check in frontend setup (Oleg)
 ..F....... [ZBX-5621] fixed custom trigger severities in user media configuration (Oleg)
