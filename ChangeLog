@@ -7,6 +7,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-4247] fixed error when trigger expression items has same trigger expression like parameter in key (Vedmak)
 ..F....... [ZBX-5606] removed 'units' and 'store value' fields for character data items (Vedmak)
 ..F....... [ZBX-5608] fixed incorrect macro resolving in trigger descriptions if expression has duplicate functions (Vedmak)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
