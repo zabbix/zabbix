@@ -10,6 +10,7 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3803] added session auto start check in frontend setup (Oleg)
 ..F....... [ZBX-5621] fixed custom trigger severities in user media configuration (Oleg)
 ..F....... [ZBX-5617] fixed class bug in triggers (Oleg)
 A.F....... [ZBX-5046] fixed error message when delete globalmacro if macro doesn't exist (Oleg)
