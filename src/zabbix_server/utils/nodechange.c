@@ -38,40 +38,42 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const char *old_exp, char *new_exp)
+static void	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const char *old_exp,
+		char **new_exp, size_t *new_exp_alloc)
 {
-	int				i;
-	char				id[MAX_STRING_LEN];
 	enum state_t {NORMAL, ID}	state = NORMAL;
-	char				*p, *p_id = NULL;
-	zbx_uint64_t			tmp;
+	const char			*c, *p_functionid = NULL;
+	zbx_uint64_t			functionid;
+	size_t				new_exp_offset = 0;
 
-	p = new_exp;
+	**new_exp = '\0';
 
-	for (i = 0; '\0' != old_exp[i]; i++)
+	for (c = old_exp; '\0' != *c; c++)
 	{
-		if (ID == state)
-		{
-			if ('}' == old_exp[i])
-			{
-				state = NORMAL;
-				ZBX_STR2UINT64(tmp, id);
-				tmp += prefix;
-				p += zbx_snprintf(p, MAX_STRING_LEN, ZBX_FS_UI64, tmp);
-				*p++ = old_exp[i];
-			}
-			else
-				*p_id++ = old_exp[i];
-		}
-		else if ('{' == old_exp[i])
+		if ('{' == *c)
 		{
 			state = ID;
-			memset(id, 0, MAX_STRING_LEN);
-			p_id = id;
-			*p++ = old_exp[i];
+			p_functionid = c + 1;
+			zbx_chrcpy_alloc(new_exp, new_exp_alloc, &new_exp_offset, *c);
+		}
+		else if (ID == state)
+		{
+			if ('}' == *c && NULL != p_functionid)
+			{
+				if (SUCCEED == is_uint64_n(p_functionid, c - p_functionid, &functionid))
+				{
+					zbx_snprintf_alloc(new_exp, new_exp_alloc, &new_exp_offset,
+							ZBX_FS_UI64, prefix + functionid);
+					zbx_chrcpy_alloc(new_exp, new_exp_alloc, &new_exp_offset, *c);
+				}
+
+				state = NORMAL;
+			}
 		}
 		else
-			*p++ = old_exp[i];
+		{
+			zbx_chrcpy_alloc(new_exp, new_exp_alloc, &new_exp_offset, *c);
+		}
 	}
 }
 
@@ -94,9 +96,12 @@ static void	convert_triggers_expression(int old_id, int new_id)
 	const ZBX_TABLE	*r_table;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		new_expression[MAX_STRING_LEN], *new_expression_esc;
+	char		*new_expression, *new_expression_esc;
+	size_t		new_expression_alloc = ZBX_KIBIBYTE;
 
 	assert(NULL != (r_table = DBget_table("functions")));
+
+	new_expression = zbx_malloc(NULL, new_expression_alloc);
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -106,8 +111,7 @@ static void	convert_triggers_expression(int old_id, int new_id)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		memset(new_expression, 0, sizeof(new_expression));
-		convert_expression(old_id, new_id, prefix, row[0], new_expression);
+		convert_expression(old_id, new_id, prefix, row[0], &new_expression, &new_expression_alloc);
 
 		new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 		DBexecute("update triggers set expression='%s' where triggerid=%s",
@@ -115,6 +119,8 @@ static void	convert_triggers_expression(int old_id, int new_id)
 		zbx_free(new_expression_esc);
 	}
 	DBfree_result(result);
+
+	zbx_free(new_expression);
 }
 
 /******************************************************************************
