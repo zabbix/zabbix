@@ -8,6 +8,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-4833] screens are now cloned correctly when full clone template (Vedmak)
 ..F....... [ZBX-5547] fixed server name and other parameters in frontend setup are not escaped (Vedmak)
 ..F....... [ZBX-3347] fixed error when create item with new application that already exists (Vedmak)
 A......... [ZBX-3907] fixed api user.logout method (Vedmak)
