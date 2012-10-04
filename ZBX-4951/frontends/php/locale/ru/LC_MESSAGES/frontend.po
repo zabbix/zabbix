@@ -1,10 +1,10 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 1.9\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-08 12:35+0300\n"
-"PO-Revision-Date: 2012-09-09 02:23+0200\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2012-10-03 23:31+0300\n"
+"PO-Revision-Date: 2012-09-28 16:24+0200\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -2908,7 +2908,7 @@ msgstr "Десятичный"
 #: include/views/configuration.action.edit.php:355
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:121
-#: include/views/monitoring.screen.php:116
+#: include/views/monitoring.screen.php:117
 #: include/views/monitoring.slides.php:83 jsLoader.php:143 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
@@ -4316,6 +4316,10 @@ msgstr "Фильтр по имени"
 msgid "Finish"
 msgstr "Финиш"
 
+#: include/locales.inc.php:50
+msgid "Finnish (fi_FI)"
+msgstr ""
+
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
 msgstr "Первый"
@@ -4351,7 +4355,7 @@ msgstr "Формула"
 msgid "Fourth"
 msgstr "Четвертый"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:51
 msgid "French (fr_FR)"
 msgstr "French (fr_FR)"
 
@@ -4442,7 +4446,7 @@ msgstr "Общие"
 msgid "Generated in %s sec"
 msgstr "Сгенерировано за %s сек."
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:52
 msgid "German (de_DE)"
 msgstr "German (de_DE)"
 
@@ -4646,7 +4650,7 @@ msgstr "Графики скопированы"
 msgid "Graphs deleted"
 msgstr "График удален"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:53
 msgid "Greek (el_GR)"
 msgstr "Greek (el_GR)"
 
@@ -4674,7 +4678,7 @@ msgstr "Сетка"
 #: include/views/configuration.triggers.list.php:62
 #: include/views/monitoring.charts.php:25
 #: include/views/monitoring.overview.php:31
-#: include/views/monitoring.screen.php:113
+#: include/views/monitoring.screen.php:114
 #: include/views/monitoring.slides.php:78 latest.php:124 popup.php:501
 #: templates.php:431 tr_status.php:173
 msgid "Group"
@@ -4920,7 +4924,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/js/configuration.sysmaps.js.php:15
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/monitoring.charts.php:26
-#: include/views/monitoring.screen.php:121
+#: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:88 items.php:68 items.php:458
 #: items.php:613 items.php:636 jsLoader.php:138 latest.php:125 latest.php:191
 #: popup.php:476 popup.php:513 popup.php:1083 popup.php:1279 popup.php:1484
@@ -5176,7 +5180,7 @@ msgstr "Часы"
 msgid "Housekeeper"
 msgstr "Очистка истории"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:54
 msgid "Hungarian (hu_HU)"
 msgstr "Hungary (hu_HU)"
 
@@ -6354,7 +6358,7 @@ msgstr "Невозможно выполнить выход с HTTP аутент�
 msgid "It is not possible to search by user password."
 msgstr "Невозможно выполнить поиск по паролю пользователя."
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:55
 msgid "Italian (it_IT)"
 msgstr "Italian (it_IT)"
 
@@ -6567,7 +6571,7 @@ msgstr "Янв"
 msgid "January"
 msgstr "Январь"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:57
 msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
@@ -6650,7 +6654,7 @@ msgstr "Ключевое слово"
 msgid "Kilo"
 msgstr "Кило"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:56
 msgid "Korean (ko_KR)"
 msgstr "Korean (ko_KR)"
 
@@ -6791,7 +6795,7 @@ msgstr "Последние данные"
 msgid "Latest events"
 msgstr "Последние события"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:58
 msgid "Latvian (lv_LV)"
 msgstr "Latvian (lv_LV)"
 
@@ -6883,7 +6887,7 @@ msgid "List is empty"
 msgstr "Список пустой"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
-#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:117
+#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:119
 msgid "Loading..."
 msgstr "Загрузка..."
 
@@ -7449,11 +7453,11 @@ msgstr "Минут"
 
 #: api/classes/CGraph.php:837 api/classes/CGraphPrototype.php:882
 msgid "Missing \"itemid\" field for item."
-msgstr "Пропущено поле \"itemid\" для элемента данных."
+msgstr "Отсутствует поле \"itemid\" для элемента данных."
 
 #: api/classes/CGraph.php:825 api/classes/CGraphPrototype.php:870
 msgid "Missing \"name\" field for graph."
-msgstr "Пропущено поле \"name\" для графика."
+msgstr "Отсутствует поле \"name\" для графика."
 
 #: include/classes/import/CXmlImport18.php:1579
 #: include/classes/import/CXmlImport18.php:1592
@@ -7907,10 +7911,10 @@ msgstr "Нет элемента графика с graphid \"%s\"."
 msgid "No graph prototypes defined."
 msgstr "Прототипы графиков не заданы."
 
-#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:103
+#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:97
 #: include/classes/screens/CScreenHistory.php:310
 #: include/views/configuration.graph.list.php:71
-#: include/views/monitoring.charts.php:63 popup.php:1334
+#: include/views/monitoring.charts.php:68 popup.php:1334
 msgid "No graphs defined."
 msgstr "Графики не заданы."
 
@@ -8242,7 +8246,7 @@ msgid "No slide shows defined."
 msgstr "Слайд-шоу не заданы."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:120 popup.php:1681
+#: include/views/monitoring.slides.php:122 popup.php:1681
 msgid "No slides defined."
 msgstr "Слайды не заданы."
 
@@ -8647,7 +8651,7 @@ msgstr "Только Супер-Администраторы могут обно
 
 #: api/classes/CUser.php:684
 msgid "Only Zabbix Admins can add user media."
-msgstr "Только Супер-Администраторы могут добавлять пользователям оповещения."
+msgstr "Только Супер-Администраторы могут добавлять оповещения пользователям."
 
 #: api/classes/CUser.php:752
 msgid "Only Zabbix Admins can change user media."
@@ -8877,11 +8881,11 @@ msgstr "Отсутствует поддержка PHP gd FreeType"
 
 #: include/classes/class.frontendsetup.php:434
 msgid "PHP gd JPEG image support missing"
-msgstr "Отсутствует поддержка изображений PHP gd JPEG"
+msgstr "Отсутствует поддержка изображений JPEG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:430
 msgid "PHP gd JPEG support"
-msgstr "Поддержка PHP gd JPEG"
+msgstr "Поддержка JPEG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:408
 msgid "PHP gd PNG image support missing"
@@ -9148,6 +9152,10 @@ msgstr "Права доступа"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Права доступа могут быть назначены только группам пользователей."
 
+#: include/locales.inc.php:59
+msgid "Persian (fa_IR)"
+msgstr ""
+
 #: include/func.inc.php:568
 msgid "Peta"
 msgstr "Пета"
@@ -9189,7 +9197,7 @@ msgstr "Пожалуйста, введите текст подтверждени
 msgid "Please select two elements"
 msgstr "Пожалуйста, выберите два элемента"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Polish (pl_PL)"
 msgstr "Polish (pl_PL)"
 
@@ -9219,7 +9227,7 @@ msgstr "Порт не может быть пустым у интерфейса �
 msgid "Port range"
 msgstr "Диапазон портов"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Portuguese (pt_BR)"
 msgstr "Portuguese (pt_BR)"
 
@@ -9852,7 +9860,7 @@ msgstr "Выполнять удаленные команды в группах �
 msgid "Run remote commands on hosts"
 msgstr "Выполнять удаленные команды на узлах сети"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
@@ -9867,9 +9875,9 @@ msgid "S"
 msgstr "Вс"
 
 #: include/views/monitoring.hostscreen.php:30
-#: include/views/monitoring.hostscreen.php:39
+#: include/views/monitoring.hostscreen.php:40
 #: include/views/monitoring.screen.php:35
-#: include/views/monitoring.screen.php:66
+#: include/views/monitoring.screen.php:67
 msgid "SCREENS"
 msgstr "КОМПЛЕКСНЫЕ ЭКРАНЫ"
 
@@ -10054,7 +10062,7 @@ msgstr "Суббота"
 #: include/views/administration.general.other.edit.php:48
 #: include/views/administration.general.triggerDisplayOptions.edit.php:120
 #: include/views/administration.general.triggerSeverity.edit.php:76
-#: include/views/administration.general.valuemapping.edit.php:61
+#: include/views/administration.general.valuemapping.edit.php:60
 #: include/views/administration.general.workingtime.edit.php:34
 #: include/views/administration.mediatypes.edit.php:104
 #: include/views/administration.node.edit.php:91
@@ -10213,12 +10221,12 @@ msgstr "Комплексный экран должен содержать по �
 msgid "Screen updated"
 msgstr "Комплексный экран обновлен"
 
-#: include/views/monitoring.screen.php:47
+#: include/views/monitoring.screen.php:48
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
 msgstr "Комплексный экран с ID \"%s\" не существует."
 
-#: include/views/monitoring.screen.php:46
+#: include/views/monitoring.screen.php:47
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
 msgstr "Комплексный экран с именем \"%s\" не существует."
@@ -10227,7 +10235,7 @@ msgstr "Комплексный экран с именем \"%s\" не сущес
 #: include/html.inc.php:488 include/menu.inc.php:68 include/menu.inc.php:201
 #: include/views/configuration.screen.list.php:38
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
-#: include/views/monitoring.screen.php:85
+#: include/views/monitoring.screen.php:86
 #: include/views/monitoring.slides.php:29 popup.php:85 popup.php:109
 #: search.php:135 search.php:207 search.php:372 search.php:405 search.php:428
 #: templates.php:448 templates.php:515
@@ -10785,7 +10793,7 @@ msgstr "Слайд-шоу"
 msgid "Slides"
 msgstr "Слайды"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
@@ -10852,7 +10860,7 @@ msgstr "Сортировка по полю \"%s\" не допускается."
 msgid "Source"
 msgstr "Источник"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Spanish (es_ES)"
 msgstr "Spanish (es_ES)"
 
@@ -11054,7 +11062,7 @@ msgstr "Поддержка"
 msgid "Surname"
 msgstr "Фамилия"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
@@ -11838,7 +11846,7 @@ msgstr "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 
@@ -12380,7 +12388,7 @@ msgstr "Преобразования значений с valuemapid \"%1$s\" н�
 #: adm.triggerdisplayingoptions.php:82 adm.triggerdisplayoptions.php:82
 #: adm.triggerseverities.php:85 adm.valuemapping.php:121
 #: adm.valuemapping.php:177 adm.workingtime.php:63
-#: include/views/administration.general.valuemapping.edit.php:57
+#: include/views/administration.general.valuemapping.edit.php:56
 msgid "Value mapping"
 msgstr "Преобразование значений"
 
@@ -12429,7 +12437,7 @@ msgstr "Видимое имя"
 
 #: api/classes/CHost.php:1360
 msgid "Visible name cannot be empty if host name is missing."
-msgstr "Видимое имя не может быть пустым, если имя узла сети не заполнено."
+msgstr "Видимое имя не может быть пустым, если имя узла сети отсутствует."
 
 #: jsLoader.php:124
 msgctxt "Wednesday short"
@@ -12511,7 +12519,7 @@ msgstr "Предупреждение. Некорректное значение 
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Предупреждение. Некорректное значение для поля \"%1$s\": оно должно быть между %2$s и %3$s."
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
+#: include/classes/screens/CScreenBase.php:313 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
@@ -12519,7 +12527,7 @@ msgstr[0] "Предупреждение. Максимально отобража
 msgstr[1] "Предупреждение. Максимально отображаемый период времени %1$s дня."
 msgstr[2] "Предупреждение. Максимально отображаемый период времени %1$s дней."
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
+#: include/classes/screens/CScreenBase.php:308 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -12733,12 +12741,12 @@ msgstr "X"
 #: include/reports.inc.php:207 include/reports.inc.php:369
 #: include/reports.inc.php:518
 msgid "X label"
-msgstr "Подпись к оси X"
+msgstr "Подпись оси X"
 
 #: include/classes/import/readers/CXmlImportReader.php:48
 #, php-format
 msgid "XML file contains error %1$s:"
-msgstr "Файл XML содержит ошибку %1$s:"
+msgstr "XML файл содержит ошибку %1$s:"
 
 #: include/classes/import/CXmlImport18.php:403
 #: include/classes/import/CXmlImport18.php:406
@@ -12790,7 +12798,7 @@ msgstr "Расположение оси Y"
 #: include/reports.inc.php:208 include/reports.inc.php:370
 #: include/reports.inc.php:519
 msgid "Y label"
-msgstr "Подпись к оси Y"
+msgstr "Подпись оси Y"
 
 #: include/defines.inc.php:891 include/defines.inc.php:892
 msgid "Y-m-d H:i:s"
@@ -13006,8 +13014,8 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
-"Не удалось найти Zabbix сервер \"%s\". Возможные причины:\n"
-"1. Некорректные IP/DNS сервера в \"zabbix.conf.php\";\n"
+"Не удалось обнаружить Zabbix сервер \"%s\". Возможные причины:\n"
+"1. Некорректный IP/DNS сервер в \"zabbix.conf.php\";\n"
 "2. Некорректная настройка сети.\n"
 
 #: include/blocks.inc.php:696
@@ -13033,7 +13041,7 @@ msgstr "Zabbix сервер запущен"
 #: adm.gui.php:75
 #, php-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr "Интервал проверки работы Zabbix сервера составляет \"%1$s\"."
+msgstr "Интервал проверки работоспособности Zabbix сервера \"%1$s\"."
 
 #: include/setup.inc.php:370
 msgid "Zabbix server name"
@@ -13411,7 +13419,7 @@ msgid "of every"
 msgstr "каждую"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
-#: include/views/monitoring.hostscreen.php:53
+#: include/views/monitoring.hostscreen.php:54
 msgid "on"
 msgstr "в"
 

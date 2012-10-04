@@ -131,6 +131,10 @@
 	}
 
 	jQuery(document).ready(function() {
+		<?php if (!empty($this->data['dataTypeVisibility'])) { ?>
+		var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
+			<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
+		<?php } ?>
 		<?php
 		if (!empty($this->data['valueTypeVisibility'])) { ?>
 			var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
@@ -148,10 +152,6 @@
 		if (!empty($this->data['securityLevelVisibility'])) { ?>
 			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
-		<?php }
-		if (!empty($this->data['dataTypeVisibility'])) { ?>
-			var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
-				<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
 		<?php } ?>
 
 		var multpStat = document.getElementById('multiplier');

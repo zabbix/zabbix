@@ -118,10 +118,10 @@ jQuery(function($) {
 			// set next refresh execution time
 			if (screen.isFlickerfree && screen.refreshInterval > 0) {
 				clearTimeout(screen.timeout);
-				screen.timeout = window.setTimeout(function() { flickerfreeScreen.refresh(id, true); }, screen.refreshInterval);
+				screen.timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(id, true); }, screen.refreshInterval);
 
 				// refresh time
-				clearTimeout(timeControl.timeTimeout);
+				clearTimeout(timeControl.timeRefreshTimeout);
 				timeControl.refreshTime();
 			}
 		},
@@ -150,6 +150,7 @@ jQuery(function($) {
 			}
 			else {
 				screen.isRefreshing = true;
+
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
 					type: 'post',
@@ -157,6 +158,7 @@ jQuery(function($) {
 					dataType: 'html',
 					success: function(data) {
 						$('#flickerfreescreen_' + id).html(data);
+
 						screen.isRefreshing = false;
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -167,7 +169,7 @@ jQuery(function($) {
 				$.when(ajaxRequest).always(function() {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
-						flickerfreeScreen.refresh(id, false);
+						window.flickerfreeScreen.refresh(id, false);
 					}
 				});
 			}
@@ -184,27 +186,28 @@ jQuery(function($) {
 
 				$('#flickerfreescreen_' + id).find('img').each(function() {
 					var workImg = $(this);
-					var doId = '#' + $(this).attr('id');
-					var chartUrl = new Curl($(this).attr('src'));
+					var chartUrl = new Curl(workImg.attr('src'));
 					chartUrl.setArgument('screenid', !empty(screen.screenid) ? screen.screenid : null);
-					chartUrl.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? +screen.updateProfile : null);
+					chartUrl.setArgument('updateProfile', (typeof(screen.updateProfile) != 'undefined') ? + screen.updateProfile : null);
 					chartUrl.setArgument('period', !empty(screen.timeline.period) ? screen.timeline.period : null);
 					chartUrl.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
 					chartUrl.setArgument('curtime', new CDate().getTime());
 
 					// img
 					$('<img />', {
-						id: $(this).attr('id') + '_tmp',
-						calss: $(doId).attr('class'),
-						border: $(doId).attr('border'),
-						usemap: $(doId).attr('usemap'),
-						alt: $(doId).attr('alt'),
-						name: $(doId).attr('name')
-					}).attr('src', chartUrl.getUrl()).load(function() {
-						var doId = $(this).attr('id').substring(0, $(this).attr('id').indexOf('_tmp'));
+						id: workImg.attr('id') + '_tmp',
+						'class': workImg.attr('class'),
+						border: workImg.attr('border'),
+						usemap: workImg.attr('usemap'),
+						alt: workImg.attr('alt'),
+						name: workImg.attr('name')
+					})
+					.attr('src', chartUrl.getUrl())
+					.load(function() {
+						var elem = $(this);
+						elem.attr('id', elem.attr('id').substring(0, elem.attr('id').indexOf('_tmp')));
 
-						$(this).attr('id', doId);
-						$(workImg).replaceWith($(this));
+						workImg.replaceWith(elem);
 
 						if (typeof(successAction) !== 'undefined') {
 							successAction();
@@ -212,14 +215,14 @@ jQuery(function($) {
 
 						// rebuild listener
 						if (!empty(ZBX_SBOX[id])) {
-							ZBX_SBOX[id].sbox.addListeners();
+							ZBX_SBOX[id].addListeners();
 						}
 
 						screen.isRefreshing = false;
 
 						if (screen.isReRefreshRequire) {
 							screen.isReRefreshRequire = false;
-							flickerfreeScreen.refresh(id, false);
+							window.flickerfreeScreen.refresh(id, false);
 						}
 					});
 				});
@@ -239,8 +242,6 @@ jQuery(function($) {
 					type: 'post',
 					data: {},
 					success: function(data) {
-						// do nothing
-
 						screen.isRefreshing = false;
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -251,18 +252,18 @@ jQuery(function($) {
 				$.when(ajaxRequest).always(function() {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
-						flickerfreeScreen.refresh(id, false);
+						window.flickerfreeScreen.refresh(id, false);
 					}
 				});
 			}
 		},
 
 		isRefreshAllowed: function (screen, isSelfRefresh) {
-			if (isSelfRefresh == false) {
+			if (isSelfRefresh == false || empty(timeControl.timeline)) {
 				return true;
 			}
 
-			var isNow = timeControl.isNow();
+			var isNow = timeControl.timeline.isNow();
 			if (!is_null(isNow)) {
 				return isNow;
 			}
@@ -274,10 +275,8 @@ jQuery(function($) {
 		},
 
 		getCalculatedSTime: function(screen) {
-			if (typeof(timeControl.objectList[screen.id]) != 'undefined'
-					&& !empty(timeControl.objectList[screen.id].sliderMaximumTimePeriod)
-					&& screen.timeline.period >= timeControl.objectList[screen.id].sliderMaximumTimePeriod) {
-				return new CDate(timeControl.objectList[screen.id].timeline.starttime() * 1000).getZBXDate();
+			if (!empty(timeControl.timeline) && screen.timeline.period >= timeControl.timeline.maxperiod) {
+				return new CDate(timeControl.timeline.starttime() * 1000).getZBXDate();
 			}
 
 			return (screen.timeline.isNow || screen.timeline.isNow == 1)
@@ -310,7 +309,7 @@ jQuery(function($) {
 			this.screens[screen.id].isReRefreshRequire = false;
 
 			if (screen.isFlickerfree && screen.refreshInterval > 0) {
-				this.screens[screen.id].timeout = window.setTimeout(function() { flickerfreeScreen.refresh(screen.id, true); }, this.screens[screen.id].refreshInterval);
+				this.screens[screen.id].timeout = window.setTimeout(function() { window.flickerfreeScreen.refresh(screen.id, true); }, this.screens[screen.id].refreshInterval);
 			}
 		}
 	};
