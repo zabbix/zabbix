@@ -125,19 +125,65 @@ class CScreenItem extends CZBXAPI {
 	public function create(array $screenItems) {
 		$screenItems = zbx_toArray($screenItems);
 
-		$dbScreenItems = $this->get(array(
-			'screenids' => zbx_objectValues($screenItems, 'screenid'),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		// validate input
-		$this->checkInput($screenItems, $dbScreenItems, array('check_duplicate_resource_in_cell' => true));
+		$this->validateCreate($screenItems);
 
 		// insert items
 		$screenItemids = DB::insert($this->tableName(), $screenItems);
 
 		return array('screenitemids' => $screenItemids);
+	}
+
+	/**
+	 * Validates the input parameters for the create() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screenItems
+	 *
+	 * @return void
+	 */
+	protected function validateCreate(array $screenItems) {
+		foreach ($screenItems as $screenItem) {
+			if (empty($screenItem['screenid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+		}
+
+		$screenIds = zbx_objectValues($screenItems, 'screenid');
+
+		// fetch the items we're updating
+		$dbScreenItems = API::getApi()->select('screens_items', array(
+			'screenids' => $screenIds,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		$screens = API::getApi()->select('screens', array(
+			'output' => array('screenid', 'hsize', 'vsize'),
+			'screenids' => $screenIds,
+			'preservekeys' => true
+		));
+
+		foreach($screenItems as $screenItem) {
+			$screen = $screens[$screenItem['screenid']];
+
+			// check duplicate resource in cell
+			if (isset($screenItem['x']) && isset($screenItem['y'])) {
+				foreach ($dbScreenItems as $dbScreenItem) {
+					if ($dbScreenItem['screenid'] == $screenItem['screenid']
+						&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
+						&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exists.'));
+					}
+				}
+			}
+
+			$this->checkSpans($screenItem);
+			$this->checkSpansInBounds($screenItem, $screen);
+		}
+
+		// validate input
+		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
 	/**
@@ -150,16 +196,7 @@ class CScreenItem extends CZBXAPI {
 	public function update(array $screenItems) {
 		$screenItems = zbx_toArray($screenItems);
 
-		// fetch the items we're updating
-		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
-		$dbScreenItems = $this->get(array(
-			'screenitemids' => $screenItemids,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		// validate input
-		$this->checkInput($screenItems, $dbScreenItems);
+		$this->validateUpdate($screenItems);
 
 		// update items
 		$update = array();
@@ -174,6 +211,50 @@ class CScreenItem extends CZBXAPI {
 		DB::update($this->tableName(), $update);
 
 		return array('screenitemids' => zbx_objectValues($screenItems, 'screenitemid'));
+	}
+
+	/**
+	 * Validates the input parameters for the update() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screenItems
+	 *
+	 * @return void
+	 */
+	protected function validateUpdate(array $screenItems) {
+		foreach ($screenItems as $screenItem) {
+			if (empty($screenItem['screenitemid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+		}
+		$screenItemIds = zbx_objectValues($screenItems, 'screenitemid');
+
+		$screens = API::getApi()->select('screens', array(
+			'output' => array('screenid', 'hsize', 'vsize'),
+			'screenitemids' => $screenItemIds,
+			'preservekeys' => true
+		));
+
+		$screenItems = $this->extendObjects($this->tableName(), $screenItems, array('screenid', 'x', 'y', 'rowspan', 'colspan'));
+
+		foreach ($screenItems as $screenItem) {
+			$screen = $screens[$screenItem['screenid']];
+
+			$this->checkSpans($screenItem);
+			$this->checkSpansInBounds($screenItem, $screen);
+		}
+
+		// old validation
+		// fetch the items we're updating
+		$dbScreenItems = API::getApi()->select('screens_items', array(
+			'screenitemids' => $screenItemIds,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		// validate input
+		$this->checkInput($screenItems, $dbScreenItems);
 	}
 
 	/**
@@ -318,10 +399,8 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @param array $screenItems	An array of screen items to validate
 	 * @param array $dbScreenItems	An array of screen items $screenItems should be matched against
-	 * @param array $options		An array of check options:
-	 *		"check_duplicate_resource_in_cell" - defines if will processed validation on duplicate resource in same cell
 	 */
-	protected function checkInput(array $screenItems, array $dbScreenItems = array(), array $options = array()) {
+	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
 		$hostgroups = array();
 		$hosts = array();
 		$graphs = array();
@@ -338,17 +417,6 @@ class CScreenItem extends CZBXAPI {
 			// check resource type
 			if (!$this->isValidResourceType($screenItem['resourcetype'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
-			}
-
-			// check duplicate resource in cell
-			if (!empty($options['check_duplicate_resource_in_cell']) && isset($screenItem['x']) && isset($screenItem['y'])) {
-				foreach ($dbScreenItems as $dbScreenItem) {
-					if ($dbScreenItem['screenid'] == $screenItem['screenid']
-							&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
-							&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exists.'));
-					}
-				}
 			}
 
 			// perform resource type specific validation
@@ -500,6 +568,43 @@ class CScreenItem extends CZBXAPI {
 	 */
 	protected function isValidResourceType($resourceType) {
 		return in_array($resourceType, self::$resourceTypes);
+	}
+
+	/**
+	 * Checks that the row and column spans are valid.
+	 *
+	 * @throws APIException if the any of the spans is not an integer or missing
+	 *
+	 * @param array $screenItem
+	 *
+	 * @return void
+	 */
+	protected function checkSpans(array $screenItem) {
+		if (zbx_empty($screenItem['rowspan']) || !zbx_is_int($screenItem['rowspan'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect row span provided for screen element.'));
+		}
+		if (zbx_empty($screenItem['colspan']) || !zbx_is_int($screenItem['colspan'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect column span provided for screen element.'));
+		}
+	}
+
+	/**
+	 * Checks that the row and column spans fit into the size of the screen.
+	 *
+	 * @throws APIException if the any of the spans is bigger then the free space on the screen
+	 *
+	 * @param array $screenItem
+	 * @param array $screen
+	 *
+	 * @return void
+	 */
+	protected function checkSpansInBounds(array $screenItem, array $screen) {
+		if ($screenItem['rowspan'] > $screen['vsize'] - $screenItem['y']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements row span is too big.'));
+		}
+		if ($screenItem['colspan'] > $screen['hsize'] - $screenItem['x']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements column span is too big.'));
+		}
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
