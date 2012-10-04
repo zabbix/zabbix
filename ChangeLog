@@ -36,6 +36,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+...G...... [ZBX-5571] fixed reporting of system.sw.packages for multiple package systems (Andris)
+...G...... [ZBX-5559] fixed reporting of system.sw.packages with short package listing (Andris)
 ..F....... [ZBX-5280] fixed functional macros for newly created items returning 0 instead of 'no data' (Toms)
 ..F....... [ZBX-5280] fixed HOST.DNS macro priorities if only JMX and IPMI interfaces are used in host (Toms)
 ..F....... [ZBX-5280] fixed HOST.DNS macro did not used default DNS from host interface configuration (Toms)
