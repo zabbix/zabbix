@@ -868,11 +868,11 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		if ($macrosToAdd) {
-			$this->create($macrosToAdd);
-		}
 		if ($macroIdsToDelete) {
 			$this->delete($macroIdsToDelete);
+		}
+		if ($macrosToAdd) {
+			$this->create($macrosToAdd);
 		}
 		if ($macrosToUpdate) {
 			$this->update($macrosToUpdate);
