@@ -444,7 +444,11 @@ jQuery(function($) {
 				);
 
 				// fade screen
-				elem.find(item.prop('nodeName')).fadeTo(2000, 0.6);
+				var itemNode = elem.find(item.prop('nodeName'));
+				if (!empty(itemNode)) {
+					itemNode = (itemNode.length > 0) ? $(itemNode[0]) : itemNode;
+					itemNode.fadeTo(2000, 0.6);
+				}
 
 				// show loading icon..
 				elem.append($('<div>', {'class': 'loading'})
@@ -502,13 +506,18 @@ jQuery(function($) {
 		},
 
 		findScreenItem: function(elem) {
-			var item = elem.children(':first'),
+			var item = elem.children().eq(0),
 				tag;
 
 			if (!empty(item)) {
 				tag = item.prop('nodeName');
 
-				if (tag == 'TABLE' || tag == 'DIV') {
+				if (tag == 'MAP') {
+					item = elem.children().eq(1);
+					tag = item.prop('nodeName');
+				}
+
+				if (tag == 'TABLE' || tag == 'DIV' || tag == 'IMG') {
 					return item;
 				}
 				else {

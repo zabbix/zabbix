@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'itemid' =>			array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+	'screenid' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -59,8 +60,8 @@ if (empty($dbItems)) {
  * Display
  */
 $timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.item.graph'),
-	'profileIdx2' => get_request('itemid'),
+	'profileIdx' => get_request('profileIdx', 'web.screens'),
+	'profileIdx2' => get_request('screenid', get_request('itemid')),
 	'updateProfile' => get_request('updateProfile', true),
 	'period' => get_request('period'),
 	'stime' => get_request('stime')
