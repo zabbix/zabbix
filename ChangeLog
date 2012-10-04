@@ -10,6 +10,7 @@ New features:
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5596] Login form input field width fix (Oleg)
 ..F....... [ZBX-5629] fixed javascript error if user media contains doublequote (Oleg)
 ..F....... [ZBX-5580] fixed graphs grid for negative values (Oleg)
 ..F....... [ZBX-1825] fixed clickable text on popup menu headers (Oleg)
