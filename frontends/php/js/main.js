@@ -74,7 +74,7 @@ var PageRefresh = {
 
 		this.delayLeft -= 1000;
 		if (this.delayLeft < 0) {
-			location.reload();
+			location.replace(location.href);
 		}
 		else {
 			this.timeout = setTimeout('PageRefresh.check()', 1000);

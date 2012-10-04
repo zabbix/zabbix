@@ -56,10 +56,10 @@ $warning = new CWarning(_('Zabbix').SPACE.ZABBIX_VERSION, $msg);
 $warning->setAlignment('center');
 $warning->setAttribute('style', 'margin-top: 100px;');
 $warning->setPaddings(SPACE);
-$warning->setButtons(new CButton('retry', _('Retry'), 'javascript: document.location.reload();', 'formlist'));
+$warning->setButtons(new CButton('retry', _('Retry'), 'javascript: location.replace(location.href);', 'formlist'));
 $warning->show();
 
-zbx_add_post_js('setTimeout("document.location.reload();", '.($refresh_rate * 1000).');');
+zbx_add_post_js('setTimeout("location.replace(location.href);", '.($refresh_rate * 1000).');');
 echo SBR;
 
 require_once dirname(__FILE__).'/include/page_footer.php';
