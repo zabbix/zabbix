@@ -626,28 +626,6 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		DB::delete('items', array('itemid' => $ruleids));
 
-		// housekeeper
-		$itemDataTables = array(
-			'trends',
-			'trends_uint',
-			'history_text',
-			'history_log',
-			'history_uint',
-			'history_str',
-			'history'
-		);
-		$insert = array();
-		foreach ($ruleids as $ruleid) {
-			foreach ($itemDataTables as $table) {
-				$insert[] = array(
-					'tablename' => $table,
-					'field' => 'itemid',
-					'value' => $ruleid
-				);
-			}
-		}
-		DB::insert('housekeeper', $insert);
-
 		// TODO: remove info from API
 		foreach ($delRules as $item) {
 			$host = reset($item['hosts']);

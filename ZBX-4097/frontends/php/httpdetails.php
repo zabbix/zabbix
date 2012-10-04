@@ -276,14 +276,11 @@ $src = 'chart3.php?'.url_param('period').
 
 $dom_graph_id = 'graph_in';
 $objData = array(
-	'id' => $_REQUEST['httptestid'],
-	'domid' => $dom_graph_id,
+	'id' => $dom_graph_id,
 	'containerid' => 'graph_1',
 	'src' => $src,
 	'objDims' => $graphDims,
-	'loadSBox' => 1,
 	'loadImage' => 1,
-	'loadScroll' => 0,
 	'dynamic' => 1,
 	'mainObject' => 1,
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
@@ -302,14 +299,11 @@ $src ='chart3.php?'.url_param('period').url_param('from').
 
 $dom_graph_id = 'graph_time';
 $objData = array(
-	'id' => $_REQUEST['httptestid'],
-	'domid' => $dom_graph_id,
+	'id' => $dom_graph_id,
 	'containerid' => 'graph_2',
 	'src' => $src,
 	'objDims' => $graphDims,
-	'loadSBox' => 1,
 	'loadImage' => 1,
-	'loadScroll' => 0,
 	'dynamic' => 1,
 	'mainObject' => 1,
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
@@ -319,12 +313,8 @@ zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'", '.zbx_jsvalue($timel
 
 $dom_graph_id = 'none';
 $objData = array(
-	'id' => $_REQUEST['httptestid'],
-	'domid' => $dom_graph_id,
-	'loadSBox' => 0,
-	'loadImage' => 0,
+	'id' => $dom_graph_id,
 	'loadScroll' => 1,
-	'scrollWidthByImage' => 0,
 	'dynamic' => 1,
 	'mainObject' => 1,
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),

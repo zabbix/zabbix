@@ -1,10 +1,10 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 1.9\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-09-08 12:32+0300\n"
-"PO-Revision-Date: 2012-08-23 10:08+0200\n"
-"Last-Translator: xxxss <xxxss@msn.com>\n"
+"PO-Revision-Date: 2012-09-28 08:49+0200\n"
+"Last-Translator: 鹏 <pengyao@pengyao.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -105,9 +105,8 @@ msgid "- all groups -"
 msgstr "- 所有组 -"
 
 #: acknow.php:97
-#, fuzzy
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr "----[BULK ACKNOWLEDGE]----"
+msgstr "----[整批知悉]----"
 
 #: include/triggers.inc.php:2296 include/triggers.inc.php:2297
 #: include/triggers.inc.php:2298 include/triggers.inc.php:2300
@@ -150,9 +149,8 @@ msgid "<manual>"
 msgstr "<手册>"
 
 #: acknow.php:146
-#, fuzzy
 msgid "ALARM ACKNOWLEDGES"
-msgstr "ALARM ACKNOWLEDGES"
+msgstr "报警知悉"
 
 #: include/triggers.inc.php:1900 include/triggers.inc.php:1956
 #: include/views/configuration.action.edit.php:114
@@ -195,57 +193,50 @@ msgstr "账户被锁定 %s 秒"
 #: include/blocks.inc.php:835 include/blocks.inc.php:1365
 #: include/events.inc.php:135 include/events.inc.php:206
 #: include/views/configuration.action.edit.php:938
-#, fuzzy
 msgid "Ack"
-msgstr "Ack"
+msgstr "知悉"
 
 #: acknow.php:179 include/triggers.inc.php:1409 include/triggers.inc.php:1412
 #: tr_status.php:634
 msgid "Acknowledge"
-msgstr "确认"
+msgstr "知悉"
 
 #: acknow.php:122
-#, fuzzy
 msgid "Acknowledge added"
-msgstr "Acknowledge added"
+msgstr "已加知悉"
 
 #: acknow.php:150 acknow.php:178
 #, fuzzy
 msgid "Acknowledge alarm by"
-msgstr "Acknowledge alarm by"
+msgstr "知悉报警"
 
 #: acknow.php:151 acknow.php:180
-#, fuzzy
 msgid "Acknowledge and return"
-msgstr "Acknowledge and return"
+msgstr "知悉并返回"
 
 #: tr_status.php:203
-#, fuzzy
 msgid "Acknowledge status"
-msgstr "Acknowledge status"
+msgstr "知悉状态"
 
 #: include/events.inc.php:120 tr_status.php:291 tr_status.php:637
 msgid "Acknowledged"
-msgstr "已确认"
+msgstr "已知悉"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
-#, fuzzy
 msgid "Acknowledged OK events"
-msgstr "Acknowledged OK events"
+msgstr "已知悉恢复正常事件"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Acknowledged PROBLEM events"
+msgstr "已知悉的问题事件"
 
 #: acknow.php:27 tr_events.php:123
-#, fuzzy
 msgid "Acknowledges"
-msgstr "Acknowledges"
+msgstr "知悉"
 
 #: include/views/configuration.sysmap.edit.php:144
-#, fuzzy
 msgid "Acknowledging disabled"
-msgstr "Acknowledging disabled"
+msgstr "无法知悉"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -271,39 +262,39 @@ msgstr "Acknowledging disabled"
 #: include/views/configuration.triggers.massupdate.php:79 tr_logform.php:299
 #: tr_logform.php:303
 msgid "Action"
-msgstr "操作"
+msgstr "动作"
 
 #: api/classes/CAction.php:816 api/classes/CAction.php:913
-#, fuzzy, php-format
+#, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "操作\"%1$s\"不正确的值已经有\"esc_period\" (最少%2$s秒)."
+msgstr "动作\"%1$s\"不正确的值已经有\"esc_period\" (最少%2$s秒)."
 
 #: api/classes/CAction.php:819 api/classes/CAction.php:833
 #: api/classes/CAction.php:922 api/classes/CAction.php:941
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr "\"%s\"操作已存在."
+msgstr "动作\"%s\"已存在."
 
 #: api/classes/CAction.php:968
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr "\"%s\"操作没有定义动作."
+msgstr "动作\"%s\"没有定义操作."
 
 #: actionconf.php:149
 msgid "Action added"
-msgstr "添加操作"
+msgstr "动作已添加"
 
 #: actionconf.php:170
 msgid "Action deleted"
-msgstr "删除操作"
+msgstr "动作已删除"
 
 #: include/views/configuration.action.edit.php:399
 msgid "Action operations"
-msgstr "操作类型"
+msgstr "动作类型"
 
 #: actionconf.php:145
 msgid "Action updated"
-msgstr "更新操作"
+msgstr "动作已更新"
 
 #: events.php:567 events.php:580 include/blocks.inc.php:836
 #: include/blocks.inc.php:1366 include/events.inc.php:136
@@ -312,11 +303,11 @@ msgstr "更新操作"
 #: include/views/administration.auditlogs.list.php:29
 #: include/views/configuration.action.list.php:39
 msgid "Actions"
-msgstr "操作"
+msgstr "动作"
 
 #: include/views/configuration.item.prototype.list.php:104
 msgid "Activate selected"
-msgstr "激活所选"
+msgstr "激活已选择的"
 
 #: include/views/administration.proxy.edit.php:40
 #: include/views/administration.proxy.list.php:76
@@ -1092,9 +1083,8 @@ msgid "Cancel"
 msgstr "取消"
 
 #: acknow.php:119
-#, fuzzy
 msgid "Cannot acknowledge event"
-msgstr "Cannot acknowledge event"
+msgstr "无法知悉事件"
 
 #: actionconf.php:149
 msgid "Cannot add action"
@@ -1111,7 +1101,7 @@ msgstr "无法新增一个主机到一个模板的依赖."
 #: include/triggers.inc.php:699
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "无法从触发器\"%1$s:%2$s\"添加依赖关系至不存在的\"%3$s:%4$s\"触发器."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1259,24 +1249,24 @@ msgstr "不能复制触发器类型."
 
 #: scripts_exec.php:64
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "无法连接到zabbix服务器trapper端口，不过它应该是可用的."
 
 #: graphs.php:290
 msgid "Cannot copy graphs"
-msgstr "Cannot copy graphs"
+msgstr "无法拷贝绘图"
 
 #: items.php:594
 msgid "Cannot copy items"
-msgstr "Cannot copy items"
+msgstr "无法拷贝监控项"
 
 #: include/triggers.inc.php:608
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "无法拷贝\"%1$s:%2$s\"触发器，因为在表达式中关联了多个主机."
 
 #: include/db.inc.php:54
 msgid "Cannot create another database connection."
-msgstr "无法建立另外一个数据库连接"
+msgstr "无法建立新的数据库连接"
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
@@ -1284,7 +1274,7 @@ msgstr "无法创建自动发现规则"
 
 #: api/classes/CHostGroup.php:616
 msgid "Cannot create group without name."
-msgstr "无法创建不带名字的组"
+msgstr "无法创建没有名字的组."
 
 #: api/classes/CHost.php:1763
 msgid "Cannot create host group."
@@ -1292,34 +1282,35 @@ msgstr "无法创建主机组"
 
 #: adm.iconmapping.php:66
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "无法创建图示对应"
 
 #: api/classes/CIconMap.php:259 api/classes/CIconMap.php:319
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr ""
+msgstr "无法创建同名\"%s\"的图示对应."
 
 #: include/classes/import/CXmlImport18.php:816
 #, php-format
 msgid "Cannot create map \"%s\"."
-msgstr ""
+msgstr "无法创建\"%s\"拓扑图."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
-msgstr ""
+msgstr "无法创建新的组件"
 
+# screen暂时翻译成"面板"
 #: include/classes/import/CXmlImport18.php:1707
 msgid "Cannot create screen."
-msgstr ""
+msgstr "无法创建面板"
 
 #: api/classes/CUser.php:370
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "无法删除zabbix内建用户\"%1$s\"，请尝试停用它."
 
 #: actionconf.php:170
 msgid "Cannot delete action"
-msgstr "无法删除操作Cannot delete action"
+msgstr "无法删除动作"
 
 #: applications.php:130 applications.php:161
 msgid "Cannot delete application"
@@ -1327,7 +1318,7 @@ msgstr "无法删除应用程序"
 
 #: api/classes/CTrigger.php:1549
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "无法删除依赖"
 
 #: api/classes/CDiscoveryRule.php:624 discoveryconf.php:135
 #: host_discovery.php:166
@@ -1336,7 +1327,7 @@ msgstr "无法删除自动发现的规则"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "无法删除自动发现的规则"
 
 #: graphs.php:237
 msgid "Cannot delete graph"
@@ -1344,11 +1335,11 @@ msgstr "无法删除图表"
 
 #: api/classes/CGraphPrototype.php:823
 msgid "Cannot delete graph prototype."
-msgstr ""
+msgstr "无法删除图标类型."
 
 #: api/classes/CItem.php:1002
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "无法删除图表"
 
 #: graphs.php:244
 msgid "Cannot delete graphs"
@@ -1356,7 +1347,7 @@ msgstr "无法删除图表"
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:170 usergrps.php:198
 msgid "Cannot delete group"
-msgstr "Cannot delete group"
+msgstr "无法删除组"
 
 #: hosts.php:508 hosts.php:532
 msgid "Cannot delete host"
@@ -1364,11 +1355,11 @@ msgstr "无法删除主机"
 
 #: api/classes/CHost.php:1774
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "无法删除主机组"
 
 #: adm.iconmapping.php:79
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "无法删除图示对应"
 
 #: adm.images.php:112
 msgid "Cannot delete image"
@@ -1376,49 +1367,48 @@ msgstr "无法删除图片"
 
 #: api/classes/CHost.php:1867
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "无法删除资产"
 
 #: disc_prototypes.php:188 items.php:348 screenedit.php:199
 msgid "Cannot delete item"
-msgstr "Cannot delete item"
+msgstr "无法删除监控项"
 
 #: disc_prototypes.php:299 items.php:642
 msgid "Cannot delete items"
-msgstr "Cannot delete items"
+msgstr "无法删除监控项"
 
 #: maintenance.php:160
 msgid "Cannot delete maintenance"
-msgstr "Cannot delete maintenance"
+msgstr "无法删除预维护"
 
 #: media_types.php:104 media_types.php:143
 msgid "Cannot delete media type"
-msgstr ""
+msgstr "无法删除媒介类型"
 
 #: sysmaps.php:188
 msgid "Cannot delete network map"
-msgstr "Cannot delete network map"
+msgstr "无法删除网络拓扑"
 
 #: nodes.php:93
 msgid "Cannot delete node"
-msgstr "Cannot delete node"
+msgstr "无法删除节点"
 
 #: proxies.php:110 proxies.php:156
 msgid "Cannot delete proxy"
-msgstr "Cannot delete proxy"
+msgstr "无法删除代理"
 
 #: adm.regexps.php:117
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "无法删除表达式"
 
 #: httpconf.php:155
 msgid "Cannot delete scenario"
-msgstr "Cannot delete scenario"
+msgstr "无法删除方案"
 
 #: screenconf.php:227
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "无法删除面板"
 
 #: scripts.php:139 scripts.php:155
 msgid "Cannot delete script"
@@ -1426,50 +1416,52 @@ msgstr "无法删除脚本"
 
 #: api/classes/CScript.php:408
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr ""
+msgstr "无法删除脚本.输入的\"scriptids\"参数为空."
 
 #: api/classes/CScript.php:432
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr ""
+msgstr "无法删除脚本，脚本“%1$s”当前应用于动作\"%2$s\"."
 
 #: api/classes/CScript.php:421
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
-msgstr ""
+msgstr "无法删除脚本脚本.脚本ID为\"%s\"的脚本不存在."
 
 #: actionconf.php:308
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "无法删除已选择的动作"
 
 #: services.php:107
 msgid "Cannot delete service"
 msgstr "无法删除服务"
 
+# slide show实在想到该怎么翻译，临时借用台湾翻译版本里边的“简报片展示”
 #: slideconf.php:102 slideconf.php:124
+#, fuzzy
 msgid "Cannot delete slide show"
-msgstr ""
+msgstr "无法删除简报片展示"
 
 #: templates.php:339 templates.php:357 templates.php:382
 msgid "Cannot delete template"
-msgstr "Cannot delete template"
+msgstr "无法删除模板"
 
 #: api/classes/CGraph.php:767 api/classes/CGraphPrototype.php:799
 msgid "Cannot delete templated graphs."
-msgstr ""
+msgstr "无法删除模板绘图"
 
 #: api/classes/CItem.php:966
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "无法删除模板监控项"
 
 #: api/classes/CDiscoveryRule.php:583
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "无法删除模板监控项"
 
 #: api/classes/CTrigger.php:1143 api/classes/CTriggerPrototype.php:1053
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "无法删除模板触发器\"%1$sL%2$s\"."
 
 #: trigger_prototypes.php:177 triggers.php:168
 msgid "Cannot delete trigger"
@@ -1477,7 +1469,7 @@ msgstr "无法删除触发器"
 
 #: api/classes/CItem.php:1018
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "无法删除触发器."
 
 #: trigger_prototypes.php:287 triggers.php:355
 msgid "Cannot delete triggers"
@@ -1489,107 +1481,107 @@ msgstr "无法删除用户"
 
 #: api/classes/CUser.php:786
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "无法删除用户媒介"
 
 #: adm.valuemapping.php:78
 msgid "Cannot delete value map"
-msgstr "Cannot delete value map"
+msgstr "无法删除值对应"
 
 #: media_types.php:136
 msgid "Cannot disable media type"
-msgstr ""
+msgstr "无法停用媒介类型"
 
 #: media_types.php:120
 msgid "Cannot enable media type"
-msgstr ""
+msgstr "无法启用媒介类型"
 
 #: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "无法找到在拓扑图\"%2$s\"中使用的背景图片\"%1$s\""
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1664
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "无法找到在面板\"%2$s\"中使用的绘图\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:210
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "无法找到在拓扑中使用的组\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:483
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "无法找到在面板\"%2$s\"里边使用的组\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:218
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "无法找到在拓扑图\"%2$s\"中使用的主机\"%1$s\""
 
 #: include/classes/import/CXmlImport18.php:495
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "无法找到在面板\"%2$s\"中使用的主机\"%1$s\""
 
 #: api/classes/CDiscoveryRule.php:1041 api/classes/CDiscoveryRule.php:1106
 #: api/classes/CItemGeneral.php:570 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "无法找到用于监控项\"%2$s\"的主机接口."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "无法找到应用于拓扑图\"%2$s\"里的图标\"%1$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "无法找到应用于拓扑\"%2$s\"的图标对应\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1677
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "无法找到应用于面板\"$2$s\"里的监控项\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:712
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "无法找到导出的拓扑图\"%2$s\"中的拓扑\"%1$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "无法找到应用于拓扑图\"%2$s\"的拓扑\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "无法找到应用于面板\"%2$s\"里的拓扑\"%1$s\"."
 
 #: include/js.inc.php:248
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "无法找到有名称的对象"
 
 #: include/classes/import/CXmlImport18.php:541
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "无法找到应用于面板\"%2$s\"里的面板\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
@@ -1597,47 +1589,47 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "无法找到应用于拓扑\"%2$s\"里的触发器\"%1$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr ""
+msgstr "无法形成树状结构.请检查服务连接的逻辑结构."
 
 #: services.php:413
 msgid "Cannot format tree."
-msgstr ""
+msgstr "无法形成树状结构."
 
 #: api/classes/CTemplate.php:1381
 msgid "Cannot have empty visible template name"
-msgstr ""
+msgstr "可见的模板名称不能为空"
 
 #: api/classes/CTrigger.php:1577 api/classes/CTrigger.php:1649
 #: api/classes/CTriggerPrototype.php:1149
 #: api/classes/CTriggerPrototype.php:1200
 #, php-format
 msgid "Cannot implode expression \"%s\"."
-msgstr ""
+msgstr "不能合并表达式\"%s\"."
 
 #: include/classes/import/importers/CScreenImporter.php:78
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
+msgstr[0] "不能导入面板\"%2$s\": 子面板\"%3$s\"不存在."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
+msgstr[0] "不能导入模板\"%2$s\",链接的模板\"%3$s\"不存在."
 
 #: include/classes/class.cview.php:113
-#, php-format
+#, fuzzy, php-format
 msgid "Cannot include view file \"%s\"."
-msgstr ""
+msgstr "不能包含可视文件\"%s\"."
 
 #: api/classes/CUser.php:815
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "无法插入用户媒介."
 
 #: api/classes/CHost.php:1846
 msgid "Cannot link template"
@@ -1645,91 +1637,91 @@ msgstr "无法与模板关联"
 
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
-msgstr ""
+msgstr "无法退出."
 
 #: api/classes/CHost.php:1670
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "无法批量更新主机名."
 
 #: api/classes/CTemplate.php:1340
 msgid "Cannot mass update template name"
-msgstr ""
+msgstr "无法批量更新模板名"
 
 #: api/classes/CHost.php:1660
 msgid "Cannot mass update visible host name."
-msgstr ""
+msgstr "无法批量更新可视的主机名."
 
 #: api/classes/CTemplate.php:1313
 msgid "Cannot mass update visible template name"
-msgstr ""
+msgstr "无法更新可视的模板名"
 
 #: api/classes/CHostGeneral.php:157
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr ""
+msgstr "无法传递重复的模板ID给链接: %s."
 
 #: include/classes/db/DB.php:615
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "无法删除没有where条件的表\"%1$s\"中的数据."
 
 #: include/classes/db/DB.php:438
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr ""
+msgstr "无法在表\"%1$s\"上执行没有值的更新操作."
 
 #: include/classes/db/DB.php:449
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "无法在表\"%1$s\"上更新没有where条件的操作."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr ""
+msgstr "无法移除宏."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "无法重命名guest用户."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
-msgstr ""
+msgstr "无法保存没有检查项的发现规则."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
-msgstr ""
+msgstr "无法切换主机接口."
 
 #: users.php:276
 msgid "Cannot unblock users"
-msgstr "Cannot unblock users"
+msgstr "无法解除用户锁定"
 
 #: api/classes/CHostGeneral.php:693
 msgid "Cannot unlink and clear applications"
-msgstr ""
+msgstr "无法解除及清空应用"
 
 #: api/classes/CHostGeneral.php:546
 msgid "Cannot unlink and clear discovery rules"
-msgstr ""
+msgstr "无法解除及清空发现规则"
 
 #: api/classes/CHostGeneral.php:635
 msgid "Cannot unlink and clear graph prototypes"
-msgstr ""
+msgstr "无法解除及清空绘图类型"
 
 #: api/classes/CHostGeneral.php:653
 msgid "Cannot unlink and clear graphs."
-msgstr ""
+msgstr "无法解除及清空绘图"
 
 #: api/classes/CHostGeneral.php:582
 msgid "Cannot unlink and clear item prototypes"
-msgstr ""
+msgstr "无法解除及清空监控类型"
 
 #: api/classes/CHostGeneral.php:564
 msgid "Cannot unlink and clear items"
-msgstr ""
+msgstr "无法解除及清空监控项"
 
 #: api/classes/CHostGeneral.php:484 api/classes/CHostGeneral.php:501
 msgid "Cannot unlink and clear triggers"
-msgstr ""
+msgstr "无法解除及清空触发器"
 
 #: api/classes/CHost.php:1837
 msgid "Cannot unlink template"
@@ -1738,25 +1730,25 @@ msgstr "无法关联模板"
 #: api/classes/CHostGeneral.php:438
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "无法解除触发器\"%s\"连接,它模板中监控项被链接到主机"
 
 #: actionconf.php:145
 msgid "Cannot update action"
-msgstr "无法更新操作Cannot update action"
+msgstr "无法更新操作"
 
 #: applications.php:97
 msgid "Cannot update application"
-msgstr "无法更新应用程序"
+msgstr "无法更新应用"
 
 #: tr_comments.php:63
 msgid "Cannot update comment"
-msgstr "Cannot update comment"
+msgstr "无法更新评论"
 
 #: adm.gui.php:64 adm.housekeeper.php:51 adm.other.php:56
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
 #: adm.triggerseverities.php:69 adm.workingtime.php:44
 msgid "Cannot update configuration"
-msgstr ""
+msgstr "无法更新配置"
 
 #: usergrps.php:254
 msgid "Cannot update debug mode"
@@ -1764,11 +1756,11 @@ msgstr "无法更新调试模式"
 
 #: discoveryconf.php:116 host_discovery.php:229
 msgid "Cannot update discovery rule"
-msgstr "无法更新自动发现的规则"
+msgstr "无法更新自动发现规则"
 
 #: usergrps.php:225
 msgid "Cannot update frontend access"
-msgstr ""
+msgstr "无法更新前端访问规则"
 
 #: graphs.php:223
 msgid "Cannot update graph"
@@ -1776,11 +1768,11 @@ msgstr "无法更新图表"
 
 #: hostgroups.php:115 usergrps.php:146
 msgid "Cannot update group"
-msgstr "Cannot update group"
+msgstr "无法更新组"
 
 #: api/classes/CUserGroup.php:397
 msgid "Cannot update group."
-msgstr ""
+msgstr "无法更新足"
 
 #: hostgroups.php:196 hosts.php:322
 msgid "Cannot update host"
@@ -1792,11 +1784,11 @@ msgstr "无法更新主机状态"
 
 #: hosts.php:302
 msgid "Cannot update hosts"
-msgstr ""
+msgstr "无法更新主机"
 
 #: adm.iconmapping.php:61
 msgid "Cannot update icon map"
-msgstr ""
+msgstr "无法更新图示对应"
 
 #: adm.images.php:48
 msgid "Cannot update image"
@@ -1804,48 +1796,48 @@ msgstr "无法更新图片"
 
 #: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
-msgstr ""
+msgstr "无法更新图片."
 
 #: disc_prototypes.php:273 items.php:434 screenedit.php:173
 msgid "Cannot update item"
-msgstr "Cannot update item"
+msgstr "无法更新监控项"
 
 #: items.php:544
 msgid "Cannot update items"
-msgstr ""
+msgstr "无法更新监控项"
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr ""
+msgstr "无法更新宏."
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
-msgstr ""
+msgstr "无法更新宏"
 
 #: maintenance.php:104
 msgid "Cannot update maintenance"
-msgstr "Cannot update maintenance"
+msgstr "无法更新预维护"
 
 #: include/classes/import/CXmlImport18.php:807
 #, php-format
 msgid "Cannot update map \"%s\"."
-msgstr ""
+msgstr "无法更新拓扑\"%s\"."
 
 #: media_types.php:86
 msgid "Cannot update media type"
-msgstr ""
+msgstr "无法更新媒介类型"
 
 #: sysmaps.php:157
 msgid "Cannot update network map"
-msgstr "Cannot update network map"
+msgstr "无法更新网络拓扑"
 
 #: nodes.php:69
 msgid "Cannot update node"
-msgstr "Cannot update node"
+msgstr "无法更新节点"
 
 #: proxies.php:74
 msgid "Cannot update proxy"
-msgstr "Cannot update proxy"
+msgstr "无法更新代理"
 
 #: adm.regexps.php:78
 msgid "Cannot update regular expression"
@@ -1853,15 +1845,15 @@ msgstr "无法更新表达式"
 
 #: httpconf.php:175
 msgid "Cannot update scenario"
-msgstr "Cannot update scenario"
+msgstr "无法更新方案"
 
 #: screenconf.php:154
 msgid "Cannot update screen"
-msgstr "无法更新图表"
+msgstr "无法更新面板"
 
 #: include/classes/import/CXmlImport18.php:1699
 msgid "Cannot update screen."
-msgstr ""
+msgstr "无法更新面板."
 
 #: scripts.php:110
 msgid "Cannot update script"
@@ -1873,15 +1865,15 @@ msgstr "无法更新服务"
 
 #: slideconf.php:80
 msgid "Cannot update slide show"
-msgstr ""
+msgstr "无法更新简报展示"
 
 #: actionconf.php:298 trigger_prototypes.php:283 triggers.php:320
 msgid "Cannot update status"
-msgstr "Cannot update status"
+msgstr "无法更新状态"
 
 #: templates.php:179
 msgid "Cannot update template"
-msgstr "Cannot update template"
+msgstr "无法更新模板"
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:154
 #: triggers.php:205 tr_logform.php:112
@@ -1894,7 +1886,7 @@ msgstr "无法更新用户"
 
 #: api/classes/CUser.php:807
 msgid "Cannot update user media."
-msgstr ""
+msgstr "无法更新用户媒介"
 
 #: profile.php:110 users.php:125
 msgid "Cannot update user. Both passwords must be equal."
@@ -1902,23 +1894,23 @@ msgstr "无法更新用户. 两次输入的密码必须一致."
 
 #: usergrps.php:282
 msgid "Cannot update users status"
-msgstr "Cannot update users status"
+msgstr "无法更新用户状态"
 
 #: adm.valuemapping.php:54
 msgid "Cannot update value map"
-msgstr "Cannot update value map"
+msgstr "无法更新值对应"
 
 #: popup_bitem.php:115 popup_period.php:114
 msgid "Caption"
-msgstr "Caption"
+msgstr "标题"
 
 #: include/forms.inc.php:1878 include/forms.inc.php:1974
 msgid "Case sensitive"
-msgstr "Case sensitive"
+msgstr "区分大小写"
 
 #: include/views/configuration.screen.constructor.edit.php:586
 msgid "Center"
-msgstr ""
+msgstr "置中"
 
 #: include/classes/screens/CScreenBase.php:241
 #: include/classes/screens/CScreenBuilder.php:414
@@ -1930,7 +1922,7 @@ msgstr "更改"
 #: latest.php:195
 msgctxt "noun in latest data"
 msgid "Change"
-msgstr ""
+msgstr "更改"
 
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
@@ -1941,108 +1933,110 @@ msgstr "修改密码"
 #: include/triggers.inc.php:2274 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:160
 msgid "Character"
-msgstr "字符串"
+msgstr "字符"
 
 #: include/regexp.inc.php:178
 msgid "Character string included"
-msgstr "Character string included"
+msgstr "字符串包括"
 
 #: include/regexp.inc.php:184
 msgid "Character string not included"
-msgstr "Character string not included"
+msgstr "不包含的字符串"
 
 #: include/hosts.inc.php:240
+#, fuzzy
 msgid "Chassis"
-msgstr ""
+msgstr "最低"
 
 #: include/views/js/configuration.discovery.edit.js.php:286
 msgid "Check already exists."
-msgstr ""
+msgstr "检查已存在"
 
 #: api/classes/CTriggerExpression.php:52
 #, php-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr ""
+msgstr "检查表达式\"%1$s\"开头"
 
 #: api/classes/CItemGeneral.php:248
 msgid "Check the key, please. Default example was passed."
-msgstr ""
+msgstr "检查键值,默认使用预设的值."
 
 #: include/views/js/configuration.discovery.edit.js.php:23
 msgid "Check type"
-msgstr ""
+msgstr "检查类型"
 
 #: include/views/configuration.discovery.edit.php:61
 #: include/views/configuration.discovery.list.php:43
 msgid "Checks"
-msgstr "Checks"
+msgstr "检查"
 
 #: api/classes/CDRule.php:558
 msgid "Checks should be unique."
-msgstr ""
+msgstr "检查必须唯一."
 
 #: include/nodes.inc.php:248
 msgid "Child"
-msgstr "Child"
+msgstr "子"
 
 #: include/locales.inc.php:46
 msgid "Chinese (zh_CN)"
-msgstr "中文 (zh_CN)"
+msgstr "简体中文 (zh_CN)"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "繁体中文 (zh_TW)"
 
 #: api/classes/CTrigger.php:1859
 msgid "Circular dependencies are not allowed."
-msgstr ""
+msgstr "不允许循环依赖."
 
 #: api/classes/CMapElement.php:533
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr ""
+msgstr "不能为拓扑组件\"%s\"创建循环链接."
 
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr ""
+msgstr "拓扑图\"%1$s\"含有循环引用."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr ""
+msgstr "面板\"%1$s\"含有循环引用."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr ""
+msgstr "模板\"%1$s\"含有循环引用."
 
 #: api/classes/CHostGeneral.php:332 api/classes/CHostGeneral.php:756
 msgid "Circular template linkage is not allowed."
-msgstr ""
+msgstr "不允许出现循环模板链接."
 
 #: include/classes/core/ZBase.php:134
 msgid "Classic"
-msgstr ""
+msgstr "典型的"
 
 #: jsLoader.php:160
 msgid "Clear"
-msgstr ""
+msgstr "清空"
 
 #: include/views/configuration.item.edit.php:452
 msgid "Clear history and trends"
-msgstr ""
+msgstr "清空历史和趋势"
 
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251
 msgid "Clear history for selected"
-msgstr "Clear history for selected"
+msgstr "清空选择的历史"
 
 #: include/views/configuration.host.massupdate.php:119
 msgid "Clear when unlinking"
-msgstr ""
+msgstr "清空当前正在链接的"
 
 #: include/screens.inc.php:28
+#, fuzzy
 msgid "Clock"
 msgstr "Clock"
 
@@ -2072,11 +2066,11 @@ msgstr "复制"
 #: include/views/js/configuration.sysmaps.js.php:375 jsLoader.php:144
 #: jsLoader.php:168 tr_testexpr.php:169
 msgid "Close"
-msgstr "Close"
+msgstr "关闭"
 
 #: include/views/configuration.triggers.edit.php:234
 msgid "Close expression constructor"
-msgstr ""
+msgstr "关闭表达式构建"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
@@ -2088,11 +2082,11 @@ msgstr "颜色"
 
 #: include/views/js/configuration.sysmaps.js.php:340
 msgid "Colour (OK)"
-msgstr "Colour (OK)"
+msgstr "颜色 (OK)"
 
 #: include/profiles.inc.php:279
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "颜色不正确: 请使用十六进制颜色代码 (6位)"
 
 #: include/views/configuration.screen.constructor.edit.php:605
 #: screenedit.php:45
@@ -2105,7 +2099,7 @@ msgstr "列数"
 
 #: include/forms.inc.php:1814
 msgid "Combined result"
-msgstr "Combined result"
+msgstr "组合结果"
 
 #: include/actions.inc.php:756 include/actions.inc.php:790
 #: include/actions.inc.php:858
@@ -2116,11 +2110,11 @@ msgstr "命令"
 
 #: tr_events.php:134
 msgid "Command actions"
-msgstr "Command actions"
+msgstr "命令动作"
 
 #: scripts.php:90
 msgid "Command cannot be empty."
-msgstr ""
+msgstr "命令不能为空."
 
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
@@ -2128,11 +2122,11 @@ msgstr ""
 #: include/views/configuration.action.edit.php:727 popup.php:1971
 #: popup.php:1978
 msgid "Commands"
-msgstr ""
+msgstr "命令"
 
 #: tr_comments.php:63
 msgid "Comment updated"
-msgstr "Comment updated"
+msgstr "备注已更新"
 
 #: include/acknow.inc.php:42 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:368 tr_status.php:295
@@ -2141,42 +2135,42 @@ msgstr "备注"
 
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Commercial"
-msgstr ""
+msgstr "商业的"
 
 #: report6.php:160
 msgid "Compare values for multiple periods"
-msgstr "Compare values for multiple periods"
+msgstr "多个时期的比较值"
 
 #: include/views/administration.usergroups.edit.php:113
 msgid "Composing permissions"
-msgstr ""
+msgstr "组合许可"
 
 #: popup_trexpr.php:25
 msgid "Condition"
-msgstr "Condition"
+msgstr "条件"
 
 #: include/views/configuration.action.edit.php:117
 #: include/views/configuration.action.edit.php:898
 #: include/views/configuration.action.edit.php:966
 #: include/views/configuration.action.list.php:51
 msgid "Conditions"
-msgstr "触发条件"
+msgstr "条件"
 
 #: include/menu.inc.php:153
 msgid "Configuration"
-msgstr "系统配置"
+msgstr "配置"
 
 #: conf.import.php:25
 msgid "Configuration import"
-msgstr ""
+msgstr "导入配置"
 
 #: adm.gui.php:24
 msgid "Configuration of GUI"
-msgstr ""
+msgstr "GUI配置"
 
 #: services.php:27
 msgid "Configuration of IT services"
-msgstr "配置 IT 服务"
+msgstr "IT 服务配置"
 
 #: adm.triggerdisplayoptions.php:24 include/audit.inc.php:25
 msgid "Configuration of Zabbix"
@@ -2184,174 +2178,174 @@ msgstr "ZABBIX配置"
 
 #: actionconf.php:25
 msgid "Configuration of actions"
-msgstr "配置操作过程"
+msgstr "动作配置"
 
 #: applications.php:26
 msgid "Configuration of applications"
-msgstr ""
+msgstr "应用配置"
 
 #: authentication.php:24
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "认证配置"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
-msgstr "配置自动发现"
+msgstr "自动发现配置"
 
 #: host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr ""
+msgstr "自动发现规则配置"
 
 #: graphs.php:27
 msgid "Configuration of graphs"
-msgstr "图表显示配置"
+msgstr "绘图配置"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr ""
+msgstr "主机组配置"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
-msgstr ""
+msgstr "主机配置"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeper"
-msgstr ""
+msgstr "清理器配置"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
-msgstr ""
+msgstr "图示对应配置"
 
 #: adm.images.php:25
 msgid "Configuration of images"
-msgstr ""
+msgstr "图片配置"
 
 #: disc_prototypes.php:27
 msgid "Configuration of item prototypes"
-msgstr ""
+msgstr "监控项类型配置"
 
 #: items.php:27
 msgid "Configuration of items"
-msgstr "配置监控项"
+msgstr "监控项配置"
 
 #: adm.macros.php:24
 msgid "Configuration of macros"
-msgstr ""
+msgstr "宏配置"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance"
-msgstr ""
+msgstr "预维护配置"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr ""
+msgstr "媒介类型配置"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
-msgstr "配置拓扑图"
+msgstr "网络拓扑图配置"
 
 #: nodes.php:25
 msgid "Configuration of nodes"
-msgstr ""
+msgstr "节点配置"
 
 #: proxies.php:25
 msgid "Configuration of proxies"
-msgstr ""
+msgstr "代理配置"
 
 #: adm.regexps.php:26
 msgid "Configuration of regular expressions"
-msgstr ""
+msgstr "正则表达式配置"
 
 #: screenconf.php:38 screenedit.php:27
 msgid "Configuration of screens"
-msgstr "显示图表配置"
+msgstr "面板配置"
 
 #: scripts.php:23
 msgid "Configuration of scripts"
-msgstr ""
+msgstr "脚本配置"
 
 #: slideconf.php:27
 msgid "Configuration of slide shows"
-msgstr ""
+msgstr "简报展示配置"
 
 #: templates.php:38
 msgid "Configuration of templates"
-msgstr ""
+msgstr "模板配置"
 
 #: report5.php:152
 msgid "Configuration of trigger"
-msgstr ""
+msgstr "触发器配置"
 
 #: adm.triggerdisplayingoptions.php:24
 msgid "Configuration of trigger displaying options"
-msgstr ""
+msgstr "触发器显示选项配置"
 
 #: trigger_prototypes.php:27
 msgid "Configuration of trigger prototypes"
-msgstr ""
+msgstr "触发器类型配置"
 
 #: adm.triggerseverities.php:24
 msgid "Configuration of trigger severities"
-msgstr ""
+msgstr "触发器级别配置"
 
 #: triggers.php:27 tr_status.php:484
 msgid "Configuration of triggers"
-msgstr "配置触发器"
+msgstr "触发器配置"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr ""
+msgstr "用户组配置"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr ""
+msgstr "用户配置"
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
-msgstr ""
+msgstr "值对应配置"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr ""
+msgstr "WEB监控配置"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
-msgstr ""
+msgstr "工作时间配置"
 
 #: adm.gui.php:64 adm.housekeeper.php:51 adm.other.php:56
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
 #: adm.triggerseverities.php:69 adm.workingtime.php:44
 msgid "Configuration updated"
-msgstr "Configuration updated"
+msgstr "配置已更新"
 
 #: dashboard.php:227
 #, php-format
 msgid "Configure (Filter %s)"
-msgstr ""
+msgstr "配置 (过滤器%s)"
 
 #: include/views/administration.script.edit.php:109
 msgid "Confirmation text"
-msgstr ""
+msgstr "确认文字"
 
 #: popup.php:613
 msgid "Conflict between selected templates."
-msgstr ""
+msgstr "所选模板有冲突."
 
 #: include/views/administration.proxy.edit.php:54
 #: include/views/configuration.host.edit.php:217
 #: include/views/js/configuration.sysmaps.js.php:325
 msgid "Connect to"
-msgstr "Connect to"
+msgstr "连接"
 
 #: include/page_footer.php:93
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr ""
+msgstr "连接为\"%1$s\""
 
 #: include/page_footer.php:90
 #, php-format
 msgid "Connected as '%1$s' from '%2$s'"
-msgstr ""
+msgstr "来自\"%2$s\"的为\"%1s\"的连接"
 
 #: api/classes/CScript.php:477
 #, php-format
@@ -2360,6 +2354,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"连接Zabbix服务端\"%s\"失败,原因可能为:\n"
+"1. \"zabbix.conf.php\"中配置了错误的服务端IP/DNS地址;\n"
+"2. DNS配置错误.\n"
 
 #: api/classes/CScript.php:468
 #, php-format
@@ -2370,6 +2367,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"连接Zabbix服务端\"%s\"拒绝.原因可能为:\n"
+"1. \"zabbix.conf.php\"中配置了错误的服务端IP/DNS地址;\n"
+"2. 安全设置(如SElinux)阻塞了本次连接;\n"
+"3. Zabbix服务端没有运行;\n"
+"4. 防火墙阻塞了TCP连接.\n"
 
 #: api/classes/CScript.php:474
 #, php-format
@@ -2378,6 +2380,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"连接Zabbix服务端\"%s\"超时.原因可能为:\n"
+"1. \"zabbix.conf.php\"中配置了错误的服务端IP/DNS地址;\n"
+"2. 防火墙阻塞了TCP连接.\n"
 
 #: include/hosts.inc.php:215
 msgid "Contact"
@@ -2385,123 +2390,123 @@ msgstr "联系人"
 
 #: include/hosts.inc.php:260
 msgid "Contract number"
-msgstr ""
+msgstr "合约号"
 
 #: include/views/js/configuration.sysmaps.js.php:150
 msgid "Coordinates"
-msgstr ""
+msgstr "坐标"
 
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
 msgid "Copy"
-msgstr "Copy"
+msgstr "复制"
 
 #: include/views/configuration.graph.list.php:136
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
-msgstr "拷贝所选到 ..."
+msgstr "复制所选到 ..."
 
 #: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
-msgstr ""
+msgstr "正确登入 \"%s\"."
 
 #: api/classes/CImage.php:485
 msgid "Could not save image!"
-msgstr "Could not save image!"
+msgstr "无法保存图片!"
 
 #: include/graphs.inc.php:84
 #: include/views/configuration.triggers.expression.php:92 popup_bitem.php:131
 #: popup_trexpr.php:45
 msgid "Count"
-msgstr "数量"
+msgstr "计数"
 
 #: include/views/configuration.slideconf.list.php:42
 msgid "Count of slides"
-msgstr "Count of slides"
+msgstr "简报片数量"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
-msgstr ""
+msgstr "创建动作"
 
 #: include/views/configuration.application.list.php:31
 msgid "Create application"
-msgstr "创建应用程序"
+msgstr "创建应用"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:29
 msgid "Create discovery rule"
-msgstr ""
+msgstr "创建发现规则"
 
 #: include/views/configuration.graph.list.php:40
 msgid "Create graph"
-msgstr ""
+msgstr "创建绘图"
 
 #: include/views/configuration.graph.list.php:43
 msgid "Create graph (select host first)"
-msgstr ""
+msgstr "创建绘图(先选择主机)"
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
-msgstr ""
+msgstr "创建绘图类型"
 
 #: hosts.php:633
 msgid "Create host"
-msgstr ""
+msgstr "创建主机"
 
 #: include/views/configuration.hostgroups.list.php:28
 #: include/views/configuration.hostgroups.list.php:31
 msgid "Create host group"
-msgstr ""
+msgstr "创建主机组"
 
 #: adm.iconmapping.php:107
 msgid "Create icon map"
-msgstr ""
+msgstr "创建图示对应"
 
 #: adm.images.php:141
 msgid "Create image"
-msgstr ""
+msgstr "创建图片"
 
 #: include/views/configuration.item.list.php:30 items.php:654
 msgid "Create item"
-msgstr ""
+msgstr "创建监控项"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
-msgstr ""
+msgstr "创建监控项类型"
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
-msgstr "Create maintenance period"
+msgstr "创建预维护时间片"
 
 #: sysmaps.php:208
 msgid "Create map"
-msgstr ""
+msgstr "创建拓扑"
 
 #: include/views/administration.mediatypes.list.php:26
 msgid "Create media type"
-msgstr ""
+msgstr "创建媒介类型"
 
 #: include/views/administration.node.list.php:36
 msgid "Create node"
-msgstr ""
+msgstr "创建节点"
 
 #: include/views/administration.proxy.list.php:32
 msgid "Create proxy"
-msgstr ""
+msgstr "创建代理"
 
 #: include/views/configuration.httpconf.list.php:30
 msgid "Create scenario"
-msgstr "Create scenario"
+msgstr "创建方案"
 
 #: include/views/configuration.httpconf.list.php:33
 msgid "Create scenario (select host first)"
-msgstr ""
+msgstr "创建方案 (先选择主机)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
-msgstr ""
+msgstr "创建面板"
 
 #: include/views/administration.script.list.php:24
 msgid "Create script"
@@ -2509,230 +2514,230 @@ msgstr "创建脚本"
 
 #: include/views/configuration.slideconf.list.php:27
 msgid "Create slide show"
-msgstr ""
+msgstr "创建简报片展示"
 
 #: templates.php:422
 msgid "Create template"
-msgstr ""
+msgstr "创建模板"
 
 #: include/views/configuration.triggers.list.php:44 jsLoader.php:99
 msgid "Create trigger"
-msgstr ""
+msgstr "创建触发器"
 
 #: include/views/configuration.triggers.list.php:39
 msgid "Create trigger prototype"
-msgstr ""
+msgstr "创建触发器类型"
 
 #: include/views/administration.users.list.php:30
 msgid "Create user"
-msgstr ""
+msgstr "创建用户"
 
 #: include/views/administration.usergroups.list.php:30
 msgid "Create user group"
-msgstr ""
+msgstr "创建用户组"
 
 #: adm.valuemapping.php:129
 msgid "Create value map"
-msgstr "Create value map"
+msgstr "创建值对应"
 
 #: api/classes/CApplication.php:541
 #, php-format
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已创建: 已在\"%2$s\"创建了应用\"%1$s\""
 
 #: api/classes/CDiscoveryRule.php:889
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已创建: 已在\"%2$s\"创建了发现规则\"%1$s\""
 
 #: api/classes/CItem.php:868
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已创建: 已在\"%2$s\"上创建了监控项\"%1$s\""
 
 #: api/classes/CItemPrototype.php:598
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已创建: 已在\"%2$s\"上创建了监控项类型\"%1$s\"."
 
 #: api/classes/CTrigger.php:1587
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已创建: 已在\"%2$s\"上创建了触发器\"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:1156
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已创建: 已在\"%2$s\"上创建了触发器类型\"%1$s\"."
 
 #: include/validate.inc.php:386
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"包含多字节字符."
 
 #: include/validate.inc.php:447
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"是强制的."
 
 #: include/validate.inc.php:326
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"不是个IP范围段"
 
 #: include/validate.inc.php:312
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "严重不错. 字段\"%1$s\"不是个IP."
 
 #: include/validate.inc.php:398
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"不是颜色."
 
 #: include/validate.inc.php:364
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"不是小数."
 
 #: include/validate.inc.php:340
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"不是个整数列表或范围."
 
 #: include/validate.inc.php:353
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"不是整数."
 
 #: include/validate.inc.php:375
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"不是个字符串."
 
 #: include/validate.inc.php:464
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"必须缺失."
 
 #: include/validate.inc.php:518
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr ""
+msgstr "严重错误. 字段\"%2$s\"中的值\"%1$s\"错误."
 
 #: include/validate.inc.php:508
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr ""
+msgstr "严重错误. 字段\"%2$s\"中的值\"%1$s\"错误: 必须在 %3$s 到 %4$s 之间."
 
 #: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "严重错误. 字段\"%1$s\"中值错误: 值不能为空."
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
 msgid "Current host"
-msgstr ""
+msgstr "当前主机"
 
 #: include/page_header.php:363
 msgid "Current node"
-msgstr "Current node"
+msgstr "当前节点"
 
 #: include/setup.inc.php:193
 msgid "Current value"
-msgstr ""
+msgstr "当前值"
 
 #: charts.php:26
 msgid "Custom graphs"
-msgstr "Custom graphs"
+msgstr "自定义绘图"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
-msgstr ""
+msgstr "自定义标签"
 
 #: api/classes/CMap.php:597
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr ""
+msgstr "自定义拓扑\"%2$s\"组件类型为\"%1$s\"的不能为空的标签."
 
 #: disc_prototypes.php:103 include/views/configuration.item.massupdate.php:250
 #: items.php:134
 msgid "Custom multiplier"
-msgstr "Custom multiplier"
+msgstr "自定义倍数"
 
 #: screens.php:27
 msgid "Custom screens"
-msgstr "用户图表"
+msgstr "自定义面板"
 
 #: include/views/configuration.action.edit.php:646
 msgid "Custom script"
-msgstr ""
+msgstr "自定义脚本"
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
-msgstr ""
+msgstr "自定义级别"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr ""
+msgstr "自定义级别名称会影响到所有语系，需要手动翻译!"
 
 #: include/views/js/configuration.sysmaps.js.php:43
 msgid "Custom size"
-msgstr ""
+msgstr "自定义尺寸"
 
 #: slides.php:27
 msgid "Custom slides"
-msgstr ""
+msgstr "自定义简报片"
 
 #: include/locales.inc.php:48
 msgid "Czech (cs_CZ)"
-msgstr ""
+msgstr "捷克(cs_CZ)"
 
 #: include/classes/class.cchart.php:1236
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: include/defines.inc.php:907
 msgid "D, d M Y H:i:s O"
-msgstr ""
+msgstr "D, d M Y H:i:s O"
 
 #: dashconf.php:112
 msgid "DASHBOARD CONFIGURATION"
-msgstr "DASHBOARD CONFIGURATION"
+msgstr "仪表盘配置"
 
 #: httpdetails.php:125
 msgid "DETAILS OF SCENARIO"
-msgstr "DETAILS OF SCENARIO"
+msgstr "方案详情"
 
 #: include/maps.inc.php:572 include/maps.inc.php:664 include/maps.inc.php:759
 #: include/maps.inc.php:856
 msgid "DISABLED"
-msgstr "关闭"
+msgstr "已禁用"
 
 #: include/triggers.inc.php:380
 msgid "DISCOVERED"
-msgstr ""
+msgstr "已发现"
 
 #: include/menu.inc.php:248
 msgid "DM"
-msgstr "节点管理"
+msgstr "分布式管理"
 
 #: events.php:486 events.php:495 hosts.php:652
 #: include/views/administration.proxy.edit.php:60
 #: include/views/js/configuration.host.edit.js.php:18 popup.php:540
 #: search.php:131
 msgid "DNS"
-msgstr "主机域名"
+msgstr "域名"
 
 #: include/views/administration.proxy.edit.php:53
 #: include/views/configuration.host.edit.php:216
 msgid "DNS name"
-msgstr "DNS name"
+msgstr "域名"
 
 #: include/triggers.inc.php:379
 msgid "DOWN"
-msgstr ""
+msgstr "宕机"
 
 #: include/forms.inc.php:1496 include/maintenances.inc.php:35
 #: include/reports.inc.php:213 include/reports.inc.php:659
@@ -2742,28 +2747,28 @@ msgstr "每日"
 
 #: include/classes/core/ZBase.php:137
 msgid "Dark orange"
-msgstr ""
+msgstr "暗橙"
 
 #: include/reports.inc.php:705
 msgid "Darken"
-msgstr "Darken"
+msgstr "转暗"
 
 #: dashboard.php:24 include/menu.inc.php:34 include/profiles.inc.php:353
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr "仪表盘"
 
 #: dashconf.php:27
 msgid "Dashboard configuration"
-msgstr "Dashboard configuration"
+msgstr "仪表盘配置"
 
 #: dashconf.php:168
 msgid "Dashboard filter"
-msgstr "Dashboard filter"
+msgstr "仪表盘过滤"
 
 #: include/graphs.inc.php:73 include/views/js/configuration.sysmaps.js.php:335
 #: include/views/js/configuration.sysmaps.js.php:411
 msgid "Dashed line"
-msgstr "Dashed line"
+msgstr "虚线"
 
 #: include/views/monitoring.overview.php:28
 msgid "Data"
@@ -2772,77 +2777,78 @@ msgstr "数据"
 #: include/classes/class.cchart.php:2372 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "数据来源于\"%1$s\". 生成于 \"%2$s\"秒."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
-msgstr "Data overview"
+msgstr "数据预览"
 
 #: include/forms.inc.php:442 include/views/configuration.item.edit.php:232
 #: include/views/configuration.item.massupdate.php:177
 msgid "Data type"
-msgstr "Data type"
+msgstr "数据类型"
 
 #: include/setup.inc.php:253 include/setup.inc.php:346
 msgid "Database file"
-msgstr ""
+msgstr "数据库文件"
 
 #: include/setup.inc.php:257
 msgid "Database host"
-msgstr ""
+msgstr "数据库主机"
 
 #: include/items.inc.php:87
 msgid "Database monitor"
-msgstr "Database monitor"
+msgstr "数据库监控"
 
 #: include/setup.inc.php:268 include/setup.inc.php:358 setup.php:42
 msgid "Database name"
-msgstr ""
+msgstr "数据库名称"
 
 #: include/setup.inc.php:360
 msgid "Database password"
-msgstr ""
+msgstr "数据库密码"
 
 #: include/setup.inc.php:261 include/setup.inc.php:353
 #: include/setup.inc.php:356
 msgid "Database port"
-msgstr ""
+msgstr "数据库端口"
 
 #: include/setup.inc.php:273 include/setup.inc.php:362
+#, fuzzy
 msgid "Database schema"
-msgstr ""
+msgstr "数据库结构"
 
 #: include/setup.inc.php:351
 msgid "Database server"
-msgstr ""
+msgstr "数据库服务器"
 
 #: include/setup.inc.php:250 include/setup.inc.php:339
 msgid "Database type"
-msgstr ""
+msgstr "数据库类型"
 
 #: include/setup.inc.php:359
 msgid "Database user"
-msgstr ""
+msgstr "数据库用户"
 
 #: include/forms.inc.php:1582 include/forms.inc.php:1646 jsrpc.php:138
 msgid "Date"
-msgstr "Date"
+msgstr "日期"
 
 #: include/hosts.inc.php:335
 msgid "Date HW decommissioned"
-msgstr ""
+msgstr "硬件下架日期"
 
 #: include/hosts.inc.php:325
 msgid "Date HW installed"
-msgstr ""
+msgstr "硬件安装日期"
 
 #: include/hosts.inc.php:330
 msgid "Date HW maintenance expires"
-msgstr ""
+msgstr "硬件过保日期"
 
 #: include/hosts.inc.php:320
 msgid "Date HW purchased"
-msgstr ""
+msgstr "硬件采购日期"
 
 #: include/forms.inc.php:1582 report3.php:127 report4.php:138 report5.php:45
 #: tr_status.php:208 tr_status.php:210
@@ -2851,12 +2857,12 @@ msgstr "日"
 
 #: include/forms.inc.php:1610
 msgid "Day of month"
-msgstr "Day of month"
+msgstr "月中第几日"
 
 #: include/forms.inc.php:1525 include/forms.inc.php:1582
 #: include/forms.inc.php:1606
 msgid "Day of week"
-msgstr "Day of week"
+msgstr "一周中第几日"
 
 #: include/forms.inc.php:1667 tr_status.php:208 tr_status.php:210
 msgid "Days"
@@ -2878,16 +2884,16 @@ msgstr "调试模式已更新"
 
 #: include/func.inc.php:229
 msgid "Dec"
-msgstr ""
+msgstr "十二月"
 
 #: include/forms.inc.php:1559 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:121
 msgid "December"
-msgstr "December"
+msgstr "十二月"
 
 #: include/items.inc.php:130
 msgid "Decimal"
-msgstr "Decimal"
+msgstr "小数"
 
 #: include/hosts.inc.php:38
 #: include/views/administration.general.iconmap.edit.php:127
@@ -2906,20 +2912,20 @@ msgstr "默认认证方式"
 
 #: include/views/configuration.slideconf.edit.php:39 slideconf.php:40
 msgid "Default delay (in seconds)"
-msgstr ""
+msgstr "默认延迟(单位为秒)"
 
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:534
 msgid "Default message"
-msgstr "默认信息"
+msgstr "默认消息"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
-msgstr ""
+msgstr "默认操作步骤持续时间"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
-msgstr "默认主题"
+msgstr "默认标题"
 
 #: include/views/administration.general.gui.edit.php:31
 msgid "Default theme"
@@ -2928,7 +2934,7 @@ msgstr "默认风格"
 #: adm.gui.php:68
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr ""
+msgstr "默认主题\"%1$s\"."
 
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:49
@@ -2938,11 +2944,11 @@ msgstr "延迟"
 
 #: include/views/configuration.discovery.edit.php:48
 msgid "Delay (in sec)"
-msgstr ""
+msgstr "延迟(单位为秒)"
 
 #: queue.php:247
 msgid "Delayed by"
-msgstr "Delayed by"
+msgstr "延迟因为"
 
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1908
 #: include/views/administration.auditlogs.list.php:47
@@ -2953,28 +2959,28 @@ msgstr "删除"
 
 #: include/views/configuration.template.edit.php:418
 msgid "Delete and clear"
-msgstr "Delete AND clear"
+msgstr "删除并清空"
 
 #: templates.php:603
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Warning: this will delete selected templates and clear all linked hosts"
+msgstr "删除并清除所选的模板?(警告: 所有链接的主机将会被清空!)"
 
 #: include/views/configuration.template.edit.php:418
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "删除并清除模板?(警告: 所有链接的主机将会被清空!)"
 
 #: include/views/configuration.application.edit.php:73
 msgid "Delete application?"
-msgstr ""
+msgstr "删除应用?"
 
 #: include/views/configuration.action.edit.php:974
 msgid "Delete current action?"
-msgstr ""
+msgstr "删除当前动作?"
 
 #: include/views/configuration.discovery.edit.php:80
 #: include/views/configuration.item.edit.php:457
 msgid "Delete discovery rule?"
-msgstr ""
+msgstr "删除发现规则?"
 
 #: include/views/configuration.triggers.edit.php:156 jsLoader.php:102
 #: tr_logform.php:334
@@ -2983,23 +2989,23 @@ msgstr "删除表达式?"
 
 #: include/views/configuration.graph.edit.php:304
 msgid "Delete graph?"
-msgstr "Delete graph?"
+msgstr "删除绘图?"
 
 #: include/views/configuration.httpconf.list.php:138
 msgid "Delete history of selected WEB scenarios?"
-msgstr "Delete history of selected WEB scenarios?"
+msgstr "删除所选的WEB方案历史数据?"
 
 #: include/views/configuration.item.list.php:252
 msgid "Delete history of selected items?"
-msgstr "Delete history of selected items?"
+msgstr "删除所选监控项的历史数据?"
 
 #: include/views/administration.general.iconmap.edit.php:142
 msgid "Delete icon map?"
-msgstr ""
+msgstr "删除图示对应？"
 
 #: include/views/configuration.item.edit.php:462
 msgid "Delete item?"
-msgstr ""
+msgstr "删除监控项?"
 
 #: jsLoader.php:101 tr_logform.php:350
 msgid "Delete keyword?"
@@ -3007,31 +3013,31 @@ msgstr "删除关键字?"
 
 #: jsLoader.php:152
 msgid "Delete links between selected elements?"
-msgstr ""
+msgstr "删除所选组件间链接?"
 
 #: include/views/configuration.maintenance.edit.php:174
 msgid "Delete maintenance period?"
-msgstr "Delete maintenance period?"
+msgstr "删除维护时间区间？"
 
 #: include/views/configuration.sysmap.edit.php:209
 msgid "Delete network map?"
-msgstr ""
+msgstr "删除网络拓扑?"
 
 #: include/views/administration.proxy.edit.php:95
 msgid "Delete proxy?"
-msgstr ""
+msgstr "删除代理?"
 
 #: include/forms.inc.php:1844
 msgid "Delete regular expression?"
-msgstr "删除表达式?"
+msgstr "删除正则表达式?"
 
 #: include/views/configuration.httpconf.edit.php:219
 msgid "Delete scenario?"
-msgstr "Delete scenario?"
+msgstr "删除方案?"
 
 #: include/views/configuration.screen.edit.php:53
 msgid "Delete screen?"
-msgstr "删除图表?"
+msgstr "删除面板?"
 
 #: include/views/administration.script.edit.php:122
 msgid "Delete script?"
@@ -3070,11 +3076,11 @@ msgstr "删除所选"
 
 #: include/views/configuration.httpconf.list.php:142
 msgid "Delete selected WEB scenarios?"
-msgstr "Delete selected WEB scenarios?"
+msgstr "删除所选的WEB监控方案?"
 
 #: include/views/configuration.action.list.php:102
 msgid "Delete selected actions?"
-msgstr ""
+msgstr "删除所选的动作?"
 
 #: include/views/configuration.application.list.php:90
 msgid "Delete selected applications?"
@@ -3087,131 +3093,131 @@ msgstr "删除所选的自发现规则?"
 
 #: jsLoader.php:148
 msgid "Delete selected elements?"
-msgstr ""
+msgstr "删除所选的组件?"
 
 #: include/views/configuration.graph.list.php:140
 msgid "Delete selected graphs?"
-msgstr "Delete selected graphs?"
+msgstr "删除所选的绘图?"
 
 #: include/views/administration.usergroups.edit.php:136
 #: include/views/configuration.hostgroups.edit.php:74
 msgid "Delete selected group?"
-msgstr "删除所选组?"
+msgstr "删除所选的组?"
 
 #: include/views/administration.usergroups.list.php:146
 msgid "Delete selected groups?"
-msgstr "删除所选脚本?"
+msgstr "删除所选的组?"
 
 #: include/views/configuration.hostgroups.list.php:126
 msgid "Delete selected host groups?"
-msgstr ""
+msgstr "删除所选的主机组?"
 
 #: include/views/configuration.host.edit.php:641
 msgid "Delete selected host?"
-msgstr "Delete selected host?"
+msgstr "删除所选的主机?"
 
 #: hosts.php:876
 msgid "Delete selected hosts?"
-msgstr "删除选中主机?"
+msgstr "删除所选的主机?"
 
 #: include/views/administration.general.image.edit.php:52
 msgid "Delete selected image?"
-msgstr "Delete selected image?"
+msgstr "删除所选择的图片?"
 
 #: include/views/configuration.item.list.php:256
 #: include/views/configuration.item.prototype.list.php:113
 msgid "Delete selected items?"
-msgstr "Delete selected items?"
+msgstr "删除所选的监控项?"
 
 #: include/views/configuration.maintenance.list.php:77
 msgid "Delete selected maintenance periods?"
-msgstr "Delete selected maintenance periods?"
+msgstr "删除所选的维护时间段?"
 
 #: sysmaps.php:299
 msgid "Delete selected maps?"
-msgstr "Delete selected maps?"
+msgstr "删除所选的拓扑?"
 
 #: include/views/administration.mediatypes.edit.php:109
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "删除所选的媒介类型?"
 
 #: include/views/administration.mediatypes.list.php:118
 msgid "Delete selected media types?"
-msgstr ""
+msgstr "删除所选的媒介类型?"
 
 #: include/views/administration.node.edit.php:89
 msgid "Delete selected node?"
-msgstr "删除所选节点?"
+msgstr "删除所选的节点?"
 
 #: include/views/administration.proxy.list.php:96
 msgid "Delete selected proxies?"
-msgstr "删除所选代理?"
+msgstr "删除所选的代理?"
 
 #: include/views/administration.general.regularexpressions.list.php:58
 msgid "Delete selected regular expressions?"
-msgstr "删除所选表达式?"
+msgstr "删除所选的正则表达式?"
 
 #: include/views/configuration.screen.list.php:69
 msgid "Delete selected screens?"
-msgstr ""
+msgstr "删除所选的面板?"
 
 #: include/views/administration.script.list.php:90
 msgid "Delete selected scripts?"
-msgstr "删除所选脚本?"
+msgstr "删除所选的脚本?"
 
 #: include/views/configuration.slideconf.list.php:60
 msgid "Delete selected slide shows?"
-msgstr ""
+msgstr "删除所选的简报展示?"
 
 #: templates.php:599
 msgid "Delete selected templates?"
-msgstr "Delete selected templates?"
+msgstr "删除所选的模板?"
 
 #: include/views/configuration.triggers.list.php:238
 msgid "Delete selected triggers?"
-msgstr "Delete selected triggers?"
+msgstr "删除所选的触发器?"
 
 #: include/views/administration.users.edit.php:324
 msgid "Delete selected user?"
-msgstr "Delete selected user?"
+msgstr "删除所选的用户?"
 
 #: include/views/administration.users.list.php:141
 msgid "Delete selected users?"
-msgstr "Delete selected users?"
+msgstr "删除所选的用户?"
 
 #: adm.valuemapping.php:163
 msgid "Delete selected value mapping?"
-msgstr "Delete selected value mapping?"
+msgstr "删除所选的键值对应?"
 
 #: adm.valuemapping.php:160
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
-msgstr[0] ""
+msgstr[0] "删除所选的键值对应? 它正被%d个监控项使用着!"
 
 #: templates.php:602
 msgid "Delete selected with linked elements"
-msgstr "Delete selected with linked elements"
+msgstr "删除所选的被链接的组件"
 
 #: jsLoader.php:179
 msgid "Delete service"
-msgstr ""
+msgstr "删除服务"
 
 #: include/views/configuration.slideconf.edit.php:115
 msgid "Delete slide show?"
-msgstr ""
+msgstr "删除简报片展示?"
 
 #: include/views/configuration.template.edit.php:417
 msgid "Delete template?"
-msgstr ""
+msgstr "删除模板?"
 
 #: jsLoader.php:180
 msgid "Delete the selected service?"
-msgstr ""
+msgstr "删除所选的服务?"
 
 #: include/views/configuration.triggers.edit.php:305
 msgid "Delete trigger?"
-msgstr "Delete trigger?"
+msgstr "删除触发器?"
 
 #: auditlogs.php:140
 msgid "Deleted"
@@ -3220,53 +3226,53 @@ msgstr "已删除"
 #: api/classes/CApplication.php:634
 #, php-format
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已删除: 在\"$2$s\"上的应用\"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:654
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已删除: 在\"%2$s\"上的发现规则\"%1$s\"."
 
 #: api/classes/CGraph.php:799
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已删除: 在\"%2$s\"上的绘图\"%1$s\"."
 
 #: api/classes/CHost.php:2139
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
-msgstr ""
+msgstr "已删除: 主机\"%1$s\"."
 
 #: api/classes/CItem.php:1057
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已删除: 在\"%2$s\"上的监控项\"%1$s\"."
 
 #: api/classes/CItemPrototype.php:798
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已删除: 在\"%2$s\"上的监控项类型\"%1$s\"."
 
 #: api/classes/CProxy.php:532
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
-msgstr ""
+msgstr "已删除: 代理\"%1$s\"."
 
 #: api/classes/CTemplate.php:1242
 #, php-format
 msgid "Deleted: Template \"%1$s\"."
-msgstr ""
+msgstr "已删除: 模板\"%1$s\"."
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
 #: api/classes/CTrigger.php:1376
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已删除: 在\"%2$s\"上的触发器\"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:1113
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "已删除: 在\"%2$s\"上的触发器类型\"%1$s\"."
 
 #: include/forms.inc.php:1805 include/forms.inc.php:1886
 #: include/forms.inc.php:1966
@@ -3276,38 +3282,39 @@ msgstr "分隔符"
 #: include/views/configuration.item.edit.php:363
 #: include/views/configuration.item.massupdate.php:376
 msgid "Delta (simple change)"
-msgstr "Delta (simple change)"
+msgstr "差量 (单纯变化)"
 
 #: include/views/configuration.item.edit.php:362
 #: include/views/configuration.item.massupdate.php:375
 msgid "Delta (speed per second)"
-msgstr "Delta (speed per second)"
+msgstr "差量 (每秒速率)"
 
 #: include/forms.inc.php:271 include/perm.inc.php:25
 #: include/views/administration.usergroups.edit.php:80
 msgid "Deny"
-msgstr "禁止"
+msgstr "拒绝"
 
 #: include/views/configuration.services.edit.php:261
 #: include/views/configuration.triggers.edit.php:285
 #: include/views/configuration.triggers.edit.php:294
 msgid "Dependencies"
-msgstr ""
+msgstr "依赖"
 
 #: include/triggers.inc.php:1530 tr_status.php:529
 msgid "Dependent"
-msgstr "Dependent"
+msgstr "相关"
 
 #: include/triggers.inc.php:1510
 #: include/views/configuration.services.edit.php:101
 #: include/views/configuration.triggers.list.php:140 popup.php:1024
 #: tr_status.php:513
 msgid "Depends on"
-msgstr "Depends on"
+msgstr "依赖于"
 
 #: include/hosts.inc.php:270
+#, fuzzy
 msgid "Deployment status"
-msgstr ""
+msgstr "部署状态"
 
 #: events.php:487 events.php:496 events.php:562 events.php:575
 #: include/classes/screens/CScreenEvents.php:46
@@ -3322,7 +3329,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:244 popup.php:1338
 #: tr_logform.php:256
 msgid "Description"
-msgstr "检测内容"
+msgstr "描述"
 
 #: include/actions.inc.php:825 include/blocks.inc.php:687
 #: include/config.inc.php:336
@@ -3331,19 +3338,19 @@ msgstr "检测内容"
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:321 jsrpc.php:137 queue.php:50
 msgid "Details"
-msgstr "详细内容"
+msgstr "细节"
 
 #: httpdetails.php:27
 msgid "Details of scenario"
-msgstr "Details of scenario"
+msgstr "方案细节"
 
 #: include/actions.inc.php:72
 msgid "Device"
-msgstr "Device"
+msgstr "设备"
 
 #: discoveryconf.php:42 include/views/configuration.discovery.edit.php:67
 msgid "Device uniqueness criteria"
-msgstr "Device uniqueness criteria"
+msgstr "设备唯一性标准"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3351,15 +3358,15 @@ msgstr "图表规格 (列 x 行)"
 
 #: include/views/administration.auditlogs.list.php:49
 msgid "Disable"
-msgstr "关闭"
+msgstr "停用"
 
 #: include/views/administration.usergroups.list.php:141
 msgid "Disable DEBUG"
-msgstr "关闭DEBUG"
+msgstr "关闭调试"
 
 #: include/views/administration.usergroups.list.php:142
 msgid "Disable debug mode in selected groups?"
-msgstr "Disable debug mode in selected groups?"
+msgstr "所选的组关闭调试?"
 
 #: include/actions.inc.php:292 include/actions.inc.php:501
 msgid "Disable host"
@@ -3367,15 +3374,15 @@ msgstr "禁用主机"
 
 #: hosts.php:797 hosts.php:808
 msgid "Disable host?"
-msgstr ""
+msgstr "禁用主机?"
 
 #: include/views/configuration.hostgroups.list.php:123
 msgid "Disable hosts in the selected host groups?"
-msgstr ""
+msgstr "禁用所选择主机组中的主机?"
 
 #: include/views/administration.proxy.list.php:92
 msgid "Disable hosts monitored by selected proxies?"
-msgstr "Disable hosts monitored by selected proxies?"
+msgstr "禁用所选代理上的主机监控?"
 
 #: hosts.php:871 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:91
@@ -3394,11 +3401,11 @@ msgstr "禁用所选"
 
 #: include/views/configuration.httpconf.list.php:134
 msgid "Disable selected WEB scenarios?"
-msgstr "Disable selected WEB scenarios?"
+msgstr "禁用所选的WEB方案?"
 
 #: include/views/configuration.action.list.php:98
 msgid "Disable selected actions?"
-msgstr ""
+msgstr "禁用所选的动作?"
 
 #: include/views/configuration.application.list.php:86
 msgid "Disable selected applications?"
@@ -3411,24 +3418,24 @@ msgstr "关闭所选的自发现规则?"
 
 #: include/views/administration.usergroups.list.php:134
 msgid "Disable selected groups?"
-msgstr "Disable selected groups?"
+msgstr "禁用所选的组?"
 
 #: hosts.php:872
 msgid "Disable selected hosts?"
-msgstr "Disable selected hosts?"
+msgstr "禁用所选的主机?"
 
 #: include/views/configuration.item.list.php:242
 #: include/views/configuration.item.prototype.list.php:109
 msgid "Disable selected items?"
-msgstr "Disable selected items?"
+msgstr "禁用所选的项目?"
 
 #: include/views/administration.mediatypes.list.php:114
 msgid "Disable selected media types?"
-msgstr ""
+msgstr "禁用所选的媒体类型?"
 
 #: include/views/configuration.triggers.list.php:229
 msgid "Disable selected triggers?"
-msgstr "Disable selected triggers?"
+msgstr "禁用所选的触发器?"
 
 #: auditlogs.php:152 dashboard.php:227 dashconf.php:164
 #: include/discovery.inc.php:119 include/httptest.inc.php:46
@@ -3451,11 +3458,11 @@ msgstr "Disable selected triggers?"
 #: include/views/monitoring.overview.php:40 popup_media.php:137 popup.php:1035
 #: tr_logform.php:370
 msgid "Disabled"
-msgstr "不活跃"
+msgstr "已停用"
 
 #: include/views/monitoring.overview.php:61
 msgid "Disabled or no trigger"
-msgstr ""
+msgstr "停用或者没有触发器"
 
 #: adm.triggerseverities.php:64
 #: include/views/administration.general.triggerSeverity.edit.php:64
@@ -3464,11 +3471,11 @@ msgstr "灾难"
 
 #: include/discovery.inc.php:151
 msgid "Discovered"
-msgstr "Discovered"
+msgstr "已发现的"
 
 #: include/views/monitoring.discovery.php:42
 msgid "Discovered device"
-msgstr "Discovered device"
+msgstr "已发现的设备"
 
 #: events.php:307 hosts.php:687 hosts.php:767 include/events.inc.php:27
 #: include/html.inc.php:387 include/menu.inc.php:78 include/menu.inc.php:215
@@ -3479,23 +3486,23 @@ msgstr "自动发现"
 
 #: include/views/configuration.discovery.edit.php:46
 msgid "Discovery by proxy"
-msgstr "Discovery by proxy"
+msgstr "通过代理发现的"
 
 #: include/actions.inc.php:51
 msgid "Discovery check"
-msgstr "Discovery check"
+msgstr "发现检查"
 
 #: popup.php:131
 msgid "Discovery checks"
-msgstr ""
+msgstr "发现检查"
 
 #: include/html.inc.php:385
 msgid "Discovery list"
-msgstr ""
+msgstr "发现列表"
 
 #: include/actions.inc.php:52
 msgid "Discovery object"
-msgstr ""
+msgstr "发现对象"
 
 #: include/actions.inc.php:50 include/audit.inc.php:44
 #: include/blocks.inc.php:1075 include/forms.inc.php:1010
@@ -3503,39 +3510,39 @@ msgstr ""
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
-msgstr "自动发现规则"
+msgstr "发现规则"
 
 #: api/classes/CDiscoveryRule.php:972
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "发现规则\"$1$s\"已在\"%2$s\"中, 继承自其它模板."
 
 #: api/classes/CDiscoveryRule.php:959
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr ""
+msgstr "自动发现规则\"%1$s:%2$s\"生命周期错误: \"%3%s\". （最小值: %4$d, 最大值:  %5$d, 允许使用宏）"
 
 #: api/classes/CDRule.php:596
 #, php-format
 msgid "Discovery rule \"%s\" already exists."
-msgstr ""
+msgstr "发现规则 \"%s\" 已存在."
 
 #: api/classes/CDRule.php:664
 #, php-format
 msgid "Discovery rule [%s] already exists"
-msgstr ""
+msgstr "发现规则 [%s] 已存在"
 
 #: discoveryconf.php:121 host_discovery.php:233
 msgid "Discovery rule created"
-msgstr ""
+msgstr "发现规则已创建"
 
 #: discoveryconf.php:135 host_discovery.php:166
 msgid "Discovery rule deleted"
-msgstr "自发现规则已删除"
+msgstr "发现规则已删除"
 
 #: discoveryconf.php:115 host_discovery.php:229
 msgid "Discovery rule updated"
-msgstr "自动发现的规则已更新"
+msgstr "发现的规则已更新"
 
 #: include/html.inc.php:496 include/html.inc.php:500
 #: include/views/configuration.host.discovery.list.php:33
@@ -3544,31 +3551,31 @@ msgstr "自动发现的规则已更新"
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:35
 #: popup.php:127
 msgid "Discovery rules"
-msgstr ""
+msgstr "发现规则"
 
 #: host_discovery.php:246
 msgid "Discovery rules activated"
-msgstr ""
+msgstr "发现规则已使用"
 
 #: discoveryconf.php:163 host_discovery.php:250
 msgid "Discovery rules deleted"
-msgstr "自发现规则已删除"
+msgstr "发现规则已删除"
 
 #: host_discovery.php:246
 msgid "Discovery rules disabled"
-msgstr ""
+msgstr "发现规则已禁用"
 
 #: discoveryconf.php:153
 msgid "Discovery rules updated"
-msgstr "自动发现的规则已更新"
+msgstr "发现规则已更新"
 
 #: dashboard.php:334 include/actions.inc.php:56
 msgid "Discovery status"
-msgstr "自动发现状态"
+msgstr "发现状态"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 msgid "Display OK triggers for"
-msgstr ""
+msgstr "显示OK状态的触发器为"
 
 #: include/func.inc.php:1688
 msgid "Displaying"
@@ -3577,143 +3584,143 @@ msgstr "显示"
 #: search.php:219 search.php:321 search.php:446
 #, php-format
 msgid "Displaying %1$s of %2$s found"
-msgstr ""
+msgstr "显示已发现 %2$s中的%1$s  "
 
 #: report6.php:159
 msgid "Distribution of values for multiple items"
-msgstr "Distribution of values for multiple items"
+msgstr "多个监控项中分布的值"
 
 #: report6.php:158
 msgid "Distribution of values for multiple periods"
-msgstr "Distribution of values for multiple periods"
+msgstr "多个时间片中分布的值"
 
 #: include/services.inc.php:61
 msgid "Do not calculate"
-msgstr "Do not calculate"
+msgstr "不需要计算"
 
 #: adm.housekeeper.php:33
 #: include/views/administration.general.housekeeper.edit.php:24
 msgid "Do not keep actions older than (in days)"
-msgstr "Do not keep actions older than (in days)"
+msgstr "保留的动作不要久于(天)"
 
 #: adm.housekeeper.php:56
 #, php-format
 msgid "Do not keep actions older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "保留的动作不要久于(天) \"%1$s\"."
 
 #: adm.housekeeper.php:35
 #: include/views/administration.general.housekeeper.edit.php:25
 msgid "Do not keep events older than (in days)"
-msgstr "Do not keep events older than (in days)"
+msgstr "保留的事件不要久于(天)"
 
 #: adm.housekeeper.php:55
 #, php-format
 msgid "Do not keep events older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "保留的事件不要久于 \"%1$s\"(天)."
 
 #: jsLoader.php:97
 msgid "Do you wish to replace the conditional expression?"
-msgstr ""
+msgstr "你要更换条件表达式？"
 
 #: jsLoader.php:130
 msgid "Done"
-msgstr ""
+msgstr "完成"
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:334
 #: include/views/js/configuration.sysmaps.js.php:410 jsLoader.php:146
 msgid "Dot"
-msgstr "Dot"
+msgstr "点"
 
 #: include/blocks.inc.php:1077
 msgctxt "discovery results in dashboard"
 msgid "Down"
-msgstr ""
+msgstr "下"
 
 #: include/discovery.inc.php:150
 msgctxt "discovery status"
 msgid "Down"
-msgstr ""
+msgstr "下"
 
 #: api/classes/CWebCheck.php:623
 #, php-format
 msgid "Download speed for scenario \"%s\"."
-msgstr ""
+msgstr "方案 \"%s\" 的下载速度."
 
 #: api/classes/CWebCheck.php:722
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
-msgstr ""
+msgstr "方案\"%2$s\"中步骤 \"%1$s\" 的下载速度."
 
 #: include/views/configuration.services.edit.php:126
 #: include/views/configuration.services.edit.php:240
 #: include/views/monitoring.discovery.php:44
 #: include/views/monitoring.discovery.php:168 report3.php:86
 msgid "Downtime"
-msgstr "下线时间"
+msgstr "宕机时间"
 
 #: include/views/configuration.host.edit.php:271
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
-msgstr ""
+msgstr "点击这里来改变接口类型为\"IPMI\"类型."
 
 #: include/views/configuration.host.edit.php:256
 msgid "Drag here to change the type of the interface to \"JMX\" type."
-msgstr ""
+msgstr "点击这里来改变接口类型为\"JMX\"类型."
 
 #: include/views/configuration.host.edit.php:240
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
-msgstr ""
+msgstr "点击这里来改变接口类型为\"SNMP\"类型."
 
 #: include/views/configuration.host.edit.php:223
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr ""
+msgstr "拖动这里来改变接口类型为\"agent\"类型."
 
 #: include/views/configuration.graph.edit.php:72
 msgid "Draw style"
-msgstr "Draw style"
+msgstr "绘制样式"
 
 #: include/views/administration.general.gui.edit.php:32
 msgid "Dropdown first entry"
-msgstr "Dropdown first entry"
+msgstr "下拉列表的第一个条目"
 
 #: adm.gui.php:72
 #, php-format
 msgid "Dropdown first entry \"%1$s\"."
-msgstr ""
+msgstr "下拉列表的第一个条目 \"%1$s\"."
 
 #: adm.gui.php:73
 #, php-format
 msgid "Dropdown remember selected \"%1$s\"."
-msgstr ""
+msgstr "记住下拉列表中所选择的 \"%1$s\"."
 
 #: api/classes/CHost.php:1349
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr ""
+msgstr "重复的主机. 数据中存在具有同样主机名称 \"%s\"的主机."
 
 #: api/classes/CHost.php:1381
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr ""
+msgstr "重复的主机.数据中存在具有相同可视名称\"%s\"的主机."
 
 #: api/classes/CMap.php:565
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
-msgstr ""
+msgstr "重复的拓扑名称\"%s\"."
 
 #: api/classes/CScript.php:307 api/classes/CScript.php:358
 #, php-format
 msgid "Duplicate script name \"%s\"."
-msgstr ""
+msgstr "重复的脚本名称\"%s\"."
 
 #: include/profiles.inc.php:311
 #, php-format
 msgid "Duplicate severity name \"%s\"."
-msgstr ""
+msgstr "重复的严重程度级别\"%s\"."
 
 #: api/classes/CUser.php:388
 #, php-format
 msgid "Duplicate user alias \"%s\"."
-msgstr ""
+msgstr "重复的用户别名\"%s\"."
 
 #: events.php:565 events.php:578 include/events.inc.php:133
 #: include/events.inc.php:206 include/events.inc.php:209 tr_status.php:290
@@ -3722,11 +3729,11 @@ msgstr "持续时间"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Duration (sec)"
-msgstr ""
+msgstr "持续时间(秒)"
 
 #: include/locales.inc.php:49
 msgid "Dutch (nl_NL)"
-msgstr "Dutch (nl_NL)"
+msgstr "荷兰语 (nl_NL)"
 
 #: include/views/configuration.screen.constructor.edit.php:610
 msgid "Dynamic item"
@@ -3735,11 +3742,11 @@ msgstr "动态监控项"
 #: include/func.inc.php:569
 msgctxt "Exa short"
 msgid "E"
-msgstr ""
+msgstr "E"
 
 #: include/config.inc.php:303
 msgid "ERROR"
-msgstr ""
+msgstr "错误"
 
 #: tr_events.php:101
 msgid "EVENTS"
@@ -3747,7 +3754,7 @@ msgstr "事件"
 
 #: jsLoader.php:151
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr ""
+msgstr "每个URL名称必须是唯一的.请确保只有一个URL名称"
 
 #: include/forms.inc.php:1879 include/forms.inc.php:1893
 #: include/views/administration.users.edit.php:157
@@ -3764,27 +3771,27 @@ msgstr "编辑"
 
 #: include/views/configuration.maintenance.edit.php:123
 msgid "Edit maintenance period"
-msgstr "Edit maintenance period"
+msgstr "编辑维修期间"
 
 #: include/views/js/configuration.sysmaps.js.php:7
 msgid "Edit map element"
-msgstr "Edit map element"
+msgstr "编辑地图元素"
 
 #: jsLoader.php:178
 msgid "Edit service"
-msgstr ""
+msgstr "编辑服务"
 
 #: include/views/configuration.item.list.php:181
 msgid "Edit trigger"
-msgstr ""
+msgstr "编辑触发器"
 
 #: include/views/configuration.sysmap.edit.php:151
 msgid "Element"
-msgstr "Element"
+msgstr "组件"
 
 #: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:296
 msgid "Element name"
-msgstr "Element name"
+msgstr "组件名称"
 
 #: include/media.inc.php:24
 #: include/views/administration.mediatypes.edit.php:39
@@ -3793,19 +3800,19 @@ msgstr "邮件"
 
 #: popup.php:524
 msgid "Empty"
-msgstr "Empty"
+msgstr "空"
 
 #: api/classes/CAction.php:1766
 msgid "Empty action condition."
-msgstr ""
+msgstr "条件为空"
 
 #: api/classes/CTriggerExpression.php:21
 msgid "Empty expression."
-msgstr ""
+msgstr "表达式为空"
 
 #: api/classes/CTriggerExpression.php:68
 msgid "Empty host name provided in expression."
-msgstr ""
+msgstr "在表达式中没有提供主机名"
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:649
 #: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
@@ -3821,32 +3828,32 @@ msgstr ""
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:502
 #: api/classes/CUserMacro.php:654
 msgid "Empty input parameter."
-msgstr ""
+msgstr "输入参数为空"
 
 #: api/classes/CDRule.php:418
 msgid "Empty input."
-msgstr ""
+msgstr "输入为空"
 
 #: api/classes/CTriggerExpression.php:78
 #, php-format
 msgid "Empty item key \"%1$s\" is used in expression."
-msgstr ""
+msgstr "空的监控项键值 \"%1$s\"被用于表达式中"
 
 #: api/classes/CUserMacro.php:892
 msgid "Empty macro."
-msgstr ""
+msgstr "宏为空."
 
 #: api/classes/CService.php:1110
 msgid "Empty name."
-msgstr ""
+msgstr "名字为空."
 
 #: api/classes/CImage.php:502 api/rpc/class.czbxrpc.php:46
 msgid "Empty parameters"
-msgstr ""
+msgstr "参数为空"
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
-msgstr ""
+msgstr "时间区间为空."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -3858,15 +3865,15 @@ msgstr "打开DEBUG"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
-msgstr ""
+msgstr "确认开启"
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
-msgstr "Enable debug mode in selected groups?"
+msgstr "在选择的组中开启调试模式?"
 
 #: include/views/administration.general.gui.edit.php:41
 msgid "Enable event acknowledges"
-msgstr ""
+msgstr "开启事件确认"
 
 #: include/actions.inc.php:289 include/actions.inc.php:500
 msgid "Enable host"
@@ -3874,11 +3881,11 @@ msgstr "启用主机"
 
 #: hosts.php:803
 msgid "Enable host?"
-msgstr ""
+msgstr "开启主机?"
 
 #: include/views/administration.proxy.list.php:88
 msgid "Enable hosts monitored by selected proxies?"
-msgstr "Enable hosts monitored by selected proxies?"
+msgstr "在选择的代理节点中开启主机的监控?"
 
 #: hosts.php:867 include/views/administration.mediatypes.list.php:109
 #: include/views/administration.proxy.list.php:87
@@ -3896,41 +3903,41 @@ msgstr "启用所选"
 
 #: include/views/configuration.httpconf.list.php:130
 msgid "Enable selected WEB scenarios?"
-msgstr ""
+msgstr "开启选择的web方案?"
 
 #: include/views/configuration.action.list.php:94
 msgid "Enable selected actions?"
-msgstr ""
+msgstr "开启所选的动作?"
 
 #: include/views/configuration.application.list.php:82
 msgid "Enable selected applications?"
-msgstr ""
+msgstr "开启所选的应用?"
 
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:102
 msgid "Enable selected discovery rules?"
-msgstr "启用所选的自发现规则?"
+msgstr "启用所选的发现规则?"
 
 #: include/views/administration.usergroups.list.php:130
 msgid "Enable selected groups?"
-msgstr "Enable selected groups?"
+msgstr "开启所选的组?"
 
 #: hosts.php:868 include/views/configuration.hostgroups.list.php:120
 msgid "Enable selected hosts?"
-msgstr ""
+msgstr "开启所选的主机?"
 
 #: include/views/configuration.item.list.php:238
 #: include/views/configuration.item.prototype.list.php:105
 msgid "Enable selected items?"
-msgstr "Enable selected items?"
+msgstr "开启所选的项目?"
 
 #: include/views/administration.mediatypes.list.php:110
 msgid "Enable selected media types?"
-msgstr ""
+msgstr "开启所选的媒体类型?"
 
 #: include/views/configuration.triggers.list.php:226
 msgid "Enable selected triggers?"
-msgstr "Enable selected triggers?"
+msgstr "开启所选的触发器?"
 
 #: auditlogs.php:149 dashboard.php:227 dashconf.php:160
 #: include/discovery.inc.php:118 include/httptest.inc.php:45
@@ -3962,7 +3969,7 @@ msgstr "英语 (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "英语 (en_US)"
 
 #: include/actions.inc.php:681 include/actions.inc.php:757
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
@@ -3976,83 +3983,86 @@ msgstr "错误"
 
 #: api/classes/CScript.php:482
 msgid "Error description"
-msgstr ""
+msgstr "错误描述"
 
 #: api/classes/CScript.php:520
 msgid "Error description: can't read script response, check connection."
-msgstr ""
+msgstr "错误描述: 无法读取到脚本的回应,检查连接."
 
 #: api/classes/CScript.php:497
 msgid "Error description: can't send command, check connection."
-msgstr ""
+msgstr "错误描述: 不能发送命令，请检查连接."
 
 #: api/classes/CScript.php:513
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr ""
+"错误描述: 已经达到在\"include/defines.inc.php\"中ZBX_SCRIPT_BYTES_LIMIT定义的读取字节限制. "
+"你可以尝试增大该值."
 
 #: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr ""
+"错误描述: 已经达到在\"include/defines.inc.php\"中ZBX_SCRIPT_TIMEOUT定义的超时时间限制. 你可以尝试增大该值."
 
 #: api/classes/CScript.php:528
 msgid "Error description: empty response received."
-msgstr ""
+msgstr "错误描述: 收到的回应为空."
 
 #: api/classes/CItemGeneral.php:253
 #, php-format
 msgid "Error in item key: \"%s\"."
-msgstr ""
+msgstr "错误的监控项键值: \"%s\"."
 
 #: include/db.inc.php:927 include/db.inc.php:983
 #, php-format
 msgid "Error in search request for table \"%1$s\"."
-msgstr ""
+msgstr "搜索表\"%1$s\"的请求错误."
 
 #: httpdetails.php:161 httpdetails.php:215
 #, php-format
 msgid "Error: %1$s"
-msgstr ""
+msgstr "错误: %1$s"
 
 #: include/events.inc.php:115
 msgid "Event"
-msgstr "Event"
+msgstr "事件"
 
 #: include/classes/screens/CScreenHistory.php:167
 msgid "Event ID"
-msgstr "Event ID"
+msgstr "事件ID"
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
-msgstr "Event acknowledged"
+msgstr "事件已知悉"
 
 #: adm.gui.php:69
 #, php-format
 msgid "Event acknowledges \"%1$s\"."
-msgstr ""
+msgstr "事件知悉\"%1$s\"."
 
 #: dashconf.php:260
 msgid "Event acknowledging disabled"
-msgstr ""
+msgstr "事件知悉已停用"
 
 #: tr_events.php:30 tr_events.php:115
 msgid "Event details"
-msgstr "Event details"
+msgstr "事件细节"
 
 #: include/triggers.inc.php:1783
 msgid "Event generation"
-msgstr "Event generation"
+msgstr "事件产生"
 
 #: tr_events.php:139
 msgid "Event list [previous 20]"
-msgstr ""
+msgstr "事件列表 [前20]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
-msgstr "事件源"
+msgstr "事件来源"
 
 #: tr_events.php:110
 msgid "Event source details"
-msgstr ""
+msgstr "事件来源细节"
 
 #: events.php:314 include/menu.inc.php:58 include/triggers.inc.php:1442
 #: jsLoader.php:107 search.php:134 search.php:206 search.php:261
@@ -4062,11 +4072,11 @@ msgstr "事件"
 
 #: include/forms.inc.php:1508
 msgid "Every day(s)"
-msgstr "Every day(s)"
+msgstr "每天"
 
 #: include/forms.inc.php:1515
 msgid "Every week(s)"
-msgstr "Every week(s)"
+msgstr "每周"
 
 #: include/func.inc.php:569
 msgid "Exa"
@@ -4074,17 +4084,17 @@ msgstr "Exa"
 
 #: tr_logform.php:283 tr_logform.php:336
 msgid "Exclude"
-msgstr "Exclude"
+msgstr "除外"
 
 #: include/views/js/administration.script.edit.js.php:66
 #: include/views/js/general.script.confirm.js.php:37
 msgid "Execute"
-msgstr ""
+msgstr "执行"
 
 #: api/classes/CImage.php:339
 #, php-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "在[\"%2$s\"]中执行SQL错误[\"%1$s\"]."
 
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
@@ -4092,23 +4102,23 @@ msgstr ""
 #: include/views/js/configuration.action.edit.js.php:114 popup.php:1970
 #: popup.php:1977
 msgid "Execute on"
-msgstr ""
+msgstr "执行于"
 
 #: include/items.inc.php:1322 include/views/configuration.item.edit.php:186
 msgid "Executed script"
-msgstr "Executed script"
+msgstr "已执行的脚本"
 
 #: include/views/js/general.script.confirm.js.php:16
 msgid "Execution confirmation"
-msgstr ""
+msgstr "执行确认"
 
 #: sysmap.php:190
 msgid "Expand macros"
-msgstr ""
+msgstr "扩展宏"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Expand single problem"
-msgstr "Expand single problem"
+msgstr "展开单一问题"
 
 #: include/forms.inc.php:1746 include/forms.inc.php:1877
 msgid "Expected result"
@@ -4117,16 +4127,16 @@ msgstr "期望的结果"
 #: api/rpc/class.cjsonrpc.php:81
 #, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
-msgstr ""
+msgstr "要求为JSON-rpc 2.0版本,当前是\"%s\"."
 
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr ""
+msgstr "已过期"
 
 #: include/graphs.inc.php:27 popup.php:1413
 msgid "Exploded"
-msgstr "Exploded"
+msgstr "已发生"
 
 #: hosts.php:864 include/views/configuration.screen.list.php:66
 #: sysmaps.php:297 templates.php:596
@@ -4135,7 +4145,7 @@ msgstr "导出所选"
 
 #: events.php:255
 msgid "Export to CSV"
-msgstr ""
+msgstr "导出为CSV"
 
 #: include/forms.inc.php:1745 include/forms.inc.php:1876
 #: include/forms.inc.php:1949 include/triggers.inc.php:1782
@@ -4151,23 +4161,24 @@ msgstr "表达式"
 #: include/forms.inc.php:1332 include/forms.inc.php:1337
 #: include/forms.inc.php:1350
 msgid "Expression Syntax Error."
-msgstr ""
+msgstr "表达式语法错误."
 
 #: tr_testexpr.php:56
+#, fuzzy
 msgid "Expression Variable Elements"
-msgstr ""
+msgstr "表达式变量元素"
 
 #: include/triggers.inc.php:735
 msgid "Expression cannot be empty"
-msgstr "Expression cannot be empty"
+msgstr "表达式不能为空"
 
 #: include/views/configuration.triggers.edit.php:126
 msgid "Expression constructor"
-msgstr ""
+msgstr "表达式构造器"
 
 #: include/forms.inc.php:1958
 msgid "Expression type"
-msgstr "Expression type"
+msgstr "表达式类型"
 
 #: include/views/administration.general.regularexpressions.edit.php:33
 #: include/views/administration.general.regularexpressions.list.php:29
@@ -4176,21 +4187,22 @@ msgstr "表达式"
 
 #: include/items.inc.php:86
 msgid "External check"
-msgstr "External check"
+msgstr "外部检查"
 
 #: include/media.inc.php:28
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Ez Texting"
-msgstr ""
+msgstr "Ez简讯"
 
 #: jsLoader.php:126
+#, fuzzy
 msgctxt "Friday short"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: include/forms.inc.php:1801 include/forms.inc.php:1821
 msgid "FALSE"
-msgstr "FALSE"
+msgstr "假"
 
 #: include/discovery.inc.php:60
 #: include/views/js/configuration.discovery.edit.js.php:120
@@ -4204,79 +4216,79 @@ msgstr "Fail"
 
 #: include/actions.inc.php:930 include/blocks.inc.php:986
 msgid "Failed"
-msgstr "Failed"
+msgstr "已失败"
 
 #: api/classes/CWebCheck.php:630
 #, php-format
 msgid "Failed step of scenario \"%s\"."
-msgstr ""
+msgstr "方案\"%s\"失败的步骤."
 
 #: api/classes/CTemplate.php:1092
 msgid "Failed to update template"
-msgstr ""
+msgstr "更新模板失败"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
-msgstr "Failure Audit"
+msgstr "失败的审计"
 
 #: dashboard.php:259 include/blocks.inc.php:1097
 msgid "Favourite graphs"
-msgstr ""
+msgstr "常用的绘图"
 
 #: dashboard.php:273 include/blocks.inc.php:1213
 msgid "Favourite maps"
-msgstr ""
+msgstr "常用的拓扑"
 
 #: dashboard.php:266 include/blocks.inc.php:1258
 msgid "Favourite screens"
-msgstr ""
+msgstr "常用的面板"
 
 #: include/views/monitoring.slides.php:41 slides.php:76 slides.php:83
 msgid "Favourites"
-msgstr "Favourites"
+msgstr "常用的"
 
 #: include/func.inc.php:219
 msgid "Feb"
-msgstr ""
+msgstr "二月"
 
 #: include/forms.inc.php:1537 include/func.inc.php:105
 #: include/func.inc.php:236 jsLoader.php:111
 msgid "February"
-msgstr "February"
+msgstr "二月"
 
 #: hostinventoriesoverview.php:87
 msgid "Field"
-msgstr "Field"
+msgstr "字段"
 
 #: api/classes/CDRule.php:527
 msgid "Field \"druleid\" is required."
-msgstr ""
+msgstr "\"druleid\"字段是需要的."
 
 #: api/classes/CTemplate.php:991
 msgid "Field \"host\" is mandatory"
-msgstr ""
+msgstr "\"druleid\"字段是强制的"
 
 #: api/classes/CDRule.php:534
 msgid "Field \"name\" is required."
-msgstr ""
+msgstr "\"name\"字段是必须的."
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr ""
+msgstr "字段:"
 
 #: include/classes/helpers/CUploadFile.php:143
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr ""
+msgstr "文件过大，允许上传的最大尺寸为 %1$s 字节."
 
 #: include/classes/class.cview.php:68
-#, php-format
+#, fuzzy, php-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
-msgstr ""
+msgstr "文件在视图中不存在.尝试寻找\"%s\"."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
-msgstr "Filled region"
+msgstr "填充区域"
 
 #: dashconf.php:265 events.php:367 hostinventories.php:134 hosts.php:657
 #: include/classes/class.cwidget.php:134 include/forms.inc.php:573
@@ -4286,7 +4298,7 @@ msgstr "Filled region"
 #: include/views/configuration.item.edit.php:335
 #: include/views/monitoring.history.php:124 latest.php:141 tr_status.php:249
 msgid "Filter"
-msgstr "Filter"
+msgstr "过滤"
 
 #: include/reports.inc.php:102
 msgid "Filter by host group"
@@ -12640,7 +12652,7 @@ msgstr ""
 
 #: api/classes/CMapElement.php:570
 msgid "Wrong fields for map link"
-msgstr ""
+msgstr "错误的地图连接字段"
 
 #: api/classes/CMediatype.php:326 api/classes/CMediatype.php:377
 msgid "Wrong fields for media type."

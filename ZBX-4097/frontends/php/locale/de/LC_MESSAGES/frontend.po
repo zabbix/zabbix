@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 1.9\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-08 12:35+0300\n"
+"POT-Creation-Date: 2012-10-03 23:23+0300\n"
 "PO-Revision-Date: 2012-09-08 00:13+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2916,7 +2916,7 @@ msgstr "Dezimal"
 #: include/views/configuration.action.edit.php:355
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:121
-#: include/views/monitoring.screen.php:116
+#: include/views/monitoring.screen.php:117
 #: include/views/monitoring.slides.php:83 jsLoader.php:143 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
@@ -4327,6 +4327,10 @@ msgstr "Nach Namen filtern"
 msgid "Finish"
 msgstr "Beenden"
 
+#: include/locales.inc.php:50
+msgid "Finnish (fi_FI)"
+msgstr ""
+
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
 msgstr "Ersten"
@@ -4362,7 +4366,7 @@ msgstr "Formel"
 msgid "Fourth"
 msgstr "Vierten"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:51
 msgid "French (fr_FR)"
 msgstr "Französisch (fr_FR)"
 
@@ -4454,7 +4458,7 @@ msgstr "Allgemein"
 msgid "Generated in %s sec"
 msgstr "Erstellt in %s s"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:52
 msgid "German (de_DE)"
 msgstr "Deutsch (de_DE)"
 
@@ -4658,7 +4662,7 @@ msgstr "Diagramme kopiert"
 msgid "Graphs deleted"
 msgstr "Diagramme gelöscht"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:53
 msgid "Greek (el_GR)"
 msgstr "Griechisch (el_GR)"
 
@@ -4686,7 +4690,7 @@ msgstr "Raster"
 #: include/views/configuration.triggers.list.php:62
 #: include/views/monitoring.charts.php:25
 #: include/views/monitoring.overview.php:31
-#: include/views/monitoring.screen.php:113
+#: include/views/monitoring.screen.php:114
 #: include/views/monitoring.slides.php:78 latest.php:124 popup.php:501
 #: templates.php:431 tr_status.php:173
 msgid "Group"
@@ -4935,7 +4939,7 @@ msgstr "Horizontale Ausrichtung"
 #: include/views/js/configuration.sysmaps.js.php:15
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/monitoring.charts.php:26
-#: include/views/monitoring.screen.php:121
+#: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:88 items.php:68 items.php:458
 #: items.php:613 items.php:636 jsLoader.php:138 latest.php:125 latest.php:191
 #: popup.php:476 popup.php:513 popup.php:1083 popup.php:1279 popup.php:1484
@@ -5192,7 +5196,7 @@ msgstr "Stunden"
 msgid "Housekeeper"
 msgstr "Entrümpler"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:54
 msgid "Hungarian (hu_HU)"
 msgstr "Ungarisch (hu_HU)"
 
@@ -6372,7 +6376,7 @@ msgstr "Abmelden ist nicht möglich bei HTTP-Authentifizierung."
 msgid "It is not possible to search by user password."
 msgstr "Nach Benutzer-Passwort kann nicht gesucht werden."
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:55
 msgid "Italian (it_IT)"
 msgstr "Italienisch (it_IT)"
 
@@ -6585,7 +6589,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Januar"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:57
 msgid "Japanese (ja_JP)"
 msgstr "Japanisch (ja_JP)"
 
@@ -6668,7 +6672,7 @@ msgstr "Schlüsselwort"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:56
 msgid "Korean (ko_KR)"
 msgstr "Koreanisch (ko_KR)"
 
@@ -6807,7 +6811,7 @@ msgstr "Aktuelle Daten"
 msgid "Latest events"
 msgstr "Aktuelle Ereignisse"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:58
 msgid "Latvian (lv_LV)"
 msgstr "Lettisch (lv_LV)"
 
@@ -6901,7 +6905,7 @@ msgid "List is empty"
 msgstr "Liste ist leer"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
-#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:117
+#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:119
 msgid "Loading..."
 msgstr "Lade ..."
 
@@ -7923,10 +7927,10 @@ msgstr ""
 msgid "No graph prototypes defined."
 msgstr "Keine Graphen-Prototypen definiert."
 
-#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:103
+#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:97
 #: include/classes/screens/CScreenHistory.php:310
 #: include/views/configuration.graph.list.php:71
-#: include/views/monitoring.charts.php:63 popup.php:1334
+#: include/views/monitoring.charts.php:68 popup.php:1334
 msgid "No graphs defined."
 msgstr "Keine Diagramme definiert."
 
@@ -8258,7 +8262,7 @@ msgid "No slide shows defined."
 msgstr "Keine Vorführungen definiert."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:120 popup.php:1681
+#: include/views/monitoring.slides.php:122 popup.php:1681
 msgid "No slides defined."
 msgstr "Keine Seiten definiert."
 
@@ -9171,6 +9175,10 @@ msgstr "Berechtigungen"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Berechtigungen können nur Benutzergruppen zugewiesen werden."
 
+#: include/locales.inc.php:59
+msgid "Persian (fa_IR)"
+msgstr ""
+
 #: include/func.inc.php:568
 msgid "Peta"
 msgstr "Peta"
@@ -9212,7 +9220,7 @@ msgstr "Bitte Bestätigungs-Text eingeben."
 msgid "Please select two elements"
 msgstr "Bitte zwei Elemente auswählen"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Polish (pl_PL)"
 msgstr "Polnisch (pl_PL)"
 
@@ -9242,7 +9250,7 @@ msgstr ""
 msgid "Port range"
 msgstr "Port-Bereich"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Portuguese (pt_BR)"
 msgstr "Portugiesisch (pt_BR)"
 
@@ -9876,7 +9884,7 @@ msgstr "Befehl ausführen auf Host-Gruppe"
 msgid "Run remote commands on hosts"
 msgstr "Befehle ausführen auf Hosts"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "Russian (ru_RU)"
 msgstr "Russisch (ru_RU)"
 
@@ -9893,9 +9901,9 @@ msgid "S"
 msgstr "So"
 
 #: include/views/monitoring.hostscreen.php:30
-#: include/views/monitoring.hostscreen.php:39
+#: include/views/monitoring.hostscreen.php:40
 #: include/views/monitoring.screen.php:35
-#: include/views/monitoring.screen.php:66
+#: include/views/monitoring.screen.php:67
 msgid "SCREENS"
 msgstr "ANSICHTSTAFELN"
 
@@ -10082,7 +10090,7 @@ msgstr "Samstag"
 #: include/views/administration.general.other.edit.php:48
 #: include/views/administration.general.triggerDisplayOptions.edit.php:120
 #: include/views/administration.general.triggerSeverity.edit.php:76
-#: include/views/administration.general.valuemapping.edit.php:61
+#: include/views/administration.general.valuemapping.edit.php:60
 #: include/views/administration.general.workingtime.edit.php:34
 #: include/views/administration.mediatypes.edit.php:104
 #: include/views/administration.node.edit.php:91
@@ -10241,12 +10249,12 @@ msgstr "Übersichtstafel sollte zumindest eine Zeile und Spalte haben."
 msgid "Screen updated"
 msgstr "Übersichtstafel aktualisiert"
 
-#: include/views/monitoring.screen.php:47
+#: include/views/monitoring.screen.php:48
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
 msgstr "Übersichtstafel mit ID \"%s\" existiert nicht."
 
-#: include/views/monitoring.screen.php:46
+#: include/views/monitoring.screen.php:47
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
 msgstr "Übersichtstafel namens \"%s\" existiert nicht."
@@ -10255,7 +10263,7 @@ msgstr "Übersichtstafel namens \"%s\" existiert nicht."
 #: include/html.inc.php:488 include/menu.inc.php:68 include/menu.inc.php:201
 #: include/views/configuration.screen.list.php:38
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
-#: include/views/monitoring.screen.php:85
+#: include/views/monitoring.screen.php:86
 #: include/views/monitoring.slides.php:29 popup.php:85 popup.php:109
 #: search.php:135 search.php:207 search.php:372 search.php:405 search.php:428
 #: templates.php:448 templates.php:515
@@ -10822,7 +10830,7 @@ msgstr "Vorführung"
 msgid "Slides"
 msgstr "Seiten"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "Slovak (sk_SK)"
 msgstr "Slovakisch (sk_SK)"
 
@@ -10891,7 +10899,7 @@ msgstr "Nach Feld \"%s\" darf nicht sortiert werden."
 msgid "Source"
 msgstr "Quelle"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Spanish (es_ES)"
 msgstr "Spanisch (es_ES)"
 
@@ -11095,7 +11103,7 @@ msgstr "Unterstützung"
 msgid "Surname"
 msgstr "Nachname"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Swedish (sv_SE)"
 msgstr "Schwedisch (sv_SE)"
 
@@ -11880,7 +11888,7 @@ msgstr "BENUTZERPROFIL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainisch (uk_UA)"
 
@@ -12423,7 +12431,7 @@ msgstr "Wertzuordnung mit valuemapid \"%1$s\" existiert nicht."
 #: adm.triggerdisplayingoptions.php:82 adm.triggerdisplayoptions.php:82
 #: adm.triggerseverities.php:85 adm.valuemapping.php:121
 #: adm.valuemapping.php:177 adm.workingtime.php:63
-#: include/views/administration.general.valuemapping.edit.php:57
+#: include/views/administration.general.valuemapping.edit.php:56
 msgid "Value mapping"
 msgstr "Wertezuordnung"
 
@@ -12554,14 +12562,14 @@ msgstr "Warnung: Unzulässiger Wert in Feld \"%1$s\". Darf nicht leer sein."
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Warnung: Unzulässiger Wert in Feld \"%1$s\". Muss zwischen %2$s und %3$s liegen."
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
+#: include/classes/screens/CScreenBase.php:313 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] "Warnung. Der maximale Zeitraum der angezeigt werden kann, ist %1$s Tag."
 msgstr[1] "Warnung. Der maximale Zeitraum der angezeigt werden kann, ist %1$s Tage."
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
+#: include/classes/screens/CScreenBase.php:308 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -13456,7 +13464,7 @@ msgid "of every"
 msgstr "jeder"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
-#: include/views/monitoring.hostscreen.php:53
+#: include/views/monitoring.hostscreen.php:54
 #, fuzzy
 msgid "on"
 msgstr "an"
