@@ -119,7 +119,7 @@ if ($isDataValid) {
 
 	$graph->setPeriod($_REQUEST['period']);
 	$graph->setSTime($_REQUEST['stime']);
-	$graph->setWidth(get_request('width', 900));
+//	$graph->setWidth(get_request('width', 900));
 	$graph->setHeight(get_request('height', 200));
 	$graph->showLegend(get_request('legend', 1));
 	$graph->showWorkPeriod(get_request('showworkperiod', 1));

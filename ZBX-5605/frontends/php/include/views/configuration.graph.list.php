@@ -73,7 +73,6 @@ $graphTable->setHeader(array(
 	new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');"),
 	!empty($this->data['hostid']) ? null : _('Hosts'),
 	make_sorting_header(_('Name'), 'name'),
-	_('Width'),
 	_('Height'),
 	make_sorting_header(_('Graph type'), 'graphtype')
 ));
@@ -124,7 +123,6 @@ foreach ($this->data['graphs'] as $graph) {
 		$checkBox,
 		$hostList,
 		$name,
-		$graph['width'],
 		$graph['height'],
 		$graph['graphtype']
 	));

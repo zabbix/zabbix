@@ -318,7 +318,6 @@ class CConfigurationExportBuilder {
 		foreach ($graphs as $graph) {
 			$result[] = array(
 				'name' => $graph['name'],
-				'width' => $graph['width'],
 				'height' => $graph['height'],
 				'yaxismin' => $graph['yaxismin'],
 				'yaxismax' => $graph['yaxismax'],

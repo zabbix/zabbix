@@ -283,7 +283,6 @@
 		jQuery('#tab_previewTab').click(function() {
 			var name = 'chart3.php';
 			var src = '&name=' + encodeURIComponent(jQuery('#name').val())
-						+ '&width=' + jQuery('#width').val()
 						+ '&height=' + jQuery('#height').val()
 						+ '&graphtype=' + jQuery('#graphtype').val()
 						+ '&legend=' + (jQuery('#legend').is(':checked') ? 1 : 0);

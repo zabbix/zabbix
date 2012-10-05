@@ -40,7 +40,6 @@ $fields = array(
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null),
 	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'(isset({form})&&({form}=="update"))'),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({save})', _('Name')),
-	'width' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Width').' (min:20, max:65535)'),
 	'height' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Height').' (min:20, max:65535)'),
 	'ymin_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
 	'ymax_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
@@ -171,7 +170,6 @@ elseif (isset($_REQUEST['save'])) {
 	if ($result) {
 		$graph = array(
 			'name' => $_REQUEST['name'],
-			'width' => $_REQUEST['width'],
 			'height' => $_REQUEST['height'],
 			'ymin_type' => get_request('ymin_type', 0),
 			'ymax_type' => get_request('ymax_type', 0),
@@ -347,7 +345,6 @@ elseif (isset($_REQUEST['form'])) {
 		$graph = reset($graph);
 
 		$data['name'] = $graph['name'];
-		$data['width'] = $graph['width'];
 		$data['height'] = $graph['height'];
 		$data['ymin_type'] = $graph['ymin_type'];
 		$data['ymax_type'] = $graph['ymax_type'];
@@ -422,11 +419,9 @@ elseif (isset($_REQUEST['form'])) {
 		$data['graphtype'] = get_request('graphtype', GRAPH_TYPE_NORMAL);
 
 		if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			$data['width'] = get_request('width', 400);
 			$data['height'] = get_request('height', 300);
 		}
 		else {
-			$data['width'] = get_request('width', 900);
 			$data['height'] = get_request('height', 200);
 		}
 
@@ -462,7 +457,6 @@ elseif (isset($_REQUEST['form'])) {
 
 	$_REQUEST['items'] = $data['items'];
 	$_REQUEST['name'] = $data['name'];
-	$_REQUEST['width'] = $data['width'];
 	$_REQUEST['height'] = $data['height'];
 	$_REQUEST['ymin_type'] = $data['ymin_type'];
 	$_REQUEST['ymax_type'] = $data['ymax_type'];
@@ -553,7 +547,7 @@ else {
 
 	$options = array(
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
-		'output' => array('graphid', 'name', 'templateid', 'graphtype', 'width', 'height'),
+		'output' => array('graphid', 'name', 'templateid', 'graphtype', 'height'),
 		'selectDiscoveryRule' => array('itemid', 'name'),
 	);
 	if ($pageFilter->hostid == 0) {
