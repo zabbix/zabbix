@@ -2888,6 +2888,29 @@ size_t	zbx_strlen_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_utf8_char_len                                                *
+ *                                                                            *
+ * Purpose: Returns the size (in bytes) of an UTF-8 encoded character or 0    *
+ *          if the character is not a valid UTF-8.                            *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the 1st byte of UTF-8 character         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_utf8_char_len(const char *text)
+{
+	if (0 == (*text & 0x80))		/* ASCII */
+		return 1;
+	else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 starts a 2-byte sequence */
+		return 2;
+	else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 starts a 3-byte sequence */
+		return 3;
+	else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 starts a 4-byte sequence */
+		return 4;
+	return 0;				/* not a valid UTF-8 character */
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_strlen_utf8_n                                                *
  *                                                                            *
  * Purpose: calculates number of bytes in utf8 text limited by utf8_maxlen    *
