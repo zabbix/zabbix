@@ -800,10 +800,6 @@ class CItem extends CItemGeneral {
 	protected function checkInput(array &$items, $update = false) {
 		// add the values that cannot be changed, but are required for further processing, and do check for "templateid"
 		foreach ($items as &$item) {
-			// check inputted data, because "templateid" is not allowed
-			if (isset($item['templateid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set "templateid" for item.'));
-			}
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 		unset($item);
