@@ -1958,47 +1958,51 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Checks if the given dependencies contain duplicates.
 	 *
-	 * @throws APIException     if the given dependencies contain duplicates
+	 * @throws APIException if the given dependencies contain duplicates
 	 *
 	 * @param array $triggers
 	 */
 	protected function checkDependencyDuplicates(array $triggers) {
 		// check duplicates in array
+		$uniqueTriggers = array();
+		$duplicateTriggerId = null;
 		foreach ($triggers as $trigger) {
-			foreach( $trigger['dependencies'] as $dep) {
+			foreach ($trigger['dependencies'] as $dep) {
 				if (isset($uniqueTriggers[$trigger['triggerid']][$dep])) {
-					$duplicateTrigger = $trigger['triggerid'];
-					break;
+					$duplicateTriggerId = $trigger['triggerid'];
+					break 2;
 				}
 				else {
 					$uniqueTriggers[$trigger['triggerid']][$dep] = 1;
 				}
 			}
 		}
-		if (!isset($duplicateTrigger)) {
-			// check duplicates in DB $duplicateTrigger
+
+		if ($duplicateTriggerId === null) {
+			// check if dependency already exists in DB
 			foreach ($triggers as $trigger) {
 				$dbUpTriggers = DBselect(
 					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
 					' WHERE '.DBcondition('td.triggerid_up', $trigger['dependencies']).
 					' AND td.triggerid_down='.zbx_dbstr($trigger['triggerid'])
-				);
+				, 1);
 				if (DBfetch($dbUpTriggers)) {
-					$duplicateTrigger = $trigger['triggerid'];
+					$duplicateTriggerId = $trigger['triggerid'];
 					break;
 				}
 			}
 		}
-		if (isset($duplicateTrigger)) {
-				$dplTrigger = DBfetch(DBselect(
-					'SELECT t.description'.
-					' FROM triggers t'.
-					' WHERE t.triggerid='.zbx_dbstr($duplicateTrigger)
-				));
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate dependencies in trigger "%1$s".', $dplTrigger['description'])
-				);
+
+		if ($duplicateTriggerId) {
+			$dplTrigger = DBfetch(DBselect(
+				'SELECT t.description'.
+				' FROM triggers t'.
+				' WHERE t.triggerid='.zbx_dbstr($duplicateTriggerId)
+			));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate dependencies in trigger "%1$s".', $dplTrigger['description'])
+			);
 		}
 	}
 
