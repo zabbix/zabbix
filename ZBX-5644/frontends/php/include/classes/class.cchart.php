@@ -450,9 +450,7 @@ class CChart extends CGraphDraw {
 				}
 
 				$trigger = API::UserMacro()->resolveTrigger($trigger);
-				// removing spaces
-				$trigger['expression'] = preg_replace('/\s+/', '', $trigger['expression']);
-				if (!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) {
+				if (!preg_match('/\{([0-9]{1,})\}\s*?([\<\>\=]{1})\s*?([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) {
 					continue;
 				}
 
