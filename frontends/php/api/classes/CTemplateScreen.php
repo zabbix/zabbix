@@ -583,7 +583,7 @@ class CTemplateScreen extends CScreen {
 		return array('screenids' => $screenIds);
 	}
 
-	function copy($data) {
+	public function copy(array $data) {
 		$screenIds = $data['screenIds'] = zbx_toArray($data['screenIds']);
 		$templateIds = $data['templateIds'] = zbx_toArray($data['templateIds']);
 
