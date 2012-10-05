@@ -858,3 +858,65 @@ function objectSize(obj) {
 
 	return size;
 }
+
+/**
+ * Optimization:
+ *
+ * 86400 = 24 * 60 * 60
+ * 31536000 = 365 * 86400
+ * 2592000 = 30 * 86400
+ * 604800 = 7 * 86400
+ *
+ * @param int timestamp
+ * @param boolean isTsDouble
+ * @param boolean isExtend
+ *
+ * @return string
+ */
+function formatTimestamp(timestamp, isTsDouble, isExtend) {
+	timestamp = timestamp || 0;
+	var years = 0,
+		months = 0,
+		weeks = 0;
+
+	if (isExtend) {
+		years = parseInt(timestamp / 31536000);
+		months = parseInt((timestamp - years * 31536000) / 2592000);
+		//weeks = parseInt((timestamp - years * 31536000 - months * 2592000) / 604800);
+	}
+
+	var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
+	var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
+	//var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
+
+	if (isTsDouble) {
+		if (months.toString().length == 1) {
+			months = '0' + months;
+		}
+		if (weeks.toString().length == 1) {
+			weeks = '0' + weeks;
+		}
+		if (days.toString().length == 1) {
+			days = '0' + days;
+		}
+		if (hours.toString().length == 1) {
+			hours = '0' + hours;
+		}
+		/*if (minutes.toString().length == 1) {
+			minutes = '0' + minutes;
+		}*/
+	}
+
+	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
+	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
+	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
+	str += (isExtend && isTsDouble)
+		? days + locale['S_DAY_SHORT'] + ' '
+		: (days == 0)
+			? ''
+			: days + locale['S_DAY_SHORT'] + ' ';
+	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
+	//str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
+
+	return str;
+}

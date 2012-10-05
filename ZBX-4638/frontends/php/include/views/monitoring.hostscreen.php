@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,8 +32,9 @@ if (empty($this->data['screen']) || empty($this->data['host'])) {
 	$screenWidget->addItem(new CTableInfo(_('No screens defined.')));
 
 	$screenBuilder = new CScreenBuilder();
-	$screenBuilder->insertScreenScrollJs('scrollbar');
-	$screenBuilder->insertProcessObjectsJs();
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline
+	));
 }
 else {
 	$screenWidget->addPageHeader(_('SCREENS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
@@ -64,8 +65,11 @@ else {
 		'profileIdx2' => $this->data['screen']['screenid']
 	));
 	$screenWidget->addItem($screenBuilder->show());
-	$screenBuilder->insertScreenScrollJs($this->data['screen']['screenid']);
-	$screenBuilder->insertProcessObjectsJs();
+
+	CScreenBuilder::insertScreenStandardJs(array(
+		'timeline' => $screenBuilder->timeline,
+		'profileIdx' => $screenBuilder->profileIdx
+	));
 }
 
 return $screenWidget;

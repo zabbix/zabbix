@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 1.9\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-05 21:32+0300\n"
+"POT-Creation-Date: 2012-10-03 23:23+0300\n"
 "PO-Revision-Date: 2012-06-02 20:32+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1590,15 +1590,11 @@ msgstr "Δεν βρίσκω οθόνη \"%1$s\" χρησιμοποιούμενη
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/importers/CMapImporter.php:227
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr ""
-
-#: include/classes/import/importers/CMapImporter.php:227
-#, php-format
-msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr "Δεν βρίσκω έναυσμα \"%1$s\" χρησιμοποιούμενο στον χάρτη %2$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -2909,7 +2905,7 @@ msgstr "Δεκαδικός"
 #: include/views/configuration.action.edit.php:355
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:121
-#: include/views/monitoring.screen.php:116
+#: include/views/monitoring.screen.php:117
 #: include/views/monitoring.slides.php:83 jsLoader.php:143 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
@@ -4317,6 +4313,10 @@ msgstr "Φιλτράρισμα μέ όνομα"
 msgid "Finish"
 msgstr "Τέλος"
 
+#: include/locales.inc.php:50
+msgid "Finnish (fi_FI)"
+msgstr ""
+
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
 msgstr "Πρώτο"
@@ -4352,7 +4352,7 @@ msgstr "Τύπος"
 msgid "Fourth"
 msgstr "Τέταρτος"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:51
 msgid "French (fr_FR)"
 msgstr "Γαλλικά (fr_FR)"
 
@@ -4443,7 +4443,7 @@ msgstr "Γενικά"
 msgid "Generated in %s sec"
 msgstr "Παραγόμενο σε %s δευτερόλεπτα"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:52
 msgid "German (de_DE)"
 msgstr "Γερμανικά (de_DE)"
 
@@ -4647,7 +4647,7 @@ msgstr "Γραφήματα αντιγράφηκαν"
 msgid "Graphs deleted"
 msgstr "Γραφήματα διεγράφησαν"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:53
 msgid "Greek (el_GR)"
 msgstr "Ελληνικά (el_GR)"
 
@@ -4675,7 +4675,7 @@ msgstr "Πλέγμα"
 #: include/views/configuration.triggers.list.php:62
 #: include/views/monitoring.charts.php:25
 #: include/views/monitoring.overview.php:31
-#: include/views/monitoring.screen.php:113
+#: include/views/monitoring.screen.php:114
 #: include/views/monitoring.slides.php:78 latest.php:124 popup.php:501
 #: templates.php:431 tr_status.php:173
 msgid "Group"
@@ -4921,7 +4921,7 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: include/views/js/configuration.sysmaps.js.php:15
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/monitoring.charts.php:26
-#: include/views/monitoring.screen.php:121
+#: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:88 items.php:68 items.php:458
 #: items.php:613 items.php:636 jsLoader.php:138 latest.php:125 latest.php:191
 #: popup.php:476 popup.php:513 popup.php:1083 popup.php:1279 popup.php:1484
@@ -5177,7 +5177,7 @@ msgstr "Ώρες"
 msgid "Housekeeper"
 msgstr "Τακτοποίηση"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:54
 msgid "Hungarian (hu_HU)"
 msgstr "Ουγγρικά (hu_HU)"
 
@@ -6355,7 +6355,7 @@ msgstr ""
 msgid "It is not possible to search by user password."
 msgstr "Αδύνατη η αναζήτηση με κωδικό χρήστη."
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:55
 msgid "Italian (it_IT)"
 msgstr "Ιταλικά (it_IT)"
 
@@ -6568,7 +6568,7 @@ msgstr "Ιαν"
 msgid "January"
 msgstr "Ιανουάριος"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:57
 msgid "Japanese (ja_JP)"
 msgstr "Ιαπωνικά (ja_JP)"
 
@@ -6651,7 +6651,7 @@ msgstr "Λέξη-κλειδί"
 msgid "Kilo"
 msgstr "Κιλο"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:56
 msgid "Korean (ko_KR)"
 msgstr "Κορεάτικα (ko_KR)"
 
@@ -6790,7 +6790,7 @@ msgstr "Τελευταία δεδομένα"
 msgid "Latest events"
 msgstr "Τελευταία συμβάντα"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:58
 msgid "Latvian (lv_LV)"
 msgstr "Λετονικά (lv_LV)"
 
@@ -6882,7 +6882,7 @@ msgid "List is empty"
 msgstr "Ο κατάλογος είναι άδειος"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
-#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:117
+#: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:119
 msgid "Loading..."
 msgstr "Φορτώνω..."
 
@@ -7903,10 +7903,10 @@ msgstr "Χωρίς στοιχείο γραφήματος με αναγνωρισ
 msgid "No graph prototypes defined."
 msgstr "Δεν ορίσθηκαν πρωτότυπα γραφήματα."
 
-#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:103
+#: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:97
 #: include/classes/screens/CScreenHistory.php:310
 #: include/views/configuration.graph.list.php:71
-#: include/views/monitoring.charts.php:63 popup.php:1334
+#: include/views/monitoring.charts.php:68 popup.php:1334
 msgid "No graphs defined."
 msgstr "Δεν ορίσθηκαν γραφήματα."
 
@@ -8238,7 +8238,7 @@ msgid "No slide shows defined."
 msgstr "Δεν ορίσθηκαν προβολές διαφάνειας."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:120 popup.php:1681
+#: include/views/monitoring.slides.php:122 popup.php:1681
 msgid "No slides defined."
 msgstr "Δεν ορίσθηκαν διαφάνειες."
 
@@ -9144,6 +9144,10 @@ msgstr "Δικαιώματα"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Τα δικαιώματα μπορούν να εκχωρηθούν μόνο σε ομάδες χρηστών."
 
+#: include/locales.inc.php:59
+msgid "Persian (fa_IR)"
+msgstr ""
+
 #: include/func.inc.php:568
 msgid "Peta"
 msgstr "Πετα"
@@ -9185,7 +9189,7 @@ msgstr "Εισάγετε κείμενο επιβεβαίωσης."
 msgid "Please select two elements"
 msgstr "Επιλέξτε δύο στοιχεία"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Polish (pl_PL)"
 msgstr "Πολωνικά (pl_PL)"
 
@@ -9215,7 +9219,7 @@ msgstr "Η θύρα δεν μπορεί να είναι κενή για διεπ
 msgid "Port range"
 msgstr "Περιοχή θύρας"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Portuguese (pt_BR)"
 msgstr "Πορτογαλικά (pt_BR)"
 
@@ -9848,7 +9852,7 @@ msgstr "Εκτέλεση απομακρυσμένων εντολών στις ο
 msgid "Run remote commands on hosts"
 msgstr "Εκτέλεση απομακρυσμένων εντολών στους ξενιστές"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "Russian (ru_RU)"
 msgstr "Ρωσικά (ru_RU)"
 
@@ -9863,9 +9867,9 @@ msgid "S"
 msgstr "S"
 
 #: include/views/monitoring.hostscreen.php:30
-#: include/views/monitoring.hostscreen.php:39
+#: include/views/monitoring.hostscreen.php:40
 #: include/views/monitoring.screen.php:35
-#: include/views/monitoring.screen.php:66
+#: include/views/monitoring.screen.php:67
 msgid "SCREENS"
 msgstr "ΟΘΟΝΕΣ"
 
@@ -10050,7 +10054,7 @@ msgstr "Σάββατο"
 #: include/views/administration.general.other.edit.php:48
 #: include/views/administration.general.triggerDisplayOptions.edit.php:120
 #: include/views/administration.general.triggerSeverity.edit.php:76
-#: include/views/administration.general.valuemapping.edit.php:61
+#: include/views/administration.general.valuemapping.edit.php:60
 #: include/views/administration.general.workingtime.edit.php:34
 #: include/views/administration.mediatypes.edit.php:104
 #: include/views/administration.node.edit.php:91
@@ -10209,12 +10213,12 @@ msgstr "Η οθόνη πρέπει να περιέχει τουλάχιστον 
 msgid "Screen updated"
 msgstr "Οθόνη ενημερώθηκε"
 
-#: include/views/monitoring.screen.php:47
+#: include/views/monitoring.screen.php:48
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
 msgstr "Οθόνη με ID \"%s\" δεν υπάρχει."
 
-#: include/views/monitoring.screen.php:46
+#: include/views/monitoring.screen.php:47
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
 msgstr "Οθόνη με όνομα \"%s\" δεν υπάρχει."
@@ -10223,7 +10227,7 @@ msgstr "Οθόνη με όνομα \"%s\" δεν υπάρχει."
 #: include/html.inc.php:488 include/menu.inc.php:68 include/menu.inc.php:201
 #: include/views/configuration.screen.list.php:38
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
-#: include/views/monitoring.screen.php:85
+#: include/views/monitoring.screen.php:86
 #: include/views/monitoring.slides.php:29 popup.php:85 popup.php:109
 #: search.php:135 search.php:207 search.php:372 search.php:405 search.php:428
 #: templates.php:448 templates.php:515
@@ -10781,7 +10785,7 @@ msgstr "Προβολές διαφάνειας"
 msgid "Slides"
 msgstr "Διαφάνειες"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "Slovak (sk_SK)"
 msgstr "Σλοβακικά (sk_SK)"
 
@@ -10848,7 +10852,7 @@ msgstr "Ταξινόμηση με πεδίο \"%s\" δεν επιτρέπετα�
 msgid "Source"
 msgstr "Προέλευση"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Spanish (es_ES)"
 msgstr "Ισπανικά (es_ES)"
 
@@ -11050,7 +11054,7 @@ msgstr "Υποστήριξη"
 msgid "Surname"
 msgstr "Επώνυμο"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Swedish (sv_SE)"
 msgstr "Σουηδικά (sv_SE)"
 
@@ -11831,7 +11835,7 @@ msgstr "ΠΡΟΦΙΛ ΧΡΗΣΤΗ"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Ukrainian (uk_UA)"
 msgstr "Ουκρανικά (uk_UA)"
 
@@ -12374,7 +12378,7 @@ msgstr "Αντιστοιχία τιμής με valuemapid \"%1$s\" δεν υπά
 #: adm.triggerdisplayingoptions.php:82 adm.triggerdisplayoptions.php:82
 #: adm.triggerseverities.php:85 adm.valuemapping.php:121
 #: adm.valuemapping.php:177 adm.workingtime.php:63
-#: include/views/administration.general.valuemapping.edit.php:57
+#: include/views/administration.general.valuemapping.edit.php:56
 msgid "Value mapping"
 msgstr "Αντιστοίχιση τιμής"
 
@@ -12505,14 +12509,14 @@ msgstr "Προειδοποίηση. Λανθασμένη τιμή για πεδ�
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Προειδοποίηση. Λανθασμένη τιμή για πεδίο \"%1$s\": πρέπει να είναι μεταξύ %2$s και %3$s."
 
-#: include/classes/screens/CScreenBase.php:307 include/graphs.inc.php:400
+#: include/classes/screens/CScreenBase.php:313 include/graphs.inc.php:400
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] "Προειδοποίηση. Μέγιστη χρονική περίοδος εμφάνισης είναι %1$s ημέρα."
 msgstr[1] "Προειδοποίηση. Μέγιστη χρονική περίοδος εμφάνισης είναι %1$s ημέρες."
 
-#: include/classes/screens/CScreenBase.php:302 include/graphs.inc.php:393
+#: include/classes/screens/CScreenBase.php:308 include/graphs.inc.php:393
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
@@ -13404,7 +13408,7 @@ msgid "of every"
 msgstr "της κάθε"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
-#: include/views/monitoring.hostscreen.php:53
+#: include/views/monitoring.hostscreen.php:54
 msgid "on"
 msgstr "επί"
 

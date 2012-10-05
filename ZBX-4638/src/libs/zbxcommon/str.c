@@ -1373,7 +1373,7 @@ int	num_param(const char *p)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      param   - parameter list                                              *
+ *      p       - parameter list                                              *
  *      num     - requested parameter index                                   *
  *      buf     - pointer of output buffer                                    *
  *      max_len - size of output buffer                                       *

@@ -44,37 +44,37 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
-$fields=array(
-	'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID, 		NULL),
-	'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
-	'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
-	'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
+$fields = array(
+	'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID, 		null),
+	'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		null),
+	'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		null),
+	'templates'			=> array(T_ZBX_STR, O_OPT,	null,		null,		null),
 	'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
-	'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	NULL,		'isset({save})'),
-	'visiblename'		=> array(T_ZBX_STR,	O_OPT,	NULL,		NULL,		'isset({save})'),
-	'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
-	'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
-	'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
+	'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	null,		'isset({save})'),
+	'visiblename'		=> array(T_ZBX_STR,	O_OPT,	null,		null,		'isset({save})'),
+	'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		null),
+	'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		null),
+	'newgroup'			=> array(T_ZBX_STR, O_OPT,	null,		null,		null),
 
-	'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		NULL,	NULL),
-	'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
-	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
-	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+	'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // actions
-	'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+	'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
 //form
-	'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'save'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'clone'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'full_clone'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+	'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'save'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'clone'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'full_clone'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
 // other
-	'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
-	'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+	'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
+	'form_refresh'		=> array(T_ZBX_STR, O_OPT,	null,			null,		null),
 );
 
 // OUTER DATA
@@ -102,11 +102,11 @@ if ($EXPORT_DATA) {
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
-	if (!no_errors()) {
-		show_messages();
+	if (no_errors()) {
+		print($exportData);
 	}
 	else {
-		print($exportData);
+		show_messages();
 	}
 	exit();
 }
@@ -299,11 +299,26 @@ elseif (isset($_REQUEST['save'])) {
 					throw new Exception();
 				}
 			}
+
+			// clone screens
+			$screens = API::TemplateScreen()->get(array(
+				'templateids' => $clone_templateid,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true,
+				'inherited' => false
+			));
+			if ($screens) {
+				$screensCopied = API::TemplateScreen()->copy(array(
+					'screenIds' => zbx_objectValues($screens, 'screenid'),
+					'templateIds' => $templateid
+				));
+				if (!$screensCopied) {
+					throw new Exception();
+				}
+			}
 		}
 
-		if (!DBend(true)) {
-			throw new Exception();
-		}
+		DBend(true);
 		show_messages(true, $msg_ok, $msg_fail);
 
 		if ($created) {
