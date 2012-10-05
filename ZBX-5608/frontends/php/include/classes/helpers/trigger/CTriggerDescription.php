@@ -390,7 +390,7 @@ class CTriggerDescription {
 						' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
 						' WHERE '.DBcondition('f.functionid', array_keys($expandItem))
 			);
-			while ($func = DBfetch($dbFuncs)) {
+			while ($func = DBfetch($dbFuncs, false)) {
 				foreach ($expandItem[$func['functionid']] as $macro => $fNums) {
 					switch ($macro) {
 						case 'ITEM.LASTVALUE':
