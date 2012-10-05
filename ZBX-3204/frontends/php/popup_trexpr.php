@@ -116,19 +116,19 @@ $allowed_types_log = array(
 
 $functions = array(
 	'abschange[<]' => array(
-		'description' =>  _('Absolute difference between last and previous value < N'),
+		'description' =>  _('Absolute difference between last and previous value is < N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'abschange[>]' => array(
-		'description' =>  _('Absolute difference between last and previous value > N'),
+		'description' =>  _('Absolute difference between last and previous value is > N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'abschange[=]' => array(
-		'description' =>  _('Absolute difference between last and previous value = N'),
+		'description' =>  _('Absolute difference between last and previous value is = N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'abschange[#]' => array(
-		'description' =>  _('Absolute difference between last and previous value NOT N'),
+		'description' =>  _('Absolute difference between last and previous value is NOT N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'avg[<]' => array(
@@ -208,11 +208,11 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'diff[=]' => array(
-		'description' =>  _('Difference between last and preceding values, if N = 1, 0 - otherwise'),
+		'description' =>  _('Difference between last and preceding values, then N = 1, 0 - otherwise'),
 		'allowed_types' => $allowed_types_any
 	),
 	'diff[#]' => array(
-		'description' =>  _('Difference between last and preceding values, if N NOT 1, 0 - otherwise'),
+		'description' =>  _('Difference between last and preceding values, then N NOT 1, 0 - otherwise'),
 		'allowed_types' => $allowed_types_any
 	),
 	'last[<]' => array(
@@ -390,42 +390,42 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'fuzzytime[=]' => array(
-		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, if N = 1, 0 - otherwise'),
+		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise'),
 		'params' => $param1_sec_count_no_timeshift,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'fuzzytime[#]' => array(
-		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, if N NOT 1, 0 - otherwise'),
+		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise'),
 		'params' => $param1_sec_count_no_timeshift,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'regexp[=]' => array(
-		'description' =>  _('Regular expression V matching last value in period T, if N = 1, 0 - otherwise'),
+		'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'regexp[#]' => array(
-		'description' =>  _('Regular expression V matching last value in period T, if N NOT 1, 0 - otherwise'),
+		'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'iregexp[=]' => array(
-		'description' =>  _('Regular expression V matching last value in period T, if N = 1, 0 - otherwise (non case-sensitive)'),
+		'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'iregexp[#]' => array(
-		'description' =>  _('Regular expression V matching last value in period T, if N NOT 1, 0 - otherwise (non case-sensitive)'),
+		'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)'),
 		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'logeventid[=]' => array(
-		'description' =>  _('Regular expression T matching last log entry event ID, if N = 1, 0 - otherwise'),
+		'description' =>  _('Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logeventid[#]' => array(
-		'description' =>  _('Regular expression T matching last log entry event ID, if N NOT 1, 0 - otherwise'),
+		'description' =>  _('Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
@@ -446,22 +446,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[<]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, if N < 1, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[>]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, if N > 1, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[=]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, if N = 1, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
 	'logsource[#]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, if N NOT 1, 0 - otherwise'),
+		'description' =>  _('Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise'),
 		'params' => $param1_str,
 		'allowed_types' => $allowed_types_log
 	),
@@ -495,16 +495,6 @@ $functions = array(
 	),
 	'time[#]' => array(
 		'description' =>  _('Current time is NOT N'),
-		'allowed_types' => $allowed_types_any
-	),
-	'nodata[<]' => array(
-		'description' =>  _('No data received during period of time T, if N < 1, 0 - otherwise'),
-		'params' => $param1_sec,
-		'allowed_types' => $allowed_types_any
-	),
-	'nodata[>]' => array(
-		'description' =>  _('No data received during period of time T, if N > 1, 0 - otherwise'),
-		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[=]' => array(
