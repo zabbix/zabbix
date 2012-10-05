@@ -43,7 +43,7 @@
  * Parameters: src      - [IN] a null-terminated UTF-8 string to encode       *
  *             p_base64 - [OUT] a pointer to the encoded string               *
  *                                                                            *
- * Comments: Based on the patch sybmitted by                                  *
+ * Comments: Based on the patch submitted by                                  *
  *           Jairo Eduardo Lopez Fuentes Nacarino                             *
  *                                                                            *
  ******************************************************************************/
@@ -85,7 +85,7 @@ void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 
 			str_base64_encode(p0, b64_buf, p1 - p0);
 
-			if (0 != p_base64_offset)	/* it not a first word ? */
+			if (0 != p_base64_offset)	/* not the first "encoded-word" ? */
 			{
 				zbx_strcpy_alloc(p_base64, &p_base64_alloc, &p_base64_offset,
 						ZBX_EMAIL_ENCODED_WORD_SEPARATOR);
