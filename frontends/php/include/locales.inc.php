@@ -147,6 +147,7 @@ function zbx_locale_variants_win($language) {
 		'ko_kr' => array('Korean_Korea.949', 'korean'),
 		'ja_jp' => array('Japanese_Japan.932', 'japanese'),
 		'lv_lv' => array('Latvian_Latvia.1257', 'latvian'),
+		'fa_IR' => array('Persian_Iran.1256', 'persian'),
 		'pl_pl' => array('Polish_Poland.1250', 'polish'),
 		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese'),
 		'ru_ru' => array('Russian_Russia.1251', 'russian'),
