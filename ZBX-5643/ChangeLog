@@ -10,6 +10,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
+A.F....... [ZBX-3920] added check for dependencies duplicates (Oleg)
 ..F....... [ZBX-5636] fixed empty acknowledge block in event details if event has no acknowledges (Vedmak)
 ...G...... [ZBX-5571] fixed reporting of system.sw.packages for multiple package systems (Andris)
 ...G...... [ZBX-5559] fixed reporting of system.sw.packages with short package listing (Andris)
@@ -1067,6 +1069,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
 ..F....... [ZBX-5514] fixed sql query in get_min_itemclock_by_itemid function (Eduard)
 A......... [ZBX-5505] fixed incorrect sql query building using limits (Eduard)

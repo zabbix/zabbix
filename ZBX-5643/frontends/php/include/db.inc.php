@@ -555,7 +555,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
-function DBfetch(&$cursor) {
+function DBfetch(&$cursor, $convertNulls = true) {
 	global $DB;
 
 	$result = false;
@@ -615,7 +615,7 @@ function DBfetch(&$cursor) {
 			break;
 	}
 
-	if ($result) {
+	if ($convertNulls && $result) {
 		foreach ($result as $key => $val) {
 			if (is_null($val)) {
 				$result[$key] = '0';

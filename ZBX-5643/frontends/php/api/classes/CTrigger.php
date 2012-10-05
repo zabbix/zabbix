@@ -1451,6 +1451,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
+		$this->checkDependencyDuplicates($triggers);
 	}
 
 	/**
@@ -1951,6 +1952,57 @@ class CTrigger extends CTriggerGeneral {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Checks if the given dependencies contain duplicates.
+	 *
+	 * @throws APIException if the given dependencies contain duplicates
+	 *
+	 * @param array $triggers
+	 */
+	protected function checkDependencyDuplicates(array $triggers) {
+		// check duplicates in array
+		$uniqueTriggers = array();
+		$duplicateTriggerId = null;
+		foreach ($triggers as $trigger) {
+			foreach ($trigger['dependencies'] as $dep) {
+				if (isset($uniqueTriggers[$trigger['triggerid']][$dep])) {
+					$duplicateTriggerId = $trigger['triggerid'];
+					break 2;
+				}
+				else {
+					$uniqueTriggers[$trigger['triggerid']][$dep] = 1;
+				}
+			}
+		}
+
+		if ($duplicateTriggerId === null) {
+			// check if dependency already exists in DB
+			foreach ($triggers as $trigger) {
+				$dbUpTriggers = DBselect(
+					'SELECT td.triggerid_up'.
+					' FROM trigger_depends td'.
+					' WHERE '.DBcondition('td.triggerid_up', $trigger['dependencies']).
+					' AND td.triggerid_down='.zbx_dbstr($trigger['triggerid'])
+				, 1);
+				if (DBfetch($dbUpTriggers)) {
+					$duplicateTriggerId = $trigger['triggerid'];
+					break;
+				}
+			}
+		}
+
+		if ($duplicateTriggerId) {
+			$dplTrigger = DBfetch(DBselect(
+				'SELECT t.description'.
+				' FROM triggers t'.
+				' WHERE t.triggerid='.zbx_dbstr($duplicateTriggerId)
+			));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate dependencies in trigger "%1$s".', $dplTrigger['description'])
+			);
 		}
 	}
 
