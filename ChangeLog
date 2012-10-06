@@ -38,6 +38,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+........S. [ZBX-5652] fixed resolving of a {ITEM.NAME} macro in notification messages (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
 A.F....... [ZBX-3920] added check for dependencies duplicates (Oleg)
 ..F....... [ZBX-5636] fixed empty acknowledge block in event details if event has no acknowledges (Vedmak)
