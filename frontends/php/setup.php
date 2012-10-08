@@ -32,11 +32,8 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
 require_once dirname(__FILE__).'/include/validate.inc.php';
 require_once dirname(__FILE__).'/include/profiles.inc.php';
-
 require_once dirname(__FILE__).'/include/nodes.inc.php';
-
 require_once dirname(__FILE__).'/include/locales.inc.php';
-require_once dirname(__FILE__).'/include/db.inc.php';
 
 try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
@@ -47,6 +44,7 @@ catch (Exception $e) {
 	exit;
 }
 
+require_once dirname(__FILE__).'/include/setup.inc.php';
 
 // function used in defines, so can't move it to func.inc.php
 function zbx_stripslashes($value) {
@@ -61,13 +59,6 @@ function zbx_stripslashes($value) {
 	return $value;
 }
 
-
-
-
-require_once dirname(__FILE__).'/include/setup.inc.php';
-
-$page['title'] = _('Installation');
-$page['file'] = 'setup.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -144,14 +135,12 @@ zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 <!doctype html>
 <html>
 <head>
-	<title>Installation</title>
+	<title><?php _('Installation') ?></title>
 	<meta name="Author" content="Zabbix SIA" />
 	<meta charset="utf-8" />
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
 	<link rel="stylesheet" type="text/css" href="css.css" />
 	<link rel="stylesheet" type="text/css" href="styles/themes/originalblue/main.css" />
-	<script type="text/javascript" src="js/browsers.js"></script>
-	<script type="text/javascript" src="jsLoader.php?ver=2.1.0&lang=en_GB&isMenu=0"></script>
 </head>
 
 <body class="originalblue setupBG">

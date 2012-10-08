@@ -50,7 +50,7 @@ class ZBase {
 	/**
 	 * @var array of config data from zabbix config file
 	 */
-	protected $config;
+	protected $config = array();
 
 	/**
 	 * Returns the current instance of Z.
@@ -178,6 +178,22 @@ class ZBase {
 			case self::EXEC_MODE_SETUP:
 				$this->setErrorHandler();
 				$this->setMaintenanceMode();
+				try {
+					// try to load config file, if it exests we need to init db and authenticate user to check permissions
+					$this->loadConfigFile();
+
+					$this->initDB();
+					$this->initNodes();
+					$this->authenticateUser();
+					$this->initLocales();
+					DBclose();
+
+					// if config file exists, only super admin user can access setup
+					if (isset(CWebUser::$data['type']) && CWebUser::$data['type'] < USER_TYPE_SUPER_ADMIN) {
+						throw new Exception('No permissions to referred object or it does not exist!');
+					}
+				}
+				catch (ConfigFileException $e) {}
 				break;
 		}
 	}
