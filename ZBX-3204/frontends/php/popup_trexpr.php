@@ -132,78 +132,78 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'avg[<]' => array(
-		'description' =>  _('Average value for period of T times is < N'),
+		'description' =>  _('Average value for period of a period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'avg[>]' => array(
-		'description' =>  _('Average value for period of T times is > N'),
+		'description' =>  _('Average value for period of a period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'avg[=]' => array(
-		'description' =>  _('Average value for period of T times is = N'),
+		'description' =>  _('Average value for period of a period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'avg[#]' => array(
-		'description' =>  _('Average value for period of T times is NOT N'),
+		'description' =>  _('Average value for period of a period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'delta[<]' => array(
-		'description' =>  _('Difference between MAX and MIN value of T times is < N'),
+		'description' =>  _('Difference between MAX and MIN value of a period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'delta[>]' => array(
-		'description' =>  _('Difference between MAX and MIN value of T times is > N'),
+		'description' =>  _('Difference between MAX and MIN value of a period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'delta[=]' => array(
-		'description' =>  _('Difference between MAX and MIN value of T times is = N'),
+		'description' =>  _('Difference between MAX and MIN value of a period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'delta[#]' => array(
-		'description' =>  _('Difference between MAX and MIN value of T times is NOT N'),
+		'description' =>  _('Difference between MAX and MIN value of a period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'change[<]' => array(
-		'description' =>  _('Difference between last and previous value of T times is < N'),
+		'description' =>  _('Difference between last and previous value of a period T is < N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'change[>]' => array(
-		'description' =>  _('Difference between last and previous value of T times is > N'),
+		'description' =>  _('Difference between last and previous value of a period T is > N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'change[=]' => array(
-		'description' =>  _('Difference between last and previous value of T times is = N'),
+		'description' =>  _('Difference between last and previous value of a period T is = N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'change[#]' => array(
-		'description' =>  _('Difference between last and previous value of T times is NOT N'),
+		'description' =>  _('Difference between last and previous value of a period T is NOT N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'count[<]' => array(
-		'description' =>  _('Number of successfully retrieved values V for period of time is T > N'),
+		'description' =>  _('Number of successfully retrieved values V of a period T is > N'),
 		'params' => $param2_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[>]' => array(
-		'description' =>  _('Number of successfully retrieved values V for period of time is T < N'),
+		'description' =>  _('Number of successfully retrieved values V of a period T is < N'),
 		'params' => $param2_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[=]' => array(
-		'description' =>  _('Number of successfully retrieved values V for period of time is T = N'),
+		'description' =>  _('Number of successfully retrieved values V of a period T is = N'),
 		'params' => $param2_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[#]' => array(
-		'description' =>  _('Number of successfully retrieved values V for period of time is T NOT N'),
+		'description' =>  _('Number of successfully retrieved values V of a period T is NOT N'),
 		'params' => $param2_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
@@ -327,12 +327,12 @@ $functions = array(
 		'allowed_types' => $allowed_types_numeric
 	),
 	'sum[>]' => array(
-		'description' =>  _('Sum of values for period of time is T > N'),
+		'description' =>  _('Sum of values of a period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'sum[=]' => array(
-		'description' =>  _('Sum of values for period of time is T = N'),
+		'description' =>  _('Sum of values of a period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
