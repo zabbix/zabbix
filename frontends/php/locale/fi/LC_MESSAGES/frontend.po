@@ -2,115 +2,116 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-08 22:13+0300\n"
-"PO-Revision-Date: 2012-09-07 21:48+0300\n"
-"Last-Translator: Automatically generated\n"
+"POT-Creation-Date: 2012-10-08 22:15+0300\n"
+"PO-Revision-Date: 2012-10-07 13:00+0200\n"
+"Last-Translator: jeppe <jeppe@arabuusimiehet.com>\n"
 "Language-Team: none\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.1.6\n"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:479
 #: api/classes/CMaintenance.php:587 api/classes/CMaintenance.php:592
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" täytyy olla välillä 1970.01.01 - 2038.01.18."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Näytä OK-tilassa olevat liipaisimet\" täytyy olla \"0\" tai positiivinen kokonaisluku."
 
 #: include/profiles.inc.php:291
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Liipaisimet viĺkkuvat tilanvaihdossa\" täytyy olla \"0\" tai positiivinen kokonaisluku."
 
 #: include/func.inc.php:433
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d päivä, "
+msgstr[1] "%1$d päivää, "
 
 #: httpmon.php:296 include/views/configuration.httpconf.list.php:116
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d skenaario"
+msgstr[1] "%1$d skenaariota"
 
 #: chart4.php:90 chart5.php:84
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (vuosi %2$s)"
 
 #: latest.php:377 latest.php:550
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s Nimike"
+msgstr[1] "%1$s Nimikettä"
 
 #: include/page_header.php:480
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s epäonnistunut kirjautumisyritys kirjattu. Edellinen epäonnistunut yritys oli osoitteesta %2$s %3$s kello %4$s."
+msgstr[1] "%1$s epäonnistunutta kirjautumisyritystä kirjattu. Edellinen epäonnistunut yritys oli osoitteesta %2$s %3$s kello %4$s."
 
 #: include/blocks.inc.php:944
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%2$d / %1$d asiaa näytetty"
+msgstr[1] "%2$d / %1$d asiasta näytetty"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d laite"
+msgstr[1] "%d laitetta"
 
 #: include/views/configuration.action.edit.php:424
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - toistaiseksi)"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Vain pääylläpitäjät voivat luoda ryhmän)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:143
 msgid "(Only superadmins can create group)"
-msgstr ""
+msgstr "(Vain pääylläpitäjät voivat luoda ryhmän)"
 
 #: include/forms.inc.php:538 include/forms.inc.php:553
 msgid "(in days)"
-msgstr ""
+msgstr "(päivissä)"
 
 #: include/forms.inc.php:435
 msgid "(in sec)"
-msgstr ""
+msgstr "(sekunneissa)"
 
 #: include/views/configuration.action.edit.php:434
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(minimi 60 sekuntia, 0 - käytä toiminnan oletusta)"
 
 #: include/views/configuration.host.edit.php:284
 #: include/views/configuration.host.massupdate.php:60
 msgid "(no proxy)"
-msgstr ""
+msgstr "(ei välityspalvelinta)"
 
 #: include/views/configuration.screen.constructor.edit.php:475 popup.php:1883
 #: popup.php:1884
 msgid "- all groups -"
-msgstr ""
+msgstr "- kaikki ryhmät -"
 
 #: acknow.php:97
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr ""
+msgstr "----[MASSAKUITTAUS]----"
 
 #: include/triggers.inc.php:2296 include/triggers.inc.php:2297
 #: include/triggers.inc.php:2298 include/triggers.inc.php:2300
@@ -118,128 +119,128 @@ msgstr ""
 #: include/triggers.inc.php:2308 include/triggers.inc.php:2309
 #: include/triggers.inc.php:2317 include/triggers.inc.php:2324
 msgid "0 or 1"
-msgstr ""
+msgstr "0 tai 1"
 
 #: queue.php:162 queue.php:225
 msgid "1 minute"
-msgstr ""
+msgstr "1 minuutti"
 
 #: queue.php:160 queue.php:223
 msgid "10 seconds"
-msgstr ""
+msgstr "10 sekuntia"
 
 #: queue.php:161 queue.php:224
 msgid "30 seconds"
-msgstr ""
+msgstr "30 sekuntia"
 
 #: include/views/configuration.graph.edit.php:277
 msgid "3D view"
-msgstr ""
+msgstr "3D-näkymä"
 
 #: queue.php:163 queue.php:226
 msgid "5 minutes"
-msgstr ""
+msgstr "5 minuuttia"
 
 #: queue.php:159 queue.php:222
 msgid "5 seconds"
-msgstr ""
+msgstr "5 sekuntia"
 
 #: include/items.inc.php:781 include/views/monitoring.history.php:63
 msgid "500 latest values"
-msgstr ""
+msgstr "500 viimeisintä arvoa"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
-msgstr ""
+msgstr "<manuaalinen>"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
-msgstr ""
+msgstr "HÄLYTYSTEN KUITTAUKSET"
 
 #: include/triggers.inc.php:1900 include/triggers.inc.php:1956
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:880
 #: include/views/configuration.triggers.edit.php:104 tr_logform.php:290
 msgid "AND"
-msgstr ""
+msgstr "JA"
 
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:879
 msgid "AND / OR"
-msgstr ""
+msgstr "JA / TAI"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
-msgstr ""
+msgstr "TOIMINTOJEN TARKASTUS"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
-msgstr ""
+msgstr "LOGIEN TARKASTUS"
 
 #: report2.php:127
 msgid "AVAILABILITY REPORT"
-msgstr ""
+msgstr "SAATAVUUSRAPORTTI"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Hyväksyttävä SLA"
 
 #: sysmap.php:75
 msgid "Access denied!"
-msgstr ""
+msgstr "Ei käyttöoikeutta!"
 
 #: api/classes/CUser.php:919
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "Tilin käyttö on estetty %s sekuntia"
 
 #: events.php:566 events.php:579 include/actions.inc.php:189
 #: include/blocks.inc.php:835 include/blocks.inc.php:1365
 #: include/events.inc.php:135 include/events.inc.php:206
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
-msgstr ""
+msgstr "Kuittaa"
 
 #: acknow.php:179 include/triggers.inc.php:1409 include/triggers.inc.php:1412
 #: tr_status.php:664
 msgid "Acknowledge"
-msgstr ""
+msgstr "Kuittaa"
 
 #: acknow.php:122
 msgid "Acknowledge added"
-msgstr ""
+msgstr "Kuittaus lisätty"
 
 #: acknow.php:150 acknow.php:178
 msgid "Acknowledge alarm by"
-msgstr ""
+msgstr "Kuittaa hälytys"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Kuittaa ja palaa"
 
 #: tr_status.php:203
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Kuittaa tila"
 
 #: include/events.inc.php:120 tr_status.php:291 tr_status.php:667
 msgid "Acknowledged"
-msgstr ""
+msgstr "Kuitattu"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Kuitatut OK-tapahtumat"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Kuitatut ONGELMA-tapahtumat"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
-msgstr ""
+msgstr "Kuittaukset"
 
 #: include/views/configuration.sysmap.edit.php:144
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Kuittaus pois päältä"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -265,39 +266,39 @@ msgstr ""
 #: include/views/configuration.triggers.massupdate.php:79 tr_logform.php:299
 #: tr_logform.php:303
 msgid "Action"
-msgstr ""
+msgstr "Toiminto"
 
 #: api/classes/CAction.php:816 api/classes/CAction.php:913
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2$s sekuntia)."
 
 #: api/classes/CAction.php:819 api/classes/CAction.php:833
 #: api/classes/CAction.php:922 api/classes/CAction.php:941
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Toiminto \"%s\" on jo olemassa."
 
 #: api/classes/CAction.php:968
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Toiminnolla \"%s\" ei ole operaatioita määriteltynä."
 
 #: actionconf.php:149
 msgid "Action added"
-msgstr ""
+msgstr "Toiminto lisätty"
 
 #: actionconf.php:170
 msgid "Action deleted"
-msgstr ""
+msgstr "Toiminto poistettu"
 
 #: include/views/configuration.action.edit.php:399
 msgid "Action operations"
-msgstr ""
+msgstr "Toiminnon operaatiot"
 
 #: actionconf.php:145
 msgid "Action updated"
-msgstr ""
+msgstr "Toiminto päivitetty"
 
 #: events.php:567 events.php:580 include/blocks.inc.php:836
 #: include/blocks.inc.php:1366 include/events.inc.php:136
@@ -306,32 +307,32 @@ msgstr ""
 #: include/views/administration.auditlogs.list.php:29
 #: include/views/configuration.action.list.php:39
 msgid "Actions"
-msgstr ""
+msgstr "Toiminnot"
 
 #: include/views/configuration.item.prototype.list.php:104
 msgid "Activate selected"
-msgstr ""
+msgstr "Aktivoi valitut"
 
 #: include/views/administration.proxy.edit.php:40
 #: include/views/administration.proxy.list.php:76
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
-msgstr ""
+msgstr "Aktiivinen"
 
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Aktiivinen"
 
 #: api/classes/CMaintenance.php:474 api/classes/CMaintenance.php:587
 #: include/views/configuration.maintenance.edit.php:58
 msgid "Active since"
-msgstr ""
+msgstr "Aktiivinen lähtien"
 
 #: api/classes/CMaintenance.php:479 api/classes/CMaintenance.php:592
 #: include/views/configuration.maintenance.edit.php:73
 msgid "Active till"
-msgstr ""
+msgstr "Aktiivinen asti"
 
 #: dashconf.php:211 include/blocks.inc.php:1104 include/blocks.inc.php:1110
 #: include/blocks.inc.php:1215 include/blocks.inc.php:1260
@@ -382,114 +383,114 @@ msgstr ""
 #: popup_media.php:141 popup_period.php:183 tr_logform.php:289
 #: tr_status.php:717
 msgid "Add"
-msgstr ""
+msgstr "Lisää"
 
 #: acknow.php:173
 msgid "Add comment by"
-msgstr ""
+msgstr "Lisää kommentti"
 
 #: sysmap.php:144
 msgid "Add element"
-msgstr ""
+msgstr "Lisää elementti"
 
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Lisää kuvaajaan arvoja ensin"
 
 #: include/actions.inc.php:283 include/actions.inc.php:498
 msgid "Add host"
-msgstr ""
+msgstr "Lisää kone"
 
 #: sysmap.php:150
 msgid "Add link"
-msgstr ""
+msgstr "Lisää linkki"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Lisää puuttuvat"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
-msgstr ""
+msgstr "Lisää prototyyppi"
 
 #: jsLoader.php:177
 msgid "Add service"
-msgstr ""
+msgstr "Lisää palvelu"
 
 #: slides.php:83
 msgid "Add to"
-msgstr ""
+msgstr "Lisää"
 
 #: charts.php:82 history.php:94 host_screen.php:88 include/html.inc.php:256
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr ""
+msgstr "Lisää suosikkeihin"
 
 #: include/actions.inc.php:502
 msgid "Add to host group"
-msgstr ""
+msgstr "Lisää koneryhmään"
 
 #: include/actions.inc.php:309 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
-msgstr ""
+msgstr "Lisää koneryhmiin"
 
 #: auditlogs.php:134
 msgid "Added"
-msgstr ""
+msgstr "Lisätty"
 
 #: include/items.inc.php:1324 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
-msgstr ""
+msgstr "Lisäparametrit"
 
 #: include/hosts.inc.php:70
 msgid "Admin"
-msgstr ""
+msgstr "Hallinta"
 
 #: include/menu.inc.php:224
 msgid "Administration"
-msgstr ""
+msgstr "Hallinta"
 
 #: include/views/configuration.sysmap.edit.php:84
 msgid "Advanced labels"
-msgstr ""
+msgstr "Edistyneet nimilaput"
 
 #: include/blocks.inc.php:833 include/blocks.inc.php:1363
 #: include/events.inc.php:134 include/events.inc.php:206
 #: include/events.inc.php:209 tr_status.php:289
 msgid "Age"
-msgstr ""
+msgstr "Ikä"
 
 #: tr_status.php:237
 msgid "Age less than"
-msgstr ""
+msgstr "Ikä vähemmän kuin"
 
 #: include/views/monitoring.overview.php:55
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Ikä vähemmän kuin %s"
 
 #: include/items.inc.php:182 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:114 popup.php:2024
 msgid "Agent"
-msgstr ""
+msgstr "Agentti"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Agentin verkkoliitännät"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agentin, SNMP:n, JMX:n tai IPMI:n verkkoliitäntä"
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:897 users.php:43
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: sysmap.php:174
 msgid "Align icons"
-msgstr ""
+msgstr "Oikaise ikonit"
 
 #: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1194
 #: include/blocks.inc.php:1203 include/blocks.inc.php:1248
@@ -510,34 +511,34 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:138 jsLoader.php:84
 #: popup_right.php:56 tr_status.php:216
 msgid "All"
-msgstr ""
+msgstr "Kaikki"
 
 #: include/classes/class.chostsinfo.php:115
 #: include/classes/class.ctriggersinfo.php:124
 msgid "All groups"
-msgstr ""
+msgstr "Kaikki ryhmät"
 
 #: jsLoader.php:150
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Kaikilla linkeillä pitäisi olla \"Nimi\" tai \"URL\" määriteltynä"
 
 #: include/page_header.php:121
 msgid "All nodes"
-msgstr ""
+msgstr "Kaikki solmut"
 
 #: include/views/configuration.item.edit.php:346
 #: include/views/configuration.item.edit.php:381
 #: include/views/configuration.item.massupdate.php:407
 msgid "Allowed hosts"
-msgstr ""
+msgstr "Sallitut koneet"
 
 #: tr_status.php:194 tr_status.php:200
 msgid "Any"
-msgstr ""
+msgstr "Mikä tahansa"
 
 #: include/regexp.inc.php:181
 msgid "Any character string included"
-msgstr ""
+msgstr "Mikä tahansa merkkijono mukaanluettuna"
 
 #: applications.php:111 httpconf.php:42 include/actions.inc.php:60
 #: include/audit.inc.php:32 include/forms.inc.php:525
@@ -545,43 +546,43 @@ msgstr ""
 #: include/views/configuration.application.list.php:54
 #: include/views/configuration.httpconf.edit.php:44
 msgid "Application"
-msgstr ""
+msgstr "Sovellus"
 
 #: api/classes/CApplication.php:787
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Sovellus \"%1$s\" on jo olemassa koneelle \"%2$s\"."
 
 #: api/classes/CApplication.php:482
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Sovellus  \"%1$s\" on jo olemassa."
 
 #: api/classes/CApplication.php:626
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Sovellusta \"%1$s\", jota skenaario \"%2$s\" käyttää, ei voi poistaa."
 
 #: applications.php:103
 msgid "Application added"
-msgstr ""
+msgstr "Sovellus lisätty"
 
 #: applications.php:130 applications.php:161
 msgid "Application deleted"
-msgstr ""
+msgstr "Sovellus poistettu"
 
 #: api/rpc/class.cjsonrpc.php:206
 msgid "Application error."
-msgstr ""
+msgstr "Sovelluksessa virhe."
 
 #: applications.php:96
 msgid "Application updated"
-msgstr ""
+msgstr "Sovellus päivitetty"
 
 #: api/classes/CItemGeneral.php:325
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Sovellus ID:llä \"%1$s\" ei ole käytettävissä koneella \"%2$s\"."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:821
 #: include/html.inc.php:397 include/html.inc.php:401
@@ -595,43 +596,43 @@ msgstr ""
 #: search.php:136 search.php:160 search.php:179 search.php:368 search.php:389
 #: search.php:412 templates.php:459 templates.php:522
 msgid "Applications"
-msgstr ""
+msgstr "Sovellukset"
 
 #: include/views/js/configuration.sysmaps.js.php:184
 #: include/views/js/configuration.sysmaps.js.php:273
 #: include/views/js/configuration.sysmaps.js.php:374
 msgid "Apply"
-msgstr ""
+msgstr "Käytä"
 
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Lähestyy"
 
 #: include/func.inc.php:221
 msgid "Apr"
-msgstr ""
+msgstr "Huhti"
 
 #: include/forms.inc.php:1547 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:113
 msgid "April"
-msgstr ""
+msgstr "Huhtikuu"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Oletko varma, että haluat tehdä tämän toiminnon?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Oletko varma, että haluat poistaa?"
 
 #: include/views/js/configuration.sysmaps.js.php:48
 msgid "Area size"
-msgstr ""
+msgstr "Alueen koko"
 
 #: include/views/js/configuration.sysmaps.js.php:36
 msgid "Area type"
-msgstr ""
+msgstr "Alueen tyyppi"
 
 #: include/views/configuration.item.edit.php:361
 #: include/views/configuration.item.edit.php:369
@@ -639,15 +640,15 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:374
 #: include/views/configuration.item.massupdate.php:388
 msgid "As is"
-msgstr ""
+msgstr "sellaisenaan"
 
 #: include/views/monitoring.history.php:67
 msgid "As plain text"
-msgstr ""
+msgstr "Paljaana tekstinä"
 
 #: include/hosts.inc.php:155
 msgid "Asset tag"
-msgstr ""
+msgstr "Resurssitägi"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 msgid "At"
@@ -659,19 +660,19 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:419 api/classes/CMaintenance.php:611
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Ainakin yksi kone tai ryhmä pitää olla valittuna."
 
 #: api/classes/CMaintenance.php:489 api/classes/CMaintenance.php:602
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Ainakin yksi ylläpitoikkuna täytyy olla luotuna."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Ainakin MySQL, PostgreSQL, Oracle, SQLite3 tai IBM DB2 pitäisi olla tuettu"
 
 #: include/menu.inc.php:270
 msgid "Audit"
-msgstr ""
+msgstr "Seuranta"
 
 #: auditacts.php:27
 msgid "Audit actions"
@@ -13454,11 +13455,11 @@ msgstr ""
 
 #: include/page_header.php:129
 msgid "refreshed every"
-msgstr ""
+msgstr "verestä joka"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
-msgstr ""
+msgstr "muista valitut"
 
 #: include/services.inc.php:104 include/services.inc.php:107
 #: include/services.inc.php:200
@@ -13466,39 +13467,39 @@ msgstr ""
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:43
 msgid "root"
-msgstr ""
+msgstr "juuri"
 
 #: include/classes/class.cserverinfo.php:36
 msgid "running"
-msgstr ""
+msgstr "käynnissä"
 
 #: include/func.inc.php:442 include/func.inc.php:493
 msgctxt "second short"
 msgid "s"
-msgstr ""
+msgstr "s"
 
 #: include/page_header.php:129
 #: include/views/configuration.httpconf.edit.php:188
 msgid "sec"
-msgstr ""
+msgstr "sek"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
 msgid "seconds"
-msgstr ""
+msgstr "sekuntia"
 
 #: include/actions.inc.php:705 include/classes/screens/CScreenActions.php:120
 #: include/views/administration.auditacts.list.php:86
 msgid "sent"
-msgstr ""
+msgstr "lähetetty"
 
 #: include/views/configuration.services.edit.php:177
 msgid "short description"
-msgstr ""
+msgstr "lyhyt kuvaus"
 
 #: include/views/configuration.sysmap.edit.php:76
 msgid "show icon mappings"
-msgstr ""
+msgstr "näytä ikoni"
 
 #: include/views/configuration.item.edit.php:378
 #: include/views/configuration.item.massupdate.php:392
@@ -13570,9 +13571,9 @@ msgstr ""
 #: include/views/configuration.services.edit.php:183
 #: include/views/configuration.services.edit.php:200
 msgid "yyyy"
-msgstr ""
+msgstr "vvvv"
 
 #: include/func.inc.php:561
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"

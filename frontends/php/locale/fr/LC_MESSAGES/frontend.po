@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-08 22:13+0300\n"
-"PO-Revision-Date: 2012-10-03 23:18+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2012-10-08 22:15+0300\n"
+"PO-Revision-Date: 2012-10-04 16:05+0200\n"
+"Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -9187,7 +9187,7 @@ msgstr "Les permissions ne peuvent être assignées qu'aux groupes d'utilisateur
 
 #: include/locales.inc.php:59
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Persan (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
