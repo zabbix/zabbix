@@ -798,7 +798,7 @@ class CItem extends CItemGeneral {
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		// add the values that cannot be changed, but are required for further processing, and do check for "templateid"
+		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}

@@ -172,7 +172,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			// check for "templateid", because it is not allowed
 			if (isset($item['templateid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set "templateid" for item.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for item.'));
 			}
 
 
