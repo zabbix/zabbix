@@ -1,7 +1,0 @@
-Database upgrade
-----------------
-
-Zabbix Server performs automatic database upgrade starting from version 2.2.0. No SQL scripts
-are provided anymore.
-
-Please see ... for more details.
