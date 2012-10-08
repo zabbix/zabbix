@@ -123,17 +123,17 @@ class CsetupWizard extends CForm {
 		}
 
 		if (isset($this->stage[$this->getStep() + 1])) {
-			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
+			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>', null, 'ui-state-default ui-button');
 		}
 		else {
-			$next = new CSubmit('finish', _('Finish'));
+			$next = new CSubmit('finish', _('Finish'), null, 'ui-state-default ui-button');
 		}
 
 		if (isset($this->HIDE_CANCEL_BUTTON) && $this->HIDE_CANCEL_BUTTON) {
 			$cancel = null;
 		}
 		else {
-			$cancel = new CDiv(new CSubmit('cancel', _('Cancel')), 'footer_left');
+			$cancel = new CDiv(new CSubmit('cancel', _('Cancel'), null, 'ui-state-default ui-button'), 'footer_left');
 		}
 
 		if ($this->DISABLE_NEXT_BUTTON) {
@@ -143,7 +143,7 @@ class CsetupWizard extends CForm {
 		$footer = new CDiv(array(
 			$cancel,
 			new CDiv(array(
-				$this->getStep() != 0 ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous')) : null,
+				$this->getStep() != 0 ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous'), null, 'ui-state-default ui-button') : null,
 				$next), 'footer_right')
 			), 'footer');
 
@@ -305,7 +305,7 @@ class CsetupWizard extends CForm {
 					new CSpan(array(_('OK'), BR()), 'ok')
 					: new CSpan(array(_('Fail'), BR()), 'fail')
 					: null,
-				new  CSubmit('retry', 'Test connection')
+				new  CSubmit('retry', 'Test connection', null, 'ui-state-default ui-button')
 			), 'info_bar')
 
 		);
@@ -404,8 +404,9 @@ class CsetupWizard extends CForm {
 		);
 		$config->save();
 
-		if ($config->load()) {
+		try {
 			$error = false;
+			$config->load();
 
 			if ($config->config['DB']['TYPE'] != $this->getConfig('DB_TYPE')) {
 				$error = true;
@@ -439,10 +440,11 @@ class CsetupWizard extends CForm {
 			}
 			$error_text = 'Unable to overwrite the existing configuration file. ';
 		}
-		else {
+		catch (ConfigFileException $e) {
 			$error = true;
 			$error_text = 'Unable to create the configuration file. ';
 		}
+
 		clear_messages();
 		if ($error) {
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
@@ -460,7 +462,7 @@ class CsetupWizard extends CForm {
 
 		return array(
 			$table, BR(), BR(),
-			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(), BR()) : null,
+			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry'), null, 'ui-state-default ui-button'), BR(), BR()) : null,
 			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
 				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
 					'Press the "Download configuration file" button, download the configuration file ',
@@ -509,11 +511,6 @@ class CsetupWizard extends CForm {
 		}
 
 		DBclose();
-
-		if ($DB['TYPE'] == ZBX_DB_SQLITE3 && !zbx_is_callable(array('ftok', 'sem_get', 'sem_acquire', 'sem_release', 'sem_remove'))) {
-			error('Support of SQLite3 requires PHP IPC functions');
-			$result = false;
-		}
 
 		$DB = null;
 		return $result;
