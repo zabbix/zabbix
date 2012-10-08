@@ -281,5 +281,5 @@ function getMappedValue($value, $valueMapId) {
 function applyValueMap($value, $valueMapId) {
 	$mapping = getMappedValue($value, $valueMapId);
 
-	return $mapping === false ? $value : $mapping['newvalue'].' ('.$value.')';
+	return $mapping === false ? $value : $mapping.' ('.$value.')';
 }
