@@ -45,7 +45,6 @@ var timeControl = {
 			loadSBox: 0,
 			loadImage: 0,
 			loadScroll: 0,
-			scrollWidthByImage: 0, // TODO remove me!
 			mainObject: 0, // object on changing will reflect on all others
 			sliderMaximumTimePeriod: null // max period in seconds
 		};

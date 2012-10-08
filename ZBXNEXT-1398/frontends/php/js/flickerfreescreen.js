@@ -34,6 +34,7 @@ jQuery(function($) {
 			this.screens[screen.id].interval = (screen.interval > 0) ? screen.interval * 1000 : 0;
 			this.screens[screen.id].timestamp = 0;
 			this.screens[screen.id].timestampResponsiveness = 0;
+			this.screens[screen.id].timestampActual = 0;
 			this.screens[screen.id].isRefreshing = false;
 			this.screens[screen.id].isReRefreshRequire = false;
 			this.screens[screen.id].error = 0;
@@ -54,6 +55,9 @@ jQuery(function($) {
 			if (empty(isSelfRefresh)) {
 				isSelfRefresh = false;
 			}
+
+			// set actual timestamp
+			screen.timestampActual = new CDate().getTime();
 
 			var ajaxUrl = new Curl('jsrpc.php');
 			ajaxUrl.setArgument('type', 9); // PAGE_TYPE_TEXT
@@ -191,7 +195,8 @@ jQuery(function($) {
 							screen.isRefreshing = false;
 							screen.timestamp = $(html).data('timestamp');
 
-							window.flickerfreeScreenShadow.end(id);
+							window.flickerfreeScreenShadow.isShadowed(id, false);
+							window.flickerfreeScreenShadow.validate(id);
 						}
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -242,6 +247,7 @@ jQuery(function($) {
 						'data-timestamp': new CDate().getTime()
 					})
 					.attr('src', url.getUrl())
+					.css({position: 'relative', zIndex: 2})
 					.error(function() {
 						screen.error++;
 						screen.isRefreshing = false;
@@ -251,7 +257,7 @@ jQuery(function($) {
 							window.flickerfreeScreen.refresh(id, true);
 						}
 					})
-					.load(function(request) {
+					.load(function() {
 						if (screen.error > 0) {
 							return;
 						}
@@ -271,6 +277,11 @@ jQuery(function($) {
 
 								// set id
 								bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
+
+								// set opacity state
+								if (window.flickerfreeScreenShadow.isShadowed(id)) {
+									bufferImg.fadeTo(0, 0.6);
+								}
 
 								// set loaded image from buffer to dom
 								domImg.replaceWith(bufferImg);
@@ -385,6 +396,7 @@ jQuery(function($) {
 				this.timers[id] = {};
 				this.timers[id].timeoutHandler = null;
 				this.timers[id].ready = false;
+				this.timers[id].isShadowed = false;
 			}
 
 			clearTimeout(this.timers[id].timeoutHandler);
@@ -392,97 +404,111 @@ jQuery(function($) {
 		},
 
 		end: function(id) {
-			clearTimeout(this.timers[id].timeoutHandler);
-			this.removeShadow(id);
+			var screen = window.flickerfreeScreen.screens[id];
+
+			if (screen.timestamp + this.timeout >= screen.timestampActual) {
+				clearTimeout(this.timers[id].timeoutHandler);
+				this.removeShadow(id);
+			}
 		},
 
 		validate: function(id) {
 			var screen = window.flickerfreeScreen.screens[id];
 
-			if (screen.isRefreshing) {
+			if (screen.timestamp + this.timeout < screen.timestampActual) {
 				this.createShadow(id);
 				this.start(id);
 			}
 			else {
-				this.removeShadow(id);
 				this.end(id);
 			}
 		},
 
 		createShadow: function(id) {
-			var elem = $('#flickerfreescreen_' + id),
-				item = window.flickerfreeScreenShadow.findScreenItem(elem),
-				timer = this.timers[id];
-			if (empty(item)) {
-				return;
-			}
+			var timer = this.timers[id];
 
-			// don't show shadow if image not loaded first time with the page
-			if (item.prop('nodeName') == 'IMG' && !timer.ready && typeof(item.get(0).complete) == 'boolean') {
-				if (!item.get(0).complete) {
+			if (!timer.isShadowed) {
+				var elem = $('#flickerfreescreen_' + id),
+					item = window.flickerfreeScreenShadow.findScreenItem(elem);
+				if (empty(item)) {
 					return;
 				}
-				else {
-					timer.ready = true;
-				}
-			}
 
-			// create shadow
-			if (elem.find('.shadow').length == 0) {
-				item.css({position: 'relative', zIndex: 2});
-
-				elem.append($('<div>', {'class': 'shadow'})
-					.html('&nbsp;')
-					.css({
-						top: item.position().top,
-						left: item.position().left,
-						width: item.width(),
-						height: item.height(),
-						position: 'absolute',
-						zIndex: 1
-					})
-				);
-
-				// fade screen
-				var itemNode = elem.find(item.prop('nodeName'));
-				if (!empty(itemNode)) {
-					itemNode = (itemNode.length > 0) ? $(itemNode[0]) : itemNode;
-					itemNode.fadeTo(2000, 0.6);
+				// don't show shadow if image not loaded first time with the page
+				if (item.prop('nodeName') == 'IMG' && !timer.ready && typeof(item.get(0).complete) == 'boolean') {
+					if (!item.get(0).complete) {
+						return;
+					}
+					else {
+						timer.ready = true;
+					}
 				}
 
-				// show loading icon..
-				elem.append($('<div>', {'class': 'loading'})
-					.css({
-						width: '24px',
-						height: '24px',
-						position: 'absolute',
-						zIndex: 3,
-						top: item.position().top + Math.round(item.height() / 2) - 12,
-						left: item.position().left + Math.round(item.width() / 2) - 12
-					})
-				);
-				elem.find('.loading').activity({
-					segments: 12,
-					steps: 3,
-					opacity: 0.3,
-					width: 2,
-					space: 0,
-					length: 5,
-					color: '#0b0b0b'
-				});
+				// create shadow
+				if (elem.find('.shadow').length == 0) {
+					item.css({position: 'relative', zIndex: 2});
+
+					elem.append($('<div>', {'class': 'shadow'})
+						.html('&nbsp;')
+						.css({
+							top: item.position().top,
+							left: item.position().left,
+							width: item.width(),
+							height: item.height(),
+							position: 'absolute',
+							zIndex: 1
+						})
+					);
+
+					// fade screen
+					var itemNode = elem.find(item.prop('nodeName'));
+					if (!empty(itemNode)) {
+						itemNode = (itemNode.length > 0) ? $(itemNode[0]) : itemNode;
+						itemNode.fadeTo(2000, 0.6);
+					}
+
+					// show loading indicator..
+					elem.append($('<div>', {'class': 'loading'})
+						.css({
+							width: '24px',
+							height: '24px',
+							position: 'absolute',
+							zIndex: 3,
+							top: item.position().top + Math.round(item.height() / 2) - 12,
+							left: item.position().left + Math.round(item.width() / 2) - 12
+						})
+					);
+					elem.find('.loading').activity({
+						segments: 12,
+						steps: 3,
+						opacity: 0.3,
+						width: 2,
+						space: 0,
+						length: 5,
+						color: '#0b0b0b'
+					});
+
+					timer.isShadowed = true;
+				}
 			}
 		},
 
 		removeShadow: function(id) {
-			var elem = $('#flickerfreescreen_' + id),
-				item = window.flickerfreeScreenShadow.findScreenItem(elem);
-			if (empty(item)) {
-				return;
-			}
+			var timer = this.timers[id];
 
-			elem.find(item.prop('nodeName')).fadeIn(0);
-			elem.find('.loading').remove();
-			elem.find('.shadow').remove();
+			if (timer.isShadowed) {
+				var elem = $('#flickerfreescreen_' + id),
+					item = window.flickerfreeScreenShadow.findScreenItem(elem);
+				if (empty(item)) {
+					return;
+				}
+
+				elem.find('.loading').remove();
+				elem.find('.shadow').remove();
+				elem.find(item.prop('nodeName')).fadeTo(0, 1);
+
+				timer.isShadowed = false;
+			}
 		},
 
 		moveShadows: function() {
@@ -493,13 +519,23 @@ jQuery(function($) {
 					return;
 				}
 
+				// shadow
 				var shadows = elem.find('.shadow');
-				if (shadows.length == 1) {
+				if (shadows.length > 0) {
 					shadows.css({
 						top: item.position().top,
 						left: item.position().left,
 						width: item.width(),
 						height: item.height()
+					});
+				}
+
+				// loading indicator
+				var loading = elem.find('.loading');
+				if (loading.length > 0) {
+					loading.css({
+						top: item.position().top + Math.round(item.height() / 2) - 12,
+						left: item.position().left + Math.round(item.width() / 2) - 12
 					});
 				}
 			});
@@ -529,6 +565,14 @@ jQuery(function($) {
 			else {
 				return null;
 			}
+		},
+
+		isShadowed: function(id, isShadowed) {
+			if (typeof(isShadowed) != 'undefined') {
+				this.timers[id].isShadowed = isShadowed;
+			}
+
+			return this.timers[id].isShadowed;
 		}
 	};
 
