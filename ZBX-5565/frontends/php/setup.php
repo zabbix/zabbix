@@ -46,23 +46,9 @@ catch (Exception $e) {
 
 require_once dirname(__FILE__).'/include/setup.inc.php';
 
-// function used in defines, so can't move it to func.inc.php
-function zbx_stripslashes($value) {
-	if (is_array($value)) {
-		foreach ($value as $id => $data) {
-			$value[$id] = zbx_stripslashes($data);
-		}
-	}
-	elseif (is_string($value)) {
-		$value = stripslashes($value);
-	}
-	return $value;
-}
-
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'trouble' =>			array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'type' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null),
 	'server' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'port' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')),

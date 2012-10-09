@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 /**
  * A helper class for working with JavaScript.
@@ -38,8 +37,7 @@ class CJs {
 	 * @static
 	 *
 	 * @param mixed $data
-	 *
-	 * @param bool $forceObject force all arrays to objects
+	 * @param bool  $forceObject force all arrays to objects
 	 *
 	 * @return mixed
 	 */
@@ -49,5 +47,23 @@ class CJs {
 		}
 
 		return self::$json->encode($data, array(), $forceObject);
+	}
+
+	/**
+	 * Decodes JSON sting.
+	 *
+	 * @static
+	 *
+	 * @param string $data
+	 * @param bool   $asArray get result as array instead of object
+	 *
+	 * @return mixed
+	 */
+	public static function decodeJson($data, $asArray = true) {
+		if (self::$json === null) {
+			self::$json = new CJSON();
+		}
+
+		return self::$json->decode($data, $asArray);
 	}
 }

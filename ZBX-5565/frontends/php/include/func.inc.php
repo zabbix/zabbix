@@ -797,21 +797,6 @@ function zbx_arrayFindDuplicates(array $array) {
 }
 
 /************* STRING *************/
-if (!function_exists('zbx_stripslashes')) {
-	function zbx_stripslashes($value) {
-		if (is_array($value)) {
-			foreach ($value as $id => $data) {
-				$value[$id] = zbx_stripslashes($data);
-			}
-		}
-		elseif (is_string($value)) {
-			$value = stripslashes($value);
-		}
-
-		return $value;
-	}
-}
-
 function zbx_nl2br($str) {
 	$str_res = array();
 	$str_arr = explode("\n", $str);

@@ -218,8 +218,6 @@ class CsetupWizard extends CForm {
 		if (!$final_result) {
 			$this->DISABLE_NEXT_BUTTON = true;
 
-			$this->addVar('trouble', true);
-
 			$final_result = array(
 				_('Please correct all issues and press "Retry" button'),
 				BR(),
