@@ -68,14 +68,51 @@ class ZBase {
 	}
 
 	/**
+	 * Init modules required to run frontend.
+	 */
+	protected function init() {
+		$this->rootDir = $this->findRootDir();
+		$this->registerAutoloader();
+
+		$this->setMaintenanceMode();
+		$this->setErrorHandler();
+	}
+
+	/**
 	 * Initializes the application.
 	 */
 	public function run($mode = self::EXEC_MODE_DEFAULT) {
-		$this->rootDir = $this->findRootDir();
+		$this->init();
 
-		$this->registerAutoloader();
+		switch ($mode) {
+			case self::EXEC_MODE_DEFAULT:
+				$this->loadConfigFile();
+				$this->initDB();
+				$this->initNodes();
+				$this->authenticateUser();
+				$this->initLocales();
+				break;
+			case self::EXEC_MODE_API:
+				break;
+			case self::EXEC_MODE_SETUP:
+				try {
+					// try to load config file, if it exists we need to init db and authenticate user to check permissions
+					$this->loadConfigFile();
 
-		$this->init($mode);
+					$this->initDB();
+					$this->initNodes();
+					$this->authenticateUser();
+					$this->initLocales();
+					DBclose();
+
+					// if config file exists, only super admin user can access setup
+					if (isset(CWebUser::$data['type']) && CWebUser::$data['type'] < USER_TYPE_SUPER_ADMIN) {
+						throw new Exception('No permissions to referred object or it does not exist!');
+					}
+				}
+				catch (ConfigFileException $e) {}
+				break;
+		}
 	}
 
 	/**
@@ -160,42 +197,6 @@ class ZBase {
 		}
 
 		return $this->session;
-	}
-
-	protected function init($mode) {
-		switch ($mode) {
-			case self::EXEC_MODE_DEFAULT:
-				$this->setErrorHandler();
-				$this->setMaintenanceMode();
-				$this->loadConfigFile();
-				$this->initDB();
-				$this->initNodes();
-				$this->authenticateUser();
-				$this->initLocales();
-				break;
-			case self::EXEC_MODE_API:
-				break;
-			case self::EXEC_MODE_SETUP:
-				$this->setErrorHandler();
-				$this->setMaintenanceMode();
-				try {
-					// try to load config file, if it exests we need to init db and authenticate user to check permissions
-					$this->loadConfigFile();
-
-					$this->initDB();
-					$this->initNodes();
-					$this->authenticateUser();
-					$this->initLocales();
-					DBclose();
-
-					// if config file exists, only super admin user can access setup
-					if (isset(CWebUser::$data['type']) && CWebUser::$data['type'] < USER_TYPE_SUPER_ADMIN) {
-						throw new Exception('No permissions to referred object or it does not exist!');
-					}
-				}
-				catch (ConfigFileException $e) {}
-				break;
-		}
 	}
 
 	protected function setErrorHandler() {

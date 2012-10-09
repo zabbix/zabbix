@@ -86,15 +86,4 @@ global $ZBX_PAGE_POST_JS, $page;
 global $ZBX_SERVER, $ZBX_SERVER_PORT;
 $page = array();
 
-// function used in defines, so can't move it to func.inc.php
-function zbx_stripslashes($value) {
-	if (is_array($value)) {
-		foreach ($value as $id => $data) {
-			$value[$id] = zbx_stripslashes($data);
-		}
-	}
-	elseif (is_string($value)) {
-		$value = stripslashes($value);
-	}
-	return $value;
-}
+
