@@ -1015,9 +1015,13 @@ elseif ($srctbl == 'triggers') {
 		else {
 			$values = array(
 				$dstfld1 => $trigger[$srcfld1],
-				$dstfld2 => $trigger[$srcfld2],
-				$dstfld3 => $trigger[$srcfld3]
+				$dstfld2 => $trigger[$srcfld2]
 			);
+
+			if (!empty($dstfld3) && !empty($srcfld3)) {
+				$values[$dstfld3] = $trigger[$srcfld3];
+			}
+
 			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
