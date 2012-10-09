@@ -34,6 +34,7 @@ static zbx_ibm_db2_handle_t	ibm_db2;
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
 static zbx_oracle_db_handle_t	oracle;
+static OCIStmt			*stmthp = NULL;
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static int			ZBX_PG_BYTEAOID = 0;
@@ -288,6 +289,18 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		}
 	}
 
+	if (ZBX_DB_OK == ret)
+	{
+		/* initialize statement handle */
+		err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
+
+		if (OCI_SUCCESS != err)
+		{
+			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+			ret = ZBX_DB_DOWN;
+		}
+	}
+
 	zbx_free(connect);
 
 	if (ZBX_DB_OK != ret)
@@ -432,27 +445,34 @@ void	zbx_db_close()
 	mysql_close(conn);
 	conn = NULL;
 #elif defined(HAVE_ORACLE)
-	if (oracle.svchp)
+	/* deallocate statement handle */
+	if (NULL != stmthp)
 	{
-		(void)OCILogoff(oracle.svchp, oracle.errhp);
+		OCIHandleFree((dvoid *)stmthp, OCI_HTYPE_STMT);
+		stmthp = NULL;
+	}
+
+	if (NULL != oracle.svchp)
+	{
+		OCILogoff(oracle.svchp, oracle.errhp);
 		oracle.svchp = NULL;
 	}
 
-	if (oracle.errhp)
+	if (NULL != oracle.errhp)
 	{
-		(void)OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
+		OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
 		oracle.errhp = NULL;
 	}
 
-	if (oracle.envhp)
+	if (NULL != oracle.envhp)
 	{
-		(void)OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
 		oracle.envhp = NULL;
 	}
 
-	if (oracle.srvhp)
+	if (NULL != oracle.srvhp)
 	{
-		(void)OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
+		OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
 		oracle.srvhp = NULL;
 	}
 #elif defined(HAVE_POSTGRESQL)
@@ -685,7 +705,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 #elif defined(HAVE_MYSQL)
 	int		status;
 #elif defined(HAVE_ORACLE)
-	OCIStmt		*stmthp = NULL;
 	sword		err = OCI_SUCCESS;
 #elif defined(HAVE_POSTGRESQL)
 	PGresult	*result;
@@ -801,8 +820,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
-
 	if (OCI_SUCCESS == err)
 	{
 		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql),
@@ -829,12 +846,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	{
 		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
 		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
-
-	if (NULL != stmthp)
-	{
-		(void)OCIHandleFree((dvoid *)stmthp, OCI_HTYPE_STMT);
-		stmthp = NULL;
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
