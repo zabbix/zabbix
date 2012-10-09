@@ -24,7 +24,7 @@ define('ZABBIX_API_VERSION', '1.4');
 define('ZABBIX_DB_VERSION',	 2010006);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO', '2012');
+define('ZABBIX_COPYRIGHT_TO',   '2012');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec

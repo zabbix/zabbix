@@ -117,18 +117,11 @@ $ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
 zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
+$pageHeader = new CPageHeader(_('Installation'));
+$pageHeader->addCssFile('css.css');
+$pageHeader->addCssFile('styles/themes/originalblue/main.css');
+$pageHeader->display();
 ?>
-<!doctype html>
-<html>
-<head>
-	<title><?php _('Installation') ?></title>
-	<meta name="Author" content="Zabbix SIA" />
-	<meta charset="utf-8" />
-	<link rel="shortcut icon" href="images/general/zabbix.ico" />
-	<link rel="stylesheet" type="text/css" href="css.css" />
-	<link rel="stylesheet" type="text/css" href="styles/themes/originalblue/main.css" />
-</head>
-
 <body class="originalblue setupBG">
 
 <?php $ZBX_SETUP_WIZARD->show(); ?>
