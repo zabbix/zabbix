@@ -155,7 +155,7 @@ class CTag extends CObject {
 	}
 
 	/**
-	 * Returns true if HTML class exist.
+	 * HTML class check for existing, return thue if exist
 	 *
 	 * @param string $cssClass
 	 *
@@ -163,7 +163,6 @@ class CTag extends CObject {
 	 */
 	public function hasClass($cssClass) {
 		$chkClass = explode(' ', $this->getAttribute('class'));
-
 		return in_array($cssClass, $chkClass);
 	}
 
