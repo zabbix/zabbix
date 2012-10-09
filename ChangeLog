@@ -11,6 +11,7 @@ New features:
 Bug fixes:
 ..F....... [ZBX-3396] added error message if FreeType support is missing (Toms)
 ...G...... [ZBX-4355] fixed response on check inodes on file systems not supporting them (Sasha)
+..F....... [ZBX-5673] fixed incorrect Y-scale if point value > 10 PB (Oleg)
 ..F....... [ZBX-875] fixed duplicate Y-scale (Oleg)
 ..F....... [ZBX-3934] unified color codes validation in frontend (Vedmak)
 A......... [ZBX-3684] fixed template.get method returns excessive 'hostid' field (Vedmak)
