@@ -1424,10 +1424,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL ",%d)" ZBX_ROW_DL,
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.dbl,
-					history[i].ns);
+					history[i].itemid, history[i].clock, history[i].value.dbl, history[i].ns);
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -1454,11 +1451,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL ",%d)" ZBX_ROW_DL,
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						history[i].value.dbl,
-						history[i].ns);
+						get_nodeid_by_id(history[i].itemid), history[i].itemid,
+						history[i].clock, history[i].value.dbl, history[i].ns);
 			}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -1488,10 +1482,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.ui64,
-					history[i].ns);
+					history[i].itemid, history[i].clock, history[i].value.ui64, history[i].ns);
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -1518,11 +1509,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						history[i].value.ui64,
-						history[i].ns);
+						get_nodeid_by_id(history[i].itemid), history[i].itemid,
+						history[i].clock, history[i].value.ui64, history[i].ns);
 			}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -1553,10 +1541,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",%d,'%s',%d)" ZBX_ROW_DL,
-					history[i].itemid,
-					history[i].clock,
-					value_esc,
-					history[i].ns);
+					history[i].itemid, history[i].clock, value_esc, history[i].ns);
 			zbx_free(value_esc);
 		}
 
@@ -1585,11 +1570,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"(%d," ZBX_FS_UI64 ",%d,'%s',%d)" ZBX_ROW_DL,
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						value_esc,
-						history[i].ns);
+						get_nodeid_by_id(history[i].itemid), history[i].itemid,
+						history[i].clock, value_esc, history[i].ns);
 				zbx_free(value_esc);
 			}
 
@@ -1623,11 +1605,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d)" ZBX_ROW_DL,
-					id,
-					history[i].itemid,
-					history[i].clock,
-					value_esc,
-					history[i].ns);
+					id, history[i].itemid, history[i].clock, value_esc, history[i].ns);
 			zbx_free(value_esc);
 			id++;
 		}
@@ -1662,15 +1640,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d,%d)" ZBX_ROW_DL,
-					id,
-					history[i].itemid,
-					history[i].clock,
-					history[i].timestamp,
-					source_esc,
-					history[i].severity,
-					value_esc,
-					history[i].logeventid,
-					history[i].ns);
+					id, history[i].itemid, history[i].clock, history[i].timestamp, source_esc,
+					history[i].severity, value_esc, history[i].logeventid, history[i].ns);
 			zbx_free(value_esc);
 			zbx_free(source_esc);
 			id++;
