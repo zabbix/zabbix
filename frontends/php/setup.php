@@ -21,20 +21,6 @@
 
 require_once dirname(__FILE__).'/include/classes/core/Z.php';
 
-require_once dirname(__FILE__).'/include/debug.inc.php';
-require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/include/defines.inc.php';
-require_once dirname(__FILE__).'/include/func.inc.php';
-require_once dirname(__FILE__).'/include/html.inc.php';
-require_once dirname(__FILE__).'/include/perm.inc.php';
-require_once dirname(__FILE__).'/include/audit.inc.php';
-require_once dirname(__FILE__).'/include/js.inc.php';
-require_once dirname(__FILE__).'/include/users.inc.php';
-require_once dirname(__FILE__).'/include/validate.inc.php';
-require_once dirname(__FILE__).'/include/profiles.inc.php';
-require_once dirname(__FILE__).'/include/nodes.inc.php';
-require_once dirname(__FILE__).'/include/locales.inc.php';
-
 try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
 }

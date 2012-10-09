@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
 	const EXEC_MODE_DEFAULT = 'default';
-	const EXEC_MODE_API = 'api';
 	const EXEC_MODE_SETUP = 'setup';
 
 	/**
@@ -74,8 +73,39 @@ class ZBase {
 		$this->rootDir = $this->findRootDir();
 		$this->registerAutoloader();
 
-		$this->setMaintenanceMode();
-		$this->setErrorHandler();
+		// system includes
+		require_once $this->getRootDir().'/include/debug.inc.php';
+		require_once $this->getRootDir().'/include/gettextwrapper.inc.php';
+		require_once $this->getRootDir().'/include/defines.inc.php';
+		require_once $this->getRootDir().'/include/func.inc.php';
+		require_once $this->getRootDir().'/include/html.inc.php';
+		require_once $this->getRootDir().'/include/perm.inc.php';
+		require_once $this->getRootDir().'/include/audit.inc.php';
+		require_once $this->getRootDir().'/include/js.inc.php';
+		require_once $this->getRootDir().'/include/users.inc.php';
+		require_once $this->getRootDir().'/include/validate.inc.php';
+		require_once $this->getRootDir().'/include/profiles.inc.php';
+		require_once $this->getRootDir().'/include/locales.inc.php';
+
+		// page specific includes
+		require_once $this->getRootDir().'/include/acknow.inc.php';
+		require_once $this->getRootDir().'/include/actions.inc.php';
+		require_once $this->getRootDir().'/include/discovery.inc.php';
+		require_once $this->getRootDir().'/include/events.inc.php';
+		require_once $this->getRootDir().'/include/graphs.inc.php';
+		require_once $this->getRootDir().'/include/hosts.inc.php';
+		require_once $this->getRootDir().'/include/httptest.inc.php';
+		require_once $this->getRootDir().'/include/ident.inc.php';
+		require_once $this->getRootDir().'/include/images.inc.php';
+		require_once $this->getRootDir().'/include/items.inc.php';
+		require_once $this->getRootDir().'/include/maintenances.inc.php';
+		require_once $this->getRootDir().'/include/maps.inc.php';
+		require_once $this->getRootDir().'/include/media.inc.php';
+		require_once $this->getRootDir().'/include/services.inc.php';
+		require_once $this->getRootDir().'/include/sounds.inc.php';
+		require_once $this->getRootDir().'/include/triggers.inc.php';
+		require_once $this->getRootDir().'/include/valuemap.inc.php';
+		require_once $this->getRootDir().'/include/nodes.inc.php';
 	}
 
 	/**
@@ -84,6 +114,9 @@ class ZBase {
 	public function run($mode = self::EXEC_MODE_DEFAULT) {
 		$this->init();
 
+		$this->setMaintenanceMode();
+		$this->setErrorHandler();
+
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
 				$this->loadConfigFile();
@@ -91,8 +124,6 @@ class ZBase {
 				$this->initNodes();
 				$this->authenticateUser();
 				$this->initLocales();
-				break;
-			case self::EXEC_MODE_API:
 				break;
 			case self::EXEC_MODE_SETUP:
 				try {
@@ -229,8 +260,7 @@ class ZBase {
 	protected function loadConfigFile() {
 		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($configFile);
-		$config->load();
-		$this->config = $config->config;
+		$this->config = $config->load();
 	}
 
 	protected function initDB() {
@@ -259,8 +289,6 @@ class ZBase {
 	}
 
 	protected function initLocales() {
-		require_once $this->getRootDir().'/include/locales.inc.php';
-
 		init_mbstrings();
 
 		if (function_exists('bindtextdomain')) {
@@ -296,7 +324,6 @@ class ZBase {
 
 	protected function authenticateUser() {
 		if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
-//			throw new Exception('User not authenticated');
 			CWebUser::setDefault();
 		}
 	}

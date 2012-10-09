@@ -21,39 +21,6 @@
 
 require_once dirname(__FILE__).'/classes/core/Z.php';
 
-require_once dirname(__FILE__).'/debug.inc.php';
-require_once dirname(__FILE__).'/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/defines.inc.php';
-require_once dirname(__FILE__).'/func.inc.php';
-require_once dirname(__FILE__).'/html.inc.php';
-require_once dirname(__FILE__).'/perm.inc.php';
-require_once dirname(__FILE__).'/audit.inc.php';
-require_once dirname(__FILE__).'/js.inc.php';
-require_once dirname(__FILE__).'/users.inc.php';
-require_once dirname(__FILE__).'/validate.inc.php';
-require_once dirname(__FILE__).'/profiles.inc.php';
-
-// abc sorting
-require_once dirname(__FILE__).'/acknow.inc.php';
-require_once dirname(__FILE__).'/actions.inc.php';
-require_once dirname(__FILE__).'/discovery.inc.php';
-require_once dirname(__FILE__).'/events.inc.php';
-require_once dirname(__FILE__).'/graphs.inc.php';
-require_once dirname(__FILE__).'/hosts.inc.php';
-require_once dirname(__FILE__).'/httptest.inc.php';
-require_once dirname(__FILE__).'/ident.inc.php';
-require_once dirname(__FILE__).'/images.inc.php';
-require_once dirname(__FILE__).'/items.inc.php';
-require_once dirname(__FILE__).'/maintenances.inc.php';
-require_once dirname(__FILE__).'/maps.inc.php';
-require_once dirname(__FILE__).'/media.inc.php';
-require_once dirname(__FILE__).'/services.inc.php';
-require_once dirname(__FILE__).'/sounds.inc.php';
-require_once dirname(__FILE__).'/triggers.inc.php';
-require_once dirname(__FILE__).'/valuemap.inc.php';
-
-require_once dirname(__FILE__).'/nodes.inc.php';
-
 try {
 	Z::getInstance()->run();
 }
@@ -85,5 +52,3 @@ CProfiler::getInstance()->start();
 global $ZBX_PAGE_POST_JS, $page;
 global $ZBX_SERVER, $ZBX_SERVER_PORT;
 $page = array();
-
-
