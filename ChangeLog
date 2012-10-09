@@ -1074,6 +1074,7 @@ Changes for 1.8.16rc1
 
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
+A......... [ZBX-4097] changed the "application", "host" and "group" parameters for item.get and trigger.get to be case sensitive (Pavels)
 ..F....... [ZBX-5514] fixed SQL query in get_min_itemclock_by_itemid function (Eduard)
 A......... [ZBX-5505] fixed incorrect SQL query building using limits (Eduard)
 A......... [ZBX-5512] fixed undefined index in screens (Eduard)
