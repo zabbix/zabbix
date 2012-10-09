@@ -1,13 +1,8 @@
-<!doctype html>
-<html>
-<head>
-	<title>Warning [refreshed every 30 sec]</title>
-	<meta name="Author" content="Zabbix SIA" />
-	<meta charset="utf-8" />
-	<link rel="shortcut icon" href="images/general/zabbix.ico" />
-	<link rel="stylesheet" type="text/css" href="css.css" />
-</head>
-
+<?php
+$pageHeader = new CPageHeader('Warning [refreshed every 30 sec]');
+$pageHeader->addCssFile('css.css');
+$pageHeader->display();
+?>
 <body>
 
 <table class="warningTable" style="margin-top: 100px;">
