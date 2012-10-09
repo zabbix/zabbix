@@ -40,38 +40,6 @@ if (!isset($allowed_content[$content_type])) {
 
 require_once dirname(__FILE__).'/include/classes/core/Z.php';
 
-require_once dirname(__FILE__).'/include/debug.inc.php';
-require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/include/defines.inc.php';
-require_once dirname(__FILE__).'/include/html.inc.php';
-require_once dirname(__FILE__).'/include/perm.inc.php';
-require_once dirname(__FILE__).'/include/audit.inc.php';
-require_once dirname(__FILE__).'/include/js.inc.php';
-require_once dirname(__FILE__).'/include/users.inc.php';
-require_once dirname(__FILE__).'/include/validate.inc.php';
-require_once dirname(__FILE__).'/include/profiles.inc.php';
-
-// abc sorting
-require_once dirname(__FILE__).'/include/acknow.inc.php';
-require_once dirname(__FILE__).'/include/actions.inc.php';
-require_once dirname(__FILE__).'/include/discovery.inc.php';
-require_once dirname(__FILE__).'/include/events.inc.php';
-require_once dirname(__FILE__).'/include/graphs.inc.php';
-require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/httptest.inc.php';
-require_once dirname(__FILE__).'/include/ident.inc.php';
-require_once dirname(__FILE__).'/include/images.inc.php';
-require_once dirname(__FILE__).'/include/items.inc.php';
-require_once dirname(__FILE__).'/include/maintenances.inc.php';
-require_once dirname(__FILE__).'/include/maps.inc.php';
-require_once dirname(__FILE__).'/include/media.inc.php';
-require_once dirname(__FILE__).'/include/services.inc.php';
-require_once dirname(__FILE__).'/include/sounds.inc.php';
-require_once dirname(__FILE__).'/include/triggers.inc.php';
-require_once dirname(__FILE__).'/include/valuemap.inc.php';
-require_once dirname(__FILE__).'/include/nodes.inc.php';
-
-
 header('Content-Type: application/json');
 $data = $http_request->body();
 

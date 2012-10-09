@@ -108,7 +108,7 @@ class CConfigFile {
 			$this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
 		}
 
-		return true;
+		return $this->config;
 	}
 
 	public function makeGlobal() {
