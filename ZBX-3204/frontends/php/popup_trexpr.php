@@ -132,22 +132,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'avg[<]' => array(
-		'description' =>  _('Average value for period of a period T is < N'),
+		'description' =>  _('Average value of a period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'avg[>]' => array(
-		'description' =>  _('Average value for period of a period T is > N'),
+		'description' =>  _('Average value of a period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'avg[=]' => array(
-		'description' =>  _('Average value for period of a period T is = N'),
+		'description' =>  _('Average value of a period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'avg[#]' => array(
-		'description' =>  _('Average value for period of a period T is NOT N'),
+		'description' =>  _('Average value of a period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
