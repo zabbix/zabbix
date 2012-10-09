@@ -1625,10 +1625,18 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_TEXT == history[i].value_type)
-			history_text_num++;
-		else if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
-			history_log_num++;
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
+			continue;
+
+		switch (history[i].value_type)
+		{
+			case ITEM_VALUE_TYPE_TEXT:
+				history_text_num++;
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				history_log_num++;
+				break;
+		}
 	}
 
 	/* history_text */
@@ -1637,19 +1645,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		id = DBget_maxid_num("history_text", history_text_num);
 
 #ifdef HAVE_MULTIROW_INSERT
-		tmp_offset = sql_offset;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_history_text_sql);
 #endif
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (0 == history[i].keep_history)
+			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
 			if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null)
 				continue;
 
 			value_esc = DBdyn_escape_string(history[i].value_orig.str);
@@ -1673,8 +1677,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			sql_offset--;
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
-		else
-			sql_offset = tmp_offset;
 #endif
 	}
 
@@ -1684,19 +1686,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		id = DBget_maxid_num("history_log", history_log_num);
 
 #ifdef HAVE_MULTIROW_INSERT
-		tmp_offset = sql_offset;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_history_log_sql);
 #endif
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (0 == history[i].keep_history)
+			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
 			if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null)
 				continue;
 
 			source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
@@ -1726,8 +1724,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			sql_offset--;
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
-		else
-			sql_offset = tmp_offset;
 #endif
 	}
 
