@@ -1359,7 +1359,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	const char	*__function_name = "DCmass_add_history";
 	size_t		sql_offset = 0;
 	char		*value_esc, *source_esc;
-	int		history_text_num, history_log_num, i;
+	int		history_text_num = 0, history_log_num = 0, i;
 	zbx_uint64_t	id;
 	const char	*ins_history_sql = "insert into history (itemid,clock,value,ns) values ";
 	const char	*ins_history_sync_sql = "insert into history_sync (nodeid,itemid,clock,value,ns) values ";
@@ -1382,9 +1382,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-/*
- * history
- */
+	/* history */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_history_sql);
@@ -1463,9 +1461,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-/*
- * history_uint
- */
+	/* history_uint */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_history_uint_sql);
@@ -1544,9 +1540,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-/*
- * history_str
- */
+	/* history_str */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_history_str_sql);
@@ -1629,9 +1623,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-	history_text_num = 0;
-	history_log_num = 0;
-
 	for (i = 0; i < history_num; i++)
 	{
 		if (ITEM_VALUE_TYPE_TEXT == history[i].value_type)
@@ -1640,9 +1631,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			history_log_num++;
 	}
 
-/*
- * history_text
- */
+	/* history_text */
 	if (0 < history_text_num)
 	{
 		id = DBget_maxid_num("history_text", history_text_num);
@@ -1689,9 +1678,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-/*
- * history_log
- */
+	/* history_log */
 	if (0 < history_log_num)
 	{
 		id = DBget_maxid_num("history_log", history_log_num);
