@@ -209,33 +209,41 @@ function get_operation_desc($type, $data) {
 	if ($type == SHORT_DESCRIPTION) {
 		switch ($data['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if (!isset($data['opmessage_usr'])) {
-					$data['opmessage_usr'] = array();
+				$mediaTypes = API::Mediatype()->get(array(
+					'mediatypeids' => $data['opmessage']['mediatypeid'],
+					'output' => array('description')
+				));
+				if (empty($mediaTypes)) {
+					$mediatype = _('all media');
 				}
-				if (!isset($data['opmessage_grp'])) {
-					$data['opmessage_grp'] = array();
+				else {
+					$mediatype = reset($mediaTypes);
+					$mediatype = $mediatype['description'];
 				}
 
-				$users = API::User()->get(array(
-					'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
-					'output' => array('userid', 'alias')
-				));
-				if (!empty($users)) {
+
+				if (!empty($data['opmessage_usr'])) {
+					$users = API::User()->get(array(
+						'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
+						'output' => array('userid', 'alias')
+					));
 					order_result($users, 'alias');
 
-					$result[] = bold(array(_('Send message to users').':'.SPACE));
-					$result[] = array(implode(', ', zbx_objectValues($users, 'alias')), BR());
+					$result[] = bold(_('Send message to users').': ');
+					$result[] = array(implode(', ', zbx_objectValues($users, 'alias')), SPACE, _('via'), SPACE, $mediatype);
+					$result[] = BR();
 				}
 
-				$usrgrps = API::UserGroup()->get(array(
-					'usrgrpids' => zbx_objectValues($data['opmessage_grp'], 'usrgrpid'),
-					'output' => API_OUTPUT_EXTEND
-				));
-				if (!empty($usrgrps)) {
+				if (!empty($data['opmessage_grp'])) {
+					$usrgrps = API::UserGroup()->get(array(
+						'usrgrpids' => zbx_objectValues($data['opmessage_grp'], 'usrgrpid'),
+						'output' => API_OUTPUT_EXTEND
+					));
 					order_result($usrgrps, 'name');
 
-					$result[] = bold(array(_('Send message to user groups').':'.SPACE));
-					$result[] = array(implode(', ', zbx_objectValues($usrgrps, 'name')), BR());
+					$result[] = bold(_('Send message to user groups').': ');
+					$result[] = array(implode(', ', zbx_objectValues($usrgrps, 'name')), SPACE, _('via'), SPACE, $mediatype);
+					$result[] = BR();
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
