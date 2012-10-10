@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -919,9 +919,11 @@ elseif ($srctbl == 'users') {
 		}
 		else {
 			$values = array(
-				$dstfld1 => $user[$srcfld1],
-				$dstfld2 => isset($srcfld2) ? $user[$srcfld2] : null,
+				$dstfld1 => $user[$srcfld1]
 			);
+			if (isset($srcfld2)) {
+				$values[$dstfld2] = $user[$srcfld2];
+			}
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$alias->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
@@ -1017,11 +1019,9 @@ elseif ($srctbl == 'triggers') {
 				$dstfld1 => $trigger[$srcfld1],
 				$dstfld2 => $trigger[$srcfld2]
 			);
-
 			if (isset($srcfld3)) {
 				$values[$dstfld3] = $trigger[$srcfld3];
 			}
-
 			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
