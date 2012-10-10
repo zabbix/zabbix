@@ -40,6 +40,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-3204] changed generating and reading algorithm for trigger expression condition functions, and fixed English translation (Oleg)
 ..F....... [ZBX-5677] fixed param field 3 manipulation in trigger popup (Eduard)
 A......... [ZBX-5648] disallowed changing "templateid" in items, or creating new item with a predefined "templateid" (Oleg)
 ..F....... [ZBX-5644] fixed triggers with spaces in the expression missing from the graph legend (Oleg)
