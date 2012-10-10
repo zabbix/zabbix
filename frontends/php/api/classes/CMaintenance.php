@@ -485,7 +485,7 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate timeperiods
-			if (empty($maintenance['timeperiods'])) {
+			if (empty($maintenance['timeperiods'][0])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
@@ -598,7 +598,7 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate timeperiods
-			if (empty($maintenance['timeperiods'])) {
+			if (empty($maintenance['timeperiods'][0])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
