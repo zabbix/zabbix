@@ -101,7 +101,7 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
 	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0'*/
 
-	if (3 < (nparam = num_param(param)))
+	if (3 < (nparam = num_param(param)))	/* Too many parameters ? */
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, devname, sizeof(devname)))
@@ -163,9 +163,14 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
+	if (NULL == collector)
 	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		/* CPU statistics collector and (optionally) disk statistics collector is started only when Zabbix */
+		/* agentd is running as a daemon. When Zabbix agent or agentd is started with "-p" or "-t" parameter */
+		/* the collectors are not available and keys "vfs.dev.read", "vfs.dev.write" with some parameters */
+		/* (e.g. sps, ops) are not supported. */
+
+		SET_MSG_RESULT(result, strdup("This parameter is available only in daemon mode when collectors are started."));
 		return SYSINFO_RET_FAIL;
 	}
 
