@@ -239,6 +239,9 @@ class ZBase {
 		return $this->session;
 	}
 
+	/**
+	 * Set custom error handler for PHP errors.
+	 */
 	protected function setErrorHandler() {
 		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 			$pathLength = strlen(__FILE__);
@@ -252,6 +255,11 @@ class ZBase {
 		set_error_handler('zbx_err_handler');
 	}
 
+	/**
+	 * Check if maintenance mode is enabled.
+	 *
+	 * @throws Exception
+	 */
 	protected function setMaintenanceMode() {
 		require_once $this->getRootDir().'/conf/maintenance.inc.php';
 
@@ -265,12 +273,19 @@ class ZBase {
 		}
 	}
 
+	/**
+	 * Load zabbix config file.
+	 */
 	protected function loadConfigFile() {
 		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($configFile);
 		$this->config = $config->load();
 	}
 
+	/**
+	 * Initialize DB functions and check if frontend can connect to DB.
+	 * @throws DBException
+	 */
 	protected function initDB() {
 		// $DB is used in db.inc.php file
 		$DB = $this->config['DB'];
@@ -282,6 +297,9 @@ class ZBase {
 		}
 	}
 
+	/**
+	 * Check if distributed monitoring is enabled.
+	 */
 	protected function initNodes() {
 		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_NODES;
 
@@ -296,6 +314,9 @@ class ZBase {
 		}
 	}
 
+	/**
+	 * Initilaize translations.
+	 */
 	protected function initLocales() {
 		init_mbstrings();
 
@@ -330,6 +351,9 @@ class ZBase {
 		setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 	}
 
+	/**
+	 * Authenticate user.
+	 */
 	protected function authenticateUser() {
 		if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
 			CWebUser::setDefault();
