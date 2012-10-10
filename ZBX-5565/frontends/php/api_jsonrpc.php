@@ -44,7 +44,7 @@ header('Content-Type: application/json');
 $data = $http_request->body();
 
 try {
-	Z::getInstance()->run();
+	Z::getInstance()->run(ZBase::EXEC_MODE_API);
 
 	$jsonRpc = new CJSONrpc($data);
 	echo $jsonRpc->execute();

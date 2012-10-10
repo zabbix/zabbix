@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/CAutoloader.php';
 class ZBase {
 	const EXEC_MODE_DEFAULT = 'default';
 	const EXEC_MODE_SETUP = 'setup';
+	const EXEC_MODE_API = 'api';
 
 	/**
 	 * An instance of the current Z object.
@@ -123,6 +124,12 @@ class ZBase {
 				$this->initDB();
 				$this->initNodes();
 				$this->authenticateUser();
+				$this->initLocales();
+				break;
+			case self::EXEC_MODE_DEFAULT:
+				$this->loadConfigFile();
+				$this->initDB();
+				$this->initNodes();
 				$this->initLocales();
 				break;
 			case self::EXEC_MODE_SETUP:
