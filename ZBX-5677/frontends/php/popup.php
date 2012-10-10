@@ -1018,7 +1018,7 @@ elseif ($srctbl == 'triggers') {
 				$dstfld2 => $trigger[$srcfld2]
 			);
 
-			if (!empty($dstfld3) && !empty($srcfld3)) {
+			if (isset($srcfld3)) {
 				$values[$dstfld3] = $trigger[$srcfld3];
 			}
 
