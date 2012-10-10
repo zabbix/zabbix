@@ -136,7 +136,6 @@ class ZBase {
 				try {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
-
 					$this->initDB();
 					$this->initNodes();
 					$this->authenticateUser();
@@ -151,6 +150,8 @@ class ZBase {
 				catch (ConfigFileException $e) {}
 				break;
 		}
+		// init nodes after user is authenticated
+		init_nodes();
 	}
 
 	/**
