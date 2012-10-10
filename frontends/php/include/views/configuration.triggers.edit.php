@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -225,7 +225,6 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 
 	$wrapOutline = new CSpan(array($this->data['outline']));
-	$wrapOutline->addStyle('white-space: pre;');
 	$triggersFormList->addRow(SPACE, array(
 		$wrapOutline,
 		BR(),

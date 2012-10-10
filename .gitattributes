@@ -96,6 +96,10 @@ frontends/php/images/general/sort_up.png -text
 frontends/php/images/general/sort_up_blue.png -text
 frontends/php/images/general/sort_up_od.png -text
 frontends/php/images/general/tick.png -text
+frontends/php/images/general/tr_space.gif -text
+frontends/php/images/general/tr_top_bottom.gif -text
+frontends/php/images/general/tr_top_right.gif -text
+frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/transparent.png -text
 frontends/php/images/general/tree/minus.gif -text
 frontends/php/images/general/tree/plus.gif -text
