@@ -58,7 +58,7 @@ class CPageHeader {
 	 * @param string $title
 	 */
 	public function __construct($title = '') {
-		$this->titel = $title;
+		$this->title = $title;
 	}
 
 	/**
