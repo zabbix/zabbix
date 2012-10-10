@@ -126,7 +126,7 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales();
 				break;
-			case self::EXEC_MODE_DEFAULT:
+			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->initNodes();
