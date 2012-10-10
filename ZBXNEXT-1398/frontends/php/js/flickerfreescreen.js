@@ -189,11 +189,23 @@ jQuery(function($) {
 					data: {},
 					dataType: 'html',
 					success: function(html) {
-						if ($('#flickerfreescreen_' + id).data('timestamp') < $(html).data('timestamp')) {
+						// get timestamp from html
+						var htmlTimestamp = null;
+
+						$(html).each(function() {
+							var elem = $(this);
+
+							if (elem.prop('nodeName') == 'DIV') {
+								htmlTimestamp = elem.data('timestamp');
+							}
+						});
+
+						// set html
+						if ($('#flickerfreescreen_' + id).data('timestamp') < htmlTimestamp) {
 							$('#flickerfreescreen_' + id).replaceWith(html);
 
 							screen.isRefreshing = false;
-							screen.timestamp = $(html).data('timestamp');
+							screen.timestamp = htmlTimestamp;
 
 							window.flickerfreeScreenShadow.isShadowed(id, false);
 							window.flickerfreeScreenShadow.validate(id);
