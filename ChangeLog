@@ -1,6 +1,7 @@
 Changes for 2.0.4rc1
 
 New features:
+A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 ..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
 .......PS. [ZBX-4638] added support of {HOST.HOST}, {HOST.NAME}, {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in "params" field for SSH, Telnet and DB monitor items (Sasha)
 .....J.... [ZBX-4663] added possibility to use dots in JMX attribute names (dimir)
