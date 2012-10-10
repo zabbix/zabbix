@@ -10,7 +10,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
-A......... [ZBX-5648] disallowed changing "templateid" in items, or creating new item with a predefined "templateid"  (Oleg)
+..F....... [ZBX-5677] fixed param field 3 manipulation in trigger popup (Eduard)
+A......... [ZBX-5648] disallowed changing "templateid" in items, or creating new item with a predefined "templateid" (Oleg)
 ..F....... [ZBX-5644] fixed triggers with spaces in the expression missing from the graph legend (Oleg)
 ........S. [ZBX-5652] fixed resolving of a {ITEM.NAME} macro in notification messages (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
