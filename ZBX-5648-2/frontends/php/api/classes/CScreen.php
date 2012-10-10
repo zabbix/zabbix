@@ -439,6 +439,10 @@ class CScreen extends CZBXAPI {
 		}
 
 		foreach ($screens as $screen) {
+			// check for "templateid", because it is not allowed
+			if (isset($screen['templateid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for screen.'));
+			}
 			$screenDbFields = array('name' => null);
 			if (!check_db_fields($screenDbFields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
@@ -484,9 +488,10 @@ class CScreen extends CZBXAPI {
 			if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
-		}
-
-		foreach ($screens as $screen) {
+			// check for "templateid", because it is not allowed
+			if (isset($screen['templateid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for screen.'));
+			}
 			if (isset($screen['name'])) {
 				$existScreen = $this->get(array(
 					'filter' => array('name' => $screen['name']),

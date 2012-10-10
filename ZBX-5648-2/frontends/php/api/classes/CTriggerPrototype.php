@@ -896,6 +896,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger.'));
 			}
 
+			// check for "templateid", because it is not allowed
+			if (isset($trigger['templateid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for trigger.'));
+			}
+
 			$expressionData = new CTriggerExpression(array('expression' => $trigger['expression']));
 
 			if (!empty($expressionData->errors)) {
@@ -958,6 +963,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			if (!isset($trigger['triggerid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for trigger.'));
+			}
+
+			// check for "templateid", because it is not allowed
+			if (isset($trigger['templateid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for trigger.'));
 			}
 
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
