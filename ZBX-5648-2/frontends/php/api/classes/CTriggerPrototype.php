@@ -897,7 +897,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			// check for "templateid", because it is not allowed
-			if (isset($trigger['templateid'])) {
+			if (array_key_exists('templateid', $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for trigger.'));
 			}
 
@@ -966,7 +966,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			// check for "templateid", because it is not allowed
-			if (isset($trigger['templateid'])) {
+			if (array_key_exists('templateid', $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for trigger.'));
 			}
 

@@ -415,18 +415,15 @@ class CScreen extends CZBXAPI {
 	}
 
 	/**
-	 * Create Screen
+	 * Validates the input parameters for the create() method.
 	 *
-	 * @param _array $screens
-	 * @param string $screens['name']
-	 * @param array $screens['hsize']
-	 * @param int $screens['vsize']
-	 * @return array
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screens
+	 *
+	 * @return void
 	 */
-	public function create($screens) {
-		$screens = zbx_toArray($screens);
-		$insertScreenItems = array();
-
+	protected function validateCreate($screens) {
 		$newScreenNames = zbx_objectValues($screens, 'name');
 
 		$dbScreens = $this->get(array(
@@ -440,7 +437,7 @@ class CScreen extends CZBXAPI {
 
 		foreach ($screens as $screen) {
 			// check for "templateid", because it is not allowed
-			if (isset($screen['templateid'])) {
+			if (array_key_exists('templateid', $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for screen.'));
 			}
 			$screenDbFields = array('name' => null);
@@ -448,6 +445,22 @@ class CScreen extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
 			}
 		}
+	}
+
+	/**
+	 * Create Screen
+	 *
+	 * @param _array $screens
+	 * @param string $screens['name']
+	 * @param array $screens['hsize']
+	 * @param int $screens['vsize']
+	 * @return array
+	 */
+	public function create(array $screens) {
+		$screens = zbx_toArray($screens);
+		$this->validateCreate($screens);
+		$insertScreenItems = array();
+
 		$screenids = DB::insert('screens', $screens);
 
 		foreach ($screens as $snum => $screen) {
@@ -465,19 +478,15 @@ class CScreen extends CZBXAPI {
 	}
 
 	/**
-	 * Update Screen
+	 * Validates the input parameters for the update() method.
 	 *
-	 * @param _array $screens multidimensional array with Hosts data
-	 * @param string $screens['screenid']
-	 * @param int $screens['name']
-	 * @param int $screens['hsize']
-	 * @param int $screens['vsize']
-	 * @return boolean
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screens
+	 *
+	 * @return void
 	 */
-	public function update($screens) {
-		$screens = zbx_toArray($screens);
-		$update = array();
-
+	protected function validateUpdate(array $screens) {
 		$updScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
@@ -487,10 +496,6 @@ class CScreen extends CZBXAPI {
 		foreach ($screens as $screen) {
 			if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-			// check for "templateid", because it is not allowed
-			if (isset($screen['templateid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for screen.'));
 			}
 			if (isset($screen['name'])) {
 				$existScreen = $this->get(array(
@@ -505,7 +510,25 @@ class CScreen extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Screen "%1$s" already exists.', $screen['name']));
 				}
 			}
+		}
+	}
 
+	/**
+	 * Update Screen
+	 *
+	 * @param _array $screens multidimensional array with Hosts data
+	 * @param string $screens['screenid']
+	 * @param int $screens['name']
+	 * @param int $screens['hsize']
+	 * @param int $screens['vsize']
+	 * @return boolean
+	 */
+	public function update($screens) {
+		$screens = zbx_toArray($screens);
+		$this->validateUpdate($screens);
+		$update = array();
+
+		foreach ($screens as $screen) {
 			$screenid = $screen['screenid'];
 			unset($screen['screenid']);
 			if (!empty($screen)) {

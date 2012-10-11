@@ -42,8 +42,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * @param boolean $prototype
 	 * @return true
 	 */
-	protected function checkInput($graphs, $update = false, $prototype = false) {
-		$itemids = array();
+	protected function checkInput($graphs, $update = false) {
 		foreach ($graphs as $gnum => $graph) {
 			// graph fields
 			$fields = array('name' => null);
@@ -52,7 +51,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 
 			// check for "templateid", because it is not allowed
-			if (isset($graph['templateid'])) {
+			if (array_key_exists('templateid', $graph)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for graph.'));
 			}
 
@@ -72,9 +71,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 				if (!preg_match('/^[A-F0-9]{6}$/i', $gitem['color'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect colour "%1$s".', $gitem['color']));
 				}
-
-				// assigning with key preservs unique itemids
-				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 
 			// more than one sum type item for pie graph
@@ -99,41 +95,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 		}
 
-
-		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $itemids,
-			'webitems' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		// check permissions only for non super admins
-		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
-			foreach ($itemids as $itemid) {
-				if (!isset($allowedItems[$itemid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-			}
-		}
-
 		$graphNames = array();
 		foreach ($graphs as $graph) {
-			// check if the graph has at least one prototype
-			if ($prototype) {
-				$hasPrototype = false;
-				foreach ($graph['gitems'] as $gitem) {
-					// $allowedItems used because it is possible to make API call without full item data
-					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-						$hasPrototype = true;
-						break;
-					}
-				}
-				if (!$hasPrototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
-				}
-			}
 			// check if the host has any graphs in DB with the same name within host
 			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
@@ -143,26 +106,14 @@ abstract class CGraphGeneral extends CZBXAPI {
 			));
 
 			$hostids = array_keys($hosts);
-			if ($prototype) {
-				$graphsExists = API::Graph()->get(array(
-					'hostids' => $hostids,
-					'output' => API_OUTPUT_SHORTEN,
-					'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
-					'nopermissions' => true,
-					'preservekeys' => true, // faster
-					'limit' => 1 // one match enough for check
-				));
-			}
-			else {
-				$graphsExists = $this->get(array(
-					'hostids' => $hostids,
-					'output' => API_OUTPUT_SHORTEN,
-					'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
-					'nopermissions' => true,
-					'preservekeys' => true, // faster
-					'limit' => 1 // one match enough for check
-				));
-			}
+			$graphsExists = API::Graph()->get(array(
+				'hostids' => $hostids,
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
+				'nopermissions' => true,
+				'preservekeys' => true, // faster
+				'limit' => 1 // one match enough for check
+			));
 			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
 			foreach ($graphsExists as $graphExists) {
 				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {

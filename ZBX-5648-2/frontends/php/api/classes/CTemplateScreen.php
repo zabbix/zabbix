@@ -732,6 +732,10 @@ class CTemplateScreen extends CScreen {
 			'preservekeys' => true
 		));
 		foreach ($screens as $screen) {
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for screen.'));
+			}
 			if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}

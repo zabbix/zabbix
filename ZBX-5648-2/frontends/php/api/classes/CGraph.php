@@ -811,7 +811,32 @@ class CGraph extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function checkGraphInput($graphs, $update = false) {
-		parent::checkInput($graphs, $update, false);
+		parent::checkInput($graphs, $update);
+		$itemids = array();
+		foreach ($graphs as $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				// assigning with key preservs unique itemids
+				$itemids[$gitem['itemid']] = $gitem['itemid'];
+			}
+		}
+
+		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $itemids,
+			'webitems' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		// check permissions only for non super admins
+		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
+			foreach ($itemids as $itemid) {
+				if (!isset($allowedItems[$itemid])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+			}
+		}
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
