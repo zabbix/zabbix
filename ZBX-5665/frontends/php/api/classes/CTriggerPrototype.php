@@ -894,61 +894,74 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Delete triggers
 	 *
-	 * @param array $triggerids array with trigger ids
+	 * @param array $triggerIds array with trigger ids
 	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($triggerids, $nopermissions = false) {
-		$triggerids = zbx_toArray($triggerids);
+	public function delete($triggerIds, $nopermissions = false) {
+		$triggerIds = zbx_toArray($triggerIds);
 
-		if (empty($triggerids)) {
+		if (empty($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$delTriggers = $this->get(array(
-			'triggerids' => $triggerids,
+			'triggerids' => $triggerIds,
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'preservekeys' => true
 		));
-
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
-			foreach ($triggerids as $triggerid) {
-				if (!isset($delTriggers[$triggerid])) {
+			foreach ($triggerIds as $triggerId) {
+				if (!isset($delTriggers[$triggerId])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
-				if ($delTriggers[$triggerid]['templateid'] != 0) {
+				if ($delTriggers[$triggerId]['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Cannot delete templated trigger "%1$s:%2$s".',
-							$delTriggers[$triggerid]['description'],
-							explode_exp($delTriggers[$triggerid]['expression']))
+							$delTriggers[$triggerId]['description'],
+							explode_exp($delTriggers[$triggerId]['expression']))
 					);
 				}
 			}
 		}
 
 		// get child triggers
-		$parentTriggerids = $triggerids;
+		$parentTriggerids = $triggerIds;
 		do {
 			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parentTriggerids));
 			$parentTriggerids = array();
 			while ($dbTrigger = DBfetch($dbItems)) {
 				$parentTriggerids[] = $dbTrigger['triggerid'];
-				$triggerids[$dbTrigger['triggerid']] = $dbTrigger['triggerid'];
+				$triggerIds[$dbTrigger['triggerid']] = $dbTrigger['triggerid'];
 			}
 		} while (!empty($parentTriggerids));
 
 		// select all triggers which are deleted (include childs)
 		$delTriggers = $this->get(array(
-			'triggerids' => $triggerids,
+			'triggerids' => $triggerIds,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectHosts' => array('name')
 		));
+
+		// created triggers
+		$createdTriggers = array();
+		$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.DBcondition('parent_triggerid', $triggerIds);
+		$dbTriggers = DBselect($sql);
+		while ($trigger = DBfetch($dbTriggers)) {
+			$createdTriggers[$trigger['triggerid']] = $trigger['triggerid'];
+		}
+		if (!empty($createdTriggers)) {
+			$result = API::Trigger()->delete($createdTriggers, true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype.'));
+			}
+		}
 
 		// TODO: REMOVE info
 		foreach ($delTriggers as $trigger) {
@@ -959,9 +972,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 					$trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
-		DB::delete('triggers', array('triggerid' => $triggerids));
+		DB::delete('triggers', array('triggerid' => $triggerIds));
 
-		return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerIds);
 	}
 
 	protected function createReal(array &$triggers) {
