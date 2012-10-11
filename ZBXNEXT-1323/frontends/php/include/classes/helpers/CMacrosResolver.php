@@ -32,17 +32,11 @@ class CMacrosResolver {
 	 *
 	 * @return string
 	 */
-	public function resolveMacrosInText($text, $hostIds) {
-		zbx_toArray($hostIds);
-
+	public function resolveMacrosInText($text, $hostId) {
 		// host macros
 		$hostMacros = $this->findMacros('HOSTNAME|HOST\.HOST|HOST\.NAME', $text);
 		if (!empty($hostMacros)) {
-			$dbHosts = DBselect(
-				'SELECT h.name,h.host'.
-				' FROM hosts h'.
-				' WHERE '.DBcondition('h.hostid', $hostIds)
-			);
+			$dbHosts = DBselect('SELECT h.name,h.host FROM hosts h WHERE h.hostid='.$hostId);
 			while ($dbHost = DBfetch($dbHosts)) {
 				foreach ($hostMacros as $hostMacro) {
 					$value = '';
@@ -57,9 +51,7 @@ class CMacrosResolver {
 							break;
 					}
 
-					if (!empty($value)) {
-						$text = str_ireplace($hostMacro, $value, $text);
-					}
+					$text = str_replace($hostMacro, $value, $text);
 				}
 			}
 		}
@@ -67,11 +59,7 @@ class CMacrosResolver {
 		// ip macros
 		$ipMacros = $this->findMacros('IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN', $text);
 		if (!empty($ipMacros)) {
-			$dbInterfaces = DBselect(
-				'SELECT i.ip,i.dns,i.useip'.
-				' FROM interface i'.
-				' WHERE '.DBcondition('i.hostid', $hostIds)
-			);
+			$dbInterfaces = DBselect('SELECT i.ip,i.dns,i.useip FROM interface i WHERE i.hostid='.$hostId);
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				foreach ($ipMacros as $ipMacro) {
 					$value = '';
@@ -89,9 +77,7 @@ class CMacrosResolver {
 							break;
 					}
 
-					if (!empty($value)) {
-						$text = str_ireplace($ipMacro, $value, $text);
-					}
+					$text = str_replace($ipMacro, $value, $text);
 				}
 			}
 		}
@@ -108,7 +94,7 @@ class CMacrosResolver {
 	 * @return array
 	 */
 	function findMacros($pattern, $s) {
-		preg_match_all('/{('.$pattern.')([1-9]?)}/', $s, $matches);
+		preg_match_all('/{('.$pattern.')}/', $s, $matches);
 
 		return !empty($matches[0]) ? $matches[0] : null;
 	}

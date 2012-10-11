@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,14 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 /**
  * Class containing methods for operations with Scripts
@@ -559,16 +558,16 @@ class CScript extends CZBXAPI {
 			$macrosResolver = new CMacrosResolver();
 
 			foreach ($scripts as $script) {
-				// resolve macros in confirmation text
-				if (!empty($script['confirmation'])) {
-					$script['confirmation'] = $macrosResolver->resolveMacrosInText($script['confirmation'], $hostIds);
-				}
-
 				foreach ($script['hosts'] as $host) {
 					$hostId = $host['hostid'];
 
 					if (isset($scriptsByHost[$hostId])) {
 						$scriptsByHost[$hostId][] = $script;
+
+						// resolve macros in confirmation text
+						if (!empty($script['confirmation'])) {
+							$scriptsByHost[$hostId][count($scriptsByHost[$hostId]) - 1]['confirmation'] = $macrosResolver->resolveMacrosInText($script['confirmation'], $hostId);
+						}
 					}
 				}
 			}
@@ -618,4 +617,3 @@ class CScript extends CZBXAPI {
 		return $result;
 	}
 }
-?>
