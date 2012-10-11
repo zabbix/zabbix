@@ -499,11 +499,12 @@ class CScript extends CZBXAPI {
 
 		$response = '';
 
-		$pbl = ZBX_SCRIPT_BYTES_LIMIT > 8192 ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
+		$pbl = (ZBX_SCRIPT_BYTES_LIMIT > 8192) ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
 		$now = time();
 		$i = 0;
 		while (!feof($socket)) {
 			$i++;
+
 			if ((time() - $now) >= ZBX_SCRIPT_TIMEOUT) {
 				self::exception(ZBX_API_ERROR_INTERNAL,
 					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value.'));
@@ -543,28 +544,38 @@ class CScript extends CZBXAPI {
 		zbx_value2array($hostIds);
 
 		$scriptsByHost = array();
-		foreach ($hostIds as $hostid) {
-			$scriptsByHost[$hostid] = array();
+		foreach ($hostIds as $hostId) {
+			$scriptsByHost[$hostId] = array();
 		}
 
-		$scripts  = $this->get(array(
+		$scripts = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
 			'hostids' => $hostIds,
 			'sortfield' => 'name',
 			'preservekeys' => true
 		));
-		foreach ($scripts as $script) {
-			foreach ($script['hosts'] as $host) {
-				$hostId = $host['hostid'];
-				if (isset($scriptsByHost[$hostId])) {
-					$scriptsByHost[$hostId][] = $script;
+		if (!empty($scripts)) {
+			$macrosResolver = new CMacrosResolver();
+
+			foreach ($scripts as $script) {
+				// resolve macros in confirmation text
+				if (!empty($script['confirmation'])) {
+					$script['confirmation'] = $macrosResolver->resolveMacrosInText($script['confirmation'], $hostIds);
+				}
+
+				foreach ($script['hosts'] as $host) {
+					$hostId = $host['hostid'];
+
+					if (isset($scriptsByHost[$hostId])) {
+						$scriptsByHost[$hostId][] = $script;
+					}
 				}
 			}
 		}
+
 		return $scriptsByHost;
 	}
-
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// only apply the node option if no specific ids are given

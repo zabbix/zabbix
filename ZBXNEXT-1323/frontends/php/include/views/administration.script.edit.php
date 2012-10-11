@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,14 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 // include js + templates
 include('include/views/js/administration.script.edit.js.php');
@@ -55,17 +54,17 @@ $typeRB = new CRadioButtonList('execute_on', $this->get('execute_on'));
 $typeRB->makeVertical();
 $typeRB->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
 $typeRB->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
-$scriptTab->addRow(_('Execute on'), new CDiv($typeRB, 'objectgroup inlineblock border_dotted ui-corner-all'), $data['type'] == ZBX_SCRIPT_TYPE_IPMI);
+$scriptTab->addRow(_('Execute on'), new CDiv($typeRB, 'objectgroup inlineblock border_dotted ui-corner-all'), ($data['type'] == ZBX_SCRIPT_TYPE_IPMI));
 
 // command
 $commandTA = new CTextArea('command', $this->get('command'));
 $commandTA->addStyle('width: 50em; padding: 0;');
-$scriptTab->addRow(_('Commands'), $commandTA, $this->get('type') == ZBX_SCRIPT_TYPE_IPMI);
+$scriptTab->addRow(_('Commands'), $commandTA, ($this->get('type') == ZBX_SCRIPT_TYPE_IPMI));
 
 // command ipmi
 $commandIpmiTB = new CTextBox('commandipmi', $this->get('commandipmi'));
 $commandIpmiTB->addStyle('width: 50em;');
-$scriptTab->addRow(_('Command'), $commandIpmiTB, $this->get('type') == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
+$scriptTab->addRow(_('Command'), $commandIpmiTB, ($this->get('type') == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT));
 
 // description
 $descriptionTA = new CTextArea('description', $this->get('description'));
@@ -129,5 +128,3 @@ $frmScr->addItem($footer);
 $scripts_wdgt->addItem($frmScr);
 
 return $scripts_wdgt;
-
-?>

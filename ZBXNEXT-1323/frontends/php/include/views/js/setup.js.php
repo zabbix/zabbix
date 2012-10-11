@@ -3,14 +3,14 @@
 
 		jQuery(document.body).addClass('setupBG');
 
-		jQuery(":submit").button();
+		jQuery(':submit').button();
 
-		jQuery("#agree").change(function(){
+		jQuery('#agree').change(function() {
 			if (this.checked) {
-				jQuery("#next_1").button("enable");
+				jQuery('next_1').button('enable');
 			}
 			else {
-				jQuery("#next_1").button("disable");
+				jQuery('#next_1').button('disable');
 			}
 		})
 	});
