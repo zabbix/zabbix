@@ -90,9 +90,10 @@ static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packag
 	if (NULL != manager)
 		offset += zbx_snprintf(buffer + offset, size - offset, "[%s]", manager);
 
-	if (0 != packages->values_num)
+	if (0 < packages->values_num)
 	{
-		offset += zbx_snprintf(buffer + offset, size - offset, " ");
+		if (NULL != manager)
+			offset += zbx_snprintf(buffer + offset, size - offset, " ");
 
 		zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
@@ -120,7 +121,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	size_t			offset = 0;
-	int			ret = SYSINFO_RET_FAIL, show_pm, i;
+	int			ret = SYSINFO_RET_FAIL, show_pm, i, j;
 	char			buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN], manager[MAX_STRING_LEN],
 				tmp[MAX_STRING_LEN], *buf = NULL, *package;
 	zbx_vector_str_t	packages;
@@ -184,6 +185,11 @@ next:
 			{
 				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, mng->name);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+
+				/* deallocate memory used for string vector elements */
+				for (j = 0; j < packages.values_num; j++)
+					zbx_free(packages.values[j]);
+				packages.values_num = 0;
 			}
 		}
 	}
@@ -191,12 +197,16 @@ next:
 	zbx_free(buf);
 
 	if (0 == show_pm)
+	{
 		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
+
+		/* deallocate memory used for string vector elements */
+		for (j = 0; j < packages.values_num; j++)
+			zbx_free(packages.values[j]);
+		packages.values_num = 0;
+	}
 	else if (0 != offset)
 		buffer[--offset] = '\0';
-
-	for (i = 0; i < packages.values_num; i++)
-		zbx_free(packages.values[i]);
 
 	zbx_vector_str_destroy(&packages);
 
