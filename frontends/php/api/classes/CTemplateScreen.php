@@ -583,7 +583,7 @@ class CTemplateScreen extends CScreen {
 		return array('screenids' => $screenIds);
 	}
 
-	function copy($data) {
+	public function copy(array $data) {
 		$screenIds = $data['screenIds'] = zbx_toArray($data['screenIds']);
 		$templateIds = $data['templateIds'] = zbx_toArray($data['templateIds']);
 
@@ -743,7 +743,7 @@ class CTemplateScreen extends CScreen {
 
 			$dbScreen = $updScreens[$screen['screenid']];
 			if (isset($screen['templateid']) && (bccomp($screen['templateid'], $dbScreen['templateid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot change template for Screen "%1$s".', $screen['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot change template for screen "%1$s".', $screen['name']));
 			}
 
 			if (isset($screen['name'])) {

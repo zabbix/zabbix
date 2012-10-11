@@ -154,6 +154,18 @@ class CTag extends CObject {
 		return $this->attributes['class'];
 	}
 
+	/**
+	 * HTML class check for existing, return thue if exist
+	 *
+	 * @param string $cssClass
+	 *
+	 * @return bool
+	 */
+	public function hasClass($cssClass) {
+		$chkClass = explode(' ', $this->getAttribute('class'));
+		return in_array($cssClass, $chkClass);
+	}
+
 	public function attr($name, $value) {
 		if (!is_null($value)) {
 			$this->setAttribute($name, $value);

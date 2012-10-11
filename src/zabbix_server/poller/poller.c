@@ -628,6 +628,7 @@ static int	get_values(unsigned char poller_type)
 						&items[i].snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
@@ -651,6 +652,7 @@ static int	get_values(unsigned char poller_type)
 						&items[i].publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
@@ -659,9 +661,10 @@ static int	get_values(unsigned char poller_type)
 						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
@@ -739,6 +742,7 @@ static int	get_values(unsigned char poller_type)
 				zbx_free(items[i].snmpv3_securityname);
 				zbx_free(items[i].snmpv3_authpassphrase);
 				zbx_free(items[i].snmpv3_privpassphrase);
+				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 				zbx_free(items[i].snmp_community);
@@ -747,6 +751,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_SSH:
 				zbx_free(items[i].publickey);
 				zbx_free(items[i].privatekey);
+				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);

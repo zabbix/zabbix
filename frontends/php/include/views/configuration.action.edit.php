@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -41,13 +41,6 @@ $actionFormList = new CFormList('actionlist');
 $nameTextBox = new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $actionFormList->addRow(_('Name'), $nameTextBox);
-
-if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$actionFormList->addRow(_('Default operation step duration'), array(
-		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6, 'no'),
-		' ('._('minimum 60 seconds').')')
-	);
-}
 
 $actionFormList->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
 $actionFormList->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
@@ -312,6 +305,13 @@ $conditionFormList->addRow(_('New condition'), $newConditionDiv);
  */
 $operationFormList = new CFormList('operationlist');
 
+if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	$operationFormList->addRow(_('Default operation step duration'), array(
+		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6, 'no'),
+		' ('._('minimum 60 seconds').')')
+	);
+}
+
 // create operation table
 $operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
 $operationsTable->attr('style', 'min-width: 600px;');
@@ -337,7 +337,6 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	$details = new CSpan(get_operation_desc(SHORT_DESCRIPTION, $operation));
 	$details->setHint(get_operation_desc(LONG_DESCRIPTION, $operation));
 
-
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$esc_steps_txt = null;
 		$esc_period_txt = null;
@@ -351,8 +350,8 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 
 		// display N-N as N
 		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
-				? $operation['esc_step_from']
-				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+			? $operation['esc_step_from']
+			: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
 		$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
 		$esc_delay_txt = $delay[$operation['esc_step_from']] ? convert_units($delay[$operation['esc_step_from']], 'uptime') : _('Immediately');

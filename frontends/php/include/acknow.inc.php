@@ -37,10 +37,10 @@ function get_acknowledges_by_eventid($eventid) {
 }
 
 function make_acktab_by_eventid($event) {
-	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
-		$table = new CTableInfo(_('No acknowledges defined.'));
-		$table->setHeader(array(_('Time'), _('User'), _('Comments')));
+	$table = new CTableInfo(_('No acknowledges defined.'));
+	$table->setHeader(array(_('Time'), _('User'), _('Comments')));
 
+	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
 		foreach ($event['acknowledges'] as $ack) {
 			$table->addRow(array(
 				zbx_date2str(_('d M Y H:i:s'), $ack['clock']),
@@ -48,10 +48,7 @@ function make_acktab_by_eventid($event) {
 				new CCol(zbx_nl2br($ack['message']), 'wraptext')
 			));
 		}
+	}
 
-		return $table;
-	}
-	else {
-		return null;
-	}
+	return $table;
 }
