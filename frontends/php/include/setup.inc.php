@@ -123,17 +123,17 @@ class CsetupWizard extends CForm {
 		}
 
 		if (isset($this->stage[$this->getStep() + 1])) {
-			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>', null, 'ui-state-default ui-button');
+			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
 		}
 		else {
-			$next = new CSubmit('finish', _('Finish'), null, 'ui-state-default ui-button');
+			$next = new CSubmit('finish', _('Finish'));
 		}
 
 		if (isset($this->HIDE_CANCEL_BUTTON) && $this->HIDE_CANCEL_BUTTON) {
 			$cancel = null;
 		}
 		else {
-			$cancel = new CDiv(new CSubmit('cancel', _('Cancel'), null, 'ui-state-default ui-button'), 'footer_left');
+			$cancel = new CDiv(new CSubmit('cancel', _('Cancel')), 'footer_left');
 		}
 
 		if ($this->DISABLE_NEXT_BUTTON) {
@@ -143,7 +143,7 @@ class CsetupWizard extends CForm {
 		$footer = new CDiv(array(
 			$cancel,
 			new CDiv(array(
-				$this->getStep() != 0 ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous'), null, 'ui-state-default ui-button') : null,
+				$this->getStep() != 0 ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous')) : null,
 				$next), 'footer_right')
 			), 'footer');
 
@@ -303,7 +303,7 @@ class CsetupWizard extends CForm {
 					new CSpan(array(_('OK'), BR()), 'ok')
 					: new CSpan(array(_('Fail'), BR()), 'fail')
 					: null,
-				new  CSubmit('retry', 'Test connection', null, 'ui-state-default ui-button')
+				new  CSubmit('retry', 'Test connection')
 			), 'info_bar')
 
 		);
@@ -460,7 +460,7 @@ class CsetupWizard extends CForm {
 
 		return array(
 			$table, BR(), BR(),
-			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry'), null, 'ui-state-default ui-button'), BR(), BR()) : null,
+			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(), BR()) : null,
 			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
 				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
 					'Press the "Download configuration file" button, download the configuration file ',

@@ -106,10 +106,17 @@ zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 $pageHeader = new CPageHeader(_('Installation'));
 $pageHeader->addCssFile('css.css');
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
+$pageHeader->addJsFile('js/jquery/jquery.js');
+$pageHeader->addJsFile('js/jquery/jquery-ui.js');
 $pageHeader->display();
 ?>
 <body class="originalblue setupBG">
 
 <?php $ZBX_SETUP_WIZARD->show(); ?>
+<script>
+	jQuery(function($) {
+		$(':submit').button();
+	});
+</script>
 </body>
 </html>
