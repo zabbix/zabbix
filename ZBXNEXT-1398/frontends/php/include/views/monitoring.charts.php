@@ -52,7 +52,11 @@ if (!empty($this->data['graphid'])) {
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['graphid']
 	));
-	$chartsWidget->addItem($screen->get());
+
+	$chartTable = new CTable(_('No graphs defined.'), 'maxwidth');
+	$chartTable->addRow($screen->get());
+
+	$chartsWidget->addItem($chartTable);
 
 	CScreenBuilder::insertScreenStandardJs(array(
 		'timeline' => $screen->timeline,

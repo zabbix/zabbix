@@ -212,8 +212,7 @@ jQuery(function($) {
 						}
 					},
 					error: function() {
-						screen.isRefreshing = false;
-						window.flickerfreeScreenShadow.validate(id);
+						window.flickerfreeScreen.calculateReRefresh(id);
 					}
 				});
 
@@ -263,8 +262,7 @@ jQuery(function($) {
 					.css({position: 'relative', zIndex: 2})
 					.error(function() {
 						screen.error++;
-						screen.isRefreshing = false;
-						window.flickerfreeScreenShadow.validate(id);
+						window.flickerfreeScreen.calculateReRefresh(id);
 					})
 					.load(function() {
 						if (screen.error > 0) {
@@ -332,7 +330,7 @@ jQuery(function($) {
 						screen.isRefreshing = false;
 					},
 					error: function() {
-						screen.isRefreshing = false;
+						window.flickerfreeScreen.calculateReRefresh(id);
 					}
 				});
 
@@ -350,7 +348,7 @@ jQuery(function($) {
 
 			if (screen.timestamp + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()
 					&& screen.timestampResponsiveness + window.flickerfreeScreenShadow.responsiveness < new CDate().getTime()) {
-				// take of beasy flags
+				// take of busy flags
 				screen.isRefreshing = false;
 				screen.isReRefreshRequire = false;
 
@@ -560,6 +558,15 @@ jQuery(function($) {
 				if (tag == 'MAP') {
 					item = elem.children().eq(1);
 					tag = item.prop('nodeName');
+				}
+
+				if (tag == 'DIV') {
+					var imgItem = item.find('img');
+
+					if (imgItem.length > 0) {
+						item = $(imgItem[0]);
+						tag = 'IMG';
+					}
 				}
 
 				if (tag == 'TABLE' || tag == 'DIV' || tag == 'IMG') {
