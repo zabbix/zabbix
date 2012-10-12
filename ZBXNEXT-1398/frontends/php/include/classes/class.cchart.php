@@ -450,7 +450,7 @@ class CChart extends CGraphDraw {
 				}
 
 				$trigger = API::UserMacro()->resolveTrigger($trigger);
-				if (!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) {
+				if (!preg_match('/\{([0-9]{1,})\}\s*?([\<\>\=]{1})\s*?([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) {
 					continue;
 				}
 
@@ -1571,7 +1571,7 @@ class CChart extends CGraphDraw {
 	 */
 	protected function getYStepMarkerValueOffset($yAxis, $stepNumber) {
 		$step = $this->gridStep[$yAxis];
-		$minY = $this->m_minY[$yAxis];
+		$minY = abs($this->m_minY[$yAxis]);
 
 		$offset = 0;
 		if ($stepNumber > 0 && $minY) {

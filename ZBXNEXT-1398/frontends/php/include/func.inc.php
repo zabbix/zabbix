@@ -1004,6 +1004,14 @@ function zbx_substr_replace($string, $replacement, $start, $length = null) {
 	}
 }
 
+function str_replace_first($search, $replace, $subject) {
+	$pos = zbx_strpos($subject, $search);
+	if ($pos !== false) {
+		$subject = zbx_substr_replace($subject, $replace, $pos, zbx_strlen($search));
+	}
+	return $subject;
+}
+
 /************* SELECT *************/
 function selectByPattern(&$table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
