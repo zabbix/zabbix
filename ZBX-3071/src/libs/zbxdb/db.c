@@ -34,7 +34,6 @@ static zbx_ibm_db2_handle_t	ibm_db2;
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
 static zbx_oracle_db_handle_t	oracle;
-static OCIStmt			*stmthp = NULL;
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static int			ZBX_PG_BYTEAOID = 0;
@@ -292,7 +291,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret)
 	{
 		/* initialize statement handle */
-		err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
+		err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&oracle.stmthp, OCI_HTYPE_STMT,
+				(size_t)0, (dvoid **)0);
 
 		if (OCI_SUCCESS != err)
 		{
@@ -446,10 +446,10 @@ void	zbx_db_close()
 	conn = NULL;
 #elif defined(HAVE_ORACLE)
 	/* deallocate statement handle */
-	if (NULL != stmthp)
+	if (NULL != oracle.stmthp)
 	{
-		OCIHandleFree((dvoid *)stmthp, OCI_HTYPE_STMT);
-		stmthp = NULL;
+		OCIHandleFree((dvoid *)oracle.stmthp, OCI_HTYPE_STMT);
+		oracle.stmthp = NULL;
 	}
 
 	if (NULL != oracle.svchp)
@@ -688,6 +688,147 @@ int	zbx_db_txn_error()
 	return txn_error;
 }
 
+#ifdef HAVE_ORACLE
+static sword	zbx_oracle_statement_prepare(const char *sql)
+{
+	return OCIStmtPrepare(oracle.stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql), (ub4)OCI_NTV_SYNTAX,
+			(ub4)OCI_DEFAULT);
+}
+
+static sword	zbx_oracle_bind_parameter(ub4 position, void *buffer, sb4 buffer_sz, ub2 dty)
+{
+	OCIBind	*bindhp = NULL;
+
+	return OCIBindByPos(oracle.stmthp, &bindhp, oracle.errhp, position, buffer, buffer_sz, dty,
+			0, 0, 0, 0, 0, (ub4)OCI_DEFAULT);
+}
+
+static sword	zbx_oracle_statement_execute(ub4 *nrows)
+{
+	sword	err;
+
+	if (OCI_SUCCESS == (err = OCIStmtExecute(oracle.svchp, oracle.stmthp, oracle.errhp, (ub4)1, (ub4)0,
+			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS)))
+	{
+		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
+	}
+
+	return err;
+}
+#endif
+
+#ifdef HAVE_ORACLE
+int	zbx_db_statement_prepare(const char *sql)
+{
+	sword	err;
+	int	ret = ZBX_DB_OK;
+
+	if (0 == txn_init && 0 == txn_level)
+		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
+
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
+		return ZBX_DB_FAIL;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
+
+	/* Oracle */
+	if (OCI_SUCCESS != (err = zbx_oracle_statement_prepare(sql)))
+	{
+		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
+		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+
+	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
+		txn_error = 1;
+	}
+
+	return ret;
+}
+
+int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
+{
+	const char	*__function_name = "zbx_db_bind_parameter";
+
+	sword	err;
+	int	ret = ZBX_DB_OK;
+
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
+		return ZBX_DB_FAIL;
+	}
+
+	/* Oracle */
+	switch (type)
+	{
+		case ZBX_TYPE_ID:
+			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(zbx_uint64_t), SQLT_INT);
+			break;
+		case ZBX_TYPE_INT:
+			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(int), SQLT_INT);
+			break;
+		case ZBX_TYPE_TEXT:
+			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)strlen((char *)buffer), SQLT_LNG);
+			break;
+		default:
+			err = OCI_SUCCESS;
+	}
+
+	if (OCI_SUCCESS != err)
+	{
+		zabbix_errlog(ERR_Z3007, err, zbx_oci_error(err));
+		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+
+	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
+		txn_error = 1;
+	}
+
+	return ret;
+
+}
+
+int	zbx_db_statement_execute()
+{
+	const char	*__function_name = "zbx_db_statement_execute";
+	sword	err;
+	ub4	nrows;
+	int	ret;
+
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
+		ret = ZBX_DB_FAIL;
+		goto out;
+	}
+
+	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(&nrows)))
+	{
+		zabbix_errlog(ERR_Z3007, err, zbx_oci_error(err));
+		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+	else
+		ret = (int)nrows;
+
+	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
+		txn_error = 1;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "%s():%d", __function_name, ret);
+
+	return ret;
+}
+#endif
+
 /*
  * Execute SQL statement. For non-select statements only.
  */
@@ -820,26 +961,12 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	if (OCI_SUCCESS == err)
+	if (OCI_SUCCESS == (err = zbx_oracle_statement_prepare(sql)))
 	{
-		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql),
-				(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
-	}
+		ub4	nrows = 0;
 
-	if (OCI_SUCCESS == err)
-	{
-		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4)1, (ub4)0,
-				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
-
-		if (OCI_SUCCESS == err)
-		{
-			ub4	nrows = 0;
-
-			err = OCIAttrGet((void *)stmthp, OCI_HTYPE_STMT, (ub4 *)&nrows,
-					  (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
-
-			ret = nrows;
-		}
+		if (OCI_SUCCESS == (err = zbx_oracle_statement_execute(&nrows)))
+			ret = (int)nrows;
 	}
 
 	if (OCI_SUCCESS != err)
@@ -1087,53 +1214,84 @@ error:
 	assert(0 < result->ncolumn);
 
 	result->values = zbx_malloc(NULL, result->ncolumn * sizeof(char *));
+	result->clobs = zbx_malloc(NULL, result->ncolumn * sizeof(OCILobLocator *));
+	result->values_alloc = zbx_malloc(NULL, result->ncolumn * sizeof(ub4));
 	memset(result->values, 0, result->ncolumn * sizeof(char *));
+	memset(result->clobs, 0, result->ncolumn * sizeof(OCILobLocator *));
+	memset(result->values_alloc, 0, result->ncolumn * sizeof(ub4));
 
 	for (counter = 1; OCI_SUCCESS == err && counter <= result->ncolumn; counter++)
 	{
 		OCIParam	*parmdp = NULL;
 		OCIDefine	*defnp = NULL;
 		ub4		char_semantics;
-		ub2		col_width;
+		ub2		col_width = 0, data_type;
 
 		/* request a parameter descriptor in the select-list */
 		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp, (void **)&parmdp, (ub4)counter);
 
 		if (OCI_SUCCESS == err)
 		{
-			/* retrieve the length semantics for the column */
-			char_semantics = 0;
-			err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics, (ub4 *)0,
-					(ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
+			/* retrieve the data type for the column */
+			err = OCIAttrGet((void *)parmdp, OCI_DTYPE_PARAM, (dvoid *)&data_type, (ub4 *)NULL,
+					(ub4)OCI_ATTR_DATA_TYPE, (OCIError *)oracle.errhp);
 		}
 
-		if (OCI_SUCCESS == err)
+		if (SQLT_CLOB == data_type)
 		{
-			col_width = 0;
-			if (char_semantics)
+			if (ZBX_DB_OK == err)
 			{
-				/* retrieve the column width in characters */
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
-						(ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+				/* allocate the lob locator variable */
+				err = OCIDescriptorAlloc((dvoid *)oracle.envhp, (dvoid **)&result->clobs[counter - 1],
+						OCI_DTYPE_LOB, (size_t)0, (dvoid **)0);
 			}
-			else
+
+			if (OCI_SUCCESS == err)
 			{
-				/* retrieve the column width in bytes */
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
-						(ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+				/* associate clob var with its define handle */
+				err = OCIDefineByPos((void *)result->stmthp, &defnp, (OCIError *)oracle.errhp,
+						(ub4)counter, (dvoid *)&result->clobs[counter - 1], (sb4)-1,
+						data_type, (dvoid *)0, (ub2 *)0, (ub2 *)0, (ub4)OCI_DEFAULT);
 			}
 		}
-		col_width++;
-
-		result->values[counter - 1] = zbx_malloc(NULL, col_width);
-		memset(result->values[counter - 1], 0, col_width);
-
-		if (OCI_SUCCESS == err)
+		else
 		{
-			/* represent any data as characters */
-			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
-					(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
-					(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
+			if (OCI_SUCCESS == err)
+			{
+				/* retrieve the length semantics for the column */
+				char_semantics = 0;
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
+						(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
+			}
+
+			if (OCI_SUCCESS == err)
+			{
+				if (0 != char_semantics)
+				{
+					/* retrieve the column width in characters */
+					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+				}
+				else
+				{
+					/* retrieve the column width in bytes */
+					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+							(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+				}
+			}
+			col_width++;
+
+			result->values_alloc[counter - 1] = col_width;
+			result->values[counter - 1] = zbx_malloc(NULL, col_width);
+			*result->values[counter - 1] = '\0';
+
+			if (OCI_SUCCESS == err)
+			{
+				/* represent any data as characters */
+				err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
+						(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
+						(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
+			}
 		}
 
 		/* free cell descriptor */
@@ -1253,6 +1411,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 #if defined(HAVE_IBM_DB2)
 	int		i;
 #elif defined(HAVE_ORACLE)
+	int		i;
 	sword		rc;
 	static char	errbuf[512];
 	sb4		errcode;
@@ -1276,6 +1435,41 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 #elif defined(HAVE_ORACLE)
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
+
+	for (i = 0; i < result->ncolumn; i++)
+	{
+		if (NULL != result->clobs[i])
+		{
+			ub4	alloc, amount, amt = 0;
+			ub1	csfrm;
+
+			rc = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount);
+
+			if (OCI_SUCCESS != rc)
+				break;
+
+			rc = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm);
+
+			if (OCI_SUCCESS != rc)
+				break;
+
+			if (result->values_alloc[i] < (alloc = amount * 4 + 1))
+			{
+				result->values_alloc[i] = alloc;
+				result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
+			}
+
+			amt = amount;
+			rc = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amt, (ub4)1,
+					(dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
+					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm);
+
+			if (OCI_SUCCESS != rc)
+				zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+
+			result->values[i][amt] = '\0';
+		}
+	}
 
 	if (OCI_SUCCESS == rc)
 		return result->values;
@@ -1397,9 +1591,17 @@ void	OCI_DBfree_result(DB_RESULT result)
 		for (i = 0; i < result->ncolumn; i++)
 		{
 			zbx_free(result->values[i]);
+
+			/* deallocate the lob locator variable */
+			if (NULL != result->clobs[i])
+			{
+				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
+				result->clobs[i] = NULL;
+			}
 		}
 
 		zbx_free(result->values);
+		zbx_free(result->values_alloc);
 	}
 
 	if (result->stmthp)
