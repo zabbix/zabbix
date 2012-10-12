@@ -172,7 +172,10 @@ else {
 		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 	}
 
-	$historyWidget->addItem($screen->get());
+	$historyTable = new CTable(_('No graphs defined.'), 'maxwidth');
+	$historyTable->addRow($screen->get());
+
+	$historyWidget->addItem($historyTable);
 
 	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph') {
 		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));

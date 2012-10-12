@@ -304,14 +304,10 @@ class CScreenHistory extends CScreenBase {
 
 		if ($this->action == 'showgraph' && !isset($iv_string[$this->item['value_type']])) {
 			$this->dataId = 'historyGraph';
-			$containerid = 'graph_cont1';
+			$containerId = 'graph_cont1';
 			$src = 'chart.php?itemid='.$this->item['itemid'].'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'];
 
-			$historyTable = new CTableInfo(_('No graphs defined.'), 'chart');
-			$graphContainer = new CCol();
-			$graphContainer->setAttribute('id', $containerid);
-			$historyTable->addRow($graphContainer);
-			$output[] = $historyTable;
+			$output[] = new CDiv(null, 'center', $containerId);
 		}
 
 		// time control
@@ -327,7 +323,7 @@ class CScreenHistory extends CScreenBase {
 
 			if (!empty($this->dataId)) {
 				$timeControlData['id'] = $this->getDataId();
-				$timeControlData['containerid'] = $containerid;
+				$timeControlData['containerid'] = $containerId;
 				$timeControlData['src'] = $src;
 				$timeControlData['objDims'] = $graphDims;
 				$timeControlData['loadSBox'] = 1;
