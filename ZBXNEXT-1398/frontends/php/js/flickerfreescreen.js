@@ -211,8 +211,9 @@ jQuery(function($) {
 							window.flickerfreeScreenShadow.validate(id);
 						}
 					},
-					error: function(jqXHR, textStatus, errorThrown) {
+					error: function() {
 						screen.isRefreshing = false;
+						window.flickerfreeScreenShadow.validate(id);
 					}
 				});
 
@@ -263,11 +264,7 @@ jQuery(function($) {
 					.error(function() {
 						screen.error++;
 						screen.isRefreshing = false;
-
-						// retry load image
-						if (screen.error < 10) {
-							window.flickerfreeScreen.refresh(id, true);
-						}
+						window.flickerfreeScreenShadow.validate(id);
 					})
 					.load(function() {
 						if (screen.error > 0) {
@@ -334,7 +331,7 @@ jQuery(function($) {
 						screen.timestamp = new CDate().getTime();
 						screen.isRefreshing = false;
 					},
-					error: function(jqXHR, textStatus, errorThrown) {
+					error: function() {
 						screen.isRefreshing = false;
 					}
 				});
