@@ -162,7 +162,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 		}
 
-		$this->checkGraphInput($graphs, true);
+		$this->checkInput($graphs, true);
 
 		foreach ($graphs as $graph) {
 			unset($graph['templateid']);
@@ -211,7 +211,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
-		$this->checkGraphInput($graphs, false);
+		$this->checkInput($graphs, false);
 
 		foreach ($graphs as $graph) {
 			$graphHosts = API::Host()->get(array(

@@ -854,7 +854,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @return void
 	 */
-	protected function checkGraphInput($graphs, $update = false) {
+	protected function checkInput($graphs, $update = false) {
 		parent::checkInput($graphs, $update);
 		$itemids = array();
 		foreach ($graphs as $graph) {
