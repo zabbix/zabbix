@@ -24,65 +24,80 @@
  */
 class CMacrosResolver {
 
+	const PATTERN_HOST = 'HOSTNAME|HOST\.HOST|HOST\.NAME';
+	const PATTERN_IP = 'IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN';
+
+	/**
+	 * Interface priorities.
+	 *
+	 * @var array
+	 */
+	public $interfacePriorities = array(
+		INTERFACE_TYPE_AGENT => 4,
+		INTERFACE_TYPE_SNMP => 3,
+		INTERFACE_TYPE_JMX => 2,
+		INTERFACE_TYPE_IPMI => 1
+	);
+
 	/**
 	 * Resolve host and ip macros in text using host id.
 	 *
 	 * @param string $text
-	 * @param array|string $hostIds
+	 * @param int $hostId
 	 *
 	 * @return string
 	 */
 	public function resolveMacrosInText($text, $hostId) {
+		$macros = array();
+
 		// host macros
-		$hostMacros = $this->findMacros('HOSTNAME|HOST\.HOST|HOST\.NAME', $text);
+		$hostMacros = $this->findMacros(CMacrosResolver::PATTERN_HOST, $text);
 		if (!empty($hostMacros)) {
 			$dbHosts = DBselect('SELECT h.name,h.host FROM hosts h WHERE h.hostid='.$hostId);
 			while ($dbHost = DBfetch($dbHosts)) {
 				foreach ($hostMacros as $hostMacro) {
-					$value = '';
-
 					switch ($hostMacro) {
 						case '{HOSTNAME}':
 						case '{HOST.HOST}':
-							$value = $dbHost['host'];
+							$macros[$hostMacro] = $dbHost['host'];
 							break;
 						case '{HOST.NAME}':
-							$value = $dbHost['name'];
+							$macros[$hostMacro] = $dbHost['name'];
 							break;
 					}
-
-					$text = str_replace($hostMacro, $value, $text);
 				}
 			}
 		}
 
-		// ip macros
-		$ipMacros = $this->findMacros('IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN', $text);
+		// ip macros, macro should be resolved to interface with highest priority
+		$ipMacros = $this->findMacros(CMacrosResolver::PATTERN_IP, $text);
 		if (!empty($ipMacros)) {
-			$dbInterfaces = DBselect('SELECT i.ip,i.dns,i.useip FROM interface i WHERE i.hostid='.$hostId);
+			$interface = array('type' => 0);
+
+			$dbInterfaces = DBselect('SELECT i.ip,i.dns,i.useip,i.type FROM interface i WHERE i.hostid='.$hostId);
 			while ($dbInterface = DBfetch($dbInterfaces)) {
-				foreach ($ipMacros as $ipMacro) {
-					$value = '';
+				if (!empty($this->interfacePriorities[$dbInterface['type']]) && $this->interfacePriorities[$dbInterface['type']] > $interface['type']) {
+					$interface = $dbInterface;
+				}
+			}
 
-					switch ($ipMacro) {
-						case '{IPADDRESS}':
-						case '{HOST.IP}':
-							$value = $dbInterface['ip'];
-							break;
-						case '{HOST.DNS}':
-							$value = $dbInterface['dns'];
-							break;
-						case '{HOST.CONN}':
-							$value = $dbInterface['useip'] ? $dbInterface['ip'] : $dbInterface['dns'];
-							break;
-					}
-
-					$text = str_replace($ipMacro, $value, $text);
+			foreach ($ipMacros as $ipMacro) {
+				switch ($ipMacro) {
+					case '{IPADDRESS}':
+					case '{HOST.IP}':
+						$macros[$ipMacro] = $interface['ip'];
+						break;
+					case '{HOST.DNS}':
+						$macros[$ipMacro] = $interface['dns'];
+						break;
+					case '{HOST.CONN}':
+						$macros[$ipMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+						break;
 				}
 			}
 		}
 
-		return $text;
+		return $this->replaceMacroValues($text, $macros);
 	}
 
 	/**
@@ -97,5 +112,62 @@ class CMacrosResolver {
 		preg_match_all('/{('.$pattern.')}/', $s, $matches);
 
 		return !empty($matches[0]) ? $matches[0] : null;
+	}
+
+	/**
+	 * Replace macros by values.
+	 * All macros are resolved in one go.
+	 *
+	 * @param string $text
+	 * @param array $macros
+	 *
+	 * @return string
+	 */
+	function replaceMacroValues($text, $macros) {
+		$i = 0;
+		$begin = false;
+		while ($i = strpos($text, ($begin ? '}' : '{'), $i)) {
+			$char = zbx_substr($text, $i, 1);
+
+			if ($char == '{') {
+				$begin = $i;
+			}
+			elseif ($char == '}') {
+				if ($begin !== false) {
+					$macro = zbx_substr($text, $begin, $i - $begin + 1);
+
+					if (isset($macros[$macro])) {
+						$value = $macros[$macro];
+					}
+					elseif ($this->isMacroAllowed($macro)) {
+						$value = UNRESOLVED_MACRO_STRING;
+					}
+					else {
+						$value = false;
+					}
+
+					if ($value !== false) {
+						$text = zbx_substr_replace($text, $value, $begin, zbx_strlen($macro));
+
+						// recalculate iterator
+						$i = $begin + zbx_strlen($value) - 1;
+						$begin = false;
+					}
+				}
+			}
+		}
+
+		return $text;
+	}
+
+	/**
+	 * Check if the macro is supported.
+	 *
+	 * @param string $macro
+	 *
+	 * @return bool
+	 */
+	function isMacroAllowed($macro) {
+		return preg_match('/{'.CMacrosResolver::PATTERN_HOST.CMacrosResolver::PATTERN_IP.'?}/', $macro);
 	}
 }
