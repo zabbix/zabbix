@@ -58,7 +58,7 @@
 static int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
 {
 	size_t	sz;
-	int	mib[4], ret;
+	int	mib[4];
 
 	if (NULL == *argv) {
 		*argv_alloc = ARGS_START_SIZE;
