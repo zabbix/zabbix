@@ -178,7 +178,7 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	int				type, mode, nparam;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
 
-	if (3 < (nparam = num_param(param)))	/* Too many parameters ? */
+	if (3 < (nparam = num_param(param)))	/* too many parameters? */
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, devname, sizeof(devname)))

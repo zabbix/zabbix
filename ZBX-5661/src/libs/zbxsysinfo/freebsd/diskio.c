@@ -99,9 +99,9 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	char		devname[32], tmp[16];
 	int		type, mode, nparam;
 	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
-	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0'*/
+	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0' */
 
-	if (3 < (nparam = num_param(param)))	/* Too many parameters ? */
+	if (3 < (nparam = num_param(param)))	/* too many parameters? */
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, devname, sizeof(devname)))
