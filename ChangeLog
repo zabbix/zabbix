@@ -12,6 +12,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+........S. [ZBX-5674] fixed execution of actions with SSH commands with "Public key" autentication (Sasha)
 A......... [ZBX-5656] fixed timeperiod validation (Eduard)
 ..F....... [ZBX-5660] fixed expression constructor exp labels style (Eduard)
 ..F....... [ZBX-3204] changed generating and reading algorithm for trigger expression condition functions, and fixed English translation (Oleg)
