@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 define('ZBX_PAGE_NO_HEADER', 1);
 define('ZBX_PAGE_NO_FOOTER', 1);
 
@@ -26,6 +26,7 @@ $request = CHtml::encode(get_request('request', ''));
 $message = CHtml::encode(get_request('message', '')) ;
 
 require_once dirname(__FILE__).'/../page_header.php';
+
 ?>
 <form action="index.php" method="post">
 <input type="hidden" name="request" class="input hidden" value="<?php echo $request; ?>" />
@@ -95,4 +96,3 @@ require_once dirname(__FILE__).'/../page_header.php';
 </script>
 <?php
 require_once dirname(__FILE__).'/../page_footer.php';
-?>

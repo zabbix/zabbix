@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -114,7 +114,7 @@ class CConfigurationImport {
 		try {
 			// hack to make api throw exceptions
 			// this made to not check all api calls results for false return
-			czbxrpc::$useExceptions = true;
+			CZbxRpc::$useExceptions = true;
 			DBstart();
 
 			$this->data = $this->reader->read($this->source);
@@ -165,11 +165,11 @@ class CConfigurationImport {
 			}
 
 			// prevent api from throwing exception
-			czbxrpc::$useExceptions = false;
+			CZbxRpc::$useExceptions = false;
 			return DBend(true);
 		}
 		catch (Exception $e) {
-			czbxrpc::$useExceptions = false;
+			CZbxRpc::$useExceptions = false;
 			DBend(false);
 			throw new Exception($e->getMessage(), $e->getCode());
 		}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,22 +10,20 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-// @author: Artem Suharev <aly@zabbix.com>
 
-class CJSONrpc{
+
+class CJSONrpc {
+
 	const VERSION = '2.0';
 
 	public $json;
-
 	private $_multicall;
 	private $_error;
 	private $_response;
@@ -36,39 +34,47 @@ class CJSONrpc{
 	public function __construct($jsonData) {
 		$this->json = new CJSON();
 		$this->initErrors();
-
 		$this->_multicall = false;
 		$this->_error = false;
 		$this->_response = array();
-
 		$this->_jsonDecoded = $this->json->decode($jsonData, true);
+
 		if (!$this->_jsonDecoded) {
 			$this->jsonError(null, '-32700', null, null, true);
 			return;
 		}
 
-		if (!isset($this->_jsonDecoded['jsonrpc']))
+		if (!isset($this->_jsonDecoded['jsonrpc'])) {
 			$this->multicall = true;
-		else
+		}
+		else {
 			$this->_jsonDecoded = array($this->_jsonDecoded);
-
+		}
 	}
 
-	public function execute($encoded=true) {
+	public function execute($encoded = true) {
 		foreach ($this->_jsonDecoded as $call) {
-			if (!isset($call['id'])) $call['id'] = null;  // Notification
+			if (!isset($call['id'])) {
+				$call['id'] = null; // notification
+			}
 
-			if (!$this->validate($call)) continue;
+			if (!$this->validate($call)) {
+				continue;
+			}
 
 			$params = isset($call['params']) ? $call['params'] : null;
 			$auth = isset($call['auth']) ? $call['auth'] : null;
 
-			$result = czbxrpc::call($call['method'], $params, $auth);
+			$result = CZbxRpc::call($call['method'], $params, $auth);
 			$this->processResult($call, $result);
 		}
 
-		if (!$encoded) return $this->_response;
-		else return $this->json->encode($this->_response);
+		if (!$encoded) {
+			return $this->_response;
+		}
+		else {
+			return $this->json->encode($this->_response);
+		}
 	}
 
 	public function validate($call) {
@@ -92,13 +98,15 @@ class CJSONrpc{
 			return false;
 		}
 
-	return true;
+		return true;
 	}
 
 	public function processResult($call, $result) {
 		if (isset($result['result'])) {
-// Notifications MUST NOT be answered
-			if ($call['id'] === null) return;
+			// notifications must not be answered
+			if ($call['id'] === null) {
+				return;
+			}
 
 			$formedResp = array(
 				'jsonrpc' => self::VERSION,
@@ -106,10 +114,12 @@ class CJSONrpc{
 				'id' => $call['id']
 			);
 
-			if ($this->multicall)
+			if ($this->multicall) {
 				$this->_response[] = $formedResp;
-			else
+			}
+			else {
 				$this->_response = $formedResp;
+			}
 		}
 		else {
 			$result['data'] = isset($result['data']) ? $result['data'] : null;
@@ -124,12 +134,11 @@ class CJSONrpc{
 		return $this->_error;
 	}
 
-// NOT Public methods
-//------------------------------------------------------------------------------
-
-	private function jsonError($id, $errno, $data=null, $debug=null, $force_err=false) {
-// Notifications MUST NOT be answered, but error MUST be generated on JSON parse error
-		if (is_null($id) && !$force_err) return;
+	private function jsonError($id, $errno, $data = null, $debug = null, $force_err = false) {
+		// notifications must not be answered, but error must be generated on json parse error
+		if (is_null($id) && !$force_err) {
+			return;
+		}
 
 		$this->_error = true;
 
@@ -140,11 +149,12 @@ class CJSONrpc{
 
 		$error = $this->_error_list[$errno];
 
-		if (!is_null($data))
+		if (!is_null($data)) {
 			$error['data'] = $data;
-		if (!is_null($debug))
+		}
+		if (!is_null($debug)) {
 			$error['debug'] = $debug;
-
+		}
 
 		$formed_error = array(
 			'jsonrpc' => self::VERSION,
@@ -152,54 +162,64 @@ class CJSONrpc{
 			'id' => $id
 		);
 
-		if ($this->multicall)
+		if ($this->multicall) {
 			$this->_response[] = $formed_error;
-		else
+		}
+		else {
 			$this->_response = $formed_error;
+		}
 	}
 
 	private function initErrors() {
 		$this->_error_list = array(
 			'-32700' => array(
-					'code' => -32700,
-					'message' =>_('Parse error'),
-					'data' => _('Invalid JSON. An error occurred on the server while parsing the JSON text.')),
+				'code' => -32700,
+				'message' =>_('Parse error'),
+				'data' => _('Invalid JSON. An error occurred on the server while parsing the JSON text.')
+			),
 			'-32600' => array(
-					'code' => -32600,
-					'message' =>_('Invalid Request.'),
-					'data' => _('The received JSON is not a valid JSON-RPC Request.')),
+				'code' => -32600,
+				'message' =>_('Invalid Request.'),
+				'data' => _('The received JSON is not a valid JSON-RPC Request.')
+			),
 			'-32601' => array(
-					'code' => -32601,
-					'message' =>_('Method not found.'),
-					'data' => _('The requested remote-procedure does not exist / is not available')),
+				'code' => -32601,
+				'message' =>_('Method not found.'),
+				'data' => _('The requested remote-procedure does not exist / is not available')
+			),
 			'-32602' => array(
-					'code' => -32602,
-					'message' =>_('Invalid params.'),
-					'data' => _('Invalid method parameters.')),
+				'code' => -32602,
+				'message' =>_('Invalid params.'),
+				'data' => _('Invalid method parameters.')
+			),
 			'-32603' => array(
-					'code' => -32603,
-					'message' =>_('Internal error.'),
-					'data' => _('Internal JSON-RPC error.')),
+				'code' => -32603,
+				'message' =>_('Internal error.'),
+				'data' => _('Internal JSON-RPC error.')
+			),
 			'-32500' => array(
-					'code' => -32500,
-					'message' =>_('Application error.'),
-					'data' => _('No details')),
+				'code' => -32500,
+				'message' =>_('Application error.'),
+				'data' => _('No details')
+			),
 			'-32400' => array(
-					'code' => -32400,
-					'message' =>_('System error.'),
-					'data' => _('No details')),
+				'code' => -32400,
+				'message' =>_('System error.'),
+				'data' => _('No details')
+			),
 			'-32300' => array(
-					'code' => -32300,
-					'message' =>_('Transport error.'),
-					'data' => _('No details')));
+				'code' => -32300,
+				'message' =>_('Transport error.'),
+				'data' => _('No details')
+			)
+		);
 
 		$this->_zbx2jsonErrors = array(
 			ZBX_API_ERROR_NO_METHOD => '-32601',
 			ZBX_API_ERROR_PARAMETERS => '-32602',
 			ZBX_API_ERROR_NO_AUTH => '-32602',
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
-			ZBX_API_ERROR_INTERNAL => '-32500',
+			ZBX_API_ERROR_INTERNAL => '-32500'
 		);
 	}
 }
-?>
