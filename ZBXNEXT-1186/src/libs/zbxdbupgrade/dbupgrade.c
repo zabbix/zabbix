@@ -322,7 +322,7 @@ int	DBcheck_version()
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";
-	int		db_mandatory, db_optional, required, optional, i, ret = FAIL,
+	int		db_mandatory, db_optional, required, i, ret = FAIL,
 			total = 0, current = 0, completed, last_completed = -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -347,13 +347,12 @@ int	DBcheck_version()
 
 	DBget_version(&db_mandatory, &db_optional);
 
-	optional = required = ZBX_FIRST_DB_VERSION;
+	required = ZBX_FIRST_DB_VERSION;
 
 	for (i = 0; NULL != patches[i].function; i++)
 	{
 		if (0 != patches[i].mandatory)
 			required = patches[i].version;
-		optional = patches[i].version;
 
 		if (db_optional < patches[i].version)
 			total++;
