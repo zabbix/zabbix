@@ -3469,8 +3469,8 @@ int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
 	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
 	{
 		trigger->triggerid = dc_trigger->triggerid;
-		strscpy(trigger->description, dc_trigger->description);
-		strscpy(trigger->expression, dc_trigger->expression);
+		trigger->description = zbx_strdup(trigger->description, dc_trigger->description);
+		trigger->expression = zbx_strdup(trigger->expression, dc_trigger->expression);
 		trigger->priority = dc_trigger->priority;
 		trigger->type = dc_trigger->type;
 	}
