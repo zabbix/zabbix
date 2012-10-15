@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)

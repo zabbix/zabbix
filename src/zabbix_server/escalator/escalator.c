@@ -972,7 +972,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: use 'free_event_info' function to clear allocated memory         *
+ * Comments: use 'free_event_info' function to release allocated memory       *
  *                                                                            *
  ******************************************************************************/
 static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
@@ -984,41 +984,46 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 	memset(event, 0, sizeof(DB_EVENT));
 
 	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns"
-			" from events where eventid=" ZBX_FS_UI64,
+			" from events"
+			" where eventid=" ZBX_FS_UI64,
 			eventid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(event->eventid, row[0]);
-		event->source		= atoi(row[1]);
-		event->object		= atoi(row[2]);
+		event->source = atoi(row[1]);
+		event->object = atoi(row[2]);
 		ZBX_STR2UINT64(event->objectid, row[3]);
-		event->clock		= atoi(row[4]);
-		event->value		= atoi(row[5]);
-		event->acknowledged	= atoi(row[6]);
-		event->ns		= atoi(row[7]);
+		event->clock = atoi(row[4]);
+		event->value = atoi(row[5]);
+		event->acknowledged = atoi(row[6]);
+		event->ns = atoi(row[7]);
 
 		res = SUCCEED;
 	}
 	DBfree_result(result);
 
-	if (res == SUCCEED && event->object == EVENT_OBJECT_TRIGGER)
+	if (SUCCEED == res && EVENT_SOURCE_TRIGGERS == event->source)
 	{
 		result = DBselect("select description,expression,priority,comments,url"
-				" from triggers where triggerid=" ZBX_FS_UI64,
+				" from triggers"
+				" where triggerid=" ZBX_FS_UI64,
 				event->objectid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
 			event->trigger.triggerid = event->objectid;
-			strscpy(event->trigger.description, row[0]);
-			strscpy(event->trigger.expression, row[1]);
+			event->trigger.description = zbx_strdup(event->trigger.description, row[0]);
+			event->trigger.expression = zbx_strdup(event->trigger.expression, row[1]);
 			event->trigger.priority = (unsigned char)atoi(row[2]);
 			event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
 			event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
 		}
+		else
+			res = FAIL;
 		DBfree_result(result);
 	}
+
 	return res;
 }
 
@@ -1026,7 +1031,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
  *                                                                            *
  * Function: free_event_info                                                  *
  *                                                                            *
- * Purpose: clean allocated memory by function 'get_event_info'               *
+ * Purpose: deallocate memory allocated in function 'get_event_info'          *
  *                                                                            *
  * Parameters: event - [IN] event data                                        *
  *                                                                            *
@@ -1039,8 +1044,13 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
  ******************************************************************************/
 static void	free_event_info(DB_EVENT *event)
 {
-	zbx_free(event->trigger.comments);
-	zbx_free(event->trigger.url);
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_free(event->trigger.description);
+		zbx_free(event->trigger.expression);
+		zbx_free(event->trigger.comments);
+		zbx_free(event->trigger.url);
+	}
 }
 
 static void	execute_escalation(DB_ESCALATION *escalation)
@@ -1162,8 +1172,9 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
 
 					execute_operations(escalation, &event, &action);
+
+					free_event_info(&event);
 				}
-				free_event_info(&event);
 				break;
 			case ESCALATION_STATUS_RECOVERY:
 				if (SUCCEED == get_event_info(escalation->r_eventid, &event))
@@ -1174,8 +1185,9 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
 
 					process_recovery_msg(escalation, &event, &action);
+
+					free_event_info(&event);
 				}
-				free_event_info(&event);
 				break;
 			default:
 				break;
