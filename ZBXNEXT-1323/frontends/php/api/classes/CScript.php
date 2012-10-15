@@ -554,9 +554,22 @@ class CScript extends CZBXAPI {
 			'sortfield' => 'name',
 			'preservekeys' => true
 		));
-		if (!empty($scripts)) {
-			$macrosResolver = new CMacrosResolver();
 
+		if (!empty($scripts)) {
+			// get resolved macros
+			$macrosData = array();
+			foreach ($scripts as $script) {
+				if (!empty($script['confirmation'])) {
+					foreach ($script['hosts'] as $host) {
+						$macrosData[$host['hostid']] = $script['confirmation'];
+					}
+				}
+			}
+
+			$macrosResolver = new CMacrosResolver();
+			$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+
+			// set script to host
 			foreach ($scripts as $script) {
 				foreach ($script['hosts'] as $host) {
 					$hostId = $host['hostid'];
@@ -564,9 +577,9 @@ class CScript extends CZBXAPI {
 					if (isset($scriptsByHost[$hostId])) {
 						$scriptsByHost[$hostId][] = $script;
 
-						// resolve macros in confirmation text
-						if (!empty($script['confirmation'])) {
-							$scriptsByHost[$hostId][count($scriptsByHost[$hostId]) - 1]['confirmation'] = $macrosResolver->resolveMacrosInText($script['confirmation'], $hostId);
+						// set confirmation text with resolved macros
+						if (!empty($macrosData[$hostId])) {
+							$scriptsByHost[$hostId][count($scriptsByHost[$hostId]) - 1]['confirmation'] = $macrosData[$hostId];
 						}
 					}
 				}

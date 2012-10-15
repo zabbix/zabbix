@@ -40,10 +40,87 @@ class CMacrosResolver {
 	);
 
 	/**
+	 * Batch resolving host and ip macros in text using host id.
+	 *
+	 * @param array $data (as $hostid => $text)
+	 *
+	 * @return array (as $hostid => $text)
+	 */
+	public function resolveMacrosInTextBatch(array $data) {
+		$hostIds = array_keys($data);
+		$macros = array();
+
+		// host macros
+		$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.DBcondition('h.hostid', $hostIds));
+		while ($dbHost = DBfetch($dbHosts)) {
+			$hostId = $dbHost['hostid'];
+			$hostMacros = $this->findMacros(CMacrosResolver::PATTERN_HOST, $data[$hostId]);
+
+			if (!empty($hostMacros)) {
+				foreach ($hostMacros as $hostMacro) {
+					switch ($hostMacro) {
+						case '{HOSTNAME}':
+						case '{HOST.HOST}':
+							$macros[$hostId][$hostMacro] = $dbHost['host'];
+							break;
+						case '{HOST.NAME}':
+							$macros[$hostId][$hostMacro] = $dbHost['name'];
+							break;
+					}
+				}
+			}
+		}
+
+		// ip macros, macro should be resolved to interface with highest priority
+		$interfaces = array();
+
+		$dbInterfaces = DBselect('SELECT i.hostid,i.ip,i.dns,i.useip,i.type FROM interface i WHERE '.DBcondition('i.hostid', $hostIds));
+		while ($dbInterface = DBfetch($dbInterfaces)) {
+			$hostId = $dbInterface['hostid'];
+
+			if (!empty($this->interfacePriorities[$dbInterface['type']])
+					&& (empty($interfaces[$hostId]) || $this->interfacePriorities[$dbInterface['type']] > $interfaces[$hostId]['type'])) {
+				$interfaces[$hostId] = $dbInterface;
+			}
+		}
+
+		if (!empty($interfaces)) {
+			foreach ($interfaces as $hostId => $interface) {
+				$ipMacros = $this->findMacros(CMacrosResolver::PATTERN_IP, $data[$hostId]);
+
+				if (!empty($ipMacros)) {
+					foreach ($ipMacros as $ipMacro) {
+						switch ($ipMacro) {
+							case '{IPADDRESS}':
+							case '{HOST.IP}':
+								$macros[$hostId][$ipMacro] = $interface['ip'];
+								break;
+							case '{HOST.DNS}':
+								$macros[$hostId][$ipMacro] = $interface['dns'];
+								break;
+							case '{HOST.CONN}':
+								$macros[$hostId][$ipMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+								break;
+						}
+					}
+				}
+			}
+		}
+
+		foreach ($data as $hostId => $text) {
+			if (!empty($macros[$hostId])) {
+				$data[$hostId] = $this->replaceMacroValues($text, $macros[$hostId]);
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Resolve host and ip macros in text using host id.
 	 *
 	 * @param string $text
-	 * @param int $hostId
+	 * @param string $hostId
 	 *
 	 * @return string
 	 */
