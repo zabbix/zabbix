@@ -1437,6 +1437,7 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$depTtriggerIds = array();
 		$triggers = array();
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
@@ -1448,7 +1449,13 @@ class CTrigger extends CTriggerGeneral {
 				);
 			}
 			$triggers[$triggerId]['dependencies'][] = $dep['dependsOnTriggerid'];
+			$depTtriggerIds[$dep['dependsOnTriggerid']] = $dep['dependsOnTriggerid'];
 		}
+
+		if (!$this->isReadable($depTtriggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		};
+
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
 		$this->checkDependencyDuplicates($triggers);
@@ -1465,13 +1472,20 @@ class CTrigger extends CTriggerGeneral {
 	public function addDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
 
+		$triggerIds = array();
+		foreach ($triggersData as $dep) {
+			$triggerIds[$dep['triggerid']] = $dep['triggerid'];
+		}
+		if (!$this->isWritable($triggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		};
+
 		$this->validateAddDependencies($triggersData);
 
-		$triggerids = array();
+
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
 			$depTriggerId = $dep['dependsOnTriggerid'];
-			$triggerids[$dep['triggerid']] = $dep['triggerid'];
 
 			DB::insert('trigger_depends', array(array(
 				'triggerid_down' => $triggerId,
@@ -1500,7 +1514,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerIds);
 	}
 
 	/**
