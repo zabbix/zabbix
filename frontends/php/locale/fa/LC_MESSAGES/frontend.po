@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-08 22:15+0300\n"
+"POT-Creation-Date: 2012-10-15 20:07+0300\n"
 "PO-Revision-Date: 2012-10-06 14:22+0200\n"
 "Last-Translator: Nader <jafari@sain.ir>\n"
 "Language-Team: none\n"
@@ -98,8 +98,8 @@ msgstr "حداقل 60 ثانیه - به صورت پیش فرض"
 msgid "(no proxy)"
 msgstr "(بدون پروکسی)"
 
-#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1883
-#: popup.php:1884
+#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1887
+#: popup.php:1888
 msgid "- all groups -"
 msgstr "- همه گروه‌ها -"
 
@@ -174,6 +174,22 @@ msgstr "ثبت وقایع ممیزی"
 #: report2.php:127
 msgid "AVAILABILITY REPORT"
 msgstr "گزارش دسترسی"
+
+#: popup_trexpr.php:119
+msgid "Absolute difference between last and previous value is < N"
+msgstr ""
+
+#: popup_trexpr.php:127
+msgid "Absolute difference between last and previous value is = N"
+msgstr ""
+
+#: popup_trexpr.php:123
+msgid "Absolute difference between last and previous value is > N"
+msgstr ""
+
+#: popup_trexpr.php:131
+msgid "Absolute difference between last and previous value is NOT N"
+msgstr ""
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -256,7 +272,7 @@ msgstr "تأیید غیر فعال شده"
 #: include/views/configuration.services.edit.php:115
 #: include/views/configuration.slideconf.edit.php:50
 #: include/views/configuration.triggers.edit.php:147
-#: include/views/configuration.triggers.edit.php:272
+#: include/views/configuration.triggers.edit.php:271
 #: include/views/configuration.triggers.massupdate.php:79 tr_logform.php:299
 #: tr_logform.php:303
 msgid "Action"
@@ -367,7 +383,7 @@ msgstr "فعال تا"
 #: include/views/configuration.template.edit.php:407
 #: include/views/configuration.triggers.edit.php:79
 #: include/views/configuration.triggers.edit.php:96
-#: include/views/configuration.triggers.edit.php:289
+#: include/views/configuration.triggers.edit.php:288
 #: include/views/configuration.triggers.massupdate.php:96
 #: include/views/js/configuration.action.edit.js.php:275
 #: include/views/js/configuration.discovery.edit.js.php:66
@@ -465,7 +481,7 @@ msgid "Age less than %s"
 msgstr "سن کمتر از %s"
 
 #: include/items.inc.php:182 include/views/administration.script.list.php:64
-#: include/views/configuration.httpconf.edit.php:114 popup.php:2024
+#: include/views/configuration.httpconf.edit.php:114 popup.php:2028
 msgid "Agent"
 msgstr "عامل"
 
@@ -758,6 +774,22 @@ msgstr "متوسط"
 msgid "Average by"
 msgstr "میانگین توسط"
 
+#: popup_trexpr.php:135
+msgid "Average value of a period T is < N"
+msgstr ""
+
+#: popup_trexpr.php:145
+msgid "Average value of a period T is = N"
+msgstr ""
+
+#: popup_trexpr.php:140
+msgid "Average value of a period T is > N"
+msgstr ""
+
+#: popup_trexpr.php:150
+msgid "Average value of a period T is NOT N"
+msgstr ""
+
 #: popup_bitem.php:140
 msgid "Axis side"
 msgstr "سمت محور"
@@ -992,7 +1024,7 @@ msgstr ""
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
-#: include/views/configuration.triggers.massupdate.php:40 triggers.php:378
+#: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "پیکربندی هشدار ها"
 
@@ -1188,7 +1220,7 @@ msgstr "نمایش اسلاید نمی تواند اضافه شود"
 msgid "Cannot add template"
 msgstr "قالب نمی تواند اضافه شود"
 
-#: trigger_prototypes.php:168 triggers.php:158 triggers.php:346
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
 #: tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "هشدار نمی تواند اضافه شود"
@@ -1223,7 +1255,7 @@ msgstr "روش تصدیق هویت نمی تواند به Fanoos internal تغی
 
 #: api/classes/CTemplateScreen.php:746
 #, php-format
-msgid "Cannot change template for Screen \"%1$s\"."
+msgid "Cannot change template for screen \"%1$s\"."
 msgstr ""
 
 #: items.php:472
@@ -1455,7 +1487,7 @@ msgstr ""
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "هشدارهای قالب شده \"%1$s:%2$s\" نمی توانند حذف شوند."
 
-#: trigger_prototypes.php:177 triggers.php:168
+#: trigger_prototypes.php:177 triggers.php:166
 msgid "Cannot delete trigger"
 msgstr "هشدار نمی‌تواند حذف شود"
 
@@ -1463,7 +1495,7 @@ msgstr "هشدار نمی‌تواند حذف شود"
 msgid "Cannot delete trigger."
 msgstr "هشدار نمی‌تواند حذف شود"
 
-#: trigger_prototypes.php:287 triggers.php:355
+#: trigger_prototypes.php:287 triggers.php:353
 msgid "Cannot delete triggers"
 msgstr "هشدارها نمی‌توانند حذف شوند"
 
@@ -1863,7 +1895,7 @@ msgstr "سرویس نمی‌تواند بروز شود"
 msgid "Cannot update slide show"
 msgstr "نمایش اسلاید نمی‌تواند بروز شود"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:320
+#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
 msgid "Cannot update status"
 msgstr "وضعیت نمیتواند بروز شود"
 
@@ -1871,8 +1903,8 @@ msgstr "وضعیت نمیتواند بروز شود"
 msgid "Cannot update template"
 msgstr "قالب نمی تواند بروز شود"
 
-#: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:154
-#: triggers.php:205 tr_logform.php:112
+#: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
+#: triggers.php:203 tr_logform.php:112
 msgid "Cannot update trigger"
 msgstr "هشدار نمی‌تواند بروز شود"
 
@@ -2051,7 +2083,7 @@ msgstr "ساعت"
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.edit.php:208
 #: include/views/configuration.template.edit.php:435
-#: include/views/configuration.triggers.edit.php:303
+#: include/views/configuration.triggers.edit.php:302
 msgid "Clone"
 msgstr "کپی برداری"
 
@@ -2062,7 +2094,7 @@ msgstr "کپی برداری"
 msgid "Close"
 msgstr "بستن"
 
-#: include/views/configuration.triggers.edit.php:234
+#: include/views/configuration.triggers.edit.php:233
 msgid "Close expression constructor"
 msgstr "بستن عبارت سازنده"
 
@@ -2113,8 +2145,8 @@ msgstr "فرمان نمی تواند خالی باشد."
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:723
-#: include/views/configuration.action.edit.php:727 popup.php:1976
-#: popup.php:1983
+#: include/views/configuration.action.edit.php:727 popup.php:1980
+#: popup.php:1987
 msgid "Commands"
 msgstr "فرمان ها"
 
@@ -2400,7 +2432,7 @@ msgid "Could not save image!"
 msgstr "نتوانست تصویر را ذخیره کند."
 
 #: include/graphs.inc.php:84
-#: include/views/configuration.triggers.expression.php:92 popup_bitem.php:131
+#: include/views/configuration.triggers.expression.php:90 popup_bitem.php:131
 #: popup_trexpr.php:45
 msgid "Count"
 msgstr "تعداد"
@@ -2618,6 +2650,22 @@ msgstr ""
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
 
+#: popup_trexpr.php:345
+msgid "Current date is < N"
+msgstr ""
+
+#: popup_trexpr.php:353
+msgid "Current date is = N"
+msgstr ""
+
+#: popup_trexpr.php:349
+msgid "Current date is > N"
+msgstr ""
+
+#: popup_trexpr.php:357
+msgid "Current date is NOT N"
+msgstr ""
+
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
 msgid "Current host"
@@ -2626,6 +2674,22 @@ msgstr "هاست فعلی"
 #: include/page_header.php:363
 msgid "Current node"
 msgstr "گره فعلی"
+
+#: popup_trexpr.php:485
+msgid "Current time is < N"
+msgstr ""
+
+#: popup_trexpr.php:493
+msgid "Current time is = N"
+msgstr ""
+
+#: popup_trexpr.php:489
+msgid "Current time is > N"
+msgstr ""
+
+#: popup_trexpr.php:497
+msgid "Current time is NOT N"
+msgstr ""
 
 #: include/setup.inc.php:192
 msgid "Current value"
@@ -2841,10 +2905,42 @@ msgstr "روز"
 msgid "Day of month"
 msgstr "روز از ماه"
 
+#: popup_trexpr.php:377
+msgid "Day of month is < N"
+msgstr ""
+
+#: popup_trexpr.php:385
+msgid "Day of month is = N"
+msgstr ""
+
+#: popup_trexpr.php:381
+msgid "Day of month is > N"
+msgstr ""
+
+#: popup_trexpr.php:389
+msgid "Day of month is NOT N"
+msgstr ""
+
 #: include/forms.inc.php:1525 include/forms.inc.php:1582
 #: include/forms.inc.php:1606
 msgid "Day of week"
 msgstr "روز از هفته"
+
+#: popup_trexpr.php:361
+msgid "Day of week is < N"
+msgstr ""
+
+#: popup_trexpr.php:369
+msgid "Day of week is = N"
+msgstr ""
+
+#: popup_trexpr.php:365
+msgid "Day of week is > N"
+msgstr ""
+
+#: popup_trexpr.php:373
+msgid "Day of week is NOT N"
+msgstr ""
 
 #: include/forms.inc.php:1667 tr_status.php:208 tr_status.php:210
 msgid "Days"
@@ -3197,7 +3293,7 @@ msgstr ""
 msgid "Delete the selected service?"
 msgstr ""
 
-#: include/views/configuration.triggers.edit.php:305
+#: include/views/configuration.triggers.edit.php:304
 msgid "Delete trigger?"
 msgstr ""
 
@@ -3277,8 +3373,8 @@ msgid "Deny"
 msgstr "رد کردن"
 
 #: include/views/configuration.services.edit.php:261
-#: include/views/configuration.triggers.edit.php:285
-#: include/views/configuration.triggers.edit.php:294
+#: include/views/configuration.triggers.edit.php:284
+#: include/views/configuration.triggers.edit.php:293
 msgid "Dependencies"
 msgstr "وابستگی‌ها"
 
@@ -3288,7 +3384,7 @@ msgstr "وابسته"
 
 #: include/triggers.inc.php:1510
 #: include/views/configuration.services.edit.php:101
-#: include/views/configuration.triggers.list.php:140 popup.php:1029
+#: include/views/configuration.triggers.list.php:140 popup.php:1033
 #: tr_status.php:542
 msgid "Depends on"
 msgstr "وابسته به"
@@ -3307,7 +3403,7 @@ msgstr "وضعیت گسترش"
 #: include/views/configuration.item.massupdate.php:438
 #: include/views/configuration.maintenance.edit.php:76
 #: include/views/configuration.maintenance.list.php:47
-#: include/views/configuration.triggers.edit.php:244 popup.php:1343
+#: include/views/configuration.triggers.edit.php:243 popup.php:1347
 #: tr_logform.php:256
 msgid "Description"
 msgstr "توصیف"
@@ -3333,6 +3429,46 @@ msgstr "دستگاه"
 #: discoveryconf.php:42 include/views/configuration.discovery.edit.php:67
 msgid "Device uniqueness criteria"
 msgstr "ضابطه یکتایی دستگاه"
+
+#: popup_trexpr.php:155
+msgid "Difference between MAX and MIN value of a period T is < N"
+msgstr ""
+
+#: popup_trexpr.php:165
+msgid "Difference between MAX and MIN value of a period T is = N"
+msgstr ""
+
+#: popup_trexpr.php:160
+msgid "Difference between MAX and MIN value of a period T is > N"
+msgstr ""
+
+#: popup_trexpr.php:170
+msgid "Difference between MAX and MIN value of a period T is NOT N"
+msgstr ""
+
+#: popup_trexpr.php:211
+msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:215
+msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:175
+msgid "Difference between last and previous value of a period T is < N"
+msgstr ""
+
+#: popup_trexpr.php:183
+msgid "Difference between last and previous value of a period T is = N"
+msgstr ""
+
+#: popup_trexpr.php:179
+msgid "Difference between last and previous value of a period T is > N"
+msgstr ""
+
+#: popup_trexpr.php:187
+msgid "Difference between last and previous value of a period T is NOT N"
+msgstr ""
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3437,7 +3573,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:250
 #: include/views/configuration.triggers.list.php:189
 #: include/views/js/configuration.sysmaps.js.php:139
-#: include/views/monitoring.overview.php:40 popup_media.php:137 popup.php:1040
+#: include/views/monitoring.overview.php:40 popup_media.php:137 popup.php:1044
 #: tr_logform.php:370
 msgid "Disabled"
 msgstr "غیرفعال‌شده"
@@ -3944,9 +4080,9 @@ msgstr ""
 #: include/views/configuration.discovery.edit.php:71
 #: include/views/configuration.item.edit.php:432
 #: include/views/configuration.item.list.php:149
-#: include/views/configuration.triggers.edit.php:255
+#: include/views/configuration.triggers.edit.php:254
 #: include/views/configuration.triggers.list.php:192
-#: include/views/monitoring.overview.php:44 popup_media.php:136 popup.php:1043
+#: include/views/monitoring.overview.php:44 popup_media.php:136 popup.php:1047
 msgid "Enabled"
 msgstr "فعال‌شده"
 
@@ -4014,6 +4150,14 @@ msgstr "رویداد"
 #: include/classes/screens/CScreenHistory.php:167
 msgid "Event ID"
 msgstr "شناسه‌ی رویداد"
+
+#: popup_trexpr.php:423
+msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:428
+msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
+msgstr ""
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
@@ -4083,8 +4227,8 @@ msgstr ""
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
 #: include/views/configuration.action.edit.php:664
-#: include/views/js/configuration.action.edit.js.php:114 popup.php:1975
-#: popup.php:1982
+#: include/views/js/configuration.action.edit.js.php:114 popup.php:1979
+#: popup.php:1986
 msgid "Execute on"
 msgstr "اجرا روی"
 
@@ -4118,7 +4262,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr ""
 
-#: include/graphs.inc.php:27 popup.php:1418
+#: include/graphs.inc.php:27 popup.php:1422
 msgid "Exploded"
 msgstr "گسترش یافته"
 
@@ -4137,8 +4281,8 @@ msgstr "صدور به CSV"
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
 #: include/views/configuration.triggers.edit.php:145
-#: include/views/configuration.triggers.list.php:96 tr_logform.php:295
-#: tr_logform.php:303 tr_testexpr.php:129
+#: include/views/configuration.triggers.list.php:96 triggers.php:48
+#: tr_logform.php:295 tr_logform.php:303 tr_testexpr.php:129
 msgid "Expression"
 msgstr "عبارت"
 
@@ -4290,6 +4434,14 @@ msgstr "فیلتر با گروه هاست "
 msgid "Filter by name"
 msgstr "فیلتر بر اساس نام"
 
+#: popup_trexpr.php:295
+msgid "Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:300
+msgid "Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
+msgstr ""
+
 #: include/setup.inc.php:130
 msgid "Finish"
 msgstr "پایان"
@@ -4380,7 +4532,7 @@ msgid "Fullscreen"
 msgstr "تمام‌صفحه"
 
 #: include/views/configuration.graph.edit.php:71
-#: include/views/configuration.triggers.expression.php:68 popup_bitem.php:133
+#: include/views/configuration.triggers.expression.php:66 popup_bitem.php:133
 msgid "Function"
 msgstr "تابع"
 
@@ -4594,7 +4746,7 @@ msgid "Graph sum"
 msgstr "مجموع گراف"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:78 popup.php:1344 popup.php:1350
+#: include/views/configuration.graph.list.php:78 popup.php:1348 popup.php:1354
 msgid "Graph type"
 msgstr "نوع گراف"
 
@@ -4910,8 +5062,8 @@ msgstr "ردیف کردن افقی"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:88 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:138 latest.php:125 latest.php:191
-#: popup.php:478 popup.php:515 popup.php:1088 popup.php:1284 popup.php:1489
-#: popup.php:1497 popup.php:1627 queue.php:249 report2.php:225 report5.php:60
+#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1288 popup.php:1493
+#: popup.php:1501 popup.php:1631 queue.php:249 report2.php:225 report5.php:60
 #: tr_status.php:174 tr_status.php:293
 msgid "Host"
 msgstr "هاست"
@@ -6192,7 +6344,7 @@ msgstr "اطلاعات"
 msgid "Information"
 msgstr "اطلاعات"
 
-#: include/views/configuration.triggers.expression.php:126
+#: include/views/configuration.triggers.expression.php:124
 msgid "Insert"
 msgstr "درج"
 
@@ -6625,7 +6777,7 @@ msgstr "نگهداری روندها (روز)"
 #: include/views/configuration.item.list.php:57
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/js/configuration.discovery.edit.js.php:235 items.php:75
-#: popup.php:953 popup.php:1091 popup.php:1200 popup.php:1209 popup.php:1629
+#: popup.php:955 popup.php:1095 popup.php:1204 popup.php:1213 popup.php:1633
 msgid "Key"
 msgstr "کلید"
 
@@ -6722,6 +6874,22 @@ msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
 msgstr[0] "%1$d پیامد اخیر"
 
+#: popup_trexpr.php:219
+msgid "Last (most recent) T value is < N"
+msgstr ""
+
+#: popup_trexpr.php:229
+msgid "Last (most recent) T value is = N"
+msgstr ""
+
+#: popup_trexpr.php:224
+msgid "Last (most recent) T value is > N"
+msgstr ""
+
+#: popup_trexpr.php:234
+msgid "Last (most recent) T value is NOT N"
+msgstr ""
+
 #: srv_status.php:87
 msgid "Last 24 hours"
 msgstr "24 ساعت گذشته"
@@ -6808,6 +6976,22 @@ msgstr "چپ"
 #: include/reports.inc.php:521
 msgid "Legend"
 msgstr "فهرست"
+
+#: popup_trexpr.php:305
+msgid "Length of last (most recent) T value in characters is < N"
+msgstr ""
+
+#: popup_trexpr.php:315
+msgid "Length of last (most recent) T value in characters is = N"
+msgstr ""
+
+#: popup_trexpr.php:310
+msgid "Length of last (most recent) T value in characters is > N"
+msgstr ""
+
+#: popup_trexpr.php:320
+msgid "Length of last (most recent) T value in characters is NOT N"
+msgstr ""
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:333
 #: include/views/js/configuration.sysmaps.js.php:409
@@ -6911,6 +7095,38 @@ msgstr "طول جغرافیایی"
 #: include/views/configuration.item.massupdate.php:161
 msgid "Log"
 msgstr "ثبت وقایع"
+
+#: popup_trexpr.php:433
+msgid "Log severity of the last log entry is < N"
+msgstr ""
+
+#: popup_trexpr.php:441
+msgid "Log severity of the last log entry is = N"
+msgstr ""
+
+#: popup_trexpr.php:437
+msgid "Log severity of the last log entry is > N"
+msgstr ""
+
+#: popup_trexpr.php:445
+msgid "Log severity of the last log entry is NOT N"
+msgstr ""
+
+#: popup_trexpr.php:449
+msgid "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:459
+msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:454
+msgid "Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:464
+msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.massupdate.php:365
@@ -7269,6 +7485,22 @@ msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
 
+#: popup_trexpr.php:239
+msgid "Maximum value for period of time is T < N"
+msgstr ""
+
+#: popup_trexpr.php:249
+msgid "Maximum value for period of time is T = N"
+msgstr ""
+
+#: popup_trexpr.php:244
+msgid "Maximum value for period of time is T > N"
+msgstr ""
+
+#: popup_trexpr.php:254
+msgid "Maximum value for period of time is T NOT N"
+msgstr ""
+
 #: api/classes/CHost.php:1371
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
@@ -7440,6 +7672,22 @@ msgstr ""
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")"
 msgstr ""
 
+#: popup_trexpr.php:259
+msgid "Minimum value for period of time is T < N"
+msgstr ""
+
+#: popup_trexpr.php:269
+msgid "Minimum value for period of time is T = N"
+msgstr ""
+
+#: popup_trexpr.php:264
+msgid "Minimum value for period of time is T > N"
+msgstr ""
+
+#: popup_trexpr.php:274
+msgid "Minimum value for period of time is T NOT N"
+msgstr ""
+
 #: include/forms.inc.php:1671
 msgid "Minutes"
 msgstr "دقیقه"
@@ -7543,7 +7791,7 @@ msgstr ""
 msgid "Multiple PROBLEM events"
 msgstr "رویدادهای مشکلات چندگانه"
 
-#: include/views/configuration.triggers.edit.php:243
+#: include/views/configuration.triggers.edit.php:242
 msgid "Multiple PROBLEM events generation"
 msgstr "تولید وقایع مشکلات چندگانه"
 
@@ -7619,18 +7867,18 @@ msgstr "احراز هویت NTLM"
 #: include/views/configuration.sysmap.edit.php:45
 #: include/views/configuration.sysmap.edit.php:151
 #: include/views/configuration.triggers.edit.php:61
-#: include/views/configuration.triggers.edit.php:272
+#: include/views/configuration.triggers.edit.php:271
 #: include/views/configuration.triggers.list.php:95
 #: include/views/configuration.triggers.massupdate.php:78
 #: include/views/js/configuration.sysmaps.js.php:167 items.php:73
 #: latest.php:192 maintenance.php:45 maintenance.php:131 maintenance.php:156
 #: popup_httpstep.php:36 popup.php:544 popup.php:633 popup.php:681
-#: popup.php:742 popup.php:794 popup.php:839 popup.php:898 popup.php:953
-#: popup.php:976 popup.php:1090 popup.php:1199 popup.php:1208 popup.php:1285
-#: popup.php:1320 popup.php:1349 popup.php:1490 popup.php:1498 popup.php:1561
-#: popup.php:1564 popup.php:1628 popup.php:1689 popup.php:1692 popup.php:1749
-#: popup.php:1753 popup.php:1804 popup.php:1835 popup.php:1866 popup.php:1906
-#: popup.php:1922 popup.php:1945 popup.php:1974 popup.php:1981
+#: popup.php:742 popup.php:794 popup.php:839 popup.php:898 popup.php:955
+#: popup.php:978 popup.php:1094 popup.php:1203 popup.php:1212 popup.php:1289
+#: popup.php:1324 popup.php:1353 popup.php:1494 popup.php:1502 popup.php:1565
+#: popup.php:1568 popup.php:1632 popup.php:1693 popup.php:1696 popup.php:1753
+#: popup.php:1757 popup.php:1808 popup.php:1839 popup.php:1870 popup.php:1910
+#: popup.php:1926 popup.php:1949 popup.php:1978 popup.php:1985
 #: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:226
 #: screenconf.php:50 services.php:43 slideconf.php:39 sysmaps.php:48
 #: sysmaps.php:265 trigger_prototypes.php:41 triggers.php:41 tr_status.php:294
@@ -7783,7 +8031,7 @@ msgstr ""
 msgid "No application with ID \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.application.list.php:50 popup.php:1282
+#: include/views/configuration.application.list.php:50 popup.php:1286
 msgid "No applications defined."
 msgstr ""
 
@@ -7828,13 +8076,21 @@ msgstr "هیچ شرطی تعریف نشده است"
 msgid "No data defined."
 msgstr ""
 
+#: popup_trexpr.php:501
+msgid "No data received during period of time T, if N = 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:506
+msgid "No data received during period of time T, if N NOT 1, 0 - otherwise"
+msgstr ""
+
 #: api/classes/CHostInterface.php:1007
 #, php-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr ""
 
 #: include/views/configuration.services.edit.php:75
-#: include/views/configuration.triggers.edit.php:269
+#: include/views/configuration.triggers.edit.php:268
 #: include/views/configuration.triggers.massupdate.php:74
 msgid "No dependencies defined."
 msgstr ""
@@ -7848,7 +8104,7 @@ msgstr "بدون جزئیات"
 msgid "No discoveries defined."
 msgstr ""
 
-#: popup.php:1921
+#: popup.php:1925
 msgid "No discovery checks defined."
 msgstr ""
 
@@ -7857,7 +8113,7 @@ msgid "No discovery rule IDs given."
 msgstr ""
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:43 popup.php:1905
+#: include/views/configuration.host.discovery.list.php:43 popup.php:1909
 msgid "No discovery rules defined."
 msgstr ""
 
@@ -7911,7 +8167,7 @@ msgstr ""
 #: chart2.php:47 chart6.php:49 include/classes/screens/CScreenChart.php:97
 #: include/classes/screens/CScreenHistory.php:310
 #: include/views/configuration.graph.list.php:71
-#: include/views/monitoring.charts.php:68 popup.php:1339
+#: include/views/monitoring.charts.php:68 popup.php:1343
 msgid "No graphs defined."
 msgstr "نمودار تعریف نشده"
 
@@ -7952,7 +8208,7 @@ msgid "No host group ID provided for screen element."
 msgstr ""
 
 #: include/views/configuration.hostgroups.list.php:47 popup.php:678
-#: popup.php:1834 popup.php:1865
+#: popup.php:1838 popup.php:1869
 msgid "No host groups defined."
 msgstr ""
 
@@ -8026,7 +8282,7 @@ msgstr ""
 msgid "No item ID provided for screen element."
 msgstr ""
 
-#: popup.php:1195
+#: popup.php:1199
 msgid "No item prototypes defined."
 msgstr ""
 
@@ -8042,8 +8298,8 @@ msgstr ""
 
 #: chart.php:46 include/items.inc.php:654
 #: include/views/configuration.graph.edit.php:62
-#: include/views/configuration.item.list.php:50 popup.php:952 popup.php:1085
-#: popup.php:1450 popup.php:1625
+#: include/views/configuration.item.list.php:50 popup.php:954 popup.php:1089
+#: popup.php:1454 popup.php:1629
 msgid "No items defined."
 msgstr ""
 
@@ -8063,7 +8319,7 @@ msgstr "هیچ بازه نگه داری تعریف نشده است"
 msgid "No map ID provided for screen element."
 msgstr ""
 
-#: include/views/monitoring.maps.php:27 popup.php:1558 sysmaps.php:262
+#: include/views/monitoring.maps.php:27 popup.php:1562 sysmaps.php:262
 msgid "No maps defined."
 msgstr ""
 
@@ -8075,7 +8331,7 @@ msgstr ""
 msgid "No media types defined."
 msgstr ""
 
-#: include/views/administration.node.list.php:39 popup.php:1319
+#: include/views/administration.node.list.php:39 popup.php:1323
 msgid "No nodes defined."
 msgstr ""
 
@@ -8186,7 +8442,7 @@ msgstr ""
 msgid "No private key file specified."
 msgstr ""
 
-#: include/views/administration.proxy.list.php:42 popup.php:1944
+#: include/views/administration.proxy.list.php:42 popup.php:1948
 msgid "No proxies defined."
 msgstr "پروکسی تعریف نشده است"
 
@@ -8226,7 +8482,7 @@ msgstr ""
 #: include/classes/screens/CScreenBuilder.php:263
 #: include/views/configuration.screen.list.php:46
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:37 popup.php:1745 popup.php:1803
+#: include/views/monitoring.screen.php:37 popup.php:1749 popup.php:1807
 msgid "No screens defined."
 msgstr ""
 
@@ -8234,7 +8490,7 @@ msgstr ""
 msgid "No script specified for action operation command."
 msgstr ""
 
-#: include/views/administration.script.list.php:34 popup.php:1970
+#: include/views/administration.script.list.php:34 popup.php:1974
 msgid "No scripts defined."
 msgstr ""
 
@@ -8244,7 +8500,7 @@ msgid "No slide shows defined."
 msgstr "هیچ نمایش اسلایدی تعریف نشده است"
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:122 popup.php:1686
+#: include/views/monitoring.slides.php:122 popup.php:1690
 msgid "No slides defined."
 msgstr ""
 
@@ -8252,7 +8508,7 @@ msgstr ""
 msgid "No steps defined."
 msgstr ""
 
-#: triggers.php:350
+#: triggers.php:348
 msgid "No target selected"
 msgstr "هدف انتخاب نشده"
 
@@ -8279,7 +8535,7 @@ msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
 #: chart4.php:40 include/triggers.inc.php:1329
-#: include/views/configuration.triggers.list.php:90 popup.php:972
+#: include/views/configuration.triggers.list.php:90 popup.php:974
 #: report2.php:222 tr_comments.php:43 tr_status.php:268
 msgid "No triggers defined."
 msgstr ""
@@ -8363,7 +8619,7 @@ msgstr "گره ها"
 msgid "None"
 msgstr "هیچکدام"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1783 popup.php:1421
+#: include/graphs.inc.php:24 include/triggers.inc.php:1783 popup.php:1425
 msgid "Normal"
 msgstr "عادی"
 
@@ -8466,6 +8722,22 @@ msgstr "تعداد هاست ها ( مانیتور شده / مانیتور نشد
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "تعداد آیتم ها ( مانیتور شده / غیرفعال / عدم پشتیبانی)"
 
+#: popup_trexpr.php:469
+msgid "Number of seconds since the Epoch is < N"
+msgstr ""
+
+#: popup_trexpr.php:477
+msgid "Number of seconds since the Epoch is = N"
+msgstr ""
+
+#: popup_trexpr.php:473
+msgid "Number of seconds since the Epoch is > N"
+msgstr ""
+
+#: popup_trexpr.php:481
+msgid "Number of seconds since the Epoch is NOT N"
+msgstr ""
+
 #: report5.php:63
 msgid "Number of status changes"
 msgstr "تعداد حالت‌های تغییر یافته"
@@ -8473,6 +8745,22 @@ msgstr "تعداد حالت‌های تغییر یافته"
 #: httpmon.php:144 include/views/configuration.httpconf.list.php:69
 msgid "Number of steps"
 msgstr "تعداد مراحل"
+
+#: popup_trexpr.php:196
+msgid "Number of successfully retrieved values V of a period T is < N"
+msgstr ""
+
+#: popup_trexpr.php:201
+msgid "Number of successfully retrieved values V of a period T is = N"
+msgstr ""
+
+#: popup_trexpr.php:191
+msgid "Number of successfully retrieved values V of a period T is > N"
+msgstr ""
+
+#: popup_trexpr.php:206
+msgid "Number of successfully retrieved values V of a period T is NOT N"
+msgstr ""
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9166,7 +9454,7 @@ msgstr "فارسی"
 msgid "Peta"
 msgstr ""
 
-#: include/graphs.inc.php:26 popup.php:1415
+#: include/graphs.inc.php:26 popup.php:1419
 msgid "Pie"
 msgstr "دایره ای"
 
@@ -9259,6 +9547,22 @@ msgstr "قبلی"
 #: include/func.inc.php:1647
 msgctxt "page navigation"
 msgid "Previous"
+msgstr ""
+
+#: popup_trexpr.php:279
+msgid "Previous value is < N"
+msgstr ""
+
+#: popup_trexpr.php:287
+msgid "Previous value is = N"
+msgstr ""
+
+#: popup_trexpr.php:283
+msgid "Previous value is > N"
+msgstr ""
+
+#: popup_trexpr.php:291
+msgid "Previous value is NOT N"
 msgstr ""
 
 #: include/hosts.inc.php:405
@@ -9517,6 +9821,22 @@ msgstr "عبارت منظم"
 msgid "Regular expression \"%s\" already exists."
 msgstr ""
 
+#: popup_trexpr.php:403
+msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:413
+msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
+msgstr ""
+
+#: popup_trexpr.php:408
+msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:418
+msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
+msgstr ""
+
 #: adm.regexps.php:83
 msgid "Regular expression added"
 msgstr ""
@@ -9571,7 +9891,7 @@ msgstr "فرمان راه دور"
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/configuration.sysmap.edit.php:161
 #: include/views/configuration.sysmap.edit.php:179
-#: include/views/configuration.triggers.edit.php:279
+#: include/views/configuration.triggers.edit.php:278
 #: include/views/configuration.triggers.massupdate.php:87
 #: include/views/js/administration.general.valuemapping.edit.js.php:14
 #: include/views/js/common.macros.js.php:14
@@ -10097,7 +10417,7 @@ msgstr "شنبه"
 #: include/views/configuration.slideconf.edit.php:112
 #: include/views/configuration.sysmap.edit.php:205
 #: include/views/configuration.template.edit.php:432
-#: include/views/configuration.triggers.edit.php:313
+#: include/views/configuration.triggers.edit.php:312
 #: include/views/configuration.triggers.massupdate.php:124 popup_bitem.php:150
 #: popup_media.php:141 sysmap.php:180 tr_comments.php:93 tr_logform.php:371
 msgid "Save"
@@ -10354,9 +10674,9 @@ msgid "Secondary POC screen name"
 msgstr ""
 
 #: include/views/administration.users.edit.php:180
-#: include/views/configuration.triggers.expression.php:88
-#: include/views/configuration.triggers.expression.php:97
-#: include/views/configuration.triggers.expression.php:101 popup_trexpr.php:44
+#: include/views/configuration.triggers.expression.php:86
+#: include/views/configuration.triggers.expression.php:95
+#: include/views/configuration.triggers.expression.php:99 popup_trexpr.php:44
 msgid "Seconds"
 msgstr "ثانیه"
 
@@ -10403,9 +10723,9 @@ msgstr "ثانیه"
 #: include/views/js/configuration.sysmaps.js.php:89
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/js/configuration.sysmaps.js.php:104 popup_bitem.php:119
-#: popup.php:652 popup.php:722 popup.php:779 popup.php:876 popup.php:938
-#: popup.php:1067 popup.php:1177 popup.php:1266 popup.php:1432 popup.php:1540
-#: popup.php:1611 popup.php:1725 popup.php:1787 popup.php:2042
+#: popup.php:652 popup.php:722 popup.php:779 popup.php:876 popup.php:940
+#: popup.php:1071 popup.php:1181 popup.php:1270 popup.php:1436 popup.php:1544
+#: popup.php:1615 popup.php:1729 popup.php:1791 popup.php:2046
 #: popup_right.php:109 popup_usrgrp.php:102 tr_logform.php:274
 msgid "Select"
 msgstr "انتخاب"
@@ -10497,7 +10817,7 @@ msgstr ""
 msgid "Serial number B"
 msgstr ""
 
-#: include/views/administration.script.list.php:67 popup.php:2027
+#: include/views/administration.script.list.php:67 popup.php:2031
 #: queue.php:186
 msgid "Server"
 msgstr "سرور"
@@ -10581,9 +10901,9 @@ msgstr "جلسه پایان یافت ، لطفاً دوباره وارد شوی�
 #: events.php:564 events.php:577 include/classes/screens/CScreenEvents.php:48
 #: include/classes/screens/CScreenHistory.php:166
 #: include/triggers.inc.php:1781 include/views/configuration.item.list.php:109
-#: include/views/configuration.triggers.edit.php:246
+#: include/views/configuration.triggers.edit.php:245
 #: include/views/configuration.triggers.list.php:93
-#: include/views/configuration.triggers.massupdate.php:65 popup.php:977
+#: include/views/configuration.triggers.massupdate.php:65 popup.php:979
 #: report5.php:62 tr_logform.php:367 tr_status.php:285
 msgid "Severity"
 msgstr "جدیت"
@@ -10888,7 +11208,7 @@ msgstr ""
 msgid "Speed"
 msgstr "سرعت"
 
-#: include/graphs.inc.php:25 popup.php:1412
+#: include/graphs.inc.php:25 popup.php:1416
 msgid "Stacked"
 msgstr "پشته‌ای"
 
@@ -10928,8 +11248,8 @@ msgstr "حالت"
 #: include/views/configuration.item.massupdate.php:355
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.triggers.list.php:97 popup_media.php:138
-#: popup.php:544 popup.php:978 popup.php:1094 popup.php:1203 popup.php:1212
-#: popup.php:1632 srv_status.php:161 tr_status.php:286
+#: popup.php:544 popup.php:980 popup.php:1098 popup.php:1207 popup.php:1216
+#: popup.php:1636 srv_status.php:161 tr_status.php:286
 msgid "Status"
 msgstr "وضعیت"
 
@@ -10984,7 +11304,7 @@ msgstr "وضعیت هشدار ها"
 msgid "Status only"
 msgstr "فقط وضعیت"
 
-#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:320
+#: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
 msgid "Status updated"
 msgstr ""
 
@@ -11059,6 +11379,22 @@ msgstr "زیر نقشه"
 #: include/items.inc.php:39
 msgid "Success Audit"
 msgstr "رسیدگی موفق"
+
+#: popup_trexpr.php:325
+msgid "Sum of values for period of time is T < N"
+msgstr ""
+
+#: popup_trexpr.php:340
+msgid "Sum of values for period of time is T NOT N"
+msgstr ""
+
+#: popup_trexpr.php:335
+msgid "Sum of values of a period T is = N"
+msgstr ""
+
+#: popup_trexpr.php:330
+msgid "Sum of values of a period T is > N"
+msgstr ""
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11445,6 +11781,14 @@ msgstr "زمان انقضا"
 msgid "Timestamp"
 msgstr "مهر زمان"
 
+#: popup_trexpr.php:393
+msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
+msgstr ""
+
+#: popup_trexpr.php:398
+msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
+msgstr ""
+
 #: include/reports.inc.php:206 include/reports.inc.php:368
 #: include/reports.inc.php:517
 msgid "Title"
@@ -11513,7 +11857,7 @@ msgstr "روندها"
 #: include/views/configuration.services.edit.php:65
 #: include/views/configuration.services.edit.php:78
 #: include/views/configuration.services.parent.list.php:36
-#: include/views/configuration.triggers.edit.php:262
+#: include/views/configuration.triggers.edit.php:261
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:140
 #: report5.php:61 services.php:410 tr_comments.php:69 tr_logform.php:151
@@ -11553,7 +11897,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: trigger_prototypes.php:168 triggers.php:158 triggers.php:346
+#: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
 #: tr_logform.php:147
 msgid "Trigger added"
 msgstr ""
@@ -11566,7 +11910,7 @@ msgstr ""
 msgid "Trigger comments"
 msgstr "توضیحات هشدار"
 
-#: trigger_prototypes.php:177 triggers.php:168
+#: trigger_prototypes.php:177 triggers.php:166
 msgid "Trigger deleted"
 msgstr ""
 
@@ -11579,7 +11923,7 @@ msgstr ""
 msgid "Trigger displaying options"
 msgstr "نمایش گزبنه های هشدار"
 
-#: include/views/configuration.triggers.expression.php:122
+#: include/views/configuration.triggers.expression.php:120
 msgid "Trigger expression condition"
 msgstr "عبارت شرط هشدار"
 
@@ -11641,12 +11985,12 @@ msgstr "جدیت هشدارها"
 msgid "Trigger severity"
 msgstr "جدیت هشدار"
 
-#: triggers.php:290
+#: triggers.php:288
 msgid "Trigger status became \"Disabled\"."
 msgstr "وضعیت هشدار \"غیرفعال\" شد."
 
-#: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:154
-#: triggers.php:205 tr_logform.php:112
+#: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
+#: triggers.php:203 tr_logform.php:112
 msgid "Trigger updated"
 msgstr ""
 
@@ -11677,7 +12021,7 @@ msgstr "هشدارها"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "هشدار ها (ف/غ-ف) [مشکل/ناشناخته/صحیح]"
 
-#: trigger_prototypes.php:287 triggers.php:355
+#: trigger_prototypes.php:287 triggers.php:353
 msgid "Triggers deleted"
 msgstr ""
 
@@ -11759,8 +12103,8 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:12
 #: include/views/js/configuration.sysmaps.js.php:355
 #: include/views/monitoring.overview.php:32 popup_media.php:121 popup.php:512
-#: popup.php:1092 popup.php:1201 popup.php:1210 popup.php:1491 popup.php:1499
-#: popup.php:1630 tr_logform.php:299 tr_logform.php:303
+#: popup.php:1096 popup.php:1205 popup.php:1214 popup.php:1495 popup.php:1503
+#: popup.php:1634 tr_logform.php:299 tr_logform.php:303
 msgid "Type"
 msgstr "نوع"
 
@@ -11788,8 +12132,8 @@ msgstr "نوع محاسبات"
 #: include/forms.inc.php:496 include/forms.inc.php:831
 #: include/views/configuration.item.edit.php:209
 #: include/views/configuration.item.edit.php:220
-#: include/views/configuration.item.massupdate.php:165 popup.php:1093
-#: popup.php:1202 popup.php:1211 popup.php:1492 popup.php:1500 popup.php:1631
+#: include/views/configuration.item.massupdate.php:165 popup.php:1097
+#: popup.php:1206 popup.php:1215 popup.php:1496 popup.php:1504 popup.php:1635
 msgid "Type of information"
 msgstr "نوع اطلاعات"
 
@@ -11816,7 +12160,7 @@ msgstr "بالا"
 #: include/views/configuration.httpconf.edit.php:132
 #: include/views/configuration.httpconf.popup.php:60
 #: include/views/configuration.sysmap.edit.php:151
-#: include/views/configuration.triggers.edit.php:245
+#: include/views/configuration.triggers.edit.php:244
 #: include/views/js/configuration.sysmaps.js.php:168 popup_httpstep.php:37
 #: tr_logform.php:369 tr_status.php:519
 msgid "URL"
