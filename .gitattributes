@@ -7,8 +7,6 @@ bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
 create/src/data.tmpl -text
-frontends/php/api/classes/CTemplateScreenItem.php -text
-frontends/php/api/classes/managers/CApplicationManager.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -98,6 +96,10 @@ frontends/php/images/general/sort_up.png -text
 frontends/php/images/general/sort_up_blue.png -text
 frontends/php/images/general/sort_up_od.png -text
 frontends/php/images/general/tick.png -text
+frontends/php/images/general/tr_space.gif -text
+frontends/php/images/general/tr_top_bottom.gif -text
+frontends/php/images/general/tr_top_right.gif -text
+frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/transparent.png -text
 frontends/php/images/general/tree/minus.gif -text
 frontends/php/images/general/tree/plus.gif -text
@@ -164,40 +166,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/db/Db2DbBackend.php -text
-frontends/php/include/classes/db/DbBackend.php -text
-frontends/php/include/classes/db/MysqlDbBackend.php -text
-frontends/php/include/classes/db/OracleDbBackend.php -text
-frontends/php/include/classes/db/PostgresqlDbBackend.php -text
-frontends/php/include/classes/db/SqliteDbBackend.php -text
-frontends/php/include/classes/screens/CScreenActions.php -text
-frontends/php/include/classes/screens/CScreenBase.php -text
-frontends/php/include/classes/screens/CScreenBuilder.php -text
-frontends/php/include/classes/screens/CScreenChart.php -text
-frontends/php/include/classes/screens/CScreenClock.php -text
-frontends/php/include/classes/screens/CScreenDataOverview.php -text
-frontends/php/include/classes/screens/CScreenEvents.php -text
-frontends/php/include/classes/screens/CScreenGraph.php -text
-frontends/php/include/classes/screens/CScreenHistory.php -text
-frontends/php/include/classes/screens/CScreenHostTriggers.php -text
-frontends/php/include/classes/screens/CScreenHostgroupTriggers.php -text
-frontends/php/include/classes/screens/CScreenHostsInfo.php -text
-frontends/php/include/classes/screens/CScreenMap.php -text
-frontends/php/include/classes/screens/CScreenPlainText.php -text
-frontends/php/include/classes/screens/CScreenScreen.php -text
-frontends/php/include/classes/screens/CScreenServerInfo.php -text
-frontends/php/include/classes/screens/CScreenSimpleGraph.php -text
-frontends/php/include/classes/screens/CScreenSystemStatus.php -text
-frontends/php/include/classes/screens/CScreenTriggersInfo.php -text
-frontends/php/include/classes/screens/CScreenTriggersOverview.php -text
-frontends/php/include/classes/screens/CScreenUrl.php -text
-frontends/php/include/classes/validators/CColorValidator.php -text
-frontends/php/include/views/js/monitoring.history.js.php -text
-frontends/php/include/views/monitoring.charts.php -text
-frontends/php/include/views/monitoring.history.php -text
-frontends/php/include/views/monitoring.hostscreen.php -text
-frontends/php/include/views/monitoring.maps.php -text
-frontends/php/include/views/monitoring.overview.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
@@ -205,8 +173,11 @@ frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/el/LC_MESSAGES/frontend.po -text
 frontends/php/locale/en_US/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text
+frontends/php/locale/fa/LC_MESSAGES/frontend.po -text
+frontends/php/locale/fi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/fr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
+frontends/php/locale/id/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ja/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text

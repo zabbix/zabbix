@@ -2,8 +2,8 @@ Changes for 2.1.0
 
 New features:
 A.F..I..S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
+..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
-..F....... [ZBX-875] fixed duplicate Y-scale (Oleg)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
 ..F....... [ZBX-5180] maintenance periods form redesign (Vedmak)
@@ -11,6 +11,10 @@ A.F..I..S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3396] added error message if FreeType support is missing (Toms)
+...G...... [ZBX-4355] fixed response on check inodes on file systems not supporting them (Sasha)
+..F....... [ZBX-5673] fixed incorrect Y-scale if point value > 10 PB (Oleg)
+..F....... [ZBX-875] fixed duplicate Y-scale (Oleg)
 ..F....... [ZBX-3934] unified color codes validation in frontend (Vedmak)
 A......... [ZBX-3684] fixed template.get method returns excessive 'hostid' field (Vedmak)
 A......... [ZBX-5498] improved performance of template linkage operations in API (Vedmak)
@@ -23,6 +27,73 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.4rc1
+
+New features:
+A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
+..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
+.......PS. [ZBX-4638] added support of {HOST.HOST}, {HOST.NAME}, {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in "params" field for SSH, Telnet and DB monitor items (Sasha)
+.....J.... [ZBX-4663] added possibility to use dots in JMX attribute names (dimir)
+..F....... [ZBX-5556] action recovery message body can now be empty (Vedmak)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, French, Hungarian, Italian, Polish, Slovak and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBXNEXT-1426] added initial Persian translation (Richlv)
+A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
+........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
+
+Bug fixes:
+...G...... [ZBX-5661] fixed keys "vfs.dev.read" and "vfs.dev.write" with "ops" and "sps" parameters on Linux and FreeBSD (Andris)
+...G...... [ZBX-5614] fixed agent compiling problem on OpenBSD 5.1 (Andris)
+........S. [ZBX-5674] fixed execution of actions with SSH commands with "Public key" autentication (Sasha)
+A......... [ZBX-5656] fixed timeperiod validation (Eduard)
+..F....... [ZBX-5660] fixed expression constructor exp labels style (Eduard)
+..F....... [ZBX-3204] changed generating and reading algorithm for trigger expression condition functions, and fixed English translation (Oleg)
+..F....... [ZBX-5677] fixed param field 3 manipulation in trigger popup (Eduard)
+A......... [ZBX-5648] disallowed changing "templateid" in items, or creating new item with a predefined "templateid" (Oleg)
+..F....... [ZBX-5644] fixed triggers with spaces in the expression missing from the graph legend (Oleg)
+........S. [ZBX-5652] fixed resolving of a {ITEM.NAME} macro in notification messages (Sasha)
+........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
+A.F....... [ZBX-3920] added check for duplicate dependencies (Oleg)
+..F....... [ZBX-5636] fixed empty acknowledge block in event details if event has no acknowledgments (Vedmak)
+...G...... [ZBX-5571] fixed reporting of system.sw.packages for multiple package systems (Andris)
+...G...... [ZBX-5559] fixed reporting of system.sw.packages with short package listing (Andris)
+..F....... [ZBX-5280] fixed functional macros for newly created items returning 0 instead of 'no data' (Toms)
+..F....... [ZBX-5280] fixed HOST.DNS macro priorities when only JMX and IPMI interfaces are used in host (Toms)
+..F....... [ZBX-5280] fixed HOST.DNS macro not using default DNS from host interface configuration (Toms)
+..F....... [ZBX-5280] added HOST.HOST macro support in map labels for trigger items (Toms)
+A......... [ZBX-4097] changed the "application", "host" and "group" parameters for item.get, trigger.get and triggerprototype.get to be case sensitive (Pavels)
+A.F....... [ZBX-1946] fixed being able to create screen items with spans exceeding the size of the screen (Pavels)
+A.F....... [ZBX-5619] fixed errors when importing a template with an empty screen (Oleg)
+..F....... [ZBX-3803] added PHP session auto start check in frontend setup (Oleg)
+..F....... [ZBX-5621] fixed custom trigger severity displaying in user media configuration (Oleg)
+..F....... [ZBX-5617] fixed class bug in trigger expression condition (Oleg)
+A.F....... [ZBX-5046] fixed an error when deleting a globalmacro when the macro doesn't exist (Oleg)
+..F....... [ZBX-5595] fixed "housekeeper" table getting entries when deleting a discovery rule or an item prototype (Oleg)
+..F....... [ZBX-5596] fixed login form input field width (Oleg)
+..F....... [ZBX-5629] fixed JavaScript error if user media contains doublequote (Oleg)
+..F....... [ZBX-5580] fixed graph grid for negative values (Oleg)
+..F....... [ZBX-1825] fixed clickable text in popup menu headers (Oleg)
+.D........ [ZBX-5582] clarified StartTrappers parameter in the server and proxy configuration files (Richlv)
+..F....... [ZBX-4833] fixed screens not being cloned upon a full template clone (Vedmak)
+..F....... [ZBX-5547] fixed server name and other parameters in frontend setup not being escaped (Vedmak)
+..F....... [ZBX-3347] fixed error when creating an item with a new application that already exists (Vedmak)
+A......... [ZBX-3907] fixed API user.logout method (Vedmak)
+..F....... [ZBX-4983] fixed importing of 1.8 templates if they contain already existing host macros (Vedmak)
+..F....... [ZBX-5579] fixed displaying 'Acknowledged' in Monitoring -> Triggers when a trigger has no events by displaying 'No events' instead (Vedmak)
+..F....... [ZBX-4247] fixed error when trigger expression items have same trigger expression like parameter in key (Vedmak)
+..F....... [ZBX-5606] removed 'units' and 'store value' fields for character data items (Vedmak)
+..F....... [ZBX-5608] fixed incorrect macro resolving in trigger descriptions if expression has duplicate functions (Vedmak)
+.D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
+.......PS. [ZBX-5414] fixed handling of an incorrect username/password in SNMPv3 checks (Sasha)
+...G...... [ZBX-5609] fixed defaults for parameters of vfs.dev.read/write items in "zabbix_agentd -p" (Sasha)
+...G...... [ZBX-5552] fixed processing of vm.memory.size[total] under FreeBSD (Sasha)
+.......PS. [ZBX-5572] fixed trivial compilation warnings (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.3
+
+2.0.3rc2 was released as 2.0.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.3rc2
@@ -1041,9 +1112,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
+.D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
 A......... [ZBX-4097] changed the "application", "host" and "group" parameters for item.get and trigger.get to be case sensitive (Pavels)
-..F....... [ZBX-5514] fixed sql query in get_min_itemclock_by_itemid function (Eduard)
-A......... [ZBX-5505] fixed incorrect sql query building using limits (Eduard)
+..F....... [ZBX-5514] fixed SQL query in get_min_itemclock_by_itemid function (Eduard)
+A......... [ZBX-5505] fixed incorrect SQL query building using limits (Eduard)
 A......... [ZBX-5512] fixed undefined index in screens (Eduard)
 ...G...PS. [ZBX-5383] maximum data size accepted via Zabbix communication protocol is limited to 128 MB (Andris)
 ........S. [ZBX-5450] added support of "KMGTsmhdw" suffixes in the second parameter of count() function (Sasha)
