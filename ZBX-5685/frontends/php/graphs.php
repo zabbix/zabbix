@@ -388,7 +388,7 @@ elseif (isset($_REQUEST['form'])) {
 					$parentTemplate = reset($parentGraphPrototype['templates']);
 
 					$link = new CLink($parentTemplate['name'],
-						'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['hostid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
+						'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['templateid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
 					);
 				}
 				// parent graph link
@@ -397,7 +397,7 @@ elseif (isset($_REQUEST['form'])) {
 					$parentTemplate = DBfetch($parentTemplate);
 
 					$link = new CLink($parentTemplate['name'],
-						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
+						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['templateid']
 					);
 				}
 				$data['templates'][] = $link;
