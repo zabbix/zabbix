@@ -891,19 +891,27 @@ class CGraph extends CGraphGeneral {
 		$graphNames = array();
 		foreach ($graphs as $graph) {
 
-			// check if the host has any graphs in DB with the same name within host
+			// check if the host/template has any graphs in DB with the same name within host/template
 			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
-
-			$hostids = array_keys($hosts);
-			$graphsExists = $this->get(array(
-				'hostids' => $hostids,
+			$templates = API::Template()->get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+
+			$hostAndTemplateIds = array_keys($hosts + $templates);
+
+			// filter 'flags' => null retrievs all types of graphs, which is not default
+			$graphsExists = $this->get(array(
+				'hostids' => $hostAndTemplateIds,
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array('name' => $graph['name'], 'flags' => null),
 				'nopermissions' => true,
 				'preservekeys' => true, // faster
 				'limit' => 1 // one match enough for check
@@ -916,15 +924,15 @@ class CGraph extends CGraphGeneral {
 				}
 			}
 			// cheks that there is no two graphs with the same name within host
-			foreach ($hostids as $hostid) {
+			foreach ($hostAndTemplateIds as $id) {
 				if (!isset($graphNames[$graph['name']])) {
 					$graphNames[$graph['name']] = array();
 				}
-				if (isset($graphNames[$graph['name']][$hostid])) {
+				if (isset($graphNames[$graph['name']][$id])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('More than one graph with name "%1$s" within host.', $graph['name']));
 				}
 				else {
-					$graphNames[$graph['name']][$hostid] = true;
+					$graphNames[$graph['name']][$id] = true;
 				}
 			}
 		}
