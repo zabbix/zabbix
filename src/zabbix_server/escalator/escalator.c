@@ -971,7 +971,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: use 'free_event_info' function to clear allocated memory         *
+ * Comments: use 'free_event_info' function to release allocated memory       *
  *                                                                            *
  ******************************************************************************/
 static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
@@ -1030,7 +1030,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
  *                                                                            *
  * Function: free_event_info                                                  *
  *                                                                            *
- * Purpose: clean allocated memory by function 'get_event_info'               *
+ * Purpose: deallocate memory allocated in function 'get_event_info'          *
  *                                                                            *
  * Parameters: event - [IN] event data                                        *
  *                                                                            *
