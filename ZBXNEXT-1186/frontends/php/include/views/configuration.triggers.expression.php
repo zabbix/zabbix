@@ -58,16 +58,14 @@ $expressionFormList->addRow(_('Item'), $item);
 $functionComboBox = new CComboBox('expr_type', $this->data['expr_type'], 'submit()');
 $functionComboBox->addStyle('width: 373px;');
 foreach ($this->data['functions'] as $id => $f) {
-	foreach ($f['operators'] as $op => $txt_op) {
-		// if user has selected an item, we are filtering out the triggers that can't work with it
-		if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
-			$functionComboBox->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
-		}
+	// if user has selected an item, we are filtering out the triggers that can't work with it
+	if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
+		$functionComboBox->addItem($id, $f['description']);
 	}
 }
 $expressionFormList->addRow(_('Function'), $functionComboBox);
-if (isset($this->data['functions'][$this->data['function']]['params'])) {
-	foreach ($this->data['functions'][$this->data['function']]['params'] as $pid => $pf) {
+if (isset($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'])) {
+	foreach ($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'] as $pid => $pf) {
 		$paramIsReadonly = 'no';
 		$paramValue = isset($this->data['param'][$pid]) ? $this->data['param'][$pid] : null;
 

@@ -888,7 +888,7 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
-					*replace_to = zbx_strdup(*replace_to, row[0]);
+					*replace_to = zbx_strdup(*replace_to, row[5]);
 					item_description(replace_to, key, dc_item.host.hostid);
 					zbx_free(key);
 				}
@@ -1728,7 +1728,8 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_ITEM_LOG_SEVERITY		"{ITEM.LOG.SEVERITY}"
 #define MVAR_ITEM_LOG_NSEVERITY		"{ITEM.LOG.NSEVERITY}"
 #define MVAR_ITEM_LOG_EVENTID		"{ITEM.LOG.EVENTID}"
-#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
+#define MVAR_TRIGGER_DESCRIPTION	"{TRIGGER.DESCRIPTION}"
+#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"		/* deprecated */
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
 #define MVAR_TRIGGER_EXPRESSION		"{TRIGGER.EXPRESSION}"
@@ -2207,7 +2208,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, event->trigger.expression);
 					DCexpand_trigger_expression(&replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
+				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
+						0 == strcmp(m, MVAR_TRIGGER_COMMENT))	/* deprecated */
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.comments);
 				}
@@ -2500,7 +2502,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 			}
 		}
-		else if (macro_type & MACRO_TYPE_ITEM_KEY)
+		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);

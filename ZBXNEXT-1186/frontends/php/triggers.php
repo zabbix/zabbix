@@ -45,7 +45,7 @@ $fields = array(
 	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'status' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'input_method' =>		array(T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'),
-	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression})||isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
+	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression})||isset({and_expression})||isset({or_expression})||isset({replace_expression}))', _('Expression')),
 	'expr_target_single' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
 	'dependencies' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'),
@@ -88,25 +88,23 @@ $_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
 if (get_request('triggerid', false)) {
-	$options = array(
+	$triggers = API::Trigger()->get(array(
 		'triggerids' => $_REQUEST['triggerid'],
-		'editable' => true,
 		'preservekeys' => true,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-	);
-	$triggers = API::Trigger()->get($options);
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		'editable' => true
+	));
 	if (empty($triggers)) {
 		access_deny();
 	}
 }
 elseif (get_request('hostid', 0) > 0) {
-	$options = array(
+	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND,
 		'templated_hosts' => true,
 		'editable' => true
-	);
-	$hosts = API::Host()->get($options);
+	));
 	if (empty($hosts)) {
 		access_deny();
 	}
@@ -229,9 +227,9 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		// get requested triggers with permission check
 		$db_triggers = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable' => true,
 			'output' => array('triggerid', 'status'),
-			'preservekeys' => true
+			'preservekeys' => true,
+			'editable' => true
 		));
 
 		// triggerids which status must be changed
@@ -271,8 +269,8 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			$valueTriggerIds = array();
 			$db_triggers = DBselect(
 				'SELECT t.triggerid'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid=f.triggerid'.
+				' FROM triggers t,functions f,items i,hosts h'.
+				' WHERE t.triggerid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=h.hostid'.
 					' AND '.DBcondition('t.triggerid', $triggerIdsToUpdate).
@@ -330,9 +328,9 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
-					' FROM hosts h,hosts_groups hg'.
-					' WHERE h.hostid=hg.hostid'.
-						' AND '.DBcondition('hg.groupid', $group_ids)
+				' FROM hosts h,hosts_groups hg'.
+				' WHERE h.hostid=hg.hostid'.
+					' AND '.DBcondition('hg.groupid', $group_ids)
 			);
 			while ($db_host = DBfetch($db_hosts)) {
 				$hosts_ids[] = $db_host['hostid'];
