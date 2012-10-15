@@ -116,6 +116,8 @@ function make_event_details($event, $trigger) {
 	$table->addRow(array(_('Time'), zbx_date2str(_('d M Y H:i:s'), $event['clock'])));
 
 	if ($config['event_ack_enable']) {
+		// to make resulting link not have hint with acknowledges
+		$event['acknowledges'] = count($event['acknowledges']);
 		$ack = getEventAckState($event, true);
 		$table->addRow(array(_('Acknowledged'), $ack));
 	}
