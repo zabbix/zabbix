@@ -29,7 +29,7 @@ var timeControl = {
 	// options
 	refreshPage: true,
 	timeRefreshInterval: 0,
-	timeRefreshTimeout: null,
+	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
 		this.objectList[id] = {
@@ -45,7 +45,6 @@ var timeControl = {
 			loadSBox: 0,
 			loadImage: 0,
 			loadScroll: 0,
-			scrollWidthByImage: 0, // TODO remove me!
 			mainObject: 0, // object on changing will reflect on all others
 			sliderMaximumTimePeriod: null // max period in seconds
 		};
@@ -233,7 +232,7 @@ var timeControl = {
 			this.scrollbar.resetIsNow();
 
 			// plan next time update
-			this.timeRefreshTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
+			this.timeRefreshTimeoutHandler = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
 		}
 	},
 
