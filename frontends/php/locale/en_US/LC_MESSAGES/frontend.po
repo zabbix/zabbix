@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 20:07+0300\n"
-"PO-Revision-Date: 2012-10-03 23:19+0200\n"
+"POT-Creation-Date: 2012-10-15 20:09+0300\n"
+"PO-Revision-Date: 2012-10-08 21:54+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
@@ -8151,7 +8151,7 @@ msgstr "No errors found."
 
 #: tr_status.php:671
 msgid "No events"
-msgstr ""
+msgstr "No events"
 
 #: events.php:380 include/classes/screens/CScreenEvents.php:41
 msgid "No events defined."
@@ -9259,11 +9259,11 @@ msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
-msgstr ""
+msgstr "PHP session auto start"
 
 #: include/classes/class.frontendsetup.php:589
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
-msgstr ""
+msgstr "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
 
 #: include/classes/class.frontendsetup.php:570
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
