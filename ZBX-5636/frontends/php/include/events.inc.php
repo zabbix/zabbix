@@ -251,6 +251,17 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 	return $table;
 }
 
+/**
+ * Create element with event acknowledges info.
+ * If $event has subarray 'acknowledges', returned link will have hint with acknowledges.
+ *
+ * @param array       $event   event data
+ * @param bool|string $backUrl if true, add backurl param to link with current page file name
+ * @param bool        $isLink  if true, return link otherwise span
+ * @param array       $params  additional params for link
+ *
+ * @return array|CLink|CSpan|null|string
+ */
 function getEventAckState($event, $backUrl = false, $isLink = true, $params = array()) {
 	$config = select_config();
 
@@ -286,12 +297,16 @@ function getEventAckState($event, $backUrl = false, $isLink = true, $params = ar
 		}
 		else {
 			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, 'enabled');
-			$ackLinkHints = make_acktab_by_eventid($event);
-			if (!empty($ackLinkHints)) {
-				$ackLink->setHint($ackLinkHints, '', '', false);
+			if (is_array($event['acknowledges'])) {
+				$ackLinkHints = make_acktab_by_eventid($event);
+				if (!empty($ackLinkHints)) {
+					$ackLink->setHint($ackLinkHints, '', '', false);
+				}
+				$ack = array($ackLink, ' ('.count($event['acknowledges']).')');
 			}
-
-			$ack = array($ackLink, ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
+			else {
+				$ack = array($ackLink, ' ('.$event['acknowledges'].')');
+			}
 		}
 	}
 	else {
