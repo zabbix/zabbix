@@ -530,6 +530,21 @@ function insert_js($script, $jQueryDocumentReady = false) {
 	echo get_js($script, $jQueryDocumentReady);
 }
 
+function insertPagePostJs() {
+	global $ZBX_PAGE_POST_JS;
+
+	if (!empty($ZBX_PAGE_POST_JS)) {
+		$js = '';
+		foreach ($ZBX_PAGE_POST_JS as $script) {
+			$js .= $script."\n";
+		}
+
+		if (!empty($js)) {
+			echo get_js($js, true);
+		}
+	}
+}
+
 function get_js($script, $jQueryDocumentReady = false) {
 	return $jQueryDocumentReady
 		? '<script type="text/javascript">// <![CDATA['."\n".'jQuery(document).ready(function() { '.$script.' });'."\n".'// ]]></script>'

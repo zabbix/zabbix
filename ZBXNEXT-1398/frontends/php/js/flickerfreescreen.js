@@ -9,7 +9,7 @@
  **
  ** This program is distributed in the hope that it will be useful,
  ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  ** GNU General Public License for more details.
  **
  ** You should have received a copy of the GNU General Public License
@@ -389,6 +389,18 @@ jQuery(function($) {
 			$('form[name=' + formName + ']').append('<input type="hidden" name="period" value="' + period + '" />');
 			$('form[name=' + formName + ']').append('<input type="hidden" name="stime" value="' + stime + '" />');
 			$('form[name=' + formName + ']').submit();
+		},
+
+		cleanAll: function() {
+			for (var id in this.screens) {
+				var screen = this.screens[id];
+
+				if (!empty(screen.id)) {
+					clearTimeout(screen.timeoutHandler);
+				}
+			}
+
+			this.screens = [];
 		}
 	};
 

@@ -561,6 +561,15 @@ class CScreenBuilder {
 	}
 
 	/**
+	 * Insert javascript to clean all screen items.
+	 *
+	 * @static
+	 */
+	public static function insertScreenCleanJs() {
+		zbx_add_post_js('window.flickerfreeScreen.cleanAll();');
+	}
+
+	/**
 	 * Insert javascript for standard screens.
 	 *
 	 * @param array $options
