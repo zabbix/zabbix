@@ -130,15 +130,17 @@ function zbx_locale_variants_unix($language) {
 
 function zbx_locale_variants_win($language) {
 	// windows locales are written like language[_country[.charset]]
-	// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
+	// for a list of supported languages see:
+	// http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
+	// http://docs.moodle.org/dev/Table_of_locales#Table
 	$winLanguageName = array(
-		'en_gb' => array('English_United States.1252', 'english-uk'),
+		'en_gb' => array('English_United Kingdom.1252', 'english-uk'),
 		'en_us' => array('English_United States.1252', 'english-usa'),
 		'zh_cn' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
-		'zh_tw' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
+		'zh_tw' => array('Chinese_Taiwan.950', 'chinese'),
 		'cs_cz' => array('Czech_Czech Republic.1250', 'czech'),
 		'nl_nl' => array('Dutch_Netherlands.1252', 'dutch'),
-		'fi_fi' => array('finnish'),
+		'fi_fi' => array('Finnish_Finland.1252', 'finnish'),
 		'fr_fr' => array('French_France.1252', 'french'),
 		'de_de' => array('German_Germany.1252', 'german'),
 		'hu_hu' => array('Hungarian_Hungary.1250', 'hungarian'),
