@@ -83,7 +83,7 @@ elseif (isset($_REQUEST['save'])) {
 		$msg1 = _('Regular expression added');
 		$msg2 = _('Cannot add regular expression');
 	}
-	$result = Dbend($result);
+
 	show_messages($result, $msg1, $msg2);
 
 	if ($result) {
@@ -92,6 +92,7 @@ elseif (isset($_REQUEST['save'])) {
 
 		unset($_REQUEST['form']);
 	}
+	Dbend($result);
 }
 elseif (isset($_REQUEST['go'])) {
 	if ($_REQUEST['go'] == 'delete') {
