@@ -231,6 +231,15 @@ class CScreenBase {
 	}
 
 	/**
+	 * Get profile url params.
+	 *
+	 * @return string
+	 */
+	public function getProfileUrlParams() {
+		return '&updateProfile='.(int) $this->updateProfile.'&profileIdx='.$this->profileIdx.'&profileIdx2='.$this->profileIdx2;
+	}
+
+	/**
 	 * Get enveloped screen inside container.
 	 *
 	 * @param object	$item
@@ -299,7 +308,7 @@ class CScreenBase {
 	 *
 	 * @return array
 	 */
-	public static function calculateTime(array $options = array()) {
+	public static function calculateTime(array $options = array()) {global $page; sdff($options);sdff($page['file']);
 		if (!array_key_exists('updateProfile', $options)) {
 			$options['updateProfile'] = true;
 		}

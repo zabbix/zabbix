@@ -47,8 +47,6 @@ if (!empty($this->data['graphid'])) {
 	$screen = CScreenBuilder::getScreen(array(
 		'resourcetype' => SCREEN_RESOURCE_CHART,
 		'graphid' => $this->data['graphid'],
-		'period' => $this->data['period'],
-		'stime' => $this->data['stime'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['graphid']
 	));

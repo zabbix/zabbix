@@ -52,7 +52,7 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($resourceid)) {
 			$this->action = 'history.php?action=showgraph&itemid='.$resourceid.'&period='.$this->timeline['period'].
-					'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
+					'&stime='.$this->timeline['stimeNow'].$this->getProfileUrlParams();
 		}
 
 		if (!zbx_empty($resourceid) && $this->mode != SCREEN_MODE_EDIT) {
@@ -62,12 +62,14 @@ class CScreenSimpleGraph extends CScreenBase {
 		}
 
 		$timeControlData['src'] = zbx_empty($resourceid)
-			? 'chart3.php?updateProfile='.(int) $this->updateProfile
+			? 'chart3.php?'
 			: 'chart.php?itemid='.$resourceid.'&'.$this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
 
 		$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
 			? '&period=3600&stime='.date('YmdHis', time())
 			: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
+
+		$timeControlData['src'] .= $this->getProfileUrlParams();
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
@@ -86,7 +88,7 @@ class CScreenSimpleGraph extends CScreenBase {
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].
-						'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile);
+						'&stime='.$this->timeline['stimeNow']);
 			}
 			$item->setAttribute('id', $containerid);
 

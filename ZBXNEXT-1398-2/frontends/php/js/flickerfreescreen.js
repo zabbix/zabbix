@@ -400,6 +400,10 @@ jQuery(function($) {
 			}
 
 			this.screens = [];
+			ZBX_SBOX = {};
+			timeControl.objectList = {};
+
+			window.flickerfreeScreenShadow.cleanAll();
 		}
 	};
 
@@ -430,7 +434,7 @@ jQuery(function($) {
 		end: function(id) {
 			var screen = window.flickerfreeScreen.screens[id];
 
-			if (screen.timestamp + this.timeout >= screen.timestampActual) {
+			if (!empty(screen) && screen.timestamp + this.timeout >= screen.timestampActual) {
 				var timer = this.timers[id];
 				timer.inUpdate = false;
 
@@ -442,7 +446,7 @@ jQuery(function($) {
 		validate: function(id) {
 			var screen = window.flickerfreeScreen.screens[id];
 
-			if (screen.timestamp + this.timeout < screen.timestampActual) {
+			if (!empty(screen) && screen.timestamp + this.timeout < screen.timestampActual) {
 				this.createShadow(id);
 				this.start(id);
 			}
@@ -454,7 +458,7 @@ jQuery(function($) {
 		createShadow: function(id) {
 			var timer = this.timers[id];
 
-			if (!timer.isShadowed) {
+			if (!empty(timer) && !timer.isShadowed) {
 				var elem = $('#flickerfreescreen_' + id),
 					item = window.flickerfreeScreenShadow.findScreenItem(elem);
 				if (empty(item)) {
@@ -523,7 +527,7 @@ jQuery(function($) {
 		removeShadow: function(id) {
 			var timer = this.timers[id];
 
-			if (timer.isShadowed) {
+			if (!empty(timer) && timer.isShadowed) {
 				var elem = $('#flickerfreescreen_' + id),
 					item = window.flickerfreeScreenShadow.findScreenItem(elem);
 				if (empty(item)) {
@@ -604,11 +608,29 @@ jQuery(function($) {
 		},
 
 		isShadowed: function(id, isShadowed) {
-			if (typeof(isShadowed) != 'undefined') {
-				this.timers[id].isShadowed = isShadowed;
+			var timer = this.timers[id];
+
+			if (!empty(timer)) {
+				if (typeof(isShadowed) != 'undefined') {
+					this.timers[id].isShadowed = isShadowed;
+				}
+
+				return this.timers[id].isShadowed;
 			}
 
-			return this.timers[id].isShadowed;
+			return false;
+		},
+
+		cleanAll: function() {
+			for (var id in this.timers) {
+				var timer = this.timers[id];
+
+				if (!empty(timer.timeoutHandler)) {
+					clearTimeout(timer.timeoutHandler);
+				}
+			}
+
+			this.timers = [];
 		}
 	};
 

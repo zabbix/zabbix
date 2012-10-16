@@ -32,6 +32,8 @@ $fields = array(
 	'screenid' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
@@ -61,7 +63,7 @@ if (empty($dbItems)) {
  */
 $timeline = CScreenBase::calculateTime(array(
 	'profileIdx' => get_request('profileIdx', 'web.screens'),
-	'profileIdx2' => get_request('screenid', get_request('itemid')),
+	'profileIdx2' => get_request('profileIdx2'),
 	'updateProfile' => get_request('updateProfile', true),
 	'period' => get_request('period'),
 	'stime' => get_request('stime')

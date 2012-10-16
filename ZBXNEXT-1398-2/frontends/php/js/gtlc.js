@@ -473,10 +473,8 @@ var CScrollBar = Class.create(CDebug, {
 			this.fixedperiod = (fixedperiod == 1) ? 1 : 0;
 			this.maxperiod = maximalPeriod;
 
-			// checks
-			if (empty(this.dom.scrollbar)) {
-				this.scrollcreate(width);
-			}
+			// create scrollbar
+			this.scrollCreate(width);
 
 			// variable initialization
 			this.ghostBox = new CGhostBox(this.dom.ghost);
@@ -1269,11 +1267,14 @@ var CScrollBar = Class.create(CDebug, {
 		}
 	},
 
-	scrollcreate: function(width) {
+	scrollCreate: function(width) {
 		var scr_cntr = $('scrollbar_cntr');
 		if (is_null(scr_cntr)) {
 			throw('ERROR: SCROLL [scrollcreate]: scroll container node is not found!');
 		}
+
+		// remove existed scrollbars
+		jQuery('.scrollbar').remove();
 
 		scr_cntr.style.paddingRight = '2px';
 		scr_cntr.style.paddingLeft = '2px';
