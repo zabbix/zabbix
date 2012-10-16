@@ -272,39 +272,38 @@ jQuery(function($) {
 						screen.isRefreshing = false;
 
 						// re-refresh image
+						var bufferImg = $(this);
+
+						if (bufferImg.data('timestamp') > screen.timestamp) {
+							screen.timestamp = bufferImg.data('timestamp');
+
+							// set id
+							bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
+
+							// set opacity state
+							if (window.flickerfreeScreenShadow.isShadowed(id)) {
+								bufferImg.fadeTo(0, 0.6);
+							}
+
+							// set loaded image from buffer to dom
+							domImg.replaceWith(bufferImg);
+
+							// callback function on success
+							if (!empty(successAction)) {
+								successAction();
+							}
+
+							// rebuild timeControl sbox listeners
+							if (!empty(ZBX_SBOX[id])) {
+								ZBX_SBOX[id].addListeners();
+							}
+
+							window.flickerfreeScreenShadow.end(id);
+						}
+
 						if (screen.isReRefreshRequire) {
 							screen.isReRefreshRequire = false;
 							window.flickerfreeScreen.refresh(id, true);
-						}
-						else {
-							var bufferImg = $(this);
-
-							if (bufferImg.data('timestamp') > screen.timestamp) {
-								screen.timestamp = bufferImg.data('timestamp');
-
-								// set id
-								bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
-
-								// set opacity state
-								if (window.flickerfreeScreenShadow.isShadowed(id)) {
-									bufferImg.fadeTo(0, 0.6);
-								}
-
-								// set loaded image from buffer to dom
-								domImg.replaceWith(bufferImg);
-
-								// callback function on success
-								if (!empty(successAction)) {
-									successAction();
-								}
-
-								// rebuild timeControl sbox listeners
-								if (!empty(ZBX_SBOX[id])) {
-									ZBX_SBOX[id].addListeners();
-								}
-
-								window.flickerfreeScreenShadow.end(id);
-							}
 						}
 					});
 				});
@@ -416,17 +415,26 @@ jQuery(function($) {
 				this.timers[id].timeoutHandler = null;
 				this.timers[id].ready = false;
 				this.timers[id].isShadowed = false;
+				this.timers[id].inUpdate = false;
 			}
 
-			clearTimeout(this.timers[id].timeoutHandler);
-			this.timers[id].timeoutHandler = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
+			var timer = this.timers[id];
+
+			if (!timer.inUpdate) {
+				timer.inUpdate = true;
+				clearTimeout(timer.timeoutHandler);
+				timer.timeoutHandler = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
+			}
 		},
 
 		end: function(id) {
 			var screen = window.flickerfreeScreen.screens[id];
 
 			if (screen.timestamp + this.timeout >= screen.timestampActual) {
-				clearTimeout(this.timers[id].timeoutHandler);
+				var timer = this.timers[id];
+				timer.inUpdate = false;
+
+				clearTimeout(timer.timeoutHandler);
 				this.removeShadow(id);
 			}
 		},
