@@ -290,6 +290,8 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			1000},
 		{"StartIPMIPollers",		&CONFIG_IPMIPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"StartTimers",			&CONFIG_TIMER_FORKS,			TYPE_INT,
+			PARM_OPT,	1,			1000},
 		{"StartTrappers",		&CONFIG_TRAPPER_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartJavaPollers",		&CONFIG_JAVAPOLLER_FORKS,		TYPE_INT,
