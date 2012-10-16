@@ -768,8 +768,8 @@ class CGraphPrototype extends CGraphGeneral {
 	/**
 	 * Delete GraphPrototype.
 	 *
-	 * @param string|array $graphids
-	 * @param bool         $nopermissions
+	 * @param int|array $graphids
+	 * @param bool      $nopermissions
 	 *
 	 * @return array
 	 */
