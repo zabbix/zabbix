@@ -20,10 +20,6 @@
 
 
 /**
- * File containing graph class for API.
- * @package API
- */
-/**
  * Class containing methods for operations with graphs
  */
 class CGraphPrototype extends CGraphGeneral {
@@ -770,10 +766,11 @@ class CGraphPrototype extends CGraphGeneral {
 	}
 
 	/**
-	 * Delete GraphPrototype
+	 * Delete GraphPrototype.
 	 *
-	 * @param array $graphs
-	 * @param array $graphs['graphids']
+	 * @param int|string|array $graphids
+	 * @param bool             $nopermissions
+	 *
 	 * @return array
 	 */
 	public function delete($graphids, $nopermissions = false) {
@@ -820,24 +817,11 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!empty($createdGraphs)) {
 			$result = API::Graph()->delete($createdGraphs, true);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graphs created by low level discovery.'));
 			}
 		}
 
-		DB::delete('screens_items', array(
-			'resourceid' => $graphids,
-			'resourcetype' => SCREEN_RESOURCE_GRAPH
-		));
-
-		DB::delete('profiles', array(
-			'idx' => 'web.favorite.graphids',
-			'source' => 'graphid',
-			'value_id' => $graphids
-		));
-
-		DB::delete('graphs', array(
-			'graphid' => $graphids
-		));
+		DB::delete('graphs', array('graphid' => $graphids));
 
 		foreach ($delGraphs as $graph) {
 			info(_s('Graph prototype "%s" deleted.', $graph['name']));
@@ -858,7 +842,8 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param boolean $update
-	 * @return true
+	 *
+	 * @return bool
 	 */
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
