@@ -812,6 +812,10 @@ class CDiscoveryRule extends CItemGeneral {
 			$dstItems[$item['key_']] = $item;
 		}
 
+		foreach ($srcTriggers as $i => $srcItems) {
+				unset($srcTriggers[$i]['templateid']);
+		}
+
 		// save new triggers
 		$dstTriggers = $srcTriggers;
 		foreach ($dstTriggers as $id => $trigger) {
@@ -1004,6 +1008,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcHost = $hosts[$srcDiscovery['hostid']];
 		$dstHost = $hosts[$hostid];
 
+		unset($srcDiscovery['templateid']);
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
 
@@ -1035,6 +1040,11 @@ class CDiscoveryRule extends CItemGeneral {
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			));
+
+			foreach ($newPrototypes as $i => $newPrototype) {
+					unset($newPrototypes[$i]['templateid']);
+			}
+
 			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
@@ -1071,6 +1081,8 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
+
+				unset($prototype['templateid']);
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1197,6 +1209,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$yMaxSrcItem = $srcItems[$graph['ymax_itemid']];
 				$graph['ymax_itemid'] = $dstItems[$yMaxSrcItem['key_']]['itemid'];
 			}
+
+			unset($graph['templateid']);
 		}
 
 		// save graphs

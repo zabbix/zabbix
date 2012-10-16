@@ -855,7 +855,6 @@ class CGraphPrototype extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
-		parent::checkInput($graphs, $update);
 		$itemids = array();
 		foreach ($graphs as $graph) {
 			foreach ($graph['gitems'] as $gitem) {
@@ -863,24 +862,25 @@ class CGraphPrototype extends CGraphGeneral {
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 		}
-
-		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $itemids,
-			'webitems' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
 		// check permissions only for non super admins
 		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
+			$allowedItems = API::Item()->get(array(
+				'nodeids' => get_current_nodeid(true),
+				'itemids' => $itemids,
+				'webitems' => true,
+				'editable' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 			}
 		}
+
+		parent::checkInput($graphs, $update);
 
 		foreach ($graphs as $graph) {
 			// check if the graph has at least one prototype

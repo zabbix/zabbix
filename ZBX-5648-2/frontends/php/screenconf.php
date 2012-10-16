@@ -124,8 +124,7 @@ elseif (isset($_REQUEST['save'])) {
 			'screenid' => $_REQUEST['screenid'],
 			'name' => $_REQUEST['name'],
 			'hsize' => $_REQUEST['hsize'],
-			'vsize' => $_REQUEST['vsize'],
-			'templateid' => get_request('templateid', 0)
+			'vsize' => $_REQUEST['vsize']
 		);
 		if (isset($_REQUEST['templateid'])) {
 			$screenOld = API::TemplateScreen()->get(array(
@@ -157,13 +156,21 @@ elseif (isset($_REQUEST['save'])) {
 		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 			access_deny();
 		}
-
-		$screen = array(
-			'name' => $_REQUEST['name'],
-			'hsize' => $_REQUEST['hsize'],
-			'vsize' => $_REQUEST['vsize'],
-			'templateid' => get_request('templateid')
-		);
+		if (isset($_REQUEST['templateid'])) {
+			$screen = array(
+				'name' => $_REQUEST['name'],
+				'hsize' => $_REQUEST['hsize'],
+				'vsize' => $_REQUEST['vsize'],
+				'templateid' => get_request('templateid')
+			);
+		}
+		else {
+			$screen = array(
+				'name' => $_REQUEST['name'],
+				'hsize' => $_REQUEST['hsize'],
+				'vsize' => $_REQUEST['vsize']
+			);
+		}
 		if (isset($_REQUEST['templateid'])) {
 			$screenids = API::TemplateScreen()->create($screen);
 		}
@@ -262,7 +269,9 @@ if (isset($_REQUEST['form'])) {
 		$data['name'] = $data['screen']['name'];
 		$data['hsize'] = $data['screen']['hsize'];
 		$data['vsize'] = $data['screen']['vsize'];
-		$data['templateid'] = !empty($data['screen']['templateid']) ? $data['screen']['templateid'] : null;
+		if (!empty($data['screen']['templateid'])) {
+			$data['templateid'] = $data['screen']['templateid'];
+		}
 	}
 	else {
 		$data['name'] = get_request('name', '');

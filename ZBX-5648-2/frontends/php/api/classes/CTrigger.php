@@ -1123,20 +1123,27 @@ class CTrigger extends CTriggerGeneral {
 			);
 		}
 
+		if ($update){
+			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
+		}
+
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
 
-			if (!check_db_fields($triggerDbFields, $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
+			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for trigger.'));
+			if (array_key_exists('templateid', $trigger) && $update) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for trigger "%1$s".', $trigger['description']));
+			}
+			if (array_key_exists('templateid', $trigger) && !$update) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for trigger "%1$s".', $trigger['description']));
 			}
 
-			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			if (!check_db_fields($triggerDbFields, $trigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
 			if ($update) {

@@ -43,6 +43,9 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * @return true
 	 */
 	protected function checkInput($graphs, $update = false) {
+		if ($update){
+			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
+		}
 		foreach ($graphs as $gnum => $graph) {
 			// graph fields
 			$fields = array('name' => null);
@@ -51,8 +54,11 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 
 			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for graph.'));
+			if ($update && array_key_exists('templateid', $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for graph "%1$s".', $graph['name']));
+			}
+			if (!$update && array_key_exists('templateid', $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for graph "%1$s".', $graph['name']));
 			}
 
 			// no items

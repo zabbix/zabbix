@@ -898,7 +898,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			// check for "templateid", because it is not allowed
 			if (array_key_exists('templateid', $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for trigger.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
 			$expressionData = new CTriggerExpression(array('expression' => $trigger['expression']));
@@ -956,6 +956,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
+
+		$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
+
 		foreach ($triggers as $tnum => $trigger) {
 			if (!isset($dbTriggers[$trigger['triggerid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -967,7 +970,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			// check for "templateid", because it is not allowed
 			if (array_key_exists('templateid', $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set "templateid" for trigger.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];

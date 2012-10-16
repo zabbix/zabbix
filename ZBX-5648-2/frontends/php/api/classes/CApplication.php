@@ -434,11 +434,14 @@ class CApplication extends CZBXAPI {
 			));
 		}
 
+		if ($update){
+			$applications = $this->extendObjects($this->tableName(), $applications, array('name'));
+		}
+
 		foreach ($applications as &$application) {
 			if (!check_db_fields($itemDbFields, $application)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 			}
-			unset($application['templateid']);
 
 			// check permissions by hostid
 			if ($create) {
@@ -452,6 +455,14 @@ class CApplication extends CZBXAPI {
 				if (!isset($dbApplications[$application['applicationid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+			}
+
+			// check for "templateid", because it is not allowed
+			if ($update && array_key_exists('templateid', $application)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for application "%1$s".', $application['name']));
+			}
+			if ($create && array_key_exists('templateid', $application)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for application "%1$s".', $application['name']));
 			}
 
 			// check on operating with templated applications
