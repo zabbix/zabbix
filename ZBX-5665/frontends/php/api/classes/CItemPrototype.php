@@ -667,8 +667,8 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Delete Item prototypes.
 	 *
-	 * @param int|array $prototypeids
-	 * @param bool      $nopermissions
+	 * @param int|string|array $prototypeids
+	 * @param bool             $nopermissions
 	 *
 	 * @return array
 	 */
