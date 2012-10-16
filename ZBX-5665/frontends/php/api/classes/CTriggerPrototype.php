@@ -959,7 +959,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!empty($createdTriggers)) {
 			$result = API::Trigger()->delete($createdTriggers, true);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete triggers created by low level discovery.'));
 			}
 		}
 

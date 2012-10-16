@@ -766,10 +766,10 @@ class CGraphPrototype extends CGraphGeneral {
 	}
 
 	/**
-	 * Delete GraphPrototype
+	 * Delete GraphPrototype.
 	 *
-	 * @param      $graphids
-	 * @param bool $nopermissions
+	 * @param string|array $graphids
+	 * @param bool         $nopermissions
 	 *
 	 * @return array
 	 */
@@ -817,7 +817,7 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!empty($createdGraphs)) {
 			$result = API::Graph()->delete($createdGraphs, true);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graphs created by low level discovery.'));
 			}
 		}
 

@@ -664,12 +664,14 @@ class CItemPrototype extends CItemGeneral {
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-/**
- * Delete Itemprototypes
- *
- * @param array $ruleids
- * @return
- */
+	/**
+	 * Delete Item prototypes.
+	 *
+	 * @param string|array $prototypeids
+	 * @param bool         $nopermissions
+	 *
+	 * @return array
+	 */
 	public function delete($prototypeids, $nopermissions = false) {
 		if (empty($prototypeids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
@@ -701,14 +703,14 @@ class CItemPrototype extends CItemGeneral {
 		// first delete child items
 		$parentItemids = $prototypeids;
 		$childPrototypeids = array();
-		do{
+		do {
 			$dbItems = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parentItemids));
 			$parentItemids = array();
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		}while (!empty($parentItemids));
+		} while (!empty($parentItemids));
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -749,7 +751,7 @@ class CItemPrototype extends CItemGeneral {
 		if (!empty($createdItems)) {
 			$result = API::Item()->delete($createdItems, true);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete item prototype'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete items created by low level discovery.'));
 			}
 		}
 
