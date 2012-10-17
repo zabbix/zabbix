@@ -426,22 +426,23 @@ class CScreen extends CZBXAPI {
 	protected function validateCreate($screens) {
 		$newScreenNames = zbx_objectValues($screens, 'name');
 
+		foreach ($screens as $screen) {
+			$screenDbFields = array('name' => null);
+			if (!check_db_fields($screenDbFields, $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for screen "%1$s".', $screen['name']));
+			}
+		}
+
 		$dbScreens = $this->get(array(
 			'filter' => array('name' => $newScreenNames),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
 		));
-		foreach ($screens as $screen) {
-			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" "%1$s".', $screen['name']));
-			}
-
-			$screenDbFields = array('name' => null);
-			if (!check_db_fields($screenDbFields, $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
-			}
-		}
 		foreach ($dbScreens as $dbScreen) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $dbScreen['name']));
 		}
@@ -487,18 +488,15 @@ class CScreen extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateUpdate($screens) {
-		// check permissions only for non super admins
-		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
-			$updScreens = $this->get(array(
-				'screenids' => zbx_objectValues($screens, 'screenid'),
-				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true
-			));
-			foreach ($screens as $screen) {
-				if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
+		$updScreens = $this->get(array(
+			'screenids' => zbx_objectValues($screens, 'screenid'),
+			'editable' => true,
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => true
+		));
+		foreach ($screens as $screen) {
+			if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 

@@ -156,22 +156,14 @@ elseif (isset($_REQUEST['save'])) {
 		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 			access_deny();
 		}
+
+		$screen = array(
+			'name' => $_REQUEST['name'],
+			'hsize' => $_REQUEST['hsize'],
+			'vsize' => $_REQUEST['vsize']
+		);
 		if (isset($_REQUEST['templateid'])) {
-			$screen = array(
-				'name' => $_REQUEST['name'],
-				'hsize' => $_REQUEST['hsize'],
-				'vsize' => $_REQUEST['vsize'],
-				'templateid' => get_request('templateid')
-			);
-		}
-		else {
-			$screen = array(
-				'name' => $_REQUEST['name'],
-				'hsize' => $_REQUEST['hsize'],
-				'vsize' => $_REQUEST['vsize']
-			);
-		}
-		if (isset($_REQUEST['templateid'])) {
+			$screen['templateid'] = get_request('templateid');
 			$screenids = API::TemplateScreen()->create($screen);
 		}
 		else {
