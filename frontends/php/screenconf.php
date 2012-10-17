@@ -124,8 +124,7 @@ elseif (isset($_REQUEST['save'])) {
 			'screenid' => $_REQUEST['screenid'],
 			'name' => $_REQUEST['name'],
 			'hsize' => $_REQUEST['hsize'],
-			'vsize' => $_REQUEST['vsize'],
-			'templateid' => get_request('templateid', 0)
+			'vsize' => $_REQUEST['vsize']
 		);
 		if (isset($_REQUEST['templateid'])) {
 			$screenOld = API::TemplateScreen()->get(array(
@@ -161,10 +160,10 @@ elseif (isset($_REQUEST['save'])) {
 		$screen = array(
 			'name' => $_REQUEST['name'],
 			'hsize' => $_REQUEST['hsize'],
-			'vsize' => $_REQUEST['vsize'],
-			'templateid' => get_request('templateid')
+			'vsize' => $_REQUEST['vsize']
 		);
 		if (isset($_REQUEST['templateid'])) {
+			$screen['templateid'] = get_request('templateid');
 			$screenids = API::TemplateScreen()->create($screen);
 		}
 		else {
@@ -262,7 +261,9 @@ if (isset($_REQUEST['form'])) {
 		$data['name'] = $data['screen']['name'];
 		$data['hsize'] = $data['screen']['hsize'];
 		$data['vsize'] = $data['screen']['vsize'];
-		$data['templateid'] = !empty($data['screen']['templateid']) ? $data['screen']['templateid'] : null;
+		if (!empty($data['screen']['templateid'])) {
+			$data['templateid'] = $data['screen']['templateid'];
+		}
 	}
 	else {
 		$data['name'] = get_request('name', '');
