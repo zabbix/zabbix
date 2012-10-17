@@ -458,11 +458,14 @@ class CApplication extends CZBXAPI {
 			}
 
 			// check for "templateid", because it is not allowed
-			if ($update && array_key_exists('templateid', $application)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for application "%1$s".', $application['name']));
-			}
-			if ($create && array_key_exists('templateid', $application)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for application "%1$s".', $application['name']));
+			if (array_key_exists('templateid', $application)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for application "%1$s".', $application['name']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for application "%1$s".', $application['name']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			// check on operating with templated applications
