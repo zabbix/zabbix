@@ -64,11 +64,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
-			// no items
-			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
-			}
-
 			// items fields
 			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {

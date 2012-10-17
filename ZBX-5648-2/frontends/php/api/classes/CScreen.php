@@ -423,7 +423,7 @@ class CScreen extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function validateCreate($screens) {
+	protected function validateCreate(array $screens) {
 		$newScreenNames = zbx_objectValues($screens, 'name');
 
 		foreach ($screens as $screen) {
@@ -457,7 +457,7 @@ class CScreen extends CZBXAPI {
 	 * @param int $screens['vsize']
 	 * @return array
 	 */
-	public function create($screens) {
+	public function create(array $screens) {
 		$screens = zbx_toArray($screens);
 		$this->validateCreate($screens);
 		$insertScreenItems = array();
@@ -487,7 +487,7 @@ class CScreen extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function validateUpdate($screens) {
+	protected function validateUpdate(array $screens) {
 		$updScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
@@ -534,7 +534,7 @@ class CScreen extends CZBXAPI {
 	 * @param int $screens['vsize']
 	 * @return boolean
 	 */
-	public function update($screens) {
+	public function update(array $screens) {
 		$screens = zbx_toArray($screens);
 		$this->validateUpdate($screens);
 		$update = array();
