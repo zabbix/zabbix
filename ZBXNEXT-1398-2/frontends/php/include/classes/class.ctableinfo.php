@@ -60,14 +60,18 @@ class CTableInfo extends CTable {
 								width = span.width(),
 								transform = (width / 2) + "px " + (width / 2) + "px";
 
-							var divInner = $("<div>", {"class": "vertical_rotation_inner"})
-								.css({
-									"transform-origin": transform,
-									"-webkit-transform-origin": transform,
-									"-moz-transform-origin": transform,
-									"-o-transform-origin": transform
-								})
-								.append(span.text());
+							var css = {
+								"transform-origin": transform,
+								"-webkit-transform-origin": transform,
+								"-moz-transform-origin": transform,
+								"-o-transform-origin": transform
+							};
+
+							if (IE9) {
+								css["-ms-transform-origin"] = transform;
+							}
+
+							var divInner = $("<div>", {"class": "vertical_rotation_inner"}).css(css).append(span.text());
 
 							var div = $("<div>", {height: width, width: height}).append(divInner);
 							betterCells.push(div);
@@ -92,7 +96,20 @@ class CTableInfo extends CTable {
 					jQuery(".'.$this->getAttribute('class').'").makeVerticalRotation();
 
 					if (IE8) {
-						jQuery(".vertical_rotation_inner").css("filter", "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)");
+						jQuery(".vertical_rotation_inner").css({
+							filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"
+						});
+					}
+					else if (IE9) {
+						jQuery(".vertical_rotation_inner").css({
+							"-ms-transform": "rotate(270deg)"
+						});
+					}
+
+					if (!IE9) {
+						jQuery(".vertical_rotation_inner").css({
+							"writing-mode": "tb-rl"
+						});
 					}
 				});'
 			, true);
