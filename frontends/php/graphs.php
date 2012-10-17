@@ -397,7 +397,7 @@ elseif (isset($_REQUEST['form'])) {
 					$parentTemplate = DBfetch($parentTemplate);
 
 					$link = new CLink($parentTemplate['name'],
-						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['templateid']
+						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
 					);
 				}
 				$data['templates'][] = $link;
