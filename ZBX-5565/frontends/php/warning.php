@@ -4,23 +4,13 @@ $pageHeader->addCssFile('css.css');
 $pageHeader->display();
 ?>
 <body>
-
-<table class="warningTable" style="margin-top: 100px;">
-	<tr class="header">
-		<td>Zabbix <?php echo ZABBIX_VERSION ?></td>
-	</tr>
-	<tr class="content center">
-		<td><?php echo $warningMessage ?></td>
-	</tr>
-	<tr class="footer">
-		<td >
-			<div class="buttons">
-				<input class="input formlist" type="button" value="Retry" onclick="document.location.reload();" />
-			</div>
-		</td>
-	</tr>
-</table>
-
+<?php
+$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $warningMessage);
+$warning->setButtons(array(
+	new CButton('login', _('Retry'), 'document.location.reload();', 'formlist'),
+));
+$warning->show();
+?>
 <script>
 setTimeout("document.location.reload();", 30000);
 </script>
