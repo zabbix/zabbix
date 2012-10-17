@@ -87,6 +87,8 @@ class ZBase {
 		require_once $this->getRootDir().'/include/validate.inc.php';
 		require_once $this->getRootDir().'/include/profiles.inc.php';
 		require_once $this->getRootDir().'/include/locales.inc.php';
+		require_once $this->getRootDir().'/include/db.inc.php';
+		require_once $this->getRootDir().'/include/nodes.inc.php';
 
 		// page specific includes
 		require_once $this->getRootDir().'/include/acknow.inc.php';
@@ -106,7 +108,6 @@ class ZBase {
 		require_once $this->getRootDir().'/include/sounds.inc.php';
 		require_once $this->getRootDir().'/include/triggers.inc.php';
 		require_once $this->getRootDir().'/include/valuemap.inc.php';
-		require_once $this->getRootDir().'/include/nodes.inc.php';
 	}
 
 	/**
@@ -124,6 +125,8 @@ class ZBase {
 				$this->initDB();
 				$this->initNodes();
 				$this->authenticateUser();
+				// init nodes after user is authenticated
+				init_nodes();
 				$this->initLocales();
 				break;
 			case self::EXEC_MODE_API:
@@ -139,6 +142,8 @@ class ZBase {
 					$this->initDB();
 					$this->initNodes();
 					$this->authenticateUser();
+					// init nodes after user is authenticated
+					init_nodes();
 					$this->initLocales();
 					DBclose();
 
@@ -150,8 +155,6 @@ class ZBase {
 				catch (ConfigFileException $e) {}
 				break;
 		}
-		// init nodes after user is authenticated
-		init_nodes();
 	}
 
 	/**
@@ -287,9 +290,115 @@ class ZBase {
 	 * @throws DBException
 	 */
 	protected function initDB() {
-		// $DB is used in db.inc.php file
 		$DB = $this->config['DB'];
-		require_once $this->getRootDir().'/include/db.inc.php';
+
+		if (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_MYSQL) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".mysql_real_escape_string($value)."'";
+					}
+					return $var;
+				}
+				return "'".mysql_real_escape_string($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS UNSIGNED) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".pg_escape_string($value)."'";
+					}
+					return $var;
+				}
+				return "'".pg_escape_string($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS BIGINT) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".preg_replace('/\'/', '\'\'', $value)."'";
+					}
+					return $var;
+				}
+				return "'".preg_replace('/\'/','\'\'',$var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS NUMBER(20)) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				if ($afterWhere) {
+					return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+				}
+				else {
+					return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+				}
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".db2_escape_string($value)."'";
+					}
+					return $var;
+				}
+				return "'".db2_escape_string($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS BIGINT) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				if ($afterWhere) {
+					return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+				}
+				else {
+					return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+				}
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
+			function zbx_dbstr($var) {
+				global $DB;
+
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".$DB['DB']->escapeString($value)."'";
+					}
+					return $var;
+				}
+				return "'".$DB['DB']->escapeString($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS BIGINT) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+			}
+		}
 
 		$error = null;
 		if (!DBconnect($error)) {
