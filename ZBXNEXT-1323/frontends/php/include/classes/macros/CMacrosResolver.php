@@ -125,56 +125,9 @@ class CMacrosResolver {
 	 * @return string
 	 */
 	public function resolveMacrosInText($text, $hostId) {
-		$macros = array();
+		$data = $this->resolveMacrosInTextBatch(array($hostId => $text));
 
-		// host macros
-		$hostMacros = $this->findMacros(CMacrosResolver::PATTERN_HOST, $text);
-		if (!empty($hostMacros)) {
-			$dbHosts = DBselect('SELECT h.name,h.host FROM hosts h WHERE h.hostid='.$hostId);
-			while ($dbHost = DBfetch($dbHosts)) {
-				foreach ($hostMacros as $hostMacro) {
-					switch ($hostMacro) {
-						case '{HOSTNAME}':
-						case '{HOST.HOST}':
-							$macros[$hostMacro] = $dbHost['host'];
-							break;
-						case '{HOST.NAME}':
-							$macros[$hostMacro] = $dbHost['name'];
-							break;
-					}
-				}
-			}
-		}
-
-		// ip macros, macro should be resolved to interface with highest priority
-		$ipMacros = $this->findMacros(CMacrosResolver::PATTERN_IP, $text);
-		if (!empty($ipMacros)) {
-			$interface = array('type' => 0);
-
-			$dbInterfaces = DBselect('SELECT i.ip,i.dns,i.useip,i.type FROM interface i WHERE i.hostid='.$hostId);
-			while ($dbInterface = DBfetch($dbInterfaces)) {
-				if (!empty($this->interfacePriorities[$dbInterface['type']]) && $this->interfacePriorities[$dbInterface['type']] > $interface['type']) {
-					$interface = $dbInterface;
-				}
-			}
-
-			foreach ($ipMacros as $ipMacro) {
-				switch ($ipMacro) {
-					case '{IPADDRESS}':
-					case '{HOST.IP}':
-						$macros[$ipMacro] = $interface['ip'];
-						break;
-					case '{HOST.DNS}':
-						$macros[$ipMacro] = $interface['dns'];
-						break;
-					case '{HOST.CONN}':
-						$macros[$ipMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
-						break;
-				}
-			}
-		}
-
-		return $this->replaceMacroValues($text, $macros);
+		return $data[$hostId];
 	}
 
 	/**
