@@ -342,9 +342,11 @@ function copyItems($srcHostId, $dstHostId) {
 			}
 		}
 		unset($srcItem['itemid']);
+		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
 		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 	}
+
 	return API::Item()->create($srcItems);
 }
 

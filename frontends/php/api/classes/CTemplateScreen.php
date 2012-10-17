@@ -509,7 +509,7 @@ class CTemplateScreen extends CScreen {
 	 * @param int $screens['vsize']
 	 * @return array
 	 */
-	public function create($screens) {
+	public function create(array $screens) {
 		$screens = zbx_toArray($screens);
 		$this->validateCreate($screens);
 
@@ -540,7 +540,7 @@ class CTemplateScreen extends CScreen {
 	 * @param int $screens['vsize']
 	 * @return boolean
 	 */
-	public function update($screens) {
+	public function update(array $screens) {
 		$screens = zbx_toArray($screens);
 		$update = array();
 		$this->validateUpdate($screens);
@@ -731,9 +731,17 @@ class CTemplateScreen extends CScreen {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
+
+		$screens = $this->extendObjects($this->tableName(), $screens, array('name'));
+
 		foreach ($screens as $screen) {
 			if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for screen "%1$s".', $screen['name']));
 			}
 
 			$screenDbFields = array('screenid' => null);
@@ -742,9 +750,6 @@ class CTemplateScreen extends CScreen {
 			}
 
 			$dbScreen = $updScreens[$screen['screenid']];
-			if (isset($screen['templateid']) && (bccomp($screen['templateid'], $dbScreen['templateid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot change template for screen "%1$s".', $screen['name']));
-			}
 
 			if (isset($screen['name'])) {
 				$existScreens = $this->get(array(
