@@ -43,7 +43,7 @@
 					.data('imageFull', 'imgstore.php?iconid=' + $(this).val());
 			})
 			.delegate('img.preview', 'click', function(e) {
-				var img = $('<img src=' + $(this).data('imageFull') + ' >');
+				var img = $('<img />', {src: $(this).data('imageFull')});
 				hintBox.showStaticHint(e, this, img, '', '', true);
 			});
 
