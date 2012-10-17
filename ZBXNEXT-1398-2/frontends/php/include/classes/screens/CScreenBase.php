@@ -308,7 +308,7 @@ class CScreenBase {
 	 *
 	 * @return array
 	 */
-	public static function calculateTime(array $options = array()) {global $page; sdff($options);sdff($page['file']);
+	public static function calculateTime(array $options = array()) {
 		if (!array_key_exists('updateProfile', $options)) {
 			$options['updateProfile'] = true;
 		}
