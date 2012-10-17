@@ -618,6 +618,8 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 			// the dependencies must be added after all triggers are created
 			unset($srcTrigger['dependencies']);
 
+			unset($srcTrigger['templateid']);
+
 			if (!$result = API::Trigger()->create($srcTrigger)) {
 				return false;
 			}
