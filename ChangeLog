@@ -12,6 +12,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5679] fixed icon mapping icon preview in configoration form (Vedmak)
 ..F....... [ZBX-5137] fixed host/group dropdowns change selected value on refresh after page actions (Vedmak)
 ..F....... [ZBX-5688] fixed trigger expression suffix support for graph triggers, only KMG were supported (Vedmak)
 ..F....... [ZBX-5665] fixed lld created triggers are not deleted when related trigger prototype is deleted (Vedmak)
