@@ -26,7 +26,7 @@ try {
 }
 catch (DBException $e) {
 	$warningMessage = 'Database error: '.$e->getMessage();
-	require_once dirname(__FILE__).'/../warning.php';
+	require_once dirname(__FILE__).'/warning.php';
 	exit;
 }
 catch (ConfigFileException $e) {
@@ -37,13 +37,13 @@ catch (ConfigFileException $e) {
 
 		case CConfigFile::CONFIG_ERROR:
 			$warningMessage = 'Configuration file error: '.$e->getMessage();
-			require_once dirname(__FILE__).'/../warning.php';
+			require_once dirname(__FILE__).'/warning.php';
 			exit;
 	}
 }
 catch (Exception $e) {
 	$warningMessage = $e->getMessage();
-	require_once dirname(__FILE__).'/../warning.php';
+	require_once dirname(__FILE__).'/warning.php';
 	exit;
 }
 

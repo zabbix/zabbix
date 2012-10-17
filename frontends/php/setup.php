@@ -26,7 +26,7 @@ try {
 }
 catch (Exception $e) {
 	$warningMessage = $e->getMessage();
-	require_once dirname(__FILE__).'/warning.php';
+	require_once dirname(__FILE__).'/include/warning.php';
 	exit;
 }
 
