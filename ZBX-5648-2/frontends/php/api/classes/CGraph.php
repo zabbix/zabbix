@@ -818,8 +818,13 @@ class CGraph extends CGraphGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
 			}
 
+			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {
-				// assigning with key preservs unique itemids
+				if (!check_db_fields($fields, $gitem)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
+				}
+
+				// assigning with key preserves unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 		}
