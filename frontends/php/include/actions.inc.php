@@ -203,7 +203,31 @@ function get_condition_desc($conditiontype, $operator, $value) {
 	return condition_type2str($conditiontype).' '.condition_operator2str($operator).' '.condition_value2str($conditiontype, $value);
 }
 
-function get_operation_desc($type, $data) {
+/**
+ * Generates array with HTML items representing operation with description
+ *
+ * @param int $type short or long description, use const. SHORT_DESCRIPTION and LONG_DESCRIPTION
+ * @param array $data
+ * @param int $data['operationtype'] type of operation: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, ...
+ * @param int $data['opmessage']['mediatypeid'] type id of message media
+ * @param bool $data['opmessage']['default_msg'] should default message be used
+ * @param bool $data['opmessage']['operationid'] if true $data['operationid'] will be used to retrieve default messages from DB
+ * @param string $data['opmessage']['subject'] subject of message
+ * @param string $data['opmessage']['message'] message it self
+ * @param array $data['opmessage_usr'] list of user ids if OPERATION_TYPE_MESSAGE
+ * @param array $data['opmessage_grp'] list of group ids if OPERATION_TYPE_MESSAGE
+ * @param array $data['opcommand_grp'] list of group ids if OPERATION_TYPE_COMMAND
+ * @param array $data['opcommand_hst'] list of host ids if OPERATION_TYPE_COMMAND
+ * @param array $data['opgroup'] list of group ids if OPERATION_TYPE_GROUP_ADD or OPERATION_TYPE_GROUP_REMOVE
+ * @param array $data['optemplate'] list of template ids if OPERATION_TYPE_TEMPLATE_ADD or OPERATION_TYPE_TEMPLATE_REMOVE
+ * @param int $data['operationid'] id of operation
+ * @param int $data['opcommand']['type'] type of command: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ...
+ * @param string $data['opcommand']['command'] actual command
+ * @param int $data['opcommand']['scriptid'] script id used if $data['opcommand']['type'] is ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+ *
+ * @return array
+ */
+function get_operation_descr($type, $data) {
 	$result = array();
 
 	if ($type == SHORT_DESCRIPTION) {
