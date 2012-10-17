@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
@@ -36,12 +37,17 @@ A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 .......PS. [ZBX-4638] added support of {HOST.HOST}, {HOST.NAME}, {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in "params" field for SSH, Telnet and DB monitor items (Sasha)
 .....J.... [ZBX-4663] added possibility to use dots in JMX attribute names (dimir)
 ..F....... [ZBX-5556] action recovery message body can now be empty (Vedmak)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, French, Hungarian, Italian, Polish, Slovak and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, French, Hungarian, Italian, Polish, Slovak and Russian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBXNEXT-1426] added initial Persian translation (Richlv)
 A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5137] fixed host/group dropdowns change selected value on refresh after page actions (Vedmak)
+..F....... [ZBX-5688] fixed trigger expression suffix support for graph triggers, only KMG were supported (Vedmak)
+..F....... [ZBX-5665] fixed lld created triggers are not deleted when related trigger prototype is deleted (Vedmak)
+...G...... [ZBX-5661] fixed keys "vfs.dev.read" and "vfs.dev.write" with "ops" and "sps" parameters on Linux and FreeBSD (Andris)
+...G...... [ZBX-5614] fixed agent compiling problem on OpenBSD 5.1 (Andris)
 ........S. [ZBX-5674] fixed execution of actions with SSH commands with "Public key" autentication (Sasha)
 A......... [ZBX-5656] fixed timeperiod validation (Eduard)
 ..F....... [ZBX-5660] fixed expression constructor exp labels style (Eduard)
