@@ -54,11 +54,14 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 
 			// check for "templateid", because it is not allowed
-			if ($update && array_key_exists('templateid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for graph "%1$s".', $graph['name']));
-			}
-			if (!$update && array_key_exists('templateid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for graph "%1$s".', $graph['name']));
+			if (array_key_exists('templateid', $graph)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for graph "%1$s".', $graph['name']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for graph "%1$s".', $graph['name']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			// no items

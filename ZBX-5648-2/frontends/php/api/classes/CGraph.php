@@ -819,7 +819,7 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 		// check permissions only for non super admins
-		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
+		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$allowedItems = API::Item()->get(array(
 				'nodeids' => get_current_nodeid(true),
 				'itemids' => $itemids,
