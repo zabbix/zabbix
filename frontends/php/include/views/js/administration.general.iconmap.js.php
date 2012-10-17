@@ -1,16 +1,20 @@
 <script type="text/javascript">
-	jQuery(document).ready(function() {
+	jQuery(document).ready(function($) {
 		'use strict';
+
+		var iconMapTable = $('#iconMapTable'),
+			addMappindButton = $('#addMapping');
 
 		function recalculateSortOrder() {
 			var i = 1;
-			jQuery('#iconMapTable tr.sortable .rowNum').each(function() {
-				jQuery(this).text(i++ + ':');
+
+			iconMapTable.find('tr.sortable .rowNum').each(function() {
+				$(this).text(i++ + ':');
 			});
 		}
 
-		jQuery('#iconMapTable').sortable({
-			disabled: (jQuery('#iconMapTable tr.sortable').length <= 1),
+		iconMapTable.sortable({
+			disabled: (iconMapTable.find('tr.sortable').length <= 1),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -20,49 +24,54 @@
 			opacity: 0.6,
 			update: recalculateSortOrder,
 			start: function(e, ui) {
-				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});
 
-		jQuery('#iconMapTable tbody').delegate('input.removeMapping', 'click', function() {
-			jQuery(this).parent().parent().remove();
+		iconMapTable.find('tbody')
+			.delegate('input.removeMapping', 'click', function() {
+				$(this).parent().parent().remove();
 
-			if (jQuery('#iconMapTable tr.sortable').length <= 1) {
-				jQuery('#iconMapTable').sortable('disable');
-			}
-			recalculateSortOrder();
-		});
+				if (iconMapTable.find('tr.sortable').length <= 1) {
+					iconMapTable.sortable('disable');
+				}
+				recalculateSortOrder();
+			})
+			.delegate('select.mappingIcon, select#iconmap_default_iconid', 'change', function() {
+				$(this).closest('tr').find('.preview')
+					.attr('src', 'imgstore.php?&width=<?php echo ZBX_ICON_PREVIEW_WIDTH; ?>&height=<?php echo ZBX_ICON_PREVIEW_HEIGHT; ?>&iconid=' + $(this).val())
+					.data('imageFull', 'imgstore.php?iconid=' + $(this).val());
+			})
+			.delegate('img.preview', 'click', function(e) {
+				var img = $('<img />', {src: $(this).data('imageFull')});
+				hintBox.showStaticHint(e, this, img, '', '', true);
+			});
 
-		jQuery('#iconMapTable tbody').delegate('select.mappingIcon, select#iconmap_default_iconid', 'change', function() {
-			jQuery(this).closest('tr').find('.preview')
-				.attr('src', 'imgstore.php?&width=<?php echo ZBX_ICON_PREVIEW_WIDTH; ?>&height=<?php echo ZBX_ICON_PREVIEW_HEIGHT; ?>&iconid=' + jQuery(this).val())
-				.data('imageFull', 'imgstore.php?iconid=' + jQuery(this).val());
-		});
-
-		jQuery('#iconMapTable tbody').delegate('img.preview', 'click', function(e) {
-			var img = jQuery('<img src=' + jQuery(this).data('imageFull') + ' >');
-			hintBox.showStaticHint(e, this, img, '', '', true);
-		});
-
-		jQuery('#addMapping').click(function() {
-			var tpl = new Template(jQuery('#rowTpl').html()),
-				iconmappingid =  getUniqueId(),
+		addMappindButton.click(function() {
+			var tpl = new Template($('#rowTpl').html()),
+				iconmappingid = getUniqueId(),
 				mapping = {};
 
-			mapping.iconmappingid = iconmappingid;
-			jQuery('<tr id="iconmapidRow_' + iconmappingid + '" class="sortable">' + tpl.evaluate(mapping) + '</tr>').insertBefore('#rowTpl');
-			jQuery('#iconmapidRow_' + iconmappingid + ' :input').prop('disabled', false);
-			jQuery('#iconMapTable').sortable('refresh');
+			// on error, whole page reloads and getUniqueId reset ids sequence which can cause in duplicate ids
+			while ($('#iconmapidRow_' + iconmappingid).length != 0) {
+				iconmappingid = getUniqueId();
+			}
 
-			if (jQuery('#iconMapTable tr.sortable').length > 1) {
-				jQuery('#iconMapTable').sortable('enable');
+			mapping.iconmappingid = iconmappingid;
+			$('<tr id="iconmapidRow_' + iconmappingid + '" class="sortable">' + tpl.evaluate(mapping) + '</tr>').insertBefore('#rowTpl');
+
+			$('#iconmapidRow_' + iconmappingid + ' :input').prop('disabled', false);
+			iconMapTable.sortable('refresh');
+
+			if (iconMapTable.find('tr.sortable').length > 1) {
+				iconMapTable.sortable('enable');
 			}
 
 			recalculateSortOrder();
 		});
 
-		if (jQuery('#iconMapTable tr.sortable').length === 0) {
-			jQuery('#addMapping').click();
+		if (iconMapTable.find('tr.sortable').length === 0) {
+			addMappindButton.click();
 		}
 	});
 </script>
