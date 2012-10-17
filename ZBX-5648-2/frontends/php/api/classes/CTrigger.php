@@ -1135,11 +1135,14 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $trigger) && $update) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for trigger "%1$s".', $trigger['description']));
-			}
-			if (array_key_exists('templateid', $trigger) && !$update) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for trigger "%1$s".', $trigger['description']));
+			if (array_key_exists('templateid', $trigger)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for trigger "%1$s".', $trigger['description']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for trigger "%1$s".', $trigger['description']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
