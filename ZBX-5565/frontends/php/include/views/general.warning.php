@@ -25,14 +25,15 @@ $pageHeader->display();
 ?>
 <body>
 <?php
-$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $warningMessage);
+// $warningMessage should be set in context where this file is included
+$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $this->get('message'));
 $warning->setButtons(array(
 	new CButton('login', _('Retry'), 'document.location.reload();', 'formlist'),
 ));
 $warning->show();
 ?>
 <script>
-setTimeout("document.location.reload();", 30000);
+	setTimeout("document.location.reload();", 30000);
 </script>
 
 </body>
