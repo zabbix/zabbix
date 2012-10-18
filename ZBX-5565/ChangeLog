@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1441] added media type name to action operations description (Vedmak)
 A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
@@ -43,6 +44,10 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5671] fixed error when save configuration in administration->general with oracle backend (Vedmak)
+A......... [ZBX-5693] fixed possibility to create graph with the same name as existing graph prototype within template (Toms)
+A......... [ZBX-5698] fixed API response after "triggerprototype.create", now request return "triggerids" after INSERT (Oleg)
+A.F....... [ZBX-5648] fixed problems with "templateid" in API. Added check for "templateid" in graphs, triggers, items, screens and template screens. Fixed full clone. Fixed screen forms. Fixed messages in API. (Oleg)
 ..F....... [ZBX-5679] fixed icon mapping icon preview in configoration form (Vedmak)
 ..F....... [ZBX-5137] fixed host/group dropdowns change selected value on refresh after page actions (Vedmak)
 ..F....... [ZBX-5688] fixed trigger expression suffix support for graph triggers, only KMG were supported (Vedmak)

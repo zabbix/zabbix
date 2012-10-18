@@ -63,7 +63,7 @@ foreach ($this->data['actions'] as $action) {
 	sortOperations($action['eventsource'], $action['operations']);
 	$operations = array();
 	foreach ($action['operations'] as $operation) {
-		$operations[] = get_operation_desc(SHORT_DESCRIPTION, $operation);
+		$operations[] = get_operation_descr(SHORT_DESCRIPTION, $operation);
 	}
 
 	if ($action['status'] == ACTION_STATUS_DISABLED) {
