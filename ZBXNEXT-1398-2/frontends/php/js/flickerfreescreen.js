@@ -63,7 +63,7 @@ jQuery(function($) {
 			ajaxUrl.setArgument('type', 9); // PAGE_TYPE_TEXT
 			ajaxUrl.setArgument('method', 'screen.get');
 			ajaxUrl.setArgument('mode', screen.mode);
-			ajaxUrl.setArgument('timestamp', new CDate().getTime());
+			ajaxUrl.setArgument('timestamp', screen.timestampActual);
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
 			ajaxUrl.setArgument('pageFile', screen.pageFile);
 			ajaxUrl.setArgument('screenid', screen.screenid);
@@ -208,6 +208,7 @@ jQuery(function($) {
 							screen.timestamp = htmlTimestamp;
 
 							window.flickerfreeScreenShadow.isShadowed(id, false);
+							window.flickerfreeScreenShadow.fadeSpeed(id, 0);
 							window.flickerfreeScreenShadow.validate(id);
 						}
 					},
@@ -419,36 +420,45 @@ jQuery(function($) {
 				this.timers[id].timeoutHandler = null;
 				this.timers[id].ready = false;
 				this.timers[id].isShadowed = false;
+				this.timers[id].fadeSpeed = 2000;
 				this.timers[id].inUpdate = false;
 			}
 
 			var timer = this.timers[id];
 
 			if (!timer.inUpdate) {
-				timer.inUpdate = true;
-				clearTimeout(timer.timeoutHandler);
-				timer.timeoutHandler = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
+				this.refresh(id);
 			}
+		},
+
+		refresh: function(id) {
+			var timer = this.timers[id];
+
+			timer.inUpdate = true;
+
+			clearTimeout(timer.timeoutHandler);
+			timer.timeoutHandler = window.setTimeout(function() { window.flickerfreeScreenShadow.validate(id); }, this.timeout);
 		},
 
 		end: function(id) {
 			var screen = window.flickerfreeScreen.screens[id];
 
-			if (!empty(screen) && screen.timestamp + this.timeout >= screen.timestampActual) {
+			if (!empty(screen) && (screen.timestamp + this.timeout) >= screen.timestampActual) {
 				var timer = this.timers[id];
 				timer.inUpdate = false;
 
 				clearTimeout(timer.timeoutHandler);
 				this.removeShadow(id);
+				this.fadeSpeed(id, 2000);
 			}
 		},
 
 		validate: function(id) {
 			var screen = window.flickerfreeScreen.screens[id];
 
-			if (!empty(screen) && screen.timestamp + this.timeout < screen.timestampActual) {
+			if (!empty(screen) && (screen.timestamp + this.timeout) < screen.timestampActual) {
 				this.createShadow(id);
-				this.start(id);
+				this.refresh(id);
 			}
 			else {
 				this.end(id);
@@ -495,7 +505,7 @@ jQuery(function($) {
 					var itemNode = elem.find(item.prop('nodeName'));
 					if (!empty(itemNode)) {
 						itemNode = (itemNode.length > 0) ? $(itemNode[0]) : itemNode;
-						itemNode.fadeTo(2000, 0.6);
+						itemNode.fadeTo(timer.fadeSpeed, 0.6);
 					}
 
 					// show loading indicator..
@@ -619,6 +629,20 @@ jQuery(function($) {
 			}
 
 			return false;
+		},
+
+		fadeSpeed: function(id, fadeSpeed) {
+			var timer = this.timers[id];
+
+			if (!empty(timer)) {
+				if (typeof(fadeSpeed) != 'undefined') {
+					this.timers[id].fadeSpeed = fadeSpeed;
+				}
+
+				return this.timers[id].fadeSpeed;
+			}
+
+			return 0;
 		},
 
 		cleanAll: function() {
