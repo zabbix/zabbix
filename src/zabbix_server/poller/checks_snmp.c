@@ -157,7 +157,7 @@ static int	cache_get_snmp_index(DC_ITEM *item, char *oid, char *value, char **id
 		res = SUCCEED;
 	}
 end:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s index:'%s'", __function_name, zbx_result_string(res), *idx);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
