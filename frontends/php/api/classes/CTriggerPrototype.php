@@ -782,8 +782,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$this->createReal($triggers);
 
+		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$createdTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'triggerids' => $triggerids,
 			'output' => array('description', 'expression', 'flags'),
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name')
