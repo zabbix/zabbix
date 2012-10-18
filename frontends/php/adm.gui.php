@@ -47,6 +47,8 @@ check_fields($fields);
  * Actions
  */
 if (isset($_REQUEST['save'])) {
+	DBstart();
+
 	$configs = array(
 		'default_theme' => get_request('default_theme'),
 		'event_ack_enable' => (is_null(get_request('event_ack_enable')) ? 0 : 1),
@@ -76,6 +78,8 @@ if (isset($_REQUEST['save'])) {
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
+
+	DBend($result);
 }
 
 /*
