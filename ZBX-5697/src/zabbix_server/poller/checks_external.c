@@ -59,7 +59,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		*pl = '\0';
 		params = pl + 1;
 
-		if (NULL != (pr = strchr(params, ']')))
+		if (NULL != (pr = strrchr(params, ']')))
 			*pr = '\0';
 		else
 		{
