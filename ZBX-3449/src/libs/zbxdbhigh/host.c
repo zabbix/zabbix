@@ -2441,7 +2441,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 
 	if (0 != app_num)
 	{
-		zbx_uint64_t	applicationid;
+		zbx_uint64_t	applicationid = 0;
 		int		i, new_applications = app_num;
 		const char	*ins_applications_sql =
 				"insert into applications"

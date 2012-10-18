@@ -17,9 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-require_once 'PHPUnit/Framework.php';
+
 
 require_once dirname(__FILE__).'/../../../include/locales.inc.php';
 require_once dirname(__FILE__).'/../../../include/gettextwrapper.inc.php';
@@ -1349,6 +1347,9 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:log[/data/logs/test.log,text1incorrect|FAIL)text2].last(0)}', true),
 			array('{host:log[/data/logs/test.log,text1(incorrect|FAIL)text2].last(0)}', true),
 			array('{Template_App_CCWS:web.page.regexp[0.0.0.0,/ws-callcontrol-1.1/test,{$CCWS_PORT},"[Ss]moke [Tt]est = ([Ss]uccess|[Ww]arning|[Ff]ail).*([[:space:]].*)+"].count(#1,event service = failed)}=1', true),
+			array('{host:key.str({$M})} | {$M}', true),
+			array('{$M} | {host:key.str({$M})}', true),
+			array('({$M} + 5) | {host:key.str({$M})}', true),
 		);
 	}
 
@@ -1366,4 +1367,3 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 }
-?>

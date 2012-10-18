@@ -4,7 +4,7 @@
 			<span class="bold"> #{name} </span>
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="javascript: removeDCheckRow(#{dcheckid});" />
+			<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="javascript: removeDCheckRow(#{dcheckid});" />
 		</td>
 	</tr>
 </script>
@@ -63,10 +63,10 @@
 				</tr>
 				</tbody>
 			</table>
-			<input type="button" id="add_new_dcheck" name="add_new_dcheck" value=<?php echo Chtml::encode(_('Add')); ?>
+			<input type="button" id="add_new_dcheck" name="add_new_dcheck" value="<?php echo CHtml::encode(_('Add')); ?>"
 				class="input button link_menu">
 			&nbsp;&nbsp;
-			<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" value=<?php echo Chtml::encode(_('Cancel')); ?>
+			<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" value="<?php echo CHtml::encode(_('Cancel')); ?>"
 				class="input button link_menu">
 		</div>
 	</div>
@@ -369,8 +369,6 @@
 	jQuery(document).ready(function() {
 		addPopupValues(<?php echo zbx_jsvalue(array_values($this->data['drule']['dchecks'])); ?>);
 		jQuery("input:radio[name='uniqueness_criteria'][value=<?php echo zbx_jsvalue($this->data['drule']['uniqueness_criteria']); ?>]").attr('checked', 'checked');
-
-		setTimeout(function(){ jQuery('#name').focus() }, 10);
 
 		jQuery('#newCheck').click(showNewCheckForm);
 		jQuery('#clone').click(function() {

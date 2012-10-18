@@ -479,7 +479,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['ghg'] = 'g.groupid = hg.groupid';
-			$sqlParts['where']['group'] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
+			$sqlParts['where']['group'] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 		// host
@@ -494,7 +494,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-			$sqlParts['where']['host'] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
+			$sqlParts['where']['host'] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
 		// only_true
@@ -1123,15 +1123,30 @@ class CTrigger extends CTriggerGeneral {
 			);
 		}
 
+		if ($update){
+			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
+		}
+
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
 
-			if (!check_db_fields($triggerDbFields, $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
-			}
-
 			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $trigger)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for trigger "%1$s".', $trigger['description']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for trigger "%1$s".', $trigger['description']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			if (!check_db_fields($triggerDbFields, $trigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
 			if ($update) {
@@ -1451,6 +1466,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
+		$this->checkDependencyDuplicates($triggers);
 	}
 
 	/**
@@ -1618,8 +1634,8 @@ class CTrigger extends CTriggerGeneral {
 				$trigger['description'] = $dbTrigger['description'];
 			}
 
-			$expressionFull = explode_exp($dbTrigger['expression']);
-			if (isset($trigger['expression']) && strcmp($expressionFull, $trigger['expression']) != 0) {
+			$oldExpression = explode_exp($dbTrigger['expression']);
+			if (isset($trigger['expression']) && strcmp($oldExpression, $trigger['expression']) != 0) {
 				$this->validateItems($trigger);
 
 				$expressionChanged = true;
@@ -1632,6 +1648,21 @@ class CTrigger extends CTriggerGeneral {
 				$expressionData = new CTriggerExpression(array('expression' => $expressionFull));
 				if (!empty($expressionData->errors)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, reset($expressionData->errors));
+				}
+
+				// if the templates used in the expresseion have changed, delete all inherited triggers
+				// and recreate them later
+				$oldExpressionData = new CTriggerExpression(array('expression' => $oldExpression));
+				if (!array_equal($oldExpressionData->data['hosts'], $expressionData->data['hosts'])) {
+					$sql = 'SELECT t.triggerid'.
+							' FROM triggers t'.
+							' WHERE t.templateid='.zbx_dbstr($trigger['triggerid']);
+					$cTrigCursor = DBselect($sql);
+					$cTrigIds = array();
+					while ($cTrig = DBfetch($cTrigCursor)) {
+						$cTrigIds[] = $cTrig['triggerid'];
+					}
+					$this->deleteByPks($cTrigIds);
 				}
 
 				// if the trigger contains templates, delete any events that may exist
@@ -1683,7 +1714,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// restore the full expression to properly validate dependencies
-			$trigger['expression'] = $expressionChanged ? explode_exp($trigger['expression']) : $expressionFull;
+			$trigger['expression'] = $expressionChanged ? explode_exp($trigger['expression']) : $oldExpression;
 
 			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'],
@@ -1705,29 +1736,11 @@ class CTrigger extends CTriggerGeneral {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$allowedHosts = API::Host()->get(array(
-			'hostids' => $data['hostids'],
-			'editable' => true,
-			'preservekeys' => true,
-			'templated_hosts' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (!API::Host()->isWritable($data['hostids'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-
-		$allowedTemplates = API::Template()->get(array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (!API::Template()->isWritable($data['templateids'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$triggers = $this->get(array(
@@ -1856,7 +1869,7 @@ class CTrigger extends CTriggerGeneral {
 				$upTriggerids = array();
 				while ($upTrigger = DBfetch($dbUpTriggers)) {
 					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular dependencies are not allowed.'));
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
 				}
@@ -1951,6 +1964,57 @@ class CTrigger extends CTriggerGeneral {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Checks if the given dependencies contain duplicates.
+	 *
+	 * @throws APIException if the given dependencies contain duplicates
+	 *
+	 * @param array $triggers
+	 */
+	protected function checkDependencyDuplicates(array $triggers) {
+		// check duplicates in array
+		$uniqueTriggers = array();
+		$duplicateTriggerId = null;
+		foreach ($triggers as $trigger) {
+			foreach ($trigger['dependencies'] as $dep) {
+				if (isset($uniqueTriggers[$trigger['triggerid']][$dep])) {
+					$duplicateTriggerId = $trigger['triggerid'];
+					break 2;
+				}
+				else {
+					$uniqueTriggers[$trigger['triggerid']][$dep] = 1;
+				}
+			}
+		}
+
+		if ($duplicateTriggerId === null) {
+			// check if dependency already exists in DB
+			foreach ($triggers as $trigger) {
+				$dbUpTriggers = DBselect(
+					'SELECT td.triggerid_up'.
+					' FROM trigger_depends td'.
+					' WHERE '.DBcondition('td.triggerid_up', $trigger['dependencies']).
+					' AND td.triggerid_down='.zbx_dbstr($trigger['triggerid'])
+				, 1);
+				if (DBfetch($dbUpTriggers)) {
+					$duplicateTriggerId = $trigger['triggerid'];
+					break;
+				}
+			}
+		}
+
+		if ($duplicateTriggerId) {
+			$dplTrigger = DBfetch(DBselect(
+				'SELECT t.description'.
+				' FROM triggers t'.
+				' WHERE t.triggerid='.zbx_dbstr($duplicateTriggerId)
+			));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate dependencies in trigger "%1$s".', $dplTrigger['description'])
+			);
 		}
 	}
 

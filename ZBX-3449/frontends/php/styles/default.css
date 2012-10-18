@@ -39,16 +39,17 @@ form { margin: 0; }
 /* media */
 @media print {
 	.printless { visibility: hidden; display: none; }
-	.printonly { display: block; visibility:visible; }
+	.printonly { display: block; visibility: visible; }
 }
 @media screen {
-	.printless { visibility:visible; display:block; }
-	.printonly { visibility: hidden; display:none; }
+	.printless { visibility: visible; display: block; }
+	.printonly { visibility: hidden; display: none; }
 }
 
 .hidden { display: none; }
 .pre { white-space: pre; }
 .placeholder { color: #aaa; }
+.fixedfont { font-family: monospace; }
 
 /* align */
 .floatleft { float: left; }
@@ -71,15 +72,15 @@ form { margin: 0; }
 
 /* color */
 .img { border: 1px black; }
-img.top { vertical-align:text-top; }
-img.bottom { vertical-align:text-bottom; }
+img.top { vertical-align: text-top; }
+img.bottom { vertical-align: text-bottom; }
 
-.vert { width:1px; }
+.vert { width: 1px; }
 .rarr { font-size: 16px; }
 .bold { font-weight: bold; }
 .italic { font-style: italic; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
-.delimiter { font-weight:bold; color: #000; }
+.delimiter { font-weight: bold; color: #000; }
 .pointer:hover { cursor: pointer; }
 .move { cursor: move; }
 .cell { padding: 1px 3px; white-space: nowrap; text-align: left; border: 0; height: 20px; }
@@ -859,7 +860,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 .colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
-<<<<<<< .working
 fieldset legend { margin: 0.2em 0.5em; }
 
 /* maintenance icon */
@@ -900,3 +900,6 @@ fieldset legend { margin: 0.2em 0.5em; }
 	display: table-cell;
 	width: 10px;
 }
+
+/* flickerfreescreen */
+.flickerfreescreen { position: relative; }

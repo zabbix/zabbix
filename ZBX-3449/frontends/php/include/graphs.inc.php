@@ -197,8 +197,11 @@ function get_min_itemclock_by_graphid($graphid) {
 }
 
 /**
- * Description:
- *	Return the time of the 1st appearance of item in trends
+ * Return the time of the 1st appearance of item in trends.
+ *
+ * @param array|int $itemids
+ *
+ * @return int (unixtime)
  */
 function get_min_itemclock_by_itemid($itemids) {
 	zbx_value2array($itemids);
@@ -265,19 +268,15 @@ function get_min_itemclock_by_itemid($itemids) {
 				$sql_from = 'history';
 		}
 
-		$res = DBselect(
-			'SELECT ht.itemid,MIN(ht.clock) AS min_clock'.
+		$dbMin = DBfetch(DBselect(
+			'SELECT MIN(ht.clock) AS min_clock'.
 			' FROM '.$sql_from.' ht'.
-			' WHERE '.DBcondition('ht.itemid', $itemids).
-			' GROUP BY ht.itemid'
-		);
-		while ($min_tmp = DBfetch($res)) {
-			$min = (is_null($min)) ? $min_tmp['min_clock'] : min($min, $min_tmp['min_clock']);
-		}
+			' WHERE '.DBcondition('ht.itemid', $itemids)
+		));
+		$min = empty($min) ? $dbMin['min_clock'] : min($min, $dbMin['min_clock']);
 	}
-	$result = is_null($min) ? $result : $min;
 
-	return $result;
+	return empty($min) ? $result : $min;
 }
 
 function get_graph_by_graphid($graphid) {
@@ -368,6 +367,7 @@ function copy_graph_to_host($graphid, $hostid) {
 	}
 
 	$graph['gitems'] = $new_gitems;
+	unset($graph['templateid']);
 	$result = API::Graph()->create($graph);
 
 	return $result;
@@ -686,59 +686,8 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 		}
 	}
 	else {
-		$dims = imageTextSize($fontsize, $angle, $string);
-
-		switch($fontsize) {
-			case 5:
-				$fontsize = 1;
-				break;
-			case 6:
-				$fontsize = 1;
-				break;
-			case 7:
-				$fontsize = 2;
-				break;
-			case 8:
-				$fontsize = 2;
-				break;
-			case 9:
-				$fontsize = 3;
-				break;
-			case 10:
-				$fontsize = 3;
-				break;
-			case 11:
-				$fontsize = 4;
-				break;
-			case 12:
-				$fontsize = 4;
-				break;
-			case 13:
-				$fontsize = 5;
-				break;
-			case 14:
-				$fontsize = 5;
-				break;
-			default:
-				$fontsize = 2;
-				break;
-		}
-
-		if ($angle) {
-			$x -= $dims['width'];
-			$y -= 2;
-		}
-		else {
-			$y -= $dims['height'] - 2;
-		}
-
-		if ($angle > 0) {
-			return imagestringup($image, $fontsize, $x, $y, $string, $color);
-		}
-		return imagestring($image, $fontsize, $x, $y, $string, $color);
+		show_error_message(_('PHP gd FreeType support missing'));
 	}
-
-	return true;
 }
 
 function imageTextSize($fontsize, $angle, $string) {
@@ -761,51 +710,8 @@ function imageTextSize($fontsize, $angle, $string) {
 		$result['baseline'] = $ar[1];
 	}
 	else {
-		switch($fontsize) {
-			case 5:
-				$fontsize = 1;
-				break;
-			case 6:
-				$fontsize = 1;
-				break;
-			case 7:
-				$fontsize = 2;
-				break;
-			case 8:
-				$fontsize = 2;
-				break;
-			case 9:
-				$fontsize = 3;
-				break;
-			case 10:
-				$fontsize = 3;
-				break;
-			case 11:
-				$fontsize = 4;
-				break;
-			case 12:
-				$fontsize = 4;
-				break;
-			case 13:
-				$fontsize = 5;
-				break;
-			case 14:
-				$fontsize = 5;
-				break;
-			default:
-				$fontsize = 2;
-				break;
-		}
-
-		if ($angle) {
-			$result['width'] = imagefontheight($fontsize);
-			$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
-		}
-		else {
-			$result['height'] = imagefontheight($fontsize);
-			$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
-		}
-		$result['baseline'] = 0;
+		show_error_message(_('PHP gd FreeType support missing'));
+		return false;
 	}
 
 	return $result;

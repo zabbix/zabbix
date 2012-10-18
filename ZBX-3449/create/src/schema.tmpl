@@ -460,7 +460,7 @@ FIELD		|server_check_interval|t_integer|'10'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 
 TABLE|triggers|triggerid|ZBX_SYNC,ZBX_DATA
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
-FIELD		|expression	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|expression	|t_varchar(2048)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -1198,3 +1198,8 @@ FIELD		|url4		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|title5		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|url5		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|userid
+
+TABLE|dbversion||
+FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
+FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
+ROW		|2010008	|2010008

@@ -17,11 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
 /**
  * Class containing methods for operations with Maps
  */
@@ -31,31 +27,31 @@ class CMap extends CMapElement {
 
 	protected $tableAlias = 's';
 
-/**
- * Get Map data
- *
- * @param array $options
- * @param array $options['nodeids'] Node IDs
- * @param array $options['groupids'] HostGroup IDs
- * @param array $options['hostids'] Host IDs
- * @param boolean $options['monitored_hosts'] only monitored Hosts
- * @param boolean $options['templated_hosts'] include templates in result
- * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_monitored_items'] only with monitored items
- * @param boolean $options['with_historical_items'] only with historical items
- * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitored triggers
- * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitored http tests
- * @param boolean $options['with_graphs'] only with graphs
- * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['count'] count Hosts, returned column name is rowscount
- * @param string $options['pattern'] search hosts by pattern in host names
- * @param int $options['limit'] limit selection
- * @param string $options['sortorder']
- * @param string $options['sortfield']
- * @return array|boolean Host data as array or false if error
- */
+	/**
+	 * Get Map data
+	 *
+	 * @param array $options
+	 * @param array $options['nodeids'] Node IDs
+	 * @param array $options['groupids'] HostGroup IDs
+	 * @param array $options['hostids'] Host IDs
+	 * @param boolean $options['monitored_hosts'] only monitored Hosts
+	 * @param boolean $options['templated_hosts'] include templates in result
+	 * @param boolean $options['with_items'] only with items
+	 * @param boolean $options['with_monitored_items'] only with monitored items
+	 * @param boolean $options['with_historical_items'] only with historical items
+	 * @param boolean $options['with_triggers'] only with triggers
+	 * @param boolean $options['with_monitored_triggers'] only with monitored triggers
+	 * @param boolean $options['with_httptests'] only with http tests
+	 * @param boolean $options['with_monitored_httptests'] only with monitored http tests
+	 * @param boolean $options['with_graphs'] only with graphs
+	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
+	 * @param int $options['count'] count Hosts, returned column name is rowscount
+	 * @param string $options['pattern'] search hosts by pattern in host names
+	 * @param int $options['limit'] limit selection
+	 * @param string $options['sortorder']
+	 * @param string $options['sortfield']
+	 * @return array|boolean Host data as array or false if error
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -473,14 +469,14 @@ class CMap extends CMapElement {
 		return $result;
 	}
 
-/**
- * Get Sysmap IDs by Sysmap params
- *
- * @param array $sysmap_data
- * @param array $sysmap_data['name']
- * @param array $sysmap_data['sysmapid']
- * @return string sysmapid
- */
+	/**
+	 * Get Sysmap IDs by Sysmap params
+	 *
+	 * @param array $sysmap_data
+	 * @param array $sysmap_data['name']
+	 * @param array $sysmap_data['sysmapid']
+	 * @return string sysmapid
+	 */
 	public function getObjects($sysmapData) {
 		$options = array(
 			'filter' => $sysmapData,
@@ -671,22 +667,22 @@ class CMap extends CMapElement {
 		return ($update || $delete) ? $dbMaps : true;
 	}
 
-/**
- * Add Map
- *
- * @param _array $maps
- * @param string $maps['name']
- * @param array $maps['width']
- * @param int $maps['height']
- * @param string $maps['backgroundid']
- * @param string $maps['highlight']
- * @param array $maps['label_type']
- * @param int $maps['label_location']
- * @param int $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
- * @param int $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
- * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
- * @return boolean | array
- */
+	/**
+	 * Add Map
+	 *
+	 * @param array $maps
+	 * @param string $maps['name']
+	 * @param array $maps['width']
+	 * @param int $maps['height']
+	 * @param string $maps['backgroundid']
+	 * @param string $maps['highlight']
+	 * @param array $maps['label_type']
+	 * @param int $maps['label_location']
+	 * @param int $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
+	 * @param int $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
+	 * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
+	 * @return boolean | array
+	 */
 	public function create($maps) {
 		$maps = zbx_toArray($maps);
 
@@ -753,22 +749,22 @@ class CMap extends CMapElement {
 		return array('sysmapids' => $sysmapids);
 	}
 
-/**
- * Update Map
- *
- * @param array $maps multidimensional array with Hosts data
- * @param string $maps['sysmapid']
- * @param string $maps['name']
- * @param array $maps['width']
- * @param int $maps['height']
- * @param string $maps['backgroundid']
- * @param array $maps['label_type']
- * @param int $maps['label_location']
- * @param int $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
- * @param int $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
- * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
- * @return boolean
- */
+	/**
+	 * Update Map
+	 *
+	 * @param array $maps multidimensional array with Hosts data
+	 * @param string $maps['sysmapid']
+	 * @param string $maps['name']
+	 * @param array $maps['width']
+	 * @param int $maps['height']
+	 * @param string $maps['backgroundid']
+	 * @param array $maps['label_type']
+	 * @param int $maps['label_location']
+	 * @param int $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
+	 * @param int $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
+	 * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
+	 * @return boolean
+	 */
 	public function update($maps) {
 		$maps = zbx_toArray($maps);
 		$sysmapids = zbx_objectValues($maps, 'sysmapid');
@@ -936,13 +932,13 @@ class CMap extends CMapElement {
 	}
 
 
-/**
- * Delete Map
- *
- * @param array $sysmaps
- * @param array $sysmaps['sysmapid']
- * @return boolean
- */
+	/**
+	 * Delete Map
+	 *
+	 * @param array $sysmaps
+	 * @param array $sysmaps['sysmapid']
+	 * @return boolean
+	 */
 	public function delete($sysmapids) {
 
 		$maps = zbx_toObject($sysmapids, 'sysmapid');
@@ -1028,4 +1024,3 @@ class CMap extends CMapElement {
 		return $sqlParts;
 	}
 }
-?>

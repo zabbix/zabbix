@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -58,15 +58,19 @@ $triggersFormList = new CFormList('triggersFormList');
 if (!empty($this->data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
 }
-$triggersFormList->addRow(_('Name'), new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']));
+$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
+$nameTextBox->attr('autofocus', 'autofocus');
+$triggersFormList->addRow(_('Name'), $nameTextBox);
 
 // append expression to form list
 $expressionTextBox = new CTextArea(
 	$this->data['expression_field_name'],
 	$this->data['expression_field_value'],
-	ZBX_TEXTAREA_STANDARD_ROWS,
-	ZBX_TEXTAREA_STANDARD_WIDTH,
-	$this->data['expression_field_readonly']
+	array(
+		'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
+		'width' => ZBX_TEXTAREA_STANDARD_WIDTH,
+		'readonly' => $this->data['expression_field_readonly']
+	)
 );
 if ($this->data['expression_field_readonly'] == 'yes') {
 	$triggersForm->addVar('expression', $this->data['expression']);
@@ -74,7 +78,7 @@ if ($this->data['expression_field_readonly'] == 'yes') {
 
 $addExpressionButton = new CButton(
 	'insert',
-	$this->data['input_method'] == IM_TREE ? _('Edit') : _('Add'),
+	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
 		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 240);',
@@ -124,7 +128,7 @@ elseif ($this->data['input_method'] != IM_FORCED) {
 	$inputMethodToggle = new CSpan(_('Expression constructor'), 'link');
 	$inputMethodToggle->setAttribute('onclick', 'javascript: '.
 		'document.getElementById("toggle_input_method").value=1;'.
-		'document.getElementById("input_method").value='.($this->data['input_method'] == IM_TREE ? IM_ESTABLISHED : IM_TREE).';'.
+		'document.getElementById("input_method").value='.(($this->data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
 		'document.forms["'.$triggersForm->getName().'"].submit();'
 	);
 	$expressionRow[] = array(BR(), $inputMethodToggle);
@@ -139,10 +143,10 @@ if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
 	$expressionTable->setHeader(array(
-		$this->data['limited'] == 'yes' ? null : _('Target'),
+		($this->data['limited'] == 'yes') ? null : _('Target'),
 		_('Expression'),
 		empty($this->data['parent_discoveryid']) ? _('Error') : null,
-		$this->data['limited'] == 'yes' ? null : _('Action')
+		($this->data['limited'] == 'yes') ? null : _('Action')
 	));
 
 	$allowedTesting = true;
@@ -156,7 +160,7 @@ if ($this->data['input_method'] == IM_TREE) {
 						' document.forms["'.$triggersForm->getName().'"].submit();'.
 					' }'
 				);
-				$triggerCheckbox = new CCheckbox('expr_target_single', $i == 0 ? 'yes' : 'no', 'check_target(this);', $e['id']);
+				$triggerCheckbox = new CCheckbox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
 			}
 			else {
 				$triggerCheckbox = null;
@@ -221,7 +225,6 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 
 	$wrapOutline = new CSpan(array($this->data['outline']));
-	$wrapOutline->addStyle('white-space: pre;');
 	$triggersFormList->addRow(SPACE, array(
 		$wrapOutline,
 		BR(),
@@ -238,10 +241,9 @@ if ($this->data['input_method'] == IM_TREE) {
 	$triggersFormList->addRow(SPACE, array($inputMethodToggle, BR()));
 }
 
-$triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', ($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no', null, 1));
+$triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', (($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no'), null, 1));
 $triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
 $triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
-
 $triggersFormList->addRow(_('Severity'), getSeverityControl($this->data['priority']));
 
 // append status to form list
@@ -249,7 +251,7 @@ if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
 	$status = 'yes';
 }
 else {
-	$status = $this->data['status'] == 0 ? 'yes' : 'no';
+	$status = ($this->data['status'] == 0) ? 'yes' : 'no';
 }
 $triggersFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
 

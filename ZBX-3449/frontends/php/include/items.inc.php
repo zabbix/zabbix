@@ -342,9 +342,11 @@ function copyItems($srcHostId, $dstHostId) {
 			}
 		}
 		unset($srcItem['itemid']);
+		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
 		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 	}
+
 	return API::Item()->create($srcItems);
 }
 
@@ -354,6 +356,10 @@ function copyApplications($srcHostId, $dstHostId) {
 		'output' => API_OUTPUT_EXTEND,
 		'inherited' => false
 	));
+	if (empty($apps_to_clone)) {
+		return true;
+	}
+
 	foreach ($apps_to_clone as &$app) {
 		$app['hostid'] = $dstHostId;
 		unset($app['applicationid'], $app['templateid']);
@@ -910,7 +916,23 @@ function formatItemValue(array $item, $unknownString = '-') {
 	}
 
 	$value = formatItemValueType($item);
-	if ($item['valuemapid'] > 0) {
+
+	if ($item['value_type'] == ITEM_VALUE_TYPE_STR
+			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
+			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+
+		$mapping = getMappedValue($value, $item['valuemapid']);
+
+		if (zbx_strlen($value) > 20) {
+			$value = zbx_substr($value, 0, 20).'...';
+		}
+		$value = nbsp(htmlspecialchars($value));
+
+		if ($mapping !== false) {
+			$value = $mapping.' ('.$value.')';
+		}
+	}
+	else {
 		$value = applyValueMap($value, $item['valuemapid']);
 	}
 
@@ -932,10 +954,6 @@ function formatItemValueType(array $item) {
 			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
 			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
 		$value = $item['lastvalue'];
-		if (zbx_strlen($value) > 20) {
-			$value = zbx_substr($value, 0, 20).' ...';
-		}
-		$value = nbsp(htmlspecialchars($value));
 	}
 	else {
 		$value = _('Unknown value type');
@@ -1039,37 +1057,31 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 	return $value;
 }
 
-/*
- * Purpose: check if current time is within given period
+/**
+ * Check if current time is within given period
  *
- * Parameters: period - [IN] time period in format [wd[-wd2],hh:mm-hh:mm]
- *             now    - [IN] timestamp for comparison
+ * @param array $period              time period format: "wd[-wd2],hh:mm-hh:mm"
+ * @param int $now                   current timestamp
  *
- * Return value: 0 - out of period, 1 - within the period
- *
- * Comments:
- *        !!! Don't forget sync code with C !!!
+ * @return bool                      true - within in a period, false - out of period
  */
-function check_time_period($period, $now) {
-	$tm = localtime($now, true);
-	$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
-	$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
-	$flag = (6 == sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2));
-	if (!$flag) {
-		$flag = (5 == sscanf($period, '%d,%d:%d-%d:%d', $d1, $h1, $m1, $h2, $m2));
+function checkTimePeriod($period, $now) {
+	if (sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2) != 6) {
+		if (sscanf($period, '%d,%d:%d-%d:%d', $d1, $h1, $m1, $h2, $m2) != 5) {
+			// delay period format is wrong - skip
+			return false;
+		}
 		$d2 = $d1;
 	}
-	if (!$flag) {
-		// Delay period format is wrong - skip
-	}
-	else {
-		if ($day >= $d1 && $day <= $d2
-			&& $sec >= (SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1)
-			&& $sec <= (SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2)) {
-			return true;
-		}
-	}
-	return false;
+
+	$tm = localtime($now, true);
+	$day = ($tm['tm_wday'] == 0) ? 7 : $tm['tm_wday'];
+	$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
+
+	$sec1 = SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1;
+	$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
+
+	return $d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2;
 }
 
 function getItemDelay($delay, $flexIntervals) {
@@ -1086,192 +1098,190 @@ function getItemDelay($delay, $flexIntervals) {
 	}
 	return $minDelay;
 }
-/*
- * Function: get_current_delay
+
+/**
+ * Return delay value that is currently applicable
  *
- * Purpose: return delay value that is currently applicable
+ * @param int $delay                 default delay
+ * @param array $arrOfFlexIntervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
+ * @param int $now                   current timestamp
  *
- * Parameters: delay          - [IN] default delay
- *             flex_intervals - [IN] separated flexible intervals
- *
- *                                   +------------[;]<----------+
- *                                   |                          |
- *                                 ->+-[d/wd[-wd2],hh:mm-hh:mm]-+
- *
- *                                 d       - delay (0-n)
- *                                 wd, wd2 - day of week (1-7)
- *                                 hh      - hours (0-24)
- *                                 mm      - minutes (0-59)
- *
- *             now            - [IN] current time
- *
- * Return value: delay value - either default or minimum delay value
- *                             out of all applicable intervals
- *
- * Author: Alexander Vladishev
+ * @return int                       delay for a current timestamp
  */
-function get_current_delay($delay, $flex_intervals, $now) {
-	if (zbx_empty($flex_intervals)) {
+function getCurrentDelay($delay, array $arrOfFlexIntervals, $now) {
+	if (empty($arrOfFlexIntervals)) {
 		return $delay;
 	}
-	$current_delay = SEC_PER_YEAR;
-	$arr_of_flex_intervals = explode(';', $flex_intervals);
-	foreach ($arr_of_flex_intervals as $flex_interval) {
-		if (sscanf($flex_interval, "%d/%29s", $flex_delay, $flex_period) != 2) {
+
+	$currentDelay = SEC_PER_YEAR;
+
+	foreach ($arrOfFlexIntervals as $flexInterval) {
+		if (sscanf($flexInterval, '%d/%29s', $flexDelay, $flexPeriod) != 2) {
 			continue;
 		}
-		if ($flex_delay < $current_delay && check_time_period($flex_period, $now)) {
-			$current_delay = $flex_delay;
+		if ($flexDelay < $currentDelay && checkTimePeriod($flexPeriod, $now)) {
+			$currentDelay = $flexDelay;
 		}
 	}
-	if ($current_delay == SEC_PER_YEAR) {
+
+	if ($currentDelay == SEC_PER_YEAR) {
 		return $delay;
 	}
-	return $current_delay == 0 ? SEC_PER_YEAR : $current_delay;
+
+	return $currentDelay == 0 ? SEC_PER_YEAR : $currentDelay;
 }
 
-/*
- * Function: get_next_delay_interval
+/**
+ * Return time of next flexible interval
  *
- * Purpose: return time of next flexible interval
+ * @param array $arrOfFlexIntervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
+ * @param int $now                   current timestamp
+ * @param int $nextInterval          timestamp of a next interval
  *
- * Parameters: flex_intervals - [IN] separated flexible intervals
-	 *
- *                                   +------------[;]<----------+
- *                                   |                          |
- *                                 ->+-[d/wd[-wd2],hh:mm-hh:mm]-+
-	 *
- *                                 d       - delay (0-n)
- *                                 wd, wd2 - day of week (1-7)
- *                                 hh      - hours (0-24)
- *                                 mm      - minutes (0-59)
-	 *
- *             now            - [IN] current time
- *
- * Return value: start of next interval
- *
- * Author: Alexei Vladishev, Alexander Vladishev
+ * @return bool                      false if no flexible intervals defined
  */
-function get_next_delay_interval($flex_intervals, $now, &$next_interval) {
-	if (zbx_empty($flex_intervals)) {
+function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
+	if (empty($arrOfFlexIntervals)) {
 		return false;
 	}
+
 	$next = 0;
 	$tm = localtime($now, true);
-	$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
+	$day = ($tm['tm_wday'] == 0) ? 7 : $tm['tm_wday'];
 	$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
-	$arr_of_flex_intervals = explode(';', $flex_intervals);
-	foreach ($arr_of_flex_intervals as $flex_interval) {
-		if (7 != sscanf($flex_interval, "%d/%d-%d,%d:%d-%d:%d", $delay, $d1, $d2, $h1, $m1, $h2, $m2)) {
-			if (6 != sscanf($flex_interval, "%d/%d,%d:%d-%d:%d", $delay, $d1, $h1, $m1, $h2, $m2)) {
+
+	foreach ($arrOfFlexIntervals as $flexInterval) {
+		if (sscanf($flexInterval, '%d/%d-%d,%d:%d-%d:%d', $delay, $d1, $d2, $h1, $m1, $h2, $m2) != 7) {
+			if (sscanf($flexInterval, '%d/%d,%d:%d-%d:%d', $delay, $d1, $h1, $m1, $h2, $m2) != 6) {
 				continue;
 			}
 			$d2 = $d1;
 		}
+
 		$sec1 = SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1;
 		$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
 
-		if ($day >= $d1 && $day <= $d2 && $sec >= $sec1 && $sec <= $sec2) {
-			// current period
-			if ($next == 0 || ($next > ($now - $sec + $sec2))) {
+		// current period
+		if ($d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2) {
+			if ($next == 0 || $next > $now - $sec + $sec2) {
+				// the next second after the current interval's upper bound
 				$next = $now - $sec + $sec2;
 			}
 		}
-		elseif ($day >= $d1 && $day <= $d2 && $sec < $sec1) {
-			// will be active today
-			if ($next == 0 || ($next > ($now - $sec + $sec1))) {
+		// will be active today
+		elseif ($d1 <= $day && $d2 >= $day && $sec < $sec1) {
+			if ($next == 0 || $next > $now - $sec + $sec1) {
 				$next = $now - $sec + $sec1;
 			}
 		}
 		else {
-			$next_day = ($day + 1 <= 7) ? $day + 1 : 1;
+			$nextDay = ($day + 1 <= 7) ? $day + 1 : 1;
 
-			if ($next_day >= $d1 && $next_day <= $d2) {
-				// will be active tomorrow
-				if ($next == 0 || ($next > ($now - $sec + SEC_PER_DAY + $sec1))) {
+			// will be active tomorrow
+			if ($d1 <= $nextDay && $nextDay <= $d2) {
+				if ($next == 0 || $next > $now - $sec + SEC_PER_DAY + $sec1) {
 					$next = $now - $sec + SEC_PER_DAY + $sec1;
 				}
 			}
+			// later in the future
 			else {
+				$dayDiff = -1;
+
 				if ($day < $d1) {
-					$day_diff = $d1 - $day;
+					$dayDiff = $d1 - $day;
 				}
 				if ($day >= $d2) {
-					$day_diff = ($d1 + 7) - $day;
+					$dayDiff = ($d1 + 7) - $day;
 				}
-				if ($day >= $d1 && $day < $d2) {
+				if ($d1 <= $day && $day < $d2) {
 					// should never happen, could not deduce day difference
-					$day_diff = -1;
+					$dayDiff = -1;
 				}
-				if ($day_diff != -1) {
-					if ($next == 0 || ($next > ($now - $sec + SEC_PER_DAY * $day_diff + $sec1))) {
-						$next = $now - $sec + SEC_PER_DAY * $day_diff + $sec1;
-					}
+				if ($dayDiff != -1 && ($next == 0 || $next > $now - $sec + SEC_PER_DAY * $dayDiff + $sec1)) {
+					$next = $now - $sec + SEC_PER_DAY * $dayDiff + $sec1;
 				}
 			}
 		}
 	}
 	if ($next != 0) {
-		$next_interval = $next;
+		$nextInterval = $next;
 	}
-	return $next;
+	return $next != 0;
 }
 
-/*
- * Function: calculate_item_nextcheck
+/**
+ * Calculate nextcheck timestamp for an item
  *
- * Description:
- *     calculate nextcheck timestamp for item
+ * the parameter $flexIntervals accepts data in a format:
  *
- * Parameters:
- *     itemid - item ID
- *     item_type - item type
- *     delay - item's refresh rate in sec
- *     flex_intervals - item's flexible refresh rate
- *     now - current timestamp
+ *           +------------[;]<----------+
+ *           |                          |
+ *         ->+-[d/wd[-wd2],hh:mm-hh:mm]-+
  *
- * Author:
- *     Alexander Vladishev
+ *         d       - delay (0-n)
+ *         wd, wd2 - day of week (1-7)
+ *         hh      - hours (0-24)
+ *         mm      - minutes (0-59)
  *
- * Comments:
- *     !!! Don't forget sync code with C !!!
+ * @param string $interfaceid
+ * @param string $itemid
+ * @param int $itemType
+ * @param int $delay                 default delay
+ * @param string $flexIntervals      flexible intervals
+ * @param int $now                   current timestamp
+ *
+ * @return array
  */
-function calculate_item_nextcheck($interfaceid, $itemid, $item_type, $delay, $flex_intervals, $now) {
+function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexIntervals, $now) {
 	if ($delay == 0) {
 		$delay = SEC_PER_YEAR;
 	}
 
 	// special processing of active items to see better view in queue
-	if ($item_type == ITEM_TYPE_ZABBIX_ACTIVE) {
+	if ($itemType == ITEM_TYPE_ZABBIX_ACTIVE) {
 		$nextcheck = $now + $delay;
 	}
 	else {
-		$current_delay = get_current_delay($delay, $flex_intervals, $now);
+		// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
 
-		if (get_next_delay_interval($flex_intervals, $now, $next_interval) && ($now + $current_delay) > $next_interval) {
-			// next check falls out of the current interval
-			do {
-				$current_delay = get_current_delay($delay, $flex_intervals, $next_interval + 1);
+		$arrOfFlexIntervals = explode(';', $flexIntervals);
+		$t = $now;
+		$tmax = $now + SEC_PER_YEAR;
+		$try = 0;
 
-				// as soon as item check in the interval is not forbidden with delay=0, use it
-				if (SEC_PER_YEAR != $current_delay) {
-					break;
+		$shift = ($itemType == ITEM_TYPE_JMX) ? $interfaceid : $itemid;
+
+		while ($t < $tmax) {
+			// calculate 'nextcheck' value for the current interval
+			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
+
+			$nextcheck = $currentDelay * floor($t / $currentDelay) + ($shift % $currentDelay);
+
+			if ($try == 0) {
+				while ($nextcheck <= $t) {
+					$nextcheck += $currentDelay;
 				}
-				get_next_delay_interval($flex_intervals, $next_interval + 1, $next_interval);
 			}
-			while ($next_interval - $now < SEC_PER_WEEK);
-			// checking the nearest week for delay!=0
+			else {
+				while ($nextcheck < $t) {
+					$nextcheck += $currentDelay;
+				}
+			}
 
-			$now = $next_interval;
+			// 'nextcheck' < end of the current interval ?
+			// the end of the current interval is the beginning of the next interval - 1
+			if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextcheck >= $nextInterval) {
+				// 'nextcheck' is beyond the current interval
+				$t = $nextInterval;
+				$try++;
+			}
+			else {
+				break;
+			}
 		}
-		$delay = $current_delay;
-		$shift = $item_type == ITEM_TYPE_JMX ? $interfaceid : $itemid;
-		$nextcheck = $delay * floor($now / $delay) + ($shift % $delay);
-
-		while ($nextcheck <= $now) {
-			$nextcheck += $delay;
-		}
+		$delay = $currentDelay;
 	}
+
 	return array('nextcheck' => $nextcheck, 'delay' => $delay);
 }
 

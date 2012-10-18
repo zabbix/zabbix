@@ -867,13 +867,15 @@ class CUser extends CZBXAPI {
 		}
 	}
 
-	public function logout($sessionid) {
+	public function logout() {
 		global $ZBX_LOCALNODEID;
 
+		$sessionId = CWebUser::$data['sessionid'];
+
 		$session = DBfetch(DBselect(
-			'SELECT s.*'.
+			'SELECT s.userid'.
 			' FROM sessions s'.
-			' WHERE s.sessionid='.zbx_dbstr($sessionid).
+			' WHERE s.sessionid='.zbx_dbstr($sessionId).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID)
 		));
@@ -882,7 +884,7 @@ class CUser extends CZBXAPI {
 		}
 
 		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
-		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionId));
 
 		return true;
 	}
@@ -931,23 +933,23 @@ class CUser extends CZBXAPI {
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid'
 		));
-		if (!zbx_empty($dbAccess['gui_access'])) {
-			$guiAccess = $dbAccess['gui_access'];
-		}
-		else {
+		if (zbx_empty($dbAccess['gui_access'])) {
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
 		}
+		else {
+			$guiAccess = $dbAccess['gui_access'];
+		}
 
+		$config = select_config();
+		$authType = $config['authentication_type'];
 		switch ($guiAccess) {
 			case GROUP_GUI_ACCESS_INTERNAL:
-				$authType = ZBX_AUTH_INTERNAL;
+				$authType = ($authType == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
 				break;
 			case GROUP_GUI_ACCESS_DISABLED:
 				/* fall through */
 			case GROUP_GUI_ACCESS_SYSTEM:
-				$config = select_config();
-				$authType = $config['authentication_type'];
-				break;
+				/* fall through */
 		}
 
 		try {

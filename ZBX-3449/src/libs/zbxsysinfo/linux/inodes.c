@@ -20,172 +20,67 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static int	get_fs_inodes_stat(char *fs, zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *usage)
-{
-#ifdef HAVE_SYS_STATVFS_H
-	struct statvfs   s;
-#else
-	struct statfs   s;
-#endif
-
-	assert(fs);
-
-#ifdef HAVE_SYS_STATVFS_H
-	if ( statvfs( fs, &s) != 0 )
-#else
-	if ( statfs( fs, &s) != 0 )
-#endif
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-
-	if(total)
-		(*total) = (zbx_uint64_t)(s.f_files);
-#ifdef HAVE_SYS_STATVFS_H
-	if(free)
-		(*free)  = (zbx_uint64_t)(s.f_favail);
-	if(usage)
-		(*usage) = (zbx_uint64_t)(s.f_files - s.f_favail);
-#else
-	if(free)
-		(*free)  = (zbx_uint64_t)(s.f_ffree);
-	if(usage)
-		(*usage) = (zbx_uint64_t)(s.f_files - s.f_ffree);
-#endif
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char		mountPoint[MAX_STRING_LEN];
-	zbx_uint64_t	value = 0;
-
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
-
-	if(get_fs_inodes_stat(mountPoint, NULL, NULL, &value) != SYSINFO_RET_OK)
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char		mountPoint[MAX_STRING_LEN];
-	zbx_uint64_t	value = 0;
-
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
-
-	if(get_fs_inodes_stat(mountPoint, NULL, &value, NULL) != SYSINFO_RET_OK)
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char		mountPoint[MAX_STRING_LEN];
-	zbx_uint64_t	value = 0;
-
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
-
-	if(get_fs_inodes_stat(mountPoint, &value, NULL, NULL) != SYSINFO_RET_OK)
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char		mountPoint[MAX_STRING_LEN];
-	zbx_uint64_t	tot_val = 0;
-	zbx_uint64_t	free_val = 0;
-
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
-
-	if(get_fs_inodes_stat(mountPoint, &tot_val, &free_val, NULL) != SYSINFO_RET_OK)
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char		mountPoint[MAX_STRING_LEN];
-	zbx_uint64_t	tot_val = 0;
-	zbx_uint64_t	usg_val = 0;
-
-        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
-
-	if(get_fs_inodes_stat(mountPoint, &tot_val, NULL, &usg_val) != SYSINFO_RET_OK)
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, (100.0 * (double)usg_val) / (double)tot_val);
-
-	return SYSINFO_RET_OK;
-}
-
 int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
+#ifdef HAVE_SYS_STATVFS_H
+#	define ZBX_STATFS	statvfs
+#	define ZBX_FFREE	f_favail
+#else
+#	define ZBX_STATFS	statfs
+#	define ZBX_FFREE	f_ffree
+#endif
+	char			fsname[MAX_STRING_LEN], mode[8];
+	zbx_uint64_t		total;
+	struct ZBX_STATFS	s;
+
+	if (2 < num_param(param))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (0 != ZBX_STATFS(fsname, &s))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 	{
-		{"free" ,	VFS_FS_INODE_FREE},
-		{"total" ,	VFS_FS_INODE_TOTAL},
-		{"used",	VFS_FS_INODE_USED},
-		{"pfree" ,	VFS_FS_INODE_PFREE},
-		{"pused" ,	VFS_FS_INODE_PUSED},
-		{NULL,		0}
-	};
-
-	char	fsname[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-	int	i;
-
-        if(num_param(param) > 2)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, fsname, sizeof(fsname)) != 0)
-                return SYSINFO_RET_FAIL;
-
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-                mode[0] = '\0';
-
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "total");
+		SET_UI64_RESULT(result, s.f_files);
 	}
+	else if (0 == strcmp(mode, "free"))
+	{
+		SET_UI64_RESULT(result, s.ZBX_FFREE);
+	}
+	else if (0 == strcmp(mode, "used"))
+	{
+		SET_UI64_RESULT(result, s.f_files - s.f_ffree);
+	}
+	else if (0 == strcmp(mode, "pfree"))
+	{
+		total = s.f_files;
+#ifdef HAVE_SYS_STATVFS_H
+		total -= s.f_ffree - s.f_favail;
+#endif
+		if (0 != total)
+			SET_DBL_RESULT(result, (double)(100.0 * s.ZBX_FFREE) / total);
+		else
+			return SYSINFO_RET_FAIL;
+	}
+	else if (0 == strcmp(mode, "pused"))
+	{
+		total = s.f_files;
+#ifdef HAVE_SYS_STATVFS_H
+		total -= s.f_ffree - s.f_favail;
+#endif
+		if (0 != total)
+			SET_DBL_RESULT(result, 100.0 - (double)(100.0 * s.ZBX_FFREE) / total);
+		else
+			return SYSINFO_RET_FAIL;
+	}
+	else
+		return SYSINFO_RET_FAIL;
 
-	for(i=0; fl[i].mode!=0; i++)
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-			return (fl[i].function)(cmd, fsname, flags, result);
-
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }

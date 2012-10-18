@@ -622,18 +622,28 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 
 			if (STAT_SUCCESS == status)
 			{
-				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error [%s]", snmp_errstring(response->errstat));
+				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error: %s", snmp_errstring(response->errstat));
 				ret = NOTSUPPORTED;
 			}
 			else if (STAT_ERROR == status)
 			{
-				zbx_snprintf(err, MAX_STRING_LEN, "Could not connect to [[%s]:%d]",
-						item->interface.addr, (int)item->interface.port);
-				ret = NETWORK_ERROR;
+				zbx_snprintf(err, MAX_STRING_LEN, "Could not connect to \"%s:%d\": %s",
+						item->interface.addr, (int)item->interface.port,
+						snmp_api_errstring(ss->s_snmp_errno));
+				switch (ss->s_snmp_errno)
+				{
+					case SNMPERR_UNKNOWN_USER_NAME:
+					case SNMPERR_UNSUPPORTED_SEC_LEVEL:
+					case SNMPERR_AUTHENTICATION_FAILURE:
+						ret = NOTSUPPORTED;
+						break;
+					default:
+						ret = NETWORK_ERROR;
+				}
 			}
 			else if (STAT_TIMEOUT == status)
 			{
-				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [[%s]:%d]",
+				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to \"%s:%d\"",
 						item->interface.addr, (int)item->interface.port);
 				ret = NETWORK_ERROR;
 			}
@@ -855,25 +865,38 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 		{
 			if (status == STAT_SUCCESS)
 			{
-				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%s]",
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error: %s",
 						snmp_errstring(response->errstat)));
 				ret = NOTSUPPORTED;
-				running = 0;
+			}
+			else if (STAT_ERROR == status)
+			{
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Could not connect to \"%s:%d\": %s",
+						item->interface.addr, (int)item->interface.port,
+						snmp_api_errstring(ss->s_snmp_errno)));
+				switch (ss->s_snmp_errno)
+				{
+					case SNMPERR_UNKNOWN_USER_NAME:
+					case SNMPERR_UNSUPPORTED_SEC_LEVEL:
+					case SNMPERR_AUTHENTICATION_FAILURE:
+						ret = NOTSUPPORTED;
+						break;
+					default:
+						ret = NETWORK_ERROR;
+				}
 			}
 			else if (status == STAT_TIMEOUT)
 			{
-				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [[%s]:%d]",
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to \"%s:%d\"",
 						item->interface.addr, (int)item->interface.port));
 				ret = NETWORK_ERROR;
-				running = 0;
 			}
 			else
 			{
-				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%d]",
-						status));
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%d]", status));
 				ret = NOTSUPPORTED;
-				running = 0;
 			}
+			running = 0;
 		}
 
 		if (response)
@@ -926,18 +949,28 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid
 	{
 		if (STAT_SUCCESS == status)
 		{
-			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%s]", snmp_errstring(response->errstat)));
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error: %s", snmp_errstring(response->errstat)));
 			ret = NOTSUPPORTED;
 		}
 		else if (STAT_ERROR == status)
 		{
-			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Could not connect to [[%s]:%d]",
-					item->interface.addr, (int)item->interface.port));
-			ret = NETWORK_ERROR;
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Could not connect to \"%s:%d\": %s",
+					item->interface.addr, (int)item->interface.port,
+					snmp_api_errstring(ss->s_snmp_errno)));
+			switch (ss->s_snmp_errno)
+			{
+				case SNMPERR_UNKNOWN_USER_NAME:
+				case SNMPERR_UNSUPPORTED_SEC_LEVEL:
+				case SNMPERR_AUTHENTICATION_FAILURE:
+					ret = NOTSUPPORTED;
+					break;
+				default:
+					ret = NETWORK_ERROR;
+			}
 		}
 		else if (STAT_TIMEOUT == status)
 		{
-			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [[%s]:%d]",
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to \"%s:%d\"",
 					item->interface.addr, (int)item->interface.port));
 			ret = NETWORK_ERROR;
 		}

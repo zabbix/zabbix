@@ -36,14 +36,10 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		// get time control
 		$timeControlData = array(
-			'id' => $resourceid,
-			'domid' => $this->getDataId(),
+			'id' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
-			'loadSBox' => 0,
 			'loadImage' => 1,
-			'loadScroll' => 0,
-			'dynamic' => 0,
 			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
@@ -66,22 +62,26 @@ class CScreenSimpleGraph extends CScreenBase {
 		}
 
 		$timeControlData['src'] = zbx_empty($resourceid)
-			? 'chart3.php?'
+			? 'chart3.php?updateProfile='.(int) $this->updateProfile
 			: 'chart.php?itemid='.$resourceid.'&'.$this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
+
+		$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
+			? '&period=3600&stime='.date('YmdHis', time())
+			: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
 			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
-			if ($this->mode == SCREEN_MODE_VIEW) { // used in slide shows
+			if ($this->mode == SCREEN_MODE_SLIDESHOW) {
 				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 			else {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
-			if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) {
+			if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {

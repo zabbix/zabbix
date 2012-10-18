@@ -626,28 +626,6 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		DB::delete('items', array('itemid' => $ruleids));
 
-		// housekeeper
-		$itemDataTables = array(
-			'trends',
-			'trends_uint',
-			'history_text',
-			'history_log',
-			'history_uint',
-			'history_str',
-			'history'
-		);
-		$insert = array();
-		foreach ($ruleids as $ruleid) {
-			foreach ($itemDataTables as $table) {
-				$insert[] = array(
-					'tablename' => $table,
-					'field' => 'itemid',
-					'value' => $ruleid
-				);
-			}
-		}
-		DB::insert('housekeeper', $insert);
-
 		// TODO: remove info from API
 		foreach ($delRules as $item) {
 			$host = reset($item['hosts']);
@@ -837,7 +815,8 @@ class CDiscoveryRule extends CItemGeneral {
 		// save new triggers
 		$dstTriggers = $srcTriggers;
 		foreach ($dstTriggers as $id => $trigger) {
-			unset($trigger['triggerid']);
+			unset($dstTriggers[$id]['templateid']);
+			unset($dstTriggers[$id]['triggerid']);
 
 			// update expression
 			$dstTriggers[$id]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
@@ -1028,6 +1007,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
+		unset($dstDiscovery['templateid']);
 
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1057,6 +1037,11 @@ class CDiscoveryRule extends CItemGeneral {
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			));
+
+			foreach ($newPrototypes as $i => $newPrototype) {
+				unset($newPrototypes[$i]['templateid']);
+			}
+
 			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
@@ -1093,6 +1078,8 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
+
+				unset($prototype['templateid']);
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1201,6 +1188,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$dstGraphs = $srcGraphs;
 		foreach ($dstGraphs as &$graph) {
 			unset($graph['graphid']);
+			unset($graph['templateid']);
 
 			foreach ($graph['gitems'] as &$gitem) {
 				// replace the old item with the new one with the same key

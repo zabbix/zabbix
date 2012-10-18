@@ -43,7 +43,7 @@ static int	add_trigger_info(DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (EVENT_OBJECT_TRIGGER == event->object && 0 != event->objectid)
+	if (EVENT_SOURCE_TRIGGERS == event->source)
 	{
 		if (SUCCEED == DBis_node_local_id(event->objectid))
 		{
@@ -63,8 +63,8 @@ static int	add_trigger_info(DB_EVENT *event)
 			if (NULL != (row = DBfetch(result)))
 			{
 				event->trigger.triggerid = event->objectid;
-				strscpy(event->trigger.description, row[0]);
-				strscpy(event->trigger.expression, row[1]);
+				event->trigger.description = zbx_strdup(event->trigger.description, row[0]);
+				event->trigger.expression = zbx_strdup(event->trigger.expression, row[1]);
 				event->trigger.priority = (unsigned char)atoi(row[2]);
 				event->trigger.type = (unsigned char)atoi(row[3]);
 			}
@@ -77,6 +77,15 @@ static int	add_trigger_info(DB_EVENT *event)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+static void	free_trigger_info(DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_free(event->trigger.description);
+		zbx_free(event->trigger.expression);
+	}
 }
 
 /******************************************************************************
@@ -132,6 +141,9 @@ int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t obj
 
 	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed && EVENT_OBJECT_TRIGGER == event.object)
 		DBupdate_services(event.objectid, TRIGGER_VALUE_TRUE == event.value ? event.trigger.priority : 0, event.clock);
+
+	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed || 1 == force_actions)
+		free_trigger_info(&event);
 
 	ret = SUCCEED;
 fail:

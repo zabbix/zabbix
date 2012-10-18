@@ -23,6 +23,7 @@
 #include "pid.h"
 #include "db.h"
 #include "dbcache.h"
+#include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
@@ -422,6 +423,8 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			0},
 		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		TYPE_INT,
 			PARM_OPT,	0,			3600000},
+		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+			PARM_OPT,	0,			1},
 		{NULL}
 	};
 
@@ -572,6 +575,8 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	DBinit();
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
 
 	init_database_cache();
 	init_configuration_cache();
@@ -632,7 +637,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_CONFSYNCER, CONFIG_CONFSYNCER_FORKS);
 
-		main_proxyconfig_loop(proxy_num);
+		main_proxyconfig_loop();
 	}
 	else if (proxy_num <= (proxy_count += CONFIG_HEARTBEAT_FORKS))
 	{
