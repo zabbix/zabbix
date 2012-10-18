@@ -222,6 +222,7 @@ static void	cache_del_snmp_index(DC_ITEM *item, char *oid, char *value)
 	{
 		zbx_free(snmpidx[i].oid);
 		zbx_free(snmpidx[i].value);
+		zbx_free(snmpidx[i].idx);
 		memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i - 1));
 		snmpidx_count--;
 	}
@@ -1080,9 +1081,9 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "Special processing");
 
-					if (get_key_param(item->snmp_oid, 1, method, sizeof(method)) != 0
-						|| get_key_param(item->snmp_oid, 2, oid_index, MAX_STRING_LEN) != 0
-						|| get_key_param(item->snmp_oid, 3, index_value, MAX_STRING_LEN) != 0)
+					if (0 != get_key_param(item->snmp_oid, 1, method, sizeof(method)) ||
+						0 != get_key_param(item->snmp_oid, 2, oid_index, MAX_STRING_LEN) ||
+						0 != get_key_param(item->snmp_oid, 3, index_value, MAX_STRING_LEN))
 					{
 						SET_MSG_RESULT(value, zbx_dsprintf(NULL,
 								"Cannot retrieve all three parameters from [%s]",
@@ -1091,9 +1092,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 						break;
 					}
 
-					zabbix_log(LOG_LEVEL_DEBUG, "method:%s", method);
-					zabbix_log(LOG_LEVEL_DEBUG, "oid_index:%s", oid_index);
-					zabbix_log(LOG_LEVEL_DEBUG, "index_value:%s", index_value);
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() method:'%s' oid_index:'%s' index_value:'%s'",
+							__function_name, method, oid_index, index_value);
 
 					if (0 != strcmp("index", method))
 					{
