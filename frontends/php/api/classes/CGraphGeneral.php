@@ -97,16 +97,17 @@ abstract class CGraphGeneral extends CZBXAPI {
 		$graphNames = array();
 		foreach ($graphs as $graph) {
 			// check if the host has any graphs in DB with the same name within host
-			$hosts = API::Host()->get(array(
+			$hostsAndTemplates = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'templated_hosts' => true
 			));
 
-			$hostids = array_keys($hosts);
+			$hostAndTemplateIds = array_keys($hostsAndTemplates);
 			$graphsExists = API::Graph()->get(array(
-				'hostids' => $hostids,
+				'hostids' => $hostAndTemplateIds,
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
 				'nopermissions' => true,
@@ -116,19 +117,19 @@ abstract class CGraphGeneral extends CZBXAPI {
 			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
 			foreach ($graphsExists as $graphExists) {
 				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists.', $graph['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists in graphs or graph prototypes.', $graph['name']));
 				}
 			}
 			// cheks that there is no two graphs with the same name within host
-			foreach ($hostids as $hostid) {
+			foreach ($hostAndTemplateIds as $id) {
 				if (!isset($graphNames[$graph['name']])) {
 					$graphNames[$graph['name']] = array();
 				}
-				if (isset($graphNames[$graph['name']][$hostid])) {
+				if (isset($graphNames[$graph['name']][$id])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('More than one graph with name "%1$s" within host.', $graph['name']));
 				}
 				else {
-					$graphNames[$graph['name']][$hostid] = true;
+					$graphNames[$graph['name']][$id] = true;
 				}
 			}
 		}
