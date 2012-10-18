@@ -25,8 +25,8 @@ try {
 	Z::getInstance()->run();
 }
 catch (DBException $e) {
-	$warningMessage = 'Database error: '.$e->getMessage();
-	require_once dirname(__FILE__).'/warning.php';
+	$warningView = new CView('general.warning', array('message' => 'Database error: '.$e->getMessage()));
+	$warningView->render();
 	exit;
 }
 catch (ConfigFileException $e) {
@@ -36,14 +36,14 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			$warningMessage = 'Configuration file error: '.$e->getMessage();
-			require_once dirname(__FILE__).'/warning.php';
+			$warningView = new CView('general.warning', array('message' => 'Configuration file error: '.$e->getMessage()));
+			$warningView->render();
 			exit;
 	}
 }
 catch (Exception $e) {
-	$warningMessage = $e->getMessage();
-	require_once dirname(__FILE__).'/warning.php';
+	$warningView = new CView('general.warning', array('message' => $e->getMessage()));
+	$warningView->render();
 	exit;
 }
 

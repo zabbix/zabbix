@@ -279,8 +279,7 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'setup.php',
-				'label' => _('Installation'),
-				'sub_pages' => array('warning.php')
+				'label' => _('Installation')
 			)
 		)
 	),
