@@ -271,11 +271,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				OCI_DEFAULT);
 
 		if (OCI_SUCCESS == err)
+		{
 			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp, (ub4 *)0,
 					OCI_ATTR_SERVER, oracle.errhp);
-
-		if (OCI_SUCCESS == err)
-			DBexecute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. '");
+		}
 
 		if (OCI_SUCCESS != err)
 		{
