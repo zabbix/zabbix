@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -29,8 +29,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'itemid' =>			array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+	'screenid' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
@@ -59,8 +62,8 @@ if (empty($dbItems)) {
  * Display
  */
 $timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.item.graph'),
-	'profileIdx2' => get_request('itemid'),
+	'profileIdx' => get_request('profileIdx', 'web.screens'),
+	'profileIdx2' => get_request('profileIdx2'),
 	'updateProfile' => get_request('updateProfile', true),
 	'period' => get_request('period'),
 	'stime' => get_request('stime')

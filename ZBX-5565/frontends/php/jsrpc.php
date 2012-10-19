@@ -85,7 +85,7 @@ switch ($data['method']) {
 		}
 
 		// timeout
-		$timeOut = time() - $msgsettings['timeout'];
+		$timeout = time() - $msgsettings['timeout'];
 		$lastMsgTime = 0;
 		if (isset($data['params']['messageLast']['events'])) {
 			$lastMsgTime = $data['params']['messageLast']['events']['time'];
@@ -93,7 +93,7 @@ switch ($data['method']) {
 
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
-			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeOut)),
+			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeout)),
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 			'priority' => array_keys($msgsettings['triggers.severities']),
 			'limit' => 15
@@ -173,6 +173,7 @@ switch ($data['method']) {
 		$options = array(
 			'pageFile' => !empty($data['pageFile']) ? $data['pageFile'] : null,
 			'mode' => !empty($data['mode']) ? $data['mode'] : null,
+			'timestamp' => !empty($data['timestamp']) ? $data['timestamp'] : time(),
 			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
 			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
 			'groupid' => !empty($data['groupid']) ? $data['groupid'] : null,

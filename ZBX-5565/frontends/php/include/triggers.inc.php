@@ -1332,14 +1332,14 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 	if (empty($hostNames)) {
 		return $triggerTable;
 	}
+	$triggerTable->makeVerticalRotation();
 	order_result($hostNames);
 
-	$css = getUserTheme(CWebUser::$data);
 	if ($view_style == STYLE_TOP) {
 		// header
 		$header = array(new CCol(_('Triggers'), 'center'));
 		foreach ($hostNames as $hostName) {
-			$header = array_merge($header, array(new CCol(array(new CImg('vtext.php?text='.urlencode($hostName).'&theme='.$css)), 'hosts')));
+			$header[] = new CCol($hostName, 'vertical_rotation');
 		}
 		$triggerTable->setHeader($header, 'vertical_header');
 
@@ -1356,8 +1356,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 		foreach ($triggers as $description => $triggerHosts) {
-			$description = array(new CImg('vtext.php?text='.urlencode($description).'&theme='.$css));
-			array_push($header, $description);
+			$header[] = new CCol($description, 'vertical_rotation');
 		}
 		$triggerTable->setHeader($header, 'vertical_header');
 

@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -207,6 +207,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/include/classes/helpers/trigger',
+			$this->rootDir.'/include/classes/macros',
 			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/api/classes',
