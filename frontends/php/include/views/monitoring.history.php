@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -172,7 +172,10 @@ else {
 		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 	}
 
-	$historyWidget->addItem($screen->get());
+	$historyTable = new CTable(_('No graphs defined.'), 'maxwidth');
+	$historyTable->addRow($screen->get());
+
+	$historyWidget->addItem($historyTable);
 
 	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph') {
 		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
