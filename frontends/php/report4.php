@@ -43,7 +43,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$_REQUEST['period'] = $period;
 	$_REQUEST['media_type'] = $media_type;
 
-	$css = getUserTheme($USER_DETAILS);
+	$css = getUserTheme(CWebUser::$data);
 
 	$media_types = array();
 

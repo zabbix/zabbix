@@ -261,7 +261,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$m_form->setName('tr_status');
 	$m_form->addVar('backurl', $page['file']);
 
-	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
+	$admin_links = ((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN) || (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN));
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 
 	$table = new CTableInfo(_('No triggers defined.'));

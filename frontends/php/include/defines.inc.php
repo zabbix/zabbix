@@ -24,7 +24,7 @@ define('ZABBIX_API_VERSION', '1.4');
 define('ZABBIX_DB_VERSION',	 2010008);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO', '2012');
+define('ZABBIX_COPYRIGHT_TO',   '2012');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -918,7 +918,12 @@ define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // if magic quotes on, then get rid of them
-if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
+
+if (get_magic_quotes_gpc()) {
+	function zbx_stripslashes($value) {
+		$value = is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value);
+		return $value;
+	}
 	$_GET = zbx_stripslashes($_GET);
 	$_POST = zbx_stripslashes($_POST);
 	$_COOKIE = zbx_stripslashes($_COOKIE);

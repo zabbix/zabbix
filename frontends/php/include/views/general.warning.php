@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,11 +19,22 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+$pageHeader = new CPageHeader('Warning [refreshed every 30 sec]');
+$pageHeader->addCssFile('css.css');
+$pageHeader->display();
+?>
+<body>
+<?php
+// $warningMessage should be set in context where this file is included
+$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $this->get('message'));
+$warning->setButtons(array(
+	new CButton('login', _('Retry'), 'document.location.reload();', 'formlist'),
+));
+$warning->show();
+?>
+<script>
+	setTimeout("document.location.reload();", 30000);
+</script>
 
-class function_DBloadfile extends CZabbixTest {
-	public function test_DBloadfile() {
-		// TODO
-		$this->markTestIncomplete();
-	}
-}
+</body>
+</html>

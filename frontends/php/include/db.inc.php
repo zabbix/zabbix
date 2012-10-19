@@ -19,28 +19,6 @@
 **/
 
 
-if (!isset($DB)) {
-	$DB = array();
-	if (isset($DB_TYPE)) {
-		$DB['TYPE'] = $DB_TYPE;
-	}
-	if (isset($DB_SERVER)) {
-		$DB['SERVER'] = $DB_SERVER;
-	}
-	if (isset($DB_PORT)) {
-		$DB['PORT'] = $DB_PORT;
-	}
-	if (isset($DB_DATABASE)) {
-		$DB['DATABASE'] = $DB_DATABASE;
-	}
-	if (isset($DB_USER)) {
-		$DB['USER'] = $DB_USER;
-	}
-	if (isset($DB_PASSWORD)) {
-		$DB['PASSWORD'] = $DB_PASSWORD;
-	}
-}
-
 /**
  * Creates global database connection
  *
@@ -416,7 +394,7 @@ function DBrollback() {
  * @param integer $offset return starting from $offset record
  * @return resource or object, False if failed
  */
-function &DBselect($query, $limit = null, $offset = 0) {
+function DBselect($query, $limit = null, $offset = 0) {
 	global $DB;
 
 	$result = false;
@@ -578,7 +556,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
-function DBfetch(&$cursor, $convertNulls = true) {
+function DBfetch($cursor, $convertNulls = true) {
 	global $DB;
 
 	$result = false;
@@ -646,115 +624,6 @@ function DBfetch(&$cursor, $convertNulls = true) {
 		}
 	}
 	return $result;
-}
-
-// string value prepearing
-if (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_MYSQL) {
-	function zbx_dbstr($var) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".mysql_real_escape_string($value)."'";
-			}
-			return $var;
-		}
-		return "'".mysql_real_escape_string($var)."'";
-	}
-
-	function zbx_dbcast_2bigint($field) {
-		return ' CAST('.$field.' AS UNSIGNED) ';
-	}
-
-	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
-		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
-	}
-}
-elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-	function zbx_dbstr($var) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".pg_escape_string($value)."'";
-			}
-			return $var;
-		}
-		return "'".pg_escape_string($var)."'";
-	}
-
-	function zbx_dbcast_2bigint($field) {
-		return ' CAST('.$field.' AS BIGINT) ';
-	}
-
-	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
-		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
-	}
-}
-elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
-	function zbx_dbstr($var) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".preg_replace('/\'/', '\'\'', $value)."'";
-			}
-			return $var;
-		}
-		return "'".preg_replace('/\'/','\'\'',$var)."'";
-	}
-
-	function zbx_dbcast_2bigint($field) {
-		return ' CAST('.$field.' AS NUMBER(20)) ';
-	}
-
-	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
-		if ($afterWhere) {
-			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
-		}
-		else {
-			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
-		}
-	}
-}
-elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
-	function zbx_dbstr($var) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".db2_escape_string($value)."'";
-			}
-			return $var;
-		}
-		return "'".db2_escape_string($var)."'";
-	}
-
-	function zbx_dbcast_2bigint($field) {
-		return ' CAST('.$field.' AS BIGINT) ';
-	}
-
-	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
-		if ($afterWhere) {
-			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
-		}
-		else {
-			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
-		}
-	}
-}
-elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
-	function zbx_dbstr($var) {
-		global $DB;
-
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".$DB['DB']->escapeString($value)."'";
-			}
-			return $var;
-		}
-		return "'".$DB['DB']->escapeString($var)."'";
-	}
-
-	function zbx_dbcast_2bigint($field) {
-		return ' CAST('.$field.' AS BIGINT) ';
-	}
-
-	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
-		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
-	}
 }
 
 function zbx_dbconcat($params) {

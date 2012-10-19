@@ -59,7 +59,6 @@ class CWebUser {
 
 			zbx_setcookie('zbx_sessionid', self::$data['sessionid'], self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0);
 
-			self::makeGlobal();
 			return true;
 		}
 		catch (Exception $e) {
@@ -102,7 +101,6 @@ class CWebUser {
 
 			zbx_setcookie('zbx_sessionid', $sessionid, self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0);
 
-			self::makeGlobal();
 			return true;
 		}
 		catch (Exception $e) {
@@ -119,13 +117,6 @@ class CWebUser {
 			'type' => '0',
 			'node' => array('name' => '- unknown -', 'nodeid' => 0)
 		);
-		self::makeGlobal();
-	}
-
-	private static function makeGlobal() {
-		global $USER_DETAILS;
-
-		$USER_DETAILS = self::$data;
 	}
 
 	/**
