@@ -556,6 +556,8 @@ class CScript extends CZBXAPI {
 		));
 
 		if (!empty($scripts)) {
+			$macrosResolver = new CMacrosResolver();
+
 			foreach ($scripts as $script) {
 				// get resolved macros
 				$macrosData = array();
@@ -565,7 +567,6 @@ class CScript extends CZBXAPI {
 					}
 				}
 
-				$macrosResolver = new CMacrosResolver();
 				$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
 
 				// set script to host
