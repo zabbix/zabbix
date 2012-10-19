@@ -556,21 +556,19 @@ class CScript extends CZBXAPI {
 		));
 
 		if (!empty($scripts)) {
-			// get resolved macros
-			$macrosData = array();
 			foreach ($scripts as $script) {
+				// get resolved macros
+				$macrosData = array();
 				if (!empty($script['confirmation'])) {
 					foreach ($script['hosts'] as $host) {
 						$macrosData[$host['hostid']] = $script['confirmation'];
 					}
 				}
-			}
 
-			$macrosResolver = new CMacrosResolver();
-			$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+				$macrosResolver = new CMacrosResolver();
+				$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
 
-			// set script to host
-			foreach ($scripts as $script) {
+				// set script to host
 				foreach ($script['hosts'] as $host) {
 					$hostId = $host['hostid'];
 

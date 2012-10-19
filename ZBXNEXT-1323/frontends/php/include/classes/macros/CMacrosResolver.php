@@ -156,7 +156,7 @@ class CMacrosResolver {
 	function replaceMacroValues($text, $macros) {
 		$i = 0;
 		$begin = false;
-		while ($i = strpos($text, ($begin ? '}' : '{'), $i)) {
+		while ($i = zbx_strpos($text, ($begin ? '}' : '{'), $i)) {
 			$char = zbx_substr($text, $i, 1);
 
 			if ($char == '{') {
