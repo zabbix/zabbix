@@ -105,6 +105,7 @@ if (isset($_REQUEST['favobj'])) {
 				else {
 					$page['type'] = PAGE_TYPE_JS;
 
+					// display screens
 					$screens = API::Screen()->get(array(
 						'screenids' => $screen['screenid'],
 						'output' => API_OUTPUT_EXTEND,
@@ -113,23 +114,30 @@ if (isset($_REQUEST['favobj'])) {
 					$currentScreen = reset($screens);
 
 					$screenBuilder = new CScreenBuilder(array(
-						'isFlickerfree' => false,
 						'screen' => $currentScreen,
-						'mode' => SCREEN_MODE_SLIDESHOW,
+						'mode' => SCREEN_MODE_PREVIEW,
 						'profileIdx' => 'web.slides',
 						'profileIdx2' => $elementid,
 						'period' => get_request('period'),
 						'stime' => get_request('stime')
 					));
 
+					CScreenBuilder::insertScreenCleanJs();
+
 					echo $screenBuilder->show()->toString();
 
+					CScreenBuilder::insertScreenStandardJs(array(
+						'timeline' => $screenBuilder->timeline,
+						'profileIdx' => $screenBuilder->profileIdx
+					));
+					insertPagePostJs();
+
+					// insert slide show refresh js
 					$refresh = ($screen['delay'] > 0) ? $screen['delay'] : $slideshow['delay'];
 					$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
 					$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
 					$script .= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
-					$script .= 'timeControl.processObjects();';
 					insert_js($script);
 				}
 			}

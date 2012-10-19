@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -34,6 +34,7 @@ $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
 
 // craete table
 $discoveryTable = new CTableInfo(_('No discoveries defined.'));
+$discoveryTable->makeVerticalRotation();
 
 $header = array(
 	is_show_all_nodes() ? new CCol(_('Node'), 'left') : null,
@@ -42,9 +43,8 @@ $header = array(
 	new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 );
 
-$css = getUserTheme(CWebUser::$data);
 foreach ($this->data['services'] as $name => $foo) {
-	$header[] = new CImg('vtext.php?text='.urlencode($name).'&theme='.$css);
+	$header[] = new CCol($name, 'vertical_rotation');
 }
 $discoveryTable->setHeader($header, 'vertical_header');
 
