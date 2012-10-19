@@ -27,6 +27,117 @@ abstract class CGraphGeneral extends CZBXAPI {
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
 
 	/**
+	 * Check $graphs:
+	 *	whether graphs have name field
+	 *	whether not set  templateid
+	 *	whether graphs has at least one item
+	 *	whether all graph items has ids
+	 *	whether Pie and Exploded graphs has at most one sum item
+	 *	whether all graph items are editable by user
+	 *	whether graph has at least one prototype
+	 *	whether not creating graphs with the same name
+	 *
+	 * @param array $graphs
+	 * @param boolean $update
+	 * @param boolean $prototype
+	 * @return true
+	 */
+	protected function checkInput($graphs, $update = false) {
+		if ($update){
+			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
+		}
+		foreach ($graphs as $gnum => $graph) {
+			// graph fields
+			$fields = array('name' => null);
+			if (!$update && !check_db_fields($fields, $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph.'));
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $graph)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for graph "%1$s".', $graph['name']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for graph "%1$s".', $graph['name']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			// items fields
+			foreach ($graph['gitems'] as $gitem) {
+				// check color
+				if (!preg_match('/^[A-F0-9]{6}$/i', $gitem['color'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect colour "%1$s".', $gitem['color']));
+				}
+			}
+
+			// more than one sum type item for pie graph
+			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$sumItems = 0;
+				foreach ($graph['gitems'] as $gitem) {
+					if ($gitem['type'] == GRAPH_ITEM_SUM) {
+						$sumItems++;
+					}
+				}
+				if ($sumItems > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
+				}
+			}
+
+			// Y axis MIN value < Y axis MAX value
+			if (($graph['graphtype'] == GRAPH_TYPE_NORMAL || $graph['graphtype'] == GRAPH_TYPE_STACKED)
+					&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
+					&& $graph['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED
+					&& $graph['yaxismin'] >= $graph['yaxismax']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MAX value must be greater than Y axis MIN value.'));
+			}
+		}
+
+		$graphNames = array();
+		foreach ($graphs as $graph) {
+			// check if the host has any graphs in DB with the same name within host
+			$hostsAndTemplates = API::Host()->get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+				'preservekeys' => true,
+				'templated_hosts' => true
+			));
+
+			$hostAndTemplateIds = array_keys($hostsAndTemplates);
+			$graphsExists = API::Graph()->get(array(
+				'hostids' => $hostAndTemplateIds,
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
+				'nopermissions' => true,
+				'preservekeys' => true, // faster
+				'limit' => 1 // one match enough for check
+			));
+			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
+			foreach ($graphsExists as $graphExists) {
+				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists in graphs or graph prototypes.', $graph['name']));
+				}
+			}
+			// cheks that there is no two graphs with the same name within host
+			foreach ($hostAndTemplateIds as $id) {
+				if (!isset($graphNames[$graph['name']])) {
+					$graphNames[$graph['name']] = array();
+				}
+				if (isset($graphNames[$graph['name']][$id])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('More than one graph with name "%1$s" within host.', $graph['name']));
+				}
+				else {
+					$graphNames[$graph['name']][$id] = true;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Update existing graphs
 	 *
 	 * @param array $graphs

@@ -63,7 +63,6 @@ class DB {
 		}
 	}
 
-
 	/**
 	 * Reserve ids for primary key of passed table.
 	 * If record for table does not exist or value is out of range, ids record is recreated
