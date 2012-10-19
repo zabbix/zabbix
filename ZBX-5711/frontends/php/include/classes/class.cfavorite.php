@@ -110,7 +110,12 @@ class CFavorite {
 	public static function remove($idx, $favid = 0, $favobj = null) {
 
 		// remove from cache
-		self::$cache[$idx] = null;
+		if ($favid == 0 && $favobj === null) {
+			self::$cache[$idx] = array();
+		}
+		else {
+			self::$cache[$idx] = null;
+		}
 
 		return DBexecute(
 			'DELETE FROM profiles'.
