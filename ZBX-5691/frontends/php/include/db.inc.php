@@ -121,13 +121,13 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
-				if (!$DB['DB']) {
-					$error = 'Error connecting to database';
-					$result = false;
+				$DB['DB']= oci_pconnect($DB['USER'], $DB['PASSWORD'], $connect);
+				if ($DB['DB']) {
+					DBexecute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. '");
 				}
 				else {
-					DBexecute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. '");
+					$error = 'Error connecting to database';
+					$result = false;
 				}
 				break;
 			case ZBX_DB_DB2:
@@ -197,7 +197,7 @@ function DBclose() {
 				$result = pg_close($DB['DB']);
 				break;
 			case ZBX_DB_ORACLE:
-				$result = ocilogoff($DB['DB']);
+				$result = oci_close($DB['DB']);
 				break;
 			case ZBX_DB_DB2:
 				$result = db2_close($DB['DB']);
@@ -327,7 +327,7 @@ function DBcommit() {
 			$result = DBexecute('commit');
 			break;
 		case ZBX_DB_ORACLE:
-			$result = ocicommit($DB['DB']);
+			$result = oci_commit($DB['DB']);
 			break;
 		case ZBX_DB_DB2:
 			$result = db2_commit($DB['DB']);
@@ -356,7 +356,7 @@ function DBrollback() {
 			$result = DBexecute('rollback');
 			break;
 		case ZBX_DB_ORACLE:
-			$result = ocirollback($DB['DB']);
+			$result = oci_rollback($DB['DB']);
 			break;
 		case ZBX_DB_DB2:
 			$result = db2_rollback($DB['DB']);
@@ -442,12 +442,12 @@ function &DBselect($query, $limit = null, $offset = 0) {
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (!$result = OCIParse($DB['DB'], $query)) {
-				$e = @ocierror();
+			if (!$result = oci_parse($DB['DB'], $query)) {
+				$e = @oci_error();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
-			elseif (!@OCIExecute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = ocierror($result);
+			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = oci_error($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			break;
@@ -513,12 +513,12 @@ function DBexecute($query, $skip_error_messages = 0) {
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (!$result = OCIParse($DB['DB'], $query)) {
-				$e = @ocierror();
+			if (!$result = oci_parse($DB['DB'], $query)) {
+				$e = @oci_error();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
-			elseif (!@OCIExecute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = ocierror($result);
+			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = oci_error($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			else {
@@ -1081,7 +1081,6 @@ function DBcondition($fieldname, $array, $notin = false) {
 
 	if (!is_array($array)) {
 		throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
-		return ' 1=0 ';
 	}
 
 	$in = $notin ? ' NOT IN ':' IN ';
