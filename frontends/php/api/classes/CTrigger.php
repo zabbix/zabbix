@@ -1326,6 +1326,11 @@ class CTrigger extends CTriggerGeneral {
 			else {
 				$dbTrigger['expression'] = explode_exp($dbTrigger['expression']);
 			}
+			// unset unchanged data
+			$arrayDiff = array_diff_key($dbTrigger, $trigger);
+			foreach ($arrayDiff as $key => $arrayData) {
+				unset($dbTrigger[$key]);
+			}
 
 			$this->inherit($dbTrigger);
 
