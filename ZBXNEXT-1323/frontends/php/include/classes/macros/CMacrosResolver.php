@@ -178,11 +178,14 @@ class CMacrosResolver {
 
 					if ($value !== false) {
 						$text = zbx_substr_replace($text, $value, $begin, zbx_strlen($macro));
-
-						// recalculate iterator
-						$i = $begin + zbx_strlen($value) - 1;
-						$begin = false;
 					}
+					else {
+						$value = $macro;
+					}
+
+					// recalculate iterator
+					$i = $begin + zbx_strlen($value) - 1;
+					$begin = false;
 				}
 			}
 		}
