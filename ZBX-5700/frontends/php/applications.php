@@ -208,10 +208,15 @@ if (isset($_REQUEST['form'])) {
 	$data['form_refresh'] = get_request('form_refresh', 0);
 	$data['groupid'] = get_request('groupid', 0);
 
-	if (!empty($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
+	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
 		$db_application = DBfetch(DBselect('SELECT s.name,s.hostid FROM applications s WHERE s.applicationid='.$data['applicationid']));
 		$data['appname'] = $db_application['name'];
 		$data['apphostid'] = $db_application['hostid'];
+
+		if (empty($db_application)) {
+			access_deny();
+		}
+
 	}
 	else {
 		$data['appname'] = get_request('appname', '');

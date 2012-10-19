@@ -306,7 +306,7 @@ if (!empty($data['form'])) {
 	$data['maintenanceid'] = get_request('maintenanceid');
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	if (!empty($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
+	if (isset($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
 		// get maintenance
 		$maintenance = API::Maintenance()->get(array(
 			'output' => API_OUTPUT_EXTEND,
@@ -314,6 +314,11 @@ if (!empty($data['form'])) {
 			'editable' => true,
 			'maintenanceids' => $data['maintenanceid'],
 		));
+
+		if (empty($maintenance)) {
+			access_deny();
+		}
+
 		$maintenance = reset($maintenance);
 		$data['mname'] = $maintenance['name'];
 		$data['maintenance_type'] = $maintenance['maintenance_type'];

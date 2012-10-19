@@ -142,8 +142,13 @@ if (isset($_REQUEST['form'])) {
 		'slides' => get_request('slides', array())
 	);
 
-	if (!empty($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
+	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
 		$slideshow = DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.$data['slideshowid']));
+
+		if (empty($slideshow)) {
+			access_deny();
+		}
+
 		$data['name'] = $slideshow['name'];
 		$data['delay'] = $slideshow['delay'];
 

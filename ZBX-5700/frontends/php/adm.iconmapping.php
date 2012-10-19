@@ -142,6 +142,11 @@ if (isset($_REQUEST['form'])) {
 			'preservekeys' => true,
 			'selectMappings' => API_OUTPUT_EXTEND,
 		));
+
+		if (empty($iconMap)) {
+			access_deny();
+		}
+
 		$data['iconmap'] = reset($iconMap);
 	}
 	else {

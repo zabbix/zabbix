@@ -143,8 +143,13 @@ if (isset($_REQUEST['form'])) {
 	$data['add_value'] = get_request('add_value');
 	$data['add_newvalue'] = get_request('add_newvalue');
 
-	if (!empty($data['valuemapid'])) {
+	if (isset($data['valuemapid'])) {
 		$db_valuemap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.$data['valuemapid']));
+
+		if (empty($db_valuemap)) {
+			access_deny();
+		}
+
 		$data['mapname'] = $db_valuemap['name'];
 
 		if (empty($data['form_refresh'])) {

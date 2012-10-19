@@ -181,13 +181,18 @@ if (isset($_REQUEST['form'])) {
 	);
 
 	// get drule
-	if (!empty($data['druleid']) && !isset($_REQUEST['form_refresh'])) {
+	if (isset($data['druleid']) && !isset($_REQUEST['form_refresh'])) {
 		$drules = API::DRule()->get(array(
 			'druleids' => $data['druleid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectDChecks' => API_OUTPUT_EXTEND,
 			'editable' => true
 		));
+
+		if (empty($drules)) {
+			access_deny();
+		}
+
 		$data['drule'] = reset($drules);
 		$data['drule']['uniqueness_criteria'] = -1;
 

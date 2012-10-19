@@ -357,6 +357,10 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 				' AND wt.httptestid='.$_REQUEST['httptestid']
 		));
 
+		if (empty($db_httptest)) {
+			access_deny();
+		}
+
 		$data['name'] = $db_httptest['name'];
 		$data['application'] = $db_httptest['application'];
 		$data['delay'] = $db_httptest['delay'];

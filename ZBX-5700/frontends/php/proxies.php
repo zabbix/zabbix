@@ -186,6 +186,11 @@ if (isset($_REQUEST['form'])) {
 			'selectHosts' => array('hostid', 'host'),
 			'output' => API_OUTPUT_EXTEND
 		));
+
+		if (empty($data['proxy'])) {
+			access_deny();
+		}
+
 		$data['proxy'] = reset($data['proxy']);
 
 		if (!isset($_REQUEST['form_refresh'])) {

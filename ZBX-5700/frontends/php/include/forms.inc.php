@@ -33,6 +33,11 @@
 				$options['nodeids'] = id2nodeid($userid);
 			}
 			$users = API::User()->get($options);
+
+			if (empty($users)) {
+				access_deny();
+			}
+
 			$user = reset($users);
 			$data['title'] = _('User').' "'.$user['alias'].'"';
 		}
@@ -1712,6 +1717,10 @@
 				' WHERE '.DBin_node('re.regexpid').
 					' AND re.regexpid='.$_REQUEST['regexpid'];
 			$regexp = DBfetch(DBSelect($sql));
+
+			if (empty($regexp)) {
+				access_deny();
+			}
 
 			$rename			= $regexp['name'];
 			$test_string	= $regexp['test_string'];

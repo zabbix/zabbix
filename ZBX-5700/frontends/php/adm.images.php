@@ -107,6 +107,10 @@ if (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 	$image = get_image_by_imageid($_REQUEST['imageid']);
 
+	if (empty($image)) {
+		access_deny();
+	}
+
 	$result = API::Image()->delete($_REQUEST['imageid']);
 
 	show_messages($result, _('Image deleted'), _('Cannot delete image'));
@@ -149,9 +153,11 @@ $data['form'] = get_request('form');
 $data['widget'] = &$cnf_wdgt;
 
 if (!empty($data['form'])) {
-	if (!empty($_REQUEST['imageid'])) {
+	if (isset($_REQUEST['imageid'])) {
 		$image = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
-
+		if (empty($image)) {
+			access_deny();
+		}
 		$data['imageid'] = $_REQUEST['imageid'];
 		$data['imagename'] = $image['name'];
 		$data['imagetype'] = $image['imagetype'];

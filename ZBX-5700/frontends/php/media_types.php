@@ -157,12 +157,17 @@ if (!empty($data['form'])) {
 	$data['mediatypeid'] = $mediatypeid;
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	if (!empty($data['mediatypeid']) && empty($_REQUEST['form_refresh'])) {
+	if (isset($data['mediatypeid']) && empty($_REQUEST['form_refresh'])) {
 		$options = array(
 			'mediatypeids' => $data['mediatypeid'],
 			'output' => API_OUTPUT_EXTEND
 		);
 		$mediatypes = API::Mediatype()->get($options);
+
+		if (empty($mediatypes)) {
+			access_deny();
+		}
+
 		$mediatype = reset($mediatypes);
 
 		$data['type'] = $mediatype['type'];
