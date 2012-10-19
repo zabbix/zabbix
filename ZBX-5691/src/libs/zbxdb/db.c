@@ -270,21 +270,17 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				(text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
 
+		if (OCI_SUCCESS == err)
+			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp, (ub4 *)0,
+					OCI_ATTR_SERVER, oracle.errhp);
+
+		if (OCI_SUCCESS == err)
+			DBexecute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. '");
+
 		if (OCI_SUCCESS != err)
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
 			ret = ZBX_DB_DOWN;
-		}
-		else
-		{
-			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp, (ub4 *)0,
-					OCI_ATTR_SERVER, oracle.errhp);
-
-			if (OCI_SUCCESS != err)
-			{
-				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
-				ret = ZBX_DB_DOWN;
-			}
 		}
 	}
 

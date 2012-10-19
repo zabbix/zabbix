@@ -126,6 +126,9 @@ function DBconnect(&$error) {
 					$error = 'Error connecting to database';
 					$result = false;
 				}
+				else {
+					DBexecute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. '");
+				}
 				break;
 			case ZBX_DB_DB2:
 				$connect = '';
