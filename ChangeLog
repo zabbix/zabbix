@@ -46,6 +46,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5111] fixed child trigger data reset after changes in parent trigger (Oleg)
 ..F....... [ZBX-5671] fixed error when save configuration in administration->general with oracle backend (Vedmak)
 A......... [ZBX-5693] fixed possibility to create graph with the same name as existing graph prototype within template (Toms)
 A......... [ZBX-5698] fixed API response after "triggerprototype.create", now request return "triggerids" after INSERT (Oleg)
