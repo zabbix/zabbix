@@ -42,12 +42,8 @@ class CFavorite {
 	}
 
 	public static function add($favobj, $favid, $source = null) {
-		$favorites = CFavorite::get($favobj);
-
-		foreach ($favorites as $favorite) {
-			if ($favorite['source'] == $source && $favorite['value'] == $favid) {
-				return true;
-			}
+		if (CFavorite::in($favobj, $favid, $source)) {
+			return true;
 		}
 
 		DBstart();
@@ -77,10 +73,8 @@ class CFavorite {
 	public static function in($favobj, $favid, $source = null) {
 		$favorites = CFavorite::get($favobj);
 		foreach ($favorites as $favorite) {
-			if (bccomp($favid, $favorite['value']) == 0) {
-				if (is_null($source) || ($favorite['source'] == $source)) {
-					return true;
-				}
+			if (bccomp($favid, $favorite['value']) == 0 && $favorite['source'] == $source) {
+				return true;
 			}
 		}
 		return false;
