@@ -29,6 +29,11 @@ class CScreenSystemStatus extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
+		global $page;
+
+		// rewrite page file
+		$page['file'] = $this->pageFile;
+
 		$item = new CUIWidget('hat_syssum', make_system_status(array(
 			'groupids' => null,
 			'hostids' => null,
