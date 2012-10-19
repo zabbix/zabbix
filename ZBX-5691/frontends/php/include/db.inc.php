@@ -121,9 +121,9 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB']= oci_pconnect($DB['USER'], $DB['PASSWORD'], $connect);
+				$DB['DB'] = ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
 				if ($DB['DB']) {
-					DBexecute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. '");
+					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
 				else {
 					$error = 'Error connecting to database';
@@ -197,7 +197,7 @@ function DBclose() {
 				$result = pg_close($DB['DB']);
 				break;
 			case ZBX_DB_ORACLE:
-				$result = oci_close($DB['DB']);
+				$result = ocilogoff($DB['DB']);
 				break;
 			case ZBX_DB_DB2:
 				$result = db2_close($DB['DB']);
@@ -327,7 +327,7 @@ function DBcommit() {
 			$result = DBexecute('commit');
 			break;
 		case ZBX_DB_ORACLE:
-			$result = oci_commit($DB['DB']);
+			$result = ocicommit($DB['DB']);
 			break;
 		case ZBX_DB_DB2:
 			$result = db2_commit($DB['DB']);
@@ -356,7 +356,7 @@ function DBrollback() {
 			$result = DBexecute('rollback');
 			break;
 		case ZBX_DB_ORACLE:
-			$result = oci_rollback($DB['DB']);
+			$result = ocirollback($DB['DB']);
 			break;
 		case ZBX_DB_DB2:
 			$result = db2_rollback($DB['DB']);
@@ -442,12 +442,12 @@ function &DBselect($query, $limit = null, $offset = 0) {
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (!$result = oci_parse($DB['DB'], $query)) {
-				$e = @oci_error();
+			if (!$result = OCIParse($DB['DB'], $query)) {
+				$e = @ocierror();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
-			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = oci_error($result);
+			elseif (!@OCIExecute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = ocierror($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			break;
@@ -513,12 +513,12 @@ function DBexecute($query, $skip_error_messages = 0) {
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (!$result = oci_parse($DB['DB'], $query)) {
-				$e = @oci_error();
+			if (!$result = OCIParse($DB['DB'], $query)) {
+				$e = @ocierror();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
-			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = oci_error($result);
+			elseif (!@OCIExecute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = ocierror($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			else {
