@@ -244,7 +244,7 @@ function show_table_header($col1, $col2 = SPACE){
 function get_icon($name, $params = array()) {
 	switch ($name) {
 		case 'favourite':
-			if (infavorites($params['fav'], $params['elid'], $params['elname'])) {
+			if (CFavorite::in($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = new CIcon(
 					_('Remove from favourites'),
 					'iconminus',

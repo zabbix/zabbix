@@ -104,7 +104,7 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 /*
  * Actions
  */
-$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpconf.applications'));
+$_REQUEST['applications'] = get_request('applications', CFavorite::get('web.httpconf.applications'));
 $_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
 
 $showAllApps = null;
@@ -130,9 +130,9 @@ elseif (isset($_REQUEST['close'])) {
 if (count($_REQUEST['applications']) > 25) {
 	$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 }
-rm4favorites('web.httpconf.applications');
+CFavorite::remove('web.httpconf.applications');
 foreach ($_REQUEST['applications'] as $application) {
-	add2favorites('web.httpconf.applications', $application);
+	CFavorite::add('web.httpconf.applications', $application);
 }
 
 // add new steps
