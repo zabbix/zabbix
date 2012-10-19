@@ -106,8 +106,11 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
-				if (!$DB['DB']) {
+				$DB['DB'] = ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
+				if ($DB['DB']) {
+					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
+				}
+				else {
 					$error = 'Error connecting to database';
 					$result = false;
 				}
@@ -970,7 +973,6 @@ function DBcondition($fieldname, $array, $notin = false) {
 
 	if (!is_array($array)) {
 		throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
-		return ' 1=0 ';
 	}
 
 	$in = $notin ? ' NOT IN ':' IN ';
