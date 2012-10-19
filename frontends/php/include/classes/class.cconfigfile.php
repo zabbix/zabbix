@@ -108,13 +108,14 @@ class CConfigFile {
 			$this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
 		}
 
+		$this->makeGlobal();
+
 		return $this->config;
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME;
+		global $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME;
 
-		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
 		$ZBX_SERVER_PORT = $this->config['ZBX_SERVER_PORT'];
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
