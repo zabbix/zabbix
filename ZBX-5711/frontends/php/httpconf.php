@@ -115,6 +115,13 @@ if (isset($_REQUEST['open'])) {
 	}
 	elseif (!uint_in_array($_REQUEST['applicationid'], $_REQUEST['applications'])) {
 		array_push($_REQUEST['applications'], $_REQUEST['applicationid']);
+		CFavorite::add('web.httpconf.applications', $_REQUEST['applicationid']);
+
+		// limit opened application count
+		if (isset($_REQUEST['applications'][25])) {
+			CFavorite::remove('web.httpconf.applications',$_REQUEST['applications'][0]);
+			array_shift($_REQUEST['applications']);
+		}
 	}
 }
 elseif (isset($_REQUEST['close'])) {
@@ -123,16 +130,8 @@ elseif (isset($_REQUEST['close'])) {
 	}
 	elseif (($i = array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== false) {
 		unset($_REQUEST['applications'][$i]);
+		CFavorite::remove('web.httpconf.applications',$_REQUEST['applicationid']);
 	}
-}
-
-// limit opened application count
-if (count($_REQUEST['applications']) > 25) {
-	$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
-}
-CFavorite::remove('web.httpconf.applications');
-foreach ($_REQUEST['applications'] as $application) {
-	CFavorite::add('web.httpconf.applications', $application);
 }
 
 // add new steps
