@@ -186,11 +186,10 @@ foreach ($all_groups as $group) {
 
 $hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
-global $USER_DETAILS;
 $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
 $newgroupTB->setAttribute('maxlength', 64);
 $tmp_label = _('New host group');
-if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
+if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only superadmins can create group)');
 	$newgroupTB->setReadonly(true);
 }

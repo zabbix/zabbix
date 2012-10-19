@@ -22,6 +22,9 @@
 require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
+	const EXEC_MODE_DEFAULT = 'default';
+	const EXEC_MODE_SETUP = 'setup';
+	const EXEC_MODE_API = 'api';
 
 	/**
 	 * An instance of the current Z object.
@@ -45,6 +48,11 @@ class ZBase {
 	protected $session;
 
 	/**
+	 * @var array of config data from zabbix config file
+	 */
+	protected $config = array();
+
+	/**
 	 * Returns the current instance of Z.
 	 *
 	 * @static
@@ -60,12 +68,93 @@ class ZBase {
 	}
 
 	/**
+	 * Init modules required to run frontend.
+	 */
+	protected function init() {
+		$this->rootDir = $this->findRootDir();
+		$this->registerAutoloader();
+
+		// system includes
+		require_once $this->getRootDir().'/include/debug.inc.php';
+		require_once $this->getRootDir().'/include/gettextwrapper.inc.php';
+		require_once $this->getRootDir().'/include/defines.inc.php';
+		require_once $this->getRootDir().'/include/func.inc.php';
+		require_once $this->getRootDir().'/include/html.inc.php';
+		require_once $this->getRootDir().'/include/perm.inc.php';
+		require_once $this->getRootDir().'/include/audit.inc.php';
+		require_once $this->getRootDir().'/include/js.inc.php';
+		require_once $this->getRootDir().'/include/users.inc.php';
+		require_once $this->getRootDir().'/include/validate.inc.php';
+		require_once $this->getRootDir().'/include/profiles.inc.php';
+		require_once $this->getRootDir().'/include/locales.inc.php';
+		require_once $this->getRootDir().'/include/db.inc.php';
+		require_once $this->getRootDir().'/include/nodes.inc.php';
+
+		// page specific includes
+		require_once $this->getRootDir().'/include/acknow.inc.php';
+		require_once $this->getRootDir().'/include/actions.inc.php';
+		require_once $this->getRootDir().'/include/discovery.inc.php';
+		require_once $this->getRootDir().'/include/events.inc.php';
+		require_once $this->getRootDir().'/include/graphs.inc.php';
+		require_once $this->getRootDir().'/include/hosts.inc.php';
+		require_once $this->getRootDir().'/include/httptest.inc.php';
+		require_once $this->getRootDir().'/include/ident.inc.php';
+		require_once $this->getRootDir().'/include/images.inc.php';
+		require_once $this->getRootDir().'/include/items.inc.php';
+		require_once $this->getRootDir().'/include/maintenances.inc.php';
+		require_once $this->getRootDir().'/include/maps.inc.php';
+		require_once $this->getRootDir().'/include/media.inc.php';
+		require_once $this->getRootDir().'/include/services.inc.php';
+		require_once $this->getRootDir().'/include/sounds.inc.php';
+		require_once $this->getRootDir().'/include/triggers.inc.php';
+		require_once $this->getRootDir().'/include/valuemap.inc.php';
+	}
+
+	/**
 	 * Initializes the application.
 	 */
-	public function run() {
-		$this->rootDir = $this->findRootDir();
+	public function run($mode = self::EXEC_MODE_DEFAULT) {
+		$this->init();
 
-		$this->registerAutoloader();
+		$this->setMaintenanceMode();
+		$this->setErrorHandler();
+
+		switch ($mode) {
+			case self::EXEC_MODE_DEFAULT:
+				$this->loadConfigFile();
+				$this->initDB();
+				$this->initNodes();
+				$this->authenticateUser();
+				// init nodes after user is authenticated
+				init_nodes();
+				$this->initLocales();
+				break;
+			case self::EXEC_MODE_API:
+				$this->loadConfigFile();
+				$this->initDB();
+				$this->initNodes();
+				$this->initLocales();
+				break;
+			case self::EXEC_MODE_SETUP:
+				try {
+					// try to load config file, if it exists we need to init db and authenticate user to check permissions
+					$this->loadConfigFile();
+					$this->initDB();
+					$this->initNodes();
+					$this->authenticateUser();
+					// init nodes after user is authenticated
+					init_nodes();
+					$this->initLocales();
+					DBclose();
+
+					// if config file exists, only super admin user can access setup
+					if (isset(CWebUser::$data['type']) && CWebUser::$data['type'] < USER_TYPE_SUPER_ADMIN) {
+						throw new Exception('No permissions to referred object or it does not exist!');
+					}
+				}
+				catch (ConfigFileException $e) {}
+				break;
+		}
 	}
 
 	/**
@@ -119,6 +208,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/include/classes/helpers/trigger',
 			$this->rootDir.'/include/classes/tree',
+			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/classes/managers',
 			$this->rootDir.'/api/rpc'
@@ -150,5 +240,232 @@ class ZBase {
 		}
 
 		return $this->session;
+	}
+
+	/**
+	 * Set custom error handler for PHP errors.
+	 */
+	protected function setErrorHandler() {
+		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+			$pathLength = strlen(__FILE__);
+
+			$pathLength -= 22;
+			$errfile = substr($errfile, $pathLength);
+
+			error($errstr.' ['.$errfile.':'.$errline.']');
+		}
+
+		set_error_handler('zbx_err_handler');
+	}
+
+	/**
+	 * Check if maintenance mode is enabled.
+	 *
+	 * @throws Exception
+	 */
+	protected function setMaintenanceMode() {
+		require_once $this->getRootDir().'/conf/maintenance.inc.php';
+
+		if (defined('ZBX_DENY_GUI_ACCESS')) {
+			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+					? $_SERVER['HTTP_X_FORWARDED_FOR']
+					: $_SERVER['REMOTE_ADDR'];
+			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
+				throw new Exception($_REQUEST['warning_msg']);
+			}
+		}
+	}
+
+	/**
+	 * Load zabbix config file.
+	 */
+	protected function loadConfigFile() {
+		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$config = new CConfigFile($configFile);
+		$this->config = $config->load();
+	}
+
+	/**
+	 * Initialize DB functions and check if frontend can connect to DB.
+	 * @throws DBException
+	 */
+	protected function initDB() {
+		$DB = $this->config['DB'];
+
+		if (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_MYSQL) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".mysql_real_escape_string($value)."'";
+					}
+					return $var;
+				}
+				return "'".mysql_real_escape_string($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS UNSIGNED) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".pg_escape_string($value)."'";
+					}
+					return $var;
+				}
+				return "'".pg_escape_string($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS BIGINT) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".preg_replace('/\'/', '\'\'', $value)."'";
+					}
+					return $var;
+				}
+				return "'".preg_replace('/\'/','\'\'',$var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS NUMBER(20)) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				if ($afterWhere) {
+					return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+				}
+				else {
+					return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+				}
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
+			function zbx_dbstr($var) {
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".db2_escape_string($value)."'";
+					}
+					return $var;
+				}
+				return "'".db2_escape_string($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS BIGINT) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				if ($afterWhere) {
+					return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+				}
+				else {
+					return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+				}
+			}
+		}
+		elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
+			function zbx_dbstr($var) {
+				global $DB;
+
+				if (is_array($var)) {
+					foreach ($var as $vnum => $value) {
+						$var[$vnum] = "'".$DB['DB']->escapeString($value)."'";
+					}
+					return $var;
+				}
+				return "'".$DB['DB']->escapeString($var)."'";
+			}
+
+			function zbx_dbcast_2bigint($field) {
+				return ' CAST('.$field.' AS BIGINT) ';
+			}
+
+			function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+				return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+			}
+		}
+
+		$error = null;
+		if (!DBconnect($error)) {
+			throw new DBException($error);
+		}
+	}
+
+	/**
+	 * Check if distributed monitoring is enabled.
+	 */
+	protected function initNodes() {
+		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_NODES;
+
+		if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
+			$ZBX_LOCALNODEID = $local_node_data['nodeid'];
+			$ZBX_LOCMASTERID = $local_node_data['masterid'];
+			$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
+			define('ZBX_DISTRIBUTED', true);
+		}
+		else {
+			define('ZBX_DISTRIBUTED', false);
+		}
+	}
+
+	/**
+	 * Initilaize translations.
+	 */
+	protected function initLocales() {
+		init_mbstrings();
+
+		if (function_exists('bindtextdomain')) {
+			// initializing gettext translations depending on language selected by user
+			$locales = zbx_locale_variants(CWebUser::$data['lang']);
+			$locale_found = false;
+			foreach ($locales as $locale) {
+				putenv('LC_ALL='.$locale);
+				putenv('LANG='.$locale);
+				putenv('LANGUAGE='.$locale);
+
+				if (setlocale(LC_ALL, $locale)) {
+					$locale_found = true;
+					CWebUser::$data['locale'] = $locale;
+					break;
+				}
+			}
+
+			if (!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb') {
+				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
+			}
+			bindtextdomain('frontend', 'locale');
+			bind_textdomain_codeset('frontend', 'UTF-8');
+			textdomain('frontend');
+		}
+		else {
+			error('Your PHP has no gettext support. Zabbix translations are not available.');
+		}
+
+		// numeric Locale to default
+		setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
+	}
+
+	/**
+	 * Authenticate user.
+	 */
+	protected function authenticateUser() {
+		if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
+			CWebUser::setDefault();
+		}
 	}
 }

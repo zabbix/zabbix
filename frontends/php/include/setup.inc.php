@@ -96,7 +96,6 @@ class CsetupWizard extends CForm {
 	}
 
 	function bodyToString($destroy = true) {
-
 		$left = new CDiv(null, 'left');
 		$left->addItem(new CDiv(null, 'setup_logo'));
 		$left->addItem(new CDiv(ZABBIX_VERSION, 'setup_version'));
@@ -112,7 +111,7 @@ class CsetupWizard extends CForm {
 		$left->addItem($licence);
 
 		$right = new CDiv(null, 'right');
-		if ($this->getStep() ==0 ) {
+		if ($this->getStep() == 0) {
 			$right->addItem(new CDiv(null, 'blank_title'));
 			$right->addItem(new CDiv($this->getState(), 'blank_under_title'));
 			$container = new CDiv(array($left, $right), 'setup_wizard setup_wizard_welcome');
@@ -174,7 +173,7 @@ class CsetupWizard extends CForm {
 
 	function getState() {
 		$fnc = $this->stage[$this->getStep()]['fnc'];
-		return  $this->$fnc();
+		return $this->$fnc();
 	}
 
 	function stage1() {
@@ -218,8 +217,6 @@ class CsetupWizard extends CForm {
 
 		if (!$final_result) {
 			$this->DISABLE_NEXT_BUTTON = true;
-
-			$this->addVar('trouble', true);
 
 			$final_result = array(
 				_('Please correct all issues and press "Retry" button'),
@@ -284,13 +281,23 @@ class CsetupWizard extends CForm {
 			break;
 		}
 
+		global $ZBX_MESSAGES;
+		if (!empty($ZBX_MESSAGES)) {
+			$lst_error = new CList(null, 'messages');
+			foreach ($ZBX_MESSAGES as $msg) {
+				$lst_error->addItem($msg['message'], $msg['type']);
+			}
+
+			$table = array($table, $lst_error);
+		}
+
 		return array(
-			new CDiv(new CDiv(array('Please create database manually,', BR(),
-			'and set the configuration parameters for connection to this database.',
-			BR(), BR(),
-			'Press "Test connection" button when done.',
-			BR(), BR(),
-			$table), 'vertical_center'), 'table_wraper'),
+			new CDiv(new CDiv(array(
+				'Please create database manually, and set the configuration parameters for connection to this database.', BR(), BR(),
+				'Press "Test connection" button when done.', BR(),
+				$table
+			), 'vertical_center'), 'table_wraper'),
+
 			new CDiv(array(
 				isset($_REQUEST['type']) ? !$this->DISABLE_NEXT_BUTTON ?
 					new CSpan(array(_('OK'), BR()), 'ok')
@@ -376,11 +383,9 @@ class CsetupWizard extends CForm {
 	}
 
 	function stage6() {
-		global $ZBX_CONFIGURATION_FILE;
-
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
-		$config = new CConfigFile($ZBX_CONFIGURATION_FILE);
+		$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
 		$config->config = array(
 			'DB' => array(
 				'TYPE' => $this->getConfig('DB_TYPE'),
@@ -397,8 +402,9 @@ class CsetupWizard extends CForm {
 		);
 		$config->save();
 
-		if ($config->load()) {
+		try {
 			$error = false;
+			$config->load();
 
 			if ($config->config['DB']['TYPE'] != $this->getConfig('DB_TYPE')) {
 				$error = true;
@@ -432,10 +438,11 @@ class CsetupWizard extends CForm {
 			}
 			$error_text = 'Unable to overwrite the existing configuration file. ';
 		}
-		else {
+		catch (ConfigFileException $e) {
 			$error = true;
 			$error_text = 'Unable to create the configuration file. ';
 		}
+
 		clear_messages();
 		if ($error) {
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
@@ -445,7 +452,8 @@ class CsetupWizard extends CForm {
 		$this->HIDE_CANCEL_BUTTON = !$this->DISABLE_NEXT_BUTTON;
 
 
-		$table = array('Configuration file', BR(), '"'.$ZBX_CONFIGURATION_FILE.'"', BR(), 'created: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
+		$table = array('Configuration file', BR(), '"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"',
+			BR(), 'created: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
 			? new CSpan(_('OK'), 'ok')
 			: new CSpan(_('Fail'), 'fail')
 		);
@@ -457,7 +465,7 @@ class CsetupWizard extends CForm {
 				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
 					'Press the "Download configuration file" button, download the configuration file ',
 					'and save it as ', BR(),
-					'"'.$ZBX_CONFIGURATION_FILE.'"', BR(), BR(),
+					'"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"', BR(), BR(),
 					new CSubmit('save_config', 'Download configuration file'),
 					BR(), BR()
 				)
@@ -501,11 +509,6 @@ class CsetupWizard extends CForm {
 		}
 
 		DBclose();
-
-		if ($DB['TYPE'] == ZBX_DB_SQLITE3 && !zbx_is_callable(array('ftok', 'sem_get', 'sem_acquire', 'sem_release', 'sem_remove'))) {
-			error('Support of SQLite3 requires PHP IPC functions');
-			$result = false;
-		}
 
 		$DB = null;
 		return $result;
