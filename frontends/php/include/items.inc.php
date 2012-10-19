@@ -655,8 +655,6 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  * @return CTableInfo
  */
 function get_items_data_overview($hostids, $view_style) {
-	global $USER_DETAILS;
-
 	$table = new CTableInfo(_('No items defined.'));
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
@@ -720,7 +718,7 @@ function get_items_data_overview($hostids, $view_style) {
 
 	order_result($hostnames);
 
-	$css = getUserTheme($USER_DETAILS);
+	$css = getUserTheme(CWebUser::$data);
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
 		foreach ($hostnames as $hostname) {
