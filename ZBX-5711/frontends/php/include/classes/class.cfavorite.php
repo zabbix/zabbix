@@ -26,8 +26,8 @@
 class CFavorite {
 
 	// cache for favorite values
-	// $cache[idx]['value']
-	// $cache[idx]['source']
+	// $cache[idx][]['value']
+	// $cache[idx][]['source']
 	private static $cache = null;
 
 	public static function get($idx) {
@@ -55,8 +55,8 @@ class CFavorite {
 		return $result;
 	}
 
-	public static function add($favobj, $favid, $source = null) {
-		if (CFavorite::in($favobj, $favid, $source)) {
+	public static function add($idx, $favid, $favobj = null) {
+		if (CFavorite::in($idx, $favid, $favobj)) {
 			return true;
 		}
 
@@ -64,41 +64,43 @@ class CFavorite {
 		$values = array(
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => CWebUser::$data['userid'],
-			'idx' => zbx_dbstr($favobj),
+			'idx' => zbx_dbstr($idx),
 			'value_id' => $favid,
 			'type' => PROFILE_TYPE_ID
 		);
-		if (!is_null($source)) {
-			$values['source'] = zbx_dbstr($source);
+		if (!is_null($favobj)) {
+			$values['source'] = zbx_dbstr($favobj);
 		}
 
 		// add to cache only if cache is created
-		if (isset(CFavorite::$cache[$favobj])) {
-			CFavorite::$cache[$favobj]['value'] = $values['idx'];
-			CFavorite::$cache[$favobj]['source'] = (isset($values['source']) ? $values['source'] : null);
+		if (isset(CFavorite::$cache[$idx])) {
+			CFavorite::$cache[$idx][] = array(
+				'value' => $values['idx'],
+				'source' =>( isset($values['source']) ? $values['source'] : null)
+			);
 		}
 
 		return DBend(DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')'));
 	}
 
-	public static function remove($favobj, $favid = 0, $source = null) {
+	public static function remove($idx, $favid = 0, $favobj = null) {
 
 		// remove from cache
-		CFavorite::$cache[$favobj] = null;
+		CFavorite::$cache[$idx] = null;
 
 		return DBexecute(
 			'DELETE FROM profiles'.
 			' WHERE userid='.CWebUser::$data['userid'].
-				' AND idx='.zbx_dbstr($favobj).
+				' AND idx='.zbx_dbstr($idx).
 				($favid > 0 ? ' AND value_id='.$favid : '').
-				(is_null($source) ? '' : ' AND source='.zbx_dbstr($source))
+				(is_null($favobj) ? '' : ' AND source='.zbx_dbstr($favobj))
 		);
 	}
 
-	public static function in($favobj, $favid, $source = null) {
-		$favorites = CFavorite::get($favobj);
+	public static function in($idx, $favid, $favobj = null) {
+		$favorites = CFavorite::get($idx);
 		foreach ($favorites as $favorite) {
-			if (bccomp($favid, $favorite['value']) == 0 && $favorite['source'] == $source) {
+			if (bccomp($favid, $favorite['value']) == 0 && $favorite['source'] == $favobj) {
 				return true;
 			}
 		}
