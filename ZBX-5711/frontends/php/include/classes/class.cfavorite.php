@@ -25,9 +25,19 @@
  */
 class CFavorite {
 
-	public static function get($idx) {
-		$result = array();
+	// cache for favorite values
+	// $cache[idx]['value']
+	// $cache[idx]['source']
+	private static $cache = null;
 
+	public static function get($idx) {
+
+		// return values if cached
+		if (isset(CFavorite::$cache[$idx])) {
+			return CFavorite::$cache[$idx];
+		}
+
+		$result = array();
 		$db_profiles = DBselect(
 			'SELECT p.value_id,p.source'.
 			' FROM profiles p'.
@@ -38,6 +48,10 @@ class CFavorite {
 		while ($profile = DBfetch($db_profiles)) {
 			$result[] = array('value' => $profile['value_id'], 'source' => $profile['source']);
 		}
+
+		// store db values in cache
+		CFavorite::$cache[$idx] = $result;
+
 		return $result;
 	}
 
@@ -57,10 +71,21 @@ class CFavorite {
 		if (!is_null($source)) {
 			$values['source'] = zbx_dbstr($source);
 		}
+
+		// add to cache only if cache is created
+		if (isset(CFavorite::$cache[$favobj])) {
+			CFavorite::$cache[$favobj]['value'] = $values['idx'];
+			CFavorite::$cache[$favobj]['source'] = (isset($values['source']) ? $values['source'] : null);
+		}
+
 		return DBend(DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')'));
 	}
 
 	public static function remove($favobj, $favid = 0, $source = null) {
+
+		// remove from cache
+		CFavorite::$cache[$favobj] = null;
+
 		return DBexecute(
 			'DELETE FROM profiles'.
 			' WHERE userid='.CWebUser::$data['userid'].
