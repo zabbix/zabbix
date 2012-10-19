@@ -19,9 +19,8 @@
 **/
 
 /**
- * Description of CFavorite
- *
- * @author TomTom
+ * Container class for favorite value management.
+ * Uses caching.
  */
 class CFavorite {
 
@@ -30,11 +29,18 @@ class CFavorite {
 	// $cache[idx][]['source']
 	private static $cache = null;
 
+	/**
+	 * Returns favorite values from db. Uses caching for performance.
+	 *
+	 * @param string $idx identifier of favorite value group
+	 *
+	 * @return array list of favorite values corresponding to $idx
+	 */
 	public static function get($idx) {
 
 		// return values if cached
-		if (isset(CFavorite::$cache[$idx])) {
-			return CFavorite::$cache[$idx];
+		if (isset(self::$cache[$idx])) {
+			return self::$cache[$idx];
 		}
 
 		$result = array();
@@ -50,13 +56,22 @@ class CFavorite {
 		}
 
 		// store db values in cache
-		CFavorite::$cache[$idx] = $result;
+		self::$cache[$idx] = $result;
 
 		return $result;
 	}
 
+	/**
+	 * Adds favorite value to DB.
+	 *
+	 * @param string $idx identifier of favorite value group
+	 * @param int $favid value id
+	 * @param string $favobj source object
+	 *
+	 * @return bool did SQL INSERT succeeded
+	 */
 	public static function add($idx, $favid, $favobj = null) {
-		if (CFavorite::in($idx, $favid, $favobj)) {
+		if (self::in($idx, $favid, $favobj)) {
 			return true;
 		}
 
@@ -73,8 +88,8 @@ class CFavorite {
 		}
 
 		// add to cache only if cache is created
-		if (isset(CFavorite::$cache[$idx])) {
-			CFavorite::$cache[$idx][] = array(
+		if (isset(self::$cache[$idx])) {
+			self::$cache[$idx][] = array(
 				'value' => $values['idx'],
 				'source' =>( isset($values['source']) ? $values['source'] : null)
 			);
@@ -83,10 +98,19 @@ class CFavorite {
 		return DBend(DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')'));
 	}
 
+	/**
+	 * Removes favorite from DB. Clears cache by $idx.
+	 *
+	 * @param string $idx identifier of favorite value group
+	 * @param int $favid value id
+	 * @param string $favobj source object
+	 *
+	 * @return boolean did SQL DELETE succeeded
+	 */
 	public static function remove($idx, $favid = 0, $favobj = null) {
 
 		// remove from cache
-		CFavorite::$cache[$idx] = null;
+		self::$cache[$idx] = null;
 
 		return DBexecute(
 			'DELETE FROM profiles'.
@@ -97,8 +121,17 @@ class CFavorite {
 		);
 	}
 
+	/**
+	 * Cheks wether exists favorite value.
+	 *
+	 * @param string $idx identifier of favorite value group
+	 * @param int $favid value id
+	 * @param string $favobj source object
+	 *
+	 * @return boolean
+	 */
 	public static function in($idx, $favid, $favobj = null) {
-		$favorites = CFavorite::get($idx);
+		$favorites = self::get($idx);
 		foreach ($favorites as $favorite) {
 			if (bccomp($favid, $favorite['value']) == 0 && $favorite['source'] == $favobj) {
 				return true;
