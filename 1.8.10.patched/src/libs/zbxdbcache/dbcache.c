@@ -989,7 +989,7 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 {
 	char	*value_esc;
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 38, "update items set lastclock=%d,lastns=%d",
+	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 64, "update items set lastclock=%d,lastns=%d",
 			h->clock, h->ns);
 
 	if (ITEM_STATUS_NOTSUPPORTED == h->status)
