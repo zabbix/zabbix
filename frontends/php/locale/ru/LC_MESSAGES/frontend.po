@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-21 21:49+0300\n"
-"PO-Revision-Date: 2012-09-28 16:24+0200\n"
+"POT-Creation-Date: 2012-10-21 21:59+0300\n"
+"PO-Revision-Date: 2012-10-21 20:27+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -190,19 +190,19 @@ msgstr "ОТЧЕТ О ДОСТУПНОСТИ"
 
 #: popup_trexpr.php:119
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Абсолютная разница между последним и предыдущими значениями < N"
 
 #: popup_trexpr.php:127
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Абсолютная разница между последним и предыдущими значениями = N"
 
 #: popup_trexpr.php:123
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Абсолютная разница между последним и предыдущими значениями > N"
 
 #: popup_trexpr.php:131
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Абсолютная разница между последним и предыдущими значениями NOT N"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -789,19 +789,19 @@ msgstr "Среднее по"
 
 #: popup_trexpr.php:135
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Среднее значение за период T < N"
 
 #: popup_trexpr.php:145
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Среднее значение за период T = N"
 
 #: popup_trexpr.php:140
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Среднее значение за период T > N"
 
 #: popup_trexpr.php:150
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Среднее значение за период T NOT N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -2749,19 +2749,19 @@ msgstr "Критическая ошибка. Некорректное значе
 
 #: popup_trexpr.php:345
 msgid "Current date is < N"
-msgstr ""
+msgstr "Текущая дата < N"
 
 #: popup_trexpr.php:353
 msgid "Current date is = N"
-msgstr ""
+msgstr "Текущая дата = N"
 
 #: popup_trexpr.php:349
 msgid "Current date is > N"
-msgstr ""
+msgstr "Текущая дата > N"
 
 #: popup_trexpr.php:357
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "Текущая дата NOT N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
@@ -2774,19 +2774,19 @@ msgstr "Текущая нода"
 
 #: popup_trexpr.php:485
 msgid "Current time is < N"
-msgstr ""
+msgstr "Текущее время < N"
 
 #: popup_trexpr.php:493
 msgid "Current time is = N"
-msgstr ""
+msgstr "Текущее время = N"
 
 #: popup_trexpr.php:489
 msgid "Current time is > N"
-msgstr ""
+msgstr "Текущее время > N"
 
 #: popup_trexpr.php:497
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "Текущее время NOT N"
 
 #: include/setup.inc.php:192
 msgid "Current value"
@@ -3004,19 +3004,19 @@ msgstr "День месяца"
 
 #: popup_trexpr.php:377
 msgid "Day of month is < N"
-msgstr ""
+msgstr "День месяца < N"
 
 #: popup_trexpr.php:385
 msgid "Day of month is = N"
-msgstr ""
+msgstr "День месяца = N"
 
 #: popup_trexpr.php:381
 msgid "Day of month is > N"
-msgstr ""
+msgstr "День месяца > N"
 
 #: popup_trexpr.php:389
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "День месяца NOT N"
 
 #: include/forms.inc.php:1525 include/forms.inc.php:1582
 #: include/forms.inc.php:1606
@@ -3025,19 +3025,19 @@ msgstr "День недели"
 
 #: popup_trexpr.php:361
 msgid "Day of week is < N"
-msgstr ""
+msgstr "День недели < N"
 
 #: popup_trexpr.php:369
 msgid "Day of week is = N"
-msgstr ""
+msgstr "День недели = N"
 
 #: popup_trexpr.php:365
 msgid "Day of week is > N"
-msgstr ""
+msgstr "День недели > N"
 
 #: popup_trexpr.php:373
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "День недели NOT N"
 
 #: include/forms.inc.php:1667 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3530,43 +3530,43 @@ msgstr "Критерий уникальности устройства"
 
 #: popup_trexpr.php:155
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "Разница между МАКС и МИН значениями за период T < N"
 
 #: popup_trexpr.php:165
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "Разница между МАКС и МИН значениями за период T = N"
 
 #: popup_trexpr.php:160
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "Разница между МАКС и МИН значениями за период T > N"
 
 #: popup_trexpr.php:170
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "Разница между МАКС и МИН значениями за период T NOT N"
 
 #: popup_trexpr.php:211
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:215
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями, тогда N NOT 1, 0 - в противном случае"
 
 #: popup_trexpr.php:175
 msgid "Difference between last and previous value of a period T is < N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями за период T < N"
 
 #: popup_trexpr.php:183
 msgid "Difference between last and previous value of a period T is = N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями за период T = N"
 
 #: popup_trexpr.php:179
 msgid "Difference between last and previous value of a period T is > N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями за период T > N"
 
 #: popup_trexpr.php:187
 msgid "Difference between last and previous value of a period T is NOT N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями за период T NOT N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3911,7 +3911,7 @@ msgstr "Запоминать выбранное в выпадающем спис
 #: api/classes/CTrigger.php:2019
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "Дубликат зависимостей в триггере \"%1$s\"."
 
 #: api/classes/CHost.php:1349
 #, php-format
@@ -4251,11 +4251,11 @@ msgstr "ID события"
 
 #: popup_trexpr.php:423
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "ID события последней записи в журнале совпадает с регулярным выражением T, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:428
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "ID события последней записи в журнале совпадает с регулярным выражением T, тогда N NOT 1, 0 - в противном случае"
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
@@ -4284,7 +4284,7 @@ msgstr "Список событий [20 предыдущих]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
-msgstr "Источник события"
+msgstr "Источник событий"
 
 #: tr_events.php:110
 msgid "Event source details"
@@ -4534,11 +4534,11 @@ msgstr "Фильтр по имени"
 
 #: popup_trexpr.php:295
 msgid "Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Поиск строки T в последнем (наиболее новом) значении. N = 1 - если найдено, 0 - в противном случае"
 
 #: popup_trexpr.php:300
 msgid "Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Поиск строки T в последнем (наиболее новом) значении. N NOT 1 - если найдено, 0 - в противном случае"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -4546,7 +4546,7 @@ msgstr "Финиш"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Финский (fi_FI)"
 
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
@@ -4780,7 +4780,7 @@ msgstr "График \"%1$s\" не может быть унаследован. �
 #: api/classes/CTemplateScreen.php:663
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "График \"%1$s\" не существует у шаблона \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1556
 #: include/classes/import/CXmlImport18.php:1560
@@ -5970,7 +5970,7 @@ msgstr "Некорректный цвет \"%1$s\"."
 
 #: api/classes/CScreenItem.php:587
 msgid "Incorrect column span provided for screen element."
-msgstr ""
+msgstr "Указан некорректный диапазон колонок для элемента комплексного экрана."
 
 #: api/classes/CTriggerExpression.php:226
 msgid "Incorrect count of quotes in expression."
@@ -6249,7 +6249,7 @@ msgstr "Указан некорректный тип ресурса для эл�
 
 #: api/classes/CScreenItem.php:584
 msgid "Incorrect row span provided for screen element."
-msgstr ""
+msgstr "Указан некорректный диапазон строк для элемента комплексного экрана."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6628,7 +6628,7 @@ msgstr "Элемент данных \"%1$s\" не может заполнять 
 #: api/classes/CTemplateScreen.php:673
 #, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Элемент данных \"%1$s\" не существует у шаблона \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1523
 #, php-format
@@ -6979,19 +6979,19 @@ msgstr[2] "Последние %1$d событий"
 
 #: popup_trexpr.php:219
 msgid "Last (most recent) T value is < N"
-msgstr ""
+msgstr "Последнее (самое новое) T значение < N"
 
 #: popup_trexpr.php:229
 msgid "Last (most recent) T value is = N"
-msgstr ""
+msgstr "Последнее (самое новое) T значение = N"
 
 #: popup_trexpr.php:224
 msgid "Last (most recent) T value is > N"
-msgstr ""
+msgstr "Последнее (самое новое) T значение > N"
 
 #: popup_trexpr.php:234
 msgid "Last (most recent) T value is NOT N"
-msgstr ""
+msgstr "Последнее (самое новое) T значение NOT N"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -7082,19 +7082,19 @@ msgstr "Легенда"
 
 #: popup_trexpr.php:305
 msgid "Length of last (most recent) T value in characters is < N"
-msgstr ""
+msgstr "Длина в символах последнего (самого нового) T значения < N"
 
 #: popup_trexpr.php:315
 msgid "Length of last (most recent) T value in characters is = N"
-msgstr ""
+msgstr "Длина в символах последнего (самого нового) T значения = N"
 
 #: popup_trexpr.php:310
 msgid "Length of last (most recent) T value in characters is > N"
-msgstr ""
+msgstr "Длина в символах последнего (самого нового) T значения > N"
 
 #: popup_trexpr.php:320
 msgid "Length of last (most recent) T value in characters is NOT N"
-msgstr ""
+msgstr "Длина в символах последнего (самого нового) T значения NOT N"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:333
 #: include/views/js/configuration.sysmaps.js.php:409
@@ -7201,19 +7201,19 @@ msgstr "Журнал (лог)"
 
 #: popup_trexpr.php:433
 msgid "Log severity of the last log entry is < N"
-msgstr ""
+msgstr "Важность последней записи в журнале < N"
 
 #: popup_trexpr.php:441
 msgid "Log severity of the last log entry is = N"
-msgstr ""
+msgstr "Важность последней записи в журнале = N"
 
 #: popup_trexpr.php:437
 msgid "Log severity of the last log entry is > N"
-msgstr ""
+msgstr "Важность последней записи в журнале > N"
 
 #: popup_trexpr.php:445
 msgid "Log severity of the last log entry is NOT N"
-msgstr ""
+msgstr "Важность последней записи в журнале NOT N"
 
 #: popup_trexpr.php:449
 msgid "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
@@ -7352,7 +7352,7 @@ msgstr "Имя макроса \"%1$s\" слишком длинное, оно н�
 #: api/classes/CUserMacro.php:1079
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Макрос с globalmacroid \"%1$s\"  не существует."
 
 #: api/classes/CUserMacro.php:1019
 #, php-format
@@ -7593,19 +7593,19 @@ msgstr[2] "Максимальная длина имени узла сети %2$d
 
 #: popup_trexpr.php:239
 msgid "Maximum value for period of time is T < N"
-msgstr ""
+msgstr "Максимальное значение за период времени T < N"
 
 #: popup_trexpr.php:249
 msgid "Maximum value for period of time is T = N"
-msgstr ""
+msgstr "Максимальное значение за период времени T = N"
 
 #: popup_trexpr.php:244
 msgid "Maximum value for period of time is T > N"
-msgstr ""
+msgstr "Максимальное значение за период времени T > N"
 
 #: popup_trexpr.php:254
 msgid "Maximum value for period of time is T NOT N"
-msgstr ""
+msgstr "Максимальное значение за период времени T NOT N"
 
 #: api/classes/CHost.php:1371
 #, php-format
@@ -7782,19 +7782,19 @@ msgstr "Минимально требуемый размер PHP post - %s (ко
 
 #: popup_trexpr.php:259
 msgid "Minimum value for period of time is T < N"
-msgstr ""
+msgstr "Минимальное значение за период времени T < N"
 
 #: popup_trexpr.php:269
 msgid "Minimum value for period of time is T = N"
-msgstr ""
+msgstr "Минимальное значение за период времени T = N"
 
 #: popup_trexpr.php:264
 msgid "Minimum value for period of time is T > N"
-msgstr ""
+msgstr "Минимальное значение за период времени T > N"
 
 #: popup_trexpr.php:274
 msgid "Minimum value for period of time is T NOT N"
-msgstr ""
+msgstr "Минимальное значение за период времени T NOT N"
 
 #: include/forms.inc.php:1671
 msgid "Minutes"
@@ -8186,11 +8186,11 @@ msgstr "Нет заданных данных."
 
 #: popup_trexpr.php:501
 msgid "No data received during period of time T, if N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Нет полученных данных за период времени T, если N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:506
 msgid "No data received during period of time T, if N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Нет полученных данных за период времени T, если N NOT 1, 0 - в противном случае"
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -8235,7 +8235,7 @@ msgstr "Ошибки не найдены."
 
 #: tr_status.php:670
 msgid "No events"
-msgstr ""
+msgstr "Событий нет"
 
 #: events.php:380 include/classes/screens/CScreenEvents.php:41
 msgid "No events defined."
@@ -8832,19 +8832,19 @@ msgstr "Количество элементов данных (активных/�
 
 #: popup_trexpr.php:469
 msgid "Number of seconds since the Epoch is < N"
-msgstr ""
+msgstr "Количество секунд с начала Эпохи < N"
 
 #: popup_trexpr.php:477
 msgid "Number of seconds since the Epoch is = N"
-msgstr ""
+msgstr "Количество секунд с начала Эпохи = N"
 
 #: popup_trexpr.php:473
 msgid "Number of seconds since the Epoch is > N"
-msgstr ""
+msgstr "Количество секунд с начала Эпохи > N"
 
 #: popup_trexpr.php:481
 msgid "Number of seconds since the Epoch is NOT N"
-msgstr ""
+msgstr "Количество секунд с начала Эпохи NOT N"
 
 #: report5.php:63
 msgid "Number of status changes"
@@ -8856,19 +8856,19 @@ msgstr "Количество шагов"
 
 #: popup_trexpr.php:196
 msgid "Number of successfully retrieved values V of a period T is < N"
-msgstr ""
+msgstr "Количество успешно полученных значений V за период T < N"
 
 #: popup_trexpr.php:201
 msgid "Number of successfully retrieved values V of a period T is = N"
-msgstr ""
+msgstr "Количество успешно полученных значений V за период T = N"
 
 #: popup_trexpr.php:191
 msgid "Number of successfully retrieved values V of a period T is > N"
-msgstr ""
+msgstr "Количество успешно полученных значений V за период T > N"
 
 #: popup_trexpr.php:206
 msgid "Number of successfully retrieved values V of a period T is NOT N"
-msgstr ""
+msgstr "Количество успешно полученных значений V за период T NOT N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9343,11 +9343,11 @@ msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
-msgstr ""
+msgstr "PHP session auto start"
 
 #: include/classes/class.frontendsetup.php:589
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
-msgstr ""
+msgstr "PHP session auto start должно быть отключено (директива PHP \"session.auto_start\")"
 
 #: include/classes/class.frontendsetup.php:570
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
@@ -9556,7 +9556,7 @@ msgstr "Права доступа могут быть назначены тол�
 
 #: include/locales.inc.php:60
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Персидский (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
@@ -9659,19 +9659,19 @@ msgstr "Предыдущая"
 
 #: popup_trexpr.php:279
 msgid "Previous value is < N"
-msgstr ""
+msgstr "Предыдущее значение < N"
 
 #: popup_trexpr.php:287
 msgid "Previous value is = N"
-msgstr ""
+msgstr "Предыдущее значение = N"
 
 #: popup_trexpr.php:283
 msgid "Previous value is > N"
-msgstr ""
+msgstr "Предыдущее значение > N"
 
 #: popup_trexpr.php:291
 msgid "Previous value is NOT N"
-msgstr ""
+msgstr "Предыдущее значение NOT N"
 
 #: include/hosts.inc.php:405
 msgid "Primary POC cell"
@@ -10613,7 +10613,7 @@ msgstr "Комплексный экран \"%1$s\" добавлен."
 
 #: api/classes/CTemplateScreen.php:821
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr ""
+msgstr "Комплексный экран \"%1$s\" уже существует у шаблона \"%2$2\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:716 api/classes/CTemplateScreen.php:767
@@ -11492,19 +11492,19 @@ msgstr "Аудит успеха"
 
 #: popup_trexpr.php:325
 msgid "Sum of values for period of time is T < N"
-msgstr ""
+msgstr "Сумма значений за период времени T < N"
 
 #: popup_trexpr.php:340
 msgid "Sum of values for period of time is T NOT N"
-msgstr ""
+msgstr "Сумма значений за период времени T NOT N"
 
 #: popup_trexpr.php:335
 msgid "Sum of values of a period T is = N"
-msgstr ""
+msgstr "Сумма значений за период времени T = N"
 
 #: popup_trexpr.php:330
 msgid "Sum of values of a period T is > N"
-msgstr ""
+msgstr "Сумма значений за период времени T > N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11899,11 +11899,11 @@ msgstr "Отметка времени"
 
 #: popup_trexpr.php:393
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Штамп времени не отличается от времени на Zabbix сервере более чем на T секунд, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:398
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Штамп времени не отличается от времени на Zabbix сервере более чем на T секунд, тогда N NOT 1, 0 - в противном случае"
 
 #: include/reports.inc.php:206 include/reports.inc.php:368
 #: include/reports.inc.php:517

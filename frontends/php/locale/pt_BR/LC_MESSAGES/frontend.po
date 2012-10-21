@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-21 21:49+0300\n"
-"PO-Revision-Date: 2012-10-11 18:20+0200\n"
+"POT-Creation-Date: 2012-10-21 21:59+0300\n"
+"PO-Revision-Date: 2012-10-20 14:05+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -184,19 +184,19 @@ msgstr "RELATÓRIO DE DISPONIBILIDADE"
 
 #: popup_trexpr.php:119
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "A diferença absoluta entre o último valor e o anterior é < N"
 
 #: popup_trexpr.php:127
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "A diferença absoluta entre o último valor e o anterior é = N"
 
 #: popup_trexpr.php:123
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "A diferença absoluta entre o último valor e o anterior não é N"
 
 #: popup_trexpr.php:131
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "A diferença absoluta entre o último valor e o anterior não é N"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -786,19 +786,19 @@ msgstr "Média por"
 
 #: popup_trexpr.php:135
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "O valor médio do período T é < N"
 
 #: popup_trexpr.php:145
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "O valor médio do período T é = N"
 
 #: popup_trexpr.php:140
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "O valor médio do período T não é N"
 
 #: popup_trexpr.php:150
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "O valor médio do período T não é N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -2743,19 +2743,19 @@ msgstr "Erro crítico. Valor incorreto para o campo \"%1$s\": ele não pode esta
 
 #: popup_trexpr.php:345
 msgid "Current date is < N"
-msgstr ""
+msgstr "A data atual é < N"
 
 #: popup_trexpr.php:353
 msgid "Current date is = N"
-msgstr ""
+msgstr "A data atual é = N"
 
 #: popup_trexpr.php:349
 msgid "Current date is > N"
-msgstr ""
+msgstr "A data atual é > N"
 
 #: popup_trexpr.php:357
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "A data atual não é N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
@@ -2768,19 +2768,19 @@ msgstr "Nó atual"
 
 #: popup_trexpr.php:485
 msgid "Current time is < N"
-msgstr ""
+msgstr "A hora atual é < N"
 
 #: popup_trexpr.php:493
 msgid "Current time is = N"
-msgstr ""
+msgstr "A hora atual é = N"
 
 #: popup_trexpr.php:489
 msgid "Current time is > N"
-msgstr ""
+msgstr "A hora atual é > N"
 
 #: popup_trexpr.php:497
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "A hora atual não é N"
 
 #: include/setup.inc.php:192
 msgid "Current value"
@@ -2797,7 +2797,7 @@ msgstr "Etiqueta personalizada"
 #: api/classes/CMap.php:597
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr ""
+msgstr "O rótulo customizado no mapa \"%2$s\" para elementos do tipo \"%1$s\" não pode ser vazio."
 
 #: disc_prototypes.php:103 include/views/configuration.item.massupdate.php:250
 #: items.php:134
@@ -2840,7 +2840,7 @@ msgstr "D"
 #
 #: include/defines.inc.php:910
 msgid "D, d M Y H:i:s O"
-msgstr ""
+msgstr "D, d M Y H:i:s O"
 
 #: dashconf.php:112
 msgid "DASHBOARD CONFIGURATION"
@@ -2976,11 +2976,11 @@ msgstr "Data"
 # Onde é utilizado isso ? Preciso do contexto
 #: include/hosts.inc.php:335
 msgid "Date HW decommissioned"
-msgstr ""
+msgstr "A data do HW foi separada"
 
 #: include/hosts.inc.php:325
 msgid "Date HW installed"
-msgstr ""
+msgstr "Data de instalação do HW"
 
 #: include/hosts.inc.php:330
 msgid "Date HW maintenance expires"
@@ -3001,19 +3001,19 @@ msgstr "Dia do mês"
 
 #: popup_trexpr.php:377
 msgid "Day of month is < N"
-msgstr ""
+msgstr "O dia do mês é < N"
 
 #: popup_trexpr.php:385
 msgid "Day of month is = N"
-msgstr ""
+msgstr "O dia do mês é = N"
 
 #: popup_trexpr.php:381
 msgid "Day of month is > N"
-msgstr ""
+msgstr "O dia do mês é > N"
 
 #: popup_trexpr.php:389
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "O dia do mês não é N"
 
 #: include/forms.inc.php:1525 include/forms.inc.php:1582
 #: include/forms.inc.php:1606
@@ -3022,19 +3022,19 @@ msgstr "Dia da semana"
 
 #: popup_trexpr.php:361
 msgid "Day of week is < N"
-msgstr ""
+msgstr "O dia da semana é < N"
 
 #: popup_trexpr.php:369
 msgid "Day of week is = N"
-msgstr ""
+msgstr "O dia da semana é = N"
 
 #: popup_trexpr.php:365
 msgid "Day of week is > N"
-msgstr ""
+msgstr "O dia da semana é > N"
 
 #: popup_trexpr.php:373
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "O dia da semana não é N"
 
 #: include/forms.inc.php:1667 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3365,8 +3365,8 @@ msgstr "Remover mapeamento de valor selecionado?"
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Apagar o mapeamento selecionado? Ele é usado por %d item!"
+msgstr[1] "Apagar o mapeamento selecionado? Ele é usado por %d itens!"
 
 #: templates.php:617
 msgid "Delete selected with linked elements"
@@ -3526,23 +3526,23 @@ msgstr "Critério único do dispositivo"
 
 #: popup_trexpr.php:155
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "A diferença entre o valor MÁXIMO e o valor MÍNIMO do período T é < N"
 
 #: popup_trexpr.php:165
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "A diferença entre o valor MÁXIMO e o valor MÍNIMO do período T é = N"
 
 #: popup_trexpr.php:160
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "A diferença entre o valor MÁXIMO e o valor MÍNIMO do período é > N"
 
 #: popup_trexpr.php:170
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "A diferença entre o valor MÁXIMO e o valor MÍNIMO do período T não é N"
 
 #: popup_trexpr.php:211
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Diferença entre o último valor e o anterior, quando N = 1, 0 - em outro caso"
 
 #: popup_trexpr.php:215
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
@@ -3550,19 +3550,19 @@ msgstr ""
 
 #: popup_trexpr.php:175
 msgid "Difference between last and previous value of a period T is < N"
-msgstr ""
+msgstr "A diferença entre o último valor e o anterior de um período T é < N"
 
 #: popup_trexpr.php:183
 msgid "Difference between last and previous value of a period T is = N"
-msgstr ""
+msgstr "A diferença entre o último valor e o anterior de um período T é = N"
 
 #: popup_trexpr.php:179
 msgid "Difference between last and previous value of a period T is > N"
-msgstr ""
+msgstr "A diferença entre o último valor e o anterior de um período T é > N"
 
 #: popup_trexpr.php:187
 msgid "Difference between last and previous value of a period T is NOT N"
-msgstr ""
+msgstr "A diferença entre o último valor e o anterior de um período T não é N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3872,19 +3872,19 @@ msgstr "Downtime"
 
 #: include/views/configuration.host.edit.php:271
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
-msgstr ""
+msgstr "Arraste para cá para mudar o tipo da interface para \"IPMI\"."
 
 #: include/views/configuration.host.edit.php:256
 msgid "Drag here to change the type of the interface to \"JMX\" type."
-msgstr ""
+msgstr "Arraste para cá para mudar o tipo da interface para \"JMX\"."
 
 #: include/views/configuration.host.edit.php:240
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
-msgstr ""
+msgstr "Arraste para cá para mudar o tipo da interface para \"SNMP\"."
 
 #: include/views/configuration.host.edit.php:223
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr ""
+msgstr "Arraste para cá para mudar o tipo da interface para \"Agente Zabbix\"."
 
 #: include/views/configuration.graph.edit.php:72
 msgid "Draw style"
@@ -3897,7 +3897,7 @@ msgstr "Primeiro ítem dropdown"
 #: adm.gui.php:74
 #, php-format
 msgid "Dropdown first entry \"%1$s\"."
-msgstr ""
+msgstr "Descer a primeira entrada \"%1$s\"."
 
 #: adm.gui.php:75
 #, php-format
@@ -3907,37 +3907,37 @@ msgstr ""
 #: api/classes/CTrigger.php:2019
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "Dependência duplicada na trigger \"%1$s\"."
 
 #: api/classes/CHost.php:1349
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr ""
+msgstr "Host duplicado. Já existe registro de outro Host usando o hostname \"%s\"."
 
 #: api/classes/CHost.php:1381
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr ""
+msgstr "Host duplicado. Já existe registro de outro Host usando o \"nome visível\" \"%s\"."
 
 #: api/classes/CMap.php:565
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
-msgstr ""
+msgstr "Nome de mapa duplicado para o mapa \"%s\"."
 
 #: api/classes/CScript.php:307 api/classes/CScript.php:358
 #, php-format
 msgid "Duplicate script name \"%s\"."
-msgstr ""
+msgstr "Nome de script duplicado \"%s\"."
 
 #: include/profiles.inc.php:311
 #, php-format
 msgid "Duplicate severity name \"%s\"."
-msgstr ""
+msgstr "Nome de severidade duplicado \"%s\"."
 
 #: api/classes/CUser.php:388
 #, php-format
 msgid "Duplicate user alias \"%s\"."
-msgstr ""
+msgstr "Apelido duplicado \"%s\"."
 
 #: events.php:565 events.php:578 include/events.inc.php:135
 #: include/events.inc.php:208 include/events.inc.php:211 tr_status.php:289
@@ -3946,7 +3946,7 @@ msgstr "Duração"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Duration (sec)"
-msgstr ""
+msgstr "Duração (segundos)"
 
 #: include/locales.inc.php:49
 msgid "Dutch (nl_NL)"
@@ -3959,7 +3959,7 @@ msgstr "Item dinâmico"
 #: include/func.inc.php:569
 msgctxt "Exa short"
 msgid "E"
-msgstr ""
+msgstr "E"
 
 #: include/config.inc.php:303
 msgid "ERROR"
@@ -3996,11 +3996,11 @@ msgstr "Editar elemento"
 
 #: jsLoader.php:179
 msgid "Edit service"
-msgstr ""
+msgstr "Editar serviço"
 
 #: include/views/configuration.item.list.php:181
 msgid "Edit trigger"
-msgstr ""
+msgstr "Editar trigger"
 
 #: include/views/configuration.sysmap.edit.php:151
 msgid "Element"
@@ -4021,15 +4021,15 @@ msgstr "Vazio"
 
 #: api/classes/CAction.php:1766
 msgid "Empty action condition."
-msgstr ""
+msgstr "A condição da ação está vazia."
 
 #: api/classes/CTriggerExpression.php:41
 msgid "Empty expression."
-msgstr ""
+msgstr "Expressão vazia."
 
 #: api/classes/CTriggerExpression.php:88
 msgid "Empty host name provided in expression."
-msgstr ""
+msgstr "O nome do host está faltando na expressão."
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
 #: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
@@ -4045,32 +4045,32 @@ msgstr ""
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:502
 #: api/classes/CUserMacro.php:654
 msgid "Empty input parameter."
-msgstr ""
+msgstr "Parâmetro de entrada vazio."
 
 #: api/classes/CDRule.php:418
 msgid "Empty input."
-msgstr ""
+msgstr "Entrada vazia."
 
 #: api/classes/CTriggerExpression.php:98
 #, php-format
 msgid "Empty item key \"%1$s\" is used in expression."
-msgstr ""
+msgstr "A chave de item vazia \"%1$s\" é utilizada na expressão."
 
 #: api/classes/CUserMacro.php:892
 msgid "Empty macro."
-msgstr ""
+msgstr "Macro vazia."
 
 #: api/classes/CService.php:1110
 msgid "Empty name."
-msgstr ""
+msgstr "Nome vazio."
 
 #: api/classes/CImage.php:502 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
-msgstr ""
+msgstr "Parâmetros vazios."
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
-msgstr ""
+msgstr "Período vazio."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -4082,7 +4082,7 @@ msgstr "Habilitar DEBUG"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
-msgstr ""
+msgstr "Ativar confirmação."
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
@@ -4090,7 +4090,7 @@ msgstr "Ativar modo debug nos grupos selecionados?"
 
 #: include/views/administration.general.gui.edit.php:41
 msgid "Enable event acknowledges"
-msgstr ""
+msgstr "Ativar reconhecimento de evento."
 
 #: include/actions.inc.php:289 include/actions.inc.php:500
 msgid "Enable host"
@@ -4098,7 +4098,7 @@ msgstr "Ativar host"
 
 #: hosts.php:803
 msgid "Enable host?"
-msgstr ""
+msgstr "Ativar host ?"
 
 #: include/views/administration.proxy.list.php:88
 msgid "Enable hosts monitored by selected proxies?"
@@ -4120,15 +4120,15 @@ msgstr "Ativar selecionadas"
 
 #: include/views/configuration.httpconf.list.php:130
 msgid "Enable selected WEB scenarios?"
-msgstr ""
+msgstr "Ativar o cenário WEB selecionado?"
 
 #: include/views/configuration.action.list.php:94
 msgid "Enable selected actions?"
-msgstr ""
+msgstr "Ativar a ação selecionada?"
 
 #: include/views/configuration.application.list.php:82
 msgid "Enable selected applications?"
-msgstr ""
+msgstr "Ativar a aplicação selecionada?"
 
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:102
@@ -4141,7 +4141,7 @@ msgstr "Habilitar grupos selecionados?"
 
 #: hosts.php:868 include/views/configuration.hostgroups.list.php:120
 msgid "Enable selected hosts?"
-msgstr ""
+msgstr "Ativar os hosts selecionados?"
 
 #: include/views/configuration.item.list.php:238
 #: include/views/configuration.item.prototype.list.php:105
@@ -4150,7 +4150,7 @@ msgstr "Ativar itens selecionados?"
 
 #: include/views/administration.mediatypes.list.php:110
 msgid "Enable selected media types?"
-msgstr ""
+msgstr "Ativar o tipo de mídia selecionado?"
 
 #: include/views/configuration.triggers.list.php:226
 msgid "Enable selected triggers?"
@@ -4186,7 +4186,7 @@ msgstr "Inglês (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "Inglês (en_US)"
 
 #: include/actions.inc.php:681 include/actions.inc.php:757
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
@@ -4200,42 +4200,42 @@ msgstr "Erro"
 
 #: api/classes/CScript.php:482
 msgid "Error description"
-msgstr ""
+msgstr "Descrição do erro"
 
 #: api/classes/CScript.php:520
 msgid "Error description: can't read script response, check connection."
-msgstr ""
+msgstr "Descrição do erro: Não foi possível receber a resposta do script, verifique as conexões."
 
 #: api/classes/CScript.php:497
 msgid "Error description: can't send command, check connection."
-msgstr ""
+msgstr "Descrição do erro: Não foi possível enviar o comando, verifique as conexões."
 
 #: api/classes/CScript.php:513
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
-msgstr ""
+msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_BYTES_LIMIT no arquivo  \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
 #: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
-msgstr ""
+msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_TIMEOUT no arquivo \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
 #: api/classes/CScript.php:528
 msgid "Error description: empty response received."
-msgstr ""
+msgstr "Descrição do erro: a resposta recebida estava vazia."
 
 #: api/classes/CItemGeneral.php:267
 #, php-format
 msgid "Error in item key: \"%s\"."
-msgstr ""
+msgstr "Erro na chave do item: \"%s\"."
 
 #: include/db.inc.php:930 include/db.inc.php:986
 #, php-format
 msgid "Error in search request for table \"%1$s\"."
-msgstr ""
+msgstr "Erro na solicitação de pesquisa para a tabela \"%1$s\"."
 
 #: httpdetails.php:161 httpdetails.php:215
 #, php-format
 msgid "Error: %1$s"
-msgstr ""
+msgstr "Erro: %1$s"
 
 #: include/events.inc.php:115
 msgid "Event"
@@ -4260,7 +4260,7 @@ msgstr "Evento reconhecido"
 #: adm.gui.php:71
 #, php-format
 msgid "Event acknowledges \"%1$s\"."
-msgstr ""
+msgstr "Evento reconhecido \"%1$s\"."
 
 #: dashconf.php:260
 msgid "Event acknowledging disabled"
@@ -4276,7 +4276,7 @@ msgstr "Geração de evento"
 
 #: tr_events.php:139
 msgid "Event list [previous 20]"
-msgstr ""
+msgstr "Lista de eventos [20 anteriores]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
@@ -4284,7 +4284,7 @@ msgstr "Origem do evento"
 
 #: tr_events.php:110
 msgid "Event source details"
-msgstr ""
+msgstr "Detalhes da origem do evento"
 
 #: events.php:314 include/menu.inc.php:57 include/triggers.inc.php:1443
 #: jsLoader.php:108 search.php:134 search.php:206 search.php:261
@@ -4311,12 +4311,12 @@ msgstr "Excluir"
 #: include/views/js/administration.script.edit.js.php:66
 #: include/views/js/general.script.confirm.js.php:37
 msgid "Execute"
-msgstr ""
+msgstr "Executar"
 
 #: api/classes/CImage.php:339
 #, php-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Erro de execução SQL [%1$s] em [%2$s]."
 
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
@@ -4324,7 +4324,7 @@ msgstr ""
 #: include/views/js/configuration.action.edit.js.php:114 popup.php:1979
 #: popup.php:1986
 msgid "Execute on"
-msgstr ""
+msgstr "Executar em"
 
 #: include/items.inc.php:1319 include/views/configuration.item.edit.php:186
 msgid "Executed script"
@@ -4332,11 +4332,11 @@ msgstr "Script executado"
 
 #: include/views/js/general.script.confirm.js.php:16
 msgid "Execution confirmation"
-msgstr ""
+msgstr "Confirmação de execução"
 
 #: sysmap.php:190
 msgid "Expand macros"
-msgstr ""
+msgstr "Expandir macros"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Expand single problem"
@@ -4349,12 +4349,12 @@ msgstr "Resultado experado"
 #: api/rpc/class.cjsonrpc.php:90
 #, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
-msgstr ""
+msgstr "Esperando JSON-rpc na versão 2.0, versão \"%s\" foi enviada."
 
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr ""
+msgstr "Expirado"
 
 #: include/graphs.inc.php:27 popup.php:1422
 msgid "Exploded"
@@ -4367,7 +4367,7 @@ msgstr "Exportar selecionados"
 
 #: events.php:255
 msgid "Export to CSV"
-msgstr ""
+msgstr "Exportar para CSV"
 
 #: include/forms.inc.php:1745 include/forms.inc.php:1876
 #: include/forms.inc.php:1949 include/triggers.inc.php:1783
@@ -4383,7 +4383,7 @@ msgstr "Expressão"
 #: include/forms.inc.php:1332 include/forms.inc.php:1337
 #: include/forms.inc.php:1350
 msgid "Expression Syntax Error."
-msgstr ""
+msgstr "Erro de sintaxe na expressão."
 
 #: tr_testexpr.php:56
 msgid "Expression Variable Elements"
@@ -4395,7 +4395,7 @@ msgstr "Expressão não pode ser vazia"
 
 #: include/views/configuration.triggers.edit.php:126
 msgid "Expression constructor"
-msgstr ""
+msgstr "Construtor de expressão"
 
 #: include/forms.inc.php:1958
 msgid "Expression type"
@@ -4413,12 +4413,12 @@ msgstr "Monitoramento externo"
 #: include/media.inc.php:28
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Ez Texting"
-msgstr ""
+msgstr "Mensagem de texto Ez"
 
 #: jsLoader.php:127
 msgctxt "Friday short"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: include/forms.inc.php:1801 include/forms.inc.php:1821
 msgid "FALSE"
@@ -4441,11 +4441,11 @@ msgstr "Falhou"
 #: api/classes/CWebCheck.php:630
 #, php-format
 msgid "Failed step of scenario \"%s\"."
-msgstr ""
+msgstr "O cenário falhou no passo \"%s\"."
 
 #: api/classes/CTemplate.php:1092
 msgid "Failed to update template"
-msgstr ""
+msgstr "A atualização do template falhou"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -4480,27 +4480,29 @@ msgstr "Fevereiro"
 msgid "Field"
 msgstr "Campo"
 
+# Onde é utilizado isso ? Não me recordo deste campo no zabbix...
 #: api/classes/CDRule.php:527
 msgid "Field \"druleid\" is required."
 msgstr ""
 
 #: api/classes/CTemplate.php:991
 msgid "Field \"host\" is mandatory"
-msgstr ""
+msgstr "O campo \"host\" é de preenchimento obrigatório."
 
 #: api/classes/CDRule.php:534
 msgid "Field \"name\" is required."
-msgstr ""
+msgstr "O campo \"nome\" é de preenchimento obrigatório."
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr ""
+msgstr "Campo:"
 
 #: include/classes/helpers/CUploadFile.php:143
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr ""
+msgstr "Arquivo muito grande, o limite de upload é de %1$s bytes."
 
+# Preciso do contexto...
 #: include/classes/class.cview.php:68
 #, php-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
@@ -4522,7 +4524,7 @@ msgstr "Filtrar"
 
 #: include/reports.inc.php:102
 msgid "Filter by host group"
-msgstr ""
+msgstr "Filtro por grupo de host"
 
 #: tr_status.php:244
 msgid "Filter by name"
@@ -4530,11 +4532,11 @@ msgstr "Filtrar por nome"
 
 #: popup_trexpr.php:295
 msgid "Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Localizar o texto T no último (mais recente) valor. N = 1 - se localizado, 0 - qualquer outro caso"
 
 #: popup_trexpr.php:300
 msgid "Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Localizar o texto T no último (mais recente) valor. N diferente de 1 - se localizado, 0 - qualquer outro caso"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -4542,7 +4544,7 @@ msgstr "Fim"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Finlandês (fi_FI)"
 
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
@@ -4551,11 +4553,11 @@ msgstr "Primeiro"
 #: include/func.inc.php:1641
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "Primeiro"
 
 #: include/views/js/configuration.sysmaps.js.php:40
 msgid "Fit to map"
-msgstr ""
+msgstr "Ajustar ao mapa"
 
 #: include/views/configuration.graph.edit.php:163
 #: include/views/configuration.graph.edit.php:221
@@ -4565,7 +4567,7 @@ msgstr "Fixo"
 #: include/views/configuration.item.edit.php:297
 #: include/views/configuration.item.massupdate.php:298
 msgid "Flexible intervals"
-msgstr ""
+msgstr "Intervalo flexível"
 
 #: profile.php:113 users.php:132
 msgid "For guest, password must be empty"
@@ -4606,15 +4608,15 @@ msgstr "De"
 #: include/views/administration.usergroups.list.php:49
 #: include/views/administration.users.list.php:61
 msgid "Frontend access"
-msgstr ""
+msgstr "Acesso à interface web"
 
 #: usergrps.php:225
 msgid "Frontend access updated"
-msgstr ""
+msgstr "Acesso à interface web atualizado"
 
 #: include/views/administration.users.edit.php:175
 msgid "Frontend messaging"
-msgstr ""
+msgstr "Mensagem da interface web"
 
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.template.edit.php:436
@@ -4632,17 +4634,17 @@ msgstr "Função"
 
 #: api/classes/CTriggerExpression.php:119
 msgid "Function does not expect parameters."
-msgstr ""
+msgstr "A função não espera parâmetros."
 
 #: api/classes/CTriggerExpression.php:127
 #, php-format
 msgid "Function supports \"%1$s\" parameters."
-msgstr ""
+msgstr "A função suporta \"%1$s\" parâmetros."
 
 #: include/func.inc.php:566
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
@@ -4659,7 +4661,7 @@ msgstr "GUI"
 
 #: include/classes/class.cwebuser.php:41 include/classes/class.cwebuser.php:99
 msgid "GUI access disabled."
-msgstr ""
+msgstr "Acesso à interface gráfica desativado."
 
 #: include/menu.inc.php:228
 msgid "General"
@@ -4668,7 +4670,7 @@ msgstr "Geral"
 #: chart4.php:180 chart5.php:201 include/classes/class.cbar.php:739
 #, php-format
 msgid "Generated in %s sec"
-msgstr ""
+msgstr "Gerado em %s segundos."
 
 #: include/locales.inc.php:52
 msgid "German (de_DE)"
@@ -4688,15 +4690,15 @@ msgstr "Expressão informada não é uma macro"
 
 #: include/classes/class.globalregexp.php:71
 msgid "Global expression does not exist."
-msgstr ""
+msgstr "Expressão global não existe."
 
 #: include/views/configuration.action.edit.php:649
 msgid "Global script"
-msgstr ""
+msgstr "Script global"
 
 #: popup.php:135
 msgid "Global scripts"
-msgstr ""
+msgstr "Scripts globais"
 
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
@@ -4724,11 +4726,11 @@ msgstr "Ir"
 
 #: include/views/js/monitoring.maps.js.php:51 jsLoader.php:174
 msgid "Go to"
-msgstr ""
+msgstr "Ir para"
 
 #: include/views/configuration.httpconf.edit.php:97
 msgid "Google Chrome"
-msgstr ""
+msgstr "Google Chrome"
 
 #: include/graphs.inc.php:75
 msgid "Gradient line"
@@ -4745,49 +4747,49 @@ msgstr "Gráfico"
 #: api/classes/CGraph.php:632 api/classes/CGraphPrototype.php:660
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr ""
+msgstr "O gráfico \"%1$s\" já existe em \"%2$s\" (herdado de outro template)."
 
 #: api/classes/CGraph.php:653 api/classes/CGraph.php:660
 #: api/classes/CGraphPrototype.php:682 api/classes/CGraphPrototype.php:689
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr ""
+msgstr "O gráfico \"%1$s\" já existe em \"%2$s\" (os itens são diferentes)."
 
 #: api/classes/CGraph.php:611 api/classes/CGraphPrototype.php:639
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "O gráfico \"%1$s\" já existe em \"%2$s\"."
 
 #: api/classes/CGraph.php:585 api/classes/CGraphPrototype.php:613
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr ""
+msgstr "O gráfico não \"%1$s\" não pode ser importado. Não existem os itens necessários em \"%2$s\" (Item para o Máximo de Y)."
 
 #: api/classes/CGraph.php:593 api/classes/CGraphPrototype.php:621
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr ""
+msgstr "O gráfico não \"%1$s\" não pode ser importado. Não existem os itens necessários em \"%2$s\" (Item para o Mínimo de Y)."
 
 #: api/classes/CGraph.php:579 api/classes/CGraphPrototype.php:607
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr ""
+msgstr "O gráfico não \"%1$s\" não pode ser importado. Não existem os itens necessários em \"%2$s\"."
 
 #: api/classes/CTemplateScreen.php:663
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "O gráfico \"%1$s\" não existe no template \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1556
 #: include/classes/import/CXmlImport18.php:1560
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Gráfico \"%1$s\" ignorado - regra de usuário."
 
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "O gráfico \"%1$s\" possui itens de template. Nesta situação não é possível adicionar itens de outros hosts."
 
 #: graphs.php:226
 msgid "Graph added"
@@ -4812,27 +4814,27 @@ msgstr "Nome do gráfico"
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "O protótipo de gráfico \"%1$s\" possui itens de template. Nesta situação não é possível adicionar itens de outros hosts."
 
 #: api/classes/CGraphPrototype.php:827
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
+msgstr "O protótipo de gráfico \"%s\" foi excluído."
 
 #: api/classes/CGraphPrototype.php:889
 msgid "Graph prototype must have at least one prototype."
-msgstr ""
+msgstr "Protótipo de gráfico deve possuir pelo menos um protótipo de item."
 
 #: include/html.inc.php:460 include/html.inc.php:464
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
 msgid "Graph prototypes"
-msgstr ""
+msgstr "Protótipos de gráfico"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
-msgstr ""
+msgstr "Protótipos de gráfico de"
 
 #: include/graphs.inc.php:44
 #: include/views/js/configuration.graph.edit.js.php:28
@@ -4856,7 +4858,7 @@ msgstr ""
 #: api/classes/CGraph.php:614 api/classes/CGraph.php:635
 #: api/classes/CGraphPrototype.php:642 api/classes/CGraphPrototype.php:663
 msgid "Graph with same name but other type exist."
-msgstr ""
+msgstr "Já existe um gráfico com o mesmo nome, mas com outro tipo."
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1194
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:786
@@ -4881,7 +4883,7 @@ msgstr "Gráficos removidos"
 
 #: include/locales.inc.php:53
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Grego (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:60 sysmap.php:192
 msgid "Grid"
@@ -4916,27 +4918,27 @@ msgstr "Grupo"
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
 msgid "Group \"%1$s\" does not exist."
-msgstr ""
+msgstr "O grupo \"%1$s\" não existe."
 
 #: include/classes/import/importers/CHostImporter.php:135
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "O grupo \"%1$s\" informado no host \"%2$s\" não existe."
 
 #: api/classes/CHostGroup.php:720
 #, php-format
 msgid "Group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "O grupo \"%1$s\" é de uso interno e não pode ser excluído."
 
 #: api/classes/CHostGroup.php:740
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "O grupo \"%s\" não pode ser excluído por ser utilizado em um script global."
 
 #: api/classes/CHostGroup.php:724
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because some hosts depend on it."
-msgstr ""
+msgstr "O grupo \"%s\" não pode ser excluído pois alguns hosts dependem dele."
 
 #: hostgroups.php:144 usergrps.php:151
 msgid "Group added"
@@ -4952,7 +4954,7 @@ msgstr "Grupo para hosts descobertos"
 
 #: adm.other.php:71
 msgid "Group for discovered hosts."
-msgstr ""
+msgstr "Grupo para descoberta de hosts."
 
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
@@ -4965,7 +4967,7 @@ msgstr "Grupo atualizado"
 
 #: hostinventoriesoverview.php:80
 msgid "Grouping by"
-msgstr ""
+msgstr "Agrupar por"
 
 #: dashconf.php:217 include/reports.inc.php:540
 #: include/views/administration.users.edit.php:80
@@ -4999,15 +5001,15 @@ msgstr "H:i:s"
 
 #: events.php:258
 msgid "HISTORY OF EVENTS"
-msgstr ""
+msgstr "HISTÓRICO DE EVENTOS"
 
 #: hostinventories.php:84
 msgid "HOST INVENTORIES"
-msgstr ""
+msgstr "INVENTÁRIO DE HOSTS"
 
 #: hostinventoriesoverview.php:61
 msgid "HOST INVENTORY OVERVIEW"
-msgstr ""
+msgstr "VISÃO GLOBAL DO INVENTÁRIO DE HOSTS"
 
 #: include/discovery.inc.php:61
 #: include/views/administration.authentication.edit.php:39
@@ -5017,16 +5019,16 @@ msgstr "HTTP"
 
 #: authentication.php:188
 msgid "HTTP authentication"
-msgstr ""
+msgstr "Autenticação HTTTP"
 
 #: include/discovery.inc.php:72
 #: include/views/js/configuration.discovery.edit.js.php:122
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: include/hosts.inc.php:250
 msgid "HW architecture"
-msgstr ""
+msgstr "Arquitetura de HW"
 
 #: include/hosts.inc.php:170
 msgid "Hardware"
@@ -5034,7 +5036,7 @@ msgstr "Hardware"
 
 #: include/hosts.inc.php:175
 msgid "Hardware (Full details)"
-msgstr ""
+msgstr "Hardware (Mais detalhes)"
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:77
@@ -5165,26 +5167,26 @@ msgstr "Host"
 #: api/classes/CHost.php:1683
 #, php-format
 msgid "Host \"%1$s\" already exists."
-msgstr ""
+msgstr "O host \"%1$s\" já existe."
 
 #: api/classes/CProxy.php:645
 #, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
-msgstr ""
+msgstr "O host \"%1$s\" é monitorado pelo proxy \"%2$s\""
 
 #: api/classes/CTemplate.php:1004
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr ""
+msgstr "O host \"%s\" já existe."
 
 #: include/classes/import/CXmlImport18.php:927
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr ""
+msgstr "O host \"%s\" está com verificação de IPMI habilitada, mas não existe uma interface IPMI definida. Utilizando o IP do host como o endereço da interface IPMI."
 
 #: include/views/configuration.screen.constructor.edit.php:343
 msgid "Host (ascending)"
-msgstr ""
+msgstr "Host (acedente)"
 
 #: include/actions.inc.php:53
 msgid "Host IP"
@@ -5192,7 +5194,7 @@ msgstr "IP do Host"
 
 #: include/forms.inc.php:1687
 msgid "Host Inventory"
-msgstr ""
+msgstr "Inventário de host"
 
 #: include/views/administration.script.list.php:43
 msgid "Host access"
@@ -5204,7 +5206,7 @@ msgstr "Host incluído"
 
 #: api/classes/CHostInterface.php:1011
 msgid "Host cannot have more than one default interface of the same type."
-msgstr ""
+msgstr "Host não pode possuir mais de uma interface padrão para cada tipo de coleta."
 
 #: hostinventoriesoverview.php:88
 #: include/views/administration.proxy.list.php:48
@@ -5233,15 +5235,15 @@ msgstr "Grupo de hosts"
 #: api/classes/CHostGroup.php:619 api/classes/CHostGroup.php:672
 #, php-format
 msgid "Host group \"%1$s\" already exists."
-msgstr ""
+msgstr "O grupo de hosts \"%1$s\" já existe."
 
 #: include/views/js/configuration.sysmaps.js.php:31
 msgid "Host group elements"
-msgstr ""
+msgstr "Elementos do grupo de host"
 
 #: include/views/configuration.sysmap.edit.php:92
 msgid "Host group label type"
-msgstr ""
+msgstr "Tipo do rótulo do grupo de host"
 
 #: dashconf.php:180 include/forms.inc.php:196 include/menu.inc.php:160
 #: include/views/administration.script.edit.php:91
@@ -5255,27 +5257,27 @@ msgstr "Grupos de hosts"
 #: include/views/configuration.item.edit.php:131
 #: include/views/configuration.item.massupdate.php:84
 msgid "Host interface"
-msgstr ""
+msgstr "Interface do host"
 
 #: hostinventories.php:26 jsLoader.php:177
 msgid "Host inventories"
-msgstr ""
+msgstr "Inventário de hosts"
 
 #: include/views/configuration.host.edit.php:630
 msgid "Host inventory"
-msgstr ""
+msgstr "Inventário do host"
 
 #: hostinventoriesoverview.php:26
 msgid "Host inventory overview"
-msgstr ""
+msgstr "Visão global do inventário de host"
 
 #: include/views/configuration.sysmap.edit.php:100
 msgid "Host label type"
-msgstr ""
+msgstr "Tipo do rótulo do host"
 
 #: include/html.inc.php:350
 msgid "Host list"
-msgstr ""
+msgstr "Lista de host"
 
 #: hosts.php:51 include/actions.inc.php:62
 #: include/views/configuration.host.edit.php:170
@@ -5284,16 +5286,16 @@ msgstr "Nome do host"
 
 #: include/hosts.inc.php:290
 msgid "Host networks"
-msgstr ""
+msgstr "Rede de hosts"
 
 #: include/hosts.inc.php:300
 msgid "Host router"
-msgstr ""
+msgstr "Roteador do host"
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
 #: jsLoader.php:173
 msgid "Host screens"
-msgstr ""
+msgstr "Telas do host"
 
 #: dashboard.php:310
 msgid "Host status"
@@ -5302,7 +5304,7 @@ msgstr "Status do host"
 #: include/triggers.inc.php:1164
 #, php-format
 msgid "Host status became \"%s\""
-msgstr ""
+msgstr "O status do host tornou-se \"%s\""
 
 #: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:147
 msgid "Host status updated"
@@ -5310,7 +5312,7 @@ msgstr "Status do host atualizado"
 
 #: include/hosts.inc.php:295
 msgid "Host subnet mask"
-msgstr ""
+msgstr "Máscara de sub-rede do host"
 
 #: include/actions.inc.php:41
 msgid "Host template"
@@ -5318,11 +5320,11 @@ msgstr "Template do host"
 
 #: include/views/configuration.screen.constructor.edit.php:513
 msgid "Host time"
-msgstr ""
+msgstr "Hora do host"
 
 #: api/classes/CHost.php:1561
 msgid "Host update failed."
-msgstr ""
+msgstr "Falha ao atualizar o host"
 
 #: hosts.php:321
 msgid "Host updated"
@@ -5331,13 +5333,13 @@ msgstr "Host atualizado"
 #: api/classes/CHost.php:1411 api/classes/CTemplate.php:1361
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
-msgstr ""
+msgstr "Existe outro host com o nome \"%s\"."
 
 #: api/classes/CHost.php:1417 api/classes/CTemplate.php:1014
 #: api/classes/CTemplate.php:1334
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
-msgstr ""
+msgstr "Existe outro host com o mesmo nome visível \"%s\"."
 
 #: dashconf.php:227 hostinventoriesoverview.php:81 hostinventories.php:94
 #: hosts.php:644 include/forms.inc.php:223 include/forms.inc.php:816
@@ -5356,7 +5358,7 @@ msgstr "Hosts"
 
 #: include/views/configuration.maintenance.edit.php:159
 msgid "Hosts & Groups"
-msgstr ""
+msgstr "Hosts & Grupos"
 
 #: include/classes/class.cserverinfo.php:48
 msgid "Hosts (m/n/t)"
@@ -5364,7 +5366,7 @@ msgstr "Hosts (m/n/t/d)"
 
 #: include/views/configuration.template.edit.php:195
 msgid "Hosts / templates"
-msgstr ""
+msgstr "Hosts / templates"
 
 #: popup.php:41
 msgid "Hosts and templates"
@@ -5372,7 +5374,7 @@ msgstr "Hosts e templates"
 
 #: include/views/configuration.hostgroups.edit.php:59
 msgid "Hosts in"
-msgstr ""
+msgstr "Hosts em"
 
 #: include/views/configuration.maintenance.edit.php:141
 msgid "Hosts in maintenance"
@@ -5389,7 +5391,7 @@ msgstr "Localização dos hosts"
 
 #: hosts.php:292
 msgid "Hosts updated"
-msgstr ""
+msgstr "Hosts atualizados"
 
 #: include/reports.inc.php:212 include/reports.inc.php:658
 #: include/reports.inc.php:666
@@ -5415,7 +5417,7 @@ msgstr "Húngaro (hu_HU)"
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
 msgid "ICMP ping"
-msgstr ""
+msgstr "ICMP ping"
 
 #: include/views/administration.auditlogs.list.php:90
 #: include/views/administration.node.edit.php:41
@@ -5446,7 +5448,7 @@ msgstr "Endereço IP"
 
 #: api/classes/CHostInterface.php:539
 msgid "IP and DNS cannot be empty for host interface."
-msgstr ""
+msgstr "O campo IP e o campo DNS não podem ficar em branco para a interface do host."
 
 #: include/views/configuration.discovery.edit.php:47
 #: include/views/configuration.discovery.list.php:41
@@ -5455,7 +5457,7 @@ msgstr "Intervalo de IPs"
 
 #: api/classes/CDRule.php:430
 msgid "IP range cannot be empty."
-msgstr ""
+msgstr "O range de IP não pode ser vazio."
 
 #: include/hosts.inc.php:477 include/items.inc.php:185
 #: include/views/administration.script.edit.php:49
@@ -5463,7 +5465,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:645
 #: include/views/configuration.host.edit.php:543
 msgid "IPMI"
-msgstr ""
+msgstr "IPMI"
 
 #: include/items.inc.php:88
 msgid "IPMI agent"
@@ -5475,7 +5477,7 @@ msgstr "Algoritmo de Autenticação IPMI"
 
 #: include/views/configuration.host.edit.php:280
 msgid "IPMI interfaces"
-msgstr ""
+msgstr "Interfaces IPMI"
 
 #: include/views/configuration.host.massupdate.php:168
 msgid "IPMI password"
@@ -5508,11 +5510,11 @@ msgstr "Serviço TI"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
-msgstr ""
+msgstr "Dependências do serviço de TI"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"
-msgstr ""
+msgstr "Pai do serviço de IT"
 
 #: include/menu.inc.php:82 include/menu.inc.php:215
 #: include/views/configuration.services.list.php:26 srv_status.php:26
@@ -5552,7 +5554,7 @@ msgstr "Ícone (problema)"
 
 #: include/views/configuration.sysmap.edit.php:81
 msgid "Icon highlight"
-msgstr ""
+msgstr "Realce de ícone"
 
 #: include/views/configuration.sysmap.edit.php:133
 msgid "Icon label location"
@@ -5575,12 +5577,12 @@ msgstr "O mapeamento de ícone \"%1$s\" não pode ser apagado. Ele é usado no m
 #: api/classes/CIconMap.php:528
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
-msgstr ""
+msgstr "O ícone do mapa \"%1$s\" possui um mapeamento com um ID de ícone incorreto \"%2$s\"."
 
 #: api/classes/CIconMap.php:524
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
-msgstr ""
+msgstr "O ícone do mapa \"%1$s\" possui um mapeamento com um link de inventário incorreto \"%2$s\"."
 
 #: api/classes/CIconMap.php:276 api/classes/CIconMap.php:353
 #, php-format
@@ -5605,7 +5607,7 @@ msgstr "O mapeamento de ícone \"%s\" possui uma expressão inválida."
 #: api/classes/CIconMap.php:499 api/classes/CIconMap.php:504
 #, php-format
 msgid "Icon map \"%s\" must have at least one mapping."
-msgstr ""
+msgstr "O mapeamento de ícone \"%s\" precisa ter pelo menos um mapeamento."
 
 #: adm.iconmapping.php:65
 msgid "Icon map created"
@@ -5626,7 +5628,7 @@ msgstr "Mapeamento de ícone atualizado"
 #: api/classes/CIconMap.php:340
 #, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
-msgstr ""
+msgstr "O mapeamento de ícone com o ID \"%s\" não existe."
 
 #: adm.gui.php:95 adm.housekeeper.php:74 adm.iconmapping.php:96
 #: adm.iconmapping.php:159 adm.images.php:130 adm.macros.php:161
@@ -5643,11 +5645,11 @@ msgstr ""
 
 #: jsLoader.php:155
 msgid "Iconmap is not enabled"
-msgstr ""
+msgstr "O mapeamento de ícones não está ativado."
 
 #: include/views/js/configuration.sysmaps.js.php:111
 msgid "Icons"
-msgstr ""
+msgstr "Ícones"
 
 #: include/config.inc.php:250
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -5673,7 +5675,7 @@ msgstr "Imagem removida"
 
 #: include/views/configuration.sysmap.edit.php:124
 msgid "Image label type"
-msgstr ""
+msgstr "Tipo do rótulo de imagem"
 
 #: adm.images.php:65 api/classes/CImage.php:312
 msgid "Image size must be less than 1MB"
@@ -5694,7 +5696,7 @@ msgstr "Imagens"
 
 #: include/views/conf.import.php:51
 msgid "Images for all maps will be updated!"
-msgstr ""
+msgstr "Imagens de todos os mapas foram atualizadas!"
 
 #: include/views/configuration.action.edit.php:356
 msgid "Immediately"
@@ -5708,7 +5710,7 @@ msgstr "Importar"
 
 #: conf.import.php:135
 msgid "Import failed"
-msgstr ""
+msgstr "Importação falhou"
 
 #: include/views/conf.import.php:64
 msgid "Import file"
@@ -5716,16 +5718,16 @@ msgstr "Importar arquivo"
 
 #: conf.import.php:131
 msgid "Imported successfully"
-msgstr ""
+msgstr "Importado com sucesso"
 
 #: hostinventories.php:187
 #, php-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
-msgstr ""
+msgstr "Impossível filtrar pelo campo de inventário \"%s\", pois ele não existe."
 
 #: screenedit.php:237 screenedit.php:252
 msgid "Impossible to remove last row and column."
-msgstr ""
+msgstr "Impossível remover a última linha e coluna."
 
 #: include/classes/class.ctweenbox.php:74
 #: include/classes/class.ctweenbox.php:101
@@ -5735,7 +5737,7 @@ msgstr "Em"
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
-msgstr ""
+msgstr "Em grupo"
 
 #: include/views/configuration.host.edit.php:186
 #: include/views/configuration.host.massupdate.php:46
@@ -5759,6 +5761,7 @@ msgstr "Em andamento"
 msgid "Include"
 msgstr "Incluir"
 
+# Onde é utilizado ? Preciso do contexto
 #: api/classes/CService.php:1332
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
@@ -5768,145 +5771,145 @@ msgstr ""
 #: api/classes/CMap.php:606
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
-msgstr ""
+msgstr "O rótulo do tipo %1$s não é válido para o mapa \"%2$s\"."
 
 #: api/classes/CProxy.php:352
 #, php-format
 msgid "Incorrect IP for passive proxy \"%1$s\"."
-msgstr ""
+msgstr "IP incorreto para um proxy passivo \"%1$s\"."
 
 #: api/classes/CDRule.php:433
 #, php-format
 msgid "Incorrect IP range \"%s\"."
-msgstr ""
+msgstr "Range de IP inválido \"%s\"."
 
 #: api/classes/CDRule.php:495
 #: include/views/js/configuration.discovery.edit.js.php:311
 msgid "Incorrect SNMP OID."
-msgstr ""
+msgstr "O OID SNMP é inválido."
 
 #: api/classes/CDRule.php:492
 #: include/views/js/configuration.discovery.edit.js.php:307
 msgid "Incorrect SNMP community."
-msgstr ""
+msgstr "A comunidade SNMP não está válida."
 
 #: api/classes/CService.php:1162
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
-msgstr ""
+msgstr "O SLA é inaceitável para o serviço \"%1$s\"."
 
 #: api/classes/CAction.php:1737
 msgid "Incorrect action condition discovery check."
-msgstr ""
+msgstr "A verificação de descoberata é invalida para esta ação."
 
 #: api/classes/CAction.php:1792
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr ""
+msgstr "A ação possui condição de descoberta inválida. A verificação de descoberta não existe ou você não possui acesso a ela."
 
 #: api/classes/CAction.php:1789
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr ""
+msgstr "A ação possui condição de descoberta inválida. A regra de descoberta não existe ou você não possui acesso a ela."
 
 #: api/classes/CAction.php:1749
 msgid "Incorrect action condition discovery status."
-msgstr ""
+msgstr "A ação possui condição de descoberta com status inválido."
 
 #: api/classes/CAction.php:1777
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "A ação possui condição de grupo de host inválida. O grupo de host não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:1780
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr ""
+msgstr "A ação possui condição de host inválida. O host não existe ou você não possui acesso à ele."
 
 #: api/classes/CAction.php:1731
 #, php-format
 msgid "Incorrect action condition ip \"%s\"."
-msgstr ""
+msgstr "A ação possui condição com IP inválido \"%s\"."
 
 #: api/classes/CAction.php:1725
 #, php-format
 msgid "Incorrect action condition period \"%s\"."
-msgstr ""
+msgstr "A ação possui condição com período inválido \"%s\"."
 
 #: api/classes/CAction.php:1743
 #, php-format
 msgid "Incorrect action condition port \"%s\"."
-msgstr ""
+msgstr "A ação possui condição com porta inválida \"%s\"."
 
 #: api/classes/CAction.php:1795
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr ""
+msgstr "A ação possui condição com proxy inválido. O proxy não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:1783
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "A ação possui condição com template inválido. O template não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:1786
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr ""
+msgstr "A ação possui condição com trigger inválido. A trigger não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:1771
 msgid "Incorrect action condition type."
-msgstr ""
+msgstr "A ação possui condição com tipo inválido."
 
 #: api/classes/CAction.php:960
 msgid "Incorrect action conditionid."
-msgstr ""
+msgstr "A ação possui condição com ID inválido."
 
 #: api/classes/CAction.php:1585
 msgid "Incorrect action operation command type."
-msgstr ""
+msgstr "A ação possui operação com comando de tipo inválido."
 
 #: api/classes/CAction.php:1819
 msgid "Incorrect action operation condition acknowledge type."
-msgstr ""
+msgstr "A ação possui condição de operação com tipo de visto inválido."
 
 #: api/classes/CAction.php:1824
 msgid "Incorrect action operation condition type."
-msgstr ""
+msgstr "A ação possui condição de operação com tipo inválido."
 
 #: api/classes/CAction.php:1503 api/classes/CAction.php:1507
 msgid "Incorrect action operation escalation step values."
-msgstr ""
+msgstr "A ação possui passo de escalonamento com valor inválido."
 
 #: api/classes/CAction.php:1656
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr ""
+msgstr "A ação possui uma operação com grupo de host inválido. O grupo de host não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:1659
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr ""
+msgstr "A ação possui operação com host inválido. O host não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:1591 api/classes/CAction.php:1595
 #, php-format
 msgid "Incorrect action operation port \"%s\"."
-msgstr ""
+msgstr "A ação possui operação com porta inválida \"%s\"."
 
 #: api/classes/CAction.php:1513
 msgid "Incorrect action operation step duration."
-msgstr ""
+msgstr "A ação possui um passo de operação com duração inválida."
 
 #: api/classes/CAction.php:1651
 msgid "Incorrect action operation type."
-msgstr ""
+msgstr "A ação possui operação com tipo inválido."
 
 #: api/classes/CAction.php:1665
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
-msgstr ""
+msgstr "A ação possui operação com grupo de usuário inválido. O grupo de usuário não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:1662
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr ""
+msgstr "A ação possui operação com usuário inválido. O usuário não existe ou você não possui acesso a ele."
 
 #: api/classes/CAction.php:985
 msgid "Incorrect action operationid."
-msgstr ""
+msgstr "A ação possui uma operação com ID inválido."
 
 #: api/classes/CService.php:1125
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
-msgstr ""
+msgstr "O serviço \"%1$s\" possui algorítimo inválido."
 
 #: api/classes/CApplication.php:443 include/regexp.inc.php:52
 #: include/regexp.inc.php:85 include/regexp.inc.php:150
@@ -5916,73 +5919,73 @@ msgstr "Argumentos incorretos passados para a função"
 #: api/classes/CHostInterface.php:506 api/classes/CHostInterface.php:696
 #: api/classes/CItemGeneral.php:174 api/classes/CWebCheck.php:544
 msgid "Incorrect arguments passed to function."
-msgstr ""
+msgstr "Argumentos incorretos passados para a função."
 
 #: api/classes/CHostInterface.php:534
 msgid "Incorrect arguments passed to method."
-msgstr ""
+msgstr "Argumentos incorretos passados ao método."
 
 #: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "O cálculo do valor do SLA para o serviço \"%1$s\" está incorreto."
 
 #: include/nodes.inc.php:267 include/nodes.inc.php:309
 msgid "Incorrect characters used for Node name."
-msgstr ""
+msgstr "Foram utilizados caracteres inválidos para o nome do Node."
 
 #: api/classes/CProxy.php:361
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
-msgstr ""
+msgstr "Foram utilizados caracteres inválidos no nome do proxy \"%s\"."
 
 #: api/classes/CTemplate.php:995
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr ""
+msgstr "Foram utilizados caracteres inválidos para o nome do template [\"%1$s\"]"
 
 #: api/classes/CHost.php:1345 api/classes/CHost.php:1666
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
-msgstr ""
+msgstr "Foram utilizados caracteres inválidos para o nome do host \"%s\"."
 
 #: api/classes/CTemplate.php:1366
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
-msgstr ""
+msgstr "Foram utilizados caracteres inválidos para o nome do template \"%s\"."
 
 #: api/classes/CTriggerExpression.php:651
 msgid "Incorrect closing curly braces in trigger expression."
-msgstr ""
+msgstr "Existem chaves de fechamento inválidas na expressão da trigger."
 
 #: api/classes/CTriggerExpression.php:655
 msgid "Incorrect closing parenthesis in trigger expression."
-msgstr ""
+msgstr "Fechamento de parênteses inválido na expressão da trigger."
 
 #: api/classes/CGraphGeneral.php:71
 #, php-format
 msgid "Incorrect colour \"%1$s\"."
-msgstr ""
+msgstr "Cor inválida \"%1$s\"."
 
 #: api/classes/CScreenItem.php:587
 msgid "Incorrect column span provided for screen element."
-msgstr ""
+msgstr "A extensão informada para a coluna dentro do elemento da tela é inválida."
 
 #: api/classes/CTriggerExpression.php:226
 msgid "Incorrect count of quotes in expression."
-msgstr ""
+msgstr "Contagem de citações inválida para a expressão."
 
 #: api/classes/CTriggerExpression.php:234
 msgid "Incorrect curly braces count in expression."
-msgstr ""
+msgstr "Contador de chaves inválido para a expressão."
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
-msgstr ""
+msgstr "Dia inválido."
 
 #: api/classes/CTrigger.php:1862
 msgid "Incorrect dependency."
-msgstr ""
+msgstr "Dependência inválida."
 
 #: adm.regexps.php:160
 msgid "Incorrect expression"
@@ -5991,33 +5994,33 @@ msgstr "Expressão incorreta"
 #: include/classes/db/DB.php:455 include/classes/db/DB.php:621
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr ""
+msgstr "O nome para o campo \"%1$s\" é inválido ou o valor é incorreto para a tabela \"%2$s\"."
 
 #: api/classes/CMap.php:550
 msgid "Incorrect fields for sysmap"
-msgstr ""
+msgstr "Campos incorretos para o sysmap."
 
 #: api/classes/CTrigger.php:1149
 msgid "Incorrect fields for trigger."
-msgstr ""
+msgstr "Campos inválidos para a trigger."
 
 #: include/classes/helpers/CUploadFile.php:149
 msgid "Incorrect file upload."
-msgstr ""
+msgstr "Upload de arquivo inválido."
 
 #: api/classes/CItemGeneral.php:757
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
-msgstr ""
+msgstr "O intervalo flexível \"%1$s\" é inválido."
 
 #: api/classes/CItemGeneral.php:746
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
-msgstr ""
+msgstr "O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível deverá ser um texto."
 
 #: api/classes/CTriggerExpression.php:114
 msgid "Incorrect function format."
-msgstr ""
+msgstr "Formato inválido para a função."
 
 #: include/triggers.inc.php:785
 msgid "Incorrect function is used"
@@ -6026,97 +6029,97 @@ msgstr "Usada função incorreta"
 #: api/classes/CScreenItem.php:516
 #, php-format
 msgid "Incorrect graph ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "O ID de gráfico informado \"%s\" é inválido para o elemento da tela."
 
 #: api/classes/CScreenItem.php:502
 #, php-format
 msgid "Incorrect host ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "O ID de host informado \"%s\" é inválido para o elemento da tela."
 
 #: api/classes/CScreenItem.php:488
 #, php-format
 msgid "Incorrect host group ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "O ID de grupo de host informado \"%s\" é inválido para o elemento da tela."
 
 #: include/profiles.inc.php:258
 msgid "Incorrect host group."
-msgstr ""
+msgstr "Grupo de host inválido."
 
 #: api/classes/CTriggerExpression.php:92
 #, php-format
 msgid "Incorrect host name \"%1$s\" provided in expression."
-msgstr ""
+msgstr "Foi informado um nome de host (\"%1$s\") inválido na expressão."
 
 #: image.php:48
 msgid "Incorrect image index."
-msgstr ""
+msgstr "Índice de imagem inválido."
 
 #: api/classes/CHostInterface.php:810
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
-msgstr ""
+msgstr "Foi informado um parâmetro de DNS inválido (\"%s\") para a interface."
 
 #: api/classes/CHostInterface.php:826
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
-msgstr ""
+msgstr "Foi informado um parâmetro de IP inválido (\"%s\") para a interface."
 
 #: api/classes/CHostInterface.php:842
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr ""
+msgstr "Foi informada uma porta inválida (\"%s\") para a interface."
 
 #: api/classes/CHost.php:1279
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
-msgstr ""
+msgstr "Campo inválido de inventário \"%s\"."
 
 #: api/classes/CScreenItem.php:531
 #, php-format
 msgid "Incorrect item ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado um ID de item (\"%s\") inválido para o elemento da tela."
 
 #: api/classes/CGraphGeneral.php:400
 msgid "Incorrect item for axis value."
-msgstr ""
+msgstr "Item inválido para o eixo."
 
 #: api/classes/CTriggerExpression.php:103
 #, php-format
 msgid "Incorrect item key \"%1$s\" is used in expression."
-msgstr ""
+msgstr "Chave de item inválida (\"%1$s\") é utilizada na expressão."
 
 #: api/classes/CTrigger.php:1247
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr ""
+msgstr "Chave de item inválida (\"%1$s\") é utilizada na expressão de trigger em \"%2$s\"."
 
 #: include/triggers.inc.php:1118
 #, php-format
 msgid "Incorrect item key \"%1$s:%2$s\" provided for trigger expression."
-msgstr ""
+msgstr "Chave de item inválida ( \"%1$s:%2$s\") é utilizada na expressão da trigger."
 
 #: api/classes/CTriggerExpression.php:567
 msgid "Incorrect item parameters syntax is used."
-msgstr ""
+msgstr "Foi utilizada sintaxe inválida para os parâmetros do item."
 
 #: include/triggers.inc.php:1112
 #, php-format
 msgid "Incorrect item value type \"%1$s:%2$s\" provided for trigger function \"%3$s\"."
-msgstr ""
+msgstr "Foi utilizado tipo incorreto de valor para item \"%1$s:%2$s\" na função da trigger \"%3$s\"."
 
 #: api/classes/CDRule.php:482
 msgid "Incorrect key."
-msgstr ""
+msgstr "Chave inválida."
 
 #: discoveryconf.php:80
 #, php-format
 msgid "Incorrect key: \"%1$s\"."
-msgstr ""
+msgstr "Chave inválida: \"%1$s\"."
 
 #: api/classes/CDRule.php:487
 #, php-format
 msgid "Incorrect key: %s"
-msgstr ""
+msgstr "Chave inválida: %s"
 
 #: include/forms.inc.php:1163 items.php:771
 msgid "Incorrect list of items."
@@ -6125,11 +6128,11 @@ msgstr "Lista de itens incorreta."
 #: api/classes/CTriggerExpression.php:78
 #, php-format
 msgid "Incorrect macro \"%1$s\" is used in expression."
-msgstr ""
+msgstr "Macro inválida \"%1$s\" foi utilizada na expressão."
 
 #: maintenance.php:221
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038."
 
 #: maintenance.php:245
 msgid "Incorrect maintenance date"
@@ -6153,7 +6156,7 @@ msgstr "Período de manutenção incorreto"
 
 #: maintenance.php:215
 msgid "Incorrect maintenance period (minimum 5 minutes)"
-msgstr ""
+msgstr "Período de manutenção inválido (o mínimo é de 5 minutos)"
 
 #: maintenance.php:228
 msgid "Incorrect maintenance week period"
@@ -6162,86 +6165,86 @@ msgstr "Semana de manutenção incorreta"
 #: api/classes/CScreenItem.php:545
 #, php-format
 msgid "Incorrect map ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado um ID de mapa \"%s\" inválido para o elemento da tela."
 
 #: api/classes/CMap.php:574
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
-msgstr ""
+msgstr "A altura do mapa \"%s\" é inválida."
 
 #: api/classes/CMap.php:571
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
-msgstr ""
+msgstr "O comprimento do mapa \"%s\" é inválido."
 
 #: include/nodes.inc.php:287
 msgid "Incorrect node type."
-msgstr ""
+msgstr "Tipo inválido de node."
 
 #: api/classes/CAction.php:813 api/classes/CAction.php:848
 #, php-format
 msgid "Incorrect parameter for action \"%s\"."
-msgstr ""
+msgstr "Parâmetro inválido para a ação \"%s\"."
 
 #: api/classes/CAction.php:1055
 msgid "Incorrect parameter for operations."
-msgstr ""
+msgstr "Parâmetro inválido para operações."
 
 #: api/classes/CIconMap.php:253
 #, php-format
 msgid "Incorrect parameter is used for icon map \"%s\"."
-msgstr ""
+msgstr "Parâmetro inválido usado no mapeamento de ícone \"%s\"."
 
 #: api/classes/CAction.php:904
 #, php-format
 msgid "Incorrect parameters for action update method \"%s\"."
-msgstr ""
+msgstr "Parâmetros incorretos para a ação de atualização \"%s\"."
 
 #: api/classes/CAction.php:1025
 msgid "Incorrect parameters for condition."
-msgstr ""
+msgstr "Parâmetros inválidos para a condição."
 
 #: api/classes/CIconMap.php:311
 #, php-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
-msgstr ""
+msgstr "Parâmetros inválidos para o método de atualização do mapeamento de ícone \"%s\"."
 
 #: api/classes/CMaintenance.php:464 api/classes/CMaintenance.php:651
 msgid "Incorrect parameters for maintenance."
-msgstr ""
+msgstr "Parâmetros inválidos para manutenção."
 
 #: api/classes/CUserGroup.php:341 api/classes/CUserGroup.php:391
 msgid "Incorrect parameters for user group."
-msgstr ""
+msgstr "Parâmetros inválidos para grupo de usuário."
 
 #: api/classes/CService.php:1210
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr ""
+msgstr "Parâmetros inválidos para o serviço pai \"%1$s\"."
 
 #: api/classes/CService.php:1213
 msgid "Incorrect parent service."
-msgstr ""
+msgstr "Serviço pai inválido."
 
 #: api/classes/CTriggerExpression.php:230
 msgid "Incorrect parenthesis count in expression."
-msgstr ""
+msgstr "Quantidade incorreta de parênteses na expressão."
 
 #: api/classes/CDRule.php:476 discoveryconf.php:74
 msgid "Incorrect port range."
-msgstr ""
+msgstr "Range de portas incorreto."
 
 #: api/classes/CDRule.php:463
 msgid "Incorrect proxyid."
-msgstr ""
+msgstr "O ID do proxy é inválido."
 
 #: api/classes/CTriggerExpression.php:462
 msgid "Incorrect quote usage in trigger expression."
-msgstr ""
+msgstr "Utilização inválida de citação na expressão da trigger."
 
 #: api/classes/CScreenItem.php:419
 msgid "Incorrect resource type provided for screen item."
-msgstr ""
+msgstr "Tipo de recurso informado para o item da tela."
 
 #: api/classes/CScreenItem.php:584
 msgid "Incorrect row span provided for screen element."
@@ -6250,72 +6253,72 @@ msgstr ""
 #: api/classes/CScreenItem.php:558
 #, php-format
 msgid "Incorrect screen ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado um ID de tela (\"%s\") inválido para o elemento."
 
 #: include/screens.inc.php:169 include/screens.inc.php:225
 msgid "Incorrect screen provided for slide show."
-msgstr ""
+msgstr "Foi informada uma tela inválida para a apresentação de slides."
 
 #: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
-msgstr ""
+msgstr "O horário final do serviço é inválido."
 
 #: include/services.inc.php:488 include/services.inc.php:497
 msgid "Incorrect service start time."
-msgstr ""
+msgstr "O horário inicial do serviço é inválido."
 
 #: include/services.inc.php:482
 msgid "Incorrect service time type."
-msgstr ""
+msgstr "O tipo de hora do serviço é inválido."
 
 #: api/classes/CService.php:1179
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
-msgstr ""
+msgstr "A ordenação do serviço \"%1$s\" é inválida."
 
 #: api/classes/CService.php:1233
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
-msgstr ""
+msgstr "O status do serviço \"%1$s\" é inválido."
 
 #: api/classes/CDRule.php:441
 msgid "Incorrect status."
-msgstr ""
+msgstr "Status inválido."
 
 #: api/classes/CTriggerExpression.php:660
 msgid "Incorrect symbol sequence in trigger expression."
-msgstr ""
+msgstr "Sequência inválida de símbolos na expressão da trigger."
 
 #: api/classes/CItemKey.php:218
 #, php-format
 msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr ""
+msgstr "Sintaxe incorreta próxima a \"%1$s\" na posição \"%2$s\""
 
 #: api/classes/CItemKey.php:162
 #, php-format
 msgid "Incorrect syntax near \"%1$s\"."
-msgstr ""
+msgstr "Sintaxe incorreta próxima a \"%1$s\"."
 
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr ""
+msgstr "A data de início informada (\"%1$s\") é inválida, ela deve ser igual ou superior ao dia final."
 
 #: include/classes/validators/CTimePeriodValidator.php:98
 #, php-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr ""
+msgstr "O horário de início informado (\"%1$s\") é inválido, ele deve ser igual ou superior ao horário final."
 
 #: include/classes/validators/CTimePeriodValidator.php:82
 #: include/classes/validators/CTimePeriodValidator.php:87
 #, php-format
 msgid "Incorrect time period \"%1$s\"."
-msgstr ""
+msgstr "O horário \"%1$s\" é um período incorreto."
 
 #: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
-msgstr ""
+msgstr "O serviço \"%1$s\" possui um trigger ID inválido."
 
 #: include/triggers.inc.php:796
 msgid "Incorrect trigger expression"
@@ -6327,38 +6330,38 @@ msgstr "Expressão de trigger incorreta"
 #: api/classes/CTriggerExpression.php:215
 #, php-format
 msgid "Incorrect trigger expression format \"%1$s\"."
-msgstr ""
+msgstr "O formato da expressão \"%1$s\" é inválido para a trigger."
 
 #: api/classes/CTriggerExpression.php:47
 msgid "Incorrect trigger expression."
-msgstr ""
+msgstr "Trigger com expressão inválida."
 
 #: include/triggers.inc.php:1236
 #, php-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "Trigger com expressão inválida. O Host \"%1$s\" não existe ou você não possui acesso à este host."
 
 #: api/classes/CTrigger.php:1223
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "Trigger com expressão inválida.O host \"%s\" não existe ou você não possui acesso à este host."
 
 #: api/classes/CTrigger.php:1229
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr ""
+msgstr "Trigger com expressão inválida. Os elementos da expressão não podem se referir à um template e a um host ao mesmo tempo."
 
 #: api/classes/CTriggerExpression.php:159
 #, php-format
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
-msgstr ""
+msgstr "A expressão da trigger possui uma função inválida (\"%1$s\")."
 
 #: api/classes/CTriggerExpression.php:586
 msgid "Incorrect trigger function parameters syntax is used."
-msgstr ""
+msgstr "A sintaxe dos parâmetros utilizados na função da trigger é inválida."
 
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
-msgstr ""
+msgstr "Tipo incorreto de asort_by_key."
 
 #: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
 #: api/classes/CItemKey.php:252

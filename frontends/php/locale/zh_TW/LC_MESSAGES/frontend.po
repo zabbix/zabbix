@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-21 21:49+0300\n"
-"PO-Revision-Date: 2012-09-06 16:03+0200\n"
-"Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
+"POT-Creation-Date: 2012-10-21 21:59+0300\n"
+"PO-Revision-Date: 2012-10-17 16:04+0800\n"
+"Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -181,19 +181,19 @@ msgstr "系統可用性統計"
 
 #: popup_trexpr.php:119
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異是 < N"
 
 #: popup_trexpr.php:127
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異是 = N"
 
 #: popup_trexpr.php:123
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異是 > N"
 
 #: popup_trexpr.php:131
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異不是 N"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -780,19 +780,19 @@ msgstr "平均之"
 
 #: popup_trexpr.php:135
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "一個期間T的平均值是 < N"
 
 #: popup_trexpr.php:145
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "一個期間T的平均值是 = N"
 
 #: popup_trexpr.php:140
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "一個期間T的平均值是 > N"
 
 #: popup_trexpr.php:150
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "一個期間T的平均值不是 N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -2734,19 +2734,19 @@ msgstr "關鍵錯誤. 欄位 \"%1$s\"的值錯誤: 不能是空白."
 
 #: popup_trexpr.php:345
 msgid "Current date is < N"
-msgstr ""
+msgstr "當前日期是 < N"
 
 #: popup_trexpr.php:353
 msgid "Current date is = N"
-msgstr ""
+msgstr "當前日期是 = N"
 
 #: popup_trexpr.php:349
 msgid "Current date is > N"
-msgstr ""
+msgstr "當前日期是 > N"
 
 #: popup_trexpr.php:357
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "當前日期不是 N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
@@ -2759,19 +2759,19 @@ msgstr "目前節點 "
 
 #: popup_trexpr.php:485
 msgid "Current time is < N"
-msgstr ""
+msgstr "當前日期是 < N"
 
 #: popup_trexpr.php:493
 msgid "Current time is = N"
-msgstr ""
+msgstr "當前日期是 = N"
 
 #: popup_trexpr.php:489
 msgid "Current time is > N"
-msgstr ""
+msgstr "當前日期是 > N"
 
 #: popup_trexpr.php:497
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "當前日期不是 N"
 
 #: include/setup.inc.php:192
 msgid "Current value"
@@ -2989,19 +2989,19 @@ msgstr "月中第幾日"
 
 #: popup_trexpr.php:377
 msgid "Day of month is < N"
-msgstr ""
+msgstr "月中第幾日是 < N"
 
 #: popup_trexpr.php:385
 msgid "Day of month is = N"
-msgstr ""
+msgstr "月中第幾日是 = N"
 
 #: popup_trexpr.php:381
 msgid "Day of month is > N"
-msgstr ""
+msgstr "月中第幾日是 > N"
 
 #: popup_trexpr.php:389
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "月中第幾日不是 N"
 
 #: include/forms.inc.php:1525 include/forms.inc.php:1582
 #: include/forms.inc.php:1606
@@ -3010,19 +3010,19 @@ msgstr "週中第幾日"
 
 #: popup_trexpr.php:361
 msgid "Day of week is < N"
-msgstr ""
+msgstr "週中第幾日是 < N"
 
 #: popup_trexpr.php:369
 msgid "Day of week is = N"
-msgstr ""
+msgstr "週中第幾日是 = N"
 
 #: popup_trexpr.php:365
 msgid "Day of week is > N"
-msgstr ""
+msgstr "週中第幾日是 > N"
 
 #: popup_trexpr.php:373
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "週中第幾日不是 N"
 
 #: include/forms.inc.php:1667 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3513,47 +3513,47 @@ msgstr "裝置唯一性準則"
 
 #: popup_trexpr.php:155
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "期間T的最大與最小值的差是 < N"
 
 #: popup_trexpr.php:165
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "期間T的最大與最小值的差是 = N"
 
 #: popup_trexpr.php:160
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "期間T的最大與最小值的差是 > N"
 
 #: popup_trexpr.php:170
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "期間T的最大與最小值的差不是 N"
 
 #: popup_trexpr.php:211
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "最末和之前的值的差, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:215
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "最末和之前的值的差, 則 N 非 1, 0 - 除外"
 
 #: popup_trexpr.php:175
 msgid "Difference between last and previous value of a period T is < N"
-msgstr ""
+msgstr "期間T的最末與前值的差是 < N"
 
 #: popup_trexpr.php:183
 msgid "Difference between last and previous value of a period T is = N"
-msgstr ""
+msgstr "期間T的最末與前值的差是 = N"
 
 #: popup_trexpr.php:179
 msgid "Difference between last and previous value of a period T is > N"
-msgstr ""
+msgstr "期間T的最末與前值的差是 > N"
 
 #: popup_trexpr.php:187
 msgid "Difference between last and previous value of a period T is NOT N"
-msgstr ""
+msgstr "期間T的最末與前值的差不是 N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
-msgstr "圖表規格 (行 x 列)"
+msgstr "圖表規格 (列 x 行)"
 
 #: include/views/administration.auditlogs.list.php:49
 msgid "Disable"
@@ -3894,7 +3894,7 @@ msgstr "下拉記住所選的 \"%1$s\"."
 #: api/classes/CTrigger.php:2019
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "觸發器 \"%1$s\" 中的重複相依關係."
 
 #: api/classes/CHost.php:1349
 #, php-format
@@ -4234,11 +4234,11 @@ msgstr "事件ID"
 
 #: popup_trexpr.php:423
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "符合正則表示式T的最末紀錄項的事件 ID, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:428
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "符合正則表示式T的最末紀錄項的事件 ID, 則 N 非 1, 0 - 除外"
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
@@ -4517,11 +4517,11 @@ msgstr "依名稱過濾"
 
 #: popup_trexpr.php:295
 msgid "Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "在最末(最近)的值中找到字串T. N = 1 - 如果找到, 0 - 除外"
 
 #: popup_trexpr.php:300
 msgid "Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "在最末(最近)的值中找到字串T. N 非 1 - 如果找到, 0 - 除外"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -4529,7 +4529,7 @@ msgstr "完成"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "芬蘭語 (fi_FI)"
 
 #: include/forms.inc.php:1588 include/maintenances.inc.php:103
 msgid "First"
@@ -4763,7 +4763,7 @@ msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目."
 #: api/classes/CTemplateScreen.php:663
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "圖形 \"%1$s\"不存在於模板\"%2$s\"中."
 
 #: include/classes/import/CXmlImport18.php:1556
 #: include/classes/import/CXmlImport18.php:1560
@@ -5712,7 +5712,7 @@ msgstr "不可能以不存在的資產紀錄欄位\"%s\"來過濾."
 
 #: screenedit.php:237 screenedit.php:252
 msgid "Impossible to remove last row and column."
-msgstr "不可能移除最後的列和行."
+msgstr "不可能移除最後的行和列."
 
 #: include/classes/class.ctweenbox.php:74
 #: include/classes/class.ctweenbox.php:101
@@ -5953,7 +5953,7 @@ msgstr "不正錯的顏色\"%1$s\"."
 
 #: api/classes/CScreenItem.php:587
 msgid "Incorrect column span provided for screen element."
-msgstr ""
+msgstr "於篩選要素中用了不正確的列跨福."
 
 #: api/classes/CTriggerExpression.php:226
 msgid "Incorrect count of quotes in expression."
@@ -6232,7 +6232,7 @@ msgstr "提供了不正確的資源類型給篩選項目."
 
 #: api/classes/CScreenItem.php:584
 msgid "Incorrect row span provided for screen element."
-msgstr ""
+msgstr "於篩選要素中用了不正確的行跨福"
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6611,7 +6611,7 @@ msgstr "項目\"%1$s\"不能填入一個不存在的主機資產紀錄欄位號�
 #: api/classes/CTemplateScreen.php:673
 #, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 
 #: include/classes/import/CXmlImport18.php:1523
 #, php-format
@@ -6959,19 +6959,19 @@ msgstr[0] "最近%1$d個議題"
 
 #: popup_trexpr.php:219
 msgid "Last (most recent) T value is < N"
-msgstr ""
+msgstr "最末(最近) T值是 < N"
 
 #: popup_trexpr.php:229
 msgid "Last (most recent) T value is = N"
-msgstr ""
+msgstr "最末(最近) T值是 = N"
 
 #: popup_trexpr.php:224
 msgid "Last (most recent) T value is > N"
-msgstr ""
+msgstr "最末(最近) T值是 > N"
 
 #: popup_trexpr.php:234
 msgid "Last (most recent) T value is NOT N"
-msgstr ""
+msgstr "最末(最近) T值不是 N"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -7062,19 +7062,19 @@ msgstr "圖例"
 
 #: popup_trexpr.php:305
 msgid "Length of last (most recent) T value in characters is < N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度是 < N"
 
 #: popup_trexpr.php:315
 msgid "Length of last (most recent) T value in characters is = N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度是 = N"
 
 #: popup_trexpr.php:310
 msgid "Length of last (most recent) T value in characters is > N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度是 > N"
 
 #: popup_trexpr.php:320
 msgid "Length of last (most recent) T value in characters is NOT N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度不是 N"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:333
 #: include/views/js/configuration.sysmaps.js.php:409
@@ -7181,35 +7181,35 @@ msgstr "日誌"
 
 #: popup_trexpr.php:433
 msgid "Log severity of the last log entry is < N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性是 < N"
 
 #: popup_trexpr.php:441
 msgid "Log severity of the last log entry is = N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性是 = N"
 
 #: popup_trexpr.php:437
 msgid "Log severity of the last log entry is > N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性是 > N"
 
 #: popup_trexpr.php:445
 msgid "Log severity of the last log entry is NOT N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性不是 N"
 
 #: popup_trexpr.php:449
 msgid "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
-msgstr ""
+msgstr "最末符合參數T的日誌項的日誌來源, 則 N < 1, 0 - 除外"
 
 #: popup_trexpr.php:459
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "最末符合參數T的日誌項的日誌來源, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:454
 msgid "Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise"
-msgstr ""
+msgstr "最末符合參數T的日誌項的日誌來源, 則 N > 1, 0 - 除外"
 
 #: popup_trexpr.php:464
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "最末符合參數T的日誌項的日誌來源, 則 N 非 1, 0 - 除外"
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.massupdate.php:365
@@ -7332,7 +7332,7 @@ msgstr "巨集\"%1$s\"的值太長, 不應超過64字元."
 #: api/classes/CUserMacro.php:1079
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "含globalmacroid  \"%1$s\"的巨集不存在."
 
 #: api/classes/CUserMacro.php:1019
 #, php-format
@@ -7569,19 +7569,19 @@ msgstr[0] "最大的主機名稱長度是%2$d個字元, \"%3$s\" 是%1$d個字�
 
 #: popup_trexpr.php:239
 msgid "Maximum value for period of time is T < N"
-msgstr ""
+msgstr "時間期間的最大值是T < N"
 
 #: popup_trexpr.php:249
 msgid "Maximum value for period of time is T = N"
-msgstr ""
+msgstr "時間期間的最大值是T = N"
 
 #: popup_trexpr.php:244
 msgid "Maximum value for period of time is T > N"
-msgstr ""
+msgstr "時間期間的最大值是T > N"
 
 #: popup_trexpr.php:254
 msgid "Maximum value for period of time is T NOT N"
-msgstr ""
+msgstr "時間期間的最大值是T 非 N"
 
 #: api/classes/CHost.php:1371
 #, php-format
@@ -7756,19 +7756,19 @@ msgstr "最小要求的PHP post尺寸是%s (組態選項\"post_max_size\")"
 
 #: popup_trexpr.php:259
 msgid "Minimum value for period of time is T < N"
-msgstr ""
+msgstr "時間期間的最小值是T < N"
 
 #: popup_trexpr.php:269
 msgid "Minimum value for period of time is T = N"
-msgstr ""
+msgstr "時間期間的最小值是T = N"
 
 #: popup_trexpr.php:264
 msgid "Minimum value for period of time is T > N"
-msgstr ""
+msgstr "時間期間的最小值是T > N"
 
 #: popup_trexpr.php:274
 msgid "Minimum value for period of time is T NOT N"
-msgstr ""
+msgstr "時間期間的最小值是T 非 N"
 
 #: include/forms.inc.php:1671
 msgid "Minutes"
@@ -8160,11 +8160,11 @@ msgstr "無已定義的資料"
 
 #: popup_trexpr.php:501
 msgid "No data received during period of time T, if N = 1, 0 - otherwise"
-msgstr ""
+msgstr "於時間期間T內為收到資料, 如果 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:506
 msgid "No data received during period of time T, if N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "於時間期間T內未收到資料, 如果 N 非1, 0 - 除外"
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -8209,7 +8209,7 @@ msgstr "沒有找到錯誤."
 
 #: tr_status.php:670
 msgid "No events"
-msgstr ""
+msgstr "沒有事件"
 
 #: events.php:380 include/classes/screens/CScreenEvents.php:41
 msgid "No events defined."
@@ -8555,7 +8555,7 @@ msgstr "沒有已定義的資源"
 
 #: include/classes/screens/CScreenBuilder.php:296
 msgid "No rows in screen."
-msgstr "篩選中沒有列"
+msgstr "篩選中沒有行"
 
 #: api/classes/CScreenItem.php:468
 msgid "No screen ID provided for screen element."
@@ -8806,19 +8806,19 @@ msgstr "監控項數量 (監控/停用/不支持)"
 
 #: popup_trexpr.php:469
 msgid "Number of seconds since the Epoch is < N"
-msgstr ""
+msgstr "自Epoch起的秒數是 < N"
 
 #: popup_trexpr.php:477
 msgid "Number of seconds since the Epoch is = N"
-msgstr ""
+msgstr "自Epoch起的秒數是 = N"
 
 #: popup_trexpr.php:473
 msgid "Number of seconds since the Epoch is > N"
-msgstr ""
+msgstr "自Epoch起的秒數是 > N"
 
 #: popup_trexpr.php:481
 msgid "Number of seconds since the Epoch is NOT N"
-msgstr ""
+msgstr "自Epoch起的秒數不是 N"
 
 #: report5.php:63
 msgid "Number of status changes"
@@ -8830,19 +8830,19 @@ msgstr "Number of steps"
 
 #: popup_trexpr.php:196
 msgid "Number of successfully retrieved values V of a period T is < N"
-msgstr ""
+msgstr "於期間T中成功收到值V的數量是 < N"
 
 #: popup_trexpr.php:201
 msgid "Number of successfully retrieved values V of a period T is = N"
-msgstr ""
+msgstr "於期間T中成功收到值V的數量是 = N"
 
 #: popup_trexpr.php:191
 msgid "Number of successfully retrieved values V of a period T is > N"
-msgstr ""
+msgstr "於期間T中成功收到值V的數量是 > N"
 
 #: popup_trexpr.php:206
 msgid "Number of successfully retrieved values V of a period T is NOT N"
-msgstr ""
+msgstr "於期間T中成功收到值V的數量不是 N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9317,11 +9317,11 @@ msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
-msgstr ""
+msgstr "PHP連線期自動啟動"
 
 #: include/classes/class.frontendsetup.php:589
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
-msgstr ""
+msgstr "PHP連線期自動啟動必須被停用 (PHP directive \"session.auto_start\")"
 
 #: include/classes/class.frontendsetup.php:570
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
@@ -9530,7 +9530,7 @@ msgstr "許可權只能被指派予用戶群組"
 
 #: include/locales.inc.php:60
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "波斯語 (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
@@ -9633,19 +9633,19 @@ msgstr "前"
 
 #: popup_trexpr.php:279
 msgid "Previous value is < N"
-msgstr ""
+msgstr "前值是 < N"
 
 #: popup_trexpr.php:287
 msgid "Previous value is = N"
-msgstr ""
+msgstr "前值是 = N"
 
 #: popup_trexpr.php:283
 msgid "Previous value is > N"
-msgstr ""
+msgstr "前值是 > N"
 
 #: popup_trexpr.php:291
 msgid "Previous value is NOT N"
-msgstr ""
+msgstr "前值不是 N"
 
 #: include/hosts.inc.php:405
 msgid "Primary POC cell"
@@ -9905,19 +9905,19 @@ msgstr "正規表示式\"%s\"已存在."
 
 #: popup_trexpr.php:403
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:413
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N = 1, 0 - 除外 (大小寫不分)"
 
 #: popup_trexpr.php:408
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N 非 1, 0 - 除外"
 
 #: popup_trexpr.php:418
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N 非 1, 0 - 除外 (大小寫不分)"
 
 #: adm.regexps.php:83
 msgid "Regular expression added"
@@ -10210,15 +10210,15 @@ msgstr "右"
 #: include/views/configuration.screen.constructor.edit.php:606
 #: screenedit.php:46
 msgid "Row span"
-msgstr "列寬度"
+msgstr "行寬度"
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
-msgstr "列"
+msgstr "行"
 
 #: include/views/administration.users.edit.php:122 profile.php:50 users.php:63
 msgid "Rows per page"
-msgstr "每頁列數"
+msgstr "每頁行數"
 
 #: include/views/conf.import.php:65
 msgid "Rules"
@@ -10584,7 +10584,7 @@ msgstr "篩選 \"%1$s\" 已新增."
 
 #: api/classes/CTemplateScreen.php:821
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr ""
+msgstr "篩選\"%1$s\"已存在於模板\"%2$2\"中."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:716 api/classes/CTemplateScreen.php:767
@@ -10619,11 +10619,11 @@ msgstr "篩選已删除"
 
 #: api/classes/CScreenItem.php:606
 msgid "Screen elements column span is too big."
-msgstr ""
+msgstr "篩選要素的列跨福太大了."
 
 #: api/classes/CScreenItem.php:603
 msgid "Screen elements row span is too big."
-msgstr ""
+msgstr "篩選要素的行跨福太大了."
 
 #: api/classes/CScreenItem.php:176
 msgid "Screen item in same cell already exists."
@@ -10631,7 +10631,7 @@ msgstr "篩選項目於相同格位中已存在."
 
 #: screenedit.php:236 screenedit.php:251
 msgid "Screen should contain at least one row and column."
-msgstr "篩選應包含至少一個列和行."
+msgstr "篩選應包含至少一個行和列."
 
 #: screenconf.php:153
 msgid "Screen updated"
@@ -10823,7 +10823,7 @@ msgstr "選擇原型"
 
 #: include/views/monitoring.history.php:102
 msgid "Select rows with value like"
-msgstr "選擇列含有值像"
+msgstr "選擇行含有值類似於"
 
 #: dashconf.php:174 include/views/monitoring.history.php:123
 msgid "Selected"
@@ -11463,19 +11463,19 @@ msgstr "成功審計"
 
 #: popup_trexpr.php:325
 msgid "Sum of values for period of time is T < N"
-msgstr ""
+msgstr "期間的總時間是 T < N"
 
 #: popup_trexpr.php:340
 msgid "Sum of values for period of time is T NOT N"
-msgstr ""
+msgstr "期間的總時間是 T 非 N"
 
 #: popup_trexpr.php:335
 msgid "Sum of values of a period T is = N"
-msgstr ""
+msgstr "期間的總時間是 T = N"
 
 #: popup_trexpr.php:330
 msgid "Sum of values of a period T is > N"
-msgstr ""
+msgstr "期間的總時間是 T > N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11777,11 +11777,11 @@ msgstr "本月"
 
 #: include/classes/screens/CScreenBuilder.php:492
 msgid "This screen-column is not empty. Delete it?"
-msgstr "這篩選-行不是空白. 刪除它?"
+msgstr "這篩選-列不是空白. 刪除它?"
 
 #: include/classes/screens/CScreenBuilder.php:474
 msgid "This screen-row is not empty. Delete it?"
-msgstr "這篩選-列不是空白. 刪除它?"
+msgstr "這篩選-行不是空白. 刪除它?"
 
 #: srv_status.php:84
 msgid "This week"
@@ -11864,11 +11864,11 @@ msgstr "時間戳"
 
 #: popup_trexpr.php:393
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "和Zabbix伺服器的時間戳記差異不超過T秒, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:398
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "和Zabbix伺服器的時間戳記差異不超過T秒, 則 N 非 1, 0 - 除外"
 
 #: include/reports.inc.php:206 include/reports.inc.php:368
 #: include/reports.inc.php:517
