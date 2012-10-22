@@ -84,6 +84,20 @@ $param2_sec_val = array(
 		'T' => T_ZBX_STR
 	)
 );
+$param3_sec_val = array(
+	array(
+		'C' => _('Last of').' (T)', // caption
+		'T' => T_ZBX_INT
+	),
+	array(
+		'C' => 'V', // caption
+		'T' => T_ZBX_STR
+	),
+	array(
+		'C' => 'O', // caption
+		'T' => T_ZBX_STR
+	)
+);
 $param2_val_sec = array(
 	array(
 		'C' => 'V', // caption
@@ -189,22 +203,22 @@ $functions = array(
 	),
 	'count[<]' => array(
 		'description' =>  _('Number of successfully retrieved values V of a period T is > N'),
-		'params' => $param2_sec_val,
+		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[>]' => array(
 		'description' =>  _('Number of successfully retrieved values V of a period T is < N'),
-		'params' => $param2_sec_val,
+		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[=]' => array(
 		'description' =>  _('Number of successfully retrieved values V of a period T is = N'),
-		'params' => $param2_sec_val,
+		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[#]' => array(
 		'description' =>  _('Number of successfully retrieved values V of a period T is NOT N'),
-		'params' => $param2_sec_val,
+		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'diff[=]' => array(
@@ -293,12 +307,12 @@ $functions = array(
 	),
 	'str[=]' => array(
 		'description' =>  _('Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise'),
-		'params' => $param1_str,
+		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'str[#]' => array(
 		'description' =>  _('Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise'),
-		'params' => $param1_str,
+		'params' => $param2_val_sec,
 		'allowed_types' => $allowed_types_str
 	),
 	'strlen[<]' => array(
@@ -391,33 +405,33 @@ $functions = array(
 	),
 	'fuzzytime[=]' => array(
 		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise'),
-		'params' => $param1_sec_count_no_timeshift,
-		'allowed_types' => $allowed_types_numeric
+		'params' => $param1_sec,
+		'allowed_types' => $allowed_types_any
 	),
 	'fuzzytime[#]' => array(
 		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise'),
-		'params' => $param1_sec_count_no_timeshift,
-		'allowed_types' => $allowed_types_numeric
+		'params' => $param1_sec,
+		'allowed_types' => $allowed_types_any
 	),
 	'regexp[=]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise'),
-		'params' => $param2_val_sec,
-		'allowed_types' => $allowed_types_str
+		'params' => $param1_sec_count,
+		'allowed_types' => $allowed_types_any
 	),
 	'regexp[#]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise'),
-		'params' => $param2_val_sec,
-		'allowed_types' => $allowed_types_str
+		'params' => $param1_sec_count,
+		'allowed_types' => $allowed_types_any
 	),
 	'iregexp[=]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)'),
-		'params' => $param2_val_sec,
-		'allowed_types' => $allowed_types_str
+		'params' => $param1_sec_count,
+		'allowed_types' => $allowed_types_any
 	),
 	'iregexp[#]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)'),
-		'params' => $param2_val_sec,
-		'allowed_types' => $allowed_types_str
+		'params' => $param1_sec_count,
+		'allowed_types' => $allowed_types_any
 	),
 	'logeventid[=]' => array(
 		'description' =>  _('Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise'),
