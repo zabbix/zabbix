@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/../../include/classes/class.cwebuser.php';
 require_once dirname(__FILE__).'/../../include/classes/debug/CProfiler.php';
 require_once dirname(__FILE__).'/../../include/classes/db/DbBackend.php';
 require_once dirname(__FILE__).'/../../include/classes/db/MysqlDbBackend.php';
+require_once dirname(__FILE__).'/../../include/classes/db/PostgresqlDbBackend.php';
 
 
 /**
