@@ -48,6 +48,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5643] fixed sql error by adding permission check for triggers when adding nonexistent dependencies via API (Toms)
+A......... [ZBX-5643] fixed circularity check for trigger addDependencies() in API (Toms)
 ..F....... [ZBX-5691] fixed error when create graph if oracle configured to use comma as decimal separator (Vedmak)
 ..F....... [ZBX-5671] fixed error when save configuration in administration->general with oracle backend (Vedmak)
 A......... [ZBX-5693] fixed possibility to create graph with the same name as existing graph prototype within template (Toms)
