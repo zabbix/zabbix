@@ -56,9 +56,15 @@ if (!empty($_REQUEST['slides'])) {
 	natksort($_REQUEST['slides']);
 }
 
-// validate permitions
+/*
+ * Permissions
+ */
 if (isset($_REQUEST['slideshowid'])) {
 	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE)) {
+		access_deny();
+	}
+	$db_slideshow = DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.get_request('slideshowid')));
+	if (empty($db_slideshow)) {
 		access_deny();
 	}
 }
@@ -94,16 +100,15 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
-	if ($slideshow = get_slideshow_by_slideshowid($_REQUEST['slideshowid'])) {
-		DBstart();
-		delete_slideshow($_REQUEST['slideshowid']);
-		$result = DBend();
+	DBstart();
+	delete_slideshow($_REQUEST['slideshowid']);
+	$result = DBend();
 
-		show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
-		if ($result) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$slideshow['name'].'" ');
-		}
+	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
+	if ($result) {
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$db_slideshow['name'].'" ');
 	}
+
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 }
 elseif ($_REQUEST['go'] == 'delete') {
@@ -143,14 +148,8 @@ if (isset($_REQUEST['form'])) {
 	);
 
 	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
-		$slideshow = DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.$data['slideshowid']));
-
-		if (empty($slideshow)) {
-			access_deny();
-		}
-
-		$data['name'] = $slideshow['name'];
-		$data['delay'] = $slideshow['delay'];
+		$data['name'] = $db_slideshow['name'];
+		$data['delay'] = $db_slideshow['delay'];
 
 		// get slides
 		$db_slides = DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.$data['slideshowid'].' ORDER BY s.step');

@@ -40,6 +40,22 @@ $fields = array(
 check_fields($fields);
 
 /*
+ * Permissions
+ */
+if (isset($_REQUEST['iconmapid'])) {
+	$iconMap = API::IconMap()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'iconmapids' => get_request('iconmapid'),
+		'editable' => true,
+		'preservekeys' => true,
+		'selectMappings' => API_OUTPUT_EXTEND,
+	));
+	if (empty($iconMap)) {
+		access_deny();
+	}
+}
+
+/*
  * Actions
  */
 if (isset($_REQUEST['save'])) {
@@ -135,18 +151,6 @@ if (isset($_REQUEST['form'])) {
 		$data['iconmap'] = get_request('iconmap');
 	}
 	elseif (isset($_REQUEST['iconmapid'])) {
-		$iconMap = API::IconMap()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'iconmapids' => $_REQUEST['iconmapid'],
-			'editable' => true,
-			'preservekeys' => true,
-			'selectMappings' => API_OUTPUT_EXTEND,
-		));
-
-		if (empty($iconMap)) {
-			access_deny();
-		}
-
 		$data['iconmap'] = reset($iconMap);
 	}
 	else {

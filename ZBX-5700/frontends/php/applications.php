@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -59,6 +59,15 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['applicationid'])) {
+	$db_application = DBfetch(DBselect('SELECT s.name,s.hostid FROM applications s WHERE s.applicationid='.get_request('applicationid')));
+	if (empty($db_application)) {
+		access_deny();
+	}
+}
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
 	if (empty($groupids)) {
@@ -209,13 +218,8 @@ if (isset($_REQUEST['form'])) {
 	$data['groupid'] = get_request('groupid', 0);
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
-		$db_application = DBfetch(DBselect('SELECT s.name,s.hostid FROM applications s WHERE s.applicationid='.$data['applicationid']));
 		$data['appname'] = $db_application['name'];
 		$data['apphostid'] = $db_application['hostid'];
-
-		if (empty($db_application)) {
-			access_deny();
-		}
 
 	}
 	else {

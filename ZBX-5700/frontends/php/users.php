@@ -78,9 +78,18 @@ $fields = array(
 );
 check_fields($fields);
 validate_sort_and_sortorder('alias', ZBX_SORT_UP);
-?>
-<?php
+
 $_REQUEST['go'] = get_request('go', 'none');
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['userid'])) {
+	$users = API::User()->get(array('userids' => get_request('userid'), 'output' => API_OUTPUT_EXTEND));
+	if (empty($users)) {
+		access_deny();
+	}
+}
 
 if (isset($_REQUEST['new_groups'])) {
 	$_REQUEST['new_groups'] = get_request('new_groups', array());
@@ -205,9 +214,7 @@ elseif (isset($_REQUEST['del_user_group'])) {
  * Delete
  */
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
-	$users = API::User()->get(array('userids' => $_REQUEST['userid'], 'output' => API_OUTPUT_EXTEND));
 	$user = reset($users);
-
 	$result = API::User()->delete($users);
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
 	if ($result) {
@@ -219,8 +226,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
  * Add USER to GROUP
  */
 elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($_REQUEST['userid']) && $_REQUEST['grpaction'] == 1) {
-	$user = API::User()->get(array('userids' => $_REQUEST['userid'], 'output' => API_OUTPUT_EXTEND));
-	$user = reset($user);
+	$user = reset($users);
 
 	$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 	$group = reset($group);
@@ -240,8 +246,7 @@ elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($
  * Remove USER from GROUP
  */
 elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($_REQUEST['userid']) && $_REQUEST['grpaction'] == 0) {
-	$user = API::User()->get(array('userids' => $_REQUEST['userid'], 'output' => API_OUTPUT_EXTEND));
-	$user = reset($user);
+	$user = reset($users);
 
 	$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 	$group = reset($group);

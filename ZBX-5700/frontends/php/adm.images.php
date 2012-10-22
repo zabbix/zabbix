@@ -40,6 +40,16 @@ $fields = array(
 check_fields($fields);
 
 /*
+ * Permissions
+ */
+if (isset($_REQUEST['imageid'])) {
+		$db_image = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid = '.get_request('imageid')));
+	if (empty($db_image)) {
+		access_deny();
+	}
+}
+
+/*
  * Actions
  */
 if (isset($_REQUEST['save'])) {
@@ -106,13 +116,7 @@ if (isset($_REQUEST['save'])) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 	$image = get_image_by_imageid($_REQUEST['imageid']);
-
-	if (empty($image)) {
-		access_deny();
-	}
-
 	$result = API::Image()->delete($_REQUEST['imageid']);
-
 	show_messages($result, _('Image deleted'), _('Cannot delete image'));
 	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$image['name'].'] deleted');
@@ -154,13 +158,9 @@ $data['widget'] = &$cnf_wdgt;
 
 if (!empty($data['form'])) {
 	if (isset($_REQUEST['imageid'])) {
-		$image = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
-		if (empty($image)) {
-			access_deny();
-		}
 		$data['imageid'] = $_REQUEST['imageid'];
-		$data['imagename'] = $image['name'];
-		$data['imagetype'] = $image['imagetype'];
+		$data['imagename'] = $db_image['name'];
+		$data['imagetype'] = $db_image['imagetype'];
 	}
 	else {
 		$data['imageid'] = null;

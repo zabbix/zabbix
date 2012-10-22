@@ -70,7 +70,20 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-// permissions
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['maintenanceid'])) {
+	$db_maintenance = API::Maintenance()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'selectTimeperiods' => API_OUTPUT_EXTEND,
+		'editable' => true,
+		'maintenanceids' => get_request('maintenanceid'),
+	));
+	if (empty($db_maintenance)) {
+		access_deny();
+	}
+}
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
 	if (empty($groupids)) {
@@ -307,27 +320,15 @@ if (!empty($data['form'])) {
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
 	if (isset($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
-		// get maintenance
-		$maintenance = API::Maintenance()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'selectTimeperiods' => API_OUTPUT_EXTEND,
-			'editable' => true,
-			'maintenanceids' => $data['maintenanceid'],
-		));
-
-		if (empty($maintenance)) {
-			access_deny();
-		}
-
-		$maintenance = reset($maintenance);
-		$data['mname'] = $maintenance['name'];
-		$data['maintenance_type'] = $maintenance['maintenance_type'];
-		$data['active_since'] = $maintenance['active_since'];
-		$data['active_till'] = $maintenance['active_till'];
-		$data['description'] = $maintenance['description'];
+		$db_maintenance = reset($db_maintenance);
+		$data['mname'] = $db_maintenance['name'];
+		$data['maintenance_type'] = $db_maintenance['maintenance_type'];
+		$data['active_since'] = $db_maintenance['active_since'];
+		$data['active_till'] = $db_maintenance['active_till'];
+		$data['description'] = $db_maintenance['description'];
 
 		// time periods
-		$data['timeperiods'] = $maintenance['timeperiods'];
+		$data['timeperiods'] = $db_maintenance['timeperiods'];
 		CArrayHelper::sort($data['timeperiods'], array('timeperiod_type', 'start_date'));
 
 		// get hosts

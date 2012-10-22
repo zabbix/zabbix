@@ -53,6 +53,16 @@ $fields = array(
 check_fields($fields);
 
 /*
+ * Permissions
+ */
+if (isset($_REQUEST['regexpid'])) {
+	$regexp = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.get_request('regexpid')));
+	if (empty($regexp)) {
+		access_deny();
+	}
+}
+
+/*
  * Actions
  */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {

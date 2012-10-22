@@ -83,6 +83,21 @@ if (!empty($_REQUEST['steps'])) {
 }
 
 /*
+ * Permissions
+ */
+if (isset($_REQUEST['httptestid'])) {
+	$db_httptest = DBfetch(DBselect(
+		'SELECT wt.*,a.name AS application'.
+		' FROM httptest wt,applications a'.
+		' WHERE a.applicationid=wt.applicationid'.
+			' AND wt.httptestid='.get_request('httptestid')
+	));
+	if (empty($db_httptest)) {
+		access_deny();
+	}
+}
+
+/*
  * Filter
  */
 $options = array(
@@ -350,17 +365,6 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
 	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)) {
-		$db_httptest = DBfetch(DBselect(
-			'SELECT wt.*,a.name AS application'.
-			' FROM httptest wt,applications a'.
-			' WHERE a.applicationid=wt.applicationid'.
-				' AND wt.httptestid='.$_REQUEST['httptestid']
-		));
-
-		if (empty($db_httptest)) {
-			access_deny();
-		}
-
 		$data['name'] = $db_httptest['name'];
 		$data['application'] = $db_httptest['application'];
 		$data['delay'] = $db_httptest['delay'];

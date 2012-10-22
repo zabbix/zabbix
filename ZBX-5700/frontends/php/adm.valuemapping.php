@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of value mapping');
@@ -38,6 +38,16 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,		null)
 );
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['valuemapid'])) {
+	$db_valuemap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.get_request('valuemapid')));
+	if (empty($db_valuemap)) {
+		access_deny();
+	}
+}
 
 /*
  * Actions
@@ -144,11 +154,6 @@ if (isset($_REQUEST['form'])) {
 	$data['add_newvalue'] = get_request('add_newvalue');
 
 	if (isset($data['valuemapid'])) {
-		$db_valuemap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.$data['valuemapid']));
-
-		if (empty($db_valuemap)) {
-			access_deny();
-		}
 
 		$data['mapname'] = $db_valuemap['name'];
 

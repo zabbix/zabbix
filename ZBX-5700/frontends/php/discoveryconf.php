@@ -61,6 +61,21 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_S
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['dchecks'] = get_request('dchecks', array());
 
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['druleid'])) {
+	$drules = API::DRule()->get(array(
+		'druleids' => get_request('druleid'),
+		'output' => API_OUTPUT_EXTEND,
+		'selectDChecks' => API_OUTPUT_EXTEND,
+		'editable' => true
+	));
+	if (empty($drules)) {
+		access_deny();
+	}
+}
+
 // ajax
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new AjaxResponse;
@@ -182,17 +197,6 @@ if (isset($_REQUEST['form'])) {
 
 	// get drule
 	if (isset($data['druleid']) && !isset($_REQUEST['form_refresh'])) {
-		$drules = API::DRule()->get(array(
-			'druleids' => $data['druleid'],
-			'output' => API_OUTPUT_EXTEND,
-			'selectDChecks' => API_OUTPUT_EXTEND,
-			'editable' => true
-		));
-
-		if (empty($drules)) {
-			access_deny();
-		}
-
 		$data['drule'] = reset($drules);
 		$data['drule']['uniqueness_criteria'] = -1;
 
