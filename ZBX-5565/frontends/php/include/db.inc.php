@@ -1091,7 +1091,7 @@ function zbx_dbstr($var) {
 		return false;
 	}
 
-	switch($DB['TYPE']) {
+	switch ($DB['TYPE']) {
 		case ZBX_DB_DB2:
 			if (is_array($var)) {
 				foreach ($var as $vnum => $value) {
@@ -1157,21 +1157,17 @@ function zbx_dbcast_2bigint($field) {
 		return false;
 	}
 
-	switch($DB['TYPE']) {
+	switch ($DB['TYPE']) {
 		case ZBX_DB_DB2:
-			return ' CAST('.$field.' AS BIGINT) ';
+		case ZBX_DB_POSTGRESQL:
+		case ZBX_DB_SQLITE3:
+			return 'CAST('.$field.' AS BIGINT)';
 
 		case ZBX_DB_MYSQL:
-			return ' CAST('.$field.' AS UNSIGNED) ';
+			return 'CAST('.$field.' AS UNSIGNED)';
 
 		case ZBX_DB_ORACLE:
-			return ' CAST('.$field.' AS NUMBER(20)) ';
-
-		case ZBX_DB_POSTGRESQL:
-			return ' CAST('.$field.' AS BIGINT) ';
-
-		case ZBX_DB_SQLITE3:
-			return ' CAST('.$field.' AS BIGINT) ';
+			return 'CAST('.$field.' AS NUMBER(20))';
 
 		default:
 			return false;
@@ -1182,44 +1178,26 @@ function zbx_dbcast_2bigint($field) {
  * Creates db dependent string with sql limit.
  * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
  *
- * @param int      $min
- * @param int|null $max
- * @param bool     $afterWhere
+ * @param int $limit
  *
  * @return bool|string
  */
-function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+function zbx_limit($limit) {
 	global $DB;
 
 	if (!isset($DB['TYPE'])) {
 		return false;
 	}
 
-	switch($DB['TYPE']) {
+	switch ($DB['TYPE']) {
 		case ZBX_DB_DB2:
-			if ($afterWhere) {
-				return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
-			}
-			else {
-				return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
-			}
+		case ZBX_DB_ORACLE:
+				return 'AND rownum<='.$limit;
 
 		case ZBX_DB_MYSQL:
-			return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
-
-		case ZBX_DB_ORACLE:
-			if ($afterWhere) {
-				return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
-			}
-			else {
-				return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
-			}
-
 		case ZBX_DB_POSTGRESQL:
-			return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
-
 		case ZBX_DB_SQLITE3:
-			return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+			return 'LIMIT '.$limit;
 
 		default:
 			return false;
