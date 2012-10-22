@@ -1192,7 +1192,7 @@ function zbx_limit($limit) {
 	switch ($DB['TYPE']) {
 		case ZBX_DB_DB2:
 		case ZBX_DB_ORACLE:
-				return 'AND rownum<='.$limit;
+			return 'AND rownum<='.$limit;
 
 		case ZBX_DB_MYSQL:
 		case ZBX_DB_POSTGRESQL:
