@@ -921,10 +921,9 @@ define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // if magic quotes on, then get rid of them
-
 if (get_magic_quotes_gpc()) {
 	function zbx_stripslashes($value) {
-		$value = is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value);
+		$value = is_array($value) ? array_map('zbx_stripslashes', $value) : stripslashes($value);
 		return $value;
 	}
 	$_GET = zbx_stripslashes($_GET);
