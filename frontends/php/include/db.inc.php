@@ -1076,6 +1076,14 @@ function pg_connect_escape($string) {
 	return addcslashes($string, "'\\");
 }
 
+/**
+ * Escape string for safe usage in SQL queries.
+ * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ *
+ * @param array|string $var
+ *
+ * @return array|bool|string
+ */
 function zbx_dbstr($var) {
 	global $DB;
 
@@ -1083,53 +1091,65 @@ function zbx_dbstr($var) {
 		return false;
 	}
 
-	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".mysql_real_escape_string($value)."'";
+	switch($DB['TYPE']) {
+		case ZBX_DB_DB2:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".db2_escape_string($value)."'";
+				}
+				return $var;
 			}
-			return $var;
-		}
-		return "'".mysql_real_escape_string($var)."'";
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".pg_escape_string($value)."'";
+			return "'".db2_escape_string($var)."'";
+
+		case ZBX_DB_MYSQL:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".mysql_real_escape_string($value)."'";
+				}
+				return $var;
 			}
-			return $var;
-		}
-		return "'".pg_escape_string($var)."'";
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_ORACLE) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".preg_replace('/\'/', '\'\'', $value)."'";
+			return "'".mysql_real_escape_string($var)."'";
+
+		case ZBX_DB_ORACLE:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".preg_replace('/\'/', '\'\'', $value)."'";
+				}
+				return $var;
 			}
-			return $var;
-		}
-		return "'".preg_replace('/\'/','\'\'',$var)."'";
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_DB2) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".db2_escape_string($value)."'";
+			return "'".preg_replace('/\'/','\'\'',$var)."'";
+
+		case ZBX_DB_POSTGRESQL:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".pg_escape_string($value)."'";
+				}
+				return $var;
 			}
-			return $var;
-		}
-		return "'".db2_escape_string($var)."'";
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_SQLITE3) {
-		if (is_array($var)) {
-			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".$DB['DB']->escapeString($value)."'";
+			return "'".pg_escape_string($var)."'";
+
+		case ZBX_DB_SQLITE3:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".$DB['DB']->escapeString($value)."'";
+				}
+				return $var;
 			}
-			return $var;
-		}
-		return "'".$DB['DB']->escapeString($var)."'";
+			return "'".$DB['DB']->escapeString($var)."'";
+
+		default:
+			return false;
 	}
 }
 
+/**
+ * Creates db dependent string with sql expression that casts passed value to bigint.
+ * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ *
+ * @param int $field
+ *
+ * @return bool|string
+ */
 function zbx_dbcast_2bigint($field) {
 	global $DB;
 
@@ -1137,23 +1157,37 @@ function zbx_dbcast_2bigint($field) {
 		return false;
 	}
 
-	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-		return ' CAST('.$field.' AS UNSIGNED) ';
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-		return ' CAST('.$field.' AS BIGINT) ';
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_ORACLE) {
-		return ' CAST('.$field.' AS NUMBER(20)) ';
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_DB2) {
-		return ' CAST('.$field.' AS BIGINT) ';
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_SQLITE3) {
-		return ' CAST('.$field.' AS BIGINT) ';
+	switch($DB['TYPE']) {
+		case ZBX_DB_DB2:
+			return ' CAST('.$field.' AS BIGINT) ';
+
+		case ZBX_DB_MYSQL:
+			return ' CAST('.$field.' AS UNSIGNED) ';
+
+		case ZBX_DB_ORACLE:
+			return ' CAST('.$field.' AS NUMBER(20)) ';
+
+		case ZBX_DB_POSTGRESQL:
+			return ' CAST('.$field.' AS BIGINT) ';
+
+		case ZBX_DB_SQLITE3:
+			return ' CAST('.$field.' AS BIGINT) ';
+
+		default:
+			return false;
 	}
 }
 
+/**
+ * Creates db dependent string with sql limit.
+ * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ *
+ * @param int      $min
+ * @param int|null $max
+ * @param bool     $afterWhere
+ *
+ * @return bool|string
+ */
 function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 	global $DB;
 
@@ -1161,29 +1195,33 @@ function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return false;
 	}
 
-	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_ORACLE) {
-		if ($afterWhere) {
-			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
-		}
-		else {
-			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
-		}
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_DB2) {
-		if ($afterWhere) {
-			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
-		}
-		else {
-			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
-		}
-	}
-	elseif ($DB['TYPE'] == ZBX_DB_SQLITE3) {
-		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+	switch($DB['TYPE']) {
+		case ZBX_DB_DB2:
+			if ($afterWhere) {
+				return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+			}
+			else {
+				return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+			}
+
+		case ZBX_DB_MYSQL:
+			return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+
+		case ZBX_DB_ORACLE:
+			if ($afterWhere) {
+				return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+			}
+			else {
+				return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+			}
+
+		case ZBX_DB_POSTGRESQL:
+			return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+
+		case ZBX_DB_SQLITE3:
+			return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+
+		default:
+			return false;
 	}
 }
