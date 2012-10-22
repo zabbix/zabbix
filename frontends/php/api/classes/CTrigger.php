@@ -1452,6 +1452,7 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$depTtriggerIds = array();
 		$triggers = array();
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
@@ -1463,7 +1464,13 @@ class CTrigger extends CTriggerGeneral {
 				);
 			}
 			$triggers[$triggerId]['dependencies'][] = $dep['dependsOnTriggerid'];
+			$depTtriggerIds[$dep['dependsOnTriggerid']] = $dep['dependsOnTriggerid'];
 		}
+
+		if (!$this->isReadable($depTtriggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		};
+
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
 		$this->checkDependencyDuplicates($triggers);
@@ -1480,13 +1487,20 @@ class CTrigger extends CTriggerGeneral {
 	public function addDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
 
+		$triggerIds = array();
+		foreach ($triggersData as $dep) {
+			$triggerIds[$dep['triggerid']] = $dep['triggerid'];
+		}
+		if (!$this->isWritable($triggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		};
+
 		$this->validateAddDependencies($triggersData);
 
-		$triggerids = array();
+
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
 			$depTriggerId = $dep['dependsOnTriggerid'];
-			$triggerids[$dep['triggerid']] = $dep['triggerid'];
 
 			DB::insert('trigger_depends', array(array(
 				'triggerid_down' => $triggerId,
@@ -1515,7 +1529,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerIds);
 	}
 
 	/**
@@ -1822,7 +1836,9 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Validates the dependencies of the given triggers.
 	 *
-	 * @param array $triggers
+	 * @param array $triggers list of triggers and corresponding dependencies
+	 * @param int $triggers[]['triggerid'] trigger id
+	 * @param array $triggers[]['dependencies'] list of trigger ids on which depends given trigger
 	 *
 	 * @trows APIException if any of the dependencies is invalid
 	 */
@@ -1852,30 +1868,41 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 
-			$downTriggerIds = $trigger['dependencies'];
-
 			// the trigger can't depend on itself
 			if (in_array($trigger['triggerid'], $trigger['dependencies'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create dependency on trigger itself.'));
 			}
 
 			// check circular dependency
+			$downTriggerIds = array($trigger['triggerid']);
 			do {
-				$dbUpTriggers = DBselect(
+				// triggerid_down depends on triggerid_up
+				$res = DBselect(
 					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
 					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds)
 				);
-				$upTriggerids = array();
-				while ($upTrigger = DBfetch($dbUpTriggers)) {
-					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular dependencies are not allowed.'));
-					}
-					$upTriggerids[] = $upTrigger['triggerid_up'];
-				}
-				$downTriggerIds = $upTriggerids;
 
-			} while (!empty($upTriggerids));
+				// combine db dependencies with thouse to be added
+				$upTriggersIds = array();
+				while ($row = DBfetch($res)) {
+					$upTriggersIds[] = $row['triggerid_up'];
+				}
+				foreach ($downTriggerIds as $id) {
+					if (isset($triggers[$id]) && isset($triggers[$id]['dependencies'])) {
+						$upTriggersIds = array_merge($upTriggersIds, $triggers[$id]['dependencies']);
+					}
+				}
+
+				// if found trigger id in dependant triggerids, then there is dependency loop
+				$downTriggerIds = array();
+				foreach ($upTriggersIds as $id) {
+					if (bccomp($id, $trigger['triggerid']) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create circular dependencies.'));
+					}
+					$downTriggerIds[] = $id;
+				}
+			} while (!empty($downTriggerIds));
 
 			// fetch all templates that are used in dependencies
 			$triggerDependencyTemplates = API::Template()->get(array(
