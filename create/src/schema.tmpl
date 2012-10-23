@@ -146,7 +146,7 @@ UNIQUE		|2		|hostid,name
 TABLE|httptest|httptestid|ZBX_SYNC,ZBX_DATA
 FIELD		|httptestid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|applicationid	|t_id		|	|NULL		|ZBX_SYNC		|1|applications
+FIELD		|applicationid	|t_id		|	|NULL		|ZBX_SYNC		|1|applications	|		|RESTRICT
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -1205,4 +1205,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010018	|2010018
+ROW		|2010020	|2010020
