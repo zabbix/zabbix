@@ -24,8 +24,10 @@
 
 #if defined(HAVE_MYSQL)
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
+#	define ZBX_DROP_FK		" drop foreign key"
 #else
 #	define ZBX_DB_TABLE_OPTIONS	""
+#	define ZBX_DROP_FK		" drop constraint"
 #endif
 
 #if defined(HAVE_POSTGRESQL)
@@ -219,6 +221,13 @@ static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " on delete cascade");
 }
 
+static void	DBdrop_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, int id)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DROP_FK " c_%s_%d",
+			table_name, table_name, id);
+}
+
 static int	DBreorg_table(const char *table_name)
 {
 #if defined(HAVE_IBM_DB2)
@@ -375,6 +384,23 @@ static int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *fi
 	return ret;
 }
 
+static int	DBdrop_foreign_key(const char *table_name, int id)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBdrop_foreign_key_sql(&sql, &sql_alloc, &sql_offset, table_name, id);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
 
 static int	DBcreate_dbversion_table()
 {
@@ -563,12 +589,24 @@ static int	DBpatch_02010016()
 
 static int	DBpatch_02010017()
 {
+	return DBdrop_foreign_key("httptest", 1);
+}
+
+static int	DBpatch_02010018()
+{
+	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("httptest", 1, &field);
+}
+
+static int	DBpatch_02010019()
+{
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("httptest", 2, &field);
 }
 
-static int	DBpatch_02010018()
+static int	DBpatch_02010020()
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -599,6 +637,8 @@ int	DBcheck_version()
 		{DBpatch_02010016, 2010016, 0, 1},
 		{DBpatch_02010017, 2010017, 0, 1},
 		{DBpatch_02010018, 2010018, 0, 1},
+		{DBpatch_02010019, 2010019, 0, 1},
+		{DBpatch_02010020, 2010020, 0, 1},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";
