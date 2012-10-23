@@ -1077,3 +1077,131 @@ function idcmp($id1, $id2) {
 function pg_connect_escape($string) {
 	return addcslashes($string, "'\\");
 }
+
+/**
+ * Escape string for safe usage in SQL queries.
+ * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ *
+ * @param array|string $var
+ *
+ * @return array|bool|string
+ */
+function zbx_dbstr($var) {
+	global $DB;
+
+	if (!isset($DB['TYPE'])) {
+		return false;
+	}
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_DB2:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".db2_escape_string($value)."'";
+				}
+				return $var;
+			}
+			return "'".db2_escape_string($var)."'";
+
+		case ZBX_DB_MYSQL:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".mysql_real_escape_string($value)."'";
+				}
+				return $var;
+			}
+			return "'".mysql_real_escape_string($var)."'";
+
+		case ZBX_DB_ORACLE:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".preg_replace('/\'/', '\'\'', $value)."'";
+				}
+				return $var;
+			}
+			return "'".preg_replace('/\'/','\'\'',$var)."'";
+
+		case ZBX_DB_POSTGRESQL:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".pg_escape_string($value)."'";
+				}
+				return $var;
+			}
+			return "'".pg_escape_string($var)."'";
+
+		case ZBX_DB_SQLITE3:
+			if (is_array($var)) {
+				foreach ($var as $vnum => $value) {
+					$var[$vnum] = "'".$DB['DB']->escapeString($value)."'";
+				}
+				return $var;
+			}
+			return "'".$DB['DB']->escapeString($var)."'";
+
+		default:
+			return false;
+	}
+}
+
+/**
+ * Creates db dependent string with sql expression that casts passed value to bigint.
+ * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ *
+ * @param int $field
+ *
+ * @return bool|string
+ */
+function zbx_dbcast_2bigint($field) {
+	global $DB;
+
+	if (!isset($DB['TYPE'])) {
+		return false;
+	}
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_DB2:
+		case ZBX_DB_POSTGRESQL:
+		case ZBX_DB_SQLITE3:
+			return 'CAST('.$field.' AS BIGINT)';
+
+		case ZBX_DB_MYSQL:
+			return 'CAST('.$field.' AS UNSIGNED)';
+
+		case ZBX_DB_ORACLE:
+			return 'CAST('.$field.' AS NUMBER(20))';
+
+		default:
+			return false;
+	}
+}
+
+/**
+ * Creates db dependent string with sql limit.
+ * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
+ *
+ * @param int $limit
+ *
+ * @return bool|string
+ */
+function zbx_limit($limit) {
+	global $DB;
+
+	if (!isset($DB['TYPE'])) {
+		return false;
+	}
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_DB2:
+		case ZBX_DB_ORACLE:
+			return 'AND rownum<='.$limit;
+
+		case ZBX_DB_MYSQL:
+		case ZBX_DB_POSTGRESQL:
+		case ZBX_DB_SQLITE3:
+			return 'LIMIT '.$limit;
+
+		default:
+			return false;
+	}
+}
