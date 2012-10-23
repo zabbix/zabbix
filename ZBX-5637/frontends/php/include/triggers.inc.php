@@ -97,8 +97,8 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'] = array(
 			'args' => array(
-				array('type' => 'sec_num', 'mandat' => true),
-				array('type' => 'sec')
+				array('type' => 'str'),
+				array('type' => 'sec_num', 'mandat' => true)
 			),
 			'value_types' => $value_types_all
 		);

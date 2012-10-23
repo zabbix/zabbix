@@ -67,14 +67,15 @@ $param1_str = array(
 		'T' => T_ZBX_STR
 	)
 );
-$param2_sec_val = array(
+$param2_sec_count = array(
 	array(
-		'C' => _('Last of').' (T)', // caption
-		'T' => T_ZBX_INT
+		'C' => 'O', // caption
+		'T' => T_ZBX_STR
 	),
 	array(
-		'C' => 'V', // caption
-		'T' => T_ZBX_STR
+		'C' => _('Last of').' (T)', // caption
+		'T' => T_ZBX_INT, // type
+		'M' => $metrics // metrcis
 	)
 );
 $param3_sec_val = array(
@@ -89,16 +90,10 @@ $param3_sec_val = array(
 	array(
 		'C' => 'O', // caption
 		'T' => T_ZBX_STR
-	)
-);
-$param2_val_sec = array(
-	array(
-		'C' => 'V', // caption
-		'T' => T_ZBX_STR
 	),
 	array(
-		'C' => _('Last of') . ' (T)', // caption
-		'T' => T_ZBX_INT
+		'C' => _('Time shift').' ', // caption
+		'T' => T_ZBX_INT // type
 	)
 );
 $allowed_types_any = array(
@@ -300,12 +295,12 @@ $functions = array(
 	),
 	'str[=]' => array(
 		'description' =>  _('Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise'),
-		'params' => $param1_sec_count,
+		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
 	'str[#]' => array(
 		'description' =>  _('Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise'),
-		'params' => $param1_sec_count,
+		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
 	'strlen[<]' => array(
@@ -408,22 +403,22 @@ $functions = array(
 	),
 	'regexp[=]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise'),
-		'params' => $param1_sec_count,
+		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
 	'regexp[#]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise'),
-		'params' => $param1_sec_count,
+		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
 	'iregexp[=]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)'),
-		'params' => $param1_sec_count,
+		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
 	'iregexp[#]' => array(
 		'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)'),
-		'params' => $param1_sec_count,
+		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
 	'logeventid[=]' => array(

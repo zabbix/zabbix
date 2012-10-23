@@ -70,7 +70,7 @@ if (isset($this->data['functions'][$this->data['function'].'['.$this->data['oper
 		$paramValue = isset($this->data['param'][$pid]) ? $this->data['param'][$pid] : null;
 
 		if ($pf['T'] == T_ZBX_INT) {
-			if ($pid == 0) {
+			if ($pid == 0 || $pid == 1) {
 				if (isset($pf['M'])) {
 					if (is_array($pf['M'])) {
 						$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype']);
@@ -94,9 +94,6 @@ if (isset($this->data['functions'][$this->data['function'].'['.$this->data['oper
 					$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
 					$paramTypeElement = SPACE._('Seconds');
 				}
-			}
-			elseif ($pid == 1) {
-				$paramTypeElement = SPACE._('Seconds');
 			}
 			else {
 				$paramTypeElement = null;
