@@ -14,6 +14,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5711] added caching for frontend favorite values (Toms)
+..F....... [ZBX-5711] removed redundant queries when editing web scenario (Toms)
 A.F....... [ZBX-5565] fixed html is returned on api requests if db is down (Vedmak)
 ..F....... [ZBX-3396] added error message if FreeType support is missing (Toms)
 ...G...... [ZBX-4355] fixed response on check inodes on file systems not supporting them (Sasha)
