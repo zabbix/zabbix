@@ -69,6 +69,15 @@ static char	*DBfield_type_string(const ZBX_FIELD *field)
 
 	switch (field->type)
 	{
+		case ZBX_TYPE_ID:
+#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
+			strscpy(type, "bigint");
+#elif defined(HAVE_MYSQL)
+			strscpy(type, "bigint unsigned");
+#elif defined(HAVE_ORACLE)
+			strscpy(type, "number(20)");
+#endif
+			break;
 		case ZBX_TYPE_INT:
 #if defined(HAVE_ORACLE)
 			strscpy(type, "number(10)");
@@ -145,33 +154,246 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 #endif
 }
 
-static int	DBcreate_dbversion_table()
+static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const ZBX_FIELD *field)
 {
-	char		*sql = NULL;
-	size_t		sql_alloc = 128, sql_offset = 0;
-	const ZBX_TABLE	*table;
-	int		ret = FAIL;
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
+			table_name);
 
-	if (NULL == (table = DBget_table("dbversion")))
-		assert(0);
+#if defined(HAVE_MYSQL)
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#elif defined(HAVE_ORACLE)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s null", field->name);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s drop not null", field->name);
+#endif
+}
+
+static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
+			table_name);
+
+#if defined(HAVE_MYSQL)
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#elif defined(HAVE_ORACLE)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s not null", field->name);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set not null", field->name);
+#endif
+}
+
+static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s add ", table_name);
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+}
+
+static void	DBcreate_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const char *index_name, const char *fields, int unique)
+{
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "create");
+	if (0 != unique)
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " unique");
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " index %s on %s (%s)", index_name, table_name, fields);
+}
+
+static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const char *index_name)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop index %s", index_name);
+#if defined(HAVE_MYSQL)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " on %s", table_name);
+#endif
+}
+
+static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, int id, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s"
+			" add constraint c_%s_%d foreign key (%s) references %s (%s)",
+			table_name, table_name, id, field->name, field->fk_table, field->fk_field);
+	if (0 != (field->fk_flags & ZBX_FK_CASCADE_DELETE))
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " on delete cascade");
+}
+
+static int	DBreorg_table(const char *table_name)
+{
+#if defined(HAVE_IBM_DB2)
+	if (ZBX_DB_OK <= DBexecute("call sysproc.admin_cmd ('reorg table %s')", table_name))
+		return SUCCEED;
+
+	return FAIL;
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBcreate_table(const ZBX_TABLE *table)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
 	DBcreate_table_sql(&sql, &sql_alloc, &sql_offset, table);
 
-	DBbegin();
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-	{
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into dbversion (mandatory,optional) values (%d,%d)",
-				ZBX_FIRST_DB_VERSION, ZBX_FIRST_DB_VERSION);
-		if (ZBX_DB_OK <= DBexecute("%s", sql))
-			ret = SUCCEED;
-	}
-	DBend(ret);
+		ret = SUCCEED;
 
 	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBadd_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBset_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBdrop_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBcreate_index(const char *table_name, const char *index_name, const char *fields, int unique)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBcreate_index_sql(&sql, &sql_alloc, &sql_offset, table_name, index_name, fields, unique);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBdrop_index(const char *table_name, const char *index_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBdrop_index_sql(&sql, &sql_alloc, &sql_offset, table_name, index_name);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBadd_foreign_key_sql(&sql, &sql_alloc, &sql_offset, table_name, id, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+
+static int	DBcreate_dbversion_table()
+{
+	const ZBX_TABLE	*table;
+	int		ret;
+
+	if (NULL == (table = DBget_table("dbversion")))
+		assert(0);
+
+	DBbegin();
+	if (SUCCEED == (ret = DBcreate_table(table)))
+	{
+		if (ZBX_DB_OK > DBexecute("insert into dbversion (mandatory,optional) values (%d,%d)",
+				ZBX_FIRST_DB_VERSION, ZBX_FIRST_DB_VERSION))
+		{
+			ret = FAIL;
+		}
+	}
+	DBend(ret);
 
 	return ret;
 }
@@ -219,21 +441,9 @@ static int	DBset_version(int version, unsigned char mandatory)
 static int	DBmodify_proxy_table_id_field(const char *table_name)
 {
 #if defined(HAVE_POSTGRESQL)
-	char		*sql = NULL;
-	size_t		sql_alloc = 64, sql_offset = 0;
 	const ZBX_FIELD	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0};
-	int		ret = FAIL;
 
-	sql = zbx_malloc(sql, sql_alloc);
-
-	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, &field);
-
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = SUCCEED;
-
-	zbx_free(sql);
-
-	return ret;
+	return DBmodify_field_type(table_name, &field);
 #else
 	return SUCCEED;
 #endif
@@ -288,21 +498,81 @@ static int	DBpatch_02010007()
 
 static int	DBpatch_02010008()
 {
-	char		*sql = NULL;
-	size_t		sql_alloc = 64, sql_offset = 0;
 	const ZBX_FIELD	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	int		ret = FAIL;
 
-	sql = zbx_malloc(sql, sql_alloc);
+	return DBmodify_field_type("triggers", &field);
+}
 
-	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, "triggers", &field);
+static int	DBpatch_02010009()
+{
+	const ZBX_FIELD	field = {"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("httptest", &field);
+}
+
+static int	DBpatch_02010010()
+{
+	const ZBX_FIELD	field = {"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_02010011()
+{
+	const char	*sql =
+			"update httptest set hostid=("
+				"select a.hostid"
+				" from applications a"
+				" where a.applicationid = httptest.applicationid"
+			")";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = SUCCEED;
+		return SUCCEED;
 
-	zbx_free(sql);
+	return FAIL;
+}
 
-	return ret;
+static int	DBpatch_02010012()
+{
+	const ZBX_FIELD	field = {"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("httptest", &field);
+}
+
+static int	DBpatch_02010013()
+{
+	const ZBX_FIELD	field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_02010014()
+{
+	return DBdrop_index("httptest", "httptest_2");
+}
+
+static int	DBpatch_02010015()
+{
+	return DBcreate_index("httptest", "httptest_2", "hostid,name", 1);
+}
+
+static int	DBpatch_02010016()
+{
+	return DBcreate_index("httptest", "httptest_4", "templateid", 0);
+}
+
+static int	DBpatch_02010017()
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("httptest", 2, &field);
+}
+
+static int	DBpatch_02010018()
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("httptest", 3, &field);
 }
 
 int	DBcheck_version()
@@ -319,6 +589,16 @@ int	DBcheck_version()
 		{DBpatch_02010006, 2010006, 0, 1},
 		{DBpatch_02010007, 2010007, 0, 0},
 		{DBpatch_02010008, 2010008, 0, 1},
+		{DBpatch_02010009, 2010009, 0, 1},
+		{DBpatch_02010010, 2010010, 0, 1},
+		{DBpatch_02010011, 2010011, 0, 1},
+		{DBpatch_02010012, 2010012, 0, 1},
+		{DBpatch_02010013, 2010013, 0, 1},
+		{DBpatch_02010014, 2010014, 0, 1},
+		{DBpatch_02010015, 2010015, 0, 1},
+		{DBpatch_02010016, 2010016, 0, 1},
+		{DBpatch_02010017, 2010017, 0, 1},
+		{DBpatch_02010018, 2010018, 0, 1},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";
