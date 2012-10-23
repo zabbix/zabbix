@@ -1485,7 +1485,7 @@ static void	DCsync_functions(DB_RESULT result)
 		DCstrpool_replace(found, &function->function, row[2]);
 		DCstrpool_replace(found, &function->parameter, row[3]);
 
-		/* process trigger information */
+		/* spread triggers with time based-fuctions between timer processes (load balancing) */
 
 		if (SUCCEED == is_time_function(function->function))
 		{
