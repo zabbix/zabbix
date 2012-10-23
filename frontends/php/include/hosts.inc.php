@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function setHostGroupInternal($groupids, $internal = ZBX_NOT_INTERNAL_GROUP) {
 	zbx_value2array($groupids);
@@ -1298,6 +1297,7 @@ function getDeletableHostGroups($groupids = null) {
 	while ($group = DBfetch($db_groups)) {
 		$deletable_groupids[$group['groupid']] = $group['groupid'];
 	}
+
 	return $deletable_groupids;
 }
 
@@ -1345,4 +1345,3 @@ function isTemplateInHost($hosts) {
 
 	return 0;
 }
-?>
