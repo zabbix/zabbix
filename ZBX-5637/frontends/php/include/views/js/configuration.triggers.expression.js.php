@@ -55,6 +55,9 @@
 </script>
 <?php
 if (!empty($this->data['insert'])) {
+	if ($this->data['function'] == 'count' && !empty($this->data['param']['2'])) {
+		$this->data['param']['2'] = '"'.$this->data['param']['2'].'"';
+	}
 	$expression = sprintf('{%s:%s.%s(%s%s)}%s%s',
 		$this->data['item_host'],
 		$this->data['item_key'],

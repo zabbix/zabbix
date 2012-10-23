@@ -55,13 +55,6 @@ $param1_sec_count = array(
 		'T' => T_ZBX_INT // type
 	)
 );
-$param1_sec_count_no_timeshift = array(
-	array(
-		'C' => _('Last of').' (T)', // caption
-		'T' => T_ZBX_INT, // type
-		'M' => $metrics // metrcis
-	)
-);
 $param1_sec = array(
 	array(
 		'C' => _('Last of').' (T)', // caption
@@ -202,22 +195,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'count[<]' => array(
-		'description' =>  _('Number of successfully retrieved values V of a period T is > N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T > N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[>]' => array(
-		'description' =>  _('Number of successfully retrieved values V of a period T is < N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T < N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[=]' => array(
-		'description' =>  _('Number of successfully retrieved values V of a period T is = N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T = N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[#]' => array(
-		'description' =>  _('Number of successfully retrieved values V of a period T is NOT N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
@@ -307,13 +300,13 @@ $functions = array(
 	),
 	'str[=]' => array(
 		'description' =>  _('Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise'),
-		'params' => $param2_val_sec,
-		'allowed_types' => $allowed_types_str
+		'params' => $param1_sec_count,
+		'allowed_types' => $allowed_types_any
 	),
 	'str[#]' => array(
 		'description' =>  _('Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise'),
-		'params' => $param2_val_sec,
-		'allowed_types' => $allowed_types_str
+		'params' => $param1_sec_count,
+		'allowed_types' => $allowed_types_any
 	),
 	'strlen[<]' => array(
 		'description' =>  _('Length of last (most recent) T value in characters is < N'),

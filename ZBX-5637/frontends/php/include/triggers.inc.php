@@ -148,13 +148,7 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
 			'value_types' => $value_types_all
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str'] = array(
-			'args' => array(
-				array('type' => 'str', 'mandat' => true),
-				array('type' => 'sec_num')
-			),
-			'value_types' => $value_types_char
-		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['strlen'] = array(
 			'args' => array(
 				array('type' => 'sec_num', 'mandat' => true),
