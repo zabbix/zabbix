@@ -58,14 +58,14 @@ if (isset($_REQUEST['favobj'])) {
 		$result = false;
 
 		if ($_REQUEST['favaction'] == 'add') {
-			$result = CFavorite::add('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = add2favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n".
 					'$("addrm_fav").onclick = function() { rm4favorites("sysmapid", "'.$_REQUEST['favid'].'", 0); }'."\n";
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = CFavorite::remove('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = rm4favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
 					'$("addrm_fav").onclick = function() { add2favorites("sysmapid", "'.$_REQUEST['favid'].'"); }'."\n";
