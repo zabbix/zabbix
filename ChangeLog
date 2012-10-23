@@ -15,7 +15,6 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 Bug fixes:
 ..F....... [ZBX-5603] fixed already defined constant error when db is unavailable (Vedmak)
 ..F....... [ZBX-5720] fixed incorrect error when delete internal host group (Vedmak)
-A......... [ZBX-5714] fixed inconsistence between shorten and refer in UserMacro API (Eduard)
 A......... [ZBX-5643] fixed sql error by adding permission check for triggers when adding nonexistent dependencies via API (Toms)
 A......... [ZBX-5643] fixed circularity check for trigger addDependencies() in API (Toms)
 ..F....... [ZBX-5691] fixed error when create graph if oracle configured to use comma as decimal separator (Vedmak)
