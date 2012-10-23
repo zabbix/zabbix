@@ -69,7 +69,7 @@ $param1_str = array(
 );
 $param2_sec_count = array(
 	array(
-		'C' => 'O', // caption
+		'C' => 'V', // caption
 		'T' => T_ZBX_STR
 	),
 	array(
