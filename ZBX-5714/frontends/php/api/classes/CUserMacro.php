@@ -239,15 +239,14 @@ class CUserMacro extends CZBXAPI {
 					$result = $macro['rowscount'];
 				}
 				else {
-					$globalmacroids[$macro['globalmacroid']] = $macro['globalmacroid'];
-
 					if ($options['output'] == API_OUTPUT_SHORTEN) {
-						$result[$macro['globalmacroid']] = array('globalmacroid' => $macro['globalmacroid']);
+						$result[$macro['globalmacroid']] = $macro;
 					}
 					else {
 						if (!isset($result[$macro['globalmacroid']])) {
 							$result[$macro['globalmacroid']] = array();
 						}
+
 						$result[$macro['globalmacroid']] += $macro;
 					}
 				}
@@ -263,16 +262,14 @@ class CUserMacro extends CZBXAPI {
 					$result = $macro['rowscount'];
 				}
 				else {
-					$hostmacroids[$macro['hostmacroid']] = $macro['hostmacroid'];
-
 					if ($options['output'] == API_OUTPUT_SHORTEN) {
-						$result[$macro['hostmacroid']] = $macro['hostmacroid'];
+						$result[$macro['hostmacroid']] = $macro;
 					}
 					else {
 						$hostids[$macro['hostid']] = $macro['hostid'];
 
 						if (!isset($result[$macro['hostmacroid']])) {
-							$result[$macro['hostmacroid']]= array();
+							$result[$macro['hostmacroid']] = array();
 						}
 
 						// groups
@@ -315,6 +312,7 @@ class CUserMacro extends CZBXAPI {
 							}
 							$result[$macro['hostmacroid']]['hosts'][] = array('hostid' => $macro['hostid']);
 						}
+
 						$result[$macro['hostmacroid']] += $macro;
 					}
 				}
@@ -391,6 +389,7 @@ class CUserMacro extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
