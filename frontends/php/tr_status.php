@@ -400,6 +400,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 				'triggerids' => $triggerIdsWithoutUnackEvents,
 				'filter' => array(
 					'object' => EVENT_OBJECT_TRIGGER,
+					'value_changed' => TRIGGER_VALUE_CHANGED_YES
 				),
 				'nopermissions' => true
 			);
