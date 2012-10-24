@@ -902,7 +902,7 @@ class CTemplate extends CHostGeneral {
 
 			if (is_array($options['selectHttpTests']) || str_in_array($options['selectHttpTests'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectHttpTests'];
-				$httpTests = API::WebCheck()->get($objParams);
+				$httpTests = API::HttpTest()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($httpTests, 'name');
@@ -927,7 +927,7 @@ class CTemplate extends CHostGeneral {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$httpTests = API::WebCheck()->get($objParams);
+				$httpTests = API::HttpTest()->get($objParams);
 				$httpTests = zbx_toHash($httpTests, 'hostid');
 				foreach ($result as $hostId => $host) {
 					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
