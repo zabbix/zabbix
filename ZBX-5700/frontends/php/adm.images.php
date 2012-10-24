@@ -43,8 +43,8 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['imageid'])) {
-		$db_image = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid = '.get_request('imageid')));
-	if (empty($db_image)) {
+	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.get_request('imageid')));
+	if (empty($dbImage)) {
 		access_deny();
 	}
 }
@@ -159,8 +159,8 @@ $data['widget'] = &$cnf_wdgt;
 if (!empty($data['form'])) {
 	if (isset($_REQUEST['imageid'])) {
 		$data['imageid'] = $_REQUEST['imageid'];
-		$data['imagename'] = $db_image['name'];
-		$data['imagetype'] = $db_image['imagetype'];
+		$data['imagename'] = $dbImage['name'];
+		$data['imagetype'] = $dbImage['imagetype'];
 	}
 	else {
 		$data['imageid'] = null;

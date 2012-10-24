@@ -57,15 +57,33 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-$_REQUEST['go'] = get_request('go', 'none');
-
 /*
  * Permissions
  */
 if (isset($_REQUEST['applicationid'])) {
-	$db_application = DBfetch(DBselect('SELECT s.name,s.hostid FROM applications s WHERE s.applicationid='.get_request('applicationid')));
-	if (empty($db_application)) {
+	$dbApplication = API::Application()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'applicationids' => get_request('applicationid')
+	));
+	if (empty($dbApplication)) {
 		access_deny();
+	}
+}
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['applications']) || !is_array($_REQUEST['applications'])) {
+		access_deny();
+	}
+	else {
+		foreach ($_REQUEST['applications'] as $applicationid) {
+			$dbApplications = API::Application()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'applicationids' => $applicationid,
+				'output' => API_OUTPUT_EXTEND
+			));
+			if (empty($dbApplications)) {
+				access_deny();
+			}
+		}
 	}
 }
 if (get_request('groupid', 0) > 0) {
@@ -86,6 +104,7 @@ if (get_request('apphostid', 0) > 0) {
 		access_deny();
 	}
 }
+$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Actions
@@ -99,24 +118,24 @@ if (isset($_REQUEST['save'])) {
 
 	if (isset($_REQUEST['applicationid'])) {
 		$application['applicationid'] = $_REQUEST['applicationid'];
-		$db_applications = API::Application()->update($application);
+		$dbApplications = API::Application()->update($application);
 
 		$action = AUDIT_ACTION_UPDATE;
 		$msg_ok = _('Application updated');
 		$msg_fail = _('Cannot update application');
 	}
 	else{
-		$db_applications = API::Application()->create($application);
+		$dbApplications = API::Application()->create($application);
 
 		$action = AUDIT_ACTION_ADD;
 		$msg_ok = _('Application added');
 		$msg_fail = _('Cannot add application');
 	}
-	$result = DBend($db_applications);
+	$result = DBend($dbApplications);
 
 	show_messages($result, $msg_ok, $msg_fail);
 	if ($result) {
-		$applicationid = reset($db_applications['applicationids']);
+		$applicationid = reset($dbApplications['applicationids']);
 		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationid.']');
 		unset($_REQUEST['form']);
 	}
@@ -149,13 +168,13 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$applications = get_request('applications', array());
 
 	DBstart();
-	$db_applications = DBselect(
+	$dbApplications = DBselect(
 		'SELECT a.applicationid,a.name,a.hostid'.
 		' FROM applications a'.
 		' WHERE '.DBin_node('a.applicationid').
 			' AND '.DBcondition('a.applicationid', $applications)
 	);
-	while ($db_app = DBfetch($db_applications)) {
+	while ($db_app = DBfetch($dbApplications)) {
 		if (!isset($applications[$db_app['applicationid']])) {
 			continue;
 		}
@@ -218,8 +237,9 @@ if (isset($_REQUEST['form'])) {
 	$data['groupid'] = get_request('groupid', 0);
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['appname'] = $db_application['name'];
-		$data['apphostid'] = $db_application['hostid'];
+		$dbApplication = reset($dbApplication);
+		$data['appname'] = $dbApplication['name'];
+		$data['apphostid'] = $dbApplication['hostid'];
 
 	}
 	else {

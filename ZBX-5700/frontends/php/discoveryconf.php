@@ -58,23 +58,39 @@ check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
-$_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['dchecks'] = get_request('dchecks', array());
 
 /*
  * Permissions
  */
 if (isset($_REQUEST['druleid'])) {
-	$drules = API::DRule()->get(array(
+	$dbDRule = API::DRule()->get(array(
 		'druleids' => get_request('druleid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectDChecks' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
-	if (empty($drules)) {
+	if (empty($dbDRule)) {
 		access_deny();
 	}
 }
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['g_druleid']) || !is_array($_REQUEST['g_druleid'])) {
+		access_deny();
+	}
+	else {
+		foreach ($_REQUEST['g_druleid'] as $g_druleid) {
+			$dbDRules = API::DRule()->get(array(
+				'druleids' => $g_druleid,
+				'output' => API_OUTPUT_EXTEND
+			));
+			if (empty($dbDRules)) {
+				access_deny();
+			}
+		}
+	}
+}
+$_REQUEST['go'] = get_request('go', 'none');
 
 // ajax
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
@@ -197,7 +213,7 @@ if (isset($_REQUEST['form'])) {
 
 	// get drule
 	if (isset($data['druleid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['drule'] = reset($drules);
+		$data['drule'] = reset($dbDRule);
 		$data['drule']['uniqueness_criteria'] = -1;
 
 		if (!empty($data['drule']['dchecks'])) {

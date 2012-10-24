@@ -56,9 +56,23 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['regexpid'])) {
-	$regexp = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.get_request('regexpid')));
-	if (empty($regexp)) {
+	$regExp = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.get_request('regexpid')));
+	if (empty($regExp)) {
 		access_deny();
+	}
+}
+if (isset($_REQUEST['go']) && !isset($_REQUEST['regexpid'])) {
+	if (!isset($_REQUEST['regexpids']) || !is_array($_REQUEST['regexpids'])) {
+		access_deny();
+	}
+	else {
+		foreach ($_REQUEST['regexpids'] as $rId) {
+			$regExps = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.$rId));
+			if (empty($regExps)) {
+				access_deny();
+			}
+		}
+		unset($regExps);
 	}
 }
 
@@ -73,7 +87,7 @@ elseif (isset($_REQUEST['cancel_new_expression'])) {
 	unset($_REQUEST['new_expression']);
 }
 elseif (isset($_REQUEST['save'])) {
-	$regexp = array(
+	$regExp = array(
 		'name' => $_REQUEST['rename'],
 		'test_string' => $_REQUEST['test_string']
 	);
@@ -81,14 +95,14 @@ elseif (isset($_REQUEST['save'])) {
 
 	DBstart();
 	if (isset($_REQUEST['regexpid'])) {
-		$regexp['regexpid'] = $_REQUEST['regexpid'];
-		$result = updateRegexp($regexp, $expressions);
+		$regExp['regexpid'] = $_REQUEST['regexpid'];
+		$result = updateRegexp($regExp, $expressions);
 
 		$msg1 = _('Regular expression updated');
 		$msg2 = _('Cannot update regular expression');
 	}
 	else {
-		$result = addRegexp($regexp, $expressions);
+		$result = addRegexp($regExp, $expressions);
 
 		$msg1 = _('Regular expression added');
 		$msg2 = _('Cannot add regular expression');
@@ -105,30 +119,30 @@ elseif (isset($_REQUEST['save'])) {
 }
 elseif (isset($_REQUEST['go'])) {
 	if ($_REQUEST['go'] == 'delete') {
-		$regexpids = get_request('regexpid', array());
+		$regExpids = get_request('regexpid', array());
 		if (isset($_REQUEST['regexpids'])) {
-			$regexpids = $_REQUEST['regexpids'];
+			$regExpids = $_REQUEST['regexpids'];
 		}
 
-		zbx_value2array($regexpids);
+		zbx_value2array($regExpids);
 
-		$regexps = array();
-		foreach ($regexpids as $regexpid) {
-			$regexps[$regexpid] = getRegexp($regexpid);
+		$regExps = array();
+		foreach ($regExpids as $regExpid) {
+			$regExps[$regExpid] = getRegexp($regExpid);
 		}
 
 		DBstart();
-		$result = DBexecute('DELETE FROM regexps WHERE '.DBcondition('regexpid', $regexpids));
+		$result = DBexecute('DELETE FROM regexps WHERE '.DBcondition('regexpid', $regExpids));
 		$result = Dbend($result);
 
-		$regexpCount = count($regexpids);
+		$regExpCount = count($regExpids);
 		show_messages($result,
-			_n('Regular expression deleted', 'Regular expressions deleted', $regexpCount),
-			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regexpCount)
+			_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
+			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
 		);
 		if ($result) {
-			foreach ($regexps as $regexpid => $regexp) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regexpid.'] '._('Name').' ['.$regexp['name'].']');
+			foreach ($regExps as $regExpid => $regExp) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regExpid.'] '._('Name').' ['.$regExp['name'].']');
 			}
 
 			unset($_REQUEST['form']);
@@ -227,10 +241,10 @@ else {
 	$data['regexpids'] = array();
 
 	$db_regexps = DBselect('SELECT re.* FROM regexps re WHERE '.DBin_node('re.regexpid'));
-	while ($regexp = DBfetch($db_regexps)) {
-		$regexp['expressions'] = array();
-		$data['regexps'][$regexp['regexpid']] = $regexp;
-		$data['regexpids'][$regexp['regexpid']] = $regexp['regexpid'];
+	while ($regExp = DBfetch($db_regexps)) {
+		$regExp['expressions'] = array();
+		$data['regexps'][$regExp['regexpid']] = $regExp;
+		$data['regexpids'][$regExp['regexpid']] = $regExp['regexpid'];
 	}
 	order_result($data['regexps'], 'name');
 

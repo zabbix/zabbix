@@ -43,8 +43,8 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['valuemapid'])) {
-	$db_valuemap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.get_request('valuemapid')));
-	if (empty($db_valuemap)) {
+	$dbValueMap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.get_request('valuemapid')));
+	if (empty($dbValueMap)) {
 		access_deny();
 	}
 }
@@ -155,7 +155,7 @@ if (isset($_REQUEST['form'])) {
 
 	if (isset($data['valuemapid'])) {
 
-		$data['mapname'] = $db_valuemap['name'];
+		$data['mapname'] = $dbValueMap['name'];
 
 		if (empty($data['form_refresh'])) {
 			$data['mappings'] = DBfetchArray(DBselect('SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.$data['valuemapid']));
@@ -188,10 +188,10 @@ else {
 	$cnf_wdgt->addItem(BR());
 
 	$data['valuemaps'] = array();
-	$db_valuemaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
-	while ($db_valuemap = DBfetch($db_valuemaps)) {
-		$data['valuemaps'][$db_valuemap['valuemapid']] = $db_valuemap;
-		$data['valuemaps'][$db_valuemap['valuemapid']]['maps'] = array();
+	$dbValueMaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
+	while ($dbValueMap = DBfetch($dbValueMaps)) {
+		$data['valuemaps'][$dbValueMap['valuemapid']] = $dbValueMap;
+		$data['valuemaps'][$dbValueMap['valuemapid']]['maps'] = array();
 	}
 	order_result($data['valuemaps'], 'name');
 

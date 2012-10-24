@@ -32,8 +32,8 @@ $page['hist_arg'] = array();
 $page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// users
@@ -79,8 +79,6 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('alias', ZBX_SORT_UP);
 
-$_REQUEST['go'] = get_request('go', 'none');
-
 /*
  * Permissions
  */
@@ -90,6 +88,20 @@ if (isset($_REQUEST['userid'])) {
 		access_deny();
 	}
 }
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['group_userid']) || !is_array($_REQUEST['group_userid'])) {
+		access_deny();
+	}
+	else {
+		foreach ($_REQUEST['group_userid'] as $groupUserId) {
+			$usersChk = API::User()->get(array('userids' => $groupUserId, 'output' => API_OUTPUT_EXTEND));
+			if (empty($usersChk)) {
+				access_deny();
+			}
+		}
+	}
+}
+$_REQUEST['go'] = get_request('go', 'none');
 
 if (isset($_REQUEST['new_groups'])) {
 	$_REQUEST['new_groups'] = get_request('new_groups', array());
