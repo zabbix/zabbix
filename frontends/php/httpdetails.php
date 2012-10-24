@@ -80,7 +80,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Collect data
  */
-$db_httptest = API::WebCheck()->get(array(
+$db_httptest = API::HttpTest()->get(array(
 	'httptestids' => $_REQUEST['httptestid'],
 	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true

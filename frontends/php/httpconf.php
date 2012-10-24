@@ -150,7 +150,7 @@ $isDuplicateStepsFound = !empty($_REQUEST['steps']) ? validateHttpDuplicateSteps
 if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	$result = false;
 	if ($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])) {
-		$result = API::WebCheck()->delete($_REQUEST['httptestid']);
+		$result = API::HttpTest()->delete($_REQUEST['httptestid']);
 	}
 	show_messages($result, _('Scenario deleted'), _('Cannot delete scenario'));
 	if ($result) {
@@ -241,13 +241,13 @@ elseif (isset($_REQUEST['save'])) {
 
 		if (isset($_REQUEST['httptestid'])) {
 			$httpTest['httptestid'] = $httptestid = $_REQUEST['httptestid'];
-			$result = API::WebCheck()->update($httpTest);
+			$result = API::HttpTest()->update($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
 		}
 		else {
-			$result = API::WebCheck()->create($httpTest);
+			$result = API::HttpTest()->create($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
@@ -324,7 +324,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	show_messages($go_result, _('History cleared'), null);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
-	$go_result = API::WebCheck()->delete($_REQUEST['group_httptestid']);
+	$go_result = API::HttpTest()->delete($_REQUEST['group_httptestid']);
 	show_messages($go_result, _('Scenario deleted'), null);
 }
 

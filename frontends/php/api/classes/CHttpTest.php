@@ -19,7 +19,7 @@
 **/
 
 
-class CWebCheck extends CZBXAPI {
+class CHttpTest extends CZBXAPI {
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
 	private $history = 30;
