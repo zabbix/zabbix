@@ -181,6 +181,10 @@ elseif (isset($_REQUEST['save'])) {
 			$message_false = _('Cannot add scenario');
 		}
 
+		if (!empty($_REQUEST['application']) && !empty($_REQUEST['new_application'])) {
+			throw new Exception(_('Cannot create new application, web scenario is already assigned to application.'));
+		}
+
 		$steps = get_request('steps', array());
 		if (!empty($steps)) {
 			if ($isDuplicateStepsFound) {
@@ -209,22 +213,24 @@ elseif (isset($_REQUEST['save'])) {
 			'steps' => $steps
 		);
 
-		$db_app_result = DBselect(
-			'SELECT a.applicationid'.
-			' FROM applications a'.
-			' WHERE a.name='.zbx_dbstr($_REQUEST['application']).
-				' AND a.hostid='.$_REQUEST['hostid']
-		);
-		if ($applicationid = DBfetch($db_app_result)) {
-			$httpTest['applicationid'] = $applicationid['applicationid'];
+
+		if (!empty($_REQUEST['application'])) {
+			$dbApplication = DBfetch(DBselect(
+				'SELECT a.applicationid'.
+						' FROM applications a'.
+						' WHERE a.name='.zbx_dbstr($_REQUEST['application']).
+						' AND a.hostid='.zbx_dbstr($_REQUEST['hostid'])
+			));
+			$httpTest['applicationid'] = $dbApplication['applicationid'];
 		}
-		else {
+
+		if (!empty($_REQUEST['new_application'])) {
 			$result = API::Application()->create(array(
-				'name' => $_REQUEST['application'],
+				'name' => $_REQUEST['new_application'],
 				'hostid' => $_REQUEST['hostid']
 			));
 			if (!$result) {
-				throw new Exception(_('Cannot add new application.').' [ '.$application.' ]');
+				throw new Exception(_s('Cannot add new application "%1$s".', $_REQUEST['new_application']));
 			}
 			else {
 				$httpTest['applicationid'] = reset($result['applicationids']);
@@ -265,6 +271,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	catch (Exception $e) {
 		DBend(false);
+		error($e->getMessage());
 		show_messages(false, null, $message_false);
 	}
 }
@@ -347,6 +354,7 @@ $data = array(
 if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$data['httptestid'] = get_request('httptestid', null);
 	$data['form'] = get_request('form');
+	$data['form_refresh'] = get_request('form_refresh');
 	$data['hostname'] = get_request('hostname', '');
 	if (empty($data['hostname'])) {
 		$hostInfo = get_host_by_hostid($data['hostid'], true);
@@ -363,6 +371,7 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 
 		$data['name'] = $dbHttpTest['name'];
 		$data['application'] = $dbHttpTest['application'] ? $dbHttpTest['application'] : '';
+		$data['new_application'] = '';
 		$data['delay'] = $dbHttpTest['delay'];
 		$data['status'] = $dbHttpTest['status'];
 		$data['agent'] = $dbHttpTest['agent'];
@@ -404,14 +413,14 @@ else {
 	$data['showAllApps'] = $showAllApps;
 
 	$data['db_apps'] = array();
-	$db_app_result = DBselect(
+	$dbApplication = DBselect(
 		'SELECT DISTINCT h.name AS hostname,a.*'.
 		' FROM applications a,hosts h'.
 		' WHERE a.hostid=h.hostid'.
 			($data['hostid'] > 0 ? ' AND h.hostid='.$data['hostid'] : '').
 			' AND '.DBcondition('h.hostid', $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array())
 	);
-	while ($db_app = DBfetch($db_app_result)) {
+	while ($db_app = DBfetch($dbApplication)) {
 		$db_app['scenarios_cnt'] = 0;
 		$data['db_apps'][$db_app['applicationid']] = $db_app;
 	}
