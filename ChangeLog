@@ -2,6 +2,9 @@ Changes for 2.1.0
 
 New features:
 ....I...S. [ZBXNEXT-1472] added support of parallel processing of time-based functions (Sasha)
+..F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard)
+.......PS. [ZBX-3449] added support of multiple dynamic SNMP indexes (Sasha)
+..F....... [ZBXNEXT-1441] added media type name to action operations description (Vedmak)
 A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
@@ -12,6 +15,10 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5714] fixed inconsistency between shorten and refer in UserMacro API (Eduard)
+..F....... [ZBX-5711] added caching for frontend favorite values (Toms)
+..F....... [ZBX-5711] removed redundant queries when editing web scenario (Toms)
+A.F....... [ZBX-5565] fixed html is returned on api requests if db is down (Vedmak)
 ..F....... [ZBX-3396] added error message if FreeType support is missing (Toms)
 ...G...... [ZBX-4355] fixed response on check inodes on file systems not supporting them (Sasha)
 ..F....... [ZBX-5673] fixed incorrect Y-scale if point value > 10 PB (Oleg)
@@ -33,17 +40,31 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.4rc1
 
 New features:
+..F....... [ZBXNEXT-1398] implemented flickerfree screen shadowing for old screen data (Eduard)
 A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 ..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
 .......PS. [ZBX-4638] added support of {HOST.HOST}, {HOST.NAME}, {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in "params" field for SSH, Telnet and DB monitor items (Sasha)
 .....J.... [ZBX-4663] added possibility to use dots in JMX attribute names (dimir)
 ..F....... [ZBX-5556] action recovery message body can now be empty (Vedmak)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Czech, French, Hungarian, Italian, Polish, Slovak and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Chinese (China), Chinese (Taiwan), Czech, French, Hungarian, Italian, Polish, Slovak and Russian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBXNEXT-1426] added initial Persian translation (Richlv)
 A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5603] fixed already defined constant error when db is unavailable (Vedmak)
+..F....... [ZBX-5720] fixed incorrect error when deleting internal host group (Vedmak)
+A......... [ZBX-5643] fixed SQL error by adding permission check for triggers when adding nonexistent dependencies via API (Toms)
+A......... [ZBX-5643] fixed circularity check for trigger addDependencies() in API (Toms)
+..F....... [ZBX-5691] fixed error when creating graph if Oracle configured to use comma as decimal separator (Vedmak)
+..F....... [ZBX-5671] fixed error when saving configuration in Administration -> General with Oracle backend (Vedmak)
+A......... [ZBX-5693] fixed possibility to create graph with the same name as existing graph prototype within template (Toms)
+A......... [ZBX-5698] fixed API response after "triggerprototype.create", now request returns "triggerids" after INSERT (Oleg)
+A.F....... [ZBX-5648] fixed problems with "templateid" in API; added check for "templateid" in graphs, triggers, items, screens and template screens; fixed full clone; fixed screen forms; fixed messages in API (Oleg)
+..F....... [ZBX-5679] fixed icon mapping icon preview in configuration form (Vedmak)
+..F....... [ZBX-5137] fixed host/group dropdowns changing selected value on refresh after page actions (Vedmak)
+..F....... [ZBX-5688] fixed trigger expression suffix support for graph triggers, only KMG were supported (Vedmak)
+..F....... [ZBX-5665] fixed LLD created triggers not being deleted when related trigger prototype is deleted (Vedmak)
 ...G...... [ZBX-5661] fixed keys "vfs.dev.read" and "vfs.dev.write" with "ops" and "sps" parameters on Linux and FreeBSD (Andris)
 ...G...... [ZBX-5614] fixed agent compiling problem on OpenBSD 5.1 (Andris)
 ........S. [ZBX-5674] fixed execution of actions with SSH commands with "Public key" autentication (Sasha)
@@ -1113,6 +1134,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+.......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
 A......... [ZBX-4097] changed the "application", "host" and "group" parameters for item.get and trigger.get to be case sensitive (Pavels)

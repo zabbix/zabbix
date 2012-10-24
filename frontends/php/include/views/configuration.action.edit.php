@@ -334,8 +334,8 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 		$operation['mediatypeid'] = 0;
 	}
 
-	$details = new CSpan(get_operation_desc(SHORT_DESCRIPTION, $operation));
-	$details->setHint(get_operation_desc(LONG_DESCRIPTION, $operation));
+	$details = new CSpan(get_operation_descr(SHORT_DESCRIPTION, $operation));
+	$details->setHint(get_operation_descr(LONG_DESCRIPTION, $operation));
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$esc_steps_txt = null;

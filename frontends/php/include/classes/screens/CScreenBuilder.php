@@ -50,6 +50,11 @@ class CScreenBuilder {
 	public $mode;
 
 	/**
+	 * @see Request timestamp
+	 */
+	public $timestamp;
+
+	/**
 	 * Host id
 	 *
 	 * @var string
@@ -91,6 +96,7 @@ class CScreenBuilder {
 	 * @param boolean	$options['isFlickerfree']
 	 * @param string	$options['pageFile']
 	 * @param int		$options['mode']
+	 * @param int		$options['timestamp']
 	 * @param int		$options['hostid']
 	 * @param int		$options['period']
 	 * @param int		$options['stime']
@@ -102,6 +108,7 @@ class CScreenBuilder {
 	public function __construct(array $options = array()) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
+		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
 
 		// get page file
@@ -384,6 +391,7 @@ class CScreenBuilder {
 						'isFlickerfree' => $this->isFlickerfree,
 						'pageFile' => $this->pageFile,
 						'mode' => $this->mode,
+						'timestamp' => $this->timestamp,
 						'hostid' => $this->hostid,
 						'profileIdx' => $this->profileIdx,
 						'profileIdx2' => $this->profileIdx2,
@@ -550,6 +558,15 @@ class CScreenBuilder {
 	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');
+	}
+
+	/**
+	 * Insert javascript to clean all screen items.
+	 *
+	 * @static
+	 */
+	public static function insertScreenCleanJs() {
+		zbx_add_post_js('window.flickerfreeScreen.cleanAll();');
 	}
 
 	/**

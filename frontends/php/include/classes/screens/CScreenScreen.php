@@ -37,6 +37,7 @@ class CScreenScreen extends CScreenBase {
 		$screenBuilder = new CScreenBuilder(array(
 			'isFlickerfree' => $this->isFlickerfree,
 			'mode' => ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) ? SCREEN_MODE_SLIDESHOW : SCREEN_MODE_PREVIEW,
+			'timestamp' => $this->timestamp,
 			'screen' => $screen,
 			'period' => $this->timeline['period'],
 			'stime' => $this->timeline['stimeNow'],

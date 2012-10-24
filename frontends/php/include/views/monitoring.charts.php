@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -47,12 +47,14 @@ if (!empty($this->data['graphid'])) {
 	$screen = CScreenBuilder::getScreen(array(
 		'resourcetype' => SCREEN_RESOURCE_CHART,
 		'graphid' => $this->data['graphid'],
-		'period' => $this->data['period'],
-		'stime' => $this->data['stime'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['graphid']
 	));
-	$chartsWidget->addItem($screen->get());
+
+	$chartTable = new CTable(_('No graphs defined.'), 'maxwidth');
+	$chartTable->addRow($screen->get());
+
+	$chartsWidget->addItem($chartTable);
 
 	CScreenBuilder::insertScreenStandardJs(array(
 		'timeline' => $screen->timeline,

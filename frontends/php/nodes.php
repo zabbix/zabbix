@@ -50,7 +50,7 @@ check_fields($fields);
 /*
  * Permissions
  */
-$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
+$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST);
 if (count($available_nodes) == 0) {
 	access_deny();
 }

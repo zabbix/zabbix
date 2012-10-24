@@ -59,7 +59,7 @@ class CScreenChart extends CScreenBase {
 			$loadSBox = 1;
 			$src = 'chart2.php';
 		}
-		$src .= '?graphid='.$this->graphid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
+		$src .= '?graphid='.$this->graphid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].$this->getProfileUrlParams();
 
 		$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($this->graphid));
 
@@ -90,14 +90,7 @@ class CScreenChart extends CScreenBase {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
-			// graph container
-			$graphContainer = new CCol();
-			$graphContainer->setAttribute('id', $containerId);
-
-			$item = new CTableInfo(_('No graphs defined.'), 'chart');
-			$item->addRow($graphContainer);
-
-			return $this->getOutput($item, true, array('graphid' => $this->graphid));
+			return $this->getOutput(new CDiv(null, 'center', $containerId), true, array('graphid' => $this->graphid));
 		}
 	}
 }
