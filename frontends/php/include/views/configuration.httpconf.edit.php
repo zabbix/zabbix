@@ -28,34 +28,50 @@ $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
 $httpForm = new CForm();
 $httpForm->setName('httpForm');
 $httpForm->addVar('form', $this->data['form']);
-$httpForm->addVar('hostid', $this->data['hostid']);
-if ($this->data['groupid'] > 0) {
-	$httpForm->addVar('groupid', $this->data['groupid']);
-}
+
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addVar('httptestid', $this->data['httptestid']);
 }
+
 $httpForm->addVar('steps', $this->data['steps']);
 
 /*
  * Scenario tab
  */
 $httpFormList = new CFormList('httpFormList');
-$httpFormList->addRow(_('Application'), array(
-	new CTextBox('application', $this->data['application'], ZBX_TEXTBOX_STANDARD_SIZE),
-	SPACE,
-	new CButton('select_app', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
-			'&dstfrm='.$httpForm->getName().'&dstfld1=application'.
-			'&only_hostid='.$this->data['hostid'].'", 500, 600, "application");',
-		'formlist'
+
+// Host
+$httpForm->addVar('hostid', $this->data['hostid']);
+$httpFormList->addRow(_('Host'), array(
+	new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
+	new CButton('btn_host', _('Select'),
+		'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid'.
+		'&dstfrm='.$httpForm->getName().'&dstfld1=hostname&dstfld2=hostid'.
+		'&noempty=1&submitParent=1", 450, 450);', 'formlist'
 	)
 ));
+
+// Name
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
 $nameTextBox->attr('autofocus', 'autofocus');
 $httpFormList->addRow(_('Name'), $nameTextBox);
 
-// append authentication to form list
+// Application
+$httpFormList->addRow(_('Application'), array(
+	new CTextBox('application', $this->data['application'], ZBX_TEXTBOX_STANDARD_SIZE, true),
+	new CButton('select_app', _('Select'),
+		'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+		'&dstfrm='.$httpForm->getName().'&dstfld1=application'.
+		'&only_hostid='.$this->data['hostid'].'", 500, 600, "application");', 'formlist'
+	)
+));
+
+// New application
+$httpFormList->addRow(_('New application'),
+	new CTextBox('new_application', $this->data['new_application'], ZBX_TEXTBOX_STANDARD_SIZE), false, null, 'new'
+);
+
+// Authentication
 $authenticationComboBox = new CComboBox('authentication', $this->data['authentication'], 'submit();');
 $authenticationComboBox->addItems(httptest_authentications());
 $httpFormList->addRow(_('Authentication'), $authenticationComboBox);
@@ -205,9 +221,6 @@ $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineb
 
 // append tabs to form
 $httpTab = new CTabView(array('remember' => true));
-if (!$this->data['form_refresh']) {
-	$httpTab->setSelected(0);
-}
 $httpTab->addTab('scenarioTab', _('Scenario'), $httpFormList);
 $httpTab->addTab('stepTab', _('Steps'), $httpStepFormList);
 $httpForm->addItem($httpTab);

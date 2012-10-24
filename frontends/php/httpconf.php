@@ -39,7 +39,7 @@ $fields = array(
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})||isset({save})'),
 	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'application' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Application')),
+	'application' =>	array(T_ZBX_STR, O_OPT, null, null, null, _('Application')),
 	'name' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Name')),
 	'delay' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	'isset({save})'),
@@ -59,6 +59,8 @@ $fields = array(
 	'sel_step' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534), null),
 	'group_httptestid' => array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'showdisabled' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'new_application' => array(T_ZBX_STR, O_OPT, null, null, null),
+	'hostname' => array(T_ZBX_STR, O_OPT, null, null, null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -87,12 +89,11 @@ if (!empty($_REQUEST['steps'])) {
  */
 $options = array(
 	'groups' => array(
-		'real_hosts' => true,
-		'not_proxy_hosts' => true,
 		'editable' => true
 	),
 	'hosts' => array(
-		'editable' => true
+		'editable' => true,
+		'templated_hosts' => true
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null)
@@ -344,33 +345,37 @@ $data = array(
 );
 
 if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
-	$data['groupid'] = get_request('groupid', 0);
 	$data['httptestid'] = get_request('httptestid', null);
 	$data['form'] = get_request('form');
-	$data['form_refresh'] = get_request('form_refresh', 0);
+	$data['hostname'] = get_request('hostname', '');
+	if (empty($data['hostname'])) {
+		$hostInfo = get_host_by_hostid($data['hostid'], true);
+		$data['hostname'] = $hostInfo['name'];
+	}
 
-	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)) {
-		$db_httptest = DBfetch(DBselect(
-			'SELECT wt.*,a.name AS application'.
-			' FROM httptest wt,applications a'.
-			' WHERE a.applicationid=wt.applicationid'.
-				' AND wt.httptestid='.$_REQUEST['httptestid']
+	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh']))) {
+		$dbHttpTest = DBfetch(DBselect(
+			'SELECT ht.*,a.name AS application'.
+			' FROM httptest ht'.
+			' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
+			' WHERE ht.httptestid='.zbx_dbstr($_REQUEST['httptestid'])
 		));
 
-		$data['name'] = $db_httptest['name'];
-		$data['application'] = $db_httptest['application'];
-		$data['delay'] = $db_httptest['delay'];
-		$data['status'] = $db_httptest['status'];
-		$data['agent'] = $db_httptest['agent'];
-		$data['macros'] = $db_httptest['macros'];
-		$data['authentication'] = $db_httptest['authentication'];
-		$data['http_user'] = $db_httptest['http_user'];
-		$data['http_password'] = $db_httptest['http_password'];
+		$data['name'] = $dbHttpTest['name'];
+		$data['application'] = $dbHttpTest['application'] ? $dbHttpTest['application'] : '';
+		$data['delay'] = $dbHttpTest['delay'];
+		$data['status'] = $dbHttpTest['status'];
+		$data['agent'] = $dbHttpTest['agent'];
+		$data['macros'] = $dbHttpTest['macros'];
+		$data['authentication'] = $dbHttpTest['authentication'];
+		$data['http_user'] = $dbHttpTest['http_user'];
+		$data['http_password'] = $dbHttpTest['http_password'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
 	}
 	else {
 		$data['name'] = get_request('name', '');
 		$data['application'] = get_request('application', '');
+		$data['new_application'] = get_request('new_application', '');
 		$data['delay'] = get_request('delay', 60);
 		$data['status'] = get_request('status', HTTPTEST_STATUS_ACTIVE);
 		$data['agent'] = get_request('agent', '');
@@ -379,6 +384,13 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 		$data['http_user'] = get_request('http_user', '');
 		$data['http_password'] = get_request('http_password', '');
 		$data['steps'] = get_request('steps', array());
+	}
+
+	if (!empty($data['application'])) {
+		$appExists = DBfetch(DBselect('SELECT a.name FROM applications a WHERE a.name='.zbx_dbstr($data['application']).' AND a.hostid='.zbx_dbstr($data['hostid'])));
+		if (!$appExists) {
+			$data['application'] = '';
+		}
 	}
 
 	// render view
