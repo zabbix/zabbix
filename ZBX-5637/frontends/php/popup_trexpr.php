@@ -81,7 +81,8 @@ $param2_sec_count = array(
 $param3_sec_val = array(
 	array(
 		'C' => _('Last of').' (T)', // caption
-		'T' => T_ZBX_INT
+		'T' => T_ZBX_INT, // type
+		'M' => $metrics // metrcis
 	),
 	array(
 		'C' => 'V', // caption

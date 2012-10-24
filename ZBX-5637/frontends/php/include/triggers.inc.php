@@ -65,7 +65,7 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count'] = array(
 			'args' => array(
-				array('type' => 'sec_num','mandat' => true),
+				array('type' => 'sec_num', 'mandat' => true),
 				array('type' => 'str'),
 				array('type' => 'str'),
 				array('type' => 'sec')

@@ -79,7 +79,7 @@ $addExpressionButton = new CButton(
 	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
-		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 240);',
+		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 265);',
 	'formlist'
 );
 if ($this->data['limited'] == 'yes') {

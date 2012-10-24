@@ -56,7 +56,7 @@ $expressionFormList->addRow(_('Item'), $item);
 
 // append function to form list
 $functionComboBox = new CComboBox('expr_type', $this->data['expr_type'], 'submit()');
-$functionComboBox->addStyle('width: 373px;');
+$functionComboBox->addStyle('width: 605px;');
 foreach ($this->data['functions'] as $id => $f) {
 	// if user has selected an item, we are filtering out the triggers that can't work with it
 	if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
