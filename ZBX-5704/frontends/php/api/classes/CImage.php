@@ -411,9 +411,6 @@ class CImage extends CZBXAPI {
 			if (!isset($image['imageid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for image.'));
 			}
-			if (empty($image['image'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image has empty content.'));
-			}
 
 			$imageExists = $this->get(array(
 				'filter' => array('name' => $image['name']),
@@ -433,14 +430,12 @@ class CImage extends CZBXAPI {
 			if (isset($image['imagetype'])) {
 				$values['imagetype'] = $image['imagetype'];
 			}
-			if (isset($image['image'])) {
+			if (!empty($image['image'])) {
 				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
 
 				// validate image
-				if (!empty($image['image'])) {
-					$this->checkImage($image['image']);
-				}
+				$this->checkImage($image['image']);
 
 				switch ($DB['TYPE']) {
 					case ZBX_DB_POSTGRESQL:
