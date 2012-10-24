@@ -89,6 +89,7 @@ class CTemplate extends CHostGeneral {
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
+			'selectHttpTests'           => null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -396,6 +397,9 @@ class CTemplate extends CHostGeneral {
 					}
 					if (!is_null($options['selectScreens']) && !isset($result[$template['templateid']]['screens'])) {
 						$template['screens'] = array();
+					}
+					if (!is_null($options['selectHttpTests']) && !isset($result[$template['templateid']]['httpTests'])) {
+						$result[$template['templateid']]['httpTests'] = array();
 					}
 
 					// groupids
@@ -883,6 +887,50 @@ class CTemplate extends CHostGeneral {
 
 				foreach ($macro['hosts'] as $hnum => $host) {
 					$result[$host['hostid']]['macros'][] = $macros[$macroid];
+				}
+			}
+		}
+
+		// adding http tests
+		if (!is_null($options['selectHttpTests'])) {
+			$objParams = array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $templateids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			);
+
+			if (is_array($options['selectHttpTests']) || str_in_array($options['selectHttpTests'], $subselectsAllowedOutputs)) {
+				$objParams['output'] = $options['selectHttpTests'];
+				$httpTests = API::WebCheck()->get($objParams);
+
+				if (!is_null($options['limitSelects'])) {
+					order_result($httpTests, 'name');
+				}
+				$count = array();
+				foreach ($httpTests as $httpTestId => $httpTest) {
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$httpTest['hostid']])) {
+							$count[$httpTest['hostid']] = 0;
+						}
+						$count[$httpTest['hostid']]++;
+
+						if ($count[$httpTest['hostid']] > $options['limitSelects']) {
+							continue;
+						}
+					}
+
+					$result[$httpTest['hostid']]['httpTests'][] = $httpTests[$httpTestId];
+				}
+			}
+			elseif (API_OUTPUT_COUNT == $options['selectHttpTests']) {
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
+
+				$httpTests = API::WebCheck()->get($objParams);
+				$httpTests = zbx_toHash($httpTests, 'hostid');
+				foreach ($result as $hostId => $host) {
+					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
 				}
 			}
 		}
