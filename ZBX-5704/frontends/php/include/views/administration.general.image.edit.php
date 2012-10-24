@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,28 +10,28 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $imageForm = new CForm('post', null, 'multipart/form-data');
 $imageForm->setName('imageForm');
 $imageForm->addVar('form', $this->data['form']);
 $imageForm->addVar('imageid', $this->data['imageid']);
 
-$imageCb = new CComboBox('imagetype', $this->data['imagetype']);
-$imageCb->addItem(IMAGE_TYPE_ICON, _('Icon'));
-$imageCb->addItem(IMAGE_TYPE_BACKGROUND, _('Background'));
+$imageComboBox = new CComboBox('imagetype', $this->data['imagetype']);
+$imageComboBox->addItem(IMAGE_TYPE_ICON, _('Icon'));
+$imageComboBox->addItem(IMAGE_TYPE_BACKGROUND, _('Background'));
 
 // append form list
 $imageFormList = new CFormList('imageFormList');
 $imageFormList->addRow(_('Name'), new CTextBox('name', $this->data['imagename'], 64, 'no', 64));
-$imageFormList->addRow(_('Type'), $imageCb);
+$imageFormList->addRow(_('Type'), $imageComboBox);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 if (!empty($this->data['imageid'])) {
 	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
@@ -49,12 +49,16 @@ $imageTab->addTab('imageTab', _('Image'), $imageFormList);
 // append buttons
 $imageForm->addItem($imageTab);
 if (!empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
+	$imageForm->addItem(makeFormFooter(array(
+		new CSubmit('save', _('Save'))),
+		array(
+			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')),
+			new CButtonCancel()
+		)
+	));
 }
 else {
 	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButtonCancel()));
 }
 
 return $imageForm;
-?>
-

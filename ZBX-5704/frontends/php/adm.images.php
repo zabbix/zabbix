@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -54,6 +54,7 @@ if (isset($_REQUEST['save'])) {
 
 	try {
 		DBstart();
+
 		if (isset($_FILES['image'])) {
 			$file = new CUploadFile($_FILES['image']);
 
@@ -61,9 +62,7 @@ if (isset($_REQUEST['save'])) {
 				$image = null;
 			}
 			else {
-				if ($file->getSize() > ZBX_MAX_IMAGE_SIZE) {
-					throw new Exception(_('Image size must be less than 1MB'));
-				}
+				$file->validateSize();
 				$image = base64_encode($file->getContent());
 			}
 		}
@@ -122,8 +121,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
  */
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.images.php', 'redirect(this.options[this.selectedIndex].value);');
-$cmbConf->addItems(array(
+$confCombobox = new CComboBox('configDropDown', 'adm.images.php', 'redirect(this.options[this.selectedIndex].value);');
+$confCombobox->addItems(array(
 	'adm.gui.php' => _('GUI'),
 	'adm.housekeeper.php' => _('Housekeeper'),
 	'adm.images.php' => _('Images'),
@@ -136,21 +135,22 @@ $cmbConf->addItems(array(
 	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
-$form->addItem($cmbConf);
+$form->addItem($confCombobox);
 if (!isset($_REQUEST['form'])) {
 	$form->addItem(new CSubmit('form', _('Create image')));
 }
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
+$imageWidget = new CWidget();
+$imageWidget->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
 
-$data = array();
-$data['form'] = get_request('form');
-$data['widget'] = &$cnf_wdgt;
+$data = array(
+	'form' => get_request('form'),
+	'widget' => &$imageWidget
+);
 
 if (!empty($data['form'])) {
 	if (!empty($_REQUEST['imageid'])) {
-		$image = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
+		$image = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.$_REQUEST['imageid']));
 
 		$data['imageid'] = $_REQUEST['imageid'];
 		$data['imagename'] = $image['name'];
@@ -166,17 +166,16 @@ if (!empty($data['form'])) {
 }
 else {
 	$data['imagetype'] = get_request('imagetype', IMAGE_TYPE_ICON);
-	$options = array(
+	$data['images'] = API::Image()->get(array(
 		'filter' => array('imagetype' => $data['imagetype']),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'name'
-	);
-	$data['images'] = API::Image()->get($options);
+	));
 
 	$imageForm = new CView('administration.general.image.list', $data);
 }
 
-$cnf_wdgt->addItem($imageForm->render());
-$cnf_wdgt->show();
+$imageWidget->addItem($imageForm->render());
+$imageWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

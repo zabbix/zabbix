@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -39,8 +39,7 @@ class CUploadFile {
 		$maxSize = trim(ini_get('upload_max_filesize'));
 
 		if ($maxSize === '') {
-			// PHP default value
-			$maxSize = '2m';
+			$maxSize = '2m'; // PHP default value
 		}
 
 		return str2mem($maxSize);
@@ -117,7 +116,16 @@ class CUploadFile {
 	 * @return bool
 	 */
 	public function isValid() {
-		return $this->error == UPLOAD_ERR_OK;
+		return ($this->error == UPLOAD_ERR_OK);
+	}
+
+	/**
+	 * Validate image.
+	 */
+	public function validateSize() {
+		if ($this->size > ZBX_MAX_IMAGE_SIZE) {
+			throw new Exception(_('Image size must be less than 1MB.'));
+		}
 	}
 
 	/**
@@ -126,7 +134,7 @@ class CUploadFile {
 	 * @return bool
 	 */
 	public function wasUploaded() {
-		return $this->error != UPLOAD_ERR_NO_FILE;
+		return ($this->error != UPLOAD_ERR_NO_FILE);
 	}
 
 	/**
