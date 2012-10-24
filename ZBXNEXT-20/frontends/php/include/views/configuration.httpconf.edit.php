@@ -221,6 +221,9 @@ $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineb
 
 // append tabs to form
 $httpTab = new CTabView(array('remember' => true));
+if (!$this->data['form_refresh']) {
+	$httpTab->setSelected(0);
+}
 $httpTab->addTab('scenarioTab', _('Scenario'), $httpFormList);
 $httpTab->addTab('stepTab', _('Steps'), $httpStepFormList);
 $httpForm->addItem($httpTab);
