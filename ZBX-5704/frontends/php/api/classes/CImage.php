@@ -301,7 +301,9 @@ class CImage extends CZBXAPI {
 			if (!check_db_fields($imageDbFields, $image)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image [ '.$image['name'].' ]');
 			}
-
+			if (empty($image['image'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%s" has empty content.', $image['name']));
+			}
 			if ($this->exists(array('name' => $image['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Image').' [ '.$image['name'].' ] '._('already exists'));
 			}
@@ -350,7 +352,7 @@ class CImage extends CZBXAPI {
 					}
 
 					$variable = $image['image'];
-					if (!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)) {
+					if (!db2_bind_param($stmt, 1, 'variable', DB2_PARAM_IN, DB2_BINARY)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 					}
 					if (!db2_execute($stmt)) {
@@ -405,9 +407,12 @@ class CImage extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($images as $num => $image) {
+		foreach ($images as $image) {
 			if (!isset($image['imageid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image.');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for image.'));
+			}
+			if (empty($image['image'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image has empty content.'));
 			}
 
 			$imageExists = $this->get(array(
@@ -434,17 +439,6 @@ class CImage extends CZBXAPI {
 
 				// validate image
 				if (!empty($image['image'])) {
-/*					sdff('A6version:');
-					sdff(unpack('A6version', $image['image']));
-					sdff('a3a3vv:');
-					sdff(unpack('a3a3vv', $image['image']));
-					sdff('Nsize/a4type:');
-					sdff(unpack('Nsize/a4type', $image['image']));
-					sdff('C:');
-					sdff(unpack("C1highbit/A3signature/C2lineendings/C1eof/C1eol", $image['image']));
-					sdff('C2:');
-					sdff(unpack("A6Version/C2Width/C2Height/C1Flag/@11/C1Aspect", $image['image']));
-*/
 					$this->checkImage($image['image']);
 				}
 
@@ -600,10 +594,18 @@ class CImage extends CZBXAPI {
 	 * @throws APIException
 	 */
 	protected function checkImage($image) {
-		if (strlen($image) > ZBX_MAX_IMAGE_SIZE) {
+		$size = strlen($image);
+
+		// check size
+		if ($size > ZBX_MAX_IMAGE_SIZE) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB.'));
 		}
-		if (!@imageCreateFromString($image)) {
+
+		// check file format
+		if ($size < 10) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is not image.'));
+		}
+		if (@imageCreateFromString($image) === false) {
 			global $ZBX_MESSAGES;
 
 			if (!empty($ZBX_MESSAGES)) {

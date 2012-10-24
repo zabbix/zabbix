@@ -74,6 +74,7 @@ if (isset($_REQUEST['save'])) {
 				'imagetype' => $_REQUEST['imagetype'],
 				'image' => $image
 			);
+
 			$result = API::Image()->update($val);
 
 			$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
