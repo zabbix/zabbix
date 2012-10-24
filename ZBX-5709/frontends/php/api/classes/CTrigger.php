@@ -1666,8 +1666,18 @@ class CTrigger extends CTriggerGeneral {
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
 				$oldExpressionData = new CTriggerExpression(array('expression' => $oldExpression));
-				// proceed if hosts are added or removed from expression
-				if (!array_equal(array_unique($oldExpressionData->data['hosts']), array_unique($expressionData->data['hosts']))) {
+				// chech if at least one template has stayed in expression, this means that child trigger will stay in host
+				$oldTemplates = array_unique($oldExpressionData->data['hosts']);
+				$newTemplates = zbx_toHash(array_unique($expressionData->data['hosts']));
+				$proceed = true;
+				foreach ($oldTemplates as $oldTemplate) {
+					if (isset($newTemplates[$oldTemplate])) {
+						$proceed = false;
+						break;
+					}
+				}
+				// proceed if there is possibility that child triggers should be deleted
+				if ($proceed) {
 					$sql = 'SELECT t.triggerid'.
 							' FROM triggers t'.
 							' WHERE t.templateid='.zbx_dbstr($trigger['triggerid']);
