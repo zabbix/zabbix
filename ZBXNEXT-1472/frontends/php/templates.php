@@ -151,7 +151,7 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
  * Save
  */
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
 	}
 

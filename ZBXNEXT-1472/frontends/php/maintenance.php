@@ -94,7 +94,7 @@ elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 	unset($_REQUEST['new_timeperiod']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
 	}
 
@@ -133,7 +133,7 @@ elseif (isset($_REQUEST['save'])) {
 	show_messages($result, $msg1, $msg2);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
 	}
 

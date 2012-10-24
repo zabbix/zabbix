@@ -55,11 +55,11 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 }
 
 
-$admin = in_array($USER_DETAILS['type'], array(
+$admin = in_array(CWebUser::$data['type'], array(
 	USER_TYPE_ZABBIX_ADMIN,
 	USER_TYPE_SUPER_ADMIN
 ));
-$rows_per_page = $USER_DETAILS['rows_per_page'];
+$rows_per_page = CWebUser::$data['rows_per_page'];
 
 $searchWidget = new CWidget('search_wdgt');
 

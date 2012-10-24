@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function init_mbstrings() {
 	$res = true;
@@ -37,10 +36,8 @@ function mbstrings_available() {
 	return function_exists('mb_strlen') && function_exists('mb_strtoupper') && function_exists('mb_strpos') && function_exists('mb_substr');
 }
 
-function set_zbx_locales() {
-	global $ZBX_LOCALES;
-
-	$ZBX_LOCALES = array(
+function getLocales() {
+	$locales = array(
 		'en_GB' => _('English (en_GB)'),
 		'en_US' => _('English (en_US)'),
 		'zh_CN' => _('Chinese (zh_CN)'),
@@ -64,9 +61,10 @@ function set_zbx_locales() {
 		'sk_SK' => _('Slovak (sk_SK)'),
 		'es_ES' => _('Spanish (es_ES)'),
 		'sv_SE' => _('Swedish (sv_SE)'),
-//		'tr_TR' => _('Turkish (tr_TR)'),
 		'uk_UA' => _('Ukrainian (uk_UA)')
 	);
+
+	return $locales;
 }
 
 /**
@@ -149,7 +147,7 @@ function zbx_locale_variants_win($language) {
 		'ko_kr' => array('Korean_Korea.949', 'korean'),
 		'ja_jp' => array('Japanese_Japan.932', 'japanese'),
 		'lv_lv' => array('Latvian_Latvia.1257', 'latvian'),
-		'fa_IR' => array('Persian_Iran.1256', 'persian'),
+		'fa_ir' => array('Farsi_Iran.1256', 'farsi'),
 		'pl_pl' => array('Polish_Poland.1250', 'polish'),
 		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese'),
 		'ru_ru' => array('Russian_Russia.1251', 'russian'),
@@ -161,4 +159,3 @@ function zbx_locale_variants_win($language) {
 	);
 	return $winLanguageName[strtolower($language)];
 }
-?>

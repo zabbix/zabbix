@@ -22,7 +22,7 @@
 /**
  * @package API
  */
-class CItemPrototype extends CItemGeneral{
+class CItemPrototype extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
@@ -664,117 +664,124 @@ class CItemPrototype extends CItemGeneral{
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-/**
- * Delete Itemprototypes
- *
- * @param array $ruleids
- * @return
- */
-	public function delete($prototypeids, $nopermissions=false) {
+	/**
+	 * Delete Item prototypes.
+	 *
+	 * @param int|string|array $prototypeids
+	 * @param bool             $nopermissions
+	 *
+	 * @return array
+	 */
+	public function delete($prototypeids, $nopermissions = false) {
+		if (empty($prototypeids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
 
-			if (empty($prototypeids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$prototypeids = zbx_toHash($prototypeids);
 
-			$prototypeids = zbx_toHash($prototypeids);
+		$options = array(
+			'itemids' => $prototypeids,
+			'editable' => true,
+			'preservekeys' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name')
+		);
+		$delItemPrototypes = $this->get($options);
 
-			$options = array(
-				'itemids' => $prototypeids,
-				'editable' => true,
-				'preservekeys' => true,
-				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('name')
-			);
-			$delItemPrototypes = $this->get($options);
-
-			// TODO: remove $nopermissions hack
-			if (!$nopermissions) {
-				foreach ($prototypeids as $prototypeid) {
-					if (!isset($delItemPrototypes[$prototypeid])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-					}
-					if ($delItemPrototypes[$prototypeid]['templateid'] != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
-					}
+		// TODO: remove $nopermissions hack
+		if (!$nopermissions) {
+			foreach ($prototypeids as $prototypeid) {
+				if (!isset($delItemPrototypes[$prototypeid])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				}
+				if ($delItemPrototypes[$prototypeid]['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items'));
 				}
 			}
+		}
 
-			// first delete child items
-			$parentItemids = $prototypeids;
-			$childPrototypeids = array();
-			do{
-				$dbItems = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parentItemids));
-				$parentItemids = array();
-				while ($dbItem = DBfetch($dbItems)) {
-					$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
-					$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
-				}
-			}while (!empty($parentItemids));
-
-			$options = array(
-				'output' => API_OUTPUT_EXTEND,
-				'itemids' => $childPrototypeids,
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'selectHosts' => array('name')
-			);
-			$delItemPrototypesChilds = $this->get($options);
-
-			$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChilds);
-			$prototypeids = array_merge($prototypeids, $childPrototypeids);
-
-			// delete graphs with this item prototype
-			$delGraphPrototypes = API::GraphPrototype()->get(array(
-				'itemids' => $prototypeids,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			if (!empty($delGraphPrototypes)) {
-				$result = API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
-				}
+		// first delete child items
+		$parentItemids = $prototypeids;
+		$childPrototypeids = array();
+		do {
+			$dbItems = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parentItemids));
+			$parentItemids = array();
+			while ($dbItem = DBfetch($dbItems)) {
+				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
+				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
+		} while (!empty($parentItemids));
 
-			// check if any graphs are referencing this item
-			$this->checkGraphReference($prototypeids);
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $childPrototypeids,
+			'nopermissions' => true,
+			'preservekeys' => true,
+			'selectHosts' => array('name')
+		);
+		$delItemPrototypesChilds = $this->get($options);
+
+		$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChilds);
+		$prototypeids = array_merge($prototypeids, $childPrototypeids);
+
+		// delete graphs with this item prototype
+		$delGraphPrototypes = API::GraphPrototype()->get(array(
+			'itemids' => $prototypeids,
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+		if (!empty($delGraphPrototypes)) {
+			$result = API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
+			}
+		}
+
+		// check if any graphs are referencing this item
+		$this->checkGraphReference($prototypeids);
 
 // CREATED ITEMS
-			$createdItems = array();
-			$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
-			$dbItems = DBselect($sql);
-			while ($item = DBfetch($dbItems)) {
-				$createdItems[$item['itemid']] = $item['itemid'];
+		$createdItems = array();
+		$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
+		$dbItems = DBselect($sql);
+		while ($item = DBfetch($dbItems)) {
+			$createdItems[$item['itemid']] = $item['itemid'];
+		}
+		if (!empty($createdItems)) {
+			$result = API::Item()->delete($createdItems, true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete items created by low level discovery.'));
 			}
-			if (!empty($createdItems)) {
-				$result = API::Item()->delete($createdItems, true);
-				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item prototype');
-			}
+		}
 
 
 // TRIGGER PROTOTYPES
-			$delTriggerPrototypes = API::TriggerPrototype()->get(array(
-				'itemids' => $prototypeids,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true,
-			));
-			if (!empty($delTriggerPrototypes)) {
-				$result = API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
-				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete trigger prototype');
+		$delTriggerPrototypes = API::TriggerPrototype()->get(array(
+			'itemids' => $prototypeids,
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => true,
+			'preservekeys' => true,
+		));
+		if (!empty($delTriggerPrototypes)) {
+			$result = API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype'));
 			}
+		}
 
 
 // ITEM PROTOTYPES
-			DB::delete('items', array('itemid' => $prototypeids));
+		DB::delete('items', array('itemid' => $prototypeids));
 
 
 // TODO: remove info from API
-			foreach ($delItemPrototypes as $item) {
-				$host = reset($item['hosts']);
-				info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
-			}
+		foreach ($delItemPrototypes as $item) {
+			$host = reset($item['hosts']);
+			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
+		}
 
-			return array('prototypeids' => $prototypeids);
+		return array('prototypeids' => $prototypeids);
 	}
 
 	public function syncTemplates($data) {

@@ -367,6 +367,7 @@ function copy_graph_to_host($graphid, $hostid) {
 	}
 
 	$graph['gitems'] = $new_gitems;
+	unset($graph['templateid']);
 	$result = API::Graph()->create($graph);
 
 	return $result;
