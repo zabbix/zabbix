@@ -294,12 +294,12 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'str[=]' => array(
-		'description' =>  _('Find string T in last (most recent) value. N = 1 - if found, 0 - otherwise'),
+		'description' =>  _('Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise'),
 		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
 	'str[#]' => array(
-		'description' =>  _('Find string T in last (most recent) value. N NOT 1 - if found, 0 - otherwise'),
+		'description' =>  _('Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise'),
 		'params' => $param2_sec_count,
 		'allowed_types' => $allowed_types_any
 	),
