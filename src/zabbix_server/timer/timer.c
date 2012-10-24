@@ -34,6 +34,7 @@
 #define TIMER_DELAY	30
 
 extern unsigned char	process_type;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -58,7 +59,7 @@ static void	process_time_functions()
 
 	zbx_vector_ptr_create(&trigger_order);
 
-	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order);
+	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, process_num);
 
 	if (0 == trigger_order.values_num)
 		goto clean;
@@ -855,6 +856,10 @@ void	main_timer_loop()
 		zbx_setproctitle("%s [processing time functions]", get_process_type_string(process_type));
 
 		process_time_functions();
+
+		/* only the "timer #1" process evaluates the maintenance periods */
+		if (1 != process_num)
+			continue;
 
 		/* we process maintenance at every 00 sec */
 		/* process time functions can take long time */
