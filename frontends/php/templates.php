@@ -462,6 +462,7 @@ else {
 		_('Graphs'),
 		_('Screens'),
 		_('Discovery'),
+		_('Web'),
 		_('Linked templates'),
 		_('Linked to')
 	));
@@ -504,7 +505,8 @@ else {
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'nopermissions' => 1,
+		'selectHttpTests' => API_OUTPUT_COUNT,
+		'nopermissions' => 1
 	);
 
 	$templates = API::Template()->get($options);
@@ -531,6 +533,8 @@ else {
 			' ('.$template['screens'].')');
 		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$template['templateid']),
 			' ('.$template['discoveries'].')');
+		$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$template['templateid']),
+			' ('.$template['httpTests'].')');
 
 
 		$i = 0;
@@ -601,6 +605,7 @@ else {
 			$graphs,
 			$screens,
 			$discoveries,
+			$httpTests,
 			(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output, 'wraptext')),
 			(empty($linked_to_output) ? '-' : new CCol($linked_to_output, 'wraptext'))
 		));

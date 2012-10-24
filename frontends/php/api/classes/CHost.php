@@ -135,6 +135,7 @@ class CHost extends CHostGeneral {
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
 			'selectInventory'			=> null,
+			'selectHttpTests'           => null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -549,13 +550,14 @@ class CHost extends CHostGeneral {
 					if (!is_null($options['selectMacros']) && !isset($result[$host['hostid']]['macros'])) {
 						$result[$host['hostid']]['macros'] = array();
 					}
-
 					if (!is_null($options['selectScreens']) && !isset($result[$host['hostid']]['screens'])) {
 						$result[$host['hostid']]['screens'] = array();
 					}
-
 					if (!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])) {
 						$result[$host['hostid']]['interfaces'] = array();
+					}
+					if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
+						$result[$host['hostid']]['httpTests'] = array();
 					}
 
 					// groupids
@@ -859,6 +861,50 @@ class CHost extends CHostGeneral {
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
 					$result[$hostid]['items'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		// adding http tests
+		if (!is_null($options['selectHttpTests'])) {
+			$objParams = array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $hostids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			);
+
+			if (is_array($options['selectHttpTests']) || str_in_array($options['selectHttpTests'], $subselectsAllowedOutputs)) {
+				$objParams['output'] = $options['selectHttpTests'];
+				$httpTests = API::WebCheck()->get($objParams);
+
+				if (!is_null($options['limitSelects'])) {
+					order_result($httpTests, 'name');
+				}
+				$count = array();
+				foreach ($httpTests as $httpTestId => $httpTest) {
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$httpTest['hostid']])) {
+							$count[$httpTest['hostid']] = 0;
+						}
+						$count[$httpTest['hostid']]++;
+
+						if ($count[$httpTest['hostid']] > $options['limitSelects']) {
+							continue;
+						}
+					}
+
+					$result[$httpTest['hostid']]['httpTests'][] = $httpTests[$httpTestId];
+				}
+			}
+			elseif (API_OUTPUT_COUNT == $options['selectHttpTests']) {
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
+
+				$httpTests = API::WebCheck()->get($objParams);
+				$httpTests = zbx_toHash($httpTests, 'hostid');
+				foreach ($result as $hostId => $host) {
+					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
 				}
 			}
 		}
