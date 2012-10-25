@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -30,8 +30,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'shows' =>			array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null),
@@ -51,17 +50,35 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-$_REQUEST['go'] = get_request('go', 'none');
 if (!empty($_REQUEST['slides'])) {
 	natksort($_REQUEST['slides']);
 }
 
-// validate permitions
+/*
+ * Permissions
+ */
 if (isset($_REQUEST['slideshowid'])) {
 	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE)) {
 		access_deny();
 	}
+	$dbSlideshow = get_slideshow_by_slideshowid(get_request('slideshowid'));
+	if (empty($dbSlideshow)) {
+		access_deny();
+	}
 }
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['shows']) || !is_array($_REQUEST['shows'])) {
+		access_deny();
+	}
+	else {
+		$dbSlideshowChk = DBfetch(DBselect('SELECT COUNT(*) AS cnt FROM slideshows s WHERE'.DBcondition('s.slideshowid', $_REQUEST['shows'])));
+		if ($dbSlideshowChk['cnt'] != count($_REQUEST['shows'])) {
+			access_deny();
+		}
+	}
+}
+
+$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Actions
@@ -94,22 +111,20 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
-	if ($slideshow = get_slideshow_by_slideshowid($_REQUEST['slideshowid'])) {
-		DBstart();
-		delete_slideshow($_REQUEST['slideshowid']);
-		$result = DBend();
+	DBstart();
+	delete_slideshow($_REQUEST['slideshowid']);
+	$result = DBend();
 
-		show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
-		if ($result) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$slideshow['name'].'" ');
-		}
+	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
+	if ($result) {
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$dbSlideshow['name'].'" ');
 	}
+
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$go_result = true;
 	$shows = get_request('shows', array());
-
 	DBstart();
 	foreach ($shows as $showid) {
 		$go_result &= delete_slideshow($showid);
@@ -142,10 +157,9 @@ if (isset($_REQUEST['form'])) {
 		'slides' => get_request('slides', array())
 	);
 
-	if (!empty($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
-		$slideshow = DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.$data['slideshowid']));
-		$data['name'] = $slideshow['name'];
-		$data['delay'] = $slideshow['delay'];
+	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
+		$data['name'] = $dbSlideshow['name'];
+		$data['delay'] = $dbSlideshow['delay'];
 
 		// get slides
 		$db_slides = DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.$data['slideshowid'].' ORDER BY s.step');
