@@ -710,19 +710,17 @@ class CHostGroup extends CZBXAPI {
 			if (!isset($delGroups[$groupid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
+			if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Group "%1$s" is internal and can not be deleted.', $delGroups[$groupid]['name']));
+			}
 		}
 
 		$dltGroupids = getDeletableHostGroups($groupids);
 		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
-				if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Group "%1$s" is internal and can not be deleted.', $delGroups[$groupid]['name']));
-				}
-				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $delGroups[$groupid]['name']));
-				}
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Group "%s" cannot be deleted, because some hosts depend on it.', $delGroups[$groupid]['name']));
 			}
 		}
 
