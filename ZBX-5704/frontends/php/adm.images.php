@@ -122,8 +122,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
  */
 $form = new CForm();
 $form->cleanItems();
-$confCombobox = new CComboBox('configDropDown', 'adm.images.php', 'redirect(this.options[this.selectedIndex].value);');
-$confCombobox->addItems(array(
+$confComboBox = new CComboBox('configDropDown', 'adm.images.php', 'redirect(this.options[this.selectedIndex].value);');
+$confComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
 	'adm.housekeeper.php' => _('Housekeeper'),
 	'adm.images.php' => _('Images'),
@@ -136,7 +136,7 @@ $confCombobox->addItems(array(
 	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
-$form->addItem($confCombobox);
+$form->addItem($confComboBox);
 if (!isset($_REQUEST['form'])) {
 	$form->addItem(new CSubmit('form', _('Create image')));
 }
