@@ -900,7 +900,7 @@ class CTemplate extends CHostGeneral {
 				'preservekeys' => true
 			);
 
-			if (is_array($options['selectHttpTests']) || str_in_array($options['selectHttpTests'], $subselectsAllowedOutputs)) {
+			if (is_array($options['selectHttpTests'])) {
 				$objParams['output'] = $options['selectHttpTests'];
 				$httpTests = API::HttpTest()->get($objParams);
 
@@ -929,6 +929,7 @@ class CTemplate extends CHostGeneral {
 
 				$httpTests = API::HttpTest()->get($objParams);
 				$httpTests = zbx_toHash($httpTests, 'hostid');
+
 				foreach ($result as $hostId => $host) {
 					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
 				}

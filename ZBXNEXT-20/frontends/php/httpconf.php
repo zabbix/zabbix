@@ -32,10 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'applications' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'applicationid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'close' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
-	'open' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})||isset({save})'),
 	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
@@ -105,36 +102,6 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 /*
  * Actions
  */
-$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpconf.applications'));
-$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
-
-$showAllApps = null;
-if (isset($_REQUEST['open'])) {
-	if (!isset($_REQUEST['applicationid'])) {
-		$_REQUEST['applications'] = array();
-		$showAllApps = 1;
-	}
-	elseif (!uint_in_array($_REQUEST['applicationid'], $_REQUEST['applications'])) {
-		array_push($_REQUEST['applications'], $_REQUEST['applicationid']);
-	}
-}
-elseif (isset($_REQUEST['close'])) {
-	if (!isset($_REQUEST['applicationid'])) {
-		$_REQUEST['applications'] = array();
-	}
-	elseif (($i = array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== false) {
-		unset($_REQUEST['applications'][$i]);
-	}
-}
-
-// limit opened application count
-if (count($_REQUEST['applications']) > 25) {
-	$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
-}
-rm4favorites('web.httpconf.applications');
-foreach ($_REQUEST['applications'] as $application) {
-	add2favorites('web.httpconf.applications', $application);
-}
 
 // add new steps
 if (isset($_REQUEST['new_httpstep'])) {
@@ -212,7 +179,6 @@ elseif (isset($_REQUEST['save'])) {
 			'macros' => $_REQUEST['macros'],
 			'steps' => $steps
 		);
-
 
 		if (!empty($_REQUEST['application'])) {
 			$dbApplication = DBfetch(DBselect(
@@ -410,50 +376,46 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 else {
 	$data['pageFilter'] = $pageFilter;
 	$data['showDisabled'] = $showDisabled;
-	$data['showAllApps'] = $showAllApps;
+	$data['httpTests'] = array();
 
-	$data['db_apps'] = array();
-	$dbApplication = DBselect(
-		'SELECT DISTINCT h.name AS hostname,a.*'.
-		' FROM applications a,hosts h'.
-		' WHERE a.hostid=h.hostid'.
-			($data['hostid'] > 0 ? ' AND h.hostid='.$data['hostid'] : '').
-			' AND '.DBcondition('h.hostid', $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array())
-	);
-	while ($db_app = DBfetch($dbApplication)) {
-		$db_app['scenarios_cnt'] = 0;
-		$data['db_apps'][$db_app['applicationid']] = $db_app;
+	if ($data['pageFilter']->hostsSelected) {
+		$sortfield = getPageSortField('hostname');
+		$options = array(
+			'editable' => true,
+			'output' => API_OUTPUT_SHORTEN,
+			'sortfield' => $sortfield,
+			'limit' => $config['search_limit'] + 1
+		);
+		if (empty($data['showDisabled'])) {
+			$options['filter']['status'] = HTTPTEST_STATUS_ACTIVE;
+		}
+		if ($data['pageFilter']->hostid > 0) {
+			$options['hostids'] = $data['pageFilter']->hostid;
+		}
+		elseif ($data['pageFilter']->groupid > 0) {
+			$options['groupids'] = $data['pageFilter']->groupid;
+		}
+		$httpTests = API::HttpTest()->get($options);
+
+		$data['paging'] = getPagingLine($httpTests);
+
+		$dbHttpTests = DBselect(
+			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,h.name AS hostname,COUNT(hs.httpstepid) AS stepsCnt'.
+				' FROM httptest ht'.
+				' INNER JOIN httpstep hs ON hs.httptestid=ht.httptestid'.
+				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
+				' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid')).
+				' GROUP BY ht.httptestid'
+		);
+		$httpTests = array();
+		while ($dbHttpTest = DBfetch($dbHttpTests)) {
+			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		}
+
+		order_result($httpTests, $sortfield, getPageSortOrder());
+
+		$data['httpTests'] = $httpTests;
 	}
-
-	// get http tests
-	$data['db_httptests'] = array();
-	$db_httptests_result = DBselect(
-		'SELECT wt.*,a.name AS application,h.name AS hostname,h.hostid'.
-		' FROM httptest wt,applications a,hosts h'.
-		' WHERE wt.applicationid=a.applicationid'.
-			' AND a.hostid=h.hostid'.
-			' AND '.DBcondition('a.applicationid', array_keys($data['db_apps'])).
-			($showDisabled == 0 ? ' AND wt.status='.HTTPTEST_STATUS_ACTIVE : '')
-	);
-	while ($httptest_data = DBfetch($db_httptests_result)) {
-		$data['db_apps'][$httptest_data['applicationid']]['scenarios_cnt']++;
-		$httptest_data['step_count'] = null;
-		$data['db_httptests'][$httptest_data['httptestid']] = $httptest_data;
-	}
-
-	// get http steps
-	$httpstep_res = DBselect(
-		'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
-		' FROM httpstep hs'.
-		' WHERE '.DBcondition('hs.httptestid', array_keys($data['db_httptests'])).
-		' GROUP BY hs.httptestid'
-	);
-	while ($step_count = DBfetch($httpstep_res)) {
-		$data['db_httptests'][$step_count['httptestid']]['step_count'] = $step_count['cnt'];
-	}
-
-	order_result($data['db_httptests'], getPageSortField('host'), getPageSortOrder());
-	$data['paging'] = getPagingLine($data['db_httptests']);
 
 	// render view
 	$httpView = new CView('configuration.httpconf.list', $data);

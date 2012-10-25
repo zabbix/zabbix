@@ -533,7 +533,7 @@ else {
 			' ('.$template['screens'].')');
 		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$template['templateid']),
 			' ('.$template['discoveries'].')');
-		$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$template['templateid']),
+		$httpTests = array(new CLink(_('Web'), 'httpconf.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 			' ('.$template['httpTests'].')');
 
 
