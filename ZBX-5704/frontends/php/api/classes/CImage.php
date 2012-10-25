@@ -589,21 +589,16 @@ class CImage extends CZBXAPI {
 	 * @throws APIException
 	 */
 	protected function checkImage($image) {
-		$size = strlen($image);
-
 		// check size
-		if ($size > ZBX_MAX_IMAGE_SIZE) {
+		if (strlen($image) > ZBX_MAX_IMAGE_SIZE) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB.'));
 		}
 
 		// check file format
-		if ($size < 10) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is not image.'));
-		}
 		if (@imageCreateFromString($image) === false) {
 			global $ZBX_MESSAGES;
 
-			if (!empty($ZBX_MESSAGES)) {
+			if (!empty($ZBX_MESSAGES) && strpos($ZBX_MESSAGES[count($ZBX_MESSAGES) -1]['message'], 'imagecreatefromstring()') !== false) {
 				array_pop($ZBX_MESSAGES);
 			}
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is not image.'));

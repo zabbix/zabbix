@@ -62,7 +62,7 @@ if (isset($_REQUEST['save'])) {
 				$image = null;
 			}
 			else {
-				$file->validateSize();
+				$file->validateImageSize();
 				$image = base64_encode($file->getContent());
 			}
 		}
