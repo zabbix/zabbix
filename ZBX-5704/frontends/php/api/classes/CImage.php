@@ -601,7 +601,7 @@ class CImage extends CZBXAPI {
 			if (!empty($ZBX_MESSAGES) && strpos($ZBX_MESSAGES[count($ZBX_MESSAGES) -1]['message'], 'imagecreatefromstring()') !== false) {
 				array_pop($ZBX_MESSAGES);
 			}
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is not image.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
 		}
 	}
 }
