@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of value mapping');
@@ -38,6 +38,16 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,		null)
 );
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['valuemapid'])) {
+	$dbValueMap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.get_request('valuemapid')));
+	if (empty($dbValueMap)) {
+		access_deny();
+	}
+}
 
 /*
  * Actions
@@ -143,9 +153,9 @@ if (isset($_REQUEST['form'])) {
 	$data['add_value'] = get_request('add_value');
 	$data['add_newvalue'] = get_request('add_newvalue');
 
-	if (!empty($data['valuemapid'])) {
-		$db_valuemap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.$data['valuemapid']));
-		$data['mapname'] = $db_valuemap['name'];
+	if (isset($data['valuemapid'])) {
+
+		$data['mapname'] = $dbValueMap['name'];
 
 		if (empty($data['form_refresh'])) {
 			$data['mappings'] = DBfetchArray(DBselect('SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.$data['valuemapid']));
@@ -178,10 +188,10 @@ else {
 	$cnf_wdgt->addItem(BR());
 
 	$data['valuemaps'] = array();
-	$db_valuemaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
-	while ($db_valuemap = DBfetch($db_valuemaps)) {
-		$data['valuemaps'][$db_valuemap['valuemapid']] = $db_valuemap;
-		$data['valuemaps'][$db_valuemap['valuemapid']]['maps'] = array();
+	$dbValueMaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
+	while ($dbValueMap = DBfetch($dbValueMaps)) {
+		$data['valuemaps'][$dbValueMap['valuemapid']] = $dbValueMap;
+		$data['valuemaps'][$dbValueMap['valuemapid']]['maps'] = array();
 	}
 	order_result($data['valuemaps'], 'name');
 
