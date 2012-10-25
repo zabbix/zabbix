@@ -377,6 +377,7 @@ else {
 	$data['pageFilter'] = $pageFilter;
 	$data['showDisabled'] = $showDisabled;
 	$data['httpTests'] = array();
+	$data['paging'] = null;
 
 	if ($data['pageFilter']->hostsSelected) {
 		$sortfield = getPageSortField('hostname');
@@ -400,7 +401,7 @@ else {
 		$data['paging'] = getPagingLine($httpTests);
 
 		$dbHttpTests = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,h.name AS hostname,COUNT(hs.httpstepid) AS stepsCnt'.
+			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,COUNT(hs.httpstepid) AS stepsCnt'.
 				' FROM httptest ht'.
 				' INNER JOIN httpstep hs ON hs.httptestid=ht.httptestid'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
@@ -413,6 +414,8 @@ else {
 		}
 
 		order_result($httpTests, $sortfield, getPageSortOrder());
+
+		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
 
 		$data['httpTests'] = $httpTests;
 	}

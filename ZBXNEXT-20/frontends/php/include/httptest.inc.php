@@ -176,3 +176,47 @@ function validateHttpDuplicateSteps($steps) {
 
 	return $isDuplicateStepFound;
 }
+
+/**
+ * Return parent templates for http tests.
+ * Result structure:
+ * array(
+ *   'httptestid' => array(
+ *     'name' => <template name>,
+ *     'id' => <template id>
+ *   ), ...
+ * )
+ *
+ * @param array $httpTests must have httptestid and templateid fields
+ *
+ * @return array
+ */
+function getHttpTestsParentTemplates(array $httpTests) {
+	$result = array();
+	$template2testMap = array();
+
+	foreach ($httpTests as $httpTest) {
+		if (!empty($httpTest['templateid'])){
+			$result[$httpTest['httptestid']] = array();
+			$template2testMap[$httpTest['templateid']] = $httpTest['httptestid'];
+		}
+	}
+
+	do {
+		$dbHttpTests = DBselect('SELECT ht.httptestid,ht.templateid,ht.hostid,h.name'.
+				' FROM httptest ht'.
+				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
+				' WHERE'.DBcondition('ht.httptestid', array_keys($template2testMap)));
+		while ($dbHttpTest = DBfetch($dbHttpTests)) {
+			$testId = $template2testMap[$dbHttpTest['httptestid']];
+			unset($template2testMap[$dbHttpTest['httptestid']]);
+			$result[$testId] = array('name' => $dbHttpTest['name'], 'id' => $dbHttpTest['hostid']);
+
+			if (!empty($dbHttpTest['templateid'])) {
+				$template2testMap[$dbHttpTest['templateid']] = $testId;
+			}
+		}
+	} while (!empty($template2testMap));
+
+	return $result;
+}
