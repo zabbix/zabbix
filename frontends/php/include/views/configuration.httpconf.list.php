@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 $httpWidget = new CWidget();
 
@@ -53,76 +52,35 @@ $httpForm = new CForm('get');
 $httpForm->setName('scenarios');
 $httpForm->addVar('hostid', $this->data['hostid']);
 
-if (!empty($this->data['showAllApps'])) {
-	$expandLink = new CLink(new CImg('images/general/minus.png'), '?close=1'.url_param('groupid').url_param('hostid'));
-}
-else {
-	$expandLink = new CLink(new CImg('images/general/plus.png'), '?open=1'.url_param('groupid').url_param('hostid'));
-}
-
 $httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
-	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'host') : null,
-	make_sorting_header(array($expandLink, SPACE, _('Name')), 'name'),
+	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,
+	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
 	_('Update interval'),
 	make_sorting_header(_('Status'), 'status'))
 );
 
 $httpTableRows = array();
-foreach ($this->data['db_httptests'] as $httptestid => $httptest_data) {
-	$db_app = $this->data['db_apps'][$httptest_data['applicationid']];
+foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 
-	if (!isset($httpTableRows[$db_app['applicationid']])) {
-		$httpTableRows[$db_app['applicationid']] = array();
-	}
-	if (!uint_in_array($db_app['applicationid'], $_REQUEST['applications']) && !isset($this->data['showAllApps'])) {
-		continue;
-	}
-
-	$httpTableRows[$db_app['applicationid']][] = array(
-		new CCheckBox('group_httptestid['.$httptest_data['httptestid'].']', null, null, $httptest_data['httptestid']),
-		is_show_all_nodes() ? SPACE : null,
-		$_REQUEST['hostid'] > 0 ? null : $db_app['hostname'],
-		new CLink($httptest_data['name'], '?form=update'.'&httptestid='.$httptest_data['httptestid'].'&hostid='.$db_app['hostid'].url_param('groupid')),
-		$httptest_data['step_count'],
-		$httptest_data['delay'],
+	$httpTable->addRow(array(
+		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
+		$_REQUEST['hostid'] > 0 ? null : $httpTest['hostname'],
+		new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTest['httptestid'].'&hostid='.$httpTest['hostid']),
+		$httpTest['stepsCnt'],
+		$httpTest['delay'],
 		new CCol(
 			new CLink(
-				httptest_status2str($httptest_data['status']),
-				'?group_httptestid[]='.$httptest_data['httptestid'].'&go='.($httptest_data['status'] ? 'activate' : 'disable'),
-				httptest_status2style($httptest_data['status'])
+				httptest_status2str($httpTest['status']),
+				'?group_httptestid[]='.$httpTest['httptestid'].'&go='.($httpTest['status'] ? 'activate' : 'disable'),
+				httptest_status2style($httpTest['status'])
 			)
 		)
-	);
-}
-
-foreach ($httpTableRows as $appid => $app_rows) {
-	$db_app = $this->data['db_apps'][$appid];
-
-	if (uint_in_array($db_app['applicationid'], $_REQUEST['applications']) || isset($this->data['showAllApps'])) {
-		$link = new CLink(new CImg('images/general/minus.png'), '?close=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
-	}
-	else {
-		$link = new CLink(new CImg('images/general/plus.png'), '?open=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
-	}
-
-	$column = new CCol(array(
-		$link,
-		SPACE,
-		bold($db_app['name']),
-		SPACE.'('._n('%1$d scenario', '%1$d scenarios', $db_app['scenarios_cnt']).')'
 	));
-	$column->setColSpan(6);
-
-	$httpTable->addRow(array(get_node_name_by_elid($db_app['applicationid']), $column));
-
-	foreach ($app_rows as $row) {
-		$httpTable->addRow($row);
-	}
 }
+
 
 // create go buttons
 $goComboBox = new CComboBox('go');
