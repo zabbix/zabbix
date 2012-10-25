@@ -62,13 +62,19 @@ $httpTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status'))
 );
 
-$httpTableRows = array();
 foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
+	$name = array();
+	if (isset($this->data['parentTemplates'][$httpTestId])) {
+		$template = $this->data['parentTemplates'][$httpTestId];
+		$name[] = new CLink($template['name'], '?hostid='.$template['id'].'&filter_set=1', 'unknown');
+		$name[] = ':'.SPACE;
+	}
+	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTest['httptestid'].'&hostid='.$httpTest['hostid']);
 
 	$httpTable->addRow(array(
 		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
 		$_REQUEST['hostid'] > 0 ? null : $httpTest['hostname'],
-		new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTest['httptestid'].'&hostid='.$httpTest['hostid']),
+		$name,
 		$httpTest['stepsCnt'],
 		$httpTest['delay'],
 		new CCol(

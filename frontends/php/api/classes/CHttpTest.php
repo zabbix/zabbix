@@ -22,8 +22,6 @@
 class CHttpTest extends CZBXAPI {
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
-	private $history = 30;
-	private $trends = 90;
 
 	/**
 	 * Get data about web scenarios.
@@ -121,15 +119,10 @@ class CHttpTest extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'a.hostid';
-			}
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
-			$sqlParts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = DBcondition('ht.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['hostid'] = 'a.hostid';
+				$sqlParts['group']['hostid'] = 'ht.hostid';
 			}
 		}
 
@@ -311,16 +304,13 @@ class CHttpTest extends CZBXAPI {
 
 		$this->validateCreate($httpTests);
 
-		$httpTestIds = DB::insert('httptest', $httpTests);
+		$httpTestManager = new CHttpTestManager();
+		$httpTests = $httpTestManager->create($httpTests);
 
-		foreach ($httpTests as $wnum => $httpTest) {
-			$httpTest['httptestid'] = $httpTestIds[$wnum];
+		$httpTestManager->inherit($httpTests);
 
-			$this->createCheckItems($httpTest);
-			$this->createStepsReal($httpTest, $httpTest['steps']);
-		}
-
-		return array('httptestids' => $httpTestIds);
+self::exception();
+		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
 
 	/**
@@ -335,95 +325,12 @@ class CHttpTest extends CZBXAPI {
 
 		$this->validateUpdate($httpTests);
 
-		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
-		$dbHttpTest = $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'httptestids' => $httpTestIds,
-			'selectSteps' => API_OUTPUT_EXTEND,
-			'editable' => true,
-			'preservekeys' => true
-		));
+		$httpTestManager = new CHttpTestManager();
+		$httpTestManager->update($httpTests);
+		$httpTestManager->inherit($httpTests);
 
-		foreach ($httpTests as $httpTest) {
-			DB::update('httptest', array(
-				'values' => $httpTest,
-				'where' => array('httptestid' => $httpTest['httptestid'])
-			));
 
-			$checkItemsUpdate = $updateFields = array();
-			$dbCheckItems = DBselect(
-				'SELECT i.itemid,hi.type'.
-				' FROM items i,httptestitem hi'.
-				' WHERE hi.httptestid='.$httpTest['httptestid'].
-					' AND hi.itemid=i.itemid'
-			);
-			while ($checkitem = DBfetch($dbCheckItems)) {
-				$itemids[] = $checkitem['itemid'];
-
-				if (isset($httpTest['name'])) {
-					switch ($checkitem['type']) {
-						case HTTPSTEP_ITEM_TYPE_IN:
-							$updateFields['key_'] = 'web.test.in['.$httpTest['name'].',,bps]';
-							break;
-						case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-							$updateFields['key_'] = 'web.test.fail['.$httpTest['name'].']';
-							break;
-						case HTTPSTEP_ITEM_TYPE_LASTERROR:
-							$updateFields['key_'] = 'web.test.error['.$httpTest['name'].']';
-							break;
-					}
-				}
-
-				if (isset($httpTest['status'])) {
-					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-				}
-				if (isset($httpTest['delay'])) {
-					$updateFields['delay'] = $httpTest['delay'];
-				}
-				if (!empty($updateFields)) {
-					$checkItemsUpdate[] = array(
-						'values' => $updateFields,
-						'where' => array('itemid' => $checkitem['itemid'])
-					);
-				}
-			}
-			DB::update('items', $checkItemsUpdate);
-
-			// update application
-			if (isset($httpTest['applicationid'])) {
-				DB::update('items_applications', array(
-					'values' => array('applicationid' => $httpTest['applicationid']),
-					'where' => array('itemid' => $itemids)
-				));
-			}
-
-			// update steps
-			$stepsCreate = $stepsUpdate = array();
-			$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'webstepid');
-
-			foreach ($httpTest['steps'] as $webstep) {
-				if (isset($webstep['webstepid']) && isset($dbSteps[$webstep['webstepid']])) {
-					$stepsUpdate[] = $webstep;
-					unset($dbSteps[$webstep['webstepid']]);
-				}
-				elseif (!isset($webstep['webstepid'])) {
-					$stepsCreate[] = $webstep;
-				}
-			}
-			$stepidsDelete = array_keys($dbSteps);
-
-			if (!empty($stepidsDelete)) {
-				$this->deleteStepsReal($stepidsDelete);
-			}
-			if (!empty($stepsUpdate)) {
-				$this->updateStepsReal($httpTest, $stepsUpdate);
-			}
-			if (!empty($stepsCreate)) {
-				$this->createStepsReal($httpTest, $stepsCreate);
-			}
-		}
-
-		return array('httptestids' => $httpTestIds);
+		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
 
 	/**
@@ -595,7 +502,6 @@ class CHttpTest extends CZBXAPI {
 		return true;
 	}
 
-
 	/**
 	 * Check web scenario names.
 	 *
@@ -610,289 +516,6 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		return $httpTestsNames;
-	}
-
-	/**
-	 * Create items required for web scenario.
-	 *
-	 * @param $httpTest
-	 */
-	protected function createCheckItems($httpTest) {
-		$checkitems = array(
-			array(
-				'name'				=> _s('Download speed for scenario "%s".', '$1'),
-				'key_'				=> 'web.test.in['.$httpTest['name'].',,bps]',
-				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
-				'units'				=> 'Bps',
-				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
-			),
-			array(
-				'name'				=> _s('Failed step of scenario "%s".', '$1'),
-				'key_'				=> 'web.test.fail['.$httpTest['name'].']',
-				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
-				'units'				=> '',
-				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
-			),
-			array(
-				'name'				=> _s('Last error message of scenario "%s".', '$1'),
-				'key_'				=> 'web.test.error['.$httpTest['name'].']',
-				'value_type'		=> ITEM_VALUE_TYPE_STR,
-				'units'				=> '',
-				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTERROR
-			)
-		);
-
-		foreach ($checkitems as &$item) {
-			$itemsExist = API::Item()->exists(array(
-				'key_' => $item['key_'],
-				'hostid' => $httpTest['hostid']
-			));
-			if ($itemsExist) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%s" already exists.', $item['key_']));
-			}
-			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
-			$item['hostid'] = $httpTest['hostid'];
-			$item['delay'] = $httpTest['delay'];
-			$item['type'] = ITEM_TYPE_HTTPTEST;
-			$item['history'] = $this->history;
-			$item['trends'] = $this->trends;
-			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-		}
-		unset($item);
-
-		$checkItemids = DB::insert('items', $checkitems);
-
-		foreach ($checkItemids as $itemid) {
-			$itemApplications[] = array(
-				'applicationid' => $httpTest['applicationid'],
-				'itemid' => $itemid
-			);
-		}
-		DB::insert('items_applications', $itemApplications);
-
-		$httpTestItems = array();
-		foreach ($checkitems as $inum => $item) {
-			$httpTestItems[] = array(
-				'httptestid' => $httpTest['httptestid'],
-				'itemid' => $checkItemids[$inum],
-				'type' => $item['httptestitemtype']
-			);
-		}
-		DB::insert('httptestitem', $httpTestItems);
-
-		foreach ($checkitems as $stepitem) {
-			info(_s('Web item "%s" created.', $stepitem['key_']));
-		}
-	}
-
-	/**
-	 * Create web scenario steps with items.
-	 *
-	 * @param $httpTest
-	 * @param $websteps
-	 */
-	protected function createStepsReal($httpTest, $websteps) {
-		$webstepsNames = zbx_objectValues($websteps, 'name');
-
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
-		}
-
-		$sql = 'SELECT h.httpstepid,h.name'.
-				' FROM httpstep h'.
-				' WHERE h.httptestid='.$httpTest['httptestid'].
-					' AND '.DBcondition('h.name', $webstepsNames);
-		if ($httpstepData = DBfetch(DBselect($sql))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstepData['name']));
-		}
-
-		foreach ($websteps as $snum => $webstep) {
-			$websteps[$snum]['httptestid'] = $httpTest['httptestid'];
-			if ($webstep['no'] <= 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1.'));
-			}
-		}
-		$webstepids = DB::insert('httpstep', $websteps);
-
-		foreach ($websteps as $snum => $webstep) {
-			$webstepid = $webstepids[$snum];
-
-			$stepitems = array(
-				array(
-					'name'				=> _s('Download speed for step "%1$s" of scenario "%2$s".', '$2', '$1'),
-					'key_'				=> 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]',
-					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'				=> 'Bps',
-					'httpstepitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
-				),
-				array(
-					'name'				=> _s('Response time for step "%1$s" of scenario "%2$s".', '$2', '$1'),
-					'key_'				=> 'web.test.time['.$httpTest['name'].','.$webstep['name'].',resp]',
-					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'				=> 's',
-					'httpstepitemtype'	=> HTTPSTEP_ITEM_TYPE_TIME
-				),
-				array(
-					'name'				=> _s('Response code for step "%1$s" of scenario "%2$s".', '$2', '$1'),
-					'key_'				=> 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']',
-					'value_type'		=> ITEM_VALUE_TYPE_UINT64,
-					'units'				=> '',
-					'httpstepitemtype'	=> HTTPSTEP_ITEM_TYPE_RSPCODE
-				)
-			);
-			foreach ($stepitems as &$item) {
-				$itemsExist = API::Item()->exists(array(
-					'key_' => $item['key_'],
-					'hostid' => $httpTest['hostid']
-				));
-				if ($itemsExist) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web item with key "%s" already exists.', $item['key_']));
-				}
-				$item['hostid'] = $httpTest['hostid'];
-				$item['delay'] = $httpTest['delay'];
-				$item['type'] = ITEM_TYPE_HTTPTEST;
-				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
-				$item['history'] = $this->history;
-				$item['trends'] = $this->trends;
-				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-			}
-			unset($item);
-
-			$stepItemids = DB::insert('items', $stepitems);
-
-			$itemApplications = array();
-			foreach ($stepItemids as $itemid) {
-				$itemApplications[] = array(
-					'applicationid' => $httpTest['applicationid'],
-					'itemid' => $itemid
-				);
-			}
-			DB::insert('items_applications', $itemApplications);
-
-			$webstepitems = array();
-			foreach ($stepitems as $inum => $item) {
-				$webstepitems[] = array(
-					'httpstepid' => $webstepid,
-					'itemid' => $stepItemids[$inum],
-					'type' => $item['httpstepitemtype']
-				);
-			}
-			DB::insert('httpstepitem', $webstepitems);
-
-			foreach ($stepitems as $stepitem) {
-				info(_s('Web item "%s" created.', $stepitem['key_']));
-			}
-		}
-	}
-
-	/**
-	 * Update web scenario steps.
-	 *
-	 * @param $httpTest
-	 * @param $websteps
-	 */
-	protected function updateStepsReal($httpTest, $websteps) {
-		$webstepsNames = zbx_objectValues($websteps, 'name');
-
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
-		}
-
-		// get all used keys
-		$webstepids = zbx_objectValues($websteps, 'webstepid');
-		$dbKeys = DBfetchArray(DBselect(
-			'SELECT i.key_'.
-			' FROM items i,httpstepitem hi'.
-			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
-				' AND hi.itemid=i.itemid'
-		));
-		$dbKeys = zbx_toHash($dbKeys, 'key_');
-
-		foreach ($websteps as $webstep) {
-			if ($webstep['no'] <= 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1.'));
-			}
-
-			DB::update('httpstep', array(
-				'values' => $webstep,
-				'where' => array('httpstepid' => $webstep['webstepid'])
-			));
-
-			// update item keys
-			$itemids = array();
-			$stepitemsUpdate = $updateFields = array();
-			$dbStepItems = DBselect(
-				'SELECT i.itemid,hi.type'.
-				' FROM items i,httpstepitem hi'.
-				' WHERE hi.httpstepid='.$webstep['webstepid'].
-					' AND hi.itemid=i.itemid'
-			);
-			while ($stepitem = DBfetch($dbStepItems)) {
-				$itemids[] = $stepitem['itemid'];
-
-				if (isset($httpTest['name']) || $webstep['name']) {
-					switch ($stepitem['type']) {
-						case HTTPSTEP_ITEM_TYPE_IN:
-							$updateFields['key_'] = 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]';
-							break;
-						case HTTPSTEP_ITEM_TYPE_TIME:
-							$updateFields['key_'] = 'web.test.time['.$httpTest['name'].','.$webstep['name'].',resp]';
-							break;
-						case HTTPSTEP_ITEM_TYPE_RSPCODE:
-							$updateFields['key_'] = 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']';
-							break;
-					}
-				}
-				if (isset($dbKeys[$updateFields['key_']])) {
-					unset($updateFields['key_']);
-				}
-				if (isset($httpTest['status'])) {
-					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-				}
-				if (isset($httpTest['delay'])) {
-					$updateFields['delay'] = $httpTest['delay'];
-				}
-				if (!empty($updateFields)) {
-					$stepitemsUpdate[] = array(
-						'values' => $updateFields,
-						'where' => array('itemid' => $stepitem['itemid'])
-					);
-				}
-			}
-			DB::update('items', $stepitemsUpdate);
-
-			// update application
-			if (isset($httpTest['applicationid'])) {
-				DB::update('items_applications', array(
-					'values' => array('applicationid' => $httpTest['applicationid']),
-					'where' => array('itemid' => $itemids)
-				));
-			}
-		}
-	}
-
-	/**
-	 * Delete web scenario steps.
-	 *
-	 * @param $webstepids
-	 */
-	protected function deleteStepsReal($webstepids) {
-		$itemids = array();
-		$dbStepItems = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,httpstepitem hi'.
-			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
-				' AND hi.itemid=i.itemid'
-		);
-		while ($stepitem = DBfetch($dbStepItems)) {
-			$itemids[] = $stepitem['itemid'];
-		}
-
-		DB::delete('httpstep', array('httpstepid' => $webstepids));
-
-		if (!empty($itemids)) {
-			API::Item()->delete($itemids, true);
-		}
 	}
 
 	/**
