@@ -86,7 +86,6 @@ class CItem extends CItemGeneral {
 			'group'						=> null,
 			'host'						=> null,
 			'application'				=> null,
-			'belongs'					=> null,
 			'with_triggers'				=> null,
 			// filter
 			'filter'					=> null,
