@@ -13,6 +13,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5637] changed form, functions description and parameters in trigger expression helper (popup_trexpr.php) and changed popup size (Oleg)
 ..F....... [ZBX-5603] fixed already defined constant error when db is unavailable (Vedmak)
 ..F....... [ZBX-5720] fixed incorrect error when deleting internal host group (Vedmak)
 A......... [ZBX-5643] fixed SQL error by adding permission check for triggers when adding nonexistent dependencies via API (Toms)
