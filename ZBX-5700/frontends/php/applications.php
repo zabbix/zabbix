@@ -74,15 +74,12 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['applications'] as $applicationid) {
-			$dbApplications = API::Application()->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'applicationids' => $applicationid,
-				'output' => API_OUTPUT_EXTEND
-			));
-			if (empty($dbApplications)) {
-				access_deny();
-			}
+		$dbApplications = API::Application()->get(array(
+			'applicationids' => $_REQUEST['applications'],
+			'countOutput' => true
+		));
+		if ($dbApplications != count($_REQUEST['applications'])) {
+			access_deny();
 		}
 	}
 }

@@ -71,11 +71,9 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['shows'] as $slideShowId) {
-			$dbSlideshowChk = get_slideshow_by_slideshowid($slideShowId);
-			if (empty($dbSlideshowChk)) {
-				access_deny();
-			}
+		$dbSlideshowChk = DBfetch(DBselect('SELECT COUNT(*) AS cnt FROM slideshows s WHERE'.DBcondition('s.slideshowid', $_REQUEST['shows'])));
+		if ($dbSlideshowChk['cnt'] != count($_REQUEST['shows'])) {
+			access_deny();
 		}
 	}
 }

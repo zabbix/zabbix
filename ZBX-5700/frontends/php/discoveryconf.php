@@ -79,14 +79,12 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['g_druleid'] as $g_druleid) {
-			$dbDRules = API::DRule()->get(array(
-				'druleids' => $g_druleid,
-				'output' => API_OUTPUT_EXTEND
-			));
-			if (empty($dbDRules)) {
-				access_deny();
-			}
+		$dbDRules = API::DRule()->get(array(
+			'druleids' => $_REQUEST['g_druleid'],
+			'countOutput' => true
+		));
+		if ($dbDRules != count($_REQUEST['g_druleid'])) {
+			access_deny();
 		}
 	}
 }

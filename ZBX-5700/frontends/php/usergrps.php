@@ -94,11 +94,12 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['group_groupid'] as $groupUserId) {
-			$dbUsrGrpChk = API::UserGroup()->get(array('usrgrpids' => $groupUserId, 'output' => API_OUTPUT_EXTEND));
-			if (empty($dbUsrGrpChk)) {
-				access_deny();
-			}
+		$dbUsrGrpChk = API::UserGroup()->get(array(
+			'usrgrpids' => $_REQUEST['group_groupid'],
+			'countOutput' => true
+		));
+		if ($dbUsrGrpChk != count($_REQUEST['group_groupid'])) {
+			access_deny();
 		}
 	}
 }

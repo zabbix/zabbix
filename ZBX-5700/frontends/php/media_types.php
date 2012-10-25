@@ -74,14 +74,12 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['mediatypeids'] as $medTypeId) {
-			$mediaTypeChk = API::Mediatype()->get(array(
-				'mediatypeids' => $medTypeId,
-				'output' => API_OUTPUT_EXTEND
-			));
-			if (empty($mediaTypeChk)) {
-				access_deny();
-			}
+		$mediaTypeChk = API::Mediatype()->get(array(
+			'mediatypeids' => $_REQUEST['mediatypeids'],
+			'countOutput' => true
+		));
+		if ($mediaTypeChk != count($_REQUEST['mediatypeids'])) {
+			access_deny();
 		}
 	}
 }

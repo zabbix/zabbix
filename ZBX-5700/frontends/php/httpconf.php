@@ -100,16 +100,13 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['group_httptestid'] as $group_httptestid) {
-			$dbHttpTests = DBfetch(DBselect(
-				'SELECT wt.applicationid'.
-				' FROM httptest wt,applications a'.
-				' WHERE a.applicationid=wt.applicationid'.
-					' AND wt.httptestid='.$group_httptestid
-			));
-			if (empty($dbHttpTests)) {
-				access_deny();
-			}
+		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT("wt.*") AS cnt'.
+											' FROM httptest wt,applications a'.
+											' WHERE a.applicationid=wt.applicationid'.
+											' AND '.DBcondition('wt.httptestid', $_REQUEST['group_httptestid'])
+										));
+		if ($dbHttpTests['cnt'] != count($_REQUEST['group_httptestid'])) {
+			access_deny();
 		}
 	}
 }

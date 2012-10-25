@@ -66,13 +66,10 @@ if (isset($_REQUEST['go']) && !isset($_REQUEST['regexpid'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['regexpids'] as $rId) {
-			$regExps = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.$rId));
-			if (empty($regExps)) {
-				access_deny();
-			}
+		$regExpChk = DBfetch(DBSelect('SELECT COUNT(*) AS cnt FROM regexps re WHERE '.DBcondition('re.regexpid', $_REQUEST['regexpids'])));
+		if ($regExpChk['cnt'] != count($_REQUEST['regexpids'])) {
+			access_deny();
 		}
-		unset($regExps);
 	}
 }
 

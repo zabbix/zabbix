@@ -66,16 +66,14 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		foreach ($_REQUEST['hosts'] as $hostId) {
-			$dbProxyChk = API::Proxy()->get(array(
-				'proxyids' => $hostId,
-				'selectInterfaces' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('hostid', 'host'),
-				'output' => API_OUTPUT_EXTEND
-			));
-			if (empty($dbProxyChk)) {
-				access_deny();
-			}
+		$dbProxyChk = API::Proxy()->get(array(
+			'proxyids' => $_REQUEST['hosts'],
+			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid', 'host'),
+			'countOutput' => true
+		));
+		if ($dbProxyChk != count($_REQUEST['hosts'])) {
+			access_deny();
 		}
 	}
 }
