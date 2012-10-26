@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-26 23:07+0300\n"
-"PO-Revision-Date: 2012-10-20 14:05+0200\n"
+"POT-Creation-Date: 2012-10-26 23:08+0300\n"
+"PO-Revision-Date: 2012-10-22 06:25+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -1370,7 +1370,7 @@ msgstr "Gráfico não foi removido"
 
 #: api/classes/CItemPrototype.php:737
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Não foi possível excluir o protótipo de gráfico."
 
 #: api/classes/CItem.php:1001
 msgid "Cannot delete graph."
@@ -1382,7 +1382,7 @@ msgstr "Não foi possível remover gráficos"
 
 #: api/classes/CGraphPrototype.php:820
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "Não é possível excluir gráficos criados pelo processo de descoberta (LLD)."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1418,7 +1418,7 @@ msgstr "Itens não foram removidos"
 
 #: api/classes/CItemPrototype.php:754
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "Não é possível excluir itens criados pelo processo de descoberta (LLD)."
 
 #: maintenance.php:174
 msgid "Cannot delete maintenance"
@@ -1498,7 +1498,7 @@ msgstr "Não é possível deletar item do template."
 
 #: api/classes/CItemPrototype.php:698
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Não é possível excluir itens de template."
 
 #: api/classes/CDiscoveryRule.php:583
 msgid "Cannot delete templated items."
@@ -1515,7 +1515,7 @@ msgstr "Trigger não foi removida"
 
 #: api/classes/CItemPrototype.php:769
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Não foi possível excluir o protótipo de trigger"
 
 #: api/classes/CItem.php:1017
 msgid "Cannot delete trigger."
@@ -1527,7 +1527,7 @@ msgstr "Triggers não foram removidas"
 
 #: api/classes/CTriggerPrototype.php:976
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "Não é possível excluir triggers criadas pelo processo de descoberta (LLD)."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1746,32 +1746,32 @@ msgstr "Não foi possível salvar as regras de descoberta sem checar."
 #: api/classes/CApplication.php:466
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível definir o ID de template para a aplicação \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível definir o ID de template para o gráfico \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível definir o ID de template para o item \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível definir o ID de template para a tela \"%1$s\"."
 
 #: api/classes/CTrigger.php:1143
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível definir o ID de template para a trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:771
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível definir o ID de template para o protótipo de trigger \"%1$s\"."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
@@ -1821,32 +1821,32 @@ msgstr "Não é possível desvincular a trigger \"%s\", tem itens do template qu
 #: api/classes/CApplication.php:463
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o ID de template para a aplicação \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o ID de template para o gráfico \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o ID de template para o item \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:744
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o ID de template para a tela \"%1$s\"."
 
 #: api/classes/CTrigger.php:1140
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o ID de template para a trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:844
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o ID de template para o protótipo de trigger \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"

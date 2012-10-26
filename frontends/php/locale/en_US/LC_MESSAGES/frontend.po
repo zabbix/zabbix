@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-26 23:07+0300\n"
-"PO-Revision-Date: 2012-10-08 21:54+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2012-10-26 23:08+0300\n"
+"PO-Revision-Date: 2012-10-25 16:51+0200\n"
+"Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -183,19 +183,19 @@ msgstr "AVAILABILITY REPORT"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Absolute difference between last and previous value is < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Absolute difference between last and previous value is = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Absolute difference between last and previous value is > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Absolute difference between last and previous value is NOT N"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -782,19 +782,19 @@ msgstr "Average by"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Average value of a period T is < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Average value of a period T is = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Average value of a period T is > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Average value of a period T is NOT N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -1366,7 +1366,7 @@ msgstr "Cannot delete graph"
 
 #: api/classes/CItemPrototype.php:737
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Cannot delete graph prototype"
 
 #: api/classes/CItem.php:1001
 msgid "Cannot delete graph."
@@ -1378,7 +1378,7 @@ msgstr "Cannot delete graphs"
 
 #: api/classes/CGraphPrototype.php:820
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "Cannot delete graphs created by low level discovery."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1414,7 +1414,7 @@ msgstr "Cannot delete items"
 
 #: api/classes/CItemPrototype.php:754
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "Cannot delete items created by low level discovery."
 
 #: maintenance.php:174
 msgid "Cannot delete maintenance"
@@ -1494,7 +1494,7 @@ msgstr "Cannot delete templated item."
 
 #: api/classes/CItemPrototype.php:698
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Cannot delete templated items"
 
 #: api/classes/CDiscoveryRule.php:583
 msgid "Cannot delete templated items."
@@ -1511,7 +1511,7 @@ msgstr "Cannot delete trigger"
 
 #: api/classes/CItemPrototype.php:769
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Cannot delete trigger prototype"
 
 #: api/classes/CItem.php:1017
 msgid "Cannot delete trigger."
@@ -1523,7 +1523,7 @@ msgstr "Cannot delete triggers"
 
 #: api/classes/CTriggerPrototype.php:976
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "Cannot delete triggers created by low level discovery."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1742,32 +1742,32 @@ msgstr "Cannot save discovery rule without checks."
 #: api/classes/CApplication.php:466
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Cannot set \"templateid\" for application \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Cannot set \"templateid\" for graph \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Cannot set \"templateid\" for item \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Cannot set \"templateid\" for screen \"%1$s\"."
 
 #: api/classes/CTrigger.php:1143
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Cannot set \"templateid\" for trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:771
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
@@ -1817,32 +1817,32 @@ msgstr "Cannot unlink trigger \"%s\", it has items from template that is left li
 #: api/classes/CApplication.php:463
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Cannot update \"templateid\" for application \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Cannot update \"templateid\" for graph \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Cannot update \"templateid\" for item \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:744
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Cannot update \"templateid\" for screen \"%1$s\"."
 
 #: api/classes/CTrigger.php:1140
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Cannot update \"templateid\" for trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:844
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -2743,19 +2743,19 @@ msgstr "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 
 #: popup_trexpr.php:348
 msgid "Current date is < N"
-msgstr ""
+msgstr "Current date is < N"
 
 #: popup_trexpr.php:356
 msgid "Current date is = N"
-msgstr ""
+msgstr "Current date is = N"
 
 #: popup_trexpr.php:352
 msgid "Current date is > N"
-msgstr ""
+msgstr "Current date is > N"
 
 #: popup_trexpr.php:360
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "Current date is NOT N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
@@ -2768,19 +2768,19 @@ msgstr "Current node"
 
 #: popup_trexpr.php:488
 msgid "Current time is < N"
-msgstr ""
+msgstr "Current time is < N"
 
 #: popup_trexpr.php:496
 msgid "Current time is = N"
-msgstr ""
+msgstr "Current time is = N"
 
 #: popup_trexpr.php:492
 msgid "Current time is > N"
-msgstr ""
+msgstr "Current time is > N"
 
 #: popup_trexpr.php:500
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "Current time is NOT N"
 
 #: include/setup.inc.php:192
 msgid "Current value"
@@ -2998,19 +2998,19 @@ msgstr "Day of month"
 
 #: popup_trexpr.php:380
 msgid "Day of month is < N"
-msgstr ""
+msgstr "Day of month is < N"
 
 #: popup_trexpr.php:388
 msgid "Day of month is = N"
-msgstr ""
+msgstr "Day of month is = N"
 
 #: popup_trexpr.php:384
 msgid "Day of month is > N"
-msgstr ""
+msgstr "Day of month is > N"
 
 #: popup_trexpr.php:392
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "Day of month is NOT N"
 
 #: include/forms.inc.php:1526 include/forms.inc.php:1583
 #: include/forms.inc.php:1607
@@ -3019,19 +3019,19 @@ msgstr "Day of week"
 
 #: popup_trexpr.php:364
 msgid "Day of week is < N"
-msgstr ""
+msgstr "Day of week is < N"
 
 #: popup_trexpr.php:372
 msgid "Day of week is = N"
-msgstr ""
+msgstr "Day of week is = N"
 
 #: popup_trexpr.php:368
 msgid "Day of week is > N"
-msgstr ""
+msgstr "Day of week is > N"
 
 #: popup_trexpr.php:376
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "Day of week is NOT N"
 
 #: include/forms.inc.php:1668 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3523,43 +3523,43 @@ msgstr "Device uniqueness criteria"
 
 #: popup_trexpr.php:158
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "Difference between MAX and MIN value of a period T is < N"
 
 #: popup_trexpr.php:168
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "Difference between MAX and MIN value of a period T is = N"
 
 #: popup_trexpr.php:163
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "Difference between MAX and MIN value of a period T is > N"
 
 #: popup_trexpr.php:173
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "Difference between MAX and MIN value of a period T is NOT N"
 
 #: popup_trexpr.php:214
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Difference between last and preceding values, then N = 1, 0 - otherwise"
 
 #: popup_trexpr.php:218
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value of a period T is < N"
-msgstr ""
+msgstr "Difference between last and previous value of a period T is < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value of a period T is = N"
-msgstr ""
+msgstr "Difference between last and previous value of a period T is = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value of a period T is > N"
-msgstr ""
+msgstr "Difference between last and previous value of a period T is > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value of a period T is NOT N"
-msgstr ""
+msgstr "Difference between last and previous value of a period T is NOT N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3904,7 +3904,7 @@ msgstr "Dropdown remember selected \"%1$s\"."
 #: api/classes/CTrigger.php:2046
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "Duplicate dependencies in trigger \"%1$s\"."
 
 #: api/classes/CHost.php:1349
 #, php-format
@@ -4244,11 +4244,11 @@ msgstr "Event ID"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
 
 #: popup_trexpr.php:431
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
@@ -4773,7 +4773,7 @@ msgstr "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 #: api/classes/CTemplateScreen.php:663
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Graph \"%1$s\" does not exist on template \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1556
 #: include/classes/import/CXmlImport18.php:1560
@@ -4848,7 +4848,7 @@ msgstr "Graph updated"
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 
 #: api/classes/CGraph.php:614 api/classes/CGraph.php:635
 #: api/classes/CGraphPrototype.php:642 api/classes/CGraphPrototype.php:663
@@ -5963,7 +5963,7 @@ msgstr "Incorrect color \"%1$s\"."
 
 #: api/classes/CScreenItem.php:587
 msgid "Incorrect column span provided for screen element."
-msgstr ""
+msgstr "Incorrect column span provided for screen element."
 
 #: api/classes/CTriggerExpression.php:226
 msgid "Incorrect count of quotes in expression."
@@ -6238,7 +6238,7 @@ msgstr "Incorrect resource type provided for screen item."
 
 #: api/classes/CScreenItem.php:584
 msgid "Incorrect row span provided for screen element."
-msgstr ""
+msgstr "Incorrect row span provided for screen element."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6421,7 +6421,7 @@ msgstr "Incorrect y min item for graph \"%1$s\"."
 
 #: include/locales.inc.php:55
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "Indonesian (id_ID)"
 
 #: include/blocks.inc.php:834 include/blocks.inc.php:1364
 #: include/classes/class.cformlist.php:65 tr_status.php:286
@@ -6617,7 +6617,7 @@ msgstr "Item \"%1$s\" cannot populate a missing host inventory field number \"%2
 #: api/classes/CTemplateScreen.php:673
 #, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Item \"%1$s\" does not exist on template \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1523
 #, php-format
@@ -6966,19 +6966,19 @@ msgstr[1] "Last %1$d issues"
 
 #: popup_trexpr.php:222
 msgid "Last (most recent) T value is < N"
-msgstr ""
+msgstr "Last (most recent) T value is < N"
 
 #: popup_trexpr.php:232
 msgid "Last (most recent) T value is = N"
-msgstr ""
+msgstr "Last (most recent) T value is = N"
 
 #: popup_trexpr.php:227
 msgid "Last (most recent) T value is > N"
-msgstr ""
+msgstr "Last (most recent) T value is > N"
 
 #: popup_trexpr.php:237
 msgid "Last (most recent) T value is NOT N"
-msgstr ""
+msgstr "Last (most recent) T value is NOT N"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -7069,19 +7069,19 @@ msgstr "Legend"
 
 #: popup_trexpr.php:308
 msgid "Length of last (most recent) T value in characters is < N"
-msgstr ""
+msgstr "Length of last (most recent) T value in characters is < N"
 
 #: popup_trexpr.php:318
 msgid "Length of last (most recent) T value in characters is = N"
-msgstr ""
+msgstr "Length of last (most recent) T value in characters is = N"
 
 #: popup_trexpr.php:313
 msgid "Length of last (most recent) T value in characters is > N"
-msgstr ""
+msgstr "Length of last (most recent) T value in characters is > N"
 
 #: popup_trexpr.php:323
 msgid "Length of last (most recent) T value in characters is NOT N"
-msgstr ""
+msgstr "Length of last (most recent) T value in characters is NOT N"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:333
 #: include/views/js/configuration.sysmaps.js.php:409
@@ -7188,35 +7188,35 @@ msgstr "Log"
 
 #: popup_trexpr.php:436
 msgid "Log severity of the last log entry is < N"
-msgstr ""
+msgstr "Log severity of the last log entry is < N"
 
 #: popup_trexpr.php:444
 msgid "Log severity of the last log entry is = N"
-msgstr ""
+msgstr "Log severity of the last log entry is = N"
 
 #: popup_trexpr.php:440
 msgid "Log severity of the last log entry is > N"
-msgstr ""
+msgstr "Log severity of the last log entry is > N"
 
 #: popup_trexpr.php:448
 msgid "Log severity of the last log entry is NOT N"
-msgstr ""
+msgstr "Log severity of the last log entry is NOT N"
 
 #: popup_trexpr.php:452
 msgid "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
-msgstr ""
+msgstr "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
 
 #: popup_trexpr.php:462
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
 
 #: popup_trexpr.php:457
 msgid "Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise"
-msgstr ""
+msgstr "Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise"
 
 #: popup_trexpr.php:467
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.massupdate.php:365
@@ -7339,7 +7339,7 @@ msgstr "Macro name \"%1$s\" is too long, it should not exceed 64 chars."
 #: api/classes/CUserMacro.php:1079
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Macro with globalmacroid \"%1$s\" does not exist."
 
 #: api/classes/CUserMacro.php:1019
 #, php-format
@@ -7578,19 +7578,19 @@ msgstr[1] "Maximum host name length is %2$d characters, \"%3$s\" is %1$d charact
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period of time is T < N"
-msgstr ""
+msgstr "Maximum value for period of time is T < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period of time is T = N"
-msgstr ""
+msgstr "Maximum value for period of time is T = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period of time is T > N"
-msgstr ""
+msgstr "Maximum value for period of time is T > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period of time is T NOT N"
-msgstr ""
+msgstr "Maximum value for period of time is T NOT N"
 
 #: api/classes/CHost.php:1371
 #, php-format
@@ -7766,19 +7766,19 @@ msgstr "Minimum required size of PHP post is %s (configuration option \"post_max
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period of time is T < N"
-msgstr ""
+msgstr "Minimum value for period of time is T < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period of time is T = N"
-msgstr ""
+msgstr "Minimum value for period of time is T = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period of time is T > N"
-msgstr ""
+msgstr "Minimum value for period of time is T > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period of time is T NOT N"
-msgstr ""
+msgstr "Minimum value for period of time is T NOT N"
 
 #: include/forms.inc.php:1672
 msgid "Minutes"
@@ -8170,11 +8170,11 @@ msgstr "No data defined."
 
 #: popup_trexpr.php:504
 msgid "No data received during period of time T, if N = 1, 0 - otherwise"
-msgstr ""
+msgstr "No data received during period of time T, if N = 1, 0 - otherwise"
 
 #: popup_trexpr.php:509
 msgid "No data received during period of time T, if N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "No data received during period of time T, if N NOT 1, 0 - otherwise"
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -8817,19 +8817,19 @@ msgstr "Number of items (monitored/disabled/not supported)"
 
 #: popup_trexpr.php:472
 msgid "Number of seconds since the Epoch is < N"
-msgstr ""
+msgstr "Number of seconds since the Epoch is < N"
 
 #: popup_trexpr.php:480
 msgid "Number of seconds since the Epoch is = N"
-msgstr ""
+msgstr "Number of seconds since the Epoch is = N"
 
 #: popup_trexpr.php:476
 msgid "Number of seconds since the Epoch is > N"
-msgstr ""
+msgstr "Number of seconds since the Epoch is > N"
 
 #: popup_trexpr.php:484
 msgid "Number of seconds since the Epoch is NOT N"
-msgstr ""
+msgstr "Number of seconds since the Epoch is NOT N"
 
 #: report5.php:63
 msgid "Number of status changes"
@@ -9644,19 +9644,19 @@ msgstr "Previous"
 
 #: popup_trexpr.php:282
 msgid "Previous value is < N"
-msgstr ""
+msgstr "Previous value is < N"
 
 #: popup_trexpr.php:290
 msgid "Previous value is = N"
-msgstr ""
+msgstr "Previous value is = N"
 
 #: popup_trexpr.php:286
 msgid "Previous value is > N"
-msgstr ""
+msgstr "Previous value is > N"
 
 #: popup_trexpr.php:294
 msgid "Previous value is NOT N"
-msgstr ""
+msgstr "Previous value is NOT N"
 
 #: include/hosts.inc.php:404
 msgid "Primary POC cell"
@@ -9916,19 +9916,19 @@ msgstr "Regular expression \"%s\" already exists."
 
 #: popup_trexpr.php:406
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
 
 #: popup_trexpr.php:416
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
 
 #: popup_trexpr.php:411
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
 
 #: popup_trexpr.php:421
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
 
 #: adm.regexps.php:104
 msgid "Regular expression added"
@@ -10596,7 +10596,7 @@ msgstr "Screen \"%1$s\" added."
 
 #: api/classes/CTemplateScreen.php:821
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr ""
+msgstr "Screen \"%1$s\" already exists on template \"%2$2\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:716 api/classes/CTemplateScreen.php:767
@@ -10631,11 +10631,11 @@ msgstr "Screen deleted"
 
 #: api/classes/CScreenItem.php:606
 msgid "Screen elements column span is too big."
-msgstr ""
+msgstr "Screen elements column span is too big."
 
 #: api/classes/CScreenItem.php:603
 msgid "Screen elements row span is too big."
-msgstr ""
+msgstr "Screen elements row span is too big."
 
 #: api/classes/CScreenItem.php:176
 msgid "Screen item in same cell already exists."
@@ -11474,19 +11474,19 @@ msgstr "Success Audit"
 
 #: popup_trexpr.php:328
 msgid "Sum of values for period of time is T < N"
-msgstr ""
+msgstr "Sum of values for period of time is T < N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values for period of time is T NOT N"
-msgstr ""
+msgstr "Sum of values for period of time is T NOT N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
-msgstr ""
+msgstr "Sum of values of a period T is = N"
 
 #: popup_trexpr.php:333
 msgid "Sum of values of a period T is > N"
-msgstr ""
+msgstr "Sum of values of a period T is > N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11878,11 +11878,11 @@ msgstr "Timestamp"
 
 #: popup_trexpr.php:396
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
 
 #: popup_trexpr.php:401
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
 
 #: include/reports.inc.php:206 include/reports.inc.php:368
 #: include/reports.inc.php:517
