@@ -65,7 +65,7 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count'] = array(
 			'args' => array(
-				array('type' => 'sec_num','mandat' => true),
+				array('type' => 'sec_num', 'mandat' => true),
 				array('type' => 'str'),
 				array('type' => 'str'),
 				array('type' => 'sec')
@@ -93,14 +93,14 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
 			'args' => array(
 				array('type' => 'sec', 'mandat' => true)
 			),
-			'value_types' => $value_types_num
+			'value_types' => $value_types_all
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'] = array(
 			'args' => array(
-				array('type' => 'str', 'mandat' => true),
-				array('type' => 'sec_num')
+				array('type' => 'str'),
+				array('type' => 'sec_num', 'mandat' => true)
 			),
-			'value_types' => $value_types_char
+			'value_types' => $value_types_all
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last'] = array(
 			'args' => array(

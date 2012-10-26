@@ -60,7 +60,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //--------
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
 
-	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpmon.applications'));
+	$_REQUEST['applications'] = get_request('applications', CFavorite::get('web.httpmon.applications'));
 	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
 
 	if (isset($_REQUEST['open'])) {
@@ -85,9 +85,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	if (count($_REQUEST['applications']) > 25) {
 		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 	}
-	rm4favorites('web.httpmon.applications');
+	CFavorite::remove('web.httpmon.applications');
 	foreach ($_REQUEST['applications'] as $application) {
-		add2favorites('web.httpmon.applications', $application);
+		CFavorite::add('web.httpmon.applications', $application);
 	}
 
 

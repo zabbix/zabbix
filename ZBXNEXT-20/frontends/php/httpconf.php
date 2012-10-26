@@ -75,11 +75,41 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $showDisabled = get_request('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_STR);
-$_REQUEST['go'] = get_request('go', 'none');
 
 if (!empty($_REQUEST['steps'])) {
 	order_result($_REQUEST['steps'], 'no');
 }
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['httptestid'])) {
+	$dbHttpTest = DBfetch(DBselect(
+		'SELECT wt.*,a.name AS application'.
+		' FROM httptest wt,applications a'.
+		' WHERE a.applicationid=wt.applicationid'.
+			' AND wt.httptestid='.get_request('httptestid')
+	));
+	if (empty($dbHttpTest)) {
+		access_deny();
+	}
+}
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['group_httptestid']) || !is_array($_REQUEST['group_httptestid'])) {
+		access_deny();
+	}
+	else {
+		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT("wt.*") AS cnt'.
+											' FROM httptest wt,applications a'.
+											' WHERE a.applicationid=wt.applicationid'.
+											' AND '.DBcondition('wt.httptestid', $_REQUEST['group_httptestid'])
+										));
+		if ($dbHttpTests['cnt'] != count($_REQUEST['group_httptestid'])) {
+			access_deny();
+		}
+	}
+}
+$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Filter
