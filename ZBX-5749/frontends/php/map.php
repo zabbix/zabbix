@@ -55,6 +55,8 @@ if (empty($map)) {
 	access_deny();
 }
 
+add_elementNames($map['selements']);
+
 $mapPainter = new CMapPainter($map, array(
 	'map' => array(
 		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements']))
