@@ -152,9 +152,6 @@ class CScript extends CZBXAPI {
 			}
 			$hostNodeIds = array_unique($hostNodeIds);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'hg.hostid';
-			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
 				' OR '.
