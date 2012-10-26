@@ -48,7 +48,7 @@ $httpWidget->addHeaderRowNumber(array(
 ));
 
 // create form
-$httpForm = new CForm('get');
+$httpForm = new CForm();
 $httpForm->setName('scenarios');
 $httpForm->addVar('hostid', $this->data['hostid']);
 
@@ -77,16 +77,13 @@ foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 		$name,
 		$httpTest['stepsCnt'],
 		$httpTest['delay'],
-		new CCol(
-			new CLink(
-				httptest_status2str($httpTest['status']),
-				'?group_httptestid[]='.$httpTest['httptestid'].'&go='.($httpTest['status'] ? 'activate' : 'disable'),
-				httptest_status2style($httpTest['status'])
-			)
+		new CLink(
+			httptest_status2str($httpTest['status']),
+			'?group_httptestid[]='.$httpTest['httptestid'].'&go='.($httpTest['status'] ? 'activate' : 'disable'),
+			httptest_status2style($httpTest['status'])
 		)
 	));
 }
-
 
 // create go buttons
 $goComboBox = new CComboBox('go');
