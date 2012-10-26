@@ -32,42 +32,40 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'applicationid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null, _('Application')),
-	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})||isset({save})'),
-	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Name')),
-	'delay' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
-	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	'isset({save})'),
-	'agent' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'macros' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'steps' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})', _('Steps')),
-	'authentication' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'), 'isset({save})'),
-	'http_user' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
+	'groupid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,             null),
+	'new_httpstep'     => array(T_ZBX_STR, O_OPT, null,  null,              null),
+	'sel_step'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(0, 65534), null),
+	'group_httptestid' => array(T_ZBX_INT, O_OPT, null,  DB_ID,             null),
+	'showdisabled'     => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),         null),
+	// form
+	'hostid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,                  'isset({form})||isset({save})'),
+	'applicationid'   => array(T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')),
+	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   '(isset({form})&&({form}=="update"))'),
+	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})', _('Name')),
+	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
+	'status'          => array(T_ZBX_INT, O_OPT, null,  IN('0,1'),               'isset({save})'),
+	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
+	'macros'          => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
+	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})', _('Steps')),
+	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({save})'),
+	'http_user'       => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
-	'http_password' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
+	'http_password'   => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
-	'new_httpstep' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'move_up' =>		array(T_ZBX_INT, O_OPT, P_ACT,	BETWEEN(0, 65534), null),
-	'move_down' =>		array(T_ZBX_INT, O_OPT, P_ACT,	BETWEEN(0, 65534), null),
-	'sel_step' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534), null),
-	'group_httptestid' => array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'showdisabled' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	'new_application' => array(T_ZBX_STR, O_OPT, null, null, null),
-	'hostname' => array(T_ZBX_STR, O_OPT, null, null, null),
+	'hostname'        => array(T_ZBX_STR, O_OPT, null, null, null),
+	'templated'       => array(T_ZBX_STR, O_OPT, null, null, null),
+
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'go'           => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'clone'        => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'save'         => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'delete'       => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'cancel'       => array(T_ZBX_STR, O_OPT, P_SYS,       null, null),
+	'form'         => array(T_ZBX_STR, O_OPT, P_SYS,       null, null),
+	'form_refresh' => array(T_ZBX_INT, O_OPT, null,        null, null)
 );
 $_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
-$_REQUEST['status'] = isset($_REQUEST['status']) ? 0 : 1;
 
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -205,7 +203,7 @@ elseif (isset($_REQUEST['save'])) {
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
 			'delay' => $_REQUEST['delay'],
-			'status' => $_REQUEST['status'],
+			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => $_REQUEST['agent'],
 			'macros' => $_REQUEST['macros'],
 			'steps' => $steps
@@ -376,20 +374,27 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 		$data['authentication'] = $dbHttpTest['authentication'];
 		$data['http_user'] = $dbHttpTest['http_user'];
 		$data['http_password'] = $dbHttpTest['http_password'];
-		$data['templateid'] = $dbHttpTest['templateid'];
+		$data['templated'] = (bool) $dbHttpTest['templateid'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
 	}
 	else {
+		if (isset($_REQUEST['form_refresh'])) {
+			$data['status'] = isset($_REQUEST['status']) ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
+		}
+		else {
+			$data['status'] = HTTPTEST_STATUS_ACTIVE;
+		}
+
 		$data['name'] = get_request('name', '');
 		$data['applicationid'] = get_request('applicationid');
 		$data['new_application'] = get_request('new_application', '');
 		$data['delay'] = get_request('delay', 60);
-		$data['status'] = get_request('status', HTTPTEST_STATUS_ACTIVE);
 		$data['agent'] = get_request('agent', '');
 		$data['macros'] = get_request('macros', array());
 		$data['authentication'] = get_request('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = get_request('http_user', '');
 		$data['http_password'] = get_request('http_password', '');
+		$data['templated'] = get_request('templated');
 		$data['steps'] = get_request('steps', array());
 	}
 

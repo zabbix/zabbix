@@ -28,6 +28,9 @@ $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
 $httpForm = new CForm();
 $httpForm->setName('httpForm');
 $httpForm->addVar('form', $this->data['form']);
+$httpForm->addVar('steps', $this->data['steps']);
+$httpForm->addVar('templated', $this->data['templated']);
+
 
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addVar('httptestid', $this->data['httptestid']);
@@ -42,11 +45,9 @@ else {
 		'dstfld1' => 'hostname',
 		'dstfld2' => 'hostid',
 		'noempty' => 1,
-		'submitParent' => 1,
+		'submitParent' => 1
 	));
 }
-
-$httpForm->addVar('steps', $this->data['steps']);
 
 /*
  * Scenario tab
@@ -61,8 +62,10 @@ $httpFormList->addRow(_('Host'), array(
 ));
 
 // Name
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['templated'], 64);
+if (!$this->data['templated']) {
+	$nameTextBox->attr('autofocus', 'autofocus');
+}
 $httpFormList->addRow(_('Name'), $nameTextBox);
 
 // Application
@@ -137,7 +140,7 @@ $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append status to form list
 $httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros']));
-$httpFormList->addRow(_('Active'), new CCheckBox('status', $this->data['status'] ? (!isset($_REQUEST['httptestid']) ? 1 : 0) : 1, null, 1)); // invert status 0 - enable, 1 - disable
+$httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status'], null, 1));
 
 /*
  * Step tab
@@ -154,7 +157,7 @@ $stepsTable->setHeader(array(
 	new CCol(_('URL'), null, null, '200'),
 	new CCol(_('Required'), null, null, '50'),
 	new CCol(_('Status codes'), null, null, '90'),
-	new CCol(_('Action'), null, null, '50')
+	new CCol('', null, null, '50')
 ));
 
 $i = 1;
@@ -182,7 +185,8 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	$name = new CSpan($step['name'], 'link');
 	$name->setAttribute('id', 'name_'.$stepid);
 	$name->setAttribute('name_step', $stepid);
-	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&list_name=steps&stepid="+jQuery(this).attr("name_step")+"'.
+	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&templated='.$this->data['templated'].
+		'&list_name=steps&stepid="+jQuery(this).attr("name_step")+"'.
 		url_param($step['name'], false, 'name').
 		url_param($step['timeout'], false, 'timeout').
 		url_param($step['url'], false, 'url').
@@ -200,11 +204,19 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$url = $step['url'];
 	}
 
-	$removeButton = new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);', 'link_menu');
-	$removeButton->setAttribute('remove_step', $stepid);
+	if ($this->data['templated']) {
+		$removeButton = SPACE;
+		$dragHandler = SPACE;
+	}
+	else {
+		$removeButton = new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);', 'link_menu');
+		$removeButton->setAttribute('remove_step', $stepid);
+		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
+	}
+
 
 	$row = new CRow(array(
-		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
+		$dragHandler,
 		$numSpan,
 		$name,
 		$step['timeout'].SPACE._('sec'),
@@ -217,9 +229,12 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	$stepsTable->addRow($row);
 }
 
-$tmpColumn = new CCol(new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 410);', 'link_menu'), null, 8);
-$tmpColumn->setAttribute('style', 'vertical-align: middle;');
-$stepsTable->addRow(new CRow($tmpColumn));
+if (!$this->data['templated']) {
+	$stepsTable->addRow(new CCol(
+		new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 410);', 'link_menu'),
+		null, 8)
+	);
+}
 
 $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
