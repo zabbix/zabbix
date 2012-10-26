@@ -752,8 +752,6 @@ int	zbx_db_statement_prepare(const char *sql)
 
 int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 {
-	const char	*__function_name = "zbx_db_bind_parameter";
-
 	sword	err;
 	int	ret = ZBX_DB_OK;
 
