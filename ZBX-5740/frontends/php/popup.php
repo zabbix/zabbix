@@ -1217,7 +1217,7 @@ elseif ($srctbl == 'prototypes') {
 	}
 	$table->setHeader($header);
 
-	$items = API::Item()->get(array(
+	$items = API::ItemPrototype()->get(array(
 		'nodeids' => $nodeid,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),

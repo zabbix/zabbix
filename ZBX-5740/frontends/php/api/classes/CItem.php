@@ -76,7 +76,6 @@ class CItem extends CItemGeneral {
 			'graphids'					=> null,
 			'triggerids'				=> null,
 			'applicationids'			=> null,
-			'discoveryids'				=> null,
 			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
@@ -269,23 +268,6 @@ class CItem extends CItemGeneral {
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['discoveryid'] = 'id.parent_itemid';
-			}
-
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
-			}
 		}
 
 		// webitems
@@ -1348,8 +1330,7 @@ class CItem extends CItemGeneral {
 				&& $options['interfaceids'] === null
 				&& $options['graphids'] === null
 				&& $options['triggerids'] === null
-				&& $options['applicationids'] === null
-				&& $options['discoveryids'] === null) {
+				&& $options['applicationids'] === null) {
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 

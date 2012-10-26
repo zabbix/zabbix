@@ -391,14 +391,14 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['selectTriggers'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
+				'itemids' => $itemids,
 				'preservekeys' => 1,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) order_result($triggers, 'name');
 				foreach ($triggers as $triggerid => $trigger) {
@@ -420,7 +420,7 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -454,14 +454,14 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['selectGraphs'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
+				'itemids' => $itemids,
 				'preservekeys' => 1,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach ($graphs as $graphid => $graph) {
@@ -483,7 +483,7 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {

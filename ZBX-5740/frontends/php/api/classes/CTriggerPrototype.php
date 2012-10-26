@@ -691,6 +691,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
+			// TODO: API::ItemPrototype()->get() should be used, but parameter 'triggerids' not implemented yet
 			$items = API::Item()->get($objParams);
 			foreach ($items as $item) {
 				$itriggers = $item['triggers'];
