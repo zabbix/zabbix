@@ -298,7 +298,7 @@ int	DBstatement_execute()
 
 /******************************************************************************
  *                                                                            *
- * Function: DBexecute                                                        *
+ * Function: __zbx_DBexecute                                                  *
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
  *                                                                            *

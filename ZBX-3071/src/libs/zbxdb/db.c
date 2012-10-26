@@ -1279,7 +1279,7 @@ error:
 							(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
 				}
 			}
-			col_width++;
+			col_width++;	/* add 1 byte for terminating '\0' */
 
 			result->values_alloc[counter - 1] = col_width;
 			result->values[counter - 1] = zbx_malloc(NULL, col_width);

@@ -1347,6 +1347,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
  * Function: dc_add_history_sql                                               *
  *                                                                            *
  * Purpose: helper function for DCmass_add_history()                          *
+ *          for writing float-type items into history/history_sync tables.    *
  *                                                                            *
  ******************************************************************************/
 static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
@@ -1361,10 +1362,10 @@ static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t 
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
 			continue;
 
-		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -1387,10 +1388,10 @@ static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t 
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (0 == history[i].keep_history || 0 != history[i].value_null)
+			if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
 				continue;
 
-			if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
+			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -1429,10 +1430,10 @@ static void	dc_add_history_uint_sql(ZBX_DC_HISTORY *history, int history_num, si
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
 			continue;
 
-		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -1455,10 +1456,10 @@ static void	dc_add_history_uint_sql(ZBX_DC_HISTORY *history, int history_num, si
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (0 == history[i].keep_history || 0 != history[i].value_null)
+			if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
 				continue;
 
-			if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
+			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -1498,10 +1499,10 @@ static void	dc_add_history_str_sql(ZBX_DC_HISTORY *history, int history_num, siz
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_STR != history[i].value_type)
 			continue;
 
-		if (ITEM_VALUE_TYPE_STR != history[i].value_type)
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
 		value_esc = DBdyn_escape_string(history[i].value_orig.str);
@@ -1526,10 +1527,10 @@ static void	dc_add_history_str_sql(ZBX_DC_HISTORY *history, int history_num, siz
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (0 == history[i].keep_history || 0 != history[i].value_null)
+			if (ITEM_VALUE_TYPE_STR != history[i].value_type)
 				continue;
 
-			if (ITEM_VALUE_TYPE_STR != history[i].value_type)
+			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
 			value_esc = DBdyn_escape_string(history[i].value_orig.str);
@@ -1571,10 +1572,10 @@ static void	dc_add_history_text_sql(ZBX_DC_HISTORY *history, int history_num, si
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
 			continue;
 
-		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
 		DBbind_parameter(1, &id, ZBX_TYPE_ID);
@@ -1603,10 +1604,10 @@ static void	dc_add_history_text_sql(ZBX_DC_HISTORY *history, int history_num, si
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
 			continue;
 
-		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
 		value_esc = DBdyn_escape_string(history[i].value_orig.str);
@@ -1651,10 +1652,10 @@ static void	dc_add_history_log_sql(ZBX_DC_HISTORY *history, int history_num, siz
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
-		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
 		DBbind_parameter(1, &id, ZBX_TYPE_ID);
@@ -1690,10 +1691,10 @@ static void	dc_add_history_log_sql(ZBX_DC_HISTORY *history, int history_num, siz
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
-		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
+		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
 		source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
@@ -2078,8 +2079,13 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 			case ITEM_VALUE_TYPE_LOG:
 				hlog_num++;
 				break;
-			default:
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+			case ITEM_VALUE_TYPE_STR:
 				h_num++;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
 
@@ -3073,12 +3079,12 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
 	ZBX_DC_ID	*id;
-	zbx_uint64_t	min, max, nextid;
-
-	LOCK_CACHE_IDS;
+	zbx_uint64_t	min, max, nextid, lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d",
 			__function_name, table_name, num);
+
+	LOCK_CACHE_IDS;
 
 	for (i = 0; i < ZBX_IDS_SIZE; i++)
 	{
@@ -3090,11 +3096,12 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 		{
 			nextid = id->lastid + 1;
 			id->lastid += num;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-					__function_name, table_name, nextid, id->lastid);
+			lastid = id->lastid;
 
 			UNLOCK_CACHE_IDS;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
+					__function_name, table_name, nextid, lastid);
 
 			return nextid;
 		}
@@ -3135,13 +3142,14 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	nextid = id->lastid + 1;
 	id->lastid += num;
+	lastid = id->lastid;
+
+	UNLOCK_CACHE_IDS;
 
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-			__function_name, table_name, nextid, id->lastid);
-
-	UNLOCK_CACHE_IDS;
+			__function_name, table_name, nextid, lastid);
 
 	return nextid;
 }
