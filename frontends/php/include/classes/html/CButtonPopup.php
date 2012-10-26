@@ -36,30 +36,85 @@ class CButtonPopup extends CButton {
 	 *
 	 * @var int
 	 */
-	protected $width;
+	protected $width = 450;
 
 	/**
 	 * Height of popup window.
 	 *
 	 * @var int
 	 */
-	protected $height;
+	protected $height = 450;
 
 	/**
 	 * @param array $options
-	 * @param int   $width
-	 * @param int   $height
 	 */
-	public function __construct(array $options, $width = 450, $height = 450) {
+	public function __construct(array $options) {
 		parent::__construct('button_popup', _('Select'), null, 'formlist');
 
 		$this->options = $options;
+		return $this;
+	}
+
+	/**
+	 * Set button caption.
+	 *
+	 * @param string $caption
+	 *
+	 * @return CButtonPopup
+	 */
+	public function setCaption($caption) {
+		$this->attr('value', $caption);
+		return $this;
+	}
+
+	/**
+	 * Set popup width.
+	 *
+	 * @param int $width
+	 *
+	 * @return CButtonPopup
+	 */
+	public function setWidth($width) {
+		$this->width = $width;
+		return $this;
+	}
+
+	/**
+	 * Set popup height.
+	 *
+	 * @param int $height
+	 *
+	 * @return CButtonPopup
+	 */
+	public function setHeight($height) {
+		$this->height = $height;
+		return $this;
+	}
+
+	/**
+	 * Set popup size, both width and height.
+	 *
+	 * @param int $width
+	 * @param int $height
+	 *
+	 * @return CButtonPopup
+	 */
+	public function setSize($width, $height) {
 		$this->width = $width;
 		$this->height = $height;
-
-		$this->addAction('onclick', $this->getPopupAction());
-
 		return $this;
+	}
+
+	/**
+	 * Assign js action for popup opening and convert object to html string.
+	 *
+	 * @param bool $destroy
+	 *
+	 * @return string
+	 */
+	public function toString($destroy = true) {
+		$this->addAction('onclick', $this->getPopupAction());
+		return parent::toString();
 	}
 
 	/**
