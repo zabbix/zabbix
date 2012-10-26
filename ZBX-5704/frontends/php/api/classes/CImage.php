@@ -301,9 +301,6 @@ class CImage extends CZBXAPI {
 			if (!check_db_fields($imageDbFields, $image)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image [ '.$image['name'].' ]');
 			}
-			if (empty($image['image'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%s" has empty content.', $image['name']));
-			}
 			if ($this->exists(array('name' => $image['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Image').' [ '.$image['name'].' ] '._('already exists'));
 			}
@@ -430,7 +427,7 @@ class CImage extends CZBXAPI {
 			if (isset($image['imagetype'])) {
 				$values['imagetype'] = $image['imagetype'];
 			}
-			if (!empty($image['image'])) {
+			if (isset($image['image'])) {
 				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
 
@@ -586,7 +583,8 @@ class CImage extends CZBXAPI {
 	 *
 	 * @param string $image
 	 *
-	 * @throws APIException
+	 * @throws APIException if image size is greater than 1MB.
+	 * @throws APIException if fiel format is unsupported.
 	 */
 	protected function checkImage($image) {
 		// check size
@@ -598,6 +596,7 @@ class CImage extends CZBXAPI {
 		if (@imageCreateFromString($image) === false) {
 			global $ZBX_MESSAGES;
 
+			// remove message if imagecreatefromstring generated exception is not ignored by PHP
 			if (!empty($ZBX_MESSAGES) && strpos($ZBX_MESSAGES[count($ZBX_MESSAGES) -1]['message'], 'imagecreatefromstring()') !== false) {
 				array_pop($ZBX_MESSAGES);
 			}
