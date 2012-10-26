@@ -31,6 +31,19 @@ $httpForm->addVar('form', $this->data['form']);
 
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addVar('httptestid', $this->data['httptestid']);
+	$hostButton = null;
+}
+else {
+	$hostButton = new CButtonPopup(array(
+		'srctbl' => 'hosts_and_templates',
+		'srcfld1' => 'name',
+		'srcfld2' => 'hostid',
+		'dstfrm' => $httpForm->getName(),
+		'dstfld1' => 'hostname',
+		'dstfld2' => 'hostid',
+		'noempty' => 1,
+		'submitParent' => 1,
+	));
 }
 
 $httpForm->addVar('steps', $this->data['steps']);
@@ -44,11 +57,7 @@ $httpFormList = new CFormList('httpFormList');
 $httpForm->addVar('hostid', $this->data['hostid']);
 $httpFormList->addRow(_('Host'), array(
 	new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-	new CButton('btn_host', _('Select'),
-		'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid'.
-		'&dstfrm='.$httpForm->getName().'&dstfld1=hostname&dstfld2=hostid'.
-		'&noempty=1&submitParent=1", 450, 450);', 'formlist'
-	)
+	$hostButton
 ));
 
 // Name
@@ -57,14 +66,9 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $httpFormList->addRow(_('Name'), $nameTextBox);
 
 // Application
-$httpFormList->addRow(_('Application'), array(
-	new CTextBox('application', $this->data['application'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-	new CButton('select_app', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
-		'&dstfrm='.$httpForm->getName().'&dstfld1=application'.
-		'&only_hostid='.$this->data['hostid'].'", 500, 600, "application");', 'formlist'
-	)
-));
+$httpFormList->addRow(_('Application'),
+	new CComboBox('applicationid', $this->data['applicationid'], null, $this->data['application_list'])
+);
 
 // New application
 $httpFormList->addRow(_('New application'),

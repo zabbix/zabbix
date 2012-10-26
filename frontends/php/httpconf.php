@@ -32,11 +32,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'applicationid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'applicationid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null, _('Application')),
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})||isset({save})'),
 	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'application' =>	array(T_ZBX_STR, O_OPT, null, null, null, _('Application')),
 	'name' =>			array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Name')),
 	'delay' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	'isset({save})'),
@@ -83,6 +82,7 @@ if (!empty($_REQUEST['steps'])) {
 /*
  * Permissions
  */
+/*
 if (isset($_REQUEST['httptestid'])) {
 	$dbHttpTest = DBfetch(DBselect(
 		'SELECT wt.*,a.name AS application'.
@@ -109,6 +109,7 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
+*/
 $_REQUEST['go'] = get_request('go', 'none');
 
 /*
@@ -318,6 +319,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 		if (delete_history_by_httptestid($id)) {
 			$go_result = true;
 			DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.$id);
+			$host = DBfetch(DBselect('SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.applicationid='.$applicationid));
 
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
@@ -359,14 +361,13 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 
 	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh']))) {
 		$dbHttpTest = DBfetch(DBselect(
-			'SELECT ht.*,a.name AS application'.
+			'SELECT ht.*'.
 			' FROM httptest ht'.
-			' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
 			' WHERE ht.httptestid='.zbx_dbstr($_REQUEST['httptestid'])
 		));
 
 		$data['name'] = $dbHttpTest['name'];
-		$data['application'] = $dbHttpTest['application'] ? $dbHttpTest['application'] : '';
+		$data['applicationid'] = $dbHttpTest['applicationid'];
 		$data['new_application'] = '';
 		$data['delay'] = $dbHttpTest['delay'];
 		$data['status'] = $dbHttpTest['status'];
@@ -375,11 +376,12 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 		$data['authentication'] = $dbHttpTest['authentication'];
 		$data['http_user'] = $dbHttpTest['http_user'];
 		$data['http_password'] = $dbHttpTest['http_password'];
+		$data['templateid'] = $dbHttpTest['templateid'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
 	}
 	else {
 		$data['name'] = get_request('name', '');
-		$data['application'] = get_request('application', '');
+		$data['applicationid'] = get_request('applicationid');
 		$data['new_application'] = get_request('new_application', '');
 		$data['delay'] = get_request('delay', 60);
 		$data['status'] = get_request('status', HTTPTEST_STATUS_ACTIVE);
@@ -391,11 +393,10 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 		$data['steps'] = get_request('steps', array());
 	}
 
-	if (!empty($data['application'])) {
-		$appExists = DBfetch(DBselect('SELECT a.name FROM applications a WHERE a.name='.zbx_dbstr($data['application']).' AND a.hostid='.zbx_dbstr($data['hostid'])));
-		if (!$appExists) {
-			$data['application'] = '';
-		}
+	$data['application_list'] = array(0 => '');
+	$dbApps = DBselect('SELECT a.applicationid,a.name FROM applications a WHERE a.hostid='.zbx_dbstr($data['hostid']));
+	while ($dbApp = DBfetch($dbApps)) {
+		$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
 	}
 
 	// render view
