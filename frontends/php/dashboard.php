@@ -64,7 +64,7 @@ if ($dashconf['filterEnable'] == 1) {
 		$dashconf['groupids'] = null;
 	}
 	else {
-		$groupids = get_favorites('web.dashconf.groups.groupids');
+		$groupids = CFavorite::get('web.dashconf.groups.groupids');
 		$dashconf['groupids'] = zbx_objectValues($groupids, 'value');
 	}
 
@@ -144,11 +144,11 @@ if (isset($_REQUEST['favobj'])) {
 			zbx_value2array($_REQUEST['favid']);
 
 			foreach ($_REQUEST['favid'] as $sourceid) {
-				$result = add2favorites('web.favorite.graphids', $sourceid, $_REQUEST['favobj']);
+				$result = CFavorite::add('web.favorite.graphids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = rm4favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::remove('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
@@ -167,11 +167,11 @@ if (isset($_REQUEST['favobj'])) {
 		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 			foreach ($_REQUEST['favid'] as $sourceid) {
-				$result = add2favorites('web.favorite.sysmapids', $sourceid, $_REQUEST['favobj']);
+				$result = CFavorite::add('web.favorite.sysmapids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = rm4favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::remove('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
 		if ($page['type'] == PAGE_TYPE_JS&& $result) {
@@ -190,11 +190,11 @@ if (isset($_REQUEST['favobj'])) {
 		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 			foreach ($_REQUEST['favid'] as $sourceid) {
-				$result = add2favorites('web.favorite.screenids', $sourceid, $_REQUEST['favobj']);
+				$result = CFavorite::add('web.favorite.screenids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = rm4favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::remove('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
