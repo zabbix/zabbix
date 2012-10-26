@@ -1376,7 +1376,7 @@ static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t 
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 
@@ -1404,7 +1404,7 @@ static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t 
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
+		(*sql_offset)--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 	}
@@ -1444,7 +1444,7 @@ static void	dc_add_history_uint_sql(ZBX_DC_HISTORY *history, int history_num, si
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 
@@ -1472,7 +1472,7 @@ static void	dc_add_history_uint_sql(ZBX_DC_HISTORY *history, int history_num, si
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
+		(*sql_offset)--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 	}
@@ -1515,7 +1515,7 @@ static void	dc_add_history_str_sql(ZBX_DC_HISTORY *history, int history_num, siz
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 
@@ -1545,7 +1545,7 @@ static void	dc_add_history_str_sql(ZBX_DC_HISTORY *history, int history_num, siz
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
+		(*sql_offset)--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 	}
@@ -1622,7 +1622,7 @@ static void	dc_add_history_text_sql(ZBX_DC_HISTORY *history, int history_num, si
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 }
@@ -1712,7 +1712,7 @@ static void	dc_add_history_log_sql(ZBX_DC_HISTORY *history, int history_num, siz
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 }
@@ -1853,7 +1853,7 @@ static void	dc_add_proxy_history_sql(ZBX_DC_HISTORY *history, int history_num, s
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 }
@@ -1919,7 +1919,7 @@ static void	dc_add_proxy_history_text_sql(ZBX_DC_HISTORY *history, int history_n
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 }
@@ -2000,7 +2000,7 @@ static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_nu
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 }
@@ -2038,7 +2038,7 @@ static void	dc_add_proxy_history_notsupported_sql(ZBX_DC_HISTORY *history, int h
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
-	sql_offset--;
+	(*sql_offset)--;
 	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
 #endif
 }
