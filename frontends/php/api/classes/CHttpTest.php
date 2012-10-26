@@ -55,6 +55,7 @@ class CHttpTest extends CZBXAPI {
 			'httptestids'		=> null,
 			'applicationids'	=> null,
 			'hostids'			=> null,
+			'groupids'			=> null,
 			'editable'			=> null,
 			'nopermissions'	 	=> null,
 			// filter
@@ -123,6 +124,23 @@ class CHttpTest extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hostid'] = 'ht.hostid';
+			}
+		}
+
+		// groupids
+		if (!is_null($options['groupids'])) {
+			zbx_value2array($options['groupids']);
+
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
+				$sqlParts['select']['groupid'] = 'hg.groupid';
+			}
+
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = 'hg.hostid=ht.hostid';
+
+			if (!is_null($options['groupCount'])) {
+				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
 		}
 
