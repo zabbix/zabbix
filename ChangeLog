@@ -13,7 +13,10 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
-..F....... [ZBX-5700] fixed error after image deleting, fixed duplicates in audit log after deleting, fixed spaces in audit log. Added permission checks in Frontend. (Oleg)
+..F....... [ZBX-5700] added permission checks in frontend (Oleg)
+..F....... [ZBX-5700] fixed error after image deleting (Oleg)
+..F....... [ZBX-5700] fixed duplicates in audit log after deleting (Oleg)
+..F....... [ZBX-5700] fixed spaces in audit log (Oleg)
 ..F....... [ZBX-4186] added permission checks in media types (Oleg)
 ..F....... [ZBX-4185] added permission checks in user groups (Oleg)
 ..F....... [ZBX-5637] changed form, functions description and parameters in trigger expression helper (popup_trexpr.php) and changed popup size (Oleg)
