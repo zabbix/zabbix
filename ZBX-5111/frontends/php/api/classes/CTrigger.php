@@ -1309,26 +1309,7 @@ class CTrigger extends CTriggerGeneral {
 		$this->checkInput($triggers, __FUNCTION__);
 		$this->updateReal($triggers);
 
-		$dbTriggers = DBselect(
-			'SELECT t.expression, t.triggerid'.
-			' FROM triggers t'.
-			' WHERE '.DBcondition('t.triggerid', $triggerids)
-			);
-		$triggerArray = array();
-		while ($dbTriggerData = DBfetch($dbTriggers)) {
-			$triggerArray[$dbTriggerData['triggerid']] = array(
-				'triggerid' => $dbTriggerData['triggerid'],
-				'expression' => $dbTriggerData['expression']
-			);
-		}
-
 		foreach ($triggers as $trigger) {
-			// pass the full trigger so the children can inherit all of the data
-			$dbTrigger = $triggerArray[$trigger['triggerid']];
-			// if we use the expression from the database, make sure it's exploded
-			if (!isset($trigger['expression'])) {
-				$trigger['expression'] = explode_exp($dbTrigger['expression']);
-			}
 			$this->inherit($trigger);
 
 			// replace dependencies
