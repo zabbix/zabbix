@@ -581,10 +581,10 @@ class CImage extends CZBXAPI {
 	/**
 	 * Validate image.
 	 *
-	 * @param string $image
+	 * @param string $image string representing image, for example, result of base64_decode()
 	 *
-	 * @throws APIException if image size is greater than 1MB.
-	 * @throws APIException if fiel format is unsupported.
+	 * @throws APIException if image size is 1MB or greater.
+	 * @throws APIException if file format is unsupported, GD can not create image from given string
 	 */
 	protected function checkImage($image) {
 		// check size
@@ -594,12 +594,6 @@ class CImage extends CZBXAPI {
 
 		// check file format
 		if (@imageCreateFromString($image) === false) {
-			global $ZBX_MESSAGES;
-
-			// remove message if imagecreatefromstring generated exception is not ignored by PHP
-			if (!empty($ZBX_MESSAGES) && strpos($ZBX_MESSAGES[count($ZBX_MESSAGES) -1]['message'], 'imagecreatefromstring()') !== false) {
-				array_pop($ZBX_MESSAGES);
-			}
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
 		}
 	}
