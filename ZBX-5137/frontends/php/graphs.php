@@ -531,6 +531,7 @@ else {
 			'output' => array('graphid', 'name', 'graphtype'),
 			'limit' => $config['search_limit'] + 1
 		);
+		// get real graphs
 		if (empty($_REQUEST['parent_discoveryid'])) {
 			if ($pageFilter->hostid > 0) {
 				$options['hostids'] = $pageFilter->hostid;
@@ -538,13 +539,13 @@ else {
 			elseif ($pageFilter->groupid > 0) {
 				$options['groupids'] = $pageFilter->groupid;
 			}
+			$data['graphs'] = API::Graph()->get($options);
 		}
+		// get graph prototypes
 		else {
 			$options['discoveryids'] = $_REQUEST['parent_discoveryid'];
+			$data['graphs'] = API::GraphPrototype()->get($options);
 		}
-		$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
 	}
 
 	if ($sortfield == 'graphtype') {
