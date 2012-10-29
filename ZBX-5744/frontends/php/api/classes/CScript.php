@@ -141,23 +141,6 @@ class CScript extends CZBXAPI {
 			$sqlParts['where'][] = '('.DBcondition('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
 		}
 
-		// hostids
-		if (!is_null($options['hostids'])) {
-			zbx_value2array($options['hostids']);
-
-			// only fetch scripts from the same nodes as the hosts
-			$hostNodeIds = array();
-			foreach ($options['hostids'] as $hostId) {
-				$hostNodeIds[] = id2nodeid($hostId);
-			}
-			$hostNodeIds = array_unique($hostNodeIds);
-
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
-				' OR '.
-				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
-		}
-
 		// scriptids
 		if (!is_null($options['scriptids'])) {
 			zbx_value2array($options['scriptids']);
@@ -198,15 +181,12 @@ class CScript extends CZBXAPI {
 		// node options
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
-		$scriptids = array();
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($script = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $script['rowscount'];
 			}
 			else {
-				$scriptids[$script['scriptid']] = $script['scriptid'];
-
 				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$script['scriptid']] = array('scriptid' => $script['scriptid']);
 				}
@@ -221,7 +201,6 @@ class CScript extends CZBXAPI {
 						$result[$script['scriptid']]['hosts'] = array();
 					}
 
-					unset($script['hostid']);
 					$result[$script['scriptid']] += $script;
 				}
 			}
@@ -238,6 +217,7 @@ class CScript extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
@@ -544,7 +524,7 @@ class CScript extends CZBXAPI {
 			$scriptsByHost[$hostid] = array();
 		}
 
-		$scripts  = $this->get(array(
+		$scripts = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
 			'hostids' => $hostIds,
@@ -559,6 +539,7 @@ class CScript extends CZBXAPI {
 				}
 			}
 		}
+
 		return $scriptsByHost;
 	}
 
@@ -590,18 +571,44 @@ class CScript extends CZBXAPI {
 		}
 
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+		if (!is_null($options['hostids'])) {
+			zbx_value2array($options['hostids']);
+			$groupIds = zbx_objectValues($result, 'groupid');
+
+			// only fetch scripts from the same nodes as the hosts
+			$hostNodeIds = array();
+			foreach ($options['hostids'] as $hostId) {
+				$hostNodeIds[] = id2nodeid($hostId);
+			}
+			$hostNodeIds = array_unique($hostNodeIds);
+
+			// fill scripts with hosts via groups
+			$dbHosts = DBselect(
+				'SELECT hg.groupid,hg.hostid'.
+				' FROM hosts_groups hg'.
+				' WHERE '.DBcondition('hg.groupid', $groupIds).
+					' AND '.DBin_node('hg.hostid', $hostNodeIds)
+			);
+			while ($dbHost = DBfetch($dbHosts)) {
+				foreach ($result as $scriptid => $script) {
+					if ($script['groupid'] == $dbHost['groupid']) {
+						$result[$scriptid]['hosts'][] = array('hostid' => $dbHost['hostid']);
+					}
+				}
+			}
+
+			// if group is empty fill script with all used hosts
+			$allHosts = array();
+			foreach ($options['hostids'] as $hostId) {
+				$allHosts[] = array('hostid' => $hostId);
+			}
 			foreach ($result as $scriptid => $script) {
-				$result[$scriptid]['hosts'] = API::Host()->get(array(
-					'output' => $options['selectHosts'],
-					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
-					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
-					'nodeids' => id2nodeid($script['scriptid'])
-				));
+				if (empty($script['groupid'])) {
+					$result[$scriptid]['hosts'] = $allHosts;
+				}
 			}
 		}
 
 		return $result;
 	}
 }
-?>
