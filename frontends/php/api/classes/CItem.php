@@ -557,7 +557,7 @@ class CItem extends CItemGeneral {
 				$triggers = API::Trigger()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) {
-					order_result($triggers, 'name');
+					order_result($triggers, 'description');
 				}
 				foreach ($triggers as $triggerid => $trigger) {
 					unset($triggers[$triggerid]['items']);
