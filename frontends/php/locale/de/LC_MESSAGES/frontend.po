@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-29 13:54+0200\n"
-"PO-Revision-Date: 2012-09-08 00:13+0200\n"
+"POT-Creation-Date: 2012-10-29 13:55+0200\n"
+"PO-Revision-Date: 2012-10-27 12:03+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -177,7 +177,7 @@ msgstr "AUDIT-AKTIONEN"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
-msgstr "AUDIT-PROTOKOLLE"
+msgstr "ÜBERWACHUNGS-PROTOKOLLE"
 
 #: report2.php:127
 msgid "AVAILABILITY REPORT"
@@ -185,19 +185,19 @@ msgstr "VERFÜGBARKEITSBERICHT"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Der Unterschied zwischen dem letzten und vorletzten Wert ist < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Der Unterschied zwischen dem letzten und vorletzten Wert ist = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Der Unterschied zwischen dem letzten und vorletzten Wert ist > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Der Unterschied zwischen dem letzten und vorletzten Wert ist nicht N"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -414,7 +414,7 @@ msgstr "Element hinzufügen"
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Zuerst die Graph Items hinzufügen"
 
 #: include/actions.inc.php:283 include/actions.inc.php:498
 msgid "Add host"
@@ -495,11 +495,11 @@ msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr "Agent Interfaces"
+msgstr "Agent Schnittstellen"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr "Agent-, SNMP-, JMX- oder IPMI-Interface"
+msgstr "Agent-, SNMP-, JMX- oder IPMI-Schnittstelle"
 
 #: include/hosts.inc.php:119 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:897 users.php:43
@@ -691,15 +691,15 @@ msgstr "Mindestens eine der Datenbanken MySQL, Oracle, SQLite3 oder IBM DB2 soll
 
 #: include/menu.inc.php:266
 msgid "Audit"
-msgstr "Audit"
+msgstr "Überwachung"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr "Aktionen auditieren"
+msgstr "Aktionen überwachen"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr "Logs auditieren"
+msgstr "Logs überwachen"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -785,19 +785,19 @@ msgstr "Durchschnitt über"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Durchschnittswert in der Zeit T ist < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Durchschnittswert in der Zeit T ist = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Durchnittswert in der Zeit T ist > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Durchnittswert in der Zeit T ist nicht N"
 
 # nach meinem Verständnis bezieht sich das darauf, ob die Achse entweder links oder rechts bzw. oben oder unten positioniert wird. 
 #: popup_bitem.php:140
@@ -866,7 +866,7 @@ msgstr "fette Linie"
 
 #: include/items.inc.php:128
 msgid "Boolean"
-msgstr "Boolesch"
+msgstr "Wahrheitswert"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
@@ -1306,11 +1306,11 @@ msgstr "Kann keine weitere Datenbank-Verbindung aufbauen."
 
 #: api/classes/CTrigger.php:1904
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Kann keine zirkuläre Abhängigkeit anlegen."
 
 #: api/classes/CTrigger.php:1876
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Trigger kann nicht von sich selbst abhängen."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -1390,7 +1390,7 @@ msgstr "Kann Diagramme nicht löschen"
 
 #: api/classes/CGraphPrototype.php:820
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "Kann Graphen nicht löschen, die von der Low-Level-Discovery angelegt wurden."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1426,7 +1426,7 @@ msgstr "Kann Elemente nicht löschen"
 
 #: api/classes/CItemPrototype.php:754
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "Kann keine Elemente löschen, die von der Low-Level-Discovery angelegt wurden."
 
 #: maintenance.php:174
 msgid "Cannot delete maintenance"
@@ -1535,7 +1535,7 @@ msgstr "Kann Auslöser nicht löschen"
 
 #: api/classes/CTriggerPrototype.php:976
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "Kann Auslöser nicht löschen, der von Low-Level-Discovery angelegt wurde."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1754,32 +1754,32 @@ msgstr "Discovery-Regel ohne Prüfung kann nicht gespeichert werden."
 #: api/classes/CApplication.php:466
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht gesetzt werden für Applikation \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht gesetzt werden für Graph \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht gesetzt werden für Element \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht gesetzt werden für Tafel \"%1$s\"."
 
 #: api/classes/CTrigger.php:1143
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht gesetzt werden für Auslöser \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:771
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht gesetzt werden für Auslöser-Prototypen \"%1$s\"."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
@@ -1829,32 +1829,32 @@ msgstr "Kann den Auslöser \"%s\" nicht trennen, da er Elemente der Vorlage hat,
 #: api/classes/CApplication.php:463
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht aktualisiert werden für Applikation \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht aktualisiert werden für Graph \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht aktualisiert werden für Element \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:744
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht aktualisiert werden für Tafel \"%1$s\"."
 
 #: api/classes/CTrigger.php:1140
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht aktualisiert werden für Auslöser \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:844
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "\"templateid\" kann nicht aktualisiert werden für Auslöser-Protoypen \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -2758,20 +2758,24 @@ msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Kritischer Fehler. Falscher Wert für Feld \"%1$s\": Darf nicht leer sein."
 
 #: popup_trexpr.php:348
+#, fuzzy
 msgid "Current date is < N"
-msgstr ""
+msgstr "Heutiges Datum < N"
 
 #: popup_trexpr.php:356
+#, fuzzy
 msgid "Current date is = N"
-msgstr ""
+msgstr "Heutiges Datum = N"
 
 #: popup_trexpr.php:352
+#, fuzzy
 msgid "Current date is > N"
-msgstr ""
+msgstr "Heutiges Datum > N"
 
 #: popup_trexpr.php:360
+#, fuzzy
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "Heutiges Datum NICHT N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
@@ -2783,20 +2787,21 @@ msgid "Current node"
 msgstr "Aktueller Knoten"
 
 #: popup_trexpr.php:488
+#, fuzzy
 msgid "Current time is < N"
-msgstr ""
+msgstr "Momentane Zeit < N"
 
 #: popup_trexpr.php:496
 msgid "Current time is = N"
-msgstr ""
+msgstr "Momentane Zeit = N"
 
 #: popup_trexpr.php:492
 msgid "Current time is > N"
-msgstr ""
+msgstr "Momentane Zeit > N"
 
 #: popup_trexpr.php:500
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "Momentane Zeit NICHT N"
 
 #: include/setup.inc.php:192
 msgid "Current value"
@@ -2813,7 +2818,7 @@ msgstr "Benutzerdefinierte Beschriftung"
 #: api/classes/CMap.php:597
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr "Benutzerdefinierte Bezeichnung der Karte \"%2$s\",  Elemente des Typs \"%1$s\" dürfen nicht leer sein."
+msgstr "Benutzerdefinierte Bezeichnung der Karte \"%2$s\", Elemente des Typs \"%1$s\" dürfen nicht leer sein."
 
 #: disc_prototypes.php:103 include/views/configuration.item.massupdate.php:250
 #: items.php:134
@@ -3016,19 +3021,19 @@ msgstr "Tag des Monats"
 
 #: popup_trexpr.php:380
 msgid "Day of month is < N"
-msgstr ""
+msgstr "Tag des Monats < N"
 
 #: popup_trexpr.php:388
 msgid "Day of month is = N"
-msgstr ""
+msgstr "Tag des Monats = N"
 
 #: popup_trexpr.php:384
 msgid "Day of month is > N"
-msgstr ""
+msgstr "Tag des Monats > N"
 
 #: popup_trexpr.php:392
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "Tag des Monats NICHT N"
 
 #: include/forms.inc.php:1526 include/forms.inc.php:1583
 #: include/forms.inc.php:1607
@@ -3037,19 +3042,19 @@ msgstr "Wochentag"
 
 #: popup_trexpr.php:364
 msgid "Day of week is < N"
-msgstr ""
+msgstr "Wochentag < N"
 
 #: popup_trexpr.php:372
 msgid "Day of week is = N"
-msgstr ""
+msgstr "Wochentag = N"
 
 #: popup_trexpr.php:368
 msgid "Day of week is > N"
-msgstr ""
+msgstr "Wochentag > N"
 
 #: popup_trexpr.php:376
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "Wochentag NICHT N"
 
 #: include/forms.inc.php:1668 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3542,19 +3547,19 @@ msgstr "Eindeutigkeitsmerkmal des Gerätes"
 
 #: popup_trexpr.php:158
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "Unterschied zwischen MAX- und MIN-Wert im Zeitraum T < N"
 
 #: popup_trexpr.php:168
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "Unterschied zwischen MAX- und MIN-Wert im Zeitraum T = N"
 
 #: popup_trexpr.php:163
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "Unterschied zwischen MAX- und MIN-Wert im Zeitraum T > N"
 
 #: popup_trexpr.php:173
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "Unterschied zwischen MAX- und MIN-Wert im Zeitraum T NICHT N"
 
 #: popup_trexpr.php:214
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -3924,7 +3929,7 @@ msgstr "Dropdown merkt sich Auswahl \"%1$s\"."
 #: api/classes/CTrigger.php:2046
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "Abhängigkeits-Duplikat bei Auslöser \"%1$s\"."
 
 #: api/classes/CHost.php:1349
 #, php-format
@@ -4527,7 +4532,7 @@ msgstr "Datei einer Übersicht existiert nicht. Es handelt sich um \"%s\"."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
-msgstr "Gefüllte Region"
+msgstr "Gefüllt"
 
 #: dashconf.php:265 events.php:367 hostinventories.php:134 hosts.php:657
 #: include/classes/class.cwidget.php:134 include/forms.inc.php:574
@@ -4561,7 +4566,7 @@ msgstr "Beenden"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Finnisch (fi_FI)"
 
 #: include/forms.inc.php:1589 include/maintenances.inc.php:103
 msgid "First"
@@ -4588,7 +4593,7 @@ msgstr "Flexible Intervalle"
 
 #: profile.php:113 users.php:154
 msgid "For guest, password must be empty"
-msgstr "Für den Gast muss das Passwort leer sein"
+msgstr "Für den Gast muss das Passwort leer bleiben"
 
 #: include/items.inc.php:1323 include/views/configuration.item.edit.php:200
 msgid "Formula"
@@ -5950,7 +5955,7 @@ msgstr "Methode erhielt falsche Argumente."
 #: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "Unzulässiger Wert für berechnete SLA bei Service \"%1$s\"."
 
 #: include/nodes.inc.php:267 include/nodes.inc.php:309
 msgid "Incorrect characters used for Node name."
@@ -6075,7 +6080,7 @@ msgstr "Falscher Bildindex"
 #: api/classes/CHostInterface.php:810
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
-msgstr "Falsche Interface DNS Parameter \"%s\" geliefert."
+msgstr "Falsche Interface DNS Parameter \"%s\" eingegeben."
 
 #: api/classes/CHostInterface.php:826
 #, php-format
@@ -6085,7 +6090,7 @@ msgstr "Falscher Interface IP-Parameter \"%s\" eingegeben."
 #: api/classes/CHostInterface.php:842
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr ""
+msgstr "Falscher Interface-Port \"%s\" eigegeben."
 
 #: api/classes/CHost.php:1279
 #, php-format
@@ -6216,7 +6221,7 @@ msgstr "Falscher Parameter verwendet für Symbolzuordnung \"%s\"."
 #: api/classes/CAction.php:904
 #, php-format
 msgid "Incorrect parameters for action update method \"%s\"."
-msgstr ""
+msgstr "Falscher Parameter für die Methode zum Aktualisieren von Aktionen \"%s\"."
 
 #: api/classes/CAction.php:1025
 msgid "Incorrect parameters for condition."
@@ -6449,7 +6454,7 @@ msgstr "Falsches Element für das y-Minimum von Graph \"%1$s\"."
 
 #: include/locales.inc.php:55
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "Indonesisch (id_ID)"
 
 #: include/blocks.inc.php:834 include/blocks.inc.php:1364
 #: include/classes/class.cformlist.php:65 tr_status.php:286
@@ -6485,26 +6490,26 @@ msgstr ""
 #: api/classes/CHostInterface.php:1030
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Interface ist verknüpft mit Element \"%1$s\" auf \"%2$s\"."
 
 #: include/views/js/configuration.host.edit.js.php:135
 msgid "Interface is used by items that require this type of the interface."
-msgstr ""
+msgstr "Es existieren Elemente, die diese Art Interface benötigen."
 
 #: api/classes/CHostInterface.php:543
 #, php-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
-msgstr ""
+msgstr "Es wurde keine IP-Adresse angegeben für das Interface mit dem DNS-Namen %1$s\""
 
 #: api/classes/CHostInterface.php:549 api/classes/CHostInterface.php:556
 #, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
-msgstr ""
+msgstr "Der DNS-Name darf nicht leer bleiben auf dem Interface mit IP-Adresse \"%1$s\", Es wurde angegeben, dass der DNS-Name verwendet wird auf \"%2$s\"."
 
 #: api/classes/CHostInterface.php:562
 #, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr ""
+msgstr "Es wurde kein DNS-Name angegeben für das Interface mit der IP-Adresse \"%1$s\"."
 
 #: include/users.inc.php:59
 #: include/views/administration.authentication.edit.php:35
@@ -6596,7 +6601,7 @@ msgstr "Invertarfeld"
 
 #: include/views/configuration.host.massupdate.php:182
 msgid "Inventory mode"
-msgstr "Inventar Modus"
+msgstr "Inventar-Modus"
 
 #: include/views/administration.users.list.php:59
 msgid "Is online?"
@@ -6646,7 +6651,7 @@ msgstr "Element \"%1$s\" befüllt nicht ein fehlendes Inventarfeld Nummer \"%2$d
 #: api/classes/CTemplateScreen.php:673
 #, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Element \"%1$s\" existiert nicht in Vorlage \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1523
 #, php-format
@@ -6706,7 +6711,7 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:249
 msgid "Item uses incorrect interface type."
-msgstr ""
+msgstr "Interface-Typ ist ungeeignet für dieses Element."
 
 #: api/classes/CItemGeneral.php:303
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -6800,7 +6805,7 @@ msgstr "JMX-Agent"
 
 #: include/views/configuration.host.edit.php:265
 msgid "JMX interfaces"
-msgstr ""
+msgstr "JMX-Interaces"
 
 #: api/rpc/class.cjsonrpc.php:149
 #, php-format
@@ -7370,12 +7375,12 @@ msgstr "Makroname \"%1$s\" ist zu lang. Er darf nicht länger als 64 Zeichen sei
 #: api/classes/CUserMacro.php:1079
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Es existiert kein Makro mit globalmacroid \"%1$s\"."
 
 #: api/classes/CUserMacro.php:1019
 #, php-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
-msgstr "Makro mit hostmacroid \"%1$s\" existiert nicht."
+msgstr "Es existiert kein Makro mit hostmacroid \"%1$s\"."
 
 #: adm.gui.php:97 adm.housekeeper.php:76 adm.iconmapping.php:114
 #: adm.images.php:140 adm.macros.php:163 adm.other.php:109 adm.regexps.php:213
@@ -9580,7 +9585,7 @@ msgstr "Berechtigungen können nur Benutzergruppen zugewiesen werden."
 
 #: include/locales.inc.php:60
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Persisch (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
@@ -10293,12 +10298,10 @@ msgid "Run commands"
 msgstr "Befehle ausführen"
 
 #: include/actions.inc.php:383
-#, fuzzy
 msgid "Run custom commands on Zabbix agent"
 msgstr "Eigene Befehle auf Zabbix-Agenten ausführen"
 
 #: include/actions.inc.php:386
-#, fuzzy
 msgid "Run custom commands on Zabbix server"
 msgstr "Eigene Befehle auf Zabbix-Server ausführen"
 
@@ -10407,7 +10410,7 @@ msgstr "SNMP-Community"
 
 #: include/views/configuration.host.edit.php:250
 msgid "SNMP interfaces"
-msgstr ""
+msgstr "SNMP-Interfaces"
 
 #: include/items.inc.php:82
 msgid "SNMP trap"
@@ -10458,9 +10461,9 @@ msgid "SNMPv3 security name"
 msgstr "SNMPv3-Sicherheitsname"
 
 #: include/classes/debug/CProfiler.php:141
-#, php-format
+#, fuzzy, php-format
 msgid "SQL count: %s (selects: %s | executes: %s)"
-msgstr ""
+msgstr "SQL-Anzahl: % s (selects: %s | executes: %s)"
 
 #: include/classes/db/DB.php:631
 #, php-format
@@ -10642,7 +10645,7 @@ msgstr "Übersichtstafel \"%1$s\" angelegt."
 
 #: api/classes/CTemplateScreen.php:821
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr ""
+msgstr "Übersichtstafel \"%1$s\" existiert bereits in Vorlage \"%2$2\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:716 api/classes/CTemplateScreen.php:767
@@ -11045,17 +11048,16 @@ msgstr "Sitzung beendet, bitte neu anmelden."
 #: include/views/configuration.triggers.massupdate.php:65 popup.php:979
 #: report5.php:62 tr_logform.php:367 tr_status.php:284
 msgid "Severity"
-msgstr "Priorität"
+msgstr "Schweregrad"
 
 #: include/views/configuration.screen.constructor.edit.php:342
 msgid "Severity (descending)"
-msgstr "Priorität (absteigend)"
+msgstr "Schweregrad (absteigend)"
 
 # Schwere
 #: include/profiles.inc.php:306
-#, fuzzy
 msgid "Severity name cannot be empty."
-msgstr "Prioriäts-Name darf nicht leer sein."
+msgstr "Name des Schweregrads darf nicht leer bleiben."
 
 #: include/classes/class.cuiwidget.php:58
 #: include/classes/class.cwidget.php:222 include/html.inc.php:146
@@ -11089,7 +11091,7 @@ msgstr "Deaktivierte Auslöser einblenden"
 #: adm.gui.php:73
 #, php-format
 msgid "Show events max \"%1$s\"."
-msgstr ""
+msgstr "Zeige höchstens \"%1$s\" Ereignisse."
 
 # nicht älter/jünger
 #: adm.gui.php:34 include/views/administration.general.gui.edit.php:43
@@ -11259,7 +11261,7 @@ msgstr "Vorführung gelöscht"
 
 #: include/screens.inc.php:156 include/screens.inc.php:212
 msgid "Slide show must contain slides."
-msgstr ""
+msgstr "Vorführung ohne Seiten nicht möglich."
 
 #: slideconf.php:97
 msgid "Slide show updated"
@@ -11281,7 +11283,6 @@ msgid "Slovak (sk_SK)"
 msgstr "Slovakisch (sk_SK)"
 
 #: jsLoader.php:162
-#, fuzzy
 msgid "Snooze"
 msgstr "Dösen"
 
@@ -11318,9 +11319,8 @@ msgid "Software application E"
 msgstr "Software-Anwendung E"
 
 #: include/reports.inc.php:379
-#, fuzzy
 msgid "Sort by"
-msgstr "sortiert nach"
+msgstr "Sortieren nach"
 
 #: include/views/configuration.services.edit.php:70 services.php:47
 msgid "Sort order (0->999)"
@@ -11502,7 +11502,7 @@ msgstr "Halt"
 msgid "Store value"
 msgstr "Wert speichern"
 
-# Autorisierungs-Form
+# Autorisierungs-Form-IPMI
 #: include/hosts.inc.php:41
 msgid "Straight"
 msgstr ""
@@ -11513,7 +11513,7 @@ msgstr "Stil"
 
 #: include/forms.inc.php:865
 msgid "Subfilter [affects only filtered data!]"
-msgstr ""
+msgstr "Folgefilter [wirkt nur auf gefilterte Daten!]"
 
 #: include/actions.inc.php:350 include/actions.inc.php:359
 #: include/actions.inc.php:365 include/actions.inc.php:719
@@ -12637,7 +12637,7 @@ msgstr "Übergeordnete Karten"
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:165
 msgid "Uptime"
-msgstr "Uptime"
+msgstr "Laufzeit"
 
 #: include/actions.inc.php:57
 msgid "Uptime/Downtime"
@@ -12654,7 +12654,7 @@ msgstr "Verwende benutzerdefinierten Multiplikator"
 
 #: popup_media.php:133
 msgid "Use if severity"
-msgstr "Benutzen bei Schwierigkeitsgrad"
+msgstr "Bei Schweregrad"
 
 #: include/views/administration.mediatypes.list.php:42
 msgid "Used in actions"
@@ -12962,7 +12962,7 @@ msgstr "Warnung"
 
 #: chart7.php:74
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Warnung kann nicht mehr als ein Item des types \"Graph sum\". anzeigen"
 
 #: include/validate.inc.php:451
 #, php-format
@@ -13094,9 +13094,8 @@ msgid "Weekly"
 msgstr "wöchentlich"
 
 #: popup_media.php:123
-#, fuzzy
 msgid "When active"
-msgstr "Gültigkeitszeitraum"
+msgstr "Aktiv um"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:76
@@ -13218,7 +13217,7 @@ msgstr "Falsche Felder für Skript."
 #: api/classes/CService.php:130 api/classes/CService.php:241
 #, php-format
 msgid "Wrong fields for service \"%1$s\"."
-msgstr ""
+msgstr "Falsche Felder für Dienst \"%1$s\"."
 
 #: api/classes/CService.php:484
 #, php-format
@@ -13237,7 +13236,7 @@ msgstr "Falsche Felder für Benutzer \"%s\"."
 #: api/classes/CUserMacro.php:898
 #, php-format
 msgid "Wrong macro \"%1$s\"."
-msgstr "Falscher Makro \"%1$s\"."
+msgstr "Falsches Makro \"%1$s\"."
 
 #: include/views/js/configuration.sysmaps.js.php:153
 msgid "X"
@@ -13251,18 +13250,18 @@ msgstr "Beschriftung X-Achse"
 #: include/classes/import/readers/CXmlImportReader.php:48
 #, php-format
 msgid "XML file contains error %1$s:"
-msgstr ""
+msgstr "XML-Datei hat Fehler %1$s:"
 
 #: include/classes/import/CXmlImport18.php:403
 #: include/classes/import/CXmlImport18.php:406
 #: include/classes/import/CXmlImport18.php:409
 msgid "XML file contains errors"
-msgstr "XML-Datei enthält Fehler"
+msgstr "XML-Datei hat Fehler"
 
 #: include/classes/import/readers/CXmlImportReader.php:51
 #, php-format
 msgid "XML file contains fatal error %1$s:"
-msgstr ""
+msgstr "XML-Datei hat fatalen Fehler %1$s:"
 
 #: include/classes/import/readers/CXmlImportReader.php:45
 #, php-format
@@ -13794,7 +13793,7 @@ msgstr "letzte"
 #: include/forms.inc.php:478 include/forms.inc.php:550
 #: include/forms.inc.php:561
 msgid "like"
-msgstr "like"
+msgstr "genauso wie"
 
 #: include/func.inc.php:562
 msgctxt "Milli short"
@@ -13892,11 +13891,11 @@ msgstr "nicht in"
 
 #: include/actions.inc.php:26
 msgid "not like"
-msgstr "not like"
+msgstr "nicht wie"
 
 #: include/classes/class.cserverinfo.php:37
 msgid "not running"
-msgstr "nicht aktiv"
+msgstr "nicht gestartet"
 
 #: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:384
 #: include/classes/class.cpagefilter.php:410 include/forms.inc.php:1029
@@ -14024,7 +14023,7 @@ msgstr "Wert"
 #: jsLoader.php:92
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #: include/maintenances.inc.php:74
 msgid "week"

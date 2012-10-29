@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-29 13:54+0200\n"
-"PO-Revision-Date: 2012-10-25 16:51+0200\n"
-"Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
+"POT-Creation-Date: 2012-10-29 13:55+0200\n"
+"PO-Revision-Date: 2012-10-27 09:33+0200\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -1294,7 +1294,7 @@ msgstr "Cannot create another database connection."
 
 #: api/classes/CTrigger.php:1904
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Cannot create circular dependencies."
 
 #: api/classes/CTrigger.php:1876
 msgid "Cannot create dependency on trigger itself."
@@ -4527,7 +4527,7 @@ msgstr "Filter by name"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"

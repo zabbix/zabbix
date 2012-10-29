@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-29 13:54+0200\n"
-"PO-Revision-Date: 2012-09-09 23:31+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2012-10-29 13:55+0200\n"
+"PO-Revision-Date: 2012-10-27 21:59+0200\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -1659,7 +1659,7 @@ msgstr "Не вдалося побудувати дерево."
 
 #: api/classes/CTemplate.php:1381
 msgid "Cannot have empty visible template name"
-msgstr "Видиме ім'я шаблону не може бути устим"
+msgstr "Видиме ім'я шаблону не може бути пустим"
 
 #: api/classes/CTrigger.php:1607 api/classes/CTrigger.php:1679
 #: api/classes/CTriggerPrototype.php:1016

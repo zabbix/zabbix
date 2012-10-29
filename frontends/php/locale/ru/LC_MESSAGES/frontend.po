@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-29 13:54+0200\n"
-"PO-Revision-Date: 2012-10-21 20:27+0200\n"
+"POT-Creation-Date: 2012-10-29 13:55+0200\n"
+"PO-Revision-Date: 2012-10-26 22:35+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1301,11 +1301,11 @@ msgstr "Не удалось создать другое подключение �
 
 #: api/classes/CTrigger.php:1904
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Не удалось создать закольцованные зависимости."
 
 #: api/classes/CTrigger.php:1876
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Невозможно создать завимость триггера от самого себя."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -1373,7 +1373,7 @@ msgstr "Не удалось удалить график"
 
 #: api/classes/CItemPrototype.php:737
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Не удалось удалить прототип графика"
 
 #: api/classes/CItem.php:1001
 msgid "Cannot delete graph."
@@ -1385,7 +1385,7 @@ msgstr "Не удалось удалить график"
 
 #: api/classes/CGraphPrototype.php:820
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "Невозможно удалить графики созданные низкоуровневым обнаружением."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1421,7 +1421,7 @@ msgstr "Не удалось удалить элементы данных"
 
 #: api/classes/CItemPrototype.php:754
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "Невозможно удалить элементы данных созданные низкоуровневым обнаружением."
 
 #: maintenance.php:174
 msgid "Cannot delete maintenance"
@@ -1502,7 +1502,7 @@ msgstr "Не удалось удалить шаблонный элемент д�
 
 #: api/classes/CItemPrototype.php:698
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Не удалось удалить шаблонные элементы данных"
 
 #: api/classes/CDiscoveryRule.php:583
 msgid "Cannot delete templated items."
@@ -1519,7 +1519,7 @@ msgstr "Не удалось удалить триггер"
 
 #: api/classes/CItemPrototype.php:769
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Не удалось удалить прототип триггера"
 
 #: api/classes/CItem.php:1017
 msgid "Cannot delete trigger."
@@ -1531,7 +1531,7 @@ msgstr "Не удалось удалить триггеры"
 
 #: api/classes/CTriggerPrototype.php:976
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "Невозможно удалить триггеры созданные низкоуровневым обнаружением."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1752,32 +1752,32 @@ msgstr "Невозможно сохранить правило обнаруже�
 #: api/classes/CApplication.php:466
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Не удалось установить \"templateid\" для группы элементов данных \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Не удалось установить \"templateid\" для графика \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Не удалось установить \"templateid\" для элемента данных \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Не удалось установить \"templateid\" для комплексного экрана \"%1$s\"."
 
 #: api/classes/CTrigger.php:1143
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Не удалось установить \"templateid\" для триггера \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:771
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Не удалось установить \"templateid\" для прототипа триггера \"%1$s\"."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
@@ -1827,32 +1827,32 @@ msgstr "Не удалось отсоединить триггер \"%s\", он �
 #: api/classes/CApplication.php:463
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" для группы элементов данных \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" для графика \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" для элемента данных \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:744
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" для комплексного экрана \"%1$s\"."
 
 #: api/classes/CTrigger.php:1140
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" для триггера \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:844
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" для прототипа триггера \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -4538,11 +4538,11 @@ msgstr "Фильтр по имени"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Искать строку V в последнем (самом новом) значении. N = 1 - если найдено, 0 - в противном случае"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Искать строку V в последнем (самом новом) значении. N NOT 1 - если найдено, 0 - в противном случае"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -4859,7 +4859,7 @@ msgstr "График обновлен"
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "График с именем \"%1$s\" уже существует в графиках или в прототипах графиков."
 
 #: api/classes/CGraph.php:614 api/classes/CGraph.php:635
 #: api/classes/CGraphPrototype.php:642 api/classes/CGraphPrototype.php:663
@@ -6432,7 +6432,7 @@ msgstr "Некорректный элемент данных для Y мин. в
 
 #: include/locales.inc.php:55
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "Индонезийский (id_ID)"
 
 #: include/blocks.inc.php:834 include/blocks.inc.php:1364
 #: include/classes/class.cformlist.php:65 tr_status.php:286
@@ -7217,19 +7217,19 @@ msgstr "Важность последней записи в журнале NOT N
 
 #: popup_trexpr.php:452
 msgid "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
-msgstr ""
+msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N < 1, 0 - в противном случае"
 
 #: popup_trexpr.php:462
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:457
 msgid "Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise"
-msgstr ""
+msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N > 1, 0 - в противном случае"
 
 #: popup_trexpr.php:467
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N NOT 1, 0 - в противном случае"
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.massupdate.php:365
@@ -8857,19 +8857,19 @@ msgstr "Количество шагов"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T < N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T = N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T = N"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T > N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T NOT N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9933,19 +9933,19 @@ msgstr "Регулярное выражение \"%s\" уже существуе
 
 #: popup_trexpr.php:406
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Регулярное выражение V соответствует последнему значений за период T, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:416
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Регулярное выражение V соответствует последнему значений за период T, тогда N = 1, 0 - в противном случае (не регистрозависимо)"
 
 #: popup_trexpr.php:411
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Регулярное выражение V соответствует последнему значений за период T, тогда N NOT 1, 0 - в противном случае"
 
 #: popup_trexpr.php:421
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Регулярное выражение V соответствует последнему значений за период T, тогда N NOT 1, 0 - в противном случае (не регистрозависимо)"
 
 #: adm.regexps.php:104
 msgid "Regular expression added"
@@ -10649,11 +10649,11 @@ msgstr "Комплексный экран удален"
 
 #: api/classes/CScreenItem.php:606
 msgid "Screen elements column span is too big."
-msgstr ""
+msgstr "Диапазон колонок элементов комплексного экрана слишком большой."
 
 #: api/classes/CScreenItem.php:603
 msgid "Screen elements row span is too big."
-msgstr ""
+msgstr "Диапазон строк элементов комплексного экрана слишком большой."
 
 #: api/classes/CScreenItem.php:176
 msgid "Screen item in same cell already exists."
