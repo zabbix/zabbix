@@ -52,6 +52,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5754] fixed English strings in trigger expression helper (Oleg)
 ..F....... [ZBX-5700] added permission checks in frontend (Oleg)
 ..F....... [ZBX-5700] fixed error after image deleting (Oleg)
 ..F....... [ZBX-5700] fixed duplicates in audit log after deleting (Oleg)
