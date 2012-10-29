@@ -534,9 +534,8 @@ void	process_httptests(int httppoller_num, int now)
 
 	result = DBselect(
 			"select t.httptestid,t.name,t.macros,t.agent,t.authentication,t.http_user,t.http_password"
-			" from httptest t,applications a,hosts h"
-			" where t.applicationid=a.applicationid"
-				" and a.hostid=h.hostid"
+			" from httptest t,hosts h"
+			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
 				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
 				" and t.status=%d"
