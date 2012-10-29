@@ -175,19 +175,19 @@ $functions = array(
 		'allowed_types' => $allowed_types_numeric
 	),
 	'change[<]' => array(
-		'description' =>  _('Difference between last and previous value of a period T is < N'),
+		'description' =>  _('Difference between last and previous value is < N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'change[>]' => array(
-		'description' =>  _('Difference between last and previous value of a period T is > N'),
+		'description' =>  _('Difference between last and previous value is > N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'change[=]' => array(
-		'description' =>  _('Difference between last and previous value of a period T is = N'),
+		'description' =>  _('Difference between last and previous value is = N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'change[#]' => array(
-		'description' =>  _('Difference between last and previous value of a period T is NOT N'),
+		'description' =>  _('Difference between last and previous value is NOT N'),
 		'allowed_types' => $allowed_types_any
 	),
 	'count[<]' => array(
