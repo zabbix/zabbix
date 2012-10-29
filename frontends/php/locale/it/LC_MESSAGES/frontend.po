@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-26 23:07+0300\n"
+"POT-Creation-Date: 2012-10-29 13:54+0200\n"
 "PO-Revision-Date: 2012-09-22 15:31+0200\n"
 "Last-Translator: unixo <ferruccio.vitale@eqx.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -3539,19 +3539,19 @@ msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise
 msgstr ""
 
 #: popup_trexpr.php:178
-msgid "Difference between last and previous value of a period T is < N"
+msgid "Difference between last and previous value is < N"
 msgstr ""
 
 #: popup_trexpr.php:186
-msgid "Difference between last and previous value of a period T is = N"
+msgid "Difference between last and previous value is = N"
 msgstr ""
 
 #: popup_trexpr.php:182
-msgid "Difference between last and previous value of a period T is > N"
+msgid "Difference between last and previous value is > N"
 msgstr ""
 
 #: popup_trexpr.php:190
-msgid "Difference between last and previous value of a period T is NOT N"
+msgid "Difference between last and previous value is NOT N"
 msgstr ""
 
 #: include/views/configuration.screen.list.php:50
