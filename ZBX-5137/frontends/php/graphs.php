@@ -316,8 +316,10 @@ $pageFilter = new CPageFilter(array(
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 ));
-$_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['hostid'] = $pageFilter->hostid;
+if (empty($_REQUEST['parent_discoveryid'])) {
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
+}
 
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
 	// render view
@@ -529,13 +531,15 @@ else {
 			'output' => array('graphid', 'name', 'graphtype'),
 			'limit' => $config['search_limit'] + 1
 		);
-		if ($pageFilter->hostid > 0) {
-			$options['hostids'] = $pageFilter->hostid;
+		if (empty($_REQUEST['parent_discoveryid'])) {
+			if ($pageFilter->hostid > 0) {
+				$options['hostids'] = $pageFilter->hostid;
+			}
+			elseif ($pageFilter->groupid > 0) {
+				$options['groupids'] = $pageFilter->groupid;
+			}
 		}
-		elseif ($pageFilter->groupid > 0) {
-			$options['groupids'] = $pageFilter->groupid;
-		}
-		if (!empty($_REQUEST['parent_discoveryid'])) {
+		else {
 			$options['discoveryids'] = $_REQUEST['parent_discoveryid'];
 		}
 		$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
