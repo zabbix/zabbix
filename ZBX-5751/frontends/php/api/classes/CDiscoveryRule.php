@@ -463,10 +463,10 @@ class CDiscoveryRule extends CItemGeneral {
 				$graphs = API::Graph()->get($objParams);
 
 				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['discoveries']);
-
+					unset($graphs[$graphid]['parent_itemid']);
+					unset($graph['graphid']);
 					$count = array();
-					foreach ($graph['discoveries'] as $item) {
+					foreach ($graph as $item) {
 						if (!is_null($options['limitSelects'])) {
 							if (!isset($count[$item['itemid']])) {
 								$count[$item['itemid']] = 0;
@@ -477,7 +477,7 @@ class CDiscoveryRule extends CItemGeneral {
 								continue;
 							}
 						}
-						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
+						$result[$graph['parent_itemid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
 			}

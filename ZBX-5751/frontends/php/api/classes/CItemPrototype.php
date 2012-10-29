@@ -454,27 +454,32 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['selectGraphs'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'itemids' => $itemids,
+				'preservekeys' => true,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($graphs, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($graphs, 'name');
+				}
 				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['discoveries']);
+					unset($graphs[$graphid]['items']);
 					$count = array();
-					foreach ($graph['discoveries'] as $item) {
+					foreach ($graph['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
 
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
-
 						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
@@ -484,13 +489,15 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['groupCount'] = 1;
 
 				$graphs = API::Graph()->get($objParams);
-
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
+
 				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid]))
+					if (isset($graphs[$itemid])) {
 						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					else
+					}
+					else {
 						$result[$itemid]['graphs'] = 0;
+					}
 				}
 			}
 		}
