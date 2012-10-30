@@ -368,7 +368,7 @@ class CItemPrototype extends CItemGeneral {
 				);
 				$hosts = API::Host()->get($objParams);
 
-				foreach ($hosts as $hostid => $host) {
+				foreach ($hosts as $host) {
 					$hitems = $host['items'];
 					unset($host['items']);
 					foreach ($hitems as $inum => $item) {
@@ -377,7 +377,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				$templates = API::Template()->get($objParams);
-				foreach ($templates as $templateid => $template) {
+				foreach ($templates as $template) {
 					$titems = $template['items'];
 					unset($template['items']);
 					foreach ($titems as $inum => $item) {
@@ -391,16 +391,17 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['selectTriggers'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'itemids' => $itemids,
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($triggers, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($triggers, 'description');
+				}
 				foreach ($triggers as $triggerid => $trigger) {
 					unset($triggers[$triggerid]['items']);
 					$count = array();
@@ -420,7 +421,7 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -455,13 +456,12 @@ class CItemPrototype extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'itemids' => $itemids,
-				'preservekeys' => true,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($graphs, 'name');
@@ -488,7 +488,7 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 
 				foreach ($result as $itemid => $item) {

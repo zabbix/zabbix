@@ -72,7 +72,6 @@ class CGraph extends CGraphGeneral {
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
-			'discoveryids'				=> null,
 			'type'						=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
@@ -218,23 +217,6 @@ class CGraph extends CGraphGeneral {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
-			}
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'id.parent_itemid';
-			}
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
 		}
 
@@ -855,8 +837,7 @@ class CGraph extends CGraphGeneral {
 				$options['templateids'] === null &&
 				$options['hostids'] === null &&
 				$options['groupids'] === null &&
-				$options['itemids'] === null &&
-				$options['discoveryids'] === null) {
+				$options['itemids'] === null) {
 
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
