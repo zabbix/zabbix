@@ -77,7 +77,6 @@ class CTrigger extends CTriggerGeneral {
 			'triggerids'					=> null,
 			'itemids'						=> null,
 			'applicationids'				=> null,
-			'discoveryids'					=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
 			'templated'						=> null,
@@ -277,24 +276,6 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'id.parent_itemid';
-			}
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['fid'] = 'f.itemid=id.itemid';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
-			}
 		}
 
 		// functions
@@ -2155,8 +2136,7 @@ class CTrigger extends CTriggerGeneral {
 			$options['hostids'] === null &&
 			$options['triggerids'] === null &&
 			$options['itemids'] === null &&
-			$options['applicationids'] === null &&
-			$options['discoveryids'] === null) {
+			$options['applicationids'] === null) {
 
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}

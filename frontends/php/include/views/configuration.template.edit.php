@@ -303,7 +303,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$templateList->addRow(_('Discovery rules'), $listBox);
 
 // Item prototypes
-		$hostItemPrototypes = API::Itemprototype()->get(array(
+		$hostItemPrototypes = API::ItemPrototype()->get(array(
 			'hostids' => $templateid,
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
