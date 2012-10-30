@@ -3156,12 +3156,73 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 /******************************************************************************
  *                                                                            *
+ * Function: substitute_discovery_macros_simple                               *
+ *                                                                            *
+ * Purpose: trying to resolve the discovery macros in item key parameters     *
+ *          in simple macros like {host:key[].func()}                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_discovery_macros_simple(char *data, char **replace_to, size_t *replace_to_alloc,
+		size_t *pos, struct zbx_json_parse *jp_row)
+{
+	char	*pl, *pr;
+	char	*key = NULL;
+	size_t	sz, replace_to_offset = 0;
+
+	pl = pr = data + *pos;
+	if ('{' != *pr++)
+		return FAIL;
+
+	/* check for macros {HOST.HOST<1-9>} and {HOSTNAME<1-9>} */
+	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
+			0 == strncmp(pr, MVAR_HOSTNAME, sz = sizeof(MVAR_HOSTNAME) - 2)) &&
+			('}' == pr[sz] || ('}' == pr[sz + 1] && '1' <= pr[sz] && pr[sz] <= '9')))
+	{
+		pr += sz + ('}' == pr[sz] ? 1 : 2);
+	}
+	else if (SUCCEED != parse_host(&pr, NULL))	/* a simple host name; e.g. "Zabbix server" */
+		return FAIL;
+
+	if (':' != *pr++)
+		return FAIL;
+
+	if (0 == *replace_to_alloc)
+	{
+		*replace_to_alloc = 128;
+		*replace_to = zbx_malloc(*replace_to, *replace_to_alloc);
+	}
+
+	zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pl, pr - pl);
+
+	/* an item key */
+	if (SUCCEED != parse_key(&pr, &key))
+		return FAIL;
+
+	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	zbx_strcpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, key);
+
+	zbx_free(key);
+
+	pl = pr;
+	/* a trigger function with parameters */
+	if ('.' != *pr++ || SUCCEED != parse_function(&pr, NULL, NULL) || '}' != *pr++)
+		return FAIL;
+
+	zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pl, pr - pl);
+
+	*pos = pr - data - 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: substitute_discovery_macros                                      *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
+void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int with_simple_macros)
 {
 	const char	*__function_name = "substitute_discovery_macros";
 
@@ -3173,30 +3234,41 @@ void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 
 	for (l = 0; '\0' != (*data)[l]; l++)
 	{
-		if ('{' != (*data)[l] || '#' != (*data)[l + 1])
+		if ('{' != (*data)[l])
 			continue;
 
-		for (r = l + 2; SUCCEED == is_macro_char((*data)[r]); r++)
-			;
+		r = l;
 
-		if ('}' != (*data)[r])
-			continue;
-
-		c = (*data)[r + 1];
-		(*data)[r + 1] = '\0';
-
-		res = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc);
-
-		(*data)[r + 1] = c;
-
-		if (SUCCEED != res)
+		/* substitute discovery macros, e.g. {#FSNAME} */
+		if ('#' == (*data)[l + 1])
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro \"%.*s\": not found in value set",
-					__function_name, (int)(r - l + 1), *data + l);
-		}
-		else
-			zbx_replace_string(data, l, &r, replace_to);
+			for (r += 2; SUCCEED == is_macro_char((*data)[r]); r++)
+				;
 
+			if ('}' != (*data)[r])
+				continue;
+
+			c = (*data)[r + 1];
+			(*data)[r + 1] = '\0';
+			res = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc);
+			(*data)[r + 1] = c;
+
+			if (SUCCEED != res)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro \"%.*s\": "
+						"not found in value set", __function_name, (int)(r - l + 1), *data + l);
+				continue;
+			}
+		}
+		/* substitute discovery macros in item key parameters */
+		/* e.g. {Zabbix server:ifAlias[{#SNMPINDEX}].last(0)} */
+		else if (0 == with_simple_macros || SUCCEED != substitute_discovery_macros_simple(*data, &replace_to,
+				&replace_to_alloc, &r, jp_row))
+		{
+			continue;
+		}
+
+		zbx_replace_string(data, l, &r, replace_to);
 		l = r;
 	}
 
@@ -3315,7 +3387,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 						&param, macro_type, NULL, 0);
 			}
 			else
-				substitute_discovery_macros(&param, jp_row);
+				substitute_discovery_macros(&param, jp_row, 0);
 
 			i--; zbx_replace_string(data, 0, &i, param); i++;
 
@@ -3400,7 +3472,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 									&param, macro_type, NULL, 0);
 						}
 						else
-							substitute_discovery_macros(&param, jp_row);
+							substitute_discovery_macros(&param, jp_row, 0);
 
 						quote_key_param(&param, 0);
 						i--; zbx_replace_string(data, l, &i, param); i++;
@@ -3432,7 +3504,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 									&param, macro_type, NULL, 0);
 						}
 						else
-							substitute_discovery_macros(&param, jp_row);
+							substitute_discovery_macros(&param, jp_row, 0);
 
 						quote_key_param(&param, 1);
 						zbx_replace_string(data, l, &i, param);

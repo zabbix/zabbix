@@ -524,7 +524,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	trigger = zbx_calloc(NULL, 1, sizeof(zbx_lld_trigger_t));
 	trigger->update_expression = 1;
 	trigger->description = zbx_strdup(NULL, description_proto);
-	substitute_discovery_macros(&trigger->description, jp_row);
+	substitute_discovery_macros(&trigger->description, jp_row, 0);
 
 	zbx_vector_ptr_create(&trigger->functions);
 	DBlld_get_trigger_functions(parent_triggerid, jp_row, &trigger->functions);
@@ -577,7 +577,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 			ZBX_STR2UINT64(h_triggerid, row[0]);
 
 			old_name = zbx_strdup(old_name, row[2]);
-			substitute_discovery_macros(&old_name, jp_row);
+			substitute_discovery_macros(&old_name, jp_row, 0);
 
 			if (0 == strcmp(old_name, row[3]))
 			{
@@ -1081,7 +1081,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	}
 
 	item->name = zbx_strdup(NULL, name_proto);
-	substitute_discovery_macros(&item->name, jp_row);
+	substitute_discovery_macros(&item->name, jp_row, 0);
 
 	item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
 	substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
@@ -1090,7 +1090,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	if (ITEM_TYPE_DB_MONITOR == type || ITEM_TYPE_SSH == type ||
 			ITEM_TYPE_TELNET == type || ITEM_TYPE_CALCULATED == type)
 	{
-		substitute_discovery_macros(&item->params, jp_row);
+		substitute_discovery_macros(&item->params, jp_row, 0);
 	}
 
 	zbx_vector_ptr_append(items, item);
@@ -1569,7 +1569,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 	graph = zbx_calloc(NULL, 1, sizeof(zbx_lld_graph_t));
 	graph->name = zbx_strdup(NULL, name_proto);
-	substitute_discovery_macros(&graph->name, jp_row);
+	substitute_discovery_macros(&graph->name, jp_row, 1);
 
 	name_esc = DBdyn_escape_string_len(graph->name, GRAPH_NAME_LEN);
 
@@ -1599,7 +1599,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 			char	*old_name = NULL;
 
 			old_name = zbx_strdup(old_name, row[1]);
-			substitute_discovery_macros(&old_name, jp_row);
+			substitute_discovery_macros(&old_name, jp_row, 1);
 
 			if (0 == strcmp(old_name, row[2]))
 				ZBX_STR2UINT64(graph->graphid, row[0]);
