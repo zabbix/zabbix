@@ -40,8 +40,6 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.4rc1
 
 New features:
-A......... [ZBX-5740] removed "discoveryids" parameter from CItem, CTrigger and CGraph get() methods (Toms)
-A......... [ZBX-5740] fixed CItemPrototype parameter "selectTriggers" not working (Toms)
 ..F....... [ZBXNEXT-1398] implemented flickerfree screen shadowing for old screen data (Eduard)
 A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 ..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
@@ -54,6 +52,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5740] removed "discoveryids" parameter from CItem, CTrigger and CGraph get() methods (Toms)
+A......... [ZBX-5740] fixed CItemPrototype parameter "selectTriggers" not working (Toms)
 A......... [ZBX-5111] fixed child trigger data reset after changes in parent trigger (Oleg)
 A......... [ZBX-5742] fixed trigger order_result in item and item prototype (Oleg)
 ..F....... [ZBX-5754] fixed English strings in trigger expression helper (Oleg)
