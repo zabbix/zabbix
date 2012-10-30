@@ -140,15 +140,17 @@ $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append status to form list
 $httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros']));
-$httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status'], null, 1));
+$httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status']));
 
 /*
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = new CTable(_('No steps defined.'), 'formElementTable');
-$stepsTable->setAttribute('style', 'min-width: 500px;');
-$stepsTable->setAttribute('id', 'httpStepTable');
+$stepsTable->setAttributes(array(
+	'style' => 'min-width: 500px;',
+	'id' => 'httpStepTable'
+));
 $stepsTable->setHeader(array(
 	new CCol(SPACE, null, null, '15'),
 	new CCol(SPACE, null, null, '15'),
@@ -183,8 +185,10 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	$numSpan->setAttribute('id', 'current_step_'.$stepid);
 
 	$name = new CSpan($step['name'], 'link');
-	$name->setAttribute('id', 'name_'.$stepid);
-	$name->setAttribute('name_step', $stepid);
+	$name->setAttributes(array(
+		'id' => 'name_'.$stepid,
+		'name_step' => $stepid
+	));
 	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&templated='.$this->data['templated'].
 		'&list_name=steps&stepid="+jQuery(this).attr("name_step")+"'.
 		url_param($step['name'], false, 'name').
@@ -214,7 +218,6 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
 	}
 
-
 	$row = new CRow(array(
 		$dragHandler,
 		$numSpan,
@@ -224,8 +227,8 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		htmlspecialchars($step['required']),
 		$step['status_codes'],
 		$removeButton
-	), 'sortable');
-	$row->setAttribute('id', 'steps_'.$stepid);
+	), 'sortable', 'steps_'.$stepid);
+
 	$stepsTable->addRow($row);
 }
 
@@ -250,7 +253,7 @@ $httpForm->addItem($httpTab);
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
@@ -260,8 +263,8 @@ if (!empty($this->data['httptestid'])) {
 }
 else {
 	$httpForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
-		array(new CButtonCancel())
+		new CSubmit('save', _('Save')),
+		new CButtonCancel()
 	));
 }
 $httpWidget->addItem($httpForm);

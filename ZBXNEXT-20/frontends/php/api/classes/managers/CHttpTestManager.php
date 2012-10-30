@@ -35,7 +35,6 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	public function create(array $httpTests) {
-
 		$httpTestIds = DB::insert('httptest', $httpTests);
 
 		foreach ($httpTests as $hnum => $httpTest) {
@@ -58,7 +57,7 @@ class CHttpTestManager {
 	 */
 	public function update(array $httpTests) {
 		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
-		$dbHttpTest = $this->get(array(
+		$dbHttpTest = API::HttpTest()->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'httptestids' => $httpTestIds,
 			'selectSteps' => API_OUTPUT_EXTEND,
@@ -113,22 +112,27 @@ class CHttpTestManager {
 
 			// update application
 			if (isset($httpTest['applicationid'])) {
-				DB::update('items_applications', array(
-					'values' => array('applicationid' => $httpTest['applicationid']),
-					'where' => array('itemid' => $itemids)
-				));
+				if ($httpTest['applicationid'] == 0) {
+					DB::delete('items_applications', array('itemid' => $itemids));
+				}
+				else {
+					DB::update('items_applications', array(
+						'values' => array('applicationid' => $httpTest['applicationid']),
+						'where' => array('itemid' => $itemids)
+					));
+				}
 			}
 
 			// update steps
 			$stepsCreate = $stepsUpdate = array();
-			$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'webstepid');
-
+			$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid');
 			foreach ($httpTest['steps'] as $webstep) {
-				if (isset($webstep['webstepid']) && isset($dbSteps[$webstep['webstepid']])) {
+				if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
+
 					$stepsUpdate[] = $webstep;
-					unset($dbSteps[$webstep['webstepid']]);
+					unset($dbSteps[$webstep['httpstepid']]);
 				}
-				elseif (!isset($webstep['webstepid'])) {
+				elseif (!isset($webstep['httpstepid'])) {
 					$stepsCreate[] = $webstep;
 				}
 			}
@@ -258,6 +262,7 @@ class CHttpTestManager {
 					$exHttpTest = $hostHttpTest['byTemplateId'][$httpTestId];
 				}
 
+				// TODO: esli match po templateid nenado checki proverjatj
 				// update by name
 				if (isset($hostHttpTest['byName'][$httpTest['name']])) {
 					$exHttpTest = $hostHttpTest['byName'][$httpTest['name']];
@@ -270,8 +275,10 @@ class CHttpTestManager {
 					}
 
 					// if we found existing http test by name and steps, we only add linkage, i.e. change templateid
-					// so we unset all data for http test we link, template id is assigned later
-					$httpTest = array();
+					// so we unset all data for http test we link, templateid is assigned later
+					if ($exHttpTest['templateid'] == 0) {
+						$httpTest = array();
+					}
 				}
 
 //				if ($this->checkIfItemsRequireChenged($httpTest)) {
@@ -283,6 +290,9 @@ class CHttpTestManager {
 				$newHttpTest['templateid'] = $httpTestId;
 				if ($exHttpTest) {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
+					if (isset($newHttpTest['steps'])) {
+						$newHttpTest['steps'] = $this->prepareHttpSteps($httpTest['steps'], $exHttpTest['httptestid']);
+					}
 				}
 				else {
 					unset($newHttpTest['httptestid']);
@@ -321,7 +331,9 @@ class CHttpTestManager {
 				' WHERE '.DBcondition('ht.hostid', $hostIds));
 		while ($dbHttpTest = DBfetch($dbCursor)) {
 			$hostHttpTests[$dbHttpTest['hostid']]['byName'][$dbHttpTest['name']] = $dbHttpTest;
-			$hostHttpTests[$dbHttpTest['hostid']]['byTemplateId'][$dbHttpTest['templateid']] = $dbHttpTest;
+			if ($dbHttpTest['templateid']) {
+				$hostHttpTests[$dbHttpTest['hostid']]['byTemplateId'][$dbHttpTest['templateid']] = $dbHttpTest;
+			}
 		}
 
 		return $hostHttpTests;
@@ -401,14 +413,43 @@ class CHttpTestManager {
 		return $httpTests;
 	}
 
+	/**
+	 * @param array $steps
+	 * @param $exHttpTestId
+	 *
+	 * @return array
+	 */
+	protected function prepareHttpSteps(array $steps, $exHttpTestId) {
+		$exSteps = array();
+		$dbCursor = DBselect('SELECT hs.httpstepid,hs.name'.
+				' FROM httpstep hs'.
+				' WHERE hs.httptestid='.zbx_dbstr($exHttpTestId));
+		while ($dbHttpStep = DBfetch($dbCursor)) {
+			$exSteps[$dbHttpStep['name']] = $dbHttpStep['httpstepid'];
+		}
+
+		$result = array();
+		foreach ($steps as $step) {
+			if (isset($exSteps[$step['name']])) {
+				$step['httpstepid'] = $exSteps[$step['name']];
+				$step['httptestid'] = $exHttpTestId;
+			}
+
+			$result[] = $step;
+		}
+
+		return $result;
+	}
 
 
 	/**
 	 * Create items required for web scenario.
 	 *
-	 * @param $httpTest
+	 * @param array $httpTest
+	 *
+	 * @throws Exception
 	 */
-	protected function createHttpTestItems($httpTest) {
+	protected function createHttpTestItems(array $httpTest) {
 		$checkitems = array(
 			array(
 				'name'				=> _s('Download speed for scenario "%s".', '$1'),
@@ -455,7 +496,7 @@ class CHttpTestManager {
 
 		$itemApplications = array();
 		foreach ($checkItemids as $itemid) {
-			if (isset($httpTest['applicationid'])) {
+			if (!empty($httpTest['applicationid'])) {
 				$itemApplications[] = array(
 					'applicationid' => $httpTest['applicationid'],
 					'itemid' => $itemid
@@ -487,6 +528,8 @@ class CHttpTestManager {
 	 *
 	 * @param $httpTest
 	 * @param $websteps
+	 *
+	 * @throws Exception
 	 */
 	protected function createStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
@@ -559,7 +602,7 @@ class CHttpTestManager {
 
 			$itemApplications = array();
 			foreach ($stepItemids as $itemid) {
-				if (isset($httpTest['applicationid'])) {
+				if (!empty($httpTest['applicationid'])) {
 					$itemApplications[] = array(
 						'applicationid' => $httpTest['applicationid'],
 						'itemid' => $itemid
@@ -592,16 +635,18 @@ class CHttpTestManager {
 	 *
 	 * @param $httpTest
 	 * @param $websteps
+	 *
+	 * @throws Exception
 	 */
 	protected function updateStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
 		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
+			throw new Exception(_('Scenario step name should contain only printable characters.'));
 		}
 
 		// get all used keys
-		$webstepids = zbx_objectValues($websteps, 'webstepid');
+		$webstepids = zbx_objectValues($websteps, 'httpstepid');
 		$dbKeys = DBfetchArray(DBselect(
 			'SELECT i.key_'.
 					' FROM items i,httpstepitem hi'.
@@ -612,12 +657,12 @@ class CHttpTestManager {
 
 		foreach ($websteps as $webstep) {
 			if ($webstep['no'] <= 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1.'));
+				throw new Exception(_('Scenario step number cannot be less than 1.'));
 			}
 
 			DB::update('httpstep', array(
 				'values' => $webstep,
-				'where' => array('httpstepid' => $webstep['webstepid'])
+				'where' => array('httpstepid' => $webstep['httpstepid'])
 			));
 
 			// update item keys
@@ -626,7 +671,7 @@ class CHttpTestManager {
 			$dbStepItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 						' FROM items i,httpstepitem hi'.
-						' WHERE hi.httpstepid='.$webstep['webstepid'].
+						' WHERE hi.httpstepid='.$webstep['httpstepid'].
 						' AND hi.itemid=i.itemid'
 			);
 			while ($stepitem = DBfetch($dbStepItems)) {
@@ -665,10 +710,15 @@ class CHttpTestManager {
 
 			// update application
 			if (isset($httpTest['applicationid'])) {
-				DB::update('items_applications', array(
-					'values' => array('applicationid' => $httpTest['applicationid']),
-					'where' => array('itemid' => $itemids)
-				));
+				if ($httpTest['applicationid'] == 0) {
+					DB::delete('items_applications', array('itemid' => $itemids));
+				}
+				else {
+					DB::update('items_applications', array(
+						'values' => array('applicationid' => $httpTest['applicationid']),
+						'where' => array('itemid' => $itemids)
+					));
+				}
 			}
 		}
 	}
