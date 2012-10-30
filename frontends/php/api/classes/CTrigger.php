@@ -1309,25 +1309,8 @@ class CTrigger extends CTriggerGeneral {
 		$this->checkInput($triggers, __FUNCTION__);
 		$this->updateReal($triggers);
 
-		$dbTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'nopermissions' => true
-		));
-
 		foreach ($triggers as $trigger) {
-			// pass the full trigger so the children can inherit all of the data
-			$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			if (isset($trigger['expression'])) {
-				$dbTrigger['expression'] = $trigger['expression'];
-			}
-			// if we use the expression from the database, make sure it's exploded
-			else {
-				$dbTrigger['expression'] = explode_exp($dbTrigger['expression']);
-			}
-
-			$this->inherit($dbTrigger);
+			$this->inherit($trigger);
 
 			// replace dependencies
 			if (isset($trigger['dependencies'])) {

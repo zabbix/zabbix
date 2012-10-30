@@ -1172,7 +1172,7 @@ function unlock_sqlite3_access() {
  * @return bool
  */
 function idcmp($id1, $id2) {
-	return $id1 === $id2;
+	return (string) $id1 === (string) $id2;
 }
 
 /**
