@@ -924,7 +924,7 @@ int	zbx_check_hostname(const char *hostname)
  ******************************************************************************/
 int	parse_host(char **exp, char **host)
 {
-	char	c, *p, *s;
+	char	*p, *s;
 
 	p = *exp;
 
@@ -935,10 +935,15 @@ int	parse_host(char **exp, char **host)
 
 	if (p != s)
 	{
-		c = *s;
-		*s = '\0';
-		*host = strdup(p);
-		*s = c;
+		if (NULL != host)
+		{
+			char	c;
+
+			c = *s;
+			*s = '\0';
+			*host = strdup(p);
+			*s = c;
+		}
 		return SUCCEED;
 	}
 	else
@@ -1129,10 +1134,13 @@ succeed:
  ******************************************************************************/
 int	parse_function(char **exp, char **func, char **params)
 {
-	char	*p, *s;
-	int	state;	/* 0 - init
-			 * 1 - function name/params
-			 */
+	char		*p, *s;
+	int		state;		/* 0 - init
+					 * 1 - function name/params
+					 */
+	unsigned char	flags = 0x00;	/* 0x01 - function OK
+					 * 0x02 - params OK
+					 */
 
 	for (p = *exp, s = *exp, state = 0; '\0' != *p; p++)	/* check for function */
 	{
@@ -1156,9 +1164,13 @@ int	parse_function(char **exp, char **func, char **params)
 					 * 3 - end of params
 					 */
 
-			*p = '\0';
-			*func = strdup(s);
-			*p++ = '(';
+			if (NULL != func)
+			{
+				*p = '\0';
+				*func = zbx_strdup(NULL, s);
+				*p++ = '(';
+			}
+			flags |= 0x01;
 
 			for (s = p, state = 0; '\0' != *p; p++)
 			{
@@ -1201,9 +1213,13 @@ int	parse_function(char **exp, char **func, char **params)
 
 			if (3 == state)
 			{
-				*p = '\0';
-				*params = strdup(s);
-				*p = ')';
+				if (NULL != params)
+				{
+					*p = '\0';
+					*params = zbx_strdup(NULL, s);
+					*p = ')';
+				}
+				flags |= 0x02;
 			}
 			else
 				goto error;
@@ -1214,15 +1230,17 @@ int	parse_function(char **exp, char **func, char **params)
 		break;
 	}
 
-	if (NULL == *func || NULL == *params)
+	if (0x03 != flags)
 		goto error;
 
 	*exp = p + 1;
 
 	return SUCCEED;
 error:
-	zbx_free(*func);
-	zbx_free(*params);
+	if (NULL != func)
+		zbx_free(*func);
+	if (NULL != params)
+		zbx_free(*params);
 
 	*exp = p;
 
