@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-30 17:13+0200\n"
-"PO-Revision-Date: 2012-09-12 14:51+0200\n"
+"POT-Creation-Date: 2012-10-30 17:15+0200\n"
+"PO-Revision-Date: 2012-10-21 20:14+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -2204,7 +2204,7 @@ msgstr "Цвет"
 #: include/classes/validators/CColorValidator.php:33 jsLoader.php:156
 #, php-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Цвет \"%1$s\" не корректный: ожидается шестнадцатеричный код цвета (6 символов)."
 
 #: include/views/js/configuration.sysmaps.js.php:341
 msgid "Colour (OK)"
@@ -2695,7 +2695,7 @@ msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
 #: include/validate.inc.php:396
 #, php-format
 msgid "Critical error. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Критическая ошибка. Цвет \"%1$s\" не корректный: ожидается шестнадцатеричный код цвета (6 символов)."
 
 #: include/validate.inc.php:382
 #, php-format
@@ -4285,7 +4285,7 @@ msgstr "Список событий [20 предыдущих]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
-msgstr "Источник события"
+msgstr "Источник событий"
 
 #: tr_events.php:110
 msgid "Event source details"
@@ -4549,7 +4549,7 @@ msgstr "Финиш"
 
 #: include/locales.inc.php:47
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Финский (fi_FI)"
 
 #: include/forms.inc.php:1576 include/maintenances.inc.php:103
 msgid "First"
@@ -9549,7 +9549,7 @@ msgstr "Права доступа могут быть назначены тол�
 
 #: include/locales.inc.php:57
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Персидский (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
@@ -11762,12 +11762,12 @@ msgstr "Текст"
 #: include/classes/db/PostgresqlDbBackend.php:41
 #: include/classes/db/SqliteDbBackend.php:34
 msgid "The frontend does not match Zabbix database."
-msgstr ""
+msgstr "Веб-интерфейс не соответствует базе данных Zabbix."
 
 #: include/classes/db/DbBackend.php:48
 #, php-format
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
-msgstr ""
+msgstr "Веб-интерфейс не соответствует базе данных Zabbix. Текущая версия базы данных (обязательная/опциональная): %d/%d. Требуется обязательная версия: %d. Свяжитесь с вашим системным администратором."
 
 #: api/classes/CImage.php:526
 #, php-format
@@ -12937,7 +12937,7 @@ msgstr "Предупреждение. Невозможно отобразить 
 #: include/validate.inc.php:400
 #, php-format
 msgid "Warning. Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Предупреждение. Цвет \"%1$s\" не корректный: ожидается шестнадцатеричный код цвета (6 символов)."
 
 #: include/validate.inc.php:450
 #, php-format
