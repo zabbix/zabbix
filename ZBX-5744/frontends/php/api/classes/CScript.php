@@ -587,7 +587,8 @@ class CScript extends CZBXAPI {
 				'SELECT hg.groupid,hg.hostid'.
 				' FROM hosts_groups hg'.
 				' WHERE '.DBcondition('hg.groupid', $groupIds).
-					' AND '.DBin_node('hg.hostid', $hostNodeIds)
+					' AND '.DBin_node('hg.hostid', $hostNodeIds).
+					' AND '.DBcondition('hg.hostid', $options['hostids'])
 			);
 			while ($dbHost = DBfetch($dbHosts)) {
 				foreach ($result as $scriptid => $script) {
