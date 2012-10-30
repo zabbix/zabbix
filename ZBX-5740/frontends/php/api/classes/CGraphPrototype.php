@@ -509,7 +509,6 @@ class CGraphPrototype extends CGraphGeneral {
 
 		// adding Items
 		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
-			// TODO: should be used API::ItemPrototype()->get(), but 'graphids' not implemented yet
 			$items = API::Item()->get(array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],

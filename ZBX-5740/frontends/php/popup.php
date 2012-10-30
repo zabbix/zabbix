@@ -1221,7 +1221,6 @@ elseif ($srctbl == 'prototypes') {
 		'nodeids' => $nodeid,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));

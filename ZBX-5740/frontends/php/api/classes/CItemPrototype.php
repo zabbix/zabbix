@@ -368,7 +368,7 @@ class CItemPrototype extends CItemGeneral {
 				);
 				$hosts = API::Host()->get($objParams);
 
-				foreach ($hosts as $hostid => $host) {
+				foreach ($hosts as $host) {
 					$hitems = $host['items'];
 					unset($host['items']);
 					foreach ($hitems as $inum => $item) {
@@ -377,7 +377,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				$templates = API::Template()->get($objParams);
-				foreach ($templates as $templateid => $template) {
+				foreach ($templates as $template) {
 					$titems = $template['items'];
 					unset($template['items']);
 					foreach ($titems as $inum => $item) {
@@ -392,8 +392,7 @@ class CItemPrototype extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'itemids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
@@ -455,8 +454,7 @@ class CItemPrototype extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'itemids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
