@@ -43,7 +43,7 @@ $fields = array(
 	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   '(isset({form})&&({form}=="update"))'),
 	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})', _('Name')),
 	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
-	'status'          => array(T_ZBX_INT, O_OPT, null,  IN('0,1'),               'isset({save})'),
+	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
 	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'macros'          => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})', _('Steps')),
@@ -177,7 +177,7 @@ elseif (isset($_REQUEST['save'])) {
 			$message_false = _('Cannot add scenario');
 		}
 
-		if (!empty($_REQUEST['application']) && !empty($_REQUEST['new_application'])) {
+		if (!empty($_REQUEST['applicationid']) && !empty($_REQUEST['new_application'])) {
 			throw new Exception(_('Cannot create new application, web scenario is already assigned to application.'));
 		}
 
@@ -190,11 +190,6 @@ elseif (isset($_REQUEST['save'])) {
 			$i = 1;
 			foreach ($steps as $snum => $step) {
 				$steps[$snum]['no'] = $i++;
-				$stepid = isset($step['httpstepid']) ? $step['httpstepid'] : null;
-				if (!is_null($stepid)) {
-					$steps[$snum]['webstepid'] = $stepid;
-					unset($steps[$snum]['httpstepid']);
-				}
 			}
 		}
 
@@ -202,22 +197,13 @@ elseif (isset($_REQUEST['save'])) {
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
+			'applicationid' => $_REQUEST['applicationid'],
 			'delay' => $_REQUEST['delay'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => $_REQUEST['agent'],
 			'macros' => $_REQUEST['macros'],
 			'steps' => $steps
 		);
-
-		if (!empty($_REQUEST['application'])) {
-			$dbApplication = DBfetch(DBselect(
-				'SELECT a.applicationid'.
-						' FROM applications a'.
-						' WHERE a.name='.zbx_dbstr($_REQUEST['application']).
-						' AND a.hostid='.zbx_dbstr($_REQUEST['hostid'])
-			));
-			$httpTest['applicationid'] = $dbApplication['applicationid'];
-		}
 
 		if (!empty($_REQUEST['new_application'])) {
 			$result = API::Application()->create(array(

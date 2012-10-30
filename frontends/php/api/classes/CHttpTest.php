@@ -296,10 +296,8 @@ class CHttpTest extends CZBXAPI {
 				' WHERE '.DBcondition('h.httptestid', $httpTestIds)
 			);
 			while ($step = DBfetch($dbSteps)) {
-				$stepid = $step['httpstepid'];
-				$step['webstepid'] = $stepid;
-				unset($step['httpstepid']);
-				$result[$step['httptestid']]['steps'][$step['webstepid']] = $step;
+				$step['webstepid'] = $step['httpstepid'];
+				$result[$step['httptestid']]['steps'][$step['httpstepid']] = $step;
 			}
 		}
 
@@ -327,7 +325,6 @@ class CHttpTest extends CZBXAPI {
 
 		$httpTestManager->inherit($httpTests);
 
-self::exception();
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
 
@@ -340,13 +337,11 @@ self::exception();
 	 */
 	public function update($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-
 		$this->validateUpdate($httpTests);
 
 		$httpTestManager = new CHttpTestManager();
 		$httpTestManager->update($httpTests);
 		$httpTestManager->inherit($httpTests);
-
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
@@ -433,6 +428,13 @@ self::exception();
 		}
 
 		foreach ($httpTests as $httpTest) {
+			$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
+				' WHERE ht.name='.zbx_dbstr($httpTest['name']).
+					' AND ht.hostid='.zbx_dbstr($httpTest['hostid']), 1));
+			if ($nameExists) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%1$s" already exists.', $nameExists['name']));
+			}
+
 			if (empty($httpTest['steps'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
 			}
@@ -455,19 +457,23 @@ self::exception();
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
 		}
 
-		$httpTestsNames = $this->checkNames($httpTests);
-
-		$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.
-				DBcondition('ht.name', $httpTestsNames).
-				' AND '.DBcondition('ht.httptestid', $httpTestIds, true), 1));
-		if ($nameExists) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $nameExists['name']));
-		}
+		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
+			if (isset($httpTest['name'])) {
+				$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
+					' WHERE ht.name='.zbx_dbstr($httpTest['name']).
+						' AND ht.hostid='.zbx_dbstr($httpTest['hostid']).
+						' AND ht.httptestid<>'.zbx_dbstr($httpTest['httptestid']), 1));
+				if ($nameExists) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%1$s" already exists.', $nameExists['name']));
+				}
+			}
+
 			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
+
 			if (isset($httpTest['steps'])) {
 				$this->checkSteps($httpTest['steps']);
 			}
@@ -529,7 +535,7 @@ self::exception();
 	 */
 	protected function checkNames(array $httpTests) {
 		$httpTestsNames = zbx_objectValues($httpTests, 'name');
-		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
+		if (!preg_grep('/^['.ZBX_PREG_PRINT.']+$/u', $httpTestsNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
 		}
 
