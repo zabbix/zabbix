@@ -461,9 +461,19 @@ class CHttpTest extends CZBXAPI {
 
 		foreach ($httpTests as $httpTest) {
 			if (isset($httpTest['name'])) {
+				// get hostid from db if it's not provided
+				if (isset($httpTest['hostid'])) {
+					$hostId = $httpTest['hostid'];
+				}
+				else {
+					$hostId = DBfetch(DBselect('SELECT ht.hostid FROM httptest ht'.
+							' WHERE ht.httptestid='.zbx_dbstr($httpTest['httptestid'])));
+					$hostId = $hostId['hostid'];
+				}
+
 				$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
 					' WHERE ht.name='.zbx_dbstr($httpTest['name']).
-						' AND ht.hostid='.zbx_dbstr($httpTest['hostid']).
+						' AND ht.hostid='.zbx_dbstr($hostId).
 						' AND ht.httptestid<>'.zbx_dbstr($httpTest['httptestid']), 1));
 				if ($nameExists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%1$s" already exists.', $nameExists['name']));

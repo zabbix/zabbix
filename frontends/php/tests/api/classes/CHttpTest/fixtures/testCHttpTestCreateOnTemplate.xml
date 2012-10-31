@@ -7,7 +7,7 @@
 <database name="alexey_test">
 	<table_data name="items">
 		<row>
-			<field name="itemid">1</field>
+			<field name="itemid">19</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -57,7 +57,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">2</field>
+			<field name="itemid">20</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -107,7 +107,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">3</field>
+			<field name="itemid">21</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -157,7 +157,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">4</field>
+			<field name="itemid">22</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -207,7 +207,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">5</field>
+			<field name="itemid">23</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -257,7 +257,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">6</field>
+			<field name="itemid">24</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -307,7 +307,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">7</field>
+			<field name="itemid">25</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -357,7 +357,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">8</field>
+			<field name="itemid">26</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -407,7 +407,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">9</field>
+			<field name="itemid">27</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -457,7 +457,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">10</field>
+			<field name="itemid">28</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -507,7 +507,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">11</field>
+			<field name="itemid">29</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -557,7 +557,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">12</field>
+			<field name="itemid">30</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -607,7 +607,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">13</field>
+			<field name="itemid">31</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -657,7 +657,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">14</field>
+			<field name="itemid">32</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -707,7 +707,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">15</field>
+			<field name="itemid">33</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -757,7 +757,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">16</field>
+			<field name="itemid">34</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -807,7 +807,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">17</field>
+			<field name="itemid">35</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>
@@ -857,7 +857,7 @@
 			<field name="lifetime">30</field>
 		</row>
 		<row>
-			<field name="itemid">18</field>
+			<field name="itemid">36</field>
 			<field name="type">9</field>
 			<field name="snmp_community"></field>
 			<field name="snmp_oid"></field>

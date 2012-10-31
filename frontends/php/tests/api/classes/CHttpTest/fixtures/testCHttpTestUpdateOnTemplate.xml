@@ -13,8 +13,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Download speed for scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.in[HttpTestCreate,,bps]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.in[HttpTestUpdate,,bps]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -63,8 +63,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Failed step of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.fail[HttpTestCreate]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.fail[HttpTestUpdate]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -113,8 +113,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Last error message of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.error[HttpTestCreate]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.error[HttpTestUpdate]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -163,8 +163,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.in[HttpTestCreate,step1,bps]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step1,bps]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -213,8 +213,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.time[HttpTestCreate,step1,resp]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step1,resp]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -263,8 +263,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.rspcode[HttpTestCreate,step1]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step1]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -313,8 +313,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.in[HttpTestCreate,step2,bps]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step2,bps]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -363,8 +363,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.time[HttpTestCreate,step2,resp]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step2,resp]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -413,8 +413,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">1</field>
 				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.rspcode[HttpTestCreate,step2]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step2]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -463,8 +463,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Download speed for scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.in[HttpTestCreate,,bps]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.in[HttpTestUpdate,,bps]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -513,8 +513,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Failed step of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.fail[HttpTestCreate]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.fail[HttpTestUpdate]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -563,8 +563,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Last error message of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.error[HttpTestCreate]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.error[HttpTestUpdate]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -613,8 +613,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.in[HttpTestCreate,step1,bps]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step1,bps]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -663,8 +663,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.time[HttpTestCreate,step1,resp]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step1,resp]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -713,8 +713,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.rspcode[HttpTestCreate,step1]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step1]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -763,8 +763,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.in[HttpTestCreate,step2,bps]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step2,bps]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -813,8 +813,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.time[HttpTestCreate,step2,resp]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step2,resp]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -863,8 +863,8 @@
 				<field name="snmp_oid"></field>
 				<field name="hostid">2</field>
 				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
-				<field name="key_">web.test.rspcode[HttpTestCreate,step2]</field>
-				<field name="delay">60</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step2]</field>
+				<field name="delay">70</field>
 				<field name="history">30</field>
 				<field name="trends">90</field>
 				<field name="lastvalue" xsi:nil="true" />
@@ -913,7 +913,7 @@
 				<field name="name">HttpTestUpdate</field>
 				<field name="applicationid" xsi:nil="true" />
 				<field name="nextcheck">0</field>
-				<field name="delay">60</field>
+				<field name="delay">70</field>
 				<field name="status">0</field>
 				<field name="macros"></field>
 				<field name="agent">Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)</field>
@@ -928,7 +928,7 @@
 				<field name="name">HttpTestUpdate</field>
 				<field name="applicationid" xsi:nil="true" />
 				<field name="nextcheck">0</field>
-				<field name="delay">60</field>
+				<field name="delay">70</field>
 				<field name="status">0</field>
 				<field name="macros"></field>
 				<field name="agent">Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)</field>
