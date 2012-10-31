@@ -227,6 +227,18 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$this->updateReal($newTrigger);
 		}
 		else {
+			$oldTrigger = $this->get(array(
+				'triggerids' => $trigger['triggerid'],
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+			$oldTrigger = reset($oldTrigger);
+			unset($oldTrigger['triggerid']);
+			foreach ($oldTrigger as $key => $value) {
+				if (!isset($newTrigger[$key])) {
+					$newTrigger[$key] = $oldTrigger[$key];
+				}
+			}
 			$this->createReal($newTrigger);
 			$newTrigger = reset($newTrigger);
 		}

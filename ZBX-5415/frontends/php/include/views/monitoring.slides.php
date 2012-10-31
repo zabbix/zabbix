@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
 
 $slideWidget = new CWidget('hat_slides');
 
@@ -96,23 +98,12 @@ else {
 		// js menu
 		insert_js('var page_menu='.zbx_jsvalue($this->data['menu']).";\n".'var page_submenu='.zbx_jsvalue($this->data['submenu']).";\n");
 
-		// get timeline
-		$screenBuilder = new CScreenBuilder(array(
-			'profileIdx' => 'web.slides',
-			'profileIdx2' => $this->data['elementid'],
-			'period' => get_request('period'),
-			'stime' => get_request('stime')
-		));
-
 		add_doll_objects(array(array(
 			'id' => 'hat_slides',
 			'frequency' => $this->data['element']['delay'] * $this->data['refresh_multiplier'],
 			'url' => 'slides.php?elementid='.$this->data['elementid'].url_param('groupid').url_param('hostid'),
 			'params'=> array('lastupdate' => time())
 		)));
-
-		$screenBuilder->insertScreenScrollJs($this->data['elementid']);
-		$screenBuilder->insertProcessObjectsJs();
 
 		$slideWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 	}

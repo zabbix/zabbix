@@ -30,8 +30,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		0,	"/,free"},
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	0,	0},
 
-	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		0,	"hda,bytes"},
-	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		0,	"hda,operations"},
+	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		NULL,	"sd0,operations"},
+	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		NULL,	"sd0,operations"},
 
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"lo0,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo0,bytes"},

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/maintenances.inc.php';
@@ -67,10 +67,23 @@ $fields = array(
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
-
-$_REQUEST['go'] = get_request('go', 'none');
-
-// permissions
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['maintenanceid'])) {
+	$dbMaintenance = API::Maintenance()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'selectTimeperiods' => API_OUTPUT_EXTEND,
+		'editable' => true,
+		'maintenanceids' => get_request('maintenanceid'),
+	));
+	if (empty($dbMaintenance)) {
+		access_deny();
+	}
+}
+if (isset($_REQUEST['go']) && (!isset($_REQUEST['maintenanceids']) || !is_array($_REQUEST['maintenanceids']))) {
+	access_deny();
+}
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
 	if (empty($groupids)) {
@@ -83,6 +96,7 @@ if (get_request('hostid', 0) > 0) {
 		access_deny();
 	}
 }
+$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Actions
@@ -306,23 +320,16 @@ if (!empty($data['form'])) {
 	$data['maintenanceid'] = get_request('maintenanceid');
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	if (!empty($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
-		// get maintenance
-		$maintenance = API::Maintenance()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'selectTimeperiods' => API_OUTPUT_EXTEND,
-			'editable' => true,
-			'maintenanceids' => $data['maintenanceid'],
-		));
-		$maintenance = reset($maintenance);
-		$data['mname'] = $maintenance['name'];
-		$data['maintenance_type'] = $maintenance['maintenance_type'];
-		$data['active_since'] = $maintenance['active_since'];
-		$data['active_till'] = $maintenance['active_till'];
-		$data['description'] = $maintenance['description'];
+	if (isset($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
+		$dbMaintenance = reset($dbMaintenance);
+		$data['mname'] = $dbMaintenance['name'];
+		$data['maintenance_type'] = $dbMaintenance['maintenance_type'];
+		$data['active_since'] = $dbMaintenance['active_since'];
+		$data['active_till'] = $dbMaintenance['active_till'];
+		$data['description'] = $dbMaintenance['description'];
 
 		// time periods
-		$data['timeperiods'] = $maintenance['timeperiods'];
+		$data['timeperiods'] = $dbMaintenance['timeperiods'];
 		CArrayHelper::sort($data['timeperiods'], array('timeperiod_type', 'start_date'));
 
 		// get hosts

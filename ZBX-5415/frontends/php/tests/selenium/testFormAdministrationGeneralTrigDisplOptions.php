@@ -81,7 +81,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 
 		$this->login('adm.triggerdisplayoptions.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger displaying options');
-		$this->checkTitle('Configuration of Zabbix');
+		$this->checkTitle('Configuration of trigger displaying options');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options', 'Colour', 'Blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for'));
 
 		// hash calculation for not-changed DB fields
@@ -146,7 +146,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 
 		$this->login('adm.triggerdisplayoptions.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger displaying options');
-		$this->checkTitle('Configuration of Zabbix');
+		$this->checkTitle('Configuration of trigger displaying options');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
 
 		// hash calculation for the DB fields that should be changed in this report

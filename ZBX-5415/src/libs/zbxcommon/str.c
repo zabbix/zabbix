@@ -1373,7 +1373,7 @@ int	num_param(const char *p)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      param   - parameter list                                              *
+ *      p       - parameter list                                              *
  *      num     - requested parameter index                                   *
  *      buf     - pointer of output buffer                                    *
  *      max_len - size of output buffer                                       *
@@ -2957,6 +2957,29 @@ size_t	zbx_strlen_utf8(const char *text)
 	}
 
 	return n;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_utf8_char_len                                                *
+ *                                                                            *
+ * Purpose: Returns the size (in bytes) of an UTF-8 encoded character or 0    *
+ *          if the character is not a valid UTF-8.                            *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the 1st byte of UTF-8 character         *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_utf8_char_len(const char *text)
+{
+	if (0 == (*text & 0x80))		/* ASCII */
+		return 1;
+	else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 starts a 2-byte sequence */
+		return 2;
+	else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 starts a 3-byte sequence */
+		return 3;
+	else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 starts a 4-byte sequence */
+		return 4;
+	return 0;				/* not a valid UTF-8 character */
 }
 
 /******************************************************************************

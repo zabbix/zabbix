@@ -53,28 +53,23 @@ class CScreenChart extends CScreenBase {
 		$graphDims = getGraphDims($this->graphid);
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 			$loadSBox = 0;
-			$scrollWidthByImage = 0;
 			$src = 'chart6.php';
 		}
 		else {
 			$loadSBox = 1;
-			$scrollWidthByImage = 1;
 			$src = 'chart2.php';
 		}
-		$src .= '?graphid='.$this->graphid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
+		$src .= '?graphid='.$this->graphid.'&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].$this->getProfileUrlParams();
 
 		$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($this->graphid));
 
 		$timeControlData = array(
-			'id' => $this->graphid,
-			'domid' => $this->getDataId(),
+			'id' => $this->getDataId(),
 			'containerid' => $containerId,
 			'src' => $src,
 			'objDims' => $graphDims,
 			'loadSBox' => $loadSBox,
 			'loadImage' => 1,
-			'loadScroll' => 1,
-			'scrollWidthByImage' => $scrollWidthByImage,
 			'dynamic' => 1,
 			'periodFixed' => CProfile::get($this->profileIdx.'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
@@ -84,7 +79,6 @@ class CScreenChart extends CScreenBase {
 		if ($this->mode == SCREEN_MODE_JS) {
 			$timeControlData['dynamic'] = 0;
 			$timeControlData['loadSBox'] = 0;
-			$timeControlData['loadScroll'] = 0;
 
 			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
@@ -96,14 +90,7 @@ class CScreenChart extends CScreenBase {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
-			// graph container
-			$graphContainer = new CCol();
-			$graphContainer->setAttribute('id', $containerId);
-
-			$item = new CTableInfo(_('No graphs defined.'), 'chart');
-			$item->addRow($graphContainer);
-
-			return $this->getOutput($item, true, array('graphid' => $this->graphid));
+			return $this->getOutput(new CDiv(null, 'center', $containerId), true, array('graphid' => $this->graphid));
 		}
 	}
 }

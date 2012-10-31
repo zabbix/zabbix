@@ -99,7 +99,7 @@ class CImg extends CTag {
 		}
 
 		insert_js(
-			'jQuery("'.$this->toString().'").load(function() {
+			'jQuery('.CJs::encodeJson($this->toString()).').load(function() {
 				var parent = jQuery("#'.$id.'preloader").parent();
 				jQuery("#'.$id.'preloader").remove();
 				jQuery(parent).append(jQuery(this));

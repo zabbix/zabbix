@@ -118,14 +118,11 @@ class CScreenGraph extends CScreenBase {
 
 		// get time control
 		$timeControlData = array(
-			'id' => $this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'],
-			'domid' => $this->getDataId(),
+			'id' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
 			'loadSBox' => 0,
 			'loadImage' => 1,
-			'loadScroll' => 0,
-			'dynamic' => 0,
 			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
@@ -140,10 +137,10 @@ class CScreenGraph extends CScreenBase {
 			$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($resourceid));
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&legend='.$legend.'&graph3d='.$graph3d;
-			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
-			}
+				.'&legend='.$legend.'&graph3d='.$graph3d.$this->getProfileUrlParams();
+			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
+				? '&period=3600&stime='.date('YmdHis', time())
+				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
@@ -157,10 +154,11 @@ class CScreenGraph extends CScreenBase {
 				}
 			}
 
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
-			if ($this->mode != SCREEN_MODE_EDIT) {
-				$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
-			}
+			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
+				.$this->getProfileUrlParams();
+			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
+				? '&period=3600&stime='.date('YmdHis', time())
+				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 
 		// output
@@ -180,7 +178,7 @@ class CScreenGraph extends CScreenBase {
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].
-						'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile);
+						'&stime='.$this->timeline['stimeNow']);
 			}
 			$item->setAttribute('id', $containerid);
 

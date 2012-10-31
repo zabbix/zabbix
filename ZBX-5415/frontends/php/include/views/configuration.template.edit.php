@@ -303,7 +303,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$templateList->addRow(_('Discovery rules'), $listBox);
 
 // Item prototypes
-		$hostItemPrototypes = API::Itemprototype()->get(array(
+		$hostItemPrototypes = API::ItemPrototype()->get(array(
 			'hostids' => $templateid,
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
@@ -364,6 +364,26 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 			$templateList->addRow(_('Graph prototypes'), $listBox);
 		}
+	}
+
+	// screens
+	$screens = API::TemplateScreen()->get(array(
+		'inherited' => false,
+		'templateids' => $templateid,
+		'output' => array('screenid', 'name'),
+	));
+	if (!empty($screens)) {
+		$screensList = array();
+		foreach ($screens as $screen) {
+			$screensList[$screen['screenid']] = $screen['name'];
+		}
+		order_result($screensList);
+
+		$listBox = new CListBox('screens', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($screensList);
+
+		$templateList->addRow(_('Screens'), $listBox);
 	}
 }
 

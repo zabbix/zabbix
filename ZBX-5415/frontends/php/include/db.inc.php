@@ -121,8 +121,11 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
-				if (!$DB['DB']) {
+				$DB['DB'] = ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
+				if ($DB['DB']) {
+					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
+				}
+				else {
 					$error = 'Error connecting to database';
 					$result = false;
 				}
@@ -555,7 +558,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
-function DBfetch(&$cursor) {
+function DBfetch(&$cursor, $convertNulls = true) {
 	global $DB;
 
 	$result = false;
@@ -615,7 +618,7 @@ function DBfetch(&$cursor) {
 			break;
 	}
 
-	if ($result) {
+	if ($convertNulls && $result) {
 		foreach ($result as $key => $val) {
 			if (is_null($val)) {
 				$result[$key] = '0';
@@ -1078,7 +1081,6 @@ function DBcondition($fieldname, $array, $notin = false) {
 
 	if (!is_array($array)) {
 		throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
-		return ' 1=0 ';
 	}
 
 	$in = $notin ? ' NOT IN ':' IN ';
@@ -1170,7 +1172,7 @@ function unlock_sqlite3_access() {
  * @return bool
  */
 function idcmp($id1, $id2) {
-	return $id1 === $id2;
+	return (string) $id1 === (string) $id2;
 }
 
 /**
