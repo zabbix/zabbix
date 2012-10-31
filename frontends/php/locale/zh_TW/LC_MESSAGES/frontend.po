@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-29 13:54+0200\n"
+"POT-Creation-Date: 2012-10-31 20:24+0200\n"
 "PO-Revision-Date: 2012-10-17 16:04+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -102,8 +102,8 @@ msgstr "(最少 60 秒, 0 為預設值)"
 msgid "(no proxy)"
 msgstr "(無系統代理程式)"
 
-#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1887
-#: popup.php:1888
+#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1886
+#: popup.php:1887
 msgid "- all groups -"
 msgstr "- 所有群組 -"
 
@@ -485,7 +485,7 @@ msgid "Age less than %s"
 msgstr "歷時少於%s"
 
 #: include/items.inc.php:182 include/views/administration.script.list.php:64
-#: include/views/configuration.httpconf.edit.php:114 popup.php:2028
+#: include/views/configuration.httpconf.edit.php:114 popup.php:2027
 msgid "Agent"
 msgstr "端點代理程式"
 
@@ -1122,7 +1122,7 @@ msgstr "無法新增操作"
 msgid "Cannot add application"
 msgstr "無法新增應用集"
 
-#: api/classes/CTrigger.php:1870
+#: api/classes/CTrigger.php:1834
 msgid "Cannot add dependency from a host to a template."
 msgstr "無法新增自主機到模板的相依關係"
 
@@ -1257,15 +1257,15 @@ msgstr "無法改變授權方式為Zabbix內部"
 msgid "Cannot clear history"
 msgstr "無法清除歷史"
 
-#: api/classes/CDiscoveryRule.php:1215
+#: api/classes/CDiscoveryRule.php:1213
 msgid "Cannot clone graph prototypes."
 msgstr "無法克隆圖形原型"
 
-#: api/classes/CDiscoveryRule.php:1105
+#: api/classes/CDiscoveryRule.php:1103
 msgid "Cannot clone item prototypes."
 msgstr "無法克隆項目原型"
 
-#: api/classes/CDiscoveryRule.php:827
+#: api/classes/CDiscoveryRule.php:825
 msgid "Cannot clone trigger prototypes."
 msgstr "無法克隆觸發器原型"
 
@@ -1290,11 +1290,11 @@ msgstr "無法複製觸發器 \"%1$s:%2$s\", 因為在其表示式中有多重�
 msgid "Cannot create another database connection."
 msgstr "無法創建另外資料庫連線."
 
-#: api/classes/CTrigger.php:1904
+#: api/classes/CTrigger.php:1868
 msgid "Cannot create circular dependencies."
 msgstr ""
 
-#: api/classes/CTrigger.php:1876
+#: api/classes/CTrigger.php:1840
 msgid "Cannot create dependency on trigger itself."
 msgstr ""
 
@@ -1345,11 +1345,11 @@ msgstr "無法删除動作"
 msgid "Cannot delete application"
 msgstr "無法删除應用集"
 
-#: api/classes/CTrigger.php:1579
+#: api/classes/CTrigger.php:1543
 msgid "Cannot delete dependency"
 msgstr "無法刪除相依關係"
 
-#: api/classes/CDiscoveryRule.php:624 discoveryconf.php:164
+#: api/classes/CDiscoveryRule.php:622 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
 msgstr "無法删除探索規則"
@@ -1366,7 +1366,7 @@ msgstr "無法删除圖形"
 msgid "Cannot delete graph prototype"
 msgstr ""
 
-#: api/classes/CItem.php:1001
+#: api/classes/CItem.php:983
 msgid "Cannot delete graph."
 msgstr "無法刪除圖形."
 
@@ -1481,11 +1481,11 @@ msgstr "無法刪除簡報片展示"
 msgid "Cannot delete template"
 msgstr "無法刪除模板"
 
-#: api/classes/CGraph.php:767 api/classes/CGraphPrototype.php:796
+#: api/classes/CGraph.php:749 api/classes/CGraphPrototype.php:796
 msgid "Cannot delete templated graphs."
 msgstr "無法刪除模板圖形."
 
-#: api/classes/CItem.php:965
+#: api/classes/CItem.php:947
 msgid "Cannot delete templated item."
 msgstr "無法刪除樣本項目."
 
@@ -1493,11 +1493,11 @@ msgstr "無法刪除樣本項目."
 msgid "Cannot delete templated items"
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:583
+#: api/classes/CDiscoveryRule.php:581
 msgid "Cannot delete templated items."
 msgstr "無法刪除模板項目."
 
-#: api/classes/CTrigger.php:1158 api/classes/CTriggerPrototype.php:938
+#: api/classes/CTrigger.php:1139 api/classes/CTriggerPrototype.php:938
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "無法刪除模板化觸發器 \"%1$s:%2$s\"."
@@ -1510,7 +1510,7 @@ msgstr "無法删除觸發器"
 msgid "Cannot delete trigger prototype"
 msgstr ""
 
-#: api/classes/CItem.php:1017
+#: api/classes/CItem.php:999
 msgid "Cannot delete trigger."
 msgstr "無法刪除觸發器."
 
@@ -1579,7 +1579,7 @@ msgstr "無法找到用在拓墣圖\"%2$s\"中的主機\"%1$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的主機\"%1$s\"."
 
-#: api/classes/CDiscoveryRule.php:1021 api/classes/CDiscoveryRule.php:1093
+#: api/classes/CDiscoveryRule.php:1019 api/classes/CDiscoveryRule.php:1091
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
@@ -1650,7 +1650,7 @@ msgstr "無法形成樹狀格式"
 msgid "Cannot have empty visible template name"
 msgstr "不能有空白的可見模板名稱"
 
-#: api/classes/CTrigger.php:1607 api/classes/CTrigger.php:1679
+#: api/classes/CTrigger.php:1571 api/classes/CTrigger.php:1643
 #: api/classes/CTriggerPrototype.php:1016
 #: api/classes/CTriggerPrototype.php:1067
 #, php-format
@@ -1754,7 +1754,7 @@ msgstr ""
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1143
+#: api/classes/CTrigger.php:1124
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
 msgstr ""
@@ -1829,7 +1829,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1140
+#: api/classes/CTrigger.php:1121
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr ""
@@ -2220,8 +2220,8 @@ msgstr "命令不能是空白."
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:723
-#: include/views/configuration.action.edit.php:727 popup.php:1980
-#: popup.php:1987
+#: include/views/configuration.action.edit.php:727 popup.php:1979
+#: popup.php:1986
 msgid "Commands"
 msgstr "命令"
 
@@ -2646,12 +2646,12 @@ msgstr "新增值對應"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 應用集 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:868
+#: api/classes/CDiscoveryRule.php:866
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 探索規則 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CItem.php:867
+#: api/classes/CItem.php:849
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 項目 \"%1$s\" 於 \"%2$s\"."
@@ -2661,7 +2661,7 @@ msgstr "已創建: 項目 \"%1$s\" 於 \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 項目原型 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CTrigger.php:1617
+#: api/classes/CTrigger.php:1581
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 觸發器 \"%1$s\" 於 \"%2$s\"."
@@ -3392,12 +3392,12 @@ msgstr "已删除"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 應用集 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:632
+#: api/classes/CDiscoveryRule.php:630
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 探索規則 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CGraph.php:799
+#: api/classes/CGraph.php:781
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 圖形 \"%1$s\" 於 \"%2$s\"."
@@ -3407,7 +3407,7 @@ msgstr "已刪除: 圖形 \"%1$s\" 於 \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已刪除: 主機 \"%1$s\"."
 
-#: api/classes/CItem.php:1056
+#: api/classes/CItem.php:1038
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 項目 \"%1$s\" 於 \"%2$s\"."
@@ -3428,7 +3428,7 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr "已刪除: 模板 \"%1$s\"."
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1391
+#: api/classes/CTrigger.php:1355
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 觸發器 \"%1$s\" 於 \"%2$s\"."
@@ -3489,7 +3489,7 @@ msgstr "佈署狀態"
 #: include/views/configuration.item.massupdate.php:438
 #: include/views/configuration.maintenance.edit.php:76
 #: include/views/configuration.maintenance.list.php:47
-#: include/views/configuration.triggers.edit.php:243 popup.php:1347
+#: include/views/configuration.triggers.edit.php:243 popup.php:1346
 #: tr_logform.php:256
 msgid "Description"
 msgstr "描述"
@@ -3715,12 +3715,12 @@ msgstr "探索物件"
 msgid "Discovery rule"
 msgstr "探索規則"
 
-#: api/classes/CDiscoveryRule.php:951
+#: api/classes/CDiscoveryRule.php:949
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "探索規則 \"%1$s\"已存在於 \"%2$s\",繼承自其它的模板."
 
-#: api/classes/CDiscoveryRule.php:938
+#: api/classes/CDiscoveryRule.php:936
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "探索規則\"%1$s:%2$s\" 有不正確的存活時間: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用戶巨集)"
@@ -3895,7 +3895,7 @@ msgstr "下拉的第一個輸入項 \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "下拉記住所選的 \"%1$s\"."
 
-#: api/classes/CTrigger.php:2046
+#: api/classes/CTrigger.php:2010
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "觸發器 \"%1$s\" 中的重複相依關係."
@@ -4023,16 +4023,16 @@ msgid "Empty host name provided in expression."
 msgstr "空的主機名稱出現在表示式中"
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
-#: api/classes/CDiscoveryRule.php:563 api/classes/CGraph.php:747
+#: api/classes/CDiscoveryRule.php:561 api/classes/CGraph.php:729
 #: api/classes/CGraphPrototype.php:778 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:945 api/classes/CItemPrototype.php:677
+#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:677
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1363 api/classes/CTrigger.php:1452
-#: api/classes/CTrigger.php:1544 api/classes/CTriggerPrototype.php:920
+#: api/classes/CTrigger.php:1327 api/classes/CTrigger.php:1416
+#: api/classes/CTrigger.php:1508 api/classes/CTriggerPrototype.php:920
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:502
 #: api/classes/CUserMacro.php:654
 msgid "Empty input parameter."
@@ -4312,8 +4312,8 @@ msgstr "執行SQL錯誤[%1$s]於[%2$s]."
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
 #: include/views/configuration.action.edit.php:664
-#: include/views/js/configuration.action.edit.js.php:114 popup.php:1979
-#: popup.php:1986
+#: include/views/js/configuration.action.edit.js.php:114 popup.php:1978
+#: popup.php:1985
 msgid "Execute on"
 msgstr "執行在"
 
@@ -4347,7 +4347,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "過期的"
 
-#: include/graphs.inc.php:27 popup.php:1422
+#: include/graphs.inc.php:27 popup.php:1421
 msgid "Exploded"
 msgstr "Exploded"
 
@@ -4733,33 +4733,33 @@ msgstr "漸層線"
 msgid "Graph"
 msgstr "圖形"
 
-#: api/classes/CGraph.php:632 api/classes/CGraphPrototype.php:660
+#: api/classes/CGraph.php:614 api/classes/CGraphPrototype.php:660
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "圖形\"%1$s\"已存在於\"%2$s\"中 (繼承自其它的模板)."
 
-#: api/classes/CGraph.php:653 api/classes/CGraph.php:660
+#: api/classes/CGraph.php:635 api/classes/CGraph.php:642
 #: api/classes/CGraphPrototype.php:682 api/classes/CGraphPrototype.php:689
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "圖形\"%1$s\"已存在於\"%2$s\"中 (項目不一致)."
 
-#: api/classes/CGraph.php:611 api/classes/CGraphPrototype.php:639
+#: api/classes/CGraph.php:593 api/classes/CGraphPrototype.php:639
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "圖形\"%1$s\"已存在於\"%2$s\"中."
 
-#: api/classes/CGraph.php:585 api/classes/CGraphPrototype.php:613
+#: api/classes/CGraph.php:567 api/classes/CGraphPrototype.php:613
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目 (Ymax值項目)."
 
-#: api/classes/CGraph.php:593 api/classes/CGraphPrototype.php:621
+#: api/classes/CGraph.php:575 api/classes/CGraphPrototype.php:621
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目 (Ymin值項目)."
 
-#: api/classes/CGraph.php:579 api/classes/CGraphPrototype.php:607
+#: api/classes/CGraph.php:561 api/classes/CGraphPrototype.php:607
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目."
@@ -4831,7 +4831,7 @@ msgid "Graph sum"
 msgstr "圖形總合"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:78 popup.php:1348 popup.php:1354
+#: include/views/configuration.graph.list.php:78 popup.php:1347 popup.php:1353
 msgid "Graph type"
 msgstr "圖形類別"
 
@@ -4844,7 +4844,7 @@ msgstr "圖形已更新"
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr ""
 
-#: api/classes/CGraph.php:614 api/classes/CGraph.php:635
+#: api/classes/CGraph.php:596 api/classes/CGraph.php:617
 #: api/classes/CGraphPrototype.php:642 api/classes/CGraphPrototype.php:663
 msgid "Graph with same name but other type exist."
 msgstr "同名但不同類型的圖形已存在."
@@ -5147,8 +5147,8 @@ msgstr "横向對齊"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
-#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1288 popup.php:1493
-#: popup.php:1501 popup.php:1631 queue.php:249 report2.php:225 report5.php:60
+#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1287 popup.php:1492
+#: popup.php:1500 popup.php:1630 queue.php:249 report2.php:225 report5.php:60
 #: tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "主機"
@@ -5984,7 +5984,7 @@ msgstr "不正確的欄位名稱\"%1$s\"或用於資料表\"%2$s\"的where陳述
 msgid "Incorrect fields for sysmap"
 msgstr "不正確的sysmap欄位"
 
-#: api/classes/CTrigger.php:1149
+#: api/classes/CTrigger.php:1130
 msgid "Incorrect fields for trigger."
 msgstr "不正確的觸發器欄位."
 
@@ -6072,7 +6072,7 @@ msgstr "不正確的項目予軸值."
 msgid "Incorrect item key \"%1$s\" is used in expression."
 msgstr "表示式中用了不正確的項目鍵值\"%1$s\""
 
-#: api/classes/CTrigger.php:1247
+#: api/classes/CTrigger.php:1228
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "提供不正確的項目鍵值\"%1$s\"給\"%2$s\"上的觸發器表示式."
@@ -6325,12 +6325,12 @@ msgstr "不正確的觸發器表示式."
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "不正確的觸發器表示式. 主機 \"%1$s\"不存在或您不能存取此主機."
 
-#: api/classes/CTrigger.php:1223
+#: api/classes/CTrigger.php:1204
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "不正確的觸發器表示式. 主機 \"%s\"不存在或您不能存取此主機."
 
-#: api/classes/CTrigger.php:1229
+#: api/classes/CTrigger.php:1210
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "不正確的觸發器表示式. 觸發器表示式組件不該同時屬於一個模板和一個主機."
 
@@ -6603,7 +6603,7 @@ msgstr "項目"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "鍵值為 \"%1$s\"的項目已存在於 \"%2$s\", 繼承自其他模板."
 
-#: api/classes/CItem.php:1239
+#: api/classes/CItem.php:1221
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "項目\"%1$s\"不能填入一個不存在的主機資產紀錄欄位號碼\"%2$d\". 選擇為: 從0(不填入)到%3$d."
@@ -6860,7 +6860,7 @@ msgstr "保留趨勢 (日計)"
 #: include/views/configuration.item.list.php:57
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/js/configuration.discovery.edit.js.php:235 items.php:75
-#: popup.php:955 popup.php:1095 popup.php:1204 popup.php:1213 popup.php:1633
+#: popup.php:955 popup.php:1095 popup.php:1204 popup.php:1213 popup.php:1632
 msgid "Key"
 msgstr "鍵值"
 
@@ -7774,7 +7774,7 @@ msgstr "時間期間的最小值是T 非 N"
 msgid "Minutes"
 msgstr "分"
 
-#: api/classes/CGraph.php:824 api/classes/CGraphPrototype.php:852
+#: api/classes/CGraph.php:806 api/classes/CGraphPrototype.php:852
 msgid "Missing \"itemid\" field for item."
 msgstr "缺少項目的\"itemid\"欄位"
 
@@ -7788,7 +7788,7 @@ msgstr "缺少圖形的\"名稱\"欄位"
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "主機 \"%2$s\"缺少了項目\"%1$s\"."
 
-#: api/classes/CGraph.php:818 api/classes/CGraphPrototype.php:846
+#: api/classes/CGraph.php:800 api/classes/CGraphPrototype.php:846
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr "缺少圖形\"%1$s\"的項目."
@@ -7956,11 +7956,11 @@ msgstr "NTLM認證"
 #: latest.php:192 maintenance.php:45 maintenance.php:145 maintenance.php:170
 #: popup_httpstep.php:36 popup.php:544 popup.php:633 popup.php:681
 #: popup.php:742 popup.php:794 popup.php:839 popup.php:898 popup.php:955
-#: popup.php:978 popup.php:1094 popup.php:1203 popup.php:1212 popup.php:1289
-#: popup.php:1324 popup.php:1353 popup.php:1494 popup.php:1502 popup.php:1565
-#: popup.php:1568 popup.php:1632 popup.php:1693 popup.php:1696 popup.php:1753
-#: popup.php:1757 popup.php:1808 popup.php:1839 popup.php:1870 popup.php:1910
-#: popup.php:1926 popup.php:1949 popup.php:1978 popup.php:1985
+#: popup.php:978 popup.php:1094 popup.php:1203 popup.php:1212 popup.php:1288
+#: popup.php:1323 popup.php:1352 popup.php:1493 popup.php:1501 popup.php:1564
+#: popup.php:1567 popup.php:1631 popup.php:1692 popup.php:1695 popup.php:1752
+#: popup.php:1756 popup.php:1807 popup.php:1838 popup.php:1869 popup.php:1909
+#: popup.php:1925 popup.php:1948 popup.php:1977 popup.php:1984
 #: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:226
 #: screenconf.php:50 services.php:43 slideconf.php:38 sysmaps.php:48
 #: sysmaps.php:265 trigger_prototypes.php:41 triggers.php:41 tr_status.php:293
@@ -8113,7 +8113,7 @@ msgstr "沒有發現動作"
 msgid "No application with ID \"%1$s\"."
 msgstr "沒有ID為\"%1$s\"的應用集."
 
-#: include/views/configuration.application.list.php:50 popup.php:1286
+#: include/views/configuration.application.list.php:50 popup.php:1285
 msgid "No applications defined."
 msgstr "沒有已定義的應用集."
 
@@ -8186,16 +8186,16 @@ msgstr "沒有細節"
 msgid "No discoveries defined."
 msgstr "沒有已定義的探索."
 
-#: popup.php:1925
+#: popup.php:1924
 msgid "No discovery checks defined."
 msgstr "沒有已定義的探索檢查."
 
-#: api/classes/CDiscoveryRule.php:650
+#: api/classes/CDiscoveryRule.php:648
 msgid "No discovery rule IDs given."
 msgstr "沒有所稱的探索規則ID"
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:43 popup.php:1909
+#: include/views/configuration.host.discovery.list.php:43 popup.php:1908
 msgid "No discovery rules defined."
 msgstr "沒有已定義的探索規則."
 
@@ -8249,7 +8249,7 @@ msgstr "沒有已定義的圖形原型."
 #: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:71
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
-#: include/views/monitoring.history.php:175 popup.php:1343
+#: include/views/monitoring.history.php:175 popup.php:1342
 msgid "No graphs defined."
 msgstr "沒有已定義的圖形."
 
@@ -8276,7 +8276,7 @@ msgstr "沒有模板[%s]的群組"
 msgid "No history defined."
 msgstr "沒有已定義的歷史."
 
-#: api/classes/CDiscoveryRule.php:653
+#: api/classes/CDiscoveryRule.php:651
 msgid "No host IDs given."
 msgstr "沒有所知的主機IDs"
 
@@ -8290,7 +8290,7 @@ msgid "No host group ID provided for screen element."
 msgstr "沒有提供主機群組給篩選組件"
 
 #: include/views/configuration.hostgroups.list.php:47 popup.php:678
-#: popup.php:1838 popup.php:1869
+#: popup.php:1837 popup.php:1868
 msgid "No host groups defined."
 msgstr "沒有已定義的主機群組."
 
@@ -8381,7 +8381,7 @@ msgstr "沒有含項目ID\"%1$s\"的項目."
 #: chart.php:49 include/items.inc.php:712
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:954 popup.php:1089
-#: popup.php:1454 popup.php:1629
+#: popup.php:1453 popup.php:1628
 msgid "No items defined."
 msgstr "沒有已定義的項目."
 
@@ -8401,7 +8401,7 @@ msgstr "沒有已定義的維修期間."
 msgid "No map ID provided for screen element."
 msgstr "沒有提供拓墣圖ID給篩選組件."
 
-#: include/views/monitoring.maps.php:27 popup.php:1562 sysmaps.php:262
+#: include/views/monitoring.maps.php:27 popup.php:1561 sysmaps.php:262
 msgid "No maps defined."
 msgstr "沒有已定義的對應."
 
@@ -8413,7 +8413,7 @@ msgstr "沒有已定義的示警媒介."
 msgid "No media types defined."
 msgstr "沒有已定義的示警媒介類型."
 
-#: include/views/administration.node.list.php:39 popup.php:1323
+#: include/views/administration.node.list.php:39 popup.php:1322
 msgid "No nodes defined."
 msgstr "沒有已定義的節點."
 
@@ -8482,19 +8482,19 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CAction.php:896 api/classes/CAction.php:1484
 #: api/classes/CApplication.php:449 api/classes/CApplication.php:456
 #: api/classes/CApplication.php:604 api/classes/CApplication.php:681
-#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:580
-#: api/classes/CDiscoveryRule.php:658 api/classes/CDiscoveryRule.php:663
-#: api/classes/CDiscoveryRule.php:681 api/classes/CDiscoveryRule.php:684
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:578
+#: api/classes/CDiscoveryRule.php:656 api/classes/CDiscoveryRule.php:661
+#: api/classes/CDiscoveryRule.php:679 api/classes/CDiscoveryRule.php:682
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:592 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:844 api/classes/CGraphPrototype.php:871
+#: api/classes/CGraph.php:826 api/classes/CGraphPrototype.php:871
 #: api/classes/CHostInterface.php:511 api/classes/CHostInterface.php:527
 #: api/classes/CHostInterface.php:659 api/classes/CHostInterface.php:855
 #: api/classes/CHost.php:1286 api/classes/CHost.php:1318
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:962 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:695
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -8505,9 +8505,9 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CScreen.php:578 api/classes/CService.php:1254
 #: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:780
 #: api/classes/CTemplateScreen.php:801 api/classes/CTemplateScreen.php:807
-#: api/classes/CTrigger.php:1134 api/classes/CTrigger.php:1471
-#: api/classes/CTrigger.php:1495 api/classes/CTrigger.php:1747
-#: api/classes/CTrigger.php:1759 api/classes/CTriggerPrototype.php:835
+#: api/classes/CTrigger.php:1115 api/classes/CTrigger.php:1435
+#: api/classes/CTrigger.php:1459 api/classes/CTrigger.php:1711
+#: api/classes/CTrigger.php:1723 api/classes/CTriggerPrototype.php:835
 #: api/classes/CTriggerPrototype.php:933
 #: api/classes/CTriggerPrototype.php:1104
 #: api/classes/CTriggerPrototype.php:1116 api/classes/CUserMacro.php:831
@@ -8525,7 +8525,7 @@ msgstr "沒有指定給動作操作命令\"%s\"的私有金鑰."
 msgid "No private key file specified."
 msgstr "沒有指定的私有金鑰."
 
-#: include/views/administration.proxy.list.php:42 popup.php:1948
+#: include/views/administration.proxy.list.php:42 popup.php:1947
 msgid "No proxies defined."
 msgstr "沒有已定義的系統代理程式"
 
@@ -8565,7 +8565,7 @@ msgstr "沒有提供篩選ID給篩選組件."
 #: include/classes/screens/CScreenBuilder.php:270
 #: include/views/configuration.screen.list.php:46
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:37 popup.php:1749 popup.php:1807
+#: include/views/monitoring.screen.php:37 popup.php:1748 popup.php:1806
 msgid "No screens defined."
 msgstr "沒有已定義的篩選"
 
@@ -8573,7 +8573,7 @@ msgstr "沒有已定義的篩選"
 msgid "No script specified for action operation command."
 msgstr "沒有指定給動作操作命令的腳本."
 
-#: include/views/administration.script.list.php:34 popup.php:1974
+#: include/views/administration.script.list.php:34 popup.php:1973
 msgid "No scripts defined."
 msgstr "沒有已定義的腳本."
 
@@ -8583,7 +8583,7 @@ msgid "No slide shows defined."
 msgstr "沒有已定義的簡報片展示."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:111 popup.php:1690
+#: include/views/monitoring.slides.php:111 popup.php:1689
 msgid "No slides defined."
 msgstr "沒有已定義的簡報片."
 
@@ -8702,7 +8702,7 @@ msgstr "節點"
 msgid "None"
 msgstr "無"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1784 popup.php:1425
+#: include/graphs.inc.php:24 include/triggers.inc.php:1784 popup.php:1424
 msgid "Normal"
 msgstr "正常"
 
@@ -8718,7 +8718,7 @@ msgstr "非知悉"
 msgid "Not Templated items"
 msgstr "非模板項目"
 
-#: api/classes/CTrigger.php:1949
+#: api/classes/CTrigger.php:1913
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "並非所有的模板都連結到\"%s\"."
@@ -9537,7 +9537,7 @@ msgstr "波斯語 (fa_IR)"
 msgid "Peta"
 msgstr "Peta"
 
-#: include/graphs.inc.php:26 popup.php:1419
+#: include/graphs.inc.php:26 popup.php:1418
 msgid "Pie"
 msgstr "Pie"
 
@@ -10805,8 +10805,8 @@ msgstr "秒"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/js/configuration.sysmaps.js.php:104 popup_bitem.php:119
 #: popup.php:652 popup.php:722 popup.php:779 popup.php:876 popup.php:940
-#: popup.php:1071 popup.php:1181 popup.php:1270 popup.php:1436 popup.php:1544
-#: popup.php:1615 popup.php:1729 popup.php:1791 popup.php:2046
+#: popup.php:1071 popup.php:1181 popup.php:1269 popup.php:1435 popup.php:1543
+#: popup.php:1614 popup.php:1728 popup.php:1790 popup.php:2045
 #: popup_right.php:109 popup_usrgrp.php:102 tr_logform.php:274
 msgid "Select"
 msgstr "選擇"
@@ -10898,7 +10898,7 @@ msgstr "序列號A"
 msgid "Serial number B"
 msgstr "序列號B"
 
-#: include/views/administration.script.list.php:67 popup.php:2031
+#: include/views/administration.script.list.php:67 popup.php:2030
 #: queue.php:186
 msgid "Server"
 msgstr "伺服器"
@@ -11268,7 +11268,7 @@ msgstr "依此排序觸發器:"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "依欄位\"%1$s\"排序是不允許的."
 
-#: api/classes/CTrigger.php:553
+#: api/classes/CTrigger.php:534
 #, php-format
 msgid "Sorting by field \"%s\" not allowed."
 msgstr "依欄位\"%s\"排序是不允許的."
@@ -11289,7 +11289,7 @@ msgstr "指定的腳本不存在或您沒有對動作操作命令的此腳本的
 msgid "Speed"
 msgstr "速度"
 
-#: include/graphs.inc.php:25 popup.php:1416
+#: include/graphs.inc.php:25 popup.php:1415
 msgid "Stacked"
 msgstr "層積的"
 
@@ -11330,7 +11330,7 @@ msgstr "州"
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.triggers.list.php:97 popup_media.php:138
 #: popup.php:544 popup.php:980 popup.php:1098 popup.php:1207 popup.php:1216
-#: popup.php:1636 srv_status.php:161 tr_status.php:285
+#: popup.php:1635 srv_status.php:161 tr_status.php:285
 msgid "Status"
 msgstr "狀態"
 
@@ -11946,7 +11946,7 @@ msgstr "趨勢"
 msgid "Trigger"
 msgstr "觸發器"
 
-#: api/classes/CTriggerGeneral.php:298
+#: api/classes/CTriggerGeneral.php:310
 #, php-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
@@ -11973,7 +11973,7 @@ msgstr "略過觸發器\"%1$s\"-用戶規則."
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr "觸發器\"%1$s:%2$s\"並無項目原型."
 
-#: api/classes/CTrigger.php:2094
+#: api/classes/CTrigger.php:2058
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "觸發器\"%s\"屬於有不同連結的模板."
@@ -11983,7 +11983,7 @@ msgstr "觸發器\"%s\"屬於有不同連結的模板."
 msgid "Trigger added"
 msgstr "觸發器已新增"
 
-#: api/classes/CTrigger.php:1992
+#: api/classes/CTrigger.php:1956
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr "觸發器不能相依於自己所繼承的觸發器."
 
@@ -12150,7 +12150,7 @@ msgstr "週二"
 msgid "Two elements should be selected"
 msgstr "兩個組件必需被選擇"
 
-#: api/classes/CItem.php:1300
+#: api/classes/CItem.php:1282
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "兩個項目 (\"%1$s\"和\"%2$s\")不能填入一個主機資產紀錄欄位\"%3$s\", 這會造成衝突."
@@ -12182,8 +12182,8 @@ msgstr "兩個項目 (\"%1$s\"和\"%2$s\")不能填入一個主機資產紀錄�
 #: include/views/js/configuration.sysmaps.js.php:12
 #: include/views/js/configuration.sysmaps.js.php:355
 #: include/views/monitoring.overview.php:32 popup_media.php:121 popup.php:512
-#: popup.php:1096 popup.php:1205 popup.php:1214 popup.php:1495 popup.php:1503
-#: popup.php:1634 tr_logform.php:299 tr_logform.php:303
+#: popup.php:1096 popup.php:1205 popup.php:1214 popup.php:1494 popup.php:1502
+#: popup.php:1633 tr_logform.php:299 tr_logform.php:303
 msgid "Type"
 msgstr "類型"
 
@@ -12212,7 +12212,7 @@ msgstr "計算方式"
 #: include/views/configuration.item.edit.php:209
 #: include/views/configuration.item.edit.php:220
 #: include/views/configuration.item.massupdate.php:165 popup.php:1097
-#: popup.php:1206 popup.php:1215 popup.php:1496 popup.php:1504 popup.php:1635
+#: popup.php:1206 popup.php:1215 popup.php:1495 popup.php:1503 popup.php:1634
 msgid "Type of information"
 msgstr "數據類型"
 
@@ -12521,12 +12521,12 @@ msgstr "已更新: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 應用程式\"%1$s\"於\"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:912
+#: api/classes/CDiscoveryRule.php:910
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 探索規則\"%1$s\"於\"%2$s\"."
 
-#: api/classes/CItem.php:918
+#: api/classes/CItem.php:900
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 項目\"%1$s\"於\"%2$s\"."
@@ -12536,7 +12536,7 @@ msgstr "已更新: 項目\"%1$s\"於\"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 項目原型\"%1$s\"於\"%2$s\"."
 
-#: api/classes/CTrigger.php:1718
+#: api/classes/CTrigger.php:1682
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 觸發器\"%1$s\"於\"%2$s\"."
@@ -13306,15 +13306,15 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 
 #: api/classes/CApplication.php:839 api/classes/CApplication.php:850
-#: api/classes/CGraph.php:691 api/classes/CGraph.php:702
-#: api/classes/CGraph.php:763 api/classes/CGraphPrototype.php:720
+#: api/classes/CGraph.php:673 api/classes/CGraph.php:684
+#: api/classes/CGraph.php:745 api/classes/CGraphPrototype.php:720
 #: api/classes/CGraphPrototype.php:731 api/classes/CGraphPrototype.php:793
 #: api/classes/CHostGroup.php:653 api/classes/CHostGroup.php:711
 #: api/classes/CHostGroup.php:863 api/classes/CHostGroup.php:918
 #: api/classes/CHostGroup.php:984 api/classes/CHostGroup.php:997
 #: api/classes/CHostGroup.php:1011 api/classes/CHost.php:1592
 #: api/classes/CHost.php:1646 api/classes/CHost.php:1960
-#: api/classes/CItem.php:1067 api/classes/CItem.php:1070
+#: api/classes/CItem.php:1049 api/classes/CItem.php:1052
 #: api/classes/CItemPrototype.php:792 api/classes/CItemPrototype.php:795
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
 #: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
