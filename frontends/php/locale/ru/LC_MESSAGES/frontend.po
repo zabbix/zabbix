@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:24+0200\n"
-"PO-Revision-Date: 2012-10-26 22:35+0200\n"
-"Last-Translator: dotneft <dotneft@gmail.com>\n"
+"POT-Creation-Date: 2012-10-31 20:49+0200\n"
+"PO-Revision-Date: 2012-10-31 01:48+0200\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -3558,19 +3558,19 @@ msgstr "Разница между последним и предыдущим з�
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Разница между последним и предыдущим значениями NOT N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -7352,7 +7352,7 @@ msgstr "Имя макроса \"%1$s\" слишком длинное, оно н�
 #: api/classes/CUserMacro.php:1079
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr "Макрос с globalmacroid \"%1$s\"  не существует."
+msgstr "Макрос с globalmacroid \"%1$s\" не существует."
 
 #: api/classes/CUserMacro.php:1019
 #, php-format

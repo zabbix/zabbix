@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:24+0200\n"
-"PO-Revision-Date: 2012-10-27 14:03+0200\n"
+"POT-Creation-Date: 2012-10-31 20:49+0200\n"
+"PO-Revision-Date: 2012-10-29 14:29+0200\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3550,19 +3550,19 @@ msgstr "Différence entre la dernière valeur et la précédente, alors N n'est 
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "La différence entre la dernière valeur et la précédente est < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "La différence entre la dernière valeur et la précédente est = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "La différence entre la dernière valeur et la précédente est > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "La différence entre la dernière valeur et la précédente n'est PAS N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:24+0200\n"
-"PO-Revision-Date: 2012-10-27 21:59+0200\n"
+"POT-Creation-Date: 2012-10-31 20:49+0200\n"
+"PO-Revision-Date: 2012-10-31 15:21+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -190,19 +190,19 @@ msgstr "ЗВІТ ПРО ДОСТУПНІСТЬ"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Абсолютна різниця між останнім і попереднім значенням < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Абсолютна різниця між останнім і попереднім значенням = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Абсолютна різниця між останнім і попереднім значенням > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Абсолютна різниця між останнім і попереднім значенням НЕ є N"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -789,19 +789,19 @@ msgstr "Середнє по"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Середнє значення за період T < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Середнє значення за період T = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Середнє значення за період T > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Середнє значення за період T НЕ є N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -1301,11 +1301,11 @@ msgstr "Не вдалося сворити інше з'єднання з баз�
 
 #: api/classes/CTrigger.php:1868
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Не вдалося створити залежності утворюючі кільце."
 
 #: api/classes/CTrigger.php:1840
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Неможливо створити залежність тригера самого від себе."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -1373,7 +1373,7 @@ msgstr "Не вдалося видалити графік"
 
 #: api/classes/CItemPrototype.php:737
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Не вдалося видалити прототип графіка"
 
 #: api/classes/CItem.php:983
 msgid "Cannot delete graph."
@@ -1385,7 +1385,7 @@ msgstr "Не вдалося видалити графіки"
 
 #: api/classes/CGraphPrototype.php:820
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "Неможливо видалити графіки створені низькорівневим виявленням."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1421,7 +1421,7 @@ msgstr "Не вдалося видалити елементи даних"
 
 #: api/classes/CItemPrototype.php:754
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "Неможливо видалити елементи даних створені низькорівневим виявленням."
 
 #: maintenance.php:174
 msgid "Cannot delete maintenance"
@@ -1502,7 +1502,7 @@ msgstr "Не вдалося видалити шаблонний елемент �
 
 #: api/classes/CItemPrototype.php:698
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Не вдалося видалити шаблонні елементи даних"
 
 #: api/classes/CDiscoveryRule.php:581
 msgid "Cannot delete templated items."
@@ -1519,7 +1519,7 @@ msgstr "Не вдалося видалити тригер"
 
 #: api/classes/CItemPrototype.php:769
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Не вдалося видалити прототип тригера"
 
 #: api/classes/CItem.php:999
 msgid "Cannot delete trigger."
@@ -1531,7 +1531,7 @@ msgstr "Не вдалося видалити тригери"
 
 #: api/classes/CTriggerPrototype.php:976
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "Неможливо видалити тригери створені низькорівневим виявленням."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1752,32 +1752,32 @@ msgstr "Не вдалось зберегти правило виявлення �
 #: api/classes/CApplication.php:466
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося встановити \"templateid\" для групи елементів даних \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося встановити \"templateid\" для графіка \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося встановити \"templateid\" для елемента даних \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося встановити \"templateid\" для комплексного екрану \"%1$s\"."
 
 #: api/classes/CTrigger.php:1124
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося встановити \"templateid\" для тригера \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:771
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося встановити \"templateid\" для прототипа тригера \"%1$s\"."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
@@ -1827,32 +1827,32 @@ msgstr "Не вдалося від'єднати тригер \"%s\", він мі
 #: api/classes/CApplication.php:463
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"templateid\" для групи елементів даних \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"templateid\" для графіка \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"templateid\" для елемента даних \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:744
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"templateid\" для комплексного екрану \"%1$s\"."
 
 #: api/classes/CTrigger.php:1121
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"templateid\" для тригера \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:844
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося оновити \"templateid\" для прототипу тригера \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -2753,19 +2753,19 @@ msgstr "Критична помилка. Некоректне значення �
 
 #: popup_trexpr.php:348
 msgid "Current date is < N"
-msgstr ""
+msgstr "Поточна дата < N"
 
 #: popup_trexpr.php:356
 msgid "Current date is = N"
-msgstr ""
+msgstr "Поточна дата = N"
 
 #: popup_trexpr.php:352
 msgid "Current date is > N"
-msgstr ""
+msgstr "Поточна дата > N"
 
 #: popup_trexpr.php:360
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "Поточна дата НЕ є N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
@@ -2778,19 +2778,19 @@ msgstr "Поточна нода"
 
 #: popup_trexpr.php:488
 msgid "Current time is < N"
-msgstr ""
+msgstr "Поточний час < N"
 
 #: popup_trexpr.php:496
 msgid "Current time is = N"
-msgstr ""
+msgstr "Поточний час = N"
 
 #: popup_trexpr.php:492
 msgid "Current time is > N"
-msgstr ""
+msgstr "Поточний час > N"
 
 #: popup_trexpr.php:500
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "Поточний час НЕ є N"
 
 #: include/setup.inc.php:192
 msgid "Current value"
@@ -3008,19 +3008,19 @@ msgstr "День в місяць"
 
 #: popup_trexpr.php:380
 msgid "Day of month is < N"
-msgstr ""
+msgstr "День місяця < N"
 
 #: popup_trexpr.php:388
 msgid "Day of month is = N"
-msgstr ""
+msgstr "День місяця = N"
 
 #: popup_trexpr.php:384
 msgid "Day of month is > N"
-msgstr ""
+msgstr "День місяця > N"
 
 #: popup_trexpr.php:392
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "День місяця НЕ є N"
 
 #: include/forms.inc.php:1526 include/forms.inc.php:1583
 #: include/forms.inc.php:1607
@@ -3029,19 +3029,19 @@ msgstr "День в тиждень"
 
 #: popup_trexpr.php:364
 msgid "Day of week is < N"
-msgstr ""
+msgstr "День тижня < N"
 
 #: popup_trexpr.php:372
 msgid "Day of week is = N"
-msgstr ""
+msgstr "День тижня = N"
 
 #: popup_trexpr.php:368
 msgid "Day of week is > N"
-msgstr ""
+msgstr "День тижня > N"
 
 #: popup_trexpr.php:376
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "День тижня НЕ є N"
 
 #: include/forms.inc.php:1668 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3534,43 +3534,43 @@ msgstr "Критерій унікальності пристрою"
 
 #: popup_trexpr.php:158
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "Різниця між МАКС і МІН значеннями за період T < N"
 
 #: popup_trexpr.php:168
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "Різниця між МАКС і МІН значеннями за період T = N"
 
 #: popup_trexpr.php:163
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "Різниця між МАКС і МІН значеннями за період T > N"
 
 #: popup_trexpr.php:173
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "Різниця між МАКС і МІН значеннями за період T НЕ є N"
 
 #: popup_trexpr.php:214
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Різниця між останнім і попереднім значеннями, тоді N = 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:218
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Різниця між останнім і попереднім значеннями, тоді N НЕ є 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "Різниця між останнім і попереднім значенням < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "Різниця між останнім і попереднім значенням = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "Різниця між останнім і попереднім значенням > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Різниця між останнім і попереднім значенням НЕ є N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3915,7 +3915,7 @@ msgstr "Запам'ятовувати вибране у випадаючому �
 #: api/classes/CTrigger.php:2010
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "Дублюючі залежності в тригері \"%1$s\"."
 
 #: api/classes/CHost.php:1349
 #, php-format
@@ -4255,11 +4255,11 @@ msgstr "ID події"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Event ID останнього запису в журналі відповідає регулярному виразу T, тоді N = 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:431
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Event ID останнього запису в журналі відповідає регулярному виразу T, тоді N НЕ є 1, 0 - в іншому випадку"
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
@@ -4538,11 +4538,11 @@ msgstr "Фільтр по імені"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Шукати рядок V в останньому (найновішому) значенні. N = 1 - якщо знайдено, 0 - в іншому випадку"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Шукати рядок V в останньому (найновішому) значенні. N НЕ є 1 - якщо знайдено, 0 - в іншому випадку"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -4550,7 +4550,7 @@ msgstr "Завершити"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Фінська (fi_FI)"
 
 #: include/forms.inc.php:1589 include/maintenances.inc.php:103
 msgid "First"
@@ -4784,7 +4784,7 @@ msgstr "Графік \"%1$s\" не може бути успадковано. Н�
 #: api/classes/CTemplateScreen.php:663
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Графік \"%1$s\" не існує в шаблоні \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1556
 #: include/classes/import/CXmlImport18.php:1560
@@ -4859,7 +4859,7 @@ msgstr "Графік оновлено"
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "Графік з іменем \"%1$s\" вже існує в графіках або в прототипах графіків."
 
 #: api/classes/CGraph.php:596 api/classes/CGraph.php:617
 #: api/classes/CGraphPrototype.php:642 api/classes/CGraphPrototype.php:663
@@ -5974,7 +5974,7 @@ msgstr "Некоректний колір \"%1$s\"."
 
 #: api/classes/CScreenItem.php:587
 msgid "Incorrect column span provided for screen element."
-msgstr ""
+msgstr "Вказано некоректний діапазон об'єднання стовпчиків для елемента комплексного екрану."
 
 #: api/classes/CTriggerExpression.php:226
 msgid "Incorrect count of quotes in expression."
@@ -6249,7 +6249,7 @@ msgstr "Вказано некоректний тип ресурсу для ел�
 
 #: api/classes/CScreenItem.php:584
 msgid "Incorrect row span provided for screen element."
-msgstr ""
+msgstr "Вказано некоректний діапазон об'єднання рядків для елемента комплексного екрану."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6432,7 +6432,7 @@ msgstr "Некоректний елемент даних для Y мін. у г�
 
 #: include/locales.inc.php:55
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "Індонезійська (id_ID)"
 
 #: include/blocks.inc.php:834 include/blocks.inc.php:1364
 #: include/classes/class.cformlist.php:65 tr_status.php:286
@@ -6628,7 +6628,7 @@ msgstr "Елемент даних \"%1$s\" не може заповнювати 
 #: api/classes/CTemplateScreen.php:673
 #, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Елемент даних \"%1$s\" не існує в шаблоні \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1523
 #, php-format
@@ -6978,19 +6978,19 @@ msgstr[2] "Останні %1$d подій"
 
 #: popup_trexpr.php:222
 msgid "Last (most recent) T value is < N"
-msgstr ""
+msgstr "Останнє (найновіше) T значення < N"
 
 #: popup_trexpr.php:232
 msgid "Last (most recent) T value is = N"
-msgstr ""
+msgstr "Останнє (найновіше) T значення = N"
 
 #: popup_trexpr.php:227
 msgid "Last (most recent) T value is > N"
-msgstr ""
+msgstr "Останнє (найновіше) T значення > N"
 
 #: popup_trexpr.php:237
 msgid "Last (most recent) T value is NOT N"
-msgstr ""
+msgstr "Останнє (найновіше) T значення НЕ є N"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -7081,19 +7081,19 @@ msgstr "Легенда"
 
 #: popup_trexpr.php:308
 msgid "Length of last (most recent) T value in characters is < N"
-msgstr ""
+msgstr "Довжина в символах останнього (найновішого) T значення < N"
 
 #: popup_trexpr.php:318
 msgid "Length of last (most recent) T value in characters is = N"
-msgstr ""
+msgstr "Довжина в символах останнього (найновішого) T значення = N"
 
 #: popup_trexpr.php:313
 msgid "Length of last (most recent) T value in characters is > N"
-msgstr ""
+msgstr "Довжина в символах останнього (найновішого) T значення > N"
 
 #: popup_trexpr.php:323
 msgid "Length of last (most recent) T value in characters is NOT N"
-msgstr ""
+msgstr "Довжина в символах останнього (найновішого) T значення НЕ є N"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:333
 #: include/views/js/configuration.sysmaps.js.php:409
@@ -7200,35 +7200,35 @@ msgstr "Лог (багато полів)"
 
 #: popup_trexpr.php:436
 msgid "Log severity of the last log entry is < N"
-msgstr ""
+msgstr "Важливість останнього запису в журналі < N"
 
 #: popup_trexpr.php:444
 msgid "Log severity of the last log entry is = N"
-msgstr ""
+msgstr "Важливість останнього запису в журналі = N"
 
 #: popup_trexpr.php:440
 msgid "Log severity of the last log entry is > N"
-msgstr ""
+msgstr "Важливість останнього запису в журналі > N"
 
 #: popup_trexpr.php:448
 msgid "Log severity of the last log entry is NOT N"
-msgstr ""
+msgstr "Важливість останнього запису в журналі НЕ є N"
 
 #: popup_trexpr.php:452
 msgid "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
-msgstr ""
+msgstr "Джерело події останнього запису в журналі відповідає параметру T, тоді N < 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:462
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Джерело події останнього запису в журналі відповідає параметру T, тоді N = 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:457
 msgid "Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise"
-msgstr ""
+msgstr "Джерело події останнього запису в журналі відповідає параметру T, тоді N > 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:467
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Джерело події останнього запису в журналі відповідає параметру T, тоді N НЕ є 1, 0 - в іншому випадку"
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.massupdate.php:365
@@ -7351,7 +7351,7 @@ msgstr "Ім'я макросу \"%1$s\" занадто довге, воно не
 #: api/classes/CUserMacro.php:1079
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Макросу з globalmacroid \"%1$s\" не існує."
 
 #: api/classes/CUserMacro.php:1019
 #, php-format
@@ -7592,19 +7592,19 @@ msgstr[2] "Максимальна довжина імені вузла мере�
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period of time is T < N"
-msgstr ""
+msgstr "Максимальне значення за період часу T < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period of time is T = N"
-msgstr ""
+msgstr "Максимальне значення за період часу T = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period of time is T > N"
-msgstr ""
+msgstr "Максимальне значення за період часу T > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period of time is T NOT N"
-msgstr ""
+msgstr "Максимальне значення за період часу T НЕ є N"
 
 #: api/classes/CHost.php:1371
 #, php-format
@@ -7781,19 +7781,19 @@ msgstr "Мінімально необхідний розмір PHP post - %s (к
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period of time is T < N"
-msgstr ""
+msgstr "Мінімальне значення за період часу T < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period of time is T = N"
-msgstr ""
+msgstr "Мінімальне значення за період часу T = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period of time is T > N"
-msgstr ""
+msgstr "Мінімальне значення за період часу T > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period of time is T NOT N"
-msgstr ""
+msgstr "Мінімальне значення за період часу T НЕ є N"
 
 #: include/forms.inc.php:1672
 msgid "Minutes"
@@ -8185,11 +8185,11 @@ msgstr "Немає заданих даних."
 
 #: popup_trexpr.php:504
 msgid "No data received during period of time T, if N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Не отримано даних за період часу T, тоді N = 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:509
 msgid "No data received during period of time T, if N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Не отримано даних за період часу T, тоді N НЕ є 1, 0 - в іншому випадку"
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -8234,7 +8234,7 @@ msgstr "Помилок не знайдено."
 
 #: tr_status.php:671
 msgid "No events"
-msgstr ""
+msgstr "Подій немає"
 
 #: events.php:380 include/classes/screens/CScreenEvents.php:41
 msgid "No events defined."
@@ -8832,19 +8832,19 @@ msgstr "Кількість елементів даних (активних/де�
 
 #: popup_trexpr.php:472
 msgid "Number of seconds since the Epoch is < N"
-msgstr ""
+msgstr "Кількість секунд з початку Епохи < N"
 
 #: popup_trexpr.php:480
 msgid "Number of seconds since the Epoch is = N"
-msgstr ""
+msgstr "Кількість секунд з початку Епохи = N"
 
 #: popup_trexpr.php:476
 msgid "Number of seconds since the Epoch is > N"
-msgstr ""
+msgstr "Кількість секунд з початку Епохи > N"
 
 #: popup_trexpr.php:484
 msgid "Number of seconds since the Epoch is NOT N"
-msgstr ""
+msgstr "Кількість секунд з початку Епохи НЕ є N"
 
 #: report5.php:63
 msgid "Number of status changes"
@@ -8856,19 +8856,19 @@ msgstr "Кількість кроків"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T < N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T = N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T = N"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T > N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T НЕ є N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9343,11 +9343,11 @@ msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
-msgstr ""
+msgstr "PHP session auto start"
 
 #: include/classes/class.frontendsetup.php:589
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
-msgstr ""
+msgstr "PHP session auto start повинно бути відключеним (директива PHP \"session.auto_start\")"
 
 #: include/classes/class.frontendsetup.php:570
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
@@ -9556,7 +9556,7 @@ msgstr "Права доступу можуть бути призначені т�
 
 #: include/locales.inc.php:60
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Персидська (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
@@ -9659,19 +9659,19 @@ msgstr "Попередня"
 
 #: popup_trexpr.php:282
 msgid "Previous value is < N"
-msgstr ""
+msgstr "Попереднє значення < N"
 
 #: popup_trexpr.php:290
 msgid "Previous value is = N"
-msgstr ""
+msgstr "Попереднє значення = N"
 
 #: popup_trexpr.php:286
 msgid "Previous value is > N"
-msgstr ""
+msgstr "Попереднє значення > N"
 
 #: popup_trexpr.php:294
 msgid "Previous value is NOT N"
-msgstr ""
+msgstr "Попереднє значення НЕ є N"
 
 #: include/hosts.inc.php:404
 msgid "Primary POC cell"
@@ -9931,19 +9931,19 @@ msgstr "Регулярний вираз \"%s\" вже існує."
 
 #: popup_trexpr.php:406
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Регулярний вираз V відповідає останньому значенню за період T, тоді N = 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:416
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Регулярний вираз V відповідає останньому значенню за період T, тоді N = 1, 0 - в іншому випадку (не чутливий до регістру)"
 
 #: popup_trexpr.php:411
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Регулярний вираз V відповідає останньому значенню за період T, тоді N НЕ є 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:421
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Регулярний вираз V відповідає останньому значенню за період T, тоді N НЕ є 1, 0 - в іншому випадку (не чутливий до регістру)"
 
 #: adm.regexps.php:104
 msgid "Regular expression added"
@@ -10612,7 +10612,7 @@ msgstr "Комплексний екран \"%1$s\" додано."
 
 #: api/classes/CTemplateScreen.php:821
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr ""
+msgstr "Комплексний екран \"%1$s\" вже існує в шаблоні \"%2$2\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:716 api/classes/CTemplateScreen.php:767
@@ -10647,11 +10647,11 @@ msgstr "Комплексний екран видалено"
 
 #: api/classes/CScreenItem.php:606
 msgid "Screen elements column span is too big."
-msgstr ""
+msgstr "Діапазон об'єднання стовпчиків елементів комплексного екрану занадто великий."
 
 #: api/classes/CScreenItem.php:603
 msgid "Screen elements row span is too big."
-msgstr ""
+msgstr "Діапазон об'єднання рядків елементів комплексного екрану занадто великий."
 
 #: api/classes/CScreenItem.php:176
 msgid "Screen item in same cell already exists."
@@ -11490,19 +11490,19 @@ msgstr "Аудит успіхів"
 
 #: popup_trexpr.php:328
 msgid "Sum of values for period of time is T < N"
-msgstr ""
+msgstr "Сума значень за період T < N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values for period of time is T NOT N"
-msgstr ""
+msgstr "Сума значень за період T НЕ є N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
-msgstr ""
+msgstr "Сума значень за період T = N"
 
 #: popup_trexpr.php:333
 msgid "Sum of values of a period T is > N"
-msgstr ""
+msgstr "Сума значень за період T > N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11686,7 +11686,7 @@ msgstr "Шаблон з групою елементів даних \"%1$s\" вж
 #: api/classes/CHostGeneral.php:179 include/hosts.inc.php:1218
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
-msgstr "Шаблон з ключем \"%1$s\" вже приєднано до вузла мережі."
+msgstr "Шаблон з ключем елемента даних \"%1$s\" вже приєднано до вузла мережі."
 
 #: api/classes/CHost.php:1427 api/classes/CTemplate.php:1356
 #, php-format
@@ -11897,11 +11897,11 @@ msgstr "Час виникнення (штамп)"
 
 #: popup_trexpr.php:396
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Штамп часу не відрізняється від часу на Zabbix сервері більш ніж на T секунд, тоді N = 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:401
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Штамп часу не відрізняється від часу на Zabbix сервері більш ніж на T секунд, тоді N НЕ є 1, 0 - в іншому випадку"
 
 #: include/reports.inc.php:206 include/reports.inc.php:368
 #: include/reports.inc.php:517
@@ -12099,7 +12099,7 @@ msgstr "Важливість тригера"
 
 #: triggers.php:288
 msgid "Trigger status became \"Disabled\"."
-msgstr "Стан тригера став \"Відключено\"."
+msgstr "Стан тригера став \"Дезактивований\"."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
 #: triggers.php:203 tr_logform.php:112

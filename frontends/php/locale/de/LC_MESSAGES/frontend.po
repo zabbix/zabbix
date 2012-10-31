@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:24+0200\n"
-"PO-Revision-Date: 2012-10-27 12:03+0200\n"
+"POT-Creation-Date: 2012-10-31 20:49+0200\n"
+"PO-Revision-Date: 2012-10-29 16:38+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -82,12 +82,12 @@ msgstr "(0 - unendlich)"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr "(Nur Superadministratoren können Gruppe erstellen)"
+msgstr "(Nur Superadministratoren können Gruppen erstellen)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:143
 msgid "(Only superadmins can create group)"
-msgstr "(Nur Superadministratoren können Gruppe erstellen)"
+msgstr "(Nur Superadministratoren können Gruppen erstellen)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -95,7 +95,7 @@ msgstr "(in Tagen)"
 
 #: include/forms.inc.php:436
 msgid "(in sec)"
-msgstr "(in Sek)"
+msgstr "(in Sek.)"
 
 #: include/views/configuration.action.edit.php:434
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -730,7 +730,7 @@ msgstr "Authentifizierungsmethode auf HTTP geändert"
 
 #: authentication.php:122 authentication.php:123
 msgid "Authentication method changed to LDAP"
-msgstr "Authentifizierungsmethode zu LDAP geändert"
+msgstr "Authentifizierungsmethode auf LDAP geändert"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
@@ -1727,7 +1727,7 @@ msgstr "Kann doppelte Vorlagen IDs nicht übergeben für die Verknüpfung: %s."
 #: include/classes/db/DB.php:614
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr "Kann den Löschvorgang in Tabelle \"%1$s\" ohne Where-Bedingung nicht durchführen."
+msgstr "Kann den Löschvorgang in Tabelle \"%1$s\" nicht durchführen ohne Where-Bedingung."
 
 #: include/classes/db/DB.php:437
 #, php-format
@@ -2758,22 +2758,18 @@ msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Kritischer Fehler. Falscher Wert für Feld \"%1$s\": Darf nicht leer sein."
 
 #: popup_trexpr.php:348
-#, fuzzy
 msgid "Current date is < N"
 msgstr "Heutiges Datum < N"
 
 #: popup_trexpr.php:356
-#, fuzzy
 msgid "Current date is = N"
 msgstr "Heutiges Datum = N"
 
 #: popup_trexpr.php:352
-#, fuzzy
 msgid "Current date is > N"
 msgstr "Heutiges Datum > N"
 
 #: popup_trexpr.php:360
-#, fuzzy
 msgid "Current date is NOT N"
 msgstr "Heutiges Datum NICHT N"
 
@@ -2787,7 +2783,6 @@ msgid "Current node"
 msgstr "Aktueller Knoten"
 
 #: popup_trexpr.php:488
-#, fuzzy
 msgid "Current time is < N"
 msgstr "Momentane Zeit < N"
 
@@ -3587,7 +3582,7 @@ msgstr ""
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
-msgstr "Dimension (Spalte x Zeile)"
+msgstr "Maße (Spalten x Zeilen)"
 
 #: include/views/administration.auditlogs.list.php:49
 msgid "Disable"
@@ -7763,7 +7758,7 @@ msgstr "Milli"
 
 #: tr_status.php:224
 msgid "Min severity"
-msgstr "Minimale Priorität"
+msgstr "Minimaler Schweregrad"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
 #: include/config.inc.php:338
@@ -13275,7 +13270,7 @@ msgstr "Y"
 #: include/func.inc.php:571
 msgctxt "Yotta short"
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #. GETTEXT: Date format (year). Do not translate.
 #: include/defines.inc.php:903
@@ -13379,7 +13374,7 @@ msgstr "Sie haben keine Host-Gruppe für die Operation angegeben."
 #: api/classes/CAction.php:1622
 #, php-format
 msgid "You did not specify targets for action operation command \"%s\"."
-msgstr ""
+msgstr "Sie haben kein Ziel angegeben für das Operations-Kommando \"%s\"."
 
 #: api/classes/CAction.php:1619
 #, php-format
@@ -13434,12 +13429,12 @@ msgstr "Sie müssen sich anmelden um diese Seite sehen zu können."
 
 #: include/views/administration.node.list.php:28
 msgid "Your setup is not configured for distributed monitoring."
-msgstr ""
+msgstr "Ihre Installation ist nicht eingerichtet für verteilte Überwachung."
 
 #: include/func.inc.php:570
 msgctxt "Zetta short"
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: index.php:30
 msgid "ZABBIX"
@@ -13501,7 +13496,7 @@ msgstr "Zabbix-interne Authentifizierung"
 
 #: warning.php:54
 msgid "Zabbix is temporarily unavailable!"
-msgstr ""
+msgstr "Zabbix ist derzeit unerreichbar!"
 
 #: include/classes/class.cserverinfo.php:39
 #: include/classes/class.cserverinfo.php:40 include/setup.inc.php:367
@@ -13518,10 +13513,13 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Zabbix-Server \"%s\" ist derzeit unerreichbar. Mögliche Gründe:\n"
+"1. Falscher Domain-Name oder falsche IP-Adresse in \"zabbix.conf.php\";\n"
+"2. Netzwerkkonfiguration fehlerhaft.\n"
 
 #: include/blocks.inc.php:696
 msgid "Zabbix server IP or port is not set!"
-msgstr "Zabbix Server IP oder Port nicht gesetzt!"
+msgstr "IP-Adresse oder Port nicht eingestellt für Zabbix-Server!"
 
 #: adm.gui.php:40
 msgid "Zabbix server activity check interval"
@@ -13537,7 +13535,7 @@ msgstr "Zabbix-Server läuft nicht: Angezeigte Informationen sind womöglich nic
 
 #: include/blocks.inc.php:694
 msgid "Zabbix server is running"
-msgstr "Zabbix Server läuft"
+msgstr "Zabbix-Server läuft"
 
 #: adm.gui.php:77
 #, php-format
@@ -13549,13 +13547,12 @@ msgid "Zabbix server name"
 msgstr "Name des Zabbix-Servers"
 
 #: include/setup.inc.php:368
-#, fuzzy
 msgid "Zabbix server port"
 msgstr "Zabbix-Server-Port"
 
 #: include/items.inc.php:84
 msgid "Zabbix trapper"
-msgstr "Zabbix trapper"
+msgstr "Zabbix-Trapper"
 
 #: include/func.inc.php:570
 msgid "Zetta"
@@ -13636,7 +13633,7 @@ msgstr "durchschn."
 #: include/func.inc.php:472 jsLoader.php:93
 msgctxt "day short"
 msgid "d"
-msgstr ""
+msgstr "T"
 
 #: include/defines.inc.php:905 include/maintenances.inc.php:57
 #: include/page_header.php:484 include/views/configuration.item.list.php:101
@@ -13696,7 +13693,7 @@ msgstr "Tage"
 #: include/views/configuration.services.edit.php:179
 #: include/views/configuration.services.edit.php:196
 msgid "dd"
-msgstr ""
+msgstr "TT"
 
 #: include/setup.inc.php:352 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
@@ -13718,7 +13715,7 @@ msgstr "Elemente kopieren nach ..."
 
 #: api/classes/CAction.php:1498
 msgid "esc_step_from and esc_step_to must be set together."
-msgstr ""
+msgstr "esc_step_from und esc_step_to müssen gemeinsam angegeben werden."
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:74
 #, fuzzy
@@ -13746,7 +13743,7 @@ msgstr "gefundenen/m"
 #: include/func.inc.php:480 jsLoader.php:94
 msgctxt "hour short"
 msgid "h"
-msgstr ""
+msgstr "h"
 
 #: include/views/configuration.maintenance.edit.php:54
 #: include/views/configuration.maintenance.edit.php:69
@@ -13755,7 +13752,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:222
 #: include/views/configuration.services.edit.php:228
 msgid "hh"
-msgstr ""
+msgstr "hh"
 
 #: api/classes/CMap.php:580
 msgid "host"
@@ -13838,7 +13835,7 @@ msgstr "min"
 
 #: include/views/configuration.action.edit.php:46
 msgid "minimum 60 seconds"
-msgstr ""
+msgstr "Mindestens 60 Sekunden"
 
 #: include/views/configuration.maintenance.edit.php:50
 #: include/views/configuration.maintenance.edit.php:56
@@ -14000,7 +13997,7 @@ msgstr "Wert-Zuordnung zeigen"
 #: api/classes/CHostGeneral.php:153
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
-msgstr ""
+msgstr "Vorlagen ID \"%1$s\" kommt %2$s mal vor"
 
 #: include/func.inc.php:1699
 msgid "to"
@@ -14040,7 +14037,7 @@ msgstr "Ganzzahl"
 #: include/func.inc.php:456 jsLoader.php:90
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "J"
 
 #: include/classes/class.frontendsetup.php:317
 #: include/classes/class.frontendsetup.php:336
@@ -14062,7 +14059,7 @@ msgstr "Ja"
 #: include/views/configuration.services.edit.php:183
 #: include/views/configuration.services.edit.php:200
 msgid "yyyy"
-msgstr "yyyy"
+msgstr "JJJJ"
 
 #: include/func.inc.php:561
 msgctxt "Micro short"

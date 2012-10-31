@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:24+0200\n"
-"PO-Revision-Date: 2012-10-22 04:45+0200\n"
+"POT-Creation-Date: 2012-10-31 20:49+0200\n"
+"PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
 "Language: id\n"
@@ -1288,11 +1288,11 @@ msgstr "Tidak dapat membuat koneksi database lainnya."
 
 #: api/classes/CTrigger.php:1868
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Tidak dapat membuat dependensi melingkar."
 
 #: api/classes/CTrigger.php:1840
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Tidak dapat membuat dependensi pada trigger itu sendiri."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -3536,19 +3536,19 @@ msgstr "Selisih antara nilai akhir dan awal, sehingga N BUKAN 1, 0 - Jika tidak"
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "Selisih antara nilai akhir dan nilai sebelumnya adalah < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "Selisih antara nilai akhir dan nilai sebelumnya adalah = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "Selisih antara nilai akhir dan nilai sebelumnya adalah > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Selisih antara nilai akhir dan nilai sebelumnya adalah BUKAN N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4516,11 +4516,11 @@ msgstr "Saring berdasarkan nama"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Cari V string dalam nilai (paling baru) terakhir. N = 1 - jika ditemukan, 0 - jika tidak"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Cari V string dalam nilai (paling baru) terakhir. N BUKAN 1 - jika ditemukan, 0 - jika tidak"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -8826,19 +8826,19 @@ msgstr "Jumlah langkah"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T < N"
-msgstr ""
+msgstr "Jumlah nilai V (yang memenuhi operator O) berhasil diambil untuk periode waktu T < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T = N"
-msgstr ""
+msgstr "Jumlah nilai V (yang memenuhi operator O) berhasil diambil untuk periode waktu T = N"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T > N"
-msgstr ""
+msgstr "Jumlah nilai V (yang memenuhi operator O) berhasil diambil untuk periode waktu T > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N"
-msgstr ""
+msgstr "Jumlah nilai V (yang memenuhi operator O) berhasil diambil untuk periode waktu T BUKAN N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -13195,7 +13195,7 @@ msgstr "Y"
 #: include/defines.inc.php:903
 msgctxt "date format"
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: include/views/configuration.graph.edit.php:274
 msgid "Y axis MAX value"
