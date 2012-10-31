@@ -604,10 +604,17 @@ class CAction extends CZBXAPI {
 		 * Adding objects
 		 */
 		// adding conditions
-		if (!is_null($options['selectConditions']) && str_in_array($options['selectConditions'], $subselectsAllowedOutputs)) {
-			$res = DBselect('SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids));
-			while ($condition = DBfetch($res)) {
-				$result[$condition['actionid']]['conditions'][$condition['conditionid']] = $condition;
+		if (!is_null($options['selectConditions']) && (is_array($options['selectConditions']) || str_in_array($options['selectConditions'], $subselectsAllowedOutputs))) {
+			$conditions = API::getApi()->select('conditions', array(
+				'output' => $this->extendOutputOption('conditions', array('conditionid', 'actionid'), $options['selectConditions']),
+				'filter' => array('actionid' => $actionids)
+			));
+			foreach ($conditions as $condition) {
+				$actionId = $condition['actionid'];
+				$conditionId = $condition['conditionid'];
+
+				$condition = $this->unsetExtraFields('conditions', $condition, $options['selectConditions']);
+				$result[$actionId]['conditions'][$conditionId] = $condition;
 			}
 		}
 
