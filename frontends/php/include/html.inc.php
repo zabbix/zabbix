@@ -295,7 +295,8 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		'graphs' => 'graphs',
 		'applications' => 'applications',
 		'screens' => 'screens',
-		'discoveries' => 'discoveries'
+		'discoveries' => 'discoveries',
+		'web' => 'web'
 	);
 	if (!empty($discoveryid)) {
 		unset($elements['applications'], $elements['screens'], $elements['discoveries']);
@@ -320,6 +321,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	}
 	if (isset($elements['discoveries'])) {
 		$options['selectDiscoveries'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['web'])) {
+		$options['selectHttpTests'] = API_OUTPUT_COUNT;
 	}
 
 	// get hosts
@@ -505,6 +509,18 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			$list->addItem(array(
 				new CLink(_('Discovery rules'), 'host_discovery.php?hostid='.$dbHost['hostid']),
 				' ('.$dbHost['discoveries'].')'
+			));
+		}
+	}
+
+	if (isset($elements['web'])) {
+		if ($currentElement == 'web') {
+			$list->addItem(_('Web').' ('.$dbHost['httpTests'].')');
+		}
+		else {
+			$list->addItem(array(
+				new CLink(_('Web'), 'httpconf.php?hostid='.$dbHost['hostid']),
+				' ('.$dbHost['httpTests'].')'
 			));
 		}
 	}

@@ -21,6 +21,11 @@
 
 $httpWidget = new CWidget();
 
+// append host summary to widget header
+if (!empty($this->data['hostid'])) {
+	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+}
+
 // create new scenario button
 $createForm = new CForm('get');
 $createForm->cleanItems();
