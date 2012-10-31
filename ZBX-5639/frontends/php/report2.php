@@ -194,33 +194,23 @@ else if (isset($_REQUEST['hostid'])) {
 
 	$config = select_config();
 
-	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST && $config['dropdown_first_entry'] == 1) {
-		if ($_REQUEST['groupid'] > 0) {
+	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
+		if ($_REQUEST['groupid'] > 0 || !$config['dropdown_first_entry']) {
 			$options['groupids'] = $_REQUEST['groupid'];
 		}
-		if ($_REQUEST['hostid'] > 0) {
+		if ($_REQUEST['hostid'] > 0 || !$config['dropdown_first_entry']) {
 			$options['hostids'] = $_REQUEST['hostid'];
 		}
 	}
-	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST && $config['dropdown_first_entry'] == 0) {
-		$options['groupids'] = $_REQUEST['groupid'];
-		$options['hostids'] = $_REQUEST['hostid'];
-	}
-
-	// if a template is selected, fetch all of the hosts, that are linked to those templates
-	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE && $config['dropdown_first_entry'] == 1) {
-		if ($_REQUEST['hostid'] > 0) {
+	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		// if a template is selected, fetch all of the hosts, that are linked to those templates
+		if ($_REQUEST['hostid'] > 0 || !$config['dropdown_first_entry']) {
 			$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
 			$options['hostids'] = zbx_objectValues($hosts, 'hostid');
 		}
-	}
-	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE && $config['dropdown_first_entry'] == 0) {
-		$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
-		$options['hostids'] = zbx_objectValues($hosts, 'hostid');
-	}
-
-	if (isset($_REQUEST['tpl_triggerid']) && $_REQUEST['tpl_triggerid'] > 0) {
-		$options['filter']['templateid'] = $_REQUEST['tpl_triggerid'];
+		if (isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0 || !$config['dropdown_first_entry'])) {
+			$options['filter']['templateid'] = $_REQUEST['tpl_triggerid'];
+		}
 	}
 
 	$triggers = API::Trigger()->get($options);
