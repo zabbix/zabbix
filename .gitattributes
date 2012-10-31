@@ -259,9 +259,16 @@ frontends/php/styles/themes/originalblue/images/icons_5481ab.png -text
 frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
+frontends/php/tests/api/classes/CHttpTestTest.php -text
+frontends/php/tests/api/classes/fixtures/CHttpTestTest/initial.xml -text
+frontends/php/tests/api/classes/fixtures/CHttpTestTest/testCHttpTestCreateOnTemplate.xml -text
+frontends/php/tests/api/classes/fixtures/CHttpTestTest/testCHttpTestUpdateOnTemplate.xml -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/general/zbx_dbcast_2bigintTest.php -text
 frontends/php/tests/general/zbx_limitTest.php -text
+frontends/php/tests/include/db/ZbxDbOperationTruncate.php -text
+frontends/php/tests/include/db/ZbxDbTestCase.php -text
+frontends/php/tests/include/db/fixtures/initial_users.xml -text
 include/zbxdbupgrade.h -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
