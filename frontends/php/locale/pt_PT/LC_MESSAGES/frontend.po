@@ -1,11 +1,6 @@
-# Portuguese translations for PACKAGE package.
-# Copyright (C) 2012 Zabbix SIA
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2012.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-30 17:15+0200\n"
 "PO-Revision-Date: 2012-10-30 17:15+0200\n"
