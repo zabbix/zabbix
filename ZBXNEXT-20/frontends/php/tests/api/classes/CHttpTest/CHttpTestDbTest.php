@@ -22,8 +22,6 @@
 require_once __DIR__.'/../../../include/db/ZbxDbTestCase.php';
 
 require_once __DIR__.'/../../../../api/rpc/class.czbxrpc.php';
-require_once __DIR__.'/../../../../api/classes/CHttpTest.php';
-require_once __DIR__.'/../../../../api/classes/managers/CHttpTestManager.php';
 
 
 class CHttpTestTest extends ZbxDbTestCase {
@@ -72,9 +70,16 @@ class CHttpTestTest extends ZbxDbTestCase {
 		$apiHttpTest = new CHttpTest();
 		$apiHttpTest->create($httpTests);
 
+		$expectedDataSet = $this->getExpectedDataSet(__DIR__, __METHOD__);
+
 		$queryTable = $this->getConnection()->createQueryTable('httptest',
 			'SELECT * FROM httptest WHERE httptestid IN (3, 4) ORDER BY httptestid');
-		$expectedTable = $this->getExpectedDataSet(__DIR__, __METHOD__)->getTable('httptest');
+		$expectedTable = $expectedDataSet->getTable('httptest');
+		$this->assertTablesEqual($expectedTable, $queryTable);
+
+		$queryTable = $this->getConnection()->createQueryTable('items',
+			'SELECT * FROM items WHERE itemid IN ('.implode(',', range(19, 36)).') ORDER BY itemid');
+		$expectedTable = $expectedDataSet->getTable('items');
 		$this->assertTablesEqual($expectedTable, $queryTable);
 	}
 
@@ -84,10 +89,13 @@ class CHttpTestTest extends ZbxDbTestCase {
 	public function testCHttpTestUpdateOnTemplate() {
 		$httpTests = array(
 			'httptestid' => 1,
+			'hostid' => 1,
+			'status' => 0,
 			'name' => 'HttpTestUpdate',
 			'delay' => 70,
 			'steps' => array(
 				array(
+					'httpstepid' => 1,
 					'name' => 'step1',
 					'timeout' => 15,
 					'url' => 'url1',
@@ -97,6 +105,7 @@ class CHttpTestTest extends ZbxDbTestCase {
 					'no' => 1,
 				),
 				array(
+					'httpstepid' => 2,
 					'name' => 'step2',
 					'timeout' => 15,
 					'url' => 'url2',
@@ -111,9 +120,16 @@ class CHttpTestTest extends ZbxDbTestCase {
 		$apiHttpTest = new CHttpTest();
 		$apiHttpTest->update($httpTests);
 
+		$expectedDataSet = $this->getExpectedDataSet(__DIR__, __METHOD__);
+
 		$queryTable = $this->getConnection()->createQueryTable('httptest',
 			'SELECT * FROM httptest WHERE httptestid IN (1, 2) ORDER BY httptestid');
-		$expectedTable = $this->getExpectedDataSet(__DIR__, __METHOD__)->getTable('httptest');
+		$expectedTable = $expectedDataSet->getTable('httptest');
+		$this->assertTablesEqual($expectedTable, $queryTable);
+
+		$queryTable = $this->getConnection()->createQueryTable('items',
+			'SELECT * FROM items WHERE itemid IN ('.implode(',', range(1, 18)).') ORDER BY itemid');
+		$expectedTable = $expectedDataSet->getTable('items');
 		$this->assertTablesEqual($expectedTable, $queryTable);
 	}
 }

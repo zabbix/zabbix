@@ -559,25 +559,25 @@ class CHttpTestManager {
 
 			$stepitems = array(
 				array(
-					'name'				=> _s('Download speed for step "%1$s" of scenario "%2$s".', '$2', '$1'),
-					'key_'				=> 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]',
-					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'				=> 'Bps',
-					'httpstepitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
+					'name' => _s('Download speed for step "%1$s" of scenario "%2$s".', '$2', '$1'),
+					'key_' => 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]',
+					'value_type' => ITEM_VALUE_TYPE_FLOAT,
+					'units' => 'Bps',
+					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
 				),
 				array(
-					'name'				=> _s('Response time for step "%1$s" of scenario "%2$s".', '$2', '$1'),
-					'key_'				=> 'web.test.time['.$httpTest['name'].','.$webstep['name'].',resp]',
-					'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'				=> 's',
-					'httpstepitemtype'	=> HTTPSTEP_ITEM_TYPE_TIME
+					'name' => _s('Response time for step "%1$s" of scenario "%2$s".', '$2', '$1'),
+					'key_' => 'web.test.time['.$httpTest['name'].','.$webstep['name'].',resp]',
+					'value_type' => ITEM_VALUE_TYPE_FLOAT,
+					'units' => 's',
+					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
 				),
 				array(
-					'name'				=> _s('Response code for step "%1$s" of scenario "%2$s".', '$2', '$1'),
-					'key_'				=> 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']',
-					'value_type'		=> ITEM_VALUE_TYPE_UINT64,
-					'units'				=> '',
-					'httpstepitemtype'	=> HTTPSTEP_ITEM_TYPE_RSPCODE
+					'name' => _s('Response code for step "%1$s" of scenario "%2$s".', '$2', '$1'),
+					'key_' => 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'units' => '',
+					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_RSPCODE
 				)
 			);
 			foreach ($stepitems as &$item) {

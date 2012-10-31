@@ -24,24 +24,66 @@ require_once __DIR__.'/../../../include/defines.inc.php';
 require_once __DIR__.'/../../../include/func.inc.php';
 require_once __DIR__.'/../../../include/db.inc.php';
 require_once __DIR__.'/../../../include/nodes.inc.php';
-require_once __DIR__.'/../../../include/classes/debug/CProfiler.php';
-require_once __DIR__.'/../../../include/classes/class.cwebuser.php';
-require_once __DIR__.'/../../../include/classes/db/DbBackend.php';
-require_once __DIR__.'/../../../include/classes/db/MysqlDbBackend.php';
-require_once __DIR__.'/../../../include/classes/db/DB.php';
-require_once __DIR__.'/../../../include/classes/api/API.php';
-require_once __DIR__.'/../../../include/classes/api/CAPIObject.php';
-require_once __DIR__.'/../../../include/classes/api/APIException.php';
-require_once __DIR__.'/../../../include/classes/api/CZBXAPI.php';
-require_once __DIR__.'/../../../include/classes/db/DBException.php';
 require_once __DIR__.'/../../../conf/zabbix.conf.php';
 
 require_once 'ZbxDbOperationTruncate.php';
 
 
+spl_autoload_register(function($className) {
+	$foundFile = false;
+
+	$includePaths = array(
+		'/include/classes',
+		'/include/classes/core',
+		'/include/classes/api',
+		'/include/classes/db',
+		'/include/classes/debug',
+		'/include/classes/validators',
+		'/include/classes/export',
+		'/include/classes/export/writers',
+		'/include/classes/export/elements',
+		'/include/classes/import',
+		'/include/classes/import/importers',
+		'/include/classes/import/readers',
+		'/include/classes/import/formatters',
+		'/include/classes/screens',
+		'/include/classes/sysmaps',
+		'/include/classes/helpers',
+		'/include/classes/helpers/trigger',
+		'/include/classes/macros',
+		'/include/classes/tree',
+		'/include/classes/html',
+		'/api/classes',
+		'/api/classes/managers',
+		'/api/rpc'
+	);
+
+	foreach ($includePaths as $includePath) {
+		$filePath = __DIR__.'/../../..'.$includePath.'/'.$className.'.php';
+
+		if (is_file($filePath)) {
+			$foundFile = $filePath;
+			break;
+		}
+		else {
+			// fallback to old class names
+			$filePath = __DIR__.'/../../..'.$includePath.'/class.'.strtolower($className).'.php';
+			if (is_file($filePath)) {
+				$foundFile = $filePath;
+				break;
+			}
+		}
+	}
+
+	if ($foundFile) {
+		require $foundFile;
+	}
+});
+
 define('ZBX_DISTRIBUTED', false);
 CZBXAPI::$userData['userid'] = 1;
 CZBXAPI::$userData['type'] = USER_TYPE_SUPER_ADMIN;
+API::setReturnAPI();
 
 
 abstract class ZbxDbTestCase extends PHPUnit_Extensions_Database_TestCase {
@@ -110,7 +152,6 @@ abstract class ZbxDbTestCase extends PHPUnit_Extensions_Database_TestCase {
 	 * Load initial.xml for test case.
 	 *
 	 * @param string $dir
-	 * @param string $class __CLASS__ in child class
 	 *
 	 * @return PHPUnit_Extensions_Database_DataSet_MysqlXmlDataSet
 	 */
