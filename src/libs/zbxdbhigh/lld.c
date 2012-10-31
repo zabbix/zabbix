@@ -422,21 +422,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_trigger                                               *
+ * Function: DBlld_trigger_exists                                             *
  *                                                                            *
- * Purpose: copy specified trigger to host                                    *
+ * Purpose: check if trigger exists                                           *
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
- *             parent_triggerid - trigger identificator from database         *
- *             description_proto - trigger description                        *
- *             expression - trigger expression                                *
- *             status - trigger status                                        *
- *             type - trigger type                                            *
- *             priority - trigger priority                                    *
- *             comments_esc - trigger comments                                *
- *             url_esc - trigger url                                          *
+ *             triggerid - trigger identificator from database                *
+ *             description - trigger description                              *
+ *             full_expression - trigger expression                           *
+ *             triggers - list of triggers                                    *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value: SUCCEED if trigger exists otherwise FAIL                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -973,12 +969,16 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_item                                                  *
+ * Function: DBlld_item_exists                                                *
  *                                                                            *
- * Parameters: parent_itemid - discovery rule identificator from database     *
- *             key - new key descriptor with substituted macros               *
+ * Purpose: check if item exists                                              *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Parameters: hostid - host identificator from database                      *
+ *             itemid - item identificator from database                      *
+ *             key - item key                                                 *
+ *             items - list of items                                          *
+ *                                                                            *
+ * Return value: SUCCEED if item exists otherwise FAIL                        *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
