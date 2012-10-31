@@ -113,7 +113,7 @@ class CAction extends CZBXAPI {
 		}
 		else {
 			// conditions are checked here by sql, operations after, by api queries
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			// condition hostgroup
 			$sqlParts['where'][] =

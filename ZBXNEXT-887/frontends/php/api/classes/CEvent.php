@@ -126,7 +126,7 @@ class CEvent extends CZBXAPI {
 					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 					$sqlParts['from']['functions'] = 'functions f';
 					$sqlParts['from']['items'] = 'items i';

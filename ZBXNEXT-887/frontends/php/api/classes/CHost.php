@@ -162,7 +162,7 @@ class CHost extends CHostGeneral {
 		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				' SELECT hh.hostid'.

@@ -108,7 +108,7 @@ function make_favorite_screens() {
 		$sourceid = $favorite['value'];
 
 		if ('slideshowid' == $source) {
-			if (!slideshow_accessible($sourceid, PERM_READ_ONLY)) {
+			if (!slideshow_accessible($sourceid, PERM_READ)) {
 				continue;
 			}
 			if (!$slide = get_slideshow_by_slideshowid($sourceid)) {
@@ -1292,7 +1292,7 @@ function make_screen_submenu() {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 		if ('slideshowid' == $source) {
-			if (!slideshow_accessible($sourceid, PERM_READ_ONLY)) {
+			if (!slideshow_accessible($sourceid, PERM_READ)) {
 				continue;
 			}
 			if (!$slide = get_slideshow_by_slideshowid($sourceid)) {

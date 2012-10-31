@@ -21,7 +21,7 @@
 <?php
 function permission2str($group_permission) {
 	$str_perm[PERM_READ_WRITE] = _('Read-write');
-	$str_perm[PERM_READ_ONLY] = _('Read only');
+	$str_perm[PERM_READ] = _('Read only');
 	$str_perm[PERM_DENY] = _('Deny');
 
 	if (isset($str_perm[$group_permission])) {
@@ -342,7 +342,7 @@ function get_accessible_nodes_by_user(&$user_data, $perm, $perm_res = null, $nod
 */
 function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res = null, $nodeid = null) {
 	if ($perm == PERM_READ_LIST) {
-		$perm = PERM_READ_ONLY;
+		$perm = PERM_READ;
 	}
 
 	$result = array();

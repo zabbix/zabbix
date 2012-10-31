@@ -102,7 +102,7 @@ class CItemPrototype extends CItemGeneral {
 		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';

@@ -115,7 +115,7 @@ class CAlert extends CZBXAPI {
 		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['events'] = 'events e';
 			$sqlParts['from']['items'] = 'items i';

@@ -89,7 +89,7 @@ foreach ($this->data['group_rights'] as $id => $rights) {
 	if ($rights['permission'] == PERM_DENY) {
 		$lstDeny->addItem($id, $rights['name']);
 	}
-	elseif ($rights['permission'] == PERM_READ_ONLY) {
+	elseif ($rights['permission'] == PERM_READ) {
 		$lstRead->addItem($id, $rights['name']);
 	}
 	elseif ($rights['permission'] == PERM_READ_WRITE) {
@@ -104,7 +104,7 @@ $permissionsTable->addRow(array(
 		new CSubmit('del_read_write', _('Delete selected'), null, 'formlist')
 	),
 	array(
-		new CButton('add_read_only', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_ONLY."', 450, 450);", 'formlist'),
+		new CButton('add_read_only', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ."', 450, 450);", 'formlist'),
 		new CSubmit('del_read_only', _('Delete selected'), null, 'formlist')
 	),
 	array(

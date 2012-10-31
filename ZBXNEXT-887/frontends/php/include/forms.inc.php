@@ -182,7 +182,7 @@
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 			foreach ($nodes as $node) {
 				switch($node['permission']) {
-					case PERM_READ_ONLY:
+					case PERM_READ:
 						$list_name = 'read_only';
 						break;
 					case PERM_READ_WRITE:
@@ -210,7 +210,7 @@
 
 		foreach ($groups as $group) {
 			switch($group['permission']) {
-				case PERM_READ_ONLY:
+				case PERM_READ:
 					$list_name = 'read_only';
 					break;
 				case PERM_READ_WRITE:
@@ -237,7 +237,7 @@
 
 		foreach ($hosts as $host) {
 			switch($host['permission']) {
-				case PERM_READ_ONLY:
+				case PERM_READ:
 					$list_name = 'read_only';
 					break;
 				case PERM_READ_WRITE:

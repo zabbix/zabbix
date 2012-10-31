@@ -128,7 +128,7 @@ class CTemplateScreen extends CScreen {
 			}
 			else {
 				// TODO: get screen
-				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 				$sqlParts['from']['rights'] = 'rights r';
