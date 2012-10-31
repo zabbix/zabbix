@@ -517,7 +517,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			$typeColumn = 'ymin_type';
 		}
 
-		// make if work for both graphs and graph prototypes
+		// make it work for both graphs and graph prototypes
 		$filter['flags'] = array(
 			ZBX_FLAG_DISCOVERY_CHILD,
 			ZBX_FLAG_DISCOVERY_NORMAL,

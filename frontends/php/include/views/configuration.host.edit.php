@@ -424,7 +424,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	}
 
 	// item prototypes
-	$hostItemPrototypes = API::Itemprototype()->get(array(
+	$hostItemPrototypes = API::ItemPrototype()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,

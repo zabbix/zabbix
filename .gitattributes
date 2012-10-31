@@ -167,13 +167,7 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/core/ConfigFileException.php -text
 frontends/php/include/classes/html/CButtonPopup.php -text
-frontends/php/include/classes/html/CPageHeader.php -text
-frontends/php/include/classes/macros/CEventDescription.php -text
-frontends/php/include/classes/macros/CMacrosResolver.php -text
-frontends/php/include/classes/macros/CTriggerDescription.php -text
-frontends/php/include/views/general.warning.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
@@ -264,8 +258,6 @@ frontends/php/tests/api/classes/CHttpTest/fixtures/initial.xml -text
 frontends/php/tests/api/classes/CHttpTest/fixtures/testCHttpTestCreateOnTemplate.xml -text
 frontends/php/tests/api/classes/CHttpTest/fixtures/testCHttpTestUpdateOnTemplate.xml -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/general/zbx_dbcast_2bigintTest.php -text
-frontends/php/tests/general/zbx_limitTest.php -text
 frontends/php/tests/include/db/ZbxDbOperationTruncate.php -text
 frontends/php/tests/include/db/ZbxDbTestCase.php -text
 frontends/php/tests/include/db/fixtures/initial_users.xml -text

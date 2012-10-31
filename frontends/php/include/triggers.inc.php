@@ -93,14 +93,14 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
 			'args' => array(
 				array('type' => 'sec', 'mandat' => true)
 			),
-			'value_types' => $value_types_all
+			'value_types' => $value_types_num
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'] = array(
 			'args' => array(
-				array('type' => 'str'),
-				array('type' => 'sec_num', 'mandat' => true)
+				array('type' => 'str', 'mandat' => true),
+				array('type' => 'sec_num')
 			),
-			'value_types' => $value_types_all
+			'value_types' => $value_types_char
 		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last'] = array(
 			'args' => array(
