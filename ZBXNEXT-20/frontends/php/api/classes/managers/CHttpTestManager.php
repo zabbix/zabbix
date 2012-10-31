@@ -123,29 +123,32 @@ class CHttpTestManager {
 				}
 			}
 
+
 			// update steps
-			$stepsCreate = $stepsUpdate = array();
-			$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid');
-			foreach ($httpTest['steps'] as $webstep) {
-				if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
+			if (isset($httpTest['steps'])) {
+				$stepsCreate = $stepsUpdate = array();
+				$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid');
+				foreach ($httpTest['steps'] as $webstep) {
+					if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
 
-					$stepsUpdate[] = $webstep;
-					unset($dbSteps[$webstep['httpstepid']]);
+						$stepsUpdate[] = $webstep;
+						unset($dbSteps[$webstep['httpstepid']]);
+					}
+					elseif (!isset($webstep['httpstepid'])) {
+						$stepsCreate[] = $webstep;
+					}
 				}
-				elseif (!isset($webstep['httpstepid'])) {
-					$stepsCreate[] = $webstep;
-				}
-			}
-			$stepidsDelete = array_keys($dbSteps);
+				$stepidsDelete = array_keys($dbSteps);
 
-			if (!empty($stepidsDelete)) {
-				$this->deleteStepsReal($stepidsDelete);
-			}
-			if (!empty($stepsUpdate)) {
-				$this->updateStepsReal($httpTest, $stepsUpdate);
-			}
-			if (!empty($stepsCreate)) {
-				$this->createStepsReal($httpTest, $stepsCreate);
+				if (!empty($stepidsDelete)) {
+					$this->deleteStepsReal($stepidsDelete);
+				}
+				if (!empty($stepsUpdate)) {
+					$this->updateStepsReal($httpTest, $stepsUpdate);
+				}
+				if (!empty($stepsCreate)) {
+					$this->createStepsReal($httpTest, $stepsCreate);
+				}
 			}
 		}
 
@@ -260,25 +263,25 @@ class CHttpTestManager {
 				// update by templateid
 				if (isset($hostHttpTest['byTemplateId'][$httpTestId])) {
 					$exHttpTest = $hostHttpTest['byTemplateId'][$httpTestId];
-				}
 
-				// TODO: esli match po templateid nenado checki proverjatj
-				// update by name
-				if (isset($hostHttpTest['byName'][$httpTest['name']])) {
-					$exHttpTest = $hostHttpTest['byName'][$httpTest['name']];
 					// need to check templateid here too in case we update linked http test to name that already exists on linked host
-					// i.e. both update conditions by templateid and by name passes
-					if (($exHttpTest['templateid'] > 0 && !idcmp($exHttpTest['templateid'], $httpTestId) )
-							|| !$this->compareHttpSteps($httpTest, $exHttpTest)) {
+					if (isset($hostHttpTest['byName'][$httpTest['name']])
+							&& !idcmp($exHttpTest['templateid'], $hostHttpTest['byName'][$httpTest['name']]['templateid'])) {
 						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
-						throw new Exception(_s('Http test "%1$s" already exists for host "%2$s".', $exHttpTest['name'], $host['name']));
+						throw new Exception(_s('Http test "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name']));
+					}
+				}
+				// update by name
+				else if (isset($hostHttpTest['byName'][$httpTest['name']])) {
+					$exHttpTest = $hostHttpTest['byName'][$httpTest['name']];
+					if ($exHttpTest['templateid'] > 0 || !$this->compareHttpSteps($httpTest, $exHttpTest)) {
+						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
+						throw new Exception(_s('Http test "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name']));
 					}
 
 					// if we found existing http test by name and steps, we only add linkage, i.e. change templateid
 					// so we unset all data for http test we link, templateid is assigned later
-					if ($exHttpTest['templateid'] == 0) {
-						$httpTest = array();
-					}
+					$httpTest = array();
 				}
 
 //				if ($this->checkIfItemsRequireChenged($httpTest)) {
