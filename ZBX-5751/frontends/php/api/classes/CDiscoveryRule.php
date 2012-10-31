@@ -460,23 +460,16 @@ class CDiscoveryRule extends CItemGeneral {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::GraphPrototype()->get($objParams);
 
+				$count = 0;
 				foreach ($graphs as $graphid => $graph) {
 					unset($graphs[$graphid]['parent_itemid']);
-					unset($graph['graphid']);
-					$count = array();
-					foreach ($graph as $item) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) {
-								$count[$item['itemid']] = 0;
-							}
-							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) {
-								continue;
-							}
+					if (!is_null($options['limitSelects'])) {
+						$count++;
+						if ($count > $options['limitSelects']) {
+							continue;
 						}
-						$result[$graph['parent_itemid']]['graphs'][] = &$graphs[$graphid];
 					}
+					$result[$graph['parent_itemid']]['graphs'][] = &$graphs[$graphid];
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
