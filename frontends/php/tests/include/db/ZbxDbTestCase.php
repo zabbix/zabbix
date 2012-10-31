@@ -114,8 +114,8 @@ abstract class ZbxDbTestCase extends PHPUnit_Extensions_Database_TestCase {
 	 *
 	 * @return PHPUnit_Extensions_Database_DataSet_MysqlXmlDataSet
 	 */
-	protected function loadInitialDataSet($dir, $class) {
-		return $this->createMySQLXMLDataSet($dir.'/fixtures/'.$class.'/initial.xml');
+	protected function loadInitialDataSet($dir) {
+		return $this->createMySQLXMLDataSet($dir.'/fixtures/initial.xml');
 	}
 
 	/**
@@ -127,7 +127,7 @@ abstract class ZbxDbTestCase extends PHPUnit_Extensions_Database_TestCase {
 	 * @return PHPUnit_Extensions_Database_DataSet_MysqlXmlDataSet
 	 */
 	protected function getExpectedDataSet($dir, $method) {
-		list($class, $method) = explode('::', $method);
-		return $this->createMySQLXMLDataSet($dir.'/fixtures/'.$class.'/'.$method.'.xml');
+		list(, $method) = explode('::', $method);
+		return $this->createMySQLXMLDataSet($dir.'/fixtures/'.$method.'.xml');
 	}
 }
