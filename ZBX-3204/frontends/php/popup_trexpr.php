@@ -239,42 +239,42 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'max[<]' => array(
-		'description' =>  _('Maximum value for period of time is T < N'),
+		'description' =>  _('Maximum value for period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[>]' => array(
-		'description' =>  _('Maximum value for period of time is T > N'),
+		'description' =>  _('Maximum value for period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[=]' => array(
-		'description' =>  _('Maximum value for period of time is T = N'),
+		'description' =>  _('Maximum value for period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[#]' => array(
-		'description' =>  _('Maximum value for period of time is T NOT N'),
+		'description' =>  _('Maximum value for period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'min[<]' => array(
-		'description' =>  _('Minimum value for period of time is T < N'),
+		'description' =>  _('Minimum value for period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[>]' => array(
-		'description' =>  _('Minimum value for period of time is T > N'),
+		'description' =>  _('Minimum value for period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[=]' => array(
-		'description' =>  _('Minimum value for period of time is T = N'),
+		'description' =>  _('Minimum value for period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[#]' => array(
-		'description' =>  _('Minimum value for period of time is T NOT N'),
+		'description' =>  _('Minimum value for period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
