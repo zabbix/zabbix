@@ -448,16 +448,6 @@ $functions = array(
 		'description' =>  _('Log severity of the last log entry is NOT N'),
 		'allowed_types' => $allowed_types_log
 	),
-	'logsource[<]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise'),
-		'params' => $param1_str,
-		'allowed_types' => $allowed_types_log
-	),
-	'logsource[>]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise'),
-		'params' => $param1_str,
-		'allowed_types' => $allowed_types_log
-	),
 	'logsource[=]' => array(
 		'description' =>  _('Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise'),
 		'params' => $param1_str,
