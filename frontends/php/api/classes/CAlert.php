@@ -157,6 +157,7 @@ class CAlert extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['groupid'] = 'hg.groupid';
 			}
+			$sqlParts['from']['events'] = 'events e';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -174,6 +175,7 @@ class CAlert extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
+			$sqlParts['from']['events'] = 'events e';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
@@ -383,7 +385,7 @@ class CAlert extends CZBXAPI {
 		$mediatypes = array();
 
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+		if (!is_null($options['selectHosts']) && (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs))) {
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
 				'hostids' => $hostids,
@@ -392,7 +394,7 @@ class CAlert extends CZBXAPI {
 		}
 
 		// adding users
-		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselectsAllowedOutputs)) {
+		if (!is_null($options['selectUsers']) && (is_array($options['selectUsers']) || str_in_array($options['selectUsers'], $subselectsAllowedOutputs))) {
 			$users = API::User()->get(array(
 				'output' => $options['selectUsers'],
 				'userids' => $userids,
@@ -400,12 +402,12 @@ class CAlert extends CZBXAPI {
 			));
 		}
 
-		// adding mediatypes
-		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs)) {
-			$res = DBselect('SELECT mt.* FROM media_type mt WHERE '.DBcondition('mt.mediatypeid', $mediatypeids));
-			while ($media = DBfetch($res)) {
-				$mediatypes[$media['mediatypeid']] = $media;
-			}
+		if (!is_null($options['selectMediatypes']) && (is_array($options['selectMediatypes']) || str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs))) {
+			$mediatypes = API::getApi()->select('media_type', array(
+				'output' => $options['selectMediatypes'],
+				'filter' => array('mediatypeid' => $mediatypeids),
+				'preservekeys' => true
+			));
 		}
 
 		foreach ($result as $alertid => $alert) {
