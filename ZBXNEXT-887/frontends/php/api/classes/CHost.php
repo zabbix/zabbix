@@ -180,7 +180,7 @@ class CHost extends CHostGeneral {
 							' AND rr.id=hggg.groupid'.
 							' AND rr.groupid=gg.usrgrpid'.
 							' AND gg.userid='.$userid.
-							' AND rr.permission<'.$permission.
+							' AND rr.permission='.PERM_DENY.
 					'))';
 		}
 
@@ -498,6 +498,7 @@ class CHost extends CHostGeneral {
 
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
 		while ($host = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {

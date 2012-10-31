@@ -133,8 +133,6 @@ class CMaintenance extends CZBXAPI {
 			}
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
-
 			$sql = 'SELECT DISTINCT m.maintenanceid'.
 					' FROM maintenances m'.
 					' WHERE NOT EXISTS ('.
@@ -145,7 +143,7 @@ class CMaintenance extends CZBXAPI {
 							' AND hg3.hostid=mh3.hostid'.
 							' AND r3.id=hg3.groupid'.
 							' AND ug3.userid='.$userid.
-							' AND r3.permission<'.$permission.
+							' AND r3.permission='.PERM_DENY.
 					')'.
 					' AND NOT EXISTS ('.
 						'SELECT mh4.maintenanceid'.
@@ -167,7 +165,7 @@ class CMaintenance extends CZBXAPI {
 							' AND r3.groupid=ug3.usrgrpid'.
 							' AND r3.id=mg2.groupid'.
 							' AND ug3.userid='.$userid.
-							' AND r3.permission<'.$permission.
+							' AND r3.permission='.PERM_DENY.
 					')'.
 					' AND NOT EXISTS ('.
 						'SELECT mg3.maintenanceid'.

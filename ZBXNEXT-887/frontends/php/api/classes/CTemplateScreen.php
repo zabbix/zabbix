@@ -145,7 +145,7 @@ class CTemplateScreen extends CScreen {
 						' AND rr.id=hgg.groupid'.
 						' AND rr.groupid=gg.usrgrpid'.
 						' AND gg.userid='.self::$userData['userid'].
-						' AND rr.permission<'.$permission.')';
+						' AND rr.permission='.PERM_DENY.')';
 			}
 		}
 

@@ -146,10 +146,13 @@
 			}
 			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
 
+			// deny beat all, read-write beat read
 			$tmp_permitions = array();
 			while ($db_right = DBfetch($db_rights)) {
-				if (isset($tmp_permitions[$db_right['id']])) {
-					$tmp_permitions[$db_right['id']] = min($tmp_permitions[$db_right['id']], $db_right['permission']);
+				if (isset($tmp_permitions[$db_right['id']]) && $tmp_permitions[$db_right['id']] != PERM_DENY) {
+					$tmp_permitions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
+						? PERM_DENY
+						: max($tmp_permitions[$db_right['id']], $db_right['permission']);
 				}
 				else {
 					$tmp_permitions[$db_right['id']] = $db_right['permission'];

@@ -125,7 +125,7 @@ class CDiscoveryRule extends CItemGeneral {
 					' AND rr.id=hgg.groupid'.
 					' AND rr.groupid=gg.usrgrpid'.
 					' AND gg.userid='.$userid.
-					' AND rr.permission<'.$permission.')';
+					' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids

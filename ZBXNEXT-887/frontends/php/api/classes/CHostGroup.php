@@ -129,7 +129,7 @@ class CHostGroup extends CZBXAPI {
 					' WHERE rr.id=g.groupid'.
 						' AND rr.groupid=ugg.usrgrpid'.
 						' AND ugg.userid='.$userid.
-						' AND rr.permission<'.$permission.')';
+						' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// groupids

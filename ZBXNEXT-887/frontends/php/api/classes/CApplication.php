@@ -113,7 +113,7 @@ class CApplication extends CZBXAPI {
 									' AND rr.id=hgg.groupid'.
 									' AND rr.groupid=gg.usrgrpid'.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+									' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids
