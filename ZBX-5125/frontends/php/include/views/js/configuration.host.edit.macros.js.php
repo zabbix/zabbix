@@ -10,7 +10,7 @@
 		<input class="input text" name="macros[#{macroid}][value]" type="text" size="40" value="#{value}" placeholder="&lt;Value&gt;">
 	</td>
 	<td>
-		<input type="button" class="link_menu" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="$('userMacroRow_#{macroid}').remove();" />
+		<input type="button" class="link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="$('userMacroRow_#{macroid}').remove();" />
 	</td>
 </tr>
 </script>

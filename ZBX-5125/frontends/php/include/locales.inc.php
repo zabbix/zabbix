@@ -47,14 +47,17 @@ function set_zbx_locales() {
 		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
 		'nl_NL' => _('Dutch (nl_NL)'),
+		'fi_FI' => _('Finnish (fi_FI)'),
 		'fr_FR' => _('French (fr_FR)'),
 		'de_DE' => _('German (de_DE)'),
 		'el_GR' => _('Greek (el_GR)'),
 		'hu_HU' => _('Hungarian (hu_HU)'),
+		'id_ID' => _('Indonesian (id_ID)'),
 		'it_IT' => _('Italian (it_IT)'),
 		'ko_KR' => _('Korean (ko_KR)'),
 		'ja_JP' => _('Japanese (ja_JP)'),
 		'lv_LV' => _('Latvian (lv_LV)'),
+		'fa_IR' => _('Persian (fa_IR)'),
 		'pl_PL' => _('Polish (pl_PL)'),
 		'pt_BR' => _('Portuguese (pt_BR)'),
 		'ru_RU' => _('Russian (ru_RU)'),
@@ -127,21 +130,26 @@ function zbx_locale_variants_unix($language) {
 
 function zbx_locale_variants_win($language) {
 	// windows locales are written like language[_country[.charset]]
-	// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
+	// for a list of supported languages see:
+	// http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
+	// http://docs.moodle.org/dev/Table_of_locales#Table
 	$winLanguageName = array(
-		'en_gb' => array('English_United States.1252', 'english-uk'),
+		'en_gb' => array('English_United Kingdom.1252', 'english-uk'),
 		'en_us' => array('English_United States.1252', 'english-usa'),
 		'zh_cn' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
-		'zh_tw' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
+		'zh_tw' => array('Chinese_Taiwan.950', 'chinese'),
 		'cs_cz' => array('Czech_Czech Republic.1250', 'czech'),
 		'nl_nl' => array('Dutch_Netherlands.1252', 'dutch'),
+		'fi_fi' => array('Finnish_Finland.1252', 'finnish'),
 		'fr_fr' => array('French_France.1252', 'french'),
 		'de_de' => array('German_Germany.1252', 'german'),
 		'hu_hu' => array('Hungarian_Hungary.1250', 'hungarian'),
+		'id_id' => array('Indonesian_indonesia.1252', 'indonesian'),
 		'it_it' => array('Italian_Italy.1252', 'italian'),
 		'ko_kr' => array('Korean_Korea.949', 'korean'),
 		'ja_jp' => array('Japanese_Japan.932', 'japanese'),
 		'lv_lv' => array('Latvian_Latvia.1257', 'latvian'),
+		'fa_ir' => array('Farsi_Iran.1256', 'farsi'),
 		'pl_pl' => array('Polish_Poland.1250', 'polish'),
 		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese'),
 		'ru_ru' => array('Russian_Russia.1251', 'russian'),

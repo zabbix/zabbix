@@ -76,11 +76,41 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $showDisabled = get_request('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_STR);
-$_REQUEST['go'] = get_request('go', 'none');
 
 if (!empty($_REQUEST['steps'])) {
 	order_result($_REQUEST['steps'], 'no');
 }
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['httptestid'])) {
+	$dbHttpTest = DBfetch(DBselect(
+		'SELECT wt.*,a.name AS application'.
+		' FROM httptest wt,applications a'.
+		' WHERE a.applicationid=wt.applicationid'.
+			' AND wt.httptestid='.get_request('httptestid')
+	));
+	if (empty($dbHttpTest)) {
+		access_deny();
+	}
+}
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['group_httptestid']) || !is_array($_REQUEST['group_httptestid'])) {
+		access_deny();
+	}
+	else {
+		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT("wt.*") AS cnt'.
+											' FROM httptest wt,applications a'.
+											' WHERE a.applicationid=wt.applicationid'.
+											' AND '.DBcondition('wt.httptestid', $_REQUEST['group_httptestid'])
+										));
+		if ($dbHttpTests['cnt'] != count($_REQUEST['group_httptestid'])) {
+			access_deny();
+		}
+	}
+}
+$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Filter
@@ -350,22 +380,15 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
 	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)) {
-		$db_httptest = DBfetch(DBselect(
-			'SELECT wt.*,a.name AS application'.
-			' FROM httptest wt,applications a'.
-			' WHERE a.applicationid=wt.applicationid'.
-				' AND wt.httptestid='.$_REQUEST['httptestid']
-		));
-
-		$data['name'] = $db_httptest['name'];
-		$data['application'] = $db_httptest['application'];
-		$data['delay'] = $db_httptest['delay'];
-		$data['status'] = $db_httptest['status'];
-		$data['agent'] = $db_httptest['agent'];
-		$data['macros'] = $db_httptest['macros'];
-		$data['authentication'] = $db_httptest['authentication'];
-		$data['http_user'] = $db_httptest['http_user'];
-		$data['http_password'] = $db_httptest['http_password'];
+		$data['name'] = $dbHttpTest['name'];
+		$data['application'] = $dbHttpTest['application'];
+		$data['delay'] = $dbHttpTest['delay'];
+		$data['status'] = $dbHttpTest['status'];
+		$data['agent'] = $dbHttpTest['agent'];
+		$data['macros'] = $dbHttpTest['macros'];
+		$data['authentication'] = $dbHttpTest['authentication'];
+		$data['http_user'] = $dbHttpTest['http_user'];
+		$data['http_password'] = $dbHttpTest['http_password'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
 	}
 	else {
@@ -406,7 +429,7 @@ else {
 
 	// get http tests
 	$data['db_httptests'] = array();
-	$db_httptests_result = DBselect(
+	$dbHttpTests_result = DBselect(
 		'SELECT wt.*,a.name AS application,h.name AS hostname,h.hostid'.
 		' FROM httptest wt,applications a,hosts h'.
 		' WHERE wt.applicationid=a.applicationid'.
@@ -414,7 +437,7 @@ else {
 			' AND '.DBcondition('a.applicationid', array_keys($data['db_apps'])).
 			($showDisabled == 0 ? ' AND wt.status='.HTTPTEST_STATUS_ACTIVE : '')
 	);
-	while ($httptest_data = DBfetch($db_httptests_result)) {
+	while ($httptest_data = DBfetch($dbHttpTests_result)) {
 		$data['db_apps'][$httptest_data['applicationid']]['scenarios_cnt']++;
 		$httptest_data['step_count'] = null;
 		$data['db_httptests'][$httptest_data['httptestid']] = $httptest_data;

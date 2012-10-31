@@ -32,8 +32,8 @@ $page['hist_arg'] = array();
 $page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// users
@@ -78,8 +78,30 @@ $fields = array(
 );
 check_fields($fields);
 validate_sort_and_sortorder('alias', ZBX_SORT_UP);
-?>
-<?php
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['userid'])) {
+	$users = API::User()->get(array('userids' => get_request('userid'), 'output' => API_OUTPUT_EXTEND));
+	if (empty($users)) {
+		access_deny();
+	}
+}
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['group_userid']) || !is_array($_REQUEST['group_userid'])) {
+		access_deny();
+	}
+	else {
+		$usersChk = API::User()->get(array(
+			'userids' => $_REQUEST['group_userid'],
+			'countOutput' => true
+		));
+		if ($usersChk != count($_REQUEST['group_userid'])) {
+			access_deny();
+		}
+	}
+}
 $_REQUEST['go'] = get_request('go', 'none');
 
 if (isset($_REQUEST['new_groups'])) {
@@ -205,9 +227,7 @@ elseif (isset($_REQUEST['del_user_group'])) {
  * Delete
  */
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
-	$users = API::User()->get(array('userids' => $_REQUEST['userid'], 'output' => API_OUTPUT_EXTEND));
 	$user = reset($users);
-
 	$result = API::User()->delete($users);
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
 	if ($result) {
@@ -219,8 +239,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
  * Add USER to GROUP
  */
 elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($_REQUEST['userid']) && $_REQUEST['grpaction'] == 1) {
-	$user = API::User()->get(array('userids' => $_REQUEST['userid'], 'output' => API_OUTPUT_EXTEND));
-	$user = reset($user);
+	$user = reset($users);
 
 	$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 	$group = reset($group);
@@ -240,8 +259,7 @@ elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($
  * Remove USER from GROUP
  */
 elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($_REQUEST['userid']) && $_REQUEST['grpaction'] == 0) {
-	$user = API::User()->get(array('userids' => $_REQUEST['userid'], 'output' => API_OUTPUT_EXTEND));
-	$user = reset($user);
+	$user = reset($users);
 
 	$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 	$group = reset($group);

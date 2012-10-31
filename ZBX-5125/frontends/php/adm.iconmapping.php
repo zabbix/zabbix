@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of icon mapping');
@@ -38,6 +38,22 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,			null,	null)
 );
 check_fields($fields);
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['iconmapid'])) {
+	$iconMap = API::IconMap()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'iconmapids' => get_request('iconmapid'),
+		'editable' => true,
+		'preservekeys' => true,
+		'selectMappings' => API_OUTPUT_EXTEND,
+	));
+	if (empty($iconMap)) {
+		access_deny();
+	}
+}
 
 /*
  * Actions
@@ -135,13 +151,6 @@ if (isset($_REQUEST['form'])) {
 		$data['iconmap'] = get_request('iconmap');
 	}
 	elseif (isset($_REQUEST['iconmapid'])) {
-		$iconMap = API::IconMap()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'iconmapids' => $_REQUEST['iconmapid'],
-			'editable' => true,
-			'preservekeys' => true,
-			'selectMappings' => API_OUTPUT_EXTEND,
-		));
 		$data['iconmap'] = reset($iconMap);
 	}
 	else {
@@ -171,4 +180,3 @@ $cnf_wdgt->addItem($iconMapView->render());
 $cnf_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

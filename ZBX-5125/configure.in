@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.0.3rc2])
+AM_INIT_AUTOMAKE([zabbix],[2.0.4rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1074,13 +1074,16 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 
 	dnl Checking for PostgreSQL support
-	AX_LIB_POSTGRESQL()
+	AX_LIB_POSTGRESQL("8.1")
 	if test "x$want_postgresql" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
 
 		if test "x$found_postgresql" = "xyes"; then
+			if test "$postgresql_version_check" != "1"; then
+				AC_MSG_ERROR([PostgreSQL version mismatch])
+			fi
 
 			have_db="PostgreSQL"
 
@@ -1137,7 +1140,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		AC_MSG_RESULT(no)
 	fi
 
-	DB_CPPFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CPPFLAGS $SQLITE3_CPPFLAGS"
+	DB_CPPFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
 	DB_LDFLAGS="$IBM_DB2_LDFLAGS $MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
 	DB_LIBS="$IBM_DB2_LIBS $MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
 

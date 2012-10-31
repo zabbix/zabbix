@@ -37,6 +37,9 @@ function empty(obj) {
 	if (is_string(obj) && obj === '') {
 		return true;
 	}
+	if (typeof(obj) == 'undefined') {
+		return true;
+	}
 
 	return is_array(obj) && obj.length == 0;
 }
@@ -168,7 +171,7 @@ function cancelEvent(e) {
 			e.cancelBubble = true;
 			e.returnValue = false;
 
-			if (IE9) {
+			if (IE9 && e.preventDefault) {
 				e.preventDefault();
 			}
 		}

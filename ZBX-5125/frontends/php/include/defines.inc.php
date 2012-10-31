@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.0.3rc2');
+define('ZABBIX_VERSION',		'2.0.4rc1');
 define('ZABBIX_API_VERSION',	'1.4');
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
@@ -533,6 +533,9 @@ define('SCREEN_TYPE_TEMPLATED',	1);
 
 define('SCREEN_SIMPLE_ITEM',	0);
 define('SCREEN_DYNAMIC_ITEM',	1);
+
+define('SCREEN_REFRESH_TIMEOUT',		30);
+define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
