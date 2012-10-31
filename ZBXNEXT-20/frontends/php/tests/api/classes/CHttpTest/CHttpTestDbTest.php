@@ -19,17 +19,17 @@
 **/
 
 
-require_once __DIR__.'/../../include/db/ZbxDbTestCase.php';
+require_once __DIR__.'/../../../include/db/ZbxDbTestCase.php';
 
-require_once __DIR__.'/../../../api/rpc/class.czbxrpc.php';
-require_once __DIR__.'/../../../api/classes/CHttpTest.php';
-require_once __DIR__.'/../../../api/classes/managers/CHttpTestManager.php';
+require_once __DIR__.'/../../../../api/rpc/class.czbxrpc.php';
+require_once __DIR__.'/../../../../api/classes/CHttpTest.php';
+require_once __DIR__.'/../../../../api/classes/managers/CHttpTestManager.php';
 
 
 class CHttpTestTest extends ZbxDbTestCase {
 
 	protected function getTestInitialDataSet() {
-		return $this->loadInitialDataSet(__DIR__, __CLASS__);
+		return $this->loadInitialDataSet(__DIR__);
 	}
 
 	/**
@@ -113,7 +113,7 @@ class CHttpTestTest extends ZbxDbTestCase {
 
 		$queryTable = $this->getConnection()->createQueryTable('httptest',
 			'SELECT * FROM httptest WHERE httptestid IN (1, 2) ORDER BY httptestid');
-		$expectedTable = $this->getExpectedDataSet(__METHOD__)->getTable('httptest');
+		$expectedTable = $this->getExpectedDataSet(__DIR__, __METHOD__)->getTable('httptest');
 		$this->assertTablesEqual($expectedTable, $queryTable);
 	}
 }
