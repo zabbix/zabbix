@@ -414,13 +414,12 @@ class CDiscoveryRule extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => true,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
@@ -440,7 +439,7 @@ class CDiscoveryRule extends CItemGeneral {
 			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -454,13 +453,12 @@ class CDiscoveryRule extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => true,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				foreach ($graphs as $graphid => $graph) {
 					unset($graphs[$graphid]['discoveries']);
@@ -484,7 +482,7 @@ class CDiscoveryRule extends CItemGeneral {
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {

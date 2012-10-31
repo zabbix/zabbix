@@ -323,20 +323,18 @@ else {
 		'editable' => true,
 		'output' => API_OUTPUT_SHORTEN,
 		'discoveryids' => $data['parent_discoveryid'],
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	);
 	if (empty($data['showdisabled'])) {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
-	$data['triggers'] = API::Trigger()->get($options);
+	$data['triggers'] = API::TriggerPrototype()->get($options);
 	$data['paging'] = getPagingLine($data['triggers']);
 
-	$data['triggers'] = API::Trigger()->get(array(
+	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectFunctions' => API_OUTPUT_EXTEND

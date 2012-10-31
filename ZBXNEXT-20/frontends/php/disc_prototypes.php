@@ -328,7 +328,7 @@ else {
 
 	// get items
 	$sortfield = getPageSortField('name');
-	$data['items'] = API::Itemprototype()->get(array(
+	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
