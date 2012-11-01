@@ -2197,7 +2197,7 @@ return array(
 			'expression' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			),
 			'description' => array(

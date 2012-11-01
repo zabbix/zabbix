@@ -72,7 +72,6 @@ class CGraph extends CGraphGeneral {
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
-			'discoveryids'				=> null,
 			'type'						=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
@@ -218,23 +217,6 @@ class CGraph extends CGraphGeneral {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
-			}
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'id.parent_itemid';
-			}
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
 		}
 
@@ -803,84 +785,42 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Check $graphs:
-	 *	whether graphs have name field
-	 *	whether graphs has at least one item
-	 *	whether all graph items has ids
-	 *	whether Pie and Exploded graphs has at most one sum item
-	 *	whether all graph items are editable by user
-	 *	whether not creating graphs with the same name
+	 * Check graph data
 	 *
 	 * @param array $graphs
 	 * @param boolean $update
-	 * @return true
+	 *
+	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
-		$colorValidator = new CColorValidator();
-
 		foreach ($graphs as $graph) {
-			// graph fields
-			$fields = array('name' => null);
-			if (!$update && !check_db_fields($fields, $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph.'));
-			}
-
 			// no items
 			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
 			}
 
-			// items fields
 			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
 				}
 
-				// check color
-				if (!$colorValidator->validate($gitem['color'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
-				}
-
-				// assigning with key preservs unique itemids
+				// assigning with key preserves unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
-
-			// more than one sum type item for pie graph
-			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$sumItems = 0;
-				foreach ($graph['gitems'] as $gitem) {
-					if ($gitem['type'] == GRAPH_ITEM_SUM) {
-						$sumItems++;
-					}
-				}
-				if ($sumItems > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
-				}
-			}
-
-			// Y axis MIN value < Y axis MAX value
-			if (($graph['graphtype'] == GRAPH_TYPE_NORMAL || $graph['graphtype'] == GRAPH_TYPE_STACKED)
-					&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
-					&& $graph['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED
-					&& $graph['yaxismin'] >= $graph['yaxismax']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MAX value must be greater than Y axis MIN value.'));
-			}
 		}
-
-
-		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $itemids,
-			'webitems' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
 		// check permissions only for non super admins
-		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
+		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$allowedItems = API::Item()->get(array(
+				'nodeids' => get_current_nodeid(true),
+				'itemids' => $itemids,
+				'webitems' => true,
+				'editable' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -888,49 +828,7 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 
-
-		$graphNames = array();
-		foreach ($graphs as $graph) {
-
-			// check if the host has any graphs in DB with the same name within host
-			$hosts = API::Host()->get(array(
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-
-			$hostids = array_keys($hosts);
-			$graphsExists = $this->get(array(
-				'hostids' => $hostids,
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
-				'nopermissions' => true,
-				'preservekeys' => true, // faster
-				'limit' => 1 // one match enough for check
-			));
-
-			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
-			foreach ($graphsExists as $graphExists) {
-				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists.', $graph['name']));
-				}
-			}
-			// cheks that there is no two graphs with the same name within host
-			foreach ($hostids as $hostid) {
-				if (!isset($graphNames[$graph['name']])) {
-					$graphNames[$graph['name']] = array();
-				}
-				if (isset($graphNames[$graph['name']][$hostid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('More than one graph with name "%1$s" within host.', $graph['name']));
-				}
-				else {
-					$graphNames[$graph['name']][$hostid] = true;
-				}
-			}
-		}
-
-		return true;
+		parent::checkInput($graphs, $update);
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -939,8 +837,7 @@ class CGraph extends CGraphGeneral {
 				$options['templateids'] === null &&
 				$options['hostids'] === null &&
 				$options['groupids'] === null &&
-				$options['itemids'] === null &&
-				$options['discoveryids'] === null) {
+				$options['itemids'] === null) {
 
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}

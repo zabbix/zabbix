@@ -88,7 +88,7 @@ zbx_graph_item_type;
 #define ZBX_DB_CONNECT_ONCE	2
 
 #define TRIGGER_DESCRIPTION_LEN		255
-#define TRIGGER_EXPRESSION_LEN		255
+#define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
 #define TRIGGER_ERROR_LEN		128
 #define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
@@ -278,8 +278,8 @@ DB_DSERVICE;
 typedef struct
 {
 	zbx_uint64_t	triggerid;
-	char		description[TRIGGER_DESCRIPTION_LEN * 4 + 1];
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	char		*description;
+	char		*expression;
 	char		*url;
 	char		*comments;
 	unsigned char	priority;

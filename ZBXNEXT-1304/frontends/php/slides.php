@@ -71,14 +71,14 @@ if (isset($_REQUEST['favobj'])) {
 	elseif (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
 		$result = false;
 		if ($_REQUEST['favaction'] == 'add') {
-			$result = add2favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::add('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo 'jQuery("#addrm_fav").title = "'._('Remove from').' '._('Favourites').'";'."\n".
 					'jQuery("#addrm_fav").click(function() { rm4favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'", 0); });'."\n";
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = rm4favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::remove('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo 'jQuery("#addrm_fav").title = "'._('Add to').' '._('Favourites').'";'."\n".
 					'jQuery("#addrm_fav").click(function() { add2favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'"); });'."\n";
@@ -105,6 +105,7 @@ if (isset($_REQUEST['favobj'])) {
 				else {
 					$page['type'] = PAGE_TYPE_JS;
 
+					// display screens
 					$screens = API::Screen()->get(array(
 						'screenids' => $screen['screenid'],
 						'output' => API_OUTPUT_EXTEND,
@@ -113,23 +114,30 @@ if (isset($_REQUEST['favobj'])) {
 					$currentScreen = reset($screens);
 
 					$screenBuilder = new CScreenBuilder(array(
-						'isFlickerfree' => false,
 						'screen' => $currentScreen,
-						'mode' => SCREEN_MODE_SLIDESHOW,
+						'mode' => SCREEN_MODE_PREVIEW,
 						'profileIdx' => 'web.slides',
 						'profileIdx2' => $elementid,
 						'period' => get_request('period'),
 						'stime' => get_request('stime')
 					));
 
+					CScreenBuilder::insertScreenCleanJs();
+
 					echo $screenBuilder->show()->toString();
 
+					CScreenBuilder::insertScreenStandardJs(array(
+						'timeline' => $screenBuilder->timeline,
+						'profileIdx' => $screenBuilder->profileIdx
+					));
+					insertPagePostJs();
+
+					// insert slide show refresh js
 					$refresh = ($screen['delay'] > 0) ? $screen['delay'] : $slideshow['delay'];
 					$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
 					$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
 					$script .= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
-					$script .= 'timeControl.processObjects();';
 					insert_js($script);
 				}
 			}

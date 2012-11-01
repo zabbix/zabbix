@@ -63,7 +63,6 @@ class DB {
 		}
 	}
 
-
 	/**
 	 * Reserve ids for primary key of passed table.
 	 * If record for table does not exist or value is out of range, ids record is recreated
@@ -453,7 +452,7 @@ class DB {
 
 			$sql .= '('.implode(',', array_values($row)).'),';
 		}
-		$sql[zbx_strlen($sql) - 1] = ' ';
+		$sql[strlen($sql) - 1] = ' ';
 
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));

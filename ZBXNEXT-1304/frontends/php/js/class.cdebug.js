@@ -251,3 +251,7 @@ var jsDump;
 function cdump($obj) {
 	console.log(jsDump.parse($obj));
 }
+
+function cdumpts(timestamp) {
+	return new CDate(timestamp).getZBXDate();
+}

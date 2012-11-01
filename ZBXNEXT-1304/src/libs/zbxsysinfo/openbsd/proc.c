@@ -29,6 +29,16 @@
 
 #define ARGS_START_SIZE 64
 
+/* in OpenBSD 5.1 KERN_PROC2 became KERN_PROC and structure kinfo_proc2 became kinfo_proc */
+#if OpenBSD >= 201205		/* OpenBSD 5.1 version as year and month */
+#	ifndef KERN_PROC2
+#		define KERN_PROC2	KERN_PROC
+#	endif
+#	ifndef kinfo_proc2
+#		define kinfo_proc2	kinfo_proc
+#	endif
+#endif
+
 #ifdef KERN_PROC2
 #	define ZBX_P_COMM	p_comm
 #	define ZBX_P_PID	p_pid
@@ -48,7 +58,7 @@
 static int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
 {
 	size_t	sz;
-	int	mib[4], ret;
+	int	mib[4];
 
 	if (NULL == *argv) {
 		*argv_alloc = ARGS_START_SIZE;

@@ -95,7 +95,7 @@ class testGeneric extends CWebTest {
 			array('adm.valuemapping.php', 'Configuration of value mapping'),
 			array('adm.workingtime.php', 'Configuration of working time'),
 			array('adm.triggerseverities.php', 'Configuration of trigger severities'),
-			array('adm.triggerdisplayoptions.php', 'Configuration of Zabbix'),
+			array('adm.triggerdisplayoptions.php', 'Configuration of trigger displaying options'),
 			array('adm.other.php', 'Other configuration parameters'),
 
 			array('nodes.php',	'Configuration of nodes'),

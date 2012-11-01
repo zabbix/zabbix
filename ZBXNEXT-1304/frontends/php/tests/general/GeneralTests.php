@@ -35,8 +35,11 @@ require_once dirname(__FILE__).'/function_DBrollback.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
 require_once dirname(__FILE__).'/function_DBstart.php';
 require_once dirname(__FILE__).'/CTimePeriodValidatorTest.php';
+require_once dirname(__FILE__).'/zbx_limitTest.php';
+require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 
 class GeneralTests {
+
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
@@ -57,6 +60,8 @@ class GeneralTests {
 		$suite->addTestSuite('function_DBselect');
 		$suite->addTestSuite('function_DBstart');
 		$suite->addTestSuite('CTimePeriodValidatorTest');
+		$suite->addTestSuite('zbx_limitTest');
+		$suite->addTestSuite('zbx_dbcast_2bigintTest');
 
 		return $suite;
 	}

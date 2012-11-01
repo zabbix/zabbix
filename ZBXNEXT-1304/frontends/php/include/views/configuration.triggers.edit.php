@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -81,7 +81,7 @@ $addExpressionButton = new CButton(
 	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
-		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 240);',
+		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 265);',
 	'formlist'
 );
 if ($this->data['limited'] == 'yes') {
@@ -225,7 +225,6 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 
 	$wrapOutline = new CSpan(array($this->data['outline']));
-	$wrapOutline->addStyle('white-space: pre;');
 	$triggersFormList->addRow(SPACE, array(
 		$wrapOutline,
 		BR(),

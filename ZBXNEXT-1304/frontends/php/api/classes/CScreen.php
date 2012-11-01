@@ -415,19 +415,28 @@ class CScreen extends CZBXAPI {
 	}
 
 	/**
-	 * Create Screen
+	 * Validates the input parameters for the create() method.
 	 *
-	 * @param _array $screens
-	 * @param string $screens['name']
-	 * @param array $screens['hsize']
-	 * @param int $screens['vsize']
-	 * @return array
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screens
+	 *
+	 * @return void
 	 */
-	public function create($screens) {
-		$screens = zbx_toArray($screens);
-		$insertScreenItems = array();
-
+	protected function validateCreate(array $screens) {
 		$newScreenNames = zbx_objectValues($screens, 'name');
+
+		foreach ($screens as $screen) {
+			$screenDbFields = array('name' => null);
+			if (!check_db_fields($screenDbFields, $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for screen "%1$s".', $screen['name']));
+			}
+		}
 
 		$dbScreens = $this->get(array(
 			'filter' => array('name' => $newScreenNames),
@@ -437,13 +446,22 @@ class CScreen extends CZBXAPI {
 		foreach ($dbScreens as $dbScreen) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $dbScreen['name']));
 		}
+	}
 
-		foreach ($screens as $screen) {
-			$screenDbFields = array('name' => null);
-			if (!check_db_fields($screenDbFields, $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
-			}
-		}
+	/**
+	 * Create Screen
+	 *
+	 * @param _array $screens
+	 * @param string $screens['name']
+	 * @param array $screens['hsize']
+	 * @param int $screens['vsize']
+	 * @return array
+	 */
+	public function create(array $screens) {
+		$screens = zbx_toArray($screens);
+		$this->validateCreate($screens);
+		$insertScreenItems = array();
+
 		$screenids = DB::insert('screens', $screens);
 
 		foreach ($screens as $snum => $screen) {
@@ -461,19 +479,15 @@ class CScreen extends CZBXAPI {
 	}
 
 	/**
-	 * Update Screen
+	 * Validates the input parameters for the update() method.
 	 *
-	 * @param _array $screens multidimensional array with Hosts data
-	 * @param string $screens['screenid']
-	 * @param int $screens['name']
-	 * @param int $screens['hsize']
-	 * @param int $screens['vsize']
-	 * @return boolean
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $screens
+	 *
+	 * @return void
 	 */
-	public function update($screens) {
-		$screens = zbx_toArray($screens);
-		$update = array();
-
+	protected function validateUpdate(array $screens) {
 		$updScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
@@ -486,7 +500,14 @@ class CScreen extends CZBXAPI {
 			}
 		}
 
+		$screens = $this->extendObjects($this->tableName(), $screens, array('name'));
+
 		foreach ($screens as $screen) {
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for screen "%1$s".', $screen['name']));
+			}
+
 			if (isset($screen['name'])) {
 				$existScreen = $this->get(array(
 					'filter' => array('name' => $screen['name']),
@@ -500,7 +521,25 @@ class CScreen extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Screen "%1$s" already exists.', $screen['name']));
 				}
 			}
+		}
+	}
 
+	/**
+	 * Update Screen
+	 *
+	 * @param _array $screens multidimensional array with Hosts data
+	 * @param string $screens['screenid']
+	 * @param int $screens['name']
+	 * @param int $screens['hsize']
+	 * @param int $screens['vsize']
+	 * @return boolean
+	 */
+	public function update(array $screens) {
+		$screens = zbx_toArray($screens);
+		$this->validateUpdate($screens);
+		$update = array();
+
+		foreach ($screens as $screen) {
 			$screenid = $screen['screenid'];
 			unset($screen['screenid']);
 			if (!empty($screen)) {

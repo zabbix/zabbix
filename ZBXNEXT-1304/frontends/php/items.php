@@ -564,7 +564,6 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 	}
 }
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
-	global $USER_DETAILS;
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
@@ -573,7 +572,6 @@ elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
 	show_messages($go_result, _('Items activated'), null);
 }
 elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
-	global $USER_DETAILS;
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
