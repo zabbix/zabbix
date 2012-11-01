@@ -573,7 +573,14 @@ class CScript extends CZBXAPI {
 		// adding hosts
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
-			$groupIds = zbx_objectValues($result, 'groupid');
+			$options['hostids'] = array_unique($options['hostids']);
+			$groupIds = array_unique(zbx_objectValues($result, 'groupid'));
+
+			// if group is empty fill script with all used hosts
+			$allHosts = array();
+			foreach ($options['hostids'] as $hostId) {
+				$allHosts[] = array('hostid' => $hostId);
+			}
 
 			// only fetch scripts from the same nodes as the hosts
 			$hostNodeIds = array();
@@ -583,28 +590,20 @@ class CScript extends CZBXAPI {
 			$hostNodeIds = array_unique($hostNodeIds);
 
 			// fill scripts with hosts via groups
-			$dbHosts = DBselect(
-				'SELECT hg.groupid,hg.hostid'.
-				' FROM hosts_groups hg'.
-				' WHERE '.DBcondition('hg.groupid', $groupIds).
-					' AND '.DBin_node('hg.hostid', $hostNodeIds).
-					' AND '.DBcondition('hg.hostid', $options['hostids'])
-			);
-			while ($dbHost = DBfetch($dbHosts)) {
-				foreach ($result as $scriptid => $script) {
-					if ($script['groupid'] == $dbHost['groupid']) {
+			foreach ($result as $scriptid => $script) {
+				if (!empty($script['groupid'])) {
+					$dbHosts = DBselect(
+						'SELECT hg.hostid'.
+						' FROM hosts_groups hg'.
+						' WHERE hg.groupid='.$script['groupid'].
+							' AND '.DBcondition('hg.hostid', $options['hostids']).
+							' AND '.DBin_node('hg.hostid', $hostNodeIds)
+					);
+					while ($dbHost = DBfetch($dbHosts)) {
 						$result[$scriptid]['hosts'][] = array('hostid' => $dbHost['hostid']);
 					}
 				}
-			}
-
-			// if group is empty fill script with all used hosts
-			$allHosts = array();
-			foreach ($options['hostids'] as $hostId) {
-				$allHosts[] = array('hostid' => $hostId);
-			}
-			foreach ($result as $scriptid => $script) {
-				if (empty($script['groupid'])) {
+				else {
 					$result[$scriptid]['hosts'] = $allHosts;
 				}
 			}
