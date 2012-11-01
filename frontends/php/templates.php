@@ -261,7 +261,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// clone triggers
 			$triggers = API::Trigger()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('triggerid'),
 				'hostids' => $clone_templateid,
 				'inherited' => false
 			));
@@ -303,7 +303,7 @@ elseif (isset($_REQUEST['save'])) {
 			// clone screens
 			$screens = API::TemplateScreen()->get(array(
 				'templateids' => $clone_templateid,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('screenid'),
 				'preservekeys' => true,
 				'inherited' => false
 			));
