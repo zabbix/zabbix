@@ -119,7 +119,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		if (isset($_REQUEST['graphid'])) {
 			$graphPrototype = API::GraphPrototype()->get(array(
 				'graphids' => array($_REQUEST['graphid']),
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('graphid'),
 				'editable' => true,
 				'preservekeys' => true
 			));
