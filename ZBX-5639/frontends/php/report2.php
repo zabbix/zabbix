@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/reports.inc.php';
 
 $page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
-$page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
+$page['hist_arg'] = array('mode', 'groupid', 'hostid', 'tpl_triggerid');
 $page['scripts'] = array('class.calendar.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'config' => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), NULL),
+	'mode' => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), NULL),
 	'filter_groupid' => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, NULL),
 	'hostgroupid' => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, NULL),
 	'filter_hostid' => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, NULL),
@@ -66,20 +66,36 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 
 //--------
 // FILTER
-if (!isset($_REQUEST['config'])) {
-	$_REQUEST['config'] = 0;
-}
 if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['filter_groupid'] = 0;
 	$_REQUEST['filter_hostid'] = 0;
 	$_REQUEST['filter_timesince'] = 0;
 	$_REQUEST['filter_timetill'] = 0;
 }
+
+$availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
+CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
+$config = select_config();
+
+if ($config['dropdown_first_remember']) {
+	if (!isset($_REQUEST['filter_rst'])) {
+		$_REQUEST['filter_groupid'] = get_request('filter_groupid', CProfile::get('web.avail_report.'.$availabilityReportMode.'.groupid', 0));
+		$_REQUEST['filter_hostid'] = get_request('filter_hostid', CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostid', 0));
+		$_REQUEST['filter_timesince'] = get_request('filter_timesince', CProfile::get('web.avail_report.'.$availabilityReportMode.'.timesince', 0));
+		$_REQUEST['filter_timetill'] = get_request('filter_timetill', CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0));
+	}
+	CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_INT);
+	CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_INT);
+	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
+	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
+}
 else {
-	$_REQUEST['filter_groupid'] = get_request('filter_groupid', CProfile::get('web.avail_report.'.$_REQUEST['config'].'.groupid', 0));
-	$_REQUEST['filter_hostid'] = get_request('filter_hostid', CProfile::get('web.avail_report.'.$_REQUEST['config'].'.hostid', 0));
-	$_REQUEST['filter_timesince'] = get_request('filter_timesince', CProfile::get('web.avail_report.'.$_REQUEST['config'].'.timesince', 0));
-	$_REQUEST['filter_timetill'] = get_request('filter_timetill', CProfile::get('web.avail_report.'.$_REQUEST['config'].'.timetill', 0));
+	if (!isset($_REQUEST['filter_rst'])) {
+		$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
+		$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
+		$_REQUEST['filter_timesince'] = get_request('filter_timesince', 0);
+		$_REQUEST['filter_timetill'] = get_request('filter_timetill', 0);
+	}
 }
 
 if (($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])) {
@@ -88,21 +104,12 @@ if (($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQ
 	$_REQUEST['filter_timetill'] = $tmp;
 }
 
-if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
-	CProfile::update('web.avail_report.'.$_REQUEST['config'].'.groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_INT);
-	CProfile::update('web.avail_report.'.$_REQUEST['config'].'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_INT);
-	CProfile::update('web.avail_report.'.$_REQUEST['config'].'.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
-	CProfile::update('web.avail_report.'.$_REQUEST['config'].'.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
-}
-
 $_REQUEST['filter_timesince'] = zbxDateToTime($_REQUEST['filter_timesince']);
 $_REQUEST['filter_timetill'] = zbxDateToTime($_REQUEST['filter_timetill']);
 
 $_REQUEST['groupid'] = $_REQUEST['filter_groupid'];
 $_REQUEST['hostid'] = $_REQUEST['filter_hostid'];
 // --------------
-$availabilityReportMode = get_request('config', CProfile::get('web.avail_report.config', AVAILABILITY_REPORT_BY_HOST));
-CProfile::update('web.avail_report.config', $availabilityReportMode, PROFILE_TYPE_INT);
 
 $params = array();
 $options = array('allow_all_hosts', 'with_items');
@@ -171,7 +178,7 @@ else if (isset($_REQUEST['hostid'])) {
 	$r_form = new CForm();
 	$r_form->setMethod('get');
 
-	$cmbConf = new CComboBox('config', $availabilityReportMode, 'submit()');
+	$cmbConf = new CComboBox('mode', $availabilityReportMode, 'submit()');
 	$cmbConf->addItem(AVAILABILITY_REPORT_BY_HOST, _('By host'));
 	$cmbConf->addItem(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template'));
 	$r_form->addItem($cmbConf);
@@ -192,8 +199,6 @@ else if (isset($_REQUEST['hostid'])) {
 		'hostids' => null
 	);
 
-	$config = select_config();
-
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
 		if ($_REQUEST['groupid'] > 0 || !$config['dropdown_first_entry']) {
 			$options['groupids'] = $_REQUEST['groupid'];
@@ -208,7 +213,7 @@ else if (isset($_REQUEST['hostid'])) {
 			$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
 			$options['hostids'] = zbx_objectValues($hosts, 'hostid');
 		}
-		if (isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0 || !$config['dropdown_first_entry'])) {
+		if (isset($_REQUEST['tpl_triggerid']) && $_REQUEST['tpl_triggerid'] > 0) {
 			$options['filter']['templateid'] = $_REQUEST['tpl_triggerid'];
 		}
 	}
