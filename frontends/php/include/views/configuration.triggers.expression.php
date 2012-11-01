@@ -56,23 +56,21 @@ $expressionFormList->addRow(_('Item'), $item);
 
 // append function to form list
 $functionComboBox = new CComboBox('expr_type', $this->data['expr_type'], 'submit()');
-$functionComboBox->addStyle('width: 373px;');
+$functionComboBox->addStyle('width: 605px;');
 foreach ($this->data['functions'] as $id => $f) {
-	foreach ($f['operators'] as $op => $txt_op) {
-		// if user has selected an item, we are filtering out the triggers that can't work with it
-		if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
-			$functionComboBox->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
-		}
+	// if user has selected an item, we are filtering out the triggers that can't work with it
+	if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
+		$functionComboBox->addItem($id, $f['description']);
 	}
 }
 $expressionFormList->addRow(_('Function'), $functionComboBox);
-if (isset($this->data['functions'][$this->data['function']]['params'])) {
-	foreach ($this->data['functions'][$this->data['function']]['params'] as $pid => $pf) {
+if (isset($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'])) {
+	foreach ($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'] as $pid => $pf) {
 		$paramIsReadonly = 'no';
 		$paramValue = isset($this->data['param'][$pid]) ? $this->data['param'][$pid] : null;
 
 		if ($pf['T'] == T_ZBX_INT) {
-			if ($pid == 0) {
+			if ($pid == 0 || $pid == 1) {
 				if (isset($pf['M'])) {
 					if (is_array($pf['M'])) {
 						$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype']);
@@ -96,9 +94,6 @@ if (isset($this->data['functions'][$this->data['function']]['params'])) {
 					$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
 					$paramTypeElement = SPACE._('Seconds');
 				}
-			}
-			elseif ($pid == 1) {
-				$paramTypeElement = SPACE._('Seconds');
 			}
 			else {
 				$paramTypeElement = null;

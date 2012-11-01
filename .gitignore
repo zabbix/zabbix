@@ -55,6 +55,7 @@ frontends/php/locale/fi/LC_MESSAGES/frontend.mo
 frontends/php/locale/fr/LC_MESSAGES/frontend.mo
 frontends/php/locale/frontend.pot
 frontends/php/locale/hu/LC_MESSAGES/frontend.mo
+frontends/php/locale/id/LC_MESSAGES/frontend.mo
 frontends/php/locale/it/LC_MESSAGES/frontend.mo
 frontends/php/locale/ja/LC_MESSAGES/frontend.mo
 frontends/php/locale/ko/LC_MESSAGES/frontend.mo
@@ -62,6 +63,7 @@ frontends/php/locale/lv/LC_MESSAGES/frontend.mo
 frontends/php/locale/nl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.mo
+frontends/php/locale/pt_PT/LC_MESSAGES/frontend.mo
 frontends/php/locale/ru/LC_MESSAGES/frontend.mo
 frontends/php/locale/sk/LC_MESSAGES/frontend.mo
 frontends/php/locale/sv/LC_MESSAGES/frontend.mo

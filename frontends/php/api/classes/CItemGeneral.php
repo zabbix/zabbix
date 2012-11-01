@@ -161,6 +161,10 @@ abstract class CItemGeneral extends CZBXAPI {
 			'preservekeys' => true
 		));
 
+		if ($update){
+			$items = $this->extendObjects($this->tableName(), $items, array('name'));
+		}
+
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
 
@@ -173,6 +177,11 @@ abstract class CItemGeneral extends CZBXAPI {
 			if ($update) {
 				if (!isset($dbItems[$item['itemid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+
+				// check for "templateid", because it is not allowed
+				if (array_key_exists('templateid', $item)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for item "%1$s".', $item['name']));
 				}
 
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
@@ -208,6 +217,11 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 
 				check_db_fields($itemDbFields, $fullItem);
+
+				// check for "templateid", because it is not allowed
+				if (array_key_exists('templateid', $item)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for item "%1$s".', $item['name']));;
+				}
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
@@ -503,7 +517,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			$typeColumn = 'ymin_type';
 		}
 
-		// make if work for both graphs and graph prototypes
+		// make it work for both graphs and graph prototypes
 		$filter['flags'] = array(
 			ZBX_FLAG_DISCOVERY_CHILD,
 			ZBX_FLAG_DISCOVERY_NORMAL,

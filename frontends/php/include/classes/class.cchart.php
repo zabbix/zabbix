@@ -450,31 +450,22 @@ class CChart extends CGraphDraw {
 				}
 
 				$trigger = API::UserMacro()->resolveTrigger($trigger);
-				if (!preg_match('/\{([0-9]{1,})\}\s*?([\<\>\=]{1})\s*?([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) {
+				if (!preg_match('/^\{([0-9]+)\}\s*?([\<\>\=]{1})\s*?([0-9\.]+)([TGMKsmhdw]?)$/', $trigger['expression'], $arr)) {
 					continue;
 				}
 
-				$val = $arr[3];
-				if (strcasecmp($arr[4],'K') == 0) {
-					$val *= 1024;
-				}
-				elseif (strcasecmp($arr[4], 'M') == 0) {
-					$val *= 1048576; //1024*1024;
-				}
-				elseif (strcasecmp($arr[4], 'G') == 0) {
-					$val *= 1073741824; //1024*1024*1024;
-				}
+				$val = convert($arr[3].$arr[4]);
 
 				$minY = $this->m_minY[$this->items[$inum]['axisside']];
 				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
 
-				array_push($this->triggers, array(
+				$this->triggers[] = array(
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY,
 					'color' => getSeverityColor($trigger['priority']),
 					'description' => _('Trigger').': '.CTriggerHelper::expandDescription($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
-				));
+				);
 				++$cnt;
 			}
 		}
@@ -2206,7 +2197,7 @@ class CChart extends CGraphDraw {
 		}
 		elseif ($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] > $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]) {
 			if ($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') {
-				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0.2 * $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT],0.2);
 			}
 			else {
 				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
@@ -2226,7 +2217,7 @@ class CChart extends CGraphDraw {
 		}
 		elseif ($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] > $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]) {
 			if ($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') {
-				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0.2 * $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT],0.2);
 			}
 			else {
 				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
@@ -2234,14 +2225,14 @@ class CChart extends CGraphDraw {
 		}
 
 		// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
-		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] - $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT])<=10) {
-			$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]*0.95;
-			$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]*1.05;
+		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] - $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]) <= 0.1) {
+			$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_LEFT],0.95);
+			$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT],1.05);
 		}
 
-		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] - $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT])<=10) {
-			$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]*0.95;
-			$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]*1.05;
+		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] - $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]) <= 0.1) {
+			$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT],0.95);
+			$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT],1.05);
 		}
 
 		$this->calcMinMaxInterval();

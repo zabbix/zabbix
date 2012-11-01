@@ -66,9 +66,9 @@ if (isset($_REQUEST['save'])) {
 		CProfile::update('web.dashconf.groups.grpswitch', $_REQUEST['grpswitch'], PROFILE_TYPE_INT);
 
 		if ($_REQUEST['grpswitch'] == 1) {
-			$result = rm4favorites('web.dashconf.groups.groupids');
+			$result = CFavorite::remove('web.dashconf.groups.groupids');
 			foreach ($groupids as $gnum => $groupid) {
-				$result &= add2favorites('web.dashconf.groups.groupids', $groupid);
+				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupid);
 			}
 		}
 // HOSTS
@@ -142,7 +142,7 @@ if (isset($_REQUEST['form_refresh'])) {
 else {
 	$filterEnable = CProfile::get('web.dashconf.filter.enable', 0);
 
-	$groupids = get_favorites('web.dashconf.groups.groupids');
+	$groupids = CFavorite::get('web.dashconf.groups.groupids');
 	$groupids = zbx_objectValues($groupids, 'value');
 	$groupids = zbx_toHash($groupids);
 

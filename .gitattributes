@@ -96,6 +96,10 @@ frontends/php/images/general/sort_up.png -text
 frontends/php/images/general/sort_up_blue.png -text
 frontends/php/images/general/sort_up_od.png -text
 frontends/php/images/general/tick.png -text
+frontends/php/images/general/tr_space.gif -text
+frontends/php/images/general/tr_top_bottom.gif -text
+frontends/php/images/general/tr_top_right.gif -text
+frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/transparent.png -text
 frontends/php/images/general/tree/minus.gif -text
 frontends/php/images/general/tree/plus.gif -text
@@ -164,6 +168,7 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
+frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/el/LC_MESSAGES/frontend.po -text
@@ -173,6 +178,7 @@ frontends/php/locale/fa/LC_MESSAGES/frontend.po -text
 frontends/php/locale/fi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/fr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
+frontends/php/locale/id/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ja/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
@@ -180,6 +186,7 @@ frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
+frontends/php/locale/pt_PT/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text

@@ -77,7 +77,6 @@ class CTrigger extends CTriggerGeneral {
 			'triggerids'					=> null,
 			'itemids'						=> null,
 			'applicationids'				=> null,
-			'discoveryids'					=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
 			'templated'						=> null,
@@ -277,24 +276,6 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'id.parent_itemid';
-			}
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['fid'] = 'f.itemid=id.itemid';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
-			}
 		}
 
 		// functions
@@ -1123,15 +1104,30 @@ class CTrigger extends CTriggerGeneral {
 			);
 		}
 
+		if ($update){
+			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
+		}
+
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
 
-			if (!check_db_fields($triggerDbFields, $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
-			}
-
 			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $trigger)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for trigger "%1$s".', $trigger['description']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for trigger "%1$s".', $trigger['description']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			if (!check_db_fields($triggerDbFields, $trigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
 			if ($update) {
@@ -1294,25 +1290,8 @@ class CTrigger extends CTriggerGeneral {
 		$this->checkInput($triggers, __FUNCTION__);
 		$this->updateReal($triggers);
 
-		$dbTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'nopermissions' => true
-		));
-
 		foreach ($triggers as $trigger) {
-			// pass the full trigger so the children can inherit all of the data
-			$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			if (isset($trigger['expression'])) {
-				$dbTrigger['expression'] = $trigger['expression'];
-			}
-			// if we use the expression from the database, make sure it's exploded
-			else {
-				$dbTrigger['expression'] = explode_exp($dbTrigger['expression']);
-			}
-
-			$this->inherit($dbTrigger);
+			$this->inherit($trigger);
 
 			// replace dependencies
 			if (isset($trigger['dependencies'])) {
@@ -1437,6 +1416,7 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$depTtriggerIds = array();
 		$triggers = array();
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
@@ -1448,7 +1428,13 @@ class CTrigger extends CTriggerGeneral {
 				);
 			}
 			$triggers[$triggerId]['dependencies'][] = $dep['dependsOnTriggerid'];
+			$depTtriggerIds[$dep['dependsOnTriggerid']] = $dep['dependsOnTriggerid'];
 		}
+
+		if (!$this->isReadable($depTtriggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		};
+
 		$this->checkDependencies($triggers);
 		$this->checkDependencyParents($triggers);
 		$this->checkDependencyDuplicates($triggers);
@@ -1465,13 +1451,20 @@ class CTrigger extends CTriggerGeneral {
 	public function addDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
 
+		$triggerIds = array();
+		foreach ($triggersData as $dep) {
+			$triggerIds[$dep['triggerid']] = $dep['triggerid'];
+		}
+		if (!$this->isWritable($triggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		};
+
 		$this->validateAddDependencies($triggersData);
 
-		$triggerids = array();
+
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
 			$depTriggerId = $dep['dependsOnTriggerid'];
-			$triggerids[$dep['triggerid']] = $dep['triggerid'];
 
 			DB::insert('trigger_depends', array(array(
 				'triggerid_down' => $triggerId,
@@ -1500,7 +1493,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerIds);
 	}
 
 	/**
@@ -1807,7 +1800,9 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Validates the dependencies of the given triggers.
 	 *
-	 * @param array $triggers
+	 * @param array $triggers list of triggers and corresponding dependencies
+	 * @param int $triggers[]['triggerid'] trigger id
+	 * @param array $triggers[]['dependencies'] list of trigger ids on which depends given trigger
 	 *
 	 * @trows APIException if any of the dependencies is invalid
 	 */
@@ -1837,30 +1832,41 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 
-			$downTriggerIds = $trigger['dependencies'];
-
 			// the trigger can't depend on itself
 			if (in_array($trigger['triggerid'], $trigger['dependencies'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create dependency on trigger itself.'));
 			}
 
 			// check circular dependency
+			$downTriggerIds = array($trigger['triggerid']);
 			do {
-				$dbUpTriggers = DBselect(
+				// triggerid_down depends on triggerid_up
+				$res = DBselect(
 					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
 					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds)
 				);
-				$upTriggerids = array();
-				while ($upTrigger = DBfetch($dbUpTriggers)) {
-					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular dependencies are not allowed.'));
-					}
-					$upTriggerids[] = $upTrigger['triggerid_up'];
-				}
-				$downTriggerIds = $upTriggerids;
 
-			} while (!empty($upTriggerids));
+				// combine db dependencies with thouse to be added
+				$upTriggersIds = array();
+				while ($row = DBfetch($res)) {
+					$upTriggersIds[] = $row['triggerid_up'];
+				}
+				foreach ($downTriggerIds as $id) {
+					if (isset($triggers[$id]) && isset($triggers[$id]['dependencies'])) {
+						$upTriggersIds = array_merge($upTriggersIds, $triggers[$id]['dependencies']);
+					}
+				}
+
+				// if found trigger id in dependant triggerids, then there is dependency loop
+				$downTriggerIds = array();
+				foreach ($upTriggersIds as $id) {
+					if (bccomp($id, $trigger['triggerid']) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create circular dependencies.'));
+					}
+					$downTriggerIds[] = $id;
+				}
+			} while (!empty($downTriggerIds));
 
 			// fetch all templates that are used in dependencies
 			$triggerDependencyTemplates = API::Template()->get(array(
@@ -2127,8 +2133,7 @@ class CTrigger extends CTriggerGeneral {
 			$options['hostids'] === null &&
 			$options['triggerids'] === null &&
 			$options['itemids'] === null &&
-			$options['applicationids'] === null &&
-			$options['discoveryids'] === null) {
+			$options['applicationids'] === null) {
 
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}

@@ -50,7 +50,7 @@ check_fields($fields);
 	$frmTitle->addVar('permission', $permission);
 
 	if(ZBX_DISTRIBUTED){
-		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
 		$cmbResourceNode->addItem(0, _('All'));

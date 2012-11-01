@@ -203,39 +203,71 @@ function get_condition_desc($conditiontype, $operator, $value) {
 	return condition_type2str($conditiontype).' '.condition_operator2str($operator).' '.condition_value2str($conditiontype, $value);
 }
 
-function get_operation_desc($type, $data) {
+/**
+ * Generates array with HTML items representing operation with description
+ *
+ * @param int $type short or long description, use const. SHORT_DESCRIPTION and LONG_DESCRIPTION
+ * @param array $data
+ * @param int $data['operationtype'] type of operation: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, ...
+ * @param int $data['opmessage']['mediatypeid'] type id of message media
+ * @param bool $data['opmessage']['default_msg'] should default message be used
+ * @param bool $data['opmessage']['operationid'] if true $data['operationid'] will be used to retrieve default messages from DB
+ * @param string $data['opmessage']['subject'] subject of message
+ * @param string $data['opmessage']['message'] message it self
+ * @param array $data['opmessage_usr'] list of user ids if OPERATION_TYPE_MESSAGE
+ * @param array $data['opmessage_grp'] list of group ids if OPERATION_TYPE_MESSAGE
+ * @param array $data['opcommand_grp'] list of group ids if OPERATION_TYPE_COMMAND
+ * @param array $data['opcommand_hst'] list of host ids if OPERATION_TYPE_COMMAND
+ * @param array $data['opgroup'] list of group ids if OPERATION_TYPE_GROUP_ADD or OPERATION_TYPE_GROUP_REMOVE
+ * @param array $data['optemplate'] list of template ids if OPERATION_TYPE_TEMPLATE_ADD or OPERATION_TYPE_TEMPLATE_REMOVE
+ * @param int $data['operationid'] id of operation
+ * @param int $data['opcommand']['type'] type of command: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ...
+ * @param string $data['opcommand']['command'] actual command
+ * @param int $data['opcommand']['scriptid'] script id used if $data['opcommand']['type'] is ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+ *
+ * @return array
+ */
+function get_operation_descr($type, $data) {
 	$result = array();
 
 	if ($type == SHORT_DESCRIPTION) {
 		switch ($data['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if (!isset($data['opmessage_usr'])) {
-					$data['opmessage_usr'] = array();
+				$mediaTypes = API::Mediatype()->get(array(
+					'mediatypeids' => $data['opmessage']['mediatypeid'],
+					'output' => array('description')
+				));
+				if (empty($mediaTypes)) {
+					$mediatype = _('all media');
 				}
-				if (!isset($data['opmessage_grp'])) {
-					$data['opmessage_grp'] = array();
+				else {
+					$mediatype = reset($mediaTypes);
+					$mediatype = $mediatype['description'];
 				}
 
-				$users = API::User()->get(array(
-					'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
-					'output' => array('userid', 'alias')
-				));
-				if (!empty($users)) {
+
+				if (!empty($data['opmessage_usr'])) {
+					$users = API::User()->get(array(
+						'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
+						'output' => array('userid', 'alias')
+					));
 					order_result($users, 'alias');
 
-					$result[] = bold(array(_('Send message to users').':'.SPACE));
-					$result[] = array(implode(', ', zbx_objectValues($users, 'alias')), BR());
+					$result[] = bold(_('Send message to users').': ');
+					$result[] = array(implode(', ', zbx_objectValues($users, 'alias')), SPACE, _('via'), SPACE, $mediatype);
+					$result[] = BR();
 				}
 
-				$usrgrps = API::UserGroup()->get(array(
-					'usrgrpids' => zbx_objectValues($data['opmessage_grp'], 'usrgrpid'),
-					'output' => API_OUTPUT_EXTEND
-				));
-				if (!empty($usrgrps)) {
+				if (!empty($data['opmessage_grp'])) {
+					$usrgrps = API::UserGroup()->get(array(
+						'usrgrpids' => zbx_objectValues($data['opmessage_grp'], 'usrgrpid'),
+						'output' => API_OUTPUT_EXTEND
+					));
 					order_result($usrgrps, 'name');
 
-					$result[] = bold(array(_('Send message to user groups').':'.SPACE));
-					$result[] = array(implode(', ', zbx_objectValues($usrgrps, 'name')), BR());
+					$result[] = bold(_('Send message to user groups').': ');
+					$result[] = array(implode(', ', zbx_objectValues($usrgrps, 'name')), SPACE, _('via'), SPACE, $mediatype);
+					$result[] = BR();
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:

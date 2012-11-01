@@ -1,131 +1,128 @@
 <!-- Discovery Actions-->
 <script type="text/x-jquery-tmpl" id="opGroupRowTPL">
 <tr id="opGroupRow_#{groupid}">
-<td>
-	<input name="new_operation[opgroup][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
-	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpGroupRow(#{groupid});" />
-</td>
+	<td>
+		<input name="new_operation[opgroup][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
+		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
+	</td>
+	<td>
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpGroupRow(#{groupid});" />
+	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opTemplateRowTPL">
 <tr id="opTemplateRow_#{templateid}">
-<td>
-	<input name="new_operation[optemplate][#{templateid}][templateid]" type="hidden" value="#{templateid}" />
-	<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpTemplateRow(#{templateid});" />
-</td>
+	<td>
+		<input name="new_operation[optemplate][#{templateid}][templateid]" type="hidden" value="#{templateid}" />
+		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
+	</td>
+	<td>
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpTemplateRow(#{templateid});" />
+	</td>
 </tr>
 </script>
 
 <!-- Trigger Actions-->
 <script type="text/x-jquery-tmpl" id="opmsgUsrgrpRowTPL">
 <tr id="opmsgUsrgrpRow_#{usrgrpid}">
-<td>
-	<input name="new_operation[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
-	<span>#{name}</span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
-</td>
+	<td>
+		<input name="new_operation[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
+		<span>#{name}</span>
+	</td>
+	<td>
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUsrgrpRow(#{usrgrpid});" />
+	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opmsgUserRowTPL">
 <tr id="opmsgUserRow_#{userid}">
-<td>
-	<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
-	<span>#{alias}</span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow(#{userid});" />
-</td>
+	<td>
+		<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
+		<span>#{alias}</span>
+	</td>
+	<td>
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow(#{userid});" />
+	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdGroupRowTPL">
 <tr id="opCmdGroupRow_#{groupid}">
-<td>
-	<input name="new_operation[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
-	<input name="new_operation[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
-	#{objectCaption}
-	<span>#{name}</span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
-</td>
+	<td>
+		<input name="new_operation[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
+		<input name="new_operation[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
+		#{objectCaption}
+		<span>#{name}</span>
+	</td>
+	<td>
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{groupid}, 'groupid');" />
+	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
 <tr id="opCmdHostRow_#{hostid}">
-<td>
-	<input name="new_operation[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
-	<input name="new_operation[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
-	#{objectCaption}
-	<span>#{name}</span>
-</td>
-<td>
-	<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
-</td>
+	<td>
+		<input name="new_operation[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
+		<input name="new_operation[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
+		#{objectCaption}
+		<span>#{name}</span>
+	</td>
+	<td>
+		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow(#{hostid}, 'hostid');" />
+	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
 <br/>
 <div id="opcmdEditForm" class="objectgroup border_dotted ui-corner-all inlineblock">
-<table class="formElementTable" style="min-width: 310px;"><tbody>
-<tr>
-	<td><?php echo _('Target'); ?></td>
-	<td>
-		<select name="opCmdTarget" class="input select">
-			<option value="0"><?php echo CHtml::encode(_('Current host')); ?></option>
-			<option value="1"><?php echo CHtml::encode(_('Host')); ?></option>
-			<option value="2"><?php echo CHtml::encode(_('Host group')); ?></option>
-		</select>
-		<div id="opCmdTargetSelect" class="inlineblock">
-			<input name="action" type="hidden" value="#{action}" />
-			<input name="opCmdId" type="hidden" value="#{opcmdid}" />
-			<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
-			<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
-			<input type="button" class="input link_menu" name="select" value="<?php echo CHtml::encode(_('Select')); ?>" />
-		</div>
-	</td>
-</tr>
-<tr>
-	<td colspan="2">
-		<input type="button" class="input link_menu" name="save" value="#{operationName}" />&nbsp;
-		<input type="button" class="input link_menu" name="cancel" value="<?php echo CHtml::encode(_('Cancel')); ?>" />
-	</td>
-</tr>
-</tbody></table>
+	<table class="formElementTable" style="min-width: 310px;"><tbody>
+		<tr>
+			<td><?php echo _('Target'); ?></td>
+			<td>
+				<select name="opCmdTarget" class="input select">
+					<option value="0"><?php echo CHtml::encode(_('Current host')); ?></option>
+					<option value="1"><?php echo CHtml::encode(_('Host')); ?></option>
+					<option value="2"><?php echo CHtml::encode(_('Host group')); ?></option>
+				</select>
+				<div id="opCmdTargetSelect" class="inlineblock">
+					<input name="action" type="hidden" value="#{action}" />
+					<input name="opCmdId" type="hidden" value="#{opcmdid}" />
+					<input name="opCmdTargetObjectId" id="opCmdTargetObjectId" type="hidden" value="#{objectid}" />
+					<input name="opCmdTargetObjectName" id="opCmdTargetObjectName" type="text" class="input text" value="#{name}" readonly="readonly" size="30"/>
+					<input type="button" class="input link_menu" name="select" value="<?php echo CHtml::encode(_('Select')); ?>" />
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="button" class="input link_menu" name="save" value="#{operationName}" />&nbsp;
+				<input type="button" class="input link_menu" name="cancel" value="<?php echo CHtml::encode(_('Cancel')); ?>" />
+			</td>
+		</tr>
+	</tbody></table>
 </div>
 </script>
 
 <!-- Script -->
 <script type="text/x-jquery-tmpl" id="operationTypesTPL">
 <tr id="operationTypeScriptElements" class="hidden">
-<td>
-	<?php echo CHtml::encode(_('Execute on')); ?>
-</td>
-<td>
-	<div class="objectgroup inlineblock border_dotted ui-corner-all" id="uniqList">
-		<div>
-			<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
-			<label for="execute_on_agent"><?php echo CHtml::encode(_('Zabbix agent')); ?></label>
+	<td><?php echo CHtml::encode(_('Execute on')); ?></td>
+	<td>
+		<div class="objectgroup inlineblock border_dotted ui-corner-all" id="uniqList">
+			<div>
+				<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
+				<label for="execute_on_agent"><?php echo CHtml::encode(_('Zabbix agent')); ?></label>
+			</div>
+			<div>
+				<input type="radio" id="execute_on_server" name="execute_on" value="1" class="input radio">
+				<label for="execute_on_server"><?php echo CHtml::encode(_('Zabbix server')); ?></label>
+			</div>
 		</div>
-
-		<div>
-			<input type="radio" id="execute_on_server" name="execute_on" value="1" class="input radio">
-			<label for="execute_on_server"><?php echo CHtml::encode(_('Zabbix server')); ?></label>
-		</div>
-	</div>
-</td>
+	</td>
 </tr>
 </script>
 
@@ -486,6 +483,10 @@
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#name').focus();
+		});
+
+		jQuery('#esc_period').change(function() {
+			jQuery('form[name="action.edit"]').submit();
 		});
 
 		// new operation form command type

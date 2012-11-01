@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -81,14 +81,14 @@ if (isset($_REQUEST['favobj'])) {
 	if (str_in_array($_REQUEST['favobj'], array('itemid', 'graphid'))) {
 		$result = false;
 		if ($_REQUEST['favaction'] == 'add') {
-			$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::add('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n";
 				echo '$("addrm_fav").onclick = function() { rm4favorites("itemid", "'.$_REQUEST['favid'].'", 0); }'."\n";
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = rm4favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::remove('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Add to favourites').'";'."\n";

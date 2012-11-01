@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -147,8 +147,7 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-global $USER_DETAILS;
-if ($min_user_type > $USER_DETAILS['type']) {
+if ($min_user_type > CWebUser::$data['type']) {
 	access_deny();
 }
 if (isset($error)) {
@@ -483,7 +482,7 @@ else {
 		if (ZBX_DISTRIBUTED) {
 			$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
-			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
+			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
 			while ($node_data = DBfetch($db_nodes)) {
 				$cmbNode->addItem($node_data['nodeid'], $node_data['name']);
 				if (bccomp($nodeid , $node_data['nodeid']) == 0) {
@@ -919,9 +918,11 @@ elseif ($srctbl == 'users') {
 		}
 		else {
 			$values = array(
-				$dstfld1 => $user[$srcfld1],
-				$dstfld2 => isset($srcfld2) ? $user[$srcfld2] : null,
+				$dstfld1 => $user[$srcfld1]
 			);
+			if (isset($srcfld2)) {
+				$values[$dstfld2] = $user[$srcfld2];
+			}
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$alias->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
@@ -1015,9 +1016,11 @@ elseif ($srctbl == 'triggers') {
 		else {
 			$values = array(
 				$dstfld1 => $trigger[$srcfld1],
-				$dstfld2 => $trigger[$srcfld2],
-				$dstfld3 => $trigger[$srcfld3]
+				$dstfld2 => $trigger[$srcfld2]
 			);
+			if (isset($srcfld3)) {
+				$values[$dstfld3] = $trigger[$srcfld3];
+			}
 			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
@@ -1214,11 +1217,10 @@ elseif ($srctbl == 'prototypes') {
 	}
 	$table->setHeader($header);
 
-	$items = API::Item()->get(array(
+	$items = API::ItemPrototype()->get(array(
 		'nodeids' => $nodeid,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));
@@ -1319,7 +1321,7 @@ elseif ($srctbl == 'nodes') {
 	$table = new CTableInfo(_('No nodes defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
+	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['name'], 'link');

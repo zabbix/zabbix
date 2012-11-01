@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -21,6 +21,8 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/actions.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Configuration of actions');
 $page['file'] = 'actionconf.php';
@@ -56,7 +58,7 @@ $fields = array(
 	'add_operation' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_operation' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'add_opcondition' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel_new_opcondition' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'cancel_new_opcondition' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -113,15 +115,15 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 	unset($_REQUEST['new_opcondition']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
 	}
 
 	$action = array(
-		'name'		=> get_request('name'),
+		'name'			=> get_request('name'),
 		'eventsource'	=> get_request('eventsource', 0),
-		'evaltype'	=> get_request('evaltype', 0),
-		'status'	=> get_request('status', ACTION_STATUS_DISABLED),
+		'evaltype'		=> get_request('evaltype', 0),
+		'status'		=> get_request('status', ACTION_STATUS_DISABLED),
 		'esc_period'	=> get_request('esc_period', 0),
 		'def_shortdata'	=> get_request('def_shortdata', ''),
 		'def_longdata'	=> get_request('def_longdata', ''),
@@ -161,7 +163,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
-	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
 	}
 
@@ -270,7 +272,7 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+	if (!count($nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
 	}
 
@@ -300,7 +302,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+	if (!count($nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
 	}
 
