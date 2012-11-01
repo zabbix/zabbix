@@ -480,7 +480,7 @@ class CScreenItem extends CZBXAPI {
 		if (!empty($hostgroups)) {
 			$result = API::HostGroup()->get(array(
 				'groupids' => $hostgroups,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('groupid'),
 				'preservekeys' => true
 			));
 			foreach ($hostgroups as $id) {
@@ -494,7 +494,7 @@ class CScreenItem extends CZBXAPI {
 		if ($hosts) {
 			$result = API::Host()->get(array(
 				'hostids' => $hosts,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('hostid'),
 				'preservekeys' => true
 			));
 			foreach ($hosts as $id) {
@@ -508,7 +508,7 @@ class CScreenItem extends CZBXAPI {
 		if ($graphs) {
 			$result = API::Graph()->get(array(
 				'graphids' => $graphs,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('graphid'),
 				'preservekeys' => true
 			));
 			foreach ($graphs as $id) {
@@ -522,7 +522,7 @@ class CScreenItem extends CZBXAPI {
 		if ($items) {
 			$result = API::Item()->get(array(
 				'itemids' => $items,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('itemid'),
 				'preservekeys' => true,
 				'webitems' => true
 			));
@@ -537,7 +537,7 @@ class CScreenItem extends CZBXAPI {
 		if ($maps) {
 			$result = API::Map()->get(array(
 				'sysmapids' => $maps,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('sysmapid'),
 				'preservekeys' => true
 			));
 			foreach ($maps as $id) {
@@ -551,7 +551,7 @@ class CScreenItem extends CZBXAPI {
 		if ($screens) {
 			$result = API::Screen()->get(array(
 				'screenids' => $screens,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('screenid'),
 				'preservekeys' => true
 			));
 			if (empty($result)) {

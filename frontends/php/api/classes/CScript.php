@@ -123,9 +123,7 @@ class CScript extends CZBXAPI {
 			zbx_value2array($options['groupids']);
 			$options['groupids'][] = 0; // include all groups scripts
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['scripts'] = 's.scriptid,s.groupid';
-			}
+			$sqlParts['select']['scripts'] = 's.scriptid,s.groupid';
 			$sqlParts['where'][] = '('.DBcondition('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
 		}
 
@@ -134,9 +132,7 @@ class CScript extends CZBXAPI {
 			zbx_value2array($options['usrgrpids']);
 			$options['usrgrpids'][] = 0; // include all usrgrps scripts
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['usrgrpid'] = 's.usrgrpid';
-			}
+			$sqlParts['select']['usrgrpid'] = 's.usrgrpid';
 			$sqlParts['where'][] = '('.DBcondition('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
 		}
 
@@ -151,9 +147,7 @@ class CScript extends CZBXAPI {
 			}
 			$hostNodeIds = array_unique($hostNodeIds);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'hg.hostid';
-			}
+			$sqlParts['select']['hostid'] = 'hg.hostid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
 				' OR '.
@@ -209,23 +203,18 @@ class CScript extends CZBXAPI {
 			else {
 				$scriptids[$script['scriptid']] = $script['scriptid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$script['scriptid']] = array('scriptid' => $script['scriptid']);
+				if (!isset($result[$script['scriptid']])) {
+					$result[$script['scriptid']] = array();
 				}
-				else {
-					if (!isset($result[$script['scriptid']])) {
-						$result[$script['scriptid']] = array();
-					}
-					if (!is_null($options['selectGroups']) && !isset($result[$script['scriptid']]['groups'])) {
-						$result[$script['scriptid']]['groups'] = array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$script['scriptid']]['hosts'])) {
-						$result[$script['scriptid']]['hosts'] = array();
-					}
+				if (!is_null($options['selectGroups']) && !isset($result[$script['scriptid']]['groups'])) {
+					$result[$script['scriptid']]['groups'] = array();
+				}
+				if (!is_null($options['selectHosts']) && !isset($result[$script['scriptid']]['hosts'])) {
+					$result[$script['scriptid']]['hosts'] = array();
+				}
 
-					unset($script['hostid']);
-					$result[$script['scriptid']] += $script;
-				}
+				unset($script['hostid']);
+				$result[$script['scriptid']] += $script;
 			}
 		}
 
@@ -343,7 +332,7 @@ class CScript extends CZBXAPI {
 
 		$updScripts = $this->get(array(
 			'scriptids' => $scriptids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('scriptid'),
 			'preservekeys' => true
 		));
 		$scriptNames = array();
@@ -446,7 +435,7 @@ class CScript extends CZBXAPI {
 		$alowedScripts = $this->get(array(
 			'hostids' => $hostid,
 			'scriptids' => $scriptid,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('scriptid'),
 			'preservekeys' => true
 		));
 		if (!isset($alowedScripts[$scriptid])) {

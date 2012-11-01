@@ -324,40 +324,35 @@ class CMaintenance extends CZBXAPI {
 			else {
 				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$maintenance['maintenanceid']] = array('maintenanceid' => $maintenance['maintenanceid']);
+				if (!isset($result[$maintenance['maintenanceid']])) {
+					$result[$maintenance['maintenanceid']] = array();
 				}
-				else {
-					if (!isset($result[$maintenance['maintenanceid']])) {
-						$result[$maintenance['maintenanceid']] = array();
-					}
 
-					if (!is_null($options['selectGroups']) && !isset($result[$maintenance['maintenanceid']]['groups'])) {
+				if (!is_null($options['selectGroups']) && !isset($result[$maintenance['maintenanceid']]['groups'])) {
+					$result[$maintenance['maintenanceid']]['groups'] = array();
+				}
+				if (!is_null($options['selectHosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])) {
+					$result[$maintenance['maintenanceid']]['hosts'] = array();
+				}
+
+				// groupids
+				if (isset($maintenance['groupid']) && is_null($options['selectGroups'])) {
+					if (!isset($result[$maintenance['maintenanceid']]['groups'])) {
 						$result[$maintenance['maintenanceid']]['groups'] = array();
 					}
-					if (!is_null($options['selectHosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])) {
+					$result[$maintenance['maintenanceid']]['groups'][] = array('groupid' => $maintenance['groupid']);
+					unset($maintenance['groupid']);
+				}
+
+				// hostids
+				if (isset($maintenance['hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$maintenance['maintenanceid']]['hosts'])) {
 						$result[$maintenance['maintenanceid']]['hosts'] = array();
 					}
-
-					// groupids
-					if (isset($maintenance['groupid']) && is_null($options['selectGroups'])) {
-						if (!isset($result[$maintenance['maintenanceid']]['groups'])) {
-							$result[$maintenance['maintenanceid']]['groups'] = array();
-						}
-						$result[$maintenance['maintenanceid']]['groups'][] = array('groupid' => $maintenance['groupid']);
-						unset($maintenance['groupid']);
-					}
-
-					// hostids
-					if (isset($maintenance['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$maintenance['maintenanceid']]['hosts'])) {
-							$result[$maintenance['maintenanceid']]['hosts'] = array();
-						}
-						$result[$maintenance['maintenanceid']]['hosts'][] = array('hostid' => $maintenance['hostid']);
-						unset($maintenance['hostid']);
-					}
-					$result[$maintenance['maintenanceid']] += $maintenance;
+					$result[$maintenance['maintenanceid']]['hosts'][] = array('hostid' => $maintenance['hostid']);
+					unset($maintenance['hostid']);
 				}
+				$result[$maintenance['maintenanceid']] += $maintenance;
 			}
 		}
 
@@ -387,7 +382,7 @@ class CMaintenance extends CZBXAPI {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('maintenanceid'),
 			'nopermissions' => true,
 			'limit' => 1
 		);
@@ -423,7 +418,7 @@ class CMaintenance extends CZBXAPI {
 		$options = array(
 			'hostids' => $hostids,
 			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'preservekeys' => true
 		);
 		$updHosts = API::Host()->get($options);
@@ -436,7 +431,7 @@ class CMaintenance extends CZBXAPI {
 		$options = array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('groupid'),
 			'preservekeys' => true
 		);
 		$updGroups = API::HostGroup()->get($options);
@@ -615,7 +610,7 @@ class CMaintenance extends CZBXAPI {
 		$options = array(
 			'hostids' => $hostids,
 			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'preservekeys' => true
 		);
 		$updHosts = API::Host()->get($options);
@@ -628,7 +623,7 @@ class CMaintenance extends CZBXAPI {
 		$options = array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('groupid'),
 			'preservekeys' => true
 		);
 		$updGroups = API::HostGroup()->get($options);
@@ -734,7 +729,7 @@ class CMaintenance extends CZBXAPI {
 			$options = array(
 				'maintenanceids' => $maintenanceids,
 				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('maintenanceid'),
 				'preservekeys' => true
 			);
 			$maintenances = $this->get($options);
@@ -760,7 +755,7 @@ class CMaintenance extends CZBXAPI {
 			// remove maintenanceid from hosts table
 			$options = array(
 				'real_hosts' => true,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('hostid'),
 				'filter' => array('maintenanceid' => $maintenanceids)
 			);
 			$hosts = API::Host()->get($options);
