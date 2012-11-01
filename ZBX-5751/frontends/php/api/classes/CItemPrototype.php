@@ -402,15 +402,18 @@ class CItemPrototype extends CItemGeneral {
 				if (!is_null($options['limitSelects'])) {
 					order_result($triggers, 'description');
 				}
+				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
 					unset($triggers[$triggerid]['items']);
-					$count = array();
 					foreach ($trigger['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
 
 						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
@@ -466,16 +469,21 @@ class CItemPrototype extends CItemGeneral {
 				if (!is_null($options['limitSelects'])) {
 					order_result($graphs, 'name');
 				}
-				$count = 0;
+				$count = array();
 				foreach ($graphs as $graphid => $graph) {
 					unset($graphs[$graphid]['items']);
+					$itemsArray = reset($graph['items']);
 					if (!is_null($options['limitSelects'])) {
-						$count++;
-						if ($count > $options['limitSelects']) {
+						if (!isset($count[$itemsArray['itemid']])) {
+							$count[$itemsArray['itemid']] = 0;
+						}
+						$count[$itemsArray['itemid']]++;
+
+						if ($count[$itemsArray['itemid']] > $options['limitSelects']) {
 							continue;
 						}
 					}
-					$result[reset($graph['items'])['itemid']]['graphs'][] = &$graphs[$graphid];
+					$result[$itemsArray['itemid']]['graphs'][] = &$graphs[$graphid];
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
