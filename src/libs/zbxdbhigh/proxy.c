@@ -1443,9 +1443,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(zbx_host_key_t) + sizeof(int)) * values_num);
-	keys = (zbx_host_key_t *)(items + values_num);
-	errcodes = (int *)(keys + values_num);
+	items = zbx_malloc(NULL, sizeof(DC_ITEM) * values_num);
+	keys = zbx_malloc(NULL, sizeof(zbx_host_key_t) * values_num);
+	errcodes = zbx_malloc(NULL, sizeof(int) * values_num);
 
 	for (i = 0; i < values_num; i++)
 	{
@@ -1529,6 +1529,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 	DCconfig_clean_items(items, errcodes, values_num);
 
+	zbx_free(errcodes);
+	zbx_free(keys);
 	zbx_free(items);
 
 	dc_flush_history();
