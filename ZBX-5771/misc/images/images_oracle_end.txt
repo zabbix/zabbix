@@ -1,0 +1,6 @@
+END;
+/
+
+DROP PROCEDURE LOAD_IMAGE;
+
+DROP DIRECTORY image_dir;
