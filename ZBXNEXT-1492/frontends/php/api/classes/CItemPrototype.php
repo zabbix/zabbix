@@ -499,7 +499,7 @@ class CItemPrototype extends CItemGeneral {
 	public function exists($object) {
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('itemid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
