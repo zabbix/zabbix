@@ -140,9 +140,7 @@ class CUserMedia extends CZBXAPI {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['userid'] = 'u.userid';
-			}
+			$sqlParts['select']['userid'] = 'u.userid';
 			$sqlParts['from']['users'] = 'users u';
 			$sqlParts['where'][] = DBcondition('u.userid', $options['userids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
@@ -160,9 +158,8 @@ class CUserMedia extends CZBXAPI {
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
-			}
+
+			$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
 			$sqlParts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['mug'] = 'm.userid=ug.userid';
@@ -180,9 +177,8 @@ class CUserMedia extends CZBXAPI {
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
-			}
+
+			$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
 			$sqlParts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -289,15 +285,10 @@ class CUserMedia extends CZBXAPI {
 			else {
 				$mediaids[$media['mediaid']] = $media['mediaid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$media['mediaid']] = array('mediaid' => $media['mediaid']);
+				if (!isset($result[$media['mediaid']])) {
+					$result[$media['mediaid']]= array();
 				}
-				else {
-					if (!isset($result[$media['mediaid']])) {
-						$result[$media['mediaid']]= array();
-					}
-					$result[$media['mediaid']] += $media;
-				}
+				$result[$media['mediaid']] += $media;
 			}
 		}
 

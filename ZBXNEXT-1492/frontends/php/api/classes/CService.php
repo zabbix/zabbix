@@ -683,7 +683,6 @@ class CService extends CZBXAPI {
 
 		$count = $this->get(array(
 			'serviceids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 		return count($ids) == $count;
