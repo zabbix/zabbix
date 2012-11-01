@@ -297,35 +297,30 @@ class CDiscoveryRule extends CItemGeneral {
 			else {
 				$itemids[$item['itemid']] = $item['itemid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$item['itemid']] = array('itemid' => $item['itemid']);
+				if (!isset($result[$item['itemid']])) {
+					$result[$item['itemid']]= array();
 				}
-				else {
-					if (!isset($result[$item['itemid']])) {
-						$result[$item['itemid']]= array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
+				if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
+					$result[$item['itemid']]['hosts'] = array();
+				}
+				if (!is_null($options['selectItems']) && !isset($result[$item['itemid']]['items'])) {
+					$result[$item['itemid']]['items'] = array();
+				}
+				if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
+					$result[$item['itemid']]['triggers'] = array();
+				}
+				if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
+					$result[$item['itemid']]['graphs'] = array();
+				}
+
+				// hostids
+				if (isset($item['hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$item['itemid']]['hosts'])) {
 						$result[$item['itemid']]['hosts'] = array();
 					}
-					if (!is_null($options['selectItems']) && !isset($result[$item['itemid']]['items'])) {
-						$result[$item['itemid']]['items'] = array();
-					}
-					if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
-						$result[$item['itemid']]['triggers'] = array();
-					}
-					if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
-						$result[$item['itemid']]['graphs'] = array();
-					}
-
-					// hostids
-					if (isset($item['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$item['itemid']]['hosts'])) {
-							$result[$item['itemid']]['hosts'] = array();
-						}
-						$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
-					}
-					$result[$item['itemid']] += $item;
+					$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
 				}
+				$result[$item['itemid']] += $item;
 			}
 		}
 
@@ -500,7 +495,7 @@ class CDiscoveryRule extends CItemGeneral {
 	public function exists($object) {
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('itemid'),
 			'nopermissions' => true,
 			'limit' => 1
 		);
@@ -721,7 +716,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -748,7 +742,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));
