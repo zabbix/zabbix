@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
 ....I...S. [ZBXNEXT-1472] added support of parallel processing of time-based functions (Sasha)
 ..F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard)
 .......PS. [ZBX-3449] added support of multiple dynamic SNMP indexes (Sasha)
