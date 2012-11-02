@@ -31,7 +31,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'",
 			__function_name, item->key_orig, item->interface.addr);
 
-	if (0 == parse_command(item->key, key, sizeof(key), params, sizeof(params)))
+	if (ZBX_COMMAND_ERROR == parse_command(item->key, key, sizeof(key), params, sizeof(params)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
 		goto notsupported;
