@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 18:16+0200\n"
-"PO-Revision-Date: 2012-10-27 09:33+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2012-11-02 18:25+0200\n"
+"PO-Revision-Date: 2012-11-01 18:07+0200\n"
+"Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -1298,7 +1298,7 @@ msgstr "Cannot create circular dependencies."
 
 #: api/classes/CTrigger.php:1840
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Cannot create dependency on trigger itself."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -3547,19 +3547,19 @@ msgstr "Difference between last and preceding values, then N NOT 1, 0 - otherwis
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "Difference between last and previous value is < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "Difference between last and previous value is = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "Difference between last and previous value is > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Difference between last and previous value is NOT N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4531,7 +4531,7 @@ msgstr "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwi
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -8841,19 +8841,19 @@ msgstr "Number of steps"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T < N"
-msgstr ""
+msgstr "Number of successfully retrieved values V (which fulfill operator O) for period of time T < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T = N"
-msgstr ""
+msgstr "Number of successfully retrieved values V (which fulfill operator O) for period of time T = N"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T > N"
-msgstr ""
+msgstr "Number of successfully retrieved values V (which fulfill operator O) for period of time T > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N"
-msgstr ""
+msgstr "Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
