@@ -612,8 +612,8 @@ class CScript extends CZBXAPI {
 			$processedGroups = array();
 
 			foreach ($result as $scriptid => $script) {
-				if (isset($processedGroups[$script['groupid']])) {
-					$result[$scriptid]['hosts'] = $result[$processedGroups[$script['groupid']]]['hosts'];
+				if (isset($processedGroups[$script['groupid'].'_'.$script['host_access']])) {
+					$result[$scriptid]['hosts'] = $result[$processedGroups[$script['groupid'].'_'.$script['host_access']]]['hosts'];
 				}
 				else {
 					$result[$scriptid]['hosts'] = API::Host()->get(array(
@@ -623,7 +623,7 @@ class CScript extends CZBXAPI {
 						'nodeids' => id2nodeid($script['scriptid'])
 					));
 
-					$processedGroups[$script['groupid']] = $scriptid;
+					$processedGroups[$script['groupid'].'_'.$script['host_access']] = $scriptid;
 				}
 			}
 		}
