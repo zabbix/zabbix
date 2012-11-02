@@ -126,7 +126,7 @@ typedef struct
 }
 zbx_active_t;
 
-static void	get_list_of_active_check(zbx_uint64_t hostid, zbx_uint64_t **itemids, zbx_active_t **items, size_t *items_num)
+static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemids, zbx_active_t **items, size_t *items_num)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -201,14 +201,11 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 {
 	const char	*__function_name = "send_list_of_active_checks";
 
-	char		*host = NULL, *p;
-	char		*buffer = NULL;
-	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
+	char		*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
+	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0, items_num = 0;
 	int		ret = FAIL, *errcodes, i;
 	zbx_uint64_t	hostid, *itemids = NULL;
 	zbx_active_t	*items = NULL;
-	size_t		items_num = 0;
-	char		error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
 	DC_ITEM		*dc_items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -230,14 +227,14 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, &hostid, error))
 		goto out;
 
-	get_list_of_active_check(hostid, &itemids, &items, &items_num);
+	get_list_of_active_checks(hostid, &itemids, &items, &items_num);
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
 	if (0 != items_num)
 	{
-		dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * items_num);
-		errcodes = (int *)(dc_items + items_num);
+		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * items_num);
+		errcodes = zbx_malloc(NULL, sizeof(int) * items_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, items_num);
 
@@ -257,6 +254,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 		DCconfig_clean_items(dc_items, errcodes, items_num);
 
 		zbx_free(dc_items);
+		zbx_free(errcodes);
 	}
 
 	zbx_free(items);
@@ -323,21 +321,24 @@ static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, 
 int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "send_list_of_active_checks_json";
-	char		host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN],
-			tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
+
+#define ZBX_KEY_OTHER		0
+#define ZBX_KEY_LOG		1
+#define ZBX_KEY_EVENTLOG	2
+
+	char		host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
+			ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN];
 	struct zbx_json	json;
 	int		ret = FAIL, *errcodes, i;
 	zbx_uint64_t	hostid, *itemids = NULL;
 	zbx_active_t	*items = NULL;
 	size_t		items_num = 0;
-	char		error[MAX_STRING_LEN];
 	DC_ITEM		*dc_items;
 	unsigned short	port;
 
-	unsigned char	process_regexp;
+	unsigned char	item_key;
 	char		**regexp = NULL;
-	int		regexp_alloc = 0;
-	int		regexp_num = 0, n;
+	int		regexp_alloc = 0, regexp_num = 0, n;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -359,7 +360,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == get_hostid_by_host(host, ip, port, &hostid, error))
 		goto error;
 
-	get_list_of_active_check(hostid, &itemids, &items, &items_num);
+	get_list_of_active_checks(hostid, &itemids, &items, &items_num);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
@@ -367,8 +368,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (0 != items_num)
 	{
-		dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * items_num);
-		errcodes = (int *)(dc_items + items_num);
+		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * items_num);
+		errcodes = zbx_malloc(NULL, sizeof(int) * items_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, items_num);
 
@@ -399,19 +400,19 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			zbx_json_close(&json);
 
 			if (0 == strncmp(dc_items[i].key, "log[", 4) || 0 == strncmp(dc_items[i].key, "logrt[", 6))
-				process_regexp = 1;
+				item_key = ZBX_KEY_LOG;
 			else if (0 == strncmp(dc_items[i].key, "eventlog[", 9))
-				process_regexp = 2;
+				item_key = ZBX_KEY_EVENTLOG;
 			else
-				process_regexp = 0;
+				item_key = ZBX_KEY_OTHER;
 
-			if (0 != process_regexp && 2 == parse_command(dc_items[i].key, NULL, 0, params, sizeof(params)))
+			if (ZBX_KEY_OTHER != item_key && ZBX_COMMAND_WITH_PARAMS == parse_command(dc_items[i].key, NULL, 0, params, sizeof(params)))
 			{
 				/* "params" paramater */
 				if (0 == get_param(params, 2, tmp, sizeof(tmp)) && '@' == *tmp)
 					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, tmp + 1);
 
-				if (2 == process_regexp)
+				if (ZBX_KEY_EVENTLOG == item_key)
 				{
 					/* "severity" parameter */
 					if (0 == get_param(params, 3, tmp, sizeof(tmp)) && '@' == *tmp)
@@ -429,6 +430,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		DCconfig_clean_items(dc_items, errcodes, items_num);
 
 		zbx_free(dc_items);
+		zbx_free(errcodes);
 	}
 
 	zbx_free(items);

@@ -911,6 +911,9 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len);
 
+#define ZBX_COMMAND_ERROR		0
+#define ZBX_COMMAND_WITHOUT_PARAMS	1
+#define ZBX_COMMAND_WITH_PARAMS		2
 int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 
 typedef struct

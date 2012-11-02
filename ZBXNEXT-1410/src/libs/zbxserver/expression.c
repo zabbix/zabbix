@@ -559,12 +559,13 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 	switch (parse_command(key, NULL, 0, params, sizeof(params)))
 	{
-		case 0:
+		case ZBX_COMMAND_ERROR:
 			return;
-		case 1:
+		case ZBX_COMMAND_WITHOUT_PARAMS:
 			*params = '\0';
-		case 2:
-			/* do nothing */;
+		case ZBX_COMMAND_WITH_PARAMS:
+			/* do nothing */
+			;
 	}
 
 	p = *data;

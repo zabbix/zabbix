@@ -69,12 +69,12 @@ int	add_user_parameter(const char *key, char *command)
 	char		usr_cmd[MAX_STRING_LEN], usr_param[MAX_STRING_LEN];
 	unsigned	flag = 0;
 
-	if (0 == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	if (ZBX_COMMAND_ERROR == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": parsing error", key);
 		return FAIL;
 	}
-	else if (2 == i)				/* with specified parameters */
+	else if (ZBX_COMMAND_WITH_PARAMS == i)
 	{
 		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
 		{
@@ -177,9 +177,9 @@ void	free_result(AGENT_RESULT *result)
 }
 
 /*
- * return value: 0 - error;
- *               1 - command without parameters;
- *               2 - command with parameters
+ * return value: ZBX_COMMAND_ERROR - error
+ *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters
+ *               ZBX_COMMAND_WITH_PARAMS - command with parameters
  */
 int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
 {
@@ -364,7 +364,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	alias_expand(in_command, usr_command, sizeof(usr_command));
 
-	if (0 == (rc = parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	if (ZBX_COMMAND_ERROR == (rc = parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
 		goto notsupported;
 
 	for (command = commands; NULL != command->key; command++)
@@ -380,7 +380,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
 				strscpy(usr_param, command->test_param);
 		}
-		else if (2 == rc)
+		else if (ZBX_COMMAND_WITH_PARAMS == rc)
 			goto notsupported;
 
 		*param = '\0';
