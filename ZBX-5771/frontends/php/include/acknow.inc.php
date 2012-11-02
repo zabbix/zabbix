@@ -25,6 +25,7 @@ function get_last_event_by_triggerid($triggerid) {
 		' FROM events e'.
 		' WHERE e.objectid='.$triggerid.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
+			' AND e.value<>2'.
 		' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC',
 		1
 	));
