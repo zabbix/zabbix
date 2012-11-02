@@ -472,18 +472,19 @@ class CItemPrototype extends CItemGeneral {
 				$count = array();
 				foreach ($graphs as $graphid => $graph) {
 					unset($graphs[$graphid]['items']);
-					$itemsArray = reset($graph['items']);
-					if (!is_null($options['limitSelects'])) {
-						if (!isset($count[$itemsArray['itemid']])) {
-							$count[$itemsArray['itemid']] = 0;
-						}
-						$count[$itemsArray['itemid']]++;
+					foreach ($graph['items'] as $item) {
+						if (!is_null($options['limitSelects'])) {
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
+							$count[$item['itemid']]++;
 
-						if ($count[$itemsArray['itemid']] > $options['limitSelects']) {
-							continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
+						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
 					}
-					$result[$itemsArray['itemid']]['graphs'][] = &$graphs[$graphid];
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
