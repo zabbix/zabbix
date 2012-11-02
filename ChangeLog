@@ -55,6 +55,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 
 Bug fixes:
 A......... [ZBX-5744] fixed redundant output hosts in Scripts API (Eduard)
+..F....... [ZBX-5762] fixed undefined indexes in graph prototype form (Oleg)
 ....I..... [ZBX-5125] fixed possible SQL errors while upgrading DB (dimir, Sasha)
 ....I..... [ZBX-5415] fixed check for PostgreSQL dev libraries (Sasha)
 A......... [ZBX-5740] removed "discoveryids" parameter from CItem, CTrigger and CGraph get() methods (Toms)
