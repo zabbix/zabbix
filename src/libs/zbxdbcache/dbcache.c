@@ -789,7 +789,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * history_num);
-	timespecs = zbx_malloc(itemids, sizeof(zbx_timespec_t) * history_num);
+	timespecs = zbx_malloc(timespecs, sizeof(zbx_timespec_t) * history_num);
 
 	for (i = 0; i < history_num; i++)
 	{

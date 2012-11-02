@@ -253,8 +253,8 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 		DCconfig_clean_items(dc_items, errcodes, items_num);
 
-		zbx_free(dc_items);
 		zbx_free(errcodes);
+		zbx_free(dc_items);
 	}
 
 	zbx_free(items);
@@ -429,8 +429,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 		DCconfig_clean_items(dc_items, errcodes, items_num);
 
-		zbx_free(dc_items);
 		zbx_free(errcodes);
+		zbx_free(dc_items);
 	}
 
 	zbx_free(items);
