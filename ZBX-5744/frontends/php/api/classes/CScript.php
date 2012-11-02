@@ -210,6 +210,41 @@ class CScript extends CZBXAPI {
 			return $result;
 		}
 
+		if (!is_null($options['hostids'])) {
+			zbx_value2array($options['hostids']);
+			$options['hostids'] = array_unique($options['hostids']);
+
+			// only fetch scripts from the same nodes as the hosts
+			$hostNodeIds = array();
+			foreach ($options['hostids'] as $hostId) {
+				$hostNodeIds[] = id2nodeid($hostId);
+			}
+			$hostNodeIds = array_unique($hostNodeIds);
+
+			// fill scripts with hosts via groups
+			foreach ($result as $scriptid => $script) {
+				if (!empty($script['groupid'])) {
+					$isHostsFound = false;
+
+					$dbHosts = DBselect(
+						'SELECT hg.hostid'.
+						' FROM hosts_groups hg'.
+						' WHERE hg.groupid='.$script['groupid'].
+							' AND '.DBcondition('hg.hostid', $options['hostids']).
+							' AND '.DBin_node('hg.hostid', $hostNodeIds)
+					);
+					while ($dbHost = DBfetch($dbHosts)) {
+						$isHostsFound = true;
+					}
+
+					// remove script from result if we have host without scripts
+					if (!$isHostsFound) {
+						unset($result[$scriptid]);
+					}
+				}
+			}
+		}
+
 		// add related objects
 		$result = $this->addRelatedObjects($options, $result);
 
@@ -536,6 +571,8 @@ class CScript extends CZBXAPI {
 				$hostId = $host['hostid'];
 				if (isset($scriptsByHost[$hostId])) {
 					$scriptsByHost[$hostId][] = $script;
+
+					unset($scriptsByHost[$hostId][count($scriptsByHost[$hostId]) - 1]['hosts']);
 				}
 			}
 		}
@@ -571,74 +608,22 @@ class CScript extends CZBXAPI {
 		}
 
 		// adding hosts
-		if (!is_null($options['hostids'])) {
-			zbx_value2array($options['hostids']);
-			$options['hostids'] = array_unique($options['hostids']);
-			$groupIds = array_unique(zbx_objectValues($result, 'groupid'));
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+			$processedGroups = array();
 
-			// if group is empty fill script with all used hosts
-			$allHosts = array();
-			foreach ($options['hostids'] as $hostId) {
-				$allHosts[] = array('hostid' => $hostId);
-			}
-
-			// only fetch scripts from the same nodes as the hosts
-			$hostNodeIds = array();
-			foreach ($options['hostids'] as $hostId) {
-				$hostNodeIds[] = id2nodeid($hostId);
-			}
-			$hostNodeIds = array_unique($hostNodeIds);
-
-			// fill scripts with hosts via groups
 			foreach ($result as $scriptid => $script) {
-				if (!empty($script['groupid'])) {
-					$isHostsFound = false;
-
-					$dbHosts = DBselect(
-						'SELECT hg.hostid'.
-						' FROM hosts_groups hg'.
-						' WHERE hg.groupid='.$script['groupid'].
-							' AND '.DBcondition('hg.hostid', $options['hostids']).
-							' AND '.DBin_node('hg.hostid', $hostNodeIds)
-					);
-					while ($dbHost = DBfetch($dbHosts)) {
-						$isHostsFound = true;
-
-						// add hosts to result
-						if (!is_null($options['selectHosts'])) {
-							$result[$scriptid]['hosts'][] = array('hostid' => $dbHost['hostid']);
-						}
-					}
-
-					// remove script from result if we have host without scripts
-					if (!$isHostsFound) {
-						unset($result[$scriptid]);
-					}
+				if (isset($processedGroups[$script['groupid']])) {
+					$result[$scriptid]['hosts'] = $result[$processedGroups[$script['groupid']]]['hosts'];
 				}
 				else {
-					// add hosts to result
-					if (!is_null($options['selectHosts'])) {
-						$result[$scriptid]['hosts'] = $allHosts;
-					}
-				}
-			}
-		}
-
-		if (!is_null($options['selectHosts'])) {
-			if ($options['selectHosts'] == API_OUTPUT_EXTEND || ($options['selectHosts'] == API_OUTPUT_REFER && is_null($options['hostids']))) {
-				foreach ($result as $scriptid => $script) {
-					$hostIds = array();
-					foreach ($script['hosts'] as $host) {
-						$hostIds[] = $host['hostid'];
-					}
-
 					$result[$scriptid]['hosts'] = API::Host()->get(array(
 						'output' => $options['selectHosts'],
-						'hostids' => !empty($hostIds) ? $hostIds : null,
 						'groupids' => ($script['groupid']) ? $script['groupid'] : null,
 						'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
 						'nodeids' => id2nodeid($script['scriptid'])
 					));
+
+					$processedGroups[$script['groupid']] = $scriptid;
 				}
 			}
 		}
