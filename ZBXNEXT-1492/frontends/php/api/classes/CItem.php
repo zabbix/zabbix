@@ -1292,7 +1292,7 @@ class CItem extends CItemGeneral {
 			));
 			foreach ($itemDiscoveries as $itemDiscovery) {
 				$refId = $itemDiscovery['itemid'];
-				$itemDiscovery = $this->unsetExtraFields('item_discovery', $itemDiscovery, $options['selectItemDiscovery']);
+				$itemDiscovery = $this->unsetExtraFields($itemDiscovery, $options['selectItemDiscovery']);
 
 				$result[$refId]['itemDiscovery'] = $itemDiscovery;
 			}

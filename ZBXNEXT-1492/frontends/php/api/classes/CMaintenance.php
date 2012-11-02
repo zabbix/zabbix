@@ -886,7 +886,7 @@ class CMaintenance extends CZBXAPI {
 			);
 			while ($tp = DBfetch($query)) {
 				$refId = $tp['maintenanceid'];
-				$tp = $this->unsetExtraFields('timeperiods', $tp, $options['selectTimeperiods']);
+				$tp = $this->unsetExtraFields($tp, $options['selectTimeperiods']);
 				$result[$refId]['timeperiods'][] = $tp;
 			}
 		}
