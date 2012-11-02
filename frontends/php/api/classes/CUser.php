@@ -1159,7 +1159,7 @@ class CUser extends CZBXAPI {
 			foreach ($usrgrps as $usrgrp) {
 				$uusers = $usrgrp['users'];
 				unset($usrgrp['users']);
-				$usrgrps = $this->unsetExtraFields('usrgrp', $usrgrps, $options['selectUsrgrps']);
+				$usrgrps = $this->unsetExtraFields($usrgrps, $options['selectUsrgrps']);
 
 				foreach ($uusers as $user) {
 					$result[$user['userid']]['usrgrps'][] = $usrgrp;
@@ -1179,7 +1179,7 @@ class CUser extends CZBXAPI {
 				'userids' => $userids,
 				'preservekeys' => true
 			));
-			$userMedias = $this->unsetExtraFields('media', $userMedias, $options['selectMedias']);
+			$userMedias = $this->unsetExtraFields($userMedias, $options['selectMedias']);
 
 			foreach ($userMedias as $mediaid => $media) {
 				$result[$media['userid']]['medias'][] = $media;
@@ -1202,7 +1202,7 @@ class CUser extends CZBXAPI {
 			foreach ($mediatypes as $mediatype) {
 				$users = $mediatype['users'];
 				unset($mediatype['users']);
-				$mediatype = $this->unsetExtraFields('media_type', $mediatype, $options['selectMediatypes']);
+				$mediatype = $this->unsetExtraFields($mediatype, $options['selectMediatypes']);
 
 				foreach ($users as $user) {
 					if (!empty($result[$user['userid']])) {
