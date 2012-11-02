@@ -567,12 +567,13 @@ class CScript extends CZBXAPI {
 			'preservekeys' => true
 		));
 		foreach ($scripts as $script) {
-			foreach ($script['hosts'] as $host) {
+			$hosts = $script['hosts'];
+			unset($script['hosts']);
+
+			foreach ($hosts as $host) {
 				$hostId = $host['hostid'];
 				if (isset($scriptsByHost[$hostId])) {
 					$scriptsByHost[$hostId][] = $script;
-
-					unset($scriptsByHost[$hostId][count($scriptsByHost[$hostId]) - 1]['hosts']);
 				}
 			}
 		}
