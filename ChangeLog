@@ -54,6 +54,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5744] fixed redundant output hosts in Scripts API (Eduard)
 ....I..... [ZBX-5125] fixed possible SQL errors while upgrading DB (dimir, Sasha)
 ....I..... [ZBX-5415] fixed check for PostgreSQL dev libraries (Sasha)
 A......... [ZBX-5740] removed "discoveryids" parameter from CItem, CTrigger and CGraph get() methods (Toms)
