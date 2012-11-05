@@ -3274,47 +3274,48 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_item_by_key                                         *
+ * Function: DCconfig_get_items_by_keys                                       *
  *                                                                            *
  * Purpose: Locate item in configuration cache                                *
  *                                                                            *
- * Parameters: item - [OUT] pointer to DC_ITEM structure                      *
+ * Parameters: item         - [OUT] pointer to DC_ITEM structure              *
  *             proxy_hostid - [IN] proxy host ID                              *
- *             host - [IN] host.host                                          *
- *             key - [IN] item key                                            *
+ *             keys         - [IN] list of item keys                          *
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key)
+void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_uint64_t proxy_hostid,
+		zbx_host_key_t *keys, int *errcodes, size_t num)
 {
-	int			res = FAIL;
+	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_host = DCfind_host(proxy_hostid, host)))
-		goto unlock;
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_host = DCfind_host(proxy_hostid, keys[i].host)) ||
+				NULL == (dc_item = DCfind_item(dc_host->hostid, keys[i].key)))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
 
-	if (NULL == (dc_item = DCfind_item(dc_host->hostid, key)))
-		goto unlock;
+		DCget_host(&items[i].host, dc_host);
+		DCget_item(&items[i], dc_item);
+		errcodes[i] = SUCCEED;
+	}
 
-	DCget_host(&item->host, dc_host);
-	DCget_item(item, dc_item);
-
-	res = SUCCEED;
-unlock:
 	UNLOCK_CACHE;
-
-	return res;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_item_by_itemid                                      *
+ * Function: DCconfig_get_items_by_itemids                                    *
  *                                                                            *
  * Purpose: Get item with specified ID                                        *
  *                                                                            *

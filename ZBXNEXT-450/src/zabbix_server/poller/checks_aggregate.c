@@ -348,7 +348,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	if (2 != parse_command(item->key, tmp, sizeof(tmp), params, sizeof(params)))
+	if (ZBX_COMMAND_WITH_PARAMS != parse_command(item->key, tmp, sizeof(tmp), params, sizeof(params)))
 		return NOTSUPPORTED;
 
 	if (0 == strcmp(tmp, "grpmin"))
