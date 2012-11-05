@@ -89,7 +89,7 @@ if (isset($_REQUEST['usrgrpid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
+if (isset($_REQUEST['go']) && !isset($_REQUEST['usrgrpid'])) {
 	if (!isset($_REQUEST['group_groupid']) || !is_array($_REQUEST['group_groupid'])) {
 		access_deny();
 	}
