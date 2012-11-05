@@ -81,6 +81,7 @@ if (!empty($_REQUEST['steps'])) {
  * Permissions
  */
 /*
+// TODO:
 if (isset($_REQUEST['httptestid'])) {
 	$dbHttpTest = DBfetch(DBselect(
 		'SELECT wt.*,a.name AS application'.
