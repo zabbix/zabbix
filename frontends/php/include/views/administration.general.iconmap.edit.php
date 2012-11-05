@@ -111,8 +111,8 @@ $iconMapTable->addRow($hiddenRowTemplate);
 
 // add row button
 $addCol = new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'));
-$addCol->setColSpan(6);
-$iconMapTable->addRow(array(SPACE, $addCol));
+$addCol->setColSpan(7);
+$iconMapTable->addRow($addCol);
 
 // <default icon row>
 $numSpan = new CSpan($i++.':');

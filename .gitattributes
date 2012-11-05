@@ -7,7 +7,6 @@ bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
 create/src/data.tmpl -text
-frontends/php/api/classes/CTemplateScreenItem.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -97,6 +96,10 @@ frontends/php/images/general/sort_up.png -text
 frontends/php/images/general/sort_up_blue.png -text
 frontends/php/images/general/sort_up_od.png -text
 frontends/php/images/general/tick.png -text
+frontends/php/images/general/tr_space.gif -text
+frontends/php/images/general/tr_top_bottom.gif -text
+frontends/php/images/general/tr_top_right.gif -text
+frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/transparent.png -text
 frontends/php/images/general/tree/minus.gif -text
 frontends/php/images/general/tree/plus.gif -text
@@ -163,42 +166,19 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/screens/CScreenActions.php -text
-frontends/php/include/classes/screens/CScreenBase.php -text
-frontends/php/include/classes/screens/CScreenBuilder.php -text
-frontends/php/include/classes/screens/CScreenChart.php -text
-frontends/php/include/classes/screens/CScreenClock.php -text
-frontends/php/include/classes/screens/CScreenDataOverview.php -text
-frontends/php/include/classes/screens/CScreenEvents.php -text
-frontends/php/include/classes/screens/CScreenGraph.php -text
-frontends/php/include/classes/screens/CScreenHistory.php -text
-frontends/php/include/classes/screens/CScreenHostTriggers.php -text
-frontends/php/include/classes/screens/CScreenHostgroupTriggers.php -text
-frontends/php/include/classes/screens/CScreenHostsInfo.php -text
-frontends/php/include/classes/screens/CScreenMap.php -text
-frontends/php/include/classes/screens/CScreenPlainText.php -text
-frontends/php/include/classes/screens/CScreenScreen.php -text
-frontends/php/include/classes/screens/CScreenServerInfo.php -text
-frontends/php/include/classes/screens/CScreenSimpleGraph.php -text
-frontends/php/include/classes/screens/CScreenSystemStatus.php -text
-frontends/php/include/classes/screens/CScreenTriggersInfo.php -text
-frontends/php/include/classes/screens/CScreenTriggersOverview.php -text
-frontends/php/include/classes/screens/CScreenUrl.php -text
-frontends/php/include/views/js/monitoring.history.js.php -text
-frontends/php/include/views/monitoring.charts.php -text
-frontends/php/include/views/monitoring.history.php -text
-frontends/php/include/views/monitoring.hostscreen.php -text
-frontends/php/include/views/monitoring.maps.php -text
-frontends/php/include/views/monitoring.overview.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
+frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/el/LC_MESSAGES/frontend.po -text
 frontends/php/locale/en_US/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text
+frontends/php/locale/fa/LC_MESSAGES/frontend.po -text
+frontends/php/locale/fi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/fr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
+frontends/php/locale/id/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ja/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
@@ -206,6 +186,7 @@ frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
+frontends/php/locale/pt_PT/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
@@ -272,6 +253,7 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+include/zbxdbupgrade.h -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -549,6 +531,8 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxdbupgrade/Makefile.am -text
+src/libs/zbxdbupgrade/dbupgrade.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
@@ -576,7 +560,4 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/p
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
-upgrades/dbpatches/2.2/ibm_db2/patch/profiles.sql -text
-upgrades/dbpatches/2.2/mysql/patch/profiles.sql -text
-upgrades/dbpatches/2.2/oracle/patch/profiles.sql -text
-upgrades/dbpatches/2.2/postgresql/patch/profiles.sql -text
+upgrades/dbpatches/2.2/README -text

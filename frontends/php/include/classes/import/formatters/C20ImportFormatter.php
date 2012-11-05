@@ -258,6 +258,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($this->data['screens'])) {
 			foreach ($this->data['screens'] as $screen) {
 				$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+				CArrayHelper::convertFieldToArray($screen, 'screenitems');
 				$screensData[] = $screen;
 			}
 		}
@@ -273,6 +274,7 @@ class C20ImportFormatter extends CImportFormatter {
 				if (!empty($template['screens'])) {
 					foreach ($template['screens'] as $screen) {
 						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+						CArrayHelper::convertFieldToArray($screen, 'screenitems');
 						$screensData[$template['template']][$screen['name']] = $screen;
 					}
 				}

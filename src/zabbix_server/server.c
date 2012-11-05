@@ -23,6 +23,7 @@
 #include "pid.h"
 #include "db.h"
 #include "dbcache.h"
+#include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
@@ -289,6 +290,8 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			1000},
 		{"StartIPMIPollers",		&CONFIG_IPMIPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"StartTimers",			&CONFIG_TIMER_FORKS,			TYPE_INT,
+			PARM_OPT,	1,			1000},
 		{"StartTrappers",		&CONFIG_TRAPPER_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartJavaPollers",		&CONFIG_JAVAPOLLER_FORKS,		TYPE_INT,
@@ -563,6 +566,9 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_INFORMATION, "NodeID:                    %3d", CONFIG_NODEID);
 		zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 	}
+
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
 
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);

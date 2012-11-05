@@ -414,13 +414,12 @@ class CDiscoveryRule extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => true,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
@@ -440,7 +439,7 @@ class CDiscoveryRule extends CItemGeneral {
 			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -454,13 +453,12 @@ class CDiscoveryRule extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => true,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				foreach ($graphs as $graphid => $graph) {
 					unset($graphs[$graphid]['discoveries']);
@@ -484,7 +482,7 @@ class CDiscoveryRule extends CItemGeneral {
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -625,28 +623,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 		DB::delete('items', array('itemid' => $ruleids));
-
-		// housekeeper
-		$itemDataTables = array(
-			'trends',
-			'trends_uint',
-			'history_text',
-			'history_log',
-			'history_uint',
-			'history_str',
-			'history'
-		);
-		$insert = array();
-		foreach ($ruleids as $ruleid) {
-			foreach ($itemDataTables as $table) {
-				$insert[] = array(
-					'tablename' => $table,
-					'field' => 'itemid',
-					'value' => $ruleid
-				);
-			}
-		}
-		DB::insert('housekeeper', $insert);
 
 		// TODO: remove info from API
 		foreach ($delRules as $item) {
@@ -837,7 +813,8 @@ class CDiscoveryRule extends CItemGeneral {
 		// save new triggers
 		$dstTriggers = $srcTriggers;
 		foreach ($dstTriggers as $id => $trigger) {
-			unset($trigger['triggerid']);
+			unset($dstTriggers[$id]['templateid']);
+			unset($dstTriggers[$id]['triggerid']);
 
 			// update expression
 			$dstTriggers[$id]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
@@ -1028,6 +1005,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
+		unset($dstDiscovery['templateid']);
 
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1057,6 +1035,11 @@ class CDiscoveryRule extends CItemGeneral {
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			));
+
+			foreach ($newPrototypes as $i => $newPrototype) {
+				unset($newPrototypes[$i]['templateid']);
+			}
+
 			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
@@ -1093,6 +1076,8 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
+
+				unset($prototype['templateid']);
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1201,6 +1186,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$dstGraphs = $srcGraphs;
 		foreach ($dstGraphs as &$graph) {
 			unset($graph['graphid']);
+			unset($graph['templateid']);
 
 			foreach ($graph['gitems'] as &$gitem) {
 				// replace the old item with the new one with the same key

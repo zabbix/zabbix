@@ -92,17 +92,9 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 {
 	const char	*__function_name = "trigger_get_N_functionid";
 
-	typedef enum
-	{
-		ZBX_EXP_NONE,
-		ZBX_EXP_FUNCTIONID
-	}
-	zbx_parser_state_t;
-
-	zbx_parser_state_t	state = ZBX_EXP_NONE;
-	int			num = 0, ret = FAIL;
-	char			*p_functionid = NULL;
-	register char		*c;
+	enum state_t {NORMAL, ID}	state = NORMAL;
+	int				num = 0, ret = FAIL;
+	const char			*c, *p_functionid = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
 			__function_name, trigger->expression, N_functionid);
@@ -114,14 +106,12 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 	{
 		if ('{' == *c)
 		{
-			state = ZBX_EXP_FUNCTIONID;
+			state = ID;
 			p_functionid = c + 1;
 		}
-		else if ('}' == *c && ZBX_EXP_FUNCTIONID == state && p_functionid)
+		else if ('}' == *c && ID == state && NULL != p_functionid)
 		{
-			*c = '\0';
-
-			if (SUCCEED == is_uint64(p_functionid, functionid))
+			if (SUCCEED == is_uint64_n(p_functionid, c - p_functionid, functionid))
 			{
 				if (++num == N_functionid)
 				{
@@ -131,8 +121,7 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 				}
 			}
 
-			*c = '}';
-			state = ZBX_EXP_NONE;
+			state = NORMAL;
 		}
 	}
 fail:
@@ -896,11 +885,11 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 					dc_item.interface.type = INTERFACE_TYPE_UNKNOWN;
 
 				key = zbx_strdup(key, row[6]);
-				substitute_key_macros(&key, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+				substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
-					*replace_to = zbx_strdup(*replace_to, row[0]);
+					*replace_to = zbx_strdup(*replace_to, row[5]);
 					item_description(replace_to, key, dc_item.host.hostid);
 					zbx_free(key);
 				}
@@ -1373,8 +1362,6 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 					zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
 					ZBX_STRDUP(*value, tmp);
 					break;
-				default:
-					;
 			}
 		}
 	}
@@ -1742,7 +1729,8 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_ITEM_LOG_SEVERITY		"{ITEM.LOG.SEVERITY}"
 #define MVAR_ITEM_LOG_NSEVERITY		"{ITEM.LOG.NSEVERITY}"
 #define MVAR_ITEM_LOG_EVENTID		"{ITEM.LOG.EVENTID}"
-#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
+#define MVAR_TRIGGER_DESCRIPTION	"{TRIGGER.DESCRIPTION}"
+#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"		/* deprecated */
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
 #define MVAR_TRIGGER_EXPRESSION		"{TRIGGER.EXPRESSION}"
@@ -2212,32 +2200,19 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 			{
 				if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
-					if (0 != event->trigger.triggerid)
-					{
-						replace_to = zbx_strdup(replace_to, event->trigger.description);
-						substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
-								&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION,
-								error, maxerrlen);
-					}
-					else
-						ret = FAIL;
+					replace_to = zbx_strdup(replace_to, event->trigger.description);
+					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
-					if (0 != event->trigger.triggerid)
-					{
-						replace_to = zbx_strdup(replace_to, event->trigger.expression);
-						DCexpand_trigger_expression(&replace_to);
-					}
-					else
-						ret = FAIL;
+					replace_to = zbx_strdup(replace_to, event->trigger.expression);
+					DCexpand_trigger_expression(&replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
+				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
+						0 == strcmp(m, MVAR_TRIGGER_COMMENT))	/* deprecated */
 				{
-					if (0 != event->trigger.triggerid)
-						replace_to = zbx_strdup(replace_to, event->trigger.comments);
-					else
-						ret = FAIL;
+					replace_to = zbx_strdup(replace_to, event->trigger.comments);
 				}
 				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
 						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))	/* deprecated */
@@ -2320,14 +2295,9 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
-					if (0 != event->trigger.triggerid)
-					{
-						replace_to = zbx_strdup(replace_to, event->trigger.url);
-						substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
-								&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
-					}
-					else
-						ret = FAIL;
+					replace_to = zbx_strdup(replace_to, event->trigger.url);
+					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 0, 1);
@@ -2354,12 +2324,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 					ret = DCget_trigger_severity_name(event->trigger.priority, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
-				{
-					if (0 != event->trigger.triggerid)
-						replace_to = zbx_dsprintf(replace_to, "%d", (int)event->trigger.priority);
-					else
-						ret = FAIL;
-				}
+					replace_to = zbx_dsprintf(replace_to, "%d", (int)event->trigger.priority);
 				else if (0 == strcmp(m, MVAR_NODE_ID))
 					ret = DBget_node_value(&event->trigger, &replace_to, N_functionid, "nodeid");
 				else if (0 == strcmp(m, MVAR_NODE_NAME))
@@ -2538,7 +2503,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 			}
 		}
-		else if (macro_type & MACRO_TYPE_ITEM_KEY)
+		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
@@ -2616,7 +2581,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_CONN, 1);
 		}
-		else if (macro_type & (MACRO_TYPE_INTERFACE_PORT | MACRO_TYPE_LLD_LIFETIME))
+		else if (macro_type & (MACRO_TYPE_INTERFACE_PORT | MACRO_TYPE_LLD_LIFETIME | MACRO_TYPE_ITEM_FIELD |
+				MACRO_TYPE_FUNCTION_PARAMETER | MACRO_TYPE_SNMP_OID))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
@@ -2624,16 +2590,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					DCget_user_macro(hostid, 1, m, &replace_to);
 				else
 					DCget_user_macro(NULL, 0, m, &replace_to);
-			}
-		}
-		else if (macro_type & (MACRO_TYPE_ITEM_FIELD | MACRO_TYPE_SNMP_OID))
-		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-			{
-				if (NULL == dc_host)
-					DCget_user_macro(NULL, 0, m, &replace_to);
-				else
-					DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_ITEM_EXPRESSION)
@@ -2644,11 +2600,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
 					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
-		}
-		else if (macro_type & MACRO_TYPE_FUNCTION_PARAMETER)
-		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-				DCget_user_macro(hostid, 1, m, &replace_to);
 		}
 		else if (macro_type & MACRO_TYPE_SCRIPT)
 		{
@@ -3315,8 +3266,8 @@ static void	quote_key_param(char **param, int forced)
  *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *jp_row, int macro_type,
-		char *error, size_t maxerrlen)
+int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	const char	*__function_name = "substitute_key_macros";
 
@@ -3360,7 +3311,10 @@ int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *
 			(*data)[i] = c;
 
 			if (NULL == jp_row)
-				substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL, &param, macro_type, NULL, 0);
+			{
+				substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
+						&param, macro_type, NULL, 0);
+			}
 			else
 				substitute_discovery_macros(&param, jp_row);
 
@@ -3443,7 +3397,7 @@ int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
+							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
 									&param, macro_type, NULL, 0);
 						}
 						else
@@ -3475,7 +3429,7 @@ int	substitute_key_macros(char **data, DC_ITEM *dc_item, struct zbx_json_parse *
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
+							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
 									&param, macro_type, NULL, 0);
 						}
 						else

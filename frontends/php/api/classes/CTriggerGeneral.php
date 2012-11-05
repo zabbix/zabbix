@@ -68,27 +68,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			'nopermissions' => true
 		));
 
-		// fetch the existing child triggers
-		$templatedTriggers = $this->get(array(
-			'output' => array('triggerid', 'description'),
-			'filter' => array(
-				'templateid' => $trigger['triggerid']
-			),
-			'selectHosts' => array('name'),
-			'preservekeys' => true
-		));
-
-		// no templates found, which means, that the trigger is no longer a templated trigger
 		if (empty($triggerTemplates)) {
-			// delete all of the former child triggers that may exist
-			if ($templatedTriggers) {
-				foreach ($templatedTriggers as $trigger) {
-					info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
-						implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
-				}
-				$this->deleteByPks(zbx_objectValues($templatedTriggers, 'triggerid'));
-			}
-
 			// nothing to inherit, just exit
 			return true;
 		}
@@ -131,17 +111,6 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			// propagate the trigger inheritance to all child hosts
 			$this->inherit($newTrigger);
 
-			unset($templatedTriggers[$newTrigger['triggerid']]);
-		}
-
-		// if we've updated the children of the trigger on all of the host, and there are still some children left,
-		// we must delete them
-		if ($templatedTriggers && !$hostids) {
-			foreach ($templatedTriggers as $trigger) {
-				info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
-					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
-			}
-			$this->deleteByPks(zbx_objectValues($templatedTriggers, 'triggerid'));
 		}
 
 		return true;
@@ -227,6 +196,18 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$this->updateReal($newTrigger);
 		}
 		else {
+			$oldTrigger = $this->get(array(
+				'triggerids' => $trigger['triggerid'],
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+			$oldTrigger = reset($oldTrigger);
+			unset($oldTrigger['triggerid']);
+			foreach ($oldTrigger as $key => $value) {
+				if (!isset($newTrigger[$key])) {
+					$newTrigger[$key] = $oldTrigger[$key];
+				}
+			}
 			$this->createReal($newTrigger);
 			$newTrigger = reset($newTrigger);
 		}

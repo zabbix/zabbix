@@ -384,12 +384,14 @@ elseif (isset($_REQUEST['form'])) {
 						'selectTemplates' => API_OUTPUT_EXTEND,
 						'selectDiscoveryRule' => array('itemid')
 					));
-					$parentGraphPrototype = reset($parentGraphPrototype);
-					$parentTemplate = reset($parentGraphPrototype['templates']);
+					if ($parentGraphPrototype) {
+						$parentGraphPrototype = reset($parentGraphPrototype);
+						$parentTemplate = reset($parentGraphPrototype['templates']);
 
-					$link = new CLink($parentTemplate['name'],
-						'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['hostid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
-					);
+						$link = new CLink($parentTemplate['name'],
+							'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['templateid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
+						);
+					}
 				}
 				// parent graph link
 				else {
@@ -400,9 +402,10 @@ elseif (isset($_REQUEST['form'])) {
 						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
 					);
 				}
-				$data['templates'][] = $link;
-				$data['templates'][] = SPACE.RARR.SPACE;
-
+				if (isset($link)) {
+					$data['templates'][] = $link;
+					$data['templates'][] = SPACE.RARR.SPACE;
+				}
 				$parentGraphid = $parentGraph['templateid'];
 			} while ($parentGraphid != 0);
 			$data['templates'] = array_reverse($data['templates']);

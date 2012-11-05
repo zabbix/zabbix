@@ -273,10 +273,11 @@ function update_config($configs) {
 		'ok_unack_color',
 		'ok_ack_color'
 	);
+	$colorvalidator = new CColorValidator();
 	foreach ($colors as $color) {
 		if (isset($configs[$color]) && !is_null($configs[$color])) {
-			if (!preg_match('/[0-9a-f]{6}/i', $configs[$color])) {
-				error(_('Colour is not correct: expecting hexadecimal colour code (6 symbols).'));
+			if (!$colorvalidator->validate($configs[$color])) {
+				error($colorvalidator->getError());
 				return false;
 			}
 		}
@@ -431,66 +432,4 @@ function add_user_history($page) {
 		}
 	}
 	return DBexecute($sql);
-}
-
-/********** USER FAVORITES ***********/
-function get_favorites($idx) {
-	$result = array();
-
-	$db_profiles = DBselect(
-		'SELECT p.value_id,p.source'.
-		' FROM profiles p'.
-		' WHERE p.userid='.CWebUser::$data['userid'].
-			' AND p.idx='.zbx_dbstr($idx).
-		' ORDER BY p.profileid'
-	);
-	while ($profile = DBfetch($db_profiles)) {
-		$result[] = array('value' => $profile['value_id'], 'source' => $profile['source']);
-	}
-	return $result;
-}
-
-function add2favorites($favobj, $favid, $source = null) {
-	$favorites = get_favorites($favobj);
-
-	foreach ($favorites as $favorite) {
-		if ($favorite['source'] == $source && $favorite['value'] == $favid) {
-			return true;
-		}
-	}
-
-	DBstart();
-	$values = array(
-		'profileid' => get_dbid('profiles', 'profileid'),
-		'userid' => CWebUser::$data['userid'],
-		'idx' => zbx_dbstr($favobj),
-		'value_id' => $favid,
-		'type' => PROFILE_TYPE_ID
-	);
-	if (!is_null($source)) {
-		$values['source'] = zbx_dbstr($source);
-	}
-	return DBend(DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')'));
-}
-
-function rm4favorites($favobj, $favid = 0, $source = null) {
-	return DBexecute(
-		'DELETE FROM profiles'.
-		' WHERE userid='.CWebUser::$data['userid'].
-			' AND idx='.zbx_dbstr($favobj).
-			($favid > 0 ? ' AND value_id='.$favid : '').
-			(is_null($source) ? '' : ' AND source='.zbx_dbstr($source))
-	);
-}
-
-function infavorites($favobj, $favid, $source = null) {
-	$favorites = get_favorites($favobj);
-	foreach ($favorites as $favorite) {
-		if (bccomp($favid, $favorite['value']) == 0) {
-			if (is_null($source) || ($favorite['source'] == $source)) {
-				return true;
-			}
-		}
-	}
-	return false;
 }

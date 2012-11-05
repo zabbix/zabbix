@@ -45,7 +45,7 @@ check_fields($fields);
 // logout
 if (isset($_REQUEST['reconnect'])) {
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
-	CWebUser::logout(get_cookie('zbx_sessionid'));
+	CWebUser::logout();
 }
 
 $config = select_config();

@@ -23,6 +23,7 @@
 #include "pid.h"
 #include "db.h"
 #include "dbcache.h"
+#include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
@@ -574,6 +575,8 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	DBinit();
+	if (SUCCEED != DBcheck_version())
+		exit(EXIT_FAILURE);
 
 	init_database_cache();
 	init_configuration_cache();
@@ -634,7 +637,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_CONFSYNCER, CONFIG_CONFSYNCER_FORKS);
 
-		main_proxyconfig_loop(proxy_num);
+		main_proxyconfig_loop();
 	}
 	else if (proxy_num <= (proxy_count += CONFIG_HEARTBEAT_FORKS))
 	{

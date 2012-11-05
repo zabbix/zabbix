@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -36,14 +36,10 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		// get time control
 		$timeControlData = array(
-			'id' => $resourceid,
-			'domid' => $this->getDataId(),
+			'id' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
-			'loadSBox' => 0,
 			'loadImage' => 1,
-			'loadScroll' => 0,
-			'dynamic' => 0,
 			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
@@ -56,7 +52,7 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($resourceid)) {
 			$this->action = 'history.php?action=showgraph&itemid='.$resourceid.'&period='.$this->timeline['period'].
-					'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
+					'&stime='.$this->timeline['stimeNow'].$this->getProfileUrlParams();
 		}
 
 		if (!zbx_empty($resourceid) && $this->mode != SCREEN_MODE_EDIT) {
@@ -69,9 +65,11 @@ class CScreenSimpleGraph extends CScreenBase {
 			? 'chart3.php?'
 			: 'chart.php?itemid='.$resourceid.'&'.$this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
 
-		if ($this->mode != SCREEN_MODE_EDIT) {
-			$timeControlData['src'] .= '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile;
-		}
+		$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
+			? '&period=3600&stime='.date('YmdHis', time())
+			: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
+
+		$timeControlData['src'] .= $this->getProfileUrlParams();
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
@@ -90,7 +88,7 @@ class CScreenSimpleGraph extends CScreenBase {
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceid.'&period='.$this->timeline['period'].
-						'&stime='.$this->timeline['stimeNow'].'&updateProfile='.(int) $this->updateProfile);
+						'&stime='.$this->timeline['stimeNow']);
 			}
 			$item->setAttribute('id', $containerid);
 

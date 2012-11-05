@@ -33,6 +33,7 @@
 				$options['nodeids'] = id2nodeid($userid);
 			}
 			$users = API::User()->get($options);
+
 			$user = reset($users);
 			$data['title'] = _('User').' "'.$user['alias'].'"';
 		}

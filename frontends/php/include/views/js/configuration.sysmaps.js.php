@@ -93,7 +93,8 @@
 				<td><?php echo _('Trigger'); ?></td>
 				<td>
 					<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description',450,450)"><?php echo _('Select'); ?></span>
+					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
+					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression',450,450)"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">
@@ -180,9 +181,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="elementApply" class="element-edit-control" type="button" name="apply" value=<?php echo Chtml::encode(_('Apply')); ?>>
-					<input id="elementRemove" class="element-edit-control" type="button" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?>>
-					<input id="elementClose" type="button" name="close" value=<?php echo Chtml::encode(_('Close')); ?>>
+					<input id="elementApply" class="element-edit-control" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
+					<input id="elementRemove" class="element-edit-control" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
+					<input id="elementClose" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
 				</td>
 			</tr>
 			</tbody>
@@ -269,9 +270,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="massApply" class="element-edit-control" type="button" name="apply" value=<?php echo Chtml::encode(_('Apply')); ?>>
-					<input id="massRemove" class="element-edit-control" type="button" name="remove" value=<?php echo Chtml::encode(_('Remove')); ?>>
-					<input id="massClose" type="button" name="close" value=<?php echo Chtml::encode(_('Close')); ?>>
+					<input id="massApply" class="element-edit-control" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
+					<input id="massRemove" class="element-edit-control" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
+					<input id="massClose" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
 				</td>
 			</tr>
 			</tbody>
@@ -370,9 +371,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="formLinkApply" type="button" value=<?php echo Chtml::encode(_('Apply')); ?>>
-					<input id="formLinkRemove" type="button" value=<?php echo Chtml::encode(_('Remove')); ?>>
-					<input id="formLinkClose" type="button" value=<?php echo Chtml::encode(_('Close')); ?>>
+					<input id="formLinkApply" type="button" value="<?php echo CHtml::encode(_('Apply')); ?>">
+					<input id="formLinkRemove" type="button" value="<?php echo CHtml::encode(_('Remove')); ?>">
+					<input id="formLinkClose" type="button" value="<?php echo CHtml::encode(_('Close')); ?>">
 				</td>
 			</tr>
 			</tbody>

@@ -31,6 +31,8 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
+ob_start();
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -51,6 +53,15 @@ $fields = array(
 );
 check_fields($fields);
 
+$pageFilter = new CPageFilter(array(
+	'groups' => array('monitored_hosts' => true, 'with_graphs' => true),
+	'hosts' => array('monitored_hosts' => true, 'with_graphs' => true),
+	'groupid' => get_request('groupid', null),
+	'hostid' => get_request('hostid', null),
+	'graphs' => array('templated' => 0),
+	'graphid' => get_request('graphid', null)
+));
+
 /*
  * Ajax
  */
@@ -69,14 +80,14 @@ if (isset($_REQUEST['favobj'])) {
 	if (str_in_array($_REQUEST['favobj'], array('itemid', 'graphid'))) {
 		$result = false;
 		if ($_REQUEST['favaction'] == 'add') {
-			$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::add('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n";
 				echo '$("addrm_fav").onclick = function() { rm4favorites("graphid", "'.$_REQUEST['favid'].'", 0); }'."\n";
 			}
 		}
 		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = rm4favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
+			$result = CFavorite::remove('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Add to favourites').'";'."\n";
@@ -89,31 +100,37 @@ if (isset($_REQUEST['favobj'])) {
 		}
 	}
 }
+if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
+	CScreenBase::calculateTime(array(
+		'profileIdx' => 'web.screens',
+		'profileIdx2' => $pageFilter->graphid,
+		'updateProfile' => true,
+		'period' => get_request('period'),
+		'stime' => get_request('stime')
+	));
+
+	$curl = new Curl($_SERVER['REQUEST_URI']);
+	$curl->removeArgument('period');
+	$curl->removeArgument('stime');
+
+	ob_end_clean();
+	redirect($curl->getUrl());
+}
+
+ob_end_flush();
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
-$pageFilter = new CPageFilter(array(
-	'groups' => array('monitored_hosts' => true, 'with_graphs' => true),
-	'hosts' => array('monitored_hosts' => true, 'with_graphs' => true),
-	'groupid' => get_request('groupid', null),
-	'hostid' => get_request('hostid', null),
-	'graphs' => array('templated' => 0),
-	'graphid' => get_request('graphid', null),
-));
-$graphid = $pageFilter->graphid;
-
 /*
  * Display
  */
 $data = array(
 	'pageFilter' => $pageFilter,
-	'graphid' => $graphid,
-	'fullscreen' => get_request('fullscreen'),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
+	'graphid' => $pageFilter->graphid,
+	'fullscreen' => get_request('fullscreen')
 );
 
 // render view

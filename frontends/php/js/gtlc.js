@@ -21,18 +21,22 @@
 // graphs timeline controls (gtlc)
 var timeControl = {
 
-	objectList: {}, // objects needs to be controlled
-	refreshPage: true,
-	refreshInterval: 0,
-	timeTimeout: null,
+	// data
+	objectList: {},
+	timeline: null,
+	scrollbar: null,
 
-	addObject: function(domid, time, objData) {
-		this.objectList[domid] = {
+	// options
+	refreshPage: true,
+	timeRefreshInterval: 0,
+	timeRefreshTimeoutHandler: null,
+
+	addObject: function(id, time, objData) {
+		this.objectList[id] = {
+			id: id,
+			containerid: null,
 			refresh: false,
 			processed: 0,
-			id: domid,
-			containerid: null,
-			domid: domid,
 			time: {},
 			objDims: {},
 			src: location.href,
@@ -40,139 +44,150 @@ var timeControl = {
 			periodFixed: 1,
 			loadSBox: 0,
 			loadImage: 0,
-			loadScroll: 1,
-			scrollWidthByImage: 0,
+			loadScroll: 0,
 			mainObject: 0, // object on changing will reflect on all others
 			sliderMaximumTimePeriod: null // max period in seconds
 		};
 
-		for (var key in this.objectList[domid]) {
+		for (var key in this.objectList[id]) {
 			if (isset(key, objData)) {
-				this.objectList[domid][key] = objData[key];
+				this.objectList[id][key] = objData[key];
 			}
 		}
 
-		var nowDate = new CDate();
-		var now = parseInt(nowDate.getTime() / 1000);
-
-		if (!isset('period', time)) {
-			time.period = 3600;
-		}
-
-		if (!isset('endtime', time)) {
-			time.endtime = now;
-		}
-
-		time.starttime = (!isset('starttime', time) || is_null(time['starttime']))
-			? time.endtime - 3 * ((time.period < 86400) ? 86400 : time.period)
-			: nowDate.setZBXDate(time.starttime) / 1000;
-
-		time.usertime = (!isset('usertime', time))
-			? time.endtime
-			: nowDate.setZBXDate(time.usertime) / 1000;
-
-		this.objectList[domid].timeline = create_timeline(
-			this.objectList[domid].domid,
-			parseInt(time.period),
-			parseInt(time.starttime),
-			parseInt(time.usertime),
-			parseInt(time.endtime),
-			this.objectList[domid].sliderMaximumTimePeriod,
-			time.isNow
-		);
+		this.objectList[id].time = time;
 	},
 
 	processObjects: function() {
-		for (var objid in this.objectList) {
-			if (empty(this.objectList[objid])) {
-				continue;
-			}
+		// create timeline and scrollbar
+		for (var id in this.objectList) {
+			if (!empty(this.objectList[id]) && !this.objectList[id].processed && this.objectList[id].loadScroll) {
+				var obj = this.objectList[id];
 
-			if (this.objectList[objid].processed == 1) {
-				continue;
-			}
-			else {
-				this.objectList[objid].processed = 1;
-			}
+				obj.processed = 1;
 
-			var obj = this.objectList[objid];
+				// timeline
+				var nowDate = new CDate(),
+					now = parseInt(nowDate.getTime() / 1000);
 
-			// width
-			if ((!isset('width', obj.objDims) || obj.objDims.width < 0) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)) {
-				var width = get_bodywidth();
+				if (!isset('period', obj.time)) {
+					obj.time.period = 3600;
+				}
+				if (!isset('endtime', obj.time)) {
+					obj.time.endtime = now;
+				}
+				if (!isset('isNow', obj.time)) {
+					obj.time.isNow = false;
+				}
+
+				obj.time.starttime = (!isset('starttime', obj.time) || is_null(obj.time['starttime']))
+					? obj.time.endtime - 3 * ((obj.time.period < 86400) ? 86400 : obj.time.period)
+					: nowDate.setZBXDate(obj.time.starttime) / 1000;
+
+				obj.time.usertime = (!isset('usertime', obj.time))
+					? obj.time.endtime
+					: nowDate.setZBXDate(obj.time.usertime) / 1000;
+
+				this.timeline = new CTimeLine(
+					parseInt(obj.time.period),
+					parseInt(obj.time.starttime),
+					parseInt(obj.time.usertime),
+					parseInt(obj.time.endtime),
+					obj.sliderMaximumTimePeriod,
+					obj.time.isNow
+				);
+
+				// scrollbar
+				var width = get_bodywidth() - 30;
 				if (!is_number(width)) {
-					width = 1000;
+					width = 900;
+				}
+				else if (width < 600) {
+					width = 600;
 				}
 
-				if (!isset('width', obj.objDims)) {
-					obj.objDims.width = 0;
+				this.scrollbar = new CScrollBar(width, obj.periodFixed, obj.sliderMaximumTimePeriod);
+				this.scrollbar.onchange = this.objectUpdate.bind(this);
+			}
+		}
+
+		// load objects
+		for (var id in this.objectList) {
+			if (!empty(this.objectList[id]) && !this.objectList[id].processed && !this.objectList[id].loadScroll) {
+				var obj = this.objectList[id];
+
+				obj.processed = 1;
+
+				// width
+				if ((!isset('width', obj.objDims) || obj.objDims.width < 0) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)) {
+					var width = get_bodywidth();
+
+					if (!is_number(width)) {
+						width = 1000;
+					}
+					if (!isset('width', obj.objDims)) {
+						obj.objDims.width = 0;
+					}
+
+					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
 				}
-				obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
-			}
 
-			// url
-			if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-				var graphUrl = new Curl(obj.src);
-				graphUrl.setArgument('width', obj.objDims.width);
+				// url
+				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
+					var graphUrl = new Curl(obj.src);
+					graphUrl.setArgument('width', obj.objDims.width);
 
-				obj.src = graphUrl.getUrl();
-			}
-
-			// image
-			if (obj.loadImage) {
-				if (!obj.refresh) {
-					this.addImage(obj.domid, false);
+					obj.src = graphUrl.getUrl();
 				}
-			}
-			else if (obj.loadScroll) {
-				this.addScroll(null, obj.domid);
-			}
 
-			// refresh
-			if (obj.refresh) {
-				this.refreshImage(obj.domid);
+				// image
+				if (obj.loadImage) {
+					if (!obj.refresh) {
+						this.addImage(id, false);
+					}
+				}
+
+				// refresh
+				if (obj.refresh) {
+					this.refreshImage(id);
+				}
 			}
 		}
 	},
 
-	addImage: function(objid, rebuildListeners) {
-		var obj = this.objectList[objid];
+	addImage: function(id, rebuildListeners) {
+		var obj = this.objectList[id],
+			img = $(id);
 
-		var img = $(obj.domid);
 		if (empty(img)) {
 			img = document.createElement('img');
-			img.setAttribute('id', obj.domid);
+			img.setAttribute('id', id);
 			img.setAttribute('src', obj.src);
 			$(obj.containerid).appendChild(img);
 		}
 
-		if (obj.loadScroll && empty(obj.scroll_listener)) {
-			obj.scroll_listener = this.addScroll.bindAsEventListener(this, obj.domid);
-			addListener(img, 'load', obj.scroll_listener);
-		}
-
 		if (obj.loadSBox && empty(obj.sbox_listener)) {
-			obj.sbox_listener = this.addSBox.bindAsEventListener(this, obj.domid);
+			obj.sbox_listener = this.addSBox.bindAsEventListener(this, id);
 			addListener(img, 'load', obj.sbox_listener);
-			addListener(img, 'load', moveSBoxes);
+			addListener(img, 'load', sboxGlobalMove);
 		}
 	},
 
-	refreshImage: function(objid) {
-		var obj = this.objectList[objid];
-		var period = this.getPeriod(objid);
-		var stime = this.getSTime(objid);
+	refreshImage: function(id) {
+		var obj = this.objectList[id],
+			period = this.timeline.period(),
+			stime = new CDate((this.timeline.usertime() - this.timeline.period()) * 1000).getZBXDate();
 
 		// image
 		var imgUrl = new Curl(obj.src);
 		imgUrl.setArgument('period', period);
 		imgUrl.setArgument('stime', stime);
-		imgUrl = this.getFormattedUrl(objid, imgUrl);
 
-		jQuery('<img />', {id: obj.domid + '_tmp', src: imgUrl.getUrl()}).load(function() {
-			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
-			jQuery('#' + id).replaceWith(jQuery(this));
-			jQuery(this).attr('id', id);
+		jQuery('<img />', {id: id + '_tmp', src: imgUrl.getUrl()}).load(function() {
+			var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+
+			jQuery('#' + imgId).replaceWith(jQuery(this));
+			jQuery(this).attr('id', imgId);
 		});
 
 		// link
@@ -180,71 +195,63 @@ var timeControl = {
 		graphUrl.setArgument('width', obj.objDims.width);
 		graphUrl.setArgument('period', period);
 		graphUrl.setArgument('stime', stime);
-		graphUrl = this.getFormattedUrl(objid, graphUrl);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
 	},
 
-	refreshObject: function(objid) {
-		this.objectList[objid].processed = 0;
-		this.objectList[objid].refresh = true;
+	refreshObject: function(id) {
+		this.objectList[id].processed = 0;
+		this.objectList[id].refresh = true;
 		this.processObjects();
+
+		if (this.timeRefreshInterval > 0) {
+			this.refreshTime();
+		}
 	},
 
-	refreshTime: function(refreshInterval) {
-		if (!empty(refreshInterval)) {
-			this.refreshInterval = refreshInterval * 1000;
+	useTimeRefresh: function(timeRefreshInterval) {
+		if (!empty(timeRefreshInterval) && timeRefreshInterval > 0) {
+			this.timeRefreshInterval = timeRefreshInterval * 1000;
 		}
+	},
 
-		if (this.refreshInterval > 0) {
-			for (var sbid in ZBX_SCROLLBARS) {
-				if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-					continue;
-				}
-
-				var timelineid = ZBX_SCROLLBARS[sbid].timeline.timelineid;
-
-				// timeline
-				if (ZBX_TIMELINES[timelineid].isNow()) {
-					ZBX_TIMELINES[timelineid].setNow();
-				}
-				else {
-					ZBX_TIMELINES[timelineid].endtime(ZBX_TIMELINES[timelineid].timeNow());
-				}
-
-				// scrollbar
-				ZBX_SCROLLBARS[sbid].timeline = ZBX_TIMELINES[timelineid];
-				ZBX_SCROLLBARS[sbid].setBarPosition();
-				ZBX_SCROLLBARS[sbid].setGhostByBar();
-				ZBX_SCROLLBARS[sbid].setTabInfo();
-				ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
+	refreshTime: function() {
+		if (this.timeRefreshInterval > 0) {
+			// timeline
+			if (this.timeline.isNow()) {
+				this.timeline.setNow();
+			}
+			else {
+				this.timeline.refreshEndtime();
 			}
 
-			this.timeTimeout = window.setTimeout(function() { timeControl.refreshTime(); }, this.refreshInterval);
+			// scrollbar
+			this.scrollbar.setBarPosition();
+			this.scrollbar.setGhostByBar();
+			this.scrollbar.setTabInfo();
+			this.scrollbar.resetIsNow();
+
+			// plan next time update
+			this.timeRefreshTimeoutHandler = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
 		}
 	},
 
-	isNow: function() {
-		for (var sbid in ZBX_SCROLLBARS) {
-			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-				continue;
+	objectUpdate: function() {
+		var usertime = this.timeline.usertime(),
+			period = this.timeline.period();
+
+		// secure browser from fast user operations
+		if (isNaN(usertime) || isNaN(period)) {
+			for (var id in this.objectList) {
+				if (isset(id, ZBX_SBOX)) {
+					ZBX_SBOX[id].clearParams();
+				}
 			}
 
-			return ZBX_TIMELINES[ZBX_SCROLLBARS[sbid].timeline.timelineid].isNow();
+			return;
 		}
 
-		return null;
-	},
-
-	objectUpdate: function(objid, timelineid) {
-		if (!isset(objid, this.objectList)) {
-			throw('timeControl: Object is not declared "' + objid + '".');
-		}
-
-		var usertime = ZBX_TIMELINES[timelineid].usertime();
-		var period = ZBX_TIMELINES[timelineid].period();
-
-		if (ZBX_TIMELINES[timelineid].now() || ZBX_TIMELINES[timelineid].isNow()) {
+		if (this.timeline.now() || this.timeline.isNow()) {
 			usertime += 31536000; // 31536000 = 86400 * 365 = 1 year
 		}
 
@@ -255,57 +262,30 @@ var timeControl = {
 			url.setArgument('period', period);
 			url.setArgument('stime', date.getZBXDate());
 			url.unsetArgument('output');
-			url = this.getFormattedUrl(objid, url);
 
 			location.href = url.getUrl();
 		}
 		else {
-			flickerfreeScreen.refreshAll(period, date.getZBXDate(), ZBX_TIMELINES[timelineid].isNow());
-
-			// update related objects
-			for (var objid in this.objectList) {
-				if (empty(this.objectList[objid])) {
-					continue;
-				}
-
-				if (isset(objid, ZBX_SBOX)) {
-					ZBX_SBOX[objid].sbox.timeline = ZBX_TIMELINES[timelineid];
-				}
-			}
+			flickerfreeScreen.refreshAll(period, date.getZBXDate(), this.timeline.isNow());
 		}
 	},
 
 	objectReset: function() {
-		var usertime = 1600000000;
-		var period = 3600;
-		var stime = 201911051255;
+		var usertime = 1600000000,
+			period = 3600,
+			stime = 201911051255;
 
-		// update time control
-		for (var objid in this.objectList) {
-			if (empty(this.objectList[objid])) {
-				continue;
-			}
-
-			this.objectList[objid].timeline.period(period);
-			this.objectList[objid].timeline.usertime(usertime);
-
-			if (isset(objid, ZBX_SCROLLBARS)) {
-				ZBX_SCROLLBARS[objid].setBarPosition();
-				ZBX_SCROLLBARS[objid].setGhostByBar();
-				ZBX_SCROLLBARS[objid].setTabInfo();
-			}
-
-			if (isset(objid, ZBX_SBOX)) {
-				ZBX_SBOX[objid].sbox.timeline = this.objectList[objid].timeline;
-			}
-		}
+		this.timeline.period(period);
+		this.timeline.usertime(usertime);
+		this.scrollbar.setBarPosition();
+		this.scrollbar.setGhostByBar();
+		this.scrollbar.setTabInfo();
 
 		if (this.refreshPage) {
 			var url = new Curl(location.href);
 			url.setArgument('period', period);
 			url.setArgument('stime', stime);
 			url.unsetArgument('output');
-			url = this.getFormattedUrl(objid, url);
 
 			location.href = url.getUrl();
 		}
@@ -314,110 +294,13 @@ var timeControl = {
 		}
 	},
 
-	addSBox: function(e, objid) {
-		var obj = this.objectList[objid];
-		var img = $(obj.domid);
-
-		if (!is_null(img)) {
-			removeListener(img, 'load', obj.sbox_listener);
-		}
-
-		ZBX_SBOX[obj.domid] = new Object;
-		ZBX_SBOX[obj.domid].shiftT = parseInt(obj.objDims.shiftYtop);
-		ZBX_SBOX[obj.domid].shiftL = parseInt(obj.objDims.shiftXleft);
-		ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
-		ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
-		ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
-
-		var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
+	addSBox: function(e, id) {
+		var sbox = sbox_init(id);
 		sbox.onchange = this.objectUpdate.bind(this);
-	},
-
-	addScroll: function(e, objid) {
-		var obj = this.objectList[objid];
-		var img = $(obj.domid);
-
-		if (!is_null(img)) {
-			removeListener(img, 'load', obj.scroll_listener);
-		}
-
-		var width = null;
-		if (obj.scrollWidthByImage == 0) {
-			width = get_bodywidth() - 30;
-			if (!is_number(width)) {
-				width = 900;
-			}
-		}
-
-		var scrl = scrollCreate(
-			obj.domid,
-			width,
-			obj.timeline.timelineid,
-			this.objectList[objid].periodFixed,
-			this.objectList[objid].sliderMaximumTimePeriod
-		);
-		scrl.onchange = this.objectUpdate.bind(this);
-
-		if (obj.dynamic && !is_null($(img))) {
-			addListener(obj.domid, 'load', function() { ZBX_SCROLLBARS[scrl.scrollbarid].disabled = 0; });
-		}
-	},
-
-	getPeriod: function(objid) {
-		return this.objectList[objid].timeline.period();
-	},
-
-	getSTime: function(objid) {
-		var obj = this.objectList[objid];
-		var date = new CDate((obj.timeline.usertime() - obj.timeline.period()) * 1000);
-
-		return date.getZBXDate();
-	},
-
-	getObject: function(objid) {
-		return this.objectList[objid];
-	},
-
-	getFormattedUrl: function(objid, url) {
-		// ignore time in edit mode
-		if (typeof(flickerfreeScreen) != 'undefined'
-				&& !empty(flickerfreeScreen.screens[objid])
-				&& flickerfreeScreen.screens[objid].mode == 1 // SCREEN_MODE_EDIT
-				&& flickerfreeScreen.screens[objid].resourcetype == 0) { // SCREEN_RESOURCE_GRAPH
-			url.unsetArgument('period');
-			url.unsetArgument('stime');
-		}
-
-		return url;
 	}
 };
 
-// timeline control core
-var ZBX_TIMELINES = {};
-
-function create_timeline(tlid, period, starttime, usertime, endtime, maximumperiod, isNow) {
-	if (is_null(tlid)) {
-		tlid = ZBX_TIMELINES.length;
-	}
-
-	var now = new CDate();
-	now = parseInt(now.getTime() / 1000);
-
-	if ('undefined' == typeof(usertime)) {
-		usertime = now;
-	}
-	if ('undefined' == typeof(endtime)) {
-		endtime = now;
-	}
-	if ('undefined' == typeof(isNow)) {
-		isNow = false;
-	}
-
-	ZBX_TIMELINES[tlid] = new CTimeLine(tlid, period, starttime, usertime, endtime, maximumperiod, isNow);
-
-	return ZBX_TIMELINES[tlid];
-}
-
+// timeline control
 var CTimeLine = Class.create(CDebug, {
 
 	_starttime:	null,	// timeline start time (left, past)
@@ -426,36 +309,23 @@ var CTimeLine = Class.create(CDebug, {
 	_period:	null,	// selected period
 	_now:		false,	// state if time is set to NOW
 	_isNow:		false,	// state if time is set to NOW (for outside usage)
-	timelineid:	null,	// own id in array
 	minperiod:	3600,	// minimal allowed period
 	maxperiod:	null,	// max period in seconds
 
-	initialize: function($super, id, period, starttime, usertime, endtime, maximumperiod, isNow) {
-		this.timelineid = id;
-		$super('CTimeLine[' + id + ']');
-
+	initialize: function($super, period, starttime, usertime, endtime, maximumPeriod, isNow) {
 		if ((endtime - starttime) < (3 * this.minperiod)) {
 			starttime = endtime - (3 * this.minperiod);
 		}
 
-		this.starttime(starttime);
-		this.endtime(endtime);
-		this.usertime(usertime);
+		this._starttime = starttime;
+		this._endtime = endtime;
+		this._usertime = usertime;
+		this._period = period;
+		this.maxperiod = maximumPeriod;
+
+		// re-validate
 		this.period(period);
-		this.maxperiod = maximumperiod;
 		this.isNow(isNow);
-	},
-
-	timeNow: function() {
-		return parseInt(new CDate().getTime() / 1000);
-	},
-
-	setNow: function() {
-		var end = this.timeNow();
-
-		this._endtime = end;
-		this._usertime = end;
-		this.now();
 	},
 
 	now: function() {
@@ -464,11 +334,31 @@ var CTimeLine = Class.create(CDebug, {
 		return this._now;
 	},
 
+	isNow: function(isNow) {
+		if (typeof(isNow) == 'undefined') {
+			return this._isNow;
+		}
+
+		this._isNow = (isNow == 1) ? true : (isNow ? isNow : false);
+	},
+
+	setNow: function() {
+		var end = parseInt(new CDate().getTime() / 1000);
+
+		this._endtime = end;
+		this._usertime = end;
+		this._now = true;
+	},
+
+	refreshEndtime: function() {
+		this._endtime = parseInt(new CDate().getTime() / 1000);
+	},
 
 	period: function(period) {
-		if ('undefined' == typeof(period)) {
+		if (empty(period)) {
 			return this._period;
 		}
+
 		if ((this._usertime - period) < this._starttime) {
 			period = this._usertime - this._starttime;
 		}
@@ -481,9 +371,10 @@ var CTimeLine = Class.create(CDebug, {
 	},
 
 	usertime: function(usertime) {
-		if ('undefined' == typeof(usertime)) {
+		if (empty(usertime)) {
 			return this._usertime;
 		}
+
 		if ((usertime - this._period) < this._starttime) {
 			usertime = this._starttime + this._period;
 		}
@@ -498,66 +389,29 @@ var CTimeLine = Class.create(CDebug, {
 	},
 
 	starttime: function(starttime) {
-		if ('undefined' == typeof(starttime)) {
+		if (empty(starttime)) {
 			return this._starttime;
 		}
+
 		this._starttime = starttime;
 
 		return this._starttime;
 	},
 
 	endtime: function(endtime) {
-		if ('undefined' == typeof(endtime)) {
+		if (empty(endtime)) {
 			return this._endtime;
 		}
-		if (endtime < (this._starttime + this._period * 3)) {
-			endtime = this._starttime + this._period * 3;
-		}
+
 		this._endtime = endtime;
 
 		return this._endtime;
-	},
-
-	isNow: function(isNow) {
-		if ('undefined' == typeof(isNow)) {
-			return this._isNow;
-		}
-
-		this._isNow = (isNow == 1) ? true : (isNow ? isNow : false);
 	}
 });
 
 // graph scrolling
-var ZBX_SCROLLBARS = {};
-
-function scrollCreate(sbid, w, timelineid, fixedperiod, maximumperiod) {
-	if (is_null(sbid)) {
-		sbid = ZBX_SCROLLBARS.length;
-	}
-
-	if (is_null(timelineid)) {
-		throw('Parameters haven\'t been sent properly.');
-	}
-
-	if (is_null(w)) {
-		var dims = getDimensions(sbid);
-		w = dims.width - 2;
-	}
-
-	if (w < 600) {
-		w = 600;
-	}
-
-	ZBX_SCROLLBARS[sbid] = new CScrollBar(sbid, timelineid, w, fixedperiod, maximumperiod);
-
-	return ZBX_SCROLLBARS[sbid];
-}
-
 var CScrollBar = Class.create(CDebug, {
 
-	scrollbarid:	null, // scroll id in array
-	timelineid:		null, // timeline id to which it is connected
-	timeline:		null, // time line object
 	ghostBox:		null, // ghost box object
 	clndrLeft:		null, // calendar object left
 	clndrRight:		null, // calendar object right
@@ -614,27 +468,18 @@ var CScrollBar = Class.create(CDebug, {
 	disabled:		1,		// activates/disables scrollbars
 	maxperiod:		null,	// max period in seconds
 
-	initialize: function($super, sbid, timelineid, width, fixedperiod, maximalperiod) {
-		this.scrollbarid = sbid;
-		$super('CScrollBar[' + sbid + ']');
-		this.maxperiod = maximalperiod;
-
+	initialize: function($super, width, fixedperiod, maximalPeriod) {
 		try {
 			this.fixedperiod = (fixedperiod == 1) ? 1 : 0;
+			this.maxperiod = maximalPeriod;
 
-			// checks
-			if (!isset(timelineid, ZBX_TIMELINES)) {
-				throw('Failed to initialize ScrollBar with given TimeLine.');
-			}
-			if (empty(this.dom.scrollbar)) {
-				this.scrollcreate(width);
-			}
+			// create scrollbar
+			this.scrollCreate(width);
 
 			// variable initialization
-			this.timeline = ZBX_TIMELINES[timelineid];
 			this.ghostBox = new CGhostBox(this.dom.ghost);
 			this.size.scrollline = width - 36; // border (17 * 2) + 2 = 36
-			this.px2sec = (this.timeline.endtime() - this.timeline.starttime()) / this.size.scrollline;
+			this.px2sec = (timeControl.timeline.endtime() - timeControl.timeline.starttime()) / this.size.scrollline;
 
 			// additional dom objects
 			this.appendZoomLinks();
@@ -652,23 +497,20 @@ var CScrollBar = Class.create(CDebug, {
 			this.make_left_arr_dragable(this.dom.left_arr);
 			this.make_right_arr_dragable(this.dom.right_arr);
 			this.disabled = 0;
-
 		}
-		catch(e) {
+		catch (e) {
 			throw('ERROR: ScrollBar initialization failed!');
 		}
 	},
 
 	onBarChange: function() {
-		this.updateGlobalTimeline();
-
+		this.resetIsNow();
 		this.changed = 1;
-		this.onchange(this.scrollbarid, this.timeline.timelineid);
+		this.onchange();
 	},
 
-	updateGlobalTimeline: function() {
-		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
-		ZBX_TIMELINES[this.timeline.timelineid].isNow(ZBX_TIMELINES[this.timeline.timelineid].now());
+	resetIsNow: function() {
+		timeControl.timeline.isNow(timeControl.timeline.now());
 	},
 
 	//------- MOVE -------
@@ -677,8 +519,9 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		this.timeline.setNow();
-		this.timeline.period(this.maxperiod);
+		timeControl.timeline.setNow();
+		timeControl.timeline.period(this.maxperiod);
+
 		this.setBarPosition();
 		this.setGhostByBar();
 		this.setTabInfo();
@@ -690,7 +533,8 @@ var CScrollBar = Class.create(CDebug, {
 			return false;
 		}
 
-		this.timeline.period(zoom);
+		timeControl.timeline.period(zoom);
+
 		this.setBarPosition();
 		this.setGhostByBar();
 		this.setTabInfo();
@@ -705,29 +549,29 @@ var CScrollBar = Class.create(CDebug, {
 		deselectAll();
 
 		var period = false;
-		if (typeof(left) == 'undefined') {
-			period = this.timeline.period();
+		if (empty(left)) {
+			period = timeControl.timeline.period();
 		}
 
 		// fixed
 		if (this.fixedperiod == 1) {
-			var usertime = this.timeline.usertime();
-			var new_usertime = (period)
-				? usertime - period // by clicking this.dom.left we move bar by period
-				: usertime - left;
+			var usertime = timeControl.timeline.usertime(),
+				new_usertime = (period)
+					? usertime - period // by clicking this.dom.left we move bar by period
+					: usertime - left;
 
 			// if we slide to another timezone
 			new_usertime -= this.getTZdiff(usertime, new_usertime);
 
-			this.timeline.usertime(new_usertime);
+			timeControl.timeline.usertime(new_usertime);
 		}
 		// dynamic
 		else {
 			var new_period = (period)
-				? this.timeline.period() + 86400 // by clicking this.dom.left we expand period by 1day
-				: this.timeline.period() + left;
+				? timeControl.timeline.period() + 86400 // by clicking this.dom.left we expand period by 1day
+				: timeControl.timeline.period() + left;
 
-			this.timeline.period(new_period);
+			timeControl.timeline.period(new_period);
 		}
 
 		this.setBarPosition();
@@ -745,10 +589,10 @@ var CScrollBar = Class.create(CDebug, {
 
 		var period = false;
 		if (typeof(right) == 'undefined') {
-			period = this.timeline.period();
+			period = timeControl.timeline.period();
 		}
 
-		var usertime = this.timeline.usertime();
+		var usertime = timeControl.timeline.usertime();
 
 		// fixed
 		if (this.fixedperiod == 1) {
@@ -759,21 +603,22 @@ var CScrollBar = Class.create(CDebug, {
 		// dynamic
 		else {
 			if (period) {
-				var new_period = this.timeline.period() + 86400; // by clicking this.dom.left we expand period by 1day
+				var new_period = timeControl.timeline.period() + 86400; // by clicking this.dom.left we expand period by 1day
 				var new_usertime = usertime + 86400; // by clicking this.dom.left we move bar by period
 			}
 			else {
-				var new_period = this.timeline.period() + right;
+				var new_period = timeControl.timeline.period() + right;
 				var new_usertime = usertime + right;
 			}
 
-			this.timeline.period(new_period);
+			timeControl.timeline.period(new_period);
 		}
 
 		// if we slide to another timezone
 		new_usertime -= this.getTZdiff(usertime, new_usertime);
 
-		this.timeline.usertime(new_usertime);
+		timeControl.timeline.usertime(new_usertime);
+
 		this.setBarPosition();
 		this.setGhostByBar();
 		this.setTabInfo();
@@ -781,27 +626,28 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setBarPosition: function(rightSide, periodWidth, setTimeLine) {
-		if ('undefined' == typeof(periodWidth)) {
+		if (empty(periodWidth)) {
 			var periodWidth =  null;
 		}
-		if ('undefined' == typeof(rightSide)) {
+		if (empty(rightSide)) {
 			var rightSide = null;
 		}
-		if ('undefined' == typeof(setTimeLine)) {
+		if (empty(setTimeLine)) {
 			var setTimeLine = false;
 		}
 
+		var width = 0;
 		if (is_null(periodWidth)) {
-			var width = Math.round(this.timeline.period() / this.px2sec);
+			width = Math.round(timeControl.timeline.period() / this.px2sec);
 			periodWidth = width;
 		}
 		else {
-			var width = periodWidth;
+			width = periodWidth;
 		}
 
 		if (is_null(rightSide)) {
-			var userTime = this.timeline.usertime();
-			var startTime = this.timeline.starttime();
+			var userTime = timeControl.timeline.usertime(),
+				startTime = timeControl.timeline.starttime();
 
 			rightSide = Math.round((userTime - startTime) / this.px2sec);
 		}
@@ -833,6 +679,11 @@ var CScrollBar = Class.create(CDebug, {
 
 			// actual bar dimensions shouldn't be over side limits
 			rightSide = right;
+		}
+
+		// validate
+		if (!is_number(width) || !is_number(right) || !is_number(rightSide) || !is_number(periodWidth)) {
+			return;
 		}
 
 		// set actual bar position
@@ -919,11 +770,11 @@ var CScrollBar = Class.create(CDebug, {
 
 		// fixed
 		if (this.fixedperiod == 1) {
-			this.timeline.usertime(time + this.timeline.period());
+			timeControl.timeline.usertime(time + timeControl.timeline.period());
 		}
 		// dynamic
 		else {
-			this.timeline.period(Math.abs(this.timeline.usertime() - time));
+			timeControl.timeline.period(Math.abs(timeControl.timeline.usertime() - time));
 		}
 
 		// bar
@@ -942,13 +793,13 @@ var CScrollBar = Class.create(CDebug, {
 
 		// fixed
 		if (this.fixedperiod == 1) {
-			this.timeline.usertime(time);
+			timeControl.timeline.usertime(time);
 		}
 		// dynamic
 		else {
-			var startusertime = this.timeline.usertime() - this.timeline.period();
-			this.timeline.usertime(time);
-			this.timeline.period(this.timeline.usertime() - startusertime);
+			var startusertime = timeControl.timeline.usertime() - timeControl.timeline.period();
+			timeControl.timeline.usertime(time);
+			timeControl.timeline.period(timeControl.timeline.usertime() - startusertime);
 		}
 
 		// bar
@@ -1020,8 +871,8 @@ var CScrollBar = Class.create(CDebug, {
 		}
 
 		this.position.leftArr = getDimensions(ui.helper.context);
-		this.ghostBox.userstartime = this.timeline.usertime();
-		this.ghostBox.usertime = this.timeline.usertime();
+		this.ghostBox.userstartime = timeControl.timeline.usertime();
+		this.ghostBox.usertime = timeControl.timeline.usertime();
 		this.ghostBox.startResize(0);
 	},
 
@@ -1070,7 +921,7 @@ var CScrollBar = Class.create(CDebug, {
 		}
 
 		this.position.rightArr = getDimensions(ui.helper.context);
-		this.ghostBox.userstartime = this.timeline.usertime() - this.timeline.period();
+		this.ghostBox.userstartime = timeControl.timeline.usertime() - timeControl.timeline.period();
 		this.ghostBox.startResize(1);
 	},
 
@@ -1124,25 +975,25 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	getTZdiff: function(time1, time2) {
-		var date = new CDate(time1 * 1000);
-		var TimezoneOffset = date.getTimezoneOffset();
+		var date = new CDate(time1 * 1000),
+			timezoneOffset = date.getTimezoneOffset();
 
 		date.setTime(time2 * 1000);
 
-		return (TimezoneOffset - date.getTimezoneOffset()) * 60;
+		return (timezoneOffset - date.getTimezoneOffset()) * 60;
 	},
 
 	roundTime: function(usertime) {
 		var time = parseInt(usertime);
 
 		if (time > 86400) {
-			var dd = new CDate();
-			dd.setTime(time * 1000);
-			dd.setHours(0);
-			dd.setMinutes(0);
-			dd.setSeconds(0);
-			dd.setMilliseconds(0);
-			time = parseInt(dd.getTime() / 1000);
+			var date = new CDate();
+			date.setTime(time * 1000);
+			date.setHours(0);
+			date.setMinutes(0);
+			date.setSeconds(0);
+			date.setMilliseconds(0);
+			time = parseInt(date.getTime() / 1000);
 		}
 
 		return time;
@@ -1150,8 +1001,8 @@ var CScrollBar = Class.create(CDebug, {
 
 	updateTimeLine: function(dim) {
 		// timeline update
-		var period = this.timeline.period();
-		var new_usertime = parseInt(dim.right * this.px2sec, 10) + this.timeline.starttime();
+		var period = timeControl.timeline.period();
+		var new_usertime = parseInt(dim.right * this.px2sec, 10) + timeControl.timeline.starttime();
 		var new_period = parseInt(dim.width * this.px2sec, 10);
 
 		if (new_period > 86400) {
@@ -1165,9 +1016,10 @@ var CScrollBar = Class.create(CDebug, {
 		if (dim.right == this.size.scrollline) {
 			if (dim.width != this.position.bar.width) {
 				this.position.bar.width = dim.width;
-				this.timeline.period(new_period);
+				timeControl.timeline.period(new_period);
 			}
-			this.timeline.setNow();
+
+			timeControl.timeline.setNow();
 		}
 		else {
 			if (right) {
@@ -1184,18 +1036,24 @@ var CScrollBar = Class.create(CDebug, {
 
 			if (dim.width != this.position.bar.width) {
 				this.position.bar.width = dim.width;
-				this.timeline.period(new_period);
+				timeControl.timeline.period(new_period);
 			}
 
-			this.timeline.usertime(new_usertime);
+			timeControl.timeline.usertime(new_usertime);
 		}
 
-		this.updateGlobalTimeline();
+		this.resetIsNow();
 	},
 
 	setTabInfo: function() {
-		var period = this.timeline.period();
-		var usertime = this.timeline.usertime();
+		var period = timeControl.timeline.period(),
+			usertime = timeControl.timeline.usertime();
+
+		// secure browser from incorrect user actions
+		if (isNaN(period) || isNaN(usertime)) {
+			return;
+		}
+
 		var userstarttime = usertime - period;
 
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
@@ -1208,27 +1066,18 @@ var CScrollBar = Class.create(CDebug, {
 		var date = this.dateToArray(usertime);
 		var right_info = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
 
-		if (this.timeline.now()) {
+		if (timeControl.timeline.now()) {
 			right_info += ' (' + locale['S_NOW_SMALL'] + '!) ';
 		}
 		this.dom.info_right.innerHTML = right_info;
 
 		// seting zoom link styles
 		this.setZoomLinksStyle();
-
-		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 	},
 
 	dateToArray: function(unixtime) {
-		var date = new CDate(unixtime * 1000);
-		var dateArray = [];
-
-		dateArray[0] = date.getDate();
-		dateArray[1] = date.getMonth() + 1;
-		dateArray[2] = date.getFullYear();
-		dateArray[3] = date.getHours();
-		dateArray[4] = date.getMinutes();
-		dateArray[5] = date.getSeconds();
+		var date = new CDate(unixtime * 1000),
+			dateArray = [date.getDate(), date.getMonth() + 1, date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds()];
 
 		for (var i = 0; i < dateArray.length; i++) {
 			if ((dateArray[i] + '').length < 2) {
@@ -1239,9 +1088,6 @@ var CScrollBar = Class.create(CDebug, {
 		return dateArray;
 	},
 
-	//----------------------------------------------------------------
-	//-------- MISC --------------------------------------------------
-	//----------------------------------------------------------------
 	getmousexy: function(e) {
 		if (e.pageX || e.pageY) {
 			return {x: e.pageX, y: e.pageY};
@@ -1257,7 +1103,7 @@ var CScrollBar = Class.create(CDebug, {
 		if (IE) {
 			document.selection.empty();
 		}
-		else if (!KQ) {
+		else {
 			var sel = window.getSelection();
 			sel.removeAllRanges();
 		}
@@ -1267,8 +1113,8 @@ var CScrollBar = Class.create(CDebug, {
 	//-------- SCROLL CREATION ---------------------------------------
 	//----------------------------------------------------------------
 	appendCalendars: function() {
-		this.clndrLeft = create_calendar(this.timeline.usertime() - this.timeline.period(), this.dom.info_left, null, null, 'scrollbar_cntr');
-		this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
+		this.clndrLeft = create_calendar(timeControl.timeline.usertime() - timeControl.timeline.period(), this.dom.info_left, null, null, 'scrollbar_cntr');
+		this.clndrRight = create_calendar(timeControl.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
 		this.clndrLeft.clndr.onselect = this.setCalendarLeft.bind(this);
 		addListener(this.dom.info_left, 'click', this.calendarShowLeft.bindAsEventListener(this));
 
@@ -1290,7 +1136,7 @@ var CScrollBar = Class.create(CDebug, {
 	 * 31536000 = 365 * 86400
 	 */
 	appendZoomLinks: function() {
-		var timeline = this.timeline.endtime() - this.timeline.starttime();
+		var timeline = timeControl.timeline.endtime() - timeControl.timeline.starttime();
 		var caption = '';
 		var zooms = [3600, 7200, 10800, 21600, 43200, 86400, 604800, 1209600, 2592000, 7776000, 15552000, 31536000];
 		var links = 0;
@@ -1333,7 +1179,7 @@ var CScrollBar = Class.create(CDebug, {
 	 * 31536000 = 365 * 86400
 	 */
 	appendNavLinks: function() {
-		var timeline = this.timeline.endtime() - this.timeline.starttime();
+		var timeline = timeControl.timeline.endtime() - timeControl.timeline.starttime();
 		var caption = '';
 		var moves = [3600, 43200, 86400, 604800, 2592000, 15552000, 31536000];
 		var links = 0;
@@ -1370,10 +1216,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.nav_links.appendChild(tmp_laquo);
 
 		for (var i = 0; i < moves.length; i++) {
-			if (!isset(i, moves) || !is_number(moves[i])) {
-				continue;
-			}
-			if ((timeline / moves[i]) < 1) {
+			if (!isset(i, moves) || !is_number(moves[i]) || (timeline / moves[i]) < 1) {
 				continue;
 			}
 
@@ -1397,40 +1240,41 @@ var CScrollBar = Class.create(CDebug, {
 	},
 
 	setZoomLinksStyle: function() {
-		var period = this.timeline.period();
+		var period = timeControl.timeline.period();
 
 		for (var i = 0; i < this.dom.linklist.length; i++) {
-			if (!isset(i, this.dom.linklist) || empty(this.dom.linklist[i])) {
-				continue;
-			}
+			if (isset(i, this.dom.linklist) && !empty(this.dom.linklist[i])) {
+				var linkzoom = this.dom.linklist[i].getAttribute('zoom');
 
-			var linkzoom = this.dom.linklist[i].getAttribute('zoom');
-
-			if (linkzoom == period) {
-				this.dom.linklist[i].style.textDecoration = 'none';
-				this.dom.linklist[i].style.fontWeight = 'bold';
-				this.dom.linklist[i].style.fontSize = '11px';
-			}
-			else {
-				this.dom.linklist[i].style.textDecoration = 'underline';
-				this.dom.linklist[i].style.fontWeight = 'normal';
-				this.dom.linklist[i].style.fontSize = '10px';
+				if (linkzoom == period) {
+					this.dom.linklist[i].style.textDecoration = 'none';
+					this.dom.linklist[i].style.fontWeight = 'bold';
+					this.dom.linklist[i].style.fontSize = '11px';
+				}
+				else {
+					this.dom.linklist[i].style.textDecoration = 'underline';
+					this.dom.linklist[i].style.fontWeight = 'normal';
+					this.dom.linklist[i].style.fontSize = '10px';
+				}
 			}
 		}
 
 		i = this.dom.linklist.length - 1;
-		if (period == (this.timeline.endtime() - this.timeline.starttime())) {
+		if (period == (timeControl.timeline.endtime() - timeControl.timeline.starttime())) {
 			this.dom.linklist[i].style.textDecoration = 'none';
 			this.dom.linklist[i].style.fontWeight = 'bold';
 			this.dom.linklist[i].style.fontSize = '11px';
 		}
 	},
 
-	scrollcreate: function(w) {
+	scrollCreate: function(width) {
 		var scr_cntr = $('scrollbar_cntr');
 		if (is_null(scr_cntr)) {
 			throw('ERROR: SCROLL [scrollcreate]: scroll container node is not found!');
 		}
+
+		// remove existed scrollbars
+		jQuery('.scrollbar').remove();
 
 		scr_cntr.style.paddingRight = '2px';
 		scr_cntr.style.paddingLeft = '2px';
@@ -1441,13 +1285,13 @@ var CScrollBar = Class.create(CDebug, {
 		scr_cntr.appendChild(this.dom.scrollbar);
 
 		Element.extend(this.dom.scrollbar);
-		this.dom.scrollbar.setStyle({width: w + 'px'});
+		this.dom.scrollbar.setStyle({width: width + 'px'});
 
 		// <info>
 		this.dom.info = document.createElement('div');
 		this.dom.scrollbar.appendChild(this.dom.info);
 		this.dom.info.className = 'info';
-		$(this.dom.info).setStyle({width: w + 'px'});
+		$(this.dom.info).setStyle({width: width + 'px'});
 
 		this.dom.zoom = document.createElement('div');
 		this.dom.info.appendChild(this.dom.zoom);
@@ -1488,7 +1332,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.sublevel = document.createElement('div');
 		this.dom.scrollbar.appendChild(this.dom.sublevel);
 		this.dom.sublevel.className = 'sublevel';
-		$(this.dom.sublevel).setStyle({width: w + 'px'});
+		$(this.dom.sublevel).setStyle({width: width + 'px'});
 
 		this.dom.left = document.createElement('div');
 		this.dom.sublevel.appendChild(this.dom.left);
@@ -1508,7 +1352,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.overlevel = document.createElement('div');
 		this.dom.scrollbar.appendChild(this.dom.overlevel);
 		this.dom.overlevel.className = 'overlevel';
-		$(this.dom.overlevel).setStyle({width: (w - 34) + 'px'});
+		$(this.dom.overlevel).setStyle({width: (width - 34) + 'px'});
 
 		this.dom.bar = document.createElement('div');
 		this.dom.overlevel.appendChild(this.dom.bar);
@@ -1538,7 +1382,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.subline = document.createElement('div');
 		this.dom.scrollbar.appendChild(this.dom.subline);
 		this.dom.subline.className = 'subline';
-		$(this.dom.subline).setStyle({width: w + 'px'});
+		$(this.dom.subline).setStyle({width: width + 'px'});
 
 		// additional positioning links
 		this.dom.nav_links = document.createElement('div');
@@ -1723,100 +1567,82 @@ var CGhostBox = Class.create(CDebug, {
 // selection box uppon graphs
 var ZBX_SBOX = {};
 
-function sbox_init(sbid, timeline, domobjectid) {
-	if (!isset(domobjectid, ZBX_SBOX)) {
-		throw('TimeControl: SBOX is not defined for object "' + domobjectid + '".');
-	}
-	if (is_null(timeline)) {
-		throw('Parametrs haven\'t been sent properly.');
-	}
+function sbox_init(id) {
+	ZBX_SBOX[id] = new sbox(id);
 
-	sbid = !is_null(sbid) ? sbid : ZBX_SBOX.length;
+	// global listeners
+	addListener(window, 'resize', sboxGlobalMove);
+	addListener(document, 'mouseup', sboxGlobalMouseup);
+	addListener(document, 'mousemove', sboxGlobalMousemove);
+	ZBX_SBOX[id].addListeners();
 
-	var dims = getDimensions(domobjectid);
-	var width = (dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR)) - 2;
-
-	ZBX_SBOX[sbid].sbox = new sbox(sbid, timeline, domobjectid, width, ZBX_SBOX[sbid].height);
-
-	// listeners
-	addListener(window, 'resize', moveSBoxes);
-	if (KQ) {
-		setTimeout('ZBX_SBOX[' + sbid + '].sbox.moveSBoxByObj(' + sbid + ');', 500);
-	}
-	ZBX_SBOX[sbid].sbox.addListeners();
-
-	return ZBX_SBOX[sbid].sbox;
+	return ZBX_SBOX[id];
 }
 
 var sbox = Class.create(CDebug, {
 
 	sbox_id:			'',		// id to create references in array to self
-	timeline:			{},		// timelines object
 	mouse_event:		{},		// json object wheres defined needed event params
 	start_event:		{},		// copy of mouse_event when box created
 	stime:				0,		// new start time
 	period:				0,		// new period
-	cobj:				{},		// objects params
 	dom_obj:			null,	// selection div html obj
 	box:				{},		// object params
+	areaWidth:			0,
+	areaHeight:			0,
 	dom_box:			null,	// selection box html obj
 	dom_period_span:	null,	// period container html obj
 	shifts:				{},		// shifts regarding to main objet
 	px2time:			null,	// seconds in 1px
 	dynamic:			'',		// how page updates, all page/graph only update
-	is_active:			false,
+	is_active:			false,	// flag show is sbox is selected, must be unique among all
+	is_activeIE:		false,
 
-	initialize: function($super, sbid, timelineid, domobjectid, width, height) {
-		this.sbox_id = sbid;
-		$super('CBOX[' + sbid + ']');
+	initialize: function($super, id) {
+		var tc = timeControl.objectList[id],
+			shiftL = parseInt(tc.objDims.shiftXleft),
+			shiftR = parseInt(tc.objDims.shiftXright),
+			width = getDimensions(id).width - (shiftL + shiftR) - 2;
 
-		if (!isset(timelineid, ZBX_TIMELINES)) {
-			throw('Failed to initialize Selection Box with given TimeLine.');
-		}
-
-		// variable initialization
-		this.timeline = ZBX_TIMELINES[timelineid];
-		this.cobj.width = width;
-		this.cobj.height = height;
-		this.box.width = 0;
+		this.sbox_id = id;
+		this.containerId = '#flickerfreescreen_' + id;
+		this.shiftT = parseInt(tc.objDims.shiftYtop);
+		this.shiftL = shiftL;
+		this.shiftR = shiftR;
+		this.additionShiftL = 0;
+		this.areaWidth = width;
+		this.areaHeight = parseInt(tc.objDims.graphHeight);
+		this.box.width = width;
 	},
 
 	addListeners: function() {
-		var sbox = ZBX_SBOX[this.sbox_id].sbox;
-		sbox.clear_params();
-
-		if (sbox.is_active) {
-			return;
-		}
-
 		var obj = $(this.sbox_id);
-
 		if (is_null(obj)) {
-			throw('Failed to initialize Selection Box with given Object.');
+			throw('Failed to initialize Selection Box with given Object!');
 		}
 
-		sbox.grphobj = obj;
-		sbox.dom_obj = this.create_box_container(obj, this.cobj.height, this.sbox_id);
-		sbox.moveSBoxByObj();
+		this.clearParams();
+		this.grphobj = obj;
+		this.createBoxContainer();
+		this.moveSBoxByObj();
 
-		jQuery(sbox.grphobj).off();
-		jQuery(sbox.dom_obj).off();
+		jQuery(this.grphobj).off();
+		jQuery(this.dom_obj).off();
 
 		if (IE) {
-			jQuery(sbox.grphobj).mousedown(jQuery.proxy(sbox.mousedown, this));
-			sbox.grphobj.onmousemove = this.mousemove.bindAsEventListener(this);
-			jQuery(sbox.grphobj).click(jQuery.proxy(sbox.ieMouseClick, this));
-			jQuery(sbox.grphobj).mouseup(jQuery.proxy(sbox.mouseup, this));
+			jQuery(this.grphobj).mousedown(jQuery.proxy(this.mouseDown, this));
+			this.grphobj.onmousemove = this.mouseMove.bindAsEventListener(this);
+			jQuery(this.containerId).find('a').attr('onclick', 'javascript: return ZBX_SBOX["' + this.sbox_id + '"].ieMouseClick();');
 		}
 		else {
-			jQuery(sbox.dom_obj).mousedown(jQuery.proxy(sbox.mousedown, this));
-			jQuery(sbox.dom_obj).mousemove(jQuery.proxy(sbox.mousemove, this));
-			jQuery(sbox.dom_obj).click(function(event) { cancelEvent(event); });
-			jQuery(sbox.dom_obj).mouseup(jQuery.proxy(sbox.mouseup, this));
+			jQuery(this.dom_obj).mousedown(jQuery.proxy(this.mouseDown, this));
+			jQuery(this.dom_obj).mousemove(jQuery.proxy(this.mouseMove, this));
+			jQuery(this.dom_obj).click(function(e) { cancelEvent(e); });
+			jQuery(this.dom_obj).mouseup(jQuery.proxy(this.mouseUp, this));
 		}
 	},
 
-	mousedown: function(e) {
+	mouseDown: function(e) {
 		e = e || window.event;
 
 		if (e.which && e.which != 1) {
@@ -1826,52 +1652,85 @@ var sbox = Class.create(CDebug, {
 			return false;
 		}
 
-		Event.stop(e);
+		this.optimizeEvent(e);
+		deselectAll();
 
-		if (!ZBX_SBOX[this.sbox_id].sbox.is_active) {
+		var posxy = getPosition(this.dom_obj);
+		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
+			return true;
+		}
+
+		cancelEvent(e);
+
+		if (!this.is_active) {
 			this.optimizeEvent(e);
-
 			deselectAll();
+			this.createBox();
 
-			if (IE) {
-				var posxy = getPosition(this.dom_obj);
-
-				if (this.mouse_event.left < posxy.left || (this.mouse_event.left > (posxy.left + this.dom_obj.offsetWidth))) {
-					return false;
-				}
-				if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
-					return true;
-				}
-			}
-
-			this.create_box();
-
-			ZBX_SBOX[this.sbox_id].sbox.is_active = true;
+			this.is_active = true;
+			this.is_activeIE = true;
 		}
 	},
 
-	mousemove: function(e) {
+	mouseMove: function(e) {
 		e = e || window.event;
 
 		if (IE) {
 			cancelEvent(e);
 		}
 
-		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
+		if (this.is_active) {
 			this.optimizeEvent(e);
-			this.resizebox();
+
+			// resize
+			if (this.mouse_event.left > (this.areaWidth + this.additionShiftL)) {
+				this.moveRight(this.areaWidth - this.start_event.left - this.additionShiftL);
+			}
+			else if (this.mouse_event.left < this.additionShiftL) {
+				this.moveLeft(this.additionShiftL, this.start_event.left - this.additionShiftL);
+			}
+			else {
+				var width = this.validateW(this.mouse_event.left - this.start_event.left),
+					left = this.mouse_event.left - this.shifts.left;
+
+				if (width > 0) {
+					this.moveRight(width);
+				}
+				else {
+					this.moveLeft(left, width);
+				}
+			}
+
+			this.period = this.calcPeriod();
+
+			if (!is_null(this.dom_box)) {
+				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
+			}
 		}
 	},
 
-	mouseup: function(e) {
-		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
-			this.onselect();
+	mouseUp: function(e) {
+		if (this.is_active) {
 			cancelEvent(e);
-			this.clear_params();
+			this.onSelect();
+			this.clearParams();
 		}
 	},
 
 	ieMouseClick: function(e) {
+		if (!e) {
+			e = window.event;
+		}
+
+		if (this.is_activeIE) {
+			this.optimizeEvent(e);
+			deselectAll();
+			this.mouseUp(e);
+			this.is_activeIE = false;
+
+			return cancelEvent(e);
+		}
+
 		if (e.which && e.which != 1) {
 			return true;
 		}
@@ -1887,125 +1746,81 @@ var sbox = Class.create(CDebug, {
 			return true;
 		}
 
-		Event.stop(e);
+		this.mouseUp(e);
+
+		return cancelEvent(e);
 	},
 
-	onselect: function() {
-		this.px2time = this.timeline.period() / this.cobj.width;
-		var userstarttime = this.timeline.usertime() - this.timeline.period();
-		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
-		var new_period = this.calcperiod();
+	onSelect: function() {
+		this.px2time = timeControl.timeline.period() / this.areaWidth;
+		var userstarttime = timeControl.timeline.usertime() - timeControl.timeline.period();
+		userstarttime += Math.round((this.box.left - (this.additionShiftL - this.shifts.left)) * this.px2time);
+		var new_period = this.calcPeriod();
 
 		if (this.start_event.left < this.mouse_event.left) {
 			userstarttime += new_period;
 		}
 
-		this.timeline.period(new_period);
-		this.timeline.usertime(userstarttime);
+		timeControl.timeline.period(new_period);
+		timeControl.timeline.usertime(userstarttime);
+		timeControl.scrollbar.setBarPosition();
+		timeControl.scrollbar.setGhostByBar();
+		timeControl.scrollbar.setTabInfo();
+		timeControl.scrollbar.resetIsNow();
 
-		// synchronize sbox with timeline and scrollbar
-		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
-
-		for (var sbid in ZBX_SCROLLBARS) {
-			if (empty(ZBX_SCROLLBARS[sbid]) || empty(ZBX_SCROLLBARS[sbid].timeline)) {
-				continue;
-			}
-
-			ZBX_SCROLLBARS[sbid].timeline = this.timeline;
-			ZBX_SCROLLBARS[sbid].setBarPosition();
-			ZBX_SCROLLBARS[sbid].setGhostByBar();
-			ZBX_SCROLLBARS[sbid].setTabInfo();
-			ZBX_SCROLLBARS[sbid].updateGlobalTimeline();
-		}
-
-		this.onchange(this.sbox_id, this.timeline.timelineid);
+		this.onchange();
 	},
 
-	create_box_container: function(obj, height) {
-		var id = jQuery(obj).attr('id') + '_box_on';
+	createBoxContainer: function() {
+		var id = this.sbox_id + '_box_on';
 
 		if (jQuery('#' + id).length) {
 			jQuery('#' + id).remove();
 		}
 
-		var div = document.createElement('div');
-		div.id = id;
-		div.className = 'box_on';
-		div.style.height = (height + 2) + 'px';
+		this.dom_obj = document.createElement('div');
+		this.dom_obj.id = id;
+		this.dom_obj.className = 'box_on';
+		this.dom_obj.style.height = (this.areaHeight + 2) + 'px';
 
-		jQuery(obj).parent().append(div);
-
-		return div;
+		jQuery(this.grphobj).parent().append(this.dom_obj);
 	},
 
-	create_box: function() {
+	createBox: function() {
 		if (!jQuery('#selection_box').length) {
 			this.dom_box = document.createElement('div');
 			this.dom_obj.appendChild(this.dom_box);
-
 			this.dom_period_span = document.createElement('span');
 			this.dom_box.appendChild(this.dom_period_span);
-
 			this.dom_period_span.setAttribute('id', 'period_span');
 			this.dom_period_span.innerHTML = this.period;
 
 			var dims = getDimensions(this.dom_obj);
+
 			this.shifts.left = dims.left;
 			this.shifts.top = dims.top;
 
-			var top = 0; // we use only x axis
-			var left = this.mouse_event.left - dims.left;
+			this.box.top = 0; // we use only x axis
+			this.box.left = this.mouse_event.left - dims.left;
+			this.box.height = this.areaHeight;
 
 			this.dom_box.setAttribute('id', 'selection_box');
-			this.dom_box.style.top = top + 'px';
-			this.dom_box.style.left = left + 'px';
-			this.dom_box.style.height = this.cobj.height + 'px';
+			this.dom_box.style.top = this.box.top + 'px';
+			this.dom_box.style.left = this.box.left + 'px';
+			this.dom_box.style.height = this.areaHeight + 'px';
 			this.dom_box.style.width = '1px';
 			this.dom_box.style.zIndex = 98;
 
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;
 
-			this.box.top = top;
-			this.box.left = left;
-			this.box.height = this.cobj.height;
-
 			if (IE) {
-				this.dom_box.onmousemove = this.mousemove.bindAsEventListener(this);
+				this.dom_box.onmousemove = this.mouseMove.bindAsEventListener(this);
 			}
 		}
 	},
 
-	resizebox: function() {
-		if (ZBX_SBOX[this.sbox_id].sbox.is_active) {
-			// fix wrong selection box
-			if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-				this.moveright(this.cobj.width - this.start_event.left - this.cobj.left);
-			}
-			else if (this.mouse_event.left < this.cobj.left) {
-				this.moveleft(this.cobj.left, this.start_event.left - this.cobj.left);
-			}
-			else {
-				var width = this.validateW(this.mouse_event.left - this.start_event.left);
-				var left = this.mouse_event.left - this.shifts.left;
-
-				if (width > 0) {
-					this.moveright(width);
-				}
-				else {
-					this.moveleft(left, width);
-				}
-			}
-
-			this.period = this.calcperiod();
-
-			if (!is_null(this.dom_box)) {
-				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
-			}
-		}
-	},
-
-	moveleft: function(left, width) {
+	moveLeft: function(left, width) {
 		if (!is_null(this.dom_box)) {
 			this.dom_box.style.left = left + 'px';
 		}
@@ -2017,7 +1832,7 @@ var sbox = Class.create(CDebug, {
 		}
 	},
 
-	moveright: function(width) {
+	moveRight: function(width) {
 		if (!is_null(this.dom_box)) {
 			this.dom_box.style.left = this.box.left + 'px';
 		}
@@ -2028,14 +1843,14 @@ var sbox = Class.create(CDebug, {
 		this.box.width = width;
 	},
 
-	calcperiod: function() {
+	calcPeriod: function() {
 		var new_period;
 
-		if (this.box.width + 1 >= this.cobj.width) {
-			new_period = this.timeline.period();
+		if (this.box.width + 1 >= this.areaWidth) {
+			new_period = timeControl.timeline.period();
 		}
 		else {
-			this.px2time = this.timeline.period() / this.cobj.width;
+			this.px2time = timeControl.timeline.period() / this.areaWidth;
 			new_period = Math.round(this.box.width * this.px2time);
 		}
 
@@ -2043,62 +1858,52 @@ var sbox = Class.create(CDebug, {
 	},
 
 	validateW: function(w) {
-		if ((this.start_event.left - this.cobj.left + w) > this.cobj.width) {
+		if ((this.start_event.left - this.additionShiftL + w) > this.areaWidth) {
 			w = 0;
 		}
-		if (this.mouse_event.left < this.cobj.left) {
+		if (this.mouse_event.left < this.additionShiftL) {
 			w = 0;
 		}
 
 		return w;
 	},
 
-	validateH: function(h) {
-		if (h <= 0) {
-			h = 1;
-		}
-		if ((this.start_event.top - this.cobj.top + h) > this.cobj.height) {
-			h = this.cobj.height - this.start_event.top;
-		}
-
-		return h;
-	},
-
 	moveSBoxByObj: function() {
 		var posxy = jQuery('#' + jQuery(this.grphobj).attr('id')).position();
 		var dims = getDimensions(this.grphobj);
 
-		this.dom_obj.style.top = (posxy.top + ZBX_SBOX[this.sbox_id].shiftT) + 'px';
+		this.dom_obj.style.top = (posxy.top + this.shiftT) + 'px';
 		this.dom_obj.style.left = posxy.left + 'px';
 		if (dims.width > 0) {
 			this.dom_obj.style.width = dims.width + 'px';
 		}
-		this.cobj.top = posxy.top + ZBX_SBOX[this.sbox_id].shiftT;
-		this.cobj.left = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
+
+		this.additionShiftL = posxy.left + this.shiftL;
 	},
 
 	optimizeEvent: function(e) {
-		if (e.pageX || e.pageY) {
-			this.mouse_event.left = e.pageX;
+		if (!empty(e.pageX) && !empty(e.pageY)) {
+			this.mouse_event.left = e.pageX - jQuery(this.containerId).position().left;
 			this.mouse_event.top = e.pageY;
 		}
-		else if (e.clientX || e.clientY) {
-			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+		else if (!empty(e.clientX) && !empty(e.clientY)) {
+			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - jQuery(this.containerId).position().left;
 			this.mouse_event.top = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 		}
-
-		this.mouse_event.left = parseInt(this.mouse_event.left);
-		this.mouse_event.top = parseInt(this.mouse_event.top);
-
-		if (this.mouse_event.left < this.cobj.left) {
-			this.mouse_event.left = this.cobj.left;
+		else {
+			this.mouse_event.left = parseInt(this.mouse_event.left);
+			this.mouse_event.top = parseInt(this.mouse_event.top);
 		}
-		else if (this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
-			this.mouse_event.left = this.cobj.width + this.cobj.left;
+
+		if (this.mouse_event.left < this.additionShiftL) {
+			this.mouse_event.left = this.additionShiftL;
+		}
+		else if (this.mouse_event.left > (this.areaWidth + this.additionShiftL)) {
+			this.mouse_event.left = this.areaWidth + this.additionShiftL;
 		}
 	},
 
-	clear_params: function() {
+	clearParams: function() {
 		if (!is_null(this.dom_box)) {
 			var id = jQuery(this.dom_box).attr('id');
 
@@ -2117,69 +1922,26 @@ var sbox = Class.create(CDebug, {
 	}
 });
 
-function moveSBoxes() {
-	for (var key in ZBX_SBOX) {
-		if (empty(ZBX_SBOX[key]) || !isset('sbox', ZBX_SBOX[key])) {
-			continue;
+function sboxGlobalMove() {
+	for (var id in ZBX_SBOX) {
+		if (!empty(ZBX_SBOX[id])) {
+			ZBX_SBOX[id].moveSBoxByObj();
 		}
-
-		ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
 }
 
-/**
- * optimization:
- *
- * 86400 = 24 * 60 * 60
- * 31536000 = 365 * 86400
- * 2592000 = 30 * 86400
- * 604800 = 7 * 86400
- */
-function formatTimestamp(timestamp, isTsDouble, isExtend) {
-	timestamp = timestamp || 0;
-	var years = 0;
-	var months = 0;
-	var weeks = 0;
-
-	if (isExtend) {
-		years = parseInt(timestamp / 31536000);
-		months = parseInt((timestamp - years * 31536000) / 2592000);
-		//weeks = parseInt((timestamp - years * 31536000 - months * 2592000) / 604800);
-	}
-
-	var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
-	var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
-	var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
-
-	if (isTsDouble) {
-		if (months.toString().length == 1) {
-			months = '0' + months;
-		}
-		if (weeks.toString().length == 1) {
-			weeks = '0' + weeks;
-		}
-		if (days.toString().length == 1) {
-			days = '0' + days;
-		}
-		if (hours.toString().length == 1) {
-			hours = '0' + hours;
-		}
-		if (minutes.toString().length == 1) {
-			minutes = '0' + minutes;
+function sboxGlobalMouseup(e) {
+	for (var id in ZBX_SBOX) {
+		if (!empty(ZBX_SBOX[id])) {
+			ZBX_SBOX[id].mouseUp(e);
 		}
 	}
+}
 
-	var str = '';
-	str += (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
-	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
-	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
-	str += (isExtend && isTsDouble)
-		? days + locale['S_DAY_SHORT'] + ' '
-		: (days == 0)
-			? ''
-			: days + locale['S_DAY_SHORT'] + ' ';
-	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
-	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
-
-	return str;
+function sboxGlobalMousemove(e) {
+	for (var id in ZBX_SBOX) {
+		if (!empty(ZBX_SBOX[id]) && ZBX_SBOX[id].is_active) {
+			ZBX_SBOX[id].mouseMove(e);
+		}
+	}
 }

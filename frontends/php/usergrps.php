@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/media.inc.php';
@@ -32,8 +32,7 @@ $page['hist_arg'] = array('config');
 $page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'grpaction' =>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
@@ -77,11 +76,34 @@ $fields = array(
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
-?>
-<?php
-$_REQUEST['go'] = get_request('go', 'none');
+
 $_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
 $_REQUEST['debug_mode'] = get_request('debug_mode', 0);
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['usrgrpid'])) {
+	$dbUsrGrp = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
+	if (empty($dbUsrGrp)) {
+		access_deny();
+	}
+}
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['group_groupid']) || !is_array($_REQUEST['group_groupid'])) {
+		access_deny();
+	}
+	else {
+		$dbUsrGrpChk = API::UserGroup()->get(array(
+			'usrgrpids' => $_REQUEST['group_groupid'],
+			'countOutput' => true
+		));
+		if ($dbUsrGrpChk != count($_REQUEST['group_groupid'])) {
+			access_deny();
+		}
+	}
+}
+$_REQUEST['go'] = get_request('go', 'none');
 
 if (isset($_REQUEST['del_deny']) && isset($_REQUEST['right_to_del']['deny'])) {
 	$_REQUEST['group_rights'] = get_request('group_rights', array());
@@ -160,8 +182,7 @@ elseif (isset($_REQUEST['save'])) {
 * Delete
 */
 elseif (isset($_REQUEST['delete'])) {
-	$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
-	$group = reset($group);
+	$group = reset($dbUsrGrp);
 
 	DBstart();
 	$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
@@ -298,8 +319,7 @@ if (isset($_REQUEST['form'])) {
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
 	if (isset($_REQUEST['usrgrpid'])) {
-		$usrgrp = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
-		$data['usrgrp'] = reset($usrgrp);
+		$data['usrgrp'] = reset($dbUsrGrp);
 	}
 	if (isset($_REQUEST['usrgrpid']) && !isset($_REQUEST['form_refresh'])) {
 		$data['name'] = $data['usrgrp']['name'];
