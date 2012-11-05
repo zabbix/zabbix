@@ -1322,6 +1322,7 @@ class CTrigger extends CTriggerGeneral {
 	public function delete($triggerids, $nopermissions = false) {
 		$triggerids = zbx_toArray($triggerids);
 		$triggers = zbx_toObject($triggerids, 'triggerid');
+		$delTriggerIds = $triggerids;
 
 		if (empty($triggerids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
@@ -1361,7 +1362,7 @@ class CTrigger extends CTriggerGeneral {
 		// execute delete
 		$this->deleteByPks($triggerids);
 
-		return array('triggerids' => $triggerids);
+		return array('triggerids' => $delTriggerIds);
 	}
 
 
