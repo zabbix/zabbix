@@ -418,11 +418,7 @@ class CHttpTest extends CZBXAPI {
 	 * @param array $httpTests
 	 */
 	protected function validateCreate(array $httpTests) {
-		$httpTestsNames = $this->checkNames($httpTests);
-
-		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.DBcondition('ht.name', $httpTestsNames), 1))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $name['name']));
-		}
+		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
 			$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
@@ -545,8 +541,6 @@ class CHttpTest extends CZBXAPI {
 		if (!preg_grep('/^['.ZBX_PREG_PRINT.']+$/u', $httpTestsNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
 		}
-
-		return $httpTestsNames;
 	}
 
 	/**
