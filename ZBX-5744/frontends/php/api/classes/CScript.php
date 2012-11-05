@@ -130,6 +130,30 @@ class CScript extends CZBXAPI {
 			$sqlParts['where'][] = '('.DBcondition('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
 		}
 
+		// hostids
+		if (!is_null($options['hostids'])) {
+			zbx_value2array($options['hostids']);
+
+			// only fetch scripts from the same nodes as the hosts
+			$hostNodeIds = array();
+			foreach ($options['hostids'] as $hostId) {
+				$hostNodeIds[] = id2nodeid($hostId);
+			}
+			$hostNodeIds = array_unique($hostNodeIds);
+
+			// return scripts that are assigned to the hosts' groups or to no group
+			$hostGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'hostids' => $options['hostids'],
+				'nodeids' => $hostNodeIds
+			));
+			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
+
+			$sqlParts['where'][] = DBcondition('s.groupid', $hostGroupIds).
+				' OR '.
+				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).')';
+		}
+
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
@@ -208,41 +232,6 @@ class CScript extends CZBXAPI {
 
 		if (!is_null($options['countOutput'])) {
 			return $result;
-		}
-
-		if (!is_null($options['hostids'])) {
-			zbx_value2array($options['hostids']);
-			$options['hostids'] = array_unique($options['hostids']);
-
-			// only fetch scripts from the same nodes as the hosts
-			$hostNodeIds = array();
-			foreach ($options['hostids'] as $hostId) {
-				$hostNodeIds[] = id2nodeid($hostId);
-			}
-			$hostNodeIds = array_unique($hostNodeIds);
-
-			// fill scripts with hosts via groups
-			foreach ($result as $scriptid => $script) {
-				if (!empty($script['groupid'])) {
-					$isHostsFound = false;
-
-					$dbHosts = DBselect(
-						'SELECT hg.hostid'.
-						' FROM hosts_groups hg'.
-						' WHERE hg.groupid='.$script['groupid'].
-							' AND '.DBcondition('hg.hostid', $options['hostids']).
-							' AND '.DBin_node('hg.hostid', $hostNodeIds)
-					);
-					while ($dbHost = DBfetch($dbHosts)) {
-						$isHostsFound = true;
-					}
-
-					// remove script from result if we have host without scripts
-					if (!$isHostsFound) {
-						unset($result[$scriptid]);
-					}
-				}
-			}
 		}
 
 		// add related objects
