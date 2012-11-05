@@ -766,6 +766,8 @@ static int	get_values(unsigned char poller_type)
 	}
 
 	DCconfig_clean_items(items, NULL, num);
+
+	dc_flush_history();
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
 
