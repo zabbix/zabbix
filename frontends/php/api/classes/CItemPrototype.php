@@ -396,15 +396,18 @@ class CItemPrototype extends CItemGeneral {
 				if (!is_null($options['limitSelects'])) {
 					order_result($triggers, 'description');
 				}
+				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
 					unset($triggers[$triggerid]['items']);
-					$count = array();
 					foreach ($trigger['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
 
 						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
@@ -457,18 +460,23 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::GraphPrototype()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($graphs, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($graphs, 'name');
+				}
+				$count = array();
 				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['discoveries']);
-					$count = array();
-					foreach ($graph['discoveries'] as $item) {
+					unset($graphs[$graphid]['items']);
+					foreach ($graph['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
 
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
-
 						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
@@ -478,13 +486,15 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['groupCount'] = 1;
 
 				$graphs = API::GraphPrototype()->get($objParams);
-
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
+
 				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid]))
+					if (isset($graphs[$itemid])) {
 						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					else
+					}
+					else {
 						$result[$itemid]['graphs'] = 0;
+					}
 				}
 			}
 		}
