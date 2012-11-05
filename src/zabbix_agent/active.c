@@ -270,9 +270,7 @@ static int	parse_list_of_checks(char *str)
 			mtime = 0;
 		}
 		else
-		{
 			mtime = atoi(tmp);
-		}
 
 		add_check(name, key_orig, delay, lastlogsize, mtime);
 	}
@@ -759,8 +757,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-			do { /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+			do
+			{
+				/* simple try realization */
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (5 < num_param(params))
@@ -857,8 +857,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-			do { /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+			do
+			{
+				/* simple try realization */
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (5 < num_param(params))
@@ -942,7 +944,6 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
 						break;
 				} /* while processing a log */
-
 			}
 			while (0); /* simple try realization */
 
@@ -963,8 +964,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 #ifdef _WINDOWS
-			do{ /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+			do
+			{
+				/* simple try realization */
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (7 < num_param(params))
@@ -1081,7 +1084,6 @@ static void	process_active_checks(char *server, unsigned short port)
 				} /* while processing an eventlog */
 
 				break;
-
 			}
 			while (0); /* simple try realization */
 #endif	/* _WINDOWS */
