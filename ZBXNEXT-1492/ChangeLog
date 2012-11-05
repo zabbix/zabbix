@@ -1,6 +1,8 @@
 Changes for 2.1.0
 
 New features:
+.......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)
+........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
 ....I...S. [ZBXNEXT-1472] added support of parallel processing of time-based functions (Sasha)
 ..F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard)
 .......PS. [ZBX-3449] added support of multiple dynamic SNMP indexes (Sasha)
@@ -15,7 +17,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
-A......... [ZBX-5714] fixed inconsistency between shorten and refer in UserMacro API (Eduard)
+A......... [ZBX-5709] fixed trigger recreation after template trigger expression change causing event history deletion (Toms)
 ..F....... [ZBX-5711] added caching for frontend favorite values (Toms)
 ..F....... [ZBX-5711] removed redundant queries when editing web scenario (Toms)
 A.F....... [ZBX-5565] fixed html is returned on api requests if db is down (Vedmak)
@@ -53,6 +55,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5667] fixed host screen defined in template does not show item data for "Plain text" elements (Toms)
+..F....... [ZBX-5762] fixed undefined indexes in graph prototype form (Oleg)
 ....I..... [ZBX-5125] fixed possible SQL errors while upgrading DB (dimir, Sasha)
 ....I..... [ZBX-5415] fixed check for PostgreSQL dev libraries (Sasha)
 A......... [ZBX-5740] removed "discoveryids" parameter from CItem, CTrigger and CGraph get() methods (Toms)
