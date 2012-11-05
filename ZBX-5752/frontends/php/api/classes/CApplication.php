@@ -548,7 +548,7 @@ class CApplication extends CZBXAPI {
 	 */
 	public function delete($applicationids, $nopermissions = false) {
 		$applicationids = zbx_toArray($applicationids);
-
+		$delApplicationIds = $applicationids;
 		// TODO: remove $nopermissions hack
 		$options = array(
 			'applicationids' => $applicationids,
@@ -608,7 +608,7 @@ class CApplication extends CZBXAPI {
 			$host = reset($delApplication['hosts']);
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
-		return array('applicationids' => $applicationids);
+		return array('applicationids' => $delApplicationIds);
 	}
 
 	/**

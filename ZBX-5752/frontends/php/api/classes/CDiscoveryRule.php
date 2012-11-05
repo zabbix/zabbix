@@ -560,6 +560,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (empty($ruleids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
+		$delRuleIds = zbx_toArray($ruleids);
 		$ruleids = zbx_toHash($ruleids);
 
 		$options = array(
@@ -629,7 +630,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
-		return array('ruleids' => $ruleids);
+		return array('ruleids' => $delRuleIds);
 	}
 
 	/**
