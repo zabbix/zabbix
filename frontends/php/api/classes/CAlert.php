@@ -154,9 +154,7 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['groupid'] = 'hg.groupid';
-			}
+			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -171,9 +169,7 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'i.hostid';
-			}
+			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
@@ -193,9 +189,7 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['actionid'] = 'a.actionid';
-			}
+			$sqlParts['select']['actionid'] = 'a.actionid';
 			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
 			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			$sqlParts['where'][] = DBcondition('e.objectid', $options['triggerids']);
@@ -212,9 +206,7 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['actionids'])) {
 			zbx_value2array($options['actionids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['actionid'] = 'a.actionid';
-			}
+			$sqlParts['select']['actionid'] = 'a.actionid';
 			$sqlParts['where'][] = DBcondition('a.actionid', $options['actionids']);
 		}
 
@@ -233,9 +225,7 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['mediatypeid'] = 'a.mediatypeid';
-			}
+			$sqlParts['select']['mediatypeid'] = 'a.mediatypeid';
 			$sqlParts['where'][] = DBcondition('a.mediatypeid', $options['mediatypeids']);
 		}
 
@@ -329,45 +319,40 @@ class CAlert extends CZBXAPI {
 					$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 				}
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$alert['alertid']] = array('alertid' => $alert['alertid']);
+				if (!isset($result[$alert['alertid']])) {
+					$result[$alert['alertid']] = array();
 				}
-				else {
-					if (!isset($result[$alert['alertid']])) {
-						$result[$alert['alertid']] = array();
+				if (!is_null($options['selectMediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])) {
+					$result[$alert['alertid']]['mediatypes'] = array();
+				}
+				if (!is_null($options['selectUsers']) && !isset($result[$alert['alertid']]['users'])) {
+					$result[$alert['alertid']]['users'] = array();
+				}
+
+				// hostids
+				if (isset($alert['hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$alert['alertid']]['hosts'])) {
+						$result[$alert['alertid']]['hosts'] = array();
 					}
-					if (!is_null($options['selectMediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])) {
-						$result[$alert['alertid']]['mediatypes'] = array();
-					}
-					if (!is_null($options['selectUsers']) && !isset($result[$alert['alertid']]['users'])) {
+					$result[$alert['alertid']]['hosts'][] = array('hostid' => $alert['hostid']);
+				}
+
+				// userids
+				if (isset($alert['userid']) && is_null($options['selectUsers'])) {
+					if (!isset($result[$alert['alertid']]['users'])) {
 						$result[$alert['alertid']]['users'] = array();
 					}
-
-					// hostids
-					if (isset($alert['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$alert['alertid']]['hosts'])) {
-							$result[$alert['alertid']]['hosts'] = array();
-						}
-						$result[$alert['alertid']]['hosts'][] = array('hostid' => $alert['hostid']);
-					}
-
-					// userids
-					if (isset($alert['userid']) && is_null($options['selectUsers'])) {
-						if (!isset($result[$alert['alertid']]['users'])) {
-							$result[$alert['alertid']]['users'] = array();
-						}
-						$result[$alert['alertid']]['users'][] = array('userid' => $alert['userid']);
-					}
-
-					// mediatypeids
-					if (isset($alert['mediatypeid']) && is_null($options['selectMediatypes'])) {
-						if (!isset($result[$alert['alertid']]['mediatypes'])) {
-							$result[$alert['alertid']]['mediatypes'] = array();
-						}
-						$result[$alert['alertid']]['mediatypes'][] = array('mediatypeid' => $alert['mediatypeid']);
-					}
-					$result[$alert['alertid']] += $alert;
+					$result[$alert['alertid']]['users'][] = array('userid' => $alert['userid']);
 				}
+
+				// mediatypeids
+				if (isset($alert['mediatypeid']) && is_null($options['selectMediatypes'])) {
+					if (!isset($result[$alert['alertid']]['mediatypes'])) {
+						$result[$alert['alertid']]['mediatypes'] = array();
+					}
+					$result[$alert['alertid']]['mediatypes'][] = array('mediatypeid' => $alert['mediatypeid']);
+				}
+				$result[$alert['alertid']] += $alert;
 			}
 		}
 

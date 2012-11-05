@@ -1022,7 +1022,7 @@ function getSelementsInfo($sysmap) {
 	if ($sysmap['iconmapid']) {
 		$hostInventories = API::Host()->get(array(
 			'hostids' => $hostsToGetInventories,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectInventory' => true
@@ -1141,7 +1141,7 @@ function getSelementsInfo($sysmap) {
 	$unack_triggerids = API::Trigger()->get(array(
 		'triggerids' => array_keys($all_triggers),
 		'withLastEventUnacknowledged' => true,
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('triggerid'),
 		'nodeids' => get_current_nodeid(true),
 		'nopermissions' => true,
 		'monitored' => true,
@@ -1854,7 +1854,7 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 	if (!empty($elementsHostids)) {
 		$mapHosts = API::Host()->get(array(
 			'hostids' => $elementsHostids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'selectInterfaces' => API_OUTPUT_EXTEND
 		));
 		$mapHosts = zbx_toHash($mapHosts, 'hostid');
@@ -2011,7 +2011,7 @@ function populateFromMapAreas(array &$map) {
 			$hosts = API::host()->get(array(
 				'groupids' => $selement['elementid'],
 				'sortfield' => 'name',
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('hostid'),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));

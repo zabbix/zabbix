@@ -118,10 +118,7 @@ abstract class CMapElement extends CZBXAPI {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['sysmapid'] = 'se.sysmapid';
-			}
-
+			$sqlParts['select']['sysmapid'] = 'se.sysmapid';
 			$sqlParts['where']['sysmapid'] = DBcondition('se.sysmapid', $options['sysmapids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -205,22 +202,17 @@ abstract class CMapElement extends CZBXAPI {
 			else{
 				$selementids[$selement['selementid']] = $selement['selementid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$selement['selementid']] = array('selementid' => $selement['selementid']);
+				if (!isset($result[$selement['selementid']])) $result[$selement['selementid']]= array();
+
+				if (!is_null($options['selectLinks']) && !isset($result[$selement['selementid']]['links'])) {
+					$result[$selement['selementid']]['links'] = array();
 				}
-				else{
-					if (!isset($result[$selement['selementid']])) $result[$selement['selementid']]= array();
 
-					if (!is_null($options['selectLinks']) && !isset($result[$selement['selementid']]['links'])) {
-						$result[$selement['selementid']]['links'] = array();
-					}
-
-					if (!is_null($options['selectUrls']) && !isset($result[$selement['selementid']]['urls'])) {
-						$result[$selement['selementid']]['urls'] = array();
-					}
-
-					$result[$selement['selementid']] += $selement;
+				if (!is_null($options['selectUrls']) && !isset($result[$selement['selementid']]['urls'])) {
+					$result[$selement['selementid']]['urls'] = array();
 				}
+
+				$result[$selement['selementid']] += $selement;
 			}
 		}
 
@@ -368,10 +360,7 @@ abstract class CMapElement extends CZBXAPI {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['sysmapid'] = 'sl.sysmapid';
-			}
-
+			$sqlParts['select']['sysmapid'] = 'sl.sysmapid';
 			$sqlParts['where']['sysmapid'] = DBcondition('sl.sysmapid', $options['sysmapids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -455,12 +444,7 @@ abstract class CMapElement extends CZBXAPI {
 			else{
 				$linkids[$link['linkid']] = $link['linkid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$link['linkid']] = array('linkid' => $link['linkid']);
-				}
-				else{
-					$result[$link['linkid']] = $link;
-				}
+				$result[$link['linkid']] = $link;
 			}
 		}
 
@@ -540,7 +524,7 @@ abstract class CMapElement extends CZBXAPI {
 
 			$dbLinks = $this->getLinks(array(
 				'selementids' => zbx_objectValues($links, 'linkid'),
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('linkid'),
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));

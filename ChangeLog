@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A......... [ZBXNEXT-1492] dropped support of output shorten for the API get methods (Pavels)
 .......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)
 ........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
 ....I...S. [ZBXNEXT-1472] added support of parallel processing of time-based functions (Sasha)
@@ -55,6 +56,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5751] fixed CDiscoveryRule get() and CItemPrototype get() "selectGraphs" parameter (Oleg)
 ..F....... [ZBX-5667] fixed host screen defined in template does not show item data for "Plain text" elements (Toms)
 ..F....... [ZBX-5762] fixed undefined indexes in graph prototype form (Oleg)
 ....I..... [ZBX-5125] fixed possible SQL errors while upgrading DB (dimir, Sasha)

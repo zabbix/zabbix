@@ -204,7 +204,7 @@ if (get_request('itemid', false)) {
 	$item = API::Item()->get(array(
 		'itemids' => $_REQUEST['itemid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('itemid'),
 		'editable' => true,
 		'preservekeys' => true
 	));
