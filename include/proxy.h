@@ -1,4 +1,3 @@
-
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -66,7 +65,7 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
 void	calc_timestamp(char *line, int *timestamp, char *format);
 
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
-		AGENT_VALUE *values, int value_num, int *processed);
+		AGENT_VALUE *values, size_t value_num, int *processed);
 int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		const zbx_uint64_t proxy_hostid, char *info, int max_info_size);
 void	process_dhis_data(struct zbx_json_parse *jp);
