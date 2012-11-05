@@ -404,7 +404,7 @@ else {
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
 			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('triggerid'),
 			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
 		);

@@ -169,26 +169,21 @@ class CScreen extends CZBXAPI {
 			else {
 				$screenids[$screen['screenid']] = $screen['screenid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$screen['screenid']] = array('screenid' => $screen['screenid']);
+				if (!isset($result[$screen['screenid']])) {
+					$result[$screen['screenid']]= array();
 				}
-				else {
-					if (!isset($result[$screen['screenid']])) {
-						$result[$screen['screenid']]= array();
-					}
-					if (!is_null($options['selectScreenItems']) && !isset($result[$screen['screenid']]['screenitems'])) {
+				if (!is_null($options['selectScreenItems']) && !isset($result[$screen['screenid']]['screenitems'])) {
+					$result[$screen['screenid']]['screenitems'] = array();
+				}
+				if (isset($screen['screenitemid']) && is_null($options['selectScreenItems'])) {
+					if (!isset($result[$screen['screenid']]['screenitems'])) {
 						$result[$screen['screenid']]['screenitems'] = array();
 					}
-					if (isset($screen['screenitemid']) && is_null($options['selectScreenItems'])) {
-						if (!isset($result[$screen['screenid']]['screenitems'])) {
-							$result[$screen['screenid']]['screenitems'] = array();
-						}
-						$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
-						unset($screen['screenitemid']);
-					}
-
-					$result[$screen['screenid']] += $screen;
+					$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
+					unset($screen['screenitemid']);
 				}
+
+				$result[$screen['screenid']] += $screen;
 			}
 		}
 
@@ -399,7 +394,7 @@ class CScreen extends CZBXAPI {
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $data),
 			'preservekeys' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('screenid'),
 			'nopermissions' => true,
 			'limit' => 1
 		);
@@ -491,7 +486,7 @@ class CScreen extends CZBXAPI {
 		$updScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('screenid'),
 			'preservekeys' => true
 		));
 		foreach ($screens as $screen) {
@@ -513,7 +508,7 @@ class CScreen extends CZBXAPI {
 					'filter' => array('name' => $screen['name']),
 					'preservekeys' => true,
 					'nopermissions' => true,
-					'output' => API_OUTPUT_SHORTEN
+					'output' => array('screenid')
 				));
 				$existScreen = reset($existScreen);
 
