@@ -1628,16 +1628,39 @@ class CTrigger extends CTriggerGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, reset($expressionData->errors));
 				}
 
-				// if the templates used in the expresseion have changed, delete all inherited triggers
-				// and recreate them later
+				// remove triggers if expression is changed in a way that trigger will not appear in current host
 				$oldExpressionData = new CTriggerExpression(array('expression' => $oldExpression));
-				if (!array_equal($oldExpressionData->data['hosts'], $expressionData->data['hosts'])) {
+				// chech if at least one template has stayed in expression, this means that child trigger will stay in host
+				$oldTemplates = array_unique($oldExpressionData->data['hosts']);
+				$newTemplates = zbx_toHash(array_unique($expressionData->data['hosts']));
+				$proceed = true;
+				foreach ($oldTemplates as $oldTemplate) {
+					if (isset($newTemplates[$oldTemplate])) {
+						$proceed = false;
+						break;
+					}
+				}
+				// proceed if there is possibility that child triggers should be deleted
+				if ($proceed) {
 					$sql = 'SELECT t.triggerid'.
 							' FROM triggers t'.
 							' WHERE t.templateid='.zbx_dbstr($trigger['triggerid']);
 					$cTrigCursor = DBselect($sql);
 					$cTrigIds = array();
 					while ($cTrig = DBfetch($cTrigCursor)) {
+						// get templates linked to templated trigger host
+						$templateNames = DBfetchArrayAssoc(DBselect('SELECT h.name'.
+							' FROM hosts h, hosts_templates ht, items i, functions f'.
+							' WHERE h.hostid = ht.templateid AND ht.hostid = i.hostid AND i.itemid = f.itemid AND'.
+							' f.triggerid='.zbx_dbstr($cTrig['triggerid'])), 'name');
+
+						// if we have at least one template linked to trigger host inside trigger expression,
+						// then we don't delete this trigger
+						foreach ($expressionData->data['hosts'] as $templateName) {
+							if (isset($templateNames[$templateName])) {
+								continue 2;
+							}
+						}
 						$cTrigIds[] = $cTrig['triggerid'];
 					}
 					$this->deleteByPks($cTrigIds);

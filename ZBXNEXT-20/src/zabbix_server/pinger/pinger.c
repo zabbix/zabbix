@@ -172,6 +172,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 		}
 	}
 
+	dc_flush_history();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -181,7 +183,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	char	cmd[16], params[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	int	num_params;
 
-	if (0 == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
+	if (ZBX_COMMAND_ERROR == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
 		return NOTSUPPORTED;
 
 	if (0 == strcmp(cmd, SERVER_ICMPPING_KEY))
@@ -416,6 +418,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	}
 
 	DCconfig_clean_items(items, NULL, num);
+
+	dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, *icmp_items_count);
 }

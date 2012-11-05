@@ -519,6 +519,8 @@ clean:
 
 	zbx_free(err_str);
 
+	dc_flush_history();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
