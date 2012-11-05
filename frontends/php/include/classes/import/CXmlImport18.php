@@ -597,7 +597,7 @@ class CXmlImport18 {
 
 						$options = array(
 							'filter' => array('name' => $image['name']),
-							'output' => API_OUTPUT_SHORTEN
+							'output' => array('imageid')
 						);
 						$imgs = API::Image()->get($options);
 						$img = reset($imgs);
@@ -1134,7 +1134,7 @@ class CXmlImport18 {
 					foreach ($templates as $template) {
 						$options = array(
 							'filter' => array('host' => $template->nodeValue),
-							'output' => API_OUTPUT_SHORTEN,
+							'output' => array('templateid'),
 							'editable' => true
 						);
 						$current_template = API::Template()->get($options);

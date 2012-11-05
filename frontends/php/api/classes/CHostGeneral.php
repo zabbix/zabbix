@@ -160,9 +160,9 @@ abstract class CHostGeneral extends CZBXAPI {
 
 		// check if any templates linked to targets have more than one unique item key/application
 		foreach ($targetids as $targetid) {
-			$linkedTpls = $this->get(array(
+			$linkedTpls = API::Template()->get(array(
 				'nopermissions' => true,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('templateid'),
 				'hostids' => $targetid
 			));
 			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));

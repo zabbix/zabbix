@@ -68,7 +68,7 @@ if (isset($_REQUEST['favobj'])) {
 			$sysmap = API::Map()->get(array(
 				'sysmapids' => $sysmapid,
 				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => array('sysmapid')
 			));
 			$sysmap = reset($sysmap);
 			if ($sysmap === false) {

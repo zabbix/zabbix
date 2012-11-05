@@ -426,7 +426,7 @@ else {
 			'source' => EVENT_SOURCE_DISCOVERY,
 			'time_from' => $from,
 			'time_till' => $till,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('eventid'),
 			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => ($config['search_limit'] + 1)
@@ -585,7 +585,7 @@ else {
 				),
 				'time_from' => $from,
 				'time_till' => $till,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('eventid'),
 				'sortfield' => 'eventid',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => ($config['search_limit'] + 1)
@@ -598,7 +598,7 @@ else {
 			// trigger options
 			$trigOpt = array(
 				'nodeids' => get_current_nodeid(),
-				'output' => API_OUTPUT_SHORTEN
+				'output' => array('triggerid')
 			);
 
 			if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
