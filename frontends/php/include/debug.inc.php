@@ -63,6 +63,27 @@ function todo($msg) {
 	echo 'TODO: '.$msg.SBR;
 }
 
+
+/**
+ * Writes data in given file. Rewrites file on each PHP execution.
+ *
+ * @staticvar resource $fileStream resource of opened file
+ * @param mixed $data data to write in file
+ * @param boolean $persist persist file content on multiple script runs
+ * @param string $fileName file where output will be stored
+ */
+function sdFile($data, $persist = false, $fileName = 'debug.txt') {
+	static $fileStream;
+	if ($persist || $fileStream) {
+		$fileStream = fopen($fileName, 'a');
+	}
+	else {
+		$fileStream = fopen($fileName, 'w');
+	}
+	fwrite($fileStream, var_export($data, true)."\n\n");
+	fclose($fileStream);
+}
+
 function sdff($msg, $fileName = '/tmp/zabbix.log') {
 	$fileStreem = @fopen($fileName, 'a');
 	if (is_array($msg)) {

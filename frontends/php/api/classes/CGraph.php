@@ -392,6 +392,11 @@ class CGraph extends CGraphGeneral {
 						$result[$graph['graphid']]['items'][] = array('itemid' => $graph['itemid']);
 						unset($graph['itemid']);
 					}
+
+					if (isset($options['expandName'])) {
+						$graph['name'] = CGraphMacroResolver::i()->resolveById($graph['name'], $graph['graphid']);
+					}
+
 					$result[$graph['graphid']] += $graph;
 				}
 			}
