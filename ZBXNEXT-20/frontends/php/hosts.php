@@ -250,7 +250,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			$hosts['groups'] = API::HostGroup()->get(array(
 				'groupids' => get_request('groups', array()),
 				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => array('groupid')
 			));
 			if (!empty($newgroup)) {
 				$hosts['groups'][] = $newgroup;
@@ -438,7 +438,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// clone triggers
 			$triggers = API::Trigger()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('triggerid'),
 				'hostids' => $srcHostId,
 				'inherited' => false
 			));
@@ -450,7 +450,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// clone discovery rules
 			$discoveryRules = API::DiscoveryRule()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('itemid'),
 				'hostids' => $srcHostId,
 				'inherited' => false
 			));

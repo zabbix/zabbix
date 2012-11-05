@@ -194,10 +194,8 @@ class CHost extends CHostGeneral {
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['groupid'] = 'hg.groupid';
-			}
 
+			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -210,19 +208,16 @@ class CHost extends CHostGeneral {
 		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['proxy_hostid'] = 'h.proxy_hostid';
-			}
+
+			$sqlParts['select']['proxy_hostid'] = 'h.proxy_hostid';
 			$sqlParts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
 		}
 
 		// templateids
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['templateid'] = 'ht.templateid';
-			}
 
+			$sqlParts['select']['templateid'] = 'ht.templateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -235,10 +230,8 @@ class CHost extends CHostGeneral {
 		// interfaceids
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['interfaceid'] = 'hi.interfaceid';
-			}
 
+			$sqlParts['select']['interfaceid'] = 'hi.interfaceid';
 			$sqlParts['from']['interface'] = 'interface hi';
 			$sqlParts['where'][] = DBcondition('hi.interfaceid', $options['interfaceids']);
 			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
@@ -247,10 +240,8 @@ class CHost extends CHostGeneral {
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'i.itemid';
-			}
 
+			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -259,10 +250,8 @@ class CHost extends CHostGeneral {
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['triggerid'] = 'f.triggerid';
-			}
 
+			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
@@ -273,10 +262,8 @@ class CHost extends CHostGeneral {
 		// httptestids
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['httptestid'] = 'ht.httptestid';
-			}
 
+			$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['httptest'] = 'httptest ht';
 			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['httptestids']);
@@ -287,10 +274,8 @@ class CHost extends CHostGeneral {
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['graphid'] = 'gi.graphid';
-			}
 
+			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
@@ -301,10 +286,8 @@ class CHost extends CHostGeneral {
 		// applicationids
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['applicationid'] = 'a.applicationid';
-			}
 
+			$sqlParts['select']['applicationid'] = 'a.applicationid';
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
@@ -313,10 +296,8 @@ class CHost extends CHostGeneral {
 		// dhostids
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['dhostid'] = 'ds.dhostid';
-			}
 
+			$sqlParts['select']['dhostid'] = 'ds.dhostid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
 			$sqlParts['where']['dsh'] = 'ds.ip=h.ip';
@@ -329,10 +310,8 @@ class CHost extends CHostGeneral {
 		// dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['dserviceid'] = 'ds.dserviceid';
-			}
 
+			$sqlParts['select']['dserviceid'] = 'ds.dserviceid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['from']['interface'] = 'interface i';
 			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
@@ -347,10 +326,8 @@ class CHost extends CHostGeneral {
 		// maintenanceids
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['maintenanceid'] = 'mh.maintenanceid';
-			}
 
+			$sqlParts['select']['maintenanceid'] = 'mh.maintenanceid';
 			$sqlParts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
 			$sqlParts['where'][] = DBcondition('mh.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'h.hostid=mh.hostid';
@@ -511,171 +488,166 @@ class CHost extends CHostGeneral {
 			else {
 				$hostids[$host['hostid']] = $host['hostid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$host['hostid']] = array('hostid' => $host['hostid']);
-				}
-				else {
-					if (!isset($result[$host['hostid']])) $result[$host['hostid']] = array();
+				if (!isset($result[$host['hostid']])) $result[$host['hostid']] = array();
 
-					if (!is_null($options['selectGroups']) && !isset($result[$host['hostid']]['groups'])) {
+				if (!is_null($options['selectGroups']) && !isset($result[$host['hostid']]['groups'])) {
+					$result[$host['hostid']]['groups'] = array();
+				}
+				if (!is_null($options['selectParentTemplates']) && !isset($result[$host['hostid']]['parentTemplates'])) {
+					$result[$host['hostid']]['parentTemplates'] = array();
+				}
+				if (!is_null($options['selectItems']) && !isset($result[$host['hostid']]['items'])) {
+					$result[$host['hostid']]['items'] = array();
+				}
+				if (!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])) {
+					$result[$host['hostid']]['discoveries'] = array();
+				}
+				if (!is_null($options['selectInventory']) && !isset($result[$host['hostid']]['inventory'])) {
+					$result[$host['hostid']]['inventory'] = array();
+				}
+				if (!is_null($options['selectTriggers']) && !isset($result[$host['hostid']]['triggers'])) {
+					$result[$host['hostid']]['triggers'] = array();
+				}
+				if (!is_null($options['selectGraphs']) && !isset($result[$host['hostid']]['graphs'])) {
+					$result[$host['hostid']]['graphs'] = array();
+				}
+				if (!is_null($options['selectDHosts']) && !isset($result[$host['hostid']]['dhosts'])) {
+					$result[$host['hostid']]['dhosts'] = array();
+				}
+				if (!is_null($options['selectDServices']) && !isset($result[$host['hostid']]['dservices'])) {
+					$result[$host['hostid']]['dservices'] = array();
+				}
+				if (!is_null($options['selectApplications']) && !isset($result[$host['hostid']]['applications'])) {
+					$result[$host['hostid']]['applications'] = array();
+				}
+				if (!is_null($options['selectMacros']) && !isset($result[$host['hostid']]['macros'])) {
+					$result[$host['hostid']]['macros'] = array();
+				}
+
+				if (!is_null($options['selectScreens']) && !isset($result[$host['hostid']]['screens'])) {
+					$result[$host['hostid']]['screens'] = array();
+				}
+				if (!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])) {
+					$result[$host['hostid']]['interfaces'] = array();
+				}
+				// groupids
+				if (isset($host['groupid']) && is_null($options['selectGroups'])) {
+					if (!isset($result[$host['hostid']]['groups'])) {
 						$result[$host['hostid']]['groups'] = array();
-					}
-					if (!is_null($options['selectParentTemplates']) && !isset($result[$host['hostid']]['parentTemplates'])) {
-						$result[$host['hostid']]['parentTemplates'] = array();
-					}
-					if (!is_null($options['selectItems']) && !isset($result[$host['hostid']]['items'])) {
-						$result[$host['hostid']]['items'] = array();
-					}
-					if (!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])) {
-						$result[$host['hostid']]['discoveries'] = array();
-					}
-					if (!is_null($options['selectInventory']) && !isset($result[$host['hostid']]['inventory'])) {
-						$result[$host['hostid']]['inventory'] = array();
-					}
-					if (!is_null($options['selectTriggers']) && !isset($result[$host['hostid']]['triggers'])) {
-						$result[$host['hostid']]['triggers'] = array();
-					}
-					if (!is_null($options['selectGraphs']) && !isset($result[$host['hostid']]['graphs'])) {
-						$result[$host['hostid']]['graphs'] = array();
-					}
-					if (!is_null($options['selectDHosts']) && !isset($result[$host['hostid']]['dhosts'])) {
-						$result[$host['hostid']]['dhosts'] = array();
-					}
-					if (!is_null($options['selectDServices']) && !isset($result[$host['hostid']]['dservices'])) {
-						$result[$host['hostid']]['dservices'] = array();
-					}
-					if (!is_null($options['selectApplications']) && !isset($result[$host['hostid']]['applications'])) {
-						$result[$host['hostid']]['applications'] = array();
-					}
-					if (!is_null($options['selectMacros']) && !isset($result[$host['hostid']]['macros'])) {
-						$result[$host['hostid']]['macros'] = array();
-					}
-					if (!is_null($options['selectScreens']) && !isset($result[$host['hostid']]['screens'])) {
-						$result[$host['hostid']]['screens'] = array();
-					}
-					if (!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])) {
-						$result[$host['hostid']]['interfaces'] = array();
 					}
 					if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
 						$result[$host['hostid']]['httpTests'] = array();
 					}
 
-					// groupids
-					if (isset($host['groupid']) && is_null($options['selectGroups'])) {
-						if (!isset($result[$host['hostid']]['groups'])) {
-							$result[$host['hostid']]['groups'] = array();
-						}
-
-						$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
-						unset($host['groupid']);
-					}
-
-					// templateids
-					if (isset($host['templateid'])) {
-						if (!isset($result[$host['hostid']]['templates'])) {
-							$result[$host['hostid']]['templates'] = array();
-						}
-
-						$result[$host['hostid']]['templates'][] = array(
-							'templateid' => $host['templateid'],
-							'hostid' => $host['templateid']
-						);
-						unset($host['templateid']);
-					}
-
-					// triggerids
-					if (isset($host['triggerid']) && is_null($options['selectTriggers'])) {
-						if (!isset($result[$host['hostid']]['triggers'])) {
-							$result[$host['hostid']]['triggers'] = array();
-						}
-
-						$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
-						unset($host['triggerid']);
-					}
-
-					// interfaceids
-					if (isset($host['interfaceid']) && is_null($options['selectInterfaces'])) {
-						if (!isset($result[$host['hostid']]['interfaces'])) {
-							$result[$host['hostid']]['interfaces'] = array();
-						}
-
-						$result[$host['hostid']]['interfaces'][] = array('interfaceid' => $host['interfaceid']);
-						unset($host['interfaceid']);
-					}
-
-					// itemids
-					if (isset($host['itemid']) && is_null($options['selectItems'])) {
-						if (!isset($result[$host['hostid']]['items'])) {
-							$result[$host['hostid']]['items'] = array();
-						}
-
-						$result[$host['hostid']]['items'][] = array('itemid' => $host['itemid']);
-						unset($host['itemid']);
-					}
-
-					// graphids
-					if (isset($host['graphid']) && is_null($options['selectGraphs'])) {
-						if (!isset($result[$host['hostid']]['graphs'])) {
-							$result[$host['hostid']]['graphs'] = array();
-						}
-
-						$result[$host['hostid']]['graphs'][] = array('graphid' => $host['graphid']);
-						unset($host['graphid']);
-					}
-
-					// graphids
-					if (isset($host['applicationid'])) {
-						if (!isset($result[$host['hostid']]['applications'])) {
-							$result[$host['hostid']]['applications'] = array();
-						}
-
-						$result[$host['hostid']]['applications'][] = array('applicationid' => $host['applicationid']);
-						unset($host['applicationid']);
-					}
-
-					// httptestids
-					if (isset($host['httptestid'])) {
-						if (!isset($result[$host['hostid']]['httptests'])) {
-							$result[$host['hostid']]['httptests'] = array();
-						}
-
-						$result[$host['hostid']]['httptests'][] = array('httptestid' => $host['httptestid']);
-						unset($host['httptestid']);
-					}
-
-					// dhostids
-					if (isset($host['dhostid']) && is_null($options['selectDHosts'])) {
-						if (!isset($result[$host['hostid']]['dhosts'])) {
-							$result[$host['hostid']]['dhosts'] = array();
-						}
-
-						$result[$host['hostid']]['dhosts'][] = array('dhostid' => $host['dhostid']);
-						unset($host['dhostid']);
-					}
-
-					// dserviceids
-					if (isset($host['dserviceid']) && is_null($options['selectDServices'])) {
-						if (!isset($result[$host['hostid']]['dservices'])) {
-							$result[$host['hostid']]['dservices'] = array();
-						}
-
-						$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
-						unset($host['dserviceid']);
-					}
-
-					// maintenanceids
-					if (isset($host['maintenanceid'])) {
-						if (!isset($result[$host['hostid']]['maintenances'])) {
-							$result[$host['hostid']]['maintenances'] = array();
-						}
-
-						if ($host['maintenanceid'] > 0) {
-							$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
-						}
-					}
-
-					$result[$host['hostid']] += $host;
+					$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
+					unset($host['groupid']);
 				}
+
+				// templateids
+				if (isset($host['templateid'])) {
+					if (!isset($result[$host['hostid']]['templates'])) {
+						$result[$host['hostid']]['templates'] = array();
+					}
+
+					$result[$host['hostid']]['templates'][] = array(
+						'templateid' => $host['templateid'],
+						'hostid' => $host['templateid']
+					);
+					unset($host['templateid']);
+				}
+
+				// triggerids
+				if (isset($host['triggerid']) && is_null($options['selectTriggers'])) {
+					if (!isset($result[$host['hostid']]['triggers'])) {
+						$result[$host['hostid']]['triggers'] = array();
+					}
+
+					$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
+					unset($host['triggerid']);
+				}
+
+				// interfaceids
+				if (isset($host['interfaceid']) && is_null($options['selectInterfaces'])) {
+					if (!isset($result[$host['hostid']]['interfaces'])) {
+						$result[$host['hostid']]['interfaces'] = array();
+					}
+
+					$result[$host['hostid']]['interfaces'][] = array('interfaceid' => $host['interfaceid']);
+					unset($host['interfaceid']);
+				}
+
+				// itemids
+				if (isset($host['itemid']) && is_null($options['selectItems'])) {
+					if (!isset($result[$host['hostid']]['items'])) {
+						$result[$host['hostid']]['items'] = array();
+					}
+
+					$result[$host['hostid']]['items'][] = array('itemid' => $host['itemid']);
+					unset($host['itemid']);
+				}
+
+				// graphids
+				if (isset($host['graphid']) && is_null($options['selectGraphs'])) {
+					if (!isset($result[$host['hostid']]['graphs'])) {
+						$result[$host['hostid']]['graphs'] = array();
+					}
+
+					$result[$host['hostid']]['graphs'][] = array('graphid' => $host['graphid']);
+					unset($host['graphid']);
+				}
+
+				// graphids
+				if (isset($host['applicationid'])) {
+					if (!isset($result[$host['hostid']]['applications'])) {
+						$result[$host['hostid']]['applications'] = array();
+					}
+
+					$result[$host['hostid']]['applications'][] = array('applicationid' => $host['applicationid']);
+					unset($host['applicationid']);
+				}
+
+				// httptestids
+				if (isset($host['httptestid'])) {
+					if (!isset($result[$host['hostid']]['httptests'])) {
+						$result[$host['hostid']]['httptests'] = array();
+					}
+
+					$result[$host['hostid']]['httptests'][] = array('httptestid' => $host['httptestid']);
+					unset($host['httptestid']);
+				}
+
+				// dhostids
+				if (isset($host['dhostid']) && is_null($options['selectDHosts'])) {
+					if (!isset($result[$host['hostid']]['dhosts'])) {
+						$result[$host['hostid']]['dhosts'] = array();
+					}
+
+					$result[$host['hostid']]['dhosts'][] = array('dhostid' => $host['dhostid']);
+					unset($host['dhostid']);
+				}
+
+				// dserviceids
+				if (isset($host['dserviceid']) && is_null($options['selectDServices'])) {
+					if (!isset($result[$host['hostid']]['dservices'])) {
+						$result[$host['hostid']]['dservices'] = array();
+					}
+
+					$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
+					unset($host['dserviceid']);
+				}
+
+				// maintenanceids
+				if (isset($host['maintenanceid'])) {
+					if (!isset($result[$host['hostid']]['maintenances'])) {
+						$result[$host['hostid']]['maintenances'] = array();
+					}
+
+					if ($host['maintenanceid'] > 0) {
+						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
+					}
+				}
+
+				$result[$host['hostid']] += $host;
 			}
 		}
 
@@ -1255,7 +1227,7 @@ class CHost extends CHostGeneral {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -1720,7 +1692,7 @@ class CHost extends CHostGeneral {
 
 			$hostExists = $this->get(array(
 				'filter' => array('host' => $curHost['host']),
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('hostid'),
 				'editable' => true,
 				'nopermissions' => true
 			));
@@ -1864,7 +1836,7 @@ class CHost extends CHostGeneral {
 		if (isset($updateTemplates)) {
 			$hostTemplates = API::Template()->get(array(
 				'hostids' => $hostids,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('templateid'),
 				'preservekeys' => true
 			));
 
@@ -2063,7 +2035,7 @@ class CHost extends CHostGeneral {
 					ZBX_FLAG_DISCOVERY_CREATED
 				)
 			),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('itemid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
@@ -2202,7 +2174,6 @@ class CHost extends CHostGeneral {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'templated_hosts' => true,
 			'countOutput' => true
 		));
@@ -2223,7 +2194,6 @@ class CHost extends CHostGeneral {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'templated_hosts' => true,
 			'countOutput' => true

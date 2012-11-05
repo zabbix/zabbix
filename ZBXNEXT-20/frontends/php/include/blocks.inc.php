@@ -973,7 +973,7 @@ function make_webmon_overview($filter) {
 		'groupids' => array_keys($groups),
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('hostid'),
 		'preservekeys' => true
 	));
 	$availableHostIds = array_keys($availableHosts);

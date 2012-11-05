@@ -72,11 +72,11 @@ elseif (isset($_REQUEST['save'])) {
 	$objects = get_request('hosts', array());
 	$hosts = API::Host()->get(array(
 		'hostids' => $objects,
-		'output' => API_OUTPUT_SHORTEN
+		'output' => array('hostid')
 	));
 	$templates = API::Template()->get(array(
 		'templateids' => $objects,
-		'output' => API_OUTPUT_SHORTEN
+		'output' => array('templateid')
 	));
 
 	if (!empty($_REQUEST['groupid'])) {
@@ -221,7 +221,7 @@ if (isset($_REQUEST['form'])) {
 			$options = array(
 				'groupids' => $data['groupid'],
 				'templated_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => array('hostid')
 			);
 			$data['hosts'] = API::Host()->get($options);
 			$data['hosts'] = zbx_objectValues($data['hosts'], 'hostid');
@@ -278,7 +278,7 @@ if (isset($_REQUEST['form'])) {
 		'hostids' => $data['hosts'],
 		'templated_hosts' =>1,
 		'editable' => 1,
-		'output' => API_OUTPUT_SHORTEN
+		'output' => array('hostid')
 	);
 	$data['rw_hosts'] = API::Host()->get($options);
 	$data['rw_hosts'] = zbx_toHash($data['rw_hosts'], 'hostid');
@@ -299,7 +299,7 @@ else {
 	$sortorder =  getPageSortOrder();
 	$options = array(
 		'editable' => 1,
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('groupid'),
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	);

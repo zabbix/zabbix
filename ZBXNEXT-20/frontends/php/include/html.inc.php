@@ -350,7 +350,6 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		$dbHost['screens'] = API::TemplateScreen()->get(array(
 			'editable' => true,
 			'countOutput' => true,
-			'output' => API_OUTPUT_SHORTEN,
 			'groupCount' => true,
 			'templateids' => $dbHost['hostid']
 		));

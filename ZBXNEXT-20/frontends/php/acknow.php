@@ -102,7 +102,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	}
 	elseif (isset($_REQUEST['triggers'])) {
 		$options = array(
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('eventid'),
 			'acknowledged' => 0,
 			'triggerids' => $_REQUEST['triggers'],
 			'filter'=> array('value_changed' => TRIGGER_VALUE_CHANGED_YES)

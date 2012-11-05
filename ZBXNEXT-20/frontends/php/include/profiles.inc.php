@@ -251,7 +251,7 @@ function update_config($configs) {
 	if (isset($configs['discovery_groupid'])) {
 		$groupid = API::HostGroup()->get(array(
 			'groupids' => $configs['discovery_groupid'],
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('groupid'),
 			'preservekeys' => true
 		));
 		if (empty($groupid)) {
