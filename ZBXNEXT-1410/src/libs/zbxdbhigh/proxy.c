@@ -34,58 +34,40 @@ typedef struct
 	zbx_json_type_t		jt;
 	char			*default_value;
 }
-ZBX_HISTORY_FIELD;
+zbx_history_field_t;
 
 typedef struct
 {
-	const char		*table, *lastfieldname;
-	const char		*from, *where;
-	ZBX_HISTORY_FIELD	fields[ZBX_MAX_FIELDS];
+	const char		*table, *lastidfield;
+	zbx_history_field_t	fields[ZBX_MAX_FIELDS];
 }
-ZBX_HISTORY_TABLE;
+zbx_history_table_t;
 
-static ZBX_HISTORY_TABLE ht = {
-	"proxy_history", "history_lastid", "hosts h,items i,", "h.hostid=i.hostid and i.itemid=p.itemid and ",
+static zbx_history_table_t dht = {
+	"proxy_dhistory", "dhistory_lastid",
 		{
-		{"h.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"i.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"p.ns",	ZBX_PROTO_TAG_NS,		ZBX_JSON_TYPE_INT,	NULL},
-		{"p.timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT,	"0"},
-		{"p.source",	ZBX_PROTO_TAG_LOGSOURCE,	ZBX_JSON_TYPE_STRING,	""},
-		{"p.severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT,	"0"},
-		{"p.value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"p.logeventid",ZBX_PROTO_TAG_LOGEVENTID,	ZBX_JSON_TYPE_INT,	"0"},
-		{"p.status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
+		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"druleid",	ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
+		{"dcheckid",	ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"type",	ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
+		{"ip",		ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"port",	ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
+		{"key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	""},
+		{"value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
+		{"status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
 		{NULL}
 		}
 };
 
-static ZBX_HISTORY_TABLE dht = {
-	"proxy_dhistory", "dhistory_lastid", "", "",
+static zbx_history_table_t areg = {
+	"proxy_autoreg_host", "autoreg_host_lastid",
 		{
-		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"p.druleid",	ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
-		{"p.dcheckid",	ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"p.type",	ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
-		{"p.ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"p.dns",	ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"p.port",	ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
-		{"p.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	""},
-		{"p.value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
-		{"p.status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
-		{NULL}
-		}
-};
-
-static ZBX_HISTORY_TABLE areg = {
-	"proxy_autoreg_host", "autoreg_host_lastid", "", "",
-		{
-		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"p.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"p.listen_ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
-		{"p.listen_dns",ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
-		{"p.listen_port",ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"listen_ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
+		{"listen_dns",	ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
+		{"listen_port",	ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
 		{NULL}
 		}
 };
@@ -869,17 +851,15 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	zbx_vector_ptr_destroy(&tables);
 
-	if (SUCCEED == ret)
-	{
-		DBcommit();
-		DCsync_configuration();
-	}
-	else
+	DBend(ret);
+
+	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
-		DBrollback();
 	}
+	else
+		DCsync_configuration();
 
 	zbx_free(error);
 
@@ -1188,23 +1168,21 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
+static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zbx_uint64_t *lastid)
 {
 	const char	*__function_name = "proxy_get_lastid";
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s]", __function_name, ht->table, ht->lastfieldname);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() field:'%s.%s'", __function_name, table_name, lastidfield);
 
 	result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
-			ht->table,
-			ht->lastfieldname);
+			table_name, lastidfield);
 
 	if (NULL == (row = DBfetch(result)))
 		*lastid = 0;
 	else
 		ZBX_STR2UINT64(*lastid, row[0]);
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,	__function_name, *lastid);
@@ -1217,36 +1195,30 @@ static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
+static void	proxy_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
 {
 	const char	*__function_name = "proxy_set_lastid";
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s:" ZBX_FS_UI64 "]",
-			__function_name, ht->table, ht->lastfieldname, lastid);
+			__function_name, table_name, lastidfield, lastid);
 
 	result = DBselect("select 1 from ids where table_name='%s' and field_name='%s'",
-			ht->table,
-			ht->lastfieldname);
+			table_name, lastidfield);
 
 	if (NULL == (row = DBfetch(result)))
 	{
 		DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
 				"values (0,'%s','%s'," ZBX_FS_UI64 ")",
-				ht->table,
-				ht->lastfieldname,
-				lastid);
+				table_name, lastidfield, lastid);
 	}
 	else
 	{
 		DBexecute("update ids set nextid=" ZBX_FS_UI64
 				" where table_name='%s' and field_name='%s'",
-				lastid,
-				ht->table,
-				ht->lastfieldname);
+				lastid, table_name, lastidfield);
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1254,29 +1226,31 @@ static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t las
 
 void	proxy_set_hist_lastid(const zbx_uint64_t lastid)
 {
-	proxy_set_lastid(&ht, lastid);
+	proxy_set_lastid("proxy_history", "history_lastid", lastid);
 }
 
 void	proxy_set_dhis_lastid(const zbx_uint64_t lastid)
 {
-	proxy_set_lastid(&dht, lastid);
+	proxy_set_lastid(dht.table, dht.lastidfield, lastid);
 }
 
 void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
 {
-	proxy_set_lastid(&areg, lastid);
+	proxy_set_lastid(areg.table, areg.lastidfield, lastid);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_get_history_data                                           *
+ * Function: proxy_get_history_data_simple                                    *
+ *                                                                            *
+ * Purpose: Get history data from the database.                               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
+static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid)
 {
-	const char	*__function_name = "proxy_get_history_data";
+	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
 	int		f, records = 0;
 	char		sql[MAX_STRING_LEN];
@@ -1288,18 +1262,15 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 
 	*lastid = 0;
 
-	proxy_get_lastid(ht, &id);
+	proxy_get_lastid(ht->table, ht->lastidfield, &id);
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select p.id");
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select id");
 
 	for (f = 0; NULL != ht->fields[f].field; f++)
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s", ht->fields[f].field);
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s%s p"
-			" where %sp.id>" ZBX_FS_UI64 " order by p.id",
-			ht->from, ht->table,
-			ht->where,
-			id);
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where id>" ZBX_FS_UI64 " order by id",
+			ht->table, id);
 
 	result = DBselectN(sql, ZBX_MAX_HRECORDS);
 
@@ -1321,8 +1292,148 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 
 		zbx_json_close(j);
 	}
-
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
+
+	return records;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_get_history_data                                           *
+ *                                                                            *
+ * Purpose: Get history data from the database. Get items configuration from  *
+ *          cache to speed things up.                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
+{
+	const char			*__function_name = "proxy_get_history_data";
+
+	typedef struct
+	{
+		size_t		psource;
+		size_t		pvalue;
+		int		clock;
+		int		ns;
+		int		timestamp;
+		int		severity;
+		int		logeventid;
+		unsigned char	status;
+	}
+	zbx_history_data_t;
+
+	char				sql[144];
+	DB_RESULT			result;
+	DB_ROW				row;
+	static char			*string_buffer = NULL;
+	static size_t			string_buffer_alloc = ZBX_KIBIBYTE;
+	size_t				string_buffer_offset = 0, len1, len2;
+	static zbx_uint64_t		*itemids = NULL, id;
+	static zbx_history_data_t	*data = NULL;
+	static size_t			data_alloc = 0;
+	size_t				data_num = 0, i;
+	DC_ITEM				*dc_items;
+	int				*errcodes, records = 0;
+	zbx_history_data_t		*hd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == string_buffer)
+		string_buffer = zbx_malloc(string_buffer, string_buffer_alloc);
+
+	*lastid = 0;
+
+	proxy_get_lastid("proxy_history", "history_lastid", &id);
+
+	zbx_snprintf(sql, sizeof(sql),
+			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,status"
+			" from proxy_history"
+			" where id>" ZBX_FS_UI64
+			" order by id",
+			id);
+
+	result = DBselectN(sql, ZBX_MAX_HRECORDS);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(*lastid, row[0]);
+
+		if (data_alloc == data_num)
+		{
+			data_alloc += 8;
+			data = zbx_realloc(data, sizeof(zbx_history_data_t) * data_alloc);
+			itemids = zbx_realloc(itemids, sizeof(zbx_uint64_t) * data_alloc);
+		}
+
+		ZBX_STR2UINT64(itemids[data_num], row[1]);
+
+		hd = &data[data_num++];
+		hd->clock = atoi(row[2]);
+		hd->ns = atoi(row[3]);
+		hd->timestamp = atoi(row[4]);
+		hd->severity = atoi(row[6]);
+		hd->logeventid = atoi(row[8]);
+		hd->status = (unsigned char)atoi(row[9]);
+
+		len1 = strlen(row[5]) + 1;
+		len2 = strlen(row[7]) + 1;
+
+		if (string_buffer_alloc < string_buffer_offset + len1 + len2)
+		{
+			string_buffer_alloc += ZBX_KIBIBYTE;
+			string_buffer = zbx_realloc(string_buffer, string_buffer_alloc);
+		}
+
+		hd->psource = string_buffer_offset;
+		memcpy(&string_buffer[string_buffer_offset], row[5], len1);
+		string_buffer_offset += len1;
+		hd->pvalue = string_buffer_offset;
+		memcpy(&string_buffer[string_buffer_offset], row[7], len2);
+		string_buffer_offset += len2;
+	}
+	DBfree_result(result);
+
+	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(errcodes)) * data_num);
+	errcodes = (int *)(dc_items + data_num);
+
+	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
+
+	for (i = 0; i < data_num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		zbx_json_addobject(j, NULL);
+
+		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, dc_items[i].host.host, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, data[i].clock);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, data[i].ns);
+		if (0 != data[i].timestamp)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, data[i].timestamp);
+		if ('\0' != string_buffer[data[i].psource])
+		{
+			zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[data[i].psource],
+					ZBX_JSON_TYPE_STRING);
+		}
+		if (0 != data[i].severity)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, data[i].severity);
+		zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[data[i].pvalue], ZBX_JSON_TYPE_STRING);
+		if (0 != data[i].logeventid)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, data[i].logeventid);
+		if (0 != data[i].status)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATUS, data[i].status);
+
+		zbx_json_close(j);
+
+		records++;
+	}
+
+	zbx_free(dc_items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
 
@@ -1331,17 +1442,17 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	return proxy_get_history_data(j, &ht, lastid);
+	return proxy_get_history_data(j, lastid);
 }
 
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	return proxy_get_history_data(j, &dht, lastid);
+	return proxy_get_history_data_simple(j, &dht, lastid);
 }
 
 int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	return proxy_get_history_data(j, &areg, lastid);
+	return proxy_get_history_data_simple(j, &areg, lastid);
 }
 
 void	calc_timestamp(char *line, int *timestamp, char *format)

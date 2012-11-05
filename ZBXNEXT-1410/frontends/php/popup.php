@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -147,8 +147,7 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-global $USER_DETAILS;
-if ($min_user_type > $USER_DETAILS['type']) {
+if ($min_user_type > CWebUser::$data['type']) {
 	access_deny();
 }
 if (isset($error)) {
@@ -161,7 +160,7 @@ if (isset($error)) {
 // allowed 'srcfld*' parameter values for each 'srctbl' value
 $allowedSrcFields = array(
 	'users'					=> '"usergrpid", "alias", "userid"',
-	'triggers'				=> '"description", "triggerid"',
+	'triggers'				=> '"description", "triggerid", "expression"',
 	'items'					=> '"itemid", "name"',
 	'prototypes'			=> '"itemid", "name", "flags"',
 	'graphs'				=> '"graphid", "name"',
@@ -248,8 +247,10 @@ check_fields($fields);
 $dstfrm = get_request('dstfrm', ''); // destination form
 $dstfld1 = get_request('dstfld1', ''); // output field on destination form
 $dstfld2 = get_request('dstfld2', ''); // second output field on destination form
+$dstfld3 = get_request('dstfld3', ''); // third output field on destination form
 $srcfld1 = get_request('srcfld1', ''); // source table field [can be different from fields of source table]
 $srcfld2 = get_request('srcfld2', null); // second source table field [can be different from fields of source table]
+$srcfld3 = get_request('srcfld3', null); //  source table field [can be different from fields of source table]
 $multiselect = get_request('multiselect', 0); // if create popup with checkboxes
 $dstact = get_request('dstact', '');
 $writeonly = get_request('writeonly');
@@ -481,7 +482,7 @@ else {
 		if (ZBX_DISTRIBUTED) {
 			$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
-			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
+			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
 			while ($node_data = DBfetch($db_nodes)) {
 				$cmbNode->addItem($node_data['nodeid'], $node_data['name']);
 				if (bccomp($nodeid , $node_data['nodeid']) == 0) {
@@ -516,9 +517,11 @@ else {
 		if (zbx_empty($noempty)) {
 			$value1 = isset($_REQUEST['dstfld1']) && zbx_strpos($_REQUEST['dstfld1'], 'id') !== false ? 0 : '';
 			$value2 = isset($_REQUEST['dstfld2']) && zbx_strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
+			$value3 = isset($_REQUEST['dstfld3']) && zbx_strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
 
 			$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
 			$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
+			$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
 			$epmtyScript .= ' close_window(); return false;';
 
 			$frmTitle->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
@@ -640,8 +643,8 @@ elseif ($srctbl == 'templates') {
 
 	$dbTemplates = API::Template()->get($options);
 	foreach ($dbTemplates as $host) {
-		$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['name']);
-		$chk->setEnabled(!isset($existed_templates[$host['hostid']]) && !isset($excludeids[$host['hostid']]));
+		$chk = new CCheckBox('templates['.$host['templateid'].']', isset($templates[$host['templateid']]), null, $host['name']);
+		$chk->setEnabled(!isset($existed_templates[$host['templateid']]) && !isset($excludeids[$host['templateid']]));
 		$table->addRow(array(array($chk, $host['name'])));
 	}
 
@@ -915,9 +918,11 @@ elseif ($srctbl == 'users') {
 		}
 		else {
 			$values = array(
-				$dstfld1 => $user[$srcfld1],
-				$dstfld2 => isset($srcfld2) ? $user[$srcfld2] : null,
+				$dstfld1 => $user[$srcfld1]
 			);
+			if (isset($srcfld2)) {
+				$values[$dstfld2] = $user[$srcfld2];
+			}
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$alias->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
@@ -1013,6 +1018,9 @@ elseif ($srctbl == 'triggers') {
 				$dstfld1 => $trigger[$srcfld1],
 				$dstfld2 => $trigger[$srcfld2]
 			);
+			if (isset($srcfld3)) {
+				$values[$dstfld3] = $trigger[$srcfld3];
+			}
 			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
@@ -1209,11 +1217,10 @@ elseif ($srctbl == 'prototypes') {
 	}
 	$table->setHeader($header);
 
-	$items = API::Item()->get(array(
+	$items = API::ItemPrototype()->get(array(
 		'nodeids' => $nodeid,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));
@@ -1314,7 +1321,7 @@ elseif ($srctbl == 'nodes') {
 	$table = new CTableInfo(_('No nodes defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
+	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['name'], 'link');

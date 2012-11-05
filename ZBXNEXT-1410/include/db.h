@@ -88,10 +88,15 @@ zbx_graph_item_type;
 #define ZBX_DB_CONNECT_ONCE	2
 
 #define TRIGGER_DESCRIPTION_LEN		255
-#define TRIGGER_EXPRESSION_LEN		255
+#define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
 #define TRIGGER_ERROR_LEN		128
 #define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#	define TRIGGER_COMMENTS_LEN	2048
+#else
+#	define TRIGGER_COMMENTS_LEN	65535
+#endif
 
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
@@ -142,7 +147,13 @@ zbx_graph_item_type;
 #define ITEM_PUBLICKEY_LEN_MAX		ITEM_PUBLICKEY_LEN+1
 #define ITEM_PRIVATEKEY_LEN		64
 #define ITEM_PRIVATEKEY_LEN_MAX		ITEM_PRIVATEKEY_LEN+1
-#define ITEM_PARAM_LEN			65535
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#	define ITEM_PARAM_LEN		2048
+#	define ITEM_DESCRIPTION_LEN	2048
+#else
+#	define ITEM_PARAM_LEN		65535
+#	define ITEM_DESCRIPTION_LEN	65535
+#endif
 
 #define FUNCTION_FUNCTION_LEN		12
 #define FUNCTION_FUNCTION_LEN_MAX	FUNCTION_FUNCTION_LEN+1
@@ -267,8 +278,8 @@ DB_DSERVICE;
 typedef struct
 {
 	zbx_uint64_t	triggerid;
-	char		description[TRIGGER_DESCRIPTION_LEN * 4 + 1];
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	char		*description;
+	char		*expression;
 	char		*url;
 	char		*comments;
 	unsigned char	priority;
@@ -466,6 +477,7 @@ int		DBis_null(const char *field);
 void		DBbegin();
 void		DBcommit();
 void		DBrollback();
+void		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
@@ -579,5 +591,8 @@ void	DBfree_history(char **value);
 
 int	DBtxn_status();
 int	DBtxn_ongoing();
+
+int	DBtable_exists(const char *table_name);
+int	DBfield_exists(const char *table_name, const char *field_name);
 
 #endif

@@ -17,10 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 /**
- * @package API
+ * API application class.
  */
 class CApplication extends CZBXAPI {
 
@@ -409,6 +408,10 @@ class CApplication extends CZBXAPI {
 	}
 
 	public function checkInput(&$applications, $method) {
+		if (empty($applications)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -434,11 +437,14 @@ class CApplication extends CZBXAPI {
 			));
 		}
 
+		if ($update){
+			$applications = $this->extendObjects($this->tableName(), $applications, array('name'));
+		}
+
 		foreach ($applications as &$application) {
 			if (!check_db_fields($itemDbFields, $application)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 			}
-			unset($application['templateid']);
 
 			// check permissions by hostid
 			if ($create) {
@@ -452,6 +458,17 @@ class CApplication extends CZBXAPI {
 				if (!isset($dbApplications[$application['applicationid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $application)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for application "%1$s".', $application['name']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for application "%1$s".', $application['name']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			// check on operating with templated applications
@@ -488,81 +505,39 @@ class CApplication extends CZBXAPI {
 	}
 
 	/**
-	 * Add Applications
+	 * Create new applications.
 	 *
 	 * @param array $applications
-	 * @param array $app_data['name']
-	 * @param array $app_data['hostid']
+
 	 * @return array
 	 */
-	public function create($applications) {
+	public function create(array $applications) {
 		$applications = zbx_toArray($applications);
 		$this->checkInput($applications, __FUNCTION__);
-		$this->createReal($applications);
-		$this->inherit($applications);
+
+		$appManager = new CApplicationManager();
+		$applications = $appManager->create($applications);
+		$appManager->inherit($applications);
+
 		return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
 	}
 
 	/**
-	 * Update Applications
+	 * Update applications.
 	 *
 	 * @param array $applications
-	 * @param array $app_data['name']
-	 * @param array $app_data['hostid']
+	 *
 	 * @return array
 	 */
-	public function update($applications) {
+	public function update(array $applications) {
 		$applications = zbx_toArray($applications);
 		$this->checkInput($applications, __FUNCTION__);
-		$this->updateReal($applications);
-		$this->inherit($applications);
-		return array('applicationids' => zbx_objectValues($applications, 'applicationids'));
-	}
 
-	protected function createReal(&$applications) {
-		if (empty($applications)) {
-			return true;
-		}
-		$applicationids = DB::insert('applications', $applications);
+		$appManager = new CApplicationManager();
+		$appManager->update($applications);
+		$appManager->inherit($applications);
 
-		foreach ($applications as $anum => $application) {
-			$applications[$anum]['applicationid'] = $applicationids[$anum];
-		}
-
-		// TODO: REMOVE info
-		$applicationsCreated = $this->get(array(
-			'applicationids' => $applicationids,
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'nopermissions' => 1
-		));
-		foreach ($applicationsCreated as $applicationCreated) {
-			$host = reset($applicationCreated['hosts']);
-			info(_s('Created: Application "%1$s" on "%2$s".', $applicationCreated['name'], $host['name']));
-		}
-	}
-
-	protected function updateReal($applications) {
-		$update = array();
-		foreach ($applications as $application) {
-			$update[] = array(
-				'values' => $application,
-				'where' => array('applicationid' => $application['applicationid'])
-			);
-		}
-		DB::update('applications', $update);
-
-		// TODO: REMOVE info
-		$applicationsUpd = $this->get(array(
-			'applicationids' => zbx_objectValues($applications, 'applicationid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'nopermissions' => 1,
-		));
-		foreach ($applicationsUpd as $applicationUpd) {
-			$host = reset($applicationUpd['hosts']);
-			info(_s('Updated: Application "%1$s" on "%2$s".', $applicationUpd['name'], $host['name']));
-		}
+		return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
 	}
 
 	/**
@@ -728,124 +703,4 @@ class CApplication extends CZBXAPI {
 		}
 		return array('applicationids'=> $applicationids);
 	}
-
-	protected function inherit($applications, $hostids = null) {
-		if (empty($applications)) {
-			return $applications;
-		}
-		$applications = zbx_toHash($applications, 'applicationid');
-
-		$chdHosts = API::Host()->get(array(
-			'output' => array('hostid', 'host'),
-			'templateids' => zbx_objectValues($applications, 'hostid'),
-			'hostids' => $hostids,
-			'preservekeys' => 1,
-			'nopermissions' => 1,
-			'templated_hosts' => 1
-		));
-		if (empty($chdHosts)) {
-			return true;
-		}
-
-		$insertApplications = array();
-		$updateApplications = array();
-
-		foreach ($chdHosts as $hostid => $host) {
-			$templateids = zbx_toHash($host['templates'], 'templateid');
-
-			// skip applications not from parent templates of current host
-			$parentApplications = array();
-			foreach ($applications as $parentApplicationId => $parentApplication) {
-				if (isset($templateids[$parentApplication['hostid']])) {
-					$parentApplications[$parentApplicationId] = $parentApplication;
-				}
-			}
-
-			// check existing items to decide insert or update
-			$exApplications = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'hostids' => $hostid,
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-
-			$exApplicationsNames = zbx_toHash($exApplications, 'name');
-			$exApplicationsTpl = zbx_toHash($exApplications, 'templateid');
-
-			foreach ($parentApplications as $parentApplicationId => $parentApplication) {
-				$exApplication = null;
-
-				// update by templateid
-				if (isset($exApplicationsTpl[$parentApplicationId])) {
-					$exApplication = $exApplicationsTpl[$parentApplicationId];
-				}
-
-				// update by name
-				if (isset($parentApplication['name']) && isset($exApplicationsNames[$parentApplication['name']])) {
-					$exApplication = $exApplicationsNames[$parentApplication['name']];
-					if ($exApplication['templateid'] > 0 && !idcmp($exApplication['templateid'], $parentApplication['applicationid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
-					}
-				}
-
-				$newApplication = $parentApplication;
-				$newApplication['hostid'] = $host['hostid'];
-				$newApplication['templateid'] = $parentApplication['applicationid'];
-
-				if ($exApplication) {
-					$newApplication['applicationid'] = $exApplication['applicationid'];
-					$updateApplications[] = $newApplication;
-				}
-				else {
-					$insertApplications[] = $newApplication;
-				}
-			}
-		}
-		$this->createReal($insertApplications);
-		$this->updateReal($updateApplications);
-		$inheritedApplications = array_merge($insertApplications, $updateApplications);
-		$this->inherit($inheritedApplications);
-		return true;
-	}
-
-	public function syncTemplates($data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$options = array(
-			'hostids' => $data['hostids'],
-			'editable' => 1,
-			'preservekeys' => 1,
-			'templated_hosts' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedHosts = API::Host()->get($options);
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-		$options = array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedTemplates = API::Template()->get($options);
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		$options = array(
-			'hostids' => $data['templateids'],
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$applications = $this->get($options);
-		$this->inherit($applications, $data['hostids']);
-
-		return true;
-	}
 }
-?>

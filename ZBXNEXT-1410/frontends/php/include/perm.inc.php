@@ -80,10 +80,8 @@ function check_perm2login($userid) {
  * Author: Aly
  */
 function get_user_auth($userid) {
-	global $USER_DETAILS;
-
-	if (bccomp($userid, $USER_DETAILS['userid']) == 0 && isset($USER_DETAILS['gui_access'])) {
-		return $USER_DETAILS['gui_access'];
+	if (bccomp($userid, CWebUser::$data['userid']) == 0 && isset(CWebUser::$data['gui_access'])) {
+		return CWebUser::$data['gui_access'];
 	}
 	else {
 		$result = GROUP_GUI_ACCESS_SYSTEM;

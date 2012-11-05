@@ -27,15 +27,13 @@ class CServerInfo extends CTable {
 	}
 
 	public function bodyToString() {
-		global $USER_DETAILS;
-
 		$this->cleanItems();
 
 		$status = get_status();
 		$server = ($status['zabbix_server'] == _('Yes'))
 			? new CSpan(_('running'), 'off')
 			: new CSpan(_('not running'), 'on');
-		$serverLink = ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN)
+		$serverLink = (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
 			? new CLink(_('Zabbix server'), 'report1.php')
 			: _('Zabbix server');
 

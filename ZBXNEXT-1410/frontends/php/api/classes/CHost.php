@@ -1502,7 +1502,7 @@ class CHost extends CHostGeneral {
 				self::exception();
 			}
 
-			if (isset($host['inventory']) && !empty($host['inventory'])) {
+			if (!empty($host['inventory'])) {
 				$fields = array_keys($host['inventory']);
 				$fields[] = 'inventory_mode';
 				$fields = implode(', ', $fields);

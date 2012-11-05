@@ -405,7 +405,11 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			strscpy(param, usr_param);
 
 		if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
+		{
+			/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+			/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
 			goto notsupported;
+		}
 	}
 	else
 		goto notsupported;

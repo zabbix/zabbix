@@ -579,14 +579,13 @@ class CXmlImport18 {
 	}
 
 	public static function parseMap($rules) {
-		global $USER_DETAILS;
 		$importMaps = self::XMLtoArray(self::$xml);
 
 		if (!isset($importMaps['zabbix_export'])) {
 			$importMaps['zabbix_export'] = $importMaps;
 		}
 
-		if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN && isset($importMaps['zabbix_export']['images'])) {
+		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN && isset($importMaps['zabbix_export']['images'])) {
 			$images = $importMaps['zabbix_export']['images'];
 			$images_to_add = array();
 			$images_to_update = array();

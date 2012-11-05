@@ -75,7 +75,7 @@ if ($_REQUEST['config'] == ZBX_AUTH_INTERNAL) {
 
 		// reset all sessions
 		if ($isAuthenticationTypeChanged) {
-			DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+			DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid']));
 		}
 
 		// update config
@@ -102,7 +102,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 
 			// check login/password
 			$login = API::User()->ldapLogin(array(
-				'user' => get_request('user', $USER_DETAILS['alias']),
+				'user' => get_request('user', CWebUser::$data['alias']),
 				'password' => get_request('user_password', ''),
 				'cnf' => $ldap_cnf
 			));
@@ -112,7 +112,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 
 			// reset all sessions
 			if ($isAuthenticationTypeChanged) {
-				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid']));
 			}
 
 			// update config
@@ -130,7 +130,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 	elseif (isset($_REQUEST['test'])) {
 		// check login/password
 		$result = API::User()->ldapLogin(array(
-			'user' => get_request('user', $USER_DETAILS['alias']),
+			'user' => get_request('user', CWebUser::$data['alias']),
 			'password' => get_request('user_password', ''),
 			'cnf' => $ldap_cnf
 		));
@@ -150,7 +150,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 
 		// reset all sessions
 		if ($isAuthenticationTypeChanged) {
-			DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+			DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid']));
 		}
 
 		// update config
@@ -172,7 +172,7 @@ show_messages();
 $data['config'] = $_REQUEST['config'];
 $data['config_data'] = $config;
 $data['is_authentication_type_changed'] = $isAuthenticationTypeChanged;
-$data['user'] = get_request('user', $USER_DETAILS['alias']);
+$data['user'] = get_request('user', CWebUser::$data['alias']);
 $data['user_password'] = get_request('user_password', '');
 $data['user_list'] = null;
 
@@ -192,7 +192,7 @@ switch ($data['config']) {
 }
 
 // get user list
-if (get_user_auth($USER_DETAILS['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
+if (get_user_auth(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 	$data['user_list'] = DBfetchArray(DBselect(
 		'SELECT u.alias,u.userid'.
 		' FROM users u'.

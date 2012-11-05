@@ -86,7 +86,7 @@
 
 	<!-- remove button -->
 	<td>
-		<input type="button" class="input link_menu" id="items_#{number}_remove" data-remove="#{number}" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeItem(this);" />
+		<input type="button" class="input link_menu" id="items_#{number}_remove" data-remove="#{number}" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeItem(this);" />
 	</td>
 </tr>
 </script>
@@ -322,7 +322,7 @@
 		});
 	});
 
-	<?php if (!empty($this->data['templates'])): ?>
+	<?php if (!empty($this->data['templateid'])): ?>
 		jQuery(document).ready(function() {
 			'use strict';
 

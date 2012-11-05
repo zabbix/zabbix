@@ -10,10 +10,10 @@
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder=<?php echo Chtml::encode(_('default')); ?> value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
+		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?php echo CHtml::encode(_('default')); ?>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
-		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value=<?php echo Chtml::encode(_('Remove')); ?> onclick="removeSlide(this);" />
+		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeSlide(this);" />
 	</td>
 </tr>
 </script>

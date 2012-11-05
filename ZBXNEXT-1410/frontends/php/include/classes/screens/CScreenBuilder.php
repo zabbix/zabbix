@@ -50,6 +50,11 @@ class CScreenBuilder {
 	public $mode;
 
 	/**
+	 * @see Request timestamp
+	 */
+	public $timestamp;
+
+	/**
 	 * Host id
 	 *
 	 * @var string
@@ -91,6 +96,7 @@ class CScreenBuilder {
 	 * @param boolean	$options['isFlickerfree']
 	 * @param string	$options['pageFile']
 	 * @param int		$options['mode']
+	 * @param int		$options['timestamp']
 	 * @param int		$options['hostid']
 	 * @param int		$options['period']
 	 * @param int		$options['stime']
@@ -102,6 +108,7 @@ class CScreenBuilder {
 	public function __construct(array $options = array()) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
+		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
 
 		// get page file
@@ -384,6 +391,7 @@ class CScreenBuilder {
 						'isFlickerfree' => $this->isFlickerfree,
 						'pageFile' => $this->pageFile,
 						'mode' => $this->mode,
+						'timestamp' => $this->timestamp,
 						'hostid' => $this->hostid,
 						'profileIdx' => $this->profileIdx,
 						'profileIdx2' => $this->profileIdx2,
@@ -502,26 +510,25 @@ class CScreenBuilder {
 	/**
 	 * Insert javascript to create scroll in time control.
 	 *
-	 * @param string	$id
-	 * @param array		$timeline
+	 * @static
+	 *
+	 * @param array $options
+	 * @param array $options['timeline']
+	 * @param string $options['profileIdx']
 	 */
-	public function insertScreenScrollJs($id) {
+	public static function insertScreenScrollJs(array $options = array()) {
+		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline'];
+		$options['profileIdx'] = empty($options['profileIdx']) ? '' : $options['profileIdx'];
+
 		$timeControlData = array(
-			'id' => $id,
-			'domid' => 'screen_scroll',
-			'loadSBox' => 0,
-			'loadImage' => 0,
+			'id' => 'scrollbar',
 			'loadScroll' => 1,
-			'scrollWidthByImage' => 0,
-			'dynamic' => 0,
 			'mainObject' => 1,
-			'periodFixed' => CProfile::get($this->profileIdx.'.timelinefixed', 1),
+			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
-		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
-
-		$this->insertScreenRefreshTime();
+		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($options['timeline']).', '.zbx_jsvalue($timeControlData).');');
 	}
 
 	/**
@@ -529,8 +536,8 @@ class CScreenBuilder {
 	 *
 	 * @static
 	 */
-	public static function insertScreenRefreshTime() {
-		zbx_add_post_js('timeControl.refreshTime('.CWebUser::$data['refresh'].');');
+	public static function insertScreenRefreshTimeJs() {
+		zbx_add_post_js('timeControl.useTimeRefresh('.CWebUser::$data['refresh'].');');
 	}
 
 	/**
@@ -551,5 +558,29 @@ class CScreenBuilder {
 	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');
+	}
+
+	/**
+	 * Insert javascript to clean all screen items.
+	 *
+	 * @static
+	 */
+	public static function insertScreenCleanJs() {
+		zbx_add_post_js('window.flickerfreeScreen.cleanAll();');
+	}
+
+	/**
+	 * Insert javascript for standard screens.
+	 *
+	 * @param array $options
+	 * @param array $options['timeline']
+	 * @param string $options['profileIdx']
+	 *
+	 * @static
+	 */
+	public static function insertScreenStandardJs(array $options = array()) {
+		CScreenBuilder::insertScreenScrollJs($options);
+		CScreenBuilder::insertScreenRefreshTimeJs();
+		CScreenBuilder::insertProcessObjectsJs();
 	}
 }

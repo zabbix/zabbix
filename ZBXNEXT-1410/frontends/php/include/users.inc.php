@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function getUserTheme($userData) {
 	$config = select_config();
@@ -166,4 +165,3 @@ function change_group_debug_mode($usrgrpids, $debug_mode){
 	zbx_value2array($usrgrpids);
 	return DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE '.DBcondition('usrgrpid', $usrgrpids));
 }
-?>

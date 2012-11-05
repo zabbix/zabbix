@@ -335,7 +335,7 @@ typedef struct
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
-	zbx_vector_ptr_t	time_triggers;
+	zbx_vector_ptr_t	*time_triggers;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_ph;		/* proxy_hostid, host */
 	zbx_hashset_t		proxies;
@@ -360,6 +360,7 @@ static ZBX_MUTEX	config_lock;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	daemon_type;
+extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
@@ -729,7 +730,6 @@ static void	DCsync_items(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* clear interface_snmpitems list */
-
 	zbx_hashset_iter_reset(&config->interface_snmpitems, &iter);
 
 	while (NULL != (interface_snmpitem = zbx_hashset_iter_next(&iter)))
@@ -1441,7 +1441,8 @@ static void	DCsync_functions(DB_RESULT result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	config->time_triggers.values_num = 0;
+	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
+		config->time_triggers[i].values_num = 0;
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, config->functions.num_data + 32);
@@ -1484,14 +1485,20 @@ static void	DCsync_functions(DB_RESULT result)
 		DCstrpool_replace(found, &function->function, row[2]);
 		DCstrpool_replace(found, &function->parameter, row[3]);
 
-		/* process trigger information */
+		/* spread triggers with time based-fuctions between timer processes (load balancing) */
 
 		if (SUCCEED == is_time_function(function->function))
-			zbx_vector_ptr_append(&config->time_triggers, trigger);
+		{
+			i = function->triggerid % CONFIG_TIMER_FORKS;
+			zbx_vector_ptr_append(&config->time_triggers[i], trigger);
+		}
 	}
 
-	zbx_vector_ptr_sort(&config->time_triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&config->time_triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
+	{
+		zbx_vector_ptr_sort(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_ptr_uniq(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
 
 	/* update links from items to triggers */
 
@@ -2465,8 +2472,11 @@ void	DCsync_configuration()
 			config->triggers.num_data, config->triggers.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __function_name,
 			config->trigdeps.num_data, config->trigdeps.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() time_trigs : %d (%d allocated)", __function_name,
-			config->time_triggers.values_num, config->time_triggers.values_alloc);
+	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() t_trigs[%d] : %d (%d allocated)", __function_name,
+				i, config->time_triggers[i].values_num, config->time_triggers[i].values_alloc);
+	}
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
 			config->hosts.num_data, config->hosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_ph   : %d (%d slots)", __function_name,
@@ -2796,7 +2806,9 @@ void	init_configuration_cache()
 
 	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize");
 
-	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG));
+	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
+			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
+	config->time_triggers = (zbx_vector_ptr_t *)(config + 1);
 
 #define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on config_size? */
 
@@ -2840,10 +2852,13 @@ void	init_configuration_cache()
 	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare);
 
-	zbx_vector_ptr_create_ext(&config->time_triggers,
-			__config_mem_malloc_func,
-			__config_mem_realloc_func,
-			__config_mem_free_func);
+	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
+	{
+		zbx_vector_ptr_create_ext(&config->time_triggers[i],
+				__config_mem_malloc_func,
+				__config_mem_realloc_func,
+				__config_mem_free_func);
+	}
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
@@ -3470,8 +3485,8 @@ int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
 	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
 	{
 		trigger->triggerid = dc_trigger->triggerid;
-		strscpy(trigger->description, dc_trigger->description);
-		strscpy(trigger->expression, dc_trigger->expression);
+		trigger->description = zbx_strdup(trigger->description, dc_trigger->description);
+		trigger->expression = zbx_strdup(trigger->expression, dc_trigger->expression);
 		trigger->priority = dc_trigger->priority;
 		trigger->type = dc_trigger->type;
 	}
@@ -3495,7 +3510,7 @@ int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
  *           and which does not have its host in no-data maintenance          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order)
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num)
 {
 	int			i, found;
 	zbx_uint64_t		functionid;
@@ -3508,11 +3523,12 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 
 	LOCK_CACHE;
 
-	*trigger_info = zbx_malloc(*trigger_info, config->time_triggers.values_num * sizeof(DC_TRIGGER));
+	*trigger_info = zbx_malloc(*trigger_info,
+			config->time_triggers[process_num - 1].values_num * sizeof(DC_TRIGGER));
 
-	for (i = 0; i < config->time_triggers.values_num; i++)
+	for (i = 0; i < config->time_triggers[process_num - 1].values_num; i++)
 	{
-		dc_trigger = (const ZBX_DC_TRIGGER *)config->time_triggers.values[i];
+		dc_trigger = (const ZBX_DC_TRIGGER *)config->time_triggers[process_num - 1].values[i];
 
 		found = 0;
 

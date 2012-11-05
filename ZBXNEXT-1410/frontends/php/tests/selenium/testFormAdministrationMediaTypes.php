@@ -67,7 +67,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 		$this->ok('Media');
 		$this->nok('Displaying');
-		$this->ok(array('Description', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email'));
+		$this->ok(array('Name', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email'));
 
 		$this->assertElementPresent('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '100');
