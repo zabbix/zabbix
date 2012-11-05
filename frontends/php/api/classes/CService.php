@@ -88,7 +88,7 @@ class CService extends CZBXAPI {
 			}
 			// a normal select query
 			else {
-				$result[$row[$this->pk()]] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
+				$result[$row[$this->pk()]] = $this->unsetExtraFields($row, $options['output']);
 			}
 		}
 
@@ -683,7 +683,6 @@ class CService extends CZBXAPI {
 
 		$count = $this->get(array(
 			'serviceids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 		return count($ids) == $count;
@@ -1520,7 +1519,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($dependencies as $dependency) {
 				$refId = $dependency['serviceupid'];
-				$dependency = $this->unsetExtraFields('services_links', $dependency, $options['selectDependencies']);
+				$dependency = $this->unsetExtraFields($dependency, $options['selectDependencies']);
 				$result[$refId]['dependencies'][] = $dependency;
 			}
 		}
@@ -1535,7 +1534,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($dependencies as $dependency) {
 				$refId = $dependency['servicedownid'];
-				$dependency = $this->unsetExtraFields('services_links', $dependency, $options['selectParentDependencies']);
+				$dependency = $this->unsetExtraFields($dependency, $options['selectParentDependencies']);
 				$result[$refId]['parentDependencies'][] = $dependency;
 			}
 		}
@@ -1578,7 +1577,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($serviceTimes as $serviceTime) {
 				$refId = $serviceTime['serviceid'];
-				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
+				$serviceTime = $this->unsetExtraFields($serviceTime, $options['selectTimes']);
 				$result[$refId]['times'][] = $serviceTime;
 			}
 		}
@@ -1596,7 +1595,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($alarmsTimes as $serviceAlarm) {
 				$refId = $serviceAlarm['serviceid'];
-				$serviceAlarm = $this->unsetExtraFields('service_alarms', $serviceAlarm, $options['selectAlarms']);
+				$serviceAlarm = $this->unsetExtraFields($serviceAlarm, $options['selectAlarms']);
 				$result[$refId]['times'][] = $serviceAlarm;
 			}
 		}

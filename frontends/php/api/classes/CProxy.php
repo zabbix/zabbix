@@ -191,21 +191,16 @@ class CProxy extends CZBXAPI {
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$proxy['proxyid']] = array('proxyid' => $proxy['proxyid']);
+				if (!isset($result[$proxy['proxyid']])) {
+					$result[$proxy['proxyid']]= array();
 				}
-				else {
-					if (!isset($result[$proxy['proxyid']])) {
-						$result[$proxy['proxyid']]= array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$proxy['proxyid']]['hosts'])) {
-						$result[$proxy['proxyid']]['hosts'] = array();
-					}
-					if (!is_null($options['selectInterfaces']) && !isset($result[$proxy['proxyid']]['interfaces'])) {
-						$result[$proxy['proxyid']]['interfaces'] = array();
-					}
-					$result[$proxy['proxyid']] += $proxy;
+				if (!is_null($options['selectHosts']) && !isset($result[$proxy['proxyid']]['hosts'])) {
+					$result[$proxy['proxyid']]['hosts'] = array();
 				}
+				if (!is_null($options['selectInterfaces']) && !isset($result[$proxy['proxyid']]['interfaces'])) {
+					$result[$proxy['proxyid']]['interfaces'] = array();
+				}
+				$result[$proxy['proxyid']] += $proxy;
 			}
 		}
 
@@ -570,7 +565,6 @@ class CProxy extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'proxyids' => $proxyids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -593,7 +587,6 @@ class CProxy extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'proxyids' => $proxyids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));

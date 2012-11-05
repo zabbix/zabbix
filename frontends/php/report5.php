@@ -80,7 +80,7 @@ switch ($_REQUEST['period']) {
 }
 
 $available_hosts = API::Host()->get(array(
-	'output' => API_OUTPUT_SHORTEN,
+	'output' => array('hostid'),
 	'preservekeys' => true
 ));
 $available_hosts = array_keys($available_hosts);

@@ -59,7 +59,7 @@
 			$data['user_type']		= $user['type'];
 			$data['messages'] 		= getMessageSettings();
 
-			$userGroups = API::UserGroup()->get(array('userids' => $userid, 'output' => API_OUTPUT_SHORTEN));
+			$userGroups = API::UserGroup()->get(array('userids' => $userid, 'output' => 'usrgrpid'));
 			$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 			$data['user_groups']	= zbx_toHash($userGroup);
 
