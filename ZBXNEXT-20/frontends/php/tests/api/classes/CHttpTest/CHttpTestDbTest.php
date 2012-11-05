@@ -33,7 +33,7 @@ class CHttpTestTest extends ZbxDbTestCase {
 	/**
 	 * @covers CHttpTest::create
 	 */
-	public function testCHttpTestCreateOnTemplate() {
+	public function testCreateOnTemplate() {
 		$httpTests = array(
 			'hostid' => 1,
 			'name' => 'HttpTestCreate',
@@ -86,7 +86,7 @@ class CHttpTestTest extends ZbxDbTestCase {
 	/**
 	 * @covers CHttpTest::update
 	 */
-	public function testCHttpTestUpdateOnTemplate() {
+	public function testUpdateOnTemplate() {
 		$httpTests = array(
 			'httptestid' => 1,
 			'hostid' => 1,
@@ -128,7 +128,47 @@ class CHttpTestTest extends ZbxDbTestCase {
 		$this->assertTablesEqual($expectedTable, $queryTable);
 
 		$queryTable = $this->getConnection()->createQueryTable('items',
-			'SELECT * FROM items WHERE itemid IN ('.implode(',', range(1, 18)).') ORDER BY itemid');
+			'SELECT * FROM items ORDER BY itemid');
+		$expectedTable = $expectedDataSet->getTable('items');
+		$this->assertTablesEqual($expectedTable, $queryTable);
+	}
+
+	/**
+	 * @covers CHttpTest::update
+	 */
+	public function testUpdateStepsOnTemplate() {
+		$httpTests = array(
+			'httptestid' => 1,
+			'hostid' => 1,
+			'status' => 0,
+			'name' => 'HttpTestUpdate',
+			'delay' => 70,
+			'steps' => array(
+				array(
+					'httpstepid' => 1,
+					'name' => 'step11',
+					'timeout' => 20,
+					'url' => 'url11',
+					'posts' => '200',
+					'required' => '',
+					'status_codes' => '',
+					'no' => 1,
+				),
+			),
+		);
+
+		$apiHttpTest = new CHttpTest();
+		$apiHttpTest->update($httpTests);
+
+		$expectedDataSet = $this->getExpectedDataSet(__DIR__, __METHOD__);
+
+		$queryTable = $this->getConnection()->createQueryTable('httptest',
+			'SELECT * FROM httptest WHERE httptestid IN (1, 2) ORDER BY httptestid');
+		$expectedTable = $expectedDataSet->getTable('httptest');
+		$this->assertTablesEqual($expectedTable, $queryTable);
+
+		$queryTable = $this->getConnection()->createQueryTable('items',
+			'SELECT * FROM items ORDER BY itemid');
 		$expectedTable = $expectedDataSet->getTable('items');
 		$this->assertTablesEqual($expectedTable, $queryTable);
 	}

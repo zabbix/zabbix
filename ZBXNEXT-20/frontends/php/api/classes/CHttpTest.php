@@ -320,10 +320,8 @@ class CHttpTest extends CZBXAPI {
 
 		$this->validateCreate($httpTests);
 
-		$httpTestManager = new CHttpTestManager();
-		$httpTests = $httpTestManager->create($httpTests);
-
-		$httpTestManager->inherit($httpTests);
+		$httpTestManager = new CHttpTestManager($httpTests);
+		$httpTestManager->persist();
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
@@ -339,9 +337,8 @@ class CHttpTest extends CZBXAPI {
 		$httpTests = zbx_toArray($httpTests);
 		$this->validateUpdate($httpTests);
 
-		$httpTestManager = new CHttpTestManager();
-		$httpTestManager->update($httpTests);
-		$httpTestManager->inherit($httpTests);
+		$httpTestManager = new CHttpTestManager($httpTests);
+		$httpTestManager->persist();
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}

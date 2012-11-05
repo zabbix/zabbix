@@ -28,6 +28,65 @@ class CHttpTestManager {
 	private $trends = 90;
 
 	/**
+	 * @var array
+	 */
+	protected $originalHttpTests = array();
+
+	/**
+	 * Array of changed steps names.
+	 * array(
+	 *   testid1 => array(nameold1 => namenew1, nameold2 => namenew2),
+	 *   ...
+	 * )
+	 *
+	 * @var array
+	 */
+	protected $changedSteps = array();
+
+	/**
+	 * Map of parent http test id to child http test id.
+	 *
+	 * @var array
+	 */
+	protected $httpTestParents = array();
+
+
+	public function __construct(array $httpTests) {
+		$this->originalHttpTests = $httpTests;
+	}
+
+	public function persist() {
+		$this->findChangedStep();
+
+		$HttpTests = $this->save($this->originalHttpTests);
+		$this->inherit($HttpTests);
+	}
+
+	protected function findChangedStep() {
+		$httpSteps = array();
+		foreach ($this->originalHttpTests as $httpTest) {
+			if (isset($httpTest['httptestid']) && isset($httpTest['steps'])) {
+				foreach ($httpTest['steps'] as $step) {
+					if (isset($step['httpstepid']) && isset($step['name'])) {
+						$httpSteps[$step['httpstepid']] = $step['name'];
+					}
+				}
+			}
+		}
+
+		if (!empty($httpSteps)) {
+			$dbCursor = DBselect('SELECT hs.httpstepid,hs.httptestid,hs.name'.
+					' FROM httpstep hs'.
+					' WHERE '.DBcondition('hs.httpstepid', array_keys($httpSteps)));
+			while ($dbStep = DBfetch($dbCursor)) {
+				if ($httpSteps[$dbStep['httpstepid']] != $dbStep['name']) {
+					$this->changedSteps[$dbStep['httptestid']][$httpSteps[$dbStep['httpstepid']]] = $dbStep['name'];
+				}
+			}
+		}
+	}
+
+	/**
 	 * Create new http tests.
 	 *
 	 * @param array $httpTests
@@ -206,7 +265,6 @@ class CHttpTestManager {
 
 		$preparedHttpTests = $this->prepareInheritedHttpTests($httpTests, $hostsTemaplatesMap);
 		$inheritedHttpTests = $this->save($preparedHttpTests);
-// TODO: we probably need to pass full original http test, because inherited can be changed
 		$this->inherit($inheritedHttpTests);
 
 		return true;
@@ -293,6 +351,14 @@ class CHttpTestManager {
 				$newHttpTest['templateid'] = $httpTestId;
 				if ($exHttpTest) {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
+
+					$parentHttpTest = $httpTestId;
+					while (isset($this->httpTestParents[$parentHttpTest])) {
+						$parentHttpTest = $this->httpTestParents[$parentHttpTest];
+					}
+
+					$this->httpTestParents[$exHttpTest['httptestid']] = $parentHttpTest;
+
 					if (isset($newHttpTest['steps'])) {
 						$newHttpTest['steps'] = $this->prepareHttpSteps($httpTest['steps'], $exHttpTest['httptestid']);
 					}
@@ -425,16 +491,24 @@ class CHttpTestManager {
 	protected function prepareHttpSteps(array $steps, $exHttpTestId) {
 		$exSteps = array();
 		$dbCursor = DBselect('SELECT hs.httpstepid,hs.name'.
-				' FROM httpstep hs'.
-				' WHERE hs.httptestid='.zbx_dbstr($exHttpTestId));
+			' FROM httpstep hs'.
+			' WHERE hs.httptestid='.zbx_dbstr($exHttpTestId));
 		while ($dbHttpStep = DBfetch($dbCursor)) {
 			$exSteps[$dbHttpStep['name']] = $dbHttpStep['httpstepid'];
 		}
 
 		$result = array();
 		foreach ($steps as $step) {
-			if (isset($exSteps[$step['name']])) {
-				$step['httpstepid'] = $exSteps[$step['name']];
+			$parentTestId = $this->httpTestParents[$exHttpTestId];
+			if (isset($this->changedSteps[$parentTestId][$step['name']])) {
+				$stepName = $this->changedSteps[$parentTestId][$step['name']];
+			}
+			else {
+				$stepName = $step['name'];
+			}
+
+			if (isset($exSteps[$stepName])) {
+				$step['httpstepid'] = $exSteps[$stepName];
 				$step['httptestid'] = $exHttpTestId;
 			}
 
