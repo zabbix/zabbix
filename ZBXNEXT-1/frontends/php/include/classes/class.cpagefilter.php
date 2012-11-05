@@ -252,7 +252,8 @@ class CPageFilter {
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
-				'hostids' => ($this->hostid > 0) ? $this->hostid : null
+				'hostids' => ($this->hostid > 0) ? $this->hostid : null,
+				'expandName' => true
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$graphs = API::Graph()->get($options);
