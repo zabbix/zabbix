@@ -515,11 +515,11 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 
 	if (isset($elements['web'])) {
 		if ($currentElement == 'web') {
-			$list->addItem(_('Web').' ('.$dbHost['httpTests'].')');
+			$list->addItem(_('Web scenarios').' ('.$dbHost['httpTests'].')');
 		}
 		else {
 			$list->addItem(array(
-				new CLink(_('Web'), 'httpconf.php?hostid='.$dbHost['hostid']),
+				new CLink(_('Web scenarios'), 'httpconf.php?hostid='.$dbHost['hostid']),
 				' ('.$dbHost['httpTests'].')'
 			));
 		}
