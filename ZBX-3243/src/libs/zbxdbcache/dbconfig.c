@@ -2716,6 +2716,29 @@ static int	__config_nextcheck_compare(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	__config_ipmi_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *i2)
+{
+	if (i1->nextcheck < i2->nextcheck)
+		return -1;
+	if (i1->nextcheck > i2->nextcheck)
+		return +1;
+
+	if (i1->interfaceid < i2->interfaceid)
+		return -1;
+	if (i1->interfaceid > i2->interfaceid)
+		return +1;
+
+	return 0;
+}
+
+static int	__config_ipmi_elem_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	return __config_ipmi_item_compare((const ZBX_DC_ITEM *)e1->data, (const ZBX_DC_ITEM *)e2->data);
+}
+
 static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *i2)
 {
 	const ZBX_DC_JMXITEM	*j1;
@@ -2862,16 +2885,23 @@ void	init_configuration_cache()
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
-		if (ZBX_POLLER_TYPE_JAVA != i)
-		{
-			zbx_binary_heap_create_ext(&config->queues[i],
-					__config_nextcheck_compare,
-					ZBX_BINARY_HEAP_OPTION_DIRECT,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
-		}
+		if (ZBX_POLLER_TYPE_IPMI == i || ZBX_POLLER_TYPE_JAVA == i)
+			continue;
+
+		zbx_binary_heap_create_ext(&config->queues[i],
+				__config_nextcheck_compare,
+				ZBX_BINARY_HEAP_OPTION_DIRECT,
+				__config_mem_malloc_func,
+				__config_mem_realloc_func,
+				__config_mem_free_func);
 	}
+
+	zbx_binary_heap_create_ext(&config->queues[ZBX_POLLER_TYPE_IPMI],
+			__config_ipmi_elem_compare,
+			ZBX_BINARY_HEAP_OPTION_DIRECT,
+			__config_mem_malloc_func,
+			__config_mem_realloc_func,
+			__config_mem_free_func);
 
 	zbx_binary_heap_create_ext(&config->queues[ZBX_POLLER_TYPE_JAVA],
 			__config_java_elem_compare,
@@ -3136,10 +3166,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->trapper_hosts = '\0';
 			break;
 		case ITEM_TYPE_IPMI:
-			if (NULL != (ipmiitem = zbx_hashset_search(&config->ipmiitems, &src_item->itemid)))
-				strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
-			else
-				*dst_item->ipmi_sensor = '\0';
+			ipmiitem = zbx_hashset_search(&config->ipmiitems, &src_item->itemid);
+			strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 			dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid);
@@ -3712,9 +3740,19 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 		if (dc_item->nextcheck > now)
 			break;
 
-		if (ZBX_POLLER_TYPE_JAVA == poller_type)
-			if (0 != num && 0 != __config_java_item_compare(dc_item_prev, dc_item))
-				break;
+		if (0 != num)
+		{
+			if (ZBX_POLLER_TYPE_IPMI == poller_type)
+			{
+				if (0 != __config_ipmi_item_compare(dc_item_prev, dc_item))
+					break;
+			}
+			else if (ZBX_POLLER_TYPE_JAVA == poller_type)
+			{
+				if (0 != __config_java_item_compare(dc_item_prev, dc_item))
+					break;
+			}
+		}
 
 		zbx_binary_heap_remove_min(queue);
 		dc_item->location = ZBX_LOC_NOWHERE;
@@ -4153,6 +4191,11 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now)
 	{
 		if (CONFIG_UNREACHABLE_PERIOD >= now - *errors_from)
 		{
+			/* if two pollers check items often than CONFIG_UNREACHABLE_DELAY */
+			/* still unavailable, but don't change *disable_until variable */
+			if (CONFIG_UNREACHABLE_DELAY > now - *errors_from)
+				goto unlock;
+
 			/* still unavailable, but won't change status to UNAVAILABLE yet */
 			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 		}

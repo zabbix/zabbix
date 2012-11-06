@@ -646,7 +646,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 		t = now;
 		tmax = now + SEC_PER_YEAR;
 
-		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
+		shift = (ITEM_TYPE_IPMI == item_type || ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
 
 		while (t < tmax)
 		{

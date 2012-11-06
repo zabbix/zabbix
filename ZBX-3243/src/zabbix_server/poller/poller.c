@@ -50,7 +50,14 @@ extern int		process_num;
 
 static int	is_bunch_poller(int poller_type)
 {
-	return ZBX_POLLER_TYPE_JAVA == poller_type ? SUCCEED : FAIL;
+	switch (poller_type)
+	{
+		case ZBX_POLLER_TYPE_IPMI:
+		case ZBX_POLLER_TYPE_JAVA:
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
 }
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
@@ -681,17 +688,21 @@ static int	get_values(unsigned char poller_type)
 	zbx_free(port);
 
 	/* retrieve item values */
-	if (SUCCEED != is_bunch_poller(poller_type))
-	{
-		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0]);
-	}
-	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
+	if (ZBX_POLLER_TYPE_JAVA == poller_type)
 	{
 		alarm(CONFIG_TIMEOUT);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		alarm(0);
+	}
+	else
+	{
+		for (i = 0; i < num; i++)
+		{
+			if (SUCCEED != errcodes[i])
+				continue;
 
+			errcodes[i] = get_value(&items[i], &results[i]);
+		}
 	}
 
 	zbx_timespec(&timespec);
