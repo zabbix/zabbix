@@ -161,7 +161,7 @@ function add_slideshow($name, $delay, $slides) {
 	$screenids = zbx_objectValues($slides, 'screenid');
 	$screens = API::Screen()->get(array(
 		'screenids' => $screenids,
-		'output' => API_OUTPUT_SHORTEN
+		'output' => array('screenid')
 	));
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {
@@ -217,7 +217,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	$screenids = zbx_objectValues($slides, 'screenid');
 	$screens = API::Screen()->get(array(
 		'screenids' => $screenids,
-		'output' => API_OUTPUT_SHORTEN
+		'output' => array('screenid')
 	));
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {

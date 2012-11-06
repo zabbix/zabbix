@@ -20,7 +20,7 @@
 
 
 define('ZABBIX_VERSION',     '2.1.0');
-define('ZABBIX_API_VERSION', '1.4');
+define('ZABBIX_API_VERSION', '2.1.0');
 define('ZABBIX_DB_VERSION',	 2010008);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
@@ -838,7 +838,6 @@ define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
 
-define('API_OUTPUT_SHORTEN',	'shorten');
 define('API_OUTPUT_REFER',		'refer');
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');

@@ -47,7 +47,7 @@ class CHostsInfo extends CTable {
 		// fetch accessible host ids
 		$hosts = API::Host()->get(array(
 			'nodeids' => get_current_nodeid(true),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'preservekeys' => true
 		));
 		$hostIds = array_keys($hosts);

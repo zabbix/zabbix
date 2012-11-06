@@ -134,9 +134,7 @@ class CUserGroup extends CZBXAPI {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['userid'] = 'ug.userid';
-			}
+			$sqlParts['select']['userid'] = 'ug.userid';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
 			$sqlParts['where'][] = DBcondition('ug.userid', $options['userids']);
 			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
@@ -219,27 +217,22 @@ class CUserGroup extends CZBXAPI {
 			else {
 				$usrgrpids[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$usrgrp['usrgrpid']] = array('usrgrpid' => $usrgrp['usrgrpid']);
+				if (!isset($result[$usrgrp['usrgrpid']])) {
+					$result[$usrgrp['usrgrpid']]= array();
 				}
-				else {
-					if (!isset($result[$usrgrp['usrgrpid']])) {
-						$result[$usrgrp['usrgrpid']]= array();
-					}
-					if (!is_null($options['selectUsers']) && !isset($result[$usrgrp['usrgrpid']]['users'])) {
+				if (!is_null($options['selectUsers']) && !isset($result[$usrgrp['usrgrpid']]['users'])) {
+					$result[$usrgrp['usrgrpid']]['users'] = array();
+				}
+
+				// groupids
+				if (isset($usrgrp['userid']) && is_null($options['selectUsers'])) {
+					if (!isset($result[$usrgrp['usrgrpid']]['users'])) {
 						$result[$usrgrp['usrgrpid']]['users'] = array();
 					}
-
-					// groupids
-					if (isset($usrgrp['userid']) && is_null($options['selectUsers'])) {
-						if (!isset($result[$usrgrp['usrgrpid']]['users'])) {
-							$result[$usrgrp['usrgrpid']]['users'] = array();
-						}
-						$result[$usrgrp['usrgrpid']]['users'][] = array('userid' => $usrgrp['userid']);
-						unset($usrgrp['userid']);
-					}
-					$result[$usrgrp['usrgrpid']] += $usrgrp;
+					$result[$usrgrp['usrgrpid']]['users'][] = array('userid' => $usrgrp['userid']);
+					unset($usrgrp['userid']);
 				}
+				$result[$usrgrp['usrgrpid']] += $usrgrp;
 			}
 		}
 
@@ -303,7 +296,7 @@ class CUserGroup extends CZBXAPI {
 	public function exists($object) {
 		$options = array(
 			'filter' => array('name' => $object['name']),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('usrgrpid'),
 			'nopermissions' => 1,
 			'limit' => 1,
 		);
@@ -520,7 +513,7 @@ class CUserGroup extends CZBXAPI {
 				// check if there already is hostgroup with this name, except current hostgroup
 				$groupExists = $this->get(array(
 					'filter' => array('name' => $data['name']),
-					'output' => API_OUTPUT_SHORTEN,
+					'output' => array('usrgrpid'),
 					'limit' => 1
 				));
 				$groupExists = reset($groupExists);
@@ -763,7 +756,6 @@ class CUserGroup extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -779,7 +771,6 @@ class CUserGroup extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));

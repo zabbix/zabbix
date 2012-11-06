@@ -1,6 +1,9 @@
 Changes for 2.1.0
 
 New features:
+A......... [ZBXNEXT-1492] dropped support of output shorten for the API get methods (Pavels)
+.......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)
+........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
 ....I...S. [ZBXNEXT-1472] added support of parallel processing of time-based functions (Sasha)
 ..F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard)
 .......PS. [ZBX-3449] added support of multiple dynamic SNMP indexes (Sasha)
@@ -15,7 +18,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
-A......... [ZBX-5714] fixed inconsistency between shorten and refer in UserMacro API (Eduard)
+A......... [ZBX-5709] fixed trigger recreation after template trigger expression change causing event history deletion (Toms)
 ..F....... [ZBX-5711] added caching for frontend favorite values (Toms)
 ..F....... [ZBX-5711] removed redundant queries when editing web scenario (Toms)
 A.F....... [ZBX-5565] fixed html is returned on api requests if db is down (Vedmak)
@@ -40,18 +43,23 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.4rc1
 
 New features:
+A.F....... [ZBX-1357] added initial Portuguese (Portugal) translation (Richlv)
 ..F....... [ZBXNEXT-1398] implemented flickerfree screen shadowing for old screen data (Eduard)
 A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 ..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
 .......PS. [ZBX-4638] added support of {HOST.HOST}, {HOST.NAME}, {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in "params" field for SSH, Telnet and DB monitor items (Sasha)
 .....J.... [ZBX-4663] added possibility to use dots in JMX attribute names (dimir)
 ..F....... [ZBX-5556] action recovery message body can now be empty (Vedmak)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Chinese (China), Chinese (Taiwan), Czech, French, German, Hungarian, Italian, Latvian, Polish, Slovak, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Chinese (China), Chinese (Taiwan), Czech, French, German, Hungarian, Italian, Japanese, Latvian, Polish, Slovak, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBXNEXT-1426] added initial Persian translation (Richlv)
 A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5751] fixed CDiscoveryRule get() and CItemPrototype get() "selectGraphs" parameter (Oleg)
+..F....... [ZBX-5667] fixed host screen defined in template does not show item data for "Plain text" elements (Toms)
+..F....... [ZBX-5762] fixed undefined indexes in graph prototype form (Oleg)
+....I..... [ZBX-5125] fixed possible SQL errors while upgrading DB (dimir, Sasha)
 ....I..... [ZBX-5415] fixed check for PostgreSQL dev libraries (Sasha)
 A......... [ZBX-5740] removed "discoveryids" parameter from CItem, CTrigger and CGraph get() methods (Toms)
 A......... [ZBX-5740] fixed CItemPrototype parameter "selectTriggers" not working (Toms)

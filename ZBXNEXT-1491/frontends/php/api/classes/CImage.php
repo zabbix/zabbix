@@ -184,23 +184,18 @@ class CImage extends CZBXAPI {
 			else {
 				$imageids[$image['imageid']] = $image['imageid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$image['imageid']] = array('imageid' => $image['imageid']);
+				if (!isset($result[$image['imageid']])) {
+					$result[$image['imageid']] = array();
 				}
-				else {
-					if (!isset($result[$image['imageid']])) {
-						$result[$image['imageid']] = array();
-					}
 
-					// sysmapds
-					if (isset($image['sysmapid'])) {
-						if (!isset($result[$image['imageid']]['sysmaps'])) {
-							$result[$image['imageid']]['sysmaps'] = array();
-						}
-						$result[$image['imageid']]['sysmaps'][] = array('sysmapid' => $image['sysmapid']);
+				// sysmapds
+				if (isset($image['sysmapid'])) {
+					if (!isset($result[$image['imageid']]['sysmaps'])) {
+						$result[$image['imageid']]['sysmaps'] = array();
 					}
-					$result[$image['imageid']] += $image;
+					$result[$image['imageid']]['sysmaps'][] = array('sysmapid' => $image['sysmapid']);
 				}
+				$result[$image['imageid']] += $image;
 			}
 		}
 
@@ -259,7 +254,7 @@ class CImage extends CZBXAPI {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('imageid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -406,7 +401,7 @@ class CImage extends CZBXAPI {
 
 			$options = array(
 				'filter' => array('name' => $image['name']),
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('imageid'),
 				'nopermissions' => 1
 			);
 			$imageExists = $this->get($options);
