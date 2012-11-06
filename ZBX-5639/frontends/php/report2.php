@@ -77,6 +77,11 @@ $availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mo
 CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
 $config = select_config();
 
+if($_REQUEST['filter_hostid'] != CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostid', 0)) {
+	unset($_REQUEST['tpl_triggerid']);
+	unset($_REQUEST['hostgroupid']);
+}
+
 if ($config['dropdown_first_remember']) {
 	if (!isset($_REQUEST['filter_rst'])) {
 		$_REQUEST['filter_groupid'] = get_request('filter_groupid', CProfile::get('web.avail_report.'.$availabilityReportMode.'.groupid', 0));
@@ -85,7 +90,6 @@ if ($config['dropdown_first_remember']) {
 		$_REQUEST['filter_timetill'] = get_request('filter_timetill', CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0));
 	}
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_INT);
-	CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_INT);
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
 }
@@ -97,6 +101,8 @@ else {
 		$_REQUEST['filter_timetill'] = get_request('filter_timetill', 0);
 	}
 }
+
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_INT);
 
 if (($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])) {
 	$tmp = $_REQUEST['filter_timesince'];
@@ -215,6 +221,9 @@ else if (isset($_REQUEST['hostid'])) {
 		}
 		if (isset($_REQUEST['tpl_triggerid']) && $_REQUEST['tpl_triggerid'] > 0) {
 			$options['filter']['templateid'] = $_REQUEST['tpl_triggerid'];
+		}
+		if (isset($_REQUEST['hostgroupid']) && $_REQUEST['hostgroupid'] > 0) {
+			$options['groupids'] = $_REQUEST['hostgroupid'];
 		}
 	}
 
