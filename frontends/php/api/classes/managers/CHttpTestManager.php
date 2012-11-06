@@ -28,11 +28,6 @@ class CHttpTestManager {
 	private $trends = 90;
 
 	/**
-	 * @var array
-	 */
-	protected $originalHttpTests = array();
-
-	/**
 	 * Changed steps names.
 	 * array(
 	 *   testid1 => array(nameold1 => namenew1, nameold2 => namenew2),
@@ -51,19 +46,14 @@ class CHttpTestManager {
 	protected $httpTestParents = array();
 
 	/**
+	 * Save http test to db.
+	 *
 	 * @param array $httpTests
 	 */
-	public function __construct(array $httpTests) {
-		$this->originalHttpTests = $httpTests;
-	}
+	public function persist(array $httpTests) {
+		$this->changedSteps = $this->findChangedStepNames($httpTests);
 
-	/**
-	 * Save http steps to db.
-	 */
-	public function persist() {
-		$this->changedSteps = $this->findChangedStepNames();
-
-		$HttpTests = $this->save($this->originalHttpTests);
+		$HttpTests = $this->save($httpTests);
 		$this->inherit($HttpTests);
 	}
 
@@ -72,10 +62,10 @@ class CHttpTestManager {
 	 *
 	 * @return array
 	 */
-	protected function findChangedStepNames() {
+	protected function findChangedStepNames(array $httpTests) {
 		$httpSteps = array();
 		$result = array();
-		foreach ($this->originalHttpTests as $httpTest) {
+		foreach ($httpTests as $httpTest) {
 			if (isset($httpTest['httptestid']) && isset($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as $step) {
 					if (isset($step['httpstepid']) && isset($step['name'])) {
@@ -351,8 +341,12 @@ class CHttpTestManager {
 					}
 
 					// if we found existing http test by name and steps, we only add linkage, i.e. change templateid
-					// so we unset all data for http test we link, templateid is assigned later
-					$httpTest = array();
+					// inheritance process for such steps should be stopped
+					DB::update('httptest', array(
+						'values' => array('templateid' => $httpTestId),
+						'where' => array('httptestid' => $exHttpTest['httptestid'])
+					));
+					continue;
 				}
 
 				$newHttpTest = $httpTest;
