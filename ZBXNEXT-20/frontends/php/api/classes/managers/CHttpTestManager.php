@@ -33,7 +33,7 @@ class CHttpTestManager {
 	protected $originalHttpTests = array();
 
 	/**
-	 * Array of changed steps names.
+	 * Changed steps names.
 	 * array(
 	 *   testid1 => array(nameold1 => namenew1, nameold2 => namenew2),
 	 *   ...
@@ -50,20 +50,31 @@ class CHttpTestManager {
 	 */
 	protected $httpTestParents = array();
 
-
+	/**
+	 * @param array $httpTests
+	 */
 	public function __construct(array $httpTests) {
 		$this->originalHttpTests = $httpTests;
 	}
 
+	/**
+	 * Save http steps to db.
+	 */
 	public function persist() {
-		$this->findChangedStep();
+		$this->changedSteps = $this->findChangedStepNames();
 
 		$HttpTests = $this->save($this->originalHttpTests);
 		$this->inherit($HttpTests);
 	}
 
-	protected function findChangedStep() {
+	/**
+	 * Find steps where name was changed.
+	 *
+	 * @return array
+	 */
+	protected function findChangedStepNames() {
 		$httpSteps = array();
+		$result = array();
 		foreach ($this->originalHttpTests as $httpTest) {
 			if (isset($httpTest['httptestid']) && isset($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as $step) {
@@ -80,10 +91,12 @@ class CHttpTestManager {
 					' WHERE '.DBcondition('hs.httpstepid', array_keys($httpSteps)));
 			while ($dbStep = DBfetch($dbCursor)) {
 				if ($httpSteps[$dbStep['httpstepid']] != $dbStep['name']) {
-					$this->changedSteps[$dbStep['httptestid']][$httpSteps[$dbStep['httpstepid']]] = $dbStep['name'];
+					$result[$dbStep['httptestid']][$httpSteps[$dbStep['httpstepid']]] = $dbStep['name'];
 				}
 			}
 		}
+
+		return $result;
 	}
 
 	/**
@@ -342,22 +355,16 @@ class CHttpTestManager {
 					$httpTest = array();
 				}
 
-//				if ($this->checkIfItemsRequireChenged($httpTest)) {
-//					$this->checkHttpTestItems($httpTest);
-//				}
-
 				$newHttpTest = $httpTest;
 				$newHttpTest['hostid'] = $hostId;
 				$newHttpTest['templateid'] = $httpTestId;
 				if ($exHttpTest) {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
 
-					$parentHttpTest = $httpTestId;
-					while (isset($this->httpTestParents[$parentHttpTest])) {
-						$parentHttpTest = $this->httpTestParents[$parentHttpTest];
+					$this->setHttpTestParent($exHttpTest['httptestid'], $httpTestId);
+					if (!empty($newHttpTest['applicationid'])) {
+						$newHttpTest['applicationid'] = $this->findChildApplication($newHttpTest['applicationid'], $hostId);
 					}
-
-					$this->httpTestParents[$exHttpTest['httptestid']] = $parentHttpTest;
 
 					if (isset($newHttpTest['steps'])) {
 						$newHttpTest['steps'] = $this->prepareHttpSteps($httpTest['steps'], $exHttpTest['httptestid']);
@@ -371,6 +378,37 @@ class CHttpTestManager {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Find application with same name on given host.
+	 *
+	 * @param $parentAppId
+	 * @param $childHostId
+	 *
+	 * @return string
+	 */
+	protected function findChildApplication($parentAppId, $childHostId) {
+		$childAppId = DBfetch(DBselect('SELECT a2.applicationid'.
+				' FROM applications a1'.
+				' INNER JOIN applications a2 ON a1.name=a2.name'.
+				' WHERE a1.applicationid='.zbx_dbstr($parentAppId).
+				' AND a2.hostid='.zbx_dbstr($childHostId)));
+
+		return $childAppId['applicationid'];
+	}
+
+	/**
+	 * Find and set first parent id for http test.
+	 *
+	 * @param $id
+	 * @param $parentId
+	 */
+	protected function setHttpTestParent($id, $parentId) {
+		while (isset($this->httpTestParents[$parentId])) {
+			$parentId = $this->httpTestParents[$parentId];
+		}
+		$this->httpTestParents[$id] = $parentId;
 	}
 
 	/**
@@ -432,21 +470,6 @@ class CHttpTestManager {
 		}
 
 		return $firstHash == $secondHash;
-	}
-
-	/**
-	 * Check if http test data requires http items change.
-	 * Changes are required if:
-	 *  - http test name changes
-	 *  - step name changes
-	 *
-	 * @param array $httpTest
-	 *
-	 * @return bool
-	 */
-	protected function checkIfItemsRequireChenged(array $httpTest) {
-
-		return true;
 	}
 
 	/**

@@ -406,7 +406,7 @@ else {
 		$sortfield = getPageSortField('hostname');
 		$options = array(
 			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('httptestid'),
 			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
 		);
