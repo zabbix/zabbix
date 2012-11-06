@@ -339,6 +339,37 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$data['form'] = get_request('form');
 	$data['form_refresh'] = get_request('form_refresh');
 	$data['hostname'] = get_request('hostname', '');
+	$data['templates'] = array();
+
+	if (isset($data['httptestid'])) {
+		// get templates
+		$httpTestId = $data['httptestid'];
+		while ($httpTestId) {
+			$dbTest = DBfetch(DBselect(
+				'SELECT h.hostid,h.name,ht.httptestid,ht.templateid'.
+					' FROM hosts h,httptest ht'.
+					' WHERE ht.hostid=h.hostid'.
+					' AND ht.httptestid='.zbx_dbstr($httpTestId)
+			));
+			$httpTestId = null;
+
+			if (!empty($dbTest)) {
+				if (!idcmp($data['httptestid'], $dbTest['httptestid'])) {
+					$data['templates'][] = new CLink(
+						$dbTest['name'],
+						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid'],
+						'highlight underline weight_normal'
+					);
+					$data['templates'][] = SPACE.RARR.SPACE;
+				}
+				$httpTestId = $dbTest['templateid'];
+			}
+		}
+		$data['templates'] = array_reverse($data['templates']);
+		array_shift($data['templates']);
+	}
+
+
 	if (empty($data['hostname'])) {
 		$hostInfo = get_host_by_hostid($data['hostid'], true);
 		$data['hostname'] = $hostInfo['name'];

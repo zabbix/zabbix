@@ -135,12 +135,7 @@ if ($pageFilter->hostsSelected) {
 
 
 	foreach($httpTests as $httpTest) {
-		if (isset($httpTest['lastcheck'])) {
-			$lastcheck = zbx_date2str(_('d M Y H:i:s'), $httpTest['lastcheck']);
-		}
-		else {
-			$lastcheck = new CCol(_('Never'));
-		}
+		$lastcheck = isset($httpTest['lastcheck']) ? zbx_date2str(_('d M Y H:i:s'), $httpTest['lastcheck']) : _('Never');
 
 		if (!isset($httpTest['lastcheck'])) {
 			$status['msg'] = _('Unknown');
