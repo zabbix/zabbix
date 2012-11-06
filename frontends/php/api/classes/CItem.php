@@ -476,15 +476,6 @@ class CItem extends CItemGeneral {
 						$result[$item['itemid']]['hosts'][] = $host;
 					}
 				}
-
-				$templates = API::Template()->get($objParams);
-				foreach ($templates as $template) {
-					$titems = $template['items'];
-					unset($template['items']);
-					foreach ($titems as $item) {
-						$result[$item['itemid']]['hosts'][] = $template;
-					}
-				}
 			}
 		}
 
