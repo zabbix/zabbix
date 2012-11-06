@@ -291,6 +291,149 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Maps a single related object to each base object, for example, a host to an item. The base objects must contain
+	 * the foreign key, which will be used for mapping.
+	 *
+	 * For example, to map an array of $hosts to $items, the items must have the 'hostid' property. Then the mapping
+	 * can be done with the following call:
+	 *
+	 * $this->mapOne($items, $hosts, 'host', 'hostid');
+	 *
+	 * @param array $baseObjects        an object hash with IDs as keys
+	 * @param array $relatedObjects     a hash of objects to map to the base objects with IDs as keys
+	 * @param string $baseField         the name of the field under which the related objects must be added
+	 * @param string $reference         the name of the foreign key in the base object
+	 * @param bool $unsetReference      whether to unset the foreign key
+	 *
+	 * @return array
+	 */
+	protected function mapOne(array $baseObjects, array $relatedObjects, $baseField, $reference, $unsetReference = true) {
+		foreach ($baseObjects as &$baseObject) {
+			// if a related object exists, add it to the base object
+			if (isset($relatedObjects[$baseObject[$reference]])) {
+				$relatedObject = $relatedObjects[$baseObject[$reference]];
+
+				$baseObject[$baseField] = $relatedObject;
+			}
+			// if no related object exist, add an empty array
+			else {
+				$baseObject[$baseField] = array();
+			}
+
+			// unset the foreign key
+			if ($unsetReference) {
+				unset($baseObject[$reference]);
+			}
+		}
+		unset($baseObject);
+
+		return $baseObjects;
+	}
+
+	/**
+	 * Maps multiple related objects to each base object, for example, items to hosts or triggers to items.
+	 * The related objects must contain references to the base objects.
+	 *
+	 * For one-to-many relations the $reference parameter must be given as the name of the foreign key field of the
+	 * related object. For example, to map an array of $items to $hosts, the items must have the 'hostid' property.
+	 * Then the mapping can be done with the following call:
+	 *
+	 * $this->mapMany($hosts, $items, 'items', 'hostid');
+	 *
+	 * For many-to-many relations - as an array, where the first element is the key, under which reference objects
+	 * are contained, and the second - the name of the foreign key field. For example, to map an array of $triggers
+	 * to $items, the $triggers array must contain an array of items under the 'items' key. Then the mapping can
+	 * be done with the following call:
+	 *
+	 * $this->mapMany($items, $triggers, 'triggers', array('items', 'itemid'));
+	 *
+	 * @param array $baseObjects        an object hash with IDs as keys
+	 * @param array $relatedObjects     a hash of objects to map to the base objects with IDs as keys
+	 * @param string $baseField         the name of the field under which the related objects must be added
+	 * @param string $reference         foreign reference
+	 * @param bool $unsetReference      whether to unset the foreign key
+	 * @param null $limit
+	 *
+	 * @return mixed
+	 */
+	protected function mapMany(array $baseObjects, array $relatedObjects, $baseField, $reference, $unsetReference = true, $limit = null) {
+		// create an empty array for every base object
+		foreach ($baseObjects as &$object) {
+			$object[$baseField] = array();
+		}
+		unset($object);
+
+		// add related objects
+		$count = array();
+		foreach ($relatedObjects as $relatedObject) {
+			// for many-to-many relations
+			if (is_array($reference)) {
+				$referenceObjectField = $reference[0];
+				$referenceIdField = $reference[1];
+
+				// fetch the relation objects
+				$relationObjects = $relatedObject[$referenceObjectField];
+
+				// remove relation objects from the result
+				if ($unsetReference) {
+					unset($relatedObject[$referenceObjectField]);
+				}
+
+				foreach ($relationObjects as $keyObject) {
+					$baseObjectId = $keyObject[$referenceIdField];
+
+					// limit the number of results for each object
+					if ($limit) {
+						if (!isset($count[$baseObjectId])) {
+							$count[$baseObjectId] = 0;
+						}
+
+						$count[$baseObjectId]++;
+
+						if ($count[$baseObjectId] > $limit) {
+							continue;
+						}
+					}
+
+					// add the related object to the base objects
+					if (isset($baseObjects[$baseObjectId])) {
+						$baseObjects[$baseObjectId][$baseField][] = $relatedObject;
+					}
+				}
+			}
+			// for one-to-many relations
+			else {
+				$baseObjectId = $relatedObject[$reference];
+
+				// remove relation objects from the result
+				if ($unsetReference) {
+					unset($relatedObject[$reference]);
+				}
+
+				// limit the number of results for each object
+				if ($limit) {
+					if (!isset($count[$baseObjectId])) {
+						$count[$baseObjectId] = 0;
+					}
+
+					$count[$baseObjectId]++;
+
+					if ($count[$baseObjectId] > $limit) {
+						continue;
+					}
+				}
+
+				// add the related object to the base objects
+				if (isset($baseObjects[$baseObjectId])) {
+					$baseObjects[$baseObjectId][$baseField][] = $relatedObject;
+				}
+			}
+		}
+
+		return $baseObjects;
+	}
+
+	/**
 	 * Constructs an SQL SELECT query for a specific table from the given API options, executes it and returns
 	 * the result.
 	 *
