@@ -909,6 +909,7 @@ class CItem extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$delItemIds = zbx_toArray($itemids);
 		$itemids = zbx_toHash($itemids);
 
 		$delItems = $this->get(array(
@@ -1020,7 +1021,7 @@ class CItem extends CItemGeneral {
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('itemids' => $itemids);
+		return array('itemids' => $delItemIds);
 	}
 
 	public function syncTemplates($data) {
