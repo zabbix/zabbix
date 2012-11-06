@@ -57,6 +57,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5811] fixed no permissions error when change user group "status", "frontend access" and "debug mode" using link in user groups list (Oleg)
 A......... [ZBX-5751] fixed CDiscoveryRule get() and CItemPrototype get() "selectGraphs" parameter (Oleg)
 ..F....... [ZBX-5667] fixed host screen defined in template does not show item data for "Plain text" elements (Toms)
 ..F....... [ZBX-5762] fixed undefined indexes in graph prototype form (Oleg)
