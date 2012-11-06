@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-06 08:11+0200\n"
-"PO-Revision-Date: 2012-11-01 22:38+0200\n"
+"POT-Creation-Date: 2012-11-06 08:18+0200\n"
+"PO-Revision-Date: 2012-11-02 21:08+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -9606,7 +9606,7 @@ msgstr "Польский (pl_PL)"
 
 #: include/views/configuration.item.edit.php:419
 msgid "Populates host inventory field"
-msgstr "Заполнение поля инвентаря узла сети"
+msgstr "Заполнять поле инвентарных данных узла сети"
 
 #: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314

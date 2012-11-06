@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-06 08:11+0200\n"
-"PO-Revision-Date: 2012-10-29 16:38+0200\n"
-"Last-Translator: volter <volker27@gmx.at>\n"
+"POT-Creation-Date: 2012-11-06 08:18+0200\n"
+"PO-Revision-Date: 2012-11-04 14:31+0200\n"
+"Last-Translator: flo <florian.koch1981@googlemail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -1378,7 +1378,7 @@ msgstr "Kann Diagramm nicht löschen"
 
 #: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Kann Schaubild nicht löschen"
 
 #: api/classes/CItem.php:983
 msgid "Cannot delete graph."
@@ -1506,7 +1506,7 @@ msgstr "Element stammt aus Vorlage und kann nicht gelöscht werden."
 
 #: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Kann template Elemente nicht löschen"
 
 #: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
@@ -1523,7 +1523,7 @@ msgstr "Kann Auslöser nicht löschen"
 
 #: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Kann Auslöser Prototyp nicht löschen"
 
 #: api/classes/CItem.php:999
 msgid "Cannot delete trigger."
@@ -3566,19 +3566,19 @@ msgstr ""
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "Unterschied zwischen letztem und vorletztem Wert ist kleiner als  N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "Unterschied zwischen letztem und vorletztem Wert ist N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "Unterschied zwischen letztem und vorletztem Wert ist größer N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Unterschied zwischen letztem und vorletztem Wert ist nicht N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4278,7 +4278,7 @@ msgstr "Ereignis bestätigt"
 #: adm.gui.php:71
 #, php-format
 msgid "Event acknowledges \"%1$s\"."
-msgstr ""
+msgstr "Ereignis Bestätigung \"%1$s\"."
 
 #: dashconf.php:260
 msgid "Event acknowledging disabled"
@@ -4549,7 +4549,7 @@ msgstr "Nach Namen filtern"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "Suche string V in letztem Wert, N = 1 bei Treffer, 0 bei keinem Treffer"
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
@@ -13795,12 +13795,12 @@ msgstr "genauso wie"
 #: include/func.inc.php:562
 msgctxt "Milli short"
 msgid "m"
-msgstr ""
+msgstr "M"
 
 #: include/func.inc.php:488 jsLoader.php:95
 msgctxt "minute short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/func.inc.php:464 jsLoader.php:91
 msgctxt "month short"
