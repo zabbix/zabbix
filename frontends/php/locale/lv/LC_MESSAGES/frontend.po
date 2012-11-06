@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 18:16+0200\n"
+"POT-Creation-Date: 2012-11-06 08:11+0200\n"
 "PO-Revision-Date: 2012-10-21 21:20+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1266,15 +1266,15 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:1213
+#: api/classes/CDiscoveryRule.php:1209
 msgid "Cannot clone graph prototypes."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:1103
+#: api/classes/CDiscoveryRule.php:1099
 msgid "Cannot clone item prototypes."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:825
+#: api/classes/CDiscoveryRule.php:821
 msgid "Cannot clone trigger prototypes."
 msgstr ""
 
@@ -1358,7 +1358,7 @@ msgstr ""
 msgid "Cannot delete dependency"
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:622 discoveryconf.php:164
+#: api/classes/CDiscoveryRule.php:618 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
 msgstr ""
@@ -1371,7 +1371,7 @@ msgstr ""
 msgid "Cannot delete graph"
 msgstr "Grafiku nav iespējams izdzēst"
 
-#: api/classes/CItemPrototype.php:737
+#: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
 msgstr ""
 
@@ -1419,7 +1419,7 @@ msgstr ""
 msgid "Cannot delete items"
 msgstr ""
 
-#: api/classes/CItemPrototype.php:754
+#: api/classes/CItemPrototype.php:764
 msgid "Cannot delete items created by low level discovery."
 msgstr ""
 
@@ -1462,16 +1462,16 @@ msgstr ""
 msgid "Cannot delete script"
 msgstr "Skriptu nav iespējams izdzēst"
 
-#: api/classes/CScript.php:385
+#: api/classes/CScript.php:408
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr ""
 
-#: api/classes/CScript.php:409
+#: api/classes/CScript.php:432
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr ""
 
-#: api/classes/CScript.php:398
+#: api/classes/CScript.php:421
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr ""
@@ -1500,11 +1500,11 @@ msgstr ""
 msgid "Cannot delete templated item."
 msgstr ""
 
-#: api/classes/CItemPrototype.php:698
+#: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:581
+#: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
 msgstr ""
 
@@ -1517,7 +1517,7 @@ msgstr ""
 msgid "Cannot delete trigger"
 msgstr "Trigeri nav iespējams izdzēst"
 
-#: api/classes/CItemPrototype.php:769
+#: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
 msgstr ""
 
@@ -1590,7 +1590,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:1019 api/classes/CDiscoveryRule.php:1091
+#: api/classes/CDiscoveryRule.php:1015 api/classes/CDiscoveryRule.php:1087
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
@@ -2463,7 +2463,7 @@ msgstr ""
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr ""
 
-#: api/classes/CScript.php:454
+#: api/classes/CScript.php:477
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2471,7 +2471,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: api/classes/CScript.php:445
+#: api/classes/CScript.php:468
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2481,7 +2481,7 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: api/classes/CScript.php:451
+#: api/classes/CScript.php:474
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -2650,7 +2650,7 @@ msgstr ""
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:866
+#: api/classes/CDiscoveryRule.php:862
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -2660,7 +2660,7 @@ msgstr ""
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemPrototype.php:598
+#: api/classes/CItemPrototype.php:608
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3398,7 +3398,7 @@ msgstr ""
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:630
+#: api/classes/CDiscoveryRule.php:626
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3418,7 +3418,7 @@ msgstr ""
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemPrototype.php:781
+#: api/classes/CItemPrototype.php:791
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3721,12 +3721,12 @@ msgstr ""
 msgid "Discovery rule"
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:949
+#: api/classes/CDiscoveryRule.php:945
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:936
+#: api/classes/CDiscoveryRule.php:932
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr ""
@@ -3921,7 +3921,7 @@ msgstr ""
 msgid "Duplicate map name for map \"%s\"."
 msgstr ""
 
-#: api/classes/CScript.php:284 api/classes/CScript.php:335
+#: api/classes/CScript.php:307 api/classes/CScript.php:358
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr ""
@@ -4029,11 +4029,11 @@ msgid "Empty host name provided in expression."
 msgstr ""
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
-#: api/classes/CDiscoveryRule.php:561 api/classes/CGraph.php:729
+#: api/classes/CDiscoveryRule.php:557 api/classes/CGraph.php:729
 #: api/classes/CGraphPrototype.php:778 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:677
+#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:687
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -4195,27 +4195,27 @@ msgstr "Angļu (en_US)"
 msgid "Error"
 msgstr "Kļūda"
 
-#: api/classes/CScript.php:459
+#: api/classes/CScript.php:482
 msgid "Error description"
 msgstr "Kļūdas apraksts"
 
-#: api/classes/CScript.php:497
+#: api/classes/CScript.php:520
 msgid "Error description: can't read script response, check connection."
 msgstr ""
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:497
 msgid "Error description: can't send command, check connection."
 msgstr ""
 
-#: api/classes/CScript.php:490
+#: api/classes/CScript.php:513
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr ""
 
-#: api/classes/CScript.php:486
+#: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr ""
 
-#: api/classes/CScript.php:505
+#: api/classes/CScript.php:528
 msgid "Error description: empty response received."
 msgstr ""
 
@@ -6596,7 +6596,7 @@ msgid "Italian (it_IT)"
 msgstr "Itāļu (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:37 include/forms.inc.php:1014
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1014
 #: include/reports.inc.php:694 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
@@ -8167,8 +8167,8 @@ msgstr ""
 msgid "No data collection"
 msgstr ""
 
-#: include/classes/screens/CScreenPlainText.php:36
-#: include/classes/screens/CScreenPlainText.php:56
+#: include/classes/screens/CScreenPlainText.php:41
+#: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
 msgstr ""
 
@@ -8204,7 +8204,7 @@ msgstr ""
 msgid "No discovery checks defined."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:648
+#: api/classes/CDiscoveryRule.php:644
 msgid "No discovery rule IDs given."
 msgstr ""
 
@@ -8290,7 +8290,7 @@ msgstr ""
 msgid "No history defined."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:651
+#: api/classes/CDiscoveryRule.php:647
 msgid "No host IDs given."
 msgstr ""
 
@@ -8496,9 +8496,9 @@ msgstr ""
 #: api/classes/CAction.php:896 api/classes/CAction.php:1484
 #: api/classes/CApplication.php:449 api/classes/CApplication.php:456
 #: api/classes/CApplication.php:604 api/classes/CApplication.php:681
-#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:578
-#: api/classes/CDiscoveryRule.php:656 api/classes/CDiscoveryRule.php:661
-#: api/classes/CDiscoveryRule.php:679 api/classes/CDiscoveryRule.php:682
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:574
+#: api/classes/CDiscoveryRule.php:652 api/classes/CDiscoveryRule.php:657
+#: api/classes/CDiscoveryRule.php:675 api/classes/CDiscoveryRule.php:678
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:592 api/classes/CGraphGeneral.php:161
 #: api/classes/CGraph.php:826 api/classes/CGraphPrototype.php:871
@@ -8508,7 +8508,7 @@ msgstr ""
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:705
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -10685,7 +10685,7 @@ msgstr ""
 msgid "Script"
 msgstr "Skripts"
 
-#: api/classes/CScript.php:297 api/classes/CScript.php:349
+#: api/classes/CScript.php:320 api/classes/CScript.php:372
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr ""
@@ -10711,7 +10711,7 @@ msgstr ""
 msgid "Script updated"
 msgstr "Skripts modificēts"
 
-#: api/classes/CScript.php:330
+#: api/classes/CScript.php:353
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
@@ -11879,8 +11879,8 @@ msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenHistory.php:266
-#: include/classes/screens/CScreenPlainText.php:37
-#: include/classes/screens/CScreenPlainText.php:57
+#: include/classes/screens/CScreenPlainText.php:42
+#: include/classes/screens/CScreenPlainText.php:62
 msgid "Timestamp"
 msgstr ""
 
@@ -12543,7 +12543,7 @@ msgstr "Atjaunots: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:910
+#: api/classes/CDiscoveryRule.php:906
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12553,7 +12553,7 @@ msgstr ""
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemPrototype.php:648
+#: api/classes/CItemPrototype.php:658
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -13155,7 +13155,7 @@ msgstr ""
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CScript.php:280
+#: api/classes/CScript.php:303
 msgid "Wrong fields for script."
 msgstr ""
 
@@ -13341,11 +13341,11 @@ msgstr ""
 #: api/classes/CHostGroup.php:1011 api/classes/CHost.php:1592
 #: api/classes/CHost.php:1646 api/classes/CHost.php:1960
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
-#: api/classes/CItemPrototype.php:792 api/classes/CItemPrototype.php:795
+#: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
-#: api/classes/CMaintenance.php:743 api/classes/CScript.php:272
-#: api/classes/CScript.php:319 api/classes/CScript.php:381
-#: api/classes/CScript.php:431 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
+#: api/classes/CScript.php:342 api/classes/CScript.php:404
+#: api/classes/CScript.php:454 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
 #: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:739
@@ -13456,7 +13456,7 @@ msgstr ""
 msgid "Zabbix server"
 msgstr ""
 
-#: api/classes/CScript.php:448
+#: api/classes/CScript.php:471
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -13597,7 +13597,7 @@ msgstr ""
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
 #: include/acknow.inc.php:46 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
-#: include/classes/screens/CScreenPlainText.php:90 include/defines.inc.php:890
+#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897
 #: include/defines.inc.php:898 include/defines.inc.php:899
 #: include/defines.inc.php:907 include/defines.inc.php:908

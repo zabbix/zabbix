@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 18:16+0200\n"
+"POT-Creation-Date: 2012-11-06 08:11+0200\n"
 "PO-Revision-Date: 2012-10-29 11:19+0200\n"
 "Last-Translator: 鹏 <pengyao@pengyao.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1257,15 +1257,15 @@ msgstr "无法改变授权方式为Zabbix内部"
 msgid "Cannot clear history"
 msgstr "无法清除历史"
 
-#: api/classes/CDiscoveryRule.php:1213
+#: api/classes/CDiscoveryRule.php:1209
 msgid "Cannot clone graph prototypes."
 msgstr "无法克隆图形原型"
 
-#: api/classes/CDiscoveryRule.php:1103
+#: api/classes/CDiscoveryRule.php:1099
 msgid "Cannot clone item prototypes."
 msgstr "无法克隆项目原型"
 
-#: api/classes/CDiscoveryRule.php:825
+#: api/classes/CDiscoveryRule.php:821
 msgid "Cannot clone trigger prototypes."
 msgstr "无法克隆触发器原型"
 
@@ -1349,7 +1349,7 @@ msgstr "无法删除应用集"
 msgid "Cannot delete dependency"
 msgstr "无法删除相依关系"
 
-#: api/classes/CDiscoveryRule.php:622 discoveryconf.php:164
+#: api/classes/CDiscoveryRule.php:618 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
 msgstr "无法删除发现规则"
@@ -1362,7 +1362,7 @@ msgstr "无法删除发现规则"
 msgid "Cannot delete graph"
 msgstr "无法删除图形"
 
-#: api/classes/CItemPrototype.php:737
+#: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
 msgstr "无法删除图原型"
 
@@ -1410,7 +1410,7 @@ msgstr "无法删除项目"
 msgid "Cannot delete items"
 msgstr "无法删除项目"
 
-#: api/classes/CItemPrototype.php:754
+#: api/classes/CItemPrototype.php:764
 msgid "Cannot delete items created by low level discovery."
 msgstr "无法删除由低级别发现创建的项目。"
 
@@ -1451,16 +1451,16 @@ msgstr "无法删除筛选"
 msgid "Cannot delete script"
 msgstr "无法删除脚本"
 
-#: api/classes/CScript.php:385
+#: api/classes/CScript.php:408
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "无法删除脚本.空白的输入参数\"scriptids\"."
 
-#: api/classes/CScript.php:409
+#: api/classes/CScript.php:432
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "无法删除脚本. 脚本 \"%1$s\" 用于动作操作\"%2$s\"."
 
-#: api/classes/CScript.php:398
+#: api/classes/CScript.php:421
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "无法删除脚本. 脚本ID为 \"%s\"的脚本不存在."
@@ -1489,11 +1489,11 @@ msgstr "无法删除模板图形."
 msgid "Cannot delete templated item."
 msgstr "无法删除样本项目."
 
-#: api/classes/CItemPrototype.php:698
+#: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
 msgstr "无法删除模板项目"
 
-#: api/classes/CDiscoveryRule.php:581
+#: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
 msgstr "无法删除模板项目."
 
@@ -1506,7 +1506,7 @@ msgstr "无法删除模板化触发器 \"%1$s:%2$s\"."
 msgid "Cannot delete trigger"
 msgstr "无法删除触发器"
 
-#: api/classes/CItemPrototype.php:769
+#: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
 msgstr "无法删除触发器原型"
 
@@ -1579,7 +1579,7 @@ msgstr "无法找到用在拓扑图\"%2$s\"中的主机\"%1$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "无法找到用在筛选\"%2$s\"中的主机\"%1$s\"."
 
-#: api/classes/CDiscoveryRule.php:1019 api/classes/CDiscoveryRule.php:1091
+#: api/classes/CDiscoveryRule.php:1015 api/classes/CDiscoveryRule.php:1087
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
@@ -2448,7 +2448,7 @@ msgstr "连接为'%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "连接为'%1$s', 来自'%2$s'"
 
-#: api/classes/CScript.php:454
+#: api/classes/CScript.php:477
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2459,7 +2459,7 @@ msgstr ""
 "1. 不正确的IP/DNS设于\"zabbix.conf.php\";\n"
 "2. 不正确的DNS主机的配置.\n"
 
-#: api/classes/CScript.php:445
+#: api/classes/CScript.php:468
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2474,7 +2474,7 @@ msgstr ""
 "3. Zabbix服务未运行;\n"
 "4. 防火墙阻断了TCP连接.\n"
 
-#: api/classes/CScript.php:451
+#: api/classes/CScript.php:474
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -2646,7 +2646,7 @@ msgstr "添加值对应"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 应用集 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:866
+#: api/classes/CDiscoveryRule.php:862
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 发现规则 \"%1$s\" 于 \"%2$s\"."
@@ -2656,7 +2656,7 @@ msgstr "已创建: 发现规则 \"%1$s\" 于 \"%2$s\"."
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 项目 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:598
+#: api/classes/CItemPrototype.php:608
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 项目原型 \"%1$s\" 于 \"%2$s\"."
@@ -3392,7 +3392,7 @@ msgstr "已删除"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 应用集 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:630
+#: api/classes/CDiscoveryRule.php:626
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 发现发现 \"%1$s\" 于 \"%2$s\"."
@@ -3412,7 +3412,7 @@ msgstr "已删除: 主机 \"%1$s\"."
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 项目 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:781
+#: api/classes/CItemPrototype.php:791
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 项目原型 \"%1$s\" 于 \"%2$s\"."
@@ -3715,12 +3715,12 @@ msgstr "发现对象"
 msgid "Discovery rule"
 msgstr "发现规则"
 
-#: api/classes/CDiscoveryRule.php:949
+#: api/classes/CDiscoveryRule.php:945
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "发现规则 \"%1$s\"已存在于 \"%2$s\",继承自其它的模板."
 
-#: api/classes/CDiscoveryRule.php:936
+#: api/classes/CDiscoveryRule.php:932
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "发现规则\"%1$s:%2$s\" 有不正确的存活时间: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用户宏)"
@@ -3915,7 +3915,7 @@ msgstr "重复的主机. 有相同主机可视名称\"%s\"的主机已存于数�
 msgid "Duplicate map name for map \"%s\"."
 msgstr "重复的拓扑图\"%s\"的拓扑图名称."
 
-#: api/classes/CScript.php:284 api/classes/CScript.php:335
+#: api/classes/CScript.php:307 api/classes/CScript.php:358
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "重复的脚本名称\"%s\"."
@@ -4023,11 +4023,11 @@ msgid "Empty host name provided in expression."
 msgstr "空的主机名称出现在表达式中"
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
-#: api/classes/CDiscoveryRule.php:561 api/classes/CGraph.php:729
+#: api/classes/CDiscoveryRule.php:557 api/classes/CGraph.php:729
 #: api/classes/CGraphPrototype.php:778 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:677
+#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:687
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -4189,27 +4189,27 @@ msgstr "英语(en_US)"
 msgid "Error"
 msgstr "错误"
 
-#: api/classes/CScript.php:459
+#: api/classes/CScript.php:482
 msgid "Error description"
 msgstr "错误描述"
 
-#: api/classes/CScript.php:497
+#: api/classes/CScript.php:520
 msgid "Error description: can't read script response, check connection."
 msgstr "错误描述: 无法读取脚本返回, 检查连接."
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:497
 msgid "Error description: can't send command, check connection."
 msgstr "错误描述: 无法发送命令, 检查连接."
 
-#: api/classes/CScript.php:490
+#: api/classes/CScript.php:513
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "错误描述:已达到定义于 \"include/defines.inc.php\"的常数ZBX_SCRIPT_BYTES_LIMIT读取位元限制. 您可以试着去增加这个值."
 
-#: api/classes/CScript.php:486
+#: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "错误描述:已达到定义于 \"include/defines.inc.php\"的常数ZBX_SCRIPT_TIMEOUT时限. 您可以试着去增加这个值."
 
-#: api/classes/CScript.php:505
+#: api/classes/CScript.php:528
 msgid "Error description: empty response received."
 msgstr "错误描述:收到空返回."
 
@@ -6590,7 +6590,7 @@ msgid "Italian (it_IT)"
 msgstr "意大利语 (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:37 include/forms.inc.php:1014
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1014
 #: include/reports.inc.php:694 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
@@ -8153,8 +8153,8 @@ msgstr "没有已定义的条件."
 msgid "No data collection"
 msgstr "没有数据采集"
 
-#: include/classes/screens/CScreenPlainText.php:36
-#: include/classes/screens/CScreenPlainText.php:56
+#: include/classes/screens/CScreenPlainText.php:41
+#: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
 msgstr "没有数据被已定义"
 
@@ -8190,7 +8190,7 @@ msgstr "没有已定义的发现."
 msgid "No discovery checks defined."
 msgstr "没有已定义的发现检查."
 
-#: api/classes/CDiscoveryRule.php:648
+#: api/classes/CDiscoveryRule.php:644
 msgid "No discovery rule IDs given."
 msgstr "没有所称的发现规则ID"
 
@@ -8276,7 +8276,7 @@ msgstr "没有模板[%s]的组"
 msgid "No history defined."
 msgstr "没有已定义的历史."
 
-#: api/classes/CDiscoveryRule.php:651
+#: api/classes/CDiscoveryRule.php:647
 msgid "No host IDs given."
 msgstr "没有所知的主机IDs"
 
@@ -8482,9 +8482,9 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CAction.php:896 api/classes/CAction.php:1484
 #: api/classes/CApplication.php:449 api/classes/CApplication.php:456
 #: api/classes/CApplication.php:604 api/classes/CApplication.php:681
-#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:578
-#: api/classes/CDiscoveryRule.php:656 api/classes/CDiscoveryRule.php:661
-#: api/classes/CDiscoveryRule.php:679 api/classes/CDiscoveryRule.php:682
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:574
+#: api/classes/CDiscoveryRule.php:652 api/classes/CDiscoveryRule.php:657
+#: api/classes/CDiscoveryRule.php:675 api/classes/CDiscoveryRule.php:678
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:592 api/classes/CGraphGeneral.php:161
 #: api/classes/CGraph.php:826 api/classes/CGraphPrototype.php:871
@@ -8494,7 +8494,7 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:705
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -10669,7 +10669,7 @@ msgstr "筛选"
 msgid "Script"
 msgstr "脚本"
 
-#: api/classes/CScript.php:297 api/classes/CScript.php:349
+#: api/classes/CScript.php:320 api/classes/CScript.php:372
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "脚本\"%s\"已存在."
@@ -10695,7 +10695,7 @@ msgstr "脚本探查器"
 msgid "Script updated"
 msgstr "脚本已更新"
 
-#: api/classes/CScript.php:330
+#: api/classes/CScript.php:353
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "脚本ID为\"%s\"的脚本不存在."
@@ -11857,8 +11857,8 @@ msgstr "超时"
 
 #: include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenHistory.php:266
-#: include/classes/screens/CScreenPlainText.php:37
-#: include/classes/screens/CScreenPlainText.php:57
+#: include/classes/screens/CScreenPlainText.php:42
+#: include/classes/screens/CScreenPlainText.php:62
 msgid "Timestamp"
 msgstr "时间戳"
 
@@ -12521,7 +12521,7 @@ msgstr "已更新: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 应用程序\"%1$s\"于\"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:910
+#: api/classes/CDiscoveryRule.php:906
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 发现规则\"%1$s\"于\"%2$s\"."
@@ -12531,7 +12531,7 @@ msgstr "已更新: 发现规则\"%1$s\"于\"%2$s\"."
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 项目\"%1$s\"于\"%2$s\"."
 
-#: api/classes/CItemPrototype.php:648
+#: api/classes/CItemPrototype.php:658
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 项目原型\"%1$s\"于\"%2$s\"."
@@ -13129,7 +13129,7 @@ msgstr "错误的代理节点字段\"%s\"."
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "错误的筛选字段\"%1$s\"."
 
-#: api/classes/CScript.php:280
+#: api/classes/CScript.php:303
 msgid "Wrong fields for script."
 msgstr "错误的脚本字段."
 
@@ -13315,11 +13315,11 @@ msgstr "您没有指定目标为动作操作的全局脚本\"%s\"."
 #: api/classes/CHostGroup.php:1011 api/classes/CHost.php:1592
 #: api/classes/CHost.php:1646 api/classes/CHost.php:1960
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
-#: api/classes/CItemPrototype.php:792 api/classes/CItemPrototype.php:795
+#: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
-#: api/classes/CMaintenance.php:743 api/classes/CScript.php:272
-#: api/classes/CScript.php:319 api/classes/CScript.php:381
-#: api/classes/CScript.php:431 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
+#: api/classes/CScript.php:342 api/classes/CScript.php:404
+#: api/classes/CScript.php:454 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
 #: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:739
@@ -13430,7 +13430,7 @@ msgstr "Zabbix暂时不存在!"
 msgid "Zabbix server"
 msgstr "Zabbix 服务器"
 
-#: api/classes/CScript.php:448
+#: api/classes/CScript.php:471
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -13574,7 +13574,7 @@ msgstr "d M Y H:i"
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
 #: include/acknow.inc.php:46 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
-#: include/classes/screens/CScreenPlainText.php:90 include/defines.inc.php:890
+#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897
 #: include/defines.inc.php:898 include/defines.inc.php:899
 #: include/defines.inc.php:907 include/defines.inc.php:908
