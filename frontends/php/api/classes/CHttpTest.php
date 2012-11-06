@@ -51,29 +51,33 @@ class CHttpTest extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'			=> null,
-			'httptestids'		=> null,
-			'applicationids'	=> null,
-			'hostids'			=> null,
-			'groupids'			=> null,
-			'editable'			=> null,
-			'nopermissions'	 	=> null,
+			'nodeids'        => null,
+			'httptestids'    => null,
+			'applicationids' => null,
+			'hostids'        => null,
+			'groupids'       => null,
+			'templateids'    => null,
+			'editable'       => null,
+			'inherited'      => null,
+			'templated'      => null,
+			'nopermissions'  => null,
 			// filter
-			'filter'			=> null,
-			'search'			=> null,
-			'searchByAny'		=> null,
-			'startSearch'		=> null,
-			'exludeSearch'		=> null,
+			'filter'         => null,
+			'search'         => null,
+			'searchByAny'    => null,
+			'startSearch'    => null,
+			'exludeSearch'   => null,
 			// output
-			'output'			=> API_OUTPUT_REFER,
-			'selectHosts'		=> null,
-			'selectSteps'		=> null,
-			'countOutput'		=> null,
-			'groupCount'		=> null,
-			'preservekeys'		=> null,
-			'sortfield'			=> '',
-			'sortorder'			=> '',
-			'limit'				=> null
+			'output'         => API_OUTPUT_REFER,
+			'expandName'     => null,
+			'selectHosts'    => null,
+			'selectSteps'    => null,
+			'countOutput'    => null,
+			'groupCount'     => null,
+			'preservekeys'   => null,
+			'sortfield'      => '',
+			'sortorder'      => '',
+			'limit'          => null
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -114,6 +118,18 @@ class CHttpTest extends CZBXAPI {
 			$sqlParts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
 		}
 
+		// templateids
+		if (!is_null($options['templateids'])) {
+			zbx_value2array($options['templateids']);
+
+			if (!is_null($options['hostids'])) {
+				zbx_value2array($options['hostids']);
+				$options['hostids'] = array_merge($options['hostids'], $options['templateids']);
+			}
+			else {
+				$options['hostids'] = $options['templateids'];
+			}
+		}
 		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
@@ -147,6 +163,18 @@ class CHttpTest extends CZBXAPI {
 				$sqlParts['select']['applicationid'] = 'a.applicationid';
 			}
 			$sqlParts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
+		}
+
+		// inherited
+		if (isset($options['inherited'])) {
+			$sqlParts['where'][] = $options['inherited'] ? 'ht.templateid IS NOT NULL' : 'ht.templateid IS NULL';
+		}
+
+		// templated
+		if (isset($options['templated'])) {
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where']['ha'] = 'h.hostid=ht.hostid';
+			$sqlParts['where'][] = 'h.status='.($options['templated'] ? HOST_STATUS_TEMPLATE : HOST_STATUS_TEMPLATE);
 		}
 
 		// output
@@ -266,6 +294,7 @@ class CHttpTest extends CZBXAPI {
 				'output' => $options['selectHosts'],
 				'httptestids' => $httpTestIds,
 				'nopermissions' => true,
+				'templated_hosts' => true,
 				'preservekeys' => true
 			);
 			$hosts = API::Host()->get($objParams);

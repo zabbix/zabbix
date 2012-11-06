@@ -67,6 +67,7 @@ class CTemplate extends CHostGeneral {
 			'with_items'				=> null,
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
+			'with_httptests'            => null,
 			'editable' 					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -289,6 +290,11 @@ class CTemplate extends CHostGeneral {
 				' FROM items i,graphs_items gi'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=gi.itemid)';
+		}
+
+		// with_httptests
+		if (!empty($options['with_httptests'])) {
+			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid FROM httptest ht WHERE ht.hostid=h.hostid)';
 		}
 
 		// filter

@@ -388,19 +388,14 @@ class CHost extends CHostGeneral {
 		}
 
 		// with_httptests, with_monitored_httptests
-		if (!is_null($options['with_httptests'])) {
-			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT a.applicationid'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid)';
+		if (!empty($options['with_httptests'])) {
+			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid FROM httptest ht WHERE ht.hostid=h.hostid)';
 		}
-		elseif (!is_null($options['with_monitored_httptests'])) {
+		elseif (!empty($options['with_monitored_httptests'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT a.applicationid'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid'.
+				' SELECT ht.httptestid'.
+				' FROM httptest ht'.
+				' WHERE ht.hostid=h.hostid'.
 					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
 

@@ -286,19 +286,15 @@ class CHostGroup extends CZBXAPI {
 		if (!is_null($options['with_httptests'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'EXISTS (SELECT a.applicationid'.
-											' FROM applications a,httptest ht'.
-											' WHERE a.hostid=hg.hostid'.
-												' AND ht.applicationid=a.applicationid)';
+			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid FROM httptest ht WHERE ht.hostid=hg.hostid)';
 		}
 		elseif (!is_null($options['with_monitored_httptests'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'EXISTS (SELECT a.applicationid'.
-											' FROM applications a,httptest ht'.
-											' WHERE a.hostid=hg.hostid'.
-												' AND ht.applicationid=a.applicationid'.
-												' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid'.
+									' FROM httptest ht'.
+									' WHERE ht.hostid=hg.hostid'.
+										' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
 
 		// with_graphs
