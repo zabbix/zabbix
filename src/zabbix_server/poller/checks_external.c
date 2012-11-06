@@ -50,7 +50,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
-	if (0 == (rc = parse_command(item->key, key, sizeof(key), params, sizeof(params))))
+	if (ZBX_COMMAND_ERROR == (rc = parse_command(item->key, key, sizeof(key), params, sizeof(params))))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
 		goto notsupported;
@@ -65,7 +65,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		goto notsupported;
 	}
 
-	if (2 == rc)	/* key with parameters */
+	if (ZBX_COMMAND_WITH_PARAMS == rc)
 	{
 		int	i, n;
 		char	param[MAX_STRING_LEN], *param_esc;

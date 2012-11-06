@@ -277,7 +277,7 @@ else {
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('applicationid'),
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
