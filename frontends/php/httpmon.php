@@ -83,7 +83,7 @@ $paging = null;
 if ($pageFilter->hostsSelected) {
 	$options = array(
 		'editable' => true,
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('httptestid'),
 		'limit' => $config['search_limit'] + 1
 	);
 	if ($pageFilter->hostid > 0) {
