@@ -890,7 +890,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	public function delete($triggerIds, $nopermissions = false) {
 		$triggerIds = zbx_toArray($triggerIds);
-
+		$triggerPrototypeIds = $triggerIds;
 		if (empty($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -963,7 +963,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		DB::delete('triggers', array('triggerid' => $triggerIds));
 
-		return array('triggerids' => $triggerIds);
+		return array('triggerids' => $triggerPrototypeIds);
 	}
 
 	protected function createReal(array &$triggers) {

@@ -767,6 +767,7 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 
 		$graphids = zbx_toArray($graphids);
+		$delGraphPrototypeIds = $graphids;
 
 		$delGraphs = $this->get(array(
 			'graphids' => $graphids,
@@ -815,7 +816,7 @@ class CGraphPrototype extends CGraphGeneral {
 			info(_s('Graph prototype "%s" deleted.', $graph['name']));
 		}
 
-		return array('graphids' => $graphids);
+		return array('graphids' => $delGraphPrototypeIds);
 	}
 
 	/**
