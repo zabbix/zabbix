@@ -52,6 +52,36 @@
 #	define ZBX_DB_SET_TYPE		""
 #endif
 
+#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
+#	define ZBX_TYPE_ID_STR		"bigint"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_TYPE_ID_STR		"bigint unsigned"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_ID_STR		"number(20)"
+#endif
+
+#if defined(HAVE_ORACLE)
+#	define ZBX_TYPE_INT_STR		"number(10)"
+#else
+#	define ZBX_TYPE_INT_STR		"integer"
+#endif
+
+#if defined(HAVE_ORACLE)
+#	define ZBX_TYPE_CHAR_STR(SZ)	"nvarchar2(" #SZ ")"
+#else
+#	define ZBX_TYPE_CHAR_STR(SZ)	"varchar(" #SZ ")"
+#endif
+
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_UINT_STR	"bigint"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_TYPE_UINT_STR	"bigint unsigned"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_UINT_STR	"number(20)"
+#elif defined(HAVE_POSTGRESQL)
+#	define ZBX_TYPE_UINT_STR	"numeric(20)"
+#endif
+
 #define ZBX_FIRST_DB_VERSION		2010000
 
 typedef struct
@@ -72,38 +102,16 @@ static char	*DBfield_type_string(const ZBX_FIELD *field)
 	switch (field->type)
 	{
 		case ZBX_TYPE_ID:
-#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
-			strscpy(type, "bigint");
-#elif defined(HAVE_MYSQL)
-			strscpy(type, "bigint unsigned");
-#elif defined(HAVE_ORACLE)
-			strscpy(type, "number(20)");
-#endif
+			strscpy(type, ZBX_TYPE_ID_STR);
 			break;
 		case ZBX_TYPE_INT:
-#if defined(HAVE_ORACLE)
-			strscpy(type, "number(10)");
-#else
-			strscpy(type, "integer");
-#endif
+			strscpy(type, ZBX_TYPE_INT_STR);
 			break;
 		case ZBX_TYPE_CHAR:
-#if defined(HAVE_ORACLE)
-			zbx_snprintf(type, sizeof(type), "nvarchar2(%hd)", field->length);
-#else
-			zbx_snprintf(type, sizeof(type), "varchar(%hd)", field->length);
-#endif
+			zbx_snprintf(type, sizeof(type), ZBX_TYPE_CHAR_STR(field->length));
 			break;
 		case ZBX_TYPE_UINT:
-#if defined(HAVE_IBM_DB2)
-			strscpy(type, "bigint");
-#elif defined(HAVE_MYSQL)
-			strscpy(type, "bigint unsigned");
-#elif defined(HAVE_ORACLE)
-			strscpy(type, "number(20)");
-#elif defined(HAVE_POSTGRESQL)
-			strscpy(type, "numeric(20)");
-#endif
+			strscpy(type, ZBX_TYPE_UINT_STR);
 			break;
 		default:
 			assert(0);
