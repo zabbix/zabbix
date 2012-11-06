@@ -586,15 +586,14 @@ class CAction extends CZBXAPI {
 		// adding conditions
 		if (!is_null($options['selectConditions']) && (is_array($options['selectConditions']) || str_in_array($options['selectConditions'], $subselectsAllowedOutputs))) {
 			$conditions = API::getApi()->select('conditions', array(
-				'output' => $this->extendOutputOption('conditions', array('conditionid', 'actionid'), $options['selectConditions']),
+				'output' => $this->extendOutputOption('conditions', 'actionid', $options['selectConditions']),
 				'filter' => array('actionid' => $actionids)
 			));
 			foreach ($conditions as $condition) {
 				$actionId = $condition['actionid'];
-				$conditionId = $condition['conditionid'];
 
-				$condition = $this->unsetExtraFields('conditions', $condition, $options['selectConditions']);
-				$result[$actionId]['conditions'][$conditionId] = $condition;
+				$condition = $this->unsetExtraFields($condition, $options['selectConditions']);
+				$result[$actionId]['conditions'][] = $condition;
 			}
 		}
 
@@ -739,7 +738,7 @@ class CAction extends CZBXAPI {
 				}
 			}
 			foreach ($operations as $operation) {
-				$result[$operation['actionid']]['operations'][$operation['operationid']] = $operation;
+				$result[$operation['actionid']]['operations'][] = $operation;
 			}
 		}
 
