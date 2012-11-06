@@ -223,7 +223,7 @@ class CZBXAPI {
 	 *
 	 * @return mixed
 	 */
-	protected function extendOutputOption($tableName, $fields, $output) {
+	protected function outputExtend($tableName, $fields, $output) {
 		$fields = (array) $fields;
 
 		foreach ($fields as $field) {
@@ -239,6 +239,30 @@ class CZBXAPI {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Returns true if the given field is requested in the output parameter.
+	 *
+	 * @param $field
+	 * @param $output
+	 *
+	 * @return bool
+	 */
+	protected function outputIsRequested($field, $output) {
+		// if an array of fields is passed, check if the field is present in the array
+		if (is_array($output)) {
+			return in_array($field, $output);
+		}
+		// if all fields are requested, just return true
+		// API_OUTPUT_REFER will always return true as an exception
+		elseif ($output == API_OUTPUT_EXTEND || $output == API_OUTPUT_REFER) {
+			return true;
+		}
+		// if the number of objects is requested, return false
+		elseif ($output == API_OUTPUT_COUNT) {
+			return false;
+		}
 	}
 
 	/**

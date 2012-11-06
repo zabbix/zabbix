@@ -72,7 +72,7 @@ class CService extends CZBXAPI {
 
 		// if the selectTrigger option is used, make sure we select the triggerid to be able to fetch the related triggers
 		if ($options['selectTrigger'] !== null) {
-			$options['output'] = $this->extendOutputOption($this->tableName(), 'triggerid', $options['output']);
+			$options['output'] = $this->outputExtend($this->tableName(), 'triggerid', $options['output']);
 		}
 
 		// build and execute query
@@ -1511,7 +1511,7 @@ class CService extends CZBXAPI {
 
 		// selectDependencies
 		if ($options['selectDependencies'] !== null) {
-			$dependencyOutput = $this->extendOutputOption('services_links', 'serviceupid', $options['selectDependencies']);
+			$dependencyOutput = $this->outputExtend('services_links', 'serviceupid', $options['selectDependencies']);
 			$dependencies = $this->fetchChildDependencies($serviceIds, $dependencyOutput);
 			foreach ($result as &$service) {
 				$service['dependencies'] = array();
@@ -1526,7 +1526,7 @@ class CService extends CZBXAPI {
 
 		// selectParentDependencies
 		if ($options['selectParentDependencies'] !== null) {
-			$dependencyOutput = $this->extendOutputOption('services_links', 'servicedownid', $options['selectParentDependencies']);
+			$dependencyOutput = $this->outputExtend('services_links', 'servicedownid', $options['selectParentDependencies']);
 			$dependencies = $this->fetchParentDependencies($serviceIds, $dependencyOutput);
 			foreach ($result as &$service) {
 				$service['parentDependencies'] = array();
@@ -1566,7 +1566,7 @@ class CService extends CZBXAPI {
 
 		// selectTimes
 		if ($options['selectTimes'] !== null) {
-			$timesOutput = $this->extendOutputOption('services_times', 'serviceid', $options['selectTimes']);
+			$timesOutput = $this->outputExtend('services_times', 'serviceid', $options['selectTimes']);
 			$serviceTimes = API::getApi()->select('services_times', array(
 				'output' => $timesOutput,
 				'filter' => array('serviceid' => $serviceIds)
@@ -1584,7 +1584,7 @@ class CService extends CZBXAPI {
 
 		// selectAlarms
 		if ($options['selectAlarms'] !== null) {
-			$alarmsOutput = $this->extendOutputOption('service_alarms', 'serviceid', $options['selectAlarms']);
+			$alarmsOutput = $this->outputExtend('service_alarms', 'serviceid', $options['selectAlarms']);
 			$alarmsTimes = API::getApi()->select('service_alarms', array(
 				'output' => $alarmsOutput,
 				'filter' => array('serviceid' => $serviceIds)
