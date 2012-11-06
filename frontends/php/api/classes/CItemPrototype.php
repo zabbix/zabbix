@@ -681,6 +681,7 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$delItemPrototypeIds = zbx_toArray($prototypeids);
 		$prototypeids = zbx_toHash($prototypeids);
 
 		$options = array(
@@ -785,7 +786,7 @@ class CItemPrototype extends CItemGeneral {
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('prototypeids' => $prototypeids);
+		return array('prototypeids' => $delItemPrototypeIds);
 	}
 
 	public function syncTemplates($data) {
