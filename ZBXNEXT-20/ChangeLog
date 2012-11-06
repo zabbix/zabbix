@@ -18,6 +18,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
 A......... [ZBX-5709] fixed trigger recreation after template trigger expression change causing event history deletion (Toms)
 ..F....... [ZBX-5711] added caching for frontend favorite values (Toms)
 ..F....... [ZBX-5711] removed redundant queries when editing web scenario (Toms)
@@ -56,6 +57,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5811] fixed no permissions error when change user group "status", "frontend access" and "debug mode" using link in user groups list (Oleg)
 A......... [ZBX-5751] fixed CDiscoveryRule get() and CItemPrototype get() "selectGraphs" parameter (Oleg)
 ..F....... [ZBX-5667] fixed host screen defined in template does not show item data for "Plain text" elements (Toms)
 ..F....... [ZBX-5762] fixed undefined indexes in graph prototype form (Oleg)
