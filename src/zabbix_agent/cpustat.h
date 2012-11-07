@@ -43,9 +43,13 @@ typedef struct
 {
 	zbx_uint64_t	h_counter[ZBX_CPU_STATE_COUNT][MAX_COLLECTOR_HISTORY];
 	unsigned char	h_status[MAX_COLLECTOR_HISTORY];
+#if (MAX_COLLECTOR_HISTORY % 8) > 0
+	unsigned char	padding0[8 - (MAX_COLLECTOR_HISTORY % 8)];	/* for 8-byte alignment */
+#endif
 	int		h_first;
 	int		h_count;
 	int		cpu_num;
+	int		padding1;	/* for 8-byte alignment */
 }
 ZBX_SINGLE_CPU_STAT_DATA;
 

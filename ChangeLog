@@ -57,6 +57,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+...G...... [ZBX-5382] fixed agent crash on HP-UX Itanium; thanks to Alice Ferrazzi (Andris)
+...G...... [ZBX-5289] fixed agent crash on Solaris; thanks to Jairo Eduardo Lopez Fuentes Nacarino, Takanori Suzuki (Andris)
 ..F....... [ZBX-5744] removed redundant HTML from the map monitoring page (Eduard, Pavels)
 A......... [ZBX-5744] fixed script.getscriptsbyhost returning an unnecessary array of hosts for each script (Eduard, Pavels)
 ..F....... [ZBX-5811] fixed no permissions error when change user group "status", "frontend access" and "debug mode" using link in user groups list (Oleg)
