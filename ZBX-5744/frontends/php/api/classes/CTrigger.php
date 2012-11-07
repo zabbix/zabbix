@@ -77,7 +77,6 @@ class CTrigger extends CTriggerGeneral {
 			'triggerids'					=> null,
 			'itemids'						=> null,
 			'applicationids'				=> null,
-			'discoveryids'					=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
 			'templated'						=> null,
@@ -277,24 +276,6 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'id.parent_itemid';
-			}
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['fid'] = 'f.itemid=id.itemid';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
-			}
 		}
 
 		// functions
@@ -1309,25 +1290,8 @@ class CTrigger extends CTriggerGeneral {
 		$this->checkInput($triggers, __FUNCTION__);
 		$this->updateReal($triggers);
 
-		$dbTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'nopermissions' => true
-		));
-
 		foreach ($triggers as $trigger) {
-			// pass the full trigger so the children can inherit all of the data
-			$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			if (isset($trigger['expression'])) {
-				$dbTrigger['expression'] = $trigger['expression'];
-			}
-			// if we use the expression from the database, make sure it's exploded
-			else {
-				$dbTrigger['expression'] = explode_exp($dbTrigger['expression']);
-			}
-
-			$this->inherit($dbTrigger);
+			$this->inherit($trigger);
 
 			// replace dependencies
 			if (isset($trigger['dependencies'])) {
@@ -2172,8 +2136,7 @@ class CTrigger extends CTriggerGeneral {
 			$options['hostids'] === null &&
 			$options['triggerids'] === null &&
 			$options['itemids'] === null &&
-			$options['applicationids'] === null &&
-			$options['discoveryids'] === null) {
+			$options['applicationids'] === null) {
 
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
