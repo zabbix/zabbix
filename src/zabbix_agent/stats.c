@@ -442,6 +442,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		zbx_sleep(1);
 	}
 
+#ifdef _WINDOWS
 	if (CPU_COLLECTOR_STARTED(collector))
 		free_cpu_collector(&(collector->cpus));
 
@@ -450,4 +451,5 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	ZBX_DO_EXIT();
 
 	zbx_thread_exit(0);
+#endif
 }

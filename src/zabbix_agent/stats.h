@@ -42,6 +42,13 @@ typedef struct
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;
 #endif
+#ifndef _LP64
+	long			padding;	/* The goal of padding is to make sizeof(ZBX_COLLECTOR_DATA) */
+						/* a multiple of 8. In 32-bit environment the padding will be */
+						/* be 4 bytes. In 64-bit environment the padding is currently not */
+						/* necessary, but harmless if used. The padding size must be */
+						/* adjusted if structure or its components change. */
+#endif
 }
 ZBX_COLLECTOR_DATA;
 
