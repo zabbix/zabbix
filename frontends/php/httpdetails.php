@@ -121,8 +121,9 @@ if (isset($db_httptest['lastcheck'])) {
 	$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $db_httptest['lastcheck']).']';
 }
 
+$resolver = new CMacrosResolver();
 $httpdetailsWidget->addPageHeader(
-	array(_('DETAILS OF SCENARIO').SPACE, bold($db_httptest['name']), $lastcheck),
+	array(_('DETAILS OF SCENARIO').SPACE, bold($resolver->resolveMacrosInText($db_httptest['name'], $db_httptest['hostid'])), $lastcheck),
 	array(
 		get_icon('reset', array('id' => $_REQUEST['httptestid'])),
 		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
@@ -147,6 +148,7 @@ $totalTime = array(
 	'valuemapid' => null,
 	'units' => null
 );
+
 
 while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$status['msg'] = _('OK');
@@ -199,7 +201,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$respItemTime = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
 
 	$httpdetailsTable->addRow(array(
-		$httpstep_data['name'],
+		$resolver->resolveMacrosInText($httpstep_data['name'], $db_httptest['hostid']),
 		$speed,
 		($respTime == 0 ? '-' : $respItemTime),
 		$resp,

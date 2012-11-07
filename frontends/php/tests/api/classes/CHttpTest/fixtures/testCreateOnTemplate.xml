@@ -911,7 +911,7 @@
 		<row>
 			<field name="httptestid">3</field>
 			<field name="name">HttpTestCreate</field>
-			<field name="applicationid" xsi:nil="true" />
+			<field name="applicationid">1</field>
 			<field name="nextcheck">0</field>
 			<field name="delay">60</field>
 			<field name="status">0</field>
@@ -926,7 +926,7 @@
 		<row>
 			<field name="httptestid">4</field>
 			<field name="name">HttpTestCreate</field>
-			<field name="applicationid" xsi:nil="true" />
+			<field name="applicationid">2</field>
 			<field name="nextcheck">0</field>
 			<field name="delay">60</field>
 			<field name="status">0</field>
