@@ -35,10 +35,10 @@ class CHttpTestTest extends ZbxDbTestCase {
 	 */
 	public function testCreateOnTemplate() {
 		$httpTests = array(
-			'hostid' => 1,
+//			'hostid' => 1,
 			'name' => 'HttpTestCreate',
 			'authentication' => 0,
-			'applicationid' => 0,
+			'applicationid' => 1,
 			'delay' => 60,
 			'status' => 0,
 			'agent' => 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',

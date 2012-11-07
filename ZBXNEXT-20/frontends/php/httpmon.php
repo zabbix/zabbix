@@ -111,6 +111,8 @@ if ($pageFilter->hostsSelected) {
 		$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 	}
 
+	$httpTests = resolveHttpTestMacros($httpTests, true, false);
+
 	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
 
 	$dbSteps = DBselect(

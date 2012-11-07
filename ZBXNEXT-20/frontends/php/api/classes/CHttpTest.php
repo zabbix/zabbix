@@ -70,6 +70,7 @@ class CHttpTest extends CZBXAPI {
 			// output
 			'output'         => API_OUTPUT_REFER,
 			'expandName'     => null,
+			'expandStepName' => null,
 			'selectHosts'    => null,
 			'selectSteps'    => null,
 			'countOutput'    => null,
@@ -272,14 +273,6 @@ class CHttpTest extends CZBXAPI {
 					$result[$httpTest['httptestid']]['steps'] = array();
 				}
 
-				// hostids
-				if (isset($httpTest['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$httpTest['httptestid']]['hosts'])) {
-						$result[$httpTest['httptestid']]['hosts'] = array();
-					}
-					$result[$httpTest['httptestid']]['hosts'][] = array('hostid' => $httpTest['hostid']);
-					unset($httpTest['hostid']);
-				}
 				$result[$httpTest['httptestid']] += $httpTest;
 			}
 		}
@@ -320,6 +313,27 @@ class CHttpTest extends CZBXAPI {
 			}
 		}
 
+		// expandName
+		if (!is_null($options['expandName']) && $result
+			&& ((is_array($options['output']) && in_array('name', $options['output'])) || ($options['output'] = 'all'))
+		) {
+			$expandSteps = false;
+			if (!is_null($options['expandStepName']) && $result && !is_null($options['selectSteps'])
+					&& ((is_array($options['selectSteps']) && in_array('name', $options['selectSteps'])) || ($options['selectSteps'] = 'all'))
+			) {
+				$expandSteps = true;
+			}
+
+			$result = resolveHttpTestMacros($result, true, $expandSteps);
+		}
+
+		// expandStepName
+		if (!is_null($options['expandStepName']) && is_null($options['expandName']) && $result && !is_null($options['selectSteps'])
+			&& ((is_array($options['selectSteps']) && in_array('name', $options['selectSteps'])) || ($options['selectSteps'] = 'all'))
+		) {
+			$result = resolveHttpTestMacros($result, false, true);
+		}
+
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -336,6 +350,16 @@ class CHttpTest extends CZBXAPI {
 	 */
 	public function create($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
+
+		// find hostid by applicationid
+		foreach ($httpTests as $hnum => $httpTest) {
+			if (empty($httpTest['hostid']) && !empty($httpTest['applicationid'])) {
+				$dbHostId = DBfetch(DBselect('SELECT a.hostid'.
+						' FROM applications a'.
+						' WHERE a.applicationid='.zbx_dbstr($httpTest['applicationid'])));
+				$httpTests[$hnum]['hostid'] = $dbHostId['hostid'];
+			}
+		}
 
 		$this->validateCreate($httpTests);
 
@@ -372,6 +396,8 @@ class CHttpTest extends CZBXAPI {
 				$httpTests[$dbTest['httptestid']]['hostid'] = $dbTest['hostid'];
 			}
 		}
+
+		// TODO: unset non changed fields, in frontend
 
 		$httpTestManager = new CHttpTestManager();
 		$httpTestManager->persist($httpTests);
