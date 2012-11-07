@@ -222,8 +222,6 @@ class CHttpTestManager {
 	 *
 	 * @param $templateId
 	 * @param $hostIds
-	 *
-	 * @return bool
 	 */
 	public function link($templateId, $hostIds) {
 		$hostIds = zbx_toArray($hostIds);
@@ -231,14 +229,14 @@ class CHttpTestManager {
 		$httpTests = array();
 		$dbCursor = DBselect('SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.macros,ht.agent,'.
 			'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid'.
-			' FROM httptests ht'.
+			' FROM httptest ht'.
 			' WHERE ht.hostid='.zbx_dbstr($templateId));
 		while ($dbHttpTest = DBfetch($dbCursor)) {
 			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 		}
 
 		$dbCursor = DBselect('SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.required,'.
-				'hs.status_code'.
+				'hs.status_codes'.
 				' FROM httpstep hs'.
 				' WHERE '.DBcondition('hs.httptestid', array_keys($httpTests)));
 		while ($dbHttpStep = DBfetch($dbCursor)) {
@@ -246,8 +244,6 @@ class CHttpTestManager {
 		}
 
 		$this->inherit($httpTests, $hostIds);
-
-		return true;
 	}
 
 	/**
@@ -356,9 +352,6 @@ class CHttpTestManager {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
 
 					$this->setHttpTestParent($exHttpTest['httptestid'], $httpTestId);
-					if (!empty($newHttpTest['applicationid'])) {
-						$newHttpTest['applicationid'] = $this->findChildApplication($newHttpTest['applicationid'], $hostId);
-					}
 
 					if (isset($newHttpTest['steps'])) {
 						$newHttpTest['steps'] = $this->prepareHttpSteps($httpTest['steps'], $exHttpTest['httptestid']);
@@ -367,6 +360,11 @@ class CHttpTestManager {
 				else {
 					unset($newHttpTest['httptestid']);
 				}
+
+				if (!empty($newHttpTest['applicationid'])) {
+					$newHttpTest['applicationid'] = $this->findChildApplication($newHttpTest['applicationid'], $hostId);
+				}
+
 				$result[] = $newHttpTest;
 			}
 		}
@@ -535,7 +533,6 @@ class CHttpTestManager {
 		return $result;
 	}
 
-
 	/**
 	 * Create items required for web scenario.
 	 *
@@ -611,10 +608,6 @@ class CHttpTestManager {
 			);
 		}
 		DB::insert('httptestitem', $httpTestItems);
-
-		foreach ($checkitems as $stepitem) {
-			info(_s('Web item "%s" created.', $stepitem['key_']));
-		}
 	}
 
 	/**
@@ -626,25 +619,8 @@ class CHttpTestManager {
 	 * @throws Exception
 	 */
 	protected function createStepsReal($httpTest, $websteps) {
-		$webstepsNames = zbx_objectValues($websteps, 'name');
-
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
-			throw new Exception(_('Scenario step name should contain only printable characters.'));
-		}
-
-		$sql = 'SELECT h.httpstepid,h.name'.
-				' FROM httpstep h'.
-				' WHERE h.httptestid='.$httpTest['httptestid'].
-				' AND '.DBcondition('h.name', $webstepsNames);
-		if ($httpstepData = DBfetch(DBselect($sql))) {
-			throw new Exception(_s('Step "%s" already exists.', $httpstepData['name']));
-		}
-
 		foreach ($websteps as $snum => $webstep) {
 			$websteps[$snum]['httptestid'] = $httpTest['httptestid'];
-			if ($webstep['no'] <= 0) {
-				throw new Exception(_('Scenario step number cannot be less than 1.'));
-			}
 		}
 		$webstepids = DB::insert('httpstep', $websteps);
 
@@ -680,7 +656,7 @@ class CHttpTestManager {
 					'hostid' => $httpTest['hostid']
 				));
 				if ($itemsExist) {
-					throw new Exception(_s('Web item with key "%s" already exists.', $item['key_']));
+					throw new Exception(_s('Web item with key "%1$s" already exists.', $item['key_']));
 				}
 				$item['hostid'] = $httpTest['hostid'];
 				$item['delay'] = $httpTest['delay'];
@@ -707,7 +683,6 @@ class CHttpTestManager {
 				DB::insert('items_applications', $itemApplications);
 			}
 
-
 			$webstepitems = array();
 			foreach ($stepitems as $inum => $item) {
 				$webstepitems[] = array(
@@ -717,10 +692,6 @@ class CHttpTestManager {
 				);
 			}
 			DB::insert('httpstepitem', $webstepitems);
-
-			foreach ($stepitems as $stepitem) {
-				info(_s('Web item "%s" created.', $stepitem['key_']));
-			}
 		}
 	}
 
@@ -733,27 +704,16 @@ class CHttpTestManager {
 	 * @throws Exception
 	 */
 	protected function updateStepsReal($httpTest, $websteps) {
-		$webstepsNames = zbx_objectValues($websteps, 'name');
-
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
-			throw new Exception(_('Scenario step name should contain only printable characters.'));
-		}
-
 		// get all used keys
 		$webstepids = zbx_objectValues($websteps, 'httpstepid');
-		$dbKeys = DBfetchArray(DBselect(
+		$dbKeys = DBfetchArrayAssoc(DBselect(
 			'SELECT i.key_'.
 					' FROM items i,httpstepitem hi'.
 					' WHERE '.DBcondition('hi.httpstepid', $webstepids).
 					' AND hi.itemid=i.itemid'
-		));
-		$dbKeys = zbx_toHash($dbKeys, 'key_');
+		), 'key_');
 
 		foreach ($websteps as $webstep) {
-			if ($webstep['no'] <= 0) {
-				throw new Exception(_('Scenario step number cannot be less than 1.'));
-			}
-
 			DB::update('httpstep', array(
 				'values' => $webstep,
 				'where' => array('httpstepid' => $webstep['httpstepid'])
@@ -820,24 +780,16 @@ class CHttpTestManager {
 	/**
 	 * Delete web scenario steps.
 	 *
-	 * @param $webstepids
+	 * @param $httpStepIds
 	 */
-	protected function deleteStepsReal($webstepids) {
-		$itemids = array();
-		$dbStepItems = DBselect(
-			'SELECT i.itemid'.
-					' FROM items i,httpstepitem hi'.
-					' WHERE '.DBcondition('hi.httpstepid', $webstepids).
-					' AND hi.itemid=i.itemid'
+	protected function deleteStepsReal($httpStepIds) {
+		$itemIds = DBfetchColumn(
+			DBselect('SELECT hi.itemid FROM httpstepitem hi WHERE '.DBcondition('hi.httpstepid', $httpStepIds)),
+			'itemid'
 		);
-		while ($stepitem = DBfetch($dbStepItems)) {
-			$itemids[] = $stepitem['itemid'];
-		}
 
-		DB::delete('httpstep', array('httpstepid' => $webstepids));
+		DB::delete('httpstep', array('httpstepid' => $httpStepIds));
 
-		if (!empty($itemids)) {
-			API::Item()->delete($itemids, true);
-		}
+		API::Item()->delete($itemIds, true);
 	}
 }

@@ -331,6 +331,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		$appManager = new CApplicationManager();
+		$httpTestManager = new CHttpTestManager();
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
@@ -353,6 +354,8 @@ abstract class CHostGeneral extends CZBXAPI {
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
+
+				$httpTestManager->link($templateid, $targetid);
 			}
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host
