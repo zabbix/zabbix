@@ -356,6 +356,23 @@ class CHttpTest extends CZBXAPI {
 		$httpTests = zbx_toArray($httpTests);
 		$this->validateUpdate($httpTests);
 
+		// add hostid if missing
+		$httpTests = zbx_toHash($httpTests, 'httptestid');
+		$hostlessTests = array();
+		foreach ($httpTests as $httpTest) {
+			if (!isset($httpTest['hostid'])) {
+				$hostlessTests[] = $httpTest['httptestid'];
+			}
+		}
+		if (!empty($hostlessTests)) {
+			$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid'.
+					' FROM httptest ht'.
+					' WHERE '.DBcondition('ht.httptestid', $hostlessTests));
+			while ($dbTest = DBfetch($dbCursor)) {
+				$httpTests[$dbTest['httptestid']]['hostid'] = $dbTest['hostid'];
+			}
+		}
+
 		$httpTestManager = new CHttpTestManager();
 		$httpTestManager->persist($httpTests);
 
@@ -440,6 +457,11 @@ class CHttpTest extends CZBXAPI {
 		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
+			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'status', 'steps'));
+			if (!empty($missingKeys)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Http test missing parameters: %1$s', implode(', ', $missingKeys)));
+			}
+
 			$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
 				' WHERE ht.name='.zbx_dbstr($httpTest['name']).
 					' AND ht.hostid='.zbx_dbstr($httpTest['hostid']), 1));
@@ -450,7 +472,7 @@ class CHttpTest extends CZBXAPI {
 			if (empty($httpTest['steps'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
 			}
-			$this->checkSteps($httpTest['steps']);
+			$this->checkSteps($httpTest);
 		}
 	}
 
@@ -472,6 +494,11 @@ class CHttpTest extends CZBXAPI {
 		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
+			$missingKeys = checkRequiredKeys($httpTest, array('httptestid'));
+			if (!empty($missingKeys)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Http test missing parameters: %1$s', implode(', ', $missingKeys)));
+			}
+
 			if (isset($httpTest['name'])) {
 				// get hostid from db if it's not provided
 				if (isset($httpTest['hostid'])) {
@@ -479,7 +506,7 @@ class CHttpTest extends CZBXAPI {
 				}
 				else {
 					$hostId = DBfetch(DBselect('SELECT ht.hostid FROM httptest ht'.
-							' WHERE ht.httptestid='.zbx_dbstr($httpTest['httptestid'])));
+						' WHERE ht.httptestid='.zbx_dbstr($httpTest['httptestid'])));
 					$hostId = $hostId['hostid'];
 				}
 
@@ -497,7 +524,8 @@ class CHttpTest extends CZBXAPI {
 			}
 
 			if (isset($httpTest['steps'])) {
-				$this->checkSteps($httpTest['steps']);
+				$this->checkSteps($httpTest);
+				$this->checkStepsOnUpdate($httpTest);
 			}
 		}
 	}
@@ -505,14 +533,43 @@ class CHttpTest extends CZBXAPI {
 	/**
 	 * Check web scenario steps.
 	 *  - check status_codes field
+	 *  - check name characters
 	 *
-	 * @param array $steps
+	 * @param array $httpTest
 	 */
-	protected function checkSteps(array $steps) {
-		foreach ($steps as $step) {
+	protected function checkSteps(array $httpTest) {
+		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', zbx_objectValues($httpTest['steps'], 'name'))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
+		}
+
+		foreach ($httpTest['steps'] as $step) {
+			if ($step['no'] <= 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1.'));
+			}
 			if (isset($step['status_codes'])) {
 				$this->checkStatusCode($step['status_codes']);
 			}
+		}
+	}
+
+	/**
+	 * Check duplicate step names.
+	 *
+	 * @param array $httpTest
+	 */
+	protected function checkStepsOnUpdate(array $httpTest) {
+		$stepNames = array();
+		foreach ($httpTest['steps'] as $step) {
+			if (!isset($step['httpstepid'])) {
+				$stepNames[] = $step['name'];
+			}
+		}
+		$sql = 'SELECT h.httpstepid,h.name'.
+				' FROM httpstep h'.
+				' WHERE h.httptestid='.$httpTest['httptestid'].
+				' AND '.DBcondition('h.name', $stepNames);
+		if ($dbStep = DBfetch(DBselect($sql))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%1$s" already exists.', $dbStep['name']));
 		}
 	}
 

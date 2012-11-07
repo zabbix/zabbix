@@ -968,6 +968,19 @@ function check_db_fields($db_fields, &$args) {
 	return true;
 }
 
+/**
+ * Check if all keys from $keys exist in $array.
+ * If some keys are missing return array of missing keys, true otherwise.
+ *
+ * @param array $array
+ * @param array $keys
+ *
+ * @return array|bool
+ */
+function checkRequiredKeys(array $array, array $keys) {
+	return array_diff($keys, array_keys($array));
+}
+
 function DBcondition($fieldname, $array, $notin = false) {
 	$condition = '';
 
@@ -1016,6 +1029,30 @@ function DBfetchArrayAssoc($cursor, $field) {
 	while ($row = DBfetch($cursor)) {
 		$result[$row[$field]] = $row;
 	}
+	return $result;
+}
+
+/**
+ * Fetch only values from one column to array.
+ *
+ * @param        $cursor
+ * @param string $column
+ * @param bool   $asHash
+ *
+ * @return array
+ */
+function DBfetchColumn($cursor, $column, $asHash = false) {
+	$result = array();
+
+	while ($dbResult = DBfetch($cursor)) {
+		if ($asHash) {
+			$result[$dbResult[$column]] = $dbResult[$column];
+		}
+		else {
+			$result[] = $dbResult[$column];
+		}
+	}
+
 	return $result;
 }
 
