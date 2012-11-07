@@ -201,7 +201,7 @@ int     NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	if_name[MAX_STRING_LEN], mode[32];
+	char	if_name[MAX_STRING_LEN];
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
