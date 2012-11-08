@@ -413,7 +413,7 @@ class CItem extends CItemGeneral {
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
-		$relationMap = array();
+		$relationMap = new RelationMap();
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -456,27 +456,27 @@ class CItem extends CItemGeneral {
 
 				// populate relation map
 				if (isset($item['hostid']) && $item['hostid']) {
-					$relationMap['hosts'][$item['hostid']][] = $item['itemid'];
+					$relationMap->addRelation($item['itemid'], 'hosts', $item['hostid']);
 				}
 				if (isset($item['triggerid']) && $item['triggerid']) {
-					$relationMap['triggers'][$item['triggerid']][] = $item['itemid'];
-					unset($item['triggerid']);
+					$relationMap->addRelation($item['itemid'], 'triggers', $item['triggerid']);
 				}
+				unset($item['triggerid']);
 				if (isset($item['interfaceid']) && $item['interfaceid']) {
-					$relationMap['interfaces'][$item['interfaceid']][] = $item['itemid'];
+					$relationMap->addRelation($item['itemid'], 'interfaces', $item['interfaceid']);
 				}
 				if (isset($item['graphid']) && $item['graphid']) {
-					$relationMap['graphs'][$item['graphid']][] = $item['itemid'];
-					unset($item['graphid']);
+					$relationMap->addRelation($item['itemid'], 'graphs', $item['graphid']);
 				}
+				unset($item['graphid']);
 				if (isset($item['applicationid']) && $item['applicationid']) {
-					$relationMap['applications'][$item['applicationid']][] = $item['itemid'];
-					unset($item['applicationid']);
+					$relationMap->addRelation($item['itemid'], 'applications', $item['applicationid']);
 				}
+				unset($item['applicationid']);
 				if (isset($item['itemdiscoveryid']) && $item['itemdiscoveryid']) {
-					$relationMap['itemDiscoveries'][$item['itemdiscoveryid']][] = $item['itemid'];
-					unset($item['itemdiscoveryid']);
+					$relationMap->addRelation($item['itemid'], 'itemDiscovery', $item['itemdiscoveryid']);
 				}
+				unset($item['itemdiscoveryid']);
 
 				$result[$item['itemid']] += $item;
 			}
@@ -493,13 +493,13 @@ class CItem extends CItemGeneral {
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$hosts = API::Host()->get(array(
 				'nodeids' => $options['nodeids'],
-				'hostids' => array_keys($relationMap['hosts']),
+				'hostids' => $relationMap->getRelatedIds('hosts'),
 				'templated_hosts' => true,
 				'output' => $options['selectHosts'],
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
-			$result = $this->mapObjectsMany($result, $hosts, $relationMap['hosts'], 'hosts');
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding interfaces
@@ -507,11 +507,11 @@ class CItem extends CItemGeneral {
 			$interfaces = API::HostInterface()->get(array(
 				'nodeids' => $options['nodeids'],
 				'output' => $options['selectInterfaces'],
-				'intefaceids' => array_keys($relationMap['interfaces']),
+				'intefaceids' => $relationMap->getRelatedIds('interfaces'),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
-			$result = $this->mapObjectsMany($result, $interfaces, $relationMap['interfaces'], 'interfaces');
+			$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
 		}
 
 		// adding triggers
@@ -520,14 +520,14 @@ class CItem extends CItemGeneral {
 				$triggers = API::Trigger()->get(array(
 					'output' => $options['selectTriggers'],
 					'nodeids' => $options['nodeids'],
-					'triggerids' => array_keys($relationMap['triggers']),
+					'triggerids' => $relationMap->getRelatedIds('triggers'),
 					'preservekeys' => true
 				));
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($triggers, 'description');
 				}
-				$result = $this->mapObjectsMany($result, $triggers, $relationMap['triggers'], 'triggers', $options['limitSelects']);
+				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
 				$triggers = API::Trigger()->get(array(
@@ -555,14 +555,14 @@ class CItem extends CItemGeneral {
 				$graphs = API::Graph()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
-					'graphids' => array_keys($relationMap['graphs']),
+					'graphids' => $relationMap->getRelatedIds('graphs'),
 					'preservekeys' => true
 				));
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($graphs, 'name');
 				}
-				$result = $this->mapObjectsMany($result, $graphs, $relationMap['graphs'], 'graphs', $options['limitSelects']);
+				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
 				$graphs = API::Graph()->get(array(
@@ -589,14 +589,15 @@ class CItem extends CItemGeneral {
 			$applications = API::Application()->get(array(
 				'output' => $options['selectApplications'],
 				'nodeids' => $options['nodeids'],
-				'applicationids' => array_keys($relationMap['applications']),
+				'applicationids' => $relationMap->getRelatedIds('applications'),
 				'preservekeys' => true
 			));
-			$result = $this->mapObjectsMany($result, $applications, $relationMap['applications'], 'applications');
+			$result = $relationMap->mapMany($result, $applications, 'applications');
 		}
 
 		// adding discoveryrule
 		if (!is_null($options['selectDiscoveryRule'])) {
+			// discovered items
 			$dbRules = DBselect(
 				'SELECT id1.itemid,id2.parent_itemid'.
 				' FROM item_discovery id1,item_discovery id2,items i'.
@@ -606,9 +607,11 @@ class CItem extends CItemGeneral {
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_CREATED
 			);
 			while ($rule = DBfetch($dbRules)) {
-				$relationMap['discoveryRules'][$rule['parent_itemid']][] = $rule['itemid'];
+				$relationMap->addRelation($rule['itemid'], 'discoveryRule', $rule['parent_itemid']);
 			}
 
+			// item prototypes
+			// TODO: this should not be in the item API
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,id.itemid'.
 				' FROM item_discovery id,items i'.
@@ -617,18 +620,18 @@ class CItem extends CItemGeneral {
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD
 			);
 			while ($rule = DBfetch($dbRules)) {
-				$relationMap['discoveryRules'][$rule['parent_itemid']][] = $rule['itemid'];
+				$relationMap->addRelation($rule['itemid'], 'discoveryRule', $rule['parent_itemid']);
 			}
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$discoveryRules = API::DiscoveryRule()->get(array(
 					'output' => $options['selectDiscoveryRule'],
 					'nodeids' => $options['nodeids'],
-					'itemids' => array_keys($relationMap['discoveryRules']),
+					'itemids' => $relationMap->getRelatedIds('discoveryRule'),
 					'nopermissions' => true,
 					'preservekeys' => true
 				));
-				$result = $this->mapObjectsOne($result, $discoveryRules, $relationMap['discoveryRules'], 'discoveryRule');
+				$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 			}
 		}
 
@@ -1229,7 +1232,7 @@ class CItem extends CItemGeneral {
 		return true;
 	}
 
-	public function addRelatedObjects(array $options, array $result, array $relationMap) {
+	public function addRelatedObjects(array $options, array $result, RelationMap $relationMap) {
 		// TODO: move selectItemHosts to CItemGeneral::addRelatedObjects();
 		// TODO: move selectInterfaces to CItemGeneral::addRelatedObjects();
 		// TODO: move selectTriggers to CItemGeneral::addRelatedObjects();
@@ -1241,10 +1244,10 @@ class CItem extends CItemGeneral {
 		if ($options['selectItemDiscovery']) {
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
 				'output' => $options['selectItemDiscovery'],
-				'itemdiscoveryids' => array_keys($relationMap['itemDiscoveries']),
+				'itemdiscoveryids' => $relationMap->getRelatedIds('itemDiscovery'),
 				'preservekeys' => true
 			));
-			$result = $this->mapObjectsOne($result, $itemDiscoveries, $relationMap['itemDiscoveries'], 'itemDiscovery');
+			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
 
 		return $result;
