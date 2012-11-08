@@ -42,7 +42,8 @@ function make_favorite_graphs() {
 	$options = array(
 		'graphids' => $graphids,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'expandName' => true
 	);
 	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
@@ -1138,7 +1139,8 @@ function make_graph_submenu() {
 	$options = array(
 		'graphids' => $graphids,
 		'selectHosts' => array('hostid', 'host'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'expandName' => true
 	);
 	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
