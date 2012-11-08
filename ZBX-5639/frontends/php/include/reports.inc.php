@@ -31,6 +31,7 @@
  * @return CFormTable
  */
 function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $usedHostIds = null){
+	global $options;
 	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
@@ -65,11 +66,18 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 			'hostids' => $usedHostIds,
 			'monitored_hosts' => true
 		));
+		$groupExist = false;
 		foreach ($hostGroups as $hostGroup) {
+			if (isset($_REQUEST['hostgroupid']) && $hostGroup['groupid'] == $_REQUEST['hostgroupid']) {
+				$groupExist = true;
+			}
 			$cmbHGrps->addItem(
 				$hostGroup['groupid'],
 				get_node_name_by_elid($hostGroup['groupid'], null, ': ').$hostGroup['name']
 			);
+		}
+		if (isset($_REQUEST['hostgroupid']) && !$groupExist) {
+			unset($options['groupids']);
 		}
 
 		if ($PAGE_HOSTS['selected']) {
@@ -90,12 +98,18 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 				$sql_cond.
 			' ORDER BY t.description';
 		$result=DBselect($sql);
-
+		$triggerExist = false;
 		while ($row = DBfetch($result)) {
+			if (isset($_REQUEST['tpl_triggerid']) && $row['triggerid'] == $_REQUEST['tpl_triggerid']) {
+				$triggerExist = true;
+			}
 			$cmbTrigs->addItem(
 				$row['triggerid'],
 				get_node_name_by_elid($row['triggerid'], null, ': ').$row['description']
 			);
+		}
+		if (isset($_REQUEST['tpl_triggerid']) && !$triggerExist) {
+			unset($options['filter']['templateid']);
 		}
 
 		$filterForm->addRow(_('Template trigger'),$cmbTrigs);

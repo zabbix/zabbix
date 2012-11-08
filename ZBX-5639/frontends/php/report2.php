@@ -77,11 +77,6 @@ $availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mo
 CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
 $config = select_config();
 
-if($_REQUEST['filter_hostid'] != CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostid', 0)) {
-	unset($_REQUEST['tpl_triggerid']);
-	unset($_REQUEST['hostgroupid']);
-}
-
 if ($config['dropdown_first_remember']) {
 	if (!isset($_REQUEST['filter_rst'])) {
 		$_REQUEST['filter_groupid'] = get_request('filter_groupid', CProfile::get('web.avail_report.'.$availabilityReportMode.'.groupid', 0));
@@ -164,7 +159,6 @@ if (isset($_REQUEST['triggerid'])) {
 	}
 }
 
-
 if (isset($_REQUEST['triggerid'])) {
 	$rep2_wdgt->addHeader(array(
 		new CLink($trigger_data['hostname'], '?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $trigger_data['hostid']),
@@ -227,15 +221,15 @@ else if (isset($_REQUEST['hostid'])) {
 		}
 	}
 
+	// filter
+	$filterForm = get_report2_filter($availabilityReportMode, $PAGE_GROUPS, $PAGE_HOSTS, $options['hostids']);
+	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
+
 	$triggers = API::Trigger()->get($options);
 	CArrayHelper::sort($triggers, array(
 		'host',
 		'description'
 	));
-
-	// filter
-	$filterForm = get_report2_filter($availabilityReportMode, $PAGE_GROUPS, $PAGE_HOSTS, $options['hostids']);
-	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 
 	$table = new CTableInfo(_('No triggers defined.'));
 	$table->setHeader(array(
