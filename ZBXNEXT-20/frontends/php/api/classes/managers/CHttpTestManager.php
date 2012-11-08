@@ -650,6 +650,17 @@ class CHttpTestManager {
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_RSPCODE
 				)
 			);
+
+			if (!isset($httpTest['delay']) || !isset($httpTest['status'])) {
+				$dbTest = DBfetch(DBselect('SELECT ht.delay,ht.status FROM httptest ht WHERE ht.httptestid='.zbx_dbstr($httpTest['httptestid'])));
+				$delay = $dbTest['delay'];
+				$status = $dbTest['status'];
+			}
+			else {
+				$delay = $httpTest['delay'];
+				$status = $httpTest['status'];
+			}
+
 			foreach ($stepitems as &$item) {
 				$itemsExist = API::Item()->exists(array(
 					'key_' => $item['key_'],
@@ -659,12 +670,12 @@ class CHttpTestManager {
 					throw new Exception(_s('Web item with key "%1$s" already exists.', $item['key_']));
 				}
 				$item['hostid'] = $httpTest['hostid'];
-				$item['delay'] = $httpTest['delay'];
+				$item['delay'] = $delay;
 				$item['type'] = ITEM_TYPE_HTTPTEST;
 				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 				$item['history'] = $this->history;
 				$item['trends'] = $this->trends;
-				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 			}
 			unset($item);
 
