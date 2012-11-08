@@ -44,7 +44,8 @@ class CGraphMacroResolver {
 
 		$str = $this->resolveFunctionalItemMacros($str, $items);
 
-		$str = $this->resolvePositionalMacros($str, $items);
+		// if at some point we want to resolve positional macros in graph names
+		// $str = $this->resolvePositionalMacros($str, $items);
 
 		return $str;
 	}
@@ -83,14 +84,14 @@ class CGraphMacroResolver {
 	private function resolveFunctionalItemMacros($str, $items) {
 		// extract all macros into $matches
 		// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({HOST.HOST[0-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}/Uu', $str, $matches);
+		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[0-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}/Uu', $str, $matches);
 
 		// match found groups if ever regexp should change
 		$matches['macros'] = $matches[0];
 		$matches['hosts'] = $matches[1];
-		$matches['keys'] = $matches[4];
-		$matches['functions'] = $matches[6];
-		$matches['parameters'] = $matches[7];
+		$matches['keys'] = $matches[5];
+		$matches['functions'] = $matches[7];
+		$matches['parameters'] = $matches[8];
 
 		// resolve positional macros in host part
 		foreach ($matches['hosts'] as $i => $host) {
@@ -180,7 +181,7 @@ class CGraphMacroResolver {
 	private function resolvePositionalMacros($str, $items) {
 		// extract all macros into $matches
 		// possible to add other macros "'/\{((HOST.HOST|SOME.OTHER.MACRO)([0-9]?))\}/'"
-		preg_match_all('/{((HOST.HOST)([0-9]?))\}/', $str, $matches);
+		preg_match_all('/{((HOST.HOST|HOSTNAME)([0-9]?))\}/', $str, $matches);
 
 		// match found groups if ever regexp should change
 		$matches['macroType'] = $matches[2];
@@ -213,6 +214,7 @@ class CGraphMacroResolver {
 
 			// retrieve macro replacement data
 			switch ($matches['macroType'][$i]) {
+				case 'HOSTNAME':
 				case 'HOST.HOST':
 					$host = API::Host()->get(array(
 						'hostids' => $items[$posInItemList]['hostid'],
