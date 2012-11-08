@@ -108,8 +108,12 @@ class CMacrosResolver {
 		}
 
 		foreach ($data as $hostId => $texts) {
-			if (!empty($macros[$hostId])) {
-				foreach ($texts as $tnum => $text) {
+			foreach ($texts as $tnum => $text) {
+				foreach ($this->expandUserMacros($text, $hostId) as $macro => $value) {
+					$macros[$hostId][$macro] = $value;
+				}
+
+				if (!empty($macros[$hostId])) {
 					$data[$hostId][$tnum] = $this->replaceMacroValues($text, $macros[$hostId]);
 				}
 			}
@@ -133,14 +137,35 @@ class CMacrosResolver {
 	}
 
 	/**
+	 * Find user macros.
+	 *
+	 * @param $string
+	 * @param $hostId
+	 *
+	 * @return mixed
+	 */
+	protected function expandUserMacros($string, $hostId) {
+		$macros = array();
+
+		if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $string, $matches)) {
+			$macros = API::UserMacro()->getMacros(array(
+				'macros' => $matches[1],
+				'hostid' => $hostId
+			));
+		}
+
+		return $macros;
+	}
+
+	/**
 	 * Find macros in string by pattern.
 	 *
 	 * @param string $pattern
-	 * @param string $s
+	 * @param array  $strings
 	 *
 	 * @return array
 	 */
-	function findMacros($pattern, $strings) {
+	function findMacros($pattern, array $strings) {
 		$result = array();
 		foreach ($strings as $s) {
 			preg_match_all('/{('.$pattern.')}/', $s, $matches);

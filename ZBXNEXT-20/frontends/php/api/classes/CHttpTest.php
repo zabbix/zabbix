@@ -383,7 +383,9 @@ class CHttpTest extends CZBXAPI {
 		// add hostid if missing
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 		$hostlessTests = array();
-		foreach ($httpTests as $httpTest) {
+		foreach ($httpTests as $hnum => $httpTest) {
+			unset($httpTests[$hnum]['templateid']);
+
 			if (!isset($httpTest['hostid'])) {
 				$hostlessTests[] = $httpTest['httptestid'];
 			}
@@ -426,6 +428,9 @@ class CHttpTest extends CZBXAPI {
 			'preservekeys' => true
 		));
 		foreach ($httpTestIds as $httpTestId) {
+			if (!empty($delHttpTests[$httpTestId]['templateid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated web scenario "%1$s".', $delHttpTests[$httpTestId]['name']));
+			}
 			if (!isset($delHttpTests[$httpTestId])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
@@ -485,18 +490,18 @@ class CHttpTest extends CZBXAPI {
 		foreach ($httpTests as $httpTest) {
 			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'status', 'steps'));
 			if (!empty($missingKeys)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Http test missing parameters: %1$s', implode(', ', $missingKeys)));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
 
 			$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
 				' WHERE ht.name='.zbx_dbstr($httpTest['name']).
 					' AND ht.hostid='.zbx_dbstr($httpTest['hostid']), 1));
 			if ($nameExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%1$s" already exists.', $nameExists['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
 			}
 
 			if (empty($httpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
 			}
 			$this->checkSteps($httpTest);
 		}
@@ -522,7 +527,7 @@ class CHttpTest extends CZBXAPI {
 		foreach ($httpTests as $httpTest) {
 			$missingKeys = checkRequiredKeys($httpTest, array('httptestid'));
 			if (!empty($missingKeys)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Http test missing parameters: %1$s', implode(', ', $missingKeys)));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
 
 			if (isset($httpTest['name'])) {
@@ -541,7 +546,7 @@ class CHttpTest extends CZBXAPI {
 						' AND ht.hostid='.zbx_dbstr($hostId).
 						' AND ht.httptestid<>'.zbx_dbstr($httpTest['httptestid']), 1));
 				if ($nameExists) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%1$s" already exists.', $nameExists['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
 				}
 			}
 
@@ -565,12 +570,12 @@ class CHttpTest extends CZBXAPI {
 	 */
 	protected function checkSteps(array $httpTest) {
 		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', zbx_objectValues($httpTest['steps'], 'name'))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
 		foreach ($httpTest['steps'] as $step) {
 			if ($step['no'] <= 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step number cannot be less than 1.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
 			if (isset($step['status_codes'])) {
 				$this->checkStatusCode($step['status_codes']);
@@ -595,7 +600,7 @@ class CHttpTest extends CZBXAPI {
 				' WHERE h.httptestid='.$httpTest['httptestid'].
 				' AND '.DBcondition('h.name', $stepNames);
 		if ($dbStep = DBfetch(DBselect($sql))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%1$s" already exists.', $dbStep['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario Step "%1$s" already exists.', $dbStep['name']));
 		}
 	}
 

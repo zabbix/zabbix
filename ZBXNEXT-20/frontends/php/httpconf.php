@@ -150,9 +150,9 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	if ($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])) {
 		$result = API::HttpTest()->delete($_REQUEST['httptestid']);
 	}
-	show_messages($result, _('Scenario deleted'), _('Cannot delete scenario'));
+	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 	if ($result) {
-		$host = get_host_by_applicationid($httptest_data['applicationid']);
+		$host = get_host_by_hostid($httptest_data['hostid']);
 
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.
 			$_REQUEST['httptestid'].'] '._('Host').' ['.$host['host'].']');
@@ -161,6 +161,7 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	unset($_REQUEST['httptestid']);
+	unset($_REQUEST['templated']);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
@@ -170,12 +171,12 @@ elseif (isset($_REQUEST['save'])) {
 		if (isset($_REQUEST['httptestid'])) {
 			$action = AUDIT_ACTION_UPDATE;
 			$message_true = _('Scenario updated');
-			$message_false = _('Cannot update scenario');
+			$message_false = _('Cannot update web scenario');
 		}
 		else {
 			$action = AUDIT_ACTION_ADD;
 			$message_true = _('Scenario added');
-			$message_false = _('Cannot add scenario');
+			$message_false = _('Cannot add web scenario');
 		}
 
 		if (!empty($_REQUEST['applicationid']) && !empty($_REQUEST['new_application'])) {
@@ -270,10 +271,10 @@ elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
-				_('Host').' ['.$host['host'].']'._('Scenario activated'));
+				_('Host').' ['.$host['host'].']'._('Web scenario activated'));
 		}
 	}
-	show_messages($go_result, _('Scenario activated'), null);
+	show_messages($go_result, _('Web scenario activated'), null);
 }
 elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
@@ -288,10 +289,10 @@ elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_httptestid'])) {
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
-				_('Host').' ['.$host['host'].']'._('Scenario disabled'));
+				_('Host').' ['.$host['host'].']'._('Web scenario disabled'));
 		}
 	}
-	show_messages($go_result, _('Scenario disabled'), null);
+	show_messages($go_result, _('Web scenario disabled'), null);
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
@@ -316,7 +317,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = API::HttpTest()->delete($_REQUEST['group_httptestid']);
-	show_messages($go_result, _('Scenario deleted'), null);
+	show_messages($go_result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 }
 
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
