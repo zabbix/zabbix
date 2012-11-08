@@ -107,7 +107,7 @@ class CGraphMacroResolver {
 				'filter' => array(
 					'key_' => $matches['keys'][$i]
 				),
-				'output' => array('lastclock', 'lastvalue', 'value_type', 'units')
+				'output' => array('lastclock', 'lastvalue', 'value_type', 'units', 'valuemapid')
 			));
 
 			// item exists and has permissions
@@ -119,10 +119,13 @@ class CGraphMacroResolver {
 						$macroList[$macro] = UNRESOLVED_MACRO_STRING;
 						continue;
 					}
-					// process item last value according its type
+					// process item last value, add units and value map
 					else {
 						$macroList[$macro] = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 							? convert_units($item['lastvalue'], $item['units']) : $item['lastvalue'];
+						if ($item['valuemapid']) {
+							$macroList[$macro] = applyValueMap($macroList[$macro], $item['valuemapid']);
+						}
 					}
 				}
 				// macro function is "max", "min" or "avg"
