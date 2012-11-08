@@ -88,13 +88,11 @@ if ($config['dropdown_first_remember']) {
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
 }
-else {
-	if (!isset($_REQUEST['filter_rst'])) {
-		$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
-		$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
-		$_REQUEST['filter_timesince'] = get_request('filter_timesince', 0);
-		$_REQUEST['filter_timetill'] = get_request('filter_timetill', 0);
-	}
+else if (!isset($_REQUEST['filter_rst'])) {
+	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
+	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
+	$_REQUEST['filter_timesince'] = get_request('filter_timesince', 0);
+	$_REQUEST['filter_timetill'] = get_request('filter_timetill', 0);
 }
 
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_INT);
