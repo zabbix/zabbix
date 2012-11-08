@@ -66,11 +66,16 @@
 #	define ZBX_TYPE_INT_STR		"integer"
 #endif
 
+static char     *ZBX_TYPE_CHAR_STR(int sz)
+{
+	static char     buf[16];
 #if defined(HAVE_ORACLE)
-#	define ZBX_TYPE_CHAR_STR(SZ)	"nvarchar2(" #SZ ")"
+	zbx_snprintf(buf, sizeof(buf),	"nvarchar2(%hd)", sz);
 #else
-#	define ZBX_TYPE_CHAR_STR(SZ)	"varchar(" #SZ ")"
+	zbx_snprintf(buf, sizeof(buf),	"varchar(%hd)", sz);
 #endif
+	return buf;
+}
 
 #if defined(HAVE_IBM_DB2)
 #	define ZBX_TYPE_UINT_STR	"bigint"
@@ -102,16 +107,16 @@ static char	*DBfield_type_string(const ZBX_FIELD *field)
 	switch (field->type)
 	{
 		case ZBX_TYPE_ID:
-			strscpy(type, ZBX_TYPE_ID_STR);
+			zbx_strlcpy(type, ZBX_TYPE_ID_STR, sizeof(type));
 			break;
 		case ZBX_TYPE_INT:
-			strscpy(type, ZBX_TYPE_INT_STR);
+			zbx_strlcpy(type, ZBX_TYPE_INT_STR, sizeof(type));
 			break;
 		case ZBX_TYPE_CHAR:
-			zbx_snprintf(type, sizeof(type), ZBX_TYPE_CHAR_STR(field->length));
+			zbx_strlcpy(type, ZBX_TYPE_CHAR_STR(field->length), sizeof(type));
 			break;
 		case ZBX_TYPE_UINT:
-			strscpy(type, ZBX_TYPE_UINT_STR);
+			zbx_strlcpy(type, ZBX_TYPE_UINT_STR, sizeof(type));
 			break;
 		default:
 			assert(0);
