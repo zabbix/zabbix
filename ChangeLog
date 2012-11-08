@@ -10,6 +10,7 @@ A......... [ZBXNEXT-1492] dropped support of output shorten for the API get meth
 ..F....... [ZBXNEXT-1441] added media type name to action operations description (Vedmak)
 A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
+..F.I..PS. [ZBXNEXT-1322] automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
