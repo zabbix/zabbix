@@ -261,7 +261,7 @@ if (!empty($this->data['httptestid'])) {
 		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
+			$this->data['templated'] ? null : new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
 			new CButtonCancel()
 		)
 	));
