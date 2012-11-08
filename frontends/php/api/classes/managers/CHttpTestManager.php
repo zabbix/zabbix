@@ -322,7 +322,7 @@ class CHttpTestManager {
 					$exHttpTest = $hostHttpTest['byTemplateId'][$httpTestId];
 
 					// need to check templateid here too in case we update linked http test to name that already exists on linked host
-					if (isset($hostHttpTest['byName'][$httpTest['name']])
+					if (isset($httpTest['name']) && isset($hostHttpTest['byName'][$httpTest['name']])
 							&& !idcmp($exHttpTest['templateid'], $hostHttpTest['byName'][$httpTest['name']]['templateid'])) {
 						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
 						throw new Exception(_s('Http test "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name']));
@@ -731,7 +731,7 @@ class CHttpTestManager {
 			while ($stepitem = DBfetch($dbStepItems)) {
 				$itemids[] = $stepitem['itemid'];
 
-				if (isset($httpTest['name']) || $webstep['name']) {
+				if (isset($httpTest['name']) || isset($webstep['name'])) {
 					switch ($stepitem['type']) {
 						case HTTPSTEP_ITEM_TYPE_IN:
 							$updateFields['key_'] = 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]';

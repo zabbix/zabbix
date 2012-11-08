@@ -2379,3 +2379,16 @@ function no_errors() {
 
 	return true;
 }
+
+function unsetEqualValues(array $a1, array $a2) {
+	foreach ($a1 as $key => $value) {
+		if (is_array($value) && isset($a2[$key])) {
+			$a1[$key] = unsetEqualValues($a1[$key], $a2[$key]);
+		}
+		elseif (isset($a2[$key]) && $a2[$key] == $a1[$key]) {
+			unset($a1[$key]);
+		}
+	}
+
+	return $a1;
+}

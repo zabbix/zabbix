@@ -353,6 +353,8 @@ class CHttpTest extends CZBXAPI {
 
 		// find hostid by applicationid
 		foreach ($httpTests as $hnum => $httpTest) {
+			unset($httpTests[$hnum]['templateid']);
+
 			if (empty($httpTest['hostid']) && !empty($httpTest['applicationid'])) {
 				$dbHostId = DBfetch(DBselect('SELECT a.hostid'.
 						' FROM applications a'.
@@ -382,24 +384,43 @@ class CHttpTest extends CZBXAPI {
 
 		// add hostid if missing
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
-		$hostlessTests = array();
 		foreach ($httpTests as $hnum => $httpTest) {
 			unset($httpTests[$hnum]['templateid']);
-
-			if (!isset($httpTest['hostid'])) {
-				$hostlessTests[] = $httpTest['httptestid'];
-			}
-		}
-		if (!empty($hostlessTests)) {
-			$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid'.
-					' FROM httptest ht'.
-					' WHERE '.DBcondition('ht.httptestid', $hostlessTests));
-			while ($dbTest = DBfetch($dbCursor)) {
-				$httpTests[$dbTest['httptestid']]['hostid'] = $dbTest['hostid'];
-			}
 		}
 
-		// TODO: unset non changed fields, in frontend
+		$dbHttpTests = array();
+		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
+				' FROM httptest ht'.
+				' WHERE '.DBcondition('ht.httptestid', array_keys($httpTests)));
+		while ($dbHttpTest = DBfetch($dbCursor)) {
+			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		}
+		$dbCursor = DBselect('SELECT hs.httpstepid,hs.httptestid,hs.name'.
+				' FROM httpstep hs'.
+				' WHERE '.DBcondition('hs.httptestid', array_keys($dbHttpTests)));
+		while ($dbHttpStep = DBfetch($dbCursor)) {
+			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
+		}
+
+		foreach($httpTests as $tnum => $httpTest) {
+			$test =& $httpTests[$tnum];
+			$test['hostid'] = $dbHttpTests[$httpTest['httptestid']]['hostid'];
+
+			if (!empty($dbTest['templateid']) || empty($test['name'])) {
+				$test['name'] = $dbHttpTests[$httpTest['httptestid']]['name'];
+				if (!empty($test['steps'])) {
+					foreach ($test['steps'] as $snum => $step) {
+						if (isset($step['httpstepid']) && (!empty($dbTest['templateid']) || empty($step['name']))) {
+							$test['steps'][$snum]['name'] = $dbHttpTests[$httpTest['httptestid']]['steps'][$step['httpstepid']]['name'];
+						}
+						if (!empty($dbTest['templateid'])) {
+							unset($test['steps'][$snum]['no']);
+						}
+					}
+				}
+			}
+			unset($test);
+		}
 
 		$httpTestManager = new CHttpTestManager();
 		$httpTestManager->persist($httpTests);
@@ -574,7 +595,7 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		foreach ($httpTest['steps'] as $step) {
-			if ($step['no'] <= 0) {
+			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
 			if (isset($step['status_codes'])) {
@@ -645,8 +666,10 @@ class CHttpTest extends CZBXAPI {
 	 */
 	protected function checkNames(array $httpTests) {
 		$httpTestsNames = zbx_objectValues($httpTests, 'name');
-		if (!preg_grep('/^['.ZBX_PREG_PRINT.']+$/u', $httpTestsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+		if (!empty($httpTestsNames)) {
+			if (!preg_grep('/^['.ZBX_PREG_PRINT.']+$/u', $httpTestsNames)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+			}
 		}
 	}
 
