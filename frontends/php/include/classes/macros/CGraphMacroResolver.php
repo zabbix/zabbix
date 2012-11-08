@@ -60,10 +60,11 @@ class CGraphMacroResolver {
 	 */
 	public function resolveById($str, $graphid) {
 		$items = DBfetchArray(DBselect(
-			'SELECT hostid FROM graphs_items gi, items i
-			WHERE gi.itemid = i.itemid AND gi.graphid = '.zbx_dbstr($graphid)
-			.' ORDER BY gi.sortorder ASC'
-		));
+			'SELECT i.hostid'.
+			' FROM graphs_items gi,items i'.
+			' WHERE gi.itemid=i.itemid AND gi.graphid='.$graphid.
+			' ORDER BY gi.sortorder')
+		);
 
 		return $this->resolve($str, $items);
 	}
@@ -142,8 +143,8 @@ class CGraphMacroResolver {
 						'SELECT '.$matches['functions'][$i].'(value) AS value'.
 						' FROM '.$historyTables[$item['value_type']].
 						' WHERE clock>'.(time() - convertFunctionValue($matches['parameters'][$i])).
-						' AND itemid='.$item['itemid']
-						.' HAVING COUNT(*) > 0' // necessary because DBselect() return 0 if empty data set, for graph templates
+						' AND itemid='.$item['itemid'].
+						' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 					);
 					if ($row = DBfetch($result)) {
 						$macroList[$macro] = convert_units($row['value'], $item['units']);
@@ -162,12 +163,23 @@ class CGraphMacroResolver {
 			}
 		}
 
+		// sorting by macro length ensure that no part of longer macro will be replaced with shorter macro,
+		// consider: {a:a.last(0)} and {a:a["{a:a.last(0)}"].last(0)} macros
+		uksort($macroList, array($this, "cmpLength"));
+
 		// replace macros with values in $str
 		foreach ($macroList as $macro => $value) {
 			$str = str_replace($macro, $value, $str);
 		}
 
 		return $str;
+	}
+
+	/**
+	 * Sorting helper function for macro array sorting by macro length
+	 */
+	private function cmpLength($a, $b) {
+		return (strlen($a) > strlen($b)) ? -1 : 1;
 	}
 
 	/**
