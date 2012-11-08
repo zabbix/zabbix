@@ -299,7 +299,7 @@ class CZBXAPI {
 	 *
 	 * $this->mapOne($items, $hosts, 'host', 'hostid');
 	 *
-	 * @param array $baseObjects        an object hash with IDs as keys
+	 * @param array $baseObjects        an array of base objects
 	 * @param array $relatedObjects     a hash of objects to map to the base objects with IDs as keys
 	 * @param string $baseField         the name of the field under which the related objects must be added
 	 * @param string $reference         the name of the foreign key in the base object
@@ -348,7 +348,7 @@ class CZBXAPI {
 	 * $this->mapMany($items, $triggers, 'triggers', array('items', 'itemid'));
 	 *
 	 * @param array $baseObjects        an object hash with IDs as keys
-	 * @param array $relatedObjects     a hash of objects to map to the base objects with IDs as keys
+	 * @param array $relatedObjects     an array of objects to map to the base objects
 	 * @param string $baseField         the name of the field under which the related objects must be added
 	 * @param string $reference         foreign reference
 	 * @param bool $unsetReference      whether to unset the foreign key
@@ -426,6 +426,58 @@ class CZBXAPI {
 				// add the related object to the base objects
 				if (isset($baseObjects[$baseObjectId])) {
 					$baseObjects[$baseObjectId][$baseField][] = $relatedObject;
+				}
+			}
+		}
+
+		return $baseObjects;
+	}
+
+	protected function mapObjectsMany($baseObjects, $relatedObjects, $map, $baseField, $limit = null) {
+		// create an empty array for every base object
+		foreach ($baseObjects as &$baseObject) {
+			$baseObject[$baseField] = array();
+		}
+		unset($baseObject);
+
+		// add related objects
+		$count = array();
+		foreach ($relatedObjects as $relatedObjectId => $relatedObject) {
+			if (isset($map[$relatedObjectId])) {
+				foreach ($map[$relatedObjectId] as $baseObjectId) {
+					// limit the number of results for each object
+					if ($limit) {
+						if (!isset($count[$baseObjectId])) {
+							$count[$baseObjectId] = 0;
+						}
+
+						$count[$baseObjectId]++;
+
+						if ($count[$baseObjectId] > $limit) {
+							continue;
+						}
+					}
+
+					$baseObjects[$baseObjectId][$baseField][] = $relatedObjects[$relatedObjectId];
+				}
+			}
+		}
+
+		return $baseObjects;
+	}
+
+	protected function mapObjectsOne($baseObjects, $relatedObjects, $map, $baseField) {
+		// create an empty array for every base object
+		foreach ($baseObjects as &$baseObject) {
+			$baseObject[$baseField] = array();
+		}
+		unset($baseObject);
+
+		// add related object
+		foreach ($relatedObjects as $relatedObjectId => $relatedObject) {
+			if (isset($map[$relatedObjectId])) {
+				foreach ($map[$relatedObjectId] as $baseObjectId) {
+					$baseObjects[$baseObjectId][$baseField] = $relatedObjects[$relatedObjectId];
 				}
 			}
 		}
@@ -530,8 +582,10 @@ class CZBXAPI {
 		$sqlWhere = (!empty($sqlParts['where'])) ? ' WHERE '.implode(' AND ', array_unique($sqlParts['where'])) : '';
 		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
 		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
+		$sqlLeftJoin = (!empty($sqlParts['leftJoin'])) ? ' LEFT JOIN '.implode(' LEFT JOIN ', array_unique($sqlParts['leftJoin'])) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
+				$sqlLeftJoin.
 				$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
@@ -702,9 +756,10 @@ class CZBXAPI {
 	 *
 	 * @param array $options
 	 * @param array $result     an object hash with PKs as keys
+	 * @param array $relationMap
 	 * @return array mixed
 	 */
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result, array $relationMap) {
 		// must be implemented in each API separately
 
 		return $result;

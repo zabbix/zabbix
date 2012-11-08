@@ -170,33 +170,37 @@ class CItem extends CItemGeneral {
 		}
 
 		// hostids
-		if (!is_null($options['hostids'])) {
+		if ($options['hostids'] !== null || $options['selectHosts'] !== null) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['hostid'] = 'i.hostid';
+			// filter
+			if ($options['hostids'] !== null) {
+				$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+
+				if (!is_null($options['groupCount'])) {
+					$sqlParts['group']['i'] = 'i.hostid';
+				}
 			}
 
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['i'] = 'i.hostid';
-			}
+			// make sure we retrieve the hostid property to be able to map hosts to items
+			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 		}
 
 		// interfaceids
-		if (!is_null($options['interfaceids'])) {
+		if ($options['interfaceids'] !== null || $options['selectInterfaces'] !== null) {
 			zbx_value2array($options['interfaceids']);
 
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['interfaceid'] = 'i.interfaceid';
+			// filter
+			if ($options['interfaceids'] !== null) {
+				$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
+
+				if (!is_null($options['groupCount'])) {
+					$sqlParts['group']['i'] = 'i.interfaceid';
+				}
 			}
 
-			$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['i'] = 'i.interfaceid';
-			}
+			// make sure we retrieve the hostid property to be able to map hosts to items
+			$sqlParts = $this->addQuerySelect('i.interfaceid', $sqlParts);
 		}
 
 		// groupids
@@ -231,33 +235,54 @@ class CItem extends CItemGeneral {
 		}
 
 		// triggerids
-		if (!is_null($options['triggerids'])) {
+		if ($options['triggerids'] !== null
+			|| ($options['selectTriggers'] !== null && $options['selectTriggers'] != API_OUTPUT_COUNT)) {
+
 			zbx_value2array($options['triggerids']);
 
 			$sqlParts['select']['triggerid'] = 'f.triggerid';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
+			$sqlParts['leftJoin']['functions'] = 'functions f ON i.itemid=f.itemid';
+
+			// filter
+			if ($options['triggerids'] !== null) {
+				$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			}
 		}
 
 		// applicationids
-		if (!is_null($options['applicationids'])) {
+		if ($options['applicationids'] !== null
+			|| ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT)) {
+
 			zbx_value2array($options['applicationids']);
 
 			$sqlParts['select']['applicationid'] = 'ia.applicationid';
-			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
-			$sqlParts['where']['ia'] = 'ia.itemid=i.itemid';
+			$sqlParts['leftJoin']['items_applications'] = 'items_applications ia ON ia.itemid=i.itemid';
+
+			// filter
+			if ($options['applicationids'] !== null) {
+				$sqlParts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
+			}
 		}
 
 		// graphids
-		if (!is_null($options['graphids'])) {
+		if ($options['graphids'] !== null
+			|| ($options['selectGraphs'] !== null && $options['selectGraphs'] != API_OUTPUT_COUNT)) {
+
 			zbx_value2array($options['graphids']);
 
 			$sqlParts['select']['graphid'] = 'gi.graphid';
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sqlParts['leftJoin']['graphs_items'] = 'graphs_items gi ON i.itemid=gi.itemid';
+
+			// filter
+			if ($options['graphids'] !== null) {
+				$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			}
+		}
+
+		// item discovery
+		if ($options['selectItemDiscovery'] !== null) {
+			$sqlParts['leftJoin']['item_discovery'] = 'item_discovery id ON i.itemid=id.itemid';
+			$sqlParts = $this->addQuerySelect('id.itemdiscoveryid', $sqlParts);
 		}
 
 		// webitems
@@ -387,6 +412,8 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
+		$relationMap = array();
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -402,24 +429,6 @@ class CItem extends CItemGeneral {
 				if (!isset($result[$item['itemid']])) {
 					$result[$item['itemid']]= array();
 				}
-				if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
-					$result[$item['itemid']]['hosts'] = array();
-				}
-				if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
-					$result[$item['itemid']]['triggers'] = array();
-				}
-				if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
-					$result[$item['itemid']]['graphs'] = array();
-				}
-				if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
-					$result[$item['itemid']]['applications'] = array();
-				}
-				if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
-					$result[$item['itemid']]['discoveryRule'] = array();
-				}
-				if (!is_null($options['selectInterfaces']) && !isset($result[$item['itemid']]['interfaces'])) {
-					$result[$item['itemid']]['interfaces'] = array();
-				}
 
 				// triggerids
 				if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
@@ -427,7 +436,6 @@ class CItem extends CItemGeneral {
 						$result[$item['itemid']]['triggers'] = array();
 					}
 					$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
-					unset($item['triggerid']);
 				}
 				// graphids
 				if (isset($item['graphid']) && is_null($options['selectGraphs'])) {
@@ -446,6 +454,30 @@ class CItem extends CItemGeneral {
 					unset($item['applicationid']);
 				}
 
+				// populate relation map
+				if (isset($item['hostid']) && $item['hostid']) {
+					$relationMap['hosts'][$item['hostid']][] = $item['itemid'];
+				}
+				if (isset($item['triggerid']) && $item['triggerid']) {
+					$relationMap['triggers'][$item['triggerid']][] = $item['itemid'];
+					unset($item['triggerid']);
+				}
+				if (isset($item['interfaceid']) && $item['interfaceid']) {
+					$relationMap['interfaces'][$item['interfaceid']][] = $item['itemid'];
+				}
+				if (isset($item['graphid']) && $item['graphid']) {
+					$relationMap['graphs'][$item['graphid']][] = $item['itemid'];
+					unset($item['graphid']);
+				}
+				if (isset($item['applicationid']) && $item['applicationid']) {
+					$relationMap['applications'][$item['applicationid']][] = $item['itemid'];
+					unset($item['applicationid']);
+				}
+				if (isset($item['itemdiscoveryid']) && $item['itemdiscoveryid']) {
+					$relationMap['itemDiscoveries'][$item['itemdiscoveryid']][] = $item['itemid'];
+					unset($item['itemdiscoveryid']);
+				}
+
 				$result[$item['itemid']] += $item;
 			}
 		}
@@ -458,85 +490,52 @@ class CItem extends CItemGeneral {
 		 * Adding objects
 		 */
 		// adding hosts
-		if (!is_null($options['selectHosts'])) {
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams = array(
-					'nodeids' => $options['nodeids'],
-					'itemids' => $itemids,
-					'templated_hosts' => true,
-					'output' => $options['selectHosts'],
-					'nopermissions' => true,
-					'preservekeys' => true
-				);
-				$hosts = API::Host()->get($objParams);
-				foreach ($hosts as $host) {
-					$hitems = $host['items'];
-					unset($host['items']);
-					foreach ($hitems as $item) {
-						$result[$item['itemid']]['hosts'][] = $host;
-					}
-				}
-			}
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = API::Host()->get(array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => array_keys($relationMap['hosts']),
+				'templated_hosts' => true,
+				'output' => $options['selectHosts'],
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $this->mapObjectsMany($result, $hosts, $relationMap['hosts'], 'hosts');
 		}
 
 		// adding interfaces
-		if (!is_null($options['selectInterfaces'])) {
-			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselectsAllowedOutputs)) {
-				$interfaces = API::HostInterface()->get(array(
-					'nodeids' => $options['nodeids'],
-					'itemids' => $itemids,
-					'output' => $options['selectInterfaces'],
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				foreach ($interfaces as $interface) {
-					$hitems = $interface['items'];
-					unset($interface['items']);
-					foreach ($hitems as $item) {
-						$result[$item['itemid']]['interfaces'][] = $interface;
-					}
-				}
-			}
+		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+			$interfaces = API::HostInterface()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectInterfaces'],
+				'intefaceids' => array_keys($relationMap['interfaces']),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $this->mapObjectsMany($result, $interfaces, $relationMap['interfaces'], 'interfaces');
 		}
 
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'itemids' => $itemids,
-				'preservekeys' => true
-			);
-
-			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$triggers = API::Trigger()->get(array(
+					'output' => $options['selectTriggers'],
+					'nodeids' => $options['nodeids'],
+					'triggerids' => array_keys($relationMap['triggers']),
+					'preservekeys' => true
+				));
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($triggers, 'description');
 				}
-				foreach ($triggers as $triggerid => $trigger) {
-					unset($triggers[$triggerid]['items']);
-					$count = array();
-					foreach ($trigger['items'] as $item) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) {
-								$count[$item['itemid']] = 0;
-							}
-							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
-					}
-				}
+				$result = $this->mapObjectsMany($result, $triggers, $relationMap['triggers'], 'triggers', $options['limitSelects']);
 			}
-			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$triggers = API::Trigger()->get($objParams);
+			else {
+				$triggers = API::Trigger()->get(array(
+					'countOutput' => true,
+					'groupCount' => true,
+					'nodeids' => $options['nodeids'],
+					'itemids' => $itemids
+				));
 				$triggers = zbx_toHash($triggers, 'itemid');
 
 				foreach ($result as $itemid => $item) {
@@ -552,42 +551,26 @@ class CItem extends CItemGeneral {
 
 		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'itemids' => $itemids,
-				'preservekeys' => true
-			);
-
-			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = API::Graph()->get(array(
+					'output' => $options['selectGraphs'],
+					'nodeids' => $options['nodeids'],
+					'graphids' => array_keys($relationMap['graphs']),
+					'preservekeys' => true
+				));
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($graphs, 'name');
 				}
-				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['items']);
-					$count = array();
-					foreach ($graph['items'] as $item) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) {
-								$count[$item['itemid']] = 0;
-							}
-							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
-					}
-				}
+				$result = $this->mapObjectsMany($result, $graphs, $relationMap['graphs'], 'graphs', $options['limitSelects']);
 			}
-			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$graphs = API::Graph()->get($objParams);
+			else {
+				$graphs = API::Graph()->get(array(
+					'countOutput' => true,
+					'groupCount' => true,
+					'nodeids' => $options['nodeids'],
+					'itemids' => $itemids
+				));
 				$graphs = zbx_toHash($graphs, 'itemid');
 
 				foreach ($result as $itemid => $item) {
@@ -602,26 +585,18 @@ class CItem extends CItemGeneral {
 		}
 
 		// adding applications
-		if (!is_null($options['selectApplications']) && str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
+		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
 			$applications = API::Application()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectApplications'],
-				'itemids' => $itemids,
+				'nodeids' => $options['nodeids'],
+				'applicationids' => array_keys($relationMap['applications']),
 				'preservekeys' => true
 			));
-			foreach ($applications as $application) {
-				$aitems = $application['items'];
-				unset($application['items']);
-				foreach ($aitems as $item) {
-					$result[$item['itemid']]['applications'][] = $application;
-				}
-			}
+			$result = $this->mapObjectsMany($result, $applications, $relationMap['applications'], 'applications');
 		}
 
 		// adding discoveryrule
 		if (!is_null($options['selectDiscoveryRule'])) {
-			$ruleids = $ruleMap = array();
-
 			$dbRules = DBselect(
 				'SELECT id1.itemid,id2.parent_itemid'.
 				' FROM item_discovery id1,item_discovery id2,items i'.
@@ -631,8 +606,7 @@ class CItem extends CItemGeneral {
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_CREATED
 			);
 			while ($rule = DBfetch($dbRules)) {
-				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
-				$ruleMap[$rule['itemid']] = $rule['parent_itemid'];
+				$relationMap['discoveryRules'][$rule['parent_itemid']][] = $rule['itemid'];
 			}
 
 			$dbRules = DBselect(
@@ -643,33 +617,24 @@ class CItem extends CItemGeneral {
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD
 			);
 			while ($rule = DBfetch($dbRules)) {
-				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
-				$ruleMap[$rule['itemid']] = $rule['parent_itemid'];
+				$relationMap['discoveryRules'][$rule['parent_itemid']][] = $rule['itemid'];
 			}
 
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'itemids' => $ruleids,
-				'filter' => array('flags' => null),
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = $this->get($objParams);
-
-				foreach ($result as $itemid => $item) {
-					if (isset($ruleMap[$itemid]) && isset($discoveryRules[$ruleMap[$itemid]])) {
-						$result[$itemid]['discoveryRule'] = $discoveryRules[$ruleMap[$itemid]];
-					}
-				}
+				$discoveryRules = API::DiscoveryRule()->get(array(
+					'output' => $options['selectDiscoveryRule'],
+					'nodeids' => $options['nodeids'],
+					'itemids' => array_keys($relationMap['discoveryRules']),
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				$result = $this->mapObjectsOne($result, $discoveryRules, $relationMap['discoveryRules'], 'discoveryRule');
 			}
 		}
 
 		// add other related objects
 		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->addRelatedObjects($options, $result, $relationMap);
 		}
 
 		// removing keys (hash -> array)
@@ -1264,29 +1229,22 @@ class CItem extends CItemGeneral {
 		return true;
 	}
 
-	public function addRelatedObjects(array $options, array $result) {
+	public function addRelatedObjects(array $options, array $result, array $relationMap) {
 		// TODO: move selectItemHosts to CItemGeneral::addRelatedObjects();
 		// TODO: move selectInterfaces to CItemGeneral::addRelatedObjects();
 		// TODO: move selectTriggers to CItemGeneral::addRelatedObjects();
 		// TODO: move selectGraphs to CItemGeneral::addRelatedObjects();
 		// TODO: move selectApplications to CItemGeneral::addRelatedObjects();
-		$result = parent::addRelatedObjects($options, $result);
-
-		$itemids = zbx_objectValues($result, 'itemid');
+		$result = parent::addRelatedObjects($options, $result, $relationMap);
 
 		// adding item discovery
 		if ($options['selectItemDiscovery']) {
-			$itemDiscoveryOutput = $this->outputExtend('item_discovery', 'itemid', $options['selectItemDiscovery']);
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
-				'output' => $itemDiscoveryOutput,
-				'filter' => array('itemid' => $itemids)
+				'output' => $options['selectItemDiscovery'],
+				'itemdiscoveryids' => array_keys($relationMap['itemDiscoveries']),
+				'preservekeys' => true
 			));
-			foreach ($itemDiscoveries as $itemDiscovery) {
-				$refId = $itemDiscovery['itemid'];
-				$itemDiscovery = $this->unsetExtraFields($itemDiscovery, $options['selectItemDiscovery']);
-
-				$result[$refId]['itemDiscovery'] = $itemDiscovery;
-			}
+			$result = $this->mapObjectsOne($result, $itemDiscoveries, $relationMap['itemDiscoveries'], 'itemDiscovery');
 		}
 
 		return $result;

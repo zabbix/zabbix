@@ -1139,8 +1139,8 @@ class CUser extends CZBXAPI {
 		return $sqlParts;
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
+	protected function addRelatedObjects(array $options, array $result, array $relationMap) {
+		$result = parent::addRelatedObjects($options, $result, $relationMap);
 
 		$userids = zbx_objectValues($result, 'userid');
 
