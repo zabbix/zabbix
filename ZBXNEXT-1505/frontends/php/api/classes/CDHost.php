@@ -117,18 +117,6 @@ class CDHost extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['dhosts']);
-
-			$dbTable = DB::getSchema('dhosts');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'dh.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 // editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -236,24 +224,6 @@ class CDHost extends CZBXAPI {
 			$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
 		}
 
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['dhosts'] = 'dh.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT dh.dhostid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 // filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('dhosts dh', $options, $sqlParts);
@@ -273,6 +243,8 @@ class CDHost extends CZBXAPI {
 		}
 //-------
 
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$dhostids = array();
 
