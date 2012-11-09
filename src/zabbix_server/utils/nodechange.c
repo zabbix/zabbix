@@ -39,14 +39,14 @@
  *                                                                            *
  ******************************************************************************/
 static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_exp,
-		char **new_exp, size_t *new_exp_alloc)
+		char **new_expression, size_t *new_expression_alloc, size_t *new_expression_offset)
 {
 	enum state_t {NORMAL, ID}	state = NORMAL;
 	const char			*c, *p_functionid = NULL;
 	zbx_uint64_t			functionid;
-	size_t				new_exp_offset = 0;
 
-	**new_exp = '\0';
+	*new_expression_offset = 0;
+	**new_expression = '\0';
 
 	for (c = old_exp; '\0' != *c; c++)
 	{
@@ -54,7 +54,7 @@ static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_
 		{
 			state = ID;
 			p_functionid = c + 1;
-			zbx_chrcpy_alloc(new_exp, new_exp_alloc, &new_exp_offset, *c);
+			zbx_chrcpy_alloc(new_expression, new_expression_alloc, new_expression_offset, *c);
 		}
 		else if (ID == state)
 		{
@@ -62,9 +62,10 @@ static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_
 			{
 				if (SUCCEED == is_uint64_n(p_functionid, c - p_functionid, &functionid))
 				{
-					zbx_snprintf_alloc(new_exp, new_exp_alloc, &new_exp_offset,
+					zbx_snprintf_alloc(new_expression, new_expression_alloc, new_expression_offset,
 							ZBX_FS_UI64, prefix + functionid);
-					zbx_chrcpy_alloc(new_exp, new_exp_alloc, &new_exp_offset, *c);
+					zbx_chrcpy_alloc(new_expression, new_expression_alloc, new_expression_offset,
+							*c);
 				}
 
 				state = NORMAL;
@@ -72,14 +73,14 @@ static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_
 		}
 		else
 		{
-			zbx_chrcpy_alloc(new_exp, new_exp_alloc, &new_exp_offset, *c);
+			zbx_chrcpy_alloc(new_expression, new_expression_alloc, new_expression_offset, *c);
 		}
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: convert_triggers_expression                                      *
+ * Function: validate_trigger_expressions                                     *
  *                                                                            *
  * Purpose: convert trigger expressions to new node ID                        *
  *                                                                            *
@@ -90,14 +91,15 @@ static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_triggers_expression(int new_id)
+static int	validate_trigger_expressions(int new_id)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*new_expression, *new_expression_esc;
-	size_t		new_expression_alloc = ZBX_KIBIBYTE;
+	char		*new_expression;
+	size_t		new_expression_alloc = ZBX_KIBIBYTE, new_expression_offset = 0;
+	int		ret = SUCCEED;
 
 	assert(NULL != (r_table = DBget_table("functions")));
 
@@ -111,7 +113,107 @@ static void	convert_triggers_expression(int new_id)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		convert_expression(new_id, prefix, row[0], &new_expression, &new_expression_alloc);
+		convert_expression(new_id, prefix, row[0], &new_expression, &new_expression_alloc,
+				&new_expression_offset);
+
+		if (new_expression_offset <= TRIGGER_EXPRESSION_LEN)
+			continue;
+
+		printf("Unable to convert. Length of trigger expression is out of range in table \"triggers\"\n");
+		ret = FAIL;
+		break;
+	}
+	DBfree_result(result);
+
+	zbx_free(new_expression);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: validate_ids                                                     *
+ *                                                                            *
+ * Purpose: validating of IDs in all tables                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	validate_ids()
+{
+	char		sql[42 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN * 2];
+	DB_RESULT	result;
+	zbx_uint64_t	max_value;
+	int		i, ret = SUCCEED;
+
+	for (i = 0; NULL != tables[i].table; i++)
+	{
+		const ZBX_TABLE	*table = &tables[i];
+		const ZBX_FIELD *field = &table->fields[0];
+
+		if (ZBX_TYPE_ID != field->type || 0 != strcmp(table->recid, field->name))
+			continue;
+
+		if (0 != (table->flags & ZBX_SYNC))
+			max_value = (zbx_uint64_t)__UINT64_C(99999999999);
+		else
+			max_value = (zbx_uint64_t)__UINT64_C(99999999999999);
+
+		zbx_snprintf(sql, sizeof(sql), "select %s from %s where %s>" ZBX_FS_UI64,
+				field->name, table->table, field->name, max_value);
+
+		result = DBselectN(sql, 1);
+
+		if (NULL != DBfetch(result))
+		{
+			printf("Unable to convert. Some of object IDs are out of range in table \"%s\"\n",
+					table->table);
+			ret = FAIL;
+		}
+
+		DBfree_result(result);
+
+		if (FAIL == ret)
+			break;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: convert_trigger_expressions                                      *
+ *                                                                            *
+ * Purpose: convert trigger expressions to new node ID                        *
+ *                                                                            *
+ * Parameters: new_id - new node id                                           *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	convert_trigger_expressions(int new_id)
+{
+	zbx_uint64_t	prefix;
+	const ZBX_TABLE	*r_table;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*new_expression, *new_expression_esc;
+	size_t		new_expression_alloc = ZBX_KIBIBYTE, new_expression_offset = 0;
+
+	assert(NULL != (r_table = DBget_table("functions")));
+
+	new_expression = zbx_malloc(NULL, new_expression_alloc);
+
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	if (0 != (r_table->flags & ZBX_SYNC))
+		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+
+	result = DBselect("select expression,triggerid from triggers");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		convert_expression(new_id, prefix, row[0], &new_expression, &new_expression_alloc,
+				&new_expression_offset);
 
 		new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 		DBexecute("update triggers set expression='%s' where triggerid=%s",
@@ -187,16 +289,13 @@ static void	convert_special_field(int new_id, const char *table_name,
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	convert_condition_values(int new_id, const char *rel_table_name, int type)
 {
-	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	value;
+	zbx_uint64_t	prefix, value;
 
 	assert(NULL != (r_table = DBget_table(rel_table_name)));
 
@@ -211,7 +310,9 @@ static void	convert_condition_values(int new_id, const char *rel_table_name, int
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(value, row[1]);
+		if (SUCCEED != is_uint64(row[1], &value))
+			continue;
+
 		value += prefix;
 		DBexecute("update conditions"
 			" set value='" ZBX_FS_UI64 "'"
@@ -343,19 +444,25 @@ int	change_nodeid(int new_id)
 		{NULL},
 	};
 
-	int		i, j, s, t, ret = FAIL;
+	int		i, j, s, t, ret;
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
 	if (1 > new_id || new_id > 999)
 	{
 		printf("Node ID must be in range of 1-999.\n");
-		return ret;
+		return FAIL;
 	}
 
 	zabbix_set_log_level(LOG_LEVEL_WARNING);
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	if (SUCCEED != validate_trigger_expressions(new_id) || SUCCEED != validate_ids())
+	{
+		DBclose();
+		return FAIL;
+	}
 
 	DBbegin();
 
@@ -439,7 +546,7 @@ int	change_nodeid(int new_id)
 	}
 
 	/* special processing for trigger expressions */
-	convert_triggers_expression(new_id);
+	convert_trigger_expressions(new_id);
 
 	/* special processing for condition values */
 	for (i = 0; NULL != condition_convs[i].rel; i++)
