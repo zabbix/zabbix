@@ -30,7 +30,7 @@
  *                                                                            *
  * Purpose: convert trigger expression to new node ID                         *
  *                                                                            *
- * Parameters: old_id - old id, new_id - new node id                          *
+ * Parameters: new_id - new node id                                           *
  *             old_exp - old expression, new_exp - new expression             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -38,7 +38,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const char *old_exp,
+static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_exp,
 		char **new_exp, size_t *new_exp_alloc)
 {
 	enum state_t {NORMAL, ID}	state = NORMAL;
@@ -83,14 +83,14 @@ static void	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, cons
  *                                                                            *
  * Purpose: convert trigger expressions to new node ID                        *
  *                                                                            *
- * Parameters: old_id - old id, new_id - new node id                          *
+ * Parameters: new_id - new node id                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_triggers_expression(int old_id, int new_id)
+static void	convert_triggers_expression(int new_id)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -111,7 +111,7 @@ static void	convert_triggers_expression(int old_id, int new_id)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		convert_expression(old_id, new_id, prefix, row[0], &new_expression, &new_expression_alloc);
+		convert_expression(new_id, prefix, row[0], &new_expression, &new_expression_alloc);
 
 		new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 		DBexecute("update triggers set expression='%s' where triggerid=%s",
@@ -129,14 +129,14 @@ static void	convert_triggers_expression(int old_id, int new_id)
  *                                                                            *
  * Purpose: convert profiles idx2 and value_id fields to new node ID          *
  *                                                                            *
- * Parameters: old_id - old id, new_id - new node id                          *
+ * Parameters: new_id - new node id                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_profiles(int old_id, int new_id, const char *field_name)
+static void	convert_profiles(int new_id, const char *field_name)
 {
 	zbx_uint64_t	prefix;
 
@@ -153,14 +153,14 @@ static void	convert_profiles(int old_id, int new_id, const char *field_name)
  *                                                                            *
  * Purpose: special processing for multipurpose fields                        *
  *                                                                            *
- * Parameters: old_id - old id, new_id - new node id                          *
+ * Parameters: new_id - new node id                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_special_field(int old_id, int new_id, const char *table_name,
+static void	convert_special_field(int new_id, const char *table_name,
 		const char *field_name, const char *type_field_name,
 		const char *rel_table_name, int type)
 {
@@ -183,14 +183,14 @@ static void	convert_special_field(int old_id, int new_id, const char *table_name
  *                                                                            *
  * Purpose: special processing for "value" field in "conditions" table        *
  *                                                                            *
- * Parameters: old_id - old id, new_id - new node id                          *
+ * Parameters: new_id - new node id                                           *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_condition_values(int old_id, int new_id, const char *rel_table_name, int type)
+static void	convert_condition_values(int new_id, const char *rel_table_name, int type)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -227,7 +227,7 @@ static void	convert_condition_values(int old_id, int new_id, const char *rel_tab
  *                                                                            *
  * Purpose: convert database data to new node ID                              *
  *                                                                            *
- * Parameters: old_id - old id, new_id - new node id                          *
+ * Parameters: new_id - new node id                                           *
  *                                                                            *
  * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
@@ -235,7 +235,7 @@ static void	convert_condition_values(int old_id, int new_id, const char *rel_tab
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	change_nodeid(int old_id, int new_id)
+int	change_nodeid(int new_id)
 {
 	struct conv_t
 	{
@@ -347,12 +347,6 @@ int	change_nodeid(int old_id, int new_id)
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	if (0 != old_id)
-	{
-		printf("Conversion from non-zero node ID is not supported.\n");
-		return ret;
-	}
-
 	if (1 > new_id || new_id > 999)
 	{
 		printf("Node ID must be in range of 1-999.\n");
@@ -398,7 +392,7 @@ int	change_nodeid(int old_id, int new_id)
 			{
 				for (t = 0; NULL != special_convs[s].convs[t].rel; t++)
 				{
-					convert_special_field(old_id, new_id, special_convs[s].table_name,
+					convert_special_field(new_id, special_convs[s].table_name,
 							special_convs[s].field_name, special_convs[s].type_field_name,
 							special_convs[s].convs[t].rel, special_convs[s].convs[t].type);
 				}
@@ -429,7 +423,7 @@ int	change_nodeid(int old_id, int new_id)
 			/* special processing for table 'profiles' */
 			else if (0 == strcmp("profiles", tables[i].table))
 			{
-				convert_profiles(old_id, new_id, tables[i].fields[j].name);
+				convert_profiles(new_id, tables[i].fields[j].name);
 				continue;
 			}
 			else
@@ -445,11 +439,11 @@ int	change_nodeid(int old_id, int new_id)
 	}
 
 	/* special processing for trigger expressions */
-	convert_triggers_expression(old_id, new_id);
+	convert_triggers_expression(new_id);
 
 	/* special processing for condition values */
 	for (i = 0; NULL != condition_convs[i].rel; i++)
-		convert_condition_values(old_id, new_id, condition_convs[i].rel, condition_convs[i].type);
+		convert_condition_values(new_id, condition_convs[i].rel, condition_convs[i].type);
 
 	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)", new_id);
 
@@ -482,7 +476,7 @@ error:
 	return ret;
 }
 #else	/* HAVE_SQLITE3 */
-int	change_nodeid(int old_id, int new_id)
+int	change_nodeid(int new_id)
 {
 	printf("Distributed monitoring with SQLite3 is not supported.\n");
 	return FAIL;
