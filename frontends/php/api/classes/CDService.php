@@ -166,7 +166,7 @@ class CDService extends CZBXAPI{
 			$sqlParts['from']['dchecks'] = 'dchecks dc';
 
 			$sqlParts['where'][] = DBcondition('dc.dcheckid', $options['dcheckids']);
-			$sqlParts['where']['dhds'] = 'dh.hostid=ds.hostid';
+			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 
 			if (!is_null($options['groupCount'])) {
