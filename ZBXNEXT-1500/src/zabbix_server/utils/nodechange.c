@@ -143,8 +143,7 @@ static void	convert_profiles(int old_id, int new_id, const char *field_name)
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id +
 		(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 
-	DBexecute("update profiles set %s=%s+" ZBX_FS_UI64 " where %s>0",
-			field_name, field_name, prefix, field_name);
+	DBexecute("update profiles set %s=%s+" ZBX_FS_UI64 " where %s>0", field_name, field_name, prefix, field_name);
 }
 
 /******************************************************************************
@@ -237,19 +236,21 @@ static void	convert_condition_values(int old_id, int new_id, const char *rel_tab
  ******************************************************************************/
 int	change_nodeid(int old_id, int new_id)
 {
-	struct conv_t
+	typedef struct
 	{
 	        const char	*rel;
         	int		type;
-	};
+	}
+	conv_t;
 
-	struct special_conv_t
+	typedef struct
 	{
 	        const char	*table_name, *field_name, *type_field_name;
-		struct conv_t	convs[32];
-	};
+		conv_t		convs[32];
+	}
+	special_conv_t;
 
-	struct special_conv_t	special_convs[] =
+	special_conv_t	special_convs[] =
 	{
 		{"sysmaps_elements",	"elementid",	"elementtype",
 			{
@@ -331,7 +332,7 @@ int	change_nodeid(int old_id, int new_id)
 		{NULL}
 	};
 
-	struct conv_t	condition_convs[] =
+	conv_t	condition_convs[] =
 	{
 		{"groups",	CONDITION_TYPE_HOST_GROUP},
 		{"hosts",	CONDITION_TYPE_HOST},
@@ -343,9 +344,8 @@ int	change_nodeid(int old_id, int new_id)
 		{NULL},
 	};
 
-	int		i, j, s, t, ret = FAIL;
+	int		i, j, t, ret = FAIL;
 	zbx_uint64_t	prefix;
-	const ZBX_TABLE	*r_table;
 
 	if (0 != old_id)
 	{
@@ -380,46 +380,49 @@ int	change_nodeid(int old_id, int new_id)
 
 	for (i = 0; NULL != tables[i].table; i++)
 	{
+		const ZBX_TABLE	*table = &tables[i];
+		special_conv_t	*s;
+
 		printf(".");
 		fflush(stdout);
 
-		for (j = 0; NULL != tables[i].fields[j].name; j++)
+		for (s = special_convs; NULL != s->table_name; s++)
 		{
-			for (s = 0; NULL != special_convs[s].table_name; s++)
-			{
-				if (0 == strcmp(special_convs[s].table_name, tables[i].table) &&
-						0 == strcmp(special_convs[s].field_name, tables[i].fields[j].name))
-				{
-					break;
-				}
-			}
+			if (0 == strcmp(s->table_name, table->table))
+				break;
+		}
 
-			if (NULL != special_convs[s].table_name)
+		for (j = 0; NULL != table->fields[j].name; j++)
+		{
+			const ZBX_FIELD	*field = &table->fields[j];
+
+			if (NULL != s->table_name && 0 == strcmp(s->field_name, field->name))
 			{
-				for (t = 0; NULL != special_convs[s].convs[t].rel; t++)
+				for (t = 0; NULL != s->convs[t].rel; t++)
 				{
-					convert_special_field(old_id, new_id, special_convs[s].table_name,
-							special_convs[s].field_name, special_convs[s].type_field_name,
-							special_convs[s].convs[t].rel, special_convs[s].convs[t].type);
+					convert_special_field(old_id, new_id, s->table_name, s->field_name,
+							s->type_field_name, s->convs[t].rel, s->convs[t].type);
 				}
 				continue;
 			}
 
-			if (ZBX_TYPE_ID != tables[i].fields[j].type)
+			if (ZBX_TYPE_ID != field->type)
 				continue;
 
 			/* primary key */
-			if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))
+			if (0 == strcmp(field->name, table->recid))
 			{
 				prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 
-				if (0 != (tables[i].flags & ZBX_SYNC))
+				if (0 != (table->flags & ZBX_SYNC))
 					prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 			}
 			/* relations */
-			else if (NULL != tables[i].fields[j].fk_table)
+			else if (NULL != field->fk_table)
 			{
-				assert(NULL != (r_table = DBget_table(tables[i].fields[j].fk_table)));
+				const ZBX_TABLE	*r_table;
+
+				assert(NULL != (r_table = DBget_table(field->fk_table)));
 
 				prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 
@@ -427,20 +430,16 @@ int	change_nodeid(int old_id, int new_id)
 					prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 			}
 			/* special processing for table 'profiles' */
-			else if (0 == strcmp("profiles", tables[i].table))
+			else if (0 == strcmp("profiles", table->table))
 			{
-				convert_profiles(old_id, new_id, tables[i].fields[j].name);
+				convert_profiles(old_id, new_id, field->name);
 				continue;
 			}
 			else
 				assert(0);
 
 			DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0",
-					tables[i].table,
-					tables[i].fields[j].name,
-					tables[i].fields[j].name,
-					prefix,
-					tables[i].fields[j].name);
+					table->table, field->name, field->name, prefix, field->name);
 		}
 	}
 
