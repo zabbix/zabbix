@@ -149,6 +149,9 @@ class CScript extends CZBXAPI {
 			));
 			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
 
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
+				$sqlParts['select']['hostid'] = 'hg.hostid';
+			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = '(('.DBcondition('hg.groupid', $hostGroupIds).' AND hg.groupid=s.groupid)'.
 				' OR '.
