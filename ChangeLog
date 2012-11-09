@@ -14,7 +14,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
-........S. [ZBX-5753] fixed server crash when using a icmpping* check as a discovery rule (Sasha)
+........S. [ZBX-5753] fixed server crash when using an icmpping* check as a discovery rule (Sasha)
 ...G...... [ZBX-5382] fixed agent crash on HP-UX Itanium; thanks to Alice Ferrazzi (Andris)
 ...G...... [ZBX-5289] fixed agent crash on Solaris; thanks to Jairo Eduardo Lopez Fuentes Nacarino, Takanori Suzuki (Andris)
 ..F....... [ZBX-5744] removed redundant HTML from the map monitoring page (Eduard, Pavels)
