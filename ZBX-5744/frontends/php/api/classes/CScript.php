@@ -111,11 +111,7 @@ class CScript extends CZBXAPI {
 		else {
 			$sqlParts['from']['rights'] = 'rights r';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = 'hg.groupid=r.id';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = '(hg.groupid=s.groupid OR s.groupid IS NULL)';
+			$sqlParts['where'][] = '((s.groupid=r.id AND r.groupid=ug.usrgrpid AND ug.userid='.$userid.') OR s.groupid IS NULL)';
 			$sqlParts['where'][] = '(ug.usrgrpid=s.usrgrpid OR s.usrgrpid IS NULL)';
 		}
 
