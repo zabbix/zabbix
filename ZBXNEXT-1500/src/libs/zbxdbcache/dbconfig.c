@@ -2288,9 +2288,8 @@ void	DCsync_configuration()
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
 			" from config"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("configid"));
+			ZBX_SQL_NODE,
+			DBwhere_node_local("configid"));
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2305,10 +2304,10 @@ void	DCsync_configuration()
 			" where i.hostid=h.hostid"
 				" and h.status in (%d)"
 				" and i.status in (%d,%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-			DBnode_local("i.itemid"));
+			DBand_node_local("i.itemid"));
 	isec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2323,21 +2322,21 @@ void	DCsync_configuration()
 				" and i.status in (%d,%d)"
 				" and t.status in (%d)"
 				" and t.flags not in (%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED,
 			ZBX_FLAG_DISCOVERY_CHILD,
-			DBnode_local("h.hostid"));
+			DBand_node_local("h.hostid"));
 	tsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	tdep_result = DBselect(
 			"select d.triggerid_down,d.triggerid_up"
 			" from trigger_depends d"
-			" where 1=1" DB_NODE
+			ZBX_SQL_NODE
 			" order by d.triggerid_down",
-			DBnode_local("d.triggerid_down"));
+			DBwhere_node_local("d.triggerid_down"));
 	dsec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2351,12 +2350,12 @@ void	DCsync_configuration()
 				" and i.status in (%d,%d)"
 				" and t.status in (%d)"
 				" and t.flags not in (%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED,
 			ZBX_FLAG_DISCOVERY_CHILD,
-			DBnode_local("h.hostid"));
+			DBand_node_local("h.hostid"));
 	fsec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2369,46 +2368,42 @@ void	DCsync_configuration()
 				"status,name"
 			" from hosts"
 			" where status in (%d,%d,%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
-			DBnode_local("hostid"));
+			DBand_node_local("hostid"));
 	hsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	htmpl_result = DBselect(
 			"select hostid,templateid"
 			" from hosts_templates"
-			" where 1=1"
-				DB_NODE
+			ZBX_SQL_NODE
 			" order by hostid,templateid",
-			DBnode_local("hosttemplateid"));
+			DBwhere_node_local("hosttemplateid"));
 	htsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	gmacro_result = DBselect(
 			"select globalmacroid,macro,value"
 			" from globalmacro"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("globalmacroid"));
+			ZBX_SQL_NODE,
+			DBwhere_node_local("globalmacroid"));
 	gmsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	hmacro_result = DBselect(
 			"select hostmacroid,hostid,macro,value"
 			" from hostmacro"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("hostmacroid"));
+			ZBX_SQL_NODE,
+			DBwhere_node_local("hostmacroid"));
 	hmsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if_result = DBselect(
 			"select interfaceid,hostid,type,main,useip,ip,dns,port"
 			" from interface"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("interfaceid"));
+			ZBX_SQL_NODE,
+			DBwhere_node_local("interfaceid"));
 	ifsec = zbx_time() - sec;
 
 	START_SYNC;
@@ -2952,9 +2947,8 @@ void	DCload_config()
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
 			" from config"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("configid"));
+			ZBX_SQL_NODE,
+			DBwhere_node_local("configid"));
 
 	LOCK_CACHE;
 

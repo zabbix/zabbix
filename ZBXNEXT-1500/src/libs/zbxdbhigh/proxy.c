@@ -106,8 +106,8 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 				" from hosts"
 				" where host='%s'"
 					" and status in (%d)"
-					DB_NODE,
-				host_esc, HOST_STATUS_PROXY_ACTIVE, DBnode_local("hostid"));
+					ZBX_SQL_NODE,
+				host_esc, HOST_STATUS_PROXY_ACTIVE, DBand_node_local("hostid"));
 
 		zbx_free(host_esc);
 
@@ -188,12 +188,10 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	if (SUCCEED == str_in_list("globalmacro,regexps,expressions,config", table->table, ','))
 	{
-		char	*field_name;
+		char	field_name[ZBX_FIELDNAME_LEN + 3];
 
-		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where 1=1" DB_NODE, DBnode_local(field_name));
-
-		zbx_free(field_name);
+		zbx_snprintf(field_name, sizeof(field_name), "t.%s", table->recid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBwhere_node_local(field_name));
 	}
 	else if (SUCCEED == str_in_list("hosts,interface,hosts_templates,hostmacro", table->table, ','))
 	{
@@ -237,8 +235,8 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	else if (0 == strcmp(table->table, "groups"))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				",config r where t.groupid=r.discovery_groupid" DB_NODE,
-				DBnode_local("r.configid"));
+				",config r where t.groupid=r.discovery_groupid" ZBX_SQL_NODE,
+				DBand_node_local("r.configid"));
 	}
 	else if (0 == strcmp(table->table, "applications"))
 	{
