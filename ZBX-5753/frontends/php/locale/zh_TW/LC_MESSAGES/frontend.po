@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:24+0200\n"
+"POT-Creation-Date: 2012-11-06 08:11+0200\n"
 "PO-Revision-Date: 2012-10-17 16:04+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1257,15 +1257,15 @@ msgstr "無法改變授權方式為Zabbix內部"
 msgid "Cannot clear history"
 msgstr "無法清除歷史"
 
-#: api/classes/CDiscoveryRule.php:1213
+#: api/classes/CDiscoveryRule.php:1209
 msgid "Cannot clone graph prototypes."
 msgstr "無法克隆圖形原型"
 
-#: api/classes/CDiscoveryRule.php:1103
+#: api/classes/CDiscoveryRule.php:1099
 msgid "Cannot clone item prototypes."
 msgstr "無法克隆項目原型"
 
-#: api/classes/CDiscoveryRule.php:825
+#: api/classes/CDiscoveryRule.php:821
 msgid "Cannot clone trigger prototypes."
 msgstr "無法克隆觸發器原型"
 
@@ -1349,7 +1349,7 @@ msgstr "無法删除應用集"
 msgid "Cannot delete dependency"
 msgstr "無法刪除相依關係"
 
-#: api/classes/CDiscoveryRule.php:622 discoveryconf.php:164
+#: api/classes/CDiscoveryRule.php:618 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
 msgstr "無法删除探索規則"
@@ -1362,7 +1362,7 @@ msgstr "無法刪除探索規則"
 msgid "Cannot delete graph"
 msgstr "無法删除圖形"
 
-#: api/classes/CItemPrototype.php:737
+#: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
 msgstr ""
 
@@ -1410,7 +1410,7 @@ msgstr "無法刪除項目"
 msgid "Cannot delete items"
 msgstr "無法刪除項目"
 
-#: api/classes/CItemPrototype.php:754
+#: api/classes/CItemPrototype.php:764
 msgid "Cannot delete items created by low level discovery."
 msgstr ""
 
@@ -1489,11 +1489,11 @@ msgstr "無法刪除模板圖形."
 msgid "Cannot delete templated item."
 msgstr "無法刪除樣本項目."
 
-#: api/classes/CItemPrototype.php:698
+#: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:581
+#: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
 msgstr "無法刪除模板項目."
 
@@ -1506,7 +1506,7 @@ msgstr "無法刪除模板化觸發器 \"%1$s:%2$s\"."
 msgid "Cannot delete trigger"
 msgstr "無法删除觸發器"
 
-#: api/classes/CItemPrototype.php:769
+#: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
 msgstr ""
 
@@ -1579,7 +1579,7 @@ msgstr "無法找到用在拓墣圖\"%2$s\"中的主機\"%1$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的主機\"%1$s\"."
 
-#: api/classes/CDiscoveryRule.php:1019 api/classes/CDiscoveryRule.php:1091
+#: api/classes/CDiscoveryRule.php:1015 api/classes/CDiscoveryRule.php:1087
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
@@ -2646,7 +2646,7 @@ msgstr "新增值對應"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 應用集 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:866
+#: api/classes/CDiscoveryRule.php:862
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 探索規則 \"%1$s\" 於 \"%2$s\"."
@@ -2656,7 +2656,7 @@ msgstr "已創建: 探索規則 \"%1$s\" 於 \"%2$s\"."
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 項目 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:598
+#: api/classes/CItemPrototype.php:608
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 項目原型 \"%1$s\" 於 \"%2$s\"."
@@ -3392,7 +3392,7 @@ msgstr "已删除"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 應用集 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:630
+#: api/classes/CDiscoveryRule.php:626
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 探索規則 \"%1$s\" 於 \"%2$s\"."
@@ -3412,7 +3412,7 @@ msgstr "已刪除: 主機 \"%1$s\"."
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 項目 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:781
+#: api/classes/CItemPrototype.php:791
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 項目原型 \"%1$s\" 於 \"%2$s\"."
@@ -3715,12 +3715,12 @@ msgstr "探索物件"
 msgid "Discovery rule"
 msgstr "探索規則"
 
-#: api/classes/CDiscoveryRule.php:949
+#: api/classes/CDiscoveryRule.php:945
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "探索規則 \"%1$s\"已存在於 \"%2$s\",繼承自其它的模板."
 
-#: api/classes/CDiscoveryRule.php:936
+#: api/classes/CDiscoveryRule.php:932
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "探索規則\"%1$s:%2$s\" 有不正確的存活時間: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用戶巨集)"
@@ -4023,11 +4023,11 @@ msgid "Empty host name provided in expression."
 msgstr "空的主機名稱出現在表示式中"
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
-#: api/classes/CDiscoveryRule.php:561 api/classes/CGraph.php:729
+#: api/classes/CDiscoveryRule.php:557 api/classes/CGraph.php:729
 #: api/classes/CGraphPrototype.php:778 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:677
+#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:687
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -6590,7 +6590,7 @@ msgid "Italian (it_IT)"
 msgstr "意大利語 (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:37 include/forms.inc.php:1014
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1014
 #: include/reports.inc.php:694 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
@@ -8153,8 +8153,8 @@ msgstr "沒有已定義的條件."
 msgid "No data collection"
 msgstr "沒有數據收集"
 
-#: include/classes/screens/CScreenPlainText.php:36
-#: include/classes/screens/CScreenPlainText.php:56
+#: include/classes/screens/CScreenPlainText.php:41
+#: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
 msgstr "無已定義的資料"
 
@@ -8190,7 +8190,7 @@ msgstr "沒有已定義的探索."
 msgid "No discovery checks defined."
 msgstr "沒有已定義的探索檢查."
 
-#: api/classes/CDiscoveryRule.php:648
+#: api/classes/CDiscoveryRule.php:644
 msgid "No discovery rule IDs given."
 msgstr "沒有所稱的探索規則ID"
 
@@ -8276,7 +8276,7 @@ msgstr "沒有模板[%s]的群組"
 msgid "No history defined."
 msgstr "沒有已定義的歷史."
 
-#: api/classes/CDiscoveryRule.php:651
+#: api/classes/CDiscoveryRule.php:647
 msgid "No host IDs given."
 msgstr "沒有所知的主機IDs"
 
@@ -8482,9 +8482,9 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CAction.php:896 api/classes/CAction.php:1484
 #: api/classes/CApplication.php:449 api/classes/CApplication.php:456
 #: api/classes/CApplication.php:604 api/classes/CApplication.php:681
-#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:578
-#: api/classes/CDiscoveryRule.php:656 api/classes/CDiscoveryRule.php:661
-#: api/classes/CDiscoveryRule.php:679 api/classes/CDiscoveryRule.php:682
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:574
+#: api/classes/CDiscoveryRule.php:652 api/classes/CDiscoveryRule.php:657
+#: api/classes/CDiscoveryRule.php:675 api/classes/CDiscoveryRule.php:678
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:592 api/classes/CGraphGeneral.php:161
 #: api/classes/CGraph.php:826 api/classes/CGraphPrototype.php:871
@@ -8494,7 +8494,7 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:705
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -11857,8 +11857,8 @@ msgstr "逾時"
 
 #: include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenHistory.php:266
-#: include/classes/screens/CScreenPlainText.php:37
-#: include/classes/screens/CScreenPlainText.php:57
+#: include/classes/screens/CScreenPlainText.php:42
+#: include/classes/screens/CScreenPlainText.php:62
 msgid "Timestamp"
 msgstr "時間戳"
 
@@ -12521,7 +12521,7 @@ msgstr "已更新: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 應用程式\"%1$s\"於\"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:910
+#: api/classes/CDiscoveryRule.php:906
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 探索規則\"%1$s\"於\"%2$s\"."
@@ -12531,7 +12531,7 @@ msgstr "已更新: 探索規則\"%1$s\"於\"%2$s\"."
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 項目\"%1$s\"於\"%2$s\"."
 
-#: api/classes/CItemPrototype.php:648
+#: api/classes/CItemPrototype.php:658
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 項目原型\"%1$s\"於\"%2$s\"."
@@ -13315,7 +13315,7 @@ msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 #: api/classes/CHostGroup.php:1011 api/classes/CHost.php:1592
 #: api/classes/CHost.php:1646 api/classes/CHost.php:1960
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
-#: api/classes/CItemPrototype.php:792 api/classes/CItemPrototype.php:795
+#: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
 #: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
 #: api/classes/CScript.php:342 api/classes/CScript.php:404
@@ -13574,7 +13574,7 @@ msgstr "d M Y H:i"
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
 #: include/acknow.inc.php:46 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
-#: include/classes/screens/CScreenPlainText.php:90 include/defines.inc.php:890
+#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897
 #: include/defines.inc.php:898 include/defines.inc.php:899
 #: include/defines.inc.php:907 include/defines.inc.php:908

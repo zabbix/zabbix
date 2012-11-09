@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:24+0200\n"
+"POT-Creation-Date: 2012-11-06 08:11+0200\n"
 "PO-Revision-Date: 2012-06-02 20:32+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1264,15 +1264,15 @@ msgstr "Αδύνατη η αλλαγή μεθόδου ταυτοποίησης �
 msgid "Cannot clear history"
 msgstr "Αδύνατη η εκκαθάριση ιστορικού"
 
-#: api/classes/CDiscoveryRule.php:1213
+#: api/classes/CDiscoveryRule.php:1209
 msgid "Cannot clone graph prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων γραφημάτων."
 
-#: api/classes/CDiscoveryRule.php:1103
+#: api/classes/CDiscoveryRule.php:1099
 msgid "Cannot clone item prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων συλλεκτών."
 
-#: api/classes/CDiscoveryRule.php:825
+#: api/classes/CDiscoveryRule.php:821
 msgid "Cannot clone trigger prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων εναυσμάτων."
 
@@ -1356,7 +1356,7 @@ msgstr "Αδύνατη η διαγραφή κατηγορίας"
 msgid "Cannot delete dependency"
 msgstr "Αδύνατη η διαγραφή εξάρτησης"
 
-#: api/classes/CDiscoveryRule.php:622 discoveryconf.php:164
+#: api/classes/CDiscoveryRule.php:618 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
 msgstr "Αδύνατη η διαγραφή κανόνα εντοπισμού"
@@ -1369,7 +1369,7 @@ msgstr ""
 msgid "Cannot delete graph"
 msgstr "Αδύνατη η διαγραφή γραφήματος"
 
-#: api/classes/CItemPrototype.php:737
+#: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
 msgstr ""
 
@@ -1417,7 +1417,7 @@ msgstr "Αδύνατη η διαγραφή συλλέκτη"
 msgid "Cannot delete items"
 msgstr "Αδύνατη η διαγραφή συλλεκτών"
 
-#: api/classes/CItemPrototype.php:754
+#: api/classes/CItemPrototype.php:764
 msgid "Cannot delete items created by low level discovery."
 msgstr ""
 
@@ -1498,11 +1498,11 @@ msgstr "Αδύνατη η διαγραφή σχεδιότυπων γραφημά
 msgid "Cannot delete templated item."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου συλλέκτη."
 
-#: api/classes/CItemPrototype.php:698
+#: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:581
+#: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπων συλλεκτών."
 
@@ -1515,7 +1515,7 @@ msgstr "Αδύνατη η διαγραφή σχεδιότυπου εναύσμα
 msgid "Cannot delete trigger"
 msgstr "Αδύνατη η διαγραφή εναύσματος"
 
-#: api/classes/CItemPrototype.php:769
+#: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
 msgstr ""
 
@@ -1588,7 +1588,7 @@ msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμε
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμενο στην οθόνη \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:1019 api/classes/CDiscoveryRule.php:1091
+#: api/classes/CDiscoveryRule.php:1015 api/classes/CDiscoveryRule.php:1087
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
@@ -2657,7 +2657,7 @@ msgstr "Δημιουργία αντιστοίχισης τιμών"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:866
+#: api/classes/CDiscoveryRule.php:862
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
@@ -2667,7 +2667,7 @@ msgstr "Δημιουργήθηκε: Κανόνας εντοπισμού \"%1$s\"
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:598
+#: api/classes/CItemPrototype.php:608
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
@@ -3405,7 +3405,7 @@ msgstr "Διεγραμμένα"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:630
+#: api/classes/CDiscoveryRule.php:626
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
@@ -3425,7 +3425,7 @@ msgstr "Διεγράφη: Ξενιστής \"%1$s\"."
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:781
+#: api/classes/CItemPrototype.php:791
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
@@ -3728,12 +3728,12 @@ msgstr "Αντικείμενο εντοπισμού"
 msgid "Discovery rule"
 msgstr "Κανόνας εντοπισμού"
 
-#: api/classes/CDiscoveryRule.php:949
+#: api/classes/CDiscoveryRule.php:945
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Ο κανόνας εντοπισμού \"%1$s\" υπάρχει ήδη σε \"%2$s\", κληρονομημένος από άλλο σχεδιότυπο."
 
-#: api/classes/CDiscoveryRule.php:936
+#: api/classes/CDiscoveryRule.php:932
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "Ο Κανόνας εντοπισμού \"%1$s:%2$s\" έχει λανθασμένο χρόνο ζωής: \"%3$s\". (ελάχιστο: %4$d, μέγιστο: %5$d, επιτρέπεται μακροεντολή χρήστη)"
@@ -4036,11 +4036,11 @@ msgid "Empty host name provided in expression."
 msgstr "Στην έκφραση παρέχεται κενό όνομα ξενιστή."
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
-#: api/classes/CDiscoveryRule.php:561 api/classes/CGraph.php:729
+#: api/classes/CDiscoveryRule.php:557 api/classes/CGraph.php:729
 #: api/classes/CGraphPrototype.php:778 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:677
+#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:687
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -6604,7 +6604,7 @@ msgid "Italian (it_IT)"
 msgstr "Ιταλικά (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:37 include/forms.inc.php:1014
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1014
 #: include/reports.inc.php:694 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
@@ -8171,8 +8171,8 @@ msgstr "Δέν ορίστηκαν συνθήκες."
 msgid "No data collection"
 msgstr "Χωρίς συλλογή δεδομένων"
 
-#: include/classes/screens/CScreenPlainText.php:36
-#: include/classes/screens/CScreenPlainText.php:56
+#: include/classes/screens/CScreenPlainText.php:41
+#: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
 msgstr ""
 
@@ -8208,7 +8208,7 @@ msgstr "Δεν ορίστηκαν εντοπισμοί."
 msgid "No discovery checks defined."
 msgstr "Δεν ορίστηκαν έλεγχοι εντοπισμού."
 
-#: api/classes/CDiscoveryRule.php:648
+#: api/classes/CDiscoveryRule.php:644
 msgid "No discovery rule IDs given."
 msgstr "Δεν δόθηκαν IDs κανόνα εντοπισμού."
 
@@ -8294,7 +8294,7 @@ msgstr "Χωρίς ομάδες για σχεδιότυπο [ %s ]"
 msgid "No history defined."
 msgstr "Δεν ορίσθηκε ιστορικό."
 
-#: api/classes/CDiscoveryRule.php:651
+#: api/classes/CDiscoveryRule.php:647
 msgid "No host IDs given."
 msgstr "Δεν δίνονται αναγνωριστικά ξενιστή."
 
@@ -8500,9 +8500,9 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CAction.php:896 api/classes/CAction.php:1484
 #: api/classes/CApplication.php:449 api/classes/CApplication.php:456
 #: api/classes/CApplication.php:604 api/classes/CApplication.php:681
-#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:578
-#: api/classes/CDiscoveryRule.php:656 api/classes/CDiscoveryRule.php:661
-#: api/classes/CDiscoveryRule.php:679 api/classes/CDiscoveryRule.php:682
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:574
+#: api/classes/CDiscoveryRule.php:652 api/classes/CDiscoveryRule.php:657
+#: api/classes/CDiscoveryRule.php:675 api/classes/CDiscoveryRule.php:678
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:592 api/classes/CGraphGeneral.php:161
 #: api/classes/CGraph.php:826 api/classes/CGraphPrototype.php:871
@@ -8512,7 +8512,7 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:705
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -11881,8 +11881,8 @@ msgstr "Λήξη χρόνου"
 
 #: include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenHistory.php:266
-#: include/classes/screens/CScreenPlainText.php:37
-#: include/classes/screens/CScreenPlainText.php:57
+#: include/classes/screens/CScreenPlainText.php:42
+#: include/classes/screens/CScreenPlainText.php:62
 msgid "Timestamp"
 msgstr "Σήμανση χρόνου"
 
@@ -12545,7 +12545,7 @@ msgstr "Ενημερωμένο: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:910
+#: api/classes/CDiscoveryRule.php:906
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
@@ -12555,7 +12555,7 @@ msgstr "Ενημερώθηκε: Κανόνας εντοπισμού \"%1$s\" σ�
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:648
+#: api/classes/CItemPrototype.php:658
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
@@ -13342,7 +13342,7 @@ msgstr "Δεν καθορίσατε στόχους για γενική δέσμ�
 #: api/classes/CHostGroup.php:1011 api/classes/CHost.php:1592
 #: api/classes/CHost.php:1646 api/classes/CHost.php:1960
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
-#: api/classes/CItemPrototype.php:792 api/classes/CItemPrototype.php:795
+#: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
 #: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
 #: api/classes/CScript.php:342 api/classes/CScript.php:404
@@ -13601,7 +13601,7 @@ msgstr "d M Y H:i"
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
 #: include/acknow.inc.php:46 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
-#: include/classes/screens/CScreenPlainText.php:90 include/defines.inc.php:890
+#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897
 #: include/defines.inc.php:898 include/defines.inc.php:899
 #: include/defines.inc.php:907 include/defines.inc.php:908

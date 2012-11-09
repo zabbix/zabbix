@@ -322,7 +322,7 @@
 		});
 	});
 
-	<?php if (!empty($this->data['templates'])): ?>
+	<?php if (!empty($this->data['templateid'])): ?>
 		jQuery(document).ready(function() {
 			'use strict';
 

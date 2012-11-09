@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 20:49+0200\n"
-"PO-Revision-Date: 2012-10-31 01:48+0200\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2012-11-06 08:18+0200\n"
+"PO-Revision-Date: 2012-11-02 21:08+0200\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -1266,15 +1266,15 @@ msgstr "Не удалось изменить метод аутентификац
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
 
-#: api/classes/CDiscoveryRule.php:1213
+#: api/classes/CDiscoveryRule.php:1209
 msgid "Cannot clone graph prototypes."
 msgstr "Не удалось клонировать прототипы графиков."
 
-#: api/classes/CDiscoveryRule.php:1103
+#: api/classes/CDiscoveryRule.php:1099
 msgid "Cannot clone item prototypes."
 msgstr "Не удалось клонировать прототипы элементов данных."
 
-#: api/classes/CDiscoveryRule.php:825
+#: api/classes/CDiscoveryRule.php:821
 msgid "Cannot clone trigger prototypes."
 msgstr "Не удалось клонировать прототипы триггеров."
 
@@ -1358,7 +1358,7 @@ msgstr "Невозможно удалить группу элементов да
 msgid "Cannot delete dependency"
 msgstr "Не удалось удалить зависимость"
 
-#: api/classes/CDiscoveryRule.php:622 discoveryconf.php:164
+#: api/classes/CDiscoveryRule.php:618 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
 msgstr "Не удалось удалить правило обнаружения"
@@ -1371,7 +1371,7 @@ msgstr "Не удалось удалить правила обнаружения
 msgid "Cannot delete graph"
 msgstr "Не удалось удалить график"
 
-#: api/classes/CItemPrototype.php:737
+#: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
 msgstr "Не удалось удалить прототип графика"
 
@@ -1419,7 +1419,7 @@ msgstr "Не удалось удалить элемент данных"
 msgid "Cannot delete items"
 msgstr "Не удалось удалить элементы данных"
 
-#: api/classes/CItemPrototype.php:754
+#: api/classes/CItemPrototype.php:764
 msgid "Cannot delete items created by low level discovery."
 msgstr "Невозможно удалить элементы данных созданные низкоуровневым обнаружением."
 
@@ -1500,11 +1500,11 @@ msgstr "Не удалось удалить шаблонные графики."
 msgid "Cannot delete templated item."
 msgstr "Не удалось удалить шаблонный элемент данных."
 
-#: api/classes/CItemPrototype.php:698
+#: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
 msgstr "Не удалось удалить шаблонные элементы данных"
 
-#: api/classes/CDiscoveryRule.php:581
+#: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
 msgstr "Не удалось удалить шаблонные элементы данных."
 
@@ -1517,7 +1517,7 @@ msgstr "Не удалось удалить шаблонный триггер \"%
 msgid "Cannot delete trigger"
 msgstr "Не удалось удалить триггер"
 
-#: api/classes/CItemPrototype.php:769
+#: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
 msgstr "Не удалось удалить прототип триггера"
 
@@ -1590,7 +1590,7 @@ msgstr "Не удалось найти узел сети \"%1$s\" использ
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:1019 api/classes/CDiscoveryRule.php:1091
+#: api/classes/CDiscoveryRule.php:1015 api/classes/CDiscoveryRule.php:1087
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
@@ -2101,7 +2101,7 @@ msgstr "Подчиненный"
 
 #: include/locales.inc.php:46
 msgid "Chinese (zh_CN)"
-msgstr "Chinese (zh_CN)"
+msgstr "Китайский (zh_CN)"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_TW)"
@@ -2661,7 +2661,7 @@ msgstr "Создать преобразование значения"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Группа элементов данных \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:866
+#: api/classes/CDiscoveryRule.php:862
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Правило обнаружения \"%1$s\" в \"%2$s\"."
@@ -2671,7 +2671,7 @@ msgstr "Создано: Правило обнаружения \"%1$s\" в \"%2$s
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Элемент данных \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:598
+#: api/classes/CItemPrototype.php:608
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Прототип элемента данных \"%1$s\" в \"%2$s\"."
@@ -2840,7 +2840,7 @@ msgstr "Пользовательские слайды"
 
 #: include/locales.inc.php:48
 msgid "Czech (cs_CZ)"
-msgstr "Czech (cs_CZ)"
+msgstr "Чешский (cs_CZ)"
 
 #: include/classes/class.cchart.php:1227
 msgid "D"
@@ -3409,7 +3409,7 @@ msgstr "Удален"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Группа элементов данных \"%1$s\" из \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:630
+#: api/classes/CDiscoveryRule.php:626
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Правило обнаружения \"%1$s\" из \"%2$s\"."
@@ -3429,7 +3429,7 @@ msgstr "Удалено: Узел сети \"%1$s\"."
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Элемент данных \"%1$s\" из \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:781
+#: api/classes/CItemPrototype.php:791
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Прототип элемента данных \"%1$s\" из \"%2$s\"."
@@ -3732,12 +3732,12 @@ msgstr "Объект обнаружения"
 msgid "Discovery rule"
 msgstr "Правило обнаружения"
 
-#: api/classes/CDiscoveryRule.php:949
+#: api/classes/CDiscoveryRule.php:945
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Правило обнаружения \"%1$s\" уже существует у \"%2$s\", наследуется из другого шаблона."
 
-#: api/classes/CDiscoveryRule.php:936
+#: api/classes/CDiscoveryRule.php:932
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "У правила обнаружения \"%1$s:%2$s\" некорректный период хранения потерянных ресурсов: \"%3$s\". (мин: %4$d, макс: %5$d, допускается пользовательский макрос)"
@@ -3915,7 +3915,7 @@ msgstr "Запоминать выбранное в выпадающем спис
 #: api/classes/CTrigger.php:2010
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr "Дубликат зависимостей в триггере \"%1$s\"."
+msgstr "Дублирующиеся зависимости в триггере \"%1$s\"."
 
 #: api/classes/CHost.php:1349
 #, php-format
@@ -3958,7 +3958,7 @@ msgstr "Длительность (сек)"
 
 #: include/locales.inc.php:49
 msgid "Dutch (nl_NL)"
-msgstr "Dutch (nl_NL)"
+msgstr "Голландский (nl_NL)"
 
 #: include/views/configuration.screen.constructor.edit.php:610
 msgid "Dynamic item"
@@ -4040,11 +4040,11 @@ msgid "Empty host name provided in expression."
 msgstr "В выражении указано пустое имя узла сети."
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
-#: api/classes/CDiscoveryRule.php:561 api/classes/CGraph.php:729
+#: api/classes/CDiscoveryRule.php:557 api/classes/CGraph.php:729
 #: api/classes/CGraphPrototype.php:778 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:677
+#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:687
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -4190,7 +4190,7 @@ msgstr "Активировано"
 
 #: include/locales.inc.php:44
 msgid "English (en_GB)"
-msgstr "English (en_GB)"
+msgstr "Английский (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
@@ -4255,11 +4255,11 @@ msgstr "ID события"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr "ID события последней записи в журнале совпадает с регулярным выражением T, тогда N = 1, 0 - в противном случае"
+msgstr "Event ID последней записи в журнале соответствует регулярному выражению T, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:431
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr "ID события последней записи в журнале совпадает с регулярным выражением T, тогда N NOT 1, 0 - в противном случае"
+msgstr "Event ID последней записи в журнале соответствует регулярному выражению T, тогда N NOT 1, 0 - в противном случае"
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
@@ -4589,7 +4589,7 @@ msgstr "Четвертый"
 
 #: include/locales.inc.php:51
 msgid "French (fr_FR)"
-msgstr "French (fr_FR)"
+msgstr "Французский (fr_FR)"
 
 #: include/func.inc.php:199
 msgid "Fri"
@@ -4680,7 +4680,7 @@ msgstr "Сгенерировано за %s сек."
 
 #: include/locales.inc.php:52
 msgid "German (de_DE)"
-msgstr "German (de_DE)"
+msgstr "Немецкий (de_DE)"
 
 #: include/page_header.php:235
 msgid "Get support"
@@ -4889,7 +4889,7 @@ msgstr "График удален"
 
 #: include/locales.inc.php:53
 msgid "Greek (el_GR)"
-msgstr "Greek (el_GR)"
+msgstr "Греческий (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:60 sysmap.php:192
 msgid "Grid"
@@ -5418,7 +5418,7 @@ msgstr "Очистка истории"
 
 #: include/locales.inc.php:54
 msgid "Hungarian (hu_HU)"
-msgstr "Hungary (hu_HU)"
+msgstr "Угорский (hu_HU)"
 
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
@@ -5974,7 +5974,7 @@ msgstr "Некорректный цвет \"%1$s\"."
 
 #: api/classes/CScreenItem.php:587
 msgid "Incorrect column span provided for screen element."
-msgstr "Указан некорректный диапазон колонок для элемента комплексного экрана."
+msgstr "Указан некорректный диапазон объединения колонок для элемента комплексного экрана."
 
 #: api/classes/CTriggerExpression.php:226
 msgid "Incorrect count of quotes in expression."
@@ -6249,7 +6249,7 @@ msgstr "Указан некорректный тип ресурса для эл�
 
 #: api/classes/CScreenItem.php:584
 msgid "Incorrect row span provided for screen element."
-msgstr "Указан некорректный диапазон строк для элемента комплексного экрана."
+msgstr "Указан некорректный диапазон объединения строк для элемента комплексного экрана."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6604,10 +6604,10 @@ msgstr "Невозможно выполнить поиск по паролю п�
 
 #: include/locales.inc.php:56
 msgid "Italian (it_IT)"
-msgstr "Italian (it_IT)"
+msgstr "Итальянский (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:37 include/forms.inc.php:1014
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1014
 #: include/reports.inc.php:694 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
@@ -6822,7 +6822,7 @@ msgstr "Январь"
 
 #: include/locales.inc.php:58
 msgid "Japanese (ja_JP)"
-msgstr "Japanese (ja_JP)"
+msgstr "Японский (ja_JP)"
 
 #: include/func.inc.php:224
 msgid "Jul"
@@ -6905,7 +6905,7 @@ msgstr "Кило"
 
 #: include/locales.inc.php:57
 msgid "Korean (ko_KR)"
-msgstr "Korean (ko_KR)"
+msgstr "Корейский (ko_KR)"
 
 #: latest.php:103
 msgid "LATEST DATA"
@@ -7062,7 +7062,7 @@ msgstr "Последние события"
 
 #: include/locales.inc.php:59
 msgid "Latvian (lv_LV)"
-msgstr "Latvian (lv_LV)"
+msgstr "Латышский (lv_LV)"
 
 #: include/reports.inc.php:313
 #: include/views/configuration.screen.constructor.edit.php:555
@@ -7217,19 +7217,19 @@ msgstr "Важность последней записи в журнале NOT N
 
 #: popup_trexpr.php:452
 msgid "Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise"
-msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N < 1, 0 - в противном случае"
+msgstr "Источник события последней записи в журнале соответствует параметру T, тогда N < 1, 0 - в противном случае"
 
 #: popup_trexpr.php:462
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N = 1, 0 - в противном случае"
+msgstr "Источник события последней записи в журнале соответствует параметру T, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:457
 msgid "Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise"
-msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N > 1, 0 - в противном случае"
+msgstr "Источник события последней записи в журнале соответствует параметру T, тогда N > 1, 0 - в противном случае"
 
 #: popup_trexpr.php:467
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr "Совпадает ли источник события последней записи в журнале параметру T, тогда N NOT 1, 0 - в противном случае"
+msgstr "Источник события последней записи в журнале соответствует параметру T, тогда N NOT 1, 0 - в противном случае"
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.massupdate.php:365
@@ -8179,18 +8179,18 @@ msgstr "Условия не заданы."
 msgid "No data collection"
 msgstr "Без сбора данных"
 
-#: include/classes/screens/CScreenPlainText.php:36
-#: include/classes/screens/CScreenPlainText.php:56
+#: include/classes/screens/CScreenPlainText.php:41
+#: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
 msgstr "Нет заданных данных."
 
 #: popup_trexpr.php:504
 msgid "No data received during period of time T, if N = 1, 0 - otherwise"
-msgstr "Нет полученных данных за период времени T, если N = 1, 0 - в противном случае"
+msgstr "Не получено данных за период времени T, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:509
 msgid "No data received during period of time T, if N NOT 1, 0 - otherwise"
-msgstr "Нет полученных данных за период времени T, если N NOT 1, 0 - в противном случае"
+msgstr "Не получено данных за период времени T, тогда N NOT 1, 0 - в противном случае"
 
 #: api/classes/CHostInterface.php:1007
 #, php-format
@@ -8216,7 +8216,7 @@ msgstr "Обнаружения не заданы."
 msgid "No discovery checks defined."
 msgstr "Проверки обнаружения не заданы."
 
-#: api/classes/CDiscoveryRule.php:648
+#: api/classes/CDiscoveryRule.php:644
 msgid "No discovery rule IDs given."
 msgstr "ID правил обнаружения не указаны."
 
@@ -8302,7 +8302,7 @@ msgstr "Группы для шаблона [ %s ] не заданы"
 msgid "No history defined."
 msgstr "История не найдена."
 
-#: api/classes/CDiscoveryRule.php:651
+#: api/classes/CDiscoveryRule.php:647
 msgid "No host IDs given."
 msgstr "Не указаны ID узлов сети."
 
@@ -8508,9 +8508,9 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CAction.php:896 api/classes/CAction.php:1484
 #: api/classes/CApplication.php:449 api/classes/CApplication.php:456
 #: api/classes/CApplication.php:604 api/classes/CApplication.php:681
-#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:578
-#: api/classes/CDiscoveryRule.php:656 api/classes/CDiscoveryRule.php:661
-#: api/classes/CDiscoveryRule.php:679 api/classes/CDiscoveryRule.php:682
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:574
+#: api/classes/CDiscoveryRule.php:652 api/classes/CDiscoveryRule.php:657
+#: api/classes/CDiscoveryRule.php:675 api/classes/CDiscoveryRule.php:678
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:592 api/classes/CGraphGeneral.php:161
 #: api/classes/CGraph.php:826 api/classes/CGraphPrototype.php:871
@@ -8520,7 +8520,7 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:705
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -8857,19 +8857,19 @@ msgstr "Количество шагов"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T < N"
-msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T < N"
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператор O) за период T < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T = N"
-msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T = N"
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператор O) за период T = N"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T > N"
-msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T > N"
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператор O) за период T > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N"
-msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период времени T NOT N"
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператор O) за период T NOT N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9046,15 +9046,15 @@ msgstr "Только Супер-Администраторы могут обно
 
 #: api/classes/CUser.php:684
 msgid "Only Zabbix Admins can add user media."
-msgstr "Только Супер-Администраторы могут добавлять оповещения пользователям."
+msgstr "Только Zabbix Администраторы могут добавлять оповещения пользователям."
 
 #: api/classes/CUser.php:752
 msgid "Only Zabbix Admins can change user media."
-msgstr "Только Супер-Администраторы могут изменять оповещения пользователей."
+msgstr "Только Zabbix Администраторы могут изменять оповещения пользователям."
 
 #: api/classes/CUser.php:722
 msgid "Only Zabbix Admins can remove user media."
-msgstr "Только Супер-Администраторы могут удалять оповещения пользователей."
+msgstr "Только Zabbix Администраторы могут удалять оповещения пользователям."
 
 #: api/classes/CWebCheck.php:609
 msgid "Only characters are allowed."
@@ -9284,11 +9284,11 @@ msgstr "Поддержка JPEG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:409
 msgid "PHP gd PNG image support missing"
-msgstr "Отсутствует поддержка изображений PHP gd PNG"
+msgstr "Отсутствует поддержка изображений PNG в PHP gd "
 
 #: include/classes/class.frontendsetup.php:405
 msgid "PHP gd PNG support"
-msgstr "Поддержка PHP gd PNG"
+msgstr "Поддержка PNG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:384
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)"
@@ -9602,11 +9602,11 @@ msgstr "Пожалуйста, выберите два элемента"
 
 #: include/locales.inc.php:61
 msgid "Polish (pl_PL)"
-msgstr "Polish (pl_PL)"
+msgstr "Польский (pl_PL)"
 
 #: include/views/configuration.item.edit.php:419
 msgid "Populates host inventory field"
-msgstr "Заполнение поля инвентаря узла сети"
+msgstr "Заполнять поле инвентарных данных узла сети"
 
 #: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314
@@ -9632,7 +9632,7 @@ msgstr "Диапазон портов"
 
 #: include/locales.inc.php:62
 msgid "Portuguese (pt_BR)"
-msgstr "Portuguese (pt_BR)"
+msgstr "Португальский (pt_BR)"
 
 #: tr_logform.php:303
 msgid "Position"
@@ -10214,11 +10214,11 @@ msgstr "Тип результата"
 #: include/classes/screens/CScreenActions.php:112
 #: include/views/administration.auditacts.list.php:73
 msgid "Retries left"
-msgstr "Попыток"
+msgstr "Осталось повторных попыток"
 
 #: include/views/configuration.screen.constructor.edit.php:363
 msgid "Retries left (ascending)"
-msgstr "Количество попыток (в порядке возрастания)"
+msgstr "Осталось повторных попыток (в порядке возрастания)"
 
 #: include/views/configuration.screen.constructor.edit.php:362
 msgid "Retries left (descending)"
@@ -10256,47 +10256,47 @@ msgstr "Правила"
 
 #: include/actions.inc.php:373
 msgid "Run IPMI command"
-msgstr "Выполнять IPMI команду"
+msgstr "Выполнить IPMI команду"
 
 #: include/actions.inc.php:376
 msgid "Run SSH commands"
-msgstr "Выполнять SSH команды"
+msgstr "Выполнить SSH команды"
 
 #: include/actions.inc.php:379
 msgid "Run TELNET commands"
-msgstr "Выполнять TELNET команды"
+msgstr "Выполнить TELNET команды"
 
 #: include/actions.inc.php:399
 msgid "Run commands"
-msgstr "Выполнять команды"
+msgstr "Выполнить команды"
 
 #: include/actions.inc.php:383
 msgid "Run custom commands on Zabbix agent"
-msgstr "Выполнять пользовательские команды на Zabbix агенте"
+msgstr "Выполнить пользовательские команды на Zabbix агенте"
 
 #: include/actions.inc.php:386
 msgid "Run custom commands on Zabbix server"
-msgstr "Выполнять пользовательские команды на Zabbix сервере"
+msgstr "Выполнить пользовательские команды на Zabbix сервере"
 
 #: include/actions.inc.php:396
 msgid "Run global script"
-msgstr "Выполнять глобальный скрипт"
+msgstr "Выполнить глобальный скрипт"
 
 #: include/actions.inc.php:259
 msgid "Run remote commands on current host"
-msgstr "Выполнять удаленные команды на текущем узле сети"
+msgstr "Выполнить удаленные команды на текущем узле сети"
 
 #: include/actions.inc.php:278
 msgid "Run remote commands on host groups"
-msgstr "Выполнять удаленные команды в группах узлов сети"
+msgstr "Выполнить удаленные команды в группах узлов сети"
 
 #: include/actions.inc.php:266
 msgid "Run remote commands on hosts"
-msgstr "Выполнять удаленные команды на узлах сети"
+msgstr "Выполнить удаленные команды на узлах сети"
 
 #: include/locales.inc.php:63
 msgid "Russian (ru_RU)"
-msgstr "Russian (ru_RU)"
+msgstr "Русский (ru_RU)"
 
 #: jsLoader.php:128
 msgctxt "Saturday short"
@@ -10649,11 +10649,11 @@ msgstr "Комплексный экран удален"
 
 #: api/classes/CScreenItem.php:606
 msgid "Screen elements column span is too big."
-msgstr "Диапазон колонок элементов комплексного экрана слишком большой."
+msgstr "Диапазон объединения колонок элементов комплексного экрана слишком большой."
 
 #: api/classes/CScreenItem.php:603
 msgid "Screen elements row span is too big."
-msgstr "Диапазон строк элементов комплексного экрана слишком большой."
+msgstr "Диапазон объединения строк элементов комплексного экрана слишком большой."
 
 #: api/classes/CScreenItem.php:176
 msgid "Screen item in same cell already exists."
@@ -10718,7 +10718,7 @@ msgstr "Имя скрипта"
 
 #: include/classes/debug/CProfiler.php:125
 msgid "Script profiler"
-msgstr "Профилировщик сценария"
+msgstr "Профилировщик скрипта"
 
 #: scripts.php:110
 msgid "Script updated"
@@ -11056,7 +11056,7 @@ msgstr "Показывать деактивированные триггеры"
 #: adm.gui.php:73
 #, php-format
 msgid "Show events max \"%1$s\"."
-msgstr "Отображаются макс \"%1$s\" событий."
+msgstr "Отображать макс \"%1$s\" событий."
 
 #: adm.gui.php:34 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
@@ -11241,7 +11241,7 @@ msgstr "Слайды"
 
 #: include/locales.inc.php:64
 msgid "Slovak (sk_SK)"
-msgstr "Slovak (sk_SK)"
+msgstr "Словацкий (sk_SK)"
 
 #: jsLoader.php:162
 msgid "Snooze"
@@ -11308,7 +11308,7 @@ msgstr "Источник"
 
 #: include/locales.inc.php:65
 msgid "Spanish (es_ES)"
-msgstr "Spanish (es_ES)"
+msgstr "Испанский (es_ES)"
 
 #: api/classes/CAction.php:1581
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
@@ -11328,7 +11328,7 @@ msgstr "Стандартные элементы данных"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Start in"
-msgstr "Начинать в"
+msgstr "Начало в"
 
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
@@ -11492,19 +11492,19 @@ msgstr "Аудит успеха"
 
 #: popup_trexpr.php:328
 msgid "Sum of values for period of time is T < N"
-msgstr "Сумма значений за период времени T < N"
+msgstr "Сумма значений за период T < N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values for period of time is T NOT N"
-msgstr "Сумма значений за период времени T NOT N"
+msgstr "Сумма значений за период T NOT N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
-msgstr "Сумма значений за период времени T = N"
+msgstr "Сумма значений за период T = N"
 
 #: popup_trexpr.php:333
 msgid "Sum of values of a period T is > N"
-msgstr "Сумма значений за период времени T > N"
+msgstr "Сумма значений за период T > N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11526,7 +11526,7 @@ msgstr "Фамилия"
 
 #: include/locales.inc.php:66
 msgid "Swedish (sv_SE)"
-msgstr "Swedish (sv_SE)"
+msgstr "Шведский (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -11646,7 +11646,7 @@ msgstr "Шаблон добавлен"
 
 #: api/classes/CHostGeneral.php:759
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "Шаблон не может быть соединен с другим шаблоном несколько раз, даже через другие шаблоны."
+msgstr "Шаблон не может быть присоединен к другому шаблону больше чем один раз, даже через другие шаблоны."
 
 #: templates.php:354 templates.php:372 templates.php:397
 msgid "Template deleted"
@@ -11670,7 +11670,7 @@ msgstr "Имя шаблона"
 
 #: include/views/conf.import.php:29
 msgid "Template screens"
-msgstr "Шаблоны комплексных экранов"
+msgstr "Шаблонные комплексные экраны"
 
 #: include/reports.inc.php:101
 msgid "Template trigger"
@@ -11683,12 +11683,12 @@ msgstr "Шаблон обновлен"
 #: api/classes/CHostGeneral.php:191 include/hosts.inc.php:1232
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
-msgstr "Шаблон с группой элементов данных \"%1$s\" уже соединен с узлом сети."
+msgstr "Шаблон с группой элементов данных \"%1$s\" уже присоединен к узлу сети."
 
 #: api/classes/CHostGeneral.php:179 include/hosts.inc.php:1218
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
-msgstr "Шаблон с ключем элемента данных \"%1$s\" уже соединен с узлом сети."
+msgstr "Шаблон с ключем элемента данных \"%1$s\" уже присоединен к узлу сети."
 
 #: api/classes/CHost.php:1427 api/classes/CTemplate.php:1356
 #, php-format
@@ -11771,7 +11771,7 @@ msgstr[2] "Изображение используется в картах се�
 #: include/views/configuration.item.list.php:100
 #, php-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Элемент данных более не обнаруживается и будет удален в %1$s (из %2$s в %3$s)."
+msgstr "Элемент данных более не обнаруживается и будет удален через %1$s (%2$s в %3$s)."
 
 #: queue.php:121
 msgid "The queue is empty"
@@ -11892,8 +11892,8 @@ msgstr "Время ожидания"
 
 #: include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenHistory.php:266
-#: include/classes/screens/CScreenPlainText.php:37
-#: include/classes/screens/CScreenPlainText.php:57
+#: include/classes/screens/CScreenPlainText.php:42
+#: include/classes/screens/CScreenPlainText.php:62
 msgid "Timestamp"
 msgstr "Отметка времени"
 
@@ -12011,7 +12011,7 @@ msgstr "Триггер \"%1$s:%2$s\" не имеет прототипа элем
 #: api/classes/CTrigger.php:2058
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
-msgstr "Триггер \"%s\" принадлежит шаблонам с разными связями."
+msgstr "Триггер \"%s\" принадлежит шаблонам с разными присоединениями."
 
 #: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
 #: tr_logform.php:147
@@ -12053,7 +12053,7 @@ msgstr "Форма триггера для журнала"
 #: api/classes/CHostGeneral.php:285
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
-msgstr "У триггера есть элементы данных из шаблона \"%1$s\", которые не соединены с узлом сети."
+msgstr "У триггера есть элементы данных из шаблона \"%1$s\", которые не присоединены к узлу сети."
 
 #: api/classes/CHostGeneral.php:236
 #, php-format
@@ -12101,7 +12101,7 @@ msgstr "Важность триггера"
 
 #: triggers.php:288
 msgid "Trigger status became \"Disabled\"."
-msgstr "Состояние триггера стало \"Отключен\"."
+msgstr "Состояние триггера стало \"Деактивирован\"."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
 #: triggers.php:203 tr_logform.php:112
@@ -12188,7 +12188,7 @@ msgstr "Должны быть выбраны два элемента"
 #: api/classes/CItem.php:1282
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не могут заполнять одно поле \"%3$s\" инвентарных данных узла сети, это может привести к конфликту."
+msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не могут заполнять одно поле \"%3$s\" инвентарных данных узла сети, это приведет к конфликту."
 
 #: hostinventories.php:160 include/actions.inc.php:676
 #: include/classes/screens/CScreenActions.php:48
@@ -12257,7 +12257,7 @@ msgstr "Для ключа журнала тип информации долже�
 
 #: api/classes/CItemGeneral.php:291
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
-msgstr "Для агрегатных элементов данных тип информации должен быть \"Числовой (с плавающей точкой)\"."
+msgstr "Для агрегированных элементов данных тип информации должен быть \"Числовой (с плавающей точкой)\"."
 
 #: include/forms.inc.php:827
 msgid "Types"
@@ -12316,19 +12316,19 @@ msgstr "UTF-8"
 
 #: include/locales.inc.php:68
 msgid "Ukrainian (uk_UA)"
-msgstr "Ukrainian (uk_UA)"
+msgstr "Украинский (uk_UA)"
 
 #: include/nodes.inc.php:321
 msgid "Unable to remove local node."
-msgstr "Не удалось удалить локальную ноду."
+msgstr "Невозможно удалить локальную ноду."
 
 #: include/profiles.inc.php:229
 msgid "Unable to select configuration."
-msgstr "Не удалось выбрать конфигурацию."
+msgstr "Невозможно выбрать конфигурацию."
 
 #: include/classes/helpers/CUploadFile.php:58
 msgid "Unable to uploade file because \"file_uploads\" is disabled."
-msgstr "Не удалось загрузить файл, потому что \"file_uploads\" отключен."
+msgstr "Невозможно загрузить файл, потому что \"file_uploads\" отключен."
 
 #: include/maps.inc.php:694 include/maps.inc.php:784 include/maps.inc.php:882
 msgid "Unacknowledged"
@@ -12556,7 +12556,7 @@ msgstr "Обновлено: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Группа элементов данных \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:910
+#: api/classes/CDiscoveryRule.php:906
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Правило обнаружения \"%1$s\" в \"%2$s\"."
@@ -12566,7 +12566,7 @@ msgstr "Обновлено: Правило обнаружения \"%1$s\" в \"
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Элемент данных \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:648
+#: api/classes/CItemPrototype.php:658
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Прототип элемента данных \"%1$s\" в \"%2$s\"."
@@ -12639,7 +12639,7 @@ msgstr "Пользователь добавлен"
 
 #: include/views/administration.users.edit.php:301
 msgid "User can't change type for himself"
-msgstr "Пользователь не может изменить тип самому себе"
+msgstr "Пользователь не может изменить тип сам себе"
 
 #: api/classes/CUserGroup.php:560
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
@@ -12656,7 +12656,7 @@ msgstr "Пользователь не может изменить статус �
 #: include/users.inc.php:98 include/users.inc.php:109
 #: include/users.inc.php:144
 msgid "User cannot change status of himself."
-msgstr "Пользователь не может изменить свое состояние."
+msgstr "Пользователь не может изменить состояние сам себе."
 
 #: users.php:232 users.php:318
 msgid "User deleted"
@@ -12691,7 +12691,7 @@ msgstr "Группа пользователей для сообщения при
 
 #: adm.other.php:88
 msgid "User group for database down message."
-msgstr "Группа пользователей для сообщения при недоступности базы данных."
+msgstr "Группа пользователей для уведомления о недоступности базы данных."
 
 #: include/views/administration.script.edit.php:82
 #: include/views/administration.usergroups.list.php:28
@@ -12865,7 +12865,7 @@ msgstr "У преобразования значений должно быть �
 
 #: include/valuemap.inc.php:126
 msgid "Value maps are used to create a mapping between numeric values and string representations."
-msgstr "Преобразования значений используются для создания карты соответствий между числовыми значениями и их строковыми представлениями."
+msgstr "Преобразования значений используются для создания карты соответствий между числовыми значениями и их текстовыми представлениями."
 
 #: include/classes/class.cpie.php:319
 #, php-format
@@ -13354,7 +13354,7 @@ msgstr "Вы не указали цели глобального скрипта 
 #: api/classes/CHostGroup.php:1011 api/classes/CHost.php:1592
 #: api/classes/CHost.php:1646 api/classes/CHost.php:1960
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
-#: api/classes/CItemPrototype.php:792 api/classes/CItemPrototype.php:795
+#: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
 #: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
 #: api/classes/CScript.php:342 api/classes/CScript.php:404
@@ -13476,7 +13476,7 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
-"Не удалось обнаружить Zabbix сервер \"%s\". Возможные причины:\n"
+"ВСТ: Не удалось достигнуть Zabbix сервер \"%s\". Возможные причины:\n"
 "1. Некорректный IP/DNS сервер в \"zabbix.conf.php\";\n"
 "2. Некорректная настройка сети.\n"
 
@@ -13613,7 +13613,7 @@ msgstr "d M Y H:i"
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
 #: include/acknow.inc.php:46 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
-#: include/classes/screens/CScreenPlainText.php:90 include/defines.inc.php:890
+#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897
 #: include/defines.inc.php:898 include/defines.inc.php:899
 #: include/defines.inc.php:907 include/defines.inc.php:908
