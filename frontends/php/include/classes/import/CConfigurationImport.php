@@ -392,6 +392,7 @@ class CConfigurationImport {
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$hostsRefs[$resource['host']] = $resource['host'];
 							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 							break;
 
@@ -420,6 +421,7 @@ class CConfigurationImport {
 
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$hostsRefs[$resource['host']] = $resource['host'];
 								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 								break;
 						}
