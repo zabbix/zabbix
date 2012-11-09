@@ -147,8 +147,12 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 	}
 	else	/* ZBX_HISTORY */
 	{
-		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, " from %s where %s>" ZBX_FS_UI64 DB_NODE " order by %s",
-			table->table, table->recid, lastid, DBnode(table->recid, nodeid), table->recid);
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
+				" from %s"
+				" where %s>" ZBX_FS_UI64
+					ZBX_SQL_NODE
+				" order by %s",
+				table->table, table->recid, lastid, DBand_node(table->recid, nodeid), table->recid);
 	}
 
 	result = DBselectN(tmp, 10000);

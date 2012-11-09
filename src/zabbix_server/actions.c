@@ -1226,8 +1226,10 @@ void	process_actions(DB_EVENT *event)
 
 	result = DBselect("select actionid,evaltype"
 			" from actions"
-			" where status=%d and eventsource=%d" DB_NODE,
-			ACTION_STATUS_ACTIVE, event->source, DBnode_local("actionid"));
+			" where status=%d"
+				" and eventsource=%d"
+				ZBX_SQL_NODE,
+			ACTION_STATUS_ACTIVE, event->source, DBand_node_local("actionid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
