@@ -129,11 +129,11 @@ class CImportReferencer {
 	 * @return string|bool
 	 */
 	public function resolveHostOrTemplate($host) {
-		if (!isset($this->templatesRefs[$host])) {
-			$this->selectTemplates($host);
+		if ($this->templatesRefs === null) {
+			$this->selectTemplates();
 		}
-		if (!isset($this->hostsRefs[$host])) {
-			$this->selectHosts($host);
+		if ($this->hostsRefs === null) {
+			$this->selectHosts();
 		}
 
 		if (isset($this->templatesRefs[$host])) {
@@ -547,14 +547,11 @@ class CImportReferencer {
 	/**
 	 * Select template ids for previously added template names.
 	 */
-	protected function selectTemplates($templateName = false) {
+	protected function selectTemplates() {
 		if (!empty($this->templates)) {
-			$templateName = $this->templates;
-		}
-		if (!empty($templateName)) {
 			$this->templatesRefs = array();
 			$dbTemplates = API::Template()->get(array(
-				'filter' => array('host' => $templateName),
+				'filter' => array('host' => $this->templates),
 				'output' => array('hostid', 'host'),
 				'preservekeys' => true,
 				'editable' => true
@@ -570,14 +567,11 @@ class CImportReferencer {
 	/**
 	 * Select host ids for previously added host names.
 	 */
-	protected function selectHosts($hostName = false) {
+	protected function selectHosts() {
 		if (!empty($this->hosts)) {
-			$hostName = $this->hosts;
-		}
-		if (!empty($hostName)) {
 			$this->hostsRefs = array();
 			$dbHosts = API::Host()->get(array(
-				'filter' => array('host' => $hostName),
+				'filter' => array('host' => $this->hosts),
 				'output' => array('hostid', 'host'),
 				'preservekeys' => true,
 				'templated_hosts' => true,
