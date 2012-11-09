@@ -104,9 +104,6 @@ class CGraphItem extends CZBXAPI {
 		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-		// output
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
@@ -130,6 +127,11 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['where'][] = 'gi.type='.$options['type'];
 		}
 
+		// output
+		if ($options['output'] == API_OUTPUT_EXTEND) {
+			$sqlParts['select']['gitems'] = 'gi.*';
+		}
+
 		// expandData
 		if (!is_null($options['expandData'])) {
 			$sqlParts['select']['key'] = 'i.key_';
@@ -140,6 +142,12 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['gii'] = 'gi.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+		}
+
+		// countOutput
+		if (!is_null($options['countOutput'])) {
+			$options['sortfield'] = '';
+			$sqlParts['select'] = array('count(DISTINCT gi.gitemid) as rowscount');
 		}
 
 		// sorting

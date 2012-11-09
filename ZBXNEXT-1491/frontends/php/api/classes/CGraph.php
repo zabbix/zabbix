@@ -375,23 +375,21 @@ class CGraph extends CGraphGeneral {
 		}
 
 		// adding GraphItems
-		if ($options['selectGraphItems'] !== null && $options['selectGraphItems'] != API_OUTPUT_COUNT) {
+		if (!is_null($options['selectGraphItems']) && str_in_array($options['selectGraphItems'], $subselectsAllowedOutputs)) {
 			$gitems = API::GraphItem()->get(array(
 				'nodeids' => $options['nodeids'],
-				'output' => $this->outputExtend('graphs_items', 'graphid', $options['selectGraphItems']),
+				'output' => $options['selectGraphItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
-			foreach ($gitems as &$gitem) {
-				// unset unnecessary graphs property
+			foreach ($gitems as $gitem) {
+				$ggraphs = $gitem['graphs'];
 				unset($gitem['graphs']);
+				foreach ($ggraphs as $graph) {
+					$result[$graph['graphid']]['gitems'][] = $gitem;
+				}
 			}
-			unset($gitem);
-
-			$result = $this->mapMany($result, $gitems, 'gitems', 'graphid',
-				!$this->outputIsRequested('graphid', $options['selectGraphItems'])
-			);
 		}
 
 		// adding HostGroups
