@@ -42,19 +42,20 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 extern int	txn_level;
 extern int	txn_error;
 
-const char	*DBnode(const char *fieldid, int nodeid)
+const char	*__DBnode(const char *field_name, int nodeid, int op)
 {
-	static char	dbnode[128];
+	static char	dbnode[62 + ZBX_FIELDNAME_LEN];
+	const char	*operators[] = {"and", "where"};
 
-	if (-1 != nodeid)
+	if (0 != nodeid)
 	{
 		zbx_uint64_t	min, max;
 
 		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
 		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
 
-		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-				fieldid, min, max);
+		zbx_snprintf(dbnode, sizeof(dbnode), " %s %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+				operators[op], field_name, min, max);
 	}
 	else
 		*dbnode = '\0';
@@ -556,12 +557,12 @@ void	DBupdate_triggers_status_after_restart()
 				" and i.status in (%d)"
 				" and i.type not in (%d,%d)"
 				" and t.status in (%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
 			TRIGGER_STATUS_ENABLED,
-			DBnode_local("t.triggerid"));
+			DBand_node_local("t.triggerid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -825,7 +826,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
 				" and i.flags not in (%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
@@ -842,7 +843,7 @@ int	DBget_queue_count(int from, int to)
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_JMX,
 			ZBX_FLAG_DISCOVERY_CHILD,
-			DBnode_local("i.itemid"));
+			DBand_node_local("i.itemid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1688,9 +1689,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				" from hosts"
 				" where proxy_hostid%s"
 					" and host='%s'"
-					DB_NODE,
+					ZBX_SQL_NODE,
 				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBnode_local("hostid"));
+				DBand_node_local("hostid"));
 
 		if (NULL != DBfetch(result))
 			res = FAIL;
@@ -1707,9 +1708,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				" from autoreg_host"
 				" where proxy_hostid%s"
 					" and host='%s'"
-					DB_NODE,
+					ZBX_SQL_NODE,
 				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBnode_local("autoreg_hostid"));
+				DBand_node_local("autoreg_hostid"));
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -1849,8 +1850,8 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-				DB_NODE,
-			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBnode_local("hostid"));
+				ZBX_SQL_NODE,
+			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBand_node_local("hostid"));
 
 	zbx_free(host_name_sample_esc);
 

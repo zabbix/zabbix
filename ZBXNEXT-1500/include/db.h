@@ -443,10 +443,13 @@ typedef struct
 }
 DB_ESCALATION;
 
-#define DB_NODE			"%s"
-#define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
-const char	*DBnode(const char *fieldid, int nodeid);
-#define DBis_node_local_id(id)	DBis_node_id(id, CONFIG_NODEID)
+#define ZBX_SQL_NODE				"%s"
+#define DBand_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 0)
+#define DBwhere_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 1)
+#define DBand_node(field_name, nodeid)		__DBnode(field_name, nodeid, 0)
+#define DBwhere_node(field_name, nodeid)	__DBnode(field_name, nodeid, 1)
+const char	*__DBnode(const char *field_name, int nodeid, int op);
+#define DBis_node_local_id(id)			DBis_node_id(id, CONFIG_NODEID)
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);

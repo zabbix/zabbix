@@ -672,13 +672,13 @@ static void	process_discovery(int now)
 				" and r.status=%d"
 				" and (r.nextcheck<=%d or r.nextcheck>%d+r.delay)"
 				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			DRULE_STATUS_MONITORED,
 			now,
 			now,
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1,
-			DBnode_local("r.druleid"));
+			DBand_node_local("r.druleid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -709,9 +709,9 @@ static int	get_minnextcheck(int now)
 			" where proxy_hostid is null"
 				" and status=%d"
 				" and " ZBX_SQL_MOD(druleid,%d) "=%d"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			DRULE_STATUS_MONITORED, CONFIG_DISCOVERER_FORKS, process_num - 1,
-			DBnode_local("druleid"));
+			DBand_node_local("druleid"));
 
 	row = DBfetch(result);
 
