@@ -62,20 +62,11 @@
 
 #if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_INT_STR		"number(10)"
+#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
 #else
 #	define ZBX_TYPE_INT_STR		"integer"
+#	define ZBX_TYPE_CHAR_STR	"varchar"
 #endif
-
-static char     *ZBX_TYPE_CHAR_STR(int sz)
-{
-	static char     buf[16];
-#if defined(HAVE_ORACLE)
-	zbx_snprintf(buf, sizeof(buf),	"nvarchar2(%hd)", sz);
-#else
-	zbx_snprintf(buf, sizeof(buf),	"varchar(%hd)", sz);
-#endif
-	return buf;
-}
 
 #if defined(HAVE_IBM_DB2)
 #	define ZBX_TYPE_UINT_STR	"bigint"
@@ -100,34 +91,31 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
-static char	*DBfield_type_string(const ZBX_FIELD *field)
+static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
-	static char	type[16];
-
 	switch (field->type)
 	{
 		case ZBX_TYPE_ID:
-			zbx_strlcpy(type, ZBX_TYPE_ID_STR, sizeof(type));
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_ID_STR);
 			break;
 		case ZBX_TYPE_INT:
-			zbx_strlcpy(type, ZBX_TYPE_INT_STR, sizeof(type));
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_INT_STR);
 			break;
 		case ZBX_TYPE_CHAR:
-			zbx_strlcpy(type, ZBX_TYPE_CHAR_STR(field->length), sizeof(type));
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%hu)", ZBX_TYPE_CHAR_STR, field->length);
 			break;
 		case ZBX_TYPE_UINT:
-			zbx_strlcpy(type, ZBX_TYPE_UINT_STR, sizeof(type));
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_UINT_STR);
 			break;
 		default:
 			assert(0);
 	}
-
-	return type;
 }
 
 static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s %s", field->name, DBfield_type_string(field));
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s ", field->name);
+	DBfield_type_string(sql, sql_alloc, sql_offset, field);
 	if (NULL != field->default_value)
 	{
 		char	*default_value_esc;
@@ -164,8 +152,8 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 #else
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_DB_SET_TYPE " %s",
-			field->name, DBfield_type_string(field));
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_DB_SET_TYPE " ", field->name);
+	DBfield_type_string(sql, sql_alloc, sql_offset, field);
 #endif
 }
 
