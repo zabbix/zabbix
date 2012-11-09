@@ -80,15 +80,58 @@ static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_
 
 /******************************************************************************
  *                                                                            *
+ * Function: validate_ids                                                     *
+ *                                                                            *
+ * Purpose: validating of IDs in all tables                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	validate_ids()
+{
+	char		sql[42 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN * 2];
+	DB_RESULT	result;
+	zbx_uint64_t	max_value;
+	int		i, ret = SUCCEED;
+
+	for (i = 0; NULL != tables[i].table; i++)
+	{
+		const ZBX_TABLE	*table = &tables[i];
+		const ZBX_FIELD *field = &table->fields[0];
+
+		if (ZBX_TYPE_ID != field->type || 0 != strcmp(table->recid, field->name))
+			continue;
+
+		if (0 != (table->flags & ZBX_SYNC))
+			max_value = (zbx_uint64_t)__UINT64_C(99999999999);
+		else
+			max_value = (zbx_uint64_t)__UINT64_C(99999999999999);
+
+		zbx_snprintf(sql, sizeof(sql), "select %s from %s where %s>" ZBX_FS_UI64,
+				field->name, table->table, field->name, max_value);
+
+		result = DBselectN(sql, 1);
+
+		if (NULL != DBfetch(result))
+		{
+			printf("Unable to convert. Some of object IDs are out of range in table \"%s\"\n",
+					table->table);
+			ret = FAIL;
+		}
+		DBfree_result(result);
+
+		if (FAIL == ret)
+			break;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: validate_trigger_expressions                                     *
  *                                                                            *
- * Purpose: convert trigger expressions to new node ID                        *
+ * Purpose: validate length of new trigger expressions                        *
  *                                                                            *
  * Parameters: new_id - new node id                                           *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	validate_trigger_expressions(int new_id)
@@ -126,54 +169,6 @@ static int	validate_trigger_expressions(int new_id)
 	DBfree_result(result);
 
 	zbx_free(new_expression);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: validate_ids                                                     *
- *                                                                            *
- * Purpose: validating of IDs in all tables                                   *
- *                                                                            *
- ******************************************************************************/
-static int	validate_ids()
-{
-	char		sql[42 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN * 2];
-	DB_RESULT	result;
-	zbx_uint64_t	max_value;
-	int		i, ret = SUCCEED;
-
-	for (i = 0; NULL != tables[i].table; i++)
-	{
-		const ZBX_TABLE	*table = &tables[i];
-		const ZBX_FIELD *field = &table->fields[0];
-
-		if (ZBX_TYPE_ID != field->type || 0 != strcmp(table->recid, field->name))
-			continue;
-
-		if (0 != (table->flags & ZBX_SYNC))
-			max_value = (zbx_uint64_t)__UINT64_C(99999999999);
-		else
-			max_value = (zbx_uint64_t)__UINT64_C(99999999999999);
-
-		zbx_snprintf(sql, sizeof(sql), "select %s from %s where %s>" ZBX_FS_UI64,
-				field->name, table->table, field->name, max_value);
-
-		result = DBselectN(sql, 1);
-
-		if (NULL != DBfetch(result))
-		{
-			printf("Unable to convert. Some of object IDs are out of range in table \"%s\"\n",
-					table->table);
-			ret = FAIL;
-		}
-
-		DBfree_result(result);
-
-		if (FAIL == ret)
-			break;
-	}
 
 	return ret;
 }
@@ -458,7 +453,7 @@ int	change_nodeid(int new_id)
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	if (SUCCEED != validate_trigger_expressions(new_id) || SUCCEED != validate_ids())
+	if (SUCCEED != validate_ids() || SUCCEED != validate_trigger_expressions(new_id))
 	{
 		DBclose();
 		return FAIL;
