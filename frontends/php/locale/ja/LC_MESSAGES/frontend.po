@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-06 08:18+0200\n"
+"POT-Creation-Date: 2012-11-10 08:31+0200\n"
 "PO-Revision-Date: 2012-06-20 11:12+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -904,12 +904,12 @@ msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "ディスカバリルールの設定"
 
 #: include/views/configuration.graph.edit.php:25
-#: include/views/configuration.graph.list.php:31
+#: include/views/configuration.graph.list.php:32
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "グラフのプロトタイプの設定"
 
 #: include/views/configuration.graph.edit.php:29
-#: include/views/configuration.graph.list.php:48
+#: include/views/configuration.graph.list.php:49
 msgid "CONFIGURATION OF GRAPHS"
 msgstr "グラフの設定"
 
@@ -1448,16 +1448,16 @@ msgstr "スクリーンを削除できません"
 msgid "Cannot delete script"
 msgstr "スクリプトを削除できません"
 
-#: api/classes/CScript.php:408
+#: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "スクリプトを削除できません。\"scriptids\"の値が空白です"
 
-#: api/classes/CScript.php:432
+#: api/classes/CScript.php:437
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "スクリプトを削除できません。スクリプト\"%1$s\"は実行するアクション\"%2$s\"に利用されています。"
 
-#: api/classes/CScript.php:421
+#: api/classes/CScript.php:426
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "スクリプトを削除できません。スクリプトID\"%s\"は存在しません。"
@@ -2445,7 +2445,7 @@ msgstr "ユーザー'%1$s'でログイン"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "'%2$s'からユーザー'%1$s'でログイン"
 
-#: api/classes/CScript.php:477
+#: api/classes/CScript.php:482
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2456,7 +2456,7 @@ msgstr ""
 "1. \"zabbix.conf.php\"に設定されたサーバーのIPまたはDNSが正しくない;\n"
 "2. DNSサーバーの設定が正しくない。\n"
 
-#: api/classes/CScript.php:468
+#: api/classes/CScript.php:473
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2471,7 +2471,7 @@ msgstr ""
 "3. Zabbixサーバーのデーモンが動作していない;\n"
 "4. ファイアーウォールがTCP接続をブロックしている。\n"
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:479
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -2499,7 +2499,7 @@ msgstr "座標"
 msgid "Copy"
 msgstr "コピー"
 
-#: include/views/configuration.graph.list.php:136
+#: include/views/configuration.graph.list.php:137
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2537,15 +2537,15 @@ msgstr "アプリケーションの作成"
 msgid "Create discovery rule"
 msgstr "ディスカバリルールの作成"
 
-#: include/views/configuration.graph.list.php:40
+#: include/views/configuration.graph.list.php:41
 msgid "Create graph"
 msgstr "グラフの作成"
 
-#: include/views/configuration.graph.list.php:43
+#: include/views/configuration.graph.list.php:44
 msgid "Create graph (select host first)"
 msgstr "グラフの作成 (先にホストを選択)"
 
-#: include/views/configuration.graph.list.php:29
+#: include/views/configuration.graph.list.php:30
 msgid "Create graph prototype"
 msgstr "グラフのプロトタイプの作成"
 
@@ -3220,7 +3220,7 @@ msgstr "スクリプトを削除しますか？"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:139
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3256,7 +3256,7 @@ msgstr "選択したディスカバリルールを削除しますか？"
 msgid "Delete selected elements?"
 msgstr "選択した要素を削除しますか？"
 
-#: include/views/configuration.graph.list.php:140
+#: include/views/configuration.graph.list.php:141
 msgid "Delete selected graphs?"
 msgstr "選択したグラフを削除しますか？"
 
@@ -3912,7 +3912,7 @@ msgstr "ホストが重複しています。同じホストの表示名\"%s\"を
 msgid "Duplicate map name for map \"%s\"."
 msgstr "マップ\"%s\"のマップ名が重複しています"
 
-#: api/classes/CScript.php:307 api/classes/CScript.php:358
+#: api/classes/CScript.php:312 api/classes/CScript.php:363
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "スクリプト名が重複しています\"%s\"."
@@ -4186,27 +4186,27 @@ msgstr "英語 (en_US)"
 msgid "Error"
 msgstr "エラー"
 
-#: api/classes/CScript.php:482
+#: api/classes/CScript.php:487
 msgid "Error description"
 msgstr "説明のエラー"
 
-#: api/classes/CScript.php:520
+#: api/classes/CScript.php:525
 msgid "Error description: can't read script response, check connection."
 msgstr "エラー詳細: スクリプトのレスポンスがありません。コネクションを確認してください。"
 
-#: api/classes/CScript.php:497
+#: api/classes/CScript.php:502
 msgid "Error description: can't send command, check connection."
 msgstr "エラー詳細: コマンドを送信できません。コネクションを確認してください"
 
-#: api/classes/CScript.php:513
+#: api/classes/CScript.php:518
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "エラー詳細: \"include/defines.inc.php\"に設定されている定数ZBX_SCRIPT_BYTES_LIMITの読み込みバイト制限に達しました。設定値を増やして再度試してください。"
 
-#: api/classes/CScript.php:509
+#: api/classes/CScript.php:514
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "エラー詳細: \"include/defines.inc.php\"に設定されている定数ZBX_SCRIPT_TIMEOUTのタイムアウトに達しました。設定値を増やして再度試してください。"
 
-#: api/classes/CScript.php:528
+#: api/classes/CScript.php:533
 msgid "Error description: empty response received."
 msgstr "エラー詳細: 受信した値が空です"
 
@@ -4696,7 +4696,7 @@ msgstr "グローバルスクリプト"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:143
+#: include/views/configuration.graph.list.php:144
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4818,7 +4818,7 @@ msgstr "グラフのプロトタイプは少なくとも1つ以上のプロト�
 msgid "Graph prototypes"
 msgstr "グラフのプロトタイプ"
 
-#: include/views/configuration.graph.list.php:32
+#: include/views/configuration.graph.list.php:33
 msgid "Graph prototypes of"
 msgstr "グラフのプロトタイプ:"
 
@@ -4828,7 +4828,7 @@ msgid "Graph sum"
 msgstr "グラフの合計値"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:78 popup.php:1347 popup.php:1353
+#: include/views/configuration.graph.list.php:79 popup.php:1347 popup.php:1353
 msgid "Graph type"
 msgstr "グラフのタイプ"
 
@@ -4849,7 +4849,7 @@ msgstr "同じ名前で異なるタイプのグラフが存在します。"
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1194
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:786
 #: include/menu.inc.php:62 include/triggers.inc.php:1487
-#: include/views/configuration.graph.list.php:54
+#: include/views/configuration.graph.list.php:55
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
@@ -4885,7 +4885,7 @@ msgstr "グリッド"
 #: include/reports.inc.php:553
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
-#: include/views/configuration.graph.list.php:51
+#: include/views/configuration.graph.list.php:52
 #: include/views/configuration.httpconf.list.php:41
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
@@ -5025,7 +5025,7 @@ msgid "Hardware (Full details)"
 msgstr "ハードウェア (詳細)"
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.list.php:77
+#: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -5125,7 +5125,7 @@ msgstr "横位置"
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
 #: include/views/configuration.application.list.php:53
-#: include/views/configuration.graph.list.php:52
+#: include/views/configuration.graph.list.php:53
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:497
 #: include/views/configuration.httpconf.list.php:42
@@ -5333,7 +5333,7 @@ msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在し
 #: include/reports.inc.php:585 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:75
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.hostgroups.list.php:111
 #: include/views/configuration.item.copy.php:42
@@ -6615,7 +6615,7 @@ msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません�
 msgid "Item \"%1$s\" does not exist."
 msgstr "アイテム\"%1$s\"は存在しません。"
 
-#: include/classes/import/CConfigurationImport.php:558
+#: include/classes/import/CConfigurationImport.php:560
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上のアイテム\"%1$s\": アプリケーション\"%3$s\"は存在しません。"
@@ -7924,7 +7924,7 @@ msgstr "NTLM認証"
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:53
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:75
+#: include/views/configuration.graph.list.php:76
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.massupdate.php:90
@@ -8239,11 +8239,11 @@ msgstr "スクリーンの要素にグラフIDが設定されていません。"
 msgid "No graph item with graphid \"%s\"."
 msgstr "グラフID\"%s\"のグラフアイテムがありません。"
 
-#: include/views/configuration.graph.list.php:71
+#: include/views/configuration.graph.list.php:72
 msgid "No graph prototypes defined."
 msgstr "グラフのプロトタイプが設定されていません。"
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:71
+#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:72
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1342
@@ -8418,8 +8418,8 @@ msgstr "ノードが設定されていません。"
 msgid "No operations defined."
 msgstr "実行するアクションが設定されていません。"
 
-#: include/classes/import/CConfigurationImport.php:816
-#: include/classes/import/CConfigurationImport.php:893
+#: include/classes/import/CConfigurationImport.php:818
+#: include/classes/import/CConfigurationImport.php:895
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"への権限がありません。"
@@ -10666,7 +10666,7 @@ msgstr "スクリーン"
 msgid "Script"
 msgstr "スクリプト"
 
-#: api/classes/CScript.php:320 api/classes/CScript.php:372
+#: api/classes/CScript.php:325 api/classes/CScript.php:377
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "スクリプト\"%s\"はすでに存在します。"
@@ -10692,7 +10692,7 @@ msgstr "スクリプトプロファイラ"
 msgid "Script updated"
 msgstr "スクリプトを更新しました"
 
-#: api/classes/CScript.php:353
+#: api/classes/CScript.php:358
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "スクリプトID\"%s\"は存在しません。"
@@ -11948,8 +11948,8 @@ msgstr "トリガー"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: include/classes/import/CConfigurationImport.php:931
-#: include/classes/import/CConfigurationImport.php:967
+#: include/classes/import/CConfigurationImport.php:933
+#: include/classes/import/CConfigurationImport.php:969
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "トリガー\"%1$s\"は存在しないトリガー\"%2$s\"に依存しています。"
@@ -13014,7 +13014,7 @@ msgid "When active"
 msgstr "有効な時間帯"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
-#: include/views/configuration.graph.list.php:76
+#: include/views/configuration.graph.list.php:77
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
@@ -13126,7 +13126,7 @@ msgstr "プロキシ\"%s\"の設定が正しくありません。"
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"の設定が正しくありません。"
 
-#: api/classes/CScript.php:303
+#: api/classes/CScript.php:308
 msgid "Wrong fields for script."
 msgstr "スクリプトの設定が正しくありません。"
 
@@ -13314,9 +13314,9 @@ msgstr "アクションのグローバルスクリプト\"%s\"のターゲット
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
 #: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
-#: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
-#: api/classes/CScript.php:342 api/classes/CScript.php:404
-#: api/classes/CScript.php:454 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:300
+#: api/classes/CScript.php:347 api/classes/CScript.php:409
+#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
 #: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:739
@@ -13427,7 +13427,7 @@ msgstr "Zabbixは一時的に利用できません"
 msgid "Zabbix server"
 msgstr "Zabbixサーバー"
 
-#: api/classes/CScript.php:471
+#: api/classes/CScript.php:476
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"

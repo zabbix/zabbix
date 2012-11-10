@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-06 08:11+0200\n"
+"POT-Creation-Date: 2012-11-10 08:31+0200\n"
 "PO-Revision-Date: 2012-10-17 16:04+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -907,12 +907,12 @@ msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "探索規則的組態"
 
 #: include/views/configuration.graph.edit.php:25
-#: include/views/configuration.graph.list.php:31
+#: include/views/configuration.graph.list.php:32
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "圖形原型的組態"
 
 #: include/views/configuration.graph.edit.php:29
-#: include/views/configuration.graph.list.php:48
+#: include/views/configuration.graph.list.php:49
 msgid "CONFIGURATION OF GRAPHS"
 msgstr "圖形的組態"
 
@@ -1451,16 +1451,16 @@ msgstr "無法刪除篩選"
 msgid "Cannot delete script"
 msgstr "無法删除脚本"
 
-#: api/classes/CScript.php:408
+#: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "無法刪除腳本.空白的輸入參數\"scriptids\"."
 
-#: api/classes/CScript.php:432
+#: api/classes/CScript.php:437
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "無法刪除腳本. 腳本 \"%1$s\" 用於動作操作\"%2$s\"."
 
-#: api/classes/CScript.php:421
+#: api/classes/CScript.php:426
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "無法刪除腳本. 腳本ID為 \"%s\"的腳本不存在."
@@ -2448,7 +2448,7 @@ msgstr "連接為'%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "連接為'%1$s', 來自'%2$s'"
 
-#: api/classes/CScript.php:477
+#: api/classes/CScript.php:482
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2459,7 +2459,7 @@ msgstr ""
 "1. 不正確的IP/DNS設於\"zabbix.conf.php\";\n"
 "2. 不正確的DNS主機的組態.\n"
 
-#: api/classes/CScript.php:468
+#: api/classes/CScript.php:473
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2474,7 +2474,7 @@ msgstr ""
 "3. Zabbix主機的服務未運作;\n"
 "4. 防火牆阻斷了TCP連線.\n"
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:479
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -2502,7 +2502,7 @@ msgstr "座標"
 msgid "Copy"
 msgstr "複製"
 
-#: include/views/configuration.graph.list.php:136
+#: include/views/configuration.graph.list.php:137
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2540,15 +2540,15 @@ msgstr "創建應用集"
 msgid "Create discovery rule"
 msgstr "創建探索規則"
 
-#: include/views/configuration.graph.list.php:40
+#: include/views/configuration.graph.list.php:41
 msgid "Create graph"
 msgstr "創建圖形"
 
-#: include/views/configuration.graph.list.php:43
+#: include/views/configuration.graph.list.php:44
 msgid "Create graph (select host first)"
 msgstr "創建圖形(先選擇主機)"
 
-#: include/views/configuration.graph.list.php:29
+#: include/views/configuration.graph.list.php:30
 msgid "Create graph prototype"
 msgstr "創建圖形原型"
 
@@ -3223,7 +3223,7 @@ msgstr "删除脚本?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:139
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3259,7 +3259,7 @@ msgstr "删除所選的探索規則?"
 msgid "Delete selected elements?"
 msgstr "刪除所選的組件?"
 
-#: include/views/configuration.graph.list.php:140
+#: include/views/configuration.graph.list.php:141
 msgid "Delete selected graphs?"
 msgstr "刪除所選的圖形?"
 
@@ -3915,7 +3915,7 @@ msgstr "重複的主機. 有相同主機可視名稱\"%s\"的主機已存於資�
 msgid "Duplicate map name for map \"%s\"."
 msgstr "重複的拓墣圖\"%s\"的拓墣圖名稱."
 
-#: api/classes/CScript.php:307 api/classes/CScript.php:358
+#: api/classes/CScript.php:312 api/classes/CScript.php:363
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "重複的腳本名稱\"%s\"."
@@ -4189,27 +4189,27 @@ msgstr "英語(en_US)"
 msgid "Error"
 msgstr "錯誤"
 
-#: api/classes/CScript.php:482
+#: api/classes/CScript.php:487
 msgid "Error description"
 msgstr "錯誤描述"
 
-#: api/classes/CScript.php:520
+#: api/classes/CScript.php:525
 msgid "Error description: can't read script response, check connection."
 msgstr "錯誤描述: 無法讀取腳本回應, 檢查連線."
 
-#: api/classes/CScript.php:497
+#: api/classes/CScript.php:502
 msgid "Error description: can't send command, check connection."
 msgstr "錯誤描述: 無法傳送命令, 檢查連線."
 
-#: api/classes/CScript.php:513
+#: api/classes/CScript.php:518
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "錯誤描述:  已達到定義於 \"include/defines.inc.php\"的常數ZBX_SCRIPT_BYTES_LIMIT讀取位元限制. 您可以試著去增加這個值."
 
-#: api/classes/CScript.php:509
+#: api/classes/CScript.php:514
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "錯誤描述:  已達到定義於 \"include/defines.inc.php\"的常數ZBX_SCRIPT_TIMEOUT時限. 您可以試著去增加這個值."
 
-#: api/classes/CScript.php:528
+#: api/classes/CScript.php:533
 msgid "Error description: empty response received."
 msgstr "錯誤描述:  收到空回應."
 
@@ -4699,7 +4699,7 @@ msgstr "全域腳本"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:143
+#: include/views/configuration.graph.list.php:144
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4821,7 +4821,7 @@ msgstr "圖形原型必需至少有一個原型."
 msgid "Graph prototypes"
 msgstr "圖形原型"
 
-#: include/views/configuration.graph.list.php:32
+#: include/views/configuration.graph.list.php:33
 msgid "Graph prototypes of"
 msgstr "圖形原型的"
 
@@ -4831,7 +4831,7 @@ msgid "Graph sum"
 msgstr "圖形總合"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:78 popup.php:1347 popup.php:1353
+#: include/views/configuration.graph.list.php:79 popup.php:1347 popup.php:1353
 msgid "Graph type"
 msgstr "圖形類別"
 
@@ -4852,7 +4852,7 @@ msgstr "同名但不同類型的圖形已存在."
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1194
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:786
 #: include/menu.inc.php:62 include/triggers.inc.php:1487
-#: include/views/configuration.graph.list.php:54
+#: include/views/configuration.graph.list.php:55
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
@@ -4888,7 +4888,7 @@ msgstr "網格"
 #: include/reports.inc.php:553
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
-#: include/views/configuration.graph.list.php:51
+#: include/views/configuration.graph.list.php:52
 #: include/views/configuration.httpconf.list.php:41
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
@@ -5028,7 +5028,7 @@ msgid "Hardware (Full details)"
 msgstr "硬體(全細節)"
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.list.php:77
+#: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -5128,7 +5128,7 @@ msgstr "横向對齊"
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
 #: include/views/configuration.application.list.php:53
-#: include/views/configuration.graph.list.php:52
+#: include/views/configuration.graph.list.php:53
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:497
 #: include/views/configuration.httpconf.list.php:42
@@ -5336,7 +5336,7 @@ msgstr "可視名稱同樣為 \"%s\" 的主機已存在."
 #: include/reports.inc.php:585 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:75
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.hostgroups.list.php:111
 #: include/views/configuration.item.copy.php:42
@@ -6618,7 +6618,7 @@ msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 msgid "Item \"%1$s\" does not exist."
 msgstr "項目 \"%1$s\"不存在."
 
-#: include/classes/import/CConfigurationImport.php:558
+#: include/classes/import/CConfigurationImport.php:560
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
@@ -7927,7 +7927,7 @@ msgstr "NTLM認證"
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:53
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:75
+#: include/views/configuration.graph.list.php:76
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.massupdate.php:90
@@ -8242,11 +8242,11 @@ msgstr "沒有提供圖形ID給篩選組件."
 msgid "No graph item with graphid \"%s\"."
 msgstr "沒有圖形ID\"%s\"的圖形項目."
 
-#: include/views/configuration.graph.list.php:71
+#: include/views/configuration.graph.list.php:72
 msgid "No graph prototypes defined."
 msgstr "沒有已定義的圖形原型."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:71
+#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:72
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1342
@@ -8421,8 +8421,8 @@ msgstr "沒有已定義的節點."
 msgid "No operations defined."
 msgstr "沒有已定義的操作."
 
-#: include/classes/import/CConfigurationImport.php:816
-#: include/classes/import/CConfigurationImport.php:893
+#: include/classes/import/CConfigurationImport.php:818
+#: include/classes/import/CConfigurationImport.php:895
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "無圖形\"%s\"的許可權"
@@ -10669,7 +10669,7 @@ msgstr "篩選"
 msgid "Script"
 msgstr "脚本"
 
-#: api/classes/CScript.php:320 api/classes/CScript.php:372
+#: api/classes/CScript.php:325 api/classes/CScript.php:377
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "腳本\"%s\"已存在."
@@ -10695,7 +10695,7 @@ msgstr "腳本探查器"
 msgid "Script updated"
 msgstr "脚本已更新"
 
-#: api/classes/CScript.php:353
+#: api/classes/CScript.php:358
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "腳本ID為\"%s\"的腳本不存在."
@@ -11951,8 +11951,8 @@ msgstr "觸發器"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:931
-#: include/classes/import/CConfigurationImport.php:967
+#: include/classes/import/CConfigurationImport.php:933
+#: include/classes/import/CConfigurationImport.php:969
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "觸發器\"%1$s\"相依於一個不存在的觸發器\"%2$s\"."
@@ -13017,7 +13017,7 @@ msgid "When active"
 msgstr "當作用中時"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
-#: include/views/configuration.graph.list.php:76
+#: include/views/configuration.graph.list.php:77
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
@@ -13129,7 +13129,7 @@ msgstr "錯誤的系統代理程式欄位\"%s\"."
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "錯誤的篩選欄位\"%1$s\"."
 
-#: api/classes/CScript.php:303
+#: api/classes/CScript.php:308
 msgid "Wrong fields for script."
 msgstr "錯誤的腳本欄位."
 
@@ -13317,9 +13317,9 @@ msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
 #: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
-#: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
-#: api/classes/CScript.php:342 api/classes/CScript.php:404
-#: api/classes/CScript.php:454 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:300
+#: api/classes/CScript.php:347 api/classes/CScript.php:409
+#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
 #: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:739
@@ -13430,7 +13430,7 @@ msgstr "Zabbix暫時不存在!"
 msgid "Zabbix server"
 msgstr "網路監測主機"
 
-#: api/classes/CScript.php:471
+#: api/classes/CScript.php:476
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"

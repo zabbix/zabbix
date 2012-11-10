@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-06 08:18+0200\n"
+"POT-Creation-Date: 2012-11-10 08:31+0200\n"
 "PO-Revision-Date: 2012-11-02 18:48+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -913,12 +913,12 @@ msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "CONFIGURAÇÃO DAS REGRAS DE DISCOVERY"
 
 #: include/views/configuration.graph.edit.php:25
-#: include/views/configuration.graph.list.php:31
+#: include/views/configuration.graph.list.php:32
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "CONFIGURAÇÃO DE TIPOS DE GRÁFICOS"
 
 #: include/views/configuration.graph.edit.php:29
-#: include/views/configuration.graph.list.php:48
+#: include/views/configuration.graph.list.php:49
 msgid "CONFIGURATION OF GRAPHS"
 msgstr "CONFIGURAÇÃO DE GRÁFICOS"
 
@@ -1458,16 +1458,16 @@ msgstr "Não foi possível excluir a tela"
 msgid "Cannot delete script"
 msgstr "Não foi possível remover script"
 
-#: api/classes/CScript.php:408
+#: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "Não é possível deletar scripts. Parâmetro \"scriptids\" vazio."
 
-#: api/classes/CScript.php:432
+#: api/classes/CScript.php:437
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na operação de ação \"%2$s\"."
 
-#: api/classes/CScript.php:421
+#: api/classes/CScript.php:426
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Scripts não foram excluídos. Script com scriptid \"%s\" não existe."
@@ -2457,7 +2457,7 @@ msgstr "Conectado como '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "Conectado como '%1$s' de '%2$s'"
 
-#: api/classes/CScript.php:477
+#: api/classes/CScript.php:482
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2468,7 +2468,7 @@ msgstr ""
 "1. Configuração incorreta de IP/DNS no arquivo \"zabbix.conf.php\";\n"
 "2. Configuração incorreta no servidor de DNS.\n"
 
-#: api/classes/CScript.php:468
+#: api/classes/CScript.php:473
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2483,7 +2483,7 @@ msgstr ""
 "3. Processo do Zabbix server não está em execução;\n"
 "4. Firewall bloqueando a conexão TCP.\n"
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:479
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -2511,7 +2511,7 @@ msgstr "Coordenadas"
 msgid "Copy"
 msgstr "Copiar"
 
-#: include/views/configuration.graph.list.php:136
+#: include/views/configuration.graph.list.php:137
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2549,15 +2549,15 @@ msgstr "Criar aplicação"
 msgid "Create discovery rule"
 msgstr "Criar regra de descoberta"
 
-#: include/views/configuration.graph.list.php:40
+#: include/views/configuration.graph.list.php:41
 msgid "Create graph"
 msgstr "Criar gráfico"
 
-#: include/views/configuration.graph.list.php:43
+#: include/views/configuration.graph.list.php:44
 msgid "Create graph (select host first)"
 msgstr "Criar gráfico (selecione o host primeiro)"
 
-#: include/views/configuration.graph.list.php:29
+#: include/views/configuration.graph.list.php:30
 msgid "Create graph prototype"
 msgstr "Criar protótipo de gráfico"
 
@@ -3235,7 +3235,7 @@ msgstr "Remover script?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:139
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3271,7 +3271,7 @@ msgstr "Remover regras de descoberta selecionadas?"
 msgid "Delete selected elements?"
 msgstr "Remover elementos selecionados?"
 
-#: include/views/configuration.graph.list.php:140
+#: include/views/configuration.graph.list.php:141
 msgid "Delete selected graphs?"
 msgstr "Remover gráficos selecionados?"
 
@@ -3928,7 +3928,7 @@ msgstr "Host duplicado. Já existe registro de outro Host usando o \"nome visív
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Nome de mapa duplicado para o mapa \"%s\"."
 
-#: api/classes/CScript.php:307 api/classes/CScript.php:358
+#: api/classes/CScript.php:312 api/classes/CScript.php:363
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "Nome de script duplicado \"%s\"."
@@ -4202,27 +4202,27 @@ msgstr "Inglês (en_US)"
 msgid "Error"
 msgstr "Erro"
 
-#: api/classes/CScript.php:482
+#: api/classes/CScript.php:487
 msgid "Error description"
 msgstr "Descrição do erro"
 
-#: api/classes/CScript.php:520
+#: api/classes/CScript.php:525
 msgid "Error description: can't read script response, check connection."
 msgstr "Descrição do erro: Não foi possível receber a resposta do script, verifique as conexões."
 
-#: api/classes/CScript.php:497
+#: api/classes/CScript.php:502
 msgid "Error description: can't send command, check connection."
 msgstr "Descrição do erro: Não foi possível enviar o comando, verifique as conexões."
 
-#: api/classes/CScript.php:513
+#: api/classes/CScript.php:518
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_BYTES_LIMIT no arquivo  \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
-#: api/classes/CScript.php:509
+#: api/classes/CScript.php:514
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_TIMEOUT no arquivo \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
-#: api/classes/CScript.php:528
+#: api/classes/CScript.php:533
 msgid "Error description: empty response received."
 msgstr "Descrição do erro: a resposta recebida estava vazia."
 
@@ -4714,7 +4714,7 @@ msgstr "Scripts globais"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:143
+#: include/views/configuration.graph.list.php:144
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4836,7 +4836,7 @@ msgstr "Protótipo de gráfico deve possuir pelo menos um protótipo de item."
 msgid "Graph prototypes"
 msgstr "Protótipos de gráfico"
 
-#: include/views/configuration.graph.list.php:32
+#: include/views/configuration.graph.list.php:33
 msgid "Graph prototypes of"
 msgstr "Protótipos de gráfico de"
 
@@ -4846,7 +4846,7 @@ msgid "Graph sum"
 msgstr "Somatória do gráfico"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:78 popup.php:1347 popup.php:1353
+#: include/views/configuration.graph.list.php:79 popup.php:1347 popup.php:1353
 msgid "Graph type"
 msgstr "Tipo do gráfico"
 
@@ -4867,7 +4867,7 @@ msgstr "Já existe um gráfico com o mesmo nome, mas com outro tipo."
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1194
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:786
 #: include/menu.inc.php:62 include/triggers.inc.php:1487
-#: include/views/configuration.graph.list.php:54
+#: include/views/configuration.graph.list.php:55
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
@@ -4903,7 +4903,7 @@ msgstr "Grade"
 #: include/reports.inc.php:553
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
-#: include/views/configuration.graph.list.php:51
+#: include/views/configuration.graph.list.php:52
 #: include/views/configuration.httpconf.list.php:41
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
@@ -5043,7 +5043,7 @@ msgid "Hardware (Full details)"
 msgstr "Hardware (Mais detalhes)"
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.list.php:77
+#: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -5143,7 +5143,7 @@ msgstr "Alinhamento horizontal"
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
 #: include/views/configuration.application.list.php:53
-#: include/views/configuration.graph.list.php:52
+#: include/views/configuration.graph.list.php:53
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:497
 #: include/views/configuration.httpconf.list.php:42
@@ -5351,7 +5351,7 @@ msgstr "Existe outro host com o mesmo nome visível \"%s\"."
 #: include/reports.inc.php:585 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:75
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.hostgroups.list.php:111
 #: include/views/configuration.item.copy.php:42
@@ -6635,7 +6635,7 @@ msgstr "O item \"%1$s\" não existe no template \"%2$s\"."
 msgid "Item \"%1$s\" does not exist."
 msgstr "O item \"%1$s\" não existe."
 
-#: include/classes/import/CConfigurationImport.php:558
+#: include/classes/import/CConfigurationImport.php:560
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "O item \"%1$s\" em \"%2$s\": a aplicação \"%3$s\" não existe."
@@ -7949,7 +7949,7 @@ msgstr "Autenticação NTLM"
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:53
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:75
+#: include/views/configuration.graph.list.php:76
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.massupdate.php:90
@@ -8264,11 +8264,11 @@ msgstr "Não foi informado o ID do gráfico para o elemento na tela."
 msgid "No graph item with graphid \"%s\"."
 msgstr "Sem item de gráfico com o ID \"%s\"."
 
-#: include/views/configuration.graph.list.php:71
+#: include/views/configuration.graph.list.php:72
 msgid "No graph prototypes defined."
 msgstr "Sem protótipos de gráfico definidos."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:71
+#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:72
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1342
@@ -8443,8 +8443,8 @@ msgstr "Não foram definidos nós."
 msgid "No operations defined."
 msgstr "Não foram definidas operações."
 
-#: include/classes/import/CConfigurationImport.php:816
-#: include/classes/import/CConfigurationImport.php:893
+#: include/classes/import/CConfigurationImport.php:818
+#: include/classes/import/CConfigurationImport.php:895
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "Sem permissão para o gráfico \"%1$s\"."
@@ -10693,7 +10693,7 @@ msgstr "Telas"
 msgid "Script"
 msgstr "Script"
 
-#: api/classes/CScript.php:320 api/classes/CScript.php:372
+#: api/classes/CScript.php:325 api/classes/CScript.php:377
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr ""
@@ -10719,7 +10719,7 @@ msgstr ""
 msgid "Script updated"
 msgstr "Script atualizado"
 
-#: api/classes/CScript.php:353
+#: api/classes/CScript.php:358
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
@@ -11978,8 +11978,8 @@ msgstr "Trigger"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:931
-#: include/classes/import/CConfigurationImport.php:967
+#: include/classes/import/CConfigurationImport.php:933
+#: include/classes/import/CConfigurationImport.php:969
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
@@ -13047,7 +13047,7 @@ msgid "When active"
 msgstr "Quando ativo"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
-#: include/views/configuration.graph.list.php:76
+#: include/views/configuration.graph.list.php:77
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
@@ -13159,7 +13159,7 @@ msgstr ""
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CScript.php:303
+#: api/classes/CScript.php:308
 msgid "Wrong fields for script."
 msgstr ""
 
@@ -13347,9 +13347,9 @@ msgstr ""
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
 #: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
-#: api/classes/CMaintenance.php:743 api/classes/CScript.php:295
-#: api/classes/CScript.php:342 api/classes/CScript.php:404
-#: api/classes/CScript.php:454 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:300
+#: api/classes/CScript.php:347 api/classes/CScript.php:409
+#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
 #: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:739
@@ -13461,7 +13461,7 @@ msgstr "Zabbix está temporariamente indisponível!"
 msgid "Zabbix server"
 msgstr ""
 
-#: api/classes/CScript.php:471
+#: api/classes/CScript.php:476
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
