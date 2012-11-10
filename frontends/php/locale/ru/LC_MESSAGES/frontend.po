@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-10 08:31+0200\n"
-"PO-Revision-Date: 2012-11-02 21:08+0200\n"
+"POT-Creation-Date: 2012-11-10 08:38+0200\n"
+"PO-Revision-Date: 2012-11-08 21:21+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1305,7 +1305,7 @@ msgstr "Не удалось создать закольцованные зави
 
 #: api/classes/CTrigger.php:1840
 msgid "Cannot create dependency on trigger itself."
-msgstr "Невозможно создать завимость триггера от самого себя."
+msgstr "Невозможно создать зависимость триггера от самого себя."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"

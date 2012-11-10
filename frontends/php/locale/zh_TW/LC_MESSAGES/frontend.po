@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-10 08:31+0200\n"
-"PO-Revision-Date: 2012-10-17 16:04+0800\n"
+"POT-Creation-Date: 2012-11-10 08:38+0200\n"
+"PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
@@ -1292,11 +1292,11 @@ msgstr "無法創建另外資料庫連線."
 
 #: api/classes/CTrigger.php:1868
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "無法創建迴圈式相依關係"
 
 #: api/classes/CTrigger.php:1840
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "無法創建在觸發器自身上的相依關係."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -1364,7 +1364,7 @@ msgstr "無法删除圖形"
 
 #: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "無法刪除圖形原型"
 
 #: api/classes/CItem.php:983
 msgid "Cannot delete graph."
@@ -1376,7 +1376,7 @@ msgstr "無法删除圖形"
 
 #: api/classes/CGraphPrototype.php:820
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "無法刪除由低階層發現所創建的圖形."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1412,7 +1412,7 @@ msgstr "無法刪除項目"
 
 #: api/classes/CItemPrototype.php:764
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "無法刪除由低階層發現所創建的項目."
 
 #: maintenance.php:174
 msgid "Cannot delete maintenance"
@@ -1491,7 +1491,7 @@ msgstr "無法刪除樣本項目."
 
 #: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "無法刪除模板化的項目"
 
 #: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
@@ -1508,7 +1508,7 @@ msgstr "無法删除觸發器"
 
 #: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "無法刪除觸發器原型"
 
 #: api/classes/CItem.php:999
 msgid "Cannot delete trigger."
@@ -1520,7 +1520,7 @@ msgstr "無法删除觸發器"
 
 #: api/classes/CTriggerPrototype.php:976
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "無法刪除由低階層發現所創建的觸發器."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1737,32 +1737,32 @@ msgstr "無法儲存未檢驗的探索規則"
 #: api/classes/CApplication.php:466
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給應用集\"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給圖形\"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給項目\"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給篩選\"%1$s\"."
 
 #: api/classes/CTrigger.php:1124
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給觸發器\"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:771
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給觸發器原型\"%1$s\"."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
@@ -1812,32 +1812,32 @@ msgstr "不能斷連觸發器\"%s\",其已有項目來自於留存連到主機�
 #: api/classes/CApplication.php:463
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給應用集\"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給圖形\"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給項目\"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:744
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給篩選\"%1$s\"."
 
 #: api/classes/CTrigger.php:1121
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給觸發器\"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:844
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給觸發器原型\"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -3541,19 +3541,19 @@ msgstr "最末和之前的值的差, 則 N 非 1, 0 - 除外"
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異是 <  N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異是 =  N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異是 >  N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異不是 N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4521,11 +4521,11 @@ msgstr "依名稱過濾"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "於最新的值中找字串V. N = 1 - 如果找到, 0 - 其它情況."
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "於最新的值中找字串V. N 非 1 - 如果找到, 0 - 其它情況."
 
 #: include/setup.inc.php:130
 msgid "Finish"
@@ -4842,7 +4842,7 @@ msgstr "圖形已更新"
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "名為\"%1$s\"的圖形已經存在於圖形或圖形原型中."
 
 #: api/classes/CGraph.php:596 api/classes/CGraph.php:617
 #: api/classes/CGraphPrototype.php:642 api/classes/CGraphPrototype.php:663
@@ -6415,7 +6415,7 @@ msgstr "圖形\"%1$s\"的不正確y min項目."
 
 #: include/locales.inc.php:55
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "印尼語 (id_ID)"
 
 #: include/blocks.inc.php:834 include/blocks.inc.php:1364
 #: include/classes/class.cformlist.php:65 tr_status.php:286
@@ -8831,19 +8831,19 @@ msgstr "Number of steps"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T < N"
-msgstr ""
+msgstr "於時間期間T中,  成功取出的值V(此為完成操作者O)的數值 < N "
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T = N"
-msgstr ""
+msgstr "於時間期間T中,  成功取出的值V(此為完成操作者O)的數值 = N"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T > N"
-msgstr ""
+msgstr "於時間期間T中,  成功取出的值V(此為完成操作者O)的數值 > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N"
-msgstr ""
+msgstr "於時間期間T中,  成功取出的值V(此為完成操作者O)的數值 不是 N"
 
 #: include/blocks.inc.php:716
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
