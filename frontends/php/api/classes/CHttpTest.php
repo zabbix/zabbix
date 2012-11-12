@@ -526,6 +526,8 @@ class CHttpTest extends CZBXAPI {
 			}
 			$this->checkSteps($httpTest);
 		}
+
+		$this->checkApplicationHost($httpTests);
 	}
 
 	/**
@@ -578,6 +580,34 @@ class CHttpTest extends CZBXAPI {
 			if (isset($httpTest['steps'])) {
 				$this->checkSteps($httpTest);
 				$this->checkStepsOnUpdate($httpTest);
+			}
+		}
+
+		$this->checkApplicationHost($httpTests);
+	}
+
+	/**
+	 * Check that application belongs to http test host.
+	 *
+	 * @param array $httpTests
+	 */
+	protected function checkApplicationHost(array $httpTests) {
+		$appIds = zbx_objectValues($httpTests, 'applicationid');
+		if (!empty($appIds)) {
+			$appHostIds = array();
+
+			$dbCursor = DBselect('SELECT a.hostid, a.applicationid FROM applications a'.
+				' WHERE '.DBcondition('a.applicationid', $appIds));
+			while ($dbApp = $dbCursor) {
+				$appHostIds[$dbApp['applicationid']] = $dbApp['hostid'];
+			}
+
+			foreach ($httpTests as $httpTest) {
+				if (isset($httpTest['applicationid'])) {
+					if (!idcmp($appHostIds[$httpTest['applicationid']], $httpTest['hostid'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('The web scenario application belongs to a different host than the web scenario host.'));
+					}
+				}
 			}
 		}
 	}

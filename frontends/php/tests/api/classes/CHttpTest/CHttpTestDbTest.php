@@ -139,8 +139,6 @@ class CHttpTestTest extends ZbxDbTestCase {
 	public function testUpdateStepsOnTemplate() {
 		$httpTests = array(
 			'httptestid' => 1,
-			'hostid' => 1,
-			'status' => 0,
 			'name' => 'HttpTestUpdate',
 			'delay' => 70,
 			'steps' => array(
