@@ -565,14 +565,12 @@ class CHttpTestManager {
 			)
 		);
 
-		foreach ($checkitems as &$item) {
-			$itemsExist = API::Item()->exists(array(
-				'key_' => $item['key_'],
-				'hostid' => $httpTest['hostid']
-			));
-			if ($itemsExist) {
-				throw new Exception(_s('Item with key "%s" already exists.', $item['key_']));
-			}
+		$insertItems = array();
+		$updateItems = array();
+		$testItemIds = array();
+		foreach ($checkitems as $item) {
+			$dbItem = DBfetch(DBselect('SELECT i.itemid, i.templateid FROM items i'.
+					' WHERE i.key_='.zbx_dbstr($item['key_']).' AND i.hostid='.zbx_dbstr($httpTest['hostid'])));
 			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 			$item['hostid'] = $httpTest['hostid'];
 			$item['delay'] = $httpTest['delay'];
@@ -580,13 +578,30 @@ class CHttpTestManager {
 			$item['history'] = $this->history;
 			$item['trends'] = $this->trends;
 			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-		}
-		unset($item);
 
-		$checkItemids = DB::insert('items', $checkitems);
+			if ($dbItem) {
+				if (!empty($dbItem['templateid'])) {
+					throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
+				}
+				$testItemIds[] = $dbItem['itemid'];
+				$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
+			}
+			else {
+				$insertItems[] = $item;
+			}
+		}
+
+
+		if (!empty($insertItems)) {
+			$newTestItemIds = DB::insert('items', $insertItems);
+			$testItemIds = array_merge($testItemIds, $newTestItemIds);
+		}
+		if (!empty($updateItems)) {
+			DB::update('items', $updateItems);
+		}
 
 		$itemApplications = array();
-		foreach ($checkItemids as $itemid) {
+		foreach ($testItemIds as $itemid) {
 			if (!empty($httpTest['applicationid'])) {
 				$itemApplications[] = array(
 					'applicationid' => $httpTest['applicationid'],
@@ -603,7 +618,7 @@ class CHttpTestManager {
 		foreach ($checkitems as $inum => $item) {
 			$httpTestItems[] = array(
 				'httptestid' => $httpTest['httptestid'],
-				'itemid' => $checkItemids[$inum],
+				'itemid' => $testItemIds[$inum],
 				'type' => $item['httptestitemtype']
 			);
 		}
@@ -661,14 +676,12 @@ class CHttpTestManager {
 				$status = $httpTest['status'];
 			}
 
-			foreach ($stepitems as &$item) {
-				$itemsExist = API::Item()->exists(array(
-					'key_' => $item['key_'],
-					'hostid' => $httpTest['hostid']
-				));
-				if ($itemsExist) {
-					throw new Exception(_s('Web item with key "%1$s" already exists.', $item['key_']));
-				}
+			$insertItems = array();
+			$updateItems = array();
+			$stepItemids = array();
+			foreach ($stepitems as $item) {
+				$dbItem = DBfetch(DBselect('SELECT i.itemid, i.templateid FROM items i'.
+					' WHERE i.key_='.zbx_dbstr($item['key_']).' AND i.hostid='.zbx_dbstr($httpTest['hostid'])));
 				$item['hostid'] = $httpTest['hostid'];
 				$item['delay'] = $delay;
 				$item['type'] = ITEM_TYPE_HTTPTEST;
@@ -676,10 +689,26 @@ class CHttpTestManager {
 				$item['history'] = $this->history;
 				$item['trends'] = $this->trends;
 				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-			}
-			unset($item);
 
-			$stepItemids = DB::insert('items', $stepitems);
+				if ($dbItem) {
+					if (!empty($dbItem['templateid'])) {
+						throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
+					}
+					$stepItemids[] = $dbItem['itemid'];
+					$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
+				}
+				else {
+					$insertItems[] = $item;
+				}
+			}
+
+			if (!empty($insertItems)) {
+				$newStepItemIds = DB::insert('items', $insertItems);
+				$stepItemids = array_merge($stepItemids, $newStepItemIds);
+			}
+			if (!empty($updateItems)) {
+				DB::update('items', $updateItems);
+			}
 
 			$itemApplications = array();
 			foreach ($stepItemids as $itemid) {
