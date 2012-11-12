@@ -380,14 +380,13 @@ class CHttpTest extends CZBXAPI {
 	 */
 	public function update($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-		$this->validateUpdate($httpTests);
 
-		// add hostid if missing
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 		foreach ($httpTests as $hnum => $httpTest) {
 			unset($httpTests[$hnum]['templateid']);
 		}
 
+		// add hostid if missing
 		$dbHttpTests = array();
 		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
 				' FROM httptest ht'.
@@ -404,14 +403,15 @@ class CHttpTest extends CZBXAPI {
 
 		foreach($httpTests as $tnum => $httpTest) {
 			$test =& $httpTests[$tnum];
-			$test['hostid'] = $dbHttpTests[$httpTest['httptestid']]['hostid'];
+			$dbTest = $dbHttpTests[$httpTest['httptestid']];
+			$test['hostid'] = $dbTest['hostid'];
 
 			if (!empty($dbTest['templateid']) || empty($test['name'])) {
-				$test['name'] = $dbHttpTests[$httpTest['httptestid']]['name'];
+				$test['name'] = $dbTest['name'];
 				if (!empty($test['steps'])) {
 					foreach ($test['steps'] as $snum => $step) {
 						if (isset($step['httpstepid']) && (!empty($dbTest['templateid']) || empty($step['name']))) {
-							$test['steps'][$snum]['name'] = $dbHttpTests[$httpTest['httptestid']]['steps'][$step['httpstepid']]['name'];
+							$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
 						}
 						if (!empty($dbTest['templateid'])) {
 							unset($test['steps'][$snum]['no']);
@@ -421,6 +421,8 @@ class CHttpTest extends CZBXAPI {
 			}
 			unset($test);
 		}
+
+		$this->validateUpdate($httpTests);
 
 		$httpTestManager = new CHttpTestManager();
 		$httpTestManager->persist($httpTests);
@@ -435,7 +437,7 @@ class CHttpTest extends CZBXAPI {
 	 *
 	 * @return array|bool
 	 */
-	public function delete($httpTestIds) {
+	public function delete($httpTestIds, $nopermissions = false) {
 		if (empty($httpTestIds)) {
 			return true;
 		}
@@ -448,12 +450,14 @@ class CHttpTest extends CZBXAPI {
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-		foreach ($httpTestIds as $httpTestId) {
-			if (!empty($delHttpTests[$httpTestId]['templateid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated web scenario "%1$s".', $delHttpTests[$httpTestId]['name']));
-			}
-			if (!isset($delHttpTests[$httpTestId])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		if (!$nopermissions) {
+			foreach ($httpTestIds as $httpTestId) {
+				if (!empty($delHttpTests[$httpTestId]['templateid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated web scenario "%1$s".', $delHttpTests[$httpTestId]['name']));
+				}
+				if (!isset($delHttpTests[$httpTestId])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
 			}
 		}
 
@@ -483,16 +487,13 @@ class CHttpTest extends CZBXAPI {
 
 		DB::delete('httptest', array('httptestid' => $httpTestIds));
 
-		// TODO: REMOVE info
-		foreach ($delHttpTests as $httpTest) {
-			info(_s('Scenario "%s" deleted.', $httpTest['name']));
-		}
-
-		// TODO: REMOVE audit
+		// TODO: REMOVE
 		foreach ($delHttpTests as $httpTest) {
 			$host = reset($httpTest['hosts']);
+
+			info(_s('Deleted: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $host['host']));
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-				_s('Scenario "%1$s" "%2$s" host "%3$s".', $httpTest['name'], $httpTest['httptestid'], $host['host']));
+				_s('Web scenario "%1$s" "%2$s" host "%3$s".', $httpTest['name'], $httpTest['httptestid'], $host['host']));
 		}
 
 		return array('httptestids' => $httpTestIds);
@@ -593,12 +594,15 @@ class CHttpTest extends CZBXAPI {
 	 */
 	protected function checkApplicationHost(array $httpTests) {
 		$appIds = zbx_objectValues($httpTests, 'applicationid');
+		$appIds = zbx_toHash($appIds);
+		unset($appIds['0']);
+
 		if (!empty($appIds)) {
 			$appHostIds = array();
 
 			$dbCursor = DBselect('SELECT a.hostid, a.applicationid FROM applications a'.
 				' WHERE '.DBcondition('a.applicationid', $appIds));
-			while ($dbApp = $dbCursor) {
+			while ($dbApp = DBfetch($dbCursor)) {
 				$appHostIds[$dbApp['applicationid']] = $dbApp['hostid'];
 			}
 
