@@ -705,8 +705,49 @@ abstract class CHostGeneral extends CZBXAPI {
 		/* }}} APPLICATIONS */
 
 
+		// http tests
+		$sqlWhere = '';
+		if (!is_null($targetids)) {
+			$sqlWhere = ' AND '.DBCondition('ht1.hostid', $targetids);
+		}
+		$sql = 'SELECT DISTINCT ht1.httptestid,ht1.name,h.name as host'.
+				' FROM httptest ht1'.
+					' INNER JOIN httptest ht2 ON ht2.httptestid=ht1.templateid'.
+					' INNER JOIN hosts h ON h.hostid=ht1.hostid'.
+				' WHERE '.DBCondition('ht2.hostid', $templateids).
+				$sqlWhere;
+		$dbHttpTests = DBSelect($sql);
+		$httpTests = array();
+		while ($httpTest = DBfetch($dbHttpTests)) {
+			$httpTests[$httpTest['httptestid']] = array(
+				'name' => $httpTest['name'],
+				'host' => $httpTest['host']
+			);
+		}
+
+		if (!empty($httpTests)) {
+			if ($clear) {
+				$result = API::HttpTest()->delete(array_keys($httpTests), true);
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
+				}
+			}
+			else {
+				DB::update('httptest', array(
+					'values' => array('templateid' => 0),
+					'where' => array('httptestid' => array_keys($httpTests))
+				));
+				foreach ($httpTests as $httpTest) {
+					info(_s('Unlinked: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['host']));
+				}
+			}
+		}
+
+
 		$cond = array('templateid' => $templateids);
-		if (!is_null($targetids)) $cond['hostid'] =  $targetids;
+		if (!is_null($targetids)) {
+			$cond['hostid'] =  $targetids;
+		}
 		DB::delete('hosts_templates', $cond);
 
 		if (!is_null($targetids)) {
