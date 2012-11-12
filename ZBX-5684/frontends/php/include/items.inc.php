@@ -511,12 +511,14 @@ function resolveItemKeyMacros(array $item) {
 	}
 
 	if (!empty($macStack)) {
-		$dbItem = API::Item()->get(array(
+		$options = array(
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'output' => API_OUTPUT_REFER
-		));
+		);
+		$dbItem = API::Item()->get($options);
+		$dbItem += API::ItemPrototype()->get($options);
 		$dbItem = reset($dbItem);
 
 		$host = reset($dbItem['hosts']);

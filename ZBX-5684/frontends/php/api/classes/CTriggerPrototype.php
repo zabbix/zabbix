@@ -692,6 +692,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'preservekeys' => true
 			);
 			$items = API::Item()->get($objParams);
+			$items += API::ItemPrototype()->get($objParams);
 			foreach ($items as $item) {
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
@@ -725,7 +726,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $triggerid => $trigger) {
 					if (isset($ruleMap[$triggerid]) && isset($discoveryRules[$ruleMap[$triggerid]])) {

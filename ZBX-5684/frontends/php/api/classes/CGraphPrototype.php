@@ -509,13 +509,16 @@ class CGraphPrototype extends CGraphGeneral {
 
 		// adding Items
 		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
-			$items = API::Item()->get(array(
+			$opt = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			);
+			$items = API::Item()->get($opt);
+			$items += API::ItemPrototype()->get($opt);
+
 			foreach ($items as $item) {
 				$igraphs = $item['graphs'];
 				unset($item['graphs']);
@@ -549,7 +552,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $graphid => $graph) {
 					if (isset($ruleMap[$graphid]) && isset($discoveryRules[$ruleMap[$graphid]])) {
@@ -857,14 +860,16 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		$allowedItems = API::Item()->get(array(
+		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
 			'webitems' => true,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		);
+		$allowedItems = API::Item()->get($options);
+		$allowedItems += API::ItemPrototype()->get($options);
 
 		foreach ($itemids as $itemid) {
 			if (!isset($allowedItems[$itemid])) {

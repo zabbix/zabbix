@@ -57,6 +57,7 @@ class CItemPrototype extends CItemGeneral {
 			'hostids'					=> null,
 			'itemids'					=> null,
 			'discoveryids'				=> null,
+			'triggerids'				=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
@@ -175,6 +176,18 @@ class CItemPrototype extends CItemGeneral {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
+		}
+
+		// triggerids
+		if (!is_null($options['triggerids'])) {
+			zbx_value2array($options['triggerids']);
+
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
+				$sqlParts['select']['triggerid'] = 'f.triggerid';
+			}
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
 // inherited

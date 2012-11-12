@@ -59,7 +59,7 @@ class CItem extends CItemGeneral {
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
-			'where'		=> array('webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST),
+			'where'		=> array('webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST, 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -662,6 +662,7 @@ class CItem extends CItemGeneral {
 				$ruleMap[$rule['itemid']] = $rule['parent_itemid'];
 			}
 
+			// remove:
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,id.itemid'.
 				' FROM item_discovery id,items i'.

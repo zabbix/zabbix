@@ -49,11 +49,14 @@ if (!DBfetch(DBselect('SELECT i.itemid FROM items i WHERE i.itemid='.$_REQUEST['
 	show_error_message(_('No items defined.'));
 }
 
-$dbItems = API::Item()->get(array(
+$options = array(
 	'itemids' => $_REQUEST['itemid'],
 	'webitems' => true,
 	'nodeids' => get_current_nodeid(true)
-));
+);
+$dbItems = API::Item()->get();
+$dbItems += API::ItemPrototype()->get();
+
 if (empty($dbItems)) {
 	access_deny();
 }

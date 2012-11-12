@@ -545,13 +545,15 @@ class CConfigurationExport {
 			}
 		}
 
-		$graphItems = API::Item()->get(array(
+		$options = array(
 			'itemids' => $graphItemIds,
 			'output' => array('key_', 'flags', 'type'),
 			'webitems' => true,
 			'selectHosts' => array('host'),
 			'preservekeys' => true
-		));
+		);
+		$graphItems = API::Item()->get($options);
+		$graphItems += API::ItemPrototype()->get($options);
 
 		foreach ($graphs as $gnum => $graph) {
 			if ($graph['ymin_itemid'] && isset($graphItems[$graph['ymin_itemid']])) {
@@ -1026,14 +1028,16 @@ class CConfigurationExport {
 	 */
 	protected function getItemsReferences(array $itemIds) {
 		$idents = array();
-		$items = API::Item()->get(array(
+		$options = array(
 			'itemids' => $itemIds,
 			'output' => array('key_'),
 			'selectHosts' => array('host'),
 			'nodeids' => get_current_nodeid(true),
 			'webitems' => true,
 			'preservekeys' => true
-		));
+		);
+		$items = API::Item()->get($options);
+		$items += API::ItemPrototype()->get($options);
 		foreach ($items as $id => $item) {
 			$host = reset($item['hosts']);
 			$idents[$id] = array(

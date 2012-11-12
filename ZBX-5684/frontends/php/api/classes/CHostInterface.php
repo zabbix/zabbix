@@ -378,13 +378,13 @@ class CHostInterface extends CZBXAPI {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectItems'];
 				$items = API::Item()->get($objParams);
+				$items += API::ItemPrototype()->get($objParams);
 
 				$count = array();
 				foreach ($items as $itemid => $item) {
@@ -407,6 +407,7 @@ class CHostInterface extends CZBXAPI {
 				$objParams['groupCount'] = 1;
 
 				$items = API::Item()->get($objParams);
+				$items += API::ItemPrototype()->get($objParams);
 				$items = zbx_toHash($items, 'interfaceid');
 				foreach ($result as $interfaceid => $interface) {
 					if (isset($items[$interfaceid])) {
@@ -1019,7 +1020,6 @@ class CHostInterface extends CZBXAPI {
 			'output' => array('name'),
 			'selectHosts' => array('name'),
 			'interfaceids' => $interfaceids,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'limit' => 1

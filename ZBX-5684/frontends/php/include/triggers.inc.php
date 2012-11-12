@@ -2351,10 +2351,7 @@ function get_item_function_info($expr) {
 
 				$itemFound = API::Item()->get(array(
 					'hostids' => zbx_objectValues($hostFound, 'hostid'),
-					'filter' => array(
-						'key_' => $triggerExpr->data['items'],
-						'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
-					),
+					'filter' => array('key_' => $triggerExpr->data['items']),
 					'webitems' => true
 				));
 				if (empty($itemFound)) {

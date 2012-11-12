@@ -556,6 +556,7 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 				'webitems' => true
 			);
 			$myItem = API::Item()->get($options);
+			$myItem += API::ItemPrototype()->get($options);
 			$myItem = reset($myItem);
 			if (isset($myItem['itemid'])) {
 				$_REQUEST['itemid'] = $myItem['itemid'];
@@ -586,12 +587,14 @@ if (!isset($function)) {
 }
 
 if ($itemid) {
-	$items_data = API::Item()->get(array(
+	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'itemids' => $itemid,
 		'webitems' => true,
 		'selectHosts' => API_OUTPUT_EXTEND
-	));
+	);
+	$items_data = API::Item()->get($options);
+	$items_data += API::ItemPrototype()->get($options);
 	$item_data = reset($items_data);
 	$item_key = $item_data['key_'];
 	$item_host = reset($item_data['hosts']);
@@ -644,10 +647,12 @@ $data = array(
 // if user has already selected an item
 if (!empty($itemid)) {
 	// getting type of return value for the item user selected
-	$selectedItems = API::Item()->get(array(
+	$options = array(
 		'itemids' => array($itemid),
 		'output' => API_OUTPUT_EXTEND
-	));
+	);
+	$selectedItems = API::Item()->get($options);
+	$selectedItems += API::ItemPrototype()->get($options);
 	if ($selectedItem = reset($selectedItems)) {
 		$data['itemValueType'] = $selectedItem['value_type'];
 	}

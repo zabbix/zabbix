@@ -395,6 +395,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 
 			$cntExist = API::Item()->get($options);
+			$cntExist += API::ItemPrototype()->get($options);
 
 			if ($cntExist != count($axisItems)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value.'));

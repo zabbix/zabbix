@@ -779,31 +779,12 @@ class CDiscoveryRule extends CItemGeneral {
 			return array();
 		}
 
-		$itemKeys = array();
 		foreach ($srcTriggers as $id => $trigger) {
 			// skip triggers with web items
 			if (httpItemExists($trigger['items'])) {
 				unset($srcTriggers[$id]);
 				continue;
 			}
-
-			foreach ($trigger['items'] as $item) {
-				$itemKeys[$item['key_']] = $item['key_'];
-			}
-		}
-
-		// fetch newly created items
-		$items = API::Item()->get(array(
-			'hostids' => $dstDiscovery['hostid'],
-			'filter' => array(
-				'key_' => $itemKeys
-			),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-		$dstItems = array();
-		foreach ($items as $item) {
-			$dstItems[$item['key_']] = $item;
 		}
 
 		// save new triggers
@@ -1153,11 +1134,14 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// fetch source items
-		$items = API::Item()->get(array(
+		$options = array(
 			'itemids' => $srcItemIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		);
+		$items = API::Item()->get($options);
+		$items += API::ItemPrototype()->get($options);
+
 		$srcItems = array();
 		$itemKeys = array();
 		foreach ($items as $item) {
@@ -1166,14 +1150,18 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// fetch newly cloned items
-		$items = array_merge($dstDiscovery['items'], API::Item()->get(array(
+		$options = array(
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => array(
 				'key_' => $itemKeys
 			),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		)));
+		);
+		$newItems = API::Item()->get($options);
+		$newItems += API::ItemPrototype()->get($options);
+
+		$items = array_merge($dstDiscovery['items'], $newItems);
 		$dstItems = array();
 		foreach ($items as $item) {
 			$dstItems[$item['key_']] = $item;

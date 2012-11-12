@@ -414,8 +414,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 			'webitems' => true,
 			'filter' => array(
 				'host' => $itemHost,
-				'key_' => $key,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				'key_' => $key
 			),
 			'output' => API_OUTPUT_EXTEND
 		));
