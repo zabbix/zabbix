@@ -662,19 +662,6 @@ class CItem extends CItemGeneral {
 				$ruleMap[$rule['itemid']] = $rule['parent_itemid'];
 			}
 
-			// remove:
-			$dbRules = DBselect(
-				'SELECT id.parent_itemid,id.itemid'.
-				' FROM item_discovery id,items i'.
-				' WHERE '.DBcondition('id.itemid', $itemids).
-					' AND i.itemid=id.itemid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD
-			);
-			while ($rule = DBfetch($dbRules)) {
-				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
-				$ruleMap[$rule['itemid']] = $rule['parent_itemid'];
-			}
-
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'itemids' => $ruleids,
