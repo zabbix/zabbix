@@ -863,6 +863,7 @@ class CItem extends CItemGeneral {
 		$itemids = array();
 		$data = array();
 		foreach ($items as $item) {
+			unset($item['flags']); // flags cannot be changed
 			$data[] = array('values' => $item, 'where' => array('itemid' => $item['itemid']));
 			$itemids[] = $item['itemid'];
 		}
