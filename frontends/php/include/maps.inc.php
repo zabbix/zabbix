@@ -431,32 +431,12 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		// do function type (last, min, max, avg) related actions
 		if (0 == strcmp($function, 'last')) {
 			$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
-			$label = str_replace($expr, $value, $label);
 		}
 		elseif (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg')) {
-			// allowed item types for min, max and avg function
-			$history_table = array(
-				ITEM_VALUE_TYPE_FLOAT => 'history',
-				ITEM_VALUE_TYPE_UINT64 => 'history_uint'
-			);
-			if (!isset($history_table[$item['value_type']])) {
-				$label = str_replace($expr, '???', $label);
-				continue;
-			}
-
-			// search for item function data in DB corresponding history tables
-			$result = DBselect(
-				'SELECT '.$function.'(value) AS value'.
-				' FROM '.$history_table[$item['value_type']].
-				' WHERE clock>'.(time() - $parameter).
-				' AND itemid='.$item['itemid']
-			);
-			if (null === ($row = DBfetch($result))) {
-				$label = str_replace($expr, '('._('no data').')', $label);
-			}
-			else {
-				$label = str_replace($expr, convert_units($row['value'], $item['units']), $label);
-			}
+			$value = getItemFunctionalValue($item, $function, $parameter);
+		}
+		if (isset($value)) {
+			$label = str_replace($expr, $value, $label);
 		}
 	}
 
