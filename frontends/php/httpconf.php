@@ -243,17 +243,9 @@ elseif (isset($_REQUEST['save'])) {
 				if (isset($step['httpstepid'])) {
 					$stepId = $step['httpstepid'];
 					$newStep = unsetEqualValues($step, $dbHttpTest['steps'][$step['httpstepid']]);
-					if (empty($newStep)) {
-						unset($httpTest['steps'][$snum]);
-					}
-					else {
-						$newStep['httpstepid'] = $stepId;
-						$httpTest['steps'][$snum] = $newStep;
-					}
+					$newStep['httpstepid'] = $stepId;
+					$httpTest['steps'][$snum] = $newStep;
 				}
-			}
-			if (empty($httpTest['steps'])) {
-				unset($httpTest['steps']);
 			}
 
 			$httpTest['httptestid'] = $httptestid = $_REQUEST['httptestid'];
