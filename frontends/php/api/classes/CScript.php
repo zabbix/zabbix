@@ -147,9 +147,11 @@ class CScript extends CZBXAPI {
 			));
 			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
 
-			$sqlParts['where'][] = DBcondition('s.groupid', $hostGroupIds).
+			$sqlParts['select']['hostid'] = 'hg.hostid';
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where'][] = '(('.DBcondition('hg.groupid', $hostGroupIds).' AND hg.groupid=s.groupid)'.
 				' OR '.
-				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).')';
+				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
 		}
 
 		// usrgrpids
@@ -250,8 +252,8 @@ class CScript extends CZBXAPI {
 
 		$dbScripts = DBselect(
 			'SELECT s.scriptid'.
-			' FROM scripts s'.
-			' WHERE '.DBin_node('s.scriptid').
+				' FROM scripts s'.
+				' WHERE '.DBin_node('s.scriptid').
 				' AND s.name='.$script['name']
 		);
 		while ($script = DBfetch($dbScripts)) {
