@@ -519,6 +519,7 @@ function resolveItemKeyMacros(array $item) {
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
+			'webitems' => true,
 			'output' => API_OUTPUT_REFER
 		));
 		$dbItem = reset($dbItem);
