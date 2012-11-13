@@ -739,11 +739,6 @@ class CTemplateScreen extends CScreen {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 
-			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for screen "%1$s".', $screen['name']));
-			}
-
 			$screenDbFields = array('screenid' => null);
 			if (!check_db_fields($screenDbFields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
