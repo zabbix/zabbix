@@ -240,24 +240,6 @@ class CMaintenance extends CZBXAPI {
 			$sqlParts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['maintenance'] = 'm.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT m.maintenanceid) AS rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('maintenances m', $options, $sqlParts);
@@ -275,6 +257,9 @@ class CMaintenance extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$maintenanceids = array();
 
