@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 18:25+0200\n"
+"POT-Creation-Date: 2012-11-10 08:31+0200\n"
 "PO-Revision-Date: 2012-10-31 15:21+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -916,12 +916,12 @@ msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "НАЛАШТУВАННЯ ПРАВИЛ ВИЯВЛЕННЯ"
 
 #: include/views/configuration.graph.edit.php:25
-#: include/views/configuration.graph.list.php:31
+#: include/views/configuration.graph.list.php:32
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "НАЛАШТУВАННЯ ПРОТОТИПІВ ГРАФІКІВ"
 
 #: include/views/configuration.graph.edit.php:29
-#: include/views/configuration.graph.list.php:48
+#: include/views/configuration.graph.list.php:49
 msgid "CONFIGURATION OF GRAPHS"
 msgstr "НАЛАШТУВАННЯ ГРАФІКІВ"
 
@@ -1266,15 +1266,15 @@ msgstr "Не вдалося змінити метод аутентифікаці
 msgid "Cannot clear history"
 msgstr "Не вдалося очистити історію"
 
-#: api/classes/CDiscoveryRule.php:1213
+#: api/classes/CDiscoveryRule.php:1209
 msgid "Cannot clone graph prototypes."
 msgstr "Не вдалося клонувати прототипи графіків."
 
-#: api/classes/CDiscoveryRule.php:1103
+#: api/classes/CDiscoveryRule.php:1099
 msgid "Cannot clone item prototypes."
 msgstr "Не вдалося клонувати прототипи елементів даних."
 
-#: api/classes/CDiscoveryRule.php:825
+#: api/classes/CDiscoveryRule.php:821
 msgid "Cannot clone trigger prototypes."
 msgstr "Не вдалося клонувати прототипи тригерів."
 
@@ -1358,7 +1358,7 @@ msgstr "Не вдалося видалити групу елементів да�
 msgid "Cannot delete dependency"
 msgstr "Не вдалося видалити залежність"
 
-#: api/classes/CDiscoveryRule.php:622 discoveryconf.php:164
+#: api/classes/CDiscoveryRule.php:618 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
 msgstr "Не вдалося видалити правило виявлення"
@@ -1371,7 +1371,7 @@ msgstr "Не вдалося видалити плавила виявлення"
 msgid "Cannot delete graph"
 msgstr "Не вдалося видалити графік"
 
-#: api/classes/CItemPrototype.php:737
+#: api/classes/CItemPrototype.php:747
 msgid "Cannot delete graph prototype"
 msgstr "Не вдалося видалити прототип графіка"
 
@@ -1419,7 +1419,7 @@ msgstr "Не вдалося видалити елемент даних"
 msgid "Cannot delete items"
 msgstr "Не вдалося видалити елементи даних"
 
-#: api/classes/CItemPrototype.php:754
+#: api/classes/CItemPrototype.php:764
 msgid "Cannot delete items created by low level discovery."
 msgstr "Неможливо видалити елементи даних створені низькорівневим виявленням."
 
@@ -1462,16 +1462,16 @@ msgstr "Не вдалося видалити комплексний екран"
 msgid "Cannot delete script"
 msgstr "Не вдалося видалити скрипт"
 
-#: api/classes/CScript.php:385
+#: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "Не вдалося видалити скрипти. Вхідний параметр \"scriptids\" пустий."
 
-#: api/classes/CScript.php:409
+#: api/classes/CScript.php:437
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Не вдалося видалити скрипт. Скрипт \"%1$s\" використовується в операції дії \"%2$s\"."
 
-#: api/classes/CScript.php:398
+#: api/classes/CScript.php:426
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Не вдалося видалити скрипт. Скрипт з scriptid \"%s\" не існує."
@@ -1500,11 +1500,11 @@ msgstr "Не вдалося видалити шаблонний графік."
 msgid "Cannot delete templated item."
 msgstr "Не вдалося видалити шаблонний елемент даних."
 
-#: api/classes/CItemPrototype.php:698
+#: api/classes/CItemPrototype.php:708
 msgid "Cannot delete templated items"
 msgstr "Не вдалося видалити шаблонні елементи даних"
 
-#: api/classes/CDiscoveryRule.php:581
+#: api/classes/CDiscoveryRule.php:577
 msgid "Cannot delete templated items."
 msgstr "Не вдалося видалити шаблонні елементи даних."
 
@@ -1517,7 +1517,7 @@ msgstr "Не вдалося видалити шаблонний тригер \"%
 msgid "Cannot delete trigger"
 msgstr "Не вдалося видалити тригер"
 
-#: api/classes/CItemPrototype.php:769
+#: api/classes/CItemPrototype.php:779
 msgid "Cannot delete trigger prototype"
 msgstr "Не вдалося видалити прототип тригера"
 
@@ -1590,7 +1590,7 @@ msgstr "Не вдалося знайти вузел мережі \"%1$s\" вик
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти вузел мережі \"%1$s\" використовуваний в комплексному екрані \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:1019 api/classes/CDiscoveryRule.php:1091
+#: api/classes/CDiscoveryRule.php:1015 api/classes/CDiscoveryRule.php:1087
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:285
 #: include/items.inc.php:341
 #, php-format
@@ -2463,7 +2463,7 @@ msgstr "В системі як '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "В системі як '%1$s' із '%2$s'"
 
-#: api/classes/CScript.php:454
+#: api/classes/CScript.php:482
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2474,7 +2474,7 @@ msgstr ""
 "1. Некоректні IP/DNS сервера в \"zabbix.conf.php\";\n"
 "2. Некоректне налаштування DNS сервера.\n"
 
-#: api/classes/CScript.php:445
+#: api/classes/CScript.php:473
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2489,7 +2489,7 @@ msgstr ""
 "3. Демон Zabbix сервера не запущено;\n"
 "4. Фаєрвол блокує TCP з'єднання.\n"
 
-#: api/classes/CScript.php:451
+#: api/classes/CScript.php:479
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -2517,7 +2517,7 @@ msgstr "Координати"
 msgid "Copy"
 msgstr "Копіювати"
 
-#: include/views/configuration.graph.list.php:136
+#: include/views/configuration.graph.list.php:137
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2555,15 +2555,15 @@ msgstr "Створити групу елементів даних"
 msgid "Create discovery rule"
 msgstr "Створити правило виявлення"
 
-#: include/views/configuration.graph.list.php:40
+#: include/views/configuration.graph.list.php:41
 msgid "Create graph"
 msgstr "Створити графік"
 
-#: include/views/configuration.graph.list.php:43
+#: include/views/configuration.graph.list.php:44
 msgid "Create graph (select host first)"
 msgstr "Створити графік (спочатку оберіть вузел мережі)"
 
-#: include/views/configuration.graph.list.php:29
+#: include/views/configuration.graph.list.php:30
 msgid "Create graph prototype"
 msgstr "Створити прототип графіка"
 
@@ -2661,7 +2661,7 @@ msgstr "Створити перетворення значення"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Створено: Група елементів даних \"%1$s\" у \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:866
+#: api/classes/CDiscoveryRule.php:862
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Створено: Правило виявлення\"%1$s\" у \"%2$s\"."
@@ -2671,7 +2671,7 @@ msgstr "Створено: Правило виявлення\"%1$s\" у \"%2$s\".
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Створено: Елемент даних \"%1$s\" у \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:598
+#: api/classes/CItemPrototype.php:608
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Створено: Прототип елемента даних \"%1$s\" у \"%2$s\"."
@@ -3238,7 +3238,7 @@ msgstr "Видалити скрипт?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:139
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3274,7 +3274,7 @@ msgstr "Видалити вибрані правила виявлення?"
 msgid "Delete selected elements?"
 msgstr "Видалити вибрані елементи?"
 
-#: include/views/configuration.graph.list.php:140
+#: include/views/configuration.graph.list.php:141
 msgid "Delete selected graphs?"
 msgstr "Видалити вибрані графіки?"
 
@@ -3409,7 +3409,7 @@ msgstr "Видалено"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Група елементів даних \"%1$s\" із \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:630
+#: api/classes/CDiscoveryRule.php:626
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Правило виявлення \"%1$s\" із \"%2$s\"."
@@ -3429,7 +3429,7 @@ msgstr "Видалено: Вузел мережі \"%1$s\"."
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Елемент даних \"%1$s\" із \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:781
+#: api/classes/CItemPrototype.php:791
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Прототип елемента даних \"%1$s\" із \"%2$s\"."
@@ -3732,12 +3732,12 @@ msgstr "Об'єкт виявлення"
 msgid "Discovery rule"
 msgstr "Правило виявлення"
 
-#: api/classes/CDiscoveryRule.php:949
+#: api/classes/CDiscoveryRule.php:945
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Правило виявлення \"%1$s\" вже існує у \"%2$s\", успадковано з іншого шаблону."
 
-#: api/classes/CDiscoveryRule.php:936
+#: api/classes/CDiscoveryRule.php:932
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "У правила виявлення \"%1$s:%2$s\" некоректний період зберігання втрачених ресурсів: \"%3$s\". (мін: %4$d, макс: %5$d, допускається макрос користувача)"
@@ -3932,7 +3932,7 @@ msgstr "Дублікат вузла мережі. Вузел мережі з т�
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Дублікат імені карти мережі для карти \"%s\"."
 
-#: api/classes/CScript.php:284 api/classes/CScript.php:335
+#: api/classes/CScript.php:312 api/classes/CScript.php:363
 #, php-format
 msgid "Duplicate script name \"%s\"."
 msgstr "Дублікат імені скрипта \"%s\"."
@@ -4040,11 +4040,11 @@ msgid "Empty host name provided in expression."
 msgstr "У виразі вказано пусте ім'я вузла мережі."
 
 #: api/classes/CAction.php:1471 api/classes/CApplication.php:663
-#: api/classes/CDiscoveryRule.php:561 api/classes/CGraph.php:729
+#: api/classes/CDiscoveryRule.php:557 api/classes/CGraph.php:729
 #: api/classes/CGraphPrototype.php:778 api/classes/CHostGroup.php:641
 #: api/classes/CHostGroup.php:698 api/classes/CHostInterface.php:648
 #: api/classes/CHost.php:1993 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:677
+#: api/classes/CItem.php:927 api/classes/CItemPrototype.php:687
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
@@ -4206,27 +4206,27 @@ msgstr "Англійська (en_US)"
 msgid "Error"
 msgstr "Помилка"
 
-#: api/classes/CScript.php:459
+#: api/classes/CScript.php:487
 msgid "Error description"
 msgstr "Опис помилки"
 
-#: api/classes/CScript.php:497
+#: api/classes/CScript.php:525
 msgid "Error description: can't read script response, check connection."
 msgstr "Опис помилки: не вдалось прочитати відповідь скрипта, перевірте з'єднання."
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:502
 msgid "Error description: can't send command, check connection."
 msgstr "Опис помилки: не вдалось відправити команду, перевірте з'єднання."
 
-#: api/classes/CScript.php:490
+#: api/classes/CScript.php:518
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "Опис помилки: константа ZBX_SCRIPT_BYTES_LIMIT встановлена у \"include/defines.inc.php\" перевищує допустиму межу. Ви можете спробувати збільшити це значення."
 
-#: api/classes/CScript.php:486
+#: api/classes/CScript.php:514
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "Опис помилки: константа ZBX_SCRIPT_TIMEOUT таймауту встановлена у \"include/defines.inc.php\" перевищена. Ви можете спробувати збільшити це значення."
 
-#: api/classes/CScript.php:505
+#: api/classes/CScript.php:533
 msgid "Error description: empty response received."
 msgstr "Опис помилки: отримано пусту відповідь."
 
@@ -4716,7 +4716,7 @@ msgstr "Глобальні скрипти"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:143
+#: include/views/configuration.graph.list.php:144
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4838,7 +4838,7 @@ msgstr "Прототип графіка повинен мати як мінім�
 msgid "Graph prototypes"
 msgstr "Прототипи графіків"
 
-#: include/views/configuration.graph.list.php:32
+#: include/views/configuration.graph.list.php:33
 msgid "Graph prototypes of"
 msgstr "Прототипи графіків для"
 
@@ -4848,7 +4848,7 @@ msgid "Graph sum"
 msgstr "Сума графіку"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:78 popup.php:1347 popup.php:1353
+#: include/views/configuration.graph.list.php:79 popup.php:1347 popup.php:1353
 msgid "Graph type"
 msgstr "Тип графіка"
 
@@ -4869,7 +4869,7 @@ msgstr "Графік з таким же іменем, але іншого тип
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1194
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:786
 #: include/menu.inc.php:62 include/triggers.inc.php:1487
-#: include/views/configuration.graph.list.php:54
+#: include/views/configuration.graph.list.php:55
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
@@ -4905,7 +4905,7 @@ msgstr "Сітка"
 #: include/reports.inc.php:553
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
-#: include/views/configuration.graph.list.php:51
+#: include/views/configuration.graph.list.php:52
 #: include/views/configuration.httpconf.list.php:41
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
@@ -5045,7 +5045,7 @@ msgid "Hardware (Full details)"
 msgstr "Апаратна частина (повні деталі)"
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.list.php:77
+#: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -5145,7 +5145,7 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
 #: include/views/configuration.application.list.php:53
-#: include/views/configuration.graph.list.php:52
+#: include/views/configuration.graph.list.php:53
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:497
 #: include/views/configuration.httpconf.list.php:42
@@ -5353,7 +5353,7 @@ msgstr "Вузел мережі з цим самим видимим іменем
 #: include/reports.inc.php:585 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:75
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.hostgroups.list.php:111
 #: include/views/configuration.item.copy.php:42
@@ -6607,7 +6607,7 @@ msgid "Italian (it_IT)"
 msgstr "Італійська (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
-#: include/classes/screens/CScreenPlainText.php:37 include/forms.inc.php:1014
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1014
 #: include/reports.inc.php:694 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
@@ -6635,7 +6635,7 @@ msgstr "Елемент даних \"%1$s\" не існує в шаблоні \"%
 msgid "Item \"%1$s\" does not exist."
 msgstr "Елемент даних \"%1$s\" не існує."
 
-#: include/classes/import/CConfigurationImport.php:558
+#: include/classes/import/CConfigurationImport.php:560
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Елемент даних \"%1$s\" в \"%2$s\": група елементів даних \"%3$s\" не існує."
@@ -7952,7 +7952,7 @@ msgstr "NTLM аутентифікація"
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:53
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:75
+#: include/views/configuration.graph.list.php:76
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.massupdate.php:90
@@ -8178,8 +8178,8 @@ msgstr "Умов не визначено."
 msgid "No data collection"
 msgstr "Без збору даних"
 
-#: include/classes/screens/CScreenPlainText.php:36
-#: include/classes/screens/CScreenPlainText.php:56
+#: include/classes/screens/CScreenPlainText.php:41
+#: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
 msgstr "Немає заданих даних."
 
@@ -8215,7 +8215,7 @@ msgstr "Виявлень не визначено."
 msgid "No discovery checks defined."
 msgstr "Перевірок виявлення не визначено."
 
-#: api/classes/CDiscoveryRule.php:648
+#: api/classes/CDiscoveryRule.php:644
 msgid "No discovery rule IDs given."
 msgstr "ID правил виявлення не вказано."
 
@@ -8267,11 +8267,11 @@ msgstr "Для елемента комплексного екрану не вк�
 msgid "No graph item with graphid \"%s\"."
 msgstr "Немає елемента графіку з graphid \"%s\"."
 
-#: include/views/configuration.graph.list.php:71
+#: include/views/configuration.graph.list.php:72
 msgid "No graph prototypes defined."
 msgstr "Прототипів графіків не визначено."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:71
+#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:72
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1342
@@ -8301,7 +8301,7 @@ msgstr "Немає груп у шаблону [ %s ]"
 msgid "No history defined."
 msgstr "Історії не визначено."
 
-#: api/classes/CDiscoveryRule.php:651
+#: api/classes/CDiscoveryRule.php:647
 msgid "No host IDs given."
 msgstr "Не вказано ID вузлів мережі."
 
@@ -8446,8 +8446,8 @@ msgstr "Нод не визначено."
 msgid "No operations defined."
 msgstr "Операцій не визначено."
 
-#: include/classes/import/CConfigurationImport.php:816
-#: include/classes/import/CConfigurationImport.php:893
+#: include/classes/import/CConfigurationImport.php:818
+#: include/classes/import/CConfigurationImport.php:895
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "Немає прав доступу до графіка \"%1$s\"."
@@ -8507,9 +8507,9 @@ msgstr "Немає прав доступу до системи."
 #: api/classes/CAction.php:896 api/classes/CAction.php:1484
 #: api/classes/CApplication.php:449 api/classes/CApplication.php:456
 #: api/classes/CApplication.php:604 api/classes/CApplication.php:681
-#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:578
-#: api/classes/CDiscoveryRule.php:656 api/classes/CDiscoveryRule.php:661
-#: api/classes/CDiscoveryRule.php:679 api/classes/CDiscoveryRule.php:682
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:574
+#: api/classes/CDiscoveryRule.php:652 api/classes/CDiscoveryRule.php:657
+#: api/classes/CDiscoveryRule.php:675 api/classes/CDiscoveryRule.php:678
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:592 api/classes/CGraphGeneral.php:161
 #: api/classes/CGraph.php:826 api/classes/CGraphPrototype.php:871
@@ -8519,7 +8519,7 @@ msgstr "Немає прав доступу до системи."
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:695
+#: api/classes/CItem.php:944 api/classes/CItemPrototype.php:705
 #: api/classes/CMaintenance.php:407 api/classes/CMaintenance.php:432
 #: api/classes/CMaintenance.php:445 api/classes/CMaintenance.php:553
 #: api/classes/CMaintenance.php:570 api/classes/CMaintenance.php:637
@@ -10696,7 +10696,7 @@ msgstr "Комплексні екрани"
 msgid "Script"
 msgstr "Скрипт"
 
-#: api/classes/CScript.php:297 api/classes/CScript.php:349
+#: api/classes/CScript.php:325 api/classes/CScript.php:377
 #, php-format
 msgid "Script \"%s\" already exists."
 msgstr "Скрипт \"%s\" вже існує."
@@ -10722,7 +10722,7 @@ msgstr "Профілювання скрипта"
 msgid "Script updated"
 msgstr "Скрипт оновлено"
 
-#: api/classes/CScript.php:330
+#: api/classes/CScript.php:358
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Скрипт з scriptid \"%s\" не існує."
@@ -11890,8 +11890,8 @@ msgstr "Час очікування"
 
 #: include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenHistory.php:266
-#: include/classes/screens/CScreenPlainText.php:37
-#: include/classes/screens/CScreenPlainText.php:57
+#: include/classes/screens/CScreenPlainText.php:42
+#: include/classes/screens/CScreenPlainText.php:62
 msgid "Timestamp"
 msgstr "Час виникнення (штамп)"
 
@@ -11984,8 +11984,8 @@ msgstr "Тригер"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Тригер \"%1$s\" вже існує у \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:931
-#: include/classes/import/CConfigurationImport.php:967
+#: include/classes/import/CConfigurationImport.php:933
+#: include/classes/import/CConfigurationImport.php:969
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Тригер \"%1$s\" залежить від тригера \"%2$s\", який не існує."
@@ -12554,7 +12554,7 @@ msgstr "Оновлено: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Оновлено: Група елементів даних \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:910
+#: api/classes/CDiscoveryRule.php:906
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Оновлено: Правило виявлення \"%1$s\" в \"%2$s\"."
@@ -12564,7 +12564,7 @@ msgstr "Оновлено: Правило виявлення \"%1$s\" в \"%2$s\"
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Оновлено: Елемент даних \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:648
+#: api/classes/CItemPrototype.php:658
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Оновлено: Прототип елемента даних \"%1$s\" в \"%2$s\"."
@@ -13054,7 +13054,7 @@ msgid "When active"
 msgstr "Коли активно"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
-#: include/views/configuration.graph.list.php:76
+#: include/views/configuration.graph.list.php:77
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
@@ -13166,7 +13166,7 @@ msgstr "Помилкові поля для проксі \"%s\"."
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "Помилкові поля для комплексного екрану \"%1$s\"."
 
-#: api/classes/CScript.php:280
+#: api/classes/CScript.php:308
 msgid "Wrong fields for script."
 msgstr "Помилкові поля для скрипта."
 
@@ -13352,11 +13352,11 @@ msgstr "Ви не вказали цілі глобального скрипта 
 #: api/classes/CHostGroup.php:1011 api/classes/CHost.php:1592
 #: api/classes/CHost.php:1646 api/classes/CHost.php:1960
 #: api/classes/CItem.php:1049 api/classes/CItem.php:1052
-#: api/classes/CItemPrototype.php:792 api/classes/CItemPrototype.php:795
+#: api/classes/CItemPrototype.php:802 api/classes/CItemPrototype.php:805
 #: api/classes/CMaintenance.php:624 api/classes/CMaintenance.php:731
-#: api/classes/CMaintenance.php:743 api/classes/CScript.php:272
-#: api/classes/CScript.php:319 api/classes/CScript.php:381
-#: api/classes/CScript.php:431 api/classes/CTemplate.php:974
+#: api/classes/CMaintenance.php:743 api/classes/CScript.php:300
+#: api/classes/CScript.php:347 api/classes/CScript.php:409
+#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1267 api/classes/CTemplate.php:1299
 #: api/classes/CTemplate.php:1533 api/classes/CTemplateScreen.php:739
@@ -13467,7 +13467,7 @@ msgstr "Zabbix тимчасово недоступний!"
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
-#: api/classes/CScript.php:448
+#: api/classes/CScript.php:476
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -13611,7 +13611,7 @@ msgstr "d.m.Y H:i"
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
 #: include/acknow.inc.php:46 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
-#: include/classes/screens/CScreenPlainText.php:90 include/defines.inc.php:890
+#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897
 #: include/defines.inc.php:898 include/defines.inc.php:899
 #: include/defines.inc.php:907 include/defines.inc.php:908
