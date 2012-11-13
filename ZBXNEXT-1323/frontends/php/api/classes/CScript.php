@@ -541,28 +541,50 @@ class CScript extends CZBXAPI {
 			$scriptsByHost[$hostid] = array();
 		}
 
-		$scripts  = $this->get(array(
+		$scripts = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
 			'hostids' => $hostIds,
 			'sortfield' => 'name',
 			'preservekeys' => true
 		));
-		foreach ($scripts as $script) {
-			$hosts = $script['hosts'];
-			unset($script['hosts']);
 
-			foreach ($hosts as $host) {
-				$hostId = $host['hostid'];
-				if (isset($scriptsByHost[$hostId])) {
-					$scriptsByHost[$hostId][] = $script;
+		if (!empty($scripts)) {
+			$macrosResolver = new CMacrosResolver();
+
+			foreach ($scripts as $script) {
+				$hosts = $script['hosts'];
+				unset($script['hosts']);
+
+				// get resolved macros
+				$macrosData = array();
+				if (!empty($script['confirmation'])) {
+					foreach ($hosts as $host) {
+						$macrosData[$host['hostid']] = $script['confirmation'];
+					}
+				}
+
+				$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+
+				// set script to host
+				foreach ($hosts as $host) {
+					$hostId = $host['hostid'];
+
+					if (isset($scriptsByHost[$hostId])) {
+						$size = count($scriptsByHost[$hostId]);
+						$scriptsByHost[$hostId][$size] = $script;
+
+						// set confirmation text with resolved macros
+						if (!empty($macrosData[$hostId])) {
+							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId];
+						}
+					}
 				}
 			}
 		}
 
 		return $scriptsByHost;
 	}
-
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// only apply the node option if no specific ids are given
