@@ -49,13 +49,12 @@ asort_by_key($items, 'sortorder');
 /*
  * Permissions
  */
-$options = array(
+$dbItems = API::Item()->get(array(
 	'webitems' => true,
 	'itemids' => zbx_objectValues($items, 'itemid'),
-	'nodeids' => get_current_nodeid(true)
-);
-$dbItems = API::Item()->get($options);
-$dbItems += API::ItemPrototype()->get($options);
+	'nodeids' => get_current_nodeid(true),
+	'filter' => array('flags' => null)
+));
 
 $dbItems = zbx_toHash($dbItems, 'itemid');
 foreach ($items as $item) {

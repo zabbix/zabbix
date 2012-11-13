@@ -57,7 +57,9 @@ class CItemPrototype extends CItemGeneral {
 			'hostids'					=> null,
 			'itemids'					=> null,
 			'discoveryids'				=> null,
+			'graphids'					=> null,
 			'triggerids'				=> null,
+			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
@@ -188,6 +190,18 @@ class CItemPrototype extends CItemGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
+		}
+
+		// graphids
+		if (!is_null($options['graphids'])) {
+			zbx_value2array($options['graphids']);
+
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
+				$sqlParts['select']['graphid'] = 'gi.graphid';
+			}
+			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
+			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
 // inherited
@@ -349,6 +363,12 @@ class CItemPrototype extends CItemGeneral {
 						$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
 						unset($item['graphid']);
 					}
+
+					// webitems
+					if (!is_null($options['webitems'])) {
+						unset($sqlParts['where']['webtype']);
+					}
+
 // discoveryids
 					if (isset($item['discoveryids'])) {
 						if (!isset($result[$item['itemid']]['discovery']))

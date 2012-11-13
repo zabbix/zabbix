@@ -515,10 +515,10 @@ function resolveItemKeyMacros(array $item) {
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
-			'output' => API_OUTPUT_REFER
+			'output' => API_OUTPUT_REFER,
+			'filter' => array('flags' => null)
 		);
 		$dbItem = API::Item()->get($options);
-		$dbItem += API::ItemPrototype()->get($options);
 		$dbItem = reset($dbItem);
 
 		$host = reset($dbItem['hosts']);

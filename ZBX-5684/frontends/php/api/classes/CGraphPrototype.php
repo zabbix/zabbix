@@ -509,15 +509,14 @@ class CGraphPrototype extends CGraphGeneral {
 
 		// adding Items
 		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
-			$opt = array(
+			$items = API::Item()->get(array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
-				'preservekeys' => true
-			);
-			$items = API::Item()->get($opt);
-			$items += API::ItemPrototype()->get($opt);
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
+			));
 
 			foreach ($items as $item) {
 				$igraphs = $item['graphs'];
@@ -860,16 +859,15 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		$options = array(
+		$allowedItems = API::Item()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
 			'webitems' => true,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		);
-		$allowedItems = API::Item()->get($options);
-		$allowedItems += API::ItemPrototype()->get($options);
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
+		));
 
 		foreach ($itemids as $itemid) {
 			if (!isset($allowedItems[$itemid])) {

@@ -956,8 +956,8 @@
 				$data['item'] = API::DiscoveryRule()->get($options);
 			}
 			else {
+				$options['filter'] = array('flags' => null);
 				$data['item'] = API::Item()->get($options);
-				$data['item'] += API::ItemPrototype()->get($options);
 			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
@@ -972,12 +972,12 @@
 					'selectHosts' => array('name')
 				);
 				if ($data['is_discovery_rule']) {
-					$data['item'] = API::DiscoveryRule()->get($options);
+					$item = API::DiscoveryRule()->get($options);
 				}
 				else {
 					$options['selectDiscoveryRule'] = array('itemid');
-					$data['item'] = API::Item()->get($options);
-					$data['item'] += API::ItemPrototype()->get($options);
+					$options['filter'] = array('flags' => null);
+					$item = API::Item()->get($options);
 				}
 				$item = reset($item);
 

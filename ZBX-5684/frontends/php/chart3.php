@@ -93,14 +93,14 @@ else {
 	$items = get_request('items', array());
 	asort_by_key($items, 'sortorder');
 
-	$options = array(
+	$dbItems = API::Item()->get(array(
 		'webitems' => true,
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
-		'output' => API_OUTPUT_SHORTEN
-	);
-	$dbItems = API::Item()->get();
-	$dbItems += API::ItemPrototype()->get();
+		'output' => API_OUTPUT_SHORTEN,
+		'preservekeys' => true,
+		'filter' => array('flags' => null)
+	));
 
 	$dbItems = zbx_toHash($dbItems, 'itemid');
 	foreach ($items as $item) {

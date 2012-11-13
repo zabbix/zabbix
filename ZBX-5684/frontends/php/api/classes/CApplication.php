@@ -681,14 +681,13 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$itemOptions = array(
+		$allowedItems = API::Item()->get(array(
 			'itemids' => $itemids,
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$allowedItems = API::Item()->get($itemOptions);
-		$allowedItems += API::ItemPrototype()->get($itemOptions);
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
+		));
 
 		foreach ($items as $num => $item) {
 			if (!isset($allowedItems[$item['itemid']])) {

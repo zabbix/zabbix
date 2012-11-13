@@ -550,13 +550,12 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 		}
 		if (isset($expr['host']) && isset($expr['item'])) {
 			$_REQUEST['description'] = $expr['host'] .':'. $expr['item'];
-			$options = array(
+			$myItem = API::Item()->get(array(
 				'filter' => array('host' => $expr['host'], 'key_' => $expr['item']),
 				'output' => API_OUTPUT_EXTEND,
-				'webitems' => true
-			);
-			$myItem = API::Item()->get($options);
-			$myItem += API::ItemPrototype()->get($options);
+				'webitems' => true,
+				'filter' => array('flags' => null)
+			));
 			$myItem = reset($myItem);
 			if (isset($myItem['itemid'])) {
 				$_REQUEST['itemid'] = $myItem['itemid'];
@@ -587,14 +586,13 @@ if (!isset($function)) {
 }
 
 if ($itemid) {
-	$options = array(
+	$items_data = API::Item()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'itemids' => $itemid,
 		'webitems' => true,
-		'selectHosts' => API_OUTPUT_EXTEND
-	);
-	$items_data = API::Item()->get($options);
-	$items_data += API::ItemPrototype()->get($options);
+		'selectHosts' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => null)
+	));
 	$item_data = reset($items_data);
 	$item_key = $item_data['key_'];
 	$item_host = reset($item_data['hosts']);
@@ -647,12 +645,11 @@ $data = array(
 // if user has already selected an item
 if (!empty($itemid)) {
 	// getting type of return value for the item user selected
-	$options = array(
+	$selectedItems = API::Item()->get(array(
 		'itemids' => array($itemid),
-		'output' => API_OUTPUT_EXTEND
-	);
-	$selectedItems = API::Item()->get($options);
-	$selectedItems += API::ItemPrototype()->get($options);
+		'output' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => null)
+	));
 	if ($selectedItem = reset($selectedItems)) {
 		$data['itemValueType'] = $selectedItem['value_type'];
 	}

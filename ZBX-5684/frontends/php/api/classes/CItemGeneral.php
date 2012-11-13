@@ -617,20 +617,10 @@ abstract class CItemGeneral extends CZBXAPI {
 				'output' => array('itemid', 'type', 'key_', 'flags', 'templateid'),
 				'hostids' => $hostId,
 				'preservekeys' => true,
-				'nopermissions' => true
+				'nopermissions' => true,
+				'filter' => array('flags' => null)
 			));
-			$exItems += API::ItemPrototype()->get(array(
-				'output' => array('itemid', 'type', 'key_', 'flags', 'templateid'),
-				'hostids' => $hostId,
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-			$exItems += API::DiscoveryRule()->get(array(
-				'output' => array('itemid', 'type', 'key_', 'flags', 'templateid'),
-				'hostids' => $hostId,
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
+
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 

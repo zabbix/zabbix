@@ -59,7 +59,7 @@ class CItem extends CItemGeneral {
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
-			'where'		=> array('webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST, 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'),
+			'where'		=> array('webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST, 'flags' => 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -327,6 +327,10 @@ class CItem extends CItemGeneral {
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 				$sqlParts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
+
+			if (array_key_exists('flags', $options['filter']) && is_null($options['filter']['flags'])) {
+				unset($sqlParts['where']['flags']);
+			}
 		}
 
 		// group
@@ -397,7 +401,6 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemids = array();
-
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {

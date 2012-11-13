@@ -379,12 +379,12 @@ class CHostInterface extends CZBXAPI {
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
 			);
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectItems'];
 				$items = API::Item()->get($objParams);
-				$items += API::ItemPrototype()->get($objParams);
 
 				$count = array();
 				foreach ($items as $itemid => $item) {
@@ -407,7 +407,6 @@ class CHostInterface extends CZBXAPI {
 				$objParams['groupCount'] = 1;
 
 				$items = API::Item()->get($objParams);
-				$items += API::ItemPrototype()->get($objParams);
 				$items = zbx_toHash($items, 'interfaceid');
 				foreach ($result as $interfaceid => $interface) {
 					if (isset($items[$interfaceid])) {
