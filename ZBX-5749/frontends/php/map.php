@@ -55,8 +55,6 @@ if (empty($map)) {
 	access_deny();
 }
 
-add_elementNames($map['selements']);
-
 $mapPainter = new CMapPainter($map, array(
 	'map' => array(
 		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements']))
@@ -102,6 +100,8 @@ if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
 
 $nocalculations = get_request('nocalculations', false);
 if ($nocalculations) {
+	add_elementNames($map['selements']);
+
 	// get default iconmap id to use for elements that use icon map
 	if ($map['iconmapid']) {
 		$iconMaps = API::IconMap()->get(array(
@@ -139,6 +139,8 @@ if ($nocalculations) {
 	$allLinks = true;
 }
 else {
+	add_triggerExpressions($map['selements']);
+
 	$areas = populateFromMapAreas($map);
 	$map_info = getSelementsInfo($map);
 	processAreasCoordinates($map, $areas, $map_info);
