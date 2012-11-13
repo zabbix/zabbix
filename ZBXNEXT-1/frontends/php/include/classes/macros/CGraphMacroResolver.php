@@ -114,29 +114,7 @@ class CGraphMacroResolver {
 				}
 				// macro function is "max", "min" or "avg"
 				else {
-					// allowed item types for min, max and avg function
-					$historyTables = array(ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint');
-					if (!isset($historyTables[$item['value_type']])) {
-						$value = UNRESOLVED_MACRO_STRING;
-					}
-					else {
-						// search for item function data in DB corresponding history table
-						$result = DBselect(
-							'SELECT '.$matches['functions'][$i].'(value) AS value'.
-							' FROM '.$historyTables[$item['value_type']].
-							' WHERE clock>'.(time() - convertFunctionValue($matches['parameters'][$i])).
-							' AND itemid='.$item['itemid'].
-							' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
-						);
-						if ($row = DBfetch($result)) {
-							$value = convert_units($row['value'], $item['units']);
-						}
-						// no data in history
-						else {
-							$value = UNRESOLVED_MACRO_STRING;
-						}
-					}
-
+					$value = getItemFunctionalValue($item, $matches['functions'][$i], $matches['parameters'][$i]);
 				}
 			}
 			// there is no item with given key in given host, or there is no permissions to that item

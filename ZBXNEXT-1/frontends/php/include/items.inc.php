@@ -938,6 +938,51 @@ function formatItemLastValue(array $item, $unknownString = '-') {
 }
 
 /**
+ * Retrieves from DB historical data for items and applies functional calculations.
+ * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
+ *
+ * @param type $item
+ * @param type $item['value_type'] type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
+ * @param type $item['itemid'] id of item
+ * @param type $item['units'] units of item
+ * @param type $function function to apply to time period from param, allowed: min, max and avg
+ * @param type $param formated parameter for function, example: "2w" meaning 2 weeks
+ *
+ * @return string item functional value from history
+ */
+function getItemFunctionalValue($item, $function, $param) {
+
+	// check wether function is allowed
+	if (!in_array($function, array('min', 'max', 'avg'))) {
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	// allowed item types for min, max and avg function
+	$historyTables = array(ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint');
+
+	if (!isset($historyTables[$item['value_type']])) {
+		return UNRESOLVED_MACRO_STRING;
+	}
+	else {
+		// search for item function data in DB corresponding history table
+		$result = DBselect(
+			'SELECT '.$function.'(value) AS value'.
+			' FROM '.$historyTables[$item['value_type']].
+			' WHERE clock>'.(time() - convertFunctionValue($param)).
+			' AND itemid='.$item['itemid'].
+			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
+		);
+		if ($row = DBfetch($result)) {
+			return convert_units($row['value'], $item['units']);
+		}
+		// no data in history
+		else {
+			return UNRESOLVED_MACRO_STRING;
+		}
+	}
+}
+
+/**
  * Format item lastvalue depending on it's value type.
  *
  * @param array $item
