@@ -115,19 +115,7 @@ class CGraphMacroResolver {
 			if ($item = reset($item)) {
 				// macro function is "last"
 				if ($matches['functions'][$i] == 'last') {
-					// if no data gathered for item
-					if ($item['lastclock'] == 0) {
-						$macroList[$macro] = UNRESOLVED_MACRO_STRING;
-						continue;
-					}
-					// process item last value, add units and value map
-					else {
-						$macroList[$macro] = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-							? convert_units($item['lastvalue'], $item['units']) : $item['lastvalue'];
-						if ($item['valuemapid']) {
-							$macroList[$macro] = applyValueMap($macroList[$macro], $item['valuemapid']);
-						}
-					}
+					$macroList[$macro] = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
 				}
 				// macro function is "max", "min" or "avg"
 				else {
