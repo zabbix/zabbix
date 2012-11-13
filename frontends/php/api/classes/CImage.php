@@ -118,17 +118,6 @@ class CImage extends CZBXAPI {
 				' OR sm.backgroundid=i.imageid)';
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['images'] = 'i.imageid, i.imagetype, i.name';
-		}
-
-		// count
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT i.imageid) as rowscount');
-		}
-
 		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('images i', $options, $sqlParts);
@@ -146,6 +135,9 @@ class CImage extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$imageids = array();
 
@@ -183,6 +175,7 @@ class CImage extends CZBXAPI {
 			}
 			else {
 				$imageids[$image['imageid']] = $image['imageid'];
+				unset($image['image']);
 
 				if (!isset($result[$image['imageid']])) {
 					$result[$image['imageid']] = array();
