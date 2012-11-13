@@ -286,8 +286,7 @@ elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
 
 		if (activate_httptest($id)) {
 			$go_result = true;
-			$host = get_host_by_applicationid($httptest_data['applicationid']);
-
+			$host = get_host_by_hostid($_REQUEST['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
 				_('Host').' ['.$host['host'].']'._('Web scenario activated'));
 		}
@@ -304,8 +303,7 @@ elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_httptestid'])) {
 
 		if (disable_httptest($id)) {
 			$go_result = true;
-			$host = get_host_by_applicationid($httptest_data['applicationid']);
-
+			$host = get_host_by_hostid($_REQUEST['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
 				_('Host').' ['.$host['host'].']'._('Web scenario disabled'));
 		}
@@ -323,9 +321,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 		if (delete_history_by_httptestid($id)) {
 			$go_result = true;
 			DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.$id);
-			$host = DBfetch(DBselect('SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.applicationid='.$applicationid));
-
-			$host = get_host_by_applicationid($httptest_data['applicationid']);
+			$host = DBfetch(DBselect('SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid'));
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
 				_('Host').' ['.$host['host'].']'._('History cleared'));
