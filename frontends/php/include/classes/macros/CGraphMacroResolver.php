@@ -99,8 +99,6 @@ class CGraphMacroResolver {
 			$matches['hosts'][$i] = $this->resolvePositionalMacros($host, $items);
 		}
 
-		// build list of macros: $macroList['{hostname:key.function(param)}'] = 'value';
-		$macroList = array();
 		foreach ($matches['macros'] as $i => $macro) {
 			// get item with key within host
 			$item = API::Item()->get(array(
@@ -115,59 +113,44 @@ class CGraphMacroResolver {
 			if ($item = reset($item)) {
 				// macro function is "last"
 				if ($matches['functions'][$i] == 'last') {
-					$macroList[$macro] = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
+					$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
 				}
 				// macro function is "max", "min" or "avg"
 				else {
 					// allowed item types for min, max and avg function
 					$historyTables = array(ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint');
 					if (!isset($historyTables[$item['value_type']])) {
-						$macroList[$macro] = UNRESOLVED_MACRO_STRING;
-						continue;
+						$value = UNRESOLVED_MACRO_STRING;
 					}
-
-					// search for item function data in DB corresponding history table
-					$result = DBselect(
-						'SELECT '.$matches['functions'][$i].'(value) AS value'.
-						' FROM '.$historyTables[$item['value_type']].
-						' WHERE clock>'.(time() - convertFunctionValue($matches['parameters'][$i])).
-						' AND itemid='.$item['itemid'].
-						' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
-					);
-					if ($row = DBfetch($result)) {
-						$macroList[$macro] = convert_units($row['value'], $item['units']);
-					}
-					// no data in history
 					else {
-						$macroList[$macro] = UNRESOLVED_MACRO_STRING;
-						continue;
+						// search for item function data in DB corresponding history table
+						$result = DBselect(
+							'SELECT '.$matches['functions'][$i].'(value) AS value'.
+							' FROM '.$historyTables[$item['value_type']].
+							' WHERE clock>'.(time() - convertFunctionValue($matches['parameters'][$i])).
+							' AND itemid='.$item['itemid'].
+							' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
+						);
+						if ($row = DBfetch($result)) {
+							$value = convert_units($row['value'], $item['units']);
+						}
+						// no data in history
+						else {
+							$value = UNRESOLVED_MACRO_STRING;
+						}
 					}
 
 				}
 			}
 			// there is no item with given key in given host, or there is no permissions to that item
 			else {
-				$macroList[$macro] = UNRESOLVED_MACRO_STRING;
+				$value = UNRESOLVED_MACRO_STRING;
 			}
-		}
 
-		// sorting by macro length ensure that no part of longer macro will be replaced with shorter macro,
-		// consider: {a:a.last(0)} and {a:a["{a:a.last(0)}"].last(0)} macros
-		uksort($macroList, array($this, "cmpLength"));
-
-		// replace macros with values in $str
-		foreach ($macroList as $macro => $value) {
-			$str = str_replace($macro, $value, $str);
+			$str = str_replace_first($macro, $value, $str);
 		}
 
 		return $str;
-	}
-
-	/**
-	 * Sorting helper function for macro array sorting by macro length
-	 */
-	private function cmpLength($a, $b) {
-		return (strlen($a) > strlen($b)) ? -1 : 1;
 	}
 
 	/**
