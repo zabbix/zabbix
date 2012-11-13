@@ -285,7 +285,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 					$tmpPriority = $priorities[$dbHost['interfacetype']];
 				}
 			}
-//sdff($selement);
+
 			// get all function ids from expression and link host data against position in expression
 			preg_match_all('/\{([0-9]+)\}/', $selement['elementExpressionTrigger'], $matches);
 			$hostsByNr = array();
