@@ -496,18 +496,42 @@ class CDRule extends CZBXAPI {
 					break;
 			}
 
-
+			// set default values for snmpv3 fields
 			if (!isset($dCheck['snmpv3_securitylevel'])) {
 				$dCheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
 			}
 
 			switch ($dCheck['snmpv3_securitylevel']) {
 				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+					$dChecks[$dcnum]['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 					$dChecks[$dcnum]['snmpv3_authpassphrase'] = $dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
 					break;
 				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 					$dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
 					break;
+			}
+
+			// validate snmpv3 fields
+			if (isset($dCheck['snmpv3_securitylevel']) && $dCheck['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+				// snmpv3 authprotocol
+				if (str_in_array($dCheck['snmpv3_securitylevel'], array(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV))) {
+					if (zbx_empty($dCheck['snmpv3_authprotocol'])
+							|| (isset($dCheck['snmpv3_authprotocol'])
+									&& !str_in_array($dCheck['snmpv3_authprotocol'], array(ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA)))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for discovery rule "%1$s".', $dCheck['name']));
+					}
+				}
+
+				// snmpv3 privprotocol
+				if ($dCheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					if (zbx_empty($dCheck['snmpv3_privprotocol'])
+							|| (isset($dCheck['snmpv3_privprotocol'])
+									&& !str_in_array($dCheck['snmpv3_privprotocol'], array(ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES)))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for discovery rule "%1$s".', $dCheck['name']));
+					}
+				}
 			}
 
 			$this->validateDuplicateChecks($dChecks);
@@ -516,8 +540,6 @@ class CDRule extends CZBXAPI {
 		if ($uniq > 1) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
 		}
-
-
 	}
 
 	protected function validateRequiredFields($dRules, $on) {

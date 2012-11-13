@@ -64,7 +64,9 @@ abstract class CItemGeneral extends CZBXAPI {
 			'prevorgvalue'			=> array('system' => 1),
 			'snmpv3_securityname'	=> array(),
 			'snmpv3_securitylevel'	=> array(),
+			'snmpv3_authprotocol'	=> array(),
 			'snmpv3_authpassphrase'	=> array(),
+			'snmpv3_privprotocol'	=> array(),
 			'snmpv3_privpassphrase'	=> array(),
 			'formula'				=> array('template' => 1),
 			'error'					=> array('system' => 1),
@@ -319,10 +321,30 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 			}
 
-			// SNMP port
+			// snmp port
 			if (isset($fullItem['port']) && !zbx_empty($fullItem['port']) && !validatePortNumberOrMacro($fullItem['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['name'], $fullItem['key_'], $fullItem['port']));
+			}
+
+			if (isset($fullItem['snmpv3_securitylevel']) && $fullItem['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+				// snmpv3 authprotocol
+				if (str_in_array($fullItem['snmpv3_securitylevel'], array(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV))) {
+					if (zbx_empty($fullItem['snmpv3_authprotocol'])
+							|| (isset($fullItem['snmpv3_authprotocol'])
+									&& !str_in_array($fullItem['snmpv3_authprotocol'], array(ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA)))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for item "%1$s".', $fullItem['name']));
+					}
+				}
+
+				// snmpv3 privprotocol
+				if ($fullItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					if (zbx_empty($fullItem['snmpv3_privprotocol'])
+							|| (isset($fullItem['snmpv3_privprotocol'])
+									&& !str_in_array($fullItem['snmpv3_privprotocol'], array(ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES)))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for item "%1$s".', $fullItem['name']));
+					}
+				}
 			}
 
 			// check that the given applications belong to the item's host
