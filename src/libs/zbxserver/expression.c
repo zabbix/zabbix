@@ -3159,28 +3159,16 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  *                                                                            *
  * Function: substitute_discovery_macros                                      *
  *                                                                            *
- * Parameters: data   - [IN/OUT] pointer to a buffer                          *
- *             jp_row - [IN] discovery data                                   *
- *             flags  - [IN] ZBX_MACRO_ANY - any macros will resolved         *
- *                           ZBX_MACRO_NUMERIC - all macros should be numeric *
- *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
- *                            set                                             *
- *                                                                            *
- * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
- *               if all discovery macros resoved to numeric values, otherwise *
- *               FAIL with an error message                                   *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int flags,
-		char *error, size_t max_error_len)
+void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "substitute_discovery_macros";
 
 	char		*replace_to = NULL, c;
 	size_t		l, r, replace_to_alloc = 0;
-	int		rc, ret = SUCCEED;
+	int		res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
@@ -3198,32 +3186,16 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 		c = (*data)[r + 1];
 		(*data)[r + 1] = '\0';
 
-		if (SUCCEED != (rc = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro \"%s\": not found in value set",
-					__function_name, *data + l);
-
-			if (ZBX_MACRO_NUMERIC == flags)
-			{
-				zbx_snprintf(error, max_error_len, "no value for macro \"%s\"", *data + l);
-				ret = FAIL;
-			}
-		}
-		else if (ZBX_MACRO_NUMERIC == flags)
-		{
-			if (SUCCEED != is_double_suffix(replace_to))
-			{
-				zbx_snprintf(error, max_error_len, "macro \"%s\" value is not numeric", *data + l);
-				ret = FAIL;
-			}
-		}
+		res = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc);
 
 		(*data)[r + 1] = c;
 
-		if (SUCCEED != ret)
-			break;
-
-		if (SUCCEED == rc)
+		if (SUCCEED != res)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro \"%.*s\": not found in value set",
+					__function_name, (int)(r - l + 1), *data + l);
+		}
+		else
 			zbx_replace_string(data, l, &r, replace_to);
 
 		l = r;
@@ -3231,9 +3203,7 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 
 	zbx_free(replace_to);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
 
 static void	unquote_key_param(char *param)
@@ -3346,7 +3316,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 						&param, macro_type, NULL, 0);
 			}
 			else
-				substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+				substitute_discovery_macros(&param, jp_row);
 
 			i--; zbx_replace_string(data, 0, &i, param); i++;
 
@@ -3431,10 +3401,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 									&param, macro_type, NULL, 0);
 						}
 						else
-						{
-							substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY,
-									NULL, 0);
-						}
+							substitute_discovery_macros(&param, jp_row);
 
 						quote_key_param(&param, 0);
 						i--; zbx_replace_string(data, l, &i, param); i++;
@@ -3466,10 +3433,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 									&param, macro_type, NULL, 0);
 						}
 						else
-						{
-							substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY,
-									NULL, 0);
-						}
+							substitute_discovery_macros(&param, jp_row);
 
 						quote_key_param(&param, 1);
 						zbx_replace_string(data, l, &i, param);
