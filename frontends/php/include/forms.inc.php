@@ -461,7 +461,7 @@
 		$snmpCommunityField->setEnabled('no');
 
 		// SNMPv3 security name
-		$snmpSecurityLabel = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
+		$snmpSecurityLabel = new CSpan(array(bold(_('Security name')), SPACE._('like').': '));
 		$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
 
 		$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
@@ -905,7 +905,9 @@
 			'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
 			'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
+			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
+			'snmpv3_privprotocol' => get_request('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
 			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
 			'ipmi_sensor' => get_request('ipmi_sensor', ''),
 			'authtype' => get_request('authtype', 0),
@@ -1050,7 +1052,9 @@
 			$data['params'] = $data['item']['params'];
 			$data['snmpv3_securityname'] = $data['item']['snmpv3_securityname'];
 			$data['snmpv3_securitylevel'] = $data['item']['snmpv3_securitylevel'];
+			$data['snmpv3_authprotocol'] = $data['item']['snmpv3_authprotocol'];
 			$data['snmpv3_authpassphrase'] = $data['item']['snmpv3_authpassphrase'];
+			$data['snmpv3_privprotocol'] = $data['item']['snmpv3_privprotocol'];
 			$data['snmpv3_privpassphrase'] = $data['item']['snmpv3_privpassphrase'];
 			$data['ipmi_sensor'] = $data['item']['ipmi_sensor'];
 			$data['authtype'] = $data['item']['authtype'];
