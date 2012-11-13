@@ -83,6 +83,10 @@ class CTriggerExpression {
 		return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $usermacro);
 	}
 
+	public function checkLLDMacro($lldmacro) {
+		return preg_match('/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/', $lldmacro);
+	}
+
 	public function checkHost($host) {
 		if (zbx_empty($host)) {
 			throw new Exception(_('Empty host name provided in expression.'));
@@ -247,6 +251,12 @@ class CTriggerExpression {
 				}
 				$this->data['usermacros'][] = $expr['usermacro'];
 			}
+			elseif (!zbx_empty($expr['lldmacro'])) {
+				if (!$this->checkLLDMacro($expr['lldmacro'])) {
+					throw new Exception(_s('Incorrect low level discovery macro "%1$s" format is used in expression.', $expr['lldmacro']));
+				}
+				$this->data['lldmacros'][] = $expr['lldmacro'];
+			}
 			else {
 				$this->checkHost($expr['host']);
 				$this->checkItem($expr['item']);
@@ -381,6 +391,16 @@ class CTriggerExpression {
 				$this->currExpr['part']['host'] = false;
 				$this->currExpr['object']['host'] = '';
 				$this->currExpr['object']['usermacro'] = $this->currExpr['object']['expression'];
+			}
+		}
+
+		// start low level discovery macro
+		if ($symbol == '#') {
+			if ($this->previous['prelast'] == '{') {
+				$this->currExpr['part']['lldmacro'] = true;
+				$this->currExpr['part']['host'] = false;
+				$this->currExpr['object']['host'] = '';
+				$this->currExpr['object']['lldmacro'] = $this->currExpr['object']['expression'];
 			}
 		}
 	}
@@ -545,6 +565,10 @@ class CTriggerExpression {
 			$this->currExpr['object']['usermacro'] = '{'.$this->currExpr['object']['usermacro'].'}';
 		}
 
+		if ($symbol == '}' && !zbx_empty($this->currExpr['object']['lldmacro'])) {
+			$this->currExpr['object']['lldmacro'] = '{'.$this->currExpr['object']['lldmacro'].'}';
+		}
+
 		if ($this->currExpr['part']['function'] && !$this->currExpr['part']['functionParam']) {
 			throw new Exception(_s('Unexpected symbol "%1$s" in trigger function.', $symbol));
 		}
@@ -603,6 +627,9 @@ class CTriggerExpression {
 		}
 		if ($this->currExpr['part']['usermacro']) {
 			$this->currExpr['object']['usermacro'] .= $symbol;
+		}
+		if ($this->currExpr['part']['lldmacro']) {
+			$this->currExpr['object']['lldmacro'] .= $symbol;
 		}
 		if ($this->currExpr['part']['host']) {
 			$this->currExpr['object']['host'] .= $symbol;
@@ -703,6 +730,7 @@ class CTriggerExpression {
 		$this->data = array(
 			'hosts' => array(),
 			'usermacros' => array(),
+			'lldmacros' => array(),
 			'macros' => array(),
 			'items' => array(),
 			'itemParams' => array(),
@@ -714,6 +742,7 @@ class CTriggerExpression {
 			'part' => array(
 				'expression' => false,
 				'usermacro' => false,
+				'lldmacro' => false,
 				'host' => false,
 				'item' => false,
 				'itemParam' => false,
@@ -724,6 +753,7 @@ class CTriggerExpression {
 				'expression' => '',
 				'macro' => '',
 				'usermacro' => '',
+				'lldmacro' => '',
 				'host' => '',
 				'item' => '',
 				'itemParam' => '',
