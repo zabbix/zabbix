@@ -67,6 +67,15 @@ class CTriggerExpression {
 			$this->checkSimpleExpression($simpleExpression);
 		}
 		catch (Exception $e) {
+			if ($symbolNum > 0) {
+				$symbolNum--;
+			}
+			else if (str_replace('\n','',$expression)) {
+				$symbolNum = strpos($expression, "\n");
+			}
+			else {
+				$symbolNum = 0;
+			}
 			$symbolNum = ($symbolNum > 0) ? --$symbolNum : $symbolNum;
 			$this->errors[] = $e->getMessage();
 			$this->errors[] = _s('Check expression part starting from "%1$s".', zbx_substr($expression, $symbolNum));
@@ -189,6 +198,7 @@ class CTriggerExpression {
 			$simpleExpr = preg_replace("/\{expression\}([\=\#\<\>\|\&\+\-\/\*])\{expression\}/u", '{expression}', $simpleExpr);
 		}
 		$simpleExpr = str_replace('{expression}', '1', $simpleExpr);
+		$this->simpleExpr = $simpleExpr;
 
 		if (strpos($simpleExpr, '()') !== false) {
 			throw new Exception(_s('Incorrect trigger expression format "%1$s".', $expression));
