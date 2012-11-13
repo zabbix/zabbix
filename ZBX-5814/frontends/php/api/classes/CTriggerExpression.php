@@ -76,7 +76,6 @@ class CTriggerExpression {
 			else {
 				$symbolNum = 0;
 			}
-			$symbolNum = ($symbolNum > 0) ? --$symbolNum : $symbolNum;
 			$this->errors[] = $e->getMessage();
 			$this->errors[] = _s('Check expression part starting from "%1$s".', zbx_substr($expression, $symbolNum));
 		}
