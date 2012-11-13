@@ -80,35 +80,13 @@ if (!empty($_REQUEST['steps'])) {
 /*
  * Permissions
  */
-/*
-// TODO:
-if (isset($_REQUEST['httptestid'])) {
-	$dbHttpTest = DBfetch(DBselect(
-		'SELECT wt.*,a.name AS application'.
-		' FROM httptest wt,applications a'.
-		' WHERE a.applicationid=wt.applicationid'.
-			' AND wt.httptestid='.get_request('httptestid')
-	));
-	if (empty($dbHttpTest)) {
+//*
+if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
+	$testIds = isset($_REQUEST['httptestid']) ? array($_REQUEST['httptestid']) : $_REQUEST['group_httptestid'];
+	if (!API::HttpTest()->isWritable($testIds)) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['group_httptestid']) || !is_array($_REQUEST['group_httptestid'])) {
-		access_deny();
-	}
-	else {
-		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT("wt.*") AS cnt'.
-											' FROM httptest wt,applications a'.
-											' WHERE a.applicationid=wt.applicationid'.
-											' AND '.DBcondition('wt.httptestid', $_REQUEST['group_httptestid'])
-										));
-		if ($dbHttpTests['cnt'] != count($_REQUEST['group_httptestid'])) {
-			access_deny();
-		}
-	}
-}
-*/
 $_REQUEST['go'] = get_request('go', 'none');
 
 /*
