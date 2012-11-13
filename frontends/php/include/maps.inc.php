@@ -430,20 +430,8 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 
 		// do function type (last, min, max, avg) related actions
 		if (0 == strcmp($function, 'last')) {
-			if ($item['lastclock'] == 0) {
-				$label = str_replace($expr, '('._('no data').')', $label);
-			}
-			else {
-				switch ($item['value_type']) {
-					case ITEM_VALUE_TYPE_FLOAT:
-					case ITEM_VALUE_TYPE_UINT64:
-						$value = convert_units($item['lastvalue'], $item['units']);
-						break;
-					default:
-						$value = $item['lastvalue'];
-				}
-				$label = str_replace($expr, $value, $label);
-			}
+			$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
+			$label = str_replace($expr, $value, $label);
 		}
 		elseif (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg')) {
 			// allowed item types for min, max and avg function

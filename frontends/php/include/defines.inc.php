@@ -332,7 +332,7 @@ define('ITEM_TYPE_CALCULATED',		15);
 define('ITEM_TYPE_JMX',				16);
 
 define('ITEM_VALUE_TYPE_FLOAT',		0);
-define('ITEM_VALUE_TYPE_STR',		1);
+define('ITEM_VALUE_TYPE_STR',		1); // aka Character
 define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);

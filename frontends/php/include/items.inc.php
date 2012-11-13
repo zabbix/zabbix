@@ -773,7 +773,7 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
 				: null;
 		}
-		$value = formatItemValue($ithosts[$hostname]);
+		$value = formatItemLastValue($ithosts[$hostname]);
 
 		$it_ov_menu = array(
 			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
@@ -898,12 +898,17 @@ function delete_trends_by_itemid($itemIds) {
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
  *
- * @param array $item
+ * @param type $item
+ * @param int $item['value_type'] type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param mixed $item['lastvalue'] value of item
+ * @param mixed $item['lastclock'] time when last value had stored
+ * @param string $item['units'] units of item
+ * @param int $item['valuemapid'] id of mapping set of values
  * @param string $unknownString the text to be used if the item has no data
  *
  * @return string
  */
-function formatItemValue(array $item, $unknownString = '-') {
+function formatItemLastValue(array $item, $unknownString = '-') {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
 		return $unknownString;
 	}
@@ -936,6 +941,9 @@ function formatItemValue(array $item, $unknownString = '-') {
  * Format item lastvalue depending on it's value type.
  *
  * @param array $item
+ * @param int $item['value_type'] type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param mixed $item['lastvalue'] value of item
+ * @param string $item['units'] units of item
  *
  * @return string
  */

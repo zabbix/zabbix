@@ -469,7 +469,7 @@ class CTriggerDescription {
 	 */
 	protected function resolveItemLastvalueMacro(array $item) {
 		if (is_null($item['newvalue'])) {
-			$value = formatItemValue($item, UNRESOLVED_MACRO_STRING);
+			$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
 		}
 		else {
 			$value = $item['newvalue'].' ('.$item['lastvalue'].')';
