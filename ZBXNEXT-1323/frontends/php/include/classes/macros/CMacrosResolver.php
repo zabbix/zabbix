@@ -156,7 +156,7 @@ class CMacrosResolver {
 	function replaceMacroValues($text, $macros) {
 		$i = 0;
 		$begin = false;
-		while ($i = zbx_strpos($text, ($begin ? '}' : '{'), $i)) {
+		while (($i = zbx_strpos($text, ($begin !== false ? '}' : '{'), $i)) || $i === 0) {
 			$char = zbx_substr($text, $i, 1);
 
 			if ($char == '{') {
@@ -185,6 +185,7 @@ class CMacrosResolver {
 
 					// recalculate iterator
 					$i = $begin + zbx_strlen($value) - 1;
+
 					$begin = false;
 				}
 			}
