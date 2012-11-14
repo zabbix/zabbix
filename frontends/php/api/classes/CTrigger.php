@@ -1350,6 +1350,13 @@ class CTrigger extends CTriggerGeneral {
 
 
 	protected function deleteByPks(array $pks) {
+
+		// others idx should be deleted as well if they arise at some point
+		DB::delete('profiles', array(
+			'idx' => 'web.events.filter.triggerid',
+			'value_id' => $pks
+		));
+
 		DB::delete('events', array(
 			'objectid' => $pks,
 			'object' => EVENT_OBJECT_TRIGGER
