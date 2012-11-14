@@ -2043,7 +2043,7 @@ class CHost extends CHostGeneral {
 			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
 		}
 		if (!empty($delHttptests)) {
-			API::HttpTest()->delete($delHttptests);
+			API::HttpTest()->delete($delHttptests, true);
 		}
 
 
