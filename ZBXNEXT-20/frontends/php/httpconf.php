@@ -313,9 +313,7 @@ show_messages();
 /*
  * Display
  */
-$data = array(
-	'hostid' => get_request('hostid', 0)
-);
+$data = array('hostid' => get_request('hostid', 0));
 
 if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$data['httptestid'] = get_request('httptestid', null);
