@@ -125,13 +125,16 @@ $isDuplicateStepsFound = !empty($_REQUEST['steps']) ? validateHttpDuplicateSteps
 
 if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	$result = false;
+
+	$host = DBfetch(DBselect(
+		'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($_REQUEST['httptestid'])));
+
 	if ($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])) {
 		$result = API::HttpTest()->delete($_REQUEST['httptestid']);
 	}
+
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 	if ($result) {
-		$host = get_host_by_hostid($httptest_data['hostid']);
-
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.
 			$_REQUEST['httptestid'].'] '._('Host').' ['.$host['host'].']');
 	}
@@ -254,39 +257,27 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(false, null, $message_false);
 	}
 }
-elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
+elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable')&& isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
+	$status = $_REQUEST['go'] == 'activate' ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
+
 	foreach ($group_httptestid as $id) {
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
 			continue;
 		}
+		$result = API::HttpTest()->update(array('httptestid' => $id, 'status' => $status));
 
-		if (activate_httptest($id)) {
+		if ($result) {
 			$go_result = true;
-			$host = get_host_by_hostid($_REQUEST['hostid']);
+			$host = DBfetch(DBselect(
+				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)));
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
-				_('Host').' ['.$host['host'].']'._('Web scenario activated'));
+				_('Host').' ['.$host['host'].']'.
+				($_REQUEST['go'] == 'activate' ? _('Web scenario activated') : _('Web scenario disabled')));
 		}
 	}
 	show_messages($go_result, _('Web scenario activated'), null);
-}
-elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_httptestid'])) {
-	$go_result = false;
-	$group_httptestid = $_REQUEST['group_httptestid'];
-	foreach ($group_httptestid as $id) {
-		if (!($httptest_data = get_httptest_by_httptestid($id))) {
-			continue;
-		}
-
-		if (disable_httptest($id)) {
-			$go_result = true;
-			$host = get_host_by_hostid($_REQUEST['hostid']);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
-				_('Host').' ['.$host['host'].']'._('Web scenario disabled'));
-		}
-	}
-	show_messages($go_result, _('Web scenario disabled'), null);
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
@@ -295,14 +286,14 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
 			continue;
 		}
-
 		if (delete_history_by_httptestid($id)) {
 			$go_result = true;
 			DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.$id);
-			$host = DBfetch(DBselect('SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid'));
+			$host = DBfetch(DBselect(
+				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)));
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
-				_('Host').' ['.$host['host'].']'._('History cleared'));
+				_('Host').' ['.$host['host'].'] '._('History cleared'));
 		}
 	}
 	show_messages($go_result, _('History cleared'), null);

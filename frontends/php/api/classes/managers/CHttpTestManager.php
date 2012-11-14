@@ -24,8 +24,8 @@
  */
 class CHttpTestManager {
 
-	private $history = 30;
-	private $trends = 90;
+	const ITEM_HISTORY = 30;
+	const ITEM_TRENDS = 90;
 
 	/**
 	 * Changed steps names.
@@ -573,8 +573,8 @@ class CHttpTestManager {
 			$item['hostid'] = $httpTest['hostid'];
 			$item['delay'] = $httpTest['delay'];
 			$item['type'] = ITEM_TYPE_HTTPTEST;
-			$item['history'] = $this->history;
-			$item['trends'] = $this->trends;
+			$item['history'] = self::ITEM_HISTORY;
+			$item['trends'] = self::ITEM_TRENDS;
 			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 			if ($dbItem) {
@@ -683,8 +683,8 @@ class CHttpTestManager {
 				$item['delay'] = $delay;
 				$item['type'] = ITEM_TYPE_HTTPTEST;
 				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
-				$item['history'] = $this->history;
-				$item['trends'] = $this->trends;
+				$item['history'] = self::ITEM_HISTORY;
+				$item['trends'] = self::ITEM_TRENDS;
 				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 				if ($dbItem) {
