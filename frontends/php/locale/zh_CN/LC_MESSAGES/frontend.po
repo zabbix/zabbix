@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-14 15:02+0200\n"
-"PO-Revision-Date: 2012-10-29 11:19+0200\n"
-"Last-Translator: 鹏 <pengyao@pengyao.org>\n"
+"POT-Creation-Date: 2012-11-14 15:03+0200\n"
+"PO-Revision-Date: 2012-11-14 06:55+0200\n"
+"Last-Translator: wen <51netpro@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -1292,11 +1292,11 @@ msgstr "无法创建其他的数据库连接."
 
 #: api/classes/CTrigger.php:1868
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "不能创建循环依赖."
 
 #: api/classes/CTrigger.php:1840
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "无法创建触发器本身的依赖。"
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
