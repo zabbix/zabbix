@@ -393,10 +393,6 @@ class CGraph extends CGraphGeneral {
 						unset($graph['itemid']);
 					}
 
-					if (isset($options['expandName'])) {
-						$graph['name'] = CGraphMacroResolver::i()->resolveById($graph['name'], $graph['graphid']);
-					}
-
 					$result[$graph['graphid']] += $graph;
 				}
 			}
@@ -404,6 +400,10 @@ class CGraph extends CGraphGeneral {
 
 		if (!is_null($options['countOutput'])) {
 			return $result;
+		}
+
+		if (isset($options['expandName'])) {
+			$result = CGraphMacroResolver::i()->massResolveByIds($result);
 		}
 
 		// adding GraphItems

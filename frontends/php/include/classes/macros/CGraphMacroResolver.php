@@ -50,20 +50,33 @@ class CGraphMacroResolver {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param type $str string in which macros should be resolved
-	 * @param int $graphid graph id for which macro should be resolved
+	 * @param type $data list of graphs
+	 * @param int $data[]['graphid'] id of graph
+	 * @param string $data[]['name'] name of graph
 	 *
-	 * @return string string with macros replaces with corresponding values
+	 * @return array inputed data with resolved names
 	 */
-	public function resolveById($str, $graphid) {
+	public function massResolveByIds($data) {
+
+		$graphIds = zbx_objectValues($data, 'graphid');
+
 		$items = DBfetchArray(DBselect(
-			'SELECT i.hostid'.
+			'SELECT i.hostid, gi.graphid'.
 			' FROM graphs_items gi,items i'.
-			' WHERE gi.itemid=i.itemid AND gi.graphid='.$graphid.
+			' WHERE gi.itemid=i.itemid AND '.DBcondition('gi.graphid', $graphIds).
 			' ORDER BY gi.sortorder')
 		);
 
-		return $this->resolve($str, $items);
+		$itemsByGraphId = array();
+		foreach ($items as $item) {
+			$itemsByGraphId[$item['graphid']][]['hostid'] = $item['hostid'];
+		}
+
+		foreach ($itemsByGraphId as $graphId => $items) {
+			$data[$graphId]['name'] = $this->resolve($data[$graphId]['name'], $items);
+		}
+
+		return $data;
 	}
 
 	/**
@@ -82,8 +95,8 @@ class CGraphMacroResolver {
 	private function resolveFunctionalItemMacros($str, $items) {
 		// extract all macros into $matches
 		// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}/Uu', $str, $matches);
-
+		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}{1}/Uu', $str, $matches);
+sdFile('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}{1}/Uu');
 		// match found groups if ever regexp should change
 		$matches['macros'] = $matches[0];
 		$matches['hosts'] = $matches[1];
@@ -95,7 +108,7 @@ class CGraphMacroResolver {
 		foreach ($matches['hosts'] as $i => $host) {
 			$matches['hosts'][$i] = $this->resolvePositionalMacros($host, $items);
 		}
-
+sdFile($matches);
 		foreach ($matches['macros'] as $i => $macro) {
 			// get item with key within host
 			$item = API::Item()->get(array(
