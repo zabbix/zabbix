@@ -201,14 +201,30 @@ class CHttpTestManager {
 					$this->createStepsReal($httpTest, $stepsCreate);
 				}
 			}
-			elseif (isset($httpTest['applicationid'])) {
-				$dbStepIds = DBfetchColumn(DBselect(
-					'SELECT i.itemid'.
-						' FROM items i'.
-						' INNER JOIN httpstepitem hi ON hi.itemid=i.itemid'.
-							' WHERE '.DBcondition('hi.httpstepid', zbx_objectValues($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid')))
-					, 'itemid');
-				$this->updateItemsApplications($dbStepIds, $httpTest['applicationid']);
+			else {
+				if (isset($httpTest['applicationid'])) {
+					$dbStepIds = DBfetchColumn(DBselect(
+						'SELECT i.itemid'.
+							' FROM items i'.
+							' INNER JOIN httpstepitem hi ON hi.itemid=i.itemid'.
+								' WHERE '.DBcondition('hi.httpstepid', zbx_objectValues($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid')))
+						, 'itemid');
+					$this->updateItemsApplications($dbStepIds, $httpTest['applicationid']);
+				}
+				if (isset($httpTest['status'])) {
+					$status = HTTPTEST_STATUS_ACTIVE ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+					$itemIds = DBfetchColumn(DBselect(
+						'SELECT hsi.itemid'.
+							' FROM httpstep hs,httpstepitem hsi'.
+							' WHERE hs.httpstepid=hsi.httpstepid'.
+								' AND hs.httptestid='.zbx_dbstr($httpTest['httptestid'])
+					), 'itemid');
+					DB::update('items', array(
+						'values' => array('status' => $status),
+						'where' => array('itemid' => $itemIds)
+					));
+				}
 			}
 		}
 
@@ -655,7 +671,7 @@ class CHttpTestManager {
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
 				),
 				array(
-					'name' => 'Response code for step "$2" of scenario "$1"',
+					'name' => 'Response code for step "$2" of scenario "$1".',
 					'key_' => 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'units' => '',
