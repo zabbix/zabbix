@@ -461,6 +461,29 @@ class CHttpTest extends CZBXAPI {
 			}
 		}
 
+		$parentHttpTestIds = $httpTestIds;
+		$childHttpTestIds = array();
+		do {
+			$dbTests = DBselect('SELECT ht.httptestid FROM httptest ht WHERE '.DBcondition('ht.templateid', $parentHttpTestIds));
+			$parentHttpTestIds = array();
+			while ($dbTest = DBfetch($dbTests)) {
+				$parentHttpTestIds[] = $dbTest['httptestid'];
+				$childHttpTestIds[$dbTest['httptestid']] = $dbTest['httptestid'];
+			}
+		} while (!empty($parentHttpTestIds));
+
+		$options = array(
+			'httptestids' => $childHttpTestIds,
+			'output' => array('httptestid', 'name'),
+			'nopermissions' => true,
+			'preservekeys' => true,
+			'selectHosts' => API_OUTPUT_EXTEND
+		);
+		$delHttpTestChilds = $this->get($options);
+		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChilds);
+		$httpTestIds = array_merge($httpTestIds, $childHttpTestIds);
+
+
 		$itemidsDel = array();
 		$dbTestItems = DBselect(
 			'SELECT hsi.itemid'.
