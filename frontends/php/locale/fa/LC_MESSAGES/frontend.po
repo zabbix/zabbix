@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-10 08:31+0200\n"
+"POT-Creation-Date: 2012-11-14 15:02+0200\n"
 "PO-Revision-Date: 2012-10-06 14:22+0200\n"
 "Last-Translator: Nader <jafari@sain.ir>\n"
 "Language-Team: none\n"
@@ -2225,7 +2225,7 @@ msgstr "فرمان ها"
 msgid "Comment updated"
 msgstr "توضیح بروز شد"
 
-#: include/acknow.inc.php:41 tr_comments.php:70 tr_comments.php:88
+#: include/acknow.inc.php:43 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:368 tr_status.php:294
 msgid "Comments"
 msgstr "توضیحات"
@@ -6604,7 +6604,7 @@ msgstr ""
 msgid "Item \"%1$s\" does not exist."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:560
+#: include/classes/import/CConfigurationImport.php:562
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
@@ -8080,7 +8080,7 @@ msgstr ""
 msgid "No accessible resources"
 msgstr ""
 
-#: include/acknow.inc.php:40
+#: include/acknow.inc.php:42
 msgid "No acknowledges defined."
 msgstr ""
 
@@ -8407,8 +8407,8 @@ msgstr ""
 msgid "No operations defined."
 msgstr "هیچ عملکردی تعریف نشده است"
 
-#: include/classes/import/CConfigurationImport.php:818
-#: include/classes/import/CConfigurationImport.php:895
+#: include/classes/import/CConfigurationImport.php:820
+#: include/classes/import/CConfigurationImport.php:897
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr ""
@@ -11795,7 +11795,7 @@ msgid "Till"
 msgstr "تا"
 
 #: events.php:479 events.php:488 events.php:554 events.php:567
-#: include/acknow.inc.php:41 include/actions.inc.php:675
+#: include/acknow.inc.php:43 include/actions.inc.php:675
 #: include/actions.inc.php:698 include/actions.inc.php:754
 #: include/actions.inc.php:772 include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
@@ -11937,8 +11937,8 @@ msgstr "هشدار"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:933
-#: include/classes/import/CConfigurationImport.php:969
+#: include/classes/import/CConfigurationImport.php:935
+#: include/classes/import/CConfigurationImport.php:971
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
@@ -12568,7 +12568,7 @@ msgstr "استفاده برای اهمیت"
 msgid "Used in actions"
 msgstr "استفاده شده در فعالیت"
 
-#: httpconf.php:52 include/acknow.inc.php:41 include/actions.inc.php:824
+#: httpconf.php:52 include/acknow.inc.php:43 include/actions.inc.php:824
 #: include/audit.inc.php:24 include/forms.inc.php:38 include/forms.inc.php:41
 #: include/hosts.inc.php:67 include/setup.inc.php:277
 #: include/views/administration.auditlogs.list.php:56
@@ -13555,7 +13555,7 @@ msgid "d M Y H:i"
 msgstr ""
 
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
-#: include/acknow.inc.php:46 include/blocks.inc.php:914
+#: include/acknow.inc.php:48 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
 #: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897

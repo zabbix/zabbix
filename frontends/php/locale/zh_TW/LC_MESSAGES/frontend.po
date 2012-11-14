@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-10 08:38+0200\n"
+"POT-Creation-Date: 2012-11-14 15:02+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2229,7 +2229,7 @@ msgstr "命令"
 msgid "Comment updated"
 msgstr "評論已更新"
 
-#: include/acknow.inc.php:41 tr_comments.php:70 tr_comments.php:88
+#: include/acknow.inc.php:43 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:368 tr_status.php:294
 msgid "Comments"
 msgstr "評論"
@@ -6618,7 +6618,7 @@ msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 msgid "Item \"%1$s\" does not exist."
 msgstr "項目 \"%1$s\"不存在."
 
-#: include/classes/import/CConfigurationImport.php:560
+#: include/classes/import/CConfigurationImport.php:562
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
@@ -8094,7 +8094,7 @@ msgstr "沒有已定義的URLs"
 msgid "No accessible resources"
 msgstr "没有可存取的資源"
 
-#: include/acknow.inc.php:40
+#: include/acknow.inc.php:42
 msgid "No acknowledges defined."
 msgstr "沒有已定義的知悉."
 
@@ -8421,8 +8421,8 @@ msgstr "沒有已定義的節點."
 msgid "No operations defined."
 msgstr "沒有已定義的操作."
 
-#: include/classes/import/CConfigurationImport.php:818
-#: include/classes/import/CConfigurationImport.php:895
+#: include/classes/import/CConfigurationImport.php:820
+#: include/classes/import/CConfigurationImport.php:897
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "無圖形\"%s\"的許可權"
@@ -11809,7 +11809,7 @@ msgid "Till"
 msgstr "直到"
 
 #: events.php:479 events.php:488 events.php:554 events.php:567
-#: include/acknow.inc.php:41 include/actions.inc.php:675
+#: include/acknow.inc.php:43 include/actions.inc.php:675
 #: include/actions.inc.php:698 include/actions.inc.php:754
 #: include/actions.inc.php:772 include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
@@ -11951,8 +11951,8 @@ msgstr "觸發器"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:933
-#: include/classes/import/CConfigurationImport.php:969
+#: include/classes/import/CConfigurationImport.php:935
+#: include/classes/import/CConfigurationImport.php:971
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "觸發器\"%1$s\"相依於一個不存在的觸發器\"%2$s\"."
@@ -12582,7 +12582,7 @@ msgstr "用此如果示警度"
 msgid "Used in actions"
 msgstr "用於動作中"
 
-#: httpconf.php:52 include/acknow.inc.php:41 include/actions.inc.php:824
+#: httpconf.php:52 include/acknow.inc.php:43 include/actions.inc.php:824
 #: include/audit.inc.php:24 include/forms.inc.php:38 include/forms.inc.php:41
 #: include/hosts.inc.php:67 include/setup.inc.php:277
 #: include/views/administration.auditlogs.list.php:56
@@ -13572,7 +13572,7 @@ msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
-#: include/acknow.inc.php:46 include/blocks.inc.php:914
+#: include/acknow.inc.php:48 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
 #: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897

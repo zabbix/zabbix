@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-10 08:38+0200\n"
+"POT-Creation-Date: 2012-11-14 15:02+0200\n"
 "PO-Revision-Date: 2012-11-08 21:21+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2244,7 +2244,7 @@ msgstr "Команды"
 msgid "Comment updated"
 msgstr "Комментарий обновлен"
 
-#: include/acknow.inc.php:41 tr_comments.php:70 tr_comments.php:88
+#: include/acknow.inc.php:43 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:368 tr_status.php:294
 msgid "Comments"
 msgstr "Комментарии"
@@ -6635,7 +6635,7 @@ msgstr "Элемент данных \"%1$s\" не существует у шаб
 msgid "Item \"%1$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" не существует."
 
-#: include/classes/import/CConfigurationImport.php:560
+#: include/classes/import/CConfigurationImport.php:562
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" в \"%2$s\": группа элементов данных \"%3$s\" не существует."
@@ -8120,7 +8120,7 @@ msgstr "URLы не заданы."
 msgid "No accessible resources"
 msgstr "Нет доступных ресурсов"
 
-#: include/acknow.inc.php:40
+#: include/acknow.inc.php:42
 msgid "No acknowledges defined."
 msgstr "Подтверждения не заданы."
 
@@ -8447,8 +8447,8 @@ msgstr "Ноды не заданы."
 msgid "No operations defined."
 msgstr "Операции не заданы."
 
-#: include/classes/import/CConfigurationImport.php:818
-#: include/classes/import/CConfigurationImport.php:895
+#: include/classes/import/CConfigurationImport.php:820
+#: include/classes/import/CConfigurationImport.php:897
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "Нет прав доступа к графику \"%1$s\"."
@@ -11844,7 +11844,7 @@ msgid "Till"
 msgstr "До"
 
 #: events.php:479 events.php:488 events.php:554 events.php:567
-#: include/acknow.inc.php:41 include/actions.inc.php:675
+#: include/acknow.inc.php:43 include/actions.inc.php:675
 #: include/actions.inc.php:698 include/actions.inc.php:754
 #: include/actions.inc.php:772 include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
@@ -11986,8 +11986,8 @@ msgstr "Триггер"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:933
-#: include/classes/import/CConfigurationImport.php:969
+#: include/classes/import/CConfigurationImport.php:935
+#: include/classes/import/CConfigurationImport.php:971
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", который не существует."
@@ -12617,7 +12617,7 @@ msgstr "Использовать, если важность"
 msgid "Used in actions"
 msgstr "Используется в действиях"
 
-#: httpconf.php:52 include/acknow.inc.php:41 include/actions.inc.php:824
+#: httpconf.php:52 include/acknow.inc.php:43 include/actions.inc.php:824
 #: include/audit.inc.php:24 include/forms.inc.php:38 include/forms.inc.php:41
 #: include/hosts.inc.php:67 include/setup.inc.php:277
 #: include/views/administration.auditlogs.list.php:56
@@ -13611,7 +13611,7 @@ msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
 #: acknow.php:162 events.php:258 httpdetails.php:121 httpmon.php:243
-#: include/acknow.inc.php:46 include/blocks.inc.php:914
+#: include/acknow.inc.php:48 include/blocks.inc.php:914
 #: include/classes/screens/CScreenEvents.php:62
 #: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:890
 #: include/defines.inc.php:891 include/defines.inc.php:897
