@@ -42,11 +42,11 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 
 			foreach ($screens as $screen) {
 				$screen = $this->resolveScreenReferences($screen);
-				$screen['templateid'] = $this->referencer->resolveTemplate($template);
 				if (isset($screen['screenid'])) {
 					$screensToUpdate[] = $screen;
 				}
 				else {
+					$screen['templateid'] = $this->referencer->resolveTemplate($template);
 					$screensToCreate[] = $screen;
 				}
 			}
