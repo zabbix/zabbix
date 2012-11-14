@@ -135,8 +135,8 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.
-			$_REQUEST['httptestid'].'] '._('Host').' ['.$host['host'].']');
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, 'Web scenario ['.$httptest_data['name'].'] ['.
+			$_REQUEST['httptestid'].'] Host ['.$host['host'].']');
 	}
 	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 }
@@ -244,8 +244,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
-		add_audit($action, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$_REQUEST['name'].'] ['.$httptestid.'] '.
-			_('Host').' ['.$host['host'].']');
+		add_audit($action, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$_REQUEST['name'].'] ['.$httptestid.'] Host ['.$host['host'].']');
 
 		unset($_REQUEST['httptestid'], $_REQUEST['form']);
 		show_messages(true, $message_true);
@@ -272,9 +271,9 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable')&& isset(
 			$go_result = true;
 			$host = DBfetch(DBselect(
 				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)));
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
-				_('Host').' ['.$host['host'].']'.
-				($_REQUEST['go'] == 'activate' ? _('Web scenario activated') : _('Web scenario disabled')));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$httptest_data['name'].'] ['.$id.
+				'] Host ['.$host['host'].']'.
+				($_REQUEST['go'] == 'activate' ? 'Web scenario activated' : 'Web scenario disabled'));
 		}
 	}
 	show_messages($go_result, _('Web scenario activated'), null);
@@ -292,8 +291,8 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 			$host = DBfetch(DBselect(
 				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)));
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
-				_('Host').' ['.$host['host'].'] '._('History cleared'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$httptest_data['name'].'] ['.$id.
+				'] Host ['.$host['host'].'] history cleared');
 		}
 	}
 	show_messages($go_result, _('History cleared'), null);
