@@ -50,7 +50,7 @@ class CGraphMacroResolver {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param type $data list of graphs
+	 * @param array $data list of graphs
 	 * @param int $data[]['graphid'] id of graph
 	 * @param string $data[]['name'] name of graph
 	 *
@@ -96,7 +96,7 @@ class CGraphMacroResolver {
 		// extract all macros into $matches
 		// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
 		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}{1}/Uu', $str, $matches);
-sdFile('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}{1}/Uu');
+
 		// match found groups if ever regexp should change
 		$matches['macros'] = $matches[0];
 		$matches['hosts'] = $matches[1];
@@ -108,7 +108,7 @@ sdFile('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_I
 		foreach ($matches['hosts'] as $i => $host) {
 			$matches['hosts'][$i] = $this->resolvePositionalMacros($host, $items);
 		}
-sdFile($matches);
+
 		foreach ($matches['macros'] as $i => $macro) {
 			// get item with key within host
 			$item = API::Item()->get(array(
