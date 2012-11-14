@@ -436,16 +436,24 @@ else {
 		$data['paging'] = getPagingLine($httpTests);
 
 		$dbHttpTests = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,COUNT(hs.httpstepid) AS stepsCnt'.
+			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname'.
 				' FROM httptest ht'.
-				' INNER JOIN httpstep hs ON hs.httptestid=ht.httptestid'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
-				' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid')).
-				' GROUP BY ht.httptestid'
+				' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
 		);
 		$httpTests = array();
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
 			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		}
+
+		$dbHttpSteps = DBselect(
+			'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
+					' FROM httpstep hs'.
+					' WHERE '.DBcondition('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
+					' GROUP BY hs.httptestid'
+		);
+		while ($dbHttpStep = DBfetch($dbHttpSteps)) {
+			$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
 		}
 
 		order_result($httpTests, $sortfield, getPageSortOrder());

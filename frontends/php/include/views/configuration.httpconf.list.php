@@ -80,7 +80,7 @@ foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
 		$_REQUEST['hostid'] > 0 ? null : $httpTest['hostname'],
 		$name,
-		$httpTest['stepsCnt'],
+		$httpTest['stepscnt'],
 		$httpTest['delay'],
 		new CLink(
 			httptest_status2str($httpTest['status']),
