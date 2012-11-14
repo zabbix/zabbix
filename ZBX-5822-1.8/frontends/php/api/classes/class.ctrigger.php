@@ -983,9 +983,6 @@ Copt::memoryPick();
 					if (isset($func['lastvalue'])) {
 						$func['lastvalue'] = convert_units($func['lastvalue'], $func['units']);
 					}
-					if (isset($func['newvalue'])) {
-						$func['newvalue'] = convert_units($func['newvalue'], $func['units']);
-					}
 
 					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
 						$fnum = $triggers_to_expand_items[$func['triggerid']][$func['functionid']];
