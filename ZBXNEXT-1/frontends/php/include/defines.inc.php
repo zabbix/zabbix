@@ -780,7 +780,7 @@ define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
-define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+?(\[[^,\]]*?\]|\[\".*\"\])*)');
+define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+?(\[\".*\"\]|\[[^,\]]*?\])*?)');
 
 // regexp ids
 define('ZBX_KEY_ID',		1);
