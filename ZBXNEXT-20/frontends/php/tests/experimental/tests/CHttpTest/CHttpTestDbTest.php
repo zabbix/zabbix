@@ -19,7 +19,7 @@
 **/
 
 
-require_once __DIR__.'/../../../include/db/ZbxDbTestCase.php';
+require_once __DIR__.'/../../include/ZbxDbTestCase.php';
 
 require_once __DIR__.'/../../../../api/rpc/class.czbxrpc.php';
 

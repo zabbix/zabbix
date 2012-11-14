@@ -88,6 +88,9 @@ API::setReturnAPI();
 
 abstract class ZbxDbTestCase extends PHPUnit_Extensions_Database_TestCase {
 
+	private $dbhost = 'sql';
+	private $dbuser = 'root';
+	private $dbname = 'alexey_test';
 	static private $pdo = null;
 	private $conn = null;
 
@@ -104,8 +107,7 @@ abstract class ZbxDbTestCase extends PHPUnit_Extensions_Database_TestCase {
 	final public function getConnection() {
 		if ($this->conn === null) {
 			if (self::$pdo == null) {
-				// TODO: hardcoded db settimgs
-				self::$pdo = new PDO('mysql:host=sql;dbname=alexey_test', 'root');
+				self::$pdo = new PDO('mysql:host='.$this->dbhost.';dbname='.$this->dbname, $this->dbuser);
 			}
 			$this->conn = $this->createDefaultDBConnection(self::$pdo);
 		}
