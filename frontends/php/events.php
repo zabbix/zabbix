@@ -337,11 +337,17 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 			'preservekeys' => true,
 			'expandDescription' => true
 		));
-		$dbTrigger = reset($dbTrigger);
-		$host = reset($dbTrigger['hosts']);
-		$trigger = $host['name'].':'.$dbTrigger['description'];
+		// check if trigger is accessible
+		if ($dbTrigger) {
+			$dbTrigger = reset($dbTrigger);
+			$host = reset($dbTrigger['hosts']);
+			$trigger = $host['name'].':'.$dbTrigger['description'];
+		}
+		else {
+			$_REQUEST['triggerid'] = 0;
+		}
 	}
-	else {
+	if (!isset($trigger)) {
 		$trigger = '';
 	}
 
