@@ -1142,7 +1142,6 @@ class CTemplate extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function delete($templateids) {
-
 		if (empty($templateids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -1258,6 +1257,17 @@ class CTemplate extends CHostGeneral {
 			'operationid'=>$delOperationids,
 		));
 
+		// http tests
+		$delHttpTests = API::HttpTest()->get(array(
+			'templateids' => $templateids,
+			'output' => array('httptestid'),
+			'nopermissions' => 1,
+			'preservekeys' => 1
+		));
+		if (!empty($delHttpTests)) {
+			API::HttpTest()->delete(array_keys($delHttpTests), true);
+		}
+
 		// Applications
 		$delApplications = API::Application()->get(array(
 			'templateids' => $templateids,
@@ -1269,13 +1279,12 @@ class CTemplate extends CHostGeneral {
 			API::Application()->delete(array_keys($delApplications), true);
 		}
 
-
 		DB::delete('hosts', array('hostid' => $templateids));
 
 		// TODO: remove info from API
 		foreach ($delTemplates as $template) {
 			info(_s('Deleted: Template "%1$s".', $template['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', null, null);
 		}
 
 		return array('templateids' => $templateids);
