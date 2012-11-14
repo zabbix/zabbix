@@ -541,21 +541,21 @@ class CHttpTestManager {
 	protected function createHttpTestItems(array $httpTest) {
 		$checkitems = array(
 			array(
-				'name'				=> _s('Download speed for scenario "%s".', '$1'),
+				'name'				=> 'Download speed for scenario "$1".',
 				'key_'				=> 'web.test.in['.$httpTest['name'].',,bps]',
 				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'				=> 'Bps',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
 			),
 			array(
-				'name'				=> _s('Failed step of scenario "%s".', '$1'),
+				'name'				=> 'Failed step of scenario "$1".',
 				'key_'				=> 'web.test.fail['.$httpTest['name'].']',
 				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
 			),
 			array(
-				'name'				=> _s('Last error message of scenario "%s".', '$1'),
+				'name'				=> 'Last error message of scenario "$1".',
 				'key_'				=> 'web.test.error['.$httpTest['name'].']',
 				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'units'				=> '',
@@ -641,21 +641,21 @@ class CHttpTestManager {
 
 			$stepitems = array(
 				array(
-					'name' => _s('Download speed for step "%1$s" of scenario "%2$s".', '$2', '$1'),
+					'name' => 'Download speed for step "$2" of scenario "$1".',
 					'key_' => 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]',
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 'Bps',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
 				),
 				array(
-					'name' => _s('Response time for step "%1$s" of scenario "%2$s".', '$2', '$1'),
+					'name' => 'Response time for step "$2" of scenario "$1".',
 					'key_' => 'web.test.time['.$httpTest['name'].','.$webstep['name'].',resp]',
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 's',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
 				),
 				array(
-					'name' => _s('Response code for step "%1$s" of scenario "%2$s".', '$2', '$1'),
+					'name' => 'Response code for step "$2" of scenario "$1"',
 					'key_' => 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'units' => '',

@@ -71,54 +71,6 @@ function httptest_status2style($status) {
 	}
 }
 
-function activate_httptest($httptestid) {
-	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
-
-	$itemids = array();
-	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$items_db = DBselect(
-		'SELECT hsi.itemid'.
-		' FROM httpstep hs,httpstepitem hsi'.
-		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND hs.httptestid='.$httptestid
-	);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids));
-
-	return $result;
-}
-
-function disable_httptest($httptestid) {
-	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
-
-	$itemids = array();
-	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$items_db = DBselect(
-		'SELECT hsi.itemid'.
-		' FROM httpstep hs,httpstepitem hsi'.
-		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND hs.httptestid='.$httptestid
-	);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids));
-
-	return $result;
-}
-
 function delete_history_by_httptestid($httptestid) {
 	$db_items = DBselect(
 		'SELECT DISTINCT i.itemid'.
@@ -146,13 +98,7 @@ function get_httpstep_by_no($httptestid, $no) {
 
 function get_httptests_by_hostid($hostids) {
 	zbx_value2array($hostids);
-
-	return DBselect(
-		'SELECT DISTINCT ht.*'.
-		' FROM httptest ht,applications ap'.
-		' WHERE ht.applicationid=ap.applicationid'.
-			' AND '.DBcondition('ap.hostid', $hostids)
-	);
+	return DBselect('SELECT DISTINCT ht.* FROM httptest ht WHERE '.DBcondition('ht.hostid', $hostids));
 }
 
 /**
