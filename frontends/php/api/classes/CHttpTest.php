@@ -493,7 +493,7 @@ class CHttpTest extends CZBXAPI {
 
 			info(_s('Deleted: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $host['host']));
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-				_s('Web scenario "%1$s" "%2$s" host "%3$s".', $httpTest['name'], $httpTest['httptestid'], $host['host']));
+				'Web scenario "'.$httpTest['name'].'" "'.$httpTest['httptestid'].'" host "'.$host['host'].'".');
 		}
 
 		return array('httptestids' => $httpTestIds);

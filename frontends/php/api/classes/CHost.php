@@ -264,11 +264,9 @@ class CHost extends CHostGeneral {
 			zbx_value2array($options['httptestids']);
 
 			$sqlParts['select']['httptestid'] = 'ht.httptestid';
-			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['httptest'] = 'httptest ht';
 			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['httptestids']);
-			$sqlParts['where']['aht'] = 'a.applicationid=ht.applicationid';
-			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
+			$sqlParts['where']['aht'] = 'ht.hostid=h.hostid';
 		}
 
 		// graphids
