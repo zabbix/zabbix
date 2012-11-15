@@ -14,6 +14,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5639] fixed global options "dropdown first entry" and "remember selected" in availability reports (Oleg)
+..F....... [ZBX-5639] improved sdii() debugging function (Toms)
 A.F.....S. [ZBX-5816] fixed undefined index in Monitoring > Events, when favorite trigger has been deleted (Toms, Sasha)
 ..F....... [ZBX-5771] fixed acknowledge tick mark lost on "overview" page (Oleg)
 ..F....... [ZBX-5821] fixed 2.0 xml format template import (Oleg)
