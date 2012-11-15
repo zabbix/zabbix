@@ -411,14 +411,14 @@ class CHttpTest extends CZBXAPI {
 
 			if (!empty($dbTest['templateid']) || empty($test['name'])) {
 				$test['name'] = $dbTest['name'];
-				if (!empty($test['steps'])) {
-					foreach ($test['steps'] as $snum => $step) {
-						if (isset($step['httpstepid']) && (!empty($dbTest['templateid']) || empty($step['name']))) {
-							$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
-						}
-						if (!empty($dbTest['templateid'])) {
-							unset($test['steps'][$snum]['no']);
-						}
+			}
+			if (!empty($test['steps'])) {
+				foreach ($test['steps'] as $snum => $step) {
+					if (isset($step['httpstepid']) && (!empty($dbTest['templateid']) || empty($step['name']))) {
+						$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
+					}
+					if (!empty($dbTest['templateid'])) {
+						unset($test['steps'][$snum]['no']);
 					}
 				}
 			}
@@ -477,7 +477,7 @@ class CHttpTest extends CZBXAPI {
 
 		$options = array(
 			'httptestids' => $childHttpTestIds,
-			'output' => array('httptestid', 'name'),
+			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectHosts' => API_OUTPUT_EXTEND
@@ -485,7 +485,6 @@ class CHttpTest extends CZBXAPI {
 		$delHttpTestChilds = $this->get($options);
 		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChilds);
 		$httpTestIds = array_merge($httpTestIds, $childHttpTestIds);
-
 
 		$itemidsDel = array();
 		$dbTestItems = DBselect(
