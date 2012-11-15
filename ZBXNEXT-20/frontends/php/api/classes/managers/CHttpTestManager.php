@@ -776,7 +776,7 @@ class CHttpTestManager {
 			$itemids = array();
 			$stepitemsUpdate = $updateFields = array();
 			$dbStepItems = DBselect(
-				'SELECT i.itemid,hi.type'.
+				'SELECT i.itemid,i.key_,hi.type'.
 						' FROM items i,httpstepitem hi'.
 						' WHERE hi.httpstepid='.$webstep['httpstepid'].
 						' AND hi.itemid=i.itemid'
@@ -785,6 +785,17 @@ class CHttpTestManager {
 				$itemids[] = $stepitem['itemid'];
 
 				if (isset($httpTest['name']) || isset($webstep['name'])) {
+					if (!isset($httpTest['name']) || !isset($webstep['name'])) {
+						$key = new CItemKey($stepitem['key_']);
+						$params = $key->getParameters();
+						if (!isset($httpTest['name'])) {
+							$httpTest['name'] = $params[0];
+						}
+						if (!isset($webstep['name'])) {
+							$webstep['name'] = $params[1];
+						}
+					}
+
 					switch ($stepitem['type']) {
 						case HTTPSTEP_ITEM_TYPE_IN:
 							$updateFields['key_'] = 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]';
