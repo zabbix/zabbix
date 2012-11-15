@@ -959,7 +959,7 @@ Copt::memoryPick();
 			}
 
 			if(!empty($functionids)){
-				$sql = 'SELECT DISTINCT f.triggerid,f.functionid,h.host,i.lastvalue,m.newvalue'.
+				$sql = 'SELECT DISTINCT f.triggerid,f.functionid,h.host,i.lastvalue,i.units,m.newvalue'.
 						' FROM functions f'.
 							' INNER JOIN items i ON f.itemid=i.itemid'.
 							' INNER JOIN hosts h ON i.hostid=h.hostid'.
@@ -978,6 +978,10 @@ Copt::memoryPick();
 						}
 
 						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
+					}
+
+					if (isset($func['lastvalue'])) {
+						$func['lastvalue'] = convert_units($func['lastvalue'], $func['units']);
 					}
 
 					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
