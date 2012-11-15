@@ -58,6 +58,9 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A.F.....S. [ZBX-5816] fixed undefined index in Monitoring > Events, when favorite trigger has been deleted (Toms, Sasha)
+..F....... [ZBX-5771] fixed acknowledge tick mark lost on "overview" page (Oleg)
+..F....... [ZBX-5821] fixed 2.0 xml format template import (Oleg)
 ........S. [ZBX-5791] fixed possible SQL errors when linking groups to a host (Sasha)
 ..F....... [ZBX-5786] fixed screens import, that contain simple graphs or plain texts (Oleg)
 ........S. [ZBX-5753] fixed server crash when using an icmpping* check as a discovery rule (Sasha)

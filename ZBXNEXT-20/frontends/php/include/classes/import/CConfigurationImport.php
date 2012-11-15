@@ -520,10 +520,12 @@ class CConfigurationImport {
 		}
 
 		// create the applications and create a hash hostid->name->applicationid
-		$newApplicationsIds = API::Application()->create($applicationsToCreate);
-		foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
-			$application = $applicationsToCreate[$anum];
-			$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+		if (!empty($applicationsToCreate)) {
+			$newApplicationsIds = API::Application()->create($applicationsToCreate);
+			foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
+				$application = $applicationsToCreate[$anum];
+				$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+			}
 		}
 
 		// refresh applications beacuse templated ones can be inherited to host and used in items
