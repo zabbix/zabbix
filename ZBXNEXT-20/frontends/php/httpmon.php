@@ -117,7 +117,7 @@ if ($pageFilter->hostsSelected) {
 				' GROUP BY hs.httptestid'
 	);
 	while ($dbHttpStep = DBfetch($dbHttpSteps)) {
-		$httpTests[$dbHttpStep['httptestid']] = $dbHttpStep['stepscnt'];
+		$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
 	}
 
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
