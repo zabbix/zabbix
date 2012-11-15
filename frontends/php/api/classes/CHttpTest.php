@@ -386,7 +386,7 @@ class CHttpTest extends CZBXAPI {
 			unset($httpTests[$hnum]['templateid']);
 		}
 
-		// add hostid if missing
+
 		$dbHttpTests = array();
 		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
 				' FROM httptest ht'.
@@ -401,6 +401,9 @@ class CHttpTest extends CZBXAPI {
 			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
 		}
 
+		// add hostid if missing
+		// add test name and steps names if it's empty or test is templated
+		// unset steps no for templated tests
 		foreach($httpTests as $tnum => $httpTest) {
 			$test =& $httpTests[$tnum];
 			$dbTest = $dbHttpTests[$httpTest['httptestid']];
@@ -647,7 +650,8 @@ class CHttpTest extends CZBXAPI {
 	 * @param array $httpTest
 	 */
 	protected function checkSteps(array $httpTest) {
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', zbx_objectValues($httpTest['steps'], 'name'))) {
+		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
+		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
