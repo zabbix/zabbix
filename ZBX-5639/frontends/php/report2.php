@@ -88,7 +88,7 @@ if ($config['dropdown_first_remember']) {
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
 }
-else if (!isset($_REQUEST['filter_rst'])) {
+elseif (!isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
 	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
 	$_REQUEST['filter_timesince'] = get_request('filter_timesince', 0);
@@ -220,10 +220,10 @@ else if (isset($_REQUEST['hostid'])) {
 	}
 
 	// filter
-	$filterForm = get_report2_filter($availabilityReportMode, $PAGE_GROUPS, $PAGE_HOSTS, $options['hostids']);
-	$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
+	$filter = get_report2_filter($availabilityReportMode, $PAGE_GROUPS, $PAGE_HOSTS, $options);
+	$rep2_wdgt->addFlicker($filter['form'], CProfile::get('web.avail_report.filter.state', 0));
 
-	$triggers = API::Trigger()->get($options);
+	$triggers = API::Trigger()->get($filter['options']);
 	CArrayHelper::sort($triggers, array(
 		'host',
 		'description'

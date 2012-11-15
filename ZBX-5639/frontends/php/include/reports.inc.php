@@ -19,19 +19,18 @@
 **/
 
 /**
- * Creates the availability report page filter.
+ * Creates the availability report page filter and modifies trigger retrieval options.
  *
  * Possible $config values are AVAILABILITY_REPORT_BY_HOST or AVAILABILITY_REPORT_BY_TEMPLATE.
  *
- * @param int $config                   report mode
- * @param array $PAGE_GROUPS            the data for the host/template group filter select
- * @param array $PAGE_HOSTS             the data for the host/template filter select
- * @param string|string[] $usedHostIds  the hosts the displayed triggers belong to
+ * @param int $config			report mode
+ * @param array $PAGE_GROUPS	the data for the host/template group filter select
+ * @param array $PAGE_HOSTS		the data for the host/template filter select
+ * @param array $options		trigger retrieval options, to be modified
  *
- * @return CFormTable
+ * @return array returns form table and modified options: array('form' => CFormTable, 'options' => array)
  */
-function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $usedHostIds = null){
-	global $options;
+function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $options){
 	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
@@ -63,20 +62,17 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 		// fetch the groups, that the used hosts belong to
 		$hostGroups = API::HostGroup()->get(array(
 			'output' => array('name', 'groupid'),
-			'hostids' => $usedHostIds,
-			'monitored_hosts' => true
+			'hostids' => $options['hostids'],
+			'monitored_hosts' => true,
+			'preservekeys' => true
 		));
-		$groupExist = false;
 		foreach ($hostGroups as $hostGroup) {
-			if (isset($_REQUEST['hostgroupid']) && $hostGroup['groupid'] == $_REQUEST['hostgroupid']) {
-				$groupExist = true;
-			}
 			$cmbHGrps->addItem(
 				$hostGroup['groupid'],
 				get_node_name_by_elid($hostGroup['groupid'], null, ': ').$hostGroup['name']
 			);
 		}
-		if (isset($_REQUEST['hostgroupid']) && !$groupExist) {
+		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
 			unset($options['groupids']);
 		}
 
@@ -97,18 +93,14 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
 			' ORDER BY t.description';
-		$result=DBselect($sql);
-		$triggerExist = false;
-		while ($row = DBfetch($result)) {
-			if (isset($_REQUEST['tpl_triggerid']) && $row['triggerid'] == $_REQUEST['tpl_triggerid']) {
-				$triggerExist = true;
-			}
+		$triggers = DBfetchArrayAssoc(DBselect($sql), 'triggerid');
+		foreach ($triggers as $trigger) {
 			$cmbTrigs->addItem(
-				$row['triggerid'],
-				get_node_name_by_elid($row['triggerid'], null, ': ').$row['description']
+				$trigger['triggerid'],
+				get_node_name_by_elid($trigger['triggerid'], null, ': ').$trigger['description']
 			);
 		}
-		if (isset($_REQUEST['tpl_triggerid']) && !$triggerExist) {
+		if (isset($_REQUEST['tpl_triggerid']) && !isset($triggers[$_REQUEST['tpl_triggerid']])) {
 			unset($options['filter']['templateid']);
 		}
 
@@ -189,7 +181,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 
 	$filterForm->addItemToBottomRow($reset);
 
-	return $filterForm;
+	return array('form' => $filterForm, 'options' => $options);
 }
 
 function bar_report_form(){
