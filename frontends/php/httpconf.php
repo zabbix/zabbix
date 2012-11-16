@@ -421,7 +421,6 @@ else {
 		$options = array(
 			'editable' => true,
 			'output' => array('httptestid'),
-			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
 		);
 		if (empty($data['showDisabled'])) {
@@ -434,6 +433,8 @@ else {
 			$options['groupids'] = $data['pageFilter']->groupid;
 		}
 		$httpTests = API::HttpTest()->get($options);
+
+		order_result($httpTests, $sortfield, getPageSortOrder());
 
 		$data['paging'] = getPagingLine($httpTests);
 
