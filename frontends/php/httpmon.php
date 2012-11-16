@@ -67,6 +67,7 @@ $httpmon_wdgt->addPageHeader(
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
 $httpmon_wdgt->addHeader(_('Web checks'), $r_form);
+$httpmon_wdgt->addHeaderRowNumber();
 
 // TABLE
 $table = new CTableInfo(_('No web checks defined.'));
@@ -84,6 +85,8 @@ if ($pageFilter->hostsSelected) {
 	$options = array(
 		'editable' => true,
 		'output' => array('httptestid'),
+		'templated' => false,
+		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
 	if ($pageFilter->hostid > 0) {

@@ -299,7 +299,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		'web' => 'web'
 	);
 	if (!empty($discoveryid)) {
-		unset($elements['applications'], $elements['screens'], $elements['discoveries']);
+		unset($elements['applications'], $elements['screens'], $elements['discoveries'], $elements['web']);
 	}
 
 	$options = array(

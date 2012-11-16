@@ -168,14 +168,19 @@ class CHttpTest extends CZBXAPI {
 
 		// inherited
 		if (isset($options['inherited'])) {
-			$sqlParts['where'][] = $options['inherited'] ? 'a.templateid IS NOT NULL' : 'a.templateid IS NULL';
+			$sqlParts['where'][] = $options['inherited'] ? 'ht.templateid IS NOT NULL' : 'ht.templateid IS NULL';
 		}
 
 		// templated
 		if (isset($options['templated'])) {
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ha'] = 'h.hostid=a.hostid';
-			$sqlParts['where'][] = 'h.status='.($options['templated'] ? HOST_STATUS_TEMPLATE : HOST_STATUS_TEMPLATE);
+			$sqlParts['where']['ha'] = 'h.hostid=ht.hostid';
+			if ($options['templated']) {
+				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			}
+			else {
+				$sqlParts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+			}
 		}
 
 		// output
