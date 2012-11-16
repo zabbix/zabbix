@@ -260,6 +260,8 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable')&& isset(
 	$go_result = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
 	$status = $_REQUEST['go'] == 'activate' ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
+	$msg_ok = $_REQUEST['go'] == 'activate' ? _('Web scenario activated') : _('Web scenario disabled');
+	$msg_problem = $_REQUEST['go'] == 'activate' ? _('Cannot activate web scenario') : _('Cannot disable web scenario');
 
 	foreach ($group_httptestid as $id) {
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
@@ -276,7 +278,7 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable')&& isset(
 				($_REQUEST['go'] == 'activate' ? 'Web scenario activated' : 'Web scenario disabled'));
 		}
 	}
-	show_messages($go_result, _('Web scenario activated'), null);
+	show_messages($go_result, $msg_ok, $msg_problem);
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
