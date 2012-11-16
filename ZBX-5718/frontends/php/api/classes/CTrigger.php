@@ -1569,11 +1569,13 @@ class CTrigger extends CTriggerGeneral {
 		// update triggers expression
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
-
-			addUnknownEvent($triggerid);
-
 			$hosts = array();
 			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
+
+			if (DBfetch(DBselect('SELECT h.hostid FROM hosts h WHERE '.DBcondition('h.host', $hosts).' AND h.status<>'.HOST_STATUS_TEMPLATE.''))) {
+				addUnknownEvent($triggerid);
+			}
+
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
