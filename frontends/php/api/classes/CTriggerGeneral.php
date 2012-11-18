@@ -131,26 +131,26 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		$newTrigger['templateid'] = $trigger['triggerid'];
 		unset($newTrigger['triggerid']);
 
-
 		if (isset($trigger['dependencies'])) {
 			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
 			$newTrigger['dependencies'] = replace_template_dependencies($deps, $chdHost['hostid']);
 		}
-		$expressionData = new CTriggerExpression($trigger);
+		$expressionData = new CTriggerExpression($trigger['expression']);
 
+		$newTrigger['expression'] = $expressionData->expressionShort;
 		// replace template separately in each expression, only in beginning (host part)
-		foreach ($expressionData->expressions as $expr) {
-			$newExpr = '';
+		foreach ($expressionData->expressions as $exprPart) {
 			foreach ($triggerTemplates as $triggerTemplate) {
-				$pos = strpos($expr['expression'], '{'.$triggerTemplate['host'].':');
-				if ($pos === 0) {
-					$newExpr = substr_replace($expr['expression'], '{'.$chdHost['host'].':', 0, strlen('{'.$triggerTemplate['host'].':'));
+				if ($triggerTemplate['host'] == $exprPart['host']) {
+					$exprPart['host'] = $chdHost['host'];
 					break;
 				}
 			}
-			if (!empty($newExpr)) {
-				$newTrigger['expression'] = str_replace($expr['expression'], $newExpr, $newTrigger['expression']);
-			}
+			$newTrigger['expression'] = str_replace(
+					'{'.$exprPart['index'].'}',
+					'{'.$exprPart['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}',
+					$newTrigger['expression']
+			);
 		}
 
 		// check if a child trigger already exists on the host
@@ -246,8 +246,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$filter['hostid'] = $hostid;
 		}
 		else {
-			$expr = new CTriggerExpression($trigger);
-			$filter['host'] = reset($expr->data['hosts']);
+			$expressionData = new CTriggerExpression($trigger['expression']);
+			$filter['host'] = $expressionData->getHosts();
 		}
 
 		$triggers = $this->get(array(

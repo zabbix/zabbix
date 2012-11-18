@@ -30,7 +30,6 @@ define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
 
 $definedErrorPhrases = array(
-	EXPRESSION_VALUE_TYPE_UNKNOWN => _('Unknown variable type, testing not available'),
 	EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 	EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
 	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro')
@@ -45,7 +44,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$expression = get_request('expression', '');
 
 	define('NO_LINK_IN_TESTING', true);
-	$triggerExpr = new CTriggerExpression(array('expression' => $expression));
+	$expressionData = new CTriggerExpression($expression);
 	list($outline, $eHTMLTree) = analyze_expression($expression);
 
 // test data (create table, create check fields)
@@ -61,15 +60,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$rplcts = array();
 	$allowedTesting = true;
 
-	if(empty($triggerExpr->errors)){
+	if ($expressionData->isValid) {
 		$macrosData = array();
 
-		foreach($triggerExpr->expressions as $exprPart){
-			$macrosId = md5($exprPart['expression']);
+		$expressions = array_merge($expressionData->expressions, $expressionData->macros, $expressionData->usermacros);
 
-			if(isset($macrosData[$exprPart['expression']])) continue;
+		foreach ($expressions as $exprPart) {
+			if (isset($macrosData[$exprPart['expression']])) {
+				continue;
+			}
 
-			$fname = 'test_data_'.$macrosId;
+			$fname = 'test_data_'.md5($exprPart['expression']);
 			$macrosData[$exprPart['expression']] = get_request($fname, '');
 
 			$info = get_item_function_info($exprPart['expression']);
