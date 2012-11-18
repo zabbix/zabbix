@@ -166,6 +166,8 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/parsers/CTriggerExpression.php -text
+frontends/php/include/classes/validators/CTriggerFunctionValidator.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
