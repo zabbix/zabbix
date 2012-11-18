@@ -181,11 +181,6 @@ class CTriggerExpression {
 					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
 			$this->isValid = false;
 		}
-
-		if ($this->isValid && count($this->expressions) == 0) {
-			$this->error = _('Trigger expression must contain at least one host:key reference.');
-			$this->isValid = false;
-		}
 	}
 
 	private function parseConstant() {

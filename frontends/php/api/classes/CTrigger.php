@@ -1169,6 +1169,11 @@ class CTrigger extends CTriggerGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
+				if (!isset($expressionData->expressions[0])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Trigger expression must contain at least one host:key reference.'));
+				}
+
 				$expressionHosts = $expressionData->getHosts();
 
 				$hosts = API::Host()->get(array(
