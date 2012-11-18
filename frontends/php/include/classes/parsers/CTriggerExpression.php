@@ -178,7 +178,12 @@ class CTriggerExpression {
 
 		if ($level != 0 || isset($this->expression[$this->pos]) || $state == STATE_AFTER_OPERATOR || $state == STATE_AFTER_MINUS) {
 			$this->error = _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".',
-					zbx_substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
+					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
+			$this->isValid = false;
+		}
+
+		if ($this->isValid && count($this->expressions) == 0) {
+			$this->error = _('Trigger expression must contain at least one host:key reference.');
 			$this->isValid = false;
 		}
 	}
