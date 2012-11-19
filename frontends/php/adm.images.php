@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -67,13 +67,9 @@ if (isset($_REQUEST['save'])) {
 		if (isset($_FILES['image'])) {
 			$file = new CUploadFile($_FILES['image']);
 
-			if (isset($_REQUEST['imageid']) && !$file->wasUploaded()) {
-				$image = null;
-			}
-			else {
-				if ($file->getSize() > ZBX_MAX_IMAGE_SIZE) {
-					throw new Exception(_('Image size must be less than 1MB'));
-				}
+			$image = null;
+			if ($file->wasUploaded()) {
+				$file->validateImageSize();
 				$image = base64_encode($file->getContent());
 			}
 		}
