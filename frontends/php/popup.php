@@ -1699,7 +1699,7 @@ elseif ($srctbl == 'slides') {
 	$slideshows = array();
 	$result = DBselect('SELECT s.slideshowid,s.name FROM slideshows s WHERE '.DBin_node('s.slideshowid', $nodeid).' ORDER BY s.name');
 	while ($row = DBfetch($result)) {
-		if (!slideshow_accessible($row['slideshowid'], PERM_READ_ONLY)) {
+		if (!slideshow_accessible($row['slideshowid'], PERM_READ)) {
 			continue;
 		}
 		$slideshows[$row['slideshowid']] = $row;
