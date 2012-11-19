@@ -126,7 +126,7 @@ class CEvent extends CZBXAPI {
 					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 					$sqlParts['from']['functions'] = 'functions f';
 					$sqlParts['from']['items'] = 'items i';
@@ -153,7 +153,7 @@ class CEvent extends CZBXAPI {
 									' AND rr.id=hgg.groupid'.
 									' AND rr.groupid=gg.usrgrpid'.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.'))';
+									' AND rr.permission='.PERM_DENY.'))';
 				}
 			}
 		}

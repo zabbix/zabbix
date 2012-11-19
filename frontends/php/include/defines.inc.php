@@ -614,7 +614,7 @@ define('GROUP_DEBUG_MODE_ENABLED',	1);
 
 define('PERM_MAX',			3);
 define('PERM_READ_WRITE',	3);
-define('PERM_READ_ONLY',	2);
+define('PERM_READ',			2);
 define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
