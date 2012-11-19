@@ -329,10 +329,15 @@ class CImage extends CZBXAPI {
 						}
 
 						oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
-						if (!oci_execute($stmt)) {
-							$e = oci_error($stid);
+						if (!oci_execute($stmt, OCI_DEFAULT)) {
+							$e = oci_error($stmt);
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Execute SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
 						}
+						if (!$lob->save($image['image'])) {
+							$e = oci_error($stmt);
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image load error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
+						}
+						$lob->free();
 						oci_free_statement($stmt);
 					break;
 					case ZBX_DB_DB2:
