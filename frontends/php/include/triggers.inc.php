@@ -180,7 +180,7 @@ function init_trigger_expression_structures($getMacros = true, $getFunctions = t
 /**
  * Returns an array of trigger IDs that are available to the current user.
  *
- * @param int $perm         either PERM_READ_WRITE for writing, or PERM_READ_ONLY for reading
+ * @param int $perm         either PERM_READ_WRITE for writing, or PERM_READ for reading
  * @param array $hostids
  * @param int $cache
  *
