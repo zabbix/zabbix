@@ -40,16 +40,15 @@
  ******************************************************************************/
 int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 {
-	int		nparams;
-	char		params[MAX_STRING_LEN], *error = NULL;
-	char		tmp[MAX_STRING_LEN], tmp1[HOST_HOST_LEN_MAX];
+	int	nparams;
+	char	params[MAX_STRING_LEN], *error = NULL, tmp[MAX_STRING_LEN], tmp1[HOST_HOST_LEN_MAX];
 
 	init_result(result);
 
 	if (0 != strncmp(item->key, "zabbix[", 7))
 		goto notsupported;
 
-	if (2 != parse_command(item->key, NULL, 0, params, sizeof(params)))
+	if (ZBX_COMMAND_WITH_PARAMS != parse_command(item->key, NULL, 0, params, sizeof(params)))
 		goto notsupported;
 
 	if (0 != get_param(params, 1, tmp, sizeof(tmp)))

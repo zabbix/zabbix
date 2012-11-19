@@ -111,9 +111,7 @@ class CWebCheck extends CZBXAPI {
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['httptestid'] = 'ht.httptestid';
-			}
+			$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			$sqlParts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
 		}
 
@@ -121,9 +119,7 @@ class CWebCheck extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'a.hostid';
-			}
+			$sqlParts['select']['hostid'] = 'a.hostid';
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
 			$sqlParts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
@@ -228,30 +224,25 @@ class CWebCheck extends CZBXAPI {
 			else {
 				$httpTestIds[$httpTest['httptestid']] = $httpTest['httptestid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$httpTest['httptestid']] = array('httptestid' => $httpTest['httptestid']);
+				if (!isset($result[$httpTest['httptestid']])) {
+					$result[$httpTest['httptestid']] = array();
 				}
-				else {
-					if (!isset($result[$httpTest['httptestid']])) {
-						$result[$httpTest['httptestid']] = array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$httpTest['httptestid']]['hosts'])) {
+				if (!is_null($options['selectHosts']) && !isset($result[$httpTest['httptestid']]['hosts'])) {
+					$result[$httpTest['httptestid']]['hosts'] = array();
+				}
+				if (!is_null($options['selectSteps']) && !isset($result[$httpTest['httptestid']]['steps'])) {
+					$result[$httpTest['httptestid']]['steps'] = array();
+				}
+
+				// hostids
+				if (isset($httpTest['hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$httpTest['httptestid']]['hosts'])) {
 						$result[$httpTest['httptestid']]['hosts'] = array();
 					}
-					if (!is_null($options['selectSteps']) && !isset($result[$httpTest['httptestid']]['steps'])) {
-						$result[$httpTest['httptestid']]['steps'] = array();
-					}
-
-					// hostids
-					if (isset($httpTest['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$httpTest['httptestid']]['hosts'])) {
-							$result[$httpTest['httptestid']]['hosts'] = array();
-						}
-						$result[$httpTest['httptestid']]['hosts'][] = array('hostid' => $httpTest['hostid']);
-						unset($httpTest['hostid']);
-					}
-					$result[$httpTest['httptestid']] += $httpTest;
+					$result[$httpTest['httptestid']]['hosts'][] = array('hostid' => $httpTest['hostid']);
+					unset($httpTest['hostid']);
 				}
+				$result[$httpTest['httptestid']] += $httpTest;
 			}
 		}
 
@@ -912,7 +903,6 @@ class CWebCheck extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'httptestids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -936,7 +926,6 @@ class CWebCheck extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'httptestids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));

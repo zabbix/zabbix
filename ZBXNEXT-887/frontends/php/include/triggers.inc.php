@@ -200,7 +200,7 @@ function get_accessible_triggers($perm, $hostids = array(), $cache = 1) {
 	}
 
 	$options = array(
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('triggerid'),
 		'nodeids' => $nodeid
 	);
 	if (!empty($hostids)) {

@@ -58,7 +58,7 @@ class CTriggersInfo extends CTable {
 		$options = array(
 			'monitored' => true,
 			'skipDependent' => true,
-			'output' => API_OUTPUT_SHORTEN
+			'output' => array('triggerid')
 		);
 
 		if ($this->hostid > 0) {

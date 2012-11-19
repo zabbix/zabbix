@@ -449,7 +449,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -469,7 +468,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));
@@ -517,7 +515,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			$typeColumn = 'ymin_type';
 		}
 
-		// make if work for both graphs and graph prototypes
+		// make it work for both graphs and graph prototypes
 		$filter['flags'] = array(
 			ZBX_FLAG_DISCOVERY_CHILD,
 			ZBX_FLAG_DISCOVERY_NORMAL,

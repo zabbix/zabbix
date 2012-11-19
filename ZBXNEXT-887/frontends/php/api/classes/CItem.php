@@ -76,7 +76,6 @@ class CItem extends CItemGeneral {
 			'graphids'					=> null,
 			'triggerids'				=> null,
 			'applicationids'			=> null,
-			'discoveryids'				=> null,
 			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
@@ -204,10 +203,7 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['groupid'] = 'hg.groupid';
-			}
-
+			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=i.hostid';
@@ -238,9 +234,7 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['triggerid'] = 'f.triggerid';
-			}
+			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
@@ -250,9 +244,7 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['applicationid'] = 'ia.applicationid';
-			}
+			$sqlParts['select']['applicationid'] = 'ia.applicationid';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
 			$sqlParts['where']['ia'] = 'ia.itemid=i.itemid';
@@ -262,29 +254,10 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['graphid'] = 'gi.graphid';
-			}
+			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['discoveryid'] = 'id.parent_itemid';
-			}
-
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
-			}
 		}
 
 		// webitems
@@ -358,9 +331,7 @@ class CItem extends CItemGeneral {
 
 		// host
 		if (!is_null($options['host'])) {
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['host'] = 'h.host';
-			}
+			$sqlParts['select']['host'] = 'h.host';
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where'][] = ' h.host='.zbx_dbstr($options['host']);
@@ -368,9 +339,7 @@ class CItem extends CItemGeneral {
 
 		// application
 		if (!is_null($options['application'])) {
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['application'] = 'a.name as application';
-			}
+			$sqlParts['select']['application'] = 'a.name as application';
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where']['aia'] = 'a.applicationid = ia.applicationid';
@@ -430,59 +399,54 @@ class CItem extends CItemGeneral {
 			else {
 				$itemids[$item['itemid']] = $item['itemid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$item['itemid']] = array('itemid' => $item['itemid']);
+				if (!isset($result[$item['itemid']])) {
+					$result[$item['itemid']]= array();
 				}
-				else {
-					if (!isset($result[$item['itemid']])) {
-						$result[$item['itemid']]= array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
-						$result[$item['itemid']]['hosts'] = array();
-					}
-					if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
+				if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
+					$result[$item['itemid']]['hosts'] = array();
+				}
+				if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
+					$result[$item['itemid']]['triggers'] = array();
+				}
+				if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
+					$result[$item['itemid']]['graphs'] = array();
+				}
+				if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
+					$result[$item['itemid']]['applications'] = array();
+				}
+				if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
+					$result[$item['itemid']]['discoveryRule'] = array();
+				}
+				if (!is_null($options['selectInterfaces']) && !isset($result[$item['itemid']]['interfaces'])) {
+					$result[$item['itemid']]['interfaces'] = array();
+				}
+
+				// triggerids
+				if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
+					if (!isset($result[$item['itemid']]['triggers'])) {
 						$result[$item['itemid']]['triggers'] = array();
 					}
-					if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
+					$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
+					unset($item['triggerid']);
+				}
+				// graphids
+				if (isset($item['graphid']) && is_null($options['selectGraphs'])) {
+					if (!isset($result[$item['itemid']]['graphs'])) {
 						$result[$item['itemid']]['graphs'] = array();
 					}
-					if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
+					$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
+					unset($item['graphid']);
+				}
+				// applicationids
+				if (isset($item['applicationid']) && is_null($options['selectApplications'])) {
+					if (!isset($result[$item['itemid']]['applications'])) {
 						$result[$item['itemid']]['applications'] = array();
 					}
-					if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
-						$result[$item['itemid']]['discoveryRule'] = array();
-					}
-					if (!is_null($options['selectInterfaces']) && !isset($result[$item['itemid']]['interfaces'])) {
-						$result[$item['itemid']]['interfaces'] = array();
-					}
-
-					// triggerids
-					if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
-						if (!isset($result[$item['itemid']]['triggers'])) {
-							$result[$item['itemid']]['triggers'] = array();
-						}
-						$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
-						unset($item['triggerid']);
-					}
-					// graphids
-					if (isset($item['graphid']) && is_null($options['selectGraphs'])) {
-						if (!isset($result[$item['itemid']]['graphs'])) {
-							$result[$item['itemid']]['graphs'] = array();
-						}
-						$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
-						unset($item['graphid']);
-					}
-					// applicationids
-					if (isset($item['applicationid']) && is_null($options['selectApplications'])) {
-						if (!isset($result[$item['itemid']]['applications'])) {
-							$result[$item['itemid']]['applications'] = array();
-						}
-						$result[$item['itemid']]['applications'][] = array('applicationid' => $item['applicationid']);
-						unset($item['applicationid']);
-					}
-
-					$result[$item['itemid']] += $item;
+					$result[$item['itemid']]['applications'][] = array('applicationid' => $item['applicationid']);
+					unset($item['applicationid']);
 				}
+
+				$result[$item['itemid']] += $item;
 			}
 		}
 
@@ -764,7 +728,7 @@ class CItem extends CItemGeneral {
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('itemid'),
 			'nopermissions' => true,
 			'limit' => 1
 		);
@@ -945,6 +909,7 @@ class CItem extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$delItemIds = zbx_toArray($itemids);
 		$itemids = zbx_toHash($itemids);
 
 		$delItems = $this->get(array(
@@ -1007,7 +972,7 @@ class CItem extends CItemGeneral {
 
 		$triggers = API::Trigger()->get(array(
 			'itemids' => $itemids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('triggerid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
@@ -1056,7 +1021,7 @@ class CItem extends CItemGeneral {
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('itemids' => $itemids);
+		return array('itemids' => $delItemIds);
 	}
 
 	public function syncTemplates($data) {
@@ -1328,7 +1293,7 @@ class CItem extends CItemGeneral {
 			));
 			foreach ($itemDiscoveries as $itemDiscovery) {
 				$refId = $itemDiscovery['itemid'];
-				$itemDiscovery = $this->unsetExtraFields('item_discovery', $itemDiscovery, $options['selectItemDiscovery']);
+				$itemDiscovery = $this->unsetExtraFields($itemDiscovery, $options['selectItemDiscovery']);
 
 				$result[$refId]['itemDiscovery'] = $itemDiscovery;
 			}
@@ -1347,8 +1312,7 @@ class CItem extends CItemGeneral {
 				&& $options['interfaceids'] === null
 				&& $options['graphids'] === null
 				&& $options['triggerids'] === null
-				&& $options['applicationids'] === null
-				&& $options['discoveryids'] === null) {
+				&& $options['applicationids'] === null) {
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 

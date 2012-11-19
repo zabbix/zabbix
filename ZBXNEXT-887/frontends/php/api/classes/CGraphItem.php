@@ -107,9 +107,8 @@ class CGraphItem extends CZBXAPI {
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['graphid'] = 'gi.graphid';
-			}
+
+			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs'] = 'graphs g';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where'][] = DBcondition('g.graphid', $options['graphids']);
@@ -118,9 +117,8 @@ class CGraphItem extends CZBXAPI {
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'gi.itemid';
-			}
+
+			$sqlParts['select']['itemid'] = 'gi.itemid';
 			$sqlParts['where'][] = DBcondition('gi.itemid', $options['itemids']);
 		}
 
@@ -198,23 +196,18 @@ class CGraphItem extends CZBXAPI {
 			else {
 				$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$gitem['gitemid']] = array('gitemid' => $gitem['gitemid']);
+				if (!isset($result[$gitem['gitemid']])) {
+					$result[$gitem['gitemid']] = array();
 				}
-				else {
-					if (!isset($result[$gitem['gitemid']])) {
-						$result[$gitem['gitemid']] = array();
-					}
 
-					// graphids
-					if (isset($gitem['graphid']) && is_null($options['selectGraphs'])) {
-						if (!isset($result[$gitem['gitemid']]['graphs'])) {
-							$result[$gitem['gitemid']]['graphs'] = array();
-						}
-						$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
+				// graphids
+				if (isset($gitem['graphid']) && is_null($options['selectGraphs'])) {
+					if (!isset($result[$gitem['gitemid']]['graphs'])) {
+						$result[$gitem['gitemid']]['graphs'] = array();
 					}
-					$result[$gitem['gitemid']] += $gitem;
+					$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
 				}
+				$result[$gitem['gitemid']] += $gitem;
 			}
 		}
 

@@ -1,12 +1,16 @@
 Changes for 2.1.0
 
 New features:
+A......... [ZBXNEXT-1492] dropped support of output shorten for the API get methods (Pavels)
+.......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)
+........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
 ....I...S. [ZBXNEXT-1472] added support of parallel processing of time-based functions (Sasha)
 ..F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard)
 .......PS. [ZBX-3449] added support of multiple dynamic SNMP indexes (Sasha)
 ..F....... [ZBXNEXT-1441] added media type name to action operations description (Vedmak)
 A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
 ..F....... [ZBXNEXT-1433] moved operation delay field to Operation tab (Eduard)
+..F.I..PS. [ZBXNEXT-1322] automatic update of database structure when upgrading to newer version (Sasha, Vedmak)
 ..F.....S. [ZBX-3236] added support of value mapping for a character data (Sasha, Vedmak)
 .......P.. [ZBX-3817] improved performance of the "data sender" process (Sasha)
 .......PS. [ZBX-5436] added support of AllowRoot paramater by server and proxy daemons (Sasha)
@@ -15,7 +19,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
-A......... [ZBX-5714] fixed inconsistency between shorten and refer in UserMacro API (Eduard)
+A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
+A......... [ZBX-5709] fixed trigger recreation after template trigger expression change causing event history deletion (Toms)
 ..F....... [ZBX-5711] added caching for frontend favorite values (Toms)
 ..F....... [ZBX-5711] removed redundant queries when editing web scenario (Toms)
 A.F....... [ZBX-5565] fixed html is returned on api requests if db is down (Vedmak)
@@ -40,18 +45,40 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.4rc1
 
 New features:
+A.F....... [ZBX-1357] added initial Portuguese (Portugal) translation (Richlv)
 ..F....... [ZBXNEXT-1398] implemented flickerfree screen shadowing for old screen data (Eduard)
 A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 ..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
 .......PS. [ZBX-4638] added support of {HOST.HOST}, {HOST.NAME}, {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in "params" field for SSH, Telnet and DB monitor items (Sasha)
 .....J.... [ZBX-4663] added possibility to use dots in JMX attribute names (dimir)
 ..F....... [ZBX-5556] action recovery message body can now be empty (Vedmak)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Chinese (China), Chinese (Taiwan), Czech, French, German, Hungarian, Italian, Latvian, Polish, Slovak, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Chinese (China), Chinese (Taiwan), Czech, French, German, Hungarian, Italian, Japanese, Latvian, Polish, Slovak, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBXNEXT-1426] added initial Persian translation (Richlv)
 A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5639] fixed global options "dropdown first entry" and "remember selected" in availability reports (Oleg)
+..F....... [ZBX-5639] improved sdii() debugging function (Toms)
+A.F.....S. [ZBX-5816] fixed undefined index in Monitoring > Events, when favorite trigger has been deleted (Toms, Sasha)
+..F....... [ZBX-5771] fixed acknowledge tick mark lost on "overview" page (Oleg)
+..F....... [ZBX-5821] fixed 2.0 xml format template import (Oleg)
+........S. [ZBX-5791] fixed possible SQL errors when linking groups to a host (Sasha)
+..F....... [ZBX-5786] fixed screens import, that contain simple graphs or plain texts (Oleg)
+........S. [ZBX-5753] fixed server crash when using an icmpping* check as a discovery rule (Sasha)
+...G...... [ZBX-5382] fixed agent crash on HP-UX Itanium; thanks to Alice Ferrazzi (Andris)
+...G...... [ZBX-5289] fixed agent crash on Solaris; thanks to Jairo Eduardo Lopez Fuentes Nacarino, Takanori Suzuki (Andris)
+..F....... [ZBX-5744] removed redundant HTML from the map monitoring page (Eduard, Pavels)
+A......... [ZBX-5744] fixed script.getscriptsbyhost returning an unnecessary array of hosts for each script (Eduard, Pavels)
+..F....... [ZBX-5811] fixed no permissions error when change user group "status", "frontend access" and "debug mode" using link in user groups list (Oleg)
+A......... [ZBX-5751] fixed CDiscoveryRule get() and CItemPrototype get() "selectGraphs" parameter (Oleg)
+..F....... [ZBX-5667] fixed host screen defined in template does not show item data for "Plain text" elements (Toms)
+..F....... [ZBX-5762] fixed undefined indexes in graph prototype form (Oleg)
+....I..... [ZBX-5125] fixed possible SQL errors while upgrading DB (dimir, Sasha)
+....I..... [ZBX-5415] fixed check for PostgreSQL dev libraries (Sasha)
+A......... [ZBX-5740] removed "discoveryids" parameter from CItem, CTrigger and CGraph get() methods (Toms)
+A......... [ZBX-5740] fixed CItemPrototype parameter "selectTriggers" not working (Toms)
+A......... [ZBX-5111] fixed child trigger data reset after changes in parent trigger (Oleg)
 A......... [ZBX-5742] fixed trigger order_result in item and item prototype (Oleg)
 ..F....... [ZBX-5754] fixed English strings in trigger expression helper (Oleg)
 ..F....... [ZBX-5700] added permission checks in frontend (Oleg)
@@ -1143,6 +1170,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)

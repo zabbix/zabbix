@@ -788,8 +788,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	itemids = zbx_malloc(itemids, history_num * sizeof(zbx_uint64_t));
-	timespecs = zbx_malloc(timespecs, history_num * sizeof(zbx_timespec_t));
+	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * history_num);
+	timespecs = zbx_malloc(timespecs, sizeof(zbx_timespec_t) * history_num);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -868,8 +868,8 @@ clean_triggers:
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
 clean_items:
-	zbx_free(itemids);
 	zbx_free(timespecs);
+	zbx_free(itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2420,205 +2420,363 @@ static void	DCadd_text(char **dst, const char *src, size_t len)
 	(*dst)[len] = '\0';
 }
 
-static void	DCadd_history(zbx_uint64_t itemid, double value_orig, zbx_timespec_t *ts)
+typedef struct
+{
+	size_t	pvalue;
+	size_t	len;
+}
+dc_value_str_t;
+
+typedef struct
+{
+	double		value_dbl;
+	zbx_uint64_t	value_uint;
+	dc_value_str_t	value_str;
+}
+dc_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	dc_value_t	value;
+	zbx_timespec_t	ts;
+	dc_value_str_t	source;		/* for log items only */
+	zbx_uint64_t	lastlogsize;	/* for log items only */
+	int		timestamp;	/* for log items only */
+	int		severity;	/* for log items only */
+	int		logeventid;	/* for log items only */
+	int		mtime;		/* for log items only */
+	unsigned char	value_type;
+	unsigned char	status;
+	unsigned char	flags;
+}
+dc_item_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	size_t		perror, len;
+	zbx_timespec_t	ts;
+}
+value_notsupported_t;
+
+#define ZBX_MAX_VALUES_LOCAL	256
+#define ZBX_STRUCT_REALLOC_STEP	8
+#define ZBX_STRING_REALLOC_STEP	ZBX_KIBIBYTE
+static char		*string_values = NULL;
+static size_t		string_values_alloc = 0, string_values_offset = 0;
+static dc_item_value_t	*item_values = NULL;
+static size_t		item_values_alloc = 0, item_values_num = 0;
+
+static void	DCadd_history_dbl(dc_item_value_t *value)
 {
 	ZBX_DC_HISTORY	*history;
 
-	LOCK_CACHE;
-
-	DCcheck_ns(ts);
+	DCcheck_ns(&value->ts);
 
 	history = DCget_history_ptr(0);
 
-	history->itemid = itemid;
-	history->clock = ts->sec;
-	history->ns = ts->ns;
+	history->itemid = value->itemid;
+	history->clock = value->ts.sec;
+	history->ns = value->ts.ns;
 	history->status = ITEM_STATUS_ACTIVE;
 	history->value_type = ITEM_VALUE_TYPE_FLOAT;
-	history->value_orig.dbl = value_orig;
+	history->value_orig.dbl = value->value.value_dbl;
 	history->value.dbl = 0;
 	history->value_null = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_float_counter++;
-
-	UNLOCK_CACHE;
 }
 
-static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, zbx_timespec_t *ts)
+static void	DCadd_history_uint(dc_item_value_t *value)
 {
 	ZBX_DC_HISTORY	*history;
 
-	LOCK_CACHE;
-
-	DCcheck_ns(ts);
+	DCcheck_ns(&value->ts);
 
 	history = DCget_history_ptr(0);
 
-	history->itemid = itemid;
-	history->clock = ts->sec;
-	history->ns = ts->ns;
+	history->itemid = value->itemid;
+	history->clock = value->ts.sec;
+	history->ns = value->ts.ns;
 	history->status = ITEM_STATUS_ACTIVE;
 	history->value_type = ITEM_VALUE_TYPE_UINT64;
-	history->value_orig.ui64 = value_orig;
+	history->value_orig.ui64 = value->value.value_uint;
 	history->value.ui64 = 0;
 	history->value_null = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_uint_counter++;
-
-	UNLOCK_CACHE;
 }
 
-static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts)
+static void	DCadd_history_str(dc_item_value_t *value)
 {
 	ZBX_DC_HISTORY	*history;
-	size_t		len;
 
-	len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
+	DCcheck_ns(&value->ts);
 
-	LOCK_CACHE;
+	history = DCget_history_ptr(value->value.value_str.len);
 
-	DCcheck_ns(ts);
-
-	history = DCget_history_ptr(len);
-
-	history->itemid = itemid;
-	history->clock = ts->sec;
-	history->ns = ts->ns;
+	history->itemid = value->itemid;
+	history->clock = value->ts.sec;
+	history->ns = value->ts.ns;
 	history->status = ITEM_STATUS_ACTIVE;
 	history->value_type = ITEM_VALUE_TYPE_STR;
-	DCadd_text(&history->value_orig.str, value_orig, len);
+	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_str_counter++;
-
-	UNLOCK_CACHE;
 }
 
-static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts)
+static void	DCadd_history_text(dc_item_value_t *value)
 {
 	ZBX_DC_HISTORY	*history;
-	size_t		len;
 
-	len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
+	DCcheck_ns(&value->ts);
 
-	LOCK_CACHE;
+	history = DCget_history_ptr(value->value.value_str.len);
 
-	DCcheck_ns(ts);
-
-	history = DCget_history_ptr(len);
-
-	history->itemid = itemid;
-	history->clock = ts->sec;
-	history->ns = ts->ns;
+	history->itemid = value->itemid;
+	history->clock = value->ts.sec;
+	history->ns = value->ts.ns;
 	history->status = ITEM_STATUS_ACTIVE;
 	history->value_type = ITEM_VALUE_TYPE_TEXT;
-	DCadd_text(&history->value_orig.str, value_orig, len);
+	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_text_counter++;
-
-	UNLOCK_CACHE;
 }
 
 /* lld item values should be stored without a limit */
-static void	DCadd_history_lld(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts)
+static void	DCadd_history_lld(dc_item_value_t *value)
 {
 	ZBX_DC_HISTORY	*history;
-	size_t		len;
 
-	len = strlen(value_orig) + 1;
+	DCcheck_ns(&value->ts);
 
-	LOCK_CACHE;
+	history = DCget_history_ptr(value->value.value_str.len);
 
-	DCcheck_ns(ts);
-
-	history = DCget_history_ptr(len);
-
-	history->itemid = itemid;
-	history->clock = ts->sec;
-	history->ns = ts->ns;
+	history->itemid = value->itemid;
+	history->clock = value->ts.sec;
+	history->ns = value->ts.ns;
 	history->status = ITEM_STATUS_ACTIVE;
 	history->value_type = ITEM_VALUE_TYPE_TEXT;
-	DCadd_text(&history->value_orig.str, value_orig, len);
+	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_text_counter++;
-
-	UNLOCK_CACHE;
 }
 
-static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts,
-		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
+static void	DCadd_history_log(dc_item_value_t *value)
 {
 	ZBX_DC_HISTORY	*history;
-	size_t		len1, len2;
 
-	len1 = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	DCcheck_ns(&value->ts);
 
-	if (NULL != source && '\0' != *source)
-		len2 = zbx_strlen_utf8_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
-	else
-		len2 = 0;
+	history = DCget_history_ptr(value->value.value_str.len + value->source.len);
 
-	LOCK_CACHE;
-
-	DCcheck_ns(ts);
-
-	history = DCget_history_ptr(len1 + len2);
-
-	history->itemid = itemid;
-	history->clock = ts->sec;
-	history->ns = ts->ns;
+	history->itemid = value->itemid;
+	history->clock = value->ts.sec;
+	history->ns = value->ts.ns;
 	history->status = ITEM_STATUS_ACTIVE;
 	history->value_type = ITEM_VALUE_TYPE_LOG;
-	DCadd_text(&history->value_orig.str, value_orig, len1);
+	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
-	history->timestamp = timestamp;
+	history->timestamp = value->timestamp;
 
-	if (0 != len2)
-		DCadd_text(&history->value.str, source, len2);
+	if (0 != value->source.len)
+		DCadd_text(&history->value.str, &string_values[value->source.pvalue], value->source.len);
 	else
 		history->value.str = NULL;
 
-	history->severity = severity;
-	history->logeventid = logeventid;
-	history->lastlogsize = lastlogsize;
-	history->mtime = mtime;
+	history->severity = value->severity;
+	history->logeventid = value->logeventid;
+	history->lastlogsize = value->lastlogsize;
+	history->mtime = value->mtime;
 
 	cache->stats.history_counter++;
 	cache->stats.history_log_counter++;
-
-	UNLOCK_CACHE;
 }
 
-static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, zbx_timespec_t *ts)
+static void	DCadd_history_notsupported(dc_item_value_t *value)
 {
 	ZBX_DC_HISTORY	*history;
-	size_t		len;
 
-	len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
+	DCcheck_ns(&value->ts);
 
-	LOCK_CACHE;
+	history = DCget_history_ptr(value->value.value_str.len);
 
-	DCcheck_ns(ts);
-
-	history = DCget_history_ptr(len);
-
-	history->itemid = itemid;
-	history->clock = ts->sec;
-	history->ns = ts->ns;
+	history->itemid = value->itemid;
+	history->clock = value->ts.sec;
+	history->ns = value->ts.ns;
 	history->status = ITEM_STATUS_NOTSUPPORTED;
-	DCadd_text(&history->value_orig.err, error, len);
+	DCadd_text(&history->value_orig.err, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 1;
 
 	cache->stats.notsupported_counter++;
+}
 
-	UNLOCK_CACHE;
+static void	dc_string_buffer_realloc(size_t len)
+{
+	while (string_values_alloc < string_values_offset + len)
+	{
+		string_values_alloc += ZBX_STRING_REALLOC_STEP;
+		string_values = zbx_realloc(string_values, string_values_alloc);
+	}
+}
+
+static dc_item_value_t	*dc_local_get_history_slot()
+{
+	if (ZBX_MAX_VALUES_LOCAL == item_values_num)
+		dc_flush_history();
+
+	while (item_values_alloc == item_values_num)
+	{
+		item_values_alloc += ZBX_STRUCT_REALLOC_STEP;
+		item_values = zbx_realloc(item_values, item_values_alloc * sizeof(dc_item_value_t));
+	}
+
+	return &item_values[item_values_num++];
+}
+
+static void	dc_local_add_history_dbl(zbx_uint64_t itemid, zbx_timespec_t *ts, double value_orig)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->value_type = ITEM_VALUE_TYPE_FLOAT;
+	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->flags = 0;
+	item_value->value.value_dbl = value_orig;
+}
+
+static void	dc_local_add_history_uint(zbx_uint64_t itemid, zbx_timespec_t *ts, zbx_uint64_t value_orig)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->value_type = ITEM_VALUE_TYPE_UINT64;
+	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->flags = 0;
+	item_value->value.value_uint = value_orig;
+}
+
+static void	dc_local_add_history_str(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->value_type = ITEM_VALUE_TYPE_STR;
+	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->flags = 0;
+	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
+
+	dc_string_buffer_realloc(item_value->value.value_str.len);
+	item_value->value.value_str.pvalue = string_values_offset;
+	memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+	string_values_offset += item_value->value.value_str.len;
+}
+
+static void	dc_local_add_history_text(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->value_type = ITEM_VALUE_TYPE_TEXT;
+	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->flags = 0;
+	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
+
+	dc_string_buffer_realloc(item_value->value.value_str.len);
+	item_value->value.value_str.pvalue = string_values_offset;
+	memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+	string_values_offset += item_value->value.value_str.len;
+}
+
+static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig,
+		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->value_type = ITEM_VALUE_TYPE_LOG;
+	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->flags = 0;
+	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	item_value->timestamp = timestamp;
+	if (NULL != source && '\0' != *source)
+		item_value->source.len = zbx_strlen_utf8_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
+	else
+		item_value->source.len = 0;
+	item_value->severity = severity;
+	item_value->logeventid = logeventid;
+	item_value->lastlogsize = lastlogsize;
+	item_value->mtime = mtime;
+
+	dc_string_buffer_realloc(item_value->value.value_str.len + item_value->source.len);
+	item_value->value.value_str.pvalue = string_values_offset;
+	memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+	string_values_offset += item_value->value.value_str.len;
+	if (0 != item_value->source.len)
+	{
+		item_value->source.pvalue = string_values_offset;
+		memcpy(&string_values[string_values_offset], source, item_value->source.len);
+		string_values_offset += item_value->source.len;
+	}
+}
+
+static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *error)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->status = ITEM_STATUS_NOTSUPPORTED;
+	item_value->value.value_str.len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
+
+	dc_string_buffer_realloc(item_value->value.value_str.len);
+	item_value->value.value_str.pvalue = string_values_offset;
+	memcpy(&string_values[string_values_offset], error, item_value->value.value_str.len);
+	string_values_offset += item_value->value.value_str.len;
+}
+
+static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->flags = ZBX_FLAG_DISCOVERY;
+	item_value->value.value_str.len = strlen(value_orig) + 1;
+
+	dc_string_buffer_realloc(item_value->value.value_str.len);
+	item_value->value.value_str.pvalue = string_values_offset;
+	memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+	string_values_offset += item_value->value.value_str.len;
 }
 
 /******************************************************************************
@@ -2636,22 +2794,20 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 {
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
-		DCadd_history_notsupported(itemid, error, ts);
+		dc_local_add_history_notsupported(itemid, ts, error);
 		return;
 	}
 
 	if (0 != (ZBX_FLAG_DISCOVERY & flags))
 	{
+		if (NULL == GET_TEXT_RESULT(value))
+			return;
+
 		/* server processes low-level discovery (lld) items while proxy stores their values in db */
 		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
-		{
 			DBlld_process_discovery_rule(itemid, value->text, ts);
-		}
 		else
-		{
-			if (GET_TEXT_RESULT(value))
-				DCadd_history_lld(itemid, value->text, ts);
-		}
+			dc_local_add_history_lld(itemid, ts, value->text);
 
 		return;
 	}
@@ -2660,31 +2816,82 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (GET_DBL_RESULT(value))
-				DCadd_history(itemid, value->dbl, ts);
+				dc_local_add_history_dbl(itemid, ts, value->dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (GET_UI64_RESULT(value))
-				DCadd_history_uint(itemid, value->ui64, ts);
+				dc_local_add_history_uint(itemid, ts, value->ui64);
 			break;
 		case ITEM_VALUE_TYPE_STR:
 			if (GET_STR_RESULT(value))
-				DCadd_history_str(itemid, value->str, ts);
+				dc_local_add_history_str(itemid, ts, value->str);
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			if (GET_TEXT_RESULT(value))
-				DCadd_history_text(itemid, value->text, ts);
+				dc_local_add_history_text(itemid, ts, value->text);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (GET_STR_RESULT(value))
 			{
-				DCadd_history_log(itemid, value->str, ts, timestamp, source,
-						severity, logeventid, lastlogsize, mtime);
+				dc_local_add_history_log(itemid, ts, value->str, timestamp, source, severity,
+						logeventid, lastlogsize, mtime);
 			}
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
 					value_type, itemid);
+			return;
 	}
+}
+
+void	dc_flush_history()
+{
+	size_t		i;
+	dc_item_value_t	*item_value;
+
+	if (0 == item_values_num)
+		return;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < item_values_num; i++)
+	{
+		item_value = &item_values[i];
+
+		if (ITEM_STATUS_NOTSUPPORTED == item_value->status)
+		{
+			DCadd_history_notsupported(item_value);
+		}
+		else if (0 != (ZBX_FLAG_DISCOVERY & item_value->flags))
+		{
+			DCadd_history_lld(item_value);
+		}
+		else
+		{
+			switch (item_value->value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					DCadd_history_dbl(item_value);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					DCadd_history_uint(item_value);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+					DCadd_history_str(item_value);
+					break;
+				case ITEM_VALUE_TYPE_TEXT:
+					DCadd_history_text(item_value);
+					break;
+				case ITEM_VALUE_TYPE_LOG:
+					DCadd_history_log(item_value);
+					break;
+			}
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	item_values_num = string_values_offset = 0;
 }
 
 /******************************************************************************

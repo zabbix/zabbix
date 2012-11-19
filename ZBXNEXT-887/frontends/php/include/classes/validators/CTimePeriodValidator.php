@@ -67,7 +67,7 @@ class CTimePeriodValidator extends CValidator {
 	 *   'day1-day2,time1-time2;' (day2 and ';' are optional)
 	 * Examples:
 	 *   5-7,00:00-09:00
-	 *   5,0:0-9:0
+	 *   5,0:00-9:00
 	 *
 	 * @param string $period
 	 *

@@ -335,7 +335,7 @@ if (!empty($data['form'])) {
 		$options = array(
 			'maintenanceids' => $data['maintenanceid'],
 			'real_hosts' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'editable' => true
 		);
 		$data['hostids'] = API::Host()->get($options);
@@ -345,7 +345,7 @@ if (!empty($data['form'])) {
 		$options = array(
 			'maintenanceids' => $data['maintenanceid'],
 			'real_hosts' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('groupid'),
 			'editable' => true
 		);
 		$data['groupids'] = API::HostGroup()->get($options);

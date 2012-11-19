@@ -65,7 +65,7 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 {
 	char	cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], dns[INTERFACE_DNS_LEN_MAX], port[8], encoding[32];
 
-	if (0 == parse_command(item->key, cmd, sizeof(cmd), params, sizeof(params)))
+	if (ZBX_COMMAND_ERROR == parse_command(item->key, cmd, sizeof(cmd), params, sizeof(params)))
 		return NOTSUPPORTED;
 
 	if (0 != strcmp(TELNET_RUN_KEY, cmd))
