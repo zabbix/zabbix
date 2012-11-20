@@ -33,13 +33,4 @@ class CButton extends CInput {
 		$this->addAction('onclick', $action);
 		return $this;
 	}
-
-	public function setAccessKey($value = 'B') {
-		if (isset($value)) {
-			if (!isset($this->attributes['title'])) {
-				$this->setTitle($this->attributes['value'].' [Alt+'.$value.']');
-			}
-		}
-		return $this->setAttribute('accessKey', $value);
-	}
 }
