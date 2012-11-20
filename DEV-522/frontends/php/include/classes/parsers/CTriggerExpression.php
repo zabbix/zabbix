@@ -84,9 +84,7 @@ class CTriggerExpression {
 	 *
 	 * @param string $expression
 	 *
-	 * @return boot
-	 */
-	/**
+	 * @return bool returns true if expression is valid, false otherwise
 	 */
 	public function parse($expression) {
 		$this->expression = $expression;
@@ -187,6 +185,8 @@ class CTriggerExpression {
 
 	/**
 	 * Returns a list of the unique hosts, used in a parsed trigger expression or empty array if expression is not valid
+	 *
+	 * @return array
 	 */
 	public function getHosts() {
 		if (!$this->isValid) {
@@ -205,7 +205,7 @@ class CTriggerExpression {
 	 *  - macro like {TRIGGER.VALUE}
 	 *  - user macro like {$MACRO}
 	 *
-	 * Returns true if parsed successfully, false otherwise
+	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseConstant() {
 		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseMacro() || $this->parseUserMacro()) {
@@ -219,7 +219,7 @@ class CTriggerExpression {
 	 * Parses a trigger function macro constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the macro
 	 *
-	 * Returns true if parsed successfully, false otherwise
+	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseFunctionMacro() {
 		$j = $this->pos;
@@ -258,7 +258,7 @@ class CTriggerExpression {
 	/**
 	 * Parses a host in a trigger function macro constant and moves a position ($pos) on a next symbol after the host
 	 *
-	 * Returns a host name if parsed successfully or null otherwise
+	 * @return string returns a host name if parsed successfully or null otherwise
 	 */
 	private function parseHost(&$pos)
 	{
@@ -281,7 +281,7 @@ class CTriggerExpression {
 	/**
 	 * Parses an item in a trigger function macro constant and moves a position ($pos) on a next symbol after the item
 	 *
-	 * Returns an item name if parsed successfully or null otherwise
+	 * @return string returns an item name if parsed successfully or null otherwise
 	 */
 	private function parseItem(&$pos)
 	{
@@ -396,6 +396,8 @@ class CTriggerExpression {
 	 * Returned array contains two elements:
 	 *   0 => function name like "last(0)"
 	 *   1 => array of parsed function parameters
+	 *
+	 * @return array
 	 */
 	private function parseFunction(&$pos)
 	{
@@ -503,7 +505,7 @@ class CTriggerExpression {
 	 * Parses a number constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the number
 	 *
-	 * Returns true if parsed successfully, false otherwise
+	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseNumber() {
 		$j = $this->pos;
@@ -543,7 +545,7 @@ class CTriggerExpression {
 	 * Parses a macro constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the macro
 	 *
-	 * Returns true if parsed successfully, false otherwise
+	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseMacro() {
 		if (strcmp(substr($this->expression, $this->pos, 15), '{TRIGGER.VALUE}') != 0) {
@@ -561,7 +563,7 @@ class CTriggerExpression {
 	 * Parses an user macro constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the macro
 	 *
-	 * Returns true if parsed successfully, false otherwise
+	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseUserMacro() {
 		$j = $this->pos;
@@ -595,6 +597,8 @@ class CTriggerExpression {
 
 	/**
 	 * Returns true if the char is allowed in the host name, false otherwise
+	 *
+	 * @return bool
 	 */
 	private function isHostChar($c) {
 		if (($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z') || ($c >= '0' && $c <= '9')
@@ -607,6 +611,8 @@ class CTriggerExpression {
 
 	/**
 	 * Returns true if the char is allowed in the item key, false otherwise
+	 *
+	 * @return bool
 	 */
 	private function isKeyChar($c) {
 		if (($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z') || ($c >= '0' && $c <= '9')
@@ -619,6 +625,8 @@ class CTriggerExpression {
 
 	/**
 	 * Returns true if the char is allowed in the function name, false otherwise
+	 *
+	 * @return bool
 	 */
 	private function isFunctionChar($c) {
 		if ($c >= 'a' && $c <= 'z') {
@@ -630,6 +638,8 @@ class CTriggerExpression {
 
 	/**
 	 * Returns true if the char is allowed in the macro, false otherwise
+	 *
+	 * @return bool
 	 */
 	private function isMacroChar($c) {
 		if (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9')) {
