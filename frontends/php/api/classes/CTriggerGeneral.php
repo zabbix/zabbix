@@ -135,7 +135,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
 			$newTrigger['dependencies'] = replace_template_dependencies($deps, $chdHost['hostid']);
 		}
-		$expressionData = new CTriggerExpression($trigger['expression']);
+		$expressionData = new CTriggerExpression();
+		$expressionData->parse($trigger['expression']);
 
 		$newTrigger['expression'] = $expressionData->expressionShort;
 		// replace template separately in each expression, only in beginning (host part)
@@ -247,6 +248,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		}
 		else {
 			$expressionData = new CTriggerExpression($trigger['expression']);
+			$expressionData->parse($trigger['expression']);
 			$filter['host'] = $expressionData->getHosts();
 		}
 

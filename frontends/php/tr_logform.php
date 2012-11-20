@@ -305,9 +305,10 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	$bExprResult = true;
-	$expressionData = new CTriggerExpression(empty($expressions) ? '' : construct_expression($itemid, $expressions));
+	$expressionData = new CTriggerExpression();
 	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !$expressionData->isValid && !isset($_REQUEST['form_refresh'])){
+			&& !$expressionData->parse(empty($expressions) ? '' : construct_expression($itemid, $expressions))
+			&& !isset($_REQUEST['form_refresh'])) {
 
 		info($expressionData->error);
 

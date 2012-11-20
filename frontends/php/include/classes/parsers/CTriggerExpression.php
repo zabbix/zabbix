@@ -43,8 +43,18 @@ class CTriggerExpression {
 	private	$expression;
 	public	$expressionShort = '';
 
+//	public function __construct() {
+//	}
+
 	/**
-	 * Parse trigger expression
+	 * Parse a trigger expression and set local variables
+	 *
+	 * $this->error       - if error occured
+	 * $this->pos         - a length of the valid expression or a pointer to a not valid element
+	 * $this->expressions - a list of trigger functions, used in the expression
+	 * $this->macros      - a list of macros, used in the expression
+	 * $this->usermacros  - a list of user macros, used in the expression
+	 *
 	 * Examples:
 	 *   expression:
 	 *     {Zabbix server:agent.ping.lats(0)}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
@@ -77,34 +87,12 @@ class CTriggerExpression {
 	 *
 	 * @param string $expression
 	 *
+	 * @return boot
 	 */
-	public function __construct($expression) {
+	/**
+	 */
+	public function parse($expression) {
 		$this->expression = $expression;
-		$this->parseExpression();
-	}
-
-	/**
-	 * Returns a list of the unique hosts, used in a parsed trigger expression or empty array if expression is not valid
-	 */
-	public function getHosts() {
-		if (!$this->isValid) {
-			return array();
-		}
-
-		return array_unique(zbx_objectValues($this->expressions, 'host'));
-	}
-
-	/**
-	 * Parses a trigger expression and sets local variables
-	 *
-	 * $this->isValid     - if an expression is parsed successfully
-	 * $this->error       - if error occured
-	 * $this->pos         - a length of the valid expression or a pointer to a not valid element
-	 * $this->expressions - a list of trigger functions, used in the expression
-	 * $this->macros      - a list of macros, used in the expression
-	 * $this->usermacros  - a list of user macros, used in the expression
-	 */
-	private function parseExpression() {
 		$this->pos = 0;
 		$state = self::STATE_INIT;
 		$level = 0;
@@ -196,6 +184,19 @@ class CTriggerExpression {
 					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
 			$this->isValid = false;
 		}
+
+		return $this->isValid;
+	}
+
+	/**
+	 * Returns a list of the unique hosts, used in a parsed trigger expression or empty array if expression is not valid
+	 */
+	public function getHosts() {
+		if (!$this->isValid) {
+			return array();
+		}
+
+		return array_unique(zbx_objectValues($this->expressions, 'host'));
 	}
 
 	/**

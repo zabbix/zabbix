@@ -1348,8 +1348,8 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 	* @dataProvider provider
 	*/
 	public function test_parse($expression, $rc) {
-		$expressionData = new CTriggerExpression($expression);
-		if ($expressionData->isValid) {
+		$expressionData = new CTriggerExpression();
+		if ($expressionData->parse($expression)) {
 			$this->assertEquals($rc, true);
 		}
 		else {
