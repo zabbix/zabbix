@@ -316,8 +316,10 @@ $pageFilter = new CPageFilter(array(
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 ));
-$_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['hostid'] = $pageFilter->hostid;
+if (empty($_REQUEST['parent_discoveryid'])) {
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
+}
 
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
 	// render view
@@ -532,18 +534,21 @@ else {
 			'output' => array('graphid', 'name', 'graphtype'),
 			'limit' => $config['search_limit'] + 1
 		);
-		if ($pageFilter->hostid > 0) {
-			$options['hostids'] = $pageFilter->hostid;
+		// get real graphs
+		if (empty($_REQUEST['parent_discoveryid'])) {
+			if ($pageFilter->hostid > 0) {
+				$options['hostids'] = $pageFilter->hostid;
+			}
+			elseif ($pageFilter->groupid > 0) {
+				$options['groupids'] = $pageFilter->groupid;
+			}
+			$data['graphs'] = API::Graph()->get($options);
 		}
-		elseif ($pageFilter->groupid > 0) {
-			$options['groupids'] = $pageFilter->groupid;
-		}
-		if (!empty($_REQUEST['parent_discoveryid'])) {
+		// get graph prototypes
+		else {
 			$options['discoveryids'] = $_REQUEST['parent_discoveryid'];
+			$data['graphs'] = API::GraphPrototype()->get($options);
 		}
-		$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
 	}
 
 	if ($sortfield == 'graphtype') {

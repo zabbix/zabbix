@@ -158,24 +158,6 @@ class CDRule extends CZBXAPI {
 			$sqlParts['where'][] = DBin_node('dr.druleid', $nodeids);
 		}
 
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['drules'] = 'dr.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT dr.druleid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 // search
 		if (!is_null($options['search'])) {
 			zbx_db_search('drules dr', $options, $sqlParts);
@@ -199,6 +181,9 @@ class CDRule extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 //------------
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$druleids = array();
 
@@ -280,7 +265,7 @@ class CDRule extends CZBXAPI {
 			}
 		}
 
-		if (($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])) {
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 

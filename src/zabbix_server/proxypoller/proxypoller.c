@@ -208,7 +208,7 @@ static int	process_proxy()
 
 		zbx_free(port);
 		port = strdup(proxy.port_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(port, &proxy.port))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Unable to connect to the proxy [%s] [%s]:%s",

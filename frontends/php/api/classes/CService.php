@@ -933,7 +933,7 @@ class CService extends CZBXAPI {
 			' FROM services s,triggers t'.
 			' WHERE s.status>0'.
 				' AND t.triggerid=s.triggerid'.
-				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).
+				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ)).
 				' AND '.DBcondition('s.serviceid', $serviceIds).
 			' ORDER BY s.status DESC,t.description'
 		));
@@ -1045,7 +1045,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1076,7 +1076,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1475,7 +1475,7 @@ class CService extends CZBXAPI {
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$accessibleTriggers = get_accessible_triggers(PERM_READ_ONLY);
+			$accessibleTriggers = get_accessible_triggers(PERM_READ);
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
 				$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
