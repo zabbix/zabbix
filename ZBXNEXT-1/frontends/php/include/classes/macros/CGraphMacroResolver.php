@@ -95,7 +95,7 @@ class CGraphMacroResolver {
 	private function resolveFunctionalItemMacros($str, $items) {
 		// extract all macros into $matches
 		// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}{1}/Uu', $str, $matches);
+		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}{1}/Uu', $str, $matches, PREG_OFFSET_CAPTURE);
 
 		// match found groups if ever regexp should change
 		$matches['macros'] = $matches[0];
@@ -106,15 +106,17 @@ class CGraphMacroResolver {
 
 		// resolve positional macros in host part
 		foreach ($matches['hosts'] as $i => $host) {
-			$matches['hosts'][$i] = $this->resolvePositionalMacros($host, $items);
+			$matches['hosts'][$i][0] = $this->resolvePositionalMacros($host[0], $items);
 		}
 
-		foreach ($matches['macros'] as $i => $macro) {
+		// iterate array backwards!
+		$i = count($matches['macros']);
+		while ($i--) {
 			// get item with key within host
 			$item = API::Item()->get(array(
-				'host' => $matches['hosts'][$i],
+				'host' => $matches['hosts'][$i][0],
 				'filter' => array(
-					'key_' => $matches['keys'][$i]
+					'key_' => $matches['keys'][$i][0]
 				),
 				'output' => array('lastclock', 'lastvalue', 'value_type', 'units', 'valuemapid')
 			));
@@ -122,12 +124,12 @@ class CGraphMacroResolver {
 			// item exists and has permissions
 			if ($item = reset($item)) {
 				// macro function is "last"
-				if ($matches['functions'][$i] == 'last') {
+				if ($matches['functions'][$i][0] == 'last') {
 					$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
 				}
 				// macro function is "max", "min" or "avg"
 				else {
-					$value = getItemFunctionalValue($item, $matches['functions'][$i], $matches['parameters'][$i]);
+					$value = getItemFunctionalValue($item, $matches['functions'][$i][0], $matches['parameters'][$i][0]);
 				}
 			}
 			// there is no item with given key in given host, or there is no permissions to that item
@@ -135,7 +137,7 @@ class CGraphMacroResolver {
 				$value = UNRESOLVED_MACRO_STRING;
 			}
 
-			$str = str_replace_first($macro, $value, $str);
+			$str = substr_replace($str, $value, $matches['macros'][$i][1], strlen($matches['macros'][$i][0]));
 		}
 
 		return $str;
