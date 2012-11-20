@@ -144,17 +144,7 @@ class CHttpTestManager {
 				$itemids[] = $checkitem['itemid'];
 
 				if (isset($httpTest['name'])) {
-					switch ($checkitem['type']) {
-						case HTTPSTEP_ITEM_TYPE_IN:
-							$updateFields['key_'] = 'web.test.in['.$httpTest['name'].',,bps]';
-							break;
-						case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-							$updateFields['key_'] = 'web.test.fail['.$httpTest['name'].']';
-							break;
-						case HTTPSTEP_ITEM_TYPE_LASTERROR:
-							$updateFields['key_'] = 'web.test.error['.$httpTest['name'].']';
-							break;
-					}
+					$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httpTest['name']);
 				}
 
 				if (isset($httpTest['status'])) {
@@ -558,21 +548,21 @@ class CHttpTestManager {
 		$checkitems = array(
 			array(
 				'name'				=> 'Download speed for scenario "$1".',
-				'key_'				=> 'web.test.in['.$httpTest['name'].',,bps]',
+				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_IN, $httpTest['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'				=> 'Bps',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
 			),
 			array(
 				'name'				=> 'Failed step of scenario "$1".',
-				'key_'				=> 'web.test.fail['.$httpTest['name'].']',
+				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTSTEP, $httpTest['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
 			),
 			array(
 				'name'				=> 'Last error message of scenario "$1".',
-				'key_'				=> 'web.test.error['.$httpTest['name'].']',
+				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTERROR, $httpTest['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTERROR
@@ -658,21 +648,21 @@ class CHttpTestManager {
 			$stepitems = array(
 				array(
 					'name' => 'Download speed for step "$2" of scenario "$1".',
-					'key_' => 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]',
+					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_IN, $httpTest['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 'Bps',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
 				),
 				array(
 					'name' => 'Response time for step "$2" of scenario "$1".',
-					'key_' => 'web.test.time['.$httpTest['name'].','.$webstep['name'].',resp]',
+					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_TIME, $httpTest['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 's',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
 				),
 				array(
 					'name' => 'Response code for step "$2" of scenario "$1".',
-					'key_' => 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']',
+					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_RSPCODE, $httpTest['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'units' => '',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_RSPCODE
@@ -796,17 +786,7 @@ class CHttpTestManager {
 						}
 					}
 
-					switch ($stepitem['type']) {
-						case HTTPSTEP_ITEM_TYPE_IN:
-							$updateFields['key_'] = 'web.test.in['.$httpTest['name'].','.$webstep['name'].',bps]';
-							break;
-						case HTTPSTEP_ITEM_TYPE_TIME:
-							$updateFields['key_'] = 'web.test.time['.$httpTest['name'].','.$webstep['name'].',resp]';
-							break;
-						case HTTPSTEP_ITEM_TYPE_RSPCODE:
-							$updateFields['key_'] = 'web.test.rspcode['.$httpTest['name'].','.$webstep['name'].']';
-							break;
-					}
+					$updateFields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
 				}
 				if (isset($dbKeys[$updateFields['key_']])) {
 					unset($updateFields['key_']);
@@ -879,5 +859,31 @@ class CHttpTestManager {
 				DB::insert('items_applications', $insert);
 			}
 		}
+	}
+
+	protected function getTestKey($type, $testName) {
+		switch ($type) {
+			case HTTPSTEP_ITEM_TYPE_IN:
+				return 'web.test.in["'.addcslashes($testName, '\\"').'",,bps]';
+			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
+				return 'web.test.fail["'.addcslashes($testName, '\\"').'"]';
+			case HTTPSTEP_ITEM_TYPE_LASTERROR:
+				return 'web.test.error["'.addcslashes($testName, '\\"').'"]';
+		}
+
+		return false;
+	}
+
+	protected function getStepKey($type, $testName, $stepName) {
+		switch ($type) {
+			case HTTPSTEP_ITEM_TYPE_IN:
+				return 'web.test.in["'.addcslashes($testName, '\\"').'","'.addcslashes($stepName, '\\"').'",bps]';
+			case HTTPSTEP_ITEM_TYPE_TIME:
+				return 'web.test.time["'.addcslashes($testName, '\\"').'","'.addcslashes($stepName, '\\"').'",resp]';
+			case HTTPSTEP_ITEM_TYPE_RSPCODE:
+				return 'web.test.rspcode["'.addcslashes($testName, '\\"').'","'.addcslashes($stepName, '\\"').'"]';
+		}
+
+		return false;
 	}
 }
