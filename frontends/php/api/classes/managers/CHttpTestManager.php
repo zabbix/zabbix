@@ -861,27 +861,44 @@ class CHttpTestManager {
 		}
 	}
 
+	/**
+	 * Get item key for test item.
+	 *
+	 * @param int    $type
+	 * @param string $testName
+	 *
+	 * @return bool|string
+	 */
 	protected function getTestKey($type, $testName) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'web.test.in["'.addcslashes($testName, '\\"').'",,bps]';
+				return 'web.test.in['.quoteItemKeyParam($testName).',,bps]';
 			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-				return 'web.test.fail["'.addcslashes($testName, '\\"').'"]';
+				return 'web.test.fail['.quoteItemKeyParam($testName).']';
 			case HTTPSTEP_ITEM_TYPE_LASTERROR:
-				return 'web.test.error["'.addcslashes($testName, '\\"').'"]';
+				return 'web.test.error['.quoteItemKeyParam($testName).']';
 		}
 
 		return false;
 	}
 
+	/**
+	 * Get item key for step item.
+	 *
+	 * @param int    $type
+	 * @param string $testName
+	 * @param string $stepName
+	 *
+	 * @return bool|string
+	 */
 	protected function getStepKey($type, $testName, $stepName) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'web.test.in["'.addcslashes($testName, '\\"').'","'.addcslashes($stepName, '\\"').'",bps]';
+				return 'web.test.in['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).',bps]';
 			case HTTPSTEP_ITEM_TYPE_TIME:
-				return 'web.test.time["'.addcslashes($testName, '\\"').'","'.addcslashes($stepName, '\\"').'",resp]';
+				return 'web.test.time['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).',resp]';
 			case HTTPSTEP_ITEM_TYPE_RSPCODE:
-				return 'web.test.rspcode["'.addcslashes($testName, '\\"').'","'.addcslashes($stepName, '\\"').'"]';
+				return 'web.test.rspcode['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).']';
 		}
 
 		return false;

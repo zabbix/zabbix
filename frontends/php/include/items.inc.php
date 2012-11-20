@@ -1340,3 +1340,18 @@ function getParamFieldLabelByType($itemType) {
 			return 'params';
 	}
 }
+
+/**
+ * Quoting $param if it contain special characters.
+ *
+ * @param string $param
+ *
+ * @return string
+ */
+function quoteItemKeyParam($param) {
+	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ']'))) {
+		return $param;
+	}
+
+	return '"'.str_replace('"', '\\"', $param).'"';
+}
