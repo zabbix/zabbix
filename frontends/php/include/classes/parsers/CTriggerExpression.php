@@ -532,7 +532,7 @@ class CTriggerExpression {
 		}
 
 		// check for an optional suffix
-		if (isset($this->expression[$j]) && false !== strpos('KMGTsmhdw', $this->expression[$j])) {
+		if (isset($this->expression[$j]) && strpos('KMGTsmhdw', $this->expression[$j]) !== false) {
 			$j++;
 		}
 
@@ -548,7 +548,7 @@ class CTriggerExpression {
 	 * Returns true if parsed successfully, false otherwise
 	 */
 	private function parseMacro() {
-		if (0 != strcmp(substr($this->expression, $this->pos, 15), '{TRIGGER.VALUE}')) {
+		if (strcmp(substr($this->expression, $this->pos, 15), '{TRIGGER.VALUE}') != 0) {
 			return false;
 		}
 
