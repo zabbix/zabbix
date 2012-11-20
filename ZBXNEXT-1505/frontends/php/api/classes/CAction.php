@@ -113,7 +113,7 @@ class CAction extends CZBXAPI {
 		}
 		else {
 			// conditions are checked here by sql, operations after, by api queries
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			// condition hostgroup
 			$sqlParts['where'][] =
@@ -137,7 +137,7 @@ class CAction extends CZBXAPI {
 								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
 									' AND rr.groupid=ugg.usrgrpid'.
 									' AND ugg.userid='.$userid.
-									' AND rr.permission<'.$permission.
+									' AND rr.permission='.PERM_DENY.
 							')'.
 						')'.
 				')';
@@ -165,7 +165,7 @@ class CAction extends CZBXAPI {
 										' AND rr.id=hgg.groupid'.
 										' AND rr.groupid=gg.usrgrpid'.
 										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')'.
+										' AND rr.permission='.PERM_DENY.')'.
 							')'.
 				')';
 
@@ -199,7 +199,7 @@ class CAction extends CZBXAPI {
 											' AND rr.id=hgg.groupid'.
 											' AND rr.groupid=ugg.usrgrpid'.
 											' AND ugg.userid='.$userid.
-											' AND rr.permission<'.$permission.'))'.
+											' AND rr.permission='.PERM_DENY.'))'.
 					')'.
 				')';
 		}

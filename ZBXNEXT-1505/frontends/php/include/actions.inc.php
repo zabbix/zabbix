@@ -847,7 +847,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	if ($host = DBfetch(DBselect($sql, 1))) {
 		$hostids[$host['hostid']] = $host['hostid'];
 	}
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
+	$available_triggers = get_accessible_triggers(PERM_READ, $hostids);
 
 	$tab_hint = new CTableInfo(_('No actions found.'));
 	$tab_hint->setAttribute('style', 'width: 300px;');
