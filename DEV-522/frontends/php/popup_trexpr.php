@@ -532,9 +532,9 @@ check_fields($fields);
 if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 	$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
-	$expressionData = new CTriggerExpression($_REQUEST['expression']);
+	$expressionData = new CTriggerExpression();
 
-	if ($expressionData->isValid && count($expressionData->expressions) == 1) {
+	if ($expressionData->parse($_REQUEST['expression']) && count($expressionData->expressions) == 1) {
 		$exprPart = reset($expressionData->expressions);
 		preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $exprSymbols);
 

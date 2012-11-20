@@ -399,8 +399,8 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		}
 
 		// try to create valid expression
-		$expressionData = new CTriggerExpression($macro);
-		if (!$expressionData->isValid || !isset($expressionData->expressions[0])) {
+		$expressionData = new CTriggerExpression();
+		if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
 			continue;
 		}
 

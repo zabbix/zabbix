@@ -923,9 +923,8 @@ function triggerExpression($trigger, $html = false) {
  */
 // translate localhost:procload.last(0)>10 to {12}>10 and create database representation.
 function implode_exp($expression, $triggerid, &$hostnames = array()) {
-	$expressionData = new CTriggerExpression($expression);
-
-	if (!$expressionData->isValid) {
+	$expressionData = new CTriggerExpression();
+	if (!$expressionData->parse($expression)) {
 		return null;
 	}
 
@@ -1075,7 +1074,11 @@ function addUnknownEvent($triggerids) {
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
-	$expressionData = new CTriggerExpression($expression);
+	$expressionData = new CTriggerExpression();
+	if (!$expressionData->parse($expression)) {
+		error($expressionData->error);
+		return false;
+	}
 	$expressionHosts = $expressionData->getHosts();
 
 	$hosts = API::Host()->get(array(
@@ -1649,8 +1652,8 @@ function analyze_expression($expression) {
 		return array('', null);
 	}
 
-	$expressionData = new CTriggerExpression($expression);
-	if (!$expressionData->isValid) {
+	$expressionData = new CTriggerExpression();
+	if (!$expressionData->parse($expression)) {
 		error($expressionData->error);
 		return false;
 	}
@@ -1920,8 +1923,8 @@ function expressionHighLevelErrors($expression, $start, $end) {
 
 	if (!isset($errors[$expression])) {
 		$errors[$expression] = array();
-		$expressionData = new CTriggerExpression($expression);
-		if ($expressionData->isValid) {
+		$expressionData = new CTriggerExpression();
+		if ($expressionData->parse($expression)) {
 			foreach ($expressionData->expressions as $exprPart) {
 				$info = get_item_function_info($exprPart['expression']);
 
@@ -1939,8 +1942,8 @@ function expressionHighLevelErrors($expression, $start, $end) {
 		return $ret;
 	}
 
-	$expressionData = new CTriggerExpression(substr($expression, $start, $end - $start + 1));
-	if ($expressionData->isValid) {
+	$expressionData = new CTriggerExpression();
+	if ($expressionData->parse(substr($expression, $start, $end - $start + 1))) {
 		foreach ($expressionData->expressions as $exprPart) {
 			if (isset($errors[$expression][$exprPart['expression']])) {
 				$ret[$exprPart['expression']] = &$errors[$expression][$exprPart['expression']];
@@ -2095,9 +2098,8 @@ function remake_expression($expression, $actionid, $action, $new_expr) {
 		return '';
 	}
 
-	$expressionData = new CTriggerExpression($expression);
-
-	if (!$expressionData->isValid) {
+	$expressionData = new CTriggerExpression();
+	if (!$expressionData->parse($expression)) {
 		return false;
 	}
 
@@ -2172,9 +2174,9 @@ function get_item_function_info($expr) {
 	);
 
 	$hostId = $itemId = $function = null;
-	$expressionData = new CTriggerExpression($expr);
+	$expressionData = new CTriggerExpression();
 
-	if ($expressionData->isValid) {
+	if ($expressionData->parse($expr)) {
 		if (isset($expressionData->macros[0])) {
 			$result = array(
 				'value_type' => _('0 or 1'),

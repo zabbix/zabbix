@@ -44,7 +44,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$expression = get_request('expression', '');
 
 	define('NO_LINK_IN_TESTING', true);
-	$expressionData = new CTriggerExpression($expression);
 	list($outline, $eHTMLTree) = analyze_expression($expression);
 
 // test data (create table, create check fields)
@@ -60,7 +59,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$rplcts = array();
 	$allowedTesting = true;
 
-	if ($expressionData->isValid) {
+	$expressionData = new CTriggerExpression();
+	if ($expressionData->parse($expression)) {
 		$macrosData = array();
 
 		$expressions = array_merge($expressionData->expressions, $expressionData->macros, $expressionData->usermacros);

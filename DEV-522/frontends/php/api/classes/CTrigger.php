@@ -1025,8 +1025,8 @@ class CTrigger extends CTriggerGeneral {
 		$result = false;
 
 		if (!isset($object['hostid']) && !isset($object['host'])) {
-			$expressionData = new CTriggerExpression($object['expression']);
-			if (!$expressionData->isValid) {
+			$expressionData = new CTriggerExpression();
+			if (!$expressionData->parse($object['expression'])) {
 				return false;
 			}
 			$object['host'] = reset($expressionData->getHosts());
@@ -1164,8 +1164,8 @@ class CTrigger extends CTriggerGeneral {
 			// validating trigger expression
 			if (isset($trigger['expression']) && $expressionChanged) {
 				// expression permissions
-				$expressionData = new CTriggerExpression($trigger['expression']);
-				if (!$expressionData->isValid) {
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
@@ -1617,13 +1617,14 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($expressionChanged) {
 				// check the expression
-				$expressionData = new CTriggerExpression($expressionFull);
-				if (!$expressionData->isValid) {
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
-				$oldExpressionData = new CTriggerExpression($oldExpression);
+				$oldExpressionData = new CTriggerExpression();
+				$oldExpressionData->parse($oldExpression);
 				// chech if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
 				$newTemplates = zbx_toHash($expressionData->getHosts());
@@ -2037,7 +2038,8 @@ class CTrigger extends CTriggerGeneral {
 	 * @return bool
 	 */
 	protected function validateItems(array $trigger) {
-		$expressionData = new CTriggerExpression($trigger['expression']);
+		$expressionData = new CTriggerExpression();
+		$expressionData->parse($trigger['expression']);
 
 		$templatesData = API::Template()->get(array(
 			'output' => API_OUTPUT_REFER,
