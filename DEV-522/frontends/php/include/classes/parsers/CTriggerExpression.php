@@ -19,7 +19,7 @@
 **/
 
 class CTriggerExpression {
-	/* for parsing of trigger expression */
+	// for parsing of trigger expression
 	const STATE_INIT = 0;
 	const STATE_AFTER_OPEN_BRACE = 1;
 	const STATE_AFTER_OPERATOR = 2;
@@ -27,7 +27,7 @@ class CTriggerExpression {
 	const STATE_AFTER_CLOSE_BRACE = 4;
 	const STATE_AFTER_CONSTANT = 5;
 
-	/* for parse of item key parameters */
+	// for parse of item key parameters
 	const ZBX_STATE_NEW = 0;
 	const ZBX_STATE_END = 1;
 	const ZBX_STATE_UNQUOTED = 2;
@@ -270,7 +270,8 @@ class CTriggerExpression {
 			$j++;
 		}
 
-		if ($pos == $j) {	/* is host empty? */
+		// is host empty?
+		if ($pos == $j) {
 			return null;
 		}
 
@@ -292,17 +293,19 @@ class CTriggerExpression {
 			$j++;
 		}
 
-		if (isset($this->expression[$j]) && $this->expression[$j] == '(') { /* for instance, agent.ping.last(0) */
+		// for instance, agent.ping.last(0)
+		if (isset($this->expression[$j]) && $this->expression[$j] == '(') {
 			for (; $j > $pos && $this->expression[$j] != '.'; $j--)
 				;
 		}
-		elseif (isset($this->expression[$j]) && $this->expression[$j] == '[') { /* for instance, net.tcp.port[,80] */
+		// for instance, net.tcp.port[,80]
+		elseif (isset($this->expression[$j]) && $this->expression[$j] == '[') {
 			$level = 0;
 			$state = self::ZBX_STATE_END;
 
 			while (isset($this->expression[$j])) {
 				if ($level == 0) {
-					/* first square bracket + Zapcat compatibility */
+					// first square bracket + Zapcat compatibility
 					if ($state == self::ZBX_STATE_END && $this->expression[$j] == '[') {
 						$state = self::ZBX_STATE_NEW;
 					}
@@ -312,7 +315,8 @@ class CTriggerExpression {
 				}
 
 				switch ($state) {
-					case self::ZBX_STATE_NEW: /* a new parameter started */
+					// a new parameter started
+					case self::ZBX_STATE_NEW:
 						switch ($this->expression[$j]) {
 							case ' ':
 							case ',':
@@ -331,7 +335,8 @@ class CTriggerExpression {
 								$state = self::ZBX_STATE_UNQUOTED;
 						}
 						break;
-					case self::ZBX_STATE_END: /* end of parameter */
+					// end of parameter
+					case self::ZBX_STATE_END:
 						switch ($this->expression[$j]) {
 							case ' ':
 								break;
@@ -345,7 +350,8 @@ class CTriggerExpression {
 								return null;
 						}
 						break;
-					case self::ZBX_STATE_UNQUOTED: /* an unquoted parameter */
+					// an unquoted parameter
+					case self::ZBX_STATE_UNQUOTED:
 						switch ($this->expression[$j]) {
 							case ']':
 								$level--;
@@ -356,7 +362,8 @@ class CTriggerExpression {
 								break;
 						}
 						break;
-					case self::ZBX_STATE_QUOTED: /* a quoted parameter */
+					// a quoted parameter
+					case self::ZBX_STATE_QUOTED:
 						switch ($this->expression[$j]) {
 							case '"':
 								if ($this->expression[$j - 1] != '\\') {
@@ -374,7 +381,8 @@ class CTriggerExpression {
 			}
 		}
 
-		if ($pos == $j) { /* is key empty? */
+		// is key empty?
+		if ($pos == $j) {
 			return null;
 		}
 
@@ -399,7 +407,8 @@ class CTriggerExpression {
 			$j++;
 		}
 
-		if ($pos == $j) { /* is function empty? */
+		// is function empty?
+		if ($pos == $j) {
 			return null;
 		}
 
@@ -414,7 +423,8 @@ class CTriggerExpression {
 
 		while (isset($this->expression[$j])) {
 			switch ($state) {
-				case self::ZBX_STATE_NEW: /* a new parameter started */
+				// a new parameter started
+				case self::ZBX_STATE_NEW:
 					switch ($this->expression[$j]) {
 						case ' ':
 							break;
@@ -422,7 +432,8 @@ class CTriggerExpression {
 							$functionParamList[++$num] = '';
 							break;
 						case ')':
-							break 3; /* end of parameters */
+							// end of parameters
+							break 3;
 						case '"':
 							$state = self::ZBX_STATE_QUOTED;
 							break;
@@ -431,7 +442,8 @@ class CTriggerExpression {
 							$state = self::ZBX_STATE_UNQUOTED;
 					}
 					break;
-				case self::ZBX_STATE_END: /* end of parameter */
+				// end of parameter
+				case self::ZBX_STATE_END:
 					switch ($this->expression[$j]) {
 						case ' ':
 							break;
@@ -440,15 +452,18 @@ class CTriggerExpression {
 							$state = self::ZBX_STATE_NEW;
 							break;
 						case ')':
-							break 3; /* end of parameters */
+							// end of parameters
+							break 3;
 						default:
 							return null;
 					}
 					break;
-				case self::ZBX_STATE_UNQUOTED: /* an unquoted parameter */
+				// an unquoted parameter
+				case self::ZBX_STATE_UNQUOTED:
 					switch ($this->expression[$j]) {
 						case ')':
-							break 3; /* end of parameters */
+							// end of parameters
+							break 3;
 						case ',':
 							$functionParamList[++$num] = '';
 							$state = self::ZBX_STATE_NEW;
@@ -457,7 +472,8 @@ class CTriggerExpression {
 							$functionParamList[$num] .= $this->expression[$j];
 					}
 					break;
-				case self::ZBX_STATE_QUOTED: /* a quoted parameter */
+				// a quoted parameter
+				case self::ZBX_STATE_QUOTED:
 					switch ($this->expression[$j]) {
 						case '"':
 							$state = self::ZBX_STATE_END;
@@ -466,7 +482,7 @@ class CTriggerExpression {
 							if (isset($this->expression[$j + 1]) && $this->expression[$j + 1] == '"') {
 								$j++;
 							}
-							/* break; is not missing here */
+							// break; is not missing here
 						default:
 							$functionParamList[$num] .= $this->expression[$j];
 							break;
@@ -515,7 +531,7 @@ class CTriggerExpression {
 			}
 		}
 
-		/* check for an optional suffix */
+		// check for an optional suffix
 		if (isset($this->expression[$j]) && false !== strpos('KMGTsmhdw', $this->expression[$j])) {
 			$j++;
 		}
