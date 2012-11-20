@@ -615,7 +615,6 @@ class CItem extends CItemGeneral {
 			$applications = API::Application()->get(array(
 				'nodeids' => $options['nodeids'],
 				'output' => $options['selectApplications'],
-				'selectItems' => array('itemid'),
 				'itemids' => $itemids,
 				'preservekeys' => true
 			));
