@@ -43,9 +43,6 @@ class CTriggerExpression {
 	private	$expression;
 	public	$expressionShort = '';
 
-//	public function __construct() {
-//	}
-
 	/**
 	 * Parse a trigger expression and set local variables
 	 *
