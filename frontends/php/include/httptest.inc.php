@@ -144,7 +144,7 @@ function getHttpTestsParentTemplates(array $httpTests) {
 	foreach ($httpTests as $httpTest) {
 		if (!empty($httpTest['templateid'])){
 			$result[$httpTest['httptestid']] = array();
-			$template2testMap[$httpTest['templateid']] = $httpTest['httptestid'];
+			$template2testMap[$httpTest['templateid']][$httpTest['httptestid']] = $httpTest['httptestid'];
 		}
 	}
 
@@ -154,13 +154,14 @@ function getHttpTestsParentTemplates(array $httpTests) {
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
 				' WHERE'.DBcondition('ht.httptestid', array_keys($template2testMap)));
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
-			$testId = $template2testMap[$dbHttpTest['httptestid']];
-			unset($template2testMap[$dbHttpTest['httptestid']]);
-			$result[$testId] = array('name' => $dbHttpTest['name'], 'id' => $dbHttpTest['hostid']);
+			foreach ($template2testMap[$dbHttpTest['httptestid']] as $testId => $data) {
+				$result[$testId] = array('name' => $dbHttpTest['name'], 'id' => $dbHttpTest['hostid']);
 
-			if (!empty($dbHttpTest['templateid'])) {
-				$template2testMap[$dbHttpTest['templateid']] = $testId;
+				if (!empty($dbHttpTest['templateid'])) {
+					$template2testMap[$dbHttpTest['templateid']][$testId] = $testId;
+				}
 			}
+			unset($template2testMap[$dbHttpTest['httptestid']]);
 		}
 	} while (!empty($template2testMap));
 

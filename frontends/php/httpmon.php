@@ -86,6 +86,7 @@ if ($pageFilter->hostsSelected) {
 		'editable' => true,
 		'output' => array('httptestid'),
 		'templated' => false,
+		'monitored' => true,
 		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
@@ -99,28 +100,16 @@ if ($pageFilter->hostsSelected) {
 
 	$paging = getPagingLine($httpTests);
 
-	$dbHttpTests = DBselect(
-		'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname'.
-			' FROM httptest ht'.
-			' INNER JOIN httpstep hs ON hs.httptestid=ht.httptestid'.
-			' INNER JOIN hosts h ON h.hostid=ht.hostid'.
-			' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid')).
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND ht.status='.HTTPTEST_STATUS_ACTIVE
-	);
-	$httpTests = array();
-	while ($dbHttpTest = DBfetch($dbHttpTests)) {
-		$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
-	}
+	$httpTests = API::HttpTest()->get(array(
+		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
+		'output' => API_OUTPUT_EXTEND,
+		'selectHosts' => API_OUTPUT_EXTEND,
+		'selectSteps' => API_OUTPUT_COUNT,
+	));
 
-	$dbHttpSteps = DBselect(
-		'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
-				' FROM httpstep hs'.
-				' WHERE '.DBcondition('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
-				' GROUP BY hs.httptestid'
-	);
-	while ($dbHttpStep = DBfetch($dbHttpSteps)) {
-		$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
+	foreach ($httpTests as &$httpTest) {
+		$host = reset($httpTest['hosts']);
+		$httpTest['hostname'] = $host['name'];
 	}
 
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
@@ -169,7 +158,7 @@ if ($pageFilter->hostsSelected) {
 		$table->addRow(new CRow(array(
 			($_REQUEST['hostid'] > 0) ? null : $httpTest['hostname'],
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
-			$httpTest['stepscnt'],
+			$httpTest['steps'],
 			$lastcheck,
 			new CSpan($status['msg'], $status['style'])
 		)));

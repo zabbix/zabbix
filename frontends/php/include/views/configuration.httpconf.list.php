@@ -30,14 +30,7 @@ if (!empty($this->data['hostid'])) {
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
-if ($this->data['hostid'] > 0) {
-	$createScenarioButton = new CSubmit('form', _('Create scenario'));
-}
-else {
-	$createScenarioButton = new CSubmit('form', _('Create scenario (select host first)'));
-	$createScenarioButton->setEnabled(false);
-}
-$createForm->addItem($createScenarioButton);
+$createForm->addItem(new CSubmit('form', _('Create scenario')));
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
 
 // header

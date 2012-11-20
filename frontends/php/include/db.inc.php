@@ -968,19 +968,6 @@ function check_db_fields($db_fields, &$args) {
 	return true;
 }
 
-/**
- * Check if all keys from $keys exist in $array.
- * If some keys are missing return array of missing keys, true otherwise.
- *
- * @param array $array
- * @param array $keys
- *
- * @return array|bool
- */
-function checkRequiredKeys(array $array, array $keys) {
-	return array_diff($keys, array_keys($array));
-}
-
 function DBcondition($fieldname, $array, $notin = false) {
 	$condition = '';
 
