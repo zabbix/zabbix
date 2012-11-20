@@ -116,18 +116,6 @@ class CDService extends CZBXAPI{
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['dservices']);
-
-			$dbTable = DB::getSchema('dservices');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 's.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 // editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -178,7 +166,7 @@ class CDService extends CZBXAPI{
 			$sqlParts['from']['dchecks'] = 'dchecks dc';
 
 			$sqlParts['where'][] = DBcondition('dc.dcheckid', $options['dcheckids']);
-			$sqlParts['where']['dhds'] = 'dh.hostid=ds.hostid';
+			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 
 			if (!is_null($options['groupCount'])) {
@@ -213,25 +201,6 @@ class CDService extends CZBXAPI{
 			$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
 		}
 
-
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['dservices'] = 'ds.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT ds.dserviceid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 // filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('dservices ds', $options, $sqlParts);
@@ -251,6 +220,8 @@ class CDService extends CZBXAPI{
 		}
 //-------
 
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$dserviceids = array();
 

@@ -139,24 +139,6 @@ class CWebCheck extends CZBXAPI {
 			$sqlParts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['httptests'] = 'ht.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(ht.httptestid) as rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('httptest ht', $options, $sqlParts);
@@ -174,6 +156,8 @@ class CWebCheck extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
+
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$httpTestIds = array();
 
@@ -211,6 +195,7 @@ class CWebCheck extends CZBXAPI {
 					$sqlWhere.
 					$sqlGroup.
 					$sqlOrder;
+
 		$res = DBselect($sql, $sqlLimit);
 		while ($httpTest = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
