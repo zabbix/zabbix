@@ -105,7 +105,7 @@ class CUserMacro extends CZBXAPI {
 			return array();
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -122,7 +122,7 @@ class CUserMacro extends CZBXAPI {
 					' AND rr.id=hgg.groupid'.
 					' AND rr.groupid=gg.usrgrpid'.
 					' AND gg.userid='.$userid.
-					' AND rr.permission<'.$permission.')';
+					' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids
@@ -200,20 +200,6 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['macros'] = 'hm.*';
-			$sqlPartsGlobal['select']['macros'] = 'gm.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-
-			$sqlParts['select'] = array('COUNT(DISTINCT hm.hostmacroid) AS rowscount');
-			$sqlPartsGlobal['select'] = array('COUNT(DISTINCT gm.globalmacroid) AS rowscount');
-		}
-
 		// sorting
 		zbx_db_sorting($sqlParts, $options, $sortColumns, 'hm');
 		zbx_db_sorting($sqlPartsGlobal, $options, $sortColumns, 'gm');
@@ -226,6 +212,7 @@ class CUserMacro extends CZBXAPI {
 
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
+			$sqlPartsGlobal = $this->applyQueryOutputOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
 			$res = DBselect($this->createSelectQueryFromParts($sqlPartsGlobal), $sqlPartsGlobal['limit']);
 			while ($macro = DBfetch($res)) {
 				if ($options['countOutput']) {
@@ -244,6 +231,7 @@ class CUserMacro extends CZBXAPI {
 		else {
 			$hostIds = array();
 
+			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
 			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 			while ($macro = DBfetch($res)) {
 
