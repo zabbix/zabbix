@@ -59,7 +59,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+$available_triggers = get_accessible_triggers(PERM_READ, array());
 
 if (isset($_REQUEST['serviceid'])) {
 	if ($service = DBfetch(DBselect('SELECT DISTINCT s.serviceid,s.triggerid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
