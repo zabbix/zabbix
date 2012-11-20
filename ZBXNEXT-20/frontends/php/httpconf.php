@@ -82,35 +82,23 @@ if (!empty($_REQUEST['steps'])) {
  */
 //*
 if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
-	$testIds = isset($_REQUEST['httptestid']) ? array($_REQUEST['httptestid']) : $_REQUEST['group_httptestid'];
+	$testIds = array();
+	if (isset($_REQUEST['httptestid'])) {
+		$testIds[] = $_REQUEST['httptestid'];
+	}
+	if (!empty($_REQUEST['group_httptestid'])) {
+		$testIds = array_merge($testIds, $_REQUEST['group_httptestid']);
+	}
 	if (!API::HttpTest()->isWritable($testIds)) {
 		access_deny();
 	}
 }
 $_REQUEST['go'] = get_request('go', 'none');
 
-/*
- * Filter
- */
-$options = array(
-	'groups' => array(
-		'editable' => true
-	),
-	'hosts' => array(
-		'editable' => true,
-		'templated_hosts' => true
-	),
-	'hostid' => get_request('hostid', null),
-	'groupid' => get_request('groupid', null)
-);
-$pageFilter = new CPageFilter($options);
-$_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['hostid'] = $pageFilter->hostid;
 
 /*
  * Actions
  */
-
 // add new steps
 if (isset($_REQUEST['new_httpstep'])) {
 	$_REQUEST['steps'] = get_request('steps', array());
@@ -189,15 +177,25 @@ elseif (isset($_REQUEST['save'])) {
 		);
 
 		if (!empty($_REQUEST['new_application'])) {
-			$result = API::Application()->create(array(
-				'name' => $_REQUEST['new_application'],
-				'hostid' => $_REQUEST['hostid']
+			$exApp = API::Application()->get(array(
+				'output' => array('applicationid'),
+				'hostids' => $_REQUEST['hostid'],
+				'filter' => array('name' => $_REQUEST['new_application'])
 			));
-			if (!$result) {
-				throw new Exception(_s('Cannot add new application "%1$s".', $_REQUEST['new_application']));
+			if ($exApp) {
+				$httpTest['applicationid'] = $exApp[0]['applicationid'];
 			}
 			else {
-				$httpTest['applicationid'] = reset($result['applicationids']);
+				$result = API::Application()->create(array(
+					'name' => $_REQUEST['new_application'],
+					'hostid' => $_REQUEST['hostid']
+				));
+				if ($result) {
+					$httpTest['applicationid'] = reset($result['applicationids']);
+				}
+				else {
+					throw new Exception(_s('Cannot add new application "%1$s".', $_REQUEST['new_application']));
+				}
 			}
 		}
 
@@ -317,7 +315,7 @@ show_messages();
  */
 $data = array('hostid' => get_request('hostid', 0));
 
-if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
+if (isset($_REQUEST['form'])) {
 	$data['httptestid'] = get_request('httptestid', null);
 	$data['form'] = get_request('form');
 	$data['form_refresh'] = get_request('form_refresh');
@@ -352,8 +350,7 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 		array_shift($data['templates']);
 	}
 
-
-	if (empty($data['hostname'])) {
+	if (empty($data['hostname']) && !empty($data['hostid'])) {
 		$hostInfo = get_host_by_hostid($data['hostid'], true);
 		$data['hostname'] = $hostInfo['name'];
 	}
@@ -400,9 +397,11 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	}
 
 	$data['application_list'] = array(0 => '');
-	$dbApps = DBselect('SELECT a.applicationid,a.name FROM applications a WHERE a.hostid='.zbx_dbstr($data['hostid']));
-	while ($dbApp = DBfetch($dbApps)) {
-		$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
+	if (!empty($data['hostid'])) {
+		$dbApps = DBselect('SELECT a.applicationid,a.name FROM applications a WHERE a.hostid='.zbx_dbstr($data['hostid']));
+		while ($dbApp = DBfetch($dbApps)) {
+			$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
+		}
 	}
 
 	// render view
@@ -411,6 +410,21 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$httpView->show();
 }
 else {
+	$options = array(
+		'groups' => array(
+			'editable' => true
+		),
+		'hosts' => array(
+			'editable' => true,
+			'templated_hosts' => true
+		),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null)
+	);
+	$pageFilter = new CPageFilter($options);
+
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
 	$data['pageFilter'] = $pageFilter;
 	$data['showDisabled'] = $showDisabled;
 	$data['httpTests'] = array();

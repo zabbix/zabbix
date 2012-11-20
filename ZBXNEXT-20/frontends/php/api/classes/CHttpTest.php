@@ -60,6 +60,7 @@ class CHttpTest extends CZBXAPI {
 			'editable'       => null,
 			'inherited'      => null,
 			'templated'      => null,
+			'monitored'      => null,
 			'nopermissions'  => null,
 			// filter
 			'filter'         => null,
@@ -180,6 +181,20 @@ class CHttpTest extends CZBXAPI {
 			}
 			else {
 				$sqlParts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+			}
+		}
+
+		// monitored
+		if (!is_null($options['monitored'])) {
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
+
+			if ($options['monitored']) {
+				$sqlParts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+				$sqlParts['where'][] = 'ht.status='.ITEM_STATUS_ACTIVE;
+			}
+			else {
+				$sqlParts['where'][] = '(h.status<>'.HOST_STATUS_MONITORED.' OR ht.status<>'.ITEM_STATUS_ACTIVE.')';
 			}
 		}
 
@@ -306,15 +321,28 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		// adding steps
-		if (!is_null($options['selectSteps']) && str_in_array($options['selectSteps'], $subselectsAllowedOutputs)) {
-			$dbSteps = DBselect(
-				'SELECT h.*'.
-				' FROM httpstep h'.
-				' WHERE '.DBcondition('h.httptestid', $httpTestIds)
-			);
-			while ($step = DBfetch($dbSteps)) {
-				$step['webstepid'] = $step['httpstepid'];
-				$result[$step['httptestid']]['steps'][$step['httpstepid']] = $step;
+		if (!is_null($options['selectSteps'])) {
+			if (str_in_array($options['selectSteps'], $subselectsAllowedOutputs)) {
+				$dbSteps = DBselect(
+					'SELECT ht.*'.
+						' FROM httpstep ht'.
+						' WHERE '.DBcondition('ht.httptestid', $httpTestIds)
+				);
+				while ($step = DBfetch($dbSteps)) {
+					$step['webstepid'] = $step['httpstepid'];
+					$result[$step['httptestid']]['steps'][$step['httpstepid']] = $step;
+				}
+			}
+			elseif ($options['selectSteps'] == API_OUTPUT_COUNT) {
+				$dbHttpSteps = DBselect(
+					'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
+						' FROM httpstep hs'.
+						' WHERE '.DBcondition('hs.httptestid', $httpTestIds).
+						' GROUP BY hs.httptestid'
+				);
+				while ($dbHttpStep = DBfetch($dbHttpSteps)) {
+					$result[$dbHttpStep['httptestid']]['steps'] = $dbHttpStep['stepscnt'];
+				}
 			}
 		}
 
