@@ -104,7 +104,7 @@ static void	send_signal_handler(int sig)
 	if (SIGALRM == sig)
 		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
 
-	exit(FAIL);
+	_exit(FAIL);
 }
 #endif
 

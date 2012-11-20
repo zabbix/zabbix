@@ -60,7 +60,7 @@
 		unsigned entry_name(void *arg_name)
 
 	#define zbx_thread_exit(status) \
-		exit((int)(status)); \
+		_exit((int)(status)); \
 		return ((unsigned)(status))
 
 	#define zbx_sleep(sec) sleep((sec))
