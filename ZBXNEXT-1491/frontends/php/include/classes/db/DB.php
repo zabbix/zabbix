@@ -21,7 +21,7 @@
 
 class DB {
 
-	const SCHEMA_FILE = 'include/schema.inc.php';
+	const SCHEMA_FILE = 'schema.inc.php';
 
 	const DBEXECUTE_ERROR = 1;
 	const RESERVEIDS_ERROR = 2;
@@ -185,7 +185,7 @@ class DB {
 	public static function getSchema($table = null) {
 		if (is_null(self::$schema)) {
 
-			self::$schema = include(Z::getRootDir().'/'.self::SCHEMA_FILE);
+			self::$schema = include(dirname(__FILE__).'/../../'.self::SCHEMA_FILE);
 		}
 
 		if (is_null($table)) {

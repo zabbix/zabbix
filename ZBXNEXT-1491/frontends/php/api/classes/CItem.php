@@ -129,7 +129,7 @@ class CItem extends CItemGeneral {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -146,7 +146,7 @@ class CItem extends CItemGeneral {
 						' AND rr.id=hgg.groupid'.
 						' AND rr.groupid=gg.usrgrpid'.
 						' AND gg.userid='.$userid.
-						' AND rr.permission<'.$permission.')';
+						' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// itemids
@@ -868,6 +868,7 @@ class CItem extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$delItemIds = zbx_toArray($itemids);
 		$itemids = zbx_toHash($itemids);
 
 		$delItems = $this->get(array(
@@ -979,7 +980,7 @@ class CItem extends CItemGeneral {
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('itemids' => $itemids);
+		return array('itemids' => $delItemIds);
 	}
 
 	public function syncTemplates($data) {

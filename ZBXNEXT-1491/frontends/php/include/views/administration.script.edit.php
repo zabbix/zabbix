@@ -92,7 +92,7 @@ $scriptTab->addRow(_('Host groups'), $host_groups);
 
 // permissions
 $select_acc = new CCombobox('access', $this->get('access'));
-$select_acc->addItem(PERM_READ_ONLY, _('Read'));
+$select_acc->addItem(PERM_READ, _('Read'));
 $select_acc->addItem(PERM_READ_WRITE, _('Write'));
 $scriptTab->addRow(_('Required host permissions'), $select_acc);
 

@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010008);
+define('ZABBIX_DB_VERSION',	 2010020);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2012');
@@ -614,7 +614,7 @@ define('GROUP_DEBUG_MODE_ENABLED',	1);
 
 define('PERM_MAX',			3);
 define('PERM_READ_WRITE',	3);
-define('PERM_READ_ONLY',	2);
+define('PERM_READ',			2);
 define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 

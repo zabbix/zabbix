@@ -253,7 +253,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	AGENT_RESULT		proc_args;
 #endif /* HAVE_SYS_PROCFS_H */
 	struct passwd		*usrinfo = NULL;
-	zbx_uint64_t		value = 0;
 	int			zbx_proc_stat;
 	zbx_uint64_t		proccount = 0;
 

@@ -118,7 +118,7 @@ class CGraph extends CGraphGeneral {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
@@ -144,7 +144,7 @@ class CGraph extends CGraphGeneral {
 							' AND rr.id=hgg.groupid'.
 							' AND rr.groupid=ugg.usrgrpid'.
 							' AND ugg.userid='.$userid.
-							' AND rr.permission<'.$permission.'))';
+							' AND rr.permission='.PERM_DENY.'))';
 		}
 
 		// groupids

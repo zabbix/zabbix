@@ -1618,7 +1618,7 @@ function getPagingLine(&$items) {
 
 	$pageline = array();
 
-	$table = BR();
+	$table = null;
 	if ($pagesCount > 1) {
 		$url = new Curl();
 		if ($startPage > 1) {
@@ -2378,4 +2378,30 @@ function no_errors() {
 	}
 
 	return true;
+}
+
+function unsetEqualValues(array $a1, array $a2) {
+	foreach ($a1 as $key => $value) {
+		if (is_array($value) && isset($a2[$key])) {
+			$a1[$key] = unsetEqualValues($a1[$key], $a2[$key]);
+		}
+		elseif (isset($a2[$key]) && $a2[$key] == $a1[$key]) {
+			unset($a1[$key]);
+		}
+	}
+
+	return $a1;
+}
+
+/**
+ * Check if all keys from $keys exist in $array.
+ * If some keys are missing return array of missing keys, true otherwise.
+ *
+ * @param array $array
+ * @param array $keys
+ *
+ * @return array|bool
+ */
+function checkRequiredKeys(array $array, array $keys) {
+	return array_diff($keys, array_keys($array));
 }

@@ -513,19 +513,20 @@ else {
 	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'simple_graph', 'plain_text'))) {
 		$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB(true)));
 	}
-	if (str_in_array($srctbl, array('triggers', 'hosts', 'host_group', 'hosts_and_templates'))) {
-		if (zbx_empty($noempty)) {
-			$value1 = isset($_REQUEST['dstfld1']) && zbx_strpos($_REQUEST['dstfld1'], 'id') !== false ? 0 : '';
-			$value2 = isset($_REQUEST['dstfld2']) && zbx_strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
-			$value3 = isset($_REQUEST['dstfld3']) && zbx_strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
+}
 
-			$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
-			$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
-			$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
-			$epmtyScript .= ' close_window(); return false;';
+if (str_in_array($srctbl, array('applications', 'triggers', 'hosts', 'host_group', 'hosts_and_templates'))) {
+	if (zbx_empty($noempty)) {
+		$value1 = isset($_REQUEST['dstfld1']) && zbx_strpos($_REQUEST['dstfld1'], 'id') !== false ? 0 : '';
+		$value2 = isset($_REQUEST['dstfld2']) && zbx_strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
+		$value3 = isset($_REQUEST['dstfld3']) && zbx_strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
 
-			$frmTitle->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
-		}
+		$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
+		$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
+		$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
+		$epmtyScript .= ' close_window(); return false;';
+
+		$frmTitle->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
 	}
 }
 
@@ -1699,7 +1700,7 @@ elseif ($srctbl == 'slides') {
 	$slideshows = array();
 	$result = DBselect('SELECT s.slideshowid,s.name FROM slideshows s WHERE '.DBin_node('s.slideshowid', $nodeid).' ORDER BY s.name');
 	while ($row = DBfetch($result)) {
-		if (!slideshow_accessible($row['slideshowid'], PERM_READ_ONLY)) {
+		if (!slideshow_accessible($row['slideshowid'], PERM_READ)) {
 			continue;
 		}
 		$slideshows[$row['slideshowid']] = $row;

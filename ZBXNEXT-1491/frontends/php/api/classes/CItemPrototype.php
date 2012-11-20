@@ -102,7 +102,7 @@ class CItemPrototype extends CItemGeneral {
 		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -119,7 +119,7 @@ class CItemPrototype extends CItemGeneral {
 									' AND rr.id=hgg.groupid '.
 									' AND rr.groupid=gg.usrgrpid '.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+									' AND rr.permission='.PERM_DENY.')';
 		}
 
 // nodeids
@@ -681,6 +681,7 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$delItemPrototypeIds = zbx_toArray($prototypeids);
 		$prototypeids = zbx_toHash($prototypeids);
 
 		$options = array(
@@ -785,7 +786,7 @@ class CItemPrototype extends CItemGeneral {
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('prototypeids' => $prototypeids);
+		return array('prototypeids' => $delItemPrototypeIds);
 	}
 
 	public function syncTemplates($data) {

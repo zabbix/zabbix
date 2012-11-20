@@ -130,7 +130,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -156,7 +156,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 							' AND rr.id=hgg.groupid'.
 							' AND rr.groupid=gg.usrgrpid'.
 							' AND gg.userid='.$userid.
-							' AND rr.permission<'.$permission.'))';
+							' AND rr.permission='.PERM_DENY.'))';
 		}
 
 		// nodeids
@@ -890,7 +890,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	public function delete($triggerIds, $nopermissions = false) {
 		$triggerIds = zbx_toArray($triggerIds);
-
+		$triggerPrototypeIds = $triggerIds;
 		if (empty($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -963,7 +963,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		DB::delete('triggers', array('triggerid' => $triggerIds));
 
-		return array('triggerids' => $triggerIds);
+		return array('triggerids' => $triggerPrototypeIds);
 	}
 
 	protected function createReal(array &$triggers) {
