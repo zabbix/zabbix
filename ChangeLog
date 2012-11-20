@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F.I..PS. [ZBXNEXT-20] added support of templated Web scenarios (Sasha, Vedmak)
 A.F....... [ZBXNEXT-887] fixed permission calculation (Eduard)
 A......... [ZBXNEXT-1492] dropped support of output shorten for the API get methods (Pavels)
 .......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)

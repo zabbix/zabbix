@@ -664,23 +664,26 @@ class CUserMacro extends CZBXAPI {
 	 */
 	public function getMacros($data) {
 		$macros = $data['macros'];
-		$itemid = isset($data['itemid']) ? $data['itemid'] : null;
-		$triggerid = isset($data['triggerid']) ? $data['triggerid'] : null;
+		$hostIds = isset($data['hostid']) ? zbx_toArray($data['hostid']) : null;
 
+		$result = array();
 		zbx_value2array($macros);
 		$macros = array_unique($macros);
 
-		$result = array();
+		if (!$hostIds) {
+			$itemid = isset($data['itemid']) ? $data['itemid'] : null;
+			$triggerid = isset($data['triggerid']) ? $data['triggerid'] : null;
 
-		$hosts = API::Host()->get(array(
-			'itemids' => $itemid,
-			'triggerids' => $triggerid,
-			'nopermissions' => true,
-			'preservekeys' => true,
-			'output' => array('hostid'),
-			'templated_hosts' => true
-		));
-		$hostIds = array_keys($hosts);
+			$hosts = API::Host()->get(array(
+				'itemids' => $itemid,
+				'triggerids' => $triggerid,
+				'nopermissions' => true,
+				'preservekeys' => true,
+				'output' => array('hostid'),
+				'templated_hosts' => true
+			));
+			$hostIds = array_keys($hosts);
+		}
 
 		do {
 			$hostMacros = $this->get(array(

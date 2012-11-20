@@ -240,21 +240,6 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 				",config r where t.groupid=r.discovery_groupid" DB_NODE,
 				DBnode_local("r.configid"));
 	}
-	else if (0 == strcmp(table->table, "applications"))
-	{
-		if (0 == httptests->values_num)
-			goto skip_data;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" where exists ("
-					"select *"
-					" from httptest r"
-					" where t.applicationid=r.applicationid"
-						" and");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.httptestid",
-				httptests->values, httptests->values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")");
-	}
 	else if (SUCCEED == str_in_list("httptest,httptestitem,httpstep", table->table, ','))
 	{
 		if (0 == httptests->values_num)
@@ -385,9 +370,8 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 
 	result = DBselect(
 			"select httptestid"
-			" from httptest t,applications a,hosts h"
-			" where t.applicationid=a.applicationid"
-				" and a.hostid=h.hostid"
+			" from httptest t,hosts h"
+			" where t.hostid=h.hostid"
 				" and t.status=%d"
 				" and h.proxy_hostid=" ZBX_FS_UI64
 				" and h.status=%d",
@@ -435,7 +419,6 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"expressions"},
 		{"groups"},
 		{"config"},
-		{"applications"},
 		{"httptest"},
 		{"httptestitem"},
 		{"httpstep"},
