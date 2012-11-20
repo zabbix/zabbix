@@ -100,7 +100,11 @@ if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
 
 $nocalculations = get_request('nocalculations', false);
 if ($nocalculations) {
-	add_elementNames($map['selements']);
+	foreach ($map['selements'] as $selement) {
+		if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE) {
+			add_elementNames($map['selements']);
+		}
+	}
 
 	// get default iconmap id to use for elements that use icon map
 	if ($map['iconmapid']) {
