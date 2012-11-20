@@ -54,9 +54,10 @@ else {
 	$httpPopupForm->addVar('dstfrm', get_request('dstfrm', null));
 	$httpPopupForm->addVar('stepid', get_request('stepid', null));
 	$httpPopupForm->addVar('list_name', get_request('list_name', null));
+	$httpPopupForm->addVar('templated', get_request('templated', null));
 
 	$httpPopupFormList = new CFormList('httpPopupFormList');
-	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', get_request('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
+	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', get_request('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, get_request('templated', null), 64));
 	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', get_request('url', ''), ZBX_TEXTBOX_STANDARD_SIZE));
 	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', get_request('posts', '')));
 	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', get_request('timeout', 15), 5));

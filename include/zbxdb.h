@@ -147,6 +147,12 @@
 #	define ZBX_SQL_MOD(x, y) "mod(" #x "," #y ")"
 #endif
 
+#ifdef HAVE_MULTIROW_INSERT
+#	define ZBX_ROW_DL	","
+#else
+#	define ZBX_ROW_DL	";\n"
+#endif
+
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 #ifdef HAVE_SQLITE3
 void	zbx_create_sqlite3_mutex(const char *dbname);
