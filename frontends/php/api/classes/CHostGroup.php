@@ -115,7 +115,7 @@ class CHostGroup extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['rights'] = 'rights r';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
@@ -129,7 +129,7 @@ class CHostGroup extends CZBXAPI {
 					' WHERE rr.id=g.groupid'.
 						' AND rr.groupid=ugg.usrgrpid'.
 						' AND ugg.userid='.$userid.
-						' AND rr.permission<'.$permission.')';
+						' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// groupids

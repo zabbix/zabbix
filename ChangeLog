@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F....... [ZBXNEXT-887] fixed permission calculation (Eduard)
 A......... [ZBXNEXT-1492] dropped support of output shorten for the API get methods (Pavels)
 .......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)
 ........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
@@ -58,6 +59,13 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
+A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
+..F....... [ZBX-5639] fixed global options "dropdown first entry" and "remember selected" in availability reports (Oleg)
+..F....... [ZBX-5639] improved sdii() debugging function (Toms)
+A.F.....S. [ZBX-5816] fixed undefined index in Monitoring > Events, when favorite trigger has been deleted (Toms, Sasha)
+..F....... [ZBX-5771] fixed acknowledge tick mark lost on "overview" page (Oleg)
+..F....... [ZBX-5821] fixed 2.0 xml format template import (Oleg)
 ........S. [ZBX-5791] fixed possible SQL errors when linking groups to a host (Sasha)
 ..F....... [ZBX-5786] fixed screens import, that contain simple graphs or plain texts (Oleg)
 ........S. [ZBX-5753] fixed server crash when using an icmpping* check as a discovery rule (Sasha)
@@ -1165,6 +1173,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)

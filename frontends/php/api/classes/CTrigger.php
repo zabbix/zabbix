@@ -159,7 +159,7 @@ class CTrigger extends CTriggerGeneral {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -185,7 +185,7 @@ class CTrigger extends CTriggerGeneral {
 													' AND rr.id=hgg.groupid'.
 													' AND rr.groupid=gg.usrgrpid'.
 													' AND gg.userid='.$userid.
-													' AND rr.permission<'.$permission.'))';
+													' AND rr.permission='.PERM_DENY.'))';
 		}
 
 		// groupids
@@ -1350,6 +1350,13 @@ class CTrigger extends CTriggerGeneral {
 
 
 	protected function deleteByPks(array $pks) {
+
+		// others idx should be deleted as well if they arise at some point
+		DB::delete('profiles', array(
+			'idx' => 'web.events.filter.triggerid',
+			'value_id' => $pks
+		));
+
 		DB::delete('events', array(
 			'objectid' => $pks,
 			'object' => EVENT_OBJECT_TRIGGER
