@@ -164,6 +164,10 @@ if ($pageFilter->hostsSelected) {
 		)));
 	}
 }
+else {
+	$tmp = array();
+	getPagingLine($tmp);
+}
 
 $httpmon_wdgt->addItem(array($paging, $table, $paging));
 $httpmon_wdgt->show();

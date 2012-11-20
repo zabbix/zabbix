@@ -1618,7 +1618,7 @@ function getPagingLine(&$items) {
 
 	$pageline = array();
 
-	$table = BR();
+	$table = null;
 	if ($pagesCount > 1) {
 		$url = new Curl();
 		if ($startPage > 1) {
