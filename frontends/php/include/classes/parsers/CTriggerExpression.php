@@ -18,32 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/* for parsing of trigger expression */
-define('STATE_INIT', 0);
-define('STATE_AFTER_OPEN_BRACE', 1);
-define('STATE_AFTER_OPERATOR', 2);
-define('STATE_AFTER_MINUS', 3);
-define('STATE_AFTER_CLOSE_BRACE', 4);
-define('STATE_AFTER_CONSTANT', 5);
-
-/* for parse of item key parameters */
-define('ZBX_STATE_NEW', 0);
-define('ZBX_STATE_END', 1);
-define('ZBX_STATE_UNQUOTED', 2);
-define('ZBX_STATE_QUOTED', 3);
-
 class CTriggerExpression {
-	public	$isValid;
-	public	$error;
+	/* for parsing of trigger expression */
+	const STATE_INIT = 0;
+	const STATE_AFTER_OPEN_BRACE = 1;
+	const STATE_AFTER_OPERATOR = 2;
+	const STATE_AFTER_MINUS = 3;
+	const STATE_AFTER_CLOSE_BRACE = 4;
+	const STATE_AFTER_CONSTANT = 5;
+
+	/* for parse of item key parameters */
+	const ZBX_STATE_NEW = 0;
+	const ZBX_STATE_END = 1;
+	const ZBX_STATE_UNQUOTED = 2;
+	const ZBX_STATE_QUOTED = 3;
+
+	public	$isValid = true;
+	public	$error = '';
 	private	$pos;
-	public	$expressions;
-	private	$expression_num;
-	public	$macros;
-	private	$macro_num;
-	public	$usermacros;
-	private	$usermacro_num;
+	public	$expressions = array();
+	private	$expression_num = 0;
+	public	$macros = array();
+	public	$usermacros = array();
 	private	$expression;
-	public	$expressionShort;
+	public	$expressionShort = '';
 
 	/**
 	 * Parse trigger expression
@@ -82,10 +80,12 @@ class CTriggerExpression {
 	 */
 	public function __construct($expression) {
 		$this->expression = $expression;
-		$this->initialize();
 		$this->parseExpression();
 	}
 
+	/**
+	 * Returns a list of the unique hosts, used in a parsed trigger expression or empty array if expression is not valid
+	 */
 	public function getHosts() {
 		if (!$this->isValid) {
 			return array();
@@ -94,51 +94,65 @@ class CTriggerExpression {
 		return array_unique(zbx_objectValues($this->expressions, 'host'));
 	}
 
+	/**
+	 * Parses a trigger expression and sets local variables
+	 *
+	 * $this->isValid     - if an expression is parsed successfully
+	 * $this->error       - if error occured
+	 * $this->pos         - a length of the valid expression or a pointer to a not valid element
+	 * $this->expressions - a list of trigger functions, used in the expression
+	 * $this->macros      - a list of macros, used in the expression
+	 * $this->usermacros  - a list of user macros, used in the expression
+	 */
 	private function parseExpression() {
-		for ($this->pos = 0, $state = STATE_INIT, $level = 0; isset($this->expression[$this->pos]); $this->pos++) {
+		$this->pos = 0;
+		$state = self::STATE_INIT;
+		$level = 0;
+
+		while (isset($this->expression[$this->pos])) {
 			switch ($state) {
-				case STATE_INIT:
-				case STATE_AFTER_OPEN_BRACE:
-				case STATE_AFTER_OPERATOR:
+				case self::STATE_INIT:
+				case self::STATE_AFTER_OPEN_BRACE:
+				case self::STATE_AFTER_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
 							$this->expressionShort .= $this->expression[$this->pos];
 							break;
 						case '-':
 							$this->expressionShort .= $this->expression[$this->pos];
-							$state = STATE_AFTER_MINUS;
+							$state = self::STATE_AFTER_MINUS;
 							break;
 						case '(':
 							$this->expressionShort .= $this->expression[$this->pos];
-							$state = STATE_AFTER_OPEN_BRACE;
+							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
 						default:
 							if (!$this->parseConstant()) {
 								break 3;
 							}
-							$state = STATE_AFTER_CONSTANT;
+							$state = self::STATE_AFTER_CONSTANT;
 					}
 					break;
-				case STATE_AFTER_MINUS:
+				case self::STATE_AFTER_MINUS:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
 							$this->expressionShort .= $this->expression[$this->pos];
 							break;
 						case '(':
 							$this->expressionShort .= $this->expression[$this->pos];
-							$state = STATE_AFTER_OPEN_BRACE;
+							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
 						default:
 							if (!$this->parseConstant()) {
 								break 3;
 							}
-							$state = STATE_AFTER_CONSTANT;
+							$state = self::STATE_AFTER_CONSTANT;
 					}
 					break;
-				case STATE_AFTER_CLOSE_BRACE:
-				case STATE_AFTER_CONSTANT:
+				case self::STATE_AFTER_CLOSE_BRACE:
+				case self::STATE_AFTER_CONSTANT:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
 							$this->expressionShort .= $this->expression[$this->pos];
@@ -154,11 +168,11 @@ class CTriggerExpression {
 						case '/':
 						case '*':
 							$this->expressionShort .= $this->expression[$this->pos];
-							$state = STATE_AFTER_OPERATOR;
+							$state = self::STATE_AFTER_OPERATOR;
 							break;
 						case ')':
 							$this->expressionShort .= $this->expression[$this->pos];
-							$state = STATE_AFTER_CLOSE_BRACE;
+							$state = self::STATE_AFTER_CLOSE_BRACE;
 							if ($level == 0) {
 								break 3;
 							}
@@ -169,6 +183,7 @@ class CTriggerExpression {
 					}
 					break;
 			}
+			$this->pos++;
 		}
 
 		if ($this->pos == 0) {
@@ -176,13 +191,24 @@ class CTriggerExpression {
 			$this->isValid = false;
 		}
 
-		if ($level != 0 || isset($this->expression[$this->pos]) || $state == STATE_AFTER_OPERATOR || $state == STATE_AFTER_MINUS) {
+		if ($level != 0 || isset($this->expression[$this->pos]) || $state == self::STATE_AFTER_OPERATOR || $state == self::STATE_AFTER_MINUS) {
 			$this->error = _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".',
 					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
 			$this->isValid = false;
 		}
 	}
 
+	/**
+	 * Parses a constant in the trigger expression and moves a current position ($this->pos) on a last symbol of the constant
+	 *
+	 * The constant can be:
+	 *  - trigger function like {host:item[].func()}
+	 *  - floating point number; can be with suffix [KMGTsmhdw]
+	 *  - macro like {TRIGGER.VALUE}
+	 *  - user macro like {$MACRO}
+	 *
+	 * Returns true if parsed successfully, false otherwise
+	 */
 	private function parseConstant() {
 		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseMacro() || $this->parseUserMacro()) {
 			return true;
@@ -191,23 +217,25 @@ class CTriggerExpression {
 		return false;
 	}
 
+	/**
+	 * Parses a trigger function macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * Returns true if parsed successfully, false otherwise
+	 */
 	private function parseFunctionMacro() {
 		$j = $this->pos;
 
-		$host = '';
-		if (!isset($this->expression[$j]) || $this->expression[$j++] != '{' || !$this->parseHost($j, $host)) {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '{' || !($host = $this->parseHost($j))) {
 			return false;
 		}
 
-		$item = '';
-		if (!isset($this->expression[$j]) || $this->expression[$j++] != ':' || !$this->parseItem($j, $item)) {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != ':' || !($item = $this->parseItem($j))) {
 			return false;
 		}
 
-		$function = '';
-		$parameters = array();
 		if (!isset($this->expression[$j]) || $this->expression[$j++] != '.'
-				|| !$this->parseFunction($j, $function, $parameters)) {
+				|| !(list($function, $functionParamList) = $this->parseFunction($j))) {
 			return false;
 		}
 
@@ -222,35 +250,47 @@ class CTriggerExpression {
 		$this->expressions[$this->expression_num]['function'] = $function;
 		$this->expressions[$this->expression_num]['functionName'] = substr($function, 0, strpos($function, '('));
 		$this->expressions[$this->expression_num]['functionParam'] = substr($function, strpos($function, '(') + 1, -1);
-		$this->expressions[$this->expression_num]['functionParamList'] = $parameters;
+		$this->expressions[$this->expression_num]['functionParamList'] = $functionParamList;
 		$this->expressionShort .= '{'.$this->expression_num.'}';
 		$this->expression_num++;
 		$this->pos = $j;
 		return true;
 	}
 
-	private function parseHost(&$pos, &$host)
+	/**
+	 * Parses a host in a trigger function macro constant and moves a position ($pos) on a next symbol after the host
+	 *
+	 * Returns a host name if parsed successfully or null otherwise
+	 */
+	private function parseHost(&$pos)
 	{
 		$j = $pos;
 
-		for (; isset($this->expression[$j]) && $this->isHostChar($this->expression[$j]); $j++)
-			;
+		while (isset($this->expression[$j]) && $this->isHostChar($this->expression[$j])) {
+			$j++;
+		}
 
 		if ($pos == $j) {	/* is host empty? */
-			return false;
+			return null;
 		}
 
 		$host = substr($this->expression, $pos, $j - $pos);
 		$pos = $j;
-		return true;
+		return $host;
 	}
 
-	private function parseItem(&$pos, &$item)
+	/**
+	 * Parses an item in a trigger function macro constant and moves a position ($pos) on a next symbol after the item
+	 *
+	 * Returns an item name if parsed successfully or null otherwise
+	 */
+	private function parseItem(&$pos)
 	{
 		$j = $pos;
 
-		for (; isset($this->expression[$j]) && $this->isKeyChar($this->expression[$j]); $j++)
-			;
+		while (isset($this->expression[$j]) && $this->isKeyChar($this->expression[$j])) {
+			$j++;
+		}
 
 		if (isset($this->expression[$j]) && $this->expression[$j] == '(') { /* for instance, agent.ping.last(0) */
 			for (; $j > $pos && $this->expression[$j] != '.'; $j--)
@@ -258,13 +298,13 @@ class CTriggerExpression {
 		}
 		elseif (isset($this->expression[$j]) && $this->expression[$j] == '[') { /* for instance, net.tcp.port[,80] */
 			$level = 0;
-			$state = ZBX_STATE_END;
+			$state = self::ZBX_STATE_END;
 
-			for (; isset($this->expression[$j]); $j++) {
+			while (isset($this->expression[$j])) {
 				if ($level == 0) {
 					/* first square bracket + Zapcat compatibility */
-					if ($state == ZBX_STATE_END && $this->expression[$j] == '[') {
-						$state = ZBX_STATE_NEW;
+					if ($state == self::ZBX_STATE_END && $this->expression[$j] == '[') {
+						$state = self::ZBX_STATE_NEW;
 					}
 					else {
 						break;
@@ -272,7 +312,7 @@ class CTriggerExpression {
 				}
 
 				switch ($state) {
-					case ZBX_STATE_NEW: /* a new parameter started */
+					case self::ZBX_STATE_NEW: /* a new parameter started */
 						switch ($this->expression[$j]) {
 							case ' ':
 							case ',':
@@ -282,156 +322,175 @@ class CTriggerExpression {
 								break;
 							case ']':
 								$level--;
-								$state = ZBX_STATE_END;
+								$state = self::ZBX_STATE_END;
 								break;
 							case '"':
-								$state = ZBX_STATE_QUOTED;
+								$state = self::ZBX_STATE_QUOTED;
 								break;
 							default:
-								$state = ZBX_STATE_UNQUOTED;
+								$state = self::ZBX_STATE_UNQUOTED;
 						}
 						break;
-					case ZBX_STATE_END: /* end of parameter */
+					case self::ZBX_STATE_END: /* end of parameter */
 						switch ($this->expression[$j]) {
 							case ' ':
 								break;
 							case ',':
-								$state = ZBX_STATE_NEW;
+								$state = self::ZBX_STATE_NEW;
 								break;
 							case ']':
 								$level--;
 								break;
 							default:
-								return false;
+								return null;
 						}
 						break;
-					case ZBX_STATE_UNQUOTED: /* an unquoted parameter */
+					case self::ZBX_STATE_UNQUOTED: /* an unquoted parameter */
 						switch ($this->expression[$j]) {
 							case ']':
 								$level--;
-								$state = ZBX_STATE_END;
+								$state = self::ZBX_STATE_END;
 								break;
 							case ',':
-								$state = ZBX_STATE_NEW;
+								$state = self::ZBX_STATE_NEW;
 								break;
 						}
 						break;
-					case ZBX_STATE_QUOTED: /* a quoted parameter */
+					case self::ZBX_STATE_QUOTED: /* a quoted parameter */
 						switch ($this->expression[$j]) {
 							case '"':
 								if ($this->expression[$j - 1] != '\\') {
-									$state = ZBX_STATE_END;
+									$state = self::ZBX_STATE_END;
 								}
 								break;
 						}
 						break;
 				}
+				$j++;
 			}
 
 			if ($level != 0) {
-				return false;
+				return null;
 			}
 		}
 
 		if ($pos == $j) { /* is key empty? */
-			return false;
+			return null;
 		}
 
 		$item = substr($this->expression, $pos, $j - $pos);
 		$pos = $j;
-		return true;
+		return $item;
 	}
 
-	private function parseFunction(&$pos, &$function, array &$parameters)
+	/**
+	 * Parses an function in a trigger function macro constant and moves a position ($pos) on a next symbol after the function
+	 *
+	 * Returns an array if parsed successfully or null otherwise
+	 * Returned array contains two elements:
+	 *   0 => function name like "last(0)"
+	 *   1 => array of parsed function parameters
+	 */
+	private function parseFunction(&$pos)
 	{
 		$j = $pos;
 
-		for (; isset($this->expression[$j]) && $this->isFunctionChar($this->expression[$j]); $j++)
-			;
+		while (isset($this->expression[$j]) && $this->isFunctionChar($this->expression[$j])) {
+			$j++;
+		}
 
 		if ($pos == $j) { /* is function empty? */
-			return false;
+			return null;
 		}
 
 		if (!isset($this->expression[$j]) || $this->expression[$j++] != '(') {
-			return false;
+			return null;
 		}
 
-		$state = ZBX_STATE_NEW;
+		$state = self::ZBX_STATE_NEW;
 		$num = 0;
-		$parameters[$num] = '';
+		$functionParamList = array();
+		$functionParamList[$num] = '';
 
-		for (; isset($this->expression[$j]); $j++) {
+		while (isset($this->expression[$j])) {
 			switch ($state) {
-				case ZBX_STATE_NEW: /* a new parameter started */
+				case self::ZBX_STATE_NEW: /* a new parameter started */
 					switch ($this->expression[$j]) {
 						case ' ':
 							break;
 						case ',':
-							$parameters[++$num] = '';
+							$functionParamList[++$num] = '';
 							break;
 						case ')':
 							break 3; /* end of parameters */
 						case '"':
-							$state = ZBX_STATE_QUOTED;
+							$state = self::ZBX_STATE_QUOTED;
 							break;
 						default:
-							$parameters[$num] .= $this->expression[$j];
-							$state = ZBX_STATE_UNQUOTED;
+							$functionParamList[$num] .= $this->expression[$j];
+							$state = self::ZBX_STATE_UNQUOTED;
 					}
 					break;
-				case ZBX_STATE_END: /* end of parameter */
+				case self::ZBX_STATE_END: /* end of parameter */
 					switch ($this->expression[$j]) {
 						case ' ':
 							break;
 						case ',':
-							$parameters[++$num] = '';
-							$state = ZBX_STATE_NEW;
+							$functionParamList[++$num] = '';
+							$state = self::ZBX_STATE_NEW;
 							break;
 						case ')':
 							break 3; /* end of parameters */
 						default:
-							return false;
+							return null;
 					}
 					break;
-				case ZBX_STATE_UNQUOTED: /* an unquoted parameter */
+				case self::ZBX_STATE_UNQUOTED: /* an unquoted parameter */
 					switch ($this->expression[$j]) {
 						case ')':
 							break 3; /* end of parameters */
 						case ',':
-							$parameters[++$num] = '';
-							$state = ZBX_STATE_NEW;
+							$functionParamList[++$num] = '';
+							$state = self::ZBX_STATE_NEW;
 							break;
 						default:
-							$parameters[$num] .= $this->expression[$j];
+							$functionParamList[$num] .= $this->expression[$j];
 					}
 					break;
-				case ZBX_STATE_QUOTED: /* a quoted parameter */
+				case self::ZBX_STATE_QUOTED: /* a quoted parameter */
 					switch ($this->expression[$j]) {
 						case '"':
-							$state = ZBX_STATE_END;
+							$state = self::ZBX_STATE_END;
 							break;
 						case '\\':
-							if (isset($this->expression[$j + 1]) && $this->expression[$j + 1] == '"')
+							if (isset($this->expression[$j + 1]) && $this->expression[$j + 1] == '"') {
 								$j++;
+							}
 							/* break; is not missing here */
 						default:
-							$parameters[$num] .= $this->expression[$j];
+							$functionParamList[$num] .= $this->expression[$j];
 							break;
 					}
 					break;
 			}
+			$j++;
 		}
 
 		if (!isset($this->expression[$j]) || $this->expression[$j++] != ')') {
-			return false;
+			return null;
 		}
 
 		$function = substr($this->expression, $pos, $j - $pos);
 		$pos = $j;
-		return true;
+		return array($function, $functionParamList);
 	}
 
+	/**
+	 * Parses a number constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the number
+	 *
+	 * Returns true if parsed successfully, false otherwise
+	 */
 	private function parseNumber() {
 		$j = $this->pos;
 
@@ -439,8 +498,10 @@ class CTriggerExpression {
 			return false;
 		}
 
-		for ($j++; isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9'; $j++)
-			;
+		$j++;
+		while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
+			$j++;
+		}
 
 		if (isset($this->expression[$j]) && $this->expression[$j] == '.') {
 			$j++;
@@ -448,8 +509,10 @@ class CTriggerExpression {
 				return false;
 			}
 
-			for ($j++; isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9'; $j++)
-				;
+			$j++;
+			while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
+				$j++;
+			}
 		}
 
 		/* check for an optional suffix */
@@ -462,18 +525,30 @@ class CTriggerExpression {
 		return true;
 	}
 
+	/**
+	 * Parses a macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * Returns true if parsed successfully, false otherwise
+	 */
 	private function parseMacro() {
 		if (0 != strcmp(substr($this->expression, $this->pos, 15), '{TRIGGER.VALUE}')) {
 			return false;
 		}
 
 		$macro = substr($this->expression, $this->pos, 15);
-		$this->macros[$this->macro_num++]['expression'] = $macro;
+		$this->macros[]['expression'] = $macro;
 		$this->expressionShort .= $macro;
 		$this->pos += 14;
 		return true;
 	}
 
+	/**
+	 * Parses an user macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * Returns true if parsed successfully, false otherwise
+	 */
 	private function parseUserMacro() {
 		$j = $this->pos;
 
@@ -485,24 +560,28 @@ class CTriggerExpression {
 			return false;
 		}
 
-		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j])) {
+		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j++])) {
 			return false;
 		}
 
-		for (; isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j]); $j++)
-			;
+		while (isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j])) {
+			$j++;
+		}
 
 		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
 			return false;
 		}
 
 		$usermacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
-		$this->usermacros[$this->usermacro_num++]['expression'] = $usermacro;
+		$this->usermacros[]['expression'] = $usermacro;
 		$this->expressionShort .= $usermacro;
 		$this->pos = $j;
 		return true;
 	}
 
+	/**
+	 * Returns true if the char is allowed in the host name, false otherwise
+	 */
 	private function isHostChar($c) {
 		if (($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z') || ($c >= '0' && $c <= '9')
 				|| $c == '.' || $c == ' ' || $c == '_' || $c == '-') {
@@ -512,6 +591,9 @@ class CTriggerExpression {
 		return false;
 	}
 
+	/**
+	 * Returns true if the char is allowed in the item key, false otherwise
+	 */
 	private function isKeyChar($c) {
 		if (($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z') || ($c >= '0' && $c <= '9')
 				|| $c == '.' || $c == '_' || $c == '-') {
@@ -521,6 +603,9 @@ class CTriggerExpression {
 		return false;
 	}
 
+	/**
+	 * Returns true if the char is allowed in the function name, false otherwise
+	 */
 	private function isFunctionChar($c) {
 		if ($c >= 'a' && $c <= 'z') {
 			return true;
@@ -529,29 +614,14 @@ class CTriggerExpression {
 		return false;
 	}
 
+	/**
+	 * Returns true if the char is allowed in the macro, false otherwise
+	 */
 	private function isMacroChar($c) {
 		if (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9')) {
 			return true;
 		}
 
 		return false;
-	}
-
-	private function initialize() {
-		$this->isValid = true;
-		$this->error = '';
-
-		$this->pos = 0;
-
-		$this->expressions = array();
-		$this->expression_num = 0;
-
-		$this->macros = array();
-		$this->macro_num = 0;
-
-		$this->usermacros = array();
-		$this->usermacro_num = 0;
-
-		$this->expressionShort = '';
 	}
 }
