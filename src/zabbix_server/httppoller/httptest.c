@@ -290,6 +290,7 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROXY, httptest->http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
@@ -552,7 +553,7 @@ void	process_httptests(int httppoller_num, int now)
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.macros,t.agent,"
-				"t.authentication,t.http_user,t.http_password"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -596,6 +597,10 @@ void	process_httptests(int httppoller_num, int now)
 			substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
 					&httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
+
+		httptest.http_proxy = zbx_strdup(NULL, row[10]);
+		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+				&httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 
 		process_httptest(&host, &httptest);
 
