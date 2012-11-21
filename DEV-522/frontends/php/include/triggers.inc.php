@@ -915,6 +915,8 @@ function triggerExpression($trigger, $html = false) {
 /**
  * Implodes expression, replaces names and keys with IDs
  *
+ * @throw Exception if error occureed
+ *
  * @param string $expression Full expression with host names and item keys
  * @param numeric $triggerid
  * @param array optional $hostnames Reference to array which will be filled with unique visible host names.
@@ -925,7 +927,7 @@ function triggerExpression($trigger, $html = false) {
 function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
-		return null;
+		throw new Exception($expressionData->error);
 	}
 
 	$newFunctions = array();
@@ -952,17 +954,15 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 						array('itemid' => $row['itemid'], 'valueType' => $row['value_type']);
 			}
 			else {
-				error(_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".',
+				throw new Exception(_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".',
 						$exprPart['item'], $exprPart['host']));
-				return null;
 			}
 		}
 
 		if (!$triggerFunctionValidator->validate(array('functionName' => $exprPart['functionName'],
 				'functionParamList' => $exprPart['functionParamList'],
 				'valueType' => $items[$exprPart['host']][$exprPart['item']]['valueType']))) {
-			error($triggerFunctionValidator->getError());
-			return null;
+			throw new Exception($triggerFunctionValidator->getError());
 		}
 
 		$newFunctions[$exprPart['expression']] = null;

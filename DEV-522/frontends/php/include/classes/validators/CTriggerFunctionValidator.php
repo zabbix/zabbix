@@ -39,7 +39,7 @@ class CTriggerFunctionValidator extends CValidator {
 		$this->setError('');
 
 		if (!isset($this->allowed[$value['functionName']])) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).SPACE.
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
 					_('Unknown function.'));
 			return false;
 		}
@@ -50,7 +50,7 @@ class CTriggerFunctionValidator extends CValidator {
 		}
 
 		if (count($this->allowed[$value['functionName']]['args']) < count($value['functionParamList'])) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).SPACE.
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
 					_s('Function supports "%1$s" parameters.', count($this->allowed[$value['functionName']]['args'])));
 			return false;
 		}
@@ -58,7 +58,7 @@ class CTriggerFunctionValidator extends CValidator {
 		foreach ($this->allowed[$value['functionName']]['args'] as $anum => $arg) {
 			// mandatory check
 			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$anum])) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).SPACE.
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
 						_('Mandatory parameter is missing.'));
 				return false;
 			}
@@ -71,28 +71,28 @@ class CTriggerFunctionValidator extends CValidator {
 					switch ($arg['type']) {
 						case 'str':
 							if (!is_string($value['functionParamList'][$anum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).SPACE.
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
 										_s('Parameter of type string or user macro expected, "%1$s" given.', $value['functionParamList'][$anum]));
 								return false;
 							}
 							break;
 						case 'sec':
 							if (!$this->validateSec($value['functionParamList'][$anum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).SPACE.
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
 										_s('Parameter sec or user macro expected, "%1$s" given.', $value['functionParamList'][$anum]));
 								return false;
 							}
 							break;
 						case 'sec_num':
 							if (!$this->validateSecNum($value['functionParamList'][$anum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).SPACE.
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
 										_s('Parameter sec or #num or user macro expected, "%1$s" given.', $value['functionParamList'][$anum]));
 								return false;
 							}
 							break;
 						case 'num':
 							if (!is_numeric($value['functionParamList'][$anum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).SPACE.
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
 										_s('Parameter num or user macro expected, "%1$s" given.', $value['functionParamList'][$anum]));
 								return false;
 							}
