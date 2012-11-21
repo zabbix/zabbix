@@ -32,6 +32,9 @@ class CTriggerFunctionValidator extends CValidator {
 	 *   array('functionName' => 'last', 'functionParamList' => array(0 => '#15'), 'valueType' => 3)
 	 *
 	 * @param array $value
+	 * @param string $value['functionName']
+	 * @param array $value['functionParamList']
+	 * @param int $value['valueType']
 	 *
 	 * @return bool
 	 */
