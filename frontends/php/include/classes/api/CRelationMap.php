@@ -21,7 +21,7 @@
 /**
  * A helper class for storing relations between objects, and mapping related objects.
  */
-class RelationMap {
+class CRelationMap {
 
 	/**
 	 * A hash of relation maps. Each key contains a hash of relations between specific objects types. A relation hash

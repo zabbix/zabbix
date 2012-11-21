@@ -713,10 +713,10 @@ class CZBXAPI {
 	 *
 	 * @param array $options
 	 * @param array $result             an object hash with PKs as keys
-	 * @param RelationMap $relationMap  object relation map
+	 * @param CRelationMap $relationMap  object relation map
 	 * @return array mixed
 	 */
-	protected function addRelatedObjects(array $options, array $result, RelationMap $relationMap) {
+	protected function addRelatedObjects(array $options, array $result, CRelationMap $relationMap) {
 		// must be implemented in each API separately
 
 		return $result;
