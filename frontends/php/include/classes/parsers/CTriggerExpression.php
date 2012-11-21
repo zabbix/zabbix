@@ -400,8 +400,9 @@ class CTriggerExpression {
 
 		// for instance, agent.ping.last(0)
 		if (isset($this->expression[$j]) && $this->expression[$j] == '(') {
-			for (; $j > $pos && $this->expression[$j] != '.'; $j--)
-				;
+			while ($j > $pos && $this->expression[$j] != '.') {
+				$j--;
+			}
 		}
 		// for instance, net.tcp.port[,80]
 		elseif (isset($this->expression[$j]) && $this->expression[$j] == '[') {
@@ -655,15 +656,22 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseMacro() {
-		if (strcmp(substr($this->expression, $this->pos, 15), '{TRIGGER.VALUE}') != 0) {
-			return false;
-		}
+		$macros = array('{TRIGGER.VALUE}');
 
-		$macro = substr($this->expression, $this->pos, 15);
-		$this->macros[]['expression'] = $macro;
-		$this->expressionShort .= $macro;
-		$this->pos += 14;
-		return true;
+		foreach ($macros as $macro) {
+			$len = strlen($macro);
+
+			if (substr($this->expression, $this->pos, $len) != $macro) {
+				continue;
+			}
+
+			$macro = substr($this->expression, $this->pos, $len);
+			$this->macros[]['expression'] = $macro;
+			$this->expressionShort .= $macro;
+			$this->pos += $len - 1;
+			return true;
+		}
+		return false;
 	}
 
 	/**
