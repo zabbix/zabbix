@@ -76,14 +76,7 @@ class CTriggerExpression {
 	 * Example:
 	 *   'expressions' => array(
 	 *     0 => array(
-	 *       'index' => 0
-	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
-	 *       'host' => 'Zabbix server',
-	 *       'item' => 'agent.ping',
-	 *       'function' => 'last(0)',
-	 *       'functionName' => 'last',
-	 *       'functionParam' => '0',
-	 *       'functionParamList' => array (0 => '0')
+	 *       'expression' => '{TRIGGER.VALUE}'
 	 *     )
 	 *   )
 	 *
@@ -98,14 +91,13 @@ class CTriggerExpression {
 	 * Example:
 	 *    array(
 	 *     0 => array(
-	 *       'index' => 0
-	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
-	 *       'host' => 'Zabbix server',
-	 *       'item' => 'agent.ping',
-	 *       'function' => 'last(0)',
-	 *       'functionName' => 'last',
-	 *       'functionParam' => '0',
-	 *       'functionParamList' => array (0 => '0')
+	 *       'expression' => '{$MACRO}'
+	 *     ),
+	 *     1 => array(
+	 *       'expression' => '{$MACRO2}'
+	 *     ),
+	 *     2 => array(
+	 *       'expression' => '{$MACRO}'
 	 *     )
 	 *   )
 	 *
