@@ -33,15 +33,125 @@ class CTriggerExpression {
 	const STATE_UNQUOTED = 2;
 	const STATE_QUOTED = 3;
 
-	public	$isValid = true;
-	public	$error = '';
-	private	$pos;
-	public	$expressions = array();
-	private	$expression_num = 0;
-	public	$macros = array();
-	public	$usermacros = array();
-	private	$expression;
-	public	$expressionShort = '';
+	/**
+	 * Shows a validity of trigger expression
+	 *
+	 * @var bool
+	 */
+	public $isValid;
+
+	/**
+	 * An error message if trigger expression is not valid
+	 *
+	 * @var string
+	 */
+	public $error;
+
+	/**
+	 * An array of trigger functions like {Zabbix server:agent.ping.last(0)}
+	 * The array isn't unique. Same functions can repeats.
+	 *
+	 * Example:
+	 *   'expressions' => array(
+	 *     0 => array(
+	 *       'index' => 0
+	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *       'host' => 'Zabbix server',
+	 *       'item' => 'agent.ping',
+	 *       'function' => 'last(0)',
+	 *       'functionName' => 'last',
+	 *       'functionParam' => '0',
+	 *       'functionParamList' => array (0 => '0')
+	 *     )
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $expressions = array();
+
+	/**
+	 * An array of macros like {TRIGGER.VALUE}
+	 * The array isn't unique. Same macros can repeats.
+	 *
+	 * Example:
+	 *   'expressions' => array(
+	 *     0 => array(
+	 *       'index' => 0
+	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *       'host' => 'Zabbix server',
+	 *       'item' => 'agent.ping',
+	 *       'function' => 'last(0)',
+	 *       'functionName' => 'last',
+	 *       'functionParam' => '0',
+	 *       'functionParamList' => array (0 => '0')
+	 *     )
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $macros = array();
+
+	/**
+	 * An array of user macros like {$MACRO}
+	 * The array isn't unique. Same macros can repeats.
+	 *
+	 * Example:
+	 *    array(
+	 *     0 => array(
+	 *       'index' => 0
+	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *       'host' => 'Zabbix server',
+	 *       'item' => 'agent.ping',
+	 *       'function' => 'last(0)',
+	 *       'functionName' => 'last',
+	 *       'functionParam' => '0',
+	 *       'functionParamList' => array (0 => '0')
+	 *     )
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $usermacros = array();
+
+	/**
+	 * An expression with trigger functions replaced by indexes like {0}, {1}, ...
+	 * The each index corresponds 'index' variable from 'expressions' array
+	 *
+	 * Example:
+	 *   normal expression : "{Zabbix server:agent.ping.last(0)}=0"
+	 *   short expression  : "{0}=0"
+	 *
+	 *   'expressions' => array(
+	 *     0 => array(
+	 *       'index' => 0
+	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *       ...
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $expressionShort = '';
+
+	/**
+	 * A current position on a parsed element
+	 *
+	 * @var integer
+	 */
+	private $pos;
+
+	/**
+	 * A number of elements in an 'expressions' array
+	 *
+	 * @var integer
+	 */
+	private $expression_num = 0;
+
+	/**
+	 * An initial expression
+	 *
+	 * @var string
+	 */
+	private $expression;
 
 	/**
 	 * Parse a trigger expression and set local variables
@@ -87,8 +197,18 @@ class CTriggerExpression {
 	 * @return bool returns true if expression is valid, false otherwise
 	 */
 	public function parse($expression) {
-		$this->expression = $expression;
+		// initializing local variables
+		$this->isValid = true;
+		$this->error = '';
+		$this->expressions = array();
+		$this->macros = array();
+		$this->usermacros = array();
+		$this->expressionShort = '';
+
 		$this->pos = 0;
+		$this->expression_num = 0;
+		$this->expression = $expression;
+
 		$state = self::STATE_INIT;
 		$level = 0;
 
