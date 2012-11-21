@@ -79,7 +79,7 @@ class CGraphItem extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -98,7 +98,7 @@ class CGraphItem extends CZBXAPI {
 					' AND rr.id=hgg.groupid'.
 					' AND rr.groupid=ugg.usrgrpid'.
 					' AND ugg.userid='.$userid.
-					' AND rr.permission<'.$permission.')';
+					' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids
@@ -127,29 +127,6 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['where'][] = 'gi.type='.$options['type'];
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['gitems'] = 'gi.*';
-		}
-
-		// expandData
-		if (!is_null($options['expandData'])) {
-			$sqlParts['select']['key'] = 'i.key_';
-			$sqlParts['select']['hostid'] = 'i.hostid';
-			$sqlParts['select']['flags'] = 'i.flags';
-			$sqlParts['select']['host'] = 'h.host';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['gii'] = 'gi.itemid=i.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT gi.gitemid) as rowscount');
-		}
-
 		// sorting
 		zbx_db_sorting($sqlParts, $options, $sortColumns, 'gi');
 
@@ -157,6 +134,9 @@ class CGraphItem extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$gitemids = array();
 
@@ -265,6 +245,24 @@ class CGraphItem extends CZBXAPI {
 			$result = $this->get(array('gitemids' => $gitemids, 'output' => API_OUTPUT_EXTEND));
 		}
 		return $result;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// expandData
+		if ($options['expandData'] !== null) {
+			$sqlParts['select'][] = 'i.key_';
+			$sqlParts['select'][] = 'i.hostid';
+			$sqlParts['select'][] = 'i.flags';
+			$sqlParts['select'][] = 'h.host';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where']['gii'] = 'gi.itemid=i.itemid';
+			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+		}
+
+		return $sqlParts;
 	}
 }
 ?>

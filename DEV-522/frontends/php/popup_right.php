@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
 	'dstfrm'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
-	'permission'=>	array(T_ZBX_INT, O_MAND,P_SYS,	IN(PERM_DENY.','.PERM_READ_ONLY.','.PERM_READ_WRITE),	NULL),
+	'permission'=>	array(T_ZBX_INT, O_MAND,P_SYS,	IN(PERM_DENY.','.PERM_READ.','.PERM_READ_WRITE),	NULL),
 	'nodeid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	NULL),
 );
 
@@ -50,7 +50,7 @@ check_fields($fields);
 	$frmTitle->addVar('permission', $permission);
 
 	if(ZBX_DISTRIBUTED){
-		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_IDS_ARRAY);
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
 		$cmbResourceNode->addItem(0, _('All'));

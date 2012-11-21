@@ -249,6 +249,11 @@ class ZBase {
 	 */
 	protected function setErrorHandler() {
 		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+			// necessary to surpress errors when calling with error control operator like @function_name()
+			if (error_reporting() === 0) {
+				return true;
+			}
+
 			$pathLength = strlen(__FILE__);
 
 			$pathLength -= 22;

@@ -975,11 +975,13 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 
 			if (ITEM_STATUS_NOTSUPPORTED == h->status)
 			{
+				int	errcode = SUCCEED;
+
 				h->value_orig.err = zbx_dsprintf(NULL, "Type of received value"
 						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 						h->value.dbl, zbx_item_value_type_string(h->value_type));
 
-				DCrequeue_reachable_item(h->itemid, h->status, h->clock);
+				DCrequeue_items(&h->itemid, &h->status, &h->clock, &errcode, 1);
 			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
