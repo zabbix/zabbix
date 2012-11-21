@@ -111,8 +111,7 @@ class CTriggerExpression {
 	 *
 	 * Example:
 	 *   $expression : "{Zabbix server:agent.ping.last(0)}=0"
-	 *   $expressions :
-	 *     array(
+	 *   $expressions : array(
 	 *       0 => array(
 	 *         'index' => 0
 	 *         'expression' => '{Zabbix server:agent.ping.last(0)}',
@@ -147,21 +146,16 @@ class CTriggerExpression {
 	private $expression;
 
 	/**
-	 * Parse a trigger expression and set local variables
-	 *
-	 * $this->error       - if error occured
-	 * $this->pos         - a length of the valid expression or a pointer to a not valid element
-	 * $this->expressions - a list of trigger functions, used in the expression
-	 * $this->macros      - a list of macros, used in the expression
-	 * $this->usermacros  - a list of user macros, used in the expression
+	 * Parse a trigger expression and set oublic variables $this->isValid, $this->error, $this->expressions,
+	 *   $this->macros, $this->usermacros and $this->expressionShort
 	 *
 	 * Examples:
 	 *   expression:
 	 *     {Zabbix server:agent.ping.lats(0)}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
 	 *   results:
-	 *     'isValid' => true
-	 *     'error' => ''
-	 *     'expressions' => array(
+	 *     $this->isValid : true
+	 *     $this->error : ''
+	 *     $this->expressions : array(
 	 *       0 => array(
 	 *         'index' => 0
 	 *         'expression' => '{Zabbix server:agent.ping.last(0)}',
@@ -173,17 +167,17 @@ class CTriggerExpression {
 	 *         'functionParamList' => array (0 => '0')
 	 *       )
 	 *     )
-	 *     'macros' => array(
+	 *     $this->macros : array(
 	 *       0 => array(
 	 *         'expression' => '{TRIGGER.VALUE}'
 	 *       )
 	 *     )
-	 *     'usermacros' => array(
+	 *     $this->usermacros : array(
 	 *       0 => array(
 	 *         'expression' => '{$TRIGGER.VALUE}'
 	 *       )
 	 *     )
-	 *     'expressionShort' => {0}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
+	 *     $this->expressionShort : {0}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
 	 *
 	 * @param string $expression
 	 *
