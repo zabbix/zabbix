@@ -102,6 +102,7 @@ if ($pageFilter->hostsSelected) {
 
 	$httpTests = API::HttpTest()->get(array(
 		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
+		'preservekeys' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectSteps' => API_OUTPUT_COUNT,

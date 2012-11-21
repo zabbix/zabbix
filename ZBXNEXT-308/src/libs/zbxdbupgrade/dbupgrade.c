@@ -614,12 +614,20 @@ static int	DBpatch_02010020()
 	return DBadd_foreign_key("httptest", 3, &field);
 }
 
+static int	DBpatch_02010021()
+{
+	const ZBX_FIELD	field = {"http_proxy", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
 int	DBcheck_version()
 {
 	const char	*__function_name = "DBcheck_version";
 
 	zbx_dbpatch_t	patches[] =
 	{
+/* function, version, duplicates flag, mandatory flag */
 		{DBpatch_02010001, 2010001, 0, 1},
 		{DBpatch_02010002, 2010002, 0, 1},
 		{DBpatch_02010003, 2010003, 0, 1},
@@ -640,6 +648,7 @@ int	DBcheck_version()
 		{DBpatch_02010018, 2010018, 0, 1},
 		{DBpatch_02010019, 2010019, 0, 1},
 		{DBpatch_02010020, 2010020, 0, 1},
+		{DBpatch_02010021, 2010021, 0, 1},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";
