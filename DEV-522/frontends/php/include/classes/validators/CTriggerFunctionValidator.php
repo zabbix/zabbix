@@ -153,43 +153,43 @@ class CTriggerFunctionValidator extends CValidator {
 	}
 
 	protected function initOptions() {
-		$value_types_all = array(
+		$valueTypesAll = array(
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true,
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_TEXT => true,
 			ITEM_VALUE_TYPE_LOG => true
 		);
-		$value_types_num = array(
+		$valueTypesNum = array(
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true
 		);
-		$value_types_char = array(
+		$valueTypesChar = array(
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_TEXT => true,
 			ITEM_VALUE_TYPE_LOG => true
 		);
-		$value_types_log = array(
+		$valueTypesLog = array(
 			ITEM_VALUE_TYPE_LOG => true
 		);
 
-		$args_ignored = array(array('type' => 'str'));
+		$argsIgnored = array(array('type' => 'str'));
 
 		$this->allowed = array(
 			'abschange' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'avg' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_num
+				'value_types' => $valueTypesNum
 			),
 			'change' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'count' => array(
 				'args' => array(
@@ -198,126 +198,126 @@ class CTriggerFunctionValidator extends CValidator {
 					array('type' => 'str'),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_all
+				'value_types' => $valueTypesAll
 			),
 			'date' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'dayofmonth' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'dayofweek' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'delta' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_num
+				'value_types' => $valueTypesNum
 			),
 			'diff' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'fuzzytime' => array(
 				'args' => array(
 					array('type' => 'sec', 'mandat' => true)
 				),
-				'value_types' => $value_types_num
+				'value_types' => $valueTypesNum
 			),
 			'iregexp' => array(
 				'args' => array(
 					array('type' => 'str', 'mandat' => true),
 					array('type' => 'sec_num')
 				),
-				'value_types' => $value_types_char
+				'value_types' => $valueTypesChar
 			),
 			'last' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_all
+				'value_types' => $valueTypesAll
 			),
 			'logeventid' => array(
 				'args' => array(
 					array('type' => 'str', 'mandat' => true)
 				),
-				'value_types' => $value_types_log
+				'value_types' => $valueTypesLog
 			),
 			'logseverity' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_log
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesLog
 			),
 			'logsource' => array(
 				'args' => array(
 					array('type' => 'str', 'mandat' => true)
 				),
-				'value_types' => $value_types_log
+				'value_types' => $valueTypesLog
 			),
 			'max' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_num
+				'value_types' => $valueTypesNum
 			),
 			'min' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_num
+				'value_types' => $valueTypesNum
 			),
 			'nodata'=> array(
 				'args' => array(
 					array('type' => 'sec', 'mandat' => true)
 				),
-				'value_types' => $value_types_all
+				'value_types' => $valueTypesAll
 			),
 			'now' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'prev' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			),
 			'regexp' => array(
 				'args' => array(
 					array('type' => 'str', 'mandat' => true),
 					array('type' => 'sec_num')
 				),
-				'value_types' => $value_types_char
+				'value_types' => $valueTypesChar
 			),
 			'str' => array(
 				'args' => array(
 					array('type' => 'str', 'mandat' => true),
 					array('type' => 'sec_num')
 				),
-				'value_types' => $value_types_char
+				'value_types' => $valueTypesChar
 			),
 			'strlen' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_char
+				'value_types' => $valueTypesChar
 			),
 			'sum' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec')
 				),
-				'value_types' => $value_types_num
+				'value_types' => $valueTypesNum
 			),
 			'time' => array(
-				'args' => $args_ignored,
-				'value_types' => $value_types_all
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			)
 		);
 	}
