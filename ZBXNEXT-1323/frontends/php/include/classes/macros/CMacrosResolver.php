@@ -42,9 +42,9 @@ class CMacrosResolver {
 	/**
 	 * Batch resolving host and ip macros in text using host id.
 	 *
-	 * @param array $data (as $hostid => $text)
+	 * @param array $data (as $hostid => $texts)
 	 *
-	 * @return array (as $hostid => $text)
+	 * @return array (as $hostid => $texts)
 	 */
 	public function resolveMacrosInTextBatch(array $data) {
 		$hostIds = array_keys($data);
@@ -107,9 +107,15 @@ class CMacrosResolver {
 			}
 		}
 
-		foreach ($data as $hostId => $text) {
-			if (!empty($macros[$hostId])) {
-				$data[$hostId] = $this->replaceMacroValues($text, $macros[$hostId]);
+		foreach ($data as $hostId => $texts) {
+			foreach ($texts as $tnum => $text) {
+				foreach ($this->expandUserMacros($text, $hostId) as $macro => $value) {
+					$macros[$hostId][$macro] = $value;
+				}
+
+				if (!empty($macros[$hostId])) {
+					$data[$hostId][$tnum] = $this->replaceMacroValues($text, $macros[$hostId]);
+				}
 			}
 		}
 
@@ -125,23 +131,48 @@ class CMacrosResolver {
 	 * @return string
 	 */
 	public function resolveMacrosInText($text, $hostId) {
-		$data = $this->resolveMacrosInTextBatch(array($hostId => $text));
+		$data = $this->resolveMacrosInTextBatch(array($hostId => array($text)));
 
-		return $data[$hostId];
+		return $data[$hostId][0];
+	}
+
+	/**
+	 * Find user macros.
+	 *
+	 * @param $string
+	 * @param $hostId
+	 *
+	 * @return mixed
+	 */
+	protected function expandUserMacros($string, $hostId) {
+		$macros = array();
+
+		if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $string, $matches)) {
+			$macros = API::UserMacro()->getMacros(array(
+				'macros' => $matches[1],
+				'hostid' => $hostId
+			));
+		}
+
+		return $macros;
 	}
 
 	/**
 	 * Find macros in string by pattern.
 	 *
 	 * @param string $pattern
-	 * @param string $s
+	 * @param array  $strings
 	 *
 	 * @return array
 	 */
-	function findMacros($pattern, $s) {
-		preg_match_all('/{('.$pattern.')}/', $s, $matches);
+	function findMacros($pattern, array $strings) {
+		$result = array();
+		foreach ($strings as $s) {
+			preg_match_all('/{('.$pattern.')}/', $s, $matches);
+			$result = array_merge($result, $matches[0]);
+		}
 
-		return !empty($matches[0]) ? $matches[0] : null;
+		return array_unique($result);
 	}
 
 	/**
@@ -156,9 +187,8 @@ class CMacrosResolver {
 	function replaceMacroValues($text, $macros) {
 		$i = 0;
 		$begin = false;
-		while (($i = zbx_strpos($text, ($begin !== false ? '}' : '{'), $i)) || $i === 0) {
+		while (($i = zbx_strpos($text, ($begin !== false ? '}' : '{'), $i)) !== false) {
 			$char = zbx_substr($text, $i, 1);
-
 			if ($char == '{') {
 				$begin = $i;
 			}

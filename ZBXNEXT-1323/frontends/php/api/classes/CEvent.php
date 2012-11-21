@@ -126,7 +126,7 @@ class CEvent extends CZBXAPI {
 					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 					$sqlParts['from']['functions'] = 'functions f';
 					$sqlParts['from']['items'] = 'items i';
@@ -153,7 +153,7 @@ class CEvent extends CZBXAPI {
 									' AND rr.id=hgg.groupid'.
 									' AND rr.groupid=gg.usrgrpid'.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.'))';
+									' AND rr.permission='.PERM_DENY.'))';
 				}
 			}
 		}
@@ -217,24 +217,6 @@ class CEvent extends CZBXAPI {
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('e.eventid', $nodeids);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts = $this->addQuerySelect('e.*', $sqlParts);
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT e.eventid) AS rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 		// object
@@ -309,6 +291,9 @@ class CEvent extends CZBXAPI {
 			$sqlParts = $this->addQuerySelect($this->fieldId('object'), $sqlParts);
 			$sqlParts = $this->addQuerySelect($this->fieldId('objectid'), $sqlParts);
 		}
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$eventids = array();
 		$triggerids = array();
