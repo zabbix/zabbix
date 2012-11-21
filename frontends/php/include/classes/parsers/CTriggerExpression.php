@@ -120,7 +120,7 @@ class CTriggerExpression {
 	 *       ...
 	 *   )
 	 *
-	 * @var array
+	 * @var string
 	 */
 	public $expressionShort = '';
 
