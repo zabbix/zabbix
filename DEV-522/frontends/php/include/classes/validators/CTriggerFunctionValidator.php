@@ -22,6 +22,19 @@ class CTriggerFunctionValidator extends CValidator {
 	/**
 	 * The array containing valid functions and parameres to them
 	 *
+	 * Structure: array(
+	 *   '<function>' => array(
+	 *     'args' => array(
+	 *       array('type' => '<parameter_type>'[, 'mandat' => bool]),
+	 *       ...
+	 *     ),
+	 *     'value_types' => array(<value_type>, <value_type>, ...)
+	 *   )
+	 * )
+	 *
+	 * <parameter_type> can be 'sec', 'sec_num' or 'str'
+	 * <value_type> can be one of ITEM_VALUE_TYPE_*
+	 *
 	 * @var array
 	 */
 	private $allowed;
