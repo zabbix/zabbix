@@ -338,7 +338,7 @@ class CAction extends CZBXAPI {
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
-		$relationMap = new RelationMap();
+		$relationMap = new CRelationMap();
 		while ($action = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $action['rowscount'];

@@ -413,7 +413,7 @@ class CItem extends CItemGeneral {
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
-		$relationMap = new RelationMap();
+		$relationMap = new CRelationMap();
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -1233,7 +1233,7 @@ class CItem extends CItemGeneral {
 		return true;
 	}
 
-	public function addRelatedObjects(array $options, array $result, RelationMap $relationMap) {
+	public function addRelatedObjects(array $options, array $result, CRelationMap $relationMap) {
 		// TODO: move selectItemHosts to CItemGeneral::addRelatedObjects();
 		// TODO: move selectInterfaces to CItemGeneral::addRelatedObjects();
 		// TODO: move selectTriggers to CItemGeneral::addRelatedObjects();

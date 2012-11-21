@@ -1504,7 +1504,7 @@ class CService extends CZBXAPI {
 		return $sqlParts;
 	}
 
-	protected function addRelatedObjects(array $options, array $result, RelationMap $relationMap) {
+	protected function addRelatedObjects(array $options, array $result, CRelationMap $relationMap) {
 		$result = parent::addRelatedObjects($options, $result, $relationMap);
 
 		$serviceIds = array_keys($result);
