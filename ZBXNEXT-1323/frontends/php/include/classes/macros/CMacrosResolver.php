@@ -103,11 +103,13 @@ class CMacrosResolver {
 								break;
 						}
 
-						// macros in macros in interface always will be resolved to unknown status
-						// if interface is AGENT macros in macros stay unresolved
+						// Resolving macros in macros. If interface is AGENT macros stay unresolved.
 						if ($interface['type'] != INTERFACE_TYPE_AGENT) {
-							$unresolvedMacros = $this->findMacros(CMacrosResolver::PATTERN_IP, array($macros[$hostId][$ipMacro]));
-							if (!empty($unresolvedMacros)) {
+							if ($this->findMacros(CMacrosResolver::PATTERN_HOST, array($macros[$hostId][$ipMacro]))
+									|| $this->findUserMacros(array($macros[$hostId][$ipMacro]))) {
+								$macros[$hostId][$ipMacro] = $this->resolveMacrosInText($macros[$hostId][$ipMacro], $hostId); // attention recursion!
+							}
+							elseif ($this->findMacros(CMacrosResolver::PATTERN_IP, array($macros[$hostId][$ipMacro]))) {
 								$macros[$hostId][$ipMacro] = UNRESOLVED_MACRO_STRING;
 							}
 						}
@@ -155,11 +157,12 @@ class CMacrosResolver {
 	 * @return mixed
 	 */
 	protected function expandUserMacros($text, $hostId) {
-		$macros = array();
+		$matches = $this->findUserMacros(array($text));
 
-		if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches)) {
+		$macros = array();
+		if (!empty($matches)) {
 			$macros = API::UserMacro()->getMacros(array(
-				'macros' => $matches[1],
+				'macros' => $matches,
 				'hostid' => $hostId
 			));
 		}
@@ -181,6 +184,25 @@ class CMacrosResolver {
 		foreach ($texts as $text) {
 			preg_match_all('/{('.$pattern.')}/', $text, $matches);
 			$result = array_merge($result, $matches[0]);
+		}
+
+		return array_unique($result);
+	}
+
+	/**
+	 * Find macros in string by pattern.
+	 *
+	 * @param string $pattern
+	 * @param array $texts
+	 *
+	 * @return array
+	 */
+	function findUserMacros($texts) {
+		$result = array();
+
+		foreach ($texts as $text) {
+			preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches);
+			$result = array_merge($result, $matches[1]);
 		}
 
 		return array_unique($result);
