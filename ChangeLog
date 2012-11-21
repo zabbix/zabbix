@@ -65,7 +65,6 @@ Bug fixes:
 ...G...... [ZBX-5722] fixed calculation of "vm.memory.size[available]" in Zabbix agent on Solaris (Andris)
 .......PS. [ZBX-5149] fixed refreshing of unsupported "Zabbix agent (active)" items by a proxy (Sasha)
 ..F....... [ZBX-5759] fixed Oracle ORA-01002 SQL error on items bulk actions (Toms)
-A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
 A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
 ..F....... [ZBX-5639] fixed global options "dropdown first entry" and "remember selected" in availability reports (Oleg)
 ..F....... [ZBX-5639] improved sdii() debugging function (Toms)
