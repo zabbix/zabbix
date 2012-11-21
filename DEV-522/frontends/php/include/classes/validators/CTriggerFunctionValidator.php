@@ -110,7 +110,7 @@ class CTriggerFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateSec($param) {
-		return preg_match('/^[ ]*\d+[smhdw]{0,1}[ ]*$/', $param, $arr) == 1;
+		return preg_match('/^[ ]*\d+['.ZBX_TIME_SUFFIXES.']{0,1}[ ]*$/', $param, $arr) == 1;
 	}
 
 	/**
