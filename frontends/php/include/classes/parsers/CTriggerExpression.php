@@ -144,7 +144,7 @@ class CTriggerExpression {
 	 *
 	 * @var integer
 	 */
-	private $expression_num = 0;
+	private $expressionNum = 0;
 
 	/**
 	 * An initial expression
@@ -206,7 +206,7 @@ class CTriggerExpression {
 		$this->expressionShort = '';
 
 		$this->pos = 0;
-		$this->expression_num = 0;
+		$this->expressionNum = 0;
 		$this->expression = $expression;
 
 		$state = self::STATE_INIT;
@@ -361,16 +361,16 @@ class CTriggerExpression {
 			return false;
 		}
 
-		$this->expressions[$this->expression_num]['index'] = $this->expression_num;
-		$this->expressions[$this->expression_num]['expression'] = substr($this->expression, $this->pos, $j - $this->pos + 1);
-		$this->expressions[$this->expression_num]['host'] = $host;
-		$this->expressions[$this->expression_num]['item'] = $item;
-		$this->expressions[$this->expression_num]['function'] = $function;
-		$this->expressions[$this->expression_num]['functionName'] = substr($function, 0, strpos($function, '('));
-		$this->expressions[$this->expression_num]['functionParam'] = substr($function, strpos($function, '(') + 1, -1);
-		$this->expressions[$this->expression_num]['functionParamList'] = $functionParamList;
-		$this->expressionShort .= '{'.$this->expression_num.'}';
-		$this->expression_num++;
+		$this->expressions[$this->expressionNum]['index'] = $this->expressionNum;
+		$this->expressions[$this->expressionNum]['expression'] = substr($this->expression, $this->pos, $j - $this->pos + 1);
+		$this->expressions[$this->expressionNum]['host'] = $host;
+		$this->expressions[$this->expressionNum]['item'] = $item;
+		$this->expressions[$this->expressionNum]['function'] = $function;
+		$this->expressions[$this->expressionNum]['functionName'] = substr($function, 0, strpos($function, '('));
+		$this->expressions[$this->expressionNum]['functionParam'] = substr($function, strpos($function, '(') + 1, -1);
+		$this->expressions[$this->expressionNum]['functionParamList'] = $functionParamList;
+		$this->expressionShort .= '{'.$this->expressionNum.'}';
+		$this->expressionNum++;
 		$this->pos = $j;
 		return true;
 	}
