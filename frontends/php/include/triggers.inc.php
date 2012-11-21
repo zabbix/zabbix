@@ -915,7 +915,7 @@ function triggerExpression($trigger, $html = false) {
 /**
  * Implodes expression, replaces names and keys with IDs
  *
- * @throw Exception if error occureed
+ * @throws Exception if error occureed
  *
  * @param string $expression Full expression with host names and item keys
  * @param numeric $triggerid
