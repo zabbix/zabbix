@@ -72,7 +72,8 @@ class API {
 		'usergroup' => 'CUserGroup',
 		'usermacro' => 'CUserMacro',
 		'usermedia' => 'CUserMedia',
-		'webcheck' => 'CWebCheck'
+		'httptest' => 'CHttpTest',
+		'webcheck' => 'CHttpTest'
 	);
 
 	/**
@@ -410,9 +411,9 @@ class API {
 	}
 
 	/**
-	 * @return CWebCheck
+	 * @return CHttpTest
 	 */
-	public static function WebCheck() {
-		return self::getObject('webcheck');
+	public static function HttpTest() {
+		return self::getObject('httptest');
 	}
 }

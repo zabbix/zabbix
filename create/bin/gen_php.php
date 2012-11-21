@@ -87,7 +87,7 @@ function parse_schema($path) {
 
 				if ($ref_table) {
 					$data['ref_table'] = "'".$ref_table."'";
-					$data['ref_field'] = "'".(isset($ref_field) ? $ref_field : $field)."'";
+					$data['ref_field'] = "'".(!empty($ref_field) ? $ref_field : $field)."'";
 				}
 
 				$schema[$table]['fields'][$field] = $data;

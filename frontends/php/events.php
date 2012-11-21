@@ -53,7 +53,7 @@ else {
 require_once dirname(__FILE__).'/include/page_header.php';
 
 
-$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
+$allow_discovery = check_right_on_discovery(PERM_READ);
 
 $allowed_sources[] = EVENT_SOURCE_TRIGGERS;
 if ($allow_discovery) {

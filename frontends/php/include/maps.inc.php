@@ -539,14 +539,6 @@ function add_elementNames(&$selements) {
 		'preservekeys' => true
 	));
 
-	$maps = API::Map()->get(array(
-		'mapids' => $mapids,
-		'output' => array('name'),
-		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
-		'preservekeys' => true
-	));
-
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $triggerids,
 		'output' => API_OUTPUT_EXTEND,
@@ -583,8 +575,7 @@ function add_elementNames(&$selements) {
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
 				$selements[$snum]['elementName'] = $hostname['name'].':'.
-						CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
-				$selements[$snum]['elementExpressionTrigger'] = $triggers[$selement['elementid']]['expression'];
+					CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 				$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
@@ -592,6 +583,37 @@ function add_elementNames(&$selements) {
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
 				$selements[$snum]['elementName'] = $images[$selement['iconid_off']]['name'];
 				break;
+		}
+	}
+
+	if (!empty($triggers)) {
+		add_triggerExpressions($selements, $triggers);
+	}
+}
+
+function add_triggerExpressions(&$selements, $triggers = array()) {
+	if (empty($triggers)) {
+		$triggerIds = array();
+
+		foreach ($selements as $selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$triggerIds[] = $selement['elementid'];
+			}
+		}
+
+		$triggers = API::Trigger()->get(array(
+			'triggerids' => $triggerIds,
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name'),
+			'nopermissions' => true,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true
+		));
+	}
+
+	foreach ($selements as $snum => $selement) {
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+			$selements[$snum]['elementExpressionTrigger'] = $triggers[$selement['elementid']]['expression'];
 		}
 	}
 }

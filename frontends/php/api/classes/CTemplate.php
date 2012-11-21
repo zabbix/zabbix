@@ -67,6 +67,7 @@ class CTemplate extends CHostGeneral {
 			'with_items'				=> null,
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
+			'with_httptests'            => null,
 			'editable' 					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -89,6 +90,7 @@ class CTemplate extends CHostGeneral {
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
+			'selectHttpTests'           => null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -119,7 +121,7 @@ class CTemplate extends CHostGeneral {
 		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -136,7 +138,7 @@ class CTemplate extends CHostGeneral {
 				' AND rr.id=hgg.groupid'.
 				' AND rr.groupid=gg.usrgrpid'.
 				' AND gg.userid='.$userid.
-				' AND rr.permission<'.$permission.')';
+				' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids
@@ -290,6 +292,11 @@ class CTemplate extends CHostGeneral {
 				' AND i.itemid=gi.itemid)';
 		}
 
+		// with_httptests
+		if (!empty($options['with_httptests'])) {
+			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid FROM httptest ht WHERE ht.hostid=h.hostid)';
+		}
+
 		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('hosts h', $options, $sqlParts);
@@ -382,6 +389,9 @@ class CTemplate extends CHostGeneral {
 				if (isset($template['groupid']) && is_null($options['selectGroups'])) {
 					if (!isset($result[$template['templateid']]['groups']))
 						$result[$template['templateid']]['groups'] = array();
+					if (!is_null($options['selectHttpTests']) && !isset($result[$template['templateid']]['httpTests'])) {
+						$result[$template['templateid']]['httpTests'] = array();
+					}
 
 					$result[$template['templateid']]['groups'][] = array('groupid' => $template['groupid']);
 					unset($template['groupid']);
@@ -866,6 +876,51 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
+		// adding http tests
+		if (!is_null($options['selectHttpTests'])) {
+			$objParams = array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $templateids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			);
+
+			if (is_array($options['selectHttpTests'])) {
+				$objParams['output'] = $options['selectHttpTests'];
+				$httpTests = API::HttpTest()->get($objParams);
+
+				if (!is_null($options['limitSelects'])) {
+					order_result($httpTests, 'name');
+				}
+				$count = array();
+				foreach ($httpTests as $httpTestId => $httpTest) {
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$httpTest['hostid']])) {
+							$count[$httpTest['hostid']] = 0;
+						}
+						$count[$httpTest['hostid']]++;
+
+						if ($count[$httpTest['hostid']] > $options['limitSelects']) {
+							continue;
+						}
+					}
+
+					$result[$httpTest['hostid']]['httpTests'][] = $httpTests[$httpTestId];
+				}
+			}
+			elseif (API_OUTPUT_COUNT == $options['selectHttpTests']) {
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
+
+				$httpTests = API::HttpTest()->get($objParams);
+				$httpTests = zbx_toHash($httpTests, 'hostid');
+
+				foreach ($result as $hostId => $host) {
+					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
+				}
+			}
+		}
+
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1087,7 +1142,6 @@ class CTemplate extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function delete($templateids) {
-
 		if (empty($templateids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -1203,6 +1257,17 @@ class CTemplate extends CHostGeneral {
 			'operationid'=>$delOperationids,
 		));
 
+		// http tests
+		$delHttpTests = API::HttpTest()->get(array(
+			'templateids' => $templateids,
+			'output' => array('httptestid'),
+			'nopermissions' => 1,
+			'preservekeys' => 1
+		));
+		if (!empty($delHttpTests)) {
+			API::HttpTest()->delete(array_keys($delHttpTests), true);
+		}
+
 		// Applications
 		$delApplications = API::Application()->get(array(
 			'templateids' => $templateids,
@@ -1214,13 +1279,12 @@ class CTemplate extends CHostGeneral {
 			API::Application()->delete(array_keys($delApplications), true);
 		}
 
-
 		DB::delete('hosts', array('hostid' => $templateids));
 
 		// TODO: remove info from API
 		foreach ($delTemplates as $template) {
 			info(_s('Deleted: Template "%1$s".', $template['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', null, null);
 		}
 
 		return array('templateids' => $templateids);
