@@ -522,7 +522,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @param $hostIds
 	 *
-	 * @return array    an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...)
+	 * @return array (an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...) )
 	 */
 	public function getScriptsByHosts($hostIds) {
 		zbx_value2array($hostIds);
@@ -551,11 +551,15 @@ class CScript extends CZBXAPI {
 				$macrosData = array();
 				if (!empty($script['confirmation'])) {
 					foreach ($hosts as $host) {
-						$macrosData[$host['hostid']] = $script['confirmation'];
+						if (isset($scriptsByHost[$host['hostid']])) {
+							$macrosData[$host['hostid']] = array($script['confirmation']);
+						}
 					}
 				}
 
-				$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+				if (!empty($macrosData)) {
+					$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+				}
 
 				// set script to host
 				foreach ($hosts as $host) {

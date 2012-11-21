@@ -74,7 +74,7 @@ class CMacrosResolver {
 		// ip macros, macro should be resolved to interface with highest priority
 		$interfaces = array();
 
-		$dbInterfaces = DBselect('SELECT i.hostid,i.ip,i.dns,i.useip,i.type FROM interface i WHERE '.DBcondition('i.hostid', $hostIds));
+		$dbInterfaces = DBselect('SELECT i.hostid,i.ip,i.dns,i.useip,i.type FROM interface i WHERE i.main=1 AND '.DBcondition('i.hostid', $hostIds));
 		while ($dbInterface = DBfetch($dbInterfaces)) {
 			$hostId = $dbInterface['hostid'];
 
@@ -102,6 +102,15 @@ class CMacrosResolver {
 								$macros[$hostId][$ipMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
 								break;
 						}
+
+						// macros in macros in interface always will be resolved to unknown status
+						// if interface is AGENT macros in macros stay unresolved
+						if ($interface['type'] != INTERFACE_TYPE_AGENT) {
+							$unresolvedMacros = $this->findMacros(CMacrosResolver::PATTERN_IP, array($macros[$hostId][$ipMacro]));
+							if (!empty($unresolvedMacros)) {
+								$macros[$hostId][$ipMacro] = UNRESOLVED_MACRO_STRING;
+							}
+						}
 					}
 				}
 			}
@@ -109,6 +118,7 @@ class CMacrosResolver {
 
 		foreach ($data as $hostId => $texts) {
 			foreach ($texts as $tnum => $text) {
+				// get user macros
 				foreach ($this->expandUserMacros($text, $hostId) as $macro => $value) {
 					$macros[$hostId][$macro] = $value;
 				}
@@ -139,15 +149,15 @@ class CMacrosResolver {
 	/**
 	 * Find user macros.
 	 *
-	 * @param $string
-	 * @param $hostId
+	 * @param string $text
+	 * @param int $hostId
 	 *
 	 * @return mixed
 	 */
-	protected function expandUserMacros($string, $hostId) {
+	protected function expandUserMacros($text, $hostId) {
 		$macros = array();
 
-		if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $string, $matches)) {
+		if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches)) {
 			$macros = API::UserMacro()->getMacros(array(
 				'macros' => $matches[1],
 				'hostid' => $hostId
@@ -161,14 +171,15 @@ class CMacrosResolver {
 	 * Find macros in string by pattern.
 	 *
 	 * @param string $pattern
-	 * @param array  $strings
+	 * @param array $texts
 	 *
 	 * @return array
 	 */
-	function findMacros($pattern, array $strings) {
+	function findMacros($pattern, $texts) {
 		$result = array();
-		foreach ($strings as $s) {
-			preg_match_all('/{('.$pattern.')}/', $s, $matches);
+
+		foreach ($texts as $text) {
+			preg_match_all('/{('.$pattern.')}/', $text, $matches);
 			$result = array_merge($result, $matches[0]);
 		}
 
