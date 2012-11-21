@@ -1550,26 +1550,62 @@ class CTrigger extends CTriggerGeneral {
 		$triggerids = DB::insert('triggers', $triggersCopy);
 		unset($triggersCopy);
 
-		// update triggers expression
+		$allHosts = array();
+		$allowedHosts = array();
+		$triggersAndHosts = array();
+		$triggerExpression = array();
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
-
-			addUnknownEvent($triggerid);
-
 			$hosts = array();
 			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
+
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
 
 			$this->validateItems($trigger);
 
+			foreach ($hosts as $host) {
+				$allHosts[] = $host;
+			}
+
+			$triggersAndHosts[$triggerid] = $hosts;
+			$triggerExpression[$triggerid] = $expression;
+		}
+
+		$allHosts = array_unique($allHosts);
+		$allowedHostsQuery = DBselect('SELECT h.host, h.status'.
+										' FROM hosts h'.
+										' WHERE '.DBcondition('h.host', $allHosts)
+							);
+		while ($allowedHostsData = DBfetch($allowedHostsQuery)) {
+			if ($allowedHostsData['status'] != HOST_STATUS_TEMPLATE) {
+				$allowedHosts[] = $allowedHostsData['host'];
+			}
+		}
+
+		// update triggers expression
+		foreach ($triggers as $tnum => $trigger) {
+			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
+
+			$statusTemplate = false;
+			foreach ($triggersAndHosts[$triggerid] as $host) {
+				if (!in_array($host, $allowedHosts)) {
+					$statusTemplate = true;
+					break;
+				}
+			}
+
+			if (!$statusTemplate) {
+				addUnknownEvent($triggerid);
+			}
+
 			DB::update('triggers', array(
-				'values' => array('expression' => $expression),
+				'values' => array('expression' => $triggerExpression[$triggerid]),
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $triggersAndHosts[$triggerid])));
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid,
 					$trigger['description'], null, null, null);
 		}
