@@ -396,7 +396,7 @@ if (isset($_REQUEST['form'])) {
 		$data['steps'] = get_request('steps', array());
 	}
 
-	$data['application_list'] = array(0 => '');
+	$data['application_list'] = array();
 	if (!empty($data['hostid'])) {
 		$dbApps = DBselect('SELECT a.applicationid,a.name FROM applications a WHERE a.hostid='.zbx_dbstr($data['hostid']));
 		while ($dbApp = DBfetch($dbApps)) {
