@@ -717,22 +717,18 @@ static int	get_values(unsigned char poller_type)
 
 		if (SUCCEED == errcodes[i])
 		{
+			items[i].status = ITEM_STATUS_ACTIVE;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
-
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, timespec.sec);
+					items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
+			items[i].status = ITEM_STATUS_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					ITEM_STATUS_NOTSUPPORTED, results[i].msg, 0, NULL, 0, 0, 0, 0);
+					items[i].status, results[i].msg, 0, NULL, 0, 0, 0, 0);
+		}
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespec.sec);
-		}
-		else if (NETWORK_ERROR == errcodes[i] || GATEWAY_ERROR == errcodes[i])
-		{
-			DCrequeue_unreachable_item(items[i].itemid);
-		}
+		DCrequeue_items(&items[i].itemid, &items[i].status, &timespec.sec, &errcodes[i], 1);
 
 		zbx_free(items[i].key);
 

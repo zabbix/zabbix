@@ -14,6 +14,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-5149] fixed refreshing of unsupported "Zabbix agent (active)" items by a proxy (Sasha)
 ..F....... [ZBX-5759] fixed Oracle ORA-01002 SQL error on items bulk actions (Toms)
 A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
 ..F....... [ZBX-5639] fixed global options "dropdown first entry" and "remember selected" in availability reports (Oleg)

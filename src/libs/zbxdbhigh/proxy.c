@@ -1438,8 +1438,17 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	AGENT_RESULT	agent;
 	DC_ITEM		item;
 	int		i;
+	zbx_uint64_t	*itemids = NULL;
+	unsigned char	*statuses = NULL;
+	int		*lastclocks = NULL, *errcodes = NULL;
+	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * value_num);
+	statuses = zbx_malloc(statuses, sizeof(unsigned char) * value_num);
+	lastclocks = zbx_malloc(lastclocks, sizeof(int) * value_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * value_num);
 
 	for (i = 0; i < value_num; i++)
 	{
@@ -1469,8 +1478,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
 		{
+			item.status = ITEM_STATUS_NOTSUPPORTED;
 			dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
-					ITEM_STATUS_NOTSUPPORTED, values[i].value, 0, NULL, 0, 0, 0, 0);
+					item.status, values[i].value, 0, NULL, 0, 0, 0, 0);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -1488,8 +1498,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (NULL != values[i].source)
 					zbx_replace_invalid_utf8(values[i].source);
 
+				item.status = ITEM_STATUS_ACTIVE;
 				dc_add_history(item.itemid, item.value_type, item.flags, &agent, &values[i].ts,
-						ITEM_STATUS_ACTIVE, NULL, values[i].timestamp, values[i].source,
+						item.status, NULL, values[i].timestamp, values[i].source,
 						values[i].severity, values[i].logeventid, values[i].lastlogsize,
 						values[i].mtime);
 
@@ -1501,17 +1512,31 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 
+				item.status = ITEM_STATUS_NOTSUPPORTED;
 				dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
-						ITEM_STATUS_NOTSUPPORTED, agent.msg, 0, NULL, 0, 0, 0, 0);
+						item.status, agent.msg, 0, NULL, 0, 0, 0, 0);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
 
 			free_result(&agent);
 		}
+
+		itemids[num] = item.itemid;
+		statuses[num] = item.status;
+		lastclocks[num] = values[i].ts.sec;
+		errcodes[num] = SUCCEED;
+		num++;
 clean:
 		DCconfig_clean_items(&item, NULL, 1);
 	}
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
+
+	zbx_free(errcodes);
+	zbx_free(lastclocks);
+	zbx_free(statuses);
+	zbx_free(itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
