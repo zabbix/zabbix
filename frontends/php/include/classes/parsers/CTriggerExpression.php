@@ -110,15 +110,16 @@ class CTriggerExpression {
 	 * The each index corresponds 'index' variable from 'expressions' array
 	 *
 	 * Example:
-	 *   normal expression : "{Zabbix server:agent.ping.last(0)}=0"
-	 *   short expression  : "{0}=0"
-	 *
-	 *   'expressions' => array(
-	 *     0 => array(
-	 *       'index' => 0
-	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
-	 *       ...
-	 *   )
+	 *   $expression : "{Zabbix server:agent.ping.last(0)}=0"
+	 *   $expressions :
+	 *     array(
+	 *       0 => array(
+	 *         'index' => 0
+	 *         'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *         ...
+	 *       )
+	 *     )
+	 *   $expressionShort : "{0}=0"
 	 *
 	 * @var string
 	 */
