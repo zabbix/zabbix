@@ -19,6 +19,11 @@
 **/
 
 class CTriggerFunctionValidator extends CValidator {
+	/**
+	 * The array containing valid functions and parameres to them
+	 *
+	 * @var array
+	 */
 	private $allowed;
 
 	/**
@@ -110,7 +115,7 @@ class CTriggerFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateSec($param) {
-		return preg_match('/^[ ]*\d+['.ZBX_TIME_SUFFIXES.']{0,1}[ ]*$/', $param, $arr) == 1;
+		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param, $arr) == 1;
 	}
 
 	/**
@@ -125,7 +130,7 @@ class CTriggerFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateSecNum($param) {
-		if (preg_match('/^[ ]*#\d+[ ]*$/', $param, $arr)) {
+		if (preg_match('/^#\d+$/', $param, $arr)) {
 			return true;
 		}
 		return $this->validateSec($param);
