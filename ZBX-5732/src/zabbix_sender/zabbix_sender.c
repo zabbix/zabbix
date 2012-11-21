@@ -104,6 +104,7 @@ static void	send_signal_handler(int sig)
 	if (SIGALRM == sig)
 		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
 
+	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	_exit(FAIL);
 }
 #endif
