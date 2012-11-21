@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/classes/parsers/CTriggerExpression.php';
 
 class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
