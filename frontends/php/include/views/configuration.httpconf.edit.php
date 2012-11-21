@@ -79,9 +79,15 @@ if (!$this->data['templated']) {
 $httpFormList->addRow(_('Name'), $nameTextBox);
 
 // Application
-$httpFormList->addRow(_('Application'),
-	new CComboBox('applicationid', $this->data['applicationid'], null, $this->data['application_list'])
-);
+if ($this->data['application_list']) {
+	$applications = zbx_array_merge(array(''), $this->data['application_list']);
+	$httpFormList->addRow(_('Application'),
+		new CComboBox('applicationid', $this->data['applicationid'], null, $applications)
+	);
+}
+else {
+	$httpFormList->addRow(_('Application'), new CSpan(_('No applications defined')));
+}
 
 // New application
 $httpFormList->addRow(_('New application'),
