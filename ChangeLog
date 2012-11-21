@@ -14,6 +14,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+...G...... [ZBX-5741] fixed Zabbix sender crash if a corrupted server response is received (Andris)
 ...G...... [ZBX-5722] fixed calculation of "vm.memory.size[available]" in Zabbix agent on Solaris (Andris)
 .......PS. [ZBX-5149] fixed refreshing of unsupported "Zabbix agent (active)" items by a proxy (Sasha)
 ..F....... [ZBX-5759] fixed Oracle ORA-01002 SQL error on items bulk actions (Toms)
