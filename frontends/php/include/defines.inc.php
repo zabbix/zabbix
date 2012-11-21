@@ -764,13 +764,17 @@ if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
 define('REGEXP_INCLUDE', 0);
 define('REGEXP_EXCLUDE', 1);
 
+// suffixes
+define('ZBX_BYTE_SUFFIXES', 'KMGT');
+define('ZBX_TIME_SUFFIXES', 'smhdw');
+
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*[KMGTsmhdw]?)');
+define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
