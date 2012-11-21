@@ -24,6 +24,11 @@ require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 $httpWidget = new CWidget();
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
 
+// append host summary to widget header
+if (!empty($this->data['hostid'])) {
+	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+}
+
 // create form
 $httpForm = new CForm();
 $httpForm->setName('httpForm');
