@@ -22,7 +22,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
-A......... [ZBX-5718] fixed unknown events generation for templated triggers (Oleg)
+A......... [ZBX-5718] fixed unknown event generation for templated triggers (Oleg)
 ..F....... [ZBX-5749] fixed macros resolving in triggers in Maps (Eduard)
 A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
 A......... [ZBX-5709] fixed trigger recreation after template trigger expression change causing event history deletion (Toms)
