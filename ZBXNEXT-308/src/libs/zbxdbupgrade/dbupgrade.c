@@ -627,7 +627,7 @@ int	DBcheck_version()
 
 	zbx_dbpatch_t	patches[] =
 	{
-/* function, version, duplicates flag, mandatory flag */
+		/* function, version, duplicates flag, mandatory flag */
 		{DBpatch_02010001, 2010001, 0, 1},
 		{DBpatch_02010002, 2010002, 0, 1},
 		{DBpatch_02010003, 2010003, 0, 1},
