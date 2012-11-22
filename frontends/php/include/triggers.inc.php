@@ -1915,6 +1915,7 @@ function expressionHighLevelErrors($expression, $start, $end) {
 
 	if (!isset($errors)) {
 		$definedErrorPhrases = array(
+			EXPRESSION_VALUE_TYPE_UNKNOWN => _('Unknown variable type, testing not available'),
 			EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 			EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
 			EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro'),
@@ -2175,7 +2176,6 @@ function get_item_function_info($expr) {
 		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6')
 	);
 
-	$hostId = $itemId = $function = null;
 	$expressionData = new CTriggerExpression();
 
 	if ($expressionData->parse($expr)) {
@@ -2195,6 +2195,10 @@ function get_item_function_info($expr) {
 		}
 		elseif (isset($expressionData->expressions[0])) {
 			$exprPart = reset($expressionData->expressions);
+
+			if (!isset($function_info[$exprPart['functionName']])) {
+				return EXPRESSION_FUNCTION_UNKNOWN;
+			}
 
 			$hostFound = API::Host()->get(array(
 				'filter' => array('host' => array($exprPart['host'])),
@@ -2217,10 +2221,6 @@ function get_item_function_info($expr) {
 				return EXPRESSION_HOST_ITEM_UNKNOWN;
 			}
 
-			if (!isset($function_info[$exprPart['functionName']])) {
-				return EXPRESSION_FUNCTION_UNKNOWN;
-			}
-
 			$result = $function_info[$exprPart['functionName']];
 
 			if (is_array($result['value_type'])) {
@@ -2235,8 +2235,8 @@ function get_item_function_info($expr) {
 					$value_type = $item_data['value_type'];
 				}
 
-				if ($value_type == null) {
-					return VALUE_TYPE_UNKNOWN;
+				if ($value_type) == null) {
+					return EXPRESSION_VALUE_TYPE_UNKNOWN;
 				}
 
 				$result['value_type'] = $result['value_type'][$value_type];
