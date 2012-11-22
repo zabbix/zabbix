@@ -146,7 +146,7 @@ class CTriggerExpression {
 	private $expression;
 
 	/**
-	 * Parse a trigger expression and set oublic variables $this->isValid, $this->error, $this->expressions,
+	 * Parse a trigger expression and set public variables $this->isValid, $this->error, $this->expressions,
 	 *   $this->macros, $this->usermacros and $this->expressionShort
 	 *
 	 * Examples:
