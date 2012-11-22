@@ -691,6 +691,22 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Adds a left join to the given table.
+	 *
+	 * @param string $tableId           name and alias of the table to join
+	 * @param string $fieldIdLocal      the reference column of the base table
+	 * @param string $fieldIdForeign    the reference column of the table being joined
+	 * @param array $sqlParts
+	 *
+	 * @return array
+	 */
+	protected function addQueryLeftJoin($tableId, $fieldIdLocal, $fieldIdForeign, array $sqlParts) {
+		$sqlParts['leftJoin'][$tableId] = $tableId.' ON '.$fieldIdLocal.'='.$fieldIdForeign;
+
+		return $sqlParts;
+	}
+
+	/**
 	 * Adds the given field to the ORDER BY part of the $sqlParts array.
 	 *
 	 * @param $fieldId
