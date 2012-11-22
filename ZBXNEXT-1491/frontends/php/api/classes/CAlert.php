@@ -144,9 +144,6 @@ class CAlert extends CZBXAPI {
 							' AND rr.permission='.PERM_DENY.'))';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);

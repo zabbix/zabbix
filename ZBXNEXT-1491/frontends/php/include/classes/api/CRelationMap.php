@@ -51,7 +51,7 @@ class CRelationMap {
 	 * @return array
 	 */
 	public function getRelatedIds($name) {
-		return array_keys($this->map[$name]);
+		return (isset($this->map[$name])) ? array_keys($this->map[$name]) : array();
 	}
 
 	public function mapMany($baseObjects, $relatedObjects, $name, $limit = null) {

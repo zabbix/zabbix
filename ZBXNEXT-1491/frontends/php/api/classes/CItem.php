@@ -53,9 +53,6 @@ class CItem extends CItemGeneral {
 		// allowed columns for sorting
 		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
@@ -596,7 +593,7 @@ class CItem extends CItemGeneral {
 		}
 
 		// adding discoveryrule
-		if (!is_null($options['selectDiscoveryRule'])) {
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			// discovered items
 			$dbRules = DBselect(
 				'SELECT id1.itemid,id2.parent_itemid'.
@@ -623,16 +620,14 @@ class CItem extends CItemGeneral {
 				$relationMap->addRelation($rule['itemid'], 'discoveryRule', $rule['parent_itemid']);
 			}
 
-			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
-				$discoveryRules = API::DiscoveryRule()->get(array(
-					'output' => $options['selectDiscoveryRule'],
-					'nodeids' => $options['nodeids'],
-					'itemids' => $relationMap->getRelatedIds('discoveryRule'),
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
-			}
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds('discoveryRule'),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
 		// add other related objects
