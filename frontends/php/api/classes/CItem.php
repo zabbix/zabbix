@@ -329,8 +329,8 @@ class CItem extends CItemGeneral {
 		// application
 		if (!is_null($options['application'])) {
 			$sqlParts['select']['application'] = 'a.name as application';
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['from']['items_applications'] = 'items_applications ia';
+			$sqlParts = $this->addQueryLeftJoin('items_applications ia', 'i.itemid', 'ia.itemid', $sqlParts);
+			$sqlParts = $this->addQueryLeftJoin('applications a', 'ia.applicationid', 'a.applicationid', $sqlParts);
 			$sqlParts['where']['aia'] = 'a.applicationid = ia.applicationid';
 			$sqlParts['where']['iai'] = 'ia.itemid=i.itemid';
 			$sqlParts['where'][] = ' a.name='.zbx_dbstr($options['application']);
