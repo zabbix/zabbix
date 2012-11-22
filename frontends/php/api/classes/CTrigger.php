@@ -1547,7 +1547,7 @@ class CTrigger extends CTriggerGeneral {
 		for ($i = 0, $size = count($triggersCopy); $i < $size; $i++) {
 			unset($triggersCopy[$i]['expression']);
 		}
-		$triggerids = DB::insert('triggers', $triggersCopy);
+		$triggerIds = DB::insert('triggers', $triggersCopy);
 		unset($triggersCopy);
 
 		$allHosts = array();
@@ -1555,9 +1555,9 @@ class CTrigger extends CTriggerGeneral {
 		$triggersAndHosts = array();
 		$triggerExpression = array();
 		foreach ($triggers as $tnum => $trigger) {
-			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
+			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
 			$hosts = array();
-			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
+			$expression = implode_exp($trigger['expression'], $triggerId, $hosts);
 
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
@@ -1569,16 +1569,17 @@ class CTrigger extends CTriggerGeneral {
 				$allHosts[] = $host;
 			}
 
-			$triggersAndHosts[$triggerid] = $hosts;
-			$triggerExpression[$triggerid] = $expression;
+			$triggersAndHosts[$triggerId] = $hosts;
+			$triggerExpression[$triggerId] = $expression;
 		}
 
 		$allHosts = array_unique($allHosts);
-		$allowedHostsQuery = DBselect('SELECT h.host, h.status'.
-										' FROM hosts h'.
-										' WHERE '.DBcondition('h.host', $allHosts)
-							);
-		while ($allowedHostsData = DBfetch($allowedHostsQuery)) {
+		$dbHostsStatuses = DBselect(
+			'SELECT h.host, h.status'.
+			' FROM hosts h'.
+			' WHERE '.DBcondition('h.host', $allHosts)
+			);
+		while ($allowedHostsData = DBfetch($dbHostsStatuses)) {
 			if ($allowedHostsData['status'] != HOST_STATUS_TEMPLATE) {
 				$allowedHosts[] = $allowedHostsData['host'];
 			}
@@ -1586,27 +1587,27 @@ class CTrigger extends CTriggerGeneral {
 
 		// update triggers expression
 		foreach ($triggers as $tnum => $trigger) {
-			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
+			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
 
-			$statusTemplate = false;
-			foreach ($triggersAndHosts[$triggerid] as $host) {
+			$statusHost = true;
+			foreach ($triggersAndHosts[$triggerId] as $host) {
 				if (!in_array($host, $allowedHosts)) {
-					$statusTemplate = true;
+					$statusHost = false;
 					break;
 				}
 			}
 
-			if (!$statusTemplate) {
-				addUnknownEvent($triggerid);
+			if ($statusHost) {
+				addUnknownEvent($triggerId);
 			}
 
 			DB::update('triggers', array(
-				'values' => array('expression' => $triggerExpression[$triggerid]),
-				'where' => array('triggerid' => $triggerid)
+				'values' => array('expression' => $triggerExpression[$triggerId]),
+				'where' => array('triggerid' => $triggerId)
 			));
 
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $triggersAndHosts[$triggerid])));
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid,
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $triggersAndHosts[$triggerId])));
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerId,
 					$trigger['description'], null, null, null);
 		}
 	}
