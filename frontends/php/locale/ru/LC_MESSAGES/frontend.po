@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-22 15:49+0200\n"
-"PO-Revision-Date: 2012-11-08 21:21+0200\n"
+"POT-Creation-Date: 2012-11-22 16:09+0200\n"
+"PO-Revision-Date: 2012-11-14 22:03+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -4457,7 +4457,7 @@ msgstr "Ошибка обновления шаблона"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
-msgstr "Аудит успеха"
+msgstr "Аудит отказа"
 
 #: dashboard.php:259 include/blocks.inc.php:1097
 msgid "Favourite graphs"
