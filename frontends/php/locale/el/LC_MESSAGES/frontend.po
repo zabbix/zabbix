@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-14 15:02+0200\n"
+"POT-Creation-Date: 2012-11-22 15:49+0200\n"
 "PO-Revision-Date: 2012-06-02 20:32+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -182,7 +182,7 @@ msgstr "ΕΝΕΡΓΕΙΕΣ ΕΠΙΘΕΩΡΗΣΗΣ"
 msgid "AUDIT LOGS"
 msgstr "ΚΑΤΑΓΡΑΦΕΣ ΕΠΙΘΕΩΡΗΣΗΣ"
 
-#: report2.php:127
+#: report2.php:137
 msgid "AVAILABILITY REPORT"
 msgstr "ΑΝΑΦΟΡΑ ΔΙΑΘΕΣΙΜΟΤΗΤΑΣ"
 
@@ -215,7 +215,7 @@ msgstr "Απαγορευμένη πρόσβαση!"
 msgid "Account is blocked for %s seconds"
 msgstr "Αποκλεισμένος λογαριασμός για %s δευτερόλεπτα"
 
-#: events.php:561 events.php:574 include/actions.inc.php:189
+#: events.php:567 events.php:580 include/actions.inc.php:189
 #: include/blocks.inc.php:835 include/blocks.inc.php:1365
 #: include/events.inc.php:137 include/events.inc.php:208
 #: include/views/configuration.action.edit.php:938
@@ -321,7 +321,7 @@ msgstr "Εργασίες ενέργειας"
 msgid "Action updated"
 msgstr "Η Ενέργεια ενημερώθηκε"
 
-#: events.php:562 events.php:575 include/blocks.inc.php:836
+#: events.php:568 events.php:581 include/blocks.inc.php:836
 #: include/blocks.inc.php:1366 include/events.inc.php:138
 #: include/menu.inc.php:193 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
@@ -358,8 +358,8 @@ msgstr "Ενεργό έως"
 #: dashconf.php:211 include/blocks.inc.php:1104 include/blocks.inc.php:1110
 #: include/blocks.inc.php:1215 include/blocks.inc.php:1260
 #: include/blocks.inc.php:1266 include/forms.inc.php:1676
-#: include/forms.inc.php:1980 include/reports.inc.php:326
-#: include/reports.inc.php:422 include/reports.inc.php:462
+#: include/forms.inc.php:1980 include/reports.inc.php:332
+#: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:112
 #: include/views/administration.general.valuemapping.edit.php:40
@@ -517,7 +517,7 @@ msgstr "Ευθυγράμμιση εικονιδιων"
 #: include/blocks.inc.php:1203 include/blocks.inc.php:1248
 #: include/blocks.inc.php:1326 include/blocks.inc.php:1335
 #: include/nodes.inc.php:156 include/page_header.php:331
-#: include/reports.inc.php:548
+#: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
 #: include/views/administration.general.gui.edit.php:28
@@ -781,7 +781,7 @@ msgstr "Διαθέσιμο"
 msgid "Average"
 msgstr "Μέση"
 
-#: include/reports.inc.php:671
+#: include/reports.inc.php:677
 msgid "Average by"
 msgstr "Μέσος όρος με"
 
@@ -873,7 +873,7 @@ msgstr "Λογικό"
 msgid "Bottom"
 msgstr "Κάτω"
 
-#: include/reports.inc.php:706
+#: include/reports.inc.php:712
 msgid "Brighten"
 msgstr "Φωτεινό"
 
@@ -881,11 +881,11 @@ msgstr "Φωτεινό"
 msgid "Bulk acknowledge"
 msgstr "Μαζική αναγνώριση"
 
-#: report2.php:171
+#: report2.php:180
 msgid "By host"
 msgstr "Ανά ξενιστή"
 
-#: report2.php:172
+#: report2.php:181
 msgid "By trigger template"
 msgstr "Με σχεδιότυπο εναύσματος"
 
@@ -960,7 +960,7 @@ msgstr "ΔΙΑΜΟΡΦΩΣΗ ΠΡΟΤΟΤΥΠΩΝ ΣΥΛΛΕΚΤΩΝ"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:31
-#: include/views/configuration.item.massupdate.php:28 items.php:667
+#: include/views/configuration.item.massupdate.php:28 items.php:664
 msgid "CONFIGURATION OF ITEMS"
 msgstr "ΔΙΑΜΟΡΦΩΣΗ ΣΥΛΛΕΚΤΩΝ"
 
@@ -1129,7 +1129,7 @@ msgstr "Αδύνατη η προσθήκη ενέργειας"
 msgid "Cannot add application"
 msgstr "Αδύνατη η προσθήκη κατηγορίας"
 
-#: api/classes/CTrigger.php:1834
+#: api/classes/CTrigger.php:1841
 msgid "Cannot add dependency from a host to a template."
 msgstr "Αδύνατη η προσθήκη εξάρτησης απο ξενιστή σε σχεδιότυπο."
 
@@ -1297,11 +1297,11 @@ msgstr "Αδύνατη η αντιγραφή εναύσματος \"%1$s:%2$s\",
 msgid "Cannot create another database connection."
 msgstr "Αδύνατη η δημιουργία σύνδεσης άλλης βάσης δεδομένων."
 
-#: api/classes/CTrigger.php:1868
+#: api/classes/CTrigger.php:1875
 msgid "Cannot create circular dependencies."
 msgstr ""
 
-#: api/classes/CTrigger.php:1840
+#: api/classes/CTrigger.php:1847
 msgid "Cannot create dependency on trigger itself."
 msgstr ""
 
@@ -1352,7 +1352,7 @@ msgstr "Αδύνατη η διαγραφή ενέργειας"
 msgid "Cannot delete application"
 msgstr "Αδύνατη η διαγραφή κατηγορίας"
 
-#: api/classes/CTrigger.php:1543
+#: api/classes/CTrigger.php:1550
 msgid "Cannot delete dependency"
 msgstr "Αδύνατη η διαγραφή εξάρτησης"
 
@@ -1413,7 +1413,7 @@ msgstr "Αδύνατη η διαγραφή απογραφής."
 msgid "Cannot delete item"
 msgstr "Αδύνατη η διαγραφή συλλέκτη"
 
-#: disc_prototypes.php:299 items.php:653
+#: disc_prototypes.php:299 items.php:651
 msgid "Cannot delete items"
 msgstr "Αδύνατη η διαγραφή συλλεκτών"
 
@@ -1659,7 +1659,7 @@ msgstr "Αδύνατον ο μορφότυπος δένδρου."
 msgid "Cannot have empty visible template name"
 msgstr "Δεν μπορώ να έχω κενό ορατό όνομα σχεδιότυπου"
 
-#: api/classes/CTrigger.php:1571 api/classes/CTrigger.php:1643
+#: api/classes/CTrigger.php:1578 api/classes/CTrigger.php:1650
 #: api/classes/CTriggerPrototype.php:1016
 #: api/classes/CTriggerPrototype.php:1067
 #, php-format
@@ -2580,7 +2580,7 @@ msgstr "Δημιουργία αντιστοίχισης εικονιδίου"
 msgid "Create image"
 msgstr "Δημιουργία εικόνας"
 
-#: include/views/configuration.item.list.php:30 items.php:665
+#: include/views/configuration.item.list.php:30 items.php:662
 msgid "Create item"
 msgstr "Δημιουργία συλλέκτη"
 
@@ -2672,7 +2672,7 @@ msgstr "Δημιουργήθηκε: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CTrigger.php:1581
+#: api/classes/CTrigger.php:1588
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Έναυσμα \"%1$s\" σε \"%2$s\"."
@@ -2868,7 +2868,7 @@ msgstr "ΕΝΤΟΠΙΣΜΕΝΟ"
 msgid "DM"
 msgstr "ΚΠ"
 
-#: events.php:481 events.php:490 hosts.php:652
+#: events.php:487 events.php:496 hosts.php:652
 #: include/views/administration.proxy.edit.php:60
 #: include/views/js/configuration.host.edit.js.php:18 popup.php:544
 #: search.php:131
@@ -2885,8 +2885,8 @@ msgid "DOWN"
 msgstr "ΜΗ ΔΙΑΘΕΣΙΜΟ"
 
 #: include/forms.inc.php:1497 include/maintenances.inc.php:35
-#: include/reports.inc.php:213 include/reports.inc.php:659
-#: include/reports.inc.php:667 report3.php:61 report4.php:98
+#: include/reports.inc.php:219 include/reports.inc.php:665
+#: include/reports.inc.php:673 report3.php:61 report4.php:98
 msgid "Daily"
 msgstr "Ημερησίως"
 
@@ -2894,7 +2894,7 @@ msgstr "Ημερησίως"
 msgid "Dark orange"
 msgstr "Σκοτεινό πορτοκαλί"
 
-#: include/reports.inc.php:705
+#: include/reports.inc.php:711
 msgid "Darken"
 msgstr "Σκοτεινό"
 
@@ -3219,8 +3219,8 @@ msgstr "Διαγραφή οθόνης;"
 msgid "Delete script?"
 msgstr "Διαγραφή δέσμης ενεργειών;"
 
-#: dashconf.php:214 hosts.php:875 include/reports.inc.php:317
-#: include/reports.inc.php:411 include/reports.inc.php:453
+#: dashconf.php:214 hosts.php:875 include/reports.inc.php:323
+#: include/reports.inc.php:417 include/reports.inc.php:459
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:95
@@ -3492,7 +3492,7 @@ msgstr "Εξαρτάται από"
 msgid "Deployment status"
 msgstr "Κατάσταση υλοποίησης"
 
-#: events.php:482 events.php:491 events.php:557 events.php:570
+#: events.php:488 events.php:497 events.php:563 events.php:576
 #: include/classes/screens/CScreenEvents.php:46
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.mediatypes.edit.php:34
@@ -3908,7 +3908,7 @@ msgstr "Πρώτη καταχώρηση Κυλιόμενων επιλογών \"
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Υπενθύμιση επιλεγμένης κυλιόμενης επιλογής \"%1$s\"."
 
-#: api/classes/CTrigger.php:2010
+#: api/classes/CTrigger.php:2017
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr ""
@@ -3943,7 +3943,7 @@ msgstr "Διπλό όνομα σοβαρότητας \"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "Διπλό ψευδώνυμο χρήστη \"%s\"."
 
-#: events.php:560 events.php:573 include/events.inc.php:135
+#: events.php:566 events.php:579 include/events.inc.php:135
 #: include/events.inc.php:208 include/events.inc.php:211 tr_status.php:289
 msgid "Duration"
 msgstr "Διάρκεια"
@@ -4044,8 +4044,8 @@ msgstr "Στην έκφραση παρέχεται κενό όνομα ξενι�
 #: api/classes/CProxy.php:549 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1327 api/classes/CTrigger.php:1416
-#: api/classes/CTrigger.php:1508 api/classes/CTriggerPrototype.php:920
+#: api/classes/CTrigger.php:1327 api/classes/CTrigger.php:1423
+#: api/classes/CTrigger.php:1515 api/classes/CTriggerPrototype.php:920
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:502
 #: api/classes/CUserMacro.php:654
 msgid "Empty input parameter."
@@ -4515,9 +4515,9 @@ msgstr "Αρχείο παρεχόμενο για προβολή δεν υπάρ�
 msgid "Filled region"
 msgstr "Γεμισμένη περιοχή"
 
-#: dashconf.php:265 events.php:367 hostinventories.php:134 hosts.php:657
+#: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
 #: include/classes/class.cwidget.php:134 include/forms.inc.php:574
-#: include/reports.inc.php:172
+#: include/reports.inc.php:178
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/configuration.item.edit.php:335
@@ -4525,7 +4525,7 @@ msgstr "Γεμισμένη περιοχή"
 msgid "Filter"
 msgstr "Φίλτρο"
 
-#: include/reports.inc.php:102
+#: include/reports.inc.php:108
 msgid "Filter by host group"
 msgstr "Φιλτράρισμα με ομάδα ξενιστών"
 
@@ -4597,8 +4597,8 @@ msgstr "Παρ"
 msgid "Friday"
 msgstr "Παρασκευή"
 
-#: include/reports.inc.php:124 include/reports.inc.php:235
-#: include/reports.inc.php:604 include/views/configuration.action.edit.php:418
+#: include/reports.inc.php:130 include/reports.inc.php:241
+#: include/reports.inc.php:610 include/views/configuration.action.edit.php:418
 #: include/views/configuration.services.edit.php:190
 #: include/views/configuration.services.edit.php:233
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
@@ -4743,7 +4743,7 @@ msgstr "Χρωμοβαθμισμένη γραμμή"
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:60 latest.php:318 latest.php:492
-#: report2.php:230
+#: report2.php:240
 msgid "Graph"
 msgstr "Γράφημα"
 
@@ -4899,7 +4899,7 @@ msgstr "Πλέγμα"
 #: include/classes/screens/CScreenHostgroupTriggers.php:61
 #: include/classes/screens/CScreenHostgroupTriggers.php:120
 #: include/classes/screens/CScreenHostTriggers.php:122
-#: include/reports.inc.php:553
+#: include/reports.inc.php:559
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
 #: include/views/configuration.graph.list.php:52
@@ -4972,7 +4972,7 @@ msgstr "Ομάδα ενημερώθηκε"
 msgid "Grouping by"
 msgstr "Ομαδοποίηση με"
 
-#: dashconf.php:217 include/reports.inc.php:540
+#: dashconf.php:217 include/reports.inc.php:546
 #: include/views/administration.users.edit.php:80
 #: include/views/administration.users.list.php:58
 #: include/views/configuration.host.edit.php:186
@@ -5125,7 +5125,7 @@ msgstr "Οριζόντια"
 msgid "Horizontal align"
 msgstr "Οριζόντια ευθυγράμμιση"
 
-#: events.php:299 events.php:506 events.php:556 events.php:569
+#: events.php:299 events.php:512 events.php:562 events.php:575
 #: hostinventories.php:157 httpconf.php:190 httpconf.php:289 httpconf.php:313
 #: httpconf.php:331 httpconf.php:351 httpmon.php:122 httpmon.php:142
 #: include/actions.inc.php:43 include/audit.inc.php:27
@@ -5136,7 +5136,7 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
 #: include/forms.inc.php:504 include/html.inc.php:379 include/maps.inc.php:24
-#: include/reports.inc.php:106 include/setup.inc.php:310
+#: include/reports.inc.php:112 include/setup.inc.php:310
 #: include/triggers.inc.php:1357 include/triggers.inc.php:1780
 #: include/views/configuration.application.edit.php:44
 #: include/views/configuration.application.edit.php:56
@@ -5162,7 +5162,7 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
 #: popup.php:478 popup.php:515 popup.php:1092 popup.php:1287 popup.php:1492
-#: popup.php:1500 popup.php:1630 queue.php:249 report2.php:225 report5.php:60
+#: popup.php:1500 popup.php:1630 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "Ξενιστής"
@@ -5223,7 +5223,7 @@ msgstr "Ξενιστής διεγράφη"
 #: include/actions.inc.php:40 include/audit.inc.php:35
 #: include/blocks.inc.php:168 include/blocks.inc.php:346
 #: include/blocks.inc.php:984 include/forms.inc.php:486
-#: include/maps.inc.php:25 include/reports.inc.php:105
+#: include/maps.inc.php:25 include/reports.inc.php:111
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.hostgroups.edit.php:63
 #: include/views/js/configuration.action.edit.js.php:89
@@ -5347,7 +5347,7 @@ msgstr "Ξενιστής με ίδιο ορατό όνομα \"%s\" υπάρχε
 #: dashconf.php:227 hostinventoriesoverview.php:81 hostinventories.php:94
 #: hosts.php:644 include/forms.inc.php:224 include/forms.inc.php:817
 #: include/items.inc.php:735 include/menu.inc.php:112 include/menu.inc.php:168
-#: include/reports.inc.php:585 include/views/administration.proxy.edit.php:82
+#: include/reports.inc.php:591 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
 #: include/views/configuration.graph.list.php:75
@@ -5396,8 +5396,8 @@ msgstr "Τοποθεσία ξενιστών"
 msgid "Hosts updated"
 msgstr "Ξενιστές ενημερώθηκαν"
 
-#: include/reports.inc.php:212 include/reports.inc.php:658
-#: include/reports.inc.php:666
+#: include/reports.inc.php:218 include/reports.inc.php:664
+#: include/reports.inc.php:672
 msgid "Hourly"
 msgstr "Ωριαία"
 
@@ -5433,7 +5433,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:480 events.php:489 hosts.php:653
+#: events.php:486 events.php:495 hosts.php:653
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -6119,7 +6119,7 @@ msgstr "Λανθασμένο κλειδί: \"%1$s\"."
 msgid "Incorrect key: %s"
 msgstr "Λανθασμένο κλειδί: %s"
 
-#: include/forms.inc.php:1164 items.php:771
+#: include/forms.inc.php:1164 items.php:768
 msgid "Incorrect list of items."
 msgstr "Λανθασμένος κατάλογος συλλεκτών."
 
@@ -6605,7 +6605,7 @@ msgstr "Ιταλικά (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:163
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1014
-#: include/reports.inc.php:694 include/views/configuration.graph.edit.php:164
+#: include/reports.inc.php:700 include/views/configuration.graph.edit.php:164
 #: include/views/configuration.graph.edit.php:222
 #: include/views/configuration.triggers.expression.php:55 items.php:468
 #: items.php:624 items.php:646 tr_logform.php:276
@@ -6728,7 +6728,7 @@ msgstr "Ο συλλέκτης με κλειδί \"%s\" υπάρχει ήδη."
 
 #: hosts.php:684 hosts.php:761 include/html.inc.php:421
 #: include/html.inc.php:425 include/items.inc.php:720
-#: include/reports.inc.php:323 include/reports.inc.php:459
+#: include/reports.inc.php:329 include/reports.inc.php:465
 #: include/views/configuration.application.list.php:73
 #: include/views/configuration.graph.edit.php:280
 #: include/views/configuration.host.discovery.list.php:52
@@ -6753,7 +6753,7 @@ msgstr "Συλλέκτες ενεργοποιήθηκαν"
 msgid "Items copied"
 msgstr "Συλλέκτες αντιγράφηκαν"
 
-#: disc_prototypes.php:299 items.php:650
+#: disc_prototypes.php:299 items.php:651
 msgid "Items deleted"
 msgstr "Συλλέκτες διεγράφησαν"
 
@@ -7059,7 +7059,7 @@ msgstr "Τελευταία συμβάντα"
 msgid "Latvian (lv_LV)"
 msgstr "Λετονικά (lv_LV)"
 
-#: include/reports.inc.php:313
+#: include/reports.inc.php:319
 #: include/views/configuration.screen.constructor.edit.php:555
 #: include/views/configuration.screen.constructor.edit.php:584
 #: include/views/configuration.sysmap.edit.php:132
@@ -7070,8 +7070,8 @@ msgstr "Λετονικά (lv_LV)"
 msgid "Left"
 msgstr "Αριστερά"
 
-#: include/reports.inc.php:209 include/reports.inc.php:372
-#: include/reports.inc.php:521
+#: include/reports.inc.php:215 include/reports.inc.php:378
+#: include/reports.inc.php:527
 msgid "Legend"
 msgstr "Υπόμνημα"
 
@@ -7724,7 +7724,7 @@ msgstr "Μέθοδος δεν βρέθηκε."
 msgid "Micro"
 msgstr "Μικρο"
 
-#: include/reports.inc.php:704
+#: include/reports.inc.php:710
 #: include/views/configuration.screen.constructor.edit.php:600
 msgid "Middle"
 msgstr "Ενδιάμεσο"
@@ -7820,7 +7820,7 @@ msgstr "Λείπει το κλειδί \"%1$s\" για τον ξενιστή \"%
 msgid "Missing parameter: usrgrpids."
 msgstr ""
 
-#: include/views/administration.proxy.list.php:46 report2.php:176
+#: include/views/administration.proxy.list.php:46 report2.php:185
 msgid "Mode"
 msgstr "Τρόπος"
 
@@ -7861,8 +7861,8 @@ msgid "Month"
 msgstr "Μήνας"
 
 #: include/forms.inc.php:1499 include/maintenances.inc.php:39
-#: include/reports.inc.php:215 include/reports.inc.php:661
-#: include/reports.inc.php:669 report3.php:63 report4.php:100
+#: include/reports.inc.php:221 include/reports.inc.php:667
+#: include/reports.inc.php:675 report3.php:63 report4.php:100
 msgid "Monthly"
 msgstr "Μηνιαίως"
 
@@ -7921,7 +7921,7 @@ msgstr "NTLM ταυτοποίηση"
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:143 include/forms.inc.php:550
 #: include/forms.inc.php:1741 include/hosts.inc.php:114
-#: include/reports.inc.php:376 include/setup.inc.php:318
+#: include/reports.inc.php:382 include/setup.inc.php:318
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:33
@@ -7979,7 +7979,7 @@ msgstr "NTLM ταυτοποίηση"
 #: popup.php:1567 popup.php:1631 popup.php:1692 popup.php:1695 popup.php:1752
 #: popup.php:1756 popup.php:1807 popup.php:1838 popup.php:1869 popup.php:1909
 #: popup.php:1925 popup.php:1948 popup.php:1977 popup.php:1984
-#: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:226
+#: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:236
 #: screenconf.php:50 services.php:43 slideconf.php:38 sysmaps.php:48
 #: sysmaps.php:265 trigger_prototypes.php:41 triggers.php:41 tr_status.php:293
 #: users.php:44
@@ -8082,7 +8082,7 @@ msgstr "Επόμενο"
 msgid "Next check"
 msgstr "Επόμενος έλεγχος"
 
-#: events.php:747 include/config.inc.php:555 include/events.inc.php:298
+#: events.php:753 include/config.inc.php:555 include/events.inc.php:298
 #: include/events.inc.php:316 include/forms.inc.php:1893
 #: include/triggers.inc.php:1785
 #: include/views/administration.users.list.php:75
@@ -8229,7 +8229,7 @@ msgstr "Δεν βρέθηκαν λάθη."
 msgid "No events"
 msgstr ""
 
-#: events.php:380 include/classes/screens/CScreenEvents.php:41
+#: events.php:386 include/classes/screens/CScreenEvents.php:41
 msgid "No events defined."
 msgstr "Δεν ορίσθηκαν συμβάντα."
 
@@ -8523,9 +8523,9 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CScreen.php:578 api/classes/CService.php:1254
 #: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:780
 #: api/classes/CTemplateScreen.php:801 api/classes/CTemplateScreen.php:807
-#: api/classes/CTrigger.php:1115 api/classes/CTrigger.php:1435
-#: api/classes/CTrigger.php:1459 api/classes/CTrigger.php:1711
-#: api/classes/CTrigger.php:1723 api/classes/CTriggerPrototype.php:835
+#: api/classes/CTrigger.php:1115 api/classes/CTrigger.php:1442
+#: api/classes/CTrigger.php:1466 api/classes/CTrigger.php:1718
+#: api/classes/CTrigger.php:1730 api/classes/CTriggerPrototype.php:835
 #: api/classes/CTriggerPrototype.php:933
 #: api/classes/CTriggerPrototype.php:1104
 #: api/classes/CTriggerPrototype.php:1116 api/classes/CUserMacro.php:831
@@ -8637,7 +8637,7 @@ msgstr "Χωρίς έναυσμα με triggerid \"%1$s\"."
 
 #: chart4.php:40 include/triggers.inc.php:1331
 #: include/views/configuration.triggers.list.php:90 popup.php:974
-#: report2.php:222 tr_comments.php:43 tr_status.php:267
+#: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
 msgstr "Δεν ορίσθηκαν εναύσματα."
 
@@ -8670,7 +8670,7 @@ msgstr "Δεν ορίσθηκαν έλεγχοι ιστού."
 msgid "No web scenarios defined."
 msgstr "Δεν ορίσθηκαν σενάρια ιστού."
 
-#: events.php:555 events.php:568 hostinventories.php:156 httpmon.php:141
+#: events.php:561 events.php:574 hostinventories.php:156 httpmon.php:141
 #: include/actions.inc.php:49 include/audit.inc.php:42
 #: include/blocks.inc.php:167 include/blocks.inc.php:345
 #: include/blocks.inc.php:829 include/blocks.inc.php:983
@@ -8679,7 +8679,7 @@ msgstr "Δεν ορίσθηκαν σενάρια ιστού."
 #: include/triggers.inc.php:1758 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:493
-#: popup_right.php:66 queue.php:248 report2.php:224 report5.php:59
+#: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
 #: search.php:128 search.php:257 search.php:366 tr_status.php:291
 msgid "Node"
 msgstr "Κόμβος"
@@ -8736,7 +8736,7 @@ msgstr "Μη αναγνώριση"
 msgid "Not Templated items"
 msgstr "Μη Σχεδιότυποι συλλέκτες"
 
-#: api/classes/CTrigger.php:1913
+#: api/classes/CTrigger.php:1920
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
@@ -8961,7 +8961,7 @@ msgstr "Εκτός"
 
 #: include/actions.inc.php:927 include/blocks.inc.php:985
 #: include/classes/class.ctriggersinfo.php:134
-#: include/views/administration.users.list.php:86 report2.php:228
+#: include/views/administration.users.list.php:86 report2.php:238
 #: report3.php:86
 msgid "Ok"
 msgstr "Ok"
@@ -9184,7 +9184,7 @@ msgstr "Άλλο"
 msgid "Other configuration parameters"
 msgstr "Άλλες παράμετροι διαμόρφωσης"
 
-#: include/reports.inc.php:540
+#: include/reports.inc.php:546
 #: include/views/administration.usergroups.edit.php:53
 #: include/views/configuration.host.edit.php:186
 #: include/views/configuration.host.massupdate.php:46
@@ -9197,7 +9197,7 @@ msgstr "Άλλες ομάδες"
 msgid "Other hosts"
 msgstr "Άλλοι ξενιστές"
 
-#: include/reports.inc.php:585
+#: include/reports.inc.php:591
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.maintenance.edit.php:140
 msgid "Other hosts | Group"
@@ -9391,12 +9391,12 @@ msgstr "ΠΡΟΒΛΗΜΑ"
 msgid "Page received incorrect data"
 msgstr "Η σελίδα έλαβε λάθος δεδομένα"
 
-#: include/reports.inc.php:708
+#: include/reports.inc.php:714
 msgid "Palette"
 msgstr "Χρωματολόγιο"
 
-#: include/reports.inc.php:698 include/reports.inc.php:699
-#: include/reports.inc.php:700 include/reports.inc.php:701
+#: include/reports.inc.php:704 include/reports.inc.php:705
+#: include/reports.inc.php:706 include/reports.inc.php:707
 #, php-format
 msgid "Palette #%1$s"
 msgstr "Χρωματολόγιο #%1$s"
@@ -9516,8 +9516,8 @@ msgstr "Εκατοστιαία γραμμή (αριστερά)"
 msgid "Percentile line (right)"
 msgstr "Εκατοστιαία γραμμή (δεξιά)"
 
-#: include/reports.inc.php:169 include/reports.inc.php:286
-#: include/reports.inc.php:419 include/reports.inc.php:655
+#: include/reports.inc.php:175 include/reports.inc.php:292
+#: include/reports.inc.php:425 include/reports.inc.php:661
 #: include/views/configuration.item.edit.php:272
 #: include/views/configuration.item.edit.php:309
 #: include/views/configuration.item.massupdate.php:271
@@ -9739,7 +9739,7 @@ msgid "Problem, if at least one child has a problem"
 msgstr "Πρόβλημα, άν τουλάχιστον ένα θυγατρικό έχει πρόβλημα"
 
 #: chart4.php:171 include/maps.inc.php:677 include/maps.inc.php:767
-#: include/maps.inc.php:865 report2.php:227 report3.php:86
+#: include/maps.inc.php:865 report2.php:237 report3.php:86
 msgid "Problems"
 msgstr "Προβλήματα"
 
@@ -10064,19 +10064,19 @@ msgstr "Αντικατάσταση εξαρτήσεων"
 msgid "Replace host groups"
 msgstr "Αντικατάσταση ομάδων ξενιστών"
 
-#: chart_bar.php:65 report2.php:175 report5.php:54 report6.php:165
+#: chart_bar.php:65 report2.php:184 report5.php:54 report6.php:165
 msgid "Report"
 msgstr "Αναφορά"
 
-#: include/reports.inc.php:186
+#: include/reports.inc.php:192
 msgid "Report 1"
 msgstr "Αναφορά 1"
 
-#: include/reports.inc.php:345
+#: include/reports.inc.php:351
 msgid "Report 2"
 msgstr "Αναφορά 2"
 
-#: include/reports.inc.php:483
+#: include/reports.inc.php:489
 msgid "Report 3"
 msgstr "Αναφορά 3"
 
@@ -10120,10 +10120,10 @@ msgstr "Απαιτούμενοι κωδικοί κατάστασης"
 msgid "Required string"
 msgstr "Απαιτούμενη στοιχειοσειρά"
 
-#: events.php:365 hostinventories.php:137 hosts.php:660
+#: events.php:371 hostinventories.php:137 hosts.php:660
 #: include/forms.inc.php:571 include/html.inc.php:276
-#: include/reports.inc.php:174 include/reports.inc.php:335
-#: include/reports.inc.php:473 include/reports.inc.php:711
+#: include/reports.inc.php:180 include/reports.inc.php:341
+#: include/reports.inc.php:479 include/reports.inc.php:717
 #: include/views/administration.auditacts.list.php:51
 #: include/views/administration.auditlogs.list.php:67 latest.php:139
 #: tr_status.php:249
@@ -10220,7 +10220,7 @@ msgstr ""
 msgid "Retry"
 msgstr "Επανάληψη"
 
-#: include/reports.inc.php:313
+#: include/reports.inc.php:319
 #: include/views/configuration.screen.constructor.edit.php:588
 #: include/views/configuration.sysmap.edit.php:132
 #: include/views/js/configuration.graph.edit.js.php:72
@@ -10530,7 +10530,7 @@ msgstr "Αποθήκευση"
 msgid "Save and return"
 msgstr "Αποθήκευση και επιστροφή"
 
-#: include/reports.inc.php:217 include/reports.inc.php:663
+#: include/reports.inc.php:223 include/reports.inc.php:669
 msgid "Scale"
 msgstr "Κλίμακα"
 
@@ -10782,9 +10782,9 @@ msgstr "Καλλιτεχνικό όνομα Δεύτερης Επαφής"
 msgid "Seconds"
 msgstr "Δευτερόλεπτα"
 
-#: events.php:352 include/forms.inc.php:489 include/forms.inc.php:507
+#: events.php:358 include/forms.inc.php:489 include/forms.inc.php:507
 #: include/forms.inc.php:529 include/page_header.php:358
-#: include/reports.inc.php:688
+#: include/reports.inc.php:694
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
 #: include/views/configuration.action.edit.php:139
@@ -10858,11 +10858,11 @@ msgstr "Επιλεγμένες ενέργειες διεγράφησαν"
 msgid "Selected elements"
 msgstr "Επιλεγμένα στοιχεία"
 
-#: include/reports.inc.php:540
+#: include/reports.inc.php:546
 msgid "Selected groups"
 msgstr "Επιλεγμένες ομάδες"
 
-#: include/reports.inc.php:585
+#: include/reports.inc.php:591
 msgid "Selected hosts"
 msgstr "Επιλεγμένοι ξενιστές"
 
@@ -10932,7 +10932,7 @@ msgstr "Πληροφορίες εξυπηρετητή"
 msgid "Server time"
 msgstr "Ώρα εξυπηρετητή"
 
-#: events.php:519 include/actions.inc.php:73
+#: events.php:525 include/actions.inc.php:73
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:260
 #: include/views/configuration.services.parent.list.php:36 services.php:408
@@ -11000,7 +11000,7 @@ msgstr ""
 msgid "Session terminated, re-login, please."
 msgstr "Τερματισμός συνεδρίας. Επανασυνδεθείτε."
 
-#: events.php:559 events.php:572 include/classes/screens/CScreenEvents.php:48
+#: events.php:565 events.php:578 include/classes/screens/CScreenEvents.php:48
 #: include/classes/screens/CScreenHistory.php:166
 #: include/triggers.inc.php:1782 include/views/configuration.item.list.php:109
 #: include/views/configuration.triggers.edit.php:245
@@ -11020,10 +11020,10 @@ msgstr "Το Όνομα σοβαρότητας δεν μπορεί να είνα
 
 #: include/classes/class.cuiwidget.php:58
 #: include/classes/class.cwidget.php:222 include/html.inc.php:146
-#: include/reports.inc.php:333 include/reports.inc.php:471
-#: include/reports.inc.php:709
+#: include/reports.inc.php:339 include/reports.inc.php:477
+#: include/reports.inc.php:715
 #: include/views/configuration.application.list.php:55
-#: include/views/js/configuration.sysmaps.js.php:24 report2.php:239
+#: include/views/js/configuration.sysmaps.js.php:24 report2.php:249
 #: tr_status.php:717
 msgid "Show"
 msgstr "Εμφάνιση"
@@ -11103,7 +11103,7 @@ msgstr "Εμφάνιση εναυσμάτων"
 msgid "Show unacknowledged"
 msgstr "Εμφάνιση μη αναγνωρισμένων"
 
-#: events.php:363
+#: events.php:369
 msgid "Show unknown events"
 msgstr "Εμφάνιση άγνωστων συμβάντων"
 
@@ -11271,7 +11271,7 @@ msgstr "Λογισμική εφαρμογή Δ"
 msgid "Software application E"
 msgstr "Λογισμική εφαρμογή Ε"
 
-#: include/reports.inc.php:379
+#: include/reports.inc.php:385
 msgid "Sort by"
 msgstr "Ταξινόμηση με"
 
@@ -11326,7 +11326,7 @@ msgstr ""
 msgid "State"
 msgstr "Κατάσταση"
 
-#: events.php:483 events.php:492 events.php:558 events.php:571 hosts.php:690
+#: events.php:489 events.php:498 events.php:564 events.php:577 hosts.php:690
 #: httpdetails.php:139 httpmon.php:146 include/actions.inc.php:677
 #: include/actions.inc.php:755 include/actions.inc.php:826
 #: include/classes/screens/CScreenActions.php:58
@@ -11664,7 +11664,7 @@ msgstr "Όνομα σχεδιότυπου"
 msgid "Template screens"
 msgstr "Σχεδιότυπα οθονών"
 
-#: include/reports.inc.php:101
+#: include/reports.inc.php:107
 msgid "Template trigger"
 msgstr "Έναυσμα σχεδιότυπου"
 
@@ -11824,15 +11824,15 @@ msgstr "Πέμ"
 msgid "Thursday"
 msgstr "Πέμπτη"
 
-#: include/reports.inc.php:148 include/reports.inc.php:259
-#: include/reports.inc.php:628
+#: include/reports.inc.php:154 include/reports.inc.php:265
+#: include/reports.inc.php:634
 #: include/views/configuration.services.edit.php:206
 #: include/views/configuration.services.edit.php:234 popup_period.php:155
 #: report3.php:146 report4.php:180
 msgid "Till"
 msgstr "Έως"
 
-#: events.php:479 events.php:488 events.php:554 events.php:567
+#: events.php:485 events.php:494 events.php:560 events.php:573
 #: include/acknow.inc.php:43 include/actions.inc.php:675
 #: include/actions.inc.php:698 include/actions.inc.php:754
 #: include/actions.inc.php:772 include/classes/screens/CScreenActions.php:32
@@ -11894,8 +11894,8 @@ msgstr ""
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
 msgstr ""
 
-#: include/reports.inc.php:206 include/reports.inc.php:368
-#: include/reports.inc.php:517
+#: include/reports.inc.php:212 include/reports.inc.php:374
+#: include/reports.inc.php:523
 msgid "Title"
 msgstr "Τίτλος"
 
@@ -11954,7 +11954,7 @@ msgstr "Σφάλμα μεταφοράς."
 msgid "Trends"
 msgstr "Τάσεις"
 
-#: events.php:306 events.php:349 include/actions.inc.php:42
+#: events.php:306 events.php:355 include/actions.inc.php:42
 #: include/audit.inc.php:33 include/classes/class.cchart.php:466
 #: include/maps.inc.php:26 include/triggers.inc.php:1439
 #: include/triggers.inc.php:1781
@@ -11997,7 +11997,7 @@ msgstr ""
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr "Το έναυσμα \"%1$s:%2$s\" δεν έχει πρωτότυπο συλλέκτη."
 
-#: api/classes/CTrigger.php:2058
+#: api/classes/CTrigger.php:2065
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Το έναυσμα \"%s\" ανήκει σε σχεδιότυπο με διαφορετικούς συνδέσμους."
@@ -12007,7 +12007,7 @@ msgstr "Το έναυσμα \"%s\" ανήκει σε σχεδιότυπο με �
 msgid "Trigger added"
 msgstr "Έναυσμα προστέθηκε"
 
-#: api/classes/CTrigger.php:1956
+#: api/classes/CTrigger.php:1963
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr ""
 
@@ -12357,8 +12357,8 @@ msgstr "Απροσδόκητο σύμβολο \"%1$s\" στην συνάρτησ
 msgid "Units"
 msgstr "Μονάδες"
 
-#: chart4.php:175 events.php:503 events.php:504 events.php:513 events.php:514
-#: events.php:515 events.php:516 hosts.php:807 httpdetails.php:165
+#: chart4.php:175 events.php:509 events.php:510 events.php:519 events.php:520
+#: events.php:521 events.php:522 hosts.php:807 httpdetails.php:165
 #: httpmon.php:250 include/actions.inc.php:36 include/actions.inc.php:68
 #: include/actions.inc.php:79 include/actions.inc.php:195
 #: include/actions.inc.php:515 include/blocks.inc.php:987
@@ -12378,7 +12378,7 @@ msgstr "Μονάδες"
 #: include/users.inc.php:50 include/users.inc.php:65
 #: include/views/js/configuration.discovery.edit.js.php:141
 #: include/views/monitoring.overview.php:47 popup.php:575 popup.php:593
-#: report2.php:229
+#: report2.php:239
 msgid "Unknown"
 msgstr "Άγνωστο"
 
@@ -12560,7 +12560,7 @@ msgstr "Ενημερώθηκε: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CTrigger.php:1682
+#: api/classes/CTrigger.php:1689
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Έναυσμα \"%1$s\" σε \"%2$s\"."
@@ -12768,7 +12768,7 @@ msgstr "Χρήστες απεμπλάκησαν"
 #: include/blocks.inc.php:686 include/classes/class.cpie.php:309
 #: include/classes/screens/CScreenEvents.php:47
 #: include/classes/screens/CScreenHistory.php:168
-#: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:377
+#: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:383
 #: include/views/administration.general.valuemapping.edit.php:39
 #: include/views/common.macros.php:25 tr_testexpr.php:56
 #, php-format
@@ -13034,8 +13034,8 @@ msgid "Week"
 msgstr "Εβδομάδα"
 
 #: include/forms.inc.php:1498 include/maintenances.inc.php:37
-#: include/reports.inc.php:214 include/reports.inc.php:660
-#: include/reports.inc.php:668 report3.php:62 report4.php:99
+#: include/reports.inc.php:220 include/reports.inc.php:666
+#: include/reports.inc.php:674 report3.php:62 report4.php:99
 msgid "Weekly"
 msgstr "Εβδομαδιαίως"
 
@@ -13188,8 +13188,8 @@ msgstr "Λάθος μακροεντολής \"%1$s\"."
 msgid "X"
 msgstr "Χ"
 
-#: include/reports.inc.php:207 include/reports.inc.php:369
-#: include/reports.inc.php:518
+#: include/reports.inc.php:213 include/reports.inc.php:375
+#: include/reports.inc.php:524
 msgid "X label"
 msgstr "Χ ετικέτα"
 
@@ -13245,8 +13245,8 @@ msgstr "Ελάχιστη τιμή άξονα Ψ"
 msgid "Y axis side"
 msgstr "Πλευρά άξονα ψ"
 
-#: include/reports.inc.php:208 include/reports.inc.php:370
-#: include/reports.inc.php:519
+#: include/reports.inc.php:214 include/reports.inc.php:376
+#: include/reports.inc.php:525
 msgid "Y label"
 msgstr "Ψ ετικέτα"
 
@@ -13276,12 +13276,12 @@ msgstr "Y.m.d H:i:s"
 msgid "Year"
 msgstr "Έτος"
 
-#: include/reports.inc.php:216 include/reports.inc.php:662
-#: include/reports.inc.php:670 report3.php:64 report4.php:101
+#: include/reports.inc.php:222 include/reports.inc.php:668
+#: include/reports.inc.php:676 report3.php:64 report4.php:101
 msgid "Yearly"
 msgstr "Ετησίως"
 
-#: events.php:747 include/blocks.inc.php:695
+#: events.php:753 include/blocks.inc.php:695
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:555
 #: include/events.inc.php:301 include/events.inc.php:319
 #: include/forms.inc.php:1893 include/triggers.inc.php:1785
