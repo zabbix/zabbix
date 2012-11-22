@@ -105,7 +105,6 @@ static int	validate_ids()
 
 		zbx_snprintf(sql, sizeof(sql), "select %s from %s where %s>" ZBX_FS_UI64,
 				field->name, table->table, field->name, max_value);
-printf("%s\n", sql);
 
 		result = DBselectN(sql, 1);
 
