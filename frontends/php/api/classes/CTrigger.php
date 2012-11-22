@@ -1029,7 +1029,8 @@ class CTrigger extends CTriggerGeneral {
 			if (!$expressionData->parse($object['expression'])) {
 				return false;
 			}
-			$object['host'] = reset($expressionData->getHosts());
+			$expressionHosts = $expressionData->getHosts();
+			$object['host'] = reset($expressionHosts);
 		}
 
 		$options = array(
