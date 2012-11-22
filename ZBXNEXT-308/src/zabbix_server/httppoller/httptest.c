@@ -611,6 +611,7 @@ void	process_httptests(int httppoller_num, int now)
 		}
 		zbx_free(httptest.agent);
 		zbx_free(httptest.macros);
+		zbx_free(httptest.http_proxy);
 	}
 	DBfree_result(result);
 
