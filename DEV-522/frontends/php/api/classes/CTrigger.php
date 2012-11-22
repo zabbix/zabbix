@@ -1655,8 +1655,8 @@ class CTrigger extends CTriggerGeneral {
 
 						// if we have at least one template linked to trigger host inside trigger expression,
 						// then we don't delete this trigger
-						$templateNames = $expressionData->getHosts();
-						foreach ($templateNames as $templateName) {
+						$expressionHosts = $expressionData->getHosts();
+						foreach ($expressionHosts as $templateName) {
 							if (isset($templateNames[$templateName])) {
 								continue 2;
 							}
