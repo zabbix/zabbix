@@ -249,7 +249,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		else {
 			$expressionData = new CTriggerExpression($trigger['expression']);
 			$expressionData->parse($trigger['expression']);
-			$filter['host'] = $expressionData->getHosts();
+			$expressionHosts = $expressionData->getHosts();
+			$filter['host'] = reset($expressionHosts);
 		}
 
 		$triggers = $this->get(array(
