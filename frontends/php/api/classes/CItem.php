@@ -167,33 +167,24 @@ class CItem extends CItemGeneral {
 		}
 
 		// hostids
-		if ($options['hostids'] !== null || $options['selectHosts'] !== null) {
+		if ($options['hostids'] !== null) {
 			zbx_value2array($options['hostids']);
+			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
 
-			// filter
-			if ($options['hostids'] !== null) {
-				$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
-
-				if (!is_null($options['groupCount'])) {
-					$sqlParts['group']['i'] = 'i.hostid';
-				}
+			if (!is_null($options['groupCount'])) {
+				$sqlParts['group']['i'] = 'i.hostid';
 			}
 
-			// make sure we retrieve the hostid property to be able to map hosts to items
 			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 		}
 
 		// interfaceids
-		if ($options['interfaceids'] !== null || $options['selectInterfaces'] !== null) {
+		if ($options['interfaceids'] !== null) {
 			zbx_value2array($options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
 
-			// filter
-			if ($options['interfaceids'] !== null) {
-				$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
-
-				if (!is_null($options['groupCount'])) {
-					$sqlParts['group']['i'] = 'i.interfaceid';
-				}
+			if (!is_null($options['groupCount'])) {
+				$sqlParts['group']['i'] = 'i.interfaceid';
 			}
 
 			// make sure we retrieve the hostid property to be able to map hosts to items
@@ -232,54 +223,30 @@ class CItem extends CItemGeneral {
 		}
 
 		// triggerids
-		if ($options['triggerids'] !== null
-			|| ($options['selectTriggers'] !== null && $options['selectTriggers'] != API_OUTPUT_COUNT)) {
-
+		if ($options['triggerids'] !== null) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['select']['triggerid'] = 'f.triggerid';
-			$sqlParts['leftJoin']['functions'] = 'functions f ON i.itemid=f.itemid';
-
-			// filter
-			if ($options['triggerids'] !== null) {
-				$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
-			}
+			$sqlParts = $this->addQuerySelect('f.triggerid', $sqlParts);
+			$sqlParts = $this->addQueryLeftJoin('functions f', 'i.itemid', 'f.itemid', $sqlParts);
+			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 		}
 
 		// applicationids
-		if ($options['applicationids'] !== null
-			|| ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT)) {
-
+		if ($options['applicationids'] !== null) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['select']['applicationid'] = 'ia.applicationid';
-			$sqlParts['leftJoin']['items_applications'] = 'items_applications ia ON ia.itemid=i.itemid';
-
-			// filter
-			if ($options['applicationids'] !== null) {
-				$sqlParts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
-			}
+			$sqlParts = $this->addQuerySelect('ia.applicationid', $sqlParts);
+			$sqlParts = $this->addQueryLeftJoin('items_applications ia', 'i.itemid', 'ia.itemid', $sqlParts);
+			$sqlParts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
 		}
 
 		// graphids
-		if ($options['graphids'] !== null
-			|| ($options['selectGraphs'] !== null && $options['selectGraphs'] != API_OUTPUT_COUNT)) {
-
+		if ($options['graphids'] !== null) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['select']['graphid'] = 'gi.graphid';
-			$sqlParts['leftJoin']['graphs_items'] = 'graphs_items gi ON i.itemid=gi.itemid';
-
-			// filter
-			if ($options['graphids'] !== null) {
-				$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
-			}
-		}
-
-		// item discovery
-		if ($options['selectItemDiscovery'] !== null) {
-			$sqlParts['leftJoin']['item_discovery'] = 'item_discovery id ON i.itemid=id.itemid';
-			$sqlParts = $this->addQuerySelect('id.itemdiscoveryid', $sqlParts);
+			$sqlParts = $this->addQuerySelect('gi.graphid', $sqlParts);
+			$sqlParts = $this->addQueryLeftJoin('graphs_items gi', 'i.itemid', 'gi.itemid', $sqlParts);
+			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 		}
 
 		// webitems
@@ -407,6 +374,7 @@ class CItem extends CItemGeneral {
 
 		$itemids = array();
 
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
@@ -1247,6 +1215,42 @@ class CItem extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectHosts'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			}
+
+			if ($options['selectInterfaces'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.interfaceid', $sqlParts);
+			}
+
+			if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
+				$sqlParts = $this->addQueryLeftJoin('items_applications ia', 'i.itemid', 'ia.itemid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('ia.applicationid', $sqlParts);
+			}
+
+			if ($options['selectTriggers'] !== null && $options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$sqlParts = $this->addQueryLeftJoin('functions f', 'i.itemid', 'f.itemid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('f.triggerid', $sqlParts);
+			}
+
+			if ($options['selectGraphs'] !== null && $options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$sqlParts = $this->addQueryLeftJoin('graphs_items gi', 'i.itemid', 'gi.itemid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('gi.graphid', $sqlParts);
+			}
+
+			if ($options['selectItemDiscovery'] !== null) {
+				$sqlParts = $this->addQueryLeftJoin('item_discovery id', 'i.itemid', 'id.itemid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('id.itemdiscoveryid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
