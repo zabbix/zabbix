@@ -53,9 +53,6 @@ class CAlert extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('alertid', 'clock', 'eventid', 'status');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('alerts' => 'a.alertid'),
 			'from'		=> array('alerts' => 'alerts a'),
@@ -167,17 +164,20 @@ class CAlert extends CZBXAPI {
 		}
 
 		// hostids
-		if (!is_null($options['hostids'])) {
+		if ($options['hostids'] !== null
+			|| $options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+
 			zbx_value2array($options['hostids']);
 
 			$sqlParts['select']['hostid'] = 'i.hostid';
-			$sqlParts['from']['events'] = 'events e';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['leftJoin']['events'] = 'events e ON a.eventid=e.eventid';
+			$sqlParts['leftJoin']['functions'] = 'functions f ON e.objectid=f.triggerid';
+			$sqlParts['leftJoin']['items'] = 'items i ON i.itemid=f.itemid';
 			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+
+			if ($options['hostids'] !== null) {
+				$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			}
 		}
 
 		// alertids
@@ -271,39 +271,12 @@ class CAlert extends CZBXAPI {
 		}
 
 		$alertids = array();
-		$userids = array();
-		$hostids = array();
-		$mediatypeids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('a.alertid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$relationMap = new CRelationMap();
 		while ($alert = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $alert['rowscount'];
@@ -311,24 +284,11 @@ class CAlert extends CZBXAPI {
 			else {
 				$alertids[$alert['alertid']] = $alert['alertid'];
 
-				if (isset($alert['userid'])) {
-					$userids[$alert['userid']] = $alert['userid'];
-				}
-				if (isset($alert['hostid'])) {
-					$hostids[$alert['hostid']] = $alert['hostid'];
-				}
-				if (isset($alert['mediatypeid'])) {
-					$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
-				}
-
 				if (!isset($result[$alert['alertid']])) {
 					$result[$alert['alertid']] = array();
 				}
 				if (!is_null($options['selectMediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])) {
 					$result[$alert['alertid']]['mediatypes'] = array();
-				}
-				if (!is_null($options['selectUsers']) && !isset($result[$alert['alertid']]['users'])) {
-					$result[$alert['alertid']]['users'] = array();
 				}
 
 				// hostids
@@ -354,6 +314,19 @@ class CAlert extends CZBXAPI {
 					}
 					$result[$alert['alertid']]['mediatypes'][] = array('mediatypeid' => $alert['mediatypeid']);
 				}
+
+				// populate relation map
+				if (isset($alert['hostid']) && $alert['hostid']) {
+					$relationMap->addRelation($alert['alertid'], 'hosts', $alert['hostid']);
+				}
+				unset($alert['hostid']);
+				if (isset($alert['userid']) && $alert['userid']) {
+					$relationMap->addRelation($alert['alertid'], 'users', $alert['userid']);
+				}
+				if (isset($alert['mediatypeid']) && $alert['mediatypeid']) {
+					$relationMap->addRelation($alert['alertid'], 'mediatypes', $alert['mediatypeid']);
+				}
+
 				$result[$alert['alertid']] += $alert;
 			}
 		}
@@ -365,46 +338,33 @@ class CAlert extends CZBXAPI {
 		/*
 		 * Adding objects
 		 */
-		$hosts = array();
-		$users = array();
-		$mediatypes = array();
-
 		// adding hosts
-		if (!is_null($options['selectHosts']) && (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs))) {
+		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
-				'hostids' => $hostids,
+				'hostids' => $relationMap->getRelatedIds('hosts'),
 				'preservekeys' => true
 			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding users
-		if (!is_null($options['selectUsers']) && (is_array($options['selectUsers']) || str_in_array($options['selectUsers'], $subselectsAllowedOutputs))) {
+		if ($options['selectUsers'] !== null && $options['selectUsers'] !== API_OUTPUT_COUNT) {
 			$users = API::User()->get(array(
 				'output' => $options['selectUsers'],
-				'userids' => $userids,
+				'userids' => $relationMap->getRelatedIds('users'),
 				'preservekeys' => true
 			));
+			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 
-		if (!is_null($options['selectMediatypes']) && (is_array($options['selectMediatypes']) || str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs))) {
+		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] !== API_OUTPUT_COUNT) {
 			$mediatypes = API::getApi()->select('media_type', array(
 				'output' => $options['selectMediatypes'],
-				'filter' => array('mediatypeid' => $mediatypeids),
+				'filter' => array('mediatypeid' => $relationMap->getRelatedIds('mediatypes')),
 				'preservekeys' => true
 			));
-		}
-
-		foreach ($result as $alertid => $alert) {
-			if (isset($alert['hostid']) && isset($hosts[$alert['hostid']])) {
-				$result[$alertid]['hosts'][] = $hosts[$alert['hostid']];
-			}
-			if (isset($mediatypes[$alert['mediatypeid']])) {
-				$result[$alertid]['mediatypes'][] = $mediatypes[$alert['mediatypeid']];
-			}
-			if (isset($users[$alert['userid']])) {
-				$result[$alertid]['users'][] = $users[$alert['userid']];
-			}
+			$result = $relationMap->mapMany($result, $mediatypes, 'mediatypes');
 		}
 
 		// removing keys (hash -> array)
@@ -413,5 +373,20 @@ class CAlert extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectUsers'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('userid'), $sqlParts);
+			}
+			if ($options['selectMediatypes'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('mediatypeid'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
 	}
 }
