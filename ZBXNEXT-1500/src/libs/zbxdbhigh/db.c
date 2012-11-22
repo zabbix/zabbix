@@ -42,6 +42,24 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 extern int	txn_level;
 extern int	txn_error;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: __DBnode                                                         *
+ *                                                                            *
+ * Purpose: prepare a SQL statement to select records from a specific node    *
+ *                                                                            *
+ * Parameters: field_name - [IN] the name of the field                        *
+ *             nodeid     - [IN] node identificator from database             *
+ *             op         - [IN] 0 - and; 1 - where                           *
+ *                                                                            *
+ * Return value:                                                              *
+ *  An SQL condition like:                                                    *
+ *   " and hostid between 100000000000000 and 199999999999999"                *
+ *  or                                                                        *
+ *   " where hostid between 100000000000000 and 199999999999999"              *
+ *  or an empty string for a standalone setup (nodeid = 0)                    *
+ *                                                                            *
+ ******************************************************************************/
 const char	*__DBnode(const char *field_name, int nodeid, int op)
 {
 	static char	dbnode[62 + ZBX_FIELDNAME_LEN];
@@ -51,8 +69,8 @@ const char	*__DBnode(const char *field_name, int nodeid, int op)
 	{
 		zbx_uint64_t	min, max;
 
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
+		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 
 		zbx_snprintf(dbnode, sizeof(dbnode), " %s %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 				operators[op], field_name, min, max);
@@ -63,12 +81,24 @@ const char	*__DBnode(const char *field_name, int nodeid, int op)
 	return dbnode;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBis_node_id                                                     *
+ *                                                                            *
+ * Purpose: checks belonging of an identifier to a certain node               *
+ *                                                                            *
+ * Parameters: id     - [IN] the checked identifier                           *
+ *             nodeid - [IN] node identificator from database                 *
+ *                                                                            *
+ * Return value: SUCCEED if identifier is belonging to a node, FAIL otherwise *
+ *                                                                            *
+ ******************************************************************************/
 int	DBis_node_id(zbx_uint64_t id, int nodeid)
 {
 	zbx_uint64_t	min, max;
 
-	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-	max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+	min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
+	max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 
 	return min <= id && id <= max ? SUCCEED : FAIL;
 }
@@ -1324,6 +1354,18 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_nextid                                                     *
+ *                                                                            *
+ * Purpose: gets a new identifier(s) for a specified table                    *
+ *                                                                            *
+ * Parameters: tablename - [IN] the name of a table                           *
+ *             num       - [IN] the number of reserved records                *
+ *                                                                            *
+ * Return value: first reserved identifier                                    *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
 	const char	*__function_name = "DBget_nextid";
@@ -1341,18 +1383,18 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	if (0 == CONFIG_NODEID)
 	{
 		min = 0;
-		max = (zbx_uint64_t)__UINT64_C(0x7fffffffffffffff);
+		max = ZBX_STANDALONE_MAX_IDS;
 	}
 	else if (0 != (table->flags & ZBX_SYNC))
 	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)CONFIG_NODEID +
-			(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)CONFIG_NODEID;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999);
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID +
+			ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)CONFIG_NODEID;
+		max = min + ZBX_DM_MAX_CONFIG_IDS - 1;
 	}
 	else
 	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)CONFIG_NODEID;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID;
+		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 	}
 
 	while (FAIL == found)

@@ -89,6 +89,7 @@ static int	validate_ids()
 {
 	char		sql[42 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN * 2];
 	DB_RESULT	result;
+	DB_ROW		row;
 	zbx_uint64_t	max_value;
 	int		i, ret = SUCCEED;
 
@@ -100,20 +101,18 @@ static int	validate_ids()
 		if (ZBX_TYPE_ID != field->type || 0 != strcmp(table->recid, field->name))
 			continue;
 
-		if (0 != (table->flags & ZBX_SYNC))
-			max_value = (zbx_uint64_t)__UINT64_C(99999999999);
-		else
-			max_value = (zbx_uint64_t)__UINT64_C(99999999999999);
+		max_value = (0 != (table->flags & ZBX_SYNC) ? ZBX_DM_MAX_CONFIG_IDS : ZBX_DM_MAX_HISTORY_IDS) - 1;
 
 		zbx_snprintf(sql, sizeof(sql), "select %s from %s where %s>" ZBX_FS_UI64,
 				field->name, table->table, field->name, max_value);
+printf("%s\n", sql);
 
 		result = DBselectN(sql, 1);
 
-		if (NULL != DBfetch(result))
+		if (NULL != (row = DBfetch(result)))
 		{
-			printf("Unable to convert. Some of object IDs are out of range in table \"%s\"\n",
-					table->table);
+			printf("Unable to convert. Some of object IDs are out of range in table \"%s\" (\"%s\" = %s)\n",
+					table->table, field->name, row[0]);
 			ret = FAIL;
 		}
 		DBfree_result(result);
@@ -162,7 +161,8 @@ static int	validate_trigger_expressions(int new_id)
 		if (new_expression_offset <= TRIGGER_EXPRESSION_LEN)
 			continue;
 
-		printf("Unable to convert. Length of trigger expression is out of range in table \"triggers\"\n");
+		printf("Unable to convert. Length of trigger expression is out of range in table"
+				" \"triggers\" (\"triggerid\" = %s)\n", row[1]);
 		ret = FAIL;
 		break;
 	}
