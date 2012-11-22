@@ -63,6 +63,7 @@ if (!empty($this->data['insert'])) {
 	foreach ($this->data['param'] as &$param) {
 		$param = quoteFunctionParam($param);
 	}
+	unset($param);
 
 	$expression = sprintf('{%s:%s.%s(%s)}%s%s',
 		$this->data['item_host'],
