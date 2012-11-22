@@ -687,6 +687,12 @@ return array(
 				'ref_table' => 'httptest',
 				'ref_field' => 'httptestid',
 			),
+			'http_proxy' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'httpstep' => array(
