@@ -604,6 +604,7 @@ void	process_httptests(int httppoller_num, int now)
 
 		process_httptest(&host, &httptest);
 
+		zbx_free(httptest.http_proxy);
 		if (HTTPTEST_AUTH_NONE != httptest.authentication)
 		{
 			zbx_free(httptest.http_password);
@@ -611,7 +612,6 @@ void	process_httptests(int httppoller_num, int now)
 		}
 		zbx_free(httptest.agent);
 		zbx_free(httptest.macros);
-		zbx_free(httptest.http_proxy);
 	}
 	DBfree_result(result);
 

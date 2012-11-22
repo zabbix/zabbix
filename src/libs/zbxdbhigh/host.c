@@ -4237,9 +4237,9 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 	{
 		httptest = (httptest_t *)httptests->values[i];
 
+		zbx_free(httptest->http_proxy_esc);
 		zbx_free(httptest->http_password_esc);
 		zbx_free(httptest->http_user_esc);
-		zbx_free(httptest->http_proxy_esc);
 		zbx_free(httptest->agent_esc);
 		zbx_free(httptest->macros_esc);
 		zbx_free(httptest->name_esc);
