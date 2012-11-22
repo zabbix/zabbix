@@ -2235,7 +2235,7 @@ function get_item_function_info($expr) {
 					$value_type = $item_data['value_type'];
 				}
 
-				if ($value_type) == null) {
+				if ($value_type == null) {
 					return EXPRESSION_VALUE_TYPE_UNKNOWN;
 				}
 
