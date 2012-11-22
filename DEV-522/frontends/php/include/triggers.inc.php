@@ -915,6 +915,8 @@ function triggerExpression($trigger, $html = false) {
 /**
  * Implodes expression, replaces names and keys with IDs
  *
+ * Fro example: localhost:procload.last(0)>10 will translated to {12}>10 and created database representation.
+ *
  * @throws Exception if error occureed
  *
  * @param string $expression Full expression with host names and item keys
@@ -923,7 +925,6 @@ function triggerExpression($trigger, $html = false) {
  *
  * @return string Imploded expression (names and keys replaced by IDs)
  */
-// translate localhost:procload.last(0)>10 to {12}>10 and create database representation.
 function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
@@ -965,7 +966,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 			throw new Exception($triggerFunctionValidator->getError());
 		}
 
-		$newFunctions[$exprPart['expression']] = null;
+		$newFunctions[$exprPart['expression']] = 0;
 
 		$functions[] = array(
 			'itemid' => $items[$exprPart['host']][$exprPart['item']]['itemid'],
@@ -974,7 +975,6 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 			'parameter' => $exprPart['functionParam']
 		);
 	}
-	unset($triggerFunctionValidator);
 
 	$functionids = DB::insert('functions', $functions);
 
@@ -982,6 +982,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	foreach ($newFunctions as &$newFunction) {
 		$newFunction = $functionids[$num++];
 	}
+	unset($newFunction);
 
 	$expr = $expressionData->expressionShort;
 	foreach ($expressionData->expressions as $exprPart) {
