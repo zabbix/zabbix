@@ -30,7 +30,7 @@
  *                                                                            *
  * Purpose: convert trigger expression to new node ID                         *
  *                                                                            *
- * Parameters: new_id - new node id                                           *
+ * Parameters: nodeid - new node id                                           *
  *             old_exp - old expression, new_exp - new expression             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -38,7 +38,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_expression(int new_id, zbx_uint64_t prefix, const char *old_exp,
+static void	convert_expression(int nodeid, zbx_uint64_t prefix, const char *old_exp,
 		char **new_expression, size_t *new_expression_alloc, size_t *new_expression_offset)
 {
 	enum state_t {NORMAL, ID}	state = NORMAL;
@@ -130,10 +130,10 @@ printf("%s\n", sql);
  *                                                                            *
  * Purpose: validate length of new trigger expressions                        *
  *                                                                            *
- * Parameters: new_id - new node id                                           *
+ * Parameters: nodeid - new node id                                           *
  *                                                                            *
  ******************************************************************************/
-static int	validate_trigger_expressions(int new_id)
+static int	validate_trigger_expressions(int nodeid)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -147,15 +147,15 @@ static int	validate_trigger_expressions(int new_id)
 
 	new_expression = zbx_malloc(NULL, new_expression_alloc);
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 	if (0 != (r_table->flags & ZBX_SYNC))
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+		prefix += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
 
 	result = DBselect("select expression,triggerid from triggers");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		convert_expression(new_id, prefix, row[0], &new_expression, &new_expression_alloc,
+		convert_expression(nodeid, prefix, row[0], &new_expression, &new_expression_alloc,
 				&new_expression_offset);
 
 		if (new_expression_offset <= TRIGGER_EXPRESSION_LEN)
@@ -179,14 +179,14 @@ static int	validate_trigger_expressions(int new_id)
  *                                                                            *
  * Purpose: convert trigger expressions to new node ID                        *
  *                                                                            *
- * Parameters: new_id - new node id                                           *
+ * Parameters: nodeid - new node id                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_trigger_expressions(int new_id)
+static void	convert_trigger_expressions(int nodeid)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -199,15 +199,15 @@ static void	convert_trigger_expressions(int new_id)
 
 	new_expression = zbx_malloc(NULL, new_expression_alloc);
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 	if (0 != (r_table->flags & ZBX_SYNC))
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+		prefix += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
 
 	result = DBselect("select expression,triggerid from triggers");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		convert_expression(new_id, prefix, row[0], &new_expression, &new_expression_alloc,
+		convert_expression(nodeid, prefix, row[0], &new_expression, &new_expression_alloc,
 				&new_expression_offset);
 
 		new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
@@ -226,19 +226,18 @@ static void	convert_trigger_expressions(int new_id)
  *                                                                            *
  * Purpose: convert profiles idx2 and value_id fields to new node ID          *
  *                                                                            *
- * Parameters: new_id - new node id                                           *
+ * Parameters: nodeid - new node id                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_profiles(int new_id, const char *field_name)
+static void	convert_profiles(int nodeid, const char *field_name)
 {
 	zbx_uint64_t	prefix;
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id +
-		(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+	prefix = (ZBX_DM_MAX_HISTORY_IDS + ZBX_DM_MAX_CONFIG_IDS) * (zbx_uint64_t)nodeid;
 
 	DBexecute("update profiles set %s=%s+" ZBX_FS_UI64 " where %s>0",
 			field_name, field_name, prefix, field_name);
@@ -250,14 +249,14 @@ static void	convert_profiles(int new_id, const char *field_name)
  *                                                                            *
  * Purpose: special processing for multipurpose fields                        *
  *                                                                            *
- * Parameters: new_id - new node id                                           *
+ * Parameters: nodeid - new node id                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	convert_special_field(int new_id, const char *table_name,
+static void	convert_special_field(int nodeid, const char *table_name,
 		const char *field_name, const char *type_field_name,
 		const char *rel_table_name, int type)
 {
@@ -266,9 +265,9 @@ static void	convert_special_field(int new_id, const char *table_name,
 
 	assert(NULL != (r_table = DBget_table(rel_table_name)));
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 	if (0 != (r_table->flags & ZBX_SYNC))
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+		prefix += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
 
 	DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s=%d and %s>0",
 			table_name, field_name, field_name, prefix, type_field_name, type, field_name);
@@ -280,12 +279,12 @@ static void	convert_special_field(int new_id, const char *table_name,
  *                                                                            *
  * Purpose: special processing for "value" field in "conditions" table        *
  *                                                                            *
- * Parameters: new_id - new node id                                           *
+ * Parameters: nodeid - new node id                                           *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-static void	convert_condition_values(int new_id, const char *rel_table_name, int type)
+static void	convert_condition_values(int nodeid, const char *rel_table_name, int type)
 {
 	const ZBX_TABLE	*r_table;
 	DB_RESULT	result;
@@ -294,9 +293,9 @@ static void	convert_condition_values(int new_id, const char *rel_table_name, int
 
 	assert(NULL != (r_table = DBget_table(rel_table_name)));
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 	if (0 != (r_table->flags & ZBX_SYNC))
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+		prefix += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
 
 	result = DBselect("select conditionid,value"
 			" from conditions"
@@ -323,7 +322,7 @@ static void	convert_condition_values(int new_id, const char *rel_table_name, int
  *                                                                            *
  * Purpose: convert database data to new node ID                              *
  *                                                                            *
- * Parameters: new_id - new node id                                           *
+ * Parameters: nodeid - new node id                                           *
  *                                                                            *
  * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
@@ -331,7 +330,7 @@ static void	convert_condition_values(int new_id, const char *rel_table_name, int
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	change_nodeid(int new_id)
+int	change_nodeid(int nodeid)
 {
 	struct conv_t
 	{
@@ -443,7 +442,7 @@ int	change_nodeid(int new_id)
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	if (1 > new_id || new_id > 999)
+	if (1 > nodeid || nodeid > 999)
 	{
 		printf("Node ID must be in range of 1-999.\n");
 		return FAIL;
@@ -453,7 +452,7 @@ int	change_nodeid(int new_id)
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	if (SUCCEED != validate_ids() || SUCCEED != validate_trigger_expressions(new_id))
+	if (SUCCEED != validate_ids() || SUCCEED != validate_trigger_expressions(nodeid))
 	{
 		DBclose();
 		return FAIL;
@@ -494,7 +493,7 @@ int	change_nodeid(int new_id)
 			{
 				for (t = 0; NULL != special_convs[s].convs[t].rel; t++)
 				{
-					convert_special_field(new_id, special_convs[s].table_name,
+					convert_special_field(nodeid, special_convs[s].table_name,
 							special_convs[s].field_name, special_convs[s].type_field_name,
 							special_convs[s].convs[t].rel, special_convs[s].convs[t].type);
 				}
@@ -507,25 +506,23 @@ int	change_nodeid(int new_id)
 			/* primary key */
 			if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))
 			{
-				prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
-
+				prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 				if (0 != (tables[i].flags & ZBX_SYNC))
-					prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+					prefix += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
 			}
 			/* relations */
 			else if (NULL != tables[i].fields[j].fk_table)
 			{
 				assert(NULL != (r_table = DBget_table(tables[i].fields[j].fk_table)));
 
-				prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
-
+				prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 				if (0 != (r_table->flags & ZBX_SYNC))
-					prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+					prefix += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
 			}
 			/* special processing for table 'profiles' */
 			else if (0 == strcmp("profiles", tables[i].table))
 			{
-				convert_profiles(new_id, tables[i].fields[j].name);
+				convert_profiles(nodeid, tables[i].fields[j].name);
 				continue;
 			}
 			else
@@ -541,13 +538,13 @@ int	change_nodeid(int new_id)
 	}
 
 	/* special processing for trigger expressions */
-	convert_trigger_expressions(new_id);
+	convert_trigger_expressions(nodeid);
 
 	/* special processing for condition values */
 	for (i = 0; NULL != condition_convs[i].rel; i++)
-		convert_condition_values(new_id, condition_convs[i].rel, condition_convs[i].type);
+		convert_condition_values(nodeid, condition_convs[i].rel, condition_convs[i].type);
 
-	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)", new_id);
+	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)", nodeid);
 
 	DBexecute("delete from ids where nodeid=0");
 
@@ -578,7 +575,7 @@ error:
 	return ret;
 }
 #else	/* HAVE_SQLITE3 */
-int	change_nodeid(int new_id)
+int	change_nodeid(int nodeid)
 {
 	printf("Distributed monitoring with SQLite3 is not supported.\n");
 	return FAIL;
