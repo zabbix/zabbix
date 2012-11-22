@@ -1931,7 +1931,7 @@ function expressionHighLevelErrors($expression, $start, $end) {
 
 				if (!is_array($info) && isset($definedErrorPhrases[$info])) {
 					if (!isset($errors[$expression][$exprPart['expression']])) {
-						$errors[$expression][$exprPart['expression']] = &$definedErrorPhrases[$info];
+						$errors[$expression][$exprPart['expression']] = $definedErrorPhrases[$info];
 					}
 				}
 			}
@@ -1947,7 +1947,7 @@ function expressionHighLevelErrors($expression, $start, $end) {
 	if ($expressionData->parse(substr($expression, $start, $end - $start + 1))) {
 		foreach ($expressionData->expressions as $exprPart) {
 			if (isset($errors[$expression][$exprPart['expression']])) {
-				$ret[$exprPart['expression']] = &$errors[$expression][$exprPart['expression']];
+				$ret[$exprPart['expression']] = $errors[$expression][$exprPart['expression']];
 			}
 		}
 	}
