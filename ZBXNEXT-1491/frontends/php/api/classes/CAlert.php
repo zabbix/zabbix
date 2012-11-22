@@ -161,15 +161,14 @@ class CAlert extends CZBXAPI {
 		}
 
 		// hostids
-		if ($options['hostids'] !== null
-			|| $options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+		if ($options['hostids'] !== null) {
 
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['hostid'] = 'i.hostid';
-			$sqlParts['leftJoin']['events'] = 'events e ON a.eventid=e.eventid';
-			$sqlParts['leftJoin']['functions'] = 'functions f ON e.objectid=f.triggerid';
-			$sqlParts['leftJoin']['items'] = 'items i ON i.itemid=f.itemid';
+			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			$sqlParts = $this->addQueryLeftJoin('events e', 'a.eventid', 'e.eventid', $sqlParts);
+			$sqlParts = $this->addQueryLeftJoin('functions f', 'e.objectid', 'f.triggerid', $sqlParts);
+			$sqlParts = $this->addQueryLeftJoin('items i', 'i.itemid', 'f.itemid', $sqlParts);
 			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 
 			if ($options['hostids'] !== null) {
@@ -379,8 +378,17 @@ class CAlert extends CZBXAPI {
 			if ($options['selectUsers'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('userid'), $sqlParts);
 			}
+
 			if ($options['selectMediatypes'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('mediatypeid'), $sqlParts);
+			}
+
+			if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+				$sqlParts = $this->addQueryLeftJoin('events e', 'a.eventid', 'e.eventid', $sqlParts);
+				$sqlParts = $this->addQueryLeftJoin('functions f', 'e.objectid', 'f.triggerid', $sqlParts);
+				$sqlParts = $this->addQueryLeftJoin('items i', 'i.itemid', 'f.itemid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+				$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			}
 		}
 

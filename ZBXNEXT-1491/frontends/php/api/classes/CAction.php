@@ -298,11 +298,6 @@ class CAction extends CZBXAPI {
 			$sqlParts['where']['ooc'] = 'o.operationid=oc.operationid';
 		}
 
-		if ($options['selectConditions'] !== null) {
-			$sqlParts['leftJoin']['conditions'] = 'conditions c ON a.actionid=c.actionid';
-			$sqlParts = $this->addQuerySelect('c.conditionid', $sqlParts);
-		}
-
 		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('actions a', $options, $sqlParts);
@@ -335,6 +330,7 @@ class CAction extends CZBXAPI {
 
 		$actionids = array();
 
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
@@ -1792,4 +1788,19 @@ class CAction extends CZBXAPI {
 
 		return true;
 	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectConditions'] !== null) {
+				$sqlParts = $this->addQueryLeftJoin('conditions c', 'a.actionid', 'c.actionid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('c.conditionid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+
 }
