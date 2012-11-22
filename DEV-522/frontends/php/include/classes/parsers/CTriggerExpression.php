@@ -665,7 +665,6 @@ class CTriggerExpression {
 				continue;
 			}
 
-			$macro = substr($this->expression, $this->pos, $len);
 			$this->macros[]['expression'] = $macro;
 			$this->expressionShort .= $macro;
 			$this->pos += $len - 1;
