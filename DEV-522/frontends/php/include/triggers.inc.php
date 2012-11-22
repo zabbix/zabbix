@@ -1917,7 +1917,8 @@ function expressionHighLevelErrors($expression, $start, $end) {
 		$definedErrorPhrases = array(
 			EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 			EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
-			EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro')
+			EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro'),
+			EXPRESSION_FUNCTION_UNKNOWN => _('Incorrect function is used')
 		);
 		$errors = array();
 	}
@@ -2214,6 +2215,10 @@ function get_item_function_info($expr) {
 			));
 			if (empty($itemFound)) {
 				return EXPRESSION_HOST_ITEM_UNKNOWN;
+			}
+
+			if (!isset($function_info[$exprPart['functionName']])) {
+				return EXPRESSION_FUNCTION_UNKNOWN;
 			}
 
 			$result = $function_info[$exprPart['functionName']];
