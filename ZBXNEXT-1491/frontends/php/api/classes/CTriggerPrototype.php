@@ -746,10 +746,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
-			$expressionData = new CTriggerExpression(array('expression' => $trigger['expression']));
-
-			if (!empty($expressionData->errors)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+			$expressionData = new CTriggerExpression();
+			if (!$expressionData->parse($trigger['expression'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 			}
 
 			$this->checkIfExistsOnHost($trigger);
@@ -986,9 +985,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
 
 			$hosts = array();
-			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
-			if (is_null($expression)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
+			try {
+				$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
+			}
+			catch (Exception $e) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot implode expression "%s".', $trigger['expression']).' '.$e->getMessage());
 			}
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),
@@ -1027,19 +1029,26 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			if ($descriptionChanged || $expressionChanged) {
-				$expressionData = new CTriggerExpression(array('expression' => $expressionFull));
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($expressionFull)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+				}
 
-				if (!empty($expressionData->errors)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+				if (!isset($expressionData->expressions[0])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Trigger expression must contain at least one host:key reference.'));
 				}
 			}
 
 			if ($expressionChanged) {
 				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
 
-				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
-				if (is_null($trigger['expression'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expressionFull));
+				try {
+					$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
+				}
+				catch (Exception $e) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
 				}
 			}
 

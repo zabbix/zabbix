@@ -67,7 +67,6 @@ class API {
 		'templatescreen' => 'CTemplateScreen',
 		'templatescreenitem' => 'CTemplateScreenItem',
 		'trigger' => 'CTrigger',
-		'triggerexpression' => 'CTriggerExpression',
 		'triggerprototype' => 'CTriggerPrototype',
 		'user' => 'CUser',
 		'usergroup' => 'CUserGroup',
@@ -374,13 +373,6 @@ class API {
 	 */
 	public static function Trigger() {
 		return self::getObject('trigger');
-	}
-
-	/**
-	 * @return CTriggerExpression
-	 */
-	public static function TriggerExpression() {
-		return self::getObject('triggerexpression');
 	}
 
 	/**
