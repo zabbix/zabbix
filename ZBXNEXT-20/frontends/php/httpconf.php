@@ -250,7 +250,6 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	catch (Exception $e) {
 		DBend(false);
-		error($e->getMessage());
 		show_messages(false, null, $message_false);
 	}
 }
