@@ -66,6 +66,9 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
+A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
+..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
 ..F....... [ZBX-5855] fixed "Array to string conversion" errors in 1.8 XML import (Oleg)
 ..F....... [ZBX-3684] fixed "Undefined index" error in 1.8 XML import (Oleg)
 ...G...... [ZBX-5732] fixed sending data from a file in Zabbix sender (Andris)
