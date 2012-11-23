@@ -330,7 +330,9 @@ class CApplication extends CZBXAPI {
 
 		// adding objects
 		// adding items
-		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
+		if (!is_null($options['selectItems'])
+			&& (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
+
 			$objParams = array(
 				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
