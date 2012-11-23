@@ -22,6 +22,9 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
+A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
+..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
 A......... [ZBX-5718] fixed unknown event generation for templated triggers (Oleg)
 ..F....... [ZBX-5749] fixed macros resolving in triggers in Maps (Eduard)
 A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
@@ -63,6 +66,10 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5860] fixed hostgroup massupdate (Eduard)
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
+A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
+..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
 ..F....... [ZBX-5855] fixed "Array to string conversion" errors in 1.8 XML import (Oleg)
 ..F....... [ZBX-3684] fixed "Undefined index" error in 1.8 XML import (Oleg)
 ...G...... [ZBX-5732] fixed sending data from a file in Zabbix sender (Andris)
@@ -151,7 +158,6 @@ A.F....... [ZBX-5046] fixed an error when deleting a globalmacro when the macro 
 A......... [ZBX-3907] fixed API user.logout method (Vedmak)
 ..F....... [ZBX-4983] fixed importing of 1.8 templates if they contain already existing host macros (Vedmak)
 ..F....... [ZBX-5579] fixed displaying 'Acknowledged' in Monitoring -> Triggers when a trigger has no events by displaying 'No events' instead (Vedmak)
-..F....... [ZBX-4247] fixed error when trigger expression items have same trigger expression like parameter in key (Vedmak)
 ..F....... [ZBX-5606] removed 'units' and 'store value' fields for character data items (Vedmak)
 ..F....... [ZBX-5608] fixed incorrect macro resolving in trigger descriptions if expression has duplicate functions (Vedmak)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)

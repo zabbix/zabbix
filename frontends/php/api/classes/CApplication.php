@@ -154,13 +154,6 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		// expandData
-		if (!is_null($options['expandData'])) {
-			$sqlParts['select']['host'] = 'h.host';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
-		}
-
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
@@ -630,6 +623,13 @@ class CApplication extends CZBXAPI {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
+			// expandData
+			if (!is_null($options['expandData'])) {
+				$sqlParts['select']['host'] = 'h.host';
+				$sqlParts['from']['hosts'] = 'hosts h';
+				$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
+			}
+
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('a.hostid', $sqlParts);
 			}

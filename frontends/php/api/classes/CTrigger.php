@@ -1025,11 +1025,12 @@ class CTrigger extends CTriggerGeneral {
 		$result = false;
 
 		if (!isset($object['hostid']) && !isset($object['host'])) {
-			$expr = new CTriggerExpression($object);
-			if (!empty($expr->errors) || empty($expr->data['hosts'])) {
+			$expressionData = new CTriggerExpression();
+			if (!$expressionData->parse($object['expression'])) {
 				return false;
 			}
-			$object['host'] = reset($expr->data['hosts']);
+			$expressionHosts = $expressionData->getHosts();
+			$object['host'] = reset($expressionHosts);
 		}
 
 		$options = array(
@@ -1164,13 +1165,20 @@ class CTrigger extends CTriggerGeneral {
 			// validating trigger expression
 			if (isset($trigger['expression']) && $expressionChanged) {
 				// expression permissions
-				$expressionData = new CTriggerExpression($trigger);
-				if (!empty($expressionData->errors)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($trigger['expression'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
+				if (!isset($expressionData->expressions[0])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Trigger expression must contain at least one host:key reference.'));
+				}
+
+				$expressionHosts = $expressionData->getHosts();
+
 				$hosts = API::Host()->get(array(
-					'filter' => array('host' => $expressionData->data['hosts']),
+					'filter' => array('host' => $expressionHosts),
 					'editable' => true,
 					'output' => array(
 						'hostid',
@@ -1182,7 +1190,7 @@ class CTrigger extends CTriggerGeneral {
 				));
 				$hosts = zbx_toHash($hosts, 'host');
 				$hostsStatusFlags = 0x0;
-				foreach ($expressionData->data['hosts'] as $host) {
+				foreach ($expressionHosts as $host) {
 					if (!isset($hosts[$host])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.', $host));
 					}
@@ -1195,10 +1203,6 @@ class CTrigger extends CTriggerGeneral {
 				}
 
 				foreach ($expressionData->expressions as $exprPart) {
-					if (zbx_empty($exprPart['item'])) {
-						continue;
-					}
-
 					$sql = 'SELECT i.itemid,i.value_type'.
 							' FROM items i,hosts h'.
 							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
@@ -1557,10 +1561,13 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
 			$hosts = array();
-			$expression = implode_exp($trigger['expression'], $triggerId, $hosts);
 
-			if (is_null($expression)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
+			try {
+				$expression = implode_exp($trigger['expression'], $triggerId, $hosts);
+			}
+			catch (Exception $e) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot implode expression "%s".', $trigger['expression']).' '.$e->getMessage());
 			}
 
 			$this->validateItems($trigger);
@@ -1651,16 +1658,17 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($expressionChanged) {
 				// check the expression
-				$expressionData = new CTriggerExpression(array('expression' => $expressionFull));
-				if (!empty($expressionData->errors)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, reset($expressionData->errors));
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($expressionFull)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
-				$oldExpressionData = new CTriggerExpression(array('expression' => $oldExpression));
+				$oldExpressionData = new CTriggerExpression();
+				$oldExpressionData->parse($oldExpression);
 				// chech if at least one template has stayed in expression, this means that child trigger will stay in host
-				$oldTemplates = array_unique($oldExpressionData->data['hosts']);
-				$newTemplates = zbx_toHash(array_unique($expressionData->data['hosts']));
+				$oldTemplates = $oldExpressionData->getHosts();
+				$newTemplates = zbx_toHash($expressionData->getHosts());
 				$proceed = true;
 				foreach ($oldTemplates as $oldTemplate) {
 					if (isset($newTemplates[$oldTemplate])) {
@@ -1684,7 +1692,8 @@ class CTrigger extends CTriggerGeneral {
 
 						// if we have at least one template linked to trigger host inside trigger expression,
 						// then we don't delete this trigger
-						foreach ($expressionData->data['hosts'] as $templateName) {
+						$expressionHosts = $expressionData->getHosts();
+						foreach ($expressionHosts as $templateName) {
 							if (isset($templateNames[$templateName])) {
 								continue 2;
 							}
@@ -1704,9 +1713,12 @@ class CTrigger extends CTriggerGeneral {
 
 				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
 
-				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
-				if (is_null($trigger['expression'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expressionFull));
+				try {
+					$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
+				}
+				catch (Exception $e) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
 				}
 
 				if (isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)) {
@@ -2070,20 +2082,14 @@ class CTrigger extends CTriggerGeneral {
 	 * @return bool
 	 */
 	protected function validateItems(array $trigger) {
-		$trigExpr = new CTriggerExpression(array('expression' => $trigger['expression']));
-
-		$hosts = array();
-		foreach ($trigExpr->expressions as $exprPart) {
-			if (!zbx_empty($exprPart['host'])) {
-				$hosts[] = $exprPart['host'];
-			}
-		}
+		$expressionData = new CTriggerExpression();
+		$expressionData->parse($trigger['expression']);
 
 		$templatesData = API::Template()->get(array(
 			'output' => API_OUTPUT_REFER,
 			'selectHosts' => API_OUTPUT_REFER,
 			'selectTemplates' => API_OUTPUT_REFER,
-			'filter' => array('host' => $hosts),
+			'filter' => array('host' => $expressionData->getHosts()),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
@@ -2157,12 +2163,10 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @return bool
 	 */
-	protected function expressionHasTemplates(CTriggerExpression $exp) {
+	protected function expressionHasTemplates(CTriggerExpression $expressionData) {
 		$hosts = API::Host()->get(array(
 			'output' => array('status'),
-			'filter' => array(
-				'name' => $exp->data['hosts']
-			),
+			'filter' => array('name' => $expressionData->getHosts()),
 			'templated_hosts' => true
 		));
 
