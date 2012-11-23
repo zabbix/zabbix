@@ -22,7 +22,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
-A.F....... [ZBX-5814] Fixed an incorrect error message when saving trigger with illegal trigger expression (Sasha)
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
 A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
 ..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
 A......... [ZBX-5718] fixed unknown event generation for templated triggers (Oleg)
