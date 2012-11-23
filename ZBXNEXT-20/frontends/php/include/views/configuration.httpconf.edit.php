@@ -61,7 +61,7 @@ $httpFormList = new CFormList('httpFormList');
 
 // Parent http tests
 if (!empty($this->data['templates'])) {
-	$httpFormList->addRow(_('Parent http tests'), $this->data['templates']);
+	$httpFormList->addRow(_('Parent web scenarios'), $this->data['templates']);
 }
 
 // Host
