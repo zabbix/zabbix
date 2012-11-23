@@ -399,16 +399,16 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		}
 
 		// try to create valid expression
-		$trigExpr = new CTriggerExpression(array('expression' => $macro));
-		if (!empty($trigExpr->errors)) {
+		$expressionData = new CTriggerExpression();
+		if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
 			continue;
 		}
 
 		// look in DB for coressponding item
-		$itemHost = reset($trigExpr->data['hosts']);
-		$key = reset($trigExpr->data['items']);
-		$function = reset($trigExpr->data['functions']);
-		$parameter = convertFunctionValue(reset($trigExpr->data['functionParams']));
+		$itemHost = $expressionData->expressions[0]['host'];
+		$key = $expressionData->expressions[0]['item'];
+		$function = $expressionData->expressions[0]['functionName'];
+		$parameter = convertFunctionValue($expressionData->expressions[0]['functionParamList'][0]);
 
 		$item = API::Item()->get(array(
 			'webitems' => true,
