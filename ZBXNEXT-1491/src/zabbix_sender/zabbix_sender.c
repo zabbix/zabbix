@@ -104,7 +104,8 @@ static void	send_signal_handler(int sig)
 	if (SIGALRM == sig)
 		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
 
-	exit(FAIL);
+	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
+	_exit(FAIL);
 }
 #endif
 
@@ -147,7 +148,7 @@ static int	check_response(char *response)
 	if (SUCCEED == ret && 0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
 		ret = FAIL;
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
+	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
 		printf("info from server: \"%s\"\n", info);
 
 	return ret;

@@ -82,10 +82,10 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3];
+	unsigned char	types[3], statuses[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
-	int		errcodes[3];
+	int		lastclocks[3], errcodes[3];
 	size_t		i, num = 0;
 	AGENT_RESULT    value;
 
@@ -147,11 +147,17 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 				break;
 		}
 
+		items[i].status = ITEM_STATUS_ACTIVE;
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
+				items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
+
+		statuses[i] = items[i].status;
+		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -164,10 +170,10 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3];
+	unsigned char	types[3], statuses[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
-	int		errcodes[3];
+	int		lastclocks[3], errcodes[3];
 	size_t		i, num = 0;
 	AGENT_RESULT    value;
 
@@ -224,11 +230,17 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 				break;
 		}
 
+		items[i].status = ITEM_STATUS_ACTIVE;
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
+				items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
+
+		statuses[i] = items[i].status;
+		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -290,6 +302,7 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROXY, httptest->http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
@@ -552,7 +565,7 @@ void	process_httptests(int httppoller_num, int now)
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.macros,t.agent,"
-				"t.authentication,t.http_user,t.http_password"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -597,8 +610,13 @@ void	process_httptests(int httppoller_num, int now)
 					&httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
+		httptest.http_proxy = zbx_strdup(NULL, row[10]);
+		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+				&httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+
 		process_httptest(&host, &httptest);
 
+		zbx_free(httptest.http_proxy);
 		if (HTTPTEST_AUTH_NONE != httptest.authentication)
 		{
 			zbx_free(httptest.http_password);

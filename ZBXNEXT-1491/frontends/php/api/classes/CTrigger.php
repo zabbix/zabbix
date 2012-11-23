@@ -1547,30 +1547,67 @@ class CTrigger extends CTriggerGeneral {
 		for ($i = 0, $size = count($triggersCopy); $i < $size; $i++) {
 			unset($triggersCopy[$i]['expression']);
 		}
-		$triggerids = DB::insert('triggers', $triggersCopy);
+		$triggerIds = DB::insert('triggers', $triggersCopy);
 		unset($triggersCopy);
 
-		// update triggers expression
+		$allHosts = array();
+		$allowedHosts = array();
+		$triggersAndHosts = array();
+		$triggerExpression = array();
 		foreach ($triggers as $tnum => $trigger) {
-			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
-
-			addUnknownEvent($triggerid);
-
+			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
 			$hosts = array();
-			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
+			$expression = implode_exp($trigger['expression'], $triggerId, $hosts);
+
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
 
 			$this->validateItems($trigger);
 
+			foreach ($hosts as $host) {
+				$allHosts[] = $host;
+			}
+
+			$triggersAndHosts[$triggerId] = $hosts;
+			$triggerExpression[$triggerId] = $expression;
+		}
+
+		$allHosts = array_unique($allHosts);
+		$dbHostsStatuses = DBselect(
+			'SELECT h.host, h.status'.
+			' FROM hosts h'.
+			' WHERE '.DBcondition('h.host', $allHosts)
+			);
+		while ($allowedHostsData = DBfetch($dbHostsStatuses)) {
+			if ($allowedHostsData['status'] != HOST_STATUS_TEMPLATE) {
+				$allowedHosts[] = $allowedHostsData['host'];
+			}
+		}
+
+		// update triggers expression
+		foreach ($triggers as $tnum => $trigger) {
+			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
+
+			$statusHost = true;
+			foreach ($triggersAndHosts[$triggerId] as $host) {
+				if (!in_array($host, $allowedHosts)) {
+					$statusHost = false;
+					break;
+				}
+			}
+
+			if ($statusHost) {
+				addUnknownEvent($triggerId);
+			}
+
 			DB::update('triggers', array(
-				'values' => array('expression' => $expression),
-				'where' => array('triggerid' => $triggerid)
+				'values' => array('expression' => $triggerExpression[$triggerId]),
+				'where' => array('triggerid' => $triggerId)
 			));
 
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid,
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $triggersAndHosts[$triggerId])));
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerId,
 					$trigger['description'], null, null, null);
 		}
 	}
