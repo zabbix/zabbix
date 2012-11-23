@@ -107,6 +107,15 @@ class CHttpTestManager {
 			$this->createStepsReal($httpTest, $httpTest['steps']);
 		}
 
+		// TODO: REMOVE info
+		$dbCursor = DBselect('SELECT ht.name, h.name as hostname'.
+			' FROM httptest ht'.
+			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
+			' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid')));
+		while ($httpTest = DBfetch($dbCursor)) {
+			info(_s('Created: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['hostname']));
+		}
+
 		return $httpTests;
 	}
 
@@ -216,6 +225,15 @@ class CHttpTestManager {
 					));
 				}
 			}
+		}
+
+		// TODO: REMOVE info
+		$dbCursor = DBselect('SELECT ht.name, h.name as hostname'.
+			' FROM httptest ht'.
+			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
+			' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid')));
+		while ($httpTest = DBfetch($dbCursor)) {
+			info(_s('Updated: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['hostname']));
 		}
 
 		return $httpTests;
