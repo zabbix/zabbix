@@ -2260,8 +2260,10 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 	$result = false;
 
 	$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
-	preg_match_all("/[0-9\.]+[KMGThmdw]?/", $evStr, $arr);
-	$evStr = str_replace(array($arr[0][0], $arr[0][1]), array(convert($arr[0][0]), convert($arr[0][1])), $evStr);
+	preg_match_all('/[0-9\.]+['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?/', $evStr, $arr, PREG_OFFSET_CAPTURE);
+	for ($i = count($arr[0]) - 1; $i >= 0; $i--) {
+		$evStr = substr_replace($evStr, convert($arr[0][$i][0]), $arr[0][$i][1], strlen($arr[0][$i][0]));
+	}
 
 	if (!preg_match("/^[0-9.\s=#()><+*\/&E|\-]+$/is", $evStr)) {
 		return 'FALSE';
@@ -2290,7 +2292,7 @@ function resolveTriggerUrl($trigger) {
 
 function convert($value) {
 	$value = trim($value);
-	if (!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>[TGMKsmhdw]?)/', $value, $arr)) {
+	if (!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/', $value, $arr)) {
 		return $value;
 	}
 
