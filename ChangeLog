@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F.I..PS. [ZBXNEXT-308] added support of WEB monitoring using HTTP proxy (Alexei)
 A.F.I..PS. [ZBXNEXT-20] added support of templated Web scenarios (Sasha, Vedmak)
 A.F....... [ZBXNEXT-887] fixed permission calculation (Eduard)
 A......... [ZBXNEXT-1492] dropped support of output shorten for the API get methods (Pavels)
@@ -21,6 +22,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5718] fixed unknown event generation for templated triggers (Oleg)
 ..F....... [ZBX-5749] fixed macros resolving in triggers in Maps (Eduard)
 A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
 A......... [ZBX-5709] fixed trigger recreation after template trigger expression change causing event history deletion (Toms)
@@ -61,9 +63,13 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5855] fixed "Array to string conversion" errors in 1.8 XML import (Oleg)
+..F....... [ZBX-3684] fixed "Undefined index" error in 1.8 XML import (Oleg)
+...G...... [ZBX-5732] fixed sending data from a file in Zabbix sender (Andris)
+...G...... [ZBX-5741] fixed Zabbix sender crash if a corrupted server response is received (Andris)
+...G...... [ZBX-5722] fixed calculation of "vm.memory.size[available]" in Zabbix agent on Solaris (Andris)
+.......PS. [ZBX-5149] fixed refreshing of unsupported "Zabbix agent (active)" items by a proxy (Sasha)
 ..F....... [ZBX-5759] fixed Oracle ORA-01002 SQL error on items bulk actions (Toms)
-A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
-A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
 ..F....... [ZBX-5639] fixed global options "dropdown first entry" and "remember selected" in availability reports (Oleg)
 ..F....... [ZBX-5639] improved sdii() debugging function (Toms)
 A.F.....S. [ZBX-5816] fixed undefined index in Monitoring > Events, when favorite trigger has been deleted (Toms, Sasha)
