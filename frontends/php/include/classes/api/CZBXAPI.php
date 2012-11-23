@@ -412,7 +412,8 @@ class CZBXAPI {
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select'] = array($this->fieldId('*', $tableAlias));
+			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
+			$sqlParts['select'][] = $this->fieldId('*', $tableAlias);
 		}
 
 		return $sqlParts;
