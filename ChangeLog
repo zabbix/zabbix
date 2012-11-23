@@ -106,7 +106,6 @@ A.F....... [ZBX-5046] fixed an error when deleting a globalmacro when the macro 
 A......... [ZBX-3907] fixed API user.logout method (Vedmak)
 ..F....... [ZBX-4983] fixed importing of 1.8 templates if they contain already existing host macros (Vedmak)
 ..F....... [ZBX-5579] fixed displaying 'Acknowledged' in Monitoring -> Triggers when a trigger has no events by displaying 'No events' instead (Vedmak)
-..F....... [ZBX-4247] fixed error when trigger expression items have same trigger expression like parameter in key (Vedmak)
 ..F....... [ZBX-5606] removed 'units' and 'store value' fields for character data items (Vedmak)
 ..F....... [ZBX-5608] fixed incorrect macro resolving in trigger descriptions if expression has duplicate functions (Vedmak)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
