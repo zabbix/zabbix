@@ -40,7 +40,7 @@ class CRelationMap {
 	 * @param string $relatedObjectId
 	 */
 	public function addRelation($baseObjectId, $name, $relatedObjectId) {
-		$this->map[$name][$relatedObjectId][] = $baseObjectId;
+		$this->map[$name][$relatedObjectId][$baseObjectId] = $baseObjectId;
 	}
 
 	/**
