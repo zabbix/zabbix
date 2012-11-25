@@ -83,6 +83,7 @@ static void	disable_all_metrics()
 		active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 }
 
+#ifdef _WINDOWS
 static void	free_active_metrics()
 {
 	int	i;
@@ -98,6 +99,7 @@ static void	free_active_metrics()
 
 	zbx_free(regexps);
 }
+#endif
 
 static int	get_min_nextcheck()
 {
@@ -1190,6 +1192,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 	}
 
+#ifdef _WINDOWS
 	zbx_free(activechk_args.host);
 	free_active_metrics();
 
@@ -1198,4 +1201,5 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_DO_EXIT();
 
 	zbx_thread_exit(0);
+#endif
 }

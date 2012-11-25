@@ -399,16 +399,16 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		}
 
 		// try to create valid expression
-		$trigExpr = new CTriggerExpression(array('expression' => $macro));
-		if (!empty($trigExpr->errors)) {
+		$expressionData = new CTriggerExpression();
+		if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
 			continue;
 		}
 
 		// look in DB for coressponding item
-		$itemHost = reset($trigExpr->data['hosts']);
-		$key = reset($trigExpr->data['items']);
-		$function = reset($trigExpr->data['functions']);
-		$parameter = convertFunctionValue(reset($trigExpr->data['functionParams']));
+		$itemHost = $expressionData->expressions[0]['host'];
+		$key = $expressionData->expressions[0]['item'];
+		$function = $expressionData->expressions[0]['functionName'];
+		$parameter = convertFunctionValue($expressionData->expressions[0]['functionParamList'][0]);
 
 		$item = API::Item()->get(array(
 			'webitems' => true,
@@ -539,14 +539,6 @@ function add_elementNames(&$selements) {
 		'preservekeys' => true
 	));
 
-	$maps = API::Map()->get(array(
-		'mapids' => $mapids,
-		'output' => array('name'),
-		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
-		'preservekeys' => true
-	));
-
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $triggerids,
 		'output' => API_OUTPUT_EXTEND,
@@ -583,8 +575,7 @@ function add_elementNames(&$selements) {
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
 				$selements[$snum]['elementName'] = $hostname['name'].':'.
-						CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
-				$selements[$snum]['elementExpressionTrigger'] = $triggers[$selement['elementid']]['expression'];
+					CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 				$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
@@ -592,6 +583,37 @@ function add_elementNames(&$selements) {
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
 				$selements[$snum]['elementName'] = $images[$selement['iconid_off']]['name'];
 				break;
+		}
+	}
+
+	if (!empty($triggers)) {
+		add_triggerExpressions($selements, $triggers);
+	}
+}
+
+function add_triggerExpressions(&$selements, $triggers = array()) {
+	if (empty($triggers)) {
+		$triggerIds = array();
+
+		foreach ($selements as $selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$triggerIds[] = $selement['elementid'];
+			}
+		}
+
+		$triggers = API::Trigger()->get(array(
+			'triggerids' => $triggerIds,
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name'),
+			'nopermissions' => true,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true
+		));
+	}
+
+	foreach ($selements as $snum => $selement) {
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+			$selements[$snum]['elementExpressionTrigger'] = $triggers[$selement['elementid']]['expression'];
 		}
 	}
 }
@@ -1022,7 +1044,7 @@ function getSelementsInfo($sysmap) {
 	if ($sysmap['iconmapid']) {
 		$hostInventories = API::Host()->get(array(
 			'hostids' => $hostsToGetInventories,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectInventory' => true
@@ -1141,7 +1163,7 @@ function getSelementsInfo($sysmap) {
 	$unack_triggerids = API::Trigger()->get(array(
 		'triggerids' => array_keys($all_triggers),
 		'withLastEventUnacknowledged' => true,
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('triggerid'),
 		'nodeids' => get_current_nodeid(true),
 		'nopermissions' => true,
 		'monitored' => true,
@@ -1854,7 +1876,7 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 	if (!empty($elementsHostids)) {
 		$mapHosts = API::Host()->get(array(
 			'hostids' => $elementsHostids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid'),
 			'selectInterfaces' => API_OUTPUT_EXTEND
 		));
 		$mapHosts = zbx_toHash($mapHosts, 'hostid');
@@ -2011,7 +2033,7 @@ function populateFromMapAreas(array &$map) {
 			$hosts = API::host()->get(array(
 				'groupids' => $selement['elementid'],
 				'sortfield' => 'name',
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('hostid'),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));

@@ -52,6 +52,32 @@
 #	define ZBX_DB_SET_TYPE		""
 #endif
 
+#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
+#	define ZBX_TYPE_ID_STR		"bigint"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_TYPE_ID_STR		"bigint unsigned"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_ID_STR		"number(20)"
+#endif
+
+#if defined(HAVE_ORACLE)
+#	define ZBX_TYPE_INT_STR		"number(10)"
+#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
+#else
+#	define ZBX_TYPE_INT_STR		"integer"
+#	define ZBX_TYPE_CHAR_STR	"varchar"
+#endif
+
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_UINT_STR	"bigint"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_TYPE_UINT_STR	"bigint unsigned"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_UINT_STR	"number(20)"
+#elif defined(HAVE_POSTGRESQL)
+#	define ZBX_TYPE_UINT_STR	"numeric(20)"
+#endif
+
 #define ZBX_FIRST_DB_VERSION		2010000
 
 typedef struct
@@ -65,56 +91,31 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
-static char	*DBfield_type_string(const ZBX_FIELD *field)
+static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
-	static char	type[16];
-
 	switch (field->type)
 	{
 		case ZBX_TYPE_ID:
-#if defined(HAVE_IBM_DB2) || defined(HAVE_POSTGRESQL)
-			strscpy(type, "bigint");
-#elif defined(HAVE_MYSQL)
-			strscpy(type, "bigint unsigned");
-#elif defined(HAVE_ORACLE)
-			strscpy(type, "number(20)");
-#endif
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_ID_STR);
 			break;
 		case ZBX_TYPE_INT:
-#if defined(HAVE_ORACLE)
-			strscpy(type, "number(10)");
-#else
-			strscpy(type, "integer");
-#endif
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_INT_STR);
 			break;
 		case ZBX_TYPE_CHAR:
-#if defined(HAVE_ORACLE)
-			zbx_snprintf(type, sizeof(type), "nvarchar2(%hd)", field->length);
-#else
-			zbx_snprintf(type, sizeof(type), "varchar(%hd)", field->length);
-#endif
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%hu)", ZBX_TYPE_CHAR_STR, field->length);
 			break;
 		case ZBX_TYPE_UINT:
-#if defined(HAVE_IBM_DB2)
-			strscpy(type, "bigint");
-#elif defined(HAVE_MYSQL)
-			strscpy(type, "bigint unsigned");
-#elif defined(HAVE_ORACLE)
-			strscpy(type, "number(20)");
-#elif defined(HAVE_POSTGRESQL)
-			strscpy(type, "numeric(20)");
-#endif
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_UINT_STR);
 			break;
 		default:
 			assert(0);
 	}
-
-	return type;
 }
 
 static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s %s", field->name, DBfield_type_string(field));
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s ", field->name);
+	DBfield_type_string(sql, sql_alloc, sql_offset, field);
 	if (NULL != field->default_value)
 	{
 		char	*default_value_esc;
@@ -151,8 +152,8 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 #else
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_DB_SET_TYPE " %s",
-			field->name, DBfield_type_string(field));
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_DB_SET_TYPE " ", field->name);
+	DBfield_type_string(sql, sql_alloc, sql_offset, field);
 #endif
 }
 
@@ -467,7 +468,7 @@ static int	DBset_version(int version, unsigned char mandatory)
 static int	DBmodify_proxy_table_id_field(const char *table_name)
 {
 #if defined(HAVE_POSTGRESQL)
-	const ZBX_FIELD	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type(table_name, &field);
 #else
@@ -615,26 +616,33 @@ static int	DBpatch_02010020()
 
 static int	DBpatch_02010021()
 {
-	const ZBX_FIELD field = {"snmpv3_authprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"http_proxy", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("items", &field);
+	return DBadd_field("httptest", &field);
 }
 
 static int	DBpatch_02010022()
 {
-	const ZBX_FIELD field = {"snmpv3_privprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"snmpv3_authprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_02010023()
 {
+	const ZBX_FIELD field = {"snmpv3_privprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_02010024()
+{
 	const ZBX_FIELD field = {"snmpv3_authprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("dchecks", &field);
 }
 
-static int	DBpatch_02010024()
+static int	DBpatch_02010025()
 {
 	const ZBX_FIELD field = {"snmpv3_privprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -647,6 +655,7 @@ int	DBcheck_version()
 
 	zbx_dbpatch_t	patches[] =
 	{
+		/* function, version, duplicates flag, mandatory flag */
 		{DBpatch_02010001, 2010001, 0, 1},
 		{DBpatch_02010002, 2010002, 0, 1},
 		{DBpatch_02010003, 2010003, 0, 1},
@@ -671,6 +680,7 @@ int	DBcheck_version()
 		{DBpatch_02010022, 2010022, 0, 1},
 		{DBpatch_02010023, 2010023, 0, 1},
 		{DBpatch_02010024, 2010024, 0, 1},
+		{DBpatch_02010025, 2010025, 0, 1},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";

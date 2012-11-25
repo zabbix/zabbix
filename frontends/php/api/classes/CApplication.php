@@ -96,7 +96,7 @@ class CApplication extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -113,7 +113,7 @@ class CApplication extends CZBXAPI {
 									' AND rr.id=hgg.groupid'.
 									' AND rr.groupid=gg.usrgrpid'.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+									' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids
@@ -122,9 +122,8 @@ class CApplication extends CZBXAPI {
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['groupid'] = 'hg.groupid';
-			}
+
+			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['ahg'] = 'a.hostid=hg.hostid';
 			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
@@ -161,20 +160,11 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		// expandData
-		if (!is_null($options['expandData'])) {
-			$sqlParts['select']['host'] = 'h.host';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
-		}
-
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'ia.itemid';
-			}
+			$sqlParts['select']['itemid'] = 'ia.itemid';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where'][] = DBcondition('ia.itemid', $options['itemids']);
 			$sqlParts['where']['aia'] = 'a.applicationid=ia.applicationid';
@@ -184,9 +174,7 @@ class CApplication extends CZBXAPI {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['applicationid'] = 'a.applicationid';
-			}
+			$sqlParts['select']['applicationid'] = 'a.applicationid';
 			$sqlParts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 		}
 
@@ -213,24 +201,6 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['apps'] = 'a.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT a.applicationid) as rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('applications a', $options, $sqlParts);
@@ -248,6 +218,9 @@ class CApplication extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$applicationids = array();
 
@@ -298,41 +271,36 @@ class CApplication extends CZBXAPI {
 			else {
 				$applicationids[$application['applicationid']] = $application['applicationid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$application['applicationid']] = array('applicationid' => $application['applicationid']);
+				if (!isset($result[$application['applicationid']])) {
+					$result[$application['applicationid']]= array();
 				}
-				else {
-					if (!isset($result[$application['applicationid']])) {
-						$result[$application['applicationid']]= array();
-					}
 
-					if (!is_null($options['selectHosts']) && !isset($result[$application['applicationid']]['hosts'])) {
+				if (!is_null($options['selectHosts']) && !isset($result[$application['applicationid']]['hosts'])) {
+					$result[$application['applicationid']]['hosts'] = array();
+				}
+
+				if (!is_null($options['selectItems']) && !isset($result[$application['applicationid']]['items'])) {
+					$result[$application['applicationid']]['items'] = array();
+				}
+
+				// hostids
+				if (isset($application['hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$application['applicationid']]['hosts'])) {
 						$result[$application['applicationid']]['hosts'] = array();
 					}
+					$result[$application['applicationid']]['hosts'][] = array('hostid' => $application['hostid']);
+				}
 
-					if (!is_null($options['selectItems']) && !isset($result[$application['applicationid']]['items'])) {
+				// itemids
+				if (isset($application['itemid']) && is_null($options['selectItems'])) {
+					if (!isset($result[$application['applicationid']]['items'])) {
 						$result[$application['applicationid']]['items'] = array();
 					}
-
-					// hostids
-					if (isset($application['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$application['applicationid']]['hosts'])) {
-							$result[$application['applicationid']]['hosts'] = array();
-						}
-						$result[$application['applicationid']]['hosts'][] = array('hostid' => $application['hostid']);
-					}
-
-					// itemids
-					if (isset($application['itemid']) && is_null($options['selectItems'])) {
-						if (!isset($result[$application['applicationid']]['items'])) {
-							$result[$application['applicationid']]['items'] = array();
-						}
-						$result[$application['applicationid']]['items'][] = array('itemid' => $application['itemid']);
-						unset($application['itemid']);
-					}
-
-					$result[$application['applicationid']] += $application;
+					$result[$application['applicationid']]['items'][] = array('itemid' => $application['itemid']);
+					unset($application['itemid']);
 				}
+
+				$result[$application['applicationid']] += $application;
 			}
 		}
 
@@ -362,7 +330,9 @@ class CApplication extends CZBXAPI {
 
 		// adding objects
 		// adding items
-		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
+		if (!is_null($options['selectItems'])
+			&& (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
+
 			$objParams = array(
 				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
@@ -393,7 +363,7 @@ class CApplication extends CZBXAPI {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('applicationid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -548,7 +518,7 @@ class CApplication extends CZBXAPI {
 	 */
 	public function delete($applicationids, $nopermissions = false) {
 		$applicationids = zbx_toArray($applicationids);
-
+		$delApplicationIds = $applicationids;
 		// TODO: remove $nopermissions hack
 		$options = array(
 			'applicationids' => $applicationids,
@@ -608,7 +578,7 @@ class CApplication extends CZBXAPI {
 			$host = reset($delApplication['hosts']);
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
-		return array('applicationids' => $applicationids);
+		return array('applicationids' => $delApplicationIds);
 	}
 
 	/**
@@ -702,5 +672,18 @@ class CApplication extends CZBXAPI {
 			}
 		}
 		return array('applicationids'=> $applicationids);
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// expandData
+		if (!is_null($options['expandData'])) {
+			$sqlParts['select']['host'] = 'h.host';
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
+		}
+
+		return $sqlParts;
 	}
 }

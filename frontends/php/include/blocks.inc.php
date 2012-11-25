@@ -108,7 +108,7 @@ function make_favorite_screens() {
 		$sourceid = $favorite['value'];
 
 		if ('slideshowid' == $source) {
-			if (!slideshow_accessible($sourceid, PERM_READ_ONLY)) {
+			if (!slideshow_accessible($sourceid, PERM_READ)) {
 				continue;
 			}
 			if (!$slide = get_slideshow_by_slideshowid($sourceid)) {
@@ -973,7 +973,7 @@ function make_webmon_overview($filter) {
 		'groupids' => array_keys($groups),
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('hostid'),
 		'preservekeys' => true
 	));
 	$availableHostIds = array_keys($availableHosts);
@@ -1292,7 +1292,7 @@ function make_screen_submenu() {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 		if ('slideshowid' == $source) {
-			if (!slideshow_accessible($sourceid, PERM_READ_ONLY)) {
+			if (!slideshow_accessible($sourceid, PERM_READ)) {
 				continue;
 			}
 			if (!$slide = get_slideshow_by_slideshowid($sourceid)) {

@@ -521,6 +521,7 @@ function resolveItemKeyMacros(array $item) {
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
+			'webitems' => true,
 			'output' => API_OUTPUT_REFER
 		));
 		$dbItem = reset($dbItem);
@@ -1340,4 +1341,19 @@ function getParamFieldLabelByType($itemType) {
 		default:
 			return 'params';
 	}
+}
+
+/**
+ * Quoting $param if it contain special characters.
+ *
+ * @param string $param
+ *
+ * @return string
+ */
+function quoteItemKeyParam($param) {
+	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ']'))) {
+		return $param;
+	}
+
+	return '"'.str_replace('"', '\\"', $param).'"';
 }

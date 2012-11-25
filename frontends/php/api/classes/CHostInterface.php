@@ -116,7 +116,7 @@ class CHostInterface extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -133,7 +133,7 @@ class CHostInterface extends CZBXAPI {
 					' AND rr.id=hgg.groupid'.
 					' AND rr.groupid=gg.usrgrpid'.
 					' AND gg.userid='.$userid.
-					' AND rr.permission<'.$permission.')';
+					' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids
@@ -165,10 +165,8 @@ class CHostInterface extends CZBXAPI {
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'i.itemid';
-			}
 
+			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'hi.interfaceid=i.interfaceid';
@@ -182,10 +180,8 @@ class CHostInterface extends CZBXAPI {
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['triggerid'] = 'f.triggerid';
-			}
 
+			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
@@ -290,31 +286,26 @@ class CHostInterface extends CZBXAPI {
 			else {
 				$interfaceids[$interface['interfaceid']] = $interface['interfaceid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$interface['interfaceid']] = array('interfaceid' => $interface['interfaceid']);
+				if (!isset($result[$interface['interfaceid']])) {
+					$result[$interface['interfaceid']] = array();
 				}
-				else {
-					if (!isset($result[$interface['interfaceid']])) {
-						$result[$interface['interfaceid']] = array();
-					}
 
-					if (!is_null($options['selectHosts']) && !isset($result[$interface['interfaceid']]['hosts'])) {
-						$result[$interface['interfaceid']]['hosts'] = array();
-					}
-					if (!is_null($options['selectItems']) && !isset($result[$interface['interfaceid']]['items'])) {
+				if (!is_null($options['selectHosts']) && !isset($result[$interface['interfaceid']]['hosts'])) {
+					$result[$interface['interfaceid']]['hosts'] = array();
+				}
+				if (!is_null($options['selectItems']) && !isset($result[$interface['interfaceid']]['items'])) {
+					$result[$interface['interfaceid']]['items'] = array();
+				}
+
+				// itemids
+				if (isset($interface['itemid']) && is_null($options['selectItems'])) {
+					if (!isset($result[$interface['interfaceid']]['items'])) {
 						$result[$interface['interfaceid']]['items'] = array();
 					}
-
-					// itemids
-					if (isset($interface['itemid']) && is_null($options['selectItems'])) {
-						if (!isset($result[$interface['interfaceid']]['items'])) {
-							$result[$interface['interfaceid']]['items'] = array();
-						}
-						$result[$interface['interfaceid']]['items'][] = array('itemid' => $interface['itemid']);
-						unset($interface['itemid']);
-					}
-					$result[$interface['interfaceid']] += $interface;
+					$result[$interface['interfaceid']]['items'][] = array('itemid' => $interface['itemid']);
+					unset($interface['itemid']);
 				}
+				$result[$interface['interfaceid']] += $interface;
 			}
 		}
 
@@ -442,7 +433,7 @@ class CHostInterface extends CZBXAPI {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('interfaceid'),
 			'nopermissions' => true,
 			'limit' => 1
 		);
@@ -702,7 +693,7 @@ class CHostInterface extends CZBXAPI {
 
 			// check main interfaces
 			$interfacesToRemove = API::getApi()->select($this->tableName(), array(
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('interfaceid'),
 				'filter' => array(
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],

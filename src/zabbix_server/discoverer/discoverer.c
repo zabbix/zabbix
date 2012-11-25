@@ -239,7 +239,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					item.snmp_oid = strdup(dcheck->key_);
 
 					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-							&item.snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+							&item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
 
@@ -253,11 +253,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
 
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+								&item.snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+								&item.snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+								&item.snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))

@@ -392,6 +392,7 @@ class CConfigurationImport {
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$hostsRefs[$resource['host']] = $resource['host'];
 							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 							break;
 
@@ -420,6 +421,7 @@ class CConfigurationImport {
 
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$hostsRefs[$resource['host']] = $resource['host'];
 								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 								break;
 						}
@@ -518,10 +520,12 @@ class CConfigurationImport {
 		}
 
 		// create the applications and create a hash hostid->name->applicationid
-		$newApplicationsIds = API::Application()->create($applicationsToCreate);
-		foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
-			$application = $applicationsToCreate[$anum];
-			$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+		if (!empty($applicationsToCreate)) {
+			$newApplicationsIds = API::Application()->create($applicationsToCreate);
+			foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
+				$application = $applicationsToCreate[$anum];
+				$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+			}
 		}
 
 		// refresh applications beacuse templated ones can be inherited to host and used in items
@@ -809,7 +813,7 @@ class CConfigurationImport {
 					if ($graphExists) {
 						$dbGraph = API::GraphPrototype()->get(array(
 							'graphids' => $graphExists['graphid'],
-							'output' => API_OUTPUT_SHORTEN,
+							'output' => array('graphid'),
 							'editable' => true
 						));
 						if (empty($dbGraph)) {
@@ -886,7 +890,7 @@ class CConfigurationImport {
 			if ($graphExists) {
 				$dbGraph = API::Graph()->get(array(
 					'graphids' => $graphExists['graphid'],
-					'output' => API_OUTPUT_SHORTEN,
+					'output' => array('graphid'),
 					'editable' => true
 				));
 				if (empty($dbGraph)) {
