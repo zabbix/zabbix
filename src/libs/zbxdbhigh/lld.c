@@ -1238,8 +1238,8 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 					trapper_hosts_esc, units_esc, multiplier, delta, formula_esc,
 					logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc, ipmi_sensor_esc,
 					snmp_community_esc, snmp_oid_esc, port_esc, snmpv3_securityname_esc,
-					(int)snmpv3_securitylevel, snmpv3_authprotocol, snmpv3_authpassphrase_esc,
-					snmpv3_privprotocol, snmpv3_privpassphrase_esc, (int)authtype, username_esc,
+					(int)snmpv3_securitylevel, (int)snmpv3_authprotocol, snmpv3_authpassphrase_esc,
+					(int)snmpv3_privprotocol, snmpv3_privpassphrase_esc, (int)authtype, username_esc,
 					password_esc, publickey_esc, privatekey_esc, description_esc,
 					DBsql_id_ins(interfaceid), ZBX_FLAG_DISCOVERY_CREATED, row_dl);
 
