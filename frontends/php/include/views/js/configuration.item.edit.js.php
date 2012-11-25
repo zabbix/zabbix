@@ -195,5 +195,15 @@
 				displayNewDeleyFlexInterval();
 			});
 		}
+
+		// mass update page, create jquery buttonset object when authprotocol visible box is switched on
+		jQuery('#authprotocol_visible').one('click', function() {
+			jQuery('#authprotocol_div').buttonset();
+		});
+
+		// mass update page, create jquery buttonset object when privprotocol visible box is switched on
+		jQuery('#privprotocol_visible').one('click', function() {
+			jQuery('#privprotocol_div').buttonset();
+		});
 	});
 </script>

@@ -167,7 +167,9 @@ class CXmlImport18 {
 				'snmp_port' => '',
 				'snmpv3_securityname' => '',
 				'snmpv3_securitylevel' => '',
+				'snmpv3_authprotocol' => '',
 				'snmpv3_authpassphrase' => '',
+				'snmpv3_privprotocol' => '',
 				'snmpv3_privpassphrase' => ''
 			)
 		),

@@ -621,6 +621,34 @@ static int	DBpatch_02010021()
 	return DBadd_field("httptest", &field);
 }
 
+static int	DBpatch_02010022()
+{
+	const ZBX_FIELD field = {"snmpv3_authprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_02010023()
+{
+	const ZBX_FIELD field = {"snmpv3_privprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_02010024()
+{
+	const ZBX_FIELD field = {"snmpv3_authprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_02010025()
+{
+	const ZBX_FIELD field = {"snmpv3_privprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
 int	DBcheck_version()
 {
 	const char	*__function_name = "DBcheck_version";
@@ -649,6 +677,10 @@ int	DBcheck_version()
 		{DBpatch_02010019, 2010019, 0, 1},
 		{DBpatch_02010020, 2010020, 0, 1},
 		{DBpatch_02010021, 2010021, 0, 1},
+		{DBpatch_02010022, 2010022, 0, 1},
+		{DBpatch_02010023, 2010023, 0, 1},
+		{DBpatch_02010024, 2010024, 0, 1},
+		{DBpatch_02010025, 2010025, 0, 1},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";
