@@ -176,17 +176,14 @@ $ZBX_MENU = array(
 					'popup_trexpr.php',
 					'host_discovery.php',
 					'disc_prototypes.php',
-					'trigger_prototypes.php'
+					'trigger_prototypes.php',
+					'httpconf.php',
+					'popup_httpstep.php'
 				)
 			),
 			array(
 				'url' => 'maintenance.php',
 				'label' => _('Maintenance')
-			),
-			array(
-				'url' => 'httpconf.php',
-				'label' => _('Web'),
-				'sub_pages' => array('popup_httpstep.php')
 			),
 			array(
 				'url' => 'actionconf.php',

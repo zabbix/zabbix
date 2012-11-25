@@ -421,7 +421,7 @@ sub process_field
 				$fk_field = $name;
 			}
 
-# RESTRICT may contains new line chars we need to clean them out
+			# RESTRICT may contain new line chars, we need to clean them out
 			$fk_flags = rtrim($fk_flags);
 
 			if (not $fk_flags or $fk_flags eq "")

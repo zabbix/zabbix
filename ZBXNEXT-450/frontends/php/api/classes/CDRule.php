@@ -113,10 +113,8 @@ class CDRule extends CZBXAPI {
 // dhostids
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['dhostid'] = 'dh.dhostid';
-			}
 
+			$sqlParts['select']['dhostid'] = 'dh.dhostid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
 			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
@@ -134,10 +132,8 @@ class CDRule extends CZBXAPI {
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['dserviceid'] = 'ds.dserviceid';
-			}
 
+			$sqlParts['select']['dserviceid'] = 'ds.dserviceid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 
@@ -160,24 +156,6 @@ class CDRule extends CZBXAPI {
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('dr.druleid', $nodeids);
-		}
-
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['drules'] = 'dr.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT dr.druleid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 // search
@@ -203,6 +181,9 @@ class CDRule extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 //------------
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$druleids = array();
 
@@ -238,57 +219,53 @@ class CDRule extends CZBXAPI {
 					$result = $drule['rowscount'];
 			}
 			else{
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$drule['druleid']] = array('druleid' => $drule['druleid']);
-				}
-				else{
-					$druleids[$drule['druleid']] = $drule['druleid'];
+				$druleids[$drule['druleid']] = $drule['druleid'];
 
-					if (!is_null($options['selectDHosts']) && !isset($result[$drule['druleid']]['dhosts'])) {
+				if (!is_null($options['selectDHosts']) && !isset($result[$drule['druleid']]['dhosts'])) {
+					$result[$drule['druleid']]['dhosts'] = array();
+				}
+				if (!is_null($options['selectDChecks']) && !isset($result[$drule['druleid']]['dchecks'])) {
+					$result[$drule['druleid']]['dchecks'] = array();
+				}
+				if (!is_null($options['selectDServices']) && !isset($result[$drule['druleid']]['dservices'])) {
+					$result[$drule['druleid']]['dservices'] = array();
+				}
+
+				// dhostids
+				if (isset($drule['dhostid']) && is_null($options['selectDHosts'])) {
+					if (!isset($result[$drule['druleid']]['dhosts']))
 						$result[$drule['druleid']]['dhosts'] = array();
-					}
-					if (!is_null($options['selectDChecks']) && !isset($result[$drule['druleid']]['dchecks'])) {
-						$result[$drule['druleid']]['dchecks'] = array();
-					}
-					if (!is_null($options['selectDServices']) && !isset($result[$drule['druleid']]['dservices'])) {
-						$result[$drule['druleid']]['dservices'] = array();
-					}
 
-// dhostids
-					if (isset($drule['dhostid']) && is_null($options['selectDHosts'])) {
-						if (!isset($result[$drule['druleid']]['dhosts']))
-							$result[$drule['druleid']]['dhosts'] = array();
-
-						$result[$drule['druleid']]['dhosts'][] = array('dhostid' => $drule['dhostid']);
-						unset($drule['dhostid']);
-					}
-// dchecks
-					if (isset($drule['dcheckid']) && is_null($options['selectDChecks'])) {
-						if (!isset($result[$drule['druleid']]['dchecks']))
-							$result[$drule['druleid']]['dchecks'] = array();
-
-						$result[$drule['druleid']]['dchecks'][] = array('dcheckid' => $drule['dcheckid']);
-						unset($drule['dcheckid']);
-					}
-
-// dservices
-					if (isset($drule['dserviceid']) && is_null($options['selectDServices'])) {
-						if (!isset($result[$drule['druleid']]['dservices']))
-							$result[$drule['druleid']]['dservices'] = array();
-
-						$result[$drule['druleid']]['dservices'][] = array('dserviceid' => $drule['dserviceid']);
-						unset($drule['dserviceid']);
-					}
-
-					if (!isset($result[$drule['druleid']]))
-						$result[$drule['druleid']]= array();
-
-					$result[$drule['druleid']] += $drule;
+					$result[$drule['druleid']]['dhosts'][] = array('dhostid' => $drule['dhostid']);
+					unset($drule['dhostid']);
 				}
+
+				// dchecks
+				if (isset($drule['dcheckid']) && is_null($options['selectDChecks'])) {
+					if (!isset($result[$drule['druleid']]['dchecks']))
+						$result[$drule['druleid']]['dchecks'] = array();
+
+					$result[$drule['druleid']]['dchecks'][] = array('dcheckid' => $drule['dcheckid']);
+					unset($drule['dcheckid']);
+				}
+
+				// dservices
+				if (isset($drule['dserviceid']) && is_null($options['selectDServices'])) {
+					if (!isset($result[$drule['druleid']]['dservices']))
+						$result[$drule['druleid']]['dservices'] = array();
+
+					$result[$drule['druleid']]['dservices'][] = array('dserviceid' => $drule['dserviceid']);
+					unset($drule['dserviceid']);
+				}
+
+				if (!isset($result[$drule['druleid']]))
+					$result[$drule['druleid']]= array();
+
+				$result[$drule['druleid']] += $drule;
 			}
 		}
 
-		if (($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])) {
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
@@ -394,7 +371,7 @@ class CDRule extends CZBXAPI {
 	public function exists(array $object) {
 		$options = array(
 			'filter' => array(),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('druleid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -455,7 +432,7 @@ class CDRule extends CZBXAPI {
 		if (!empty($proxies)) {
 			$proxiesDB = API::proxy()->get(array(
 				'proxyids' => $proxies,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('proxyid'),
 				'preservekeys' => true,
 			));
 			foreach ($proxies as $proxy) {
@@ -818,7 +795,6 @@ class CDRule extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'druleids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -841,7 +817,6 @@ class CDRule extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'druleids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));

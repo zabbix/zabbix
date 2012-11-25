@@ -414,6 +414,7 @@ typedef struct
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
+	char		*http_proxy;
 	int		authentication;
 }
 DB_HTTPTEST;

@@ -87,6 +87,8 @@ class CZBXAPI {
 			'searchWildcardsEnabled'=> null,
 			// output
 			'output'				=> API_OUTPUT_REFER,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 			'limit'					=> null
 		);
@@ -227,7 +229,7 @@ class CZBXAPI {
 		$fields = (array) $fields;
 
 		foreach ($fields as $field) {
-			if ($output == API_OUTPUT_SHORTEN || $output == API_OUTPUT_REFER) {
+			if ($output == API_OUTPUT_REFER) {
 				$output = array(
 					$this->pk($tableName),
 					$field
@@ -245,30 +247,17 @@ class CZBXAPI {
 	 * Unsets the fields that haven't been explicitly asked for by the user, but
 	 * have been included in the resulting object for whatever reasons.
 	 *
-	 * If the $option parameter is set to API_OUTPUT_SHORT, return only the private key.
 	 * If the $option parameter is set to API_OUTPUT_EXTEND or to API_OUTPUT_REFER, return the result as is.
 	 * If the $option parameter is an array of fields, return only them.
 	 *
-	 * @param string $tableName		The table that stores the object
 	 * @param array $object			The object from the database
 	 * @param array $output			The original requested output
 	 *
 	 * @return array				The resulting object
 	 */
-	protected function unsetExtraFields($tableName, array $object, $output) {
-		// for API_OUTPUT_SHORTEN return only the private key
-		if ($output == API_OUTPUT_SHORTEN) {
-			$pkField = $this->pk($tableName);
-
-			if (isset($object[$pkField])) {
-				$object = array($pkField => $object[$pkField]);
-			}
-			else {
-				$object = array();
-			}
-		}
+	protected function unsetExtraFields(array $object, $output) {
 		// if specific fields where requested, return only them
-		elseif (is_array($output)) {
+		if (is_array($output)) {
 			foreach ($object as $field => $value) {
 				if (!in_array($field, $output)) {
 					unset($object[$field]);
@@ -301,7 +290,7 @@ class CZBXAPI {
 		if (isset($options['preservekeys'])) {
 			$rs = array();
 			foreach ($objects as $object) {
-				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($tableName, $object, $options['output']);
+				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($object, $options['output']);
 			}
 
 			return $rs;
@@ -347,11 +336,11 @@ class CZBXAPI {
 			'limit' => null
 		);
 
-		// add output options
-		$sqlParts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
 		// add filter options
 		$sqlParts = $this->applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// add output options
+		$sqlParts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		// add node options
 		$sqlParts = $this->applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -401,6 +390,13 @@ class CZBXAPI {
 		// count
 		if (isset($options['countOutput'])) {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
+
+			// select columns used by group count
+			if ($options['groupCount'] !== null) {
+				foreach ($sqlParts['group'] as $fields) {
+					$sqlParts['select'][] = $fields;
+				}
+			}
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
@@ -416,7 +412,8 @@ class CZBXAPI {
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select'] = array($this->fieldId('*', $tableAlias));
+			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
+			$sqlParts['select'][] = $this->fieldId('*', $tableAlias);
 		}
 
 		return $sqlParts;

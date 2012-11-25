@@ -929,7 +929,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 										' AND rr.id=hgg.groupid'.
 										' AND rr.groupid=gg.usrgrpid'.
 										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$perm.')';
+										' AND rr.permission='.PERM_DENY.')';
 	}
 
 	// nodes

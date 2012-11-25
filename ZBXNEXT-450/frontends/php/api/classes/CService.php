@@ -88,7 +88,7 @@ class CService extends CZBXAPI {
 			}
 			// a normal select query
 			else {
-				$result[$row[$this->pk()]] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
+				$result[$row[$this->pk()]] = $this->unsetExtraFields($row, $options['output']);
 			}
 		}
 
@@ -683,7 +683,6 @@ class CService extends CZBXAPI {
 
 		$count = $this->get(array(
 			'serviceids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 		return count($ids) == $count;
@@ -934,7 +933,7 @@ class CService extends CZBXAPI {
 			' FROM services s,triggers t'.
 			' WHERE s.status>0'.
 				' AND t.triggerid=s.triggerid'.
-				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).
+				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ)).
 				' AND '.DBcondition('s.serviceid', $serviceIds).
 			' ORDER BY s.status DESC,t.description'
 		));
@@ -1046,7 +1045,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1077,7 +1076,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1476,7 +1475,7 @@ class CService extends CZBXAPI {
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$accessibleTriggers = get_accessible_triggers(PERM_READ_ONLY);
+			$accessibleTriggers = get_accessible_triggers(PERM_READ);
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
 				$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
@@ -1520,7 +1519,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($dependencies as $dependency) {
 				$refId = $dependency['serviceupid'];
-				$dependency = $this->unsetExtraFields('services_links', $dependency, $options['selectDependencies']);
+				$dependency = $this->unsetExtraFields($dependency, $options['selectDependencies']);
 				$result[$refId]['dependencies'][] = $dependency;
 			}
 		}
@@ -1535,7 +1534,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($dependencies as $dependency) {
 				$refId = $dependency['servicedownid'];
-				$dependency = $this->unsetExtraFields('services_links', $dependency, $options['selectParentDependencies']);
+				$dependency = $this->unsetExtraFields($dependency, $options['selectParentDependencies']);
 				$result[$refId]['parentDependencies'][] = $dependency;
 			}
 		}
@@ -1578,7 +1577,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($serviceTimes as $serviceTime) {
 				$refId = $serviceTime['serviceid'];
-				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
+				$serviceTime = $this->unsetExtraFields($serviceTime, $options['selectTimes']);
 				$result[$refId]['times'][] = $serviceTime;
 			}
 		}
@@ -1596,7 +1595,7 @@ class CService extends CZBXAPI {
 			unset($service);
 			foreach ($alarmsTimes as $serviceAlarm) {
 				$refId = $serviceAlarm['serviceid'];
-				$serviceAlarm = $this->unsetExtraFields('service_alarms', $serviceAlarm, $options['selectAlarms']);
+				$serviceAlarm = $this->unsetExtraFields($serviceAlarm, $options['selectAlarms']);
 				$result[$refId]['times'][] = $serviceAlarm;
 			}
 		}

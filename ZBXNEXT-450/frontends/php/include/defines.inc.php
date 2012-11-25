@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010024);
+define('ZABBIX_DB_VERSION',	 2010025);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2012');
@@ -620,7 +620,7 @@ define('GROUP_DEBUG_MODE_ENABLED',	1);
 
 define('PERM_MAX',			3);
 define('PERM_READ_WRITE',	3);
-define('PERM_READ_ONLY',	2);
+define('PERM_READ',			2);
 define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
@@ -755,6 +755,7 @@ define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
+define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
 define('AVAILABLE_NOCACHE', 0);	// take available objects not from cache
 
@@ -771,13 +772,17 @@ if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
 define('REGEXP_INCLUDE', 0);
 define('REGEXP_EXCLUDE', 1);
 
+// suffixes
+define('ZBX_BYTE_SUFFIXES', 'KMGT');
+define('ZBX_TIME_SUFFIXES', 'smhdw');
+
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*[KMGTsmhdw]?)');
+define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
@@ -844,7 +849,6 @@ define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
 
-define('API_OUTPUT_SHORTEN',	'shorten');
 define('API_OUTPUT_REFER',		'refer');
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');

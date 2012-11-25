@@ -59,7 +59,7 @@
 			$data['user_type']		= $user['type'];
 			$data['messages'] 		= getMessageSettings();
 
-			$userGroups = API::UserGroup()->get(array('userids' => $userid, 'output' => API_OUTPUT_SHORTEN));
+			$userGroups = API::UserGroup()->get(array('userids' => $userid, 'output' => 'usrgrpid'));
 			$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 			$data['user_groups']	= zbx_toHash($userGroup);
 
@@ -146,10 +146,13 @@
 			}
 			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
 
+			// deny beat all, read-write beat read
 			$tmp_permitions = array();
 			while ($db_right = DBfetch($db_rights)) {
-				if (isset($tmp_permitions[$db_right['id']])) {
-					$tmp_permitions[$db_right['id']] = min($tmp_permitions[$db_right['id']], $db_right['permission']);
+				if (isset($tmp_permitions[$db_right['id']]) && $tmp_permitions[$db_right['id']] != PERM_DENY) {
+					$tmp_permitions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
+						? PERM_DENY
+						: max($tmp_permitions[$db_right['id']], $db_right['permission']);
 				}
 				else {
 					$tmp_permitions[$db_right['id']] = $db_right['permission'];
@@ -179,7 +182,7 @@
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 			foreach ($nodes as $node) {
 				switch($node['permission']) {
-					case PERM_READ_ONLY:
+					case PERM_READ:
 						$list_name = 'read_only';
 						break;
 					case PERM_READ_WRITE:
@@ -207,7 +210,7 @@
 
 		foreach ($groups as $group) {
 			switch($group['permission']) {
-				case PERM_READ_ONLY:
+				case PERM_READ:
 					$list_name = 'read_only';
 					break;
 				case PERM_READ_WRITE:
@@ -234,7 +237,7 @@
 
 		foreach ($hosts as $host) {
 			switch($host['permission']) {
-				case PERM_READ_ONLY:
+				case PERM_READ:
 					$list_name = 'read_only';
 					break;
 				case PERM_READ_WRITE:

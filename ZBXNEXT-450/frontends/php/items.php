@@ -211,7 +211,7 @@ if (get_request('itemid', false)) {
 	$item = API::Item()->get(array(
 		'itemids' => $_REQUEST['itemid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('itemid'),
 		'editable' => true,
 		'preservekeys' => true
 	));
@@ -651,6 +651,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	show_messages($go_result, _('History cleared'), $go_result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
+	DBstart();
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	$itemsToDelete = API::Item()->get(array(
@@ -665,16 +666,12 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	if ($go_result) {
 		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
-
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
 				_('Host').' ['.$host['name'].']');
 		}
+	}
 
-		show_messages(true, _('Items deleted'));
-	}
-	else {
-		show_messages(false, null, _('Cannot delete items'));
-	}
+	show_messages(DBend($go_result), _('Items deleted'), _('Cannot delete items'));
 }
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
 	$url = new CUrl();

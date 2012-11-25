@@ -155,33 +155,28 @@ class CMap extends CMapElement {
 			else {
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$sysmap['sysmapid']] = array('sysmapid' => $sysmap['sysmapid']);
+				if (!isset($result[$sysmap['sysmapid']])) {
+					$result[$sysmap['sysmapid']] = array();
 				}
-				else {
-					if (!isset($result[$sysmap['sysmapid']])) {
-						$result[$sysmap['sysmapid']] = array();
-					}
 
-					// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
-					// leaving this block commented
-					// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
-					// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
-					// }
-					if (!is_null($options['selectSelements']) && !isset($result[$sysmap['sysmapid']]['selements'])) {
-						$result[$sysmap['sysmapid']]['selements'] = array();
-					}
-					if (!is_null($options['selectLinks']) && !isset($result[$sysmap['sysmapid']]['links'])) {
-						$result[$sysmap['sysmapid']]['links'] = array();
-					}
-					if (!is_null($options['selectIconMap']) && !isset($result[$sysmap['sysmapid']]['iconmap'])) {
-						$result[$sysmap['sysmapid']]['iconmap'] = array();
-					}
-					if (!isset($result[$sysmap['sysmapid']]['urls'])) {
-						$result[$sysmap['sysmapid']]['urls'] = array();
-					}
-					$result[$sysmap['sysmapid']] += $sysmap;
+				// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
+				// leaving this block commented
+				// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
+				// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
+				// }
+				if (!is_null($options['selectSelements']) && !isset($result[$sysmap['sysmapid']]['selements'])) {
+					$result[$sysmap['sysmapid']]['selements'] = array();
 				}
+				if (!is_null($options['selectLinks']) && !isset($result[$sysmap['sysmapid']]['links'])) {
+					$result[$sysmap['sysmapid']]['links'] = array();
+				}
+				if (!is_null($options['selectIconMap']) && !isset($result[$sysmap['sysmapid']]['iconmap'])) {
+					$result[$sysmap['sysmapid']]['iconmap'] = array();
+				}
+				if (!isset($result[$sysmap['sysmapid']]['urls'])) {
+					$result[$sysmap['sysmapid']]['urls'] = array();
+				}
+				$result[$sysmap['sysmapid']] += $sysmap;
 			}
 		}
 
@@ -204,7 +199,7 @@ class CMap extends CMapElement {
 					$trigOptions = array(
 						'triggerids' => $linkTriggers,
 						'editable' => $options['editable'],
-						'output' => API_OUTPUT_SHORTEN,
+						'output' => array('triggerid'),
 						'preservekeys' => true
 					);
 					$allTriggers = API::Trigger()->get($trigOptions);
@@ -249,7 +244,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('hostid')
 					);
 					$allowedHosts = API::Host()->get($hostOptions);
 
@@ -270,7 +265,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('sysmapid')
 					);
 					$allowedMaps = $this->get($mapOptions);
 
@@ -291,7 +286,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('triggerid')
 					);
 					$allowedTriggers = API::Trigger()->get($triggeridOptions);
 
@@ -312,7 +307,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('groupid')
 					);
 					$allowedHostGroups = API::HostGroup()->get($hostgroupOptions);
 
@@ -452,13 +447,11 @@ class CMap extends CMapElement {
 		}
 
 		// adding urls
-		if ($options['output'] != API_OUTPUT_SHORTEN) {
-			$dbUrls = DBselect('SELECT su.* FROM sysmap_url su WHERE '.DBcondition('su.sysmapid', $sysmapids));
-			while ($url = DBfetch($dbUrls)) {
-				$sysmapid = $url['sysmapid'];
-				unset($url['sysmapid']);
-				$result[$sysmapid]['urls'][] = $url;
-			}
+		$dbUrls = DBselect('SELECT su.* FROM sysmap_url su WHERE '.DBcondition('su.sysmapid', $sysmapids));
+		while ($url = DBfetch($dbUrls)) {
+			$sysmapid = $url['sysmapid'];
+			unset($url['sysmapid']);
+			$result[$sysmapid]['urls'][] = $url;
 		}
 
 		// removing keys (hash -> array)
@@ -498,7 +491,7 @@ class CMap extends CMapElement {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('sysmapid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -990,7 +983,6 @@ class CMap extends CMapElement {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -1007,7 +999,6 @@ class CMap extends CMapElement {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));

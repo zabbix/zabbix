@@ -1020,6 +1020,30 @@ function DBfetchArrayAssoc($cursor, $field) {
 }
 
 /**
+ * Fetch only values from one column to array.
+ *
+ * @param        $cursor
+ * @param string $column
+ * @param bool   $asHash
+ *
+ * @return array
+ */
+function DBfetchColumn($cursor, $column, $asHash = false) {
+	$result = array();
+
+	while ($dbResult = DBfetch($cursor)) {
+		if ($asHash) {
+			$result[$dbResult[$column]] = $dbResult[$column];
+		}
+		else {
+			$result[] = $dbResult[$column];
+		}
+	}
+
+	return $result;
+}
+
+/**
  * Initialize access to SQLite3 database
  *
  * The function creates a semaphore for exclusive SQLite3 access. It is

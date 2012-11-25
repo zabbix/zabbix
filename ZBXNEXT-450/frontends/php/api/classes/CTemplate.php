@@ -67,6 +67,7 @@ class CTemplate extends CHostGeneral {
 			'with_items'				=> null,
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
+			'with_httptests'            => null,
 			'editable' 					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -89,6 +90,7 @@ class CTemplate extends CHostGeneral {
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
+			'selectHttpTests'           => null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -119,7 +121,7 @@ class CTemplate extends CHostGeneral {
 		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -136,7 +138,7 @@ class CTemplate extends CHostGeneral {
 				' AND rr.id=hgg.groupid'.
 				' AND rr.groupid=gg.usrgrpid'.
 				' AND gg.userid='.$userid.
-				' AND rr.permission<'.$permission.')';
+				' AND rr.permission='.PERM_DENY.')';
 		}
 
 		// nodeids
@@ -146,10 +148,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['groupid'] = 'hg.groupid';
-			}
-
+			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -179,10 +178,8 @@ class CTemplate extends CHostGeneral {
 		// parentTemplateids
 		if (!is_null($options['parentTemplateids'])) {
 			zbx_value2array($options['parentTemplateids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
-			}
 
+			$sqlParts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = DBcondition('ht.templateid', $options['parentTemplateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -201,10 +198,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
-			}
-
+			$sqlParts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.templateid';
@@ -223,10 +217,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'i.itemid';
-			}
-
+			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -240,10 +231,8 @@ class CTemplate extends CHostGeneral {
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['triggerid'] = 'f.triggerid';
-			}
 
+			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
@@ -260,10 +249,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['graphid'] = 'gi.graphid';
-			}
-
+			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
@@ -304,6 +290,11 @@ class CTemplate extends CHostGeneral {
 				' FROM items i,graphs_items gi'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=gi.itemid)';
+		}
+
+		// with_httptests
+		if (!empty($options['with_httptests'])) {
+			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid FROM httptest ht WHERE ht.hostid=h.hostid)';
 		}
 
 		// filter
@@ -358,100 +349,98 @@ class CTemplate extends CHostGeneral {
 				unset($template['hostid']);
 				$templateids[$template['templateid']] = $template['templateid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$template['templateid']] = array('templateid' => $template['templateid']);
+				if (!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
+
+				if (!is_null($options['selectGroups']) && !isset($result[$template['templateid']]['groups'])) {
+					$template['groups'] = array();
 				}
-				else{
-					if (!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
-
-					if (!is_null($options['selectGroups']) && !isset($result[$template['templateid']]['groups'])) {
-						$template['groups'] = array();
-					}
-					if (!is_null($options['selectTemplates']) && !isset($result[$template['templateid']]['templates'])) {
-						$template['templates'] = array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$template['templateid']]['hosts'])) {
-						$template['hosts'] = array();
-					}
-					if (!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])) {
-						$template['parentTemplates'] = array();
-					}
-					if (!is_null($options['selectItems']) && !isset($result[$template['templateid']]['items'])) {
-						$template['items'] = array();
-					}
-					if (!is_null($options['selectDiscoveries']) && !isset($result[$template['templateid']]['discoveries'])) {
-						$result[$template['templateid']]['discoveries'] = array();
-					}
-					if (!is_null($options['selectTriggers']) && !isset($result[$template['templateid']]['triggers'])) {
-						$template['triggers'] = array();
-					}
-					if (!is_null($options['selectGraphs']) && !isset($result[$template['templateid']]['graphs'])) {
-						$template['graphs'] = array();
-					}
-					if (!is_null($options['selectApplications']) && !isset($result[$template['templateid']]['applications'])) {
-						$template['applications'] = array();
-					}
-					if (!is_null($options['selectMacros']) && !isset($result[$template['templateid']]['macros'])) {
-						$template['macros'] = array();
-					}
-					if (!is_null($options['selectScreens']) && !isset($result[$template['templateid']]['screens'])) {
-						$template['screens'] = array();
-					}
-
-					// groupids
-					if (isset($template['groupid']) && is_null($options['selectGroups'])) {
-						if (!isset($result[$template['templateid']]['groups']))
-							$result[$template['templateid']]['groups'] = array();
-
-						$result[$template['templateid']]['groups'][] = array('groupid' => $template['groupid']);
-						unset($template['groupid']);
-					}
-
-					// hostids
-					if (isset($template['linked_hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$template['templateid']]['hosts']))
-							$result[$template['templateid']]['hosts'] = array();
-
-						$result[$template['templateid']]['hosts'][] = array('hostid' => $template['linked_hostid']);
-						unset($template['linked_hostid']);
-					}
-					// parentTemplateids
-					if (isset($template['parentTemplateid']) && is_null($options['selectParentTemplates'])) {
-						if (!isset($result[$template['templateid']]['parentTemplates']))
-							$result[$template['templateid']]['parentTemplates'] = array();
-
-						$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parentTemplateid']);
-						unset($template['parentTemplateid']);
-					}
-
-					// itemids
-					if (isset($template['itemid']) && is_null($options['selectItems'])) {
-						if (!isset($result[$template['templateid']]['items']))
-							$result[$template['templateid']]['items'] = array();
-
-						$result[$template['templateid']]['items'][] = array('itemid' => $template['itemid']);
-						unset($template['itemid']);
-					}
-
-					// triggerids
-					if (isset($template['triggerid']) && is_null($options['selectTriggers'])) {
-						if (!isset($result[$template['templateid']]['triggers']))
-							$result[$template['templateid']]['triggers'] = array();
-
-						$result[$template['templateid']]['triggers'][] = array('triggerid' => $template['triggerid']);
-						unset($template['triggerid']);
-					}
-
-					// graphids
-					if (isset($template['graphid']) && is_null($options['selectGraphs'])) {
-						if (!isset($result[$template['templateid']]['graphs'])) $result[$template['templateid']]['graphs'] = array();
-
-						$result[$template['templateid']]['graphs'][] = array('graphid' => $template['graphid']);
-						unset($template['graphid']);
-					}
-
-					$result[$template['templateid']] += $template;
+				if (!is_null($options['selectTemplates']) && !isset($result[$template['templateid']]['templates'])) {
+					$template['templates'] = array();
 				}
+				if (!is_null($options['selectHosts']) && !isset($result[$template['templateid']]['hosts'])) {
+					$template['hosts'] = array();
+				}
+				if (!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])) {
+					$template['parentTemplates'] = array();
+				}
+				if (!is_null($options['selectItems']) && !isset($result[$template['templateid']]['items'])) {
+					$template['items'] = array();
+				}
+				if (!is_null($options['selectDiscoveries']) && !isset($result[$template['templateid']]['discoveries'])) {
+					$result[$template['templateid']]['discoveries'] = array();
+				}
+				if (!is_null($options['selectTriggers']) && !isset($result[$template['templateid']]['triggers'])) {
+					$template['triggers'] = array();
+				}
+				if (!is_null($options['selectGraphs']) && !isset($result[$template['templateid']]['graphs'])) {
+					$template['graphs'] = array();
+				}
+				if (!is_null($options['selectApplications']) && !isset($result[$template['templateid']]['applications'])) {
+					$template['applications'] = array();
+				}
+				if (!is_null($options['selectMacros']) && !isset($result[$template['templateid']]['macros'])) {
+					$template['macros'] = array();
+				}
+				if (!is_null($options['selectScreens']) && !isset($result[$template['templateid']]['screens'])) {
+					$template['screens'] = array();
+				}
+
+				// groupids
+				if (isset($template['groupid']) && is_null($options['selectGroups'])) {
+					if (!isset($result[$template['templateid']]['groups']))
+						$result[$template['templateid']]['groups'] = array();
+					if (!is_null($options['selectHttpTests']) && !isset($result[$template['templateid']]['httpTests'])) {
+						$result[$template['templateid']]['httpTests'] = array();
+					}
+
+					$result[$template['templateid']]['groups'][] = array('groupid' => $template['groupid']);
+					unset($template['groupid']);
+				}
+
+				// hostids
+				if (isset($template['linked_hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$template['templateid']]['hosts']))
+						$result[$template['templateid']]['hosts'] = array();
+
+					$result[$template['templateid']]['hosts'][] = array('hostid' => $template['linked_hostid']);
+					unset($template['linked_hostid']);
+				}
+				// parentTemplateids
+				if (isset($template['parentTemplateid']) && is_null($options['selectParentTemplates'])) {
+					if (!isset($result[$template['templateid']]['parentTemplates']))
+						$result[$template['templateid']]['parentTemplates'] = array();
+
+					$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parentTemplateid']);
+					unset($template['parentTemplateid']);
+				}
+
+				// itemids
+				if (isset($template['itemid']) && is_null($options['selectItems'])) {
+					if (!isset($result[$template['templateid']]['items']))
+						$result[$template['templateid']]['items'] = array();
+
+					$result[$template['templateid']]['items'][] = array('itemid' => $template['itemid']);
+					unset($template['itemid']);
+				}
+
+				// triggerids
+				if (isset($template['triggerid']) && is_null($options['selectTriggers'])) {
+					if (!isset($result[$template['templateid']]['triggers']))
+						$result[$template['templateid']]['triggers'] = array();
+
+					$result[$template['templateid']]['triggers'][] = array('triggerid' => $template['triggerid']);
+					unset($template['triggerid']);
+				}
+
+				// graphids
+				if (isset($template['graphid']) && is_null($options['selectGraphs'])) {
+					if (!isset($result[$template['templateid']]['graphs'])) $result[$template['templateid']]['graphs'] = array();
+
+					$result[$template['templateid']]['graphs'][] = array('graphid' => $template['graphid']);
+					unset($template['graphid']);
+				}
+
+				$result[$template['templateid']] += $template;
 			}
 
 		}
@@ -887,6 +876,51 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
+		// adding http tests
+		if (!is_null($options['selectHttpTests'])) {
+			$objParams = array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $templateids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			);
+
+			if (is_array($options['selectHttpTests'])) {
+				$objParams['output'] = $options['selectHttpTests'];
+				$httpTests = API::HttpTest()->get($objParams);
+
+				if (!is_null($options['limitSelects'])) {
+					order_result($httpTests, 'name');
+				}
+				$count = array();
+				foreach ($httpTests as $httpTestId => $httpTest) {
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$httpTest['hostid']])) {
+							$count[$httpTest['hostid']] = 0;
+						}
+						$count[$httpTest['hostid']]++;
+
+						if ($count[$httpTest['hostid']] > $options['limitSelects']) {
+							continue;
+						}
+					}
+
+					$result[$httpTest['hostid']]['httpTests'][] = $httpTests[$httpTestId];
+				}
+			}
+			elseif (API_OUTPUT_COUNT == $options['selectHttpTests']) {
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
+
+				$httpTests = API::HttpTest()->get($objParams);
+				$httpTests = zbx_toHash($httpTests, 'hostid');
+
+				foreach ($result as $hostId => $host) {
+					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
+				}
+			}
+		}
+
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -924,7 +958,7 @@ class CTemplate extends CHostGeneral {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('templateid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -1108,7 +1142,6 @@ class CTemplate extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function delete($templateids) {
-
 		if (empty($templateids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -1144,7 +1177,7 @@ class CTemplate extends CHostGeneral {
 		$delItems = API::Item()->get(array(
 			'templateids' => $templateids,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('itemid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
@@ -1224,10 +1257,21 @@ class CTemplate extends CHostGeneral {
 			'operationid'=>$delOperationids,
 		));
 
+		// http tests
+		$delHttpTests = API::HttpTest()->get(array(
+			'templateids' => $templateids,
+			'output' => array('httptestid'),
+			'nopermissions' => 1,
+			'preservekeys' => 1
+		));
+		if (!empty($delHttpTests)) {
+			API::HttpTest()->delete(array_keys($delHttpTests), true);
+		}
+
 		// Applications
 		$delApplications = API::Application()->get(array(
 			'templateids' => $templateids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('applicationid'),
 			'nopermissions' => 1,
 			'preservekeys' => 1
 		));
@@ -1235,13 +1279,12 @@ class CTemplate extends CHostGeneral {
 			API::Application()->delete(array_keys($delApplications), true);
 		}
 
-
 		DB::delete('hosts', array('hostid' => $templateids));
 
 		// TODO: remove info from API
 		foreach ($delTemplates as $template) {
 			info(_s('Deleted: Template "%1$s".', $template['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', null, null);
 		}
 
 		return array('templateids' => $templateids);
@@ -1319,7 +1362,7 @@ class CTemplate extends CHostGeneral {
 			$options = array(
 				'filter' => array(
 					'name' => $curTemplate['name']),
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('templateid'),
 				'editable' => 1,
 				'nopermissions' => 1
 			);
@@ -1346,7 +1389,7 @@ class CTemplate extends CHostGeneral {
 			$options = array(
 				'filter' => array(
 					'host' => $curTemplate['host']),
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('templateid'),
 				'editable' => 1,
 				'nopermissions' => 1
 			);
@@ -1551,7 +1594,6 @@ class CTemplate extends CHostGeneral {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -1567,7 +1609,6 @@ class CTemplate extends CHostGeneral {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));

@@ -126,7 +126,7 @@ class CEvent extends CZBXAPI {
 					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 					$sqlParts['from']['functions'] = 'functions f';
 					$sqlParts['from']['items'] = 'items i';
@@ -153,7 +153,7 @@ class CEvent extends CZBXAPI {
 									' AND rr.id=hgg.groupid'.
 									' AND rr.groupid=gg.usrgrpid'.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.'))';
+									' AND rr.permission='.PERM_DENY.'))';
 				}
 			}
 		}
@@ -191,9 +191,7 @@ class CEvent extends CZBXAPI {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts = $this->addQuerySelect('hg.groupid', $sqlParts);
-			}
+			$sqlParts = $this->addQuerySelect('hg.groupid', $sqlParts);
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -207,9 +205,7 @@ class CEvent extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
-			}
+			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
@@ -221,24 +217,6 @@ class CEvent extends CZBXAPI {
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('e.eventid', $nodeids);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts = $this->addQuerySelect('e.*', $sqlParts);
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT e.eventid) AS rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 		// object
@@ -314,6 +292,9 @@ class CEvent extends CZBXAPI {
 			$sqlParts = $this->addQuerySelect($this->fieldId('objectid'), $sqlParts);
 		}
 
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
 		$eventids = array();
 		$triggerids = array();
 
@@ -366,60 +347,55 @@ class CEvent extends CZBXAPI {
 			else {
 				$eventids[$event['eventid']] = $event['eventid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$event['eventid']] = array('eventid' => $event['eventid']);
+				if (isset($event['object']) && ($event['object'] == EVENT_OBJECT_TRIGGER)) {
+					$triggerids[$event['objectid']] = $event['objectid'];
 				}
-				else {
-					if (isset($event['object']) && ($event['object'] == EVENT_OBJECT_TRIGGER)) {
-						$triggerids[$event['objectid']] = $event['objectid'];
-					}
-					if (!isset($result[$event['eventid']])) {
-						$result[$event['eventid']]= array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$event['eventid']]['hosts'])) {
+				if (!isset($result[$event['eventid']])) {
+					$result[$event['eventid']]= array();
+				}
+				if (!is_null($options['selectHosts']) && !isset($result[$event['eventid']]['hosts'])) {
+					$result[$event['eventid']]['hosts'] = array();
+				}
+				if (!is_null($options['selectTriggers']) && !isset($result[$event['eventid']]['triggers'])) {
+					$result[$event['eventid']]['triggers'] = array();
+				}
+				if (!is_null($options['selectItems']) && !isset($result[$event['eventid']]['items'])) {
+					$result[$event['eventid']]['items'] = array();
+				}
+				if (!is_null($options['select_alerts']) && !isset($result[$event['eventid']]['alerts'])) {
+					$result[$event['eventid']]['alerts'] = array();
+				}
+				if (!is_null($options['select_acknowledges']) && !isset($result[$event['eventid']]['acknowledges'])) {
+					$result[$event['eventid']]['acknowledges'] = array();
+				}
+
+				// hostids
+				if (isset($event['hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$event['eventid']]['hosts'])) {
 						$result[$event['eventid']]['hosts'] = array();
 					}
-					if (!is_null($options['selectTriggers']) && !isset($result[$event['eventid']]['triggers'])) {
+					$result[$event['eventid']]['hosts'][] = array('hostid' => $event['hostid']);
+					unset($event['hostid']);
+				}
+
+				// triggerids
+				if (isset($event['triggerid']) && is_null($options['selectTriggers'])) {
+					if (!isset($result[$event['eventid']]['triggers'])) {
 						$result[$event['eventid']]['triggers'] = array();
 					}
-					if (!is_null($options['selectItems']) && !isset($result[$event['eventid']]['items'])) {
+					$result[$event['eventid']]['triggers'][] = array('triggerid' => $event['triggerid']);
+					unset($event['triggerid']);
+				}
+
+				// itemids
+				if (isset($event['itemid']) && is_null($options['selectItems'])) {
+					if (!isset($result[$event['eventid']]['items'])) {
 						$result[$event['eventid']]['items'] = array();
 					}
-					if (!is_null($options['select_alerts']) && !isset($result[$event['eventid']]['alerts'])) {
-						$result[$event['eventid']]['alerts'] = array();
-					}
-					if (!is_null($options['select_acknowledges']) && !isset($result[$event['eventid']]['acknowledges'])) {
-						$result[$event['eventid']]['acknowledges'] = array();
-					}
-
-					// hostids
-					if (isset($event['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$event['eventid']]['hosts'])) {
-							$result[$event['eventid']]['hosts'] = array();
-						}
-						$result[$event['eventid']]['hosts'][] = array('hostid' => $event['hostid']);
-						unset($event['hostid']);
-					}
-
-					// triggerids
-					if (isset($event['triggerid']) && is_null($options['selectTriggers'])) {
-						if (!isset($result[$event['eventid']]['triggers'])) {
-							$result[$event['eventid']]['triggers'] = array();
-						}
-						$result[$event['eventid']]['triggers'][] = array('triggerid' => $event['triggerid']);
-						unset($event['triggerid']);
-					}
-
-					// itemids
-					if (isset($event['itemid']) && is_null($options['selectItems'])) {
-						if (!isset($result[$event['eventid']]['items'])) {
-							$result[$event['eventid']]['items'] = array();
-						}
-						$result[$event['eventid']]['items'][] = array('itemid' => $event['itemid']);
-						unset($event['itemid']);
-					}
-					$result[$event['eventid']] += $event;
+					$result[$event['eventid']]['items'][] = array('itemid' => $event['itemid']);
+					unset($event['itemid']);
 				}
+				$result[$event['eventid']] += $event;
 			}
 		}
 

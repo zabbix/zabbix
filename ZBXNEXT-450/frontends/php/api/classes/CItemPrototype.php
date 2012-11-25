@@ -102,7 +102,7 @@ class CItemPrototype extends CItemGeneral {
 		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -119,7 +119,7 @@ class CItemPrototype extends CItemGeneral {
 									' AND rr.id=hgg.groupid '.
 									' AND rr.groupid=gg.usrgrpid '.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+									' AND rr.permission='.PERM_DENY.')';
 		}
 
 // nodeids
@@ -164,10 +164,7 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['discoveryids'])) {
 			zbx_value2array($options['discoveryids']);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['discoveryid'] = 'id.parent_itemid';
-			}
-
+			$sqlParts['select']['discoveryid'] = 'id.parent_itemid';
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
 			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
@@ -294,59 +291,56 @@ class CItemPrototype extends CItemGeneral {
 			else{
 				$itemids[$item['itemid']] = $item['itemid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$item['itemid']] = array('itemid' => $item['itemid']);
-				}
-				else{
-					if (!isset($result[$item['itemid']]))
-						$result[$item['itemid']]= array();
+				if (!isset($result[$item['itemid']]))
+					$result[$item['itemid']]= array();
 
-					if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
-						$result[$item['itemid']]['hosts'] = array();
-					}
-					if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
-						$result[$item['itemid']]['applications'] = array();
-					}
-					if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
+				if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
+					$result[$item['itemid']]['hosts'] = array();
+				}
+				if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
+					$result[$item['itemid']]['applications'] = array();
+				}
+				if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
+					$result[$item['itemid']]['triggers'] = array();
+				}
+				if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
+					$result[$item['itemid']]['graphs'] = array();
+				}
+
+				// hostids
+				if (isset($item['hostid']) && is_null($options['selectHosts'])) {
+					if (!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
+					$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
+				}
+
+				// triggerids
+				if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
+					if (!isset($result[$item['itemid']]['triggers']))
 						$result[$item['itemid']]['triggers'] = array();
-					}
-					if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
-						$result[$item['itemid']]['graphs'] = array();
-					}
 
-// hostids
-					if (isset($item['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
-						$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
-					}
-
-// triggerids
-					if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
-						if (!isset($result[$item['itemid']]['triggers']))
-							$result[$item['itemid']]['triggers'] = array();
-
-						$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
-						unset($item['triggerid']);
-					}
-// graphids
-					if (isset($item['graphid']) && is_null($options['selectGraphs'])) {
-						if (!isset($result[$item['itemid']]['graphs']))
-							$result[$item['itemid']]['graphs'] = array();
-
-						$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
-						unset($item['graphid']);
-					}
-// discoveryids
-					if (isset($item['discoveryids'])) {
-						if (!isset($result[$item['itemid']]['discovery']))
-							$result[$item['itemid']]['discovery'] = array();
-
-						$result[$item['itemid']]['discovery'][] = array('ruleid' => $item['item_parentid']);
-						unset($item['item_parentid']);
-					}
-
-					$result[$item['itemid']] += $item;
+					$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
+					unset($item['triggerid']);
 				}
+
+				// graphids
+				if (isset($item['graphid']) && is_null($options['selectGraphs'])) {
+					if (!isset($result[$item['itemid']]['graphs']))
+						$result[$item['itemid']]['graphs'] = array();
+
+					$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
+					unset($item['graphid']);
+				}
+
+				// discoveryids
+				if (isset($item['discoveryids'])) {
+					if (!isset($result[$item['itemid']]['discovery']))
+						$result[$item['itemid']]['discovery'] = array();
+
+					$result[$item['itemid']]['discovery'][] = array('ruleid' => $item['item_parentid']);
+					unset($item['item_parentid']);
+				}
+
+				$result[$item['itemid']] += $item;
 			}
 		}
 
@@ -402,15 +396,18 @@ class CItemPrototype extends CItemGeneral {
 				if (!is_null($options['limitSelects'])) {
 					order_result($triggers, 'description');
 				}
+				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
 					unset($triggers[$triggerid]['items']);
-					$count = array();
 					foreach ($trigger['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
 
 						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
@@ -438,6 +435,7 @@ class CItemPrototype extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectApplications'],
+				'selectItems' => array('itemid'),
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
@@ -463,18 +461,23 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::GraphPrototype()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($graphs, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($graphs, 'name');
+				}
+				$count = array();
 				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['discoveries']);
-					$count = array();
-					foreach ($graph['discoveries'] as $item) {
+					unset($graphs[$graphid]['items']);
+					foreach ($graph['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
 
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
-
 						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
@@ -484,13 +487,15 @@ class CItemPrototype extends CItemGeneral {
 				$objParams['groupCount'] = 1;
 
 				$graphs = API::GraphPrototype()->get($objParams);
-
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
+
 				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid]))
+					if (isset($graphs[$itemid])) {
 						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					else
+					}
+					else {
 						$result[$itemid]['graphs'] = 0;
+					}
 				}
 			}
 		}
@@ -505,7 +510,7 @@ class CItemPrototype extends CItemGeneral {
 	public function exists($object) {
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('itemid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -677,6 +682,7 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$delItemPrototypeIds = zbx_toArray($prototypeids);
 		$prototypeids = zbx_toHash($prototypeids);
 
 		$options = array(
@@ -727,7 +733,7 @@ class CItemPrototype extends CItemGeneral {
 		// delete graphs with this item prototype
 		$delGraphPrototypes = API::GraphPrototype()->get(array(
 			'itemids' => $prototypeids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('graphid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
@@ -759,7 +765,7 @@ class CItemPrototype extends CItemGeneral {
 // TRIGGER PROTOTYPES
 		$delTriggerPrototypes = API::TriggerPrototype()->get(array(
 			'itemids' => $prototypeids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('triggerid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 		));
@@ -781,7 +787,7 @@ class CItemPrototype extends CItemGeneral {
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('prototypeids' => $prototypeids);
+		return array('prototypeids' => $delItemPrototypeIds);
 	}
 
 	public function syncTemplates($data) {
