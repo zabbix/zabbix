@@ -146,7 +146,7 @@ $httpFormList->addRow(_('Agent'), $agentComboBox);
 // append HTTP proxy to form list
 $httpProxyTextBox = new CTextBox('http_proxy', $this->data['http_proxy'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 255);
 $httpProxyTextBox->setAttribute('placeholder', 'http://[username[:password]@]proxy.example.com[:port]');
-$httpFormList->addRow(_('HTTP Proxy'), $httpProxyTextBox);
+$httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
 
 // append status to form list
 $httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros']));
