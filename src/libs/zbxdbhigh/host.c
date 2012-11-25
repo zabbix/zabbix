@@ -2846,8 +2846,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
-						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,%d,'%s',%d,'%s',%d,'%s',"
-						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')%s",
+						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,%d,'%s',%d,'%s',"
+						"%d,'%s','%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')%s",
 					itemid, item[i].name_esc, item[i].key_esc, hostid, (int)item[i].type,
 					(int)item[i].value_type, (int)item[i].data_type, item[i].delay,
 					item[i].delay_flex_esc, item[i].history, item[i].trends, (int)item[i].status,
@@ -3473,139 +3473,12 @@ static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 
 /******************************************************************************
  *                                                                            *
- * Function: DBapply_dcheck_fields                                            *
- *                                                                            *
- * Purpose: update linked items by data from a discovery check                *
- *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template IDs                       *
- *             dcheckid    - [IN] discovery check identificator from database *
- *                                                                            *
- ******************************************************************************/
-static void	DBapply_dcheck_fields(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, zbx_uint64_t dcheckid)
-{
-	char		*sql = NULL;
-	size_t		sql_alloc = 512, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	unsigned char	type;
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	result = DBselect(
-			"select type,snmp_community,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,"
-				"snmpv3_privpassphrase,snmpv3_authprotocol,snmpv3_privprotocol"
-			" from dchecks"
-			" where dcheckid=" ZBX_FS_UI64
-				" and type in (%d,%d,%d)",
-			dcheckid, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		char	*snmp_community_esc, *snmpv3_securityname_esc,
-			*snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc;
-
-		switch (type = (unsigned char)atoi(row[0]))
-		{
-			case SVC_SNMPv1:
-				type = ITEM_TYPE_SNMPv1;
-				break;
-			case SVC_SNMPv2c:
-				type = ITEM_TYPE_SNMPv2c;
-				break;
-			case SVC_SNMPv3:
-				type = ITEM_TYPE_SNMPv3;
-				break;
-		}
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set ");
-
-		switch (type)
-		{
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-				snmp_community_esc = DBdyn_escape_string(row[1]);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"snmp_community='%s'", snmp_community_esc);
-				zbx_free(snmp_community_esc);
-				break;
-			case ITEM_TYPE_SNMPv3:
-				snmpv3_securityname_esc = DBdyn_escape_string(row[2]);
-				snmpv3_authpassphrase_esc = DBdyn_escape_string(row[4]);
-				snmpv3_privpassphrase_esc = DBdyn_escape_string(row[5]);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"snmpv3_securityname='%s',snmpv3_securitylevel=%s,"
-						"snmpv3_authpassphrase='%s',snmpv3_privpassphrase='%s',"
-						"snmpv3_authprotocol=%s,snmpv3_privprotocol=%s",
-						snmpv3_securityname_esc, row[3], snmpv3_authpassphrase_esc,
-						snmpv3_privpassphrase_esc, row[6], row[7]);
-				zbx_free(snmpv3_privpassphrase_esc);
-				zbx_free(snmpv3_authpassphrase_esc);
-				zbx_free(snmpv3_securityname_esc);
-				break;
-		}
-	}
-	DBfree_result(result);
-
-	if (0 != sql_offset)
-	{
-		char			*sql2 = NULL;
-		size_t			sql2_alloc = 512, sql2_offset = 0;
-		zbx_vector_uint64_t	itemids;
-		zbx_uint64_t		itemid;
-
-		zbx_vector_uint64_create(&itemids);
-		sql2 = zbx_malloc(sql2, sql2_alloc);
-
-		zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-				"select h.itemid"
-				" from items h,items t"
-				" where h.templateid=t.itemid"
-					" and h.hostid=" ZBX_FS_UI64
-					" and h.type=%d"
-					" and",
-				hostid, type);
-		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "t.hostid",
-				templateids->values, templateids->values_num);
-
-		result = DBselect("%s", sql2);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(itemid, row[0]);
-			zbx_vector_uint64_append(&itemids, itemid);
-		}
-		DBfree_result(result);
-
-		if (0 != itemids.values_num)
-		{
-			zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
-					itemids.values, itemids.values_num);
-
-			DBexecute("%s", sql);
-		}
-
-		zbx_free(sql2);
-		zbx_vector_uint64_destroy(&itemids);
-	}
-
-	zbx_free(sql);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBcopy_template_elements                                         *
  *                                                                            *
  * Purpose: copy elements from specified template                             *
  *                                                                            *
  * Parameters: hostid          - [IN] host identificator from database        *
  *             lnk_templateids - [IN] array of template IDs                   *
- *             dcheckid        - [IN] optional discovery check ID from        *
- *                                    database to fill some item fields from  *
- *                                    a discovery check                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -3614,7 +3487,7 @@ static void	DBapply_dcheck_fields(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, zbx_uint64_t dcheckid)
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
 {
 	const char		*__function_name = "DBcopy_template_elements";
 	zbx_vector_uint64_t	templateids;
@@ -3670,10 +3543,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	DBcopy_template_applications(hostid, lnk_templateids);
 	DBcopy_template_items(hostid, lnk_templateids);
 	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids)))
-	{
-		if (SUCCEED == (res = DBcopy_template_graphs(hostid, lnk_templateids)) && 0 != dcheckid)
-			DBapply_dcheck_fields(hostid, lnk_templateids, dcheckid);
-	}
+		res = DBcopy_template_graphs(hostid, lnk_templateids);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 

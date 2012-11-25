@@ -650,7 +650,7 @@ void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
 {
 	const char	*__function_name = "op_template_add";
-	zbx_uint64_t	hostid, dcheckid = 0;
+	zbx_uint64_t	hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -663,19 +663,7 @@ void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	if (EVENT_OBJECT_DSERVICE == event->object)
-	{
-		DB_RESULT	result;
-		DB_ROW		row;
-
-		result = DBselect("select dcheckid from dservices where dserviceid=" ZBX_FS_UI64, event->objectid);
-
-		if (NULL != (row = DBfetch(result)))
-			ZBX_STR2UINT64(dcheckid, row[0]);
-		DBfree_result(result);
-	}
-
-	DBcopy_template_elements(hostid, lnk_templateids, dcheckid);
+	DBcopy_template_elements(hostid, lnk_templateids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
