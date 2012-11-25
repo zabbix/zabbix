@@ -236,23 +236,25 @@ zbx_graph_item_type;
 typedef struct
 {
 	zbx_uint64_t	druleid;
+	zbx_uint64_t	unique_dcheckid;
 	char		*iprange;
 	char		*name;
-	zbx_uint64_t	unique_dcheckid;
 }
 DB_DRULE;
 
 typedef struct
 {
 	zbx_uint64_t	dcheckid;
-	int		type;
 	char		*ports;
 	char		*key_;
 	char		*snmp_community;
 	char		*snmpv3_securityname;
-	int		snmpv3_securitylevel;
 	char		*snmpv3_authpassphrase;
 	char		*snmpv3_privpassphrase;
+	int		type;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
 }
 DB_DCHECK;
 

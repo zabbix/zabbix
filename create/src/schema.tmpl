@@ -133,6 +133,8 @@ FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|uniq		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_authprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|druleid
 
 TABLE|applications|applicationid|ZBX_SYNC,ZBX_DATA
@@ -241,6 +243,8 @@ FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lifetime	|t_varchar(64)	|'30'	|NOT NULL	|ZBX_SYNC
+FIELD		|snmpv3_authprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -1206,4 +1210,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010021	|2010021
+ROW		|2010025	|2010025

@@ -553,11 +553,23 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'snmpv3_authprotocol' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			),
 			'snmpv3_authpassphrase' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
+			),
+			'snmpv3_privprotocol' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			),
 			'snmpv3_privpassphrase' => array(
 				'null' => false,
@@ -957,11 +969,23 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'snmpv3_authprotocol' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			),
 			'snmpv3_authpassphrase' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
+			),
+			'snmpv3_privprotocol' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			),
 			'snmpv3_privpassphrase' => array(
 				'null' => false,

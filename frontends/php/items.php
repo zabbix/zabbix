@@ -41,14 +41,16 @@ $fields = array(
 	'community_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securityname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securitylevel_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'authprotocol_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'authpassphrase_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'privprotocol_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'privpassphras_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'port_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'authtype_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'username_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'publickey_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'privatekey_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'password_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'authtype_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'username_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'publickey_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'privatekey_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'password_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'value_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'data_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'units_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -117,11 +119,16 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 	'snmpv3_securityname' =>	array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
-	'snmpv3_authpassphrase' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&(isset({type})&&({type}=='.
-		ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.
-		ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
-	'snmpv3_privpassphrase' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&(isset({type})&&({type}=='.
-		ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
+	'snmpv3_authprotocol' =>	array(T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.
+		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
+	'snmpv3_authpassphrase' =>	array(T_ZBX_STR, O_OPT, null,	null,
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.
+		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
+	'snmpv3_privprotocol' =>	array(T_ZBX_INT, O_OPT, null,	IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
+	'snmpv3_privpassphrase' =>	array(T_ZBX_STR, O_OPT, null,	null,
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 	'ipmi_sensor' =>			array(T_ZBX_STR, O_OPT, NO_TRIM, NOT_EMPTY,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
@@ -410,7 +417,9 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 			'delta' => get_request('delta'),
 			'snmpv3_securityname' => get_request('snmpv3_securityname'),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+			'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
 			'formula' => get_request('formula'),
 			'trends' => get_request('trends'),
@@ -433,12 +442,24 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
+			// unset snmpv3 fields
+			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+				$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+			}
+			elseif ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+			}
+
+			// unset fields without changes
 			foreach ($item as $field => $value) {
 				if ($item[$field] == $db_item[$field]) {
 					unset($item[$field]);
 				}
 			}
+
 			$item['itemid'] = $_REQUEST['itemid'];
+
 			$result = API::Item()->update($item);
 		}
 		else {
@@ -477,7 +498,6 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
-
 	if (get_request('delay_flex_visible')) {
 		$delay_flex = get_request('delay_flex');
 		if (!is_null($delay_flex)) {
@@ -494,8 +514,6 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 	else {
 		$db_delay_flex = null;
 	}
-
-
 
 	if (!is_null(get_request('formula', null))) {
 		$_REQUEST['multiplier'] = 1;
@@ -526,7 +544,9 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'delta' => get_request('delta'),
 		'snmpv3_securityname' => get_request('snmpv3_securityname'),
 		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
 		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
 		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
 		'formula' => get_request('formula'),
 		'trends' => get_request('trends'),
@@ -700,7 +720,9 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'applications' => get_request('applications', array()),
 		'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
+		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
 		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
+		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
 		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
 		'formula' => get_request('formula', '1'),
 		'logtimefmt' => get_request('logtimefmt', ''),
