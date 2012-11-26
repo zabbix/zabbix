@@ -107,6 +107,8 @@ typedef struct
 	const char	*snmpv3_authpassphrase;
 	const char	*snmpv3_privpassphrase;
 	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
 }
 ZBX_DC_SNMPITEM;
 
@@ -887,6 +889,8 @@ static void	DCsync_items(DB_RESULT result)
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_authpassphrase, row[12]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_privpassphrase, row[13]);
+			snmpitem->snmpv3_authprotocol = (unsigned char)atoi(row[29]);
+			snmpitem->snmpv3_privprotocol = (unsigned char)atoi(row[30]);
 		}
 		else if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
@@ -1106,9 +1110,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* SNMP items */
 
-		if (ITEM_TYPE_SNMPv1 == item->type ||
-				ITEM_TYPE_SNMPv2c == item->type ||
-				ITEM_TYPE_SNMPv3 == item->type)
+		if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type || ITEM_TYPE_SNMPv3 == item->type)
 		{
 			snmpitem = zbx_hashset_search(&config->snmpitems, &itemid);
 
@@ -2300,7 +2302,7 @@ void	DCsync_configuration()
 				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
 				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.flags,i.interfaceid,i.lastclock"
+				"i.flags,i.interfaceid,i.lastclock,i.snmpv3_authprotocol,i.snmpv3_privprotocol"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d)"
@@ -3106,24 +3108,17 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
-			if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid)))
-			{
-				strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
-				strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
-				strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
-				dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
-				strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
-				strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
-			}
-			else
-			{
-				*dst_item->snmp_community_orig = '\0';
-				*dst_item->snmp_oid_orig = '\0';
-				*dst_item->snmpv3_securityname_orig = '\0';
-				dst_item->snmpv3_securitylevel = 0;
-				*dst_item->snmpv3_authpassphrase_orig = '\0';
-				*dst_item->snmpv3_privpassphrase_orig = '\0';
-			}
+			snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid);
+
+			strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
+			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+			strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
+			dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
+			strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
+			strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
+			dst_item->snmpv3_authprotocol = snmpitem->snmpv3_authprotocol;
+			dst_item->snmpv3_privprotocol = snmpitem->snmpv3_privprotocol;
+
 			dst_item->snmp_community = NULL;
 			dst_item->snmp_oid = NULL;
 			dst_item->snmpv3_securityname = NULL;
