@@ -93,16 +93,14 @@ class CGraphMacroResolver {
 	 * @return string string with macros replaces with corresponding values
 	 */
 	private function resolveFunctionalItemMacros($str, $items) {
-		// extract all macros into $matches
+		// extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
 		// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-		preg_match_all('/{('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?})):'.ZBX_PREG_ITEM_KEY_FORMAT.'\.(last|max|min|avg)\(([0-9]+[smhdw]?)\)}{1}/Uu', $str, $matches, PREG_OFFSET_CAPTURE);
-
-		// match found groups if ever regexp should change
-		$matches['macros'] = $matches[0];
-		$matches['hosts'] = $matches[1];
-		$matches['keys'] = $matches[5];
-		$matches['functions'] = $matches[7];
-		$matches['parameters'] = $matches[8];
+		preg_match_all('/(?<macros>{'.
+			'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?}))):'.
+			'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
+			'(?<functions>(last|max|min|avg))\('.
+			'(?<parameters>([0-9]+[smhdw]?))'.
+			'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
 		// resolve positional macros in host part
 		foreach ($matches['hosts'] as $i => $host) {
