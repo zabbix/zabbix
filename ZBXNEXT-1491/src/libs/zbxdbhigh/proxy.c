@@ -1535,7 +1535,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	size_t		i;
 	zbx_uint64_t	*itemids = NULL;
 	unsigned char	*statuses = NULL;
-	int		*lastclocks = NULL, *errcodes = NULL, *errcodes2 = NULL;;
+	int		*lastclocks = NULL, *errcodes = NULL, *errcodes2 = NULL;
 	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
