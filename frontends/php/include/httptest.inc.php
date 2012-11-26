@@ -71,54 +71,6 @@ function httptest_status2style($status) {
 	}
 }
 
-function activate_httptest($httptestid) {
-	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
-
-	$itemids = array();
-	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$items_db = DBselect(
-		'SELECT hsi.itemid'.
-		' FROM httpstep hs,httpstepitem hsi'.
-		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND hs.httptestid='.$httptestid
-	);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids));
-
-	return $result;
-}
-
-function disable_httptest($httptestid) {
-	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
-
-	$itemids = array();
-	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$items_db = DBselect(
-		'SELECT hsi.itemid'.
-		' FROM httpstep hs,httpstepitem hsi'.
-		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND hs.httptestid='.$httptestid
-	);
-	while ($itemid = Dbfetch($items_db)) {
-		$itemids[] = $itemid['itemid'];
-	}
-
-	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids));
-
-	return $result;
-}
-
 function delete_history_by_httptestid($httptestid) {
 	$db_items = DBselect(
 		'SELECT DISTINCT i.itemid'.
@@ -146,13 +98,7 @@ function get_httpstep_by_no($httptestid, $no) {
 
 function get_httptests_by_hostid($hostids) {
 	zbx_value2array($hostids);
-
-	return DBselect(
-		'SELECT DISTINCT ht.*'.
-		' FROM httptest ht,applications ap'.
-		' WHERE ht.applicationid=ap.applicationid'.
-			' AND '.DBcondition('ap.hostid', $hostids)
-	);
+	return DBselect('SELECT DISTINCT ht.* FROM httptest ht WHERE '.DBcondition('ht.hostid', $hostids));
 }
 
 /**
@@ -175,4 +121,93 @@ function validateHttpDuplicateSteps($steps) {
 	}
 
 	return $isDuplicateStepFound;
+}
+
+/**
+ * Return parent templates for http tests.
+ * Result structure:
+ * array(
+ *   'httptestid' => array(
+ *     'name' => <template name>,
+ *     'id' => <template id>
+ *   ), ...
+ * )
+ *
+ * @param array $httpTests must have httptestid and templateid fields
+ *
+ * @return array
+ */
+function getHttpTestsParentTemplates(array $httpTests) {
+	$result = array();
+	$template2testMap = array();
+
+	foreach ($httpTests as $httpTest) {
+		if (!empty($httpTest['templateid'])){
+			$result[$httpTest['httptestid']] = array();
+			$template2testMap[$httpTest['templateid']][$httpTest['httptestid']] = $httpTest['httptestid'];
+		}
+	}
+
+	do {
+		$dbHttpTests = DBselect('SELECT ht.httptestid,ht.templateid,ht.hostid,h.name'.
+				' FROM httptest ht'.
+				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
+				' WHERE'.DBcondition('ht.httptestid', array_keys($template2testMap)));
+		while ($dbHttpTest = DBfetch($dbHttpTests)) {
+			foreach ($template2testMap[$dbHttpTest['httptestid']] as $testId => $data) {
+				$result[$testId] = array('name' => $dbHttpTest['name'], 'id' => $dbHttpTest['hostid']);
+
+				if (!empty($dbHttpTest['templateid'])) {
+					$template2testMap[$dbHttpTest['templateid']][$testId] = $testId;
+				}
+			}
+			unset($template2testMap[$dbHttpTest['httptestid']]);
+		}
+	} while (!empty($template2testMap));
+
+	return $result;
+}
+
+/**
+ * Resolve http tests macros.
+ *
+ * @param array $httpTests
+ * @param bool  $resolveTest
+ * @param bool  $esolveSteps
+ *
+ * @return array
+ */
+function resolveHttpTestMacros(array $httpTests, $resolveTest = true, $esolveSteps = true) {
+	$resolver = new CMacrosResolver();
+	$names = array();
+
+	$i = 0;
+	foreach ($httpTests as $test) {
+		if ($resolveTest) {
+			$names[$test['hostid']][$i++] = $test['name'];
+		}
+
+		if ($esolveSteps) {
+			foreach ($test['steps'] as $step) {
+				$names[$test['hostid']][$i++] = $step['name'];
+			}
+		}
+	}
+
+	$names = $resolver->resolveMacrosInTextBatch($names);
+
+	$i = 0;
+	foreach ($httpTests as $tnum => $test) {
+		if ($resolveTest) {
+			$httpTests[$tnum]['name'] = $names[$test['hostid']][$i++];
+		}
+
+		if ($esolveSteps) {
+			foreach ($httpTests[$tnum]['steps'] as $snum => $step) {
+				$httpTests[$tnum]['steps'][$snum]['name'] = $names[$test['hostid']][$i++];
+			}
+		}
+	}
+
+	return $httpTests;
 }

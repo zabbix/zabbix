@@ -66,23 +66,29 @@ static void	DBupdate_lastsize()
 static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
 {
 	AGENT_RESULT	value;
-	int		timestamp = 0;
+	int		errcode = SUCCEED;
 
 	init_result(&value);
 
 	if (SUCCEED == set_result_type(&value, item->value_type, item->data_type, trap))
 	{
+		int	timestamp = 0;
+
 		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			calc_timestamp(trap, &timestamp, item->logtimefmt);
 
+		item->status = ITEM_STATUS_ACTIVE;
 		dc_add_history(item->itemid, item->value_type, item->flags, &value,
-				ts, ITEM_STATUS_ACTIVE, NULL, timestamp, NULL, 0, 0, 0, 0);
+				ts, item->status, NULL, timestamp, NULL, 0, 0, 0, 0);
 	}
 	else
 	{
+		item->status = ITEM_STATUS_NOTSUPPORTED;
 		dc_add_history(item->itemid, item->value_type, item->flags, NULL,
-				ts, ITEM_STATUS_NOTSUPPORTED, value.msg, 0, NULL, 0, 0, 0, 0);
+				ts, item->status, value.msg, 0, NULL, 0, 0, 0, 0);
 	}
+
+	DCrequeue_items(&item->itemid, &item->status, &ts->sec, &errcode, 1);
 
 	free_result(&value);
 }

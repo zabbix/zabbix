@@ -135,6 +135,7 @@ class CHost extends CHostGeneral {
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
 			'selectInventory'			=> null,
+			'selectHttpTests'           => null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -162,7 +163,7 @@ class CHost extends CHostGeneral {
 		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				' SELECT hh.hostid'.
@@ -180,7 +181,7 @@ class CHost extends CHostGeneral {
 							' AND rr.id=hggg.groupid'.
 							' AND rr.groupid=gg.usrgrpid'.
 							' AND gg.userid='.$userid.
-							' AND rr.permission<'.$permission.
+							' AND rr.permission='.PERM_DENY.
 					'))';
 		}
 
@@ -263,11 +264,9 @@ class CHost extends CHostGeneral {
 			zbx_value2array($options['httptestids']);
 
 			$sqlParts['select']['httptestid'] = 'ht.httptestid';
-			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['httptest'] = 'httptest ht';
 			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['httptestids']);
-			$sqlParts['where']['aht'] = 'a.applicationid=ht.applicationid';
-			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
+			$sqlParts['where']['aht'] = 'ht.hostid=h.hostid';
 		}
 
 		// graphids
@@ -387,19 +386,14 @@ class CHost extends CHostGeneral {
 		}
 
 		// with_httptests, with_monitored_httptests
-		if (!is_null($options['with_httptests'])) {
-			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT a.applicationid'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid)';
+		if (!empty($options['with_httptests'])) {
+			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid FROM httptest ht WHERE ht.hostid=h.hostid)';
 		}
-		elseif (!is_null($options['with_monitored_httptests'])) {
+		elseif (!empty($options['with_monitored_httptests'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT a.applicationid'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid'.
+				' SELECT ht.httptestid'.
+				' FROM httptest ht'.
+				' WHERE ht.hostid=h.hostid'.
 					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
 
@@ -475,6 +469,7 @@ class CHost extends CHostGeneral {
 
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
 		while ($host = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -526,15 +521,16 @@ class CHost extends CHostGeneral {
 				if (!is_null($options['selectScreens']) && !isset($result[$host['hostid']]['screens'])) {
 					$result[$host['hostid']]['screens'] = array();
 				}
-
 				if (!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])) {
 					$result[$host['hostid']]['interfaces'] = array();
 				}
-
 				// groupids
 				if (isset($host['groupid']) && is_null($options['selectGroups'])) {
 					if (!isset($result[$host['hostid']]['groups'])) {
 						$result[$host['hostid']]['groups'] = array();
+					}
+					if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
+						$result[$host['hostid']]['httpTests'] = array();
 					}
 
 					$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
@@ -831,6 +827,50 @@ class CHost extends CHostGeneral {
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
 					$result[$hostid]['items'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		// adding http tests
+		if (!is_null($options['selectHttpTests'])) {
+			$objParams = array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $hostids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			);
+
+			if (is_array($options['selectHttpTests']) || str_in_array($options['selectHttpTests'], $subselectsAllowedOutputs)) {
+				$objParams['output'] = $options['selectHttpTests'];
+				$httpTests = API::HttpTest()->get($objParams);
+
+				if (!is_null($options['limitSelects'])) {
+					order_result($httpTests, 'name');
+				}
+				$count = array();
+				foreach ($httpTests as $httpTestId => $httpTest) {
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$httpTest['hostid']])) {
+							$count[$httpTest['hostid']] = 0;
+						}
+						$count[$httpTest['hostid']]++;
+
+						if ($count[$httpTest['hostid']] > $options['limitSelects']) {
+							continue;
+						}
+					}
+
+					$result[$httpTest['hostid']]['httpTests'][] = $httpTests[$httpTestId];
+				}
+			}
+			elseif (API_OUTPUT_COUNT == $options['selectHttpTests']) {
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
+
+				$httpTests = API::HttpTest()->get($objParams);
+				$httpTests = zbx_toHash($httpTests, 'hostid');
+				foreach ($result as $hostId => $host) {
+					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
 				}
 			}
 		}
@@ -2004,7 +2044,7 @@ class CHost extends CHostGeneral {
 			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
 		}
 		if (!empty($delHttptests)) {
-			API::WebCheck()->delete($delHttptests);
+			API::HttpTest()->delete($delHttptests, true);
 		}
 
 

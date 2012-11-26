@@ -146,10 +146,13 @@
 			}
 			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
 
+			// deny beat all, read-write beat read
 			$tmp_permitions = array();
 			while ($db_right = DBfetch($db_rights)) {
-				if (isset($tmp_permitions[$db_right['id']])) {
-					$tmp_permitions[$db_right['id']] = min($tmp_permitions[$db_right['id']], $db_right['permission']);
+				if (isset($tmp_permitions[$db_right['id']]) && $tmp_permitions[$db_right['id']] != PERM_DENY) {
+					$tmp_permitions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
+						? PERM_DENY
+						: max($tmp_permitions[$db_right['id']], $db_right['permission']);
 				}
 				else {
 					$tmp_permitions[$db_right['id']] = $db_right['permission'];
@@ -179,7 +182,7 @@
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 			foreach ($nodes as $node) {
 				switch($node['permission']) {
-					case PERM_READ_ONLY:
+					case PERM_READ:
 						$list_name = 'read_only';
 						break;
 					case PERM_READ_WRITE:
@@ -207,7 +210,7 @@
 
 		foreach ($groups as $group) {
 			switch($group['permission']) {
-				case PERM_READ_ONLY:
+				case PERM_READ:
 					$list_name = 'read_only';
 					break;
 				case PERM_READ_WRITE:
@@ -234,7 +237,7 @@
 
 		foreach ($hosts as $host) {
 			switch($host['permission']) {
-				case PERM_READ_ONLY:
+				case PERM_READ:
 					$list_name = 'read_only';
 					break;
 				case PERM_READ_WRITE:
@@ -461,7 +464,7 @@
 		$snmpCommunityField->setEnabled('no');
 
 		// SNMPv3 security name
-		$snmpSecurityLabel = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
+		$snmpSecurityLabel = new CSpan(array(bold(_('Security name')), SPACE._('like').': '));
 		$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
 
 		$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
@@ -905,7 +908,9 @@
 			'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
 			'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
+			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
+			'snmpv3_privprotocol' => get_request('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
 			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
 			'ipmi_sensor' => get_request('ipmi_sensor', ''),
 			'authtype' => get_request('authtype', 0),
@@ -1050,7 +1055,9 @@
 			$data['params'] = $data['item']['params'];
 			$data['snmpv3_securityname'] = $data['item']['snmpv3_securityname'];
 			$data['snmpv3_securitylevel'] = $data['item']['snmpv3_securitylevel'];
+			$data['snmpv3_authprotocol'] = $data['item']['snmpv3_authprotocol'];
 			$data['snmpv3_authpassphrase'] = $data['item']['snmpv3_authpassphrase'];
+			$data['snmpv3_privprotocol'] = $data['item']['snmpv3_privprotocol'];
 			$data['snmpv3_privpassphrase'] = $data['item']['snmpv3_privpassphrase'];
 			$data['ipmi_sensor'] = $data['item']['ipmi_sensor'];
 			$data['authtype'] = $data['item']['authtype'];

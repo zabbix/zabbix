@@ -239,7 +239,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					item.snmp_oid = strdup(dcheck->key_);
 
 					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-							&item.snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+							&item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
 
@@ -249,13 +249,15 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 						item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
 						item.snmpv3_authpassphrase = strdup(dcheck->snmpv3_authpassphrase);
 						item.snmpv3_privpassphrase = strdup(dcheck->snmpv3_privpassphrase);
+						item.snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
+						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
 
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+								&item.snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+								&item.snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+								&item.snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
@@ -392,7 +394,8 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			"select dcheckid,type,key_,snmp_community,snmpv3_securityname,snmpv3_securitylevel,"
-				"snmpv3_authpassphrase,snmpv3_privpassphrase,ports"
+				"snmpv3_authpassphrase,snmpv3_privpassphrase,snmpv3_authprotocol,snmpv3_privprotocol,"
+				"ports"
 			" from dchecks"
 			" where druleid=" ZBX_FS_UI64,
 			drule->druleid);
@@ -416,10 +419,12 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 		dcheck.key_ = row[2];
 		dcheck.snmp_community = row[3];
 		dcheck.snmpv3_securityname = row[4];
-		dcheck.snmpv3_securitylevel = atoi(row[5]);
+		dcheck.snmpv3_securitylevel = (unsigned char)atoi(row[5]);
 		dcheck.snmpv3_authpassphrase = row[6];
 		dcheck.snmpv3_privpassphrase = row[7];
-		dcheck.ports = row[8];
+		dcheck.snmpv3_authprotocol = (unsigned char)atoi(row[8]);
+		dcheck.snmpv3_privprotocol = (unsigned char)atoi(row[9]);
+		dcheck.ports = row[10];
 
 		process_check(drule, &dcheck, dhost, host_status, ip, dns);
 	}
