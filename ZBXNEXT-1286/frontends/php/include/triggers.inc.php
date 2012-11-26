@@ -679,60 +679,72 @@ function construct_expression($itemid, $expressions) {
  *																				*
  *******************************************************************************/
 function explode_exp($expression, $html = false, $resolve_macro = false, $src_host = null, $dst_host = null) {
-	$functionid = '';
-	$macros = '';
 	$exp = !$html ? '' : array();
 	$trigger = array();
-	$state = '';
 
-	for ($i = 0, $max = zbx_strlen($expression); $i < $max; $i++) {
-		if ($expression[$i] == '{' && ($expression[$i+1] == '$')) {
-			$functionid = '';
-			$macros = '';
-			$state = 'MACROS';
+	for ($i = 0, $state = '', $max = zbx_strlen($expression); $i < $max; $i++) {
+		if ($expression[$i] == '{') {
+			if ($expression[$i + 1] == '$') {
+				$usermacro = '';
+				$state = 'USERMACRO';
+			}
+			elseif ($expression[$i + 1] == '#') {
+				$lldmacro = '';
+				$state = 'LLDMACRO';
+			}
+			else {
+				$functionid = '';
+				$state = 'FUNCTIONID';
+				continue;
+			}
 		}
-		elseif ($expression[$i] == '{') {
-			$functionid = '';
-			$state = 'FUNCTIONID';
-			continue;
-		}
-
-		if ($expression[$i] == '}') {
-			if ($state == 'MACROS') {
-				$macros .= '}';
+		elseif ($expression[$i] == '}') {
+			if ($state == 'USERMACRO') {
+				$usermacro .= '}';
 				if ($resolve_macro) {
-					$function_data['expression'] = $macros;
+					$function_data['expression'] = $usermacro;
 					$function_data = API::UserMacro()->resolveTrigger($function_data);
-					$macros = $function_data['expression'];
+					$usermacro = $function_data['expression'];
 				}
 
 				if ($html) {
-					array_push($exp, $macros);
+					array_push($exp, $usermacro);
 				}
 				else {
-					$exp .= $macros;
+					$exp .= $usermacro;
 				}
-				$macros = '';
+				$state = '';
+				continue;
+			}
+			elseif ($state == 'LLDMACRO') {
+				$lldmacro .= '}';
+				if ($html) {
+					array_push($exp, $lldmacro);
+				}
+				else {
+					$exp .= $lldmacro;
+				}
+				$state = '';
+				continue;
+			}
+			elseif ($functionid == 'TRIGGER.VALUE') {
+				if ($html) {
+					array_push($exp, '{'.$functionid.'}');
+				}
+				else {
+					$exp .= '{'.$functionid.'}';
+				}
 				$state = '';
 				continue;
 			}
 
-			$state = '';
 			$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status,i.type,i.flags'.
 					' FROM items i,functions f,hosts h'.
 					' WHERE f.functionid='.$functionid.
 						' AND i.itemid=f.itemid'.
 						' AND h.hostid=i.hostid';
 
-			if ($functionid == 'TRIGGER.VALUE') {
-				if (!$html) {
-					$exp .= '{'.$functionid.'}';
-				}
-				else {
-					array_push($exp, '{'.$functionid.'}');
-				}
-			}
-			elseif (is_numeric($functionid) && $function_data = DBfetch(DBselect($sql))) {
+			if (is_numeric($functionid) && $function_data = DBfetch(DBselect($sql))) {
 				if ($resolve_macro) {
 					$trigger = $function_data;
 					$function_data = API::UserMacro()->resolveItem($function_data);
@@ -745,10 +757,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 					$function_data['host'] = $dst_host;
 				}
 
-				if (!$html) {
-					$exp .= '{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
-				}
-				else {
+				if ($html) {
 					$style = $function_data['status'] == ITEM_STATUS_DISABLED ? 'disabled' : 'unknown';
 					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
 						$style = 'enabled';
@@ -768,6 +777,9 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 					}
 					array_push($exp, array('{', $link,'.', bold($function_data['function'].'('), $function_data['parameter'], bold(')'), '}'));
 				}
+				else {
+					$exp .= '{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
+				}
 			}
 			else {
 				if ($html) {
@@ -777,23 +789,28 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 					$exp .= '*ERROR*';
 				}
 			}
+
+			$state = '';
 			continue;
 		}
 
-		if ($state == 'FUNCTIONID') {
-			$functionid = $functionid.$expression[$i];
-			continue;
-		}
-		elseif ($state == 'MACROS') {
-			$macros = $macros.$expression[$i];
-			continue;
-		}
-
-		if ($html) {
-			array_push($exp, $expression[$i]);
-		}
-		else {
-			$exp .= $expression[$i];
+		switch ($state) {
+			case 'FUNCTIONID':
+				$functionid .= $expression[$i];
+				break;
+			case 'USERMACRO':
+				$usermacro .= $expression[$i];
+				break;
+			case 'LLDMACRO':
+				$lldmacro .= $expression[$i];
+				break;
+			default:
+				if ($html) {
+					array_push($exp, $expression[$i]);
+				}
+				else {
+					$exp .= $expression[$i];
+				}
 		}
 	}
 
@@ -809,47 +826,50 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
  */
 function triggerExpression($trigger, $html = false) {
 	$expression = $trigger['expression'];
-	$functionid = '';
-	$macros = '';
 	$exp = $html ? array() : '';
-	$state = '';
 
-	for ($i = 0, $len = strlen($expression); $i < $len; $i++) {
-		if ($expression[$i] == '{' && $expression[$i+1] == '$') {
-			$functionid = '';
-			$macros = '';
-			$state = 'MACROS';
-		}
-		elseif ($expression[$i] == '{') {
-			$functionid = '';
-			$state = 'FUNCTIONID';
-			continue;
-		}
-
-		if ($expression[$i] == '}') {
-			if ($state == 'MACROS') {
-				$macros .= '}';
-
-				if ($html) {
-					array_push($exp, $macros);
-				}
-				else {
-					$exp .= $macros;
-				}
-
-				$macros = '';
-				$state = '';
+	for ($i = 0, $state = '', $len = strlen($expression); $i < $len; $i++) {
+		if ($expression[$i] == '{') {
+			if ($expression[$i + 1] == '$') {
+				$usermacro = '';
+				$state = 'USERMACRO';
+			}
+			elseif ($expression[$i + 1] == '#') {
+				$lldmacro = '';
+				$state = 'LLDMACRO';
+			}
+			else {
+				$functionid = '';
+				$state = 'FUNCTIONID';
 				continue;
 			}
+		}
+		elseif ($expression[$i] == '}') {
+			if ($state == 'USERMACRO') {
+				$usermacro .= '}';
 
-			$state = '';
-
-			if ($functionid == 'TRIGGER.VALUE') {
-				if (!$html) {
-					$exp .= '{'.$functionid.'}';
+				if ($html) {
+					array_push($exp, $usermacro);
 				}
 				else {
+					$exp .= $usermacro;
+				}
+			}
+			elseif ($state == 'LLDMACRO') {
+				$lldmacro .= '}';
+				if ($html) {
+					array_push($exp, $lldmacro);
+				}
+				else {
+					$exp .= $lldmacro;
+				}
+			}
+			elseif ($functionid == 'TRIGGER.VALUE') {
+				if ($html) {
 					array_push($exp, '{'.$functionid.'}');
+				}
+				else {
+					$exp .= '{'.$functionid.'}';
 				}
 			}
 			elseif (is_numeric($functionid) && isset($trigger['functions'][$functionid])) {
@@ -857,10 +877,7 @@ function triggerExpression($trigger, $html = false) {
 				$function_data += $trigger['items'][$function_data['itemid']];
 				$function_data += $trigger['hosts'][$function_data['hostid']];
 
-				if (!$html) {
-					$exp .= '{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
-				}
-				else {
+				if ($html) {
 					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'disabled' : 'unknown';
 					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
 						$style = 'enabled';
@@ -880,6 +897,9 @@ function triggerExpression($trigger, $html = false) {
 					}
 					array_push($exp, array('{', $link, '.', bold($function_data['function'].'('), $function_data['parameter'], bold(')'), '}'));
 				}
+				else {
+					$exp .= '{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
+				}
 			}
 			else {
 				if ($html) {
@@ -889,23 +909,28 @@ function triggerExpression($trigger, $html = false) {
 					$exp .= '*ERROR*';
 				}
 			}
+
+			$state = '';
 			continue;
 		}
 
-		if ($state == 'FUNCTIONID') {
-			$functionid = $functionid.$expression[$i];
-			continue;
-		}
-		elseif ($state == 'MACROS') {
-			$macros = $macros.$expression[$i];
-			continue;
-		}
-
-		if ($html) {
-			array_push($exp, $expression[$i]);
-		}
-		else {
-			$exp .= $expression[$i];
+		switch ($state) {
+			case 'FUNCTIONID':
+				$functionid .= $expression[$i];
+				break;
+			case 'USERMACRO':
+				$usermacro .= $expression[$i];
+				break;
+			case 'LLDMACRO':
+				$lldmacro .= $expression[$i];
+				break;
+			default:
+				if ($html) {
+					array_push($exp, $expression[$i]);
+				}
+				else {
+					$exp .= $expression[$i];
+				}
 		}
 	}
 
@@ -2186,11 +2211,11 @@ function get_item_function_info($expr) {
 				'validation' => IN('0,1')
 			);
 		}
-		elseif (isset($expressionData->usermacros[0])) {
+		elseif (isset($expressionData->usermacros[0]) || isset($expressionData->lldmacros[0])) {
 			$result = array(
-				'value_type' => _('0 or 1'),
-				'type' => T_ZBX_INT,
-				'validation' => NOT_EMPTY
+				'value_type' => $value_type[ITEM_VALUE_TYPE_FLOAT],
+				'type' => T_ZBX_STR,
+				'validation' => 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u", {})'
 			);
 		}
 		elseif (isset($expressionData->expressions[0])) {
