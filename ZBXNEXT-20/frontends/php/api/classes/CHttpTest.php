@@ -337,8 +337,8 @@ class CHttpTest extends CZBXAPI {
 			$expandName = $options['expandName'] !== null && $nameRequested;
 
 			// expandStepName
-			$stepNameRequested = $options['selectSteps'] !== null
-				&& (is_array($options['selectSteps']) && in_array('name', $options['selectSteps']))
+			$stepNameRequested = ($options['selectSteps'] !== null
+				&& is_array($options['selectSteps']) && in_array('name', $options['selectSteps']))
 					|| $options['selectSteps'] == API_OUTPUT_EXTEND;
 			$expandStepName = $options['expandStepName'] !== null && $stepNameRequested;
 
