@@ -1,6 +1,10 @@
 Changes for 2.1.0
 
 New features:
+A.F.I..PS. [ZBXNEXT-450] added support of SHA authentication protocol and AES privacy protocol for SNMPv3 chacks (Eduard, Sasha)
+A.F.I..PS. [ZBXNEXT-308] added support of WEB monitoring using HTTP proxy (Alexei)
+A.F.I..PS. [ZBXNEXT-20] added support of templated Web scenarios (Sasha, Vedmak)
+A.F....... [ZBXNEXT-887] fixed permission calculation (Eduard)
 A......... [ZBXNEXT-1492] dropped support of output shorten for the API get methods (Pavels)
 .......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)
 ........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
@@ -19,6 +23,11 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
+A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
+..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
+A......... [ZBX-5718] fixed unknown event generation for templated triggers (Oleg)
+..F....... [ZBX-5749] fixed macros resolving in triggers in Maps (Eduard)
 A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
 A......... [ZBX-5709] fixed trigger recreation after template trigger expression change causing event history deletion (Toms)
 ..F....... [ZBX-5711] added caching for frontend favorite values (Toms)
@@ -58,6 +67,22 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5860] fixed hostgroup massupdate (Eduard)
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
+A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
+..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
+..F....... [ZBX-5855] fixed "Array to string conversion" errors in 1.8 XML import (Oleg)
+..F....... [ZBX-3684] fixed "Undefined index" error in 1.8 XML import (Oleg)
+...G...... [ZBX-5732] fixed sending data from a file in Zabbix sender (Andris)
+...G...... [ZBX-5741] fixed Zabbix sender crash if a corrupted server response is received (Andris)
+...G...... [ZBX-5722] fixed calculation of "vm.memory.size[available]" in Zabbix agent on Solaris (Andris)
+.......PS. [ZBX-5149] fixed refreshing of unsupported "Zabbix agent (active)" items by a proxy (Sasha)
+..F....... [ZBX-5759] fixed Oracle ORA-01002 SQL error on items bulk actions (Toms)
+..F....... [ZBX-5639] fixed global options "dropdown first entry" and "remember selected" in availability reports (Oleg)
+..F....... [ZBX-5639] improved sdii() debugging function (Toms)
+A.F.....S. [ZBX-5816] fixed undefined index in Monitoring > Events, when favorite trigger has been deleted (Toms, Sasha)
+..F....... [ZBX-5771] fixed acknowledge tick mark lost on "overview" page (Oleg)
+..F....... [ZBX-5821] fixed 2.0 xml format template import (Oleg)
 ........S. [ZBX-5791] fixed possible SQL errors when linking groups to a host (Sasha)
 ..F....... [ZBX-5786] fixed screens import, that contain simple graphs or plain texts (Oleg)
 ........S. [ZBX-5753] fixed server crash when using an icmpping* check as a discovery rule (Sasha)
@@ -134,7 +159,6 @@ A.F....... [ZBX-5046] fixed an error when deleting a globalmacro when the macro 
 A......... [ZBX-3907] fixed API user.logout method (Vedmak)
 ..F....... [ZBX-4983] fixed importing of 1.8 templates if they contain already existing host macros (Vedmak)
 ..F....... [ZBX-5579] fixed displaying 'Acknowledged' in Monitoring -> Triggers when a trigger has no events by displaying 'No events' instead (Vedmak)
-..F....... [ZBX-4247] fixed error when trigger expression items have same trigger expression like parameter in key (Vedmak)
 ..F....... [ZBX-5606] removed 'units' and 'store value' fields for character data items (Vedmak)
 ..F....... [ZBX-5608] fixed incorrect macro resolving in trigger descriptions if expression has duplicate functions (Vedmak)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)
@@ -1165,6 +1189,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
 .D........ [ZBX-5650] added more information about ProxyLocalBuffer parameter in the example configuration file (Richlv)

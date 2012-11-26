@@ -604,7 +604,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+						&port, MACRO_TYPE_COMMON, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
@@ -623,11 +623,11 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
@@ -635,7 +635,7 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
@@ -649,18 +649,18 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].username, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
 				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
@@ -671,9 +671,9 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].username, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						&items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}
 	}
@@ -717,22 +717,18 @@ static int	get_values(unsigned char poller_type)
 
 		if (SUCCEED == errcodes[i])
 		{
+			items[i].status = ITEM_STATUS_ACTIVE;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
-
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, timespec.sec);
+					items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
+			items[i].status = ITEM_STATUS_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					ITEM_STATUS_NOTSUPPORTED, results[i].msg, 0, NULL, 0, 0, 0, 0);
+					items[i].status, results[i].msg, 0, NULL, 0, 0, 0, 0);
+		}
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespec.sec);
-		}
-		else if (NETWORK_ERROR == errcodes[i] || GATEWAY_ERROR == errcodes[i])
-		{
-			DCrequeue_unreachable_item(items[i].itemid);
-		}
+		DCrequeue_items(&items[i].itemid, &items[i].status, &timespec.sec, &errcodes[i], 1);
 
 		zbx_free(items[i].key);
 

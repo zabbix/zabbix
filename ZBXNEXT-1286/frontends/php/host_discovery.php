@@ -81,12 +81,16 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 	'snmpv3_securityname' => array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+	'snmpv3_authprotocol' => array(T_ZBX_INT, O_OPT, null, IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.
+		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
 	'snmpv3_authpassphrase' => array(T_ZBX_STR, O_OPT, null, null,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.
 		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
+	'snmpv3_privprotocol' => array(T_ZBX_INT, O_OPT, null, IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 	'snmpv3_privpassphrase' => array(T_ZBX_STR, O_OPT, null, null,
-		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.
-		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 	'ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
@@ -199,7 +203,9 @@ elseif (isset($_REQUEST['save'])) {
 		'port' => get_request('port'),
 		'snmpv3_securityname' => get_request('snmpv3_securityname'),
 		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
 		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
 		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
 		'delay_flex' => $db_delay_flex,
 		'authtype' => get_request('authtype'),
@@ -217,11 +223,23 @@ elseif (isset($_REQUEST['save'])) {
 		DBstart();
 
 		$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
+
+		// unset snmpv3 fields
+		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+			$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+		}
+		elseif ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+		}
+
+		// unset fields without changes
 		foreach ($item as $field => $value) {
 			if ($item[$field] == $db_item[$field]) {
 				unset($item[$field]);
 			}
 		}
+
 		$item['itemid'] = $_REQUEST['itemid'];
 
 		$result = API::DiscoveryRule()->update($item);

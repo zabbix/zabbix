@@ -685,6 +685,7 @@ else {
 		_('Triggers'),
 		_('Graphs'),
 		_('Discovery'),
+		_('Web'),
 		_('Interface'),
 		_('Templates'),
 		make_sorting_header(_('Status'), 'status'),
@@ -736,7 +737,8 @@ else {
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT
+		'selectApplications' => API_OUTPUT_COUNT,
+		'selectHttpTests' => API_OUTPUT_COUNT
 	));
 	order_result($hosts, $sortfield, $sortorder);
 
@@ -766,6 +768,8 @@ else {
 			' ('.$host['graphs'].')');
 		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
 			' ('.$host['discoveries'].')');
+		$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
+			' ('.$host['httpTests'].')');
 
 		$description = array();
 		if ($host['proxy_hostid']) {
@@ -853,6 +857,7 @@ else {
 			$triggers,
 			$graphs,
 			$discoveries,
+			$httpTests,
 			$hostIF,
 			new CCol($hostTemplates, 'wraptext'),
 			$status,

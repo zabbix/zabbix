@@ -53,7 +53,7 @@ else {
 require_once dirname(__FILE__).'/include/page_header.php';
 
 
-$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
+$allow_discovery = check_right_on_discovery(PERM_READ);
 
 $allowed_sources[] = EVENT_SOURCE_TRIGGERS;
 if ($allow_discovery) {
@@ -337,11 +337,17 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 			'preservekeys' => true,
 			'expandDescription' => true
 		));
-		$dbTrigger = reset($dbTrigger);
-		$host = reset($dbTrigger['hosts']);
-		$trigger = $host['name'].':'.$dbTrigger['description'];
+		// check if trigger is accessible
+		if ($dbTrigger) {
+			$dbTrigger = reset($dbTrigger);
+			$host = reset($dbTrigger['hosts']);
+			$trigger = $host['name'].':'.$dbTrigger['description'];
+		}
+		else {
+			$_REQUEST['triggerid'] = 0;
+		}
 	}
-	else {
+	if (!isset($trigger)) {
 		$trigger = '';
 	}
 

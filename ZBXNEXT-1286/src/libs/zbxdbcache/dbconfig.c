@@ -79,6 +79,7 @@ typedef struct
 	const ZBX_DC_TRIGGER	**triggers;
 	int			delay;
 	int			nextcheck;
+	int			lastclock;
 	unsigned char		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
@@ -106,6 +107,8 @@ typedef struct
 	const char	*snmpv3_authpassphrase;
 	const char	*snmpv3_privpassphrase;
 	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
 }
 ZBX_DC_SNMPITEM;
 
@@ -364,23 +367,18 @@ extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
-static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
-				unsigned char item_type, const char *key,
-				unsigned char flags, unsigned char *poller_type)
+static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
+		unsigned char item_type, const char *key, unsigned char flags)
 {
 	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
 				ITEM_TYPE_AGGREGATE != item_type &&
 				ITEM_TYPE_CALCULATED != item_type))
 	{
-		*poller_type = ZBX_NO_POLLER;
-		return;
+		return ZBX_NO_POLLER;
 	}
 
 	if (0 != (ZBX_FLAG_DISCOVERY_CHILD & flags))
-	{
-		*poller_type = ZBX_NO_POLLER;
-		return;
-	}
+		return ZBX_NO_POLLER;
 
 	switch (item_type)
 	{
@@ -391,8 +389,8 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 			{
 				if (0 == CONFIG_PINGER_FORKS)
 					break;
-				*poller_type = ZBX_POLLER_TYPE_PINGER;
-				return;
+
+				return ZBX_POLLER_TYPE_PINGER;
 			}
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMPv1:
@@ -407,21 +405,21 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 		case ITEM_TYPE_CALCULATED:
 			if (0 == CONFIG_POLLER_FORKS)
 				break;
-			*poller_type = ZBX_POLLER_TYPE_NORMAL;
-			return;
+
+			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_IPMI:
 			if (0 == CONFIG_IPMIPOLLER_FORKS)
 				break;
-			*poller_type = ZBX_POLLER_TYPE_IPMI;
-			return;
+
+			return ZBX_POLLER_TYPE_IPMI;
 		case ITEM_TYPE_JMX:
 			if (0 == CONFIG_JAVAPOLLER_FORKS)
 				break;
-			*poller_type = ZBX_POLLER_TYPE_JAVA;
-			return;
+
+			return ZBX_POLLER_TYPE_JAVA;
 	}
 
-	*poller_type = ZBX_NO_POLLER;
+	return ZBX_NO_POLLER;
 }
 
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
@@ -803,6 +801,10 @@ static void	DCsync_items(DB_RESULT result)
 		if (0 == found)
 		{
 			item->triggers = NULL;
+			if (SUCCEED != DBis_null(row[28]))
+				item->lastclock = atoi(row[28]);
+			else
+				item->lastclock = 0;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -865,7 +867,7 @@ static void	DCsync_items(DB_RESULT result)
 		item->delay = delay;
 
 		old_poller_type = item->poller_type;
-		poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags, &item->poller_type);
+		item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
 
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 				(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -887,6 +889,8 @@ static void	DCsync_items(DB_RESULT result)
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_authpassphrase, row[12]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_privpassphrase, row[13]);
+			snmpitem->snmpv3_authprotocol = (unsigned char)atoi(row[29]);
+			snmpitem->snmpv3_privprotocol = (unsigned char)atoi(row[30]);
 		}
 		else if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
@@ -1106,9 +1110,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* SNMP items */
 
-		if (ITEM_TYPE_SNMPv1 == item->type ||
-				ITEM_TYPE_SNMPv2c == item->type ||
-				ITEM_TYPE_SNMPv3 == item->type)
+		if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type || ITEM_TYPE_SNMPv3 == item->type)
 		{
 			snmpitem = zbx_hashset_search(&config->snmpitems, &itemid);
 
@@ -2300,7 +2302,7 @@ void	DCsync_configuration()
 				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
 				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.flags,i.interfaceid"
+				"i.flags,i.interfaceid,i.lastclock,i.snmpv3_authprotocol,i.snmpv3_privprotocol"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d)"
@@ -3085,6 +3087,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->delay = src_item->delay;
 	dst_item->nextcheck = src_item->nextcheck;
 	dst_item->status = src_item->status;
+	dst_item->lastclock = src_item->lastclock;
 	dst_item->flags = src_item->flags;
 
 	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
@@ -3105,24 +3108,17 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
-			if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid)))
-			{
-				strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
-				strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
-				strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
-				dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
-				strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
-				strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
-			}
-			else
-			{
-				*dst_item->snmp_community_orig = '\0';
-				*dst_item->snmp_oid_orig = '\0';
-				*dst_item->snmpv3_securityname_orig = '\0';
-				dst_item->snmpv3_securitylevel = 0;
-				*dst_item->snmpv3_authpassphrase_orig = '\0';
-				*dst_item->snmpv3_privpassphrase_orig = '\0';
-			}
+			snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid);
+
+			strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
+			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+			strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
+			dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
+			strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
+			strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
+			dst_item->snmpv3_authprotocol = snmpitem->snmpv3_authprotocol;
+			dst_item->snmpv3_privprotocol = snmpitem->snmpv3_privprotocol;
+
 			dst_item->snmp_community = NULL;
 			dst_item->snmp_oid = NULL;
 			dst_item->snmpv3_securityname = NULL;
@@ -3679,7 +3675,7 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers        *
  *           must always return the items they have taken using either        *
- *           DCrequeue_reachable_item() or DCrequeue_unreachable_item().      *
+ *           DCrequeue_items().                                               *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items)
@@ -3740,8 +3736,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
-				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key,
-						dc_item->flags, &dc_item->poller_type);
+				dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
+						dc_item->type, dc_item->key, dc_item->flags);
 
 				old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
@@ -3969,65 +3965,93 @@ int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
 	return SUCCEED;
 }
 
-void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now)
+static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 {
-	ZBX_DC_ITEM	*dc_item;
-	ZBX_DC_HOST	*dc_host;
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
-	LOCK_CACHE;
+	if (ZBX_LOC_POLLER == dc_item->location)
+		dc_item->location = ZBX_LOC_NOWHERE;
 
-	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)))
+	old_poller_type = dc_item->poller_type;
+	old_nextcheck = dc_item->nextcheck;
+
+	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
 	{
-		dc_item->status = status;
+		ZBX_DC_HOST	*dc_host;
 
-		old_poller_type = dc_item->poller_type;
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			return;
 
-		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type &&
-				NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-		{
-			poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type,
-					dc_item->key, dc_item->flags, &dc_item->poller_type);
-		}
-
-		old_nextcheck = dc_item->nextcheck;
-		dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
-
-		if (ZBX_LOC_POLLER == dc_item->location)
-			dc_item->location = ZBX_LOC_NOWHERE;
-
-		DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
+		dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
+				dc_item->type, dc_item->key, dc_item->flags);
 	}
 
-	UNLOCK_CACHE;
+	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock);
+
+	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_unreachable_item(zbx_uint64_t itemid)
+static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 {
-	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
+	if (ZBX_LOC_POLLER == dc_item->location)
+		dc_item->location = ZBX_LOC_NOWHERE;
+
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		return;
+
+	old_poller_type = dc_item->poller_type;
+	old_nextcheck = dc_item->nextcheck;
+
+	if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type ||
+			ZBX_POLLER_TYPE_IPMI == dc_item->poller_type ||
+			ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
+		dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+
+	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+
+	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
+}
+
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastclocks, int *errcodes, size_t num)
+{
+	size_t		i;
+	ZBX_DC_ITEM	*dc_item;
+
 	LOCK_CACHE;
 
-	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)) &&
-			NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+	for (i = 0; i < num; i++)
 	{
-		old_poller_type = dc_item->poller_type;
-		if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type ||
-				ZBX_POLLER_TYPE_IPMI == dc_item->poller_type ||
-				ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
-			dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+		if (FAIL == errcodes[i])
+			continue;
 
-		old_nextcheck = dc_item->nextcheck;
-		dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
+			continue;
 
-		if (ZBX_LOC_POLLER == dc_item->location)
-			dc_item->location = ZBX_LOC_NOWHERE;
+		dc_item->status = statuses[i];
+		dc_item->lastclock = lastclocks[i];
 
-		DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
+		if (ZBX_NO_POLLER == dc_item->poller_type)
+			continue;
+
+		switch (errcodes[i])
+		{
+			case SUCCEED:
+			case NOTSUPPORTED:
+			case AGENT_ERROR:
+				DCrequeue_reachable_item(dc_item, lastclocks[i]);
+				break;
+			case NETWORK_ERROR:
+			case GATEWAY_ERROR:
+				DCrequeue_unreachable_item(dc_item);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 	}
 
 	UNLOCK_CACHE;

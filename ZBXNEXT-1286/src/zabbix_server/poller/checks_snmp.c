@@ -297,65 +297,110 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 		session.securityNameLen = strlen(session.securityName);
 
 		/* set the security level to authenticated, but not encrypted */
-		if (item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+		switch (item->snmpv3_securitylevel)
 		{
-			session.securityLevel = SNMP_SEC_LEVEL_NOAUTH;
-		}
-		else if (item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV)
-		{
-			session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
+			case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+				session.securityLevel = SNMP_SEC_LEVEL_NOAUTH;
+				break;
+			case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+				session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
 
-			/* set the authentication method to MD5 */
-			session.securityAuthProto = usmHMACMD5AuthProtocol;
-			session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
-			session.securityAuthKeyLen = USM_AUTH_KU_LEN;
+				switch (item->snmpv3_authprotocol)
+				{
+					case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
+						/* set the authentication protocol to MD5 */
+						session.securityAuthProto = usmHMACMD5AuthProtocol;
+						session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+						break;
+					case ITEM_SNMPV3_AUTHPROTOCOL_SHA:
+						/* set the authentication protocol to SHA */
+						session.securityAuthProto = usmHMACSHA1AuthProtocol;
+						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+						break;
+					default:
+						zbx_snprintf(err, MAX_STRING_LEN,
+								"Unsupported authentication protocol [%d]",
+								item->snmpv3_authprotocol);
+						goto end;
+				}
 
-			if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
-					session.securityAuthProtoLen,
-					(u_char *)item->snmpv3_authpassphrase,
-					strlen(item->snmpv3_authpassphrase),
-					session.securityAuthKey,
-					&session.securityAuthKeyLen))
-			{
-				zbx_snprintf(err, MAX_STRING_LEN, "Error generating Ku from authentication pass phrase");
-				goto end;
-			}
-		}
-		else if (item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
-		{
-			session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
+				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
 
-			/* set the authentication method to MD5 */
-			session.securityAuthProto = usmHMACMD5AuthProtocol;
-			session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
-			session.securityAuthKeyLen = USM_AUTH_KU_LEN;
+				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+						session.securityAuthProtoLen, (u_char *)item->snmpv3_authpassphrase,
+						strlen(item->snmpv3_authpassphrase), session.securityAuthKey,
+						&session.securityAuthKeyLen))
+				{
+					zbx_strlcpy(err, "Error generating Ku from authentication pass phrase",
+							MAX_STRING_LEN);
+					goto end;
+				}
+				break;
+			case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
+				session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
 
-			if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
-					session.securityAuthProtoLen,
-					(u_char *)item->snmpv3_authpassphrase,
-					strlen(item->snmpv3_authpassphrase),
-					session.securityAuthKey,
-					&session.securityAuthKeyLen))
-			{
-				zbx_snprintf(err, MAX_STRING_LEN, "Error generating Ku from authentication pass phrase");
-				goto end;
-			}
+				switch (item->snmpv3_authprotocol)
+				{
+					case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
+						/* set the authentication protocol to MD5 */
+						session.securityAuthProto = usmHMACMD5AuthProtocol;
+						session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+						break;
+					case ITEM_SNMPV3_AUTHPROTOCOL_SHA:
+						/* set the authentication protocol to SHA */
+						session.securityAuthProto = usmHMACSHA1AuthProtocol;
+						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+						break;
+					default:
+						zbx_snprintf(err, MAX_STRING_LEN,
+								"Unsupported authentication protocol [%d]",
+								item->snmpv3_authprotocol);
+						goto end;
+				}
 
-			/* set the privacy method to DES */
-			session.securityPrivProto = usmDESPrivProtocol;
-			session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
-			session.securityPrivKeyLen = USM_PRIV_KU_LEN;
+				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
 
-			if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
-					session.securityAuthProtoLen,
-					(u_char *)item->snmpv3_privpassphrase,
-					strlen(item->snmpv3_privpassphrase),
-					session.securityPrivKey,
-					&session.securityPrivKeyLen))
-			{
-				zbx_snprintf(err, MAX_STRING_LEN, "Error generating Ku from privacy pass phrase");
-				goto end;
-			}
+				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+						session.securityAuthProtoLen, (u_char *)item->snmpv3_authpassphrase,
+						strlen(item->snmpv3_authpassphrase), session.securityAuthKey,
+						&session.securityAuthKeyLen))
+				{
+					zbx_strlcpy(err, "Error generating Ku from authentication pass phrase",
+							MAX_STRING_LEN);
+					goto end;
+				}
+
+				switch (item->snmpv3_privprotocol)
+				{
+					case ITEM_SNMPV3_PRIVPROTOCOL_DES:
+						/* set the privacy protocol to DES */
+						session.securityPrivProto = usmDESPrivProtocol;
+						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
+						break;
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES:
+						/* set the privacy protocol to AES */
+						session.securityPrivProto = usmAESPrivProtocol;
+						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
+						break;
+					default:
+						zbx_snprintf(err, MAX_STRING_LEN,
+								"Unsupported privacy protocol [%d]",
+								item->snmpv3_privprotocol);
+						goto end;
+				}
+
+				session.securityPrivKeyLen = USM_PRIV_KU_LEN;
+
+				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+						session.securityAuthProtoLen, (u_char *)item->snmpv3_privpassphrase,
+						strlen(item->snmpv3_privpassphrase), session.securityPrivKey,
+						&session.securityPrivKeyLen))
+				{
+					zbx_strlcpy(err, "Error generating Ku from privacy pass phrase",
+							MAX_STRING_LEN);
+					goto end;
+				}
+				break;
 		}
 		zabbix_log(LOG_LEVEL_DEBUG, "SNMPv3 [%s@%s]", session.securityName, session.peername);
 	}
@@ -371,7 +416,7 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 	{
 		SOCK_CLEANUP;
 
-		zbx_snprintf(err, MAX_STRING_LEN, "Cannot open snmp session");
+		zbx_strlcpy(err, "Cannot open snmp session", MAX_STRING_LEN);
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
