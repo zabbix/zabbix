@@ -94,7 +94,6 @@ class CHost extends CHostGeneral {
 			'maintenanceids'			=> null,
 			'graphids'					=> null,
 			'applicationids'			=> null,
-			'dhostids'					=> null,
 			'dserviceids'				=> null,
 			'httptestids'				=> null,
 			'monitored_hosts'			=> null,
@@ -128,7 +127,6 @@ class CHost extends CHostGeneral {
 			'selectDiscoveries'			=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'selectDHosts'				=> null,
 			'selectDServices'			=> null,
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
@@ -289,20 +287,6 @@ class CHost extends CHostGeneral {
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
-		}
-
-		// dhostids
-		if (!is_null($options['dhostids'])) {
-			zbx_value2array($options['dhostids']);
-
-			$sqlParts['select']['dhostid'] = 'ds.dhostid';
-			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
-			$sqlParts['where']['dsh'] = 'ds.ip=h.ip';
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['dhostid'] = 'ds.dhostid';
-			}
 		}
 
 		// dserviceids
@@ -505,9 +489,6 @@ class CHost extends CHostGeneral {
 				if (!is_null($options['selectGraphs']) && !isset($result[$host['hostid']]['graphs'])) {
 					$result[$host['hostid']]['graphs'] = array();
 				}
-				if (!is_null($options['selectDHosts']) && !isset($result[$host['hostid']]['dhosts'])) {
-					$result[$host['hostid']]['dhosts'] = array();
-				}
 				if (!is_null($options['selectDServices']) && !isset($result[$host['hostid']]['dservices'])) {
 					$result[$host['hostid']]['dservices'] = array();
 				}
@@ -608,16 +589,6 @@ class CHost extends CHostGeneral {
 
 					$result[$host['hostid']]['httptests'][] = array('httptestid' => $host['httptestid']);
 					unset($host['httptestid']);
-				}
-
-				// dhostids
-				if (isset($host['dhostid']) && is_null($options['selectDHosts'])) {
-					if (!isset($result[$host['hostid']]['dhosts'])) {
-						$result[$host['hostid']]['dhosts'] = array();
-					}
-
-					$result[$host['hostid']]['dhosts'][] = array('dhostid' => $host['dhostid']);
-					unset($host['dhostid']);
 				}
 
 				// dserviceids
@@ -1015,55 +986,6 @@ class CHost extends CHostGeneral {
 				$graphs = zbx_toHash($graphs, 'hostid');
 				foreach ($result as $hostid => $host) {
 					$result[$hostid]['graphs'] = isset($graphs[$hostid]) ? $graphs[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding discovery hosts
-		if (!is_null($options['selectDHosts'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDHosts'];
-				$dhosts = API::DHost()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($dhosts, 'dhostid');
-				}
-
-				$count = array();
-				foreach ($dhosts as $dhostid => $dhost) {
-					unset($dhosts[$dhostid]['hosts']);
-
-					foreach ($dhost['hosts'] as $host) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$host['hostid']])) {
-								$count[$host['hostid']] = 0;
-							}
-							$count[$host['hostid']]++;
-
-							if ($count[$host['hostid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$host['hostid']]['dhosts'][] = &$dhosts[$dhostid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectDHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$dhosts = API::DHost()->get($objParams);
-				$dhosts = zbx_toHash($dhosts, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['dhosts'] = isset($dhosts[$hostid]) ? $dhosts[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
@@ -2207,7 +2129,6 @@ class CHost extends CHostGeneral {
 				$options['maintenanceids'] === null &&
 				$options['graphids'] === null &&
 				$options['applicationids'] === null &&
-				$options['dhostids'] === null &&
 				$options['dserviceids'] === null &&
 				$options['httptestids'] === null &&
 				$options['groupids'] === null) {
