@@ -551,10 +551,9 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 		if (isset($expr['host']) && isset($expr['item'])) {
 			$_REQUEST['description'] = $expr['host'] .':'. $expr['item'];
 			$myItem = API::Item()->get(array(
-				'filter' => array('host' => $expr['host'], 'key_' => $expr['item']),
+				'filter' => array('host' => $expr['host'], 'key_' => $expr['item'], 'flags' => null),
 				'output' => API_OUTPUT_EXTEND,
-				'webitems' => true,
-				'filter' => array('flags' => null)
+				'webitems' => true
 			));
 			$myItem = reset($myItem);
 			if (isset($myItem['itemid'])) {
