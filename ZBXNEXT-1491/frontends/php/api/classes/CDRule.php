@@ -65,7 +65,6 @@ class CDRule extends CZBXAPI {
 			'dserviceids'				=> null,
 			'editable'					=> null,
 			'selectDHosts'				=> null,
-			'selectDServices'			=> null,
 			'selectDChecks'				=> null,
 			// filter
 			'filter'					=> null,
@@ -226,9 +225,6 @@ class CDRule extends CZBXAPI {
 				if (!is_null($options['selectDChecks']) && !isset($result[$drule['druleid']]['dchecks'])) {
 					$result[$drule['druleid']]['dchecks'] = array();
 				}
-				if (!is_null($options['selectDServices']) && !isset($result[$drule['druleid']]['dservices'])) {
-					$result[$drule['druleid']]['dservices'] = array();
-				}
 
 				// dhostids
 				if (isset($drule['dhostid']) && is_null($options['selectDHosts'])) {
@@ -246,15 +242,6 @@ class CDRule extends CZBXAPI {
 
 					$result[$drule['druleid']]['dchecks'][] = array('dcheckid' => $drule['dcheckid']);
 					unset($drule['dcheckid']);
-				}
-
-				// dservices
-				if (isset($drule['dserviceid']) && is_null($options['selectDServices'])) {
-					if (!isset($result[$drule['druleid']]['dservices']))
-						$result[$drule['druleid']]['dservices'] = array();
-
-					$result[$drule['druleid']]['dservices'][] = array('dserviceid' => $drule['dserviceid']);
-					unset($drule['dserviceid']);
 				}
 
 				if (!isset($result[$drule['druleid']]))
