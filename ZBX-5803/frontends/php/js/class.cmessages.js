@@ -396,42 +396,51 @@ createContainer: function(){
 	this.dom.header.appendChild(this.dom.controls);
 	this.dom.controls.className = 'controls';
 
-// buttons list
-	this.dom.controlList = new CList().node;
+	/*
+	 * Buttons list
+	 */
+	this.dom.controlList = document.createElement('ul');
 	this.dom.controls.appendChild(this.dom.controlList);
 	this.dom.controlList.style.cssFloat = 'right';
 
-// move
+	// move
 	this.dom.move = document.createElement('div');
 	this.dom.move.setAttribute('title', locale['S_MOVE']);
 	this.dom.move.className = 'iconmove menu_icon';
-	//this.dom.move.style.display = 'none';
+	var listItem = document.createElement('li');
+	listItem.className = 'linear';
+	listItem.appendChild(this.dom.move);
+	this.dom.controlList.appendChild(listItem);
 
-	this.dom.controlList.addItem(this.dom.move, 'linear');
-
-// snooze
+	// snooze
 	this.dom.snooze = document.createElement('div');
 	this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
-	this.dom.snooze.className = 'iconsnooze menu_icon';
+	this.dom.snooze.className = 'iconsnooze menu_icon linear';
+	var listItem = document.createElement('li');
+	listItem.className = 'linear';
+	listItem.appendChild(this.dom.snooze);
+	this.dom.controlList.appendChild(listItem);
 
-	this.dom.controlList.addItem(this.dom.snooze, 'linear');
-
-// mute
+	// mute
 	this.dom.mute = document.createElement('div');
-	this.dom.mute.setAttribute('title', locale['S_MUTE']+'/'+locale['S_UNMUTE']);
-	this.dom.mute.className = 'iconsound menu_icon';
+	this.dom.mute.setAttribute('title', locale['S_MUTE'] + '/' + locale['S_UNMUTE']);
+	this.dom.mute.className = 'iconsound menu_icon linear ';
+	var listItem = document.createElement('li');
+	listItem.className = 'linear';
+	listItem.appendChild(this.dom.mute);
+	this.dom.controlList.appendChild(listItem);
 
-	this.dom.controlList.addItem(this.dom.mute, 'linear');
-
-// close all
+	// close all
 	this.dom.closeAll = document.createElement('div');
 	this.dom.closeAll.setAttribute('title', locale['S_CLEAR']);
-	this.dom.closeAll.className = 'iconclose menu_icon';
+	this.dom.closeAll.className = 'iconclose menu_icon linear';
+	var listItem = document.createElement('li');
+	listItem.className = 'linear';
+	listItem.appendChild(this.dom.closeAll);
+	this.dom.controlList.appendChild(listItem);
 
-	this.dom.controlList.addItem(this.dom.closeAll, 'linear');
-
-// Message List
-	this.dom.list = new CList().node;
+	// message List
+	this.dom.list = document.createElement('ul');
 	this.dom.container.appendChild(this.dom.list);
 },
 
