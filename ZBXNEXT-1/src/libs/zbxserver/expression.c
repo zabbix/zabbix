@@ -3204,6 +3204,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 	zbx_free(key);
 
 	pl = pr;
+
 	/* a trigger function with parameters */
 	if ('.' != *pr++ || SUCCEED != parse_function(&pr, NULL, NULL) || '}' != *pr++)
 		return FAIL;
