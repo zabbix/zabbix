@@ -104,7 +104,6 @@ class CDService extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'selectDRules'				=> null,
 			'selectDHosts'				=> null,
-			'selectDChecks'				=> null,
 			'selectHosts'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -270,10 +269,6 @@ class CDService extends CZBXAPI{
 					$result[$dservice['dserviceid']]['dhosts'] = array();
 				}
 
-				if (!is_null($options['selectDChecks']) && !isset($result[$dservice['dserviceid']]['dchecks'])) {
-					$result[$dservice['dserviceid']]['dchecks'] = array();
-				}
-
 				if (!is_null($options['selectHosts']) && !isset($result[$dservice['dserviceid']]['hosts'])) {
 					$result[$dservice['dserviceid']]['hosts'] = array();
 				}
@@ -292,14 +287,6 @@ class CDService extends CZBXAPI{
 						$result[$dservice['dserviceid']]['dhosts'] = array();
 
 					$result[$dservice['dserviceid']]['dhosts'][] = array('dhostid' => $dservice['dhostid']);
-				}
-
-				// dcheckids
-				if (isset($dservice['dcheckid']) && is_null($options['selectDChecks'])) {
-					if (!isset($result[$dservice['dserviceid']]['dchecks']))
-						$result[$dservice['dserviceid']]['dchecks'] = array();
-
-					$result[$dservice['dserviceid']]['dchecks'][] = array('dcheckid' => $dservice['dcheckid']);
 				}
 
 				$result[$dservice['dserviceid']] += $dservice;
