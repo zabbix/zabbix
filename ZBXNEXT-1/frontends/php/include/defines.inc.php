@@ -780,7 +780,37 @@ define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
-define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+?(\[\".*\"\]|\[[^,\]]*?\])*?)');
+
+// !!! should be used with "x" modifier
+define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
+	(?P>param) # match recursive parameter group
+	|
+	(\" # match quoted string
+		(
+			((\\\\)+?[^\\\\]) # match any amount of backslash with non-backslash ending
+			|
+			[^\"\\\\] # match any character except \ or "
+		)*? # match \" or any character except "
+	\")
+	|
+	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at begining and any character except , and ] afterwards
+	|
+	() # match empty and only empty part
+)');
+define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
+(?<param>( # name parameter group used in recursion
+	\[ # match opening bracket
+		(
+			\s*?'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match spaces and parameter
+			(
+				\s*?,\s*? # match spaces, comma and spaces
+				'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match parameter
+			)*? # match spaces, comma, spaces, parameter zero or more times
+			\s*? #matches spaces
+		)
+	\] # match closing bracket
+))*? # matches non comma seperated brackets with parameters zero or more times
+)');
 
 // regexp ids
 define('ZBX_KEY_ID',		1);
