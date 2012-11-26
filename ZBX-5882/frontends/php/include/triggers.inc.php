@@ -2213,7 +2213,7 @@ function get_item_function_info($expr) {
 				'hostids' => zbx_objectValues($hostFound, 'hostid'),
 				'filter' => array(
 					'key_' => array($exprPart['item']),
-					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)
 				),
 				'webitems' => true
 			));
