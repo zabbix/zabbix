@@ -40,9 +40,6 @@ class CDCheck extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('dcheckid', 'druleid');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('dchecks' => 'dc.dcheckid'),
 			'from'		=> array('dchecks' => 'dchecks dc'),
