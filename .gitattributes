@@ -171,7 +171,6 @@ frontends/php/include/classes/html/CPageHeader.php -text
 frontends/php/include/classes/macros/CEventDescription.php -text
 frontends/php/include/classes/macros/CMacrosResolver.php -text
 frontends/php/include/classes/macros/CTriggerDescription.php -text
-frontends/php/include/classes/parsers/CTriggerExpression.php -text
 frontends/php/include/views/general.warning.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
@@ -193,7 +192,6 @@ frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
-frontends/php/locale/pt_PT/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
@@ -260,14 +258,6 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/experimental/include/ZbxDbOperationTruncate.php -text
-frontends/php/tests/experimental/include/ZbxDbTestCase.php -text
-frontends/php/tests/experimental/include/fixtures/initial_users.xml -text
-frontends/php/tests/experimental/tests/CHttpTest/CHttpTestDbTest.php -text
-frontends/php/tests/experimental/tests/CHttpTest/fixtures/initial.xml -text
-frontends/php/tests/experimental/tests/CHttpTest/fixtures/testCreateOnTemplate.xml -text
-frontends/php/tests/experimental/tests/CHttpTest/fixtures/testUpdateOnTemplate.xml -text
-frontends/php/tests/experimental/tests/CHttpTest/fixtures/testUpdateStepsOnTemplate.xml -text
 frontends/php/tests/general/zbx_dbcast_2bigintTest.php -text
 frontends/php/tests/general/zbx_limitTest.php -text
 include/zbxdbupgrade.h -text
