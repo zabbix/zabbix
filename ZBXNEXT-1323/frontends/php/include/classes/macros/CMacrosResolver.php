@@ -24,8 +24,8 @@
  */
 class CMacrosResolver {
 
-	const PATTERN_HOST = 'HOSTNAME|HOST\.HOST|HOST\.NAME';
-	const PATTERN_IP = 'IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN';
+	const PATTERN_HOST = '{HOSTNAME}|{HOST\.HOST}|{HOST\.NAME}';
+	const PATTERN_IP = '{IPADDRESS}|{HOST\.IP}|{HOST\.DNS}|{HOST\.CONN}';
 
 	/**
 	 * Interface priorities.
@@ -102,7 +102,7 @@ class CMacrosResolver {
 				' FROM interface i'.
 				' WHERE i.main=1'.
 					' AND '.DBcondition('i.hostid', $hostIds).
-					' AND '.DBcondition('i.type', array($this->interfacePriorities))
+					' AND '.DBcondition('i.type', $this->interfacePriorities)
 			);
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				$hostId = $dbInterface['hostid'];
@@ -156,7 +156,7 @@ class CMacrosResolver {
 				}
 
 				if (!empty($macros[$hostId])) {
-					$data[$hostId][$tnum] = $this->replaceMacroValues($text, $macros[$hostId]);
+					$data[$hostId][$tnum] = str_replace(array_keys($macros[$hostId]), $macros[$hostId], $text);
 				}
 			}
 		}
@@ -212,7 +212,7 @@ class CMacrosResolver {
 		$result = array();
 
 		foreach ($texts as $text) {
-			preg_match_all('/{('.$pattern.')}/', $text, $matches);
+			preg_match_all('/'.$pattern.'/', $text, $matches);
 			$result = array_merge($result, $matches[0]);
 		}
 
@@ -238,55 +238,6 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Replace macros by values.
-	 * All macros are resolved in one go.
-	 *
-	 * @param string $text
-	 * @param array $macros
-	 *
-	 * @return string
-	 */
-	private function replaceMacroValues($text, $macros) {
-		$i = 0;
-		$begin = false;
-		while (($i = zbx_strpos($text, ($begin !== false ? '}' : '{'), $i)) !== false) {
-			$char = zbx_substr($text, $i, 1);
-			if ($char == '{') {
-				$begin = $i;
-			}
-			elseif ($char == '}') {
-				if ($begin !== false) {
-					$macro = zbx_substr($text, $begin, $i - $begin + 1);
-
-					if (isset($macros[$macro])) {
-						$value = $macros[$macro];
-					}
-					elseif ($this->isMacroAllowed($macro)) {
-						$value = UNRESOLVED_MACRO_STRING;
-					}
-					else {
-						$value = false;
-					}
-
-					if ($value !== false) {
-						$text = zbx_substr_replace($text, $value, $begin, zbx_strlen($macro));
-					}
-					else {
-						$value = $macro;
-					}
-
-					// recalculate iterator
-					$i = $begin + zbx_strlen($value) - 1;
-
-					$begin = false;
-				}
-			}
-		}
-
-		return $text;
-	}
-
-	/**
 	 * Check if the macro is supported.
 	 *
 	 * @param string $macro
@@ -294,6 +245,6 @@ class CMacrosResolver {
 	 * @return int
 	 */
 	private function isMacroAllowed($macro) {
-		return preg_match('/{'.self::PATTERN_HOST.self::PATTERN_IP.'?}/', $macro);
+		return preg_match('/'.self::PATTERN_HOST.self::PATTERN_IP.'/', $macro);
 	}
 }
