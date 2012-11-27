@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F.I..PS. [ZBXNEXT-1526] added support of configurable number of retries per WEB scenario (Alexei)
 A.F.I..PS. [ZBXNEXT-450] added support of SHA authentication protocol and AES privacy protocol for SNMPv3 chacks (Eduard, Sasha)
 A.F.I..PS. [ZBXNEXT-308] added support of WEB monitoring using HTTP proxy (Alexei)
 A.F.I..PS. [ZBXNEXT-20] added support of templated Web scenarios (Sasha, Vedmak)
