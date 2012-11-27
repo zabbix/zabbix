@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,166 +19,122 @@
 
 
 var CTree = Class.create();
+
 CTree.prototype = {
-	tree_name: null,
-	treenode: [],
 
-	initialize: function(tree_name, treenode) {
-		this.tree_name = tree_name;
-		this.treenode = treenode;
+	name: null,
+	nodes: [],
 
-		if ((tree_init = cookie.read(tree_name)) != null) {
+	initialize: function(name, nodes) {
+		this.name = name;
+		this.nodes = nodes;
+
+		if ((tree_init = cookie.read(name)) != null) {
 			var nodes = tree_init.split(',');
-			var c = nodes.length;
-			for (var i = 0; i < c; i++) {
+
+			for (var i = 0, size = nodes.length; i < size; i++) {
 				this.onStartSetStatus(nodes[i]);
 			}
+
 			this.onStartOpen(nodes);
 		}
 	},
 
 	getNodeStatus: function(id) {
-		try{
-			if (this.treenode[id].status == 'close') {
-				return 'close';
-			}
-			else {
-				return 'open';
-			}
-		}
-		catch(e) {
-			return 'close';
-		}
+		return (empty(this.nodes[id]) || this.nodes[id].status == 'close') ? 'close' : 'open';
 	},
 
-	ChangeNodeStatus: function(id) {
-		try {
-			if (this.treenode[id].status == 'close') {
-				this.treenode[id].status = 'open';
-			}
-			else {
-				this.treenode[id].status = 'close';
-			}
-			var cookie_str = '';
-			for (var i = 1; i < this.treenode.length; i++) {
-				if (typeof(this.treenode[i]) != 'undefined') {
-					if (this.treenode[i].status == 'open') {
-						cookie_str += i + ',';
-					}
+	changeNodeStatus: function(id) {
+		if (!empty(this.nodes[id])) {
+			this.nodes[id].status = (this.nodes[id].status == 'close') ? 'open' : 'close';
+
+			var cookieData = '';
+
+			for (var id in this.nodes) {
+				var node = this.nodes[id];
+
+				if (!empty(node.status) && node.status == 'open') {
+					cookieData += id + ',';
 				}
 			}
 
-			cookie_str = cookie_str.slice(0, -1);
-			cookie.create(this.tree_name, cookie_str);
-		}
-		catch(e) {
-			IE ? alert(e.description) : alert(e);
+			cookie.create(this.name, cookieData.slice(0, -1));
 		}
 	},
 
-
 	closeSNodeX: function(id, img) {
-		try {
-			nodelist = this.treenode[id].nodelist.split(',');
+		if (!empty(this.nodes[id]) && !empty(img)) {
+			var nodelist = this.nodes[id].nodelist.split(',');
+
 			if (this.getNodeStatus(id) == 'close') {
-				this.OpenNode(nodelist);
+				this.openNode(nodelist);
 				img.src = 'images/general/tree/minus.gif';
 			}
 			else {
-				this.CloseNode(nodelist);
+				this.closeNode(nodelist);
 				img.src = 'images/general/tree/plus.gif';
 			}
-			this.ChangeNodeStatus(id);
-		}
-		catch(e) {
-			throw('JSTree ERROR [closeSNodeX]: ' + e);
+
+			this.changeNodeStatus(id);
 		}
 	},
 
-	OpenNode: function(nodelist) {
-		try {
-			var c = nodelist.length;
-			for (var i = 0; i < c; i++) {
-				document.getElementById('id_' + nodelist[i]).style.display = IE ? 'block' : 'table-row';
-				if (this.getNodeStatus(nodelist[i]) == 'open') {
-					this.OpenNode(this.treenode[nodelist[i]].nodelist.split(','));
-				}
+	openNode: function(nodes) {
+		for (var i = 0, size = nodes.length; i < size; i++) {
+			document.getElementById('id_' + nodes[i]).style.display = IE ? 'block' : 'table-row';
+
+			if (this.getNodeStatus(nodes[i]) == 'open') {
+				this.openNode(this.nodes[nodes[i]].nodelist.split(','));
 			}
 		}
-		catch(e) {
-			throw('JSTree ERROR [OpenNode]: ' + e);
-		}
 	},
 
-	CloseNode: function(nodelist) {
-		try {
-			var c = nodelist.length;
-			for (var i = 0; i < c; i++) {
-				document.getElementById('id_' + nodelist[i]).style.display = 'none';
-				if (this.checkParent(nodelist[i])) {
-					if (this.getNodeStatus(nodelist[i]) == 'open') {
-						this.CloseNode(this.treenode[nodelist[i]].nodelist.split(','));
-					}
-				}
-			}
-		}
-		catch(e) {
-			throw('JSTree ERROR [CloseNode]: ' + e);
-		}
-	},
+	closeNode: function(nodes) {
+		for (var i = 0, size = nodes.length; i < size; i++) {
+			document.getElementById('id_' + nodes[i]).style.display = 'none';
 
-	onStartOpen : function() {
-		var nodes = tree_init.split(',');
-		var c = nodes.length;
-
-		for (var i = 0; i < c; i++) {
-			if (typeof(nodes[i]) != 'undefined') {
-				try {
-					if (this.checkParent(nodes[i])) {
-						var nodelist = this.treenode[nodes[i]].nodelist.split(',');
-						this.OpenNode(nodelist);
-					}
-				}
-				catch(e) {
-					cookie.erase(this.tree_name);
-					throw('JSTree ERROR [OnStartOpen]: ' + e);
+			if (this.checkParent(nodes[i])) {
+				if (this.getNodeStatus(nodes[i]) == 'open') {
+					this.closeNode(this.nodes[nodes[i]].nodelist.split(','));
 				}
 			}
 		}
 	},
 
-	onStartSetStatus : function(id) {
-		try {
-			if (typeof(this.treenode[id]) == 'undefined') {
-				return;
+	onStartOpen: function(nodes) {
+		for (var i = 0, size = nodes.length; i < size; i++) {
+			if (!empty(nodes[i])) {
+				if (this.checkParent(nodes[i])) {
+					this.openNode(this.nodes[nodes[i]].nodelist.split(','));
+				}
 			}
-			var img_id='idi_' + id;
-			var img = document.getElementById(img_id);
-			img.src = 'images/general/tree/minus.gif';
-			this.treenode[id].status = 'open';
-		}
-		catch(e) {
-			throw('JSTree ERROR [OnStartSetStatus]: ' + e);
 		}
 	},
 
-	checkParent : function(id) {
-		try {
-			if (id == '0') {
-				return true;
+	onStartSetStatus: function(id) {
+		if (!empty(this.nodes[id])) {
+			var img = document.getElementById('idi_' + id);
+
+			if (!empty(img)) {
+				img.src = 'images/general/tree/minus.gif';
 			}
-			else if (typeof(this.treenode[id]) == 'undefined') {
-				return false;
-			}
-			else if (this.treenode[id].status != 'open') {
-				return false;
-			}
-			else {
-				return this.checkParent(this.treenode[id].parentid);
-			}
+
+			this.nodes[id].status = 'open';
 		}
-		catch(e) {
-			throw('JSTree ERROR [checkPparent]: ' + e);
+	},
+
+	checkParent: function(id) {
+		if (id == '0') {
+			return true;
+		}
+		else if (empty(this.nodes[id])) {
+			return false;
+		}
+		else if (this.nodes[id].status != 'open') {
+			return false;
+		}
+		else {
+			return this.checkParent(this.nodes[id].parentid);
 		}
 	}
 };
