@@ -169,7 +169,7 @@ elseif (isset($_REQUEST['save'])) {
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
-			'applicationid' => $_REQUEST['applicationid'],
+			'applicationid' => get_request('applicationid'),
 			'delay' => $_REQUEST['delay'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => $_REQUEST['agent'],
@@ -252,7 +252,11 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	catch (Exception $e) {
 		DBend(false);
-		error($e->getMessage());
+
+		$msg = $e->getMessage();
+		if (!empty($msg)) {
+			error($msg);
+		}
 		show_messages(false, null, $message_false);
 	}
 }
@@ -400,7 +404,7 @@ if (isset($_REQUEST['form'])) {
 		$data['steps'] = get_request('steps', array());
 	}
 
-	$data['application_list'] = array(0 => '');
+	$data['application_list'] = array();
 	if (!empty($data['hostid'])) {
 		$dbApps = DBselect('SELECT a.applicationid,a.name FROM applications a WHERE a.hostid='.zbx_dbstr($data['hostid']));
 		while ($dbApp = DBfetch($dbApps)) {
