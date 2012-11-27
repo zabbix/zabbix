@@ -676,10 +676,11 @@
 			if ($filter_value_type == -1) {
 				if (!isset($item_params['value_types'][$item['value_type']])) {
 					$item_params['value_types'][$item['value_type']] = array(
-						'name' => item_value_type2str($item['value_type']),
+						'name' => itemValueTypeString($item['value_type']),
 						'count' => 0
 					);
 				}
+
 				$show_item = true;
 				foreach ($item['subfilters'] as $name => $value) {
 					if ($name == 'subfilter_value_types') {
