@@ -40,7 +40,7 @@
 		}
 
 		if (jQuery('#interface_visible').data('multipleInterfaceTypes') && !jQuery('#type_visible').is(':checked')) {
-			jQuery('#interface_not_defined').html('<?php echo _('To set a host interface select a single item type for all items') ?>').show();
+			jQuery('#interface_not_defined').html(<?php echo CJs::encodeJson(_('To set a host interface select a single item type for all items')); ?>).show();
 			jQuery('#interfaceid').hide();
 		}
 		else {
@@ -73,7 +73,7 @@
 						jQuery('#interfaceid').prepend('<option value="0"></option>');
 					}
 					jQuery('#interfaceid').hide().val(0);
-					jQuery('#interface_not_defined').html('<?php echo _('No interface found') ?>').show();
+					jQuery('#interface_not_defined').html(<?php echo CJs::encodeJson(_('No interface found')); ?>).show();
 				}
 			}
 			// any interface or no interface
@@ -195,5 +195,15 @@
 				displayNewDeleyFlexInterval();
 			});
 		}
+
+		// mass update page, create jquery buttonset object when authprotocol visible box is switched on
+		jQuery('#authprotocol_visible').one('click', function() {
+			jQuery('#authprotocol_div').buttonset();
+		});
+
+		// mass update page, create jquery buttonset object when privprotocol visible box is switched on
+		jQuery('#privprotocol_visible').one('click', function() {
+			jQuery('#privprotocol_div').buttonset();
+		});
 	});
 </script>

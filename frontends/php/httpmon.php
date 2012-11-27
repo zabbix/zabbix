@@ -102,6 +102,7 @@ if ($pageFilter->hostsSelected) {
 
 	$httpTests = API::HttpTest()->get(array(
 		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
+		'preservekeys' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectSteps' => API_OUTPUT_COUNT,
@@ -147,7 +148,7 @@ if ($pageFilter->hostsSelected) {
 		elseif ($httpTest['lastfailedstep'] != 0) {
 			$step_data = get_httpstep_by_no($httpTest['httptestid'], $httpTest['lastfailedstep']);
 			$status['msg'] = _s('Step "%1$s" [%2$s of %3$s] failed: %4$s', $step_data['name'],
-				$httpTest['lastfailedstep'], $httpTest['stepscnt'], $httpTest['error']);
+				$httpTest['lastfailedstep'], $httpTest['steps'], $httpTest['error']);
 			$status['style'] = 'disabled';
 		}
 		else {

@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010020);
+define('ZABBIX_DB_VERSION',	 2010025);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2012');
@@ -365,6 +365,12 @@ define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',		2);
 
 define('ITEM_AUTHTYPE_PASSWORD',	0);
 define('ITEM_AUTHTYPE_PUBLICKEY',	1);
+
+define('ITEM_AUTHPROTOCOL_MD5', 0);
+define('ITEM_AUTHPROTOCOL_SHA', 1);
+
+define('ITEM_PRIVPROTOCOL_DES', 0);
+define('ITEM_PRIVPROTOCOL_AES', 1);
 
 define('ITEM_LOGTYPE_INFORMATION',	1);
 define('ITEM_LOGTYPE_WARNING',		2);
@@ -749,6 +755,7 @@ define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
+define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
 define('AVAILABLE_NOCACHE', 0);	// take available objects not from cache
 
@@ -765,13 +772,17 @@ if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
 define('REGEXP_INCLUDE', 0);
 define('REGEXP_EXCLUDE', 1);
 
+// suffixes
+define('ZBX_BYTE_SUFFIXES', 'KMGT');
+define('ZBX_TIME_SUFFIXES', 'smhdw');
+
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*[KMGTsmhdw]?)');
+define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
