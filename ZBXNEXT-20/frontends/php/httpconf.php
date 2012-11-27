@@ -52,6 +52,7 @@ $fields = array(
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
 	'http_password'   => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
+	'http_proxy'      => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'new_application' => array(T_ZBX_STR, O_OPT, null, null, null),
 	'hostname'        => array(T_ZBX_STR, O_OPT, null, null, null),
 	'templated'       => array(T_ZBX_STR, O_OPT, null, null, null),
@@ -173,6 +174,7 @@ elseif (isset($_REQUEST['save'])) {
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => $_REQUEST['agent'],
 			'macros' => $_REQUEST['macros'],
+			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps
 		);
 
@@ -376,6 +378,7 @@ if (isset($_REQUEST['form'])) {
 		$data['authentication'] = $dbHttpTest['authentication'];
 		$data['http_user'] = $dbHttpTest['http_user'];
 		$data['http_password'] = $dbHttpTest['http_password'];
+		$data['http_proxy'] = $dbHttpTest['http_proxy'];
 		$data['templated'] = (bool) $dbHttpTest['templateid'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
 	}
@@ -396,6 +399,7 @@ if (isset($_REQUEST['form'])) {
 		$data['authentication'] = get_request('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = get_request('http_user', '');
 		$data['http_password'] = get_request('http_password', '');
+		$data['http_proxy'] = get_request('http_proxy', '');
 		$data['templated'] = get_request('templated');
 		$data['steps'] = get_request('steps', array());
 	}

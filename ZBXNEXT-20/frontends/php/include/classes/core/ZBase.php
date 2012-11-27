@@ -210,6 +210,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/macros',
 			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
+			$this->rootDir.'/include/classes/parsers',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/classes/managers',
 			$this->rootDir.'/api/rpc'
