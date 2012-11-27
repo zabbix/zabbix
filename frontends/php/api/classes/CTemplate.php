@@ -384,13 +384,14 @@ class CTemplate extends CHostGeneral {
 				if (!is_null($options['selectScreens']) && !isset($result[$template['templateid']]['screens'])) {
 					$template['screens'] = array();
 				}
+				if (!is_null($options['selectHttpTests']) && !isset($result[$template['templateid']]['httpTests'])) {
+					$result[$template['templateid']]['httpTests'] = array();
+				}
 
 				// groupids
 				if (isset($template['groupid']) && is_null($options['selectGroups'])) {
-					if (!isset($result[$template['templateid']]['groups']))
+					if (!isset($result[$template['templateid']]['groups'])) {
 						$result[$template['templateid']]['groups'] = array();
-					if (!is_null($options['selectHttpTests']) && !isset($result[$template['templateid']]['httpTests'])) {
-						$result[$template['templateid']]['httpTests'] = array();
 					}
 
 					$result[$template['templateid']]['groups'][] = array('groupid' => $template['groupid']);
@@ -885,7 +886,7 @@ class CTemplate extends CHostGeneral {
 				'preservekeys' => true
 			);
 
-			if (is_array($options['selectHttpTests'])) {
+			if (is_array($options['selectHttpTests']) || str_in_array($options['selectHttpTests'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectHttpTests'];
 				$httpTests = API::HttpTest()->get($objParams);
 

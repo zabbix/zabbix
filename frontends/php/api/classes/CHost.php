@@ -524,13 +524,14 @@ class CHost extends CHostGeneral {
 				if (!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])) {
 					$result[$host['hostid']]['interfaces'] = array();
 				}
+				if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
+					$result[$host['hostid']]['httpTests'] = array();
+				}
+
 				// groupids
 				if (isset($host['groupid']) && is_null($options['selectGroups'])) {
 					if (!isset($result[$host['hostid']]['groups'])) {
 						$result[$host['hostid']]['groups'] = array();
-					}
-					if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
-						$result[$host['hostid']]['httpTests'] = array();
 					}
 
 					$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
