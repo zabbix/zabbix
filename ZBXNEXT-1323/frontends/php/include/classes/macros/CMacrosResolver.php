@@ -134,7 +134,7 @@ class CMacrosResolver {
 							// Resolving macros in macros. If interface is AGENT macros stay unresolved.
 							if ($interface['type'] != INTERFACE_TYPE_AGENT) {
 								if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$ipMacro]))
-										|| $this->findUserMacros(array($macros[$hostId][$ipMacro]))) {
+										|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($macros[$hostId][$ipMacro]))) {
 									$macrosInMacros = $this->resolveMacrosInTextBatch(array($hostId => array($macros[$hostId][$ipMacro]))); // attention recursion!
 									$macros[$hostId][$ipMacro] = $macrosInMacros[$hostId][0];
 								}
@@ -187,7 +187,7 @@ class CMacrosResolver {
 	 * @return mixed
 	 */
 	private function expandUserMacros($text, $hostId) {
-		$matches = $this->findUserMacros(array($text));
+		$matches = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($text));
 
 		$macros = array();
 		if (!empty($matches)) {
@@ -217,34 +217,5 @@ class CMacrosResolver {
 		}
 
 		return array_unique($result);
-	}
-
-	/**
-	 * Find user macros.
-	 *
-	 * @param array $texts
-	 *
-	 * @return array
-	 */
-	private function findUserMacros(array $texts) {
-		$result = array();
-
-		foreach ($texts as $text) {
-			preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches);
-			$result = array_merge($result, $matches[1]);
-		}
-
-		return array_unique($result);
-	}
-
-	/**
-	 * Check if the macro is supported.
-	 *
-	 * @param string $macro
-	 *
-	 * @return int
-	 */
-	private function isMacroAllowed($macro) {
-		return preg_match('/'.self::PATTERN_HOST.self::PATTERN_IP.'/', $macro);
 	}
 }
