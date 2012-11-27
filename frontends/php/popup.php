@@ -1160,7 +1160,7 @@ elseif ($srctbl == 'items') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 
@@ -1260,7 +1260,7 @@ elseif ($srctbl == 'prototypes') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}
@@ -1535,7 +1535,7 @@ elseif ($srctbl == 'simple_graph') {
 			$hostid > 0 ? null : $item['hostname'],
 			$description,
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type'])
+			itemValueTypeString($item['value_type'])
 		));
 	}
 
@@ -1670,7 +1670,7 @@ elseif ($srctbl == 'plain_text') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}
