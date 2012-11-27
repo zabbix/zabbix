@@ -539,6 +539,14 @@ function add_elementNames(&$selements) {
 		'preservekeys' => true
 	));
 
+	$maps = API::Map()->get(array(
+		'mapids' => $mapids,
+		'output' => array('name'),
+		'nopermissions' => true,
+		'nodeids' => get_current_nodeid(true),
+		'preservekeys' => true
+	));
+
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $triggerids,
 		'output' => API_OUTPUT_EXTEND,
