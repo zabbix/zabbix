@@ -106,6 +106,27 @@ class CTriggerExpression {
 	public $usermacros = array();
 
 	/**
+	 * An array of low-level discovery macros like {#MACRO}
+	 * The array isn't unique. Same macros can repeats.
+	 *
+	 * Example:
+	 *    array(
+	 *     0 => array(
+	 *       'expression' => '{#MACRO}'
+	 *     ),
+	 *     1 => array(
+	 *       'expression' => '{#MACRO2}'
+	 *     ),
+	 *     2 => array(
+	 *       'expression' => '{#MACRO}'
+	 *     )
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $lldmacros = array();
+
+	/**
 	 * An expression with trigger functions replaced by indexes like {0}, {1}, ...
 	 * The each index corresponds 'index' variable from 'expressions' array
 	 *
@@ -123,6 +144,16 @@ class CTriggerExpression {
 	 * @var string
 	 */
 	public $expressionShort = '';
+
+	/**
+	 * An options array
+	 *
+	 * Supported otions:
+	 *   'lldmacros' => true	low-level discovery macros can contain in trigger expression
+	 *
+	 * @var array
+	 */
+	public $options = array('lldmacros' => true);
 
 	/**
 	 * A current position on a parsed element
@@ -146,8 +177,18 @@ class CTriggerExpression {
 	private $expression;
 
 	/**
+	 * @param array $options
+	 * @param bool $options['lldmacros']
+	 */
+	public function __construct($options = array()) {
+		if (isset($options['lldmacros'])) {
+			$this->options['lldmacros'] = $options['lldmacros'];
+		}
+	}
+
+	/**
 	 * Parse a trigger expression and set public variables $this->isValid, $this->error, $this->expressions,
-	 *   $this->macros, $this->usermacros and $this->expressionShort
+	 *   $this->macros, $this->usermacros, $this->lldmacros and $this->expressionShort
 	 *
 	 * Examples:
 	 *   expression:
@@ -190,6 +231,7 @@ class CTriggerExpression {
 		$this->expressions = array();
 		$this->macros = array();
 		$this->usermacros = array();
+		$this->lldmacros = array();
 		$this->expressionShort = '';
 
 		$this->pos = 0;
@@ -315,7 +357,8 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseConstant() {
-		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseMacro() || $this->parseUserMacro()) {
+		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseMacro() || $this->parseUserMacro()
+				|| $this->parseLLDMacro()) {
 			return true;
 		}
 
@@ -705,6 +748,46 @@ class CTriggerExpression {
 		$usermacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
 		$this->usermacros[]['expression'] = $usermacro;
 		$this->expressionShort .= $usermacro;
+		$this->pos = $j;
+		return true;
+	}
+
+	/**
+	 * Parses a low-level discovery macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseLLDMacro() {
+		if (!$this->options['lldmacros']) {
+			return false;
+		}
+
+		$j = $this->pos;
+
+		if ($this->expression[$j++] != '{') {
+			return false;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '#') {
+			return false;
+		}
+
+		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j++])) {
+			return false;
+		}
+
+		while (isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j])) {
+			$j++;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
+			return false;
+		}
+
+		$lldmacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
+		$this->lldmacros[]['expression'] = $lldmacro;
+		$this->expressionShort .= $lldmacro;
 		$this->pos = $j;
 		return true;
 	}
