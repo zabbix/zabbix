@@ -524,7 +524,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @return array (an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...) )
 	 */
-	public function getScriptsByHosts($hostIds) {
+	public function getScriptsByHostIds($hostIds) {
 		zbx_value2array($hostIds);
 
 		$scriptsByHost = array();

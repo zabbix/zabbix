@@ -32,7 +32,7 @@ class CMacrosResolver {
 	 *
 	 * @var array
 	 */
-	public $interfacePriorities = array(
+	private $interfacePriorities = array(
 		INTERFACE_TYPE_AGENT => 4,
 		INTERFACE_TYPE_SNMP => 3,
 		INTERFACE_TYPE_JMX => 2,
@@ -47,70 +47,100 @@ class CMacrosResolver {
 	 * @return array (as $hostid => $texts)
 	 */
 	public function resolveMacrosInTextBatch(array $data) {
+		// check if macros exist
+		$isHostMacrosExist = false;
+		$isIpMacrosExist = false;
+
+		foreach ($data as $hostid => $texts) {
+			$hostMacros = $this->findMacros(self::PATTERN_HOST, $texts);
+			$ipMacros = $this->findMacros(self::PATTERN_IP, $texts);
+
+			if (!empty($hostMacros)) {
+				$isHostMacrosExist = true;
+			}
+			if (!empty($ipMacros)) {
+				$isIpMacrosExist = true;
+			}
+
+			if ($isHostMacrosExist && $isIpMacrosExist) {
+				break;
+			}
+		}
+
 		$hostIds = array_keys($data);
 		$macros = array();
 
 		// host macros
-		$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.DBcondition('h.hostid', $hostIds));
-		while ($dbHost = DBfetch($dbHosts)) {
-			$hostId = $dbHost['hostid'];
-			$hostMacros = $this->findMacros(CMacrosResolver::PATTERN_HOST, $data[$hostId]);
+		if ($isHostMacrosExist) {
+			$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.DBcondition('h.hostid', $hostIds));
+			while ($dbHost = DBfetch($dbHosts)) {
+				$hostId = $dbHost['hostid'];
+				$hostMacros = $this->findMacros(self::PATTERN_HOST, $data[$hostId]);
 
-			if (!empty($hostMacros)) {
-				foreach ($hostMacros as $hostMacro) {
-					switch ($hostMacro) {
-						case '{HOSTNAME}':
-						case '{HOST.HOST}':
-							$macros[$hostId][$hostMacro] = $dbHost['host'];
-							break;
-						case '{HOST.NAME}':
-							$macros[$hostId][$hostMacro] = $dbHost['name'];
-							break;
+				if (!empty($hostMacros)) {
+					foreach ($hostMacros as $hostMacro) {
+						switch ($hostMacro) {
+							case '{HOSTNAME}':
+							case '{HOST.HOST}':
+								$macros[$hostId][$hostMacro] = $dbHost['host'];
+								break;
+							case '{HOST.NAME}':
+								$macros[$hostId][$hostMacro] = $dbHost['name'];
+								break;
+						}
 					}
 				}
 			}
 		}
 
 		// ip macros, macro should be resolved to interface with highest priority
-		$interfaces = array();
+		if ($isIpMacrosExist) {
+			$interfaces = array();
 
-		$dbInterfaces = DBselect('SELECT i.hostid,i.ip,i.dns,i.useip,i.type FROM interface i WHERE i.main=1 AND '.DBcondition('i.hostid', $hostIds));
-		while ($dbInterface = DBfetch($dbInterfaces)) {
-			$hostId = $dbInterface['hostid'];
+			$dbInterfaces = DBselect(
+				'SELECT i.hostid,i.ip,i.dns,i.useip,i.type'.
+				' FROM interface i'.
+				' WHERE i.main=1'.
+					' AND '.DBcondition('i.hostid', $hostIds).
+					' AND '.DBcondition('i.type', array($this->interfacePriorities))
+			);
+			while ($dbInterface = DBfetch($dbInterfaces)) {
+				$hostId = $dbInterface['hostid'];
 
-			if (!empty($this->interfacePriorities[$dbInterface['type']])
-					&& (empty($interfaces[$hostId]) || $this->interfacePriorities[$dbInterface['type']] > $interfaces[$hostId]['type'])) {
-				$interfaces[$hostId] = $dbInterface;
+				if (!isset($interfaces[$hostId]) || $this->interfacePriorities[$dbInterface['type']] > $interfaces[$hostId]['type']) {
+					$interfaces[$hostId] = $dbInterface;
+				}
 			}
-		}
 
-		if (!empty($interfaces)) {
-			foreach ($interfaces as $hostId => $interface) {
-				$ipMacros = $this->findMacros(CMacrosResolver::PATTERN_IP, $data[$hostId]);
+			if (!empty($interfaces)) {
+				foreach ($interfaces as $hostId => $interface) {
+					$ipMacros = $this->findMacros(self::PATTERN_IP, $data[$hostId]);
 
-				if (!empty($ipMacros)) {
-					foreach ($ipMacros as $ipMacro) {
-						switch ($ipMacro) {
-							case '{IPADDRESS}':
-							case '{HOST.IP}':
-								$macros[$hostId][$ipMacro] = $interface['ip'];
-								break;
-							case '{HOST.DNS}':
-								$macros[$hostId][$ipMacro] = $interface['dns'];
-								break;
-							case '{HOST.CONN}':
-								$macros[$hostId][$ipMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
-								break;
-						}
-
-						// Resolving macros in macros. If interface is AGENT macros stay unresolved.
-						if ($interface['type'] != INTERFACE_TYPE_AGENT) {
-							if ($this->findMacros(CMacrosResolver::PATTERN_HOST, array($macros[$hostId][$ipMacro]))
-									|| $this->findUserMacros(array($macros[$hostId][$ipMacro]))) {
-								$macros[$hostId][$ipMacro] = $this->resolveMacrosInText($macros[$hostId][$ipMacro], $hostId); // attention recursion!
+					if (!empty($ipMacros)) {
+						foreach ($ipMacros as $ipMacro) {
+							switch ($ipMacro) {
+								case '{IPADDRESS}':
+								case '{HOST.IP}':
+									$macros[$hostId][$ipMacro] = $interface['ip'];
+									break;
+								case '{HOST.DNS}':
+									$macros[$hostId][$ipMacro] = $interface['dns'];
+									break;
+								case '{HOST.CONN}':
+									$macros[$hostId][$ipMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+									break;
 							}
-							elseif ($this->findMacros(CMacrosResolver::PATTERN_IP, array($macros[$hostId][$ipMacro]))) {
-								$macros[$hostId][$ipMacro] = UNRESOLVED_MACRO_STRING;
+
+							// Resolving macros in macros. If interface is AGENT macros stay unresolved.
+							if ($interface['type'] != INTERFACE_TYPE_AGENT) {
+								if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$ipMacro]))
+										|| $this->findUserMacros(array($macros[$hostId][$ipMacro]))) {
+									$macrosInMacros = $this->resolveMacrosInTextBatch(array($hostId => array($macros[$hostId][$ipMacro]))); // attention recursion!
+									$macros[$hostId][$ipMacro] = $macrosInMacros[$hostId][0];
+								}
+								elseif ($this->findMacros(self::PATTERN_IP, array($macros[$hostId][$ipMacro]))) {
+									$macros[$hostId][$ipMacro] = UNRESOLVED_MACRO_STRING;
+								}
 							}
 						}
 					}
@@ -156,7 +186,7 @@ class CMacrosResolver {
 	 *
 	 * @return mixed
 	 */
-	protected function expandUserMacros($text, $hostId) {
+	private function expandUserMacros($text, $hostId) {
 		$matches = $this->findUserMacros(array($text));
 
 		$macros = array();
@@ -178,7 +208,7 @@ class CMacrosResolver {
 	 *
 	 * @return array
 	 */
-	function findMacros($pattern, $texts) {
+	private function findMacros($pattern, array $texts) {
 		$result = array();
 
 		foreach ($texts as $text) {
@@ -190,14 +220,13 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Find macros in string by pattern.
+	 * Find user macros.
 	 *
-	 * @param string $pattern
 	 * @param array $texts
 	 *
 	 * @return array
 	 */
-	function findUserMacros($texts) {
+	private function findUserMacros(array $texts) {
 		$result = array();
 
 		foreach ($texts as $text) {
@@ -217,7 +246,7 @@ class CMacrosResolver {
 	 *
 	 * @return string
 	 */
-	function replaceMacroValues($text, $macros) {
+	private function replaceMacroValues($text, $macros) {
 		$i = 0;
 		$begin = false;
 		while (($i = zbx_strpos($text, ($begin !== false ? '}' : '{'), $i)) !== false) {
@@ -262,9 +291,9 @@ class CMacrosResolver {
 	 *
 	 * @param string $macro
 	 *
-	 * @return bool
+	 * @return int
 	 */
-	function isMacroAllowed($macro) {
-		return preg_match('/{'.CMacrosResolver::PATTERN_HOST.CMacrosResolver::PATTERN_IP.'?}/', $macro);
+	private function isMacroAllowed($macro) {
+		return preg_match('/{'.self::PATTERN_HOST.self::PATTERN_IP.'?}/', $macro);
 	}
 }
