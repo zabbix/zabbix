@@ -230,7 +230,7 @@ if (!$this->data['is_discovery_rule']) {
 	if ($this->data['limited']) {
 		$itemForm->addVar('value_type', $this->data['value_type']);
 		$itemFormList->addRow(_('Type of information'),
-			new CTextBox('value_type_name', item_value_type2str($this->data['value_type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
+			new CTextBox('value_type_name', itemValueTypeString($this->data['value_type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
 		);
 	}
 	else {
