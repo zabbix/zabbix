@@ -78,25 +78,28 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 			$info = get_item_function_info($exprPart['expression']);
 
-			$octet = ($info['value_type'] == 'HHMMSS');
-
-			$validation = $info['validation'];
-			if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
-				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
-
-				$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
-				foreach ($vals as $v) $control->addItem($v, $v);
-			}
-			else
-				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
-
-			if(!is_array($info) && isset($definedErrorPhrases[$info])) {
-				$control->setAttribute('disabled', 'disabled');
+			if (!is_array($info) && isset($definedErrorPhrases[$info])) {
 				$allowedTesting = false;
+				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
+				$control->setAttribute('disabled', 'disabled');
+			}
+			else {
+				$octet = ($info['value_type'] == 'HHMMSS');
+				$validation = $info['validation'];
+				if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
+					$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
+					$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
+					foreach ($vals as $v) {
+						$control->addItem($v, $v);
+					}
+				}
+				else {
+					$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
+				}
+				$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $exprPart['expression']);
 			}
 
 			$data_table->addRow(new CRow(array($exprPart['expression'], (is_array($info) || !isset($definedErrorPhrases[$info])) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
-			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $exprPart['expression']);
 		}
 	}
 //---------------------------------- CHECKS ------------------------------------
