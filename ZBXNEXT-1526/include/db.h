@@ -416,6 +416,7 @@ typedef struct
 	char		*http_password;
 	char		*http_proxy;
 	int		authentication;
+	int		retries;
 }
 DB_HTTPTEST;
 

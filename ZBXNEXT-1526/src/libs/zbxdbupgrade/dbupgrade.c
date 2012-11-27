@@ -649,6 +649,13 @@ static int	DBpatch_02010025()
 	return DBadd_field("dchecks", &field);
 }
 
+static int	DBpatch_02010026()
+{
+	const ZBX_FIELD field = {"retries", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
 int	DBcheck_version()
 {
 	const char	*__function_name = "DBcheck_version";
@@ -681,6 +688,7 @@ int	DBcheck_version()
 		{DBpatch_02010023, 2010023, 0, 1},
 		{DBpatch_02010024, 2010024, 0, 1},
 		{DBpatch_02010025, 2010025, 0, 1},
+		{DBpatch_02010025, 2010026, 0, 1},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";

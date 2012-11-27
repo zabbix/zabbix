@@ -271,6 +271,7 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 	DB_HTTPSTEP	httpstep;
 	char		*err_str = NULL;
 	int		lastfailedstep;
+	int		attempts;
 	zbx_timespec_t	ts;
 	ZBX_HTTPSTAT	stat;
 	double		speed_download = 0;
@@ -419,16 +420,17 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 			goto httpstep_error;
 		}
 
-		memset(&page, 0, sizeof(page));
-
-		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		/* Try to retrieve page several times depending on number of retries */
+		attempts = 0;
+		while (attempts < httptest->retries)
 		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-					" error doing curl_easy_perform: %s",
-					httptest->name, httpstep.name, err_str);
+			memset(&page, 0, sizeof(page));
+
+			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))	break;
+			attempts++;
 		}
-		else
+
+		if (CURLE_OK == err)
 		{
 			if ('\0' != *httpstep.required && NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
 			{
@@ -476,6 +478,13 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 				speed_download += stat.speed_download;
 				speed_download_num++;
 			}
+		}
+		else
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+					" error doing curl_easy_perform: %s",
+					httptest->name, httpstep.name, err_str);
 		}
 
 		zbx_free(page.data);
@@ -565,7 +574,7 @@ void	process_httptests(int httppoller_num, int now)
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.macros,t.agent,"
-				"t.authentication,t.http_user,t.http_password,t.http_proxy"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -613,6 +622,8 @@ void	process_httptests(int httppoller_num, int now)
 		httptest.http_proxy = zbx_strdup(NULL, row[10]);
 		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
 				&httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+
+		httptest.retries = atoi(row[11]);
 
 		process_httptest(&host, &httptest);
 

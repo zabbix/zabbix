@@ -42,7 +42,8 @@ $fields = array(
 	'applicationid'   => array(T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')),
 	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   '(isset({form})&&({form}=="update"))'),
 	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})', _('Name')),
-	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
+	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
+	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({save})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
 	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'macros'          => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
@@ -171,6 +172,7 @@ elseif (isset($_REQUEST['save'])) {
 			'authentication' => $_REQUEST['authentication'],
 			'applicationid' => $_REQUEST['applicationid'],
 			'delay' => $_REQUEST['delay'],
+			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => $_REQUEST['agent'],
 			'macros' => $_REQUEST['macros'],
@@ -368,6 +370,7 @@ if (isset($_REQUEST['form'])) {
 		$data['applicationid'] = $dbHttpTest['applicationid'];
 		$data['new_application'] = '';
 		$data['delay'] = $dbHttpTest['delay'];
+		$data['retries'] = $dbHttpTest['retries'];
 		$data['status'] = $dbHttpTest['status'];
 		$data['agent'] = $dbHttpTest['agent'];
 		$data['macros'] = $dbHttpTest['macros'];
@@ -390,6 +393,7 @@ if (isset($_REQUEST['form'])) {
 		$data['applicationid'] = get_request('applicationid');
 		$data['new_application'] = get_request('new_application', '');
 		$data['delay'] = get_request('delay', 60);
+		$data['retries'] = get_request('retries', 1);
 		$data['agent'] = get_request('agent', '');
 		$data['macros'] = get_request('macros', array());
 		$data['authentication'] = get_request('authentication', HTTPTEST_AUTH_NONE);
