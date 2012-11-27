@@ -14,6 +14,8 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5877] fixed tree position saving in IT services (Eduard)
+..F....... [ZBX-5878] fixed misaligned leading lines in IT services (Eduard)
 ..F....... [ZBX-5875] fixed items configuration in French language (Oleg)
 A......... [ZBX-5860] fixed hostgroup massupdate (Eduard)
 A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
