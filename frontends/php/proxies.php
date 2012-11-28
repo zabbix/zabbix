@@ -277,7 +277,6 @@ else {
 		'groupCount' => 1,
 		'countOutput' => 1,
 		'proxyids' => $proxyids,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'webitems' => 1,
 		'monitored' => 1
 	));

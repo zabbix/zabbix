@@ -810,7 +810,6 @@ else {
 
 	// items
 	$options = array(
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'search' => array(),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,

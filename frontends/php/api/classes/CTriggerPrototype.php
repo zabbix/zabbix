@@ -683,15 +683,16 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// adding items
 		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
-			$objParams = array(
+			$items = API::Item()->get(array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
-				'webitems' => 1,
+				'webitems' => true,
 				'nopermissions' => true,
-				'preservekeys' => true
-			);
-			$items = API::Item()->get($objParams);
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
+			));
+
 			foreach ($items as $item) {
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
@@ -725,7 +726,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $triggerid => $trigger) {
 					if (isset($ruleMap[$triggerid]) && isset($discoveryRules[$ruleMap[$triggerid]])) {

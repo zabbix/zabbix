@@ -559,7 +559,7 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 		}
 
 		$myItem = API::Item()->get(array(
-			'filter' => array('host' => $exprPart['host'], 'key_' => $exprPart['item']),
+			'filter' => array('host' => $exprPart['host'], 'key_' => $exprPart['item'], 'flags' => null),
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => true
 		));
@@ -596,7 +596,8 @@ if ($itemid) {
 		'output' => API_OUTPUT_EXTEND,
 		'itemids' => $itemid,
 		'webitems' => true,
-		'selectHosts' => API_OUTPUT_EXTEND
+		'selectHosts' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => null)
 	));
 	$item_data = reset($items_data);
 	$item_key = $item_data['key_'];
@@ -652,7 +653,8 @@ if (!empty($itemid)) {
 	// getting type of return value for the item user selected
 	$selectedItems = API::Item()->get(array(
 		'itemids' => array($itemid),
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => null)
 	));
 	if ($selectedItem = reset($selectedItems)) {
 		$data['itemValueType'] = $selectedItem['value_type'];
