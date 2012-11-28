@@ -664,7 +664,8 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Adds the given field to the SELECT part of the $sqlParts array if it's not already present.
+	 * Adds the given field to the SELECT part of the $sqlParts array if it's not already present. Supports fields with
+	 * aliases.
 	 *
 	 * @param string $fieldId
 	 * @param array $sqlParts
@@ -673,8 +674,11 @@ class CZBXAPI {
 	 */
 	protected function addQuerySelect($fieldId, array $sqlParts) {
 		list($tableAlias, $field) = explode('.', $fieldId);
+		list($field, $fieldAlias) = explode(' ', $field);
 
-		if (!in_array($fieldId, $sqlParts['select']) && !in_array($this->fieldId('*', $tableAlias), $sqlParts['select'])) {
+		if (!in_array($fieldId, $sqlParts['select'])
+			&& (!in_array($this->fieldId('*', $tableAlias), $sqlParts['select']) || $fieldAlias)) {
+
 			// if we want to select all of the columns, other columns from this table can be removed
 			if ($field == '*') {
 				foreach ($sqlParts['select'] as $key => $selectFieldId) {
