@@ -593,5 +593,5 @@ function validateUserMacro($value) {
 }
 
 function validateMaxTime($time) {
-	return $time <= 2147464800; // 2038.01.19 00:00
+	return ($time <= 2147464800 && $time != NULL); // 2038.01.19 00:00
 }
