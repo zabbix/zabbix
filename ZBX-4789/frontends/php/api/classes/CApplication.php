@@ -94,27 +94,21 @@ class CApplication extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN || !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=a.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS('.
-								' SELECT hgg.groupid'.
-								' FROM hosts_groups hgg,rights rr,users_groups gg'.
-								' WHERE hgg.hostid=hg.hostid'.
-									' AND rr.id=hgg.groupid'.
-									' AND rr.groupid=gg.usrgrpid'.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT hgg.hostid'.
+				' FROM hosts_groups hgg'.
+				' JOIN rights r'.
+					' ON r.id=hgg.groupid'.
+						' AND '.DBcondition('r.groupid', $userGroups).
+				' WHERE '.$this->tableAlias.'.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>='.$permission.
+				')';
 		}
 
 		// nodeids

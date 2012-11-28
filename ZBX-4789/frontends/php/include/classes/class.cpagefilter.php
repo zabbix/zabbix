@@ -156,7 +156,7 @@ class CPageFilter {
 	private function _initGroups($groupid, $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-			'output' => API_OUTPUT_EXTEND
+			'output' => array('groupid', 'name')
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = API::HostGroup()->get($options);

@@ -159,29 +159,21 @@ class CHost extends CHostGeneral {
 		}
 
 		// editable + PERMISSION CHECK
-		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
+			$userGroups = getUserGroupsByUserId($userid);
+
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT hh.hostid'.
-				' FROM hosts hh,hosts_groups hgg,rights r,users_groups ug'.
-				' WHERE hh.hostid=h.hostid'.
-					' AND hh.hostid=hgg.hostid'.
-					' AND r.id=hgg.groupid'.
-					' AND r.groupid=ug.usrgrpid'.
-					' AND ug.userid='.$userid.
-					' AND r.permission>='.$permission.
-					' AND NOT EXISTS ('.
-						' SELECT hggg.groupid'.
-						' FROM hosts_groups hggg,rights rr,users_groups gg'.
-						' WHERE hggg.hostid=hgg.hostid'.
-							' AND rr.id=hggg.groupid'.
-							' AND rr.groupid=gg.usrgrpid'.
-							' AND gg.userid='.$userid.
-							' AND rr.permission<'.$permission.
-					'))';
+				'SELECT hgg.hostid'.
+				' FROM hosts_groups hgg'.
+				' JOIN rights r'.
+					' ON r.id=hgg.groupid'.
+						' AND '.DBcondition('r.groupid', $userGroups).
+				' WHERE h.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>='.$permission.
+				')';
 		}
 
 		// hostids

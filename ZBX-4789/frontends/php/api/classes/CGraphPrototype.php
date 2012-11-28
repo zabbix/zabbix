@@ -111,38 +111,24 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT gii.graphid'.
-				' FROM graphs_items gii,items ii'.
-				' WHERE gii.graphid=g.graphid'.
-					' AND gii.itemid=ii.itemid'.
-					' AND EXISTS ('.
-						' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups ugg'.
-						' WHERE ii.hostid=hgg.hostid'.
-							' AND rr.id=hgg.groupid'.
-							' AND rr.groupid=ugg.usrgrpid'.
-							' AND ugg.userid='.$userid.
-							' AND rr.permission<'.$permission.'))';
-		}
+			$userGroups = getUserGroupsByUserId($userid);
 
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT hgg.hostid'.
+				' FROM graphs_items gi,items i,hosts_groups hgg'.
+				' JOIN rights r'.
+					' ON r.id=hgg.groupid'.
+						' AND '.DBcondition('r.groupid', $userGroups).
+				' WHERE '.$this->tableAlias.'.graphid=gi.graphid'.
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>='.$permission.
+				')';
+		}
 
 		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
