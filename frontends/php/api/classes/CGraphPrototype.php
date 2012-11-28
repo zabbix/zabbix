@@ -475,8 +475,10 @@ class CGraphPrototype extends CGraphGeneral {
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
 			));
+
 			foreach ($items as $item) {
 				$igraphs = $item['graphs'];
 				unset($item['graphs']);
@@ -510,7 +512,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $graphid => $graph) {
 					if (isset($ruleMap[$graphid]) && isset($discoveryRules[$ruleMap[$graphid]])) {
@@ -825,7 +827,8 @@ class CGraphPrototype extends CGraphGeneral {
 			'webitems' => true,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 
 		foreach ($itemids as $itemid) {

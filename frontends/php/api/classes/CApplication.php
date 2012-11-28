@@ -336,9 +336,8 @@ class CApplication extends CZBXAPI {
 			$objParams = array(
 				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$items = API::Item()->get($objParams);
 			foreach ($items as $itemid => $item) {
@@ -613,13 +612,14 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$itemOptions = array(
+		$allowedItems = API::Item()->get(array(
 			'itemids' => $itemids,
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$allowedItems = API::Item()->get($itemOptions);
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
+		));
+
 		foreach ($items as $num => $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

@@ -606,7 +606,6 @@ class CTemplate extends CHostGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'hostids' => $templateids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
@@ -649,14 +648,13 @@ class CTemplate extends CHostGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'hostids' => $templateids,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 				'nopermissions' => 1,
 				'preservekeys' => 1,
 			);
 
 			if (is_array($options['selectDiscoveries']) || str_in_array($options['selectDiscoveries'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveries'];
-				$items = API::Item()->get($objParams);
+				$items = API::DiscoveryRule()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) order_result($items, 'name');
 				foreach ($items as $itemid => $item) {
@@ -677,7 +675,7 @@ class CTemplate extends CHostGeneral {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$items = API::Item()->get($objParams);
+				$items = API::DiscoveryRule()->get($objParams);
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
 					if (isset($items[$hostid]))
@@ -1177,7 +1175,6 @@ class CTemplate extends CHostGeneral {
 		// delete the items
 		$delItems = API::Item()->get(array(
 			'templateids' => $templateids,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => array('itemid'),
 			'nopermissions' => true,
 			'preservekeys' => true

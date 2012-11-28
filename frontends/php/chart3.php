@@ -100,8 +100,11 @@ else {
 		'webitems' => true,
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
-		'output' => array('itemid')
+		'output' => array('itemid'),
+		'preservekeys' => true,
+		'filter' => array('flags' => null)
 	));
+
 	$dbItems = zbx_toHash($dbItems, 'itemid');
 	foreach ($items as $item) {
 		if (!isset($dbItems[$item['itemid']])) {

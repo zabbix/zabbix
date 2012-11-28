@@ -153,7 +153,7 @@ if (get_request('parent_discoveryid', false)) {
 
 	if (isset($_REQUEST['itemid'])) {
 		$itemPrototype = API::ItemPrototype()->get(array(
-			'triggerids' => $_REQUEST['itemid'],
+			'itemids' => $_REQUEST['itemid'],
 			'output' => array('itemid'),
 			'editable' => true,
 			'preservekeys' => true
