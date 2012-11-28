@@ -387,7 +387,7 @@ class CGraph extends CGraphGeneral {
 				$ggraphs = $gitem['graphs'];
 				unset($gitem['graphs']);
 				foreach ($ggraphs as $graph) {
-					$result[$graph['graphid']]['gitems'][$gitem['gitemid']] = $gitem;
+					$result[$graph['graphid']]['gitems'][] = $gitem;
 				}
 			}
 		}

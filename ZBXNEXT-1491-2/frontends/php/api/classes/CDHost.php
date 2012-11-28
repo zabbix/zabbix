@@ -155,7 +155,7 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['select']['dserviceids'] = 'ds.dserviceids';
+			$sqlParts['select']['dserviceids'] = 'ds.dserviceid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
