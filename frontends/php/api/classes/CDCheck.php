@@ -67,7 +67,6 @@ class CDCheck extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectDRules'				=> null,
-			'selectDHosts'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -196,14 +195,6 @@ class CDCheck extends CZBXAPI {
 					$result[$dcheck['dcheckid']]['drules'][] = array('druleid' => $dcheck['druleid']);
 				}
 
-				// dhostids
-				if (isset($dcheck['dhostid']) && is_null($options['selectDHosts'])) {
-					if (!isset($result[$dcheck['dcheckid']]['dhosts']))
-						$result[$dcheck['dcheckid']]['dhosts'] = array();
-
-					$result[$dcheck['dcheckid']]['dhosts'][] = array('dhostid' => $dcheck['dhostid']);
-				}
-
 				// populate relation map
 				if (isset($dcheck['druleid']) && $dcheck['druleid']) {
 					$relationMap->addRelation($dcheck['dcheckid'], 'drules', $dcheck['druleid']);
@@ -236,21 +227,6 @@ class CDCheck extends CZBXAPI {
 			}
 
 			$result = $relationMap->mapMany($result, $drules, 'drules', $options['limitSelects']);
-		}
-
-		// selectDHosts
-		if ($options['selectDHosts'] !== null && $options['selectDHosts'] !== API_OUTPUT_COUNT) {
-			$dhosts = API::DHost()->get(array(
-				'output' => $options['selectDHosts'],
-				'dhostids' => $relationMap->getRelatedIds('dhosts'),
-				'nodeids' => $nodeids,
-				'preservekeys' => 1
-			));
-
-			if (!is_null($options['limitSelects'])) {
-				order_result($dhosts, 'dhostid');
-			}
-			$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
 		}
 
 // removing keys (hash -> array)
@@ -312,11 +288,6 @@ class CDCheck extends CZBXAPI {
 		if ($options['countOutput'] === null) {
 			if ($options['selectDRules'] !== null) {
 				$sqlParts = $this->addQuerySelect('dc.druleid', $sqlParts);
-			}
-
-			if ($options['selectDHosts'] !== null && $options['selectDHosts'] != API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('dhosts dh', 'dc.druleid', 'dh.druleid', $sqlParts);
-				$sqlParts = $this->addQuerySelect('dh.dhostid', $sqlParts);
 			}
 		}
 
