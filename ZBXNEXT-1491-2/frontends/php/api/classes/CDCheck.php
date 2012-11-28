@@ -71,7 +71,6 @@ class CDCheck extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectDRules'				=> null,
 			'selectDHosts'				=> null,
-			'selectHosts'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -229,10 +228,6 @@ class CDCheck extends CZBXAPI {
 					$result[$dcheck['dcheckid']]['dhosts'] = array();
 				}
 
-				if (!is_null($options['selectHosts']) && !isset($result[$dcheck['dcheckid']]['hosts'])) {
-					$result[$dcheck['dcheckid']]['hosts'] = array();
-				}
-
 				// druleids
 				if (isset($dcheck['druleid']) && is_null($options['selectDRules'])) {
 					if (!isset($result[$dcheck['dcheckid']]['drules']))
@@ -287,19 +282,6 @@ class CDCheck extends CZBXAPI {
 					}
 				}
 			}
-			elseif (API_OUTPUT_COUNT == $options['selectDRules']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$drules = API::DRule()->get($objParams);
-				$drules = zbx_toHash($drules, 'dcheckid');
-				foreach ($result as $dcheckid => $dcheck) {
-					if (isset($drules[$dcheckid]))
-						$result[$dcheckid]['drules'] = $drules[$dcheckid]['rowscount'];
-					else
-						$result[$dcheckid]['drules'] = 0;
-				}
-			}
 		}
 
 // selectDHosts
@@ -329,65 +311,7 @@ class CDCheck extends CZBXAPI {
 					}
 				}
 			}
-			elseif (API_OUTPUT_COUNT == $options['selectDHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$dhosts = API::DHost()->get($objParams);
-				$dhosts = zbx_toHash($dhosts, 'dhostid');
-				foreach ($result as $dcheckid => $dcheck) {
-					if (isset($dhosts[$dcheckid]))
-						$result[$dcheckid]['dhosts'] = $dhosts[$dcheckid]['rowscount'];
-					else
-						$result[$dcheckid]['dhosts'] = 0;
-				}
-			}
 		}
-
-// selectHosts
-		if (!is_null($options['selectHosts'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'dcheckids' => $dcheckids,
-				'preservekeys' => 1,
-				'sortfield' => 'status'
-			);
-
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($hosts, 'hostid');
-
-				foreach ($hosts as $hostid => $host) {
-					unset($hosts[$hostid]['dchecks']);
-					foreach ($host['dchecks'] as $dnum => $dcheck) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$dcheck['dcheckid']])) $count[$dcheck['dcheckid']] = 0;
-							$count[$dcheck['dcheckid']]++;
-
-							if ($count[$dcheck['dcheckid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$dcheck['dcheckid']]['hosts'][] = &$hosts[$hostid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$hosts = API::Host()->get($objParams);
-				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach ($result as $dcheckid => $dcheck) {
-					if (isset($hosts[$dcheckid]))
-						$result[$dcheckid]['hosts'] = $hosts[$dcheckid]['rowscount'];
-					else
-						$result[$dcheckid]['hosts'] = 0;
-				}
-			}
-		}
-
 
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
