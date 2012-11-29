@@ -467,7 +467,6 @@ class CItemPrototype extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectApplications'],
-				'selectItems' => array('itemid'),
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
