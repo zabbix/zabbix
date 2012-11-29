@@ -505,13 +505,14 @@ class CHost extends CHostGeneral {
 				if (!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])) {
 					$result[$host['hostid']]['interfaces'] = array();
 				}
+				if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
+					$result[$host['hostid']]['httpTests'] = array();
+				}
+
 				// groupids
 				if (isset($host['groupid']) && is_null($options['selectGroups'])) {
 					if (!isset($result[$host['hostid']]['groups'])) {
 						$result[$host['hostid']]['groups'] = array();
-					}
-					if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
-						$result[$host['hostid']]['httpTests'] = array();
 					}
 
 					$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
@@ -762,7 +763,6 @@ class CHost extends CHostGeneral {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
@@ -1945,12 +1945,6 @@ class CHost extends CHostGeneral {
 		// delete the items
 		$delItems = API::Item()->get(array(
 			'templateids' => $hostids,
-			'filter' => array(
-				'flags' => array(
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_CREATED
-				)
-			),
 			'output' => array('itemid'),
 			'nopermissions' => true,
 			'preservekeys' => true
