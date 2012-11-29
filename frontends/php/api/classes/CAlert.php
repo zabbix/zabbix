@@ -161,19 +161,16 @@ class CAlert extends CZBXAPI {
 		}
 
 		// hostids
-		if ($options['hostids'] !== null) {
-
+		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('events e', 'a.eventid', 'e.eventid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('functions f', 'e.objectid', 'f.triggerid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('items i', 'i.itemid', 'f.itemid', $sqlParts);
+			$sqlParts['select']['hostid'] = 'i.hostid';
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-
-			if ($options['hostids'] !== null) {
-				$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
-			}
+			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// alertids

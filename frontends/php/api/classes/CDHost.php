@@ -152,9 +152,10 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts = $this->addQueryLeftJoin('dservices ds', 'dh.dhostid', 'ds.dhostid', $sqlParts);
-			$sqlParts['select']['dserviceids'] = 'ds.dserviceid';
+			$sqlParts['select']['dserviceids'] = 'ds.dserviceids';
+			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceids'] = 'ds.dserviceid';

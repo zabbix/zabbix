@@ -121,10 +121,11 @@ class CDCheck extends CZBXAPI {
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 
-			$sqlParts = $this->addQuerySelect('dh.dhostid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('dhosts dh', 'dc.druleid', 'dh.drulelid', $sqlParts);
+			$sqlParts['select']['dservices'] = 'dh.dhostid';
+			$sqlParts['from']['dhosts'] = 'dhosts dh';
 
 			$sqlParts['where']['dh'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'dh.dhostid';

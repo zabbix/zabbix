@@ -109,9 +109,10 @@ class CDRule extends CZBXAPI {
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 
-			$sqlParts = $this->addQueryLeftJoin('dhosts dh', 'dh.dhostid', 'dr.druleid', $sqlParts);
 			$sqlParts['select']['dhostid'] = 'dh.dhostid';
+			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'dh.dhostid';
