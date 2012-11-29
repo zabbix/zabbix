@@ -45,9 +45,6 @@ class CGraphItem extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('gitemid');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('gitems' => 'gi.gitemid'),
 			'from'		=> array('graphs_items' => 'graphs_items gi'),
@@ -140,35 +137,9 @@ class CGraphItem extends CZBXAPI {
 
 		$gitemids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('gi.gitemid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($gitem = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				$result = $gitem['rowscount'];
@@ -196,20 +167,15 @@ class CGraphItem extends CZBXAPI {
 		}
 
 		// adding graphs
-		if (!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
+		if ($options['selectGraphs'] !== null) {
+			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
 			$graphs = API::Graph()->get(array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectGraphs'],
-				'gitemids' => $gitemids,
+				'gitemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			foreach ($graphs as $graph) {
-				$gitems = $graph['gitems'];
-				unset($graph['gitems']);
-				foreach ($gitems as $item) {
-					$result[$gitem['gitemid']]['graphs'][] = $graph;
-				}
-			}
+			$result = $relationMap->mapMany($result, $graphs, 'graphs');
 		}
 
 		// removing keys (hash -> array)
@@ -260,6 +226,10 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['gii'] = 'gi.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+		}
+
+		if ($options['selectGraphs'] !== null) {
+			$sqlParts = $this->addQuerySelect('graphid', $sqlParts);
 		}
 
 		return $sqlParts;

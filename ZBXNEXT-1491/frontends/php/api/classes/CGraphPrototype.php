@@ -49,9 +49,6 @@ class CGraphPrototype extends CGraphGeneral {
 		// allowed columns for sorting
 		$sortColumns = array('graphid', 'name', 'graphtype');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('graphs' => 'g.graphid'),
 			'from'		=> array('graphs' => 'graphs g'),
@@ -297,42 +294,9 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$graphids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('g.graphid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-
-		$dbRes = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($graph = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -347,21 +311,6 @@ class CGraphPrototype extends CGraphGeneral {
 
 				if (!isset($result[$graph['graphid']])) {
 					$result[$graph['graphid']]= array();
-				}
-				if (!is_null($options['selectHosts']) && !isset($result[$graph['graphid']]['hosts'])) {
-					$result[$graph['graphid']]['hosts'] = array();
-				}
-				if (!is_null($options['selectGraphItems']) && !isset($result[$graph['graphid']]['gitems'])) {
-					$result[$graph['graphid']]['gitems'] = array();
-				}
-				if (!is_null($options['selectTemplates']) && !isset($result[$graph['graphid']]['templates'])) {
-					$result[$graph['graphid']]['templates'] = array();
-				}
-				if (!is_null($options['selectItems']) && !isset($result[$graph['graphid']]['items'])) {
-					$result[$graph['graphid']]['items'] = array();
-				}
-				if (!is_null($options['selectDiscoveryRule']) && !isset($result[$graph['graphid']]['discoveryRule'])) {
-					$result[$graph['graphid']]['discoveryRule'] = array();
 				}
 
 				// hostids
@@ -391,136 +340,140 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 
 		// adding GraphItems
-		if (!is_null($options['selectGraphItems']) && str_in_array($options['selectGraphItems'], $subselectsAllowedOutputs)) {
+		if ($options['selectGraphItems'] !== null && $options['selectGraphItems'] !== API_OUTPUT_COUNT) {
 			$gitems = API::GraphItem()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectGraphItems'],
+				'nodeids' => $options['nodeids'],
+				'output' => $this->outputExtend('graphs_items', array('graphid', 'gitemid'), $options['selectGraphItems']),
 				'graphids' => $graphids,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
+			$relationMap = $this->createRelationMap($gitems, 'graphid', 'gitemid');
 
-			foreach ($gitems as $gitem) {
-				$ggraphs = $gitem['graphs'];
-				unset($gitem['graphs']);
-				foreach ($ggraphs as $graph) {
-					$result[$graph['graphid']]['gitems'][$gitem['gitemid']] = $gitem;
+			// unset unrequested fields
+			foreach ($gitems as &$gitem) {
+				if (!$this->outputIsRequested('graphid', $options['selectGraphItems'])) {
+					unset($gitem['graphid']);
+				}
+				if (!$this->outputIsRequested('gitemid', $options['selectGraphItems'])) {
+					unset($gitem['gitemid']);
 				}
 			}
+			unset($gitem);
+
+			$result = $relationMap->mapMany($result, $gitems, 'gitems');
 		}
 
-		// adding Hostgroups
-		if (!is_null($options['selectGroups'])) {
-			if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-				$groups = API::HostGroup()->get(array(
-					'nodeids' => $nodeids,
-					'output' => $options['selectGroups'],
-					'graphids' => $graphids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-
-				foreach ($groups as $group) {
-					$ggraphs = $group['graphs'];
-					unset($group['graphs']);
-					foreach ($ggraphs as $graph) {
-						$result[$graph['graphid']]['groups'][] = $group;
-					}
-				}
+		// adding HostGroups
+		if ($options['selectGroups'] !== null && $options['selectGroups'] !== API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT gi.graphid,hg.groupid'.
+					' FROM graphs_items gi,items i,hosts_groups hg'.
+					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=hg.hostid'
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['graphid'], $relation['groupid']);
 			}
+
+			$groups = API::HostGroup()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectGroups'],
+				'groupids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $groups, 'groups');
 		}
 
 		// adding Hosts
-		if (!is_null($options['selectHosts'])) {
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$hosts = API::Host()->get(array(
-					'nodeids' => $nodeids,
-					'output' => $options['selectHosts'],
-					'graphids' => $graphids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				foreach ($hosts as $host) {
-					$hgraphs = $host['graphs'];
-					unset($host['graphs']);
-					foreach ($hgraphs as $graph) {
-						$result[$graph['graphid']]['hosts'][] = $host;
-					}
-				}
+		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT gi.graphid,i.hostid'.
+					' FROM graphs_items gi,items i'.
+					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' AND gi.itemid=i.itemid'
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
 			}
-		}
 
-		// adding Templates
-		if (!is_null($options['selectTemplates']) && str_in_array($options['selectTemplates'], $subselectsAllowedOutputs)) {
-			$templates = API::Template()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectTemplates'],
-				'graphids' => $graphids,
+			$hosts = API::Host()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectHosts'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
-			foreach ($templates as $template) {
-				$tgraphs = $template['graphs'];
-				unset($template['graphs']);
-				foreach ($tgraphs as $graph) {
-					$result[$graph['graphid']]['templates'][] = $template;
-				}
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding Templates
+		if ($options['selectTemplates'] !== null && $options['selectTemplates'] !== API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT gi.graphid,i.hostid'.
+					' FROM graphs_items gi,items i'.
+					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' AND gi.itemid=i.itemid'
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
 			}
+
+			$templates = API::Template()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectTemplates'],
+				'templateids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $templates, 'templates');
 		}
 
 		// adding Items
-		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
+		if ($options['selectItems'] !== null && $options['selectItems'] !== API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
 			$items = API::Item()->get(array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
-				'graphids' => $graphids,
+				'itemids' => $relationMap->getRelatedIds(),
+				'webitems' => true,
 				'nopermissions' => true,
 				'preservekeys' => true,
-				'webitems' => true,
 				'filter' => array('flags' => null)
 			));
-
-			foreach ($items as $item) {
-				$igraphs = $item['graphs'];
-				unset($item['graphs']);
-				foreach ($igraphs as $graph) {
-					$result[$graph['graphid']]['items'][] = $item;
-				}
-			}
+			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
 		// adding discoveryRule
 		if (!is_null($options['selectDiscoveryRule'])) {
-			$ruleids = $ruleMap = array();
-
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,gi.graphid'.
 					' FROM item_discovery id,graphs_items gi'.
 					' WHERE '.DBcondition('gi.graphid', $graphids).
 						' AND gi.itemid=id.itemid'
 			);
-			while ($rule = DBfetch($dbRules)) {
-				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
-				$ruleMap[$rule['graphid']] = $rule['parent_itemid'];
+			$relationMap = new CRelationMap();
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['graphid'], $relation['parent_itemid']);
 			}
 
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'itemids' => $ruleids,
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
-			);
-
-			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::DiscoveryRule()->get($objParams);
-
-				foreach ($result as $graphid => $graph) {
-					if (isset($ruleMap[$graphid]) && isset($discoveryRules[$ruleMap[$graphid]])) {
-						$result[$graphid]['discoveryRule'] = $discoveryRules[$ruleMap[$graphid]];
-					}
-				}
-			}
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
 		// removing keys (hash -> array)
