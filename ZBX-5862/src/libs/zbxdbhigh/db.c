@@ -1439,8 +1439,14 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		const zbx_uint64_t *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
-	int		i;
+#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
+
+	int		i, j, start, end, len, seq_num, first;
+	int		btwn_num;	/* number of "between ... and ..." constructions used */
+	int		in_num;		/* number of values packed into "in (...)" constructions */
+	int		in_cnt;		/* counter of values packed into an "in (...)" construction */
 	zbx_uint64_t	value;
+	int		*seq_len = NULL;
 
 	if (0 == num)
 		return;
@@ -1455,48 +1461,120 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		return;
 	}
 
-	/* if all values in an array are consecutive we return " <field name> between <id1> and <idN>"*/
+	/* ... else we return "the best mix" of " <field name> between <id1> and <idN>" and */
+	/* "<field name> in (<id1>,<id2>,...,<idN>)" */
 
-	value = values[0];
+	/* Set up an array "seq_len" for lengths of consecutive sequences of values. */
+	/* An isolated value will be represented as a sequence with length 1. */
+	/* A consecutive sequence will be represented by its length > 1. */
+	seq_len = zbx_malloc(seq_len, num * sizeof(int));
 
-	for (i = 1; i < num; i++)
+	for (i = 0; i < num; i++)
+		seq_len[i] = 0;
+
+	for (seq_num = 0, value = values[0], len = 1, start = 0, end = 1; end < num; end++)
 	{
-		if (values[i] != ++value)
+		if (values[end] == ++value)
+		{	/* consecutive sequence continues */
+			len++;
+		}
+		else
+		{
+			seq_len[seq_num++] = len;
+			len = 1;
+			value = values[end];
+			start = end;
+		}
+	}
+	if (0 < len)
+		seq_len[seq_num] = len;
+
+	/* count number of "between"s and "in"s */
+	for (btwn_num = 0, in_num = 0, i = 0; i < num; i++)
+	{
+		if (MIN_NUM_BETWEEN <= seq_len[i])
+			btwn_num++;
+		else if (1 <= seq_len[i])
+			in_num += seq_len[i];
+		else
 			break;
 	}
 
-	if (i == num)
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-				fieldname, values[0], values[num - 1]);
-		return;
-	}
-
-	/* ... else we return " <field name> in (<id1>,<id2>,...,<idN>)"*/
-
-	if (MAX_EXPRESSIONS < num)
+	/* opening '(' necessary ? */
+	if (MAX_EXPRESSIONS < in_num || 1 < btwn_num || (0 < in_num && 0 < btwn_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
-	for (i = 0; i < num; i++)
+	/* compose "between"s first */
+	for (first = 1, start = 0, i = 0; i < num; i++)
 	{
-		if (0 == (i % MAX_EXPRESSIONS))
+		if (MIN_NUM_BETWEEN <= seq_len[i])
 		{
-			if (0 != i)
-			{
-				(*sql_offset)--;
-				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
-			}
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+			if (1 != first)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+					fieldname, values[start], values[start + seq_len[i] - 1]);
+			first = 0;
 		}
 
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
+		if (0 == seq_len[i])
+			break;
+
+		start += seq_len[i];
 	}
 
-	(*sql_offset)--;
-	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+	if (0 < in_num && 0 < btwn_num)
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
 
-	if (MAX_EXPRESSIONS < num)
+	/* compose "in"s */
+	for (in_cnt = 0, start = 0, i = 0; i < num; i++)
+	{
+		if (0 == seq_len[i])
+			break;
+
+		if (MIN_NUM_BETWEEN > seq_len[i])
+		{
+			if (1 == in_num)	/* special case - only 1 value for "in"*/
+			{
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname,
+						values[start]);
+				break;
+			}
+			else
+			{
+				for (j = start; j < start + seq_len[i]; j++)
+				{
+					if (0 == (in_cnt % MAX_EXPRESSIONS))
+					{
+						if (0 != in_cnt)
+						{
+							(*sql_offset)--;
+							zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
+						}
+						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+					}
+
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[j]);
+					in_cnt++;
+				}
+			}
+		}
+		start += seq_len[i];
+	}
+
+	if (1 < in_num)
+	{
+		(*sql_offset)--;
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+	}
+
+	zbx_free(seq_len);
+
+	/* closing ')' necessary ? */
+	if (MAX_EXPRESSIONS < in_num || 1 < btwn_num || (0 < in_num && 0 < btwn_num))
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+
+	return;
 }
 
 static char	buf_string[640];
