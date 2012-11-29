@@ -249,8 +249,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-		$relationMap = new CRelationMap();
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -275,22 +273,6 @@ class CDiscoveryRule extends CItemGeneral {
 					$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
 				}
 
-				if (isset($item['hostid'])) {
-					$relationMap->addRelation($item['itemid'], 'hosts', $item['hostid']);
-				}
-				if (isset($item['plainItemid']) && $item['plainItemid']) {
-					$relationMap->addRelation($item['itemid'], 'items', $item['plainItemid']);
-				}
-				unset($item['plainItemid']);
-				if (isset($item['triggerid']) && $item['triggerid']) {
-					$relationMap->addRelation($item['itemid'], 'triggers', $item['triggerid']);
-				}
-				unset($item['triggerid']);
-				if (isset($item['graphid']) && $item['graphid']) {
-					$relationMap->addRelation($item['itemid'], 'graphs', $item['graphid']);
-				}
-				unset($item['graphid']);
-
 				$result[$item['itemid']] += $item;
 			}
 		}
@@ -304,21 +286,22 @@ class CDiscoveryRule extends CItemGeneral {
 		 */
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
-			$objParams = array(
+			$relationMap = $this->createRelationMap($result, 'itemid', 'hostid');
+			$hosts = API::Host()->get(array(
 				'nodeids' => $nodeids,
-				'hostids' => $relationMap->getRelatedIds('hosts'),
+				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'output' => $options['selectHosts'],
 				'nopermissions' => true,
 				'preservekeys' => true
-			);
-			$hosts = API::Host()->get($objParams);
+			));
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding items
 		if (!is_null($options['selectItems'])) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
 				$items = API::ItemPrototype()->get(array(
 					'output' => $options['selectItems'],
 					'nodeids' => $nodeids,
@@ -347,10 +330,22 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$relationMap = new CRelationMap();
+				$res = DBselect(
+					'SELECT id.parent_itemid,f.triggerid'.
+						' FROM item_discovery id,items i,functions f'.
+						' WHERE '.DBcondition('id.parent_itemid', $itemids).
+						' AND id.itemid=i.itemid'.
+						' AND i.itemid=f.itemid'
+				);
+				while ($relation = DBfetch($res)) {
+					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
+				}
+
 				$triggers = API::TriggerPrototype()->get(array(
 					'output' => $options['selectTriggers'],
 					'nodeids' => $nodeids,
-					'triggerids' => $relationMap->getRelatedIds('triggers'),
+					'triggerids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
@@ -373,10 +368,22 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$relationMap = new CRelationMap();
+				$res = DBselect(
+					'SELECT id.parent_itemid,gi.graphid'.
+						' FROM item_discovery id,items i,graphs_items gi'.
+						' WHERE '.DBcondition('id.parent_itemid', $itemids).
+						' AND id.itemid=i.itemid'.
+						' AND i.itemid=gi.itemid'
+				);
+				while ($relation = DBfetch($res)) {
+					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
+				}
+
 				$graphs = API::GraphPrototype()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $nodeids,
-					'graphids' => $relationMap->getRelatedIds('graphs'),
+					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
@@ -1129,24 +1136,6 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($options['countOutput'] === null) {
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
-			}
-
-			if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('item_discovery id', 'i.itemid', 'id.parent_itemid', $sqlParts);
-				// the itemid field is already used in the LLD object
-				$sqlParts = $this->addQuerySelect('id.itemid plainItemid', $sqlParts);
-			}
-
-			if ($options['selectTriggers'] !== null && $options['selectTriggers'] != API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('item_discovery id', 'i.itemid', 'id.parent_itemid', $sqlParts);
-				$sqlParts = $this->addQueryLeftJoin('functions f', 'id.itemid', 'f.itemid', $sqlParts);
-				$sqlParts = $this->addQuerySelect('f.triggerid', $sqlParts);
-			}
-
-			if ($options['selectGraphs'] !== null && $options['selectGraphs'] != API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('item_discovery id', 'i.itemid', 'id.parent_itemid', $sqlParts);
-				$sqlParts = $this->addQueryLeftJoin('graphs_items gi', 'id.itemid', 'gi.itemid', $sqlParts);
-				$sqlParts = $this->addQuerySelect('gi.graphid', $sqlParts);
 			}
 		}
 

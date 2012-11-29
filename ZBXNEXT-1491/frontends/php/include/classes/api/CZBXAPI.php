@@ -293,6 +293,44 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Creates a relation map for the given objects.
+	 *
+	 * If the $table parameter is set, the relations will be loaded from a database table, otherwise the map will be
+	 * built from two base object properties.
+	 *
+	 * @param array $objects        a hash of base objects
+	 * @param string $baseField     the base object ID field
+	 * @param string $foreignField  the related objects ID field
+	 * @param string $table         table to load the relation from
+	 *
+	 * @return CRelationMap
+	 */
+	protected function createRelationMap(array $objects, $baseField, $foreignField, $table = null) {
+		$relationMap = new CRelationMap();
+
+		// create the map from a database table
+		if ($table) {
+			$res = DBselect(API::getApi()->createSelectQuery($table, array(
+				'output' => array($baseField, $foreignField),
+				'filter' => array(
+					$baseField => array_keys($objects)
+				)
+			)));
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
+			}
+		}
+		// create a map from the base objects
+		else {
+			foreach ($objects as $object) {
+				$relationMap->addRelation($object[$baseField], $object[$foreignField]);
+			}
+		}
+
+		return $relationMap;
+	}
+
+	/**
 	 * Maps a single related object to each base object, for example, a host to an item. The base objects must contain
 	 * the foreign key, which will be used for mapping.
 	 *
@@ -734,10 +772,10 @@ class CZBXAPI {
 	 *
 	 * @param array $options
 	 * @param array $result             an object hash with PKs as keys
-	 * @param CRelationMap $relationMap  object relation map
+
 	 * @return array mixed
 	 */
-	protected function addRelatedObjects(array $options, array $result, CRelationMap $relationMap) {
+	protected function addRelatedObjects(array $options, array $result) {
 		// must be implemented in each API separately
 
 		return $result;

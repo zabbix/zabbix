@@ -220,8 +220,6 @@ class CDService extends CZBXAPI{
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-		$relationMap = new CRelationMap();
 		while ($dservice = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -252,19 +250,6 @@ class CDService extends CZBXAPI{
 					$result[$dservice['dserviceid']]['dhosts'][] = array('dhostid' => $dservice['dhostid']);
 				}
 
-				// populate relation map
-				if (isset($dservice['druleid']) && $dservice['druleid']) {
-					$relationMap->addRelation($dservice['dserviceid'], 'drules', $dservice['druleid']);
-				}
-				unset($dservice['druleid']);
-				if (isset($dservice['dhostid']) && $dservice['dhostid']) {
-					$relationMap->addRelation($dservice['dserviceid'], 'dhosts', $dservice['dhostid']);
-				}
-				if (isset($dservice['hostid']) && $dservice['hostid']) {
-					$relationMap->addRelation($dservice['dserviceid'], 'hosts', $dservice['hostid']);
-				}
-				unset($dservice['hostid']);
-
 				$result[$dservice['dserviceid']] += $dservice;
 			}
 		}
@@ -276,13 +261,24 @@ class CDService extends CZBXAPI{
 		// Adding Objects
 		// select_drules
 		if ($options['selectDRules'] !== null && $options['selectDRules'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT ds.dserviceid,dh.druleid'.
+					' FROM dservices ds,dhosts dh'.
+					' WHERE '.DBcondition('ds.dserviceid', $dserviceids).
+					' AND ds.dhostid=dh.dhostid'
+			);
+			while ($rule = DBfetch($dbRules)) {
+				$relationMap->addRelation($rule['dserviceid'], $rule['druleid']);
+			}
+
 			$drules = API::DRule()->get(array(
 				'output' => $options['selectDRules'],
 				'nodeids' => $nodeids,
-				'druleids' => $relationMap->getRelatedIds('drules'),
+				'druleids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-
 			if (!is_null($options['limitSelects'])) {
 				order_result($drules, 'name');
 			}
@@ -291,13 +287,13 @@ class CDService extends CZBXAPI{
 
 		// selectDHosts
 		if ($options['selectDHosts'] !== null && $options['selectDHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'dserviceid', 'dhostid');
 			$dhosts = API::DHost()->get(array(
 				'output' => $options['selectDHosts'],
 				'nodeids' => $nodeids,
-				'dhosts' => $relationMap->getRelatedIds('dhosts'),
+				'dhosts' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-
 			if (!is_null($options['limitSelects'])) {
 				order_result($dhosts, 'dhostid');
 			}
@@ -307,18 +303,28 @@ class CDService extends CZBXAPI{
 		// selectHosts
 		if (!is_null($options['selectHosts'])) {
 			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
+				$relationMap = new CRelationMap();
+				// discovered items
+				$dbRules = DBselect(
+					'SELECT ds.dserviceid,i.hostid'.
+						' FROM dservices ds,interface i'.
+						' WHERE '.DBcondition('ds.dserviceid', $dserviceids).
+						' AND ds.ip=i.ip'
+				);
+				while ($rule = DBfetch($dbRules)) {
+					$relationMap->addRelation($rule['dserviceid'], $rule['hostid']);
+				}
+
 				$hosts = API::Host()->get(array(
 					'output' => $options['selectHosts'],
 					'nodeids' => $nodeids,
-					'hostids' => $relationMap->getRelatedIds('hosts'),
+					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true,
 					'sortfield' => 'status'
 				));
-
 				if (!is_null($options['limitSelects'])) {
 					order_result($hosts, 'hostid');
 				}
-
 				$result = $relationMap->mapMany($result, $hosts, 'hosts');
 			}
 			else {
@@ -391,19 +397,7 @@ class CDService extends CZBXAPI{
 
 		if ($options['countOutput'] === null) {
 			if ($options['selectDHosts'] !== null) {
-				$sqlParts = $this->addQueryLeftJoin('dhosts dh', 'ds.dhostid', 'dh.dhostid', $sqlParts);
 				$sqlParts = $this->addQuerySelect('ds.dhostid', $sqlParts);
-			}
-
-			if ($options['selectDRules'] !== null && $options['selectDRules'] != API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('dhosts dh', 'ds.dhostid', 'dh.dhostid', $sqlParts);
-				$sqlParts = $this->addQueryLeftJoin('drules dr', 'dh.druleid', 'dr.druleid', $sqlParts);
-				$sqlParts = $this->addQuerySelect('dr.druleid', $sqlParts);
-			}
-
-			if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('interface i', 'ds.ip', 'i.ip', $sqlParts);
-				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 			}
 		}
 

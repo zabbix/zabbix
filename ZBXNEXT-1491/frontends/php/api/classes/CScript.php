@@ -564,8 +564,8 @@ class CScript extends CZBXAPI {
 		return $sqlParts;
 	}
 
-	protected function addRelatedObjects(array $options, array $result, CRelationMap $relationMap) {
-		$result = parent::addRelatedObjects($options, $result, $relationMap);
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
 
 		// allowed output options for [ select_* ] params
 		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);

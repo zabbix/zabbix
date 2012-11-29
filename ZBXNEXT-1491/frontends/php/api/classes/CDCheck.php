@@ -171,8 +171,6 @@ class CDCheck extends CZBXAPI {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-		$relationMap = new CRelationMap();
 		while ($dcheck = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -195,15 +193,6 @@ class CDCheck extends CZBXAPI {
 					$result[$dcheck['dcheckid']]['drules'][] = array('druleid' => $dcheck['druleid']);
 				}
 
-				// populate relation map
-				if (isset($dcheck['druleid']) && $dcheck['druleid']) {
-					$relationMap->addRelation($dcheck['dcheckid'], 'drules', $dcheck['druleid']);
-				}
-				if (isset($dcheck['dhostid']) && $dcheck['dhostid']) {
-					$relationMap->addRelation($dcheck['dcheckid'], 'dhosts', $dcheck['dhostid']);
-				}
-				unset($dcheck['dhostid']);
-
 				$result[$dcheck['dcheckid']] += $dcheck;
 			}
 		}
@@ -215,17 +204,16 @@ class CDCheck extends CZBXAPI {
 		// Adding Objects
 		// select_drules
 		if ($options['selectDRules'] !== null && $options['selectDRules'] !== API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'dcheckid', 'druleid');
 			$drules = API::DRule()->get(array(
 				'output' => $options['selectDRules'],
-				'druleids' => $relationMap->getRelatedIds('drules'),
+				'druleids' => $relationMap->getRelatedIds(),
 				'nodeids' => $nodeids,
 				'preservekeys' => 1
 			));
-
 			if (!is_null($options['limitSelects'])) {
 				order_result($drules, 'name');
 			}
-
 			$result = $relationMap->mapMany($result, $drules, 'drules', $options['limitSelects']);
 		}
 

@@ -272,7 +272,6 @@ class CAlert extends CZBXAPI {
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
-		$relationMap = new CRelationMap();
 		while ($alert = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $alert['rowscount'];
@@ -282,9 +281,6 @@ class CAlert extends CZBXAPI {
 
 				if (!isset($result[$alert['alertid']])) {
 					$result[$alert['alertid']] = array();
-				}
-				if (!is_null($options['selectMediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])) {
-					$result[$alert['alertid']]['mediatypes'] = array();
 				}
 
 				// hostids
@@ -311,18 +307,6 @@ class CAlert extends CZBXAPI {
 					$result[$alert['alertid']]['mediatypes'][] = array('mediatypeid' => $alert['mediatypeid']);
 				}
 
-				// populate relation map
-				if (isset($alert['hostid']) && $alert['hostid']) {
-					$relationMap->addRelation($alert['alertid'], 'hosts', $alert['hostid']);
-				}
-				unset($alert['hostid']);
-				if (isset($alert['userid']) && $alert['userid']) {
-					$relationMap->addRelation($alert['alertid'], 'users', $alert['userid']);
-				}
-				if (isset($alert['mediatypeid']) && $alert['mediatypeid']) {
-					$relationMap->addRelation($alert['alertid'], 'mediatypes', $alert['mediatypeid']);
-				}
-
 				$result[$alert['alertid']] += $alert;
 			}
 		}
@@ -336,9 +320,22 @@ class CAlert extends CZBXAPI {
 		 */
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			$res = DBselect(
+				'SELECT a.alertid,i.hostid'.
+					' FROM alerts a,events e,functions f,items i'.
+					' WHERE '.DBcondition('a.actionid', $alertids).
+					' AND a.eventid=e.eventid'.
+					' AND e.objectid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND e.object='.EVENT_OBJECT_TRIGGER
+			);
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation['alertid'], $relation['hostid']);
+			}
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds('hosts'),
+				'hostids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
@@ -346,18 +343,21 @@ class CAlert extends CZBXAPI {
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] !== API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'alertid', 'userid');
 			$users = API::User()->get(array(
 				'output' => $options['selectUsers'],
-				'userids' => $relationMap->getRelatedIds('users'),
+				'userids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 
+		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] !== API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'alertid', 'mediatypeid');
 			$mediatypes = API::getApi()->select('media_type', array(
 				'output' => $options['selectMediatypes'],
-				'filter' => array('mediatypeid' => $relationMap->getRelatedIds('mediatypes')),
+				'filter' => array('mediatypeid' => $relationMap->getRelatedIds()),
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $mediatypes, 'mediatypes');
@@ -381,14 +381,6 @@ class CAlert extends CZBXAPI {
 
 			if ($options['selectMediatypes'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('mediatypeid'), $sqlParts);
-			}
-
-			if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('events e', 'a.eventid', 'e.eventid', $sqlParts);
-				$sqlParts = $this->addQueryLeftJoin('functions f', 'e.objectid', 'f.triggerid', $sqlParts);
-				$sqlParts = $this->addQueryLeftJoin('items i', 'i.itemid', 'f.itemid', $sqlParts);
-				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
-				$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			}
 		}
 
