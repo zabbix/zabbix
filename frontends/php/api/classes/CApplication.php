@@ -217,8 +217,6 @@ class CApplication extends CZBXAPI {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-		$relationMap = new CRelationMap();
 		while ($application = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -252,15 +250,6 @@ class CApplication extends CZBXAPI {
 					unset($application['itemid']);
 				}
 
-				// populate relation map
-				if (isset($application['hostid']) && $application['hostid']) {
-					$relationMap->addRelation($application['applicationid'], 'hosts', $application['hostid']);
-				}
-				if (isset($application['itemid']) && $application['itemid']) {
-					$relationMap->addRelation($application['applicationid'], 'items', $application['itemid']);
-				}
-				unset($application['itemid']);
-
 				$result[$application['applicationid']] += $application;
 			}
 		}
@@ -272,9 +261,10 @@ class CApplication extends CZBXAPI {
 		// adding objects
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds('hosts'),
+				'hostids' => $relationMap->getRelatedIds(),
 				'nopermissions' => 1,
 				'templated_hosts' => true,
 				'preservekeys' => 1
@@ -282,12 +272,12 @@ class CApplication extends CZBXAPI {
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
-		// adding objects
 		// adding items
 		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'applicationid', 'itemid', 'items_applications');
 			$items = API::Item()->get(array(
 				'output' => $options['selectItems'],
-				'itemids' => $relationMap->getRelatedIds('items'),
+				'itemids' => $relationMap->getRelatedIds(),
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -632,11 +622,6 @@ class CApplication extends CZBXAPI {
 
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('a.hostid', $sqlParts);
-			}
-
-			if ($options['selectItems'] !== null && $options['selectItems'] !== API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQueryLeftJoin('items_applications ia', 'a.applicationid', 'ia.applicationid', $sqlParts);
-				$sqlParts = $this->addQuerySelect('ia.itemid', $sqlParts);
 			}
 		}
 

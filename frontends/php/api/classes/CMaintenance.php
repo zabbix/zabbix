@@ -834,8 +834,8 @@ class CMaintenance extends CZBXAPI {
 		DB::insert('maintenances_windows', $newMaintenanceWindows);
 	}
 
-	protected function addRelatedObjects(array $options, array $result, CRelationMap $relationMap) {
-		$result = parent::addRelatedObjects($options, $result, $relationMap);
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
 
 		$maintenanceIds = array_keys($result);
 

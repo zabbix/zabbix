@@ -330,11 +330,8 @@ class CAction extends CZBXAPI {
 
 		$actionids = array();
 
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-		$relationMap = new CRelationMap();
 		while ($action = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $action['rowscount'];
@@ -348,12 +345,6 @@ class CAction extends CZBXAPI {
 				if (!is_null($options['selectOperations']) && !isset($result[$action['actionid']]['operations'])) {
 					$result[$action['actionid']]['operations'] = array();
 				}
-
-				// populate relation map
-				if (isset($action['conditionid']) && $action['conditionid']) {
-					$relationMap->addRelation($action['actionid'], 'conditions', $action['conditionid']);
-				}
-				unset($action['conditionid']);
 
 				$result[$action['actionid']] += $action;
 
@@ -565,9 +556,23 @@ class CAction extends CZBXAPI {
 		// adding conditions
 		if (!is_null($options['selectConditions']) && $options['selectConditions'] != API_OUTPUT_COUNT) {
 			$conditions = API::getApi()->select('conditions', array(
-				'output' => $options['selectConditions'],
-				'filter' => array('actionid' => $relationMap->getRelatedIds('conditions'))
+				'output' => $this->outputExtend('item_discovery', array('actionid', 'conditionid'), $options['selectConditions']),
+				'filter' => array('actionid' => array_keys($result)),
+				'preservekeys' => true
 			));
+			$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
+
+			// unset unrequested fields
+			foreach ($conditions as &$condition) {
+				if (!$this->outputIsRequested('itemid', $options['selectConditions'])) {
+					unset($condition['actionid']);
+				}
+				if (!$this->outputIsRequested('itemdiscoveryid', $options['selectConditions'])) {
+					unset($condition['conditionid']);
+				}
+			}
+			unset($condition);
+
 			$result = $relationMap->mapMany($result, $conditions, 'conditions');
 		}
 
@@ -1787,19 +1792,6 @@ class CAction extends CZBXAPI {
 		}
 
 		return true;
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if ($options['countOutput'] === null) {
-			if ($options['selectConditions'] !== null) {
-				$sqlParts = $this->addQueryLeftJoin('conditions c', 'a.actionid', 'c.actionid', $sqlParts);
-				$sqlParts = $this->addQuerySelect('c.conditionid', $sqlParts);
-			}
-		}
-
-		return $sqlParts;
 	}
 
 

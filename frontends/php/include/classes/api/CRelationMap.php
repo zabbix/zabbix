@@ -24,9 +24,7 @@
 class CRelationMap {
 
 	/**
-	 * A hash of relation maps. Each key contains a hash of relations between specific objects types. A relation hash
-	 * consists of an ID of the related object as the key, and an array of corresponding base objects as the value. That
-	 * is array(relatedObjectId => array(baseObjectId2, baseObjectId2))
+	 * A hash with IDs of related objects as keys and arrays of base objects IDs as values.
 	 *
 	 * @var array
 	 */
@@ -36,22 +34,19 @@ class CRelationMap {
 	 * Adds a new relation.
 	 *
 	 * @param string $baseObjectId
-	 * @param string $name             name of the relation
 	 * @param string $relatedObjectId
 	 */
-	public function addRelation($baseObjectId, $name, $relatedObjectId) {
-		$this->map[$name][$relatedObjectId][$baseObjectId] = $baseObjectId;
+	public function addRelation($baseObjectId, $relatedObjectId) {
+		$this->map[$relatedObjectId][$baseObjectId] = $baseObjectId;
 	}
 
 	/**
-	 * Returns the IDs of all related objects for the given relation.
-	 *
-	 * @param string $name
+	 * Returns the IDs of all related objects.
 	 *
 	 * @return array
 	 */
-	public function getRelatedIds($name) {
-		return (isset($this->map[$name])) ? array_keys($this->map[$name]) : array();
+	public function getRelatedIds() {
+		return array_keys($this->map);
 	}
 
 	public function mapMany($baseObjects, $relatedObjects, $name, $limit = null) {
@@ -62,26 +57,27 @@ class CRelationMap {
 		unset($baseObject);
 
 		// add related objects
-		if (isset($this->map[$name])) {
-			$map = $this->map[$name];
+		if ($this->map) {
 			$count = array();
 			foreach ($relatedObjects as $relatedObjectId => $relatedObject) {
-				if (isset($map[$relatedObjectId])) {
-					foreach ($map[$relatedObjectId] as $baseObjectId) {
-						// limit the number of results for each object
-						if ($limit) {
-							if (!isset($count[$baseObjectId])) {
-								$count[$baseObjectId] = 0;
+				if (isset($this->map[$relatedObjectId])) {
+					foreach ($this->map[$relatedObjectId] as $baseObjectId) {
+						if (isset($baseObjects[$baseObjectId])) {
+							// limit the number of results for each object
+							if ($limit) {
+								if (!isset($count[$baseObjectId])) {
+									$count[$baseObjectId] = 0;
+								}
+
+								$count[$baseObjectId]++;
+
+								if ($count[$baseObjectId] > $limit) {
+									continue;
+								}
 							}
 
-							$count[$baseObjectId]++;
-
-							if ($count[$baseObjectId] > $limit) {
-								continue;
-							}
+							$baseObjects[$baseObjectId][$name][] = $relatedObjects[$relatedObjectId];
 						}
-
-						$baseObjects[$baseObjectId][$name][] = $relatedObjects[$relatedObjectId];
 					}
 				}
 			}
@@ -98,12 +94,13 @@ class CRelationMap {
 		unset($baseObject);
 
 		// add related object
-		if (isset($this->map[$name])) {
-			$map = $this->map[$name];
+		if ($this->map) {
 			foreach ($relatedObjects as $relatedObjectId => $relatedObject) {
-				if (isset($map[$relatedObjectId])) {
-					foreach ($map[$relatedObjectId] as $baseObjectId) {
-						$baseObjects[$baseObjectId][$name] = $relatedObjects[$relatedObjectId];
+				if (isset($this->map[$relatedObjectId])) {
+					foreach ($this->map[$relatedObjectId] as $baseObjectId) {
+						if (isset($baseObjects[$baseObjectId])) {
+							$baseObjects[$baseObjectId][$name] = $relatedObjects[$relatedObjectId];
+						}
 					}
 				}
 			}
