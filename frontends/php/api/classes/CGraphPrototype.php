@@ -476,6 +476,7 @@ class CGraphPrototype extends CGraphGeneral {
 				'graphids' => $graphids,
 				'nopermissions' => true,
 				'preservekeys' => true,
+				'webitems' => true,
 				'filter' => array('flags' => null)
 			));
 
