@@ -331,149 +331,6 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Maps a single related object to each base object, for example, a host to an item. The base objects must contain
-	 * the foreign key, which will be used for mapping.
-	 *
-	 * For example, to map an array of $hosts to $items, the items must have the 'hostid' property. Then the mapping
-	 * can be done with the following call:
-	 *
-	 * $this->mapOne($items, $hosts, 'host', 'hostid');
-	 *
-	 * @param array $baseObjects        an array of base objects
-	 * @param array $relatedObjects     a hash of objects to map to the base objects with IDs as keys
-	 * @param string $baseField         the name of the field under which the related objects must be added
-	 * @param string $reference         the name of the foreign key in the base object
-	 * @param bool $unsetReference      whether to unset the foreign key
-	 *
-	 * @return array
-	 */
-	protected function mapOne(array $baseObjects, array $relatedObjects, $baseField, $reference, $unsetReference = true) {
-		foreach ($baseObjects as &$baseObject) {
-			// if a related object exists, add it to the base object
-			if (isset($relatedObjects[$baseObject[$reference]])) {
-				$relatedObject = $relatedObjects[$baseObject[$reference]];
-
-				$baseObject[$baseField] = $relatedObject;
-			}
-			// if no related object exist, add an empty array
-			else {
-				$baseObject[$baseField] = array();
-			}
-
-			// unset the foreign key
-			if ($unsetReference) {
-				unset($baseObject[$reference]);
-			}
-		}
-		unset($baseObject);
-
-		return $baseObjects;
-	}
-
-	/**
-	 * Maps multiple related objects to each base object, for example, items to hosts or triggers to items.
-	 * The related objects must contain references to the base objects.
-	 *
-	 * For one-to-many relations the $reference parameter must be given as the name of the foreign key field of the
-	 * related object. For example, to map an array of $items to $hosts, the items must have the 'hostid' property.
-	 * Then the mapping can be done with the following call:
-	 *
-	 * $this->mapMany($hosts, $items, 'items', 'hostid');
-	 *
-	 * For many-to-many relations - as an array, where the first element is the key, under which reference objects
-	 * are contained, and the second - the name of the foreign key field. For example, to map an array of $triggers
-	 * to $items, the $triggers array must contain an array of items under the 'items' key. Then the mapping can
-	 * be done with the following call:
-	 *
-	 * $this->mapMany($items, $triggers, 'triggers', array('items', 'itemid'));
-	 *
-	 * @param array $baseObjects        an object hash with IDs as keys
-	 * @param array $relatedObjects     an array of objects to map to the base objects
-	 * @param string $baseField         the name of the field under which the related objects must be added
-	 * @param string $reference         foreign reference
-	 * @param bool $unsetReference      whether to unset the foreign key
-	 * @param null $limit
-	 *
-	 * @return mixed
-	 */
-	protected function mapMany(array $baseObjects, array $relatedObjects, $baseField, $reference, $unsetReference = true, $limit = null) {
-		// create an empty array for every base object
-		foreach ($baseObjects as &$object) {
-			$object[$baseField] = array();
-		}
-		unset($object);
-
-		// add related objects
-		$count = array();
-		foreach ($relatedObjects as $relatedObject) {
-			// for many-to-many relations
-			if (is_array($reference)) {
-				$referenceObjectField = $reference[0];
-				$referenceIdField = $reference[1];
-
-				// fetch the relation objects
-				$relationObjects = $relatedObject[$referenceObjectField];
-
-				// remove relation objects from the result
-				if ($unsetReference) {
-					unset($relatedObject[$referenceObjectField]);
-				}
-
-				foreach ($relationObjects as $keyObject) {
-					$baseObjectId = $keyObject[$referenceIdField];
-
-					// limit the number of results for each object
-					if ($limit) {
-						if (!isset($count[$baseObjectId])) {
-							$count[$baseObjectId] = 0;
-						}
-
-						$count[$baseObjectId]++;
-
-						if ($count[$baseObjectId] > $limit) {
-							continue;
-						}
-					}
-
-					// add the related object to the base objects
-					if (isset($baseObjects[$baseObjectId])) {
-						$baseObjects[$baseObjectId][$baseField][] = $relatedObject;
-					}
-				}
-			}
-			// for one-to-many relations
-			else {
-				$baseObjectId = $relatedObject[$reference];
-
-				// remove relation objects from the result
-				if ($unsetReference) {
-					unset($relatedObject[$reference]);
-				}
-
-				// limit the number of results for each object
-				if ($limit) {
-					if (!isset($count[$baseObjectId])) {
-						$count[$baseObjectId] = 0;
-					}
-
-					$count[$baseObjectId]++;
-
-					if ($count[$baseObjectId] > $limit) {
-						continue;
-					}
-				}
-
-				// add the related object to the base objects
-				if (isset($baseObjects[$baseObjectId])) {
-					$baseObjects[$baseObjectId][$baseField][] = $relatedObject;
-				}
-			}
-		}
-
-		return $baseObjects;
-	}
-
-	/**
 	 * Constructs an SQL SELECT query for a specific table from the given API options, executes it and returns
 	 * the result.
 	 *
@@ -570,10 +427,8 @@ class CZBXAPI {
 		$sqlWhere = (!empty($sqlParts['where'])) ? ' WHERE '.implode(' AND ', array_unique($sqlParts['where'])) : '';
 		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
 		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
-		$sqlLeftJoin = (!empty($sqlParts['leftJoin'])) ? ' LEFT JOIN '.implode(' LEFT JOIN ', array_unique($sqlParts['leftJoin'])) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
-				$sqlLeftJoin.
 				$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
@@ -702,8 +557,7 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Adds the given field to the SELECT part of the $sqlParts array if it's not already present. Supports fields with
-	 * aliases.
+	 * Adds the given field to the SELECT part of the $sqlParts array if it's not already present.
 	 *
 	 * @param string $fieldId
 	 * @param array $sqlParts
@@ -712,11 +566,8 @@ class CZBXAPI {
 	 */
 	protected function addQuerySelect($fieldId, array $sqlParts) {
 		list($tableAlias, $field) = explode('.', $fieldId);
-		list($field, $fieldAlias) = explode(' ', $field);
 
-		if (!in_array($fieldId, $sqlParts['select'])
-			&& (!in_array($this->fieldId('*', $tableAlias), $sqlParts['select']) || $fieldAlias)) {
-
+		if (!in_array($fieldId, $sqlParts['select']) && !in_array($this->fieldId('*', $tableAlias), $sqlParts['select'])) {
 			// if we want to select all of the columns, other columns from this table can be removed
 			if ($field == '*') {
 				foreach ($sqlParts['select'] as $key => $selectFieldId) {
@@ -729,22 +580,6 @@ class CZBXAPI {
 
 			$sqlParts['select'][] = $fieldId;
 		}
-
-		return $sqlParts;
-	}
-
-	/**
-	 * Adds a left join to the given table.
-	 *
-	 * @param string $tableId           name and alias of the table to join
-	 * @param string $fieldIdLocal      the reference column of the base table
-	 * @param string $fieldIdForeign    the reference column of the table being joined
-	 * @param array $sqlParts
-	 *
-	 * @return array
-	 */
-	protected function addQueryLeftJoin($tableId, $fieldIdLocal, $fieldIdForeign, array $sqlParts) {
-		$sqlParts['leftJoin'][$tableId] = $tableId.' ON '.$fieldIdLocal.'='.$fieldIdForeign;
 
 		return $sqlParts;
 	}

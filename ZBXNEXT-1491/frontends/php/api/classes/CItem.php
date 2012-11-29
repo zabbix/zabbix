@@ -167,28 +167,33 @@ class CItem extends CItemGeneral {
 		}
 
 		// hostids
-		if ($options['hostids'] !== null) {
+		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
+
+			if ($options['output'] != API_OUTPUT_EXTEND) {
+				$sqlParts['select']['hostid'] = 'i.hostid';
+			}
+
 			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.hostid';
 			}
-
-			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 		}
 
 		// interfaceids
-		if ($options['interfaceids'] !== null) {
+		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
+
+			if ($options['output'] != API_OUTPUT_EXTEND) {
+				$sqlParts['select']['interfaceid'] = 'i.interfaceid';
+			}
+
 			$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
 			}
-
-			// make sure we retrieve the hostid property to be able to map hosts to items
-			$sqlParts = $this->addQuerySelect('i.interfaceid', $sqlParts);
 		}
 
 		// groupids
@@ -223,30 +228,33 @@ class CItem extends CItemGeneral {
 		}
 
 		// triggerids
-		if ($options['triggerids'] !== null) {
+		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts = $this->addQuerySelect('f.triggerid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('functions f', 'i.itemid', 'f.itemid', $sqlParts);
+			$sqlParts['select']['triggerid'] = 'f.triggerid';
+			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
 		// applicationids
-		if ($options['applicationids'] !== null) {
+		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts = $this->addQuerySelect('ia.applicationid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('items_applications ia', 'i.itemid', 'ia.itemid', $sqlParts);
+			$sqlParts['select']['applicationid'] = 'ia.applicationid';
+			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
+			$sqlParts['where']['ia'] = 'ia.itemid=i.itemid';
 		}
 
 		// graphids
-		if ($options['graphids'] !== null) {
+		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts = $this->addQuerySelect('gi.graphid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('graphs_items gi', 'i.itemid', 'gi.itemid', $sqlParts);
+			$sqlParts['select']['graphid'] = 'gi.graphid';
+			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
 		// webitems
@@ -329,8 +337,8 @@ class CItem extends CItemGeneral {
 		// application
 		if (!is_null($options['application'])) {
 			$sqlParts['select']['application'] = 'a.name as application';
-			$sqlParts = $this->addQueryLeftJoin('items_applications ia', 'i.itemid', 'ia.itemid', $sqlParts);
-			$sqlParts = $this->addQueryLeftJoin('applications a', 'ia.applicationid', 'a.applicationid', $sqlParts);
+			$sqlParts['from']['applications'] = 'applications a';
+			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where']['aia'] = 'a.applicationid = ia.applicationid';
 			$sqlParts['where']['iai'] = 'ia.itemid=i.itemid';
 			$sqlParts['where'][] = ' a.name='.zbx_dbstr($options['application']);
