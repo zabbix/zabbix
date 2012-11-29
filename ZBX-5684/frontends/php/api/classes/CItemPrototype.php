@@ -59,7 +59,6 @@ class CItemPrototype extends CItemGeneral {
 			'discoveryids'				=> null,
 			'graphids'					=> null,
 			'triggerids'				=> null,
-			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
@@ -362,11 +361,6 @@ class CItemPrototype extends CItemGeneral {
 
 						$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
 						unset($item['graphid']);
-					}
-
-					// webitems
-					if (!is_null($options['webitems'])) {
-						unset($sqlParts['where']['webtype']);
 					}
 
 // discoveryids
