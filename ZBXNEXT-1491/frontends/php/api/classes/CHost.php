@@ -70,9 +70,6 @@ class CHost extends CHostGeneral {
 		// allowed columns for sorting
 		$sortColumns = array('hostid', 'host', 'name', 'status');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('hosts' => 'h.hostid'),
 			'from'		=> array('hosts' => 'hosts h'),
@@ -449,8 +446,6 @@ class CHost extends CHostGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$hostids = array();
-
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
@@ -464,49 +459,8 @@ class CHost extends CHostGeneral {
 				}
 			}
 			else {
-				$hostids[$host['hostid']] = $host['hostid'];
-
-				if (!isset($result[$host['hostid']])) $result[$host['hostid']] = array();
-
-				if (!is_null($options['selectGroups']) && !isset($result[$host['hostid']]['groups'])) {
-					$result[$host['hostid']]['groups'] = array();
-				}
-				if (!is_null($options['selectParentTemplates']) && !isset($result[$host['hostid']]['parentTemplates'])) {
-					$result[$host['hostid']]['parentTemplates'] = array();
-				}
-				if (!is_null($options['selectItems']) && !isset($result[$host['hostid']]['items'])) {
-					$result[$host['hostid']]['items'] = array();
-				}
-				if (!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])) {
-					$result[$host['hostid']]['discoveries'] = array();
-				}
-				if (!is_null($options['selectInventory']) && !isset($result[$host['hostid']]['inventory'])) {
-					$result[$host['hostid']]['inventory'] = array();
-				}
-				if (!is_null($options['selectTriggers']) && !isset($result[$host['hostid']]['triggers'])) {
-					$result[$host['hostid']]['triggers'] = array();
-				}
-				if (!is_null($options['selectGraphs']) && !isset($result[$host['hostid']]['graphs'])) {
-					$result[$host['hostid']]['graphs'] = array();
-				}
-				if (!is_null($options['selectDServices']) && !isset($result[$host['hostid']]['dservices'])) {
-					$result[$host['hostid']]['dservices'] = array();
-				}
-				if (!is_null($options['selectApplications']) && !isset($result[$host['hostid']]['applications'])) {
-					$result[$host['hostid']]['applications'] = array();
-				}
-				if (!is_null($options['selectMacros']) && !isset($result[$host['hostid']]['macros'])) {
-					$result[$host['hostid']]['macros'] = array();
-				}
-
-				if (!is_null($options['selectScreens']) && !isset($result[$host['hostid']]['screens'])) {
-					$result[$host['hostid']]['screens'] = array();
-				}
-				if (!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])) {
-					$result[$host['hostid']]['interfaces'] = array();
-				}
-				if (!is_null($options['selectHttpTests']) && !isset($result[$host['hostid']]['httpTests'])) {
-					$result[$host['hostid']]['httpTests'] = array();
+				if (!isset($result[$host['hostid']])) {
+					$result[$host['hostid']] = array();
 				}
 
 				// groupids
@@ -621,482 +575,9 @@ class CHost extends CHostGeneral {
 			return $result;
 		}
 
-		/*
-		 * adding objects
-		 */
-		// adding groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$groups = API::HostGroup()->get(array(
-				'nodeids' => $options['nodeids'],
-				'output' => $options['selectGroups'],
-				'hostids' => $hostids,
-				'preservekeys' => true
-			));
-
-			foreach ($groups as $group) {
-				$ghosts = $group['hosts'];
-				unset($group['hosts']);
-				foreach ($ghosts as $host) {
-					$result[$host['hostid']]['groups'][] = $group;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
-
-		// adding inventories
-		if (!is_null($options['selectInventory']) && $options['selectInventory'] !== false) {
-			if (is_array($options['selectInventory'])) {
-				// if we are given a list of fields that needs to be fetched
-				$dbTable = DB::getSchema('host_inventory');
-				$selectHIn = array('hin.hostid');
-				foreach ($options['selectInventory'] as $field) {
-					if (isset($dbTable['fields'][$field])) {
-						$selectHIn[] = 'hin.'.$field;
-					}
-				}
-			}
-			else {
-				// all fields are needed
-				$selectHIn = array('hin.*');
-			}
-
-			$dbInventory = DBselect(
-				'SELECT '.implode(', ', $selectHIn).
-				' FROM host_inventory hin'.
-				' WHERE '.DBcondition('hin.hostid', $hostids)
-			);
-			while ($inventory = DBfetch($dbInventory)) {
-				$result[$inventory['hostid']]['inventory'] = $inventory;
-			}
-		}
-
-		// adding templates
-		if (!is_null($options['selectParentTemplates'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectParentTemplates']) || str_in_array($options['selectParentTemplates'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectParentTemplates'];
-				$templates = API::Template()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($templates, 'host');
-				}
-				foreach ($templates as $templateid => $template) {
-					unset($templates[$templateid]['hosts']);
-					$count = array();
-					foreach ($template['hosts'] as $host) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$host['hostid']])) {
-								$count[$host['hostid']] = 0;
-							}
-							$count[$host['hostid']]++;
-
-							if ($count[$host['hostid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$host['hostid']]['parentTemplates'][] = &$templates[$templateid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectParentTemplates']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$templates = API::Template()->get($objParams);
-				$templates = zbx_toHash($templates, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['templates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding hostinterfaces
-		if (!is_null($options['selectInterfaces'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectInterfaces'];
-				$interfaces = API::HostInterface()->get($objParams);
-
-				// we need to order interfaces for proper linkage and viewing
-				order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
-
-				$count = array();
-				foreach ($interfaces as $interfaceid => $interface) {
-					if (!is_null($options['limitSelects'])) {
-						if (!isset($count[$interface['hostid']])) {
-							$count[$interface['hostid']] = 0;
-						}
-						$count[$interface['hostid']]++;
-
-						if ($count[$interface['hostid']] > $options['limitSelects']) {
-							continue;
-						}
-					}
-
-					$result[$interface['hostid']]['interfaces'][$interfaceid] = &$interfaces[$interfaceid];
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectInterfaces']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$interfaces = API::HostInterface()->get($objParams);
-				$interfaces = zbx_toHash($interfaces, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['interfaces'] = isset($interfaces[$hostid]) ? $interfaces[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding items
-		if (!is_null($options['selectItems'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectItems'];
-				$items = API::Item()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($items, 'name');
-				}
-				$count = array();
-				foreach ($items as $itemid => $item) {
-					if (!is_null($options['limitSelects'])) {
-						if (!isset($count[$item['hostid']])) {
-							$count[$item['hostid']] = 0;
-						}
-						$count[$item['hostid']]++;
-
-						if ($count[$item['hostid']] > $options['limitSelects']) {
-							continue;
-						}
-					}
-
-					$result[$item['hostid']]['items'][] = &$items[$itemid];
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectItems']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$items = API::Item()->get($objParams);
-				$items = zbx_toHash($items, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['items'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding http tests
-		if (!is_null($options['selectHttpTests'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectHttpTests']) || str_in_array($options['selectHttpTests'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHttpTests'];
-				$httpTests = API::HttpTest()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($httpTests, 'name');
-				}
-				$count = array();
-				foreach ($httpTests as $httpTestId => $httpTest) {
-					if (!is_null($options['limitSelects'])) {
-						if (!isset($count[$httpTest['hostid']])) {
-							$count[$httpTest['hostid']] = 0;
-						}
-						$count[$httpTest['hostid']]++;
-
-						if ($count[$httpTest['hostid']] > $options['limitSelects']) {
-							continue;
-						}
-					}
-
-					$result[$httpTest['hostid']]['httpTests'][] = $httpTests[$httpTestId];
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectHttpTests']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$httpTests = API::HttpTest()->get($objParams);
-				$httpTests = zbx_toHash($httpTests, 'hostid');
-				foreach ($result as $hostId => $host) {
-					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding discoveries
-		if (!is_null($options['selectDiscoveries'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectDiscoveries']) || str_in_array($options['selectDiscoveries'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDiscoveries'];
-				$items = API::DiscoveryRule()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($items, 'name');
-
-				$count = array();
-				foreach ($items as $itemid => $item) {
-					unset($items[$itemid]['hosts']);
-					foreach ($item['hosts'] as $host) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$host['hostid']])) {
-								$count[$host['hostid']] = 0;
-							}
-							$count[$host['hostid']]++;
-
-							if ($count[$host['hostid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$host['hostid']]['discoveries'][] = &$items[$itemid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectDiscoveries']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$items = API::DiscoveryRule()->get($objParams);
-				$items = zbx_toHash($items, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['discoveries'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding triggers
-		if (!is_null($options['selectTriggers'])) {
-			if (is_array($options['selectTriggers']) || str_in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
-				$triggers = API::Trigger()->get(array(
-					'nodeids' => $options['nodeids'],
-					'hostids' => $hostids,
-					'preservekeys' => true,
-					'output' => $options['selectTriggers']
-				));
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($triggers, 'description');
-				}
-
-				$count = array();
-				foreach ($triggers as $triggerid => $trigger) {
-					unset($triggers[$triggerid]['hosts']);
-
-					foreach ($trigger['hosts'] as $host) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$host['hostid']])) {
-								$count[$host['hostid']] = 0;
-							}
-							$count[$host['hostid']]++;
-
-							if ($count[$host['hostid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$host['hostid']]['triggers'][] = &$triggers[$triggerid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
-				$triggers = API::Trigger()->get(array(
-					'nodeids' => $options['nodeids'],
-					'hostids' => $hostids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-				$triggers = zbx_toHash($triggers, 'hostid');
-
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['triggers'] = isset($triggers[$hostid]) ? $triggers[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding graphs
-		if (!is_null($options['selectGraphs'])) {
-			if (is_array($options['selectGraphs']) || str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get(array(
-					'nodeids' => $options['nodeids'],
-					'hostids' => $hostids,
-					'preservekeys' => true,
-					'output' => $options['selectGraphs']
-				));
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($graphs, 'name');
-				}
-
-				$count = array();
-				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['hosts']);
-
-					foreach ($graph['hosts'] as $host) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$host['hostid']])) {
-								$count[$host['hostid']] = 0;
-							}
-							$count[$host['hostid']]++;
-
-							if ($count[$host['hostid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$host['hostid']]['graphs'][] = &$graphs[$graphid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
-				$graphs = API::Graph()->get(array(
-					'nodeids' => $options['nodeids'],
-					'hostids' => $hostids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-				$graphs = zbx_toHash($graphs, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['graphs'] = isset($graphs[$hostid]) ? $graphs[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding applications
-		if (!is_null($options['selectApplications'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectApplications']) || str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectApplications'];
-				$applications = API::Application()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($applications, 'name');
-				}
-
-				$count = array();
-				foreach ($applications as $applicationid => $application) {
-					unset($applications[$applicationid]['hosts']);
-
-					foreach ($application['hosts'] as $host) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$host['hostid']])) {
-								$count[$host['hostid']] = 0;
-							}
-							$count[$host['hostid']]++;
-
-							if ($count[$host['hostid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$host['hostid']]['applications'][] = &$applications[$applicationid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectApplications']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$applications = API::Application()->get($objParams);
-
-				$applications = zbx_toHash($applications, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['applications'] = isset($applications[$hostid]) ? $applications[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding macros
-		if (!is_null($options['selectMacros']) && str_in_array($options['selectMacros'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'output' => $options['selectMacros'],
-				'hostids' => $hostids,
-				'preservekeys' => true
-			);
-			$macros = API::UserMacro()->get($objParams);
-
-			foreach ($macros as $macroid => $macro) {
-				$mhosts = $macro['hosts'];
-				unset($macro['hosts']);
-				foreach ($mhosts as $host) {
-					$result[$host['hostid']]['macros'][$macroid] = $macro;
-				}
-			}
-		}
-
-		// adding screens
-		if (!is_null($options['selectScreens'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'editable' => $options['editable'],
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectScreens']) || str_in_array($options['selectScreens'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectScreens'];
-
-				$screens = API::TemplateScreen()->get($objParams);
-				if (!is_null($options['limitSelects'])) order_result($screens, 'name');
-
-				foreach ($screens as $snum => $screen) {
-					if (!is_null($options['limitSelects'])) {
-						if (count($result[$screen['hostid']]['screens']) >= $options['limitSelects']) continue;
-					}
-
-					unset($screens[$snum]['hosts']);
-					$result[$screen['hostid']]['screens'][] = &$screens[$snum];
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectScreens']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$screens = API::TemplateScreen()->get($objParams);
-				$screens = zbx_toHash($screens, 'hostid');
-
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['screens'] = isset($screens[$hostid]) ? $screens[$hostid]['rowscount'] : 0;
-				}
-			}
-		}
-
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -2131,5 +1612,115 @@ class CHost extends CHostGeneral {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$hostids = array_keys($result);
+
+		// adding inventories
+		if ($options['selectInventory'] !== null) {
+			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
+			$inventory = API::getApi()->select('host_inventory', array(
+				'output' => $options['selectInventory'],
+				'filter' => array('hostid' => $hostids)
+			));
+			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
+		}
+
+		// adding hostinterfaces
+		if ($options['selectInterfaces'] !== null) {
+			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
+				$interfaces = API::HostInterface()->get(array(
+					'output' => $this->outputExtend('interface', array('hostid', 'interfaceid'), $options['selectInterfaces']),
+					'nodeids' => $options['nodeids'],
+					'hostids' => $hostids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+
+				// we need to order interfaces for proper linkage and viewing
+				order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
+
+				$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
+
+				// unset unrequested fields
+				foreach ($interfaces as &$interface) {
+					if (!$this->outputIsRequested('hostid', $options['selectInterfaces'])) {
+						unset($interface['hostid']);
+					}
+					if (!$this->outputIsRequested('interfaceid', $options['selectInterfaces'])) {
+						unset($interface['interfaceid']);
+					}
+				}
+				unset($interface);
+
+				$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
+			}
+			else {
+				$interfaces = API::HostInterface()->get(array(
+					'nodeids' => $options['nodeids'],
+					'hostids' => $hostids,
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+
+				$interfaces = zbx_toHash($interfaces, 'hostid');
+				foreach ($result as $hostid => $host) {
+					$result[$hostid]['interfaces'] = isset($interfaces[$hostid]) ? $interfaces[$hostid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		// adding screens
+		if ($options['selectScreens'] !== null) {
+			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
+				$screens = API::TemplateScreen()->get(array(
+					'output' => $this->outputExtend('screens', 'hostid', $options['selectScreens']),
+					'nodeids' => $options['nodeids'],
+					'hostids' => $hostids,
+					'editable' => $options['editable'],
+					'nopermissions' => true
+				));
+				if (!is_null($options['limitSelects'])) {
+					order_result($screens, 'name');
+				}
+
+				// inherited screens do not have a unique screenid, so we're building a map using array keys
+				$relationMap = new CRelationMap();
+				foreach ($screens as $key => $screen) {
+					$relationMap->addRelation($screen['hostid'], $key);
+				}
+
+				// unset unrequested fields
+				foreach ($screens as &$screen) {
+					if (!$this->outputIsRequested('hostid', $options['selectScreens'])) {
+						unset($screen['hostid']);
+					}
+				}
+				unset($screen);
+
+				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
+			}
+			else {
+				$screens = API::TemplateScreen()->get(array(
+					'nodeids' => $options['nodeids'],
+					'hostids' => $hostids,
+					'editable' => $options['editable'],
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true,
+				));
+				$screens = zbx_toHash($screens, 'hostid');
+
+				foreach ($result as $hostid => $host) {
+					$result[$hostid]['screens'] = isset($screens[$hostid]) ? $screens[$hostid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		return $result;
 	}
 }
