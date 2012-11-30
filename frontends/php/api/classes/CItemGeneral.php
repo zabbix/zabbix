@@ -785,4 +785,36 @@ abstract class CItemGeneral extends CZBXAPI {
 			}
 		}
 	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// adding hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'itemid', 'hostid');
+			$hosts = API::Host()->get(array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
+				'output' => $options['selectHosts'],
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding applications
+		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
+			$applications = API::Application()->get(array(
+				'output' => $options['selectApplications'],
+				'nodeids' => $options['nodeids'],
+				'applicationids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $applications, 'applications');
+		}
+
+		return $result;
+	}
 }
