@@ -837,66 +837,37 @@ class CMaintenance extends CZBXAPI {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$maintenanceIds = array_keys($result);
-
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		// selectGroups
-		if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
+			$groups = API::HostGroup()->get(array(
 				'output' => $options['selectGroups'],
-				'maintenanceids' => $maintenanceIds,
+				'hostgroupids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			);
-			$groups = API::HostGroup()->get($objParams);
-			foreach ($groups as $group) {
-				$gmaintenances = $group['maintenances'];
-				unset($group['maintenances']);
-				foreach ($gmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['groups'][] = $group;
-				}
-			}
+			));
+			$result = $relationMap->mapMany($result, $groups, 'groups');
 		}
 
 		// selectHosts
-		if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'hostid', 'maintenances_hosts');
+			$groups = API::Host()->get(array(
 				'output' => $options['selectHosts'],
-				'maintenanceids' => $maintenanceIds,
+				'hostids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			);
-			$hosts = API::Host()->get($objParams);
-			foreach ($hosts as $host) {
-				$hmaintenances = $host['maintenances'];
-				unset($host['maintenances']);
-				foreach ($hmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['hosts'][] = $host;
-				}
-			}
+			));
+			$result = $relationMap->mapMany($result, $groups, 'hosts');
 		}
 
 		// selectTimeperiods
-		if ($options['selectTimeperiods'] !== null) {
-			foreach ($result as &$maintenance) {
-				$maintenance['timeperiods'] = array();
-			}
-			unset($maintenance);
-
-			// create the SELECT part of the query
-			$sqlParts = $this->applyQueryOutputOptions('timeperiods', 'tp', array(
-				'output' => $options['selectTimeperiods']
-			), array('select' => array('tp.timeperiodid')));
-			$query = DBSelect(
-				'SELECT '.implode($sqlParts['select'], ',').',mw.maintenanceid'.
-				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceIds).
-					' AND tp.timeperiodid=mw.timeperiodid'
-			);
-			while ($tp = DBfetch($query)) {
-				$refId = $tp['maintenanceid'];
-				$tp = $this->unsetExtraFields($tp, $options['selectTimeperiods']);
-				$result[$refId]['timeperiods'][] = $tp;
-			}
+		if ($options['selectTimeperiods'] !== null && $options['selectTimeperiods'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'timeperiodid', 'maintenances_windows');
+			$timeperiods = API::getApi()->select('timeperiods', array(
+				'output' => $options['selectTimeperiods'],
+				'filter' => array('timeperiodid' => $relationMap->getRelatedIds()),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
 		}
 
 		return $result;
