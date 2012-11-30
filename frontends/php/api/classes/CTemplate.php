@@ -1136,7 +1136,7 @@ class CTemplate extends CHostGeneral {
 				));
 				$templates = zbx_toHash($templates, 'templateid');
 				foreach ($result as $templateid => $template) {
-					if (isset($templates[$groupid]))
+					if (isset($templates[$templateid]))
 						$result[$templateid]['templates'] = $templates[$templateid]['rowscount'];
 					else
 						$result[$templateid]['templates'] = 0;
@@ -1166,7 +1166,7 @@ class CTemplate extends CHostGeneral {
 					'countOutput' => true,
 					'groupCount' => true
 				));
-				$hosts = zbx_toHash($hosts, 'hostid');
+				$hosts = zbx_toHash($hosts, 'templateid');
 				foreach ($result as $templateid => $template) {
 					if (isset($hosts[$templateid]))
 						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
