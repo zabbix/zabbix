@@ -18,26 +18,23 @@
 		}
 	}
 
-	function removeSelectedItems(formobject, name) {
-		formobject = $(formobject);
-		if (is_null(formobject)) {
+	function removeSelectedItems(objId, name) {
+		obj = jQuery('#' + objId);
+		if (empty(obj)) {
 			return false;
 		}
 
-		for (var i = 0; i < formobject.options.length; i++) {
-			if (formobject.options[i].selected) {
-				if (formobject.options.length > 1) {
-					var obj = $(name + '_' + formobject.options[i].value);
-					if (!is_null(obj)) {
-						obj.remove();
-					}
-					$(formobject.options[i]).remove();
-				}
-				else {
-					alert(<?php echo CJs::encodeJson(_('Cannot remove all items, at least one item should remain.')); ?>);
-					return false;
-				}
+		jQuery('option:selected', obj).each(function(){
+			var option = jQuery(this);
+
+			if (jQuery('option', obj).length > 1) {
+				jQuery('#' + name + '_' + option.val()).remove();
+				option.remove();
 			}
-		}
+			else {
+				alert(<?php echo CJs::encodeJson(_('Cannot remove all items, at least one item should remain.')); ?>);
+				return false;
+			}
+		});
 	}
 </script>
