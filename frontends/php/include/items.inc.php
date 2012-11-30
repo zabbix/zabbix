@@ -103,24 +103,27 @@ function item_type2str($type = null) {
 	}
 }
 
-function item_value_type2str($type = null) {
-	$types = array(
-		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR => _('Character'),
-		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
-	);
-	if (is_null($type)) {
-		natsort($types);
-		return $types;
+/**
+ * Returns human readable an item value type
+ *
+ * @param integer $valueType
+ *
+ * @return string
+ */
+function itemValueTypeString($valueType) {
+	switch ($valueType) {
+		case ITEM_VALUE_TYPE_UINT64:
+			return _('Numeric (unsigned)');
+		case ITEM_VALUE_TYPE_FLOAT:
+			return _('Numeric (float)');
+		case ITEM_VALUE_TYPE_STR:
+			return _('Character');
+		case ITEM_VALUE_TYPE_LOG:
+			return _('Log');
+		case ITEM_VALUE_TYPE_TEXT:
+			return _('Text');
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+	return _('Unknown');
 }
 
 function item_data_type2str($type = null) {
@@ -517,13 +520,15 @@ function resolveItemKeyMacros(array $item) {
 	}
 
 	if (!empty($macStack)) {
-		$dbItem = API::Item()->get(array(
+		$options = array(
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'webitems' => true,
-			'output' => API_OUTPUT_REFER
-		));
+			'output' => API_OUTPUT_REFER,
+			'filter' => array('flags' => null)
+		);
+		$dbItem = API::Item()->get($options);
 		$dbItem = reset($dbItem);
 
 		$host = reset($dbItem['hosts']);

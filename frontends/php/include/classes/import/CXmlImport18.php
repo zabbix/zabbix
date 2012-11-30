@@ -1261,11 +1261,7 @@ class CXmlImport18 {
 						$options = array(
 							'filter' => array(
 								'hostid' => $item_db['hostid'],
-								'key_' => $item_db['key_'],
-								'flags' => array(
-									ZBX_FLAG_DISCOVERY_NORMAL,
-									ZBX_FLAG_DISCOVERY_CREATED
-								),
+								'key_' => $item_db['key_']
 							),
 							'webitems' => 1,
 							'output' => API_OUTPUT_EXTEND,
@@ -1511,13 +1507,7 @@ class CXmlImport18 {
 
 							if ($current_item = API::Item()->exists($gitem_db)) {
 								$current_item = API::Item()->get(array(
-									'filter' => array(
-										'key_' => $gitem_db['key_'],
-										'flags' => array(
-											ZBX_FLAG_DISCOVERY_NORMAL,
-											ZBX_FLAG_DISCOVERY_CREATED
-										),
-									),
+									'filter' => array('key_' => $gitem_db['key_']),
 									'webitems' => 1,
 									'host' => $gitem_db['host'],
 									'output' => API_OUTPUT_EXTEND,
