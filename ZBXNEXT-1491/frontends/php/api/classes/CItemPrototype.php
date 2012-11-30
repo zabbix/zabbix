@@ -38,9 +38,6 @@ class CItemPrototype extends CItemGeneral {
 		// allowed columns for sorting
 		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
@@ -276,33 +273,9 @@ class CItemPrototype extends CItemGeneral {
 //----------
 
 		$itemids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= ' AND '.implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('i.itemid', $nodeids).
-					$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-//SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -313,20 +286,8 @@ class CItemPrototype extends CItemGeneral {
 			else{
 				$itemids[$item['itemid']] = $item['itemid'];
 
-				if (!isset($result[$item['itemid']]))
+				if (!isset($result[$item['itemid']])) {
 					$result[$item['itemid']]= array();
-
-				if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
-					$result[$item['itemid']]['hosts'] = array();
-				}
-				if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
-					$result[$item['itemid']]['applications'] = array();
-				}
-				if (!is_null($options['selectTriggers']) && !isset($result[$item['itemid']]['triggers'])) {
-					$result[$item['itemid']]['triggers'] = array();
-				}
-				if (!is_null($options['selectGraphs']) && !isset($result[$item['itemid']]['graphs'])) {
-					$result[$item['itemid']]['graphs'] = array();
 				}
 
 				// hostids
@@ -370,155 +331,9 @@ class CItemPrototype extends CItemGeneral {
 			return $result;
 		}
 
-// Adding Objects
-// Adding hosts
-		if (!is_null($options['selectHosts'])) {
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams = array(
-					'nodeids' => $nodeids,
-					'itemids' => $itemids,
-					'templated_hosts' => 1,
-					'output' => $options['selectHosts'],
-					'nopermissions' => 1,
-					'preservekeys' => 1
-				);
-				$hosts = API::Host()->get($objParams);
-
-				foreach ($hosts as $host) {
-					$hitems = $host['items'];
-					unset($host['items']);
-					foreach ($hitems as $inum => $item) {
-						$result[$item['itemid']]['hosts'][] = $host;
-					}
-				}
-
-				$templates = API::Template()->get($objParams);
-				foreach ($templates as $template) {
-					$titems = $template['items'];
-					unset($template['items']);
-					foreach ($titems as $inum => $item) {
-						$result[$item['itemid']]['hosts'][] = $template;
-					}
-				}
-			}
-		}
-
-// Adding triggers
-		if (!is_null($options['selectTriggers'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'itemids' => $itemids,
-				'preservekeys' => true
-			);
-
-			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::TriggerPrototype()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($triggers, 'description');
-				}
-				$count = array();
-				foreach ($triggers as $triggerid => $trigger) {
-					unset($triggers[$triggerid]['items']);
-					foreach ($trigger['items'] as $item) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) {
-								$count[$item['itemid']] = 0;
-							}
-							$count[$item['itemid']]++;
-							if ($count[$item['itemid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$triggers = API::TriggerPrototype()->get($objParams);
-
-				$triggers = zbx_toHash($triggers, 'parent_itemid');
-				foreach ($result as $itemid => $item) {
-					if (isset($triggers[$itemid]))
-						$result[$itemid]['triggers'] = $triggers[$itemid]['rowscount'];
-					else
-						$result[$itemid]['triggers'] = 0;
-				}
-			}
-		}
-
-// Adding applications
-		if (!is_null($options['selectApplications']) && str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectApplications'],
-				'itemids' => $itemids,
-				'preservekeys' => 1
-			);
-			$applications = API::Application()->get($objParams);
-			foreach ($applications as $applicationid => $application) {
-				$aitems = $application['items'];
-				unset($application['items']);
-				foreach ($aitems as $inum => $item) {
-					$result[$item['itemid']]['applications'][] = $application;
-				}
-			}
-		}
-
-// Adding graphs
-		if (!is_null($options['selectGraphs'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'itemids' => $itemids,
-				'preservekeys' => true
-			);
-
-			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::GraphPrototype()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($graphs, 'name');
-				}
-				$count = array();
-				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['items']);
-					foreach ($graph['items'] as $item) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) {
-								$count[$item['itemid']] = 0;
-							}
-							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$graphs = API::GraphPrototype()->get($objParams);
-				$graphs = zbx_toHash($graphs, 'parent_itemid');
-
-				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid])) {
-						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					}
-					else {
-						$result[$itemid]['graphs'] = 0;
-					}
-				}
-			}
+		// add other related objects
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		if (is_null($options['preservekeys'])) {
@@ -892,5 +707,97 @@ class CItemPrototype extends CItemGeneral {
 
 		// propagate the inheritance to the children
 		$this->inherit(array_merge($insertItems, $updateItems));
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectHosts'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	public function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$itemids = array_keys($result);
+
+		// adding triggers
+		if (!is_null($options['selectTriggers'])) {
+			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'itemid', 'triggerid', 'functions');
+				$triggers = API::TriggerPrototype()->get(array(
+					'output' => $options['selectTriggers'],
+					'nodeids' => $options['nodeids'],
+					'triggerids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+
+				if (!is_null($options['limitSelects'])) {
+					order_result($triggers, 'description');
+				}
+				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
+			}
+			else {
+				$triggers = API::TriggerPrototype()->get(array(
+					'countOutput' => true,
+					'groupCount' => true,
+					'nodeids' => $options['nodeids'],
+					'itemids' => $itemids
+				));
+				$triggers = zbx_toHash($triggers, 'itemid');
+
+				foreach ($result as $itemid => $item) {
+					if (isset($triggers[$itemid])) {
+						$result[$itemid]['triggers'] = $triggers[$itemid]['rowscount'];
+					}
+					else {
+						$result[$itemid]['triggers'] = 0;
+					}
+				}
+			}
+		}
+
+		// adding graphs
+		if (!is_null($options['selectGraphs'])) {
+			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'itemid', 'graphid', 'graphs_items');
+				$graphs = API::GraphPrototype()->get(array(
+					'output' => $options['selectGraphs'],
+					'nodeids' => $options['nodeids'],
+					'graphids' => $relationMap->getRelatedIds('graphs'),
+					'preservekeys' => true
+				));
+
+				if (!is_null($options['limitSelects'])) {
+					order_result($graphs, 'name');
+				}
+				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
+			}
+			else {
+				$graphs = API::GraphPrototype()->get(array(
+					'countOutput' => true,
+					'groupCount' => true,
+					'nodeids' => $options['nodeids'],
+					'itemids' => $itemids
+				));
+				$graphs = zbx_toHash($graphs, 'itemid');
+
+				foreach ($result as $itemid => $item) {
+					if (isset($graphs[$itemid])) {
+						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
+					}
+					else {
+						$result[$itemid]['graphs'] = 0;
+					}
+				}
+			}
+		}
+
+		return $result;
 	}
 }
