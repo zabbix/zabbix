@@ -419,12 +419,13 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 			goto httpstep_error;
 		}
 
-		/* Try to retrieve page several times depending on number of retries */
+		/* try to retrieve page several times depending on number of retries */
 		do
 		{
 			memset(&page, 0, sizeof(page));
 
-			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))	break;
+			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+				break;
 		}
 		while (0 != --httptest->retries);
 
