@@ -41,9 +41,6 @@ class CHostGroup extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('groupid', 'name');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('groups' => 'g.groupid'),
 			'from'		=> array('groups' => 'groups g'),
@@ -370,12 +367,6 @@ class CHostGroup extends CZBXAPI {
 
 				if (!isset($result[$group['groupid']])) {
 					$result[$group['groupid']] = array();
-				}
-				if (!is_null($options['selectTemplates']) && !isset($result[$group['groupid']]['templates'])) {
-					$result[$group['groupid']]['templates'] = array();
-				}
-				if (!is_null($options['selectHosts']) && !isset($result[$group['groupid']]['hosts'])) {
-					$result[$group['groupid']]['hosts'] = array();
 				}
 
 				// hostids
