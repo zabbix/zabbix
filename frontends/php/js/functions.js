@@ -48,17 +48,17 @@ function call_ins_macro_menu(ev){
 					[
 						[locale['S_INSERT_MACRO'],null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
 						['TRIGGER.VALUE=0', 'javascript: set_macro(0);',
-						 null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						['TRIGGER.VALUE=1', 'javascript: set_macro(1);',
-						 null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						['TRIGGER.VALUE=2', 'javascript: set_macro(2);',
-						 null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						['TRIGGER.VALUE#0', 'javascript: set_macro(10);',
-						 null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						['TRIGGER.VALUE#1', 'javascript: set_macro(11);',
-						 null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						['TRIGGER.VALUE#2', 'javascript: set_macro(12);',
-						 null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
 					],150);
 	return false;
 }
@@ -292,7 +292,7 @@ function swapNodes(n1, n2){
 		p1.replaceChild(n2, n1); // new,old
 		if(b){
 // n1 - the node which we insert
-// b - the node before which we insert 
+// b - the node before which we insert
 			p2.insertBefore(n1, b);
 		}
 		else {
