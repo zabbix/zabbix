@@ -422,45 +422,27 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		// adding hosts
-		if (!is_null($options['selectHosts'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'groupids' => $groupids,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($objParams);
-
+		if ($options['selectHosts'] !== null) {
+			if ($options['selectHosts'] !== API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
+				$hosts = API::Host()->get(array(
+					'output' => $options['selectHosts'],
+					'nodeids' => $options['nodeids'],
+					'hostids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
 				if (!is_null($options['limitSelects'])) {
 					order_result($hosts, 'host');
 				}
-
-				$count = array();
-				foreach ($hosts as $hostid => $host) {
-					$hgroups = $host['groups'];
-					unset($host['groups']);
-					foreach ($hgroups as $group) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$group['groupid']])) {
-								$count[$group['groupid']] = 0;
-							}
-							$count[$group['groupid']]++;
-
-							if ($count[$group['groupid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$group['groupid']]['hosts'][] = $hosts[$hostid];
-					}
-				}
+				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
-			elseif (API_OUTPUT_COUNT == $options['selectHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$hosts = API::Host()->get($objParams);
+			else {
+				$hosts = API::Host()->get(array(
+					'nodeids' => $options['nodeids'],
+					'groupids' => $groupids,
+					'countOutput' => true,
+					'groupCount' => true
+				));
 				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach ($result as $groupid => $group) {
 					if (isset($hosts[$groupid])) {
@@ -474,50 +456,31 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		// adding templates
-		if (!is_null($options['selectTemplates'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'groupids' => $groupids,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectTemplates']) || str_in_array($options['selectTemplates'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectTemplates'];
-				$templates = API::Template()->get($objParams);
+		if ($options['selectTemplates'] !== null) {
+			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
+				$hosts = API::Template()->get(array(
+					'output' => $options['selectTemplates'],
+					'nodeids' => $options['nodeids'],
+					'templateids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
 				if (!is_null($options['limitSelects'])) {
-					order_result($templates, 'host');
+					order_result($hosts, 'host');
 				}
-
-				$count = array();
-				foreach ($templates as $templateid => $template) {
-					$hgroups = $template['groups'];
-					unset($template['groups']);
-
-					foreach ($hgroups as $group) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$group['groupid']])) {
-								$count[$group['groupid']] = 0;
-							}
-							$count[$group['groupid']]++;
-
-							if ($count[$group['groupid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$group['groupid']]['templates'][] = $templates[$templateid];
-					}
-				}
+				$result = $relationMap->mapMany($result, $hosts, 'templates', $options['limitSelects']);
 			}
-			elseif (API_OUTPUT_COUNT == $options['selectTemplates']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$templates = API::Template()->get($objParams);
-				$templates = zbx_toHash($templates, 'groupid');
-
+			else {
+				$hosts = API::Template()->get(array(
+					'nodeids' => $options['nodeids'],
+					'groupids' => $groupids,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach ($result as $groupid => $group) {
-					if (isset($templates[$groupid])) {
-						$result[$groupid]['templates'] = $templates[$groupid]['rowscount'];
+					if (isset($hosts[$groupid])) {
+						$result[$groupid]['templates'] = $hosts[$groupid]['rowscount'];
 					}
 					else {
 						$result[$groupid]['templates'] = 0;
