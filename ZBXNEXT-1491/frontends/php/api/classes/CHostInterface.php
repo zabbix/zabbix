@@ -57,9 +57,6 @@ class CHostInterface extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('interfaceid', 'dns', 'ip');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('interface' => 'hi.interfaceid'),
 			'from'		=> array('interface' => 'interface hi'),
