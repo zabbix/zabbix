@@ -91,6 +91,7 @@ $params = array(
 	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectApplications' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT,
+	'selectHttpTests' => API_OUTPUT_COUNT,
 	'output' => array('name', 'status'),
 	'searchByAny' => true
 );
@@ -133,10 +134,12 @@ $table->setHeader(array(
 	new CCol(_('Triggers')),
 	new CCol(_('Events')),
 	new CCol(_('Screens')),
+	new CCol(_('Web')),
 	new CCol(_('Applications')),
 	new CCol(_('Items')),
 	new CCol(_('Triggers')),
 	new CCol(_('Graphs')),
+	new CCol(_('Web'))
 ));
 
 foreach ($hosts as $hnum => $host) {
@@ -172,6 +175,10 @@ foreach ($hosts as $hnum => $host) {
 			new CLink(_('Graphs'), 'graphs.php?'.$link),
 			' ('.$host['graphs'].')'
 		);
+		$httpTestsLink = array(
+			new CLink(_('Web'), 'httpconf.php?'.$link),
+			' ('.$host['httpTests'].')'
+		);
 	}
 	else {
 		$host_link = new CSpan($caption, $style);
@@ -191,6 +198,10 @@ foreach ($hosts as $hnum => $host) {
 			new CSpan(_('Graphs'), 'unknown'),
 			' ('.$host['graphs'].')'
 		);
+		$httpTestsLink = array(
+			new CSpan(_('Web'), 'unknown'),
+			' ('.$host['httpTests'].')'
+		);
 	}
 
 	$hostip = make_decoration($host['ip'], $search);
@@ -205,10 +216,12 @@ foreach ($hosts as $hnum => $host) {
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?'.$link),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
+		new CLink(_('Web'), 'httpmon.php?'.$link),
 		$applications_link,
 		$items_link,
 		$triggers_link,
 		$graphs_link,
+		$httpTestsLink
 	));
 }
 
@@ -336,6 +349,7 @@ if ($admin) {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
+		'selectHttpTests' => API_OUTPUT_COUNT,
 		'limit' => $rows_per_page
 	);
 	$db_templates = API::Template()->get($params);
@@ -370,6 +384,7 @@ if ($admin) {
 		new CCol(_('Triggers')),
 		new CCol(_('Graphs')),
 		new CCol(_('Screens')),
+		new CCol(_('Web')),
 	);
 
 	$table = new CTableInfo();
@@ -405,6 +420,10 @@ if ($admin) {
 				new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid),
 				' ('.$template['screens'].')'
 			);
+			$httpTestsLink = array(
+				new CLink(_('Web'), 'httpconf.php?'.$link),
+				' ('.$template['httpTests'].')'
+			);
 		}
 		else {
 			$template_link = new CSpan($caption);
@@ -428,6 +447,10 @@ if ($admin) {
 				new CSpan(_('Screens'), 'unknown'),
 				' ('.$template['screens'].')'
 			);
+			$httpTestsLink = array(
+				new CSpan(_('Web'), 'unknown'),
+				' ('.$template['httpTests'].')'
+			);
 		}
 
 		$table->addRow(array(
@@ -437,7 +460,8 @@ if ($admin) {
 			$items_link,
 			$triggers_link,
 			$graphs_link,
-			$screensLink
+			$screensLink,
+			$httpTestsLink
 		));
 	}
 

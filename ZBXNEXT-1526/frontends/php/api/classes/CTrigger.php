@@ -927,7 +927,7 @@ class CTrigger extends CTriggerGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $triggerid => $trigger) {
 					if (isset($ruleMap[$triggerid]) && isset($discoveryRules[$ruleMap[$triggerid]])) {
@@ -1165,7 +1165,7 @@ class CTrigger extends CTriggerGeneral {
 			// validating trigger expression
 			if (isset($trigger['expression']) && $expressionChanged) {
 				// expression permissions
-				$expressionData = new CTriggerExpression();
+				$expressionData = new CTriggerExpression(array('lldmacros' => false));
 				if (!$expressionData->parse($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}

@@ -414,8 +414,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 			'webitems' => true,
 			'filter' => array(
 				'host' => $itemHost,
-				'key_' => $key,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				'key_' => $key
 			),
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -533,6 +532,14 @@ function add_elementNames(&$selements) {
 
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostids,
+		'output' => array('name'),
+		'nopermissions' => true,
+		'nodeids' => get_current_nodeid(true),
+		'preservekeys' => true
+	));
+
+	$maps = API::Map()->get(array(
+		'mapids' => $mapids,
 		'output' => array('name'),
 		'nopermissions' => true,
 		'nodeids' => get_current_nodeid(true),

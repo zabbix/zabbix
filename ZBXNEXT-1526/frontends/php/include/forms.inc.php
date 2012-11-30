@@ -676,10 +676,11 @@
 			if ($filter_value_type == -1) {
 				if (!isset($item_params['value_types'][$item['value_type']])) {
 					$item_params['value_types'][$item['value_type']] = array(
-						'name' => item_value_type2str($item['value_type']),
+						'name' => itemValueTypeString($item['value_type']),
 						'count' => 0
 					);
 				}
+
 				$show_item = true;
 				foreach ($item['subfilters'] as $name => $value) {
 					if ($name == 'subfilter_value_types') {
@@ -957,10 +958,13 @@
 			);
 			if ($data['is_discovery_rule']) {
 				$options['hostids'] = $data['hostid'];
-				$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
 				$options['editable'] = true;
+				$data['item'] = API::DiscoveryRule()->get($options);
 			}
-			$data['item'] = API::Item()->get($options);
+			else {
+				$options['filter'] = array('flags' => null);
+				$data['item'] = API::Item()->get($options);
+			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
@@ -971,13 +975,16 @@
 				$options = array(
 					'itemids' => $itemid,
 					'output' => array('itemid', 'templateid'),
-					'selectHosts' => array('name'),
-					'selectDiscoveryRule' => array('itemid')
+					'selectHosts' => array('name')
 				);
 				if ($data['is_discovery_rule']) {
-					$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
+					$item = API::DiscoveryRule()->get($options);
 				}
-				$item = API::Item()->get($options);
+				else {
+					$options['selectDiscoveryRule'] = array('itemid');
+					$options['filter'] = array('flags' => null);
+					$item = API::Item()->get($options);
+				}
 				$item = reset($item);
 
 				if (!empty($item)) {
