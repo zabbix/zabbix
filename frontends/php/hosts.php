@@ -39,6 +39,15 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+var_dump(API::HostInterface()->get(array(
+	'selectItems' => API_OUTPUT_EXTEND,
+	'selectItems' => array('name', 'interfaceid'),
+	'selectItems' => API_OUTPUT_COUNT,
+'limit' => 20,
+)));
+
+require_once dirname(__FILE__).'/include/page_footer.php';
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
