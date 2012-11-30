@@ -29,7 +29,7 @@
 class CHostInterface extends CZBXAPI {
 
 	protected $tableName = 'interface';
-	protected $alias = 'hi';
+	protected $tableAlias = 'hi';
 
 	/**
 	 * Get Interface Interface data
@@ -239,41 +239,9 @@ class CHostInterface extends CZBXAPI {
 
 		$interfaceids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($interface = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -288,13 +256,6 @@ class CHostInterface extends CZBXAPI {
 
 				if (!isset($result[$interface['interfaceid']])) {
 					$result[$interface['interfaceid']] = array();
-				}
-
-				if (!is_null($options['selectHosts']) && !isset($result[$interface['interfaceid']]['hosts'])) {
-					$result[$interface['interfaceid']]['hosts'] = array();
-				}
-				if (!is_null($options['selectItems']) && !isset($result[$interface['interfaceid']]['items'])) {
-					$result[$interface['interfaceid']]['items'] = array();
 				}
 
 				// itemids
@@ -317,87 +278,52 @@ class CHostInterface extends CZBXAPI {
 		 * Adding objects
 		 */
 		// adding hosts
-		if (!is_null($options['selectHosts'])) {
-			$objParams = array(
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'interfaceid', 'hostid');
+			$hosts = API::Host()->get(array(
+				'output' => $options['selectHosts'],
 				'nodeids' => $nodeids,
-				'interfaceids' => $interfaceids,
+				'hosts' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			);
-
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($objParams);
-
-				$count = array();
-				foreach ($hosts as $hostid => $host) {
-					unset($hosts[$hostid]['interfaces']);
-
-					foreach ($host['interfaces'] as $tnum => $interface) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$interface['interfaceid']])) {
-								$count[$interface['interfaceid']] = 0;
-							}
-							$count[$interface['interfaceid']]++;
-
-							if ($count[$interface['interfaceid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$interface['interfaceid']]['hosts'][] = &$hosts[$hostid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$hosts = API::Host()->get($objParams);
-				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach ($result as $templateid => $template) {
-					if (isset($hosts[$templateid])) {
-						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
-					}
-					else {
-						$result[$templateid]['hosts'] = 0;
-					}
-				}
-			}
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding items
-		if (!is_null($options['selectItems'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'interfaceids' => $interfaceids,
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'filter' => array('flags' => null)
-			);
-			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectItems'];
-				$items = API::Item()->get($objParams);
+		if ($options['selectItems'] !== null) {
+			if ($options['selectItems'] != API_OUTPUT_COUNT) {
+				$items = API::Item()->get(array(
+					'output' => $this->outputExtend('items', array('itemid', 'interfaceid'), $options['selectItems']),
+					'nodeids' => $nodeids,
+					'interfaceids' => $interfaceids,
+					'nopermissions' => true,
+					'preservekeys' => true,
+					'filter' => array('flags' => null)
+				));
+				$relationMap = $this->createRelationMap($items, 'interfaceid', 'itemid');
 
-				$count = array();
-				foreach ($items as $itemid => $item) {
-					if (!is_null($options['limitSelects'])) {
-						if (!isset($count[$item['interfaceid']])) {
-							$count[$item['interfaceid']] = 0;
-						}
-						$count[$item['interfaceid']]++;
-
-						if ($count[$item['interfaceid']] > $options['limitSelects']) {
-							continue;
-						}
+				// unset unrequested fields
+				foreach ($items as &$item) {
+					if (!$this->outputIsRequested('interfaceid', $options['selectItems'])) {
+						unset($item['interfaceid']);
 					}
-
-					$result[$item['interfaceid']]['items'][] = &$items[$itemid];
+					if (!$this->outputIsRequested('itemid', $options['selectItems'])) {
+						unset($item['itemid']);
+					}
 				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectItems']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
+				unset($item);
 
-				$items = API::Item()->get($objParams);
+				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
+			}
+			else {
+				$items = API::Item()->get(array(
+					'nodeids' => $nodeids,
+					'interfaceids' => $interfaceids,
+					'nopermissions' => true,
+					'filter' => array('flags' => null),
+					'countOutput' => true,
+					'groupCount' => true
+				));
 				$items = zbx_toHash($items, 'interfaceid');
 				foreach ($result as $interfaceid => $interface) {
 					if (isset($items[$interfaceid])) {
@@ -1019,6 +945,18 @@ class CHostInterface extends CZBXAPI {
 			$host = reset($item['hosts']);
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectHosts'] !== null) {
+				$sqlParts = $this->addQuerySelect('hi.hostid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
 	}
 }
 ?>
