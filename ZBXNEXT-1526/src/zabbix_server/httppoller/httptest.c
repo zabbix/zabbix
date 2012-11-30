@@ -271,7 +271,6 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 	DB_HTTPSTEP	httpstep;
 	char		*err_str = NULL;
 	int		lastfailedstep;
-	int		attempts;
 	zbx_timespec_t	ts;
 	ZBX_HTTPSTAT	stat;
 	double		speed_download = 0;
@@ -421,14 +420,13 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 		}
 
 		/* Try to retrieve page several times depending on number of retries */
-		attempts = 0;
-		while (attempts < httptest->retries)
+		do
 		{
 			memset(&page, 0, sizeof(page));
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))	break;
-			attempts++;
 		}
+		while (0 != --httptest->retries);
 
 		if (CURLE_OK == err)
 		{
