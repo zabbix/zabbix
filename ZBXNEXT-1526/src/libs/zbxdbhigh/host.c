@@ -3664,6 +3664,7 @@ typedef struct
 	zbx_vector_ptr_t	httpsteps;
 	zbx_vector_ptr_t	httptestitems;
 	int			delay;
+	int			retries;
 	unsigned char		status;
 	unsigned char		authentication;
 }
@@ -3704,7 +3705,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.httptestid,t.name,t.applicationid,t.delay,t.status,t.macros,t.agent,"
-				"t.authentication,t.http_user,t.http_password,t.http_proxy,h.httptestid"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid"
 			" from httptest t"
 				" left join httptest h"
 					" on h.hostid=" ZBX_FS_UI64
@@ -3720,7 +3721,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 		httptest = zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_DBROW2UINT64(httptest->httptestid, row[11]);
+		ZBX_DBROW2UINT64(httptest->httptestid, row[12]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 
@@ -3738,6 +3739,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 			httptest->http_user_esc = DBdyn_escape_string(row[8]);
 			httptest->http_password_esc = DBdyn_escape_string(row[9]);
 			httptest->http_proxy_esc = DBdyn_escape_string(row[10]);
+			httptest->retries = atoi(row[11]);
 
 			zbx_vector_uint64_append(&httptestids, httptest->templateid);
 
@@ -4026,7 +4028,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	const char	*ins_httptest_sql =
 			"insert into httptest"
 			" (httptestid,name,applicationid,delay,status,macros,agent,"
-				"authentication,http_user,http_password,http_proxy,hostid,templateid)"
+				"authentication,http_user,http_password,http_proxy,hostid,templateid,retries)"
 			" values ";
 	const char	*ins_httpstep_sql =
 			"insert into httpstep"
@@ -4119,12 +4121,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s','%s',"
-						ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+						ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
 					httptest->httptestid, httptest->name_esc, DBsql_id_ins(httptest->h_applicationid),
 					httptest->delay, (int)httptest->status, httptest->macros_esc,
 					httptest->agent_esc, (int)httptest->authentication, httptest->http_user_esc,
 					httptest->http_password_esc, httptest->http_proxy_esc,
-					hostid, httptest->templateid);
+					hostid, httptest->templateid, httptest->retries);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
