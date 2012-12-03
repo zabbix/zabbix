@@ -2014,7 +2014,7 @@ function remake_expression($expression, $expressionId, $action, $newExpression) 
 	getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1, $element);
 	$expressionTree[] = $element;
 
-	if (rebuildExpressionTree(&$expressionTree, $expressionId, $action, $newExpression)) {
+	if (rebuildExpressionTree($expressionTree, $expressionId, $action, $newExpression)) {
 		$expression = makeExpression($expressionTree);
 	}
 	return $expression;
