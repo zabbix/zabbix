@@ -4028,7 +4028,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	const char	*ins_httptest_sql =
 			"insert into httptest"
 			" (httptestid,name,applicationid,delay,status,macros,agent,"
-				"authentication,http_user,http_password,http_proxy,hostid,templateid,retries)"
+				"authentication,http_user,http_password,http_proxy,retries,hostid,templateid)"
 			" values ";
 	const char	*ins_httpstep_sql =
 			"insert into httpstep"
@@ -4120,13 +4120,13 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_httptest_sql);
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s','%s',"
-						ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
+					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s','%s',%d,"
+						ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					httptest->httptestid, httptest->name_esc, DBsql_id_ins(httptest->h_applicationid),
 					httptest->delay, (int)httptest->status, httptest->macros_esc,
 					httptest->agent_esc, (int)httptest->authentication, httptest->http_user_esc,
-					httptest->http_password_esc, httptest->http_proxy_esc,
-					hostid, httptest->templateid, httptest->retries);
+					httptest->http_password_esc, httptest->http_proxy_esc, httptest->retries,
+					hostid, httptest->templateid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
