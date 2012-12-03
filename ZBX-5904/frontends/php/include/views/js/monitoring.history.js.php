@@ -19,17 +19,17 @@
 	}
 
 	function removeSelectedItems(objId, name) {
-		obj = jQuery('#' + objId);
+		var obj = jQuery('#' + objId);
 		if (empty(obj)) {
 			return false;
 		}
 
 		jQuery('option:selected', obj).each(function(){
-			var option = jQuery(this);
+			var self = jQuery(this);
 
 			if (jQuery('option', obj).length > 1) {
-				jQuery('#' + name + '_' + option.val()).remove();
-				option.remove();
+				jQuery('#' + name + '_' + self.val()).remove();
+				self.remove();
 			}
 			else {
 				alert(<?php echo CJs::encodeJson(_('Cannot remove all items, at least one item should remain.')); ?>);
