@@ -257,16 +257,6 @@ class CProxy extends CZBXAPI {
 					$result[$interface['hostid']]['interfaces'][] = &$interfaces[$interfaceid];
 				}
 			}
-			elseif (API_OUTPUT_COUNT == $options['selectInterfaces']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$interfaces = API::HostInterface()->get($objParams);
-				$interfaces = zbx_toHash($interfaces, 'hostid');
-				foreach ($result as $proxyid => $proxy) {
-					$result[$proxyid]['interfaces'] = isset($interfaces[$proxyid]) ? $interfaces[$proxyid]['rowscount'] : 0;
-				}
-			}
 		}
 
 		// removing keys (hash -> array)
