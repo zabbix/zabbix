@@ -2191,6 +2191,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	/* create trigger if no updated triggers */
 	if (SUCCEED != res)
 	{
+		char	*error_esc;
+
 		res = SUCCEED;
 
 		*new_triggerid = DBget_maxid("triggers");
@@ -2198,17 +2200,19 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
+		error_esc = DBdyn_escape_string_len("Trigger just added. No status update so far.", TRIGGER_ERROR_LEN);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,value_flags,templateid,flags)"
+						"comments,url,type,value,value_flags,templateid,flags,error)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d);\n",
-					*new_triggerid, description_esc, (int)priority,
-					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid, (int)flags);
+						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,'%s');\n",
+					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
+					url_esc, (int)type, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid,
+					(int)flags, error_esc);
 
+		zbx_free(error_esc);
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
 
@@ -3664,6 +3668,7 @@ typedef struct
 	zbx_vector_ptr_t	httpsteps;
 	zbx_vector_ptr_t	httptestitems;
 	int			delay;
+	int			retries;
 	unsigned char		status;
 	unsigned char		authentication;
 }
@@ -3704,7 +3709,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.httptestid,t.name,t.applicationid,t.delay,t.status,t.macros,t.agent,"
-				"t.authentication,t.http_user,t.http_password,t.http_proxy,h.httptestid"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid"
 			" from httptest t"
 				" left join httptest h"
 					" on h.hostid=" ZBX_FS_UI64
@@ -3720,7 +3725,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 		httptest = zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_DBROW2UINT64(httptest->httptestid, row[11]);
+		ZBX_DBROW2UINT64(httptest->httptestid, row[12]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 
@@ -3738,6 +3743,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 			httptest->http_user_esc = DBdyn_escape_string(row[8]);
 			httptest->http_password_esc = DBdyn_escape_string(row[9]);
 			httptest->http_proxy_esc = DBdyn_escape_string(row[10]);
+			httptest->retries = atoi(row[11]);
 
 			zbx_vector_uint64_append(&httptestids, httptest->templateid);
 
@@ -4026,7 +4032,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	const char	*ins_httptest_sql =
 			"insert into httptest"
 			" (httptestid,name,applicationid,delay,status,macros,agent,"
-				"authentication,http_user,http_password,http_proxy,hostid,templateid)"
+				"authentication,http_user,http_password,http_proxy,retries,hostid,templateid)"
 			" values ";
 	const char	*ins_httpstep_sql =
 			"insert into httpstep"
@@ -4118,12 +4124,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_httptest_sql);
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s','%s',"
+					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s','%s',%d,"
 						ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					httptest->httptestid, httptest->name_esc, DBsql_id_ins(httptest->h_applicationid),
 					httptest->delay, (int)httptest->status, httptest->macros_esc,
 					httptest->agent_esc, (int)httptest->authentication, httptest->http_user_esc,
-					httptest->http_password_esc, httptest->http_proxy_esc,
+					httptest->http_password_esc, httptest->http_proxy_esc, httptest->retries,
 					hostid, httptest->templateid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)

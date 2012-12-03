@@ -321,7 +321,6 @@ typedef struct
 	history_value_t		prevorgvalue;
 	int			lastclock;
 	int			lastns;
-	time_t 			lastcheck;
 	zbx_item_value_type_t	value_type;
 	int			delta;
 	int			multiplier;
@@ -416,6 +415,7 @@ typedef struct
 	char		*http_password;
 	char		*http_proxy;
 	int		authentication;
+	int		retries;
 }
 DB_HTTPTEST;
 
