@@ -160,6 +160,7 @@ FIELD		|http_password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODAT
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|hosts
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|3|httptest	|httptestid
 FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
+FIELD		|retries	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
 INDEX		|httptest_1	|applicationid
 UNIQUE		|2		|hostid,name
 INDEX		|3		|status
@@ -1210,4 +1211,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010025	|2010025
+ROW		|2010026	|2010026
