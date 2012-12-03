@@ -55,9 +55,6 @@ class CMediatype extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('mediatypeid');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('media_type' => 'mt.mediatypeid'),
 			'from'		=> array('media_type' => 'media_type mt'),
@@ -171,42 +168,9 @@ class CMediatype extends CZBXAPI {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$mediatypeids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($mediatype = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -243,19 +207,14 @@ class CMediatype extends CZBXAPI {
 		 * Adding objects
 		 */
 		// adding users
-		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselectsAllowedOutputs)) {
+		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
 			$users = API::User()->get(array(
 				'output' => $options['selectUsers'],
-				'mediatypeids' => $mediatypeids,
+				'userids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			foreach ($users as $user) {
-				$umediatypes = $user['mediatypes'];
-				unset($user['mediatypes']);
-				foreach ($umediatypes as $mediatype) {
-					$result[$mediatype['mediatypeid']]['users'][] = $user;
-				}
-			}
+			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 
 		// removing keys (hash -> array)
