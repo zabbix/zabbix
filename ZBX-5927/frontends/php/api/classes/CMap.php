@@ -387,12 +387,7 @@ class CMap extends CMapElement {
 				if (!isset($result[$selement['sysmapid']]['selements'])) {
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
-				if (!is_null($options['preservekeys'])) {
-					$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
-				}
-				else {
-					$result[$selement['sysmapid']]['selements'][] = $selement;
-				}
+				$result[$selement['sysmapid']]['selements'][] = $selement;
 			}
 		}
 
@@ -436,13 +431,7 @@ class CMap extends CMapElement {
 				if (!isset($result[$link['sysmapid']]['links'])) {
 					$result[$link['sysmapid']]['links'] = array();
 				}
-
-				if (!is_null($options['preservekeys'])) {
-					$result[$link['sysmapid']]['links'][$link['linkid']] = $link;
-				}
-				else {
-					$result[$link['sysmapid']]['links'][] = $link;
-				}
+				$result[$link['sysmapid']]['links'][] = $link;
 			}
 		}
 
