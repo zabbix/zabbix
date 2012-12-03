@@ -83,7 +83,6 @@ class CMediatype extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectUsers'				=> null,
-			'selectMedias'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -222,15 +221,6 @@ class CMediatype extends CZBXAPI {
 
 				if (!isset($result[$mediatype['mediatypeid']])) {
 					$result[$mediatype['mediatypeid']] = array();
-				}
-
-				// mediaids
-				if (isset($mediatype['mediaid']) && is_null($options['selectMedias'])) {
-					if (!isset($result[$mediatype['mediatypeid']]['medias'])) {
-						$result[$mediatype['mediatypeid']]['medias'] = array();
-					}
-					$result[$mediatype['mediatypeid']]['medias'][] = array('mediaid' => $mediatype['mediaid']);
-					unset($mediatype['mediaid']);
 				}
 
 				// userids
