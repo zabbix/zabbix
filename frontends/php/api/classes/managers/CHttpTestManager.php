@@ -587,6 +587,17 @@ class CHttpTestManager {
 			)
 		);
 
+		// if this is a template scenario, fetch the parent http items to link inherited items to them
+		$parentItems = array();
+		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
+			$parentItems = DBfetchArrayAssoc(DBselect(
+				'SELECT i.itemid,i.key_'.
+					' FROM items i,httptestitem hti'.
+					' WHERE i.itemid=hti.itemid'.
+					' AND hti.httptestid='.$httpTest['templateid']
+			), 'key_');
+		}
+
 		$insertItems = array();
 		$updateItems = array();
 		$testItemIds = array();
@@ -600,6 +611,10 @@ class CHttpTestManager {
 			$item['history'] = self::ITEM_HISTORY;
 			$item['trends'] = self::ITEM_TRENDS;
 			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+			if (isset($parentItems[$item['key_']])) {
+				$item['templateid'] = $parentItems[$item['key_']]['itemid'];
+			}
 
 			if ($dbItem) {
 				if (!empty($dbItem['templateid'])) {
@@ -660,6 +675,18 @@ class CHttpTestManager {
 		}
 		$webstepids = DB::insert('httpstep', $websteps);
 
+		// if this is a template scenario, fetch the parent http items to link inherited items to them
+		$parentStepItems = array();
+		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
+			$parentStepItems = DBfetchArrayAssoc(DBselect(
+				'SELECT i.itemid,i.key_,hsi.httpstepid'.
+					' FROM items i,httpstepitem hsi,httpstep hs'.
+					' WHERE i.itemid=hsi.itemid'.
+						' AND hsi.httpstepid=hs.httpstepid'.
+						' AND hs.httptestid='.$httpTest['templateid']
+			), 'key_');
+		}
+
 		foreach ($websteps as $snum => $webstep) {
 			$webstepid = $webstepids[$snum];
 
@@ -710,6 +737,10 @@ class CHttpTestManager {
 				$item['history'] = self::ITEM_HISTORY;
 				$item['trends'] = self::ITEM_TRENDS;
 				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+				if (isset($parentStepItems[$item['key_']])) {
+					$item['templateid'] = $parentStepItems[$item['key_']]['itemid'];
+				}
 
 				if ($dbItem) {
 					if (!empty($dbItem['templateid'])) {
