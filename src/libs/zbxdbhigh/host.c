@@ -2191,6 +2191,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	/* create trigger if no updated triggers */
 	if (SUCCEED != res)
 	{
+		char	*error_esc;
+
 		res = SUCCEED;
 
 		*new_triggerid = DBget_maxid("triggers");
@@ -2198,17 +2200,19 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
+		error_esc = DBdyn_escape_string_len("Trigger just added. No status update so far.", TRIGGER_ERROR_LEN);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,value_flags,templateid,flags)"
+						"comments,url,type,value,value_flags,templateid,flags,error)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d);\n",
-					*new_triggerid, description_esc, (int)priority,
-					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid, (int)flags);
+						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,'%s');\n",
+					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
+					url_esc, (int)type, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid,
+					(int)flags, error_esc);
 
+		zbx_free(error_esc);
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
 
