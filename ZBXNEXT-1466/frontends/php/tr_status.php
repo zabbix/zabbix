@@ -348,14 +348,22 @@ $options = array(
 	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
 	'selectItems' => API_OUTPUT_EXTEND,
 	'selectDependencies' => API_OUTPUT_EXTEND,
-	'expandDescription' => true
+	'expandDescription' => true,
+	'preservekeys' => true
 );
 $triggers = API::Trigger()->get($options);
-$triggers = zbx_toHash($triggers, 'triggerid');
 
 order_result($triggers, $sortfield, $sortorder);
 
 $triggerIds = zbx_objectValues($triggers, 'triggerid');
+
+// get editable triggers
+$triggerEditable = API::Trigger()->get(array(
+	'triggerids' => $triggerIds,
+	'output' => array('triggerid'),
+	'editable' => true,
+	'preservekeys' => true
+));
 
 // get events
 if ($config['event_ack_enable']) {
@@ -400,6 +408,7 @@ if ($config['event_ack_enable']) {
 			'nopermissions' => true
 		));
 		$allEventCounts = zbx_toHash($allEventCounts, 'objectid');
+
 		foreach ($triggers as $tnum => $trigger) {
 			if (!isset($trigger['hasEvents'])) {
 				$triggers[$tnum]['hasEvents'] = isset($allEventCounts[$trigger['triggerid']]);
@@ -693,6 +702,16 @@ foreach ($triggers as $trigger) {
 		$unknown->setHint($trigger['error'], '', 'on');
 	}
 
+	// comments
+	if (isset($triggerEditable[$trigger['triggerid']])) {
+		$comments = new CLink(zbx_empty($trigger['comments']) ? _('Add') : _('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid']);
+	}
+	else {
+		$comments = zbx_empty($trigger['comments'])
+			? new CSpan('-')
+			: new CLink(_('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid']);
+	}
+
 	$triggerTable->addRow(array(
 		$openOrCloseDiv,
 		$config['event_ack_enable'] ?
@@ -707,7 +726,7 @@ foreach ($triggers as $trigger) {
 		get_node_name_by_elid($trigger['triggerid']),
 		$hostColumn,
 		$triggerDescription,
-		new CLink(zbx_empty($trigger['comments']) ? _('Add') : _('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid'])
+		$comments
 	), 'even_row');
 
 
