@@ -268,7 +268,7 @@ calendar.prototype = {
 			result = true;
 		}
 
-		if (y > 1970 && y < 2100) {
+		if (y > 1970) {
 			this.sdt.setFullYear(y);
 			result = true;
 		}
@@ -462,6 +462,9 @@ calendar.prototype = {
 	},
 
 	yearup: function() {
+		if ((this.year+1) > 2038) {
+			return ;
+		}
 		this.year++;
 		this.syncCDT();
 		this.setCDate();

@@ -1637,16 +1637,37 @@
 			$filtertimetab->setCellSpacing(0);
 
 			$start_date = zbxDateToTime($new_timeperiod['start_date']);
+			if (isset($_REQUEST['add_timeperiod'])) {
+				$new_timeperiod_year = get_request('new_timeperiod_year');
+				$new_timeperiod_month = get_request('new_timeperiod_month');
+				$new_timeperiod_day = get_request('new_timeperiod_day');
+				$new_timeperiod_hours = get_request('new_timeperiod_hour');
+				$new_timeperiod_minutes = get_request('new_timeperiod_minute');
+			}
+			elseif ($start_date > 0) {
+				$new_timeperiod_year = date('Y', $start_date );
+				$new_timeperiod_month = date('m', $start_date );
+				$new_timeperiod_day = date('d', $start_date );
+				$new_timeperiod_hours = date('H', $start_date );
+				$new_timeperiod_minutes = date('i', $start_date );
+			}
+			else {
+				$new_timeperiod_year = '';
+				$new_timeperiod_month = '';
+				$new_timeperiod_day = '';
+				$new_timeperiod_hours = '';
+				$new_timeperiod_minutes = '';
+			}
 			$filtertimetab->addRow(array(
-				new CNumericBox('new_timeperiod_day', ($start_date > 0) ? date('d', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_day', $new_timeperiod_day, 2),
 				'/',
-				new CNumericBox('new_timeperiod_month', ($start_date > 0) ? date('m', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_month', $new_timeperiod_month, 2),
 				'/',
-				new CNumericBox('new_timeperiod_year', ($start_date > 0) ? date('Y', $start_date) : '', 4),
+				new CNumericBox('new_timeperiod_year', $new_timeperiod_year, 4),
 				SPACE,
-				new CNumericBox('new_timeperiod_hour', ($start_date > 0) ? date('H', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_hour', $new_timeperiod_hours, 2),
 				':',
-				new CNumericBox('new_timeperiod_minute', ($start_date > 0) ? date('i', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_minute', $new_timeperiod_minutes, 2),
 				$clndr_icon
 			));
 			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');
