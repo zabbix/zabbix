@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F.I..PS. [ZBXNEXT-1526] added support of configurable number of retries per WEB scenario (Alexei)
 A.F.....S. [ZBXNEXT-1286] added support of low-level discovery macros in trigger prototype expressions (Sasha)
 A.F.I..PS. [ZBXNEXT-450] added support of SHA authentication protocol and AES privacy protocol for SNMPv3 chacks (Eduard, Sasha)
 A.F.I..PS. [ZBXNEXT-308] added support of WEB monitoring using HTTP proxy (Alexei)
@@ -1199,6 +1200,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+..F....... [ZBX-5898] fixed Insert Macro button does not work in trigger constructor on IE7 and IE8 (Toms)
 A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
