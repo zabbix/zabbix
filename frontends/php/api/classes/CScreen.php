@@ -51,9 +51,6 @@ class CScreen extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('screenid', 'name');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('screens' => 's.screenid'),
 			'from'		=> array('screens' => 'screens s'),
@@ -143,9 +140,7 @@ class CScreen extends CZBXAPI {
 				if (!isset($result[$screen['screenid']])) {
 					$result[$screen['screenid']]= array();
 				}
-				if (!is_null($options['selectScreenItems']) && !isset($result[$screen['screenid']]['screenitems'])) {
-					$result[$screen['screenid']]['screenitems'] = array();
-				}
+
 				if (isset($screen['screenitemid']) && is_null($options['selectScreenItems'])) {
 					if (!isset($result[$screen['screenid']]['screenitems'])) {
 						$result[$screen['screenid']]['screenitems'] = array();
@@ -333,22 +328,27 @@ class CScreen extends CZBXAPI {
 		}
 
 		// adding ScreenItems
-		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
-			if (!isset($screensItems)) {
-				$screensItems = array();
-				$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.DBcondition('si.screenid', $screenids));
-				while ($sitem = DBfetch($dbSitems)) {
-					$screensItems[$sitem['screenitemid']] = $sitem;
+		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
+			$screenItems = API::getApi()->select('screens_items', array(
+				'output' => $this->outputExtend('screens_items', array('screenid', 'screenitemid'), $options['selectScreenItems']),
+				'filter' => array('screenid' => $screenids),
+				'preservekeys' => true
+			));
+
+			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
+
+			// unset unrequested fields
+			foreach ($screenItems as &$screenItem) {
+				if (!$this->outputIsRequested('screenid', $options['selectScreenItems'])) {
+					unset($screenItem['screenid']);
+				}
+				if (!$this->outputIsRequested('screenitemid', $options['selectScreenItems'])) {
+					unset($screenItem['screenitemid']);
 				}
 			}
+			unset($screenItem);
 
-			foreach ($screensItems as $sitem) {
-				if (!isset($result[$sitem['screenid']]['screenitems'])) {
-					$result[$sitem['screenid']]['screenitems'] = array();
-				}
-
-				$result[$sitem['screenid']]['screenitems'][] = $sitem;
-			}
+			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
 		}
 
 		// removing keys (hash -> array)
