@@ -51,9 +51,13 @@ class CMacrosResolver {
 		$isHostMacrosExist = false;
 		$isIpMacrosExist = false;
 
-		foreach ($data as $hostid => $texts) {
-			$hostMacros = $this->findMacros(self::PATTERN_HOST, $texts);
-			$ipMacros = $this->findMacros(self::PATTERN_IP, $texts);
+		foreach ($data as $texts) {
+			if (!$isHostMacrosExist) {
+				$hostMacros = $this->findMacros(self::PATTERN_HOST, $texts);
+			}
+			if (!$isIpMacrosExist) {
+				$ipMacros = $this->findMacros(self::PATTERN_IP, $texts);
+			}
 
 			if (!empty($hostMacros)) {
 				$isHostMacrosExist = true;
@@ -135,7 +139,8 @@ class CMacrosResolver {
 							if ($interface['type'] != INTERFACE_TYPE_AGENT) {
 								if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$ipMacro]))
 										|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($macros[$hostId][$ipMacro]))) {
-									$macrosInMacros = $this->resolveMacrosInTextBatch(array($hostId => array($macros[$hostId][$ipMacro]))); // attention recursion!
+									// attention recursion!
+									$macrosInMacros = $this->resolveMacrosInTextBatch(array($hostId => array($macros[$hostId][$ipMacro])));
 									$macros[$hostId][$ipMacro] = $macrosInMacros[$hostId][0];
 								}
 								elseif ($this->findMacros(self::PATTERN_IP, array($macros[$hostId][$ipMacro]))) {
