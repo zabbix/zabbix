@@ -200,9 +200,8 @@ class CScript extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// node options
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($script = DBfetch($res)) {
 			if ($options['countOutput']) {
@@ -211,12 +210,6 @@ class CScript extends CZBXAPI {
 			else {
 				if (!isset($result[$script['scriptid']])) {
 					$result[$script['scriptid']] = array();
-				}
-				if (!is_null($options['selectGroups']) && !isset($result[$script['scriptid']]['groups'])) {
-					$result[$script['scriptid']]['groups'] = array();
-				}
-				if (!is_null($options['selectHosts']) && !isset($result[$script['scriptid']]['hosts'])) {
-					$result[$script['scriptid']]['hosts'] = array();
 				}
 
 				$result[$script['scriptid']] += $script;
@@ -564,14 +557,24 @@ class CScript extends CZBXAPI {
 		return $sqlParts;
 	}
 
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['output'] != API_OUTPUT_COUNT) {
+			if ($options['selectGroups'] !== null || $options['selectHosts'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('groupid'), $sqlParts);
+				$sqlParts = $this->addQuerySelect($this->fieldId('host_access'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		// adding groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
 			foreach ($result as $scriptid => $script) {
 				$result[$scriptid]['groups'] = API::HostGroup()->get(array(
 					'output' => $options['selectGroups'],
@@ -582,7 +585,7 @@ class CScript extends CZBXAPI {
 		}
 
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$processedGroups = array();
 
 			foreach ($result as $scriptid => $script) {
