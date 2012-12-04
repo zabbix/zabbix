@@ -1596,7 +1596,7 @@ class CService extends CZBXAPI {
 			foreach ($alarmsTimes as $serviceAlarm) {
 				$refId = $serviceAlarm['serviceid'];
 				$serviceAlarm = $this->unsetExtraFields($serviceAlarm, $options['selectAlarms']);
-				$result[$refId]['times'][] = $serviceAlarm;
+				$result[$refId]['alarms'][] = $serviceAlarm;
 			}
 		}
 
