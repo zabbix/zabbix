@@ -103,7 +103,11 @@ if (in_array($this->data['authentication'], array(HTTPTEST_AUTH_BASIC, HTTPTEST_
 	$httpFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
 }
 
+// update interval
 $httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
+
+// number of retries
+$httpFormList->addRow(_('Retries'), new CNumericBox('retries', $this->data['retries'], 2));
 
 // append http agents to form list - http://www.useragentstring.com
 $agentComboBox = new CEditableComboBox('agent', $this->data['agent'], ZBX_TEXTBOX_STANDARD_SIZE);
