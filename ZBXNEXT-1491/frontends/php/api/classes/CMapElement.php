@@ -76,7 +76,6 @@ abstract class CMapElement extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectUrls'				=> null,
-			'selectLinks'				=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
@@ -204,10 +203,6 @@ abstract class CMapElement extends CZBXAPI {
 
 				if (!isset($result[$selement['selementid']])) $result[$selement['selementid']]= array();
 
-				if (!is_null($options['selectLinks']) && !isset($result[$selement['selementid']]['links'])) {
-					$result[$selement['selementid']]['links'] = array();
-				}
-
 				if (!is_null($options['selectUrls']) && !isset($result[$selement['selementid']]['urls'])) {
 					$result[$selement['selementid']]['urls'] = array();
 				}
@@ -240,43 +235,6 @@ abstract class CMapElement extends CZBXAPI {
 			$dbSelementUrls = DBselect($sql);
 			while ($selementUrl = DBfetch($dbSelementUrls)) {
 				$result[$selementUrl['selementid']]['urls'][] = $selementUrl;
-			}
-		}
-// Adding Links
-		if (!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselectsAllowedOutputs)) {
-			$linkids = array();
-			$mapLinks = array();
-
-			$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
-			$dbLinks = DBselect($sql);
-			while ($link = DBfetch($dbLinks)) {
-				$link['linktriggers'] = array();
-
-				$mapLinks[$link['linkid']] = $link;
-				$linkids[$link['linkid']] = $link['linkid'];
-			}
-
-			$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
-			$dbLinkTriggers = DBselect($sql);
-			while ($linkTrigger = DBfetch($dbLinkTriggers)) {
-				$mapLinks[$linkTrigger['linkid']]['linktriggers'][] = $linkTrigger;
-			}
-
-			foreach ($mapLinks as $link) {
-				if (!isset($result[$link['selementid1']]['links']))
-					$result[$link['selementid1']]['links'] = array();
-
-				if (!isset($result[$link['selementid2']]['links']))
-					$result[$link['selementid2']]['links'] = array();
-
-				if (!is_null($options['preservekeys'])) {
-					$result[$link['selementid1']]['links'][$link['linkid']] = $link;
-					$result[$link['selementid2']]['links'][$link['linkid']] = $link;
-				}
-				else{
-					$result[$link['selementid1']]['links'][] = $link;
-					$result[$link['selementid2']]['links'][] = $link;
-				}
 			}
 		}
 
