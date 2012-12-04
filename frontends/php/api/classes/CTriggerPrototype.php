@@ -48,10 +48,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// allowed columns for sorting
 		$sortColumns = array('triggerid', 'description', 'status', 'priority');
-
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('triggers' => 't.triggerid'),
 			'from'		=> array('t' => 'triggers t'),
@@ -158,9 +154,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 							' AND gg.userid='.$userid.
 							' AND rr.permission='.PERM_DENY.'))';
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// groupids
 		if (!is_null($options['groupids'])) {
@@ -458,43 +451,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		$triggerids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('t.triggerid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-
-		$dbRes = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -509,18 +468,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				if (!isset($result[$trigger['triggerid']])) {
 					$result[$trigger['triggerid']] = array();
-				}
-				if (!is_null($options['selectHosts']) && !isset($result[$trigger['triggerid']]['hosts'])) {
-					$result[$trigger['triggerid']]['hosts'] = array();
-				}
-				if (!is_null($options['selectItems']) && !isset($result[$trigger['triggerid']]['items'])) {
-					$result[$trigger['triggerid']]['items'] = array();
-				}
-				if (!is_null($options['selectFunctions']) && !isset($result[$trigger['triggerid']]['functions'])) {
-					$result[$trigger['triggerid']]['functions'] = array();
-				}
-				if (!is_null($options['selectDiscoveryRule']) && !isset($result[$trigger['triggerid']]['discoveryRule'])) {
-					$result[$trigger['triggerid']]['discoveryRule'] = array();
 				}
 
 				// groups
@@ -569,146 +516,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$groups = API::HostGroup()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectGroups'],
-				'triggerids' => $triggerids,
-				'preservekeys' => true
-			));
-			foreach ($groups as $group) {
-				$gtriggers = $group['triggers'];
-				unset($group['triggers']);
-
-				foreach ($gtriggers as $trigger) {
-					$result[$trigger['triggerid']]['groups'][] = $group;
-				}
-			}
-		}
-
-		// adding hosts
-		if (!is_null($options['selectHosts'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'triggerids' => $triggerids,
-				'templated_hosts' => 1,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
-				}
-				foreach ($hosts as $hostid => $host) {
-					unset($hosts[$hostid]['triggers']);
-
-					$count = array();
-					foreach ($host['triggers'] as $trigger) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$trigger['triggerid']])) {
-								$count[$trigger['triggerid']] = 0;
-							}
-							$count[$trigger['triggerid']]++;
-
-							if ($count[$trigger['triggerid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-
-						$result[$trigger['triggerid']]['hosts'][] = &$hosts[$hostid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$hosts = API::Host()->get($objParams);
-				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach ($result as $triggerid => $trigger) {
-					$result[$triggerid]['hosts'] = isset($hosts[$triggerid]) ? $hosts[$triggerid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding functions
-		if (!is_null($options['selectFunctions']) && str_in_array($options['selectFunctions'], $subselectsAllowedOutputs)) {
-			$sqlSelect = ($options['selectFunctions'] == API_OUTPUT_EXTEND) ? 'f.*' : 'f.functionid, f.triggerid';
-
-			$res = DBselect(
-				'SELECT '.$sqlSelect.
-				' FROM functions f'.
-				' WHERE '.DBcondition('f.triggerid', $triggerids)
-			);
-			while ($function = DBfetch($res)) {
-				$triggerid = $function['triggerid'];
-				unset($function['triggerid']);
-
-				$result[$triggerid]['functions'][] = $function;
-			}
-		}
-
-		// adding items
-		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
-			$items = API::Item()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectItems'],
-				'triggerids' => $triggerids,
-				'webitems' => true,
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'filter' => array('flags' => null)
-			));
-
-			foreach ($items as $item) {
-				$itriggers = $item['triggers'];
-				unset($item['triggers']);
-				foreach ($itriggers as $trigger) {
-					$result[$trigger['triggerid']]['items'][] = $item;
-				}
-			}
-		}
-
-		// adding discoveryrule
-		if (!is_null($options['selectDiscoveryRule'])) {
-			$ruleids = $ruleMap = array();
-
-			$dbRules = DBselect(
-				'SELECT id.parent_itemid,f.triggerid'.
-				' FROM item_discovery id,functions f'.
-				' WHERE '.DBcondition('f.triggerid', $triggerids).
-					' AND f.itemid=id.itemid'
-			);
-			while ($rule = DBfetch($dbRules)) {
-				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
-				$ruleMap[$rule['triggerid']] = $rule['parent_itemid'];
-			}
-
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'itemids' => $ruleids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-
-			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::DiscoveryRule()->get($objParams);
-
-				foreach ($result as $triggerid => $trigger) {
-					if (isset($ruleMap[$triggerid]) && isset($discoveryRules[$ruleMap[$triggerid]])) {
-						$result[$triggerid]['discoveryRule'] = $discoveryRules[$ruleMap[$triggerid]];
-					}
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -1115,5 +924,51 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		return true;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$triggerids = array_keys($result);
+
+		// adding items
+		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'triggerid', 'itemid', 'functions');
+			$items = API::Item()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectItems'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'webitems' => true,
+				'nopermissions' => true,
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
+			));
+			$result = $relationMap->mapMany($result, $items, 'items');
+		}
+
+		// adding discoveryrule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$dbRules = DBselect(
+				'SELECT id.parent_itemid,f.triggerid'.
+					' FROM item_discovery id,functions f'.
+					' WHERE '.DBcondition('f.triggerid', $triggerids).
+					' AND f.itemid=id.itemid'
+			);
+			$relationMap = new CRelationMap();
+			while ($rule = DBfetch($dbRules)) {
+				$relationMap->addRelation($rule['triggerid'], $rule['parent_itemid']);
+			}
+
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		return $result;
 	}
 }
