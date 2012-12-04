@@ -218,6 +218,7 @@ if (isset($_REQUEST['form'])) {
 		$sysmaps = API::Map()->get(array(
 			'sysmapids' => $_REQUEST['sysmapid'],
 			'output' => API_OUTPUT_EXTEND,
+			'selectUrls' => API_OUTPUT_EXTEND,
 			'editable' => true
 		));
 		$sysmap = reset($sysmaps);
