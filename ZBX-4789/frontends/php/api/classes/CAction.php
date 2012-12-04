@@ -109,9 +109,7 @@ class CAction extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || !is_null($options['nopermissions'])) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN || !$options['nopermissions']) {
 			// conditions are checked here by sql, operations after, by api queries
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 

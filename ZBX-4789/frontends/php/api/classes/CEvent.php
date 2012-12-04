@@ -110,9 +110,7 @@ class CEvent extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN || !$options['nopermissions']) {
 			if (is_null($options['source']) && is_null($options['object'])) {
 				$options['object'] = EVENT_OBJECT_TRIGGER;
 			}
