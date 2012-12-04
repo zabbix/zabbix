@@ -70,11 +70,6 @@ class CService extends CZBXAPI {
 	public function get(array $options) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
-		// if the selectTrigger option is used, make sure we select the triggerid to be able to fetch the related triggers
-		if ($options['selectTrigger'] !== null) {
-			$options['output'] = $this->outputExtend($this->tableName(), 'triggerid', $options['output']);
-		}
-
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
 		$res = DBselect($sql, $options['limit']);
