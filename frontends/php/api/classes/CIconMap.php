@@ -216,7 +216,7 @@ class CIconMap extends CZBXAPI {
 		if (!is_null($options['selectMappings']) && str_in_array($options['selectMappings'], $subselectsAllowedOutputs)) {
 			$res = DBselect('SELECT imp.* FROM icon_mapping imp WHERE '.DBcondition('imp.iconmapid', $iconMapids));
 			while ($mapping = DBfetch($res)) {
-				$result[$mapping['iconmapid']]['mappings'][$mapping['iconmappingid']] = $mapping;
+				$result[$mapping['iconmapid']]['mappings'][] = $mapping;
 			}
 		}
 
@@ -327,7 +327,8 @@ class CIconMap extends CZBXAPI {
 			'selectMappings' => API_OUTPUT_EXTEND
 		));
 
-		$mappingsCreate = $mappingsUpdate = $mappingidsDelete = array();
+		$oldIconMappings = array();
+		$newIconMappings = array();
 		foreach ($iconMaps as $iconMap) {
 			if (!isset($iconMapsUpd[$iconMap['iconmapid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map with iconmapid "%s" does not exist.', $iconMap['iconmapid']));
@@ -349,25 +350,13 @@ class CIconMap extends CZBXAPI {
 
 			if (isset($iconMap['mappings'])) {
 				$mappingsDb = $iconMapsUpd[$iconMap['iconmapid']]['mappings'];
-
+				foreach ($mappingsDb as $mapping) {
+					$oldIconMappings[] = $mapping;
+				}
 				foreach ($iconMap['mappings'] as $mapping) {
 					$mapping['iconmapid'] = $iconMap['iconmapid'];
-
-					if (isset($mapping['iconmappingid']) && isset($mappingsDb[$mapping['iconmappingid']])) {
-						$iconmappingid = $mapping['iconmappingid'];
-						unset($mapping['iconmappingid']);
-						$mappingsUpdate[] = array(
-							'values' => $mapping,
-							'where' => array('iconmappingid' => $iconmappingid)
-						);
-						unset($mappingsDb[$iconmappingid]);
-					}
-					else {
-						$mappingsCreate[] = $mapping;
-					}
+					$newIconMappings[] = $mapping;
 				}
-
-				$mappingidsDelete = array_merge($mappingidsDelete, array_keys($mappingsDb));
 			}
 
 			$iconMapid = $iconMap['iconmapid'];
@@ -380,12 +369,8 @@ class CIconMap extends CZBXAPI {
 			}
 		}
 
-		DB::update('icon_map', $updates);
-		DB::insert('icon_mapping', $mappingsCreate);
-		DB::update('icon_mapping', $mappingsUpdate);
-		if (!empty($mappingidsDelete)) {
-			DB::delete('icon_mapping', array('iconmappingid' => $mappingidsDelete));
-		}
+		DB::save('icon_map', $iconMaps);
+		DB::replace('icon_mapping', $oldIconMappings, $newIconMappings);
 
 		return array('iconmapids' => $iconMapids);
 	}
