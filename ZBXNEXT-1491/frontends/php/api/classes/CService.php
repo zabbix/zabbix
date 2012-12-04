@@ -1059,18 +1059,21 @@ class CService extends CZBXAPI {
 	 *
 	 * @param array $childServiceIds
 	 * @param $output
+	 * @param boolean $soft             if set to true, will return only soft-linked dependencies
 	 *
 	 * @return array    an array of service links sorted by "sortorder" in ascending order
 	 */
-	protected function fetchParentDependencies(array $childServiceIds, $output) {
+	protected function fetchParentDependencies(array $childServiceIds, $output, $soft = null) {
 		$sqlParts = API::getApi()->createSelectQueryParts('services_links', 'sl', array(
 			'output' => $output,
 			'filter' => array('servicedownid' => $childServiceIds)
 		));
 
-		// sort by sortorder
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
 		$sqlParts['where'][] = 'sl.serviceupid='.$this->fieldId('serviceid');
+		if ($soft !== null) {
+			$sqlParts['where'][] = 'sl.soft='.($soft ? 1 : 0);
+		}
 		$sqlParts = $this->addQueryOrder($this->fieldId('sortorder'), $sqlParts);
 		$sqlParts = $this->addQueryOrder($this->fieldId('serviceid'), $sqlParts);
 
@@ -1504,113 +1507,134 @@ class CService extends CZBXAPI {
 		return $sqlParts;
 	}
 
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['output'] != API_OUTPUT_COUNT) {
+			if ($options['selectTrigger']) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$serviceIds = array_keys($result);
 
 		// selectDependencies
-		if ($options['selectDependencies'] !== null) {
-			$dependencyOutput = $this->outputExtend('services_links', 'serviceupid', $options['selectDependencies']);
-			$dependencies = $this->fetchChildDependencies($serviceIds, $dependencyOutput);
-			foreach ($result as &$service) {
-				$service['dependencies'] = array();
+		if ($options['selectDependencies'] !== null && $options['selectDependencies'] != API_OUTPUT_COUNT) {
+			$dependencies = $this->fetchChildDependencies($serviceIds,
+				$this->outputExtend('services_links', array('serviceupid', 'linkid'), $options['selectDependencies'])
+			);
+			$dependencies = zbx_toHash($dependencies, 'linkid');
+			$relationMap = $this->createRelationMap($dependencies, 'serviceupid', 'linkid');
+
+			// unset unrequested fields
+			foreach ($dependencies as &$dependency) {
+				if (!$this->outputIsRequested('serviceupid', $options['selectDependencies'])) {
+					unset($dependency['serviceupid']);
+				}
+				if (!$this->outputIsRequested('linkid', $options['selectDependencies'])) {
+					unset($dependency['linkid']);
+				}
 			}
-			unset($service);
-			foreach ($dependencies as $dependency) {
-				$refId = $dependency['serviceupid'];
-				$dependency = $this->unsetExtraFields($dependency, $options['selectDependencies']);
-				$result[$refId]['dependencies'][] = $dependency;
-			}
+			unset($dependency);
+
+			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
 		}
 
 		// selectParentDependencies
-		if ($options['selectParentDependencies'] !== null) {
-			$dependencyOutput = $this->outputExtend('services_links', 'servicedownid', $options['selectParentDependencies']);
-			$dependencies = $this->fetchParentDependencies($serviceIds, $dependencyOutput);
-			foreach ($result as &$service) {
-				$service['parentDependencies'] = array();
+		if ($options['selectParentDependencies'] !== null && $options['selectParentDependencies'] != API_OUTPUT_COUNT) {
+			$dependencies = $this->fetchParentDependencies($serviceIds,
+				$this->outputExtend('services_links', array('servicedownid', 'linkid'), $options['selectParentDependencies'])
+			);
+			$dependencies = zbx_toHash($dependencies, 'linkid');
+			$relationMap = $this->createRelationMap($dependencies, 'servicedownid', 'linkid');
+
+			// unset unrequested fields
+			foreach ($dependencies as &$dependency) {
+				if (!$this->outputIsRequested('servicedownid', $options['selectParentDependencies'])) {
+					unset($dependency['servicedownid']);
+				}
+				if (!$this->outputIsRequested('linkid', $options['selectParentDependencies'])) {
+					unset($dependency['linkid']);
+				}
 			}
-			unset($service);
-			foreach ($dependencies as $dependency) {
-				$refId = $dependency['servicedownid'];
-				$dependency = $this->unsetExtraFields($dependency, $options['selectParentDependencies']);
-				$result[$refId]['parentDependencies'][] = $dependency;
-			}
+			unset($dependency);
+
+			$result = $relationMap->mapMany($result, $dependencies, 'parentDependencies');
 		}
 
 		// selectParent
-		if ($options['selectParent'] !== null) {
+		if ($options['selectParent'] !== null && $options['selectParent'] != API_OUTPUT_COUNT) {
+			$dependencies = $this->fetchParentDependencies($serviceIds, array('servicedownid', 'serviceupid'), false);
+			$relationMap = $this->createRelationMap($dependencies, 'servicedownid', 'serviceupid');
 			$parents = $this->get(array(
 				'output' => $options['selectParent'],
-				'childids' => $serviceIds,
-				'selectDependencies' => array('servicedownid', 'soft')
+				'serviceids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
 			));
-			foreach ($result as &$service) {
-				$service['parent'] = array();
-			}
-			unset($service);
-
-			// map the parents to their children, look for the first hard linked dependency
-			foreach ($parents as $parent) {
-				foreach ($parent['dependencies'] as $dependency) {
-					if (!$dependency['soft']) {
-						unset($parent['dependencies']);
-						if (isset($result[$dependency['servicedownid']])) {
-							$result[$dependency['servicedownid']]['parent'] = $parent;
-						}
-					}
-				}
-			}
+			$result = $relationMap->mapOne($result, $parents, 'parent');
 		}
 
 		// selectTimes
-		if ($options['selectTimes'] !== null) {
-			$timesOutput = $this->outputExtend('services_times', 'serviceid', $options['selectTimes']);
+		if ($options['selectTimes'] !== null && $options['selectTimes'] != API_OUTPUT_COUNT) {
 			$serviceTimes = API::getApi()->select('services_times', array(
-				'output' => $timesOutput,
-				'filter' => array('serviceid' => $serviceIds)
+				'output' => $this->outputExtend('services_times', array('serviceid', 'timeid'), $options['selectTimes']),
+				'filter' => array('serviceid' => $serviceIds),
+				'preservekeys' => true
 			));
-			foreach ($result as &$service) {
-				$service['times'] = array();
+			$relationMap = $this->createRelationMap($serviceTimes, 'serviceid', 'timeid');
+
+			// unset unrequested fields
+			foreach ($serviceTimes as &$serviceTime) {
+				if (!$this->outputIsRequested('serviceid', $options['selectTimes'])) {
+					unset($serviceTime['serviceid']);
+				}
+				if (!$this->outputIsRequested('timeid', $options['selectTimes'])) {
+					unset($serviceTime['timeid']);
+				}
 			}
-			unset($service);
-			foreach ($serviceTimes as $serviceTime) {
-				$refId = $serviceTime['serviceid'];
-				$serviceTime = $this->unsetExtraFields($serviceTime, $options['selectTimes']);
-				$result[$refId]['times'][] = $serviceTime;
-			}
+			unset($serviceTime);
+
+			$result = $relationMap->mapMany($result, $serviceTimes, 'times');
 		}
 
 		// selectAlarms
-		if ($options['selectAlarms'] !== null) {
-			$alarmsOutput = $this->outputExtend('service_alarms', 'serviceid', $options['selectAlarms']);
-			$alarmsTimes = API::getApi()->select('service_alarms', array(
-				'output' => $alarmsOutput,
-				'filter' => array('serviceid' => $serviceIds)
+		if ($options['selectAlarms'] !== null && $options['selectAlarms'] != API_OUTPUT_COUNT) {
+			$serviceAlarms = API::getApi()->select('service_alarms', array(
+				'output' => $this->outputExtend('service_alarms', array('serviceid', 'servicealarmid'), $options['selectAlarms']),
+				'filter' => array('serviceid' => $serviceIds),
+				'preservekeys' => true
 			));
-			foreach ($result as &$service) {
-				$service['times'] = array();
+			$relationMap = $this->createRelationMap($serviceAlarms, 'serviceid', 'servicealarmid');
+
+			// unset unrequested fields
+			foreach ($serviceAlarms as &$serviceAlarm) {
+				if (!$this->outputIsRequested('serviceid', $options['selectAlarms'])) {
+					unset($serviceAlarm['serviceid']);
+				}
+				if (!$this->outputIsRequested('servicealarmid', $options['selectAlarms'])) {
+					unset($serviceAlarm['servicealarmid']);
+				}
 			}
-			unset($service);
-			foreach ($alarmsTimes as $serviceAlarm) {
-				$refId = $serviceAlarm['serviceid'];
-				$serviceAlarm = $this->unsetExtraFields($serviceAlarm, $options['selectAlarms']);
-				$result[$refId]['alarms'][] = $serviceAlarm;
-			}
+			unset($serviceAlarm);
+
+			$result = $relationMap->mapMany($result, $serviceAlarms, 'alarms');
 		}
 
 		// selectTrigger
-		if ($options['selectTrigger'] !== null) {
+		if ($options['selectTrigger'] !== null && $options['selectTrigger'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'serviceid', 'triggerid');
 			$triggers = API::getApi()->select('triggers', array(
 				'output' => $options['selectTrigger'],
-				'triggerids' => array_unique(zbx_objectValues($result, 'triggerid')),
+				'triggerids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			foreach ($result as &$service) {
-				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
-			}
-			unset($service);
+			$result = $relationMap->mapOne($result, $triggers, 'trigger');
 		}
 
 		return $result;
