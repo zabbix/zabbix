@@ -132,9 +132,6 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// output
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		$gitemids = array();
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);

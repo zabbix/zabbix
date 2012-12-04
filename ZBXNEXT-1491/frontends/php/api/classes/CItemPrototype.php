@@ -84,19 +84,6 @@ class CItemPrototype extends CItemGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['items']);
-
-			$dbTable = DB::getSchema('items');
-			$sqlParts['select']['itemid'] = 'i.itemid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'i.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 // editable + PERMISSION CHECK
 		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
@@ -242,24 +229,6 @@ class CItemPrototype extends CItemGeneral {
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 				$sqlParts['where']['h'] = DBcondition('h.host', $options['filter']['host']);
-			}
-		}
-
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['items'] = 'i.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT i.itemid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
 			}
 		}
 

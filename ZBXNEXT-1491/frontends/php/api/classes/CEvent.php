@@ -289,9 +289,6 @@ class CEvent extends CZBXAPI {
 			$sqlParts = $this->addQuerySelect($this->fieldId('objectid'), $sqlParts);
 		}
 
-		// output
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		$eventids = array();
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);

@@ -81,22 +81,6 @@ class CProxy extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['hosts']);
-
-			$dbTable = DB::getSchema('hosts');
-			$sqlParts['select']['hostid'] = 'h.hostid';
-			foreach ($options['output'] as $field) {
-				if ($field == 'proxyid') {
-					continue;
-				}
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'h.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}

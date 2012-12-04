@@ -103,25 +103,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['triggers']);
-
-			$dbTable = DB::getSchema('triggers');
-			$sqlParts['select']['triggerid'] = 't.triggerid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 't.'.$field;
-				}
-			}
-
-			// ignore the "expandExpression" parameter if the expression is not requested
-			if ($options['expandExpression'] !== null && !str_in_array('expression', $options['output'])) {
-				$options['expandExpression'] = null;
-			}
-
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + permission check
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
@@ -412,36 +393,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['triggers'] = 't.*';
-		}
-
-		// expandData
-		if (!is_null($options['expandData'])) {
-			$sqlParts['select']['host'] = 'h.host';
-			$sqlParts['select']['hostid'] = 'h.hostid';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT t.triggerid) as rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 		// sorting
 		zbx_db_sorting($sqlParts, $options, $sortColumns, 't');
 
@@ -504,7 +455,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 
 				// expand expression
-				if ($options['expandExpression'] !== null && $trigger['expression']) {
+				if ($options['expandExpression'] !== null && isset($trigger['expression'])) {
 					$trigger['expression'] = explode_exp($trigger['expression'], false, true);
 				}
 
@@ -924,6 +875,26 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		return true;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if (!$options['countOutput'] !== null) {
+			// expandData
+			if (!is_null($options['expandData'])) {
+				$sqlParts['select']['host'] = 'h.host';
+				$sqlParts['select']['hostid'] = 'h.hostid';
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts'] = 'hosts h';
+				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			}
+		}
+
+		return $sqlParts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
