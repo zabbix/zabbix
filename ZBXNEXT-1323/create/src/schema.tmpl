@@ -133,6 +133,8 @@ FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|uniq		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_authprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|druleid
 
 TABLE|applications|applicationid|ZBX_SYNC,ZBX_DATA
@@ -157,6 +159,8 @@ FIELD		|http_user	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
 FIELD		|http_password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|hosts
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|3|httptest	|httptestid
+FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
+FIELD		|retries	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
 INDEX		|httptest_1	|applicationid
 UNIQUE		|2		|hostid,name
 INDEX		|3		|status
@@ -240,6 +244,8 @@ FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lifetime	|t_varchar(64)	|'30'	|NOT NULL	|ZBX_SYNC
+FIELD		|snmpv3_authprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -1205,4 +1211,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010020	|2010020
+ROW		|2010026	|2010026

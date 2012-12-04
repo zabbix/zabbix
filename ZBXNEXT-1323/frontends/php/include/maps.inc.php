@@ -399,23 +399,22 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		}
 
 		// try to create valid expression
-		$trigExpr = new CTriggerExpression(array('expression' => $macro));
-		if (!empty($trigExpr->errors)) {
+		$expressionData = new CTriggerExpression();
+		if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
 			continue;
 		}
 
 		// look in DB for coressponding item
-		$itemHost = reset($trigExpr->data['hosts']);
-		$key = reset($trigExpr->data['items']);
-		$function = reset($trigExpr->data['functions']);
-		$parameter = convertFunctionValue(reset($trigExpr->data['functionParams']));
+		$itemHost = $expressionData->expressions[0]['host'];
+		$key = $expressionData->expressions[0]['item'];
+		$function = $expressionData->expressions[0]['functionName'];
+		$parameter = convertFunctionValue($expressionData->expressions[0]['functionParamList'][0]);
 
 		$item = API::Item()->get(array(
 			'webitems' => true,
 			'filter' => array(
 				'host' => $itemHost,
-				'key_' => $key,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				'key_' => $key
 			),
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -533,6 +532,14 @@ function add_elementNames(&$selements) {
 
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostids,
+		'output' => array('name'),
+		'nopermissions' => true,
+		'nodeids' => get_current_nodeid(true),
+		'preservekeys' => true
+	));
+
+	$maps = API::Map()->get(array(
+		'mapids' => $mapids,
 		'output' => array('name'),
 		'nopermissions' => true,
 		'nodeids' => get_current_nodeid(true),

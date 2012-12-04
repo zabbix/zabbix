@@ -302,6 +302,7 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROXY, httptest->http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
@@ -418,16 +419,17 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 			goto httpstep_error;
 		}
 
-		memset(&page, 0, sizeof(page));
-
-		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		/* try to retrieve page several times depending on number of retries */
+		do
 		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-					" error doing curl_easy_perform: %s",
-					httptest->name, httpstep.name, err_str);
+			memset(&page, 0, sizeof(page));
+
+			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+				break;
 		}
-		else
+		while (0 != --httptest->retries);
+
+		if (CURLE_OK == err)
 		{
 			if ('\0' != *httpstep.required && NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
 			{
@@ -475,6 +477,13 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 				speed_download += stat.speed_download;
 				speed_download_num++;
 			}
+		}
+		else
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+					" error doing curl_easy_perform: %s",
+					httptest->name, httpstep.name, err_str);
 		}
 
 		zbx_free(page.data);
@@ -564,7 +573,7 @@ void	process_httptests(int httppoller_num, int now)
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.macros,t.agent,"
-				"t.authentication,t.http_user,t.http_password"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -609,8 +618,15 @@ void	process_httptests(int httppoller_num, int now)
 					&httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
+		httptest.http_proxy = zbx_strdup(NULL, row[10]);
+		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+				&httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+
+		httptest.retries = atoi(row[11]);
+
 		process_httptest(&host, &httptest);
 
+		zbx_free(httptest.http_proxy);
 		if (HTTPTEST_AUTH_NONE != httptest.authentication)
 		{
 			zbx_free(httptest.http_password);

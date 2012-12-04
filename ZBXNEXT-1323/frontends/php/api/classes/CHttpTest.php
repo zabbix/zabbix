@@ -87,7 +87,7 @@ class CHttpTest extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -330,25 +330,20 @@ class CHttpTest extends CZBXAPI {
 			}
 		}
 
-		// expandName
-		if (!is_null($options['expandName']) && $result
-			&& ((is_array($options['output']) && in_array('name', $options['output'])) || ($options['output'] = 'all'))
-		) {
-			$expandSteps = false;
-			if (!is_null($options['expandStepName']) && $result && !is_null($options['selectSteps'])
-					&& ((is_array($options['selectSteps']) && in_array('name', $options['selectSteps'])) || ($options['selectSteps'] = 'all'))
-			) {
-				$expandSteps = true;
+		if ($result) {
+			// expandName
+			$nameRequested = (is_array($options['output']) && in_array('name', $options['output']))
+				|| $options['output'] == API_OUTPUT_EXTEND;
+			$expandName = $options['expandName'] !== null && $nameRequested;
+
+			// expandStepName
+			$stepNameRequested = $options['selectSteps'] == API_OUTPUT_EXTEND
+					|| (is_array($options['selectSteps']) && in_array('name', $options['selectSteps']));
+			$expandStepName = $options['expandStepName'] !== null && $stepNameRequested;
+
+			if ($expandName || $expandStepName) {
+				$result = resolveHttpTestMacros($result, $expandName, $expandStepName);
 			}
-
-			$result = resolveHttpTestMacros($result, true, $expandSteps);
-		}
-
-		// expandStepName
-		if (!is_null($options['expandStepName']) && is_null($options['expandName']) && $result && !is_null($options['selectSteps'])
-			&& ((is_array($options['selectSteps']) && in_array('name', $options['selectSteps'])) || ($options['selectSteps'] = 'all'))
-		) {
-			$result = resolveHttpTestMacros($result, false, true);
 		}
 
 		// removing keys (hash -> array)
@@ -795,5 +790,19 @@ class CHttpTest extends CZBXAPI {
 		));
 
 		return (count($ids) == $count);
+	}
+
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			// make sure we request the hostid to be able to expand macros
+			if ($options['expandName'] !== null || $options['expandStepName'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('hostid'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
 	}
 }

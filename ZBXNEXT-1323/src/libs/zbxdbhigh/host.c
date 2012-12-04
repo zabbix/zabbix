@@ -2191,6 +2191,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	/* create trigger if no updated triggers */
 	if (SUCCEED != res)
 	{
+		char	*error_esc;
+
 		res = SUCCEED;
 
 		*new_triggerid = DBget_maxid("triggers");
@@ -2198,17 +2200,19 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
+		error_esc = DBdyn_escape_string_len("Trigger just added. No status update so far.", TRIGGER_ERROR_LEN);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,value_flags,templateid,flags)"
+						"comments,url,type,value,value_flags,templateid,flags,error)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d);\n",
-					*new_triggerid, description_esc, (int)priority,
-					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid, (int)flags);
+						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,'%s');\n",
+					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
+					url_esc, (int)type, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid,
+					(int)flags, error_esc);
 
+		zbx_free(error_esc);
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
 
@@ -2745,6 +2749,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		unsigned char	data_type;
 		unsigned char	status;
 		unsigned char	snmpv3_securitylevel;
+		unsigned char	snmpv3_authprotocol;
+		unsigned char	snmpv3_privprotocol;
 		unsigned char	authtype;
 		unsigned char	flags;
 		unsigned char	inventory_link;
@@ -2791,10 +2797,10 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.data_type,ti.delay,ti.delay_flex,"
 				"ti.history,ti.trends,ti.status,ti.trapper_hosts,ti.units,ti.multiplier,ti.delta,"
 				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_community,"
-				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authpassphrase,"
-				"ti.snmpv3_privpassphrase,ti.authtype,ti.username,ti.password,ti.publickey,"
-				"ti.privatekey,ti.flags,ti.filter,ti.description,ti.inventory_link,ti.lifetime,"
-				"hi.itemid"
+				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
+				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
+				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.filter,ti.description,"
+				"ti.inventory_link,ti.lifetime,hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2838,18 +2844,20 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		item[item_num].snmp_oid_esc = DBdyn_escape_string(row[21]);
 		item[item_num].snmpv3_securityname_esc = DBdyn_escape_string(row[22]);
 		item[item_num].snmpv3_securitylevel = (unsigned char)atoi(row[23]);
-		item[item_num].snmpv3_authpassphrase_esc = DBdyn_escape_string(row[24]);
-		item[item_num].snmpv3_privpassphrase_esc = DBdyn_escape_string(row[25]);
-		item[item_num].authtype = (unsigned char)atoi(row[26]);
-		item[item_num].username_esc = DBdyn_escape_string(row[27]);
-		item[item_num].password_esc = DBdyn_escape_string(row[28]);
-		item[item_num].publickey_esc = DBdyn_escape_string(row[29]);
-		item[item_num].privatekey_esc = DBdyn_escape_string(row[30]);
-		item[item_num].flags = (unsigned char)atoi(row[31]);
-		item[item_num].filter_esc = DBdyn_escape_string(row[32]);
-		item[item_num].description_esc = DBdyn_escape_string(row[33]);
-		item[item_num].inventory_link = (unsigned char)atoi(row[34]);
-		item[item_num].lifetime_esc = DBdyn_escape_string(row[35]);
+		item[item_num].snmpv3_authprotocol = (unsigned char)atoi(row[24]);
+		item[item_num].snmpv3_authpassphrase_esc = DBdyn_escape_string(row[25]);
+		item[item_num].snmpv3_privprotocol = (unsigned char)atoi(row[26]);
+		item[item_num].snmpv3_privpassphrase_esc = DBdyn_escape_string(row[27]);
+		item[item_num].authtype = (unsigned char)atoi(row[28]);
+		item[item_num].username_esc = DBdyn_escape_string(row[29]);
+		item[item_num].password_esc = DBdyn_escape_string(row[30]);
+		item[item_num].publickey_esc = DBdyn_escape_string(row[31]);
+		item[item_num].privatekey_esc = DBdyn_escape_string(row[32]);
+		item[item_num].flags = (unsigned char)atoi(row[33]);
+		item[item_num].filter_esc = DBdyn_escape_string(row[34]);
+		item[item_num].description_esc = DBdyn_escape_string(row[35]);
+		item[item_num].inventory_link = (unsigned char)atoi(row[36]);
+		item[item_num].lifetime_esc = DBdyn_escape_string(row[37]);
 
 		switch (interface_type = get_interface_type_by_item_type(item[item_num].type))
 		{
@@ -2868,10 +2876,10 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				item[item_num].interfaceid = interfaceids[interface_type - 1];
 		}
 
-		if (SUCCEED != DBis_null(row[36]))
+		if (SUCCEED != DBis_null(row[38]))
 		{
 			item[item_num].key_esc = NULL;
-			ZBX_STR2UINT64(item[item_num].itemid, row[36]);
+			ZBX_STR2UINT64(item[item_num].itemid, row[38]);
 		}
 		else
 		{
@@ -2892,9 +2900,10 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				" (itemid,name,key_,hostid,type,value_type,data_type,delay,delay_flex,history,trends,"
 					"status,trapper_hosts,units,multiplier,delta,formula,logtimefmt,valuemapid,"
 					"params,ipmi_sensor,snmp_community,snmp_oid,snmpv3_securityname,"
-					"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,authtype,"
-					"username,password,publickey,privatekey,templateid,flags,filter,description,"
-					"inventory_link,interfaceid,lifetime)"
+					"snmpv3_securitylevel,snmpv3_authprotocol,snmpv3_authpassphrase,"
+					"snmpv3_privprotocol,snmpv3_privpassphrase,authtype,username,password,"
+					"publickey,privatekey,templateid,flags,filter,description,inventory_link,"
+					"interfaceid,lifetime)"
 				" values ";
 		zbx_uint64_t	*itemids = NULL, *protoids = NULL;
 		size_t		itemids_num = 0, protoids_num = 0;
@@ -2942,7 +2951,9 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 						"snmp_oid='%s',"
 						"snmpv3_securityname='%s',"
 						"snmpv3_securitylevel=%d,"
+						"snmpv3_authprotocol=%d,"
 						"snmpv3_authpassphrase='%s',"
+						"snmpv3_privprotocol=%d,"
 						"snmpv3_privpassphrase='%s',"
 						"authtype=%d,"
 						"username='%s',"
@@ -2964,7 +2975,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					item[i].logtimefmt_esc, DBsql_id_ins(item[i].valuemapid), item[i].params_esc,
 					item[i].ipmi_sensor_esc, item[i].snmp_community_esc, item[i].snmp_oid_esc,
 					item[i].snmpv3_securityname_esc, (int)item[i].snmpv3_securitylevel,
-					item[i].snmpv3_authpassphrase_esc, item[i].snmpv3_privpassphrase_esc,
+					(int)item[i].snmpv3_authprotocol, item[i].snmpv3_authpassphrase_esc,
+					(int)item[i].snmpv3_privprotocol, item[i].snmpv3_privpassphrase_esc,
 					(int)item[i].authtype, item[i].username_esc, item[i].password_esc,
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
@@ -2995,8 +3007,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
-						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,'%s','%s',%d,'%s',"
-						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')%s",
+						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,%d,'%s',%d,'%s',"
+						"%d,'%s','%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')%s",
 					itemid, item[i].name_esc, item[i].key_esc, hostid, (int)item[i].type,
 					(int)item[i].value_type, (int)item[i].data_type, item[i].delay,
 					item[i].delay_flex_esc, item[i].history, item[i].trends, (int)item[i].status,
@@ -3005,7 +3017,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					DBsql_id_ins(item[i].valuemapid), item[i].params_esc, item[i].ipmi_sensor_esc,
 					item[i].snmp_community_esc, item[i].snmp_oid_esc,
 					item[i].snmpv3_securityname_esc, (int)item[i].snmpv3_securitylevel,
-					item[i].snmpv3_authpassphrase_esc, item[i].snmpv3_privpassphrase_esc,
+					(int)item[i].snmpv3_authprotocol, item[i].snmpv3_authpassphrase_esc,
+					(int)item[i].snmpv3_privprotocol, item[i].snmpv3_privpassphrase_esc,
 					(int)item[i].authtype, item[i].username_esc, item[i].password_esc,
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
@@ -3651,9 +3664,11 @@ typedef struct
 	char			*agent_esc;
 	char			*http_user_esc;
 	char			*http_password_esc;
+	char			*http_proxy_esc;
 	zbx_vector_ptr_t	httpsteps;
 	zbx_vector_ptr_t	httptestitems;
 	int			delay;
+	int			retries;
 	unsigned char		status;
 	unsigned char		authentication;
 }
@@ -3694,7 +3709,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.httptestid,t.name,t.applicationid,t.delay,t.status,t.macros,t.agent,"
-				"t.authentication,t.http_user,t.http_password,h.httptestid"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid"
 			" from httptest t"
 				" left join httptest h"
 					" on h.hostid=" ZBX_FS_UI64
@@ -3710,7 +3725,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 		httptest = zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_DBROW2UINT64(httptest->httptestid, row[10]);
+		ZBX_DBROW2UINT64(httptest->httptestid, row[12]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 
@@ -3727,6 +3742,8 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 			httptest->authentication = (unsigned char)atoi(row[7]);
 			httptest->http_user_esc = DBdyn_escape_string(row[8]);
 			httptest->http_password_esc = DBdyn_escape_string(row[9]);
+			httptest->http_proxy_esc = DBdyn_escape_string(row[10]);
+			httptest->retries = atoi(row[11]);
 
 			zbx_vector_uint64_append(&httptestids, httptest->templateid);
 
@@ -4015,7 +4032,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	const char	*ins_httptest_sql =
 			"insert into httptest"
 			" (httptestid,name,applicationid,delay,status,macros,agent,"
-				"authentication,http_user,http_password,hostid,templateid)"
+				"authentication,http_user,http_password,http_proxy,retries,hostid,templateid)"
 			" values ";
 	const char	*ins_httpstep_sql =
 			"insert into httpstep"
@@ -4107,12 +4124,13 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_httptest_sql);
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s',"
+					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s','%s',%d,"
 						ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					httptest->httptestid, httptest->name_esc, DBsql_id_ins(httptest->h_applicationid),
 					httptest->delay, (int)httptest->status, httptest->macros_esc,
 					httptest->agent_esc, (int)httptest->authentication, httptest->http_user_esc,
-					httptest->http_password_esc, hostid, httptest->templateid);
+					httptest->http_password_esc, httptest->http_proxy_esc, httptest->retries,
+					hostid, httptest->templateid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -4234,6 +4252,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 	{
 		httptest = (httptest_t *)httptests->values[i];
 
+		zbx_free(httptest->http_proxy_esc);
 		zbx_free(httptest->http_password_esc);
 		zbx_free(httptest->http_user_esc);
 		zbx_free(httptest->agent_esc);

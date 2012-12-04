@@ -160,13 +160,6 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		// expandData
-		if (!is_null($options['expandData'])) {
-			$sqlParts['select']['host'] = 'h.host';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
-		}
-
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
@@ -337,13 +330,14 @@ class CApplication extends CZBXAPI {
 
 		// adding objects
 		// adding items
-		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
+		if (!is_null($options['selectItems'])
+			&& (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
+
 			$objParams = array(
 				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$items = API::Item()->get($objParams);
 			foreach ($items as $itemid => $item) {
@@ -618,13 +612,14 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$itemOptions = array(
+		$allowedItems = API::Item()->get(array(
 			'itemids' => $itemids,
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$allowedItems = API::Item()->get($itemOptions);
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
+		));
+
 		foreach ($items as $num => $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -677,5 +672,18 @@ class CApplication extends CZBXAPI {
 			}
 		}
 		return array('applicationids'=> $applicationids);
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// expandData
+		if (!is_null($options['expandData'])) {
+			$sqlParts['select']['host'] = 'h.host';
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
+		}
+
+		return $sqlParts;
 	}
 }

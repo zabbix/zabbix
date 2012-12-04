@@ -1103,7 +1103,6 @@ elseif ($srctbl == 'items') {
 		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'webitems' => true,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name'),
 		'preservekeys' => true
@@ -1160,7 +1159,7 @@ elseif ($srctbl == 'items') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 
@@ -1260,7 +1259,7 @@ elseif ($srctbl == 'prototypes') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}
@@ -1469,8 +1468,7 @@ elseif ($srctbl == 'simple_graph') {
 			'templated' => false,
 			'filter' => array(
 				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				'status' => ITEM_STATUS_ACTIVE
 			),
 			'preservekeys' => true
 		);
@@ -1535,7 +1533,7 @@ elseif ($srctbl == 'simple_graph') {
 			$hostid > 0 ? null : $item['hostname'],
 			$description,
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type'])
+			itemValueTypeString($item['value_type'])
 		));
 	}
 
@@ -1641,10 +1639,7 @@ elseif ($srctbl == 'plain_text') {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'templated' => 0,
-		'filter' => array(
-			'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
-			'status' => ITEM_STATUS_ACTIVE
-		),
+		'filter' => array('status' => ITEM_STATUS_ACTIVE),
 		'sortfield' => 'name'
 	);
 	if (!is_null($writeonly)) {
@@ -1670,7 +1665,7 @@ elseif ($srctbl == 'plain_text') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}

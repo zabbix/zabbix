@@ -103,24 +103,27 @@ function item_type2str($type = null) {
 	}
 }
 
-function item_value_type2str($type = null) {
-	$types = array(
-		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR => _('Character'),
-		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
-	);
-	if (is_null($type)) {
-		natsort($types);
-		return $types;
+/**
+ * Returns human readable an item value type
+ *
+ * @param integer $valueType
+ *
+ * @return string
+ */
+function itemValueTypeString($valueType) {
+	switch ($valueType) {
+		case ITEM_VALUE_TYPE_UINT64:
+			return _('Numeric (unsigned)');
+		case ITEM_VALUE_TYPE_FLOAT:
+			return _('Numeric (float)');
+		case ITEM_VALUE_TYPE_STR:
+			return _('Character');
+		case ITEM_VALUE_TYPE_LOG:
+			return _('Log');
+		case ITEM_VALUE_TYPE_TEXT:
+			return _('Text');
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+	return _('Unknown');
 }
 
 function item_data_type2str($type = null) {
@@ -239,9 +242,10 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 		'itemids' => $srcItemIds,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase',
-			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type',
-			'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
+			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
+			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey',
+			'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
 		),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
@@ -304,9 +308,10 @@ function copyItems($srcHostId, $dstHostId) {
 		'hostids' => $srcHostId,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase',
-			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type',
-			'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
+			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
+			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+			'flags', 'filter', 'port', 'description', 'inventory_link'
 		),
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -433,8 +438,8 @@ function get_item_by_itemid_limited($itemid) {
 	$row = DBfetch(DBselect(
 		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
 			'i.snmp_community,i.snmp_oid,i.value_type,i.data_type,i.trapper_hosts,i.port,i.units,i.multiplier,i.delta,'.
-			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,'.
-			'i.formula,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,'.
+			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,'.
+			'i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,'.
 			'i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.$itemid));
@@ -445,7 +450,7 @@ function get_item_by_itemid_limited($itemid) {
 	return false;
 }
 
-/*
+/**
  * Description:
  * Replace items for specified host
  *
@@ -515,13 +520,15 @@ function resolveItemKeyMacros(array $item) {
 	}
 
 	if (!empty($macStack)) {
-		$dbItem = API::Item()->get(array(
+		$options = array(
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'webitems' => true,
-			'output' => API_OUTPUT_REFER
-		));
+			'output' => API_OUTPUT_REFER,
+			'filter' => array('flags' => null)
+		);
+		$dbItem = API::Item()->get($options);
 		$dbItem = reset($dbItem);
 
 		$host = reset($dbItem['hosts']);

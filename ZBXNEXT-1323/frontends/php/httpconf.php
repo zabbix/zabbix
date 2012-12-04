@@ -42,7 +42,8 @@ $fields = array(
 	'applicationid'   => array(T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')),
 	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   '(isset({form})&&({form}=="update"))'),
 	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})', _('Name')),
-	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
+	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
+	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({save})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
 	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'macros'          => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
@@ -52,6 +53,7 @@ $fields = array(
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
 	'http_password'   => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
+	'http_proxy'      => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'new_application' => array(T_ZBX_STR, O_OPT, null, null, null),
 	'hostname'        => array(T_ZBX_STR, O_OPT, null, null, null),
 	'templated'       => array(T_ZBX_STR, O_OPT, null, null, null),
@@ -168,11 +170,13 @@ elseif (isset($_REQUEST['save'])) {
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
-			'applicationid' => $_REQUEST['applicationid'],
+			'applicationid' => get_request('applicationid'),
 			'delay' => $_REQUEST['delay'],
+			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => $_REQUEST['agent'],
 			'macros' => $_REQUEST['macros'],
+			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps
 		);
 
@@ -250,7 +254,11 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	catch (Exception $e) {
 		DBend(false);
-		error($e->getMessage());
+
+		$msg = $e->getMessage();
+		if (!empty($msg)) {
+			error($msg);
+		}
 		show_messages(false, null, $message_false);
 	}
 }
@@ -366,12 +374,14 @@ if (isset($_REQUEST['form'])) {
 		$data['applicationid'] = $dbHttpTest['applicationid'];
 		$data['new_application'] = '';
 		$data['delay'] = $dbHttpTest['delay'];
+		$data['retries'] = $dbHttpTest['retries'];
 		$data['status'] = $dbHttpTest['status'];
 		$data['agent'] = $dbHttpTest['agent'];
 		$data['macros'] = $dbHttpTest['macros'];
 		$data['authentication'] = $dbHttpTest['authentication'];
 		$data['http_user'] = $dbHttpTest['http_user'];
 		$data['http_password'] = $dbHttpTest['http_password'];
+		$data['http_proxy'] = $dbHttpTest['http_proxy'];
 		$data['templated'] = (bool) $dbHttpTest['templateid'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.$_REQUEST['httptestid'].' ORDER BY h.no'));
 	}
@@ -387,16 +397,18 @@ if (isset($_REQUEST['form'])) {
 		$data['applicationid'] = get_request('applicationid');
 		$data['new_application'] = get_request('new_application', '');
 		$data['delay'] = get_request('delay', 60);
+		$data['retries'] = get_request('retries', 1);
 		$data['agent'] = get_request('agent', '');
 		$data['macros'] = get_request('macros', array());
 		$data['authentication'] = get_request('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = get_request('http_user', '');
 		$data['http_password'] = get_request('http_password', '');
+		$data['http_proxy'] = get_request('http_proxy', '');
 		$data['templated'] = get_request('templated');
 		$data['steps'] = get_request('steps', array());
 	}
 
-	$data['application_list'] = array(0 => '');
+	$data['application_list'] = array();
 	if (!empty($data['hostid'])) {
 		$dbApps = DBselect('SELECT a.applicationid,a.name FROM applications a WHERE a.hostid='.zbx_dbstr($data['hostid']));
 		while ($dbApp = DBfetch($dbApps)) {

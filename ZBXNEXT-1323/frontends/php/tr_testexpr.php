@@ -33,7 +33,8 @@ $definedErrorPhrases = array(
 	EXPRESSION_VALUE_TYPE_UNKNOWN => _('Unknown variable type, testing not available'),
 	EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 	EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
-	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro')
+	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro'),
+	EXPRESSION_FUNCTION_UNKNOWN => _('Incorrect function is used')
 );
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -45,7 +46,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$expression = get_request('expression', '');
 
 	define('NO_LINK_IN_TESTING', true);
-	$triggerExpr = new CTriggerExpression(array('expression' => $expression));
 	list($outline, $eHTMLTree) = analyze_expression($expression);
 
 // test data (create table, create check fields)
@@ -61,38 +61,45 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$rplcts = array();
 	$allowedTesting = true;
 
-	if(empty($triggerExpr->errors)){
+	$expressionData = new CTriggerExpression();
+	if ($expressionData->parse($expression)) {
 		$macrosData = array();
 
-		foreach($triggerExpr->expressions as $exprPart){
-			$macrosId = md5($exprPart['expression']);
+		$expressions = array_merge($expressionData->expressions, $expressionData->macros, $expressionData->usermacros,
+				$expressionData->lldmacros);
 
-			if(isset($macrosData[$exprPart['expression']])) continue;
+		foreach ($expressions as $exprPart) {
+			if (isset($macrosData[$exprPart['expression']])) {
+				continue;
+			}
 
-			$fname = 'test_data_'.$macrosId;
+			$fname = 'test_data_'.md5($exprPart['expression']);
 			$macrosData[$exprPart['expression']] = get_request($fname, '');
 
 			$info = get_item_function_info($exprPart['expression']);
 
-			$octet = ($info['value_type'] == 'HHMMSS');
-
-			$validation = $info['validation'];
-			if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
-				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
-
-				$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
-				foreach ($vals as $v) $control->addItem($v, $v);
-			}
-			else
-				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
-
-			if(!is_array($info) && isset($definedErrorPhrases[$info])) {
-				$control->setAttribute('disabled', 'disabled');
+			if (!is_array($info) && isset($definedErrorPhrases[$info])) {
 				$allowedTesting = false;
+				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
+				$control->setAttribute('disabled', 'disabled');
+			}
+			else {
+				$octet = ($info['value_type'] == 'HHMMSS');
+				$validation = $info['validation'];
+				if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
+					$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
+					$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
+					foreach ($vals as $v) {
+						$control->addItem($v, $v);
+					}
+				}
+				else {
+					$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
+				}
+				$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $exprPart['expression']);
 			}
 
 			$data_table->addRow(new CRow(array($exprPart['expression'], (is_array($info) || !isset($definedErrorPhrases[$info])) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
-			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $exprPart['expression']);
 		}
 	}
 //---------------------------------- CHECKS ------------------------------------
