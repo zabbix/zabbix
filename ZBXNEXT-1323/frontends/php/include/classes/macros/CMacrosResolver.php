@@ -47,24 +47,33 @@ class CMacrosResolver {
 	 * @return array (as $hostid => $texts)
 	 */
 	public function resolveMacrosInTextBatch(array $data) {
+		$macros = array();
+		$hostIds = array();
+
 		$isHostMacrosExist = false;
 		$isIpMacrosExist = false;
 
-		foreach ($data as $texts) {
-			if (!$isHostMacrosExist && count($this->findMacros(self::PATTERN_HOST, $texts)) > 0) {
+		foreach ($data as $hostId => $texts) {
+			$hostMacros = $this->findMacros(self::PATTERN_HOST, $texts);
+			if (!empty($hostMacros)) {
+				foreach ($hostMacros as $hostMacro) {
+					$macros[$hostId][$hostMacro] = UNRESOLVED_MACRO_STRING;
+				}
+
 				$isHostMacrosExist = true;
 			}
-			if (!$isIpMacrosExist && count($this->findMacros(self::PATTERN_IP, $texts)) > 0) {
+
+			$ipMacros = $this->findMacros(self::PATTERN_IP, $texts);
+			if (!empty($ipMacros)) {
+				foreach ($ipMacros as $ipMacro) {
+					$macros[$hostId][$ipMacro] = UNRESOLVED_MACRO_STRING;
+				}
+
 				$isIpMacrosExist = true;
 			}
 
-			if ($isHostMacrosExist && $isIpMacrosExist) {
-				break;
-			}
+			array_push($hostIds, $hostId);
 		}
-
-		$hostIds = array_keys($data);
-		$macros = array();
 
 		// host macros
 		if ($isHostMacrosExist) {
@@ -158,15 +167,7 @@ class CMacrosResolver {
 						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
 							$matche = $matches[0][$i];
 
-							if (isset($macros[$hostId][$matche[0]])) {
-								$macrosValue = $macros[$hostId][$matche[0]];
-							}
-							else {
-								preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $matche[0], $matcheType);
-
-								$macrosValue = empty($matcheType) ? UNRESOLVED_MACRO_STRING : $matche[0];
-							}
-
+							$macrosValue = isset($macros[$hostId][$matche[0]]) ? $macros[$hostId][$matche[0]] : $matche[0];
 							$text = substr_replace($text, $macrosValue, $matche[1], strlen($matche[0]));
 						}
 
