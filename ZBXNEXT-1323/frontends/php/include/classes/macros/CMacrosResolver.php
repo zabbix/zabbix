@@ -52,10 +52,10 @@ class CMacrosResolver {
 		$isIpMacrosExist = false;
 
 		foreach ($data as $texts) {
-			if (!$isHostMacrosExist && $this->findMacros(self::PATTERN_HOST, $texts)) {
+			if (!$isHostMacrosExist && count($this->findMacros(self::PATTERN_HOST, $texts)) > 0) {
 				$isHostMacrosExist = true;
 			}
-			if (!$isIpMacrosExist && $this->findMacros(self::PATTERN_IP, $texts)) {
+			if (!$isIpMacrosExist && count($this->findMacros(self::PATTERN_IP, $texts)) > 0) {
 				$isIpMacrosExist = true;
 			}
 
@@ -148,18 +148,20 @@ class CMacrosResolver {
 
 		foreach ($data as $hostId => $texts) {
 			// get user macros
-			foreach ($this->expandUserMacros($texts, $hostId) as $macro => $value) {
-				$macros[$hostId][$macro] = $value;
-			}
+			$macros[$hostId] = array_merge($macros[$hostId], $this->expandUserMacros($texts, $hostId));
 
 			// replace macros to value
 			foreach ($texts as $tnum => $text) {
 				if (!empty($macros[$hostId])) {
-					$offset = 0;
-					while (preg_match('/'.self::PATTERN_HOST.'|'.self::PATTERN_IP.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE, $offset)) {
-						$macrosValue = isset($macros[$hostId][$matches[0][0]]) ? $macros[$hostId][$matches[0][0]] : $matches[0][0];
-						$text = substr_replace($text, $macrosValue, $matches[0][1], strlen($matches[0][0]));
-						$offset = $matches[0][1] + strlen($macrosValue);
+					preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_IP.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
+
+					if (!empty($matches[0])) {
+						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
+							$matche = $matches[0][$i];
+
+							$macrosValue = isset($macros[$hostId][$matche[0]]) ? $macros[$hostId][$matche[0]] : $matche[0];
+							$text = substr_replace($text, $macrosValue, $matche[1], strlen($matche[0]));
+						}
 					}
 
 					$data[$hostId][$tnum] = $text;
@@ -187,12 +189,12 @@ class CMacrosResolver {
 	/**
 	 * Find user macros.
 	 *
-	 * @param array $text
+	 * @param array $texts
 	 * @param int $hostId
 	 *
 	 * @return mixed
 	 */
-	private function expandUserMacros($texts, $hostId) {
+	private function expandUserMacros(array $texts, $hostId) {
 		$matches = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $texts);
 
 		$macros = array();
