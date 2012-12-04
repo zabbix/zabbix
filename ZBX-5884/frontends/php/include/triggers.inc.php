@@ -2183,16 +2183,13 @@ function makeExpression(array $expressionTree, $level = 0, $operand = null)
 				$subExpression = makeExpression($element['elements'], $level + 1, $element['operand']);
 
 				$expression .= ($level == 0) ? $subExpression : '('.$subExpression.')';
-				if ($operand !== null && $key != $last_key) {
-					$expression .= ' '.$operand.' ';
-				}
 				break;
 			case 'expression':
 				$expression .= $element['expression'];
-				if ($operand !== null && $key != $last_key) {
-					$expression .= ' '.$operand.' ';
-				}
 				break;
+		}
+		if ($operand !== null && $key != $last_key) {
+			$expression .= ' '.$operand.' ';
 		}
 	}
 	return $expression;
