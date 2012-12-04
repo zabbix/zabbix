@@ -47,9 +47,6 @@ class CTemplateScreen extends CScreen {
 		// allowed columns for sorting
 		$sortColumns = array('screenid', 'name');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('screens' => 's.screenid, s.templateid'),
 			'from'		=> array('screens' => 'screens s'),
@@ -255,43 +252,9 @@ class CTemplateScreen extends CScreen {
 		}
 
 		$screenids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlGroup .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-					FROM '.$sqlFrom.'
-					WHERE '.DBin_node('s.screenid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -306,10 +269,6 @@ class CTemplateScreen extends CScreen {
 
 				if (!isset($result[$screen['screenid']])) {
 					$result[$screen['screenid']] = array();
-				}
-
-				if (!is_null($options['selectScreenItems']) && !isset($result[$screen['screenid']]['screenitems'])) {
-					$result[$screen['screenid']]['screenitems'] = array();
 				}
 
 				if (isset($screen['screenitemid']) && is_null($options['selectScreenItems'])) {
@@ -327,29 +286,44 @@ class CTemplateScreen extends CScreen {
 		$options['hostids'] = zbx_toHash($options['hostids']);
 
 		// adding screenitems
-		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
-			$screensItems = array();
-			$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.DBcondition('si.screenid', $screenids));
-			while ($sitem = DBfetch($dbSitems)) {
-				// sorting
-				$screensItems[$sitem['screenitemid']] = $sitem;
-				switch ($sitem['resourcetype']) {
+		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
+			$screenItems = API::getApi()->select('screens_items', array(
+				'output' => $this->outputExtend('screens_items',
+					array('screenid', 'screenitemid', 'resourcetype', 'resourceid'), $options['selectScreenItems']
+				),
+				'filter' => array('screenid' => $screenids),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
+
+			foreach ($screenItems as &$screenItem) {
+				switch ($screenItem['resourcetype']) {
 					case SCREEN_RESOURCE_GRAPH:
-						$graphids[$sitem['resourceid']] = $sitem['resourceid'];
+						$graphids[$screenItem['resourceid']] = $screenItem['resourceid'];
 						break;
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:
 					case SCREEN_RESOURCE_PLAIN_TEXT:
-						$itemids[$sitem['resourceid']] = $sitem['resourceid'];
+						$itemids[$screenItem['resourceid']] = $screenItem['resourceid'];
 						break;
 				}
-			}
 
-			foreach ($screensItems as $sitem) {
-				if (!isset($result[$sitem['screenid']]['screenitems'])) {
-					$result[$sitem['screenid']]['screenitems'] = array();
+				// unset unrequested fields
+				if (!$this->outputIsRequested('screenid', $options['selectScreenItems'])) {
+					unset($screenItem['screenid']);
 				}
-				$result[$sitem['screenid']]['screenitems'][] = $sitem;
+				if (!$this->outputIsRequested('screenitemid', $options['selectScreenItems'])) {
+					unset($screenItem['screenitemid']);
+				}
+				if (!$this->outputIsRequested('resourceid', $options['selectScreenItems'])) {
+					unset($screenItem['resourceid']);
+				}
+				if (!$this->outputIsRequested('resourcetype', $options['selectScreenItems'])) {
+					unset($screenItem['resourcetype']);
+				}
 			}
+			unset($screenItem);
+
+			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
 		}
 
 		// creating linkage of template -> real objects
