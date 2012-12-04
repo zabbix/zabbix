@@ -1669,9 +1669,7 @@ function analyze_expression($expression) {
 		return false;
 	}
 
-	$element = array();
-	getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1, $element);
-	$expressionTree[] = $element;
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
 
 	$next = array();
 	$letterNum = 0;
@@ -1878,7 +1876,9 @@ function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $e
  * @param integer $end
  * @param array &$expressionTree
  */
-function getExpressionTree(CTriggerExpression $expressionData, $start, $end, array &$expressionTree) {
+function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
+	$expressionTree = array();
+
 	foreach (array('|', '&') as $operand) {
 		$operand_found = false;
 		$lParentheses = -1;
@@ -1918,9 +1918,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end, arr
 							$closeSymbolNum--;
 						}
 
-						$element = array();
-						getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum, $element);
-						$expressions[] = $element;
+						$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
 						$openSymbolNum = $i + 1;
 						$operand_found = true;
 					}
@@ -1948,9 +1946,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end, arr
 				$closeSymbolNum--;
 			}
 
-			$element = array();
-			getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum, $element);
-			$expressions[] = $element;
+			$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
 
 			$openSymbolNum = $start;
 			while ($expressionData->expression[$openSymbolNum] == ' ') {
@@ -1976,7 +1972,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end, arr
 				$openSymbolNum++;
 				$closeSymbolNum--;
 
-				getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum, $expressionTree);
+				$expressionTree = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
 			}
 			else {
 				$expressionTree = array(
@@ -1987,6 +1983,8 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end, arr
 			}
 		}
 	}
+
+	return $expressionTree;
 }
 
 /**
@@ -2010,9 +2008,7 @@ function remake_expression($expression, $expressionId, $action, $newExpression) 
 		return false;
 	}
 
-	$element = array();
-	getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1, $element);
-	$expressionTree[] = $element;
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
 
 	if (rebuildExpressionTree($expressionTree, $expressionId, $action, $newExpression)) {
 		$expression = makeExpression($expressionTree);
