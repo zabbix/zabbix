@@ -155,21 +155,19 @@ class CMacrosResolver {
 					if (!empty($macros[$hostId])) {
 						preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_IP.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
 
-						if (!empty($matches[0])) {
-							for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
-								$matche = $matches[0][$i];
+						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
+							$matche = $matches[0][$i];
 
-								if (isset($macros[$hostId][$matche[0]])) {
-									$macrosValue = $macros[$hostId][$matche[0]];
-								}
-								else {
-									preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $matche[0], $matcheType);
-
-									$macrosValue = empty($matcheType) ? UNRESOLVED_MACRO_STRING : $matche[0];
-								}
-
-								$text = substr_replace($text, $macrosValue, $matche[1], strlen($matche[0]));
+							if (isset($macros[$hostId][$matche[0]])) {
+								$macrosValue = $macros[$hostId][$matche[0]];
 							}
+							else {
+								preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $matche[0], $matcheType);
+
+								$macrosValue = empty($matcheType) ? UNRESOLVED_MACRO_STRING : $matche[0];
+							}
+
+							$text = substr_replace($text, $macrosValue, $matche[1], strlen($matche[0]));
 						}
 
 						$data[$hostId][$tnum] = $text;
