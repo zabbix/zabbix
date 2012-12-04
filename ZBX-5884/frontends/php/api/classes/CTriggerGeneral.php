@@ -180,13 +180,12 @@ abstract class CTriggerGeneral extends CZBXAPI {
 				}
 			}
 
-			$length_old = strlen($exprPart['expression']);
-			$length_new = strlen('{'.$exprPart['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}');
-			$newTrigger['expression'] = substr_replace($newTrigger['expression'],
-					'{'.$exprPart['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}',
-					$exprPart['pos'] + $offset, $length_old
-			);
-			$offset += $length_new - $length_old;
+			$newExpression = '{'.$exprPart['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}';
+			$lengthOld = strlen($exprPart['expression']);
+			$lengthNew = strlen($newExpression);
+			$newTrigger['expression'] = substr_replace($newTrigger['expression'], $newExpression,
+					$exprPart['pos'] + $offset, $lengthOld);
+			$offset += $lengthNew - $lengthOld;
 		}
 
 		// check if a child trigger already exists on the host
