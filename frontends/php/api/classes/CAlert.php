@@ -95,19 +95,6 @@ class CAlert extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['alerts']);
-
-			$dbTable = DB::getSchema('alerts');
-			$sqlParts['select']['alertid'] = 'a.alertid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'a.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + PERMISSION CHECK
 		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
@@ -242,17 +229,6 @@ class CAlert extends CZBXAPI {
 		// time_till
 		if (!is_null($options['time_till'])) {
 			$sqlParts['where'][] = 'a.clock<'.$options['time_till'];
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['alerts'] = 'a.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT a.alertid) AS rowscount');
 		}
 
 		// sorting

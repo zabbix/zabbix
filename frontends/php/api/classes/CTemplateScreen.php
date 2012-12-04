@@ -84,21 +84,6 @@ class CTemplateScreen extends CScreen {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			// templateid must be selected for counting to work
-			$sqlParts['select'] = array(
-				'templateid' => 's.templateid'
-			);
-
-			$dbTable = DB::getSchema('screens');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 's.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		if (!is_null($options['editable']) || (is_null($options['hostids']) && is_null($options['templateids']))) {
 			$options['noInheritance'] = 1;
 		}
@@ -223,24 +208,6 @@ class CTemplateScreen extends CScreen {
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('screens s', $options, $sqlParts);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['screens'] = 's.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT s.screenid) as rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 		// sorting

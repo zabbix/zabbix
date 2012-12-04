@@ -98,19 +98,6 @@ class CGraph extends CGraphGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['graphs']);
-
-			$dbTable = DB::getSchema('graphs');
-			$sqlParts['select']['graphid'] = 'g.graphid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'g.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// permission check
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
@@ -242,24 +229,6 @@ class CGraph extends CGraphGeneral {
 			}
 			else {
 				$sqlParts['where'][] = 'g.templateid IS NULL';
-			}
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['graphs'] = 'g.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT g.graphid) AS rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
 			}
 		}
 

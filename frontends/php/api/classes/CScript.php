@@ -89,19 +89,6 @@ class CScript extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['scripts']);
-
-			$dbTable = DB::getSchema('scripts');
-			$sqlParts['select']['scriptid'] = 's.scriptid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 's.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + permission check
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -170,11 +157,6 @@ class CScript extends CZBXAPI {
 			$sqlParts['where'][] = DBcondition('s.scriptid', $options['scriptids']);
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['scripts'] = 's.*';
-		}
-
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('scripts s', $options, $sqlParts);
@@ -183,13 +165,6 @@ class CScript extends CZBXAPI {
 		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('scripts s', $options, $sqlParts);
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-
-			$sqlParts['select'] = array('COUNT(DISTINCT s.scriptid) AS rowscount');
 		}
 
 		// sorting

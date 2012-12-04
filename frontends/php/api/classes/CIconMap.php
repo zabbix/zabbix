@@ -84,16 +84,6 @@ class CIconMap extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			$dbTable = DB::getSchema('icon_map');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'im.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + PERMISSION CHECK
 		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return array();
@@ -123,17 +113,6 @@ class CIconMap extends CZBXAPI {
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('icon_map im', $options, $sqlParts);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['icon_map'] = 'im.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT im.iconmapid) AS rowscount');
 		}
 
 		// sorting

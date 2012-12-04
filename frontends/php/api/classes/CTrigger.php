@@ -1975,16 +1975,21 @@ class CTrigger extends CTriggerGeneral {
 		return false;
 	}
 
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['groupids'] === null &&
-			$options['templateids'] === null &&
-			$options['hostids'] === null &&
-			$options['triggerids'] === null &&
-			$options['itemids'] === null &&
-			$options['applicationids'] === null) {
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		if (!$options['countOutput'] !== null) {
+			// expandData
+			if (!is_null($options['expandData'])) {
+				$sqlParts['select']['host'] = 'h.host';
+				$sqlParts['select']['hostid'] = 'h.hostid';
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts'] = 'hosts h';
+				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			}
 		}
 
 		return $sqlParts;
