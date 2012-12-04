@@ -42,9 +42,9 @@ class CMacrosResolver {
 	/**
 	 * Batch resolving host and ip macros in text using host id.
 	 *
-	 * @param array $data (as $hostid => $texts)
+	 * @param array $data (as $hostid => array(texts))
 	 *
-	 * @return array (as $hostid => $texts)
+	 * @return array (as $hostid => array(texts))
 	 */
 	public function resolveMacrosInTextBatch(array $data) {
 		$macros = array();
@@ -72,7 +72,7 @@ class CMacrosResolver {
 				$isIpMacrosExist = true;
 			}
 
-			array_push($hostIds, $hostId);
+			$hostIds[] = $hostId;
 		}
 
 		// host macros
@@ -205,15 +205,11 @@ class CMacrosResolver {
 	private function expandUserMacros(array $texts, $hostId) {
 		$matches = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $texts);
 
-		$macros = array();
-		if (!empty($matches)) {
-			$macros = API::UserMacro()->getMacros(array(
-				'macros' => $matches,
-				'hostid' => $hostId
-			));
+		if (empty($matches)) {
+			return array();
 		}
 
-		return $macros;
+		return $macros = API::UserMacro()->getMacros(array('macros' => $matches, 'hostid' => $hostId));
 	}
 
 	/**
