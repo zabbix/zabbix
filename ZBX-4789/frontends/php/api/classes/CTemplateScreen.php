@@ -43,6 +43,7 @@ class CTemplateScreen extends CScreen {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('screenid', 'name');
@@ -128,7 +129,7 @@ class CTemplateScreen extends CScreen {
 				// TODO: get screen
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-				$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+				$userGroups = getUserGroupsByUserId($userid);
 
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT hgg.hostid'.
@@ -136,7 +137,7 @@ class CTemplateScreen extends CScreen {
 					' JOIN rights r'.
 						' ON r.id=hgg.groupid'.
 							' AND '.DBcondition('r.groupid', $userGroups).
-					' WHERE '.$this->tableAlias.'.templateid=hgg.hostid'.
+					' WHERE s.templateid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>='.$permission.
 					')';

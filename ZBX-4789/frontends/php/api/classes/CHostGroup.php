@@ -115,20 +115,7 @@ class CHostGroup extends CZBXAPI {
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'r.id=g.groupid';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT gg.groupid'.
-					' FROM groups gg,rights rr,users_groups ugg'.
-					' WHERE rr.id=g.groupid'.
-						' AND rr.groupid=ugg.usrgrpid'.
-						' AND ugg.userid='.$userid.
-						' AND rr.permission<'.$permission.')';
-/*			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT r.id'.
@@ -137,7 +124,7 @@ class CHostGroup extends CZBXAPI {
 					' AND '.DBcondition('r.groupid', $userGroups).
 				' GROUP BY r.id'.
 				' HAVING MIN(r.permission)>='.$permission.
-				')';*/
+				')';
 		}
 
 		// groupids
