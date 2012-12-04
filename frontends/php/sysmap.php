@@ -256,6 +256,7 @@ order_result($iconList, 'name');
 
 // we need selements to be a hash for further processing
 $sysmap['selements'] = zbx_toHash($sysmap['selements'], 'selementid');
+$sysmap['links'] = zbx_toHash($sysmap['links'], 'linkid');
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
 	'sysmap' => $sysmap,
 	'iconList' => $iconList,
