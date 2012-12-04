@@ -39,6 +39,14 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+var_dump(API::TemplateScreen()->get(array(
+	'selectScreenItems' => API_OUTPUT_EXTEND,
+//	'selectScreenItems' => array('description', 'servicealarmid'),
+//	'templateids' => 10073
+//	'selectHosts' => API_OUTPUT_COUNT,
+)));
+require_once dirname(__FILE__).'/include/page_footer.php';
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
