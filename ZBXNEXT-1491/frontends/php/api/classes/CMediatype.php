@@ -50,7 +50,6 @@ class CMediatype extends CZBXAPI {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('mediatypeid');

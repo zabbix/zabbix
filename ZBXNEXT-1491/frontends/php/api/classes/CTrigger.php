@@ -55,8 +55,6 @@ class CTrigger extends CTriggerGeneral {
 		// allowed columns for sorting
 		$sortColumns = array('triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname');
 
-		$fieldsToUnset = array();
-
 		$sqlParts = array(
 			'select'	=> array('triggers' => 't.triggerid'),
 			'from'		=> array('t' => 'triggers t'),
@@ -120,37 +118,6 @@ class CTrigger extends CTriggerGeneral {
 			'limitSelects'					=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
-
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['triggers']);
-
-			$dbTable = DB::getSchema('triggers');
-			$sqlParts['select']['triggerid'] = ' t.triggerid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 't.'.$field;
-				}
-			}
-
-			if (!is_null($options['expandDescription'])) {
-				if (!str_in_array('description', $options['output'])) {
-					$options['expandDescription'] = null;
-				}
-				else {
-					if (!str_in_array('expression', $options['output'])) {
-						$sqlParts['select']['expression'] = ' t.expression';
-						$fieldsToUnset[] = 'expression';
-					}
-				}
-			}
-
-			// ignore the "expandExpression" parameter if the expression is not requested
-			if ($options['expandExpression'] !== null && !str_in_array('expression', $options['output'])) {
-				$options['expandExpression'] = null;
-			}
-
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
 
 		// editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
@@ -585,6 +552,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$triggerids = array();
 
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
@@ -736,24 +704,24 @@ class CTrigger extends CTriggerGeneral {
 		// expandDescription
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CTriggerHelper::batchExpandDescription($result);
+
+			// unset the expression if it's not requested
+			if (!$this->outputIsRequested('expression', $options['output'])) {
+				foreach ($result as &$trigger) {
+					unset($trigger['expression']);
+				}
+				unset($trigger);
+			}
 		}
 
 		// expand expression
 		if ($options['expandExpression'] !== null) {
 			foreach ($result as &$trigger) {
-				if ($trigger['expression']) {
+				if (isset($trigger['expression'])) {
 					$trigger['expression'] = explode_exp($trigger['expression'], false, true);
 				}
 			}
 			unset($trigger);
-		}
-
-		if (!empty($fieldsToUnset)) {
-			foreach ($result as $tnum => $trigger) {
-				foreach ($fieldsToUnset as $fieldToUnset) {
-					unset($result[$tnum][$fieldToUnset]);
-				}
-			}
 		}
 
 		// removing keys (hash -> array)
@@ -1989,6 +1957,10 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			}
+
+			if ($options['expandDescription'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
 			}
 		}
 

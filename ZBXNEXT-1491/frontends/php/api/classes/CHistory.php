@@ -52,9 +52,6 @@ class CHistory extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('itemid', 'clock');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('history' => 'h.itemid'),
 			'from'		=> array(),

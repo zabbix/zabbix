@@ -108,9 +108,6 @@ class CItemPrototype extends CItemGeneral {
 									' AND rr.permission='.PERM_DENY.')';
 		}
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // templateids
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
