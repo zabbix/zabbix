@@ -309,21 +309,6 @@ class CEvent extends CZBXAPI {
 				if (!isset($result[$event['eventid']])) {
 					$result[$event['eventid']]= array();
 				}
-				if (!is_null($options['selectHosts']) && !isset($result[$event['eventid']]['hosts'])) {
-					$result[$event['eventid']]['hosts'] = array();
-				}
-				if (!is_null($options['selectTriggers']) && !isset($result[$event['eventid']]['triggers'])) {
-					$result[$event['eventid']]['triggers'] = array();
-				}
-				if (!is_null($options['selectItems']) && !isset($result[$event['eventid']]['items'])) {
-					$result[$event['eventid']]['items'] = array();
-				}
-				if (!is_null($options['select_alerts']) && !isset($result[$event['eventid']]['alerts'])) {
-					$result[$event['eventid']]['alerts'] = array();
-				}
-				if (!is_null($options['select_acknowledges']) && !isset($result[$event['eventid']]['acknowledges'])) {
-					$result[$event['eventid']]['acknowledges'] = array();
-				}
 
 				// hostids
 				if (isset($event['hostid']) && is_null($options['selectHosts'])) {
