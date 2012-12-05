@@ -1657,7 +1657,7 @@ function make_trigger_details($trigger) {
  *
  * @return array
  */
-function analyze_expression($expression) {
+function analyzeExpression($expression) {
 	if (empty($expression)) {
 		return array('', null);
 	}
@@ -1680,12 +1680,12 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 	$outline = '';
 
 	end($expressionTree);
-	$last_key = key($expressionTree);
+	$lastKey = key($expressionTree);
 
 	foreach ($expressionTree as $key => $element) {
 		switch ($element['type']) {
 			case 'operand':
-				$next[$level] = ($key != $last_key);
+				$next[$level] = ($key != $lastKey);
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;
 				$expr[] = italic($element['operand'] == '&' ? _('AND') : _('OR'));
@@ -1713,7 +1713,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				}
 				break;
 			case 'expression':
-				$next[$level] = ($key != $last_key);
+				$next[$level] = ($key != $lastKey);
 
 				$letter = num2letter($letterNum++);
 				$outline .= $letter;
@@ -1879,7 +1879,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 	$expressionTree = array();
 
 	foreach (array('|', '&') as $operand) {
-		$operand_found = false;
+		$operandFound = false;
 		$lParentheses = -1;
 		$rParentheses = -1;
 		$expressions = array();
@@ -1919,7 +1919,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 
 						$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
 						$openSymbolNum = $i + 1;
-						$operand_found = true;
+						$operandFound = true;
 					}
 					break;
 				case '{':
@@ -1938,7 +1938,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 			$closeSymbolNum--;
 		}
 
-		if ($operand_found) {
+		if ($operandFound) {
 			$expressionElementsNum = getExpressionElementsNum($expressionData, $openSymbolNum, $closeSymbolNum);
 			if ($expressionElementsNum == 1 && $openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
 				$openSymbolNum++;
@@ -1996,7 +1996,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
  *
  * @return bool                 returns new expression or false if expression is incorrect
  */
-function remake_expression($expression, $expressionId, $action, $newExpression) {
+function remakeExpression($expression, $expressionId, $action, $newExpression) {
 	if (empty($expression)) {
 		return false;
 	}
@@ -2174,7 +2174,7 @@ function makeExpression(array $expressionTree, $level = 0, $operand = null)
 	$expression = '';
 
 	end($expressionTree);
-	$last_key = key($expressionTree);
+	$lastKey = key($expressionTree);
 
 	foreach ($expressionTree as $key => $element) {
 		switch ($element['type']) {
@@ -2187,7 +2187,7 @@ function makeExpression(array $expressionTree, $level = 0, $operand = null)
 				$expression .= $element['expression'];
 				break;
 		}
-		if ($operand !== null && $key != $last_key) {
+		if ($operand !== null && $key != $lastKey) {
 			$expression .= ' '.$operand.' ';
 		}
 	}
