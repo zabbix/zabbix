@@ -2012,6 +2012,11 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
 	}
 
 	$expressionData = new CTriggerExpression();
+	if ($action != 'R' && !$expressionData->parse($newExpression)) {
+		error($expressionData->error);
+		return false;
+	}
+
 	if (!$expressionData->parse($expression)) {
 		error($expressionData->error);
 		return false;
