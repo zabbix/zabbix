@@ -1675,6 +1675,17 @@ function analyzeExpression($expression) {
 	return buildExpressionHtmlTree($expressionTree, $next, $letterNum);
 }
 
+/**
+ * Builds expression html tree
+ *
+ * @param array $expressionTree output of getExpressionTree() function
+ * @param array $next           parameter only for recursive call; should be empty array
+ * @param int $letterNum        parameter only for recursive call; should be 0
+ * @param int $level            parameter only for recursive call
+ * @param string $operand       parameter only for recursive call
+ *
+ * @return bool                 returns true if element is found, false - otherwise
+ */
 function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operand = null) {
 	$treeList = array();
 	$outline = '';
@@ -1806,7 +1817,7 @@ function expressionHighLevelErrors($expression) {
  * Draw level for trigger expression builder tree
  *
  * @param array $next
- * @param integer $level
+ * @param int $level
  *
  * @return array
  */
@@ -1833,8 +1844,8 @@ function expressionLevelDraw(array $next, $level) {
  * "{host.key.last(0)}=0" and "({host2:key.last(0)}=0 & {host3.key.last(0)}=0)"
  *
  * @param CTriggerExpression $expressionData
- * @param integer $start
- * @param integer $end
+ * @param int $start
+ * @param int $end
  *
  * @return integer
  */
@@ -1871,8 +1882,8 @@ function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $e
  * Makes tree of expression elements
  *
  * @param CTriggerExpression $expressionData
- * @param integer $start
- * @param integer $end
+ * @param int $start
+ * @param int $end
  * @param array &$expressionTree
  */
 function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
@@ -2164,7 +2175,7 @@ function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $
  *   "{host1:system.cpu.util[,iowait].last(0)} > 50 & {host2:system.cpu.util[,iowait].last(0)} > 50"
  *
  * @param array $expressionTree
- * @param integer $level        parameter only for recursive call
+ * @param int $level        parameter only for recursive call
  * @param string $operand       parameter only for recursive call
  *
  * @return string
