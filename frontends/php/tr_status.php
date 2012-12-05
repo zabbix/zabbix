@@ -426,7 +426,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	}
 
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
+	$scripts_by_hosts = API::Script()->getScriptsByHostIds($tr_hostids);
 
 	// fetch all hosts
 	$hosts = API::Host()->get(array(

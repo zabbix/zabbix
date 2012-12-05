@@ -687,7 +687,7 @@ function get_items_data_overview($hostids, $view_style) {
 		'with_monitored_items' => true,
 		'preservekeys' => true
 	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+	$hostScripts = API::Script()->getScriptsByHostIds(zbx_objectValues($hosts, 'hostid'));
 	foreach ($hostScripts as $hostid => $scripts) {
 		$hosts[$hostid]['scripts'] = $scripts;
 	}
