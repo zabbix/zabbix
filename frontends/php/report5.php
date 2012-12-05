@@ -85,7 +85,7 @@ $available_hosts = API::Host()->get(array(
 ));
 $available_hosts = array_keys($available_hosts);
 $available_triggers = get_accessible_triggers(PERM_READ, array());
-$scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
+$scripts_by_hosts = API::Script()->getScriptsByHostIds($available_hosts);
 
 $triggersEventCount = array();
 // get 100 triggerids with max even count
