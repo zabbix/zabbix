@@ -984,13 +984,12 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	}
 	unset($newFunction);
 
-	end($expressionData->expressions);
+	$exprPart = end($expressionData->expressions);
 	do {
-		$exprPart = current($expressionData->expressions);
 		$expression = substr_replace($expression, '{'.$newFunctions[$exprPart['expression']].'}',
 				$exprPart['pos'], strlen($exprPart['expression']));
 	}
-	while (prev($expressionData->expressions) !== false);
+	while ($exprPart = prev($expressionData->expressions));
 
 	$hostnames = array_unique($hostnames);
 
