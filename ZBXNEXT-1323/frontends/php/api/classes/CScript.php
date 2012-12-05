@@ -546,7 +546,7 @@ class CScript extends CZBXAPI {
 
 			$macrosData = array();
 			foreach ($scripts as $script) {
-				if ($script['confirmation']) {
+				if (!empty($script['confirmation'])) {
 					foreach ($script['hosts'] as $host) {
 						if (isset($scriptsByHost[$host['hostid']])) {
 							$macrosData[$host['hostid']][] = $script['confirmation'];
