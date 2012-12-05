@@ -232,7 +232,7 @@ if($_REQUEST['hostid']>0){
 $hosts = API::Host()->get($options);
 
 // fetch scripts for the host JS menu
-$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+$hostScripts = API::Script()->getScriptsByHostIds($options['hostids']);
 
 // select hosts
 $sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.

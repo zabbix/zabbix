@@ -1182,7 +1182,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 		'selectInventory' => true,
 		'preservekeys' => true
 	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+	$hostScripts = API::Script()->getScriptsByHostIds(zbx_objectValues($hosts, 'hostid'));
 	foreach ($hostScripts as $hostid => $scripts) {
 		$hosts[$hostid]['scripts'] = $scripts;
 	}
@@ -1654,7 +1654,7 @@ function make_trigger_details($trigger) {
 	));
 	$host = reset($host);
 
-	$hostScripts = API::Script()->getScriptsByHosts($host['hostid']);
+	$hostScripts = API::Script()->getScriptsByHostIds($host['hostid']);
 
 	// host js link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
