@@ -1880,10 +1880,34 @@ function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $e
 /**
  * Makes tree of expression elements
  *
+ * Expression:
+ *   "{host1:system.cpu.util[,iowait].last(0)} > 50 & {host2:system.cpu.util[,iowait].last(0)} > 50"
+ * Result:
+ *   array(
+ *     [0] => array(
+ *       'id' => '0_92',
+ *       'type' => 'operand',
+ *       'operand' => '&',
+ *       'elements' => array(
+ *         [0] => array(
+ *           'id' => '0_44',
+ *           'type' => 'expression',
+ *           'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
+ *         ),
+ *         [1] => array(
+ *           'id' => '48_92',
+ *           'type' => 'expression',
+ *           'expression' => '{host2:system.cpu.util[,iowait].last(0)} > 50'
+ *         )
+ *       )
+ *     )
+ *   )
+ *
  * @param CTriggerExpression $expressionData
  * @param int $start
  * @param int $end
- * @param array &$expressionTree
+ *
+ * @return array
  */
 function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 	$expressionTree = array();
