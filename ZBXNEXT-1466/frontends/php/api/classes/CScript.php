@@ -522,7 +522,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @param $hostIds
 	 *
-	 * @return array    an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...)
+	 * @return array (an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...) )
 	 */
 	public function getScriptsByHosts($hostIds) {
 		zbx_value2array($hostIds);
@@ -532,28 +532,58 @@ class CScript extends CZBXAPI {
 			$scriptsByHost[$hostid] = array();
 		}
 
-		$scripts  = $this->get(array(
+		$scripts = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
 			'hostids' => $hostIds,
 			'sortfield' => 'name',
 			'preservekeys' => true
 		));
-		foreach ($scripts as $script) {
-			$hosts = $script['hosts'];
-			unset($script['hosts']);
 
-			foreach ($hosts as $host) {
-				$hostId = $host['hostid'];
-				if (isset($scriptsByHost[$hostId])) {
-					$scriptsByHost[$hostId][] = $script;
+		if (!empty($scripts)) {
+			// resolve macros
+			$macrosResolver = new CMacrosResolver();
+
+			$macrosData = array();
+			foreach ($scripts as $script) {
+				if (!empty($script['confirmation'])) {
+					foreach ($script['hosts'] as $host) {
+						if (isset($scriptsByHost[$host['hostid']])) {
+							$macrosData[$host['hostid']][] = $script['confirmation'];
+						}
+					}
 				}
+			}
+			if (!empty($macrosData)) {
+				$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+			}
+
+			$i = 0;
+			foreach ($scripts as $script) {
+				$hosts = $script['hosts'];
+				unset($script['hosts']);
+
+				// set script to host
+				foreach ($hosts as $host) {
+					$hostId = $host['hostid'];
+
+					if (isset($scriptsByHost[$hostId])) {
+						$size = count($scriptsByHost[$hostId]);
+						$scriptsByHost[$hostId][$size] = $script;
+
+						// set confirmation text with resolved macros
+						if (!empty($macrosData[$hostId])) {
+							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$i];
+						}
+					}
+				}
+
+				$i++;
 			}
 		}
 
 		return $scriptsByHost;
 	}
-
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// only apply the node option if no specific ids are given

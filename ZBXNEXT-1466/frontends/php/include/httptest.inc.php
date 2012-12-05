@@ -172,22 +172,22 @@ function getHttpTestsParentTemplates(array $httpTests) {
  * Resolve http tests macros.
  *
  * @param array $httpTests
- * @param bool  $resolveTest
- * @param bool  $esolveSteps
+ * @param bool  $resolveName
+ * @param bool  $resolveStepName
  *
  * @return array
  */
-function resolveHttpTestMacros(array $httpTests, $resolveTest = true, $esolveSteps = true) {
+function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveStepName = true) {
 	$resolver = new CMacrosResolver();
 	$names = array();
 
 	$i = 0;
 	foreach ($httpTests as $test) {
-		if ($resolveTest) {
+		if ($resolveName) {
 			$names[$test['hostid']][$i++] = $test['name'];
 		}
 
-		if ($esolveSteps) {
+		if ($resolveStepName) {
 			foreach ($test['steps'] as $step) {
 				$names[$test['hostid']][$i++] = $step['name'];
 			}
@@ -198,11 +198,11 @@ function resolveHttpTestMacros(array $httpTests, $resolveTest = true, $esolveSte
 
 	$i = 0;
 	foreach ($httpTests as $tnum => $test) {
-		if ($resolveTest) {
+		if ($resolveName) {
 			$httpTests[$tnum]['name'] = $names[$test['hostid']][$i++];
 		}
 
-		if ($esolveSteps) {
+		if ($resolveStepName) {
 			foreach ($httpTests[$tnum]['steps'] as $snum => $step) {
 				$httpTests[$tnum]['steps'][$snum]['name'] = $names[$test['hostid']][$i++];
 			}

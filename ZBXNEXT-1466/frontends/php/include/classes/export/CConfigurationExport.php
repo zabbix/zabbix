@@ -558,7 +558,8 @@ class CConfigurationExport {
 			'output' => array('key_', 'flags', 'type'),
 			'webitems' => true,
 			'selectHosts' => array('host'),
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 
 		foreach ($graphs as $gnum => $graph) {
@@ -1040,7 +1041,8 @@ class CConfigurationExport {
 			'selectHosts' => array('host'),
 			'nodeids' => get_current_nodeid(true),
 			'webitems' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 		foreach ($items as $id => $item) {
 			$host = reset($item['hosts']);

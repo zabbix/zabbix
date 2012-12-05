@@ -144,6 +144,9 @@ if ($nocalculations) {
 	$allLinks = true;
 }
 else {
+	// we need selements to be a hash for further processing
+	$map['selements'] = zbx_toHash($map['selements'], 'selementid');
+
 	add_triggerExpressions($map['selements']);
 
 	$areas = populateFromMapAreas($map);

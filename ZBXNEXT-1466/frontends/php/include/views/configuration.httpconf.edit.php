@@ -24,6 +24,11 @@ require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 $httpWidget = new CWidget();
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
 
+// append host summary to widget header
+if (!empty($this->data['hostid'])) {
+	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+}
+
 // create form
 $httpForm = new CForm();
 $httpForm->setName('httpForm');
@@ -56,7 +61,7 @@ $httpFormList = new CFormList('httpFormList');
 
 // Parent http tests
 if (!empty($this->data['templates'])) {
-	$httpFormList->addRow(_('Parent http tests'), $this->data['templates']);
+	$httpFormList->addRow(_('Parent web scenarios'), $this->data['templates']);
 }
 
 // Host
@@ -74,9 +79,15 @@ if (!$this->data['templated']) {
 $httpFormList->addRow(_('Name'), $nameTextBox);
 
 // Application
-$httpFormList->addRow(_('Application'),
-	new CComboBox('applicationid', $this->data['applicationid'], null, $this->data['application_list'])
-);
+if ($this->data['application_list']) {
+	$applications = zbx_array_merge(array(''), $this->data['application_list']);
+	$httpFormList->addRow(_('Application'),
+		new CComboBox('applicationid', $this->data['applicationid'], null, $applications)
+	);
+}
+else {
+	$httpFormList->addRow(_('Application'), new CSpan(_('No applications defined')));
+}
 
 // New application
 $httpFormList->addRow(_('New application'),
@@ -92,7 +103,11 @@ if (in_array($this->data['authentication'], array(HTTPTEST_AUTH_BASIC, HTTPTEST_
 	$httpFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
 }
 
+// update interval
 $httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
+
+// number of retries
+$httpFormList->addRow(_('Retries'), new CNumericBox('retries', $this->data['retries'], 2));
 
 // append http agents to form list - http://www.useragentstring.com
 $agentComboBox = new CEditableComboBox('agent', $this->data['agent'], ZBX_TEXTBOX_STANDARD_SIZE);

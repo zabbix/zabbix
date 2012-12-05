@@ -50,7 +50,6 @@ function make_favorite_graphs() {
 	$options = array(
 		'itemids' => $itemids,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'output' => API_OUTPUT_EXTEND,
 		'webitems' => 1
 	);
@@ -1146,7 +1145,6 @@ function make_graph_submenu() {
 	$options = array(
 		'itemids' => $itemids,
 		'selectHosts' => array('hostid', 'host'),
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'output' => API_OUTPUT_EXTEND,
 		'webitems' => 1
 	);

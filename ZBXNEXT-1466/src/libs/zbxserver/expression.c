@@ -2601,7 +2601,9 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		}
 		else if (macro_type & MACRO_TYPE_SCRIPT)
 		{
-			if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
