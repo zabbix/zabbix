@@ -71,15 +71,6 @@
 		return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 	}
 
-	function validate_sec($str){
-		return (preg_match('/^[ ]*\d+[KMGTYZEPsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1);
-	}
-
-	function validate_secnum($str){
-		if(preg_match('/^[ ]*#\d+[ ]*$/', $str, $arr)) return 0;
-	return validate_sec($str);
-	}
-
 	function validate_ipv4($str,&$arr){
 		if( !preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr) )	return false;
 		for($i=1; $i<=4; $i++)	if( !is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 )	return false;

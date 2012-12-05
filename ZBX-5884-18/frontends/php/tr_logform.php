@@ -159,7 +159,7 @@ if(isset($_REQUEST['save_trigger'])){
 			// $result = $triggerid;
 			$audit_action = AUDIT_ACTION_ADD;
 
-			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 		}
 
 		if($result){
@@ -329,13 +329,12 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	$bExprResult = true;
-	$exprData = new CTriggerExpression(array(
-		'expression'=> empty($expressions) ? '' : construct_expression($itemid,$expressions)
-	));
-	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !empty($exprData->errors) && !isset($_REQUEST['form_refresh'])){
+	$expressionData = new CTriggerExpression();
+	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
+			&& !$expressionData->parse(empty($expressions) ? '' : construct_expression($itemid, $expressions))
+			&& !isset($_REQUEST['form_refresh'])) {
 
-		info($exprData->errors);
+		info($expressionData->error);
 
 		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;
@@ -343,6 +342,7 @@ if(isset($_REQUEST['sform'])){
 		$expressions[0]['view'] = $expr_incase;
 		$bExprResult = false;
 	}
+
 //sdi('<pre>'.print_r($expressions,true).'</pre>');
 	foreach($expressions as $id => $expr){
 

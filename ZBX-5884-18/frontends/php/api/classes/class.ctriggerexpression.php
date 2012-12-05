@@ -1,780 +1,764 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 class CTriggerExpression {
-	public $errors;
-	public $data;
-	public $expressions;
-	private $symbols;
-	private $previous;
-	private $currExpr;
-	private $newExpr;
-	private $allowed;
+	// for parsing of trigger expression
+	const STATE_INIT = 0;
+	const STATE_AFTER_OPEN_BRACE = 1;
+	const STATE_AFTER_OPERATOR = 2;
+	const STATE_AFTER_MINUS = 3;
+	const STATE_AFTER_CLOSE_BRACE = 4;
+	const STATE_AFTER_CONSTANT = 5;
 
-	public function __construct($trigger) {
-		$this->initializeVars();
-		$this->checkExpression($trigger['expression']);
-	}
+	// for parse of item key parameters
+	const STATE_NEW = 0;
+	const STATE_END = 1;
+	const STATE_UNQUOTED = 2;
+	const STATE_QUOTED = 3;
 
-	public function checkExpression($expression) {
-		$symbolNum = 0;
-		try {
-			if (zbx_empty(trim($expression))) {
-				throw new Exception('Empty expression.');
-			}
+	/**
+	 * Shows a validity of trigger expression
+	 *
+	 * @var bool
+	 */
+	public $isValid;
 
-			// check expr start symbol
-			$startSymbol = zbx_substr(trim($expression), 0, 1);
-			if ($startSymbol != '(' && $startSymbol != '{' && $startSymbol != '-' && !zbx_ctype_digit($startSymbol)) {
-				throw new Exception('Incorrect trigger expression.');
-			}
+	/**
+	 * An error message if trigger expression is not valid
+	 *
+	 * @var string
+	 */
+	public $error;
 
-			$length = zbx_strlen($expression);
-			for ($symbolNum = 0; $symbolNum < $length; $symbolNum++) {
-				$symbol = zbx_substr($expression, $symbolNum, 1);
-				$this->parseOpenParts($this->previous['last']);
-				$this->parseCloseParts($symbol);
+	/**
+	 * An array of trigger functions like {Zabbix server:agent.ping.last(0)}
+	 * The array isn't unique. Same functions can repeats.
+	 *
+	 * Example:
+	 *   'expressions' => array(
+	 *     0 => array(
+	 *       'index' => 0
+	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *       'host' => 'Zabbix server',
+	 *       'item' => 'agent.ping',
+	 *       'function' => 'last(0)',
+	 *       'functionName' => 'last',
+	 *       'functionParam' => '0',
+	 *       'functionParamList' => array (0 => '0')
+	 *     )
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $expressions = array();
 
-				if ($this->inParameter($symbol)) {
-					$this->setPreviousSymbol($symbol);
-					continue;
-				}
-				$this->checkSymbolSequence($symbol);
-				$this->setPreviousSymbol($symbol);
-			}
-			$symbolNum = 0;
-			$simpleExpression = $expression;
-			$this->checkBraces();
-			$this->checkParts($simpleExpression);
-			$this->checkSimpleExpression($simpleExpression);
-		}
-		catch (Exception $e) {
-			$symbolNum = ($symbolNum > 0) ? --$symbolNum : $symbolNum;
-			$this->errors[] = $e->getMessage();
-			$this->errors[] = 'Check expression part starting from "'.zbx_substr($expression, $symbolNum).'".';
-		}
-	}
+	/**
+	 * An array of macros like {TRIGGER.VALUE}
+	 * The array isn't unique. Same macros can repeats.
+	 *
+	 * Example:
+	 *   'expressions' => array(
+	 *     0 => array(
+	 *       'expression' => '{TRIGGER.VALUE}'
+	 *     )
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $macros = array();
 
-	public function checkMacro($macro) {
-		if (!preg_match('/^'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.'$/', $macro)) {
-			throw new Exception('Incorrect macro "'.$macro.'" is used in expression.');
-		}
-	}
+	/**
+	 * An array of user macros like {$MACRO}
+	 * The array isn't unique. Same macros can repeats.
+	 *
+	 * Example:
+	 *    array(
+	 *     0 => array(
+	 *       'expression' => '{$MACRO}'
+	 *     ),
+	 *     1 => array(
+	 *       'expression' => '{$MACRO2}'
+	 *     ),
+	 *     2 => array(
+	 *       'expression' => '{$MACRO}'
+	 *     )
+	 *   )
+	 *
+	 * @var array
+	 */
+	public $usermacros = array();
 
-	public function checkUserMacro($usermacro) {
-		return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $usermacro);
-	}
+	/**
+	 * An expression with trigger functions replaced by indexes like {0}, {1}, ...
+	 * The each index corresponds 'index' variable from 'expressions' array
+	 *
+	 * Example:
+	 *   $expression : "{Zabbix server:agent.ping.last(0)}=0"
+	 *   $expressions : array(
+	 *       0 => array(
+	 *         'index' => 0
+	 *         'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *         ...
+	 *       )
+	 *     )
+	 *   $expressionShort : "{0}=0"
+	 *
+	 * @var string
+	 */
+	public $expressionShort = '';
 
-	public function checkHost($host) {
-		if (zbx_empty($host)) {
-			throw new Exception('Empty host name provided in expression.');
-		}
+	/**
+	 * A current position on a parsed element
+	 *
+	 * @var integer
+	 */
+	private $pos;
 
-		if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host)) {
-			throw new Exception('Incorrect host name "'.$host.'" provided in expression.');
-		}
-	}
+	/**
+	 * A number of elements in an 'expressions' array
+	 *
+	 * @var integer
+	 */
+	private $expressionNum = 0;
 
-	public function checkItem($item) {
-		if (zbx_empty($item)) {
-			throw new Exception('Empty item key "'.$item.'" is used in expression.');
-		}
+	/**
+	 * An initial expression
+	 *
+	 * @var string
+	 */
+	private $expression;
 
-		$itemKey = new CItemKey($item);
-		if (!$itemKey->isValid()) {
-			throw new Exception('Incorrect item key "'.$item.'" is used in expression. '.$itemKey->getError());
-		}
-	}
+	/**
+	 * Parse a trigger expression and set public variables $this->isValid, $this->error, $this->expressions,
+	 *   $this->macros, $this->usermacros and $this->expressionShort
+	 *
+	 * Examples:
+	 *   expression:
+	 *     {Zabbix server:agent.ping.lats(0)}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
+	 *   results:
+	 *     $this->isValid : true
+	 *     $this->error : ''
+	 *     $this->expressions : array(
+	 *       0 => array(
+	 *         'index' => 0
+	 *         'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *         'host' => 'Zabbix server',
+	 *         'item' => 'agent.ping',
+	 *         'function' => 'last(0)',
+	 *         'functionName' => 'last',
+	 *         'functionParam' => '0',
+	 *         'functionParamList' => array (0 => '0')
+	 *       )
+	 *     )
+	 *     $this->macros : array(
+	 *       0 => array(
+	 *         'expression' => '{TRIGGER.VALUE}'
+	 *       )
+	 *     )
+	 *     $this->usermacros : array(
+	 *       0 => array(
+	 *         'expression' => '{$TRIGGER.VALUE}'
+	 *       )
+	 *     )
+	 *     $this->expressionShort : {0}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
+	 *
+	 * @param string $expression
+	 *
+	 * @return bool returns true if expression is valid, false otherwise
+	 */
+	public function parse($expression) {
+		// initializing local variables
+		$this->isValid = true;
+		$this->error = '';
+		$this->expressions = array();
+		$this->macros = array();
+		$this->usermacros = array();
+		$this->expressionShort = '';
 
-	public function checkFunction($expression) {
-		try {
-			if (!isset($this->allowed['functions'][$expression['functionName']])) {
-				throw new Exception('Unknown function.');
-			}
+		$this->pos = 0;
+		$this->expressionNum = 0;
+		$this->expression = $expression;
 
-			if (!preg_match('/^'.ZBX_PREG_FUNCTION_FORMAT.'$/u', $expression['function'])) {
-				throw new Exception('Incorrect function format.');
-			}
+		$state = self::STATE_INIT;
+		$level = 0;
 
-			if (is_null($this->allowed['functions'][$expression['functionName']]['args'])) {
-				if (!zbx_empty($expression['functionParamList'][0])) {
-					throw new Exception('Function does not expect parameters.');
-				}
-				else {
-					return true;
-				}
-			}
-
-			if (count($this->allowed['functions'][$expression['functionName']]['args']) < count($expression['functionParamList'])) {
-				throw new Exception('Function supports '.count($this->allowed['functions'][$expression['functionName']]['args']).' parameters.');
-			}
-
-			foreach ($this->allowed['functions'][$expression['functionName']]['args'] as $anum => $arg) {
-				// mandatory check
-				if (isset($arg['mandat']) && $arg['mandat'] && !isset($expression['functionParamList'][$anum])) {
-					throw new Exception('Mandatory parameter is missing.');
-				}
-
-				// type check
-				if (isset($arg['type']) && isset($expression['functionParamList'][$anum])) {
-					$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expression['functionParamList'][$anum]);
-
-					if ($arg['type'] == 'str' && !is_string($expression['functionParamList'][$anum]) && !$userMacro) {
-						throw new Exception('Parameter of type string or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+		while (isset($this->expression[$this->pos])) {
+			switch ($state) {
+				case self::STATE_INIT:
+				case self::STATE_AFTER_OPEN_BRACE:
+				case self::STATE_AFTER_OPERATOR:
+					switch ($this->expression[$this->pos]) {
+						case ' ':
+							$this->expressionShort .= $this->expression[$this->pos];
+							break;
+						case '-':
+							$this->expressionShort .= $this->expression[$this->pos];
+							$state = self::STATE_AFTER_MINUS;
+							break;
+						case '(':
+							$this->expressionShort .= $this->expression[$this->pos];
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
+							if (!$this->parseConstant()) {
+								break 3;
+							}
+							$state = self::STATE_AFTER_CONSTANT;
 					}
-
-					if ($arg['type'] == 'sec' && validate_sec($expression['functionParamList'][$anum]) != 0 && !$userMacro) {
-						throw new Exception('Parameter sec or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+					break;
+				case self::STATE_AFTER_MINUS:
+					switch ($this->expression[$this->pos]) {
+						case ' ':
+							$this->expressionShort .= $this->expression[$this->pos];
+							break;
+						case '(':
+							$this->expressionShort .= $this->expression[$this->pos];
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
+							if (!$this->parseConstant()) {
+								break 3;
+							}
+							$state = self::STATE_AFTER_CONSTANT;
 					}
-
-					if ($arg['type'] == 'sec_num' && validate_secnum($expression['functionParamList'][$anum]) != 0 && !$userMacro) {
-						throw new Exception('Parameter sec or #num or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
+					break;
+				case self::STATE_AFTER_CLOSE_BRACE:
+				case self::STATE_AFTER_CONSTANT:
+					switch ($this->expression[$this->pos]) {
+						case ' ':
+							$this->expressionShort .= $this->expression[$this->pos];
+							break;
+						case '=':
+						case '#':
+						case '<':
+						case '>':
+						case '&':
+						case '|':
+						case '+':
+						case '-':
+						case '/':
+						case '*':
+							$this->expressionShort .= $this->expression[$this->pos];
+							$state = self::STATE_AFTER_OPERATOR;
+							break;
+						case ')':
+							$this->expressionShort .= $this->expression[$this->pos];
+							$state = self::STATE_AFTER_CLOSE_BRACE;
+							if ($level == 0) {
+								break 3;
+							}
+							$level--;
+							break;
+						default:
+							break 3;
 					}
-
-					if ($arg['type'] == 'num' && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro) {
-						throw new Exception('Parameter num or user macro expected, "'.$expression['functionParamList'][$anum].'" given.');
-					}
-				}
+					break;
 			}
+			$this->pos++;
 		}
-		catch (Exception $e) {
-			$error = 'Incorrect trigger function "'.$expression['function'].'" provided in expression. ';
-			$error .= $e->getMessage();
 
-			throw new Exception($error);
+		if ($this->pos == 0) {
+			$this->error = 'Incorrect trigger expression.';
+			$this->isValid = false;
 		}
+
+		if ($level != 0 || isset($this->expression[$this->pos]) || $state == self::STATE_AFTER_OPERATOR || $state == self::STATE_AFTER_MINUS) {
+			$this->error = 'Incorrect trigger expression. Check expression part starting from "'.substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1).'".';
+			$this->isValid = false;
+		}
+
+		return $this->isValid;
 	}
 
-	// <expression> = <expression> [=#<>|&+-/*] <expression>
-	// <expression> = (<expression>)
-	// <expression> =  - <space>(0,N) <constant> | <constant>
-	// <constant> = <number> | function | macro | user macro
-	// <number> = <integer> | <integer><suffix>| <integer>.<integer> | <integer>.<integer><suffix>
-	// <suffix> = [KMGTsmhdw]
-	public function checkSimpleExpression(&$expression) {
-		$expression = preg_replace("/(\d+(\.\d+)?[YZEPKMGTsmhdw]?)/u", '{constant}', $expression);
-		$simpleExpr = str_replace(' ', '', $expression);
-
-		// constant => expression
-		$start = '';
-		while ($start != $simpleExpr) {
-			$start = $simpleExpr;
-			$simpleExpr = str_replace('({constant})', '{expression}', $simpleExpr);
-			$simpleExpr = str_replace('(-{constant})', '{expression}', $simpleExpr);
-			$simpleExpr = preg_replace("/([\(\=\#\<\>\|\&\+\-\/\*])\-\{constant\}/u", '$1{expression}', $simpleExpr);
-		}
-		$simpleExpr = preg_replace('/^\-\{constant\}(.*)$/u', '{constant}$1', $simpleExpr);
-		$simpleExpr = str_replace('{constant}', '{expression}', $simpleExpr);
-
-		// expression => expression
-		$start = '';
-		while ($start != $simpleExpr) {
-			$start = $simpleExpr;
-			$simpleExpr = str_replace('({expression})', '{expression}', $simpleExpr);
-			$simpleExpr = preg_replace("/\{expression\}([\=\#\<\>\|\&\+\-\/\*])\{expression\}/u", '{expression}', $simpleExpr);
-		}
-		$simpleExpr = str_replace('{expression}', '1', $simpleExpr);
-
-		if (strpos($simpleExpr, '()') !== false) {
-			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
-		}
-		if (strpos($simpleExpr, '11') !== false) {
-			throw new Exception('Incorrect trigger expression format " '.$expression.' "');
+	/**
+	 * Returns a list of the unique hosts, used in a parsed trigger expression or empty array if expression is not valid
+	 *
+	 * @return array
+	 */
+	public function getHosts() {
+		if (!$this->isValid) {
+			return array();
 		}
 
-		$linkageCount = 0;
-		$linkageExpr = '';
-		foreach ($this->symbols['linkage'] as $symb => $count) {
-			if ($symb == ' ') {
+		return array_unique(zbx_objectValues($this->expressions, 'host'));
+	}
+
+	/**
+	 * Parses a constant in the trigger expression and moves a current position ($this->pos) on a last symbol of the constant
+	 *
+	 * The constant can be:
+	 *  - trigger function like {host:item[].func()}
+	 *  - floating point number; can be with suffix [KMGTsmhdw]
+	 *  - macro like {TRIGGER.VALUE}
+	 *  - user macro like {$MACRO}
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseConstant() {
+		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseMacro() || $this->parseUserMacro()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Parses a trigger function macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseFunctionMacro() {
+		$j = $this->pos;
+
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '{' || !($host = $this->parseHost($j))) {
+			return false;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != ':' || !($item = $this->parseItem($j))) {
+			return false;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '.'
+				|| !(list($function, $functionParamList) = $this->parseFunction($j))) {
+			return false;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
+			return false;
+		}
+
+		$this->expressions[$this->expressionNum]['index'] = $this->expressionNum;
+		$this->expressions[$this->expressionNum]['expression'] = substr($this->expression, $this->pos, $j - $this->pos + 1);
+		$this->expressions[$this->expressionNum]['host'] = $host;
+		$this->expressions[$this->expressionNum]['item'] = $item;
+		$this->expressions[$this->expressionNum]['function'] = $function;
+		$this->expressions[$this->expressionNum]['functionName'] = substr($function, 0, strpos($function, '('));
+		$this->expressions[$this->expressionNum]['functionParam'] = substr($function, strpos($function, '(') + 1, -1);
+		$this->expressions[$this->expressionNum]['functionParamList'] = $functionParamList;
+		$this->expressionShort .= '{'.$this->expressionNum.'}';
+		$this->expressionNum++;
+		$this->pos = $j;
+		return true;
+	}
+
+	/**
+	 * Parses a host in a trigger function macro constant and moves a position ($pos) on a next symbol after the host
+	 *
+	 * @return string returns a host name if parsed successfully or null otherwise
+	 */
+	private function parseHost(&$pos)
+	{
+		$j = $pos;
+
+		while (isset($this->expression[$j]) && $this->isHostChar($this->expression[$j])) {
+			$j++;
+		}
+
+		// is host empty?
+		if ($pos == $j) {
+			return null;
+		}
+
+		$host = substr($this->expression, $pos, $j - $pos);
+		$pos = $j;
+		return $host;
+	}
+
+	/**
+	 * Parses an item in a trigger function macro constant and moves a position ($pos) on a next symbol after the item
+	 *
+	 * @return string returns an item name if parsed successfully or null otherwise
+	 */
+	private function parseItem(&$pos)
+	{
+		$j = $pos;
+
+		while (isset($this->expression[$j]) && $this->isKeyChar($this->expression[$j])) {
+			$j++;
+		}
+
+		// for instance, agent.ping.last(0)
+		if (isset($this->expression[$j]) && $this->expression[$j] == '(') {
+			while ($j > $pos && $this->expression[$j] != '.') {
+				$j--;
+			}
+		}
+		// for instance, net.tcp.port[,80]
+		elseif (isset($this->expression[$j]) && $this->expression[$j] == '[') {
+			$level = 0;
+			$state = self::STATE_END;
+
+			while (isset($this->expression[$j])) {
+				if ($level == 0) {
+					// first square bracket + Zapcat compatibility
+					if ($state == self::STATE_END && $this->expression[$j] == '[') {
+						$state = self::STATE_NEW;
+					}
+					else {
+						break;
+					}
+				}
+
+				switch ($state) {
+					// a new parameter started
+					case self::STATE_NEW:
+						switch ($this->expression[$j]) {
+							case ' ':
+							case ',':
+								break;
+							case '[':
+								$level++;
+								break;
+							case ']':
+								$level--;
+								$state = self::STATE_END;
+								break;
+							case '"':
+								$state = self::STATE_QUOTED;
+								break;
+							default:
+								$state = self::STATE_UNQUOTED;
+						}
+						break;
+					// end of parameter
+					case self::STATE_END:
+						switch ($this->expression[$j]) {
+							case ' ':
+								break;
+							case ',':
+								$state = self::STATE_NEW;
+								break;
+							case ']':
+								$level--;
+								break;
+							default:
+								return null;
+						}
+						break;
+					// an unquoted parameter
+					case self::STATE_UNQUOTED:
+						switch ($this->expression[$j]) {
+							case ']':
+								$level--;
+								$state = self::STATE_END;
+								break;
+							case ',':
+								$state = self::STATE_NEW;
+								break;
+						}
+						break;
+					// a quoted parameter
+					case self::STATE_QUOTED:
+						switch ($this->expression[$j]) {
+							case '"':
+								if ($this->expression[$j - 1] != '\\') {
+									$state = self::STATE_END;
+								}
+								break;
+						}
+						break;
+				}
+				$j++;
+			}
+
+			if ($level != 0) {
+				return null;
+			}
+		}
+
+		// is key empty?
+		if ($pos == $j) {
+			return null;
+		}
+
+		$item = substr($this->expression, $pos, $j - $pos);
+		$pos = $j;
+		return $item;
+	}
+
+	/**
+	 * Parses an function in a trigger function macro constant and moves a position ($pos) on a next symbol after the function
+	 *
+	 * Returns an array if parsed successfully or null otherwise
+	 * Returned array contains two elements:
+	 *   0 => function name like "last(0)"
+	 *   1 => array of parsed function parameters
+	 *
+	 * @return array
+	 */
+	private function parseFunction(&$pos)
+	{
+		$j = $pos;
+
+		while (isset($this->expression[$j]) && $this->isFunctionChar($this->expression[$j])) {
+			$j++;
+		}
+
+		// is function empty?
+		if ($pos == $j) {
+			return null;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '(') {
+			return null;
+		}
+
+		$state = self::STATE_NEW;
+		$num = 0;
+		$functionParamList = array();
+		$functionParamList[$num] = '';
+
+		while (isset($this->expression[$j])) {
+			switch ($state) {
+				// a new parameter started
+				case self::STATE_NEW:
+					switch ($this->expression[$j]) {
+						case ' ':
+							break;
+						case ',':
+							$functionParamList[++$num] = '';
+							break;
+						case ')':
+							// end of parameters
+							break 3;
+						case '"':
+							$state = self::STATE_QUOTED;
+							break;
+						default:
+							$functionParamList[$num] .= $this->expression[$j];
+							$state = self::STATE_UNQUOTED;
+					}
+					break;
+				// end of parameter
+				case self::STATE_END:
+					switch ($this->expression[$j]) {
+						case ' ':
+							break;
+						case ',':
+							$functionParamList[++$num] = '';
+							$state = self::STATE_NEW;
+							break;
+						case ')':
+							// end of parameters
+							break 3;
+						default:
+							return null;
+					}
+					break;
+				// an unquoted parameter
+				case self::STATE_UNQUOTED:
+					switch ($this->expression[$j]) {
+						case ')':
+							// end of parameters
+							break 3;
+						case ',':
+							$functionParamList[++$num] = '';
+							$state = self::STATE_NEW;
+							break;
+						default:
+							$functionParamList[$num] .= $this->expression[$j];
+					}
+					break;
+				// a quoted parameter
+				case self::STATE_QUOTED:
+					switch ($this->expression[$j]) {
+						case '"':
+							$state = self::STATE_END;
+							break;
+						case '\\':
+							if (isset($this->expression[$j + 1]) && $this->expression[$j + 1] == '"') {
+								$j++;
+							}
+							// break; is not missing here
+						default:
+							$functionParamList[$num] .= $this->expression[$j];
+							break;
+					}
+					break;
+			}
+			$j++;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != ')') {
+			return null;
+		}
+
+		$function = substr($this->expression, $pos, $j - $pos);
+		$pos = $j;
+		return array($function, $functionParamList);
+	}
+
+	/**
+	 * Parses a number constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the number
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseNumber() {
+		$j = $this->pos;
+
+		if ($this->expression[$j] < '0' || $this->expression[$j] > '9') {
+			return false;
+		}
+
+		$j++;
+		while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
+			$j++;
+		}
+
+		if (isset($this->expression[$j]) && $this->expression[$j] == '.') {
+			$j++;
+			if (!isset($this->expression[$j]) || $this->expression[$j] < '0' || $this->expression[$j] > '9') {
+				return false;
+			}
+
+			$j++;
+			while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
+				$j++;
+			}
+		}
+
+		// check for an optional suffix
+		if (isset($this->expression[$j]) && strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->expression[$j]) !== false) {
+			$j++;
+		}
+
+		$this->expressionShort .= substr($this->expression, $this->pos, $j - $this->pos);
+		$this->pos = $j - 1;
+		return true;
+	}
+
+	/**
+	 * Parses a macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseMacro() {
+		$macros = array('{TRIGGER.VALUE}');
+
+		foreach ($macros as $macro) {
+			$len = strlen($macro);
+
+			if (substr($this->expression, $this->pos, $len) != $macro) {
 				continue;
 			}
 
-			$linkageCount += substr_count($simpleExpr, $symb);
-			$linkageExpr .= '\\'.$symb;
-
-			if (strpos($simpleExpr, $symb.')') !== false || strpos($simpleExpr, '('.$symb.'1') !== false) {
-				throw new Exception('Incorrect trigger expression format "'.$expression.'".');
-			}
+			$this->macros[]['expression'] = $macro;
+			$this->expressionShort .= $macro;
+			$this->pos += $len - 1;
+			return true;
 		}
-
-		if (!preg_match('/^([\d'.$linkageExpr.']+)$/ui', $simpleExpr)) {
-			throw new Exception('Incorrect trigger expression format "'.$expression.'".');
-		}
-		$exprCount = substr_count($simpleExpr, '1');
-
-		if ($linkageCount != $exprCount - 1) {
-			throw new Exception('Incorrect usage of expression logic linking symbols.');
-		}
+		return false;
 	}
 
-	private function checkBraces() {
-		if ($this->symbols['params']['"'] % 2 != 0) {
-			throw new Exception('Incorrect count of quotes in expression.');
-		}
+	/**
+	 * Parses an user macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseUserMacro() {
+		$j = $this->pos;
 
-		if ($this->symbols['open']['('] != $this->symbols['close'][')']) {
-			throw new Exception('Incorrect parenthesis count in expression.');
-		}
-
-		if ($this->symbols['open']['{'] != $this->symbols['close']['}']) {
-			throw new Exception('Incorrect curly braces count in expression.');
-		}
-	}
-
-	private function checkParts(&$expression) {
-		foreach ($this->expressions as $enum => $expr) {
-			if (!zbx_empty($expr['macro'])) {
-				$this->checkMacro($expr['macro']);
-				$this->data['macros'][] = $expr['macro'];
-			}
-			elseif (!zbx_empty($expr['usermacro'])) {
-				if (!$this->checkUserMacro($expr['usermacro'])) {
-					throw new Exception('Incorrect user macro "'.$expr['usermacro'].'" format is used in expression.');
-				}
-				$this->data['usermacros'][] = $expr['usermacro'];
-			}
-			else {
-				$this->checkHost($expr['host']);
-				$this->checkItem($expr['item']);
-				$this->checkFunction($expr);
-
-				$this->data['hosts'][] = $expr['host'];
-				$this->data['items'][] = $expr['item'];
-				$this->data['itemParams'][] = $expr['itemParam'];
-				$this->data['functions'][] = $expr['functionName'];
-				$this->data['functionParams'][] = $expr['functionParam'];
-
-				// ading user macros from item & trigger params
-				foreach ($expr['itemParamList'] as $itemParam) {
-					if ($this->checkUserMacro($itemParam)) {
-						$this->data['usermacros'][] = $itemParam;
-					}
-				}
-
-				foreach ($expr['functionParamList'] as $funcParam) {
-					if ($this->checkUserMacro($funcParam)) {
-						$this->data['usermacros'][] = $funcParam;
-					}
-				}
-
-				$this->expressions[$enum]['itemParam'] = $this->expressions[$enum]['itemParamReal'];
-				unset($this->expressions[$enum]['itemParamReal']);
-
-				$this->expressions[$enum]['functionParam'] = $this->expressions[$enum]['functionParamReal'];
-				unset($this->expressions[$enum]['functionParamReal']);
-			}
-			$expression = str_replace($expr['expression'], '{constant}', $expression);
-		}
-
-		if (empty($this->data['hosts']) || empty($this->data['items'])) {
-			throw new Exception('Trigger expression must contain at least one host:key reference.');
-		}
-	}
-
-	private function isSlashed($pre = false) {
-		if ($pre) {
-			return $this->previous['prelast'] == '\\';
-		}
-		else {
-			return $this->previous['last'] == '\\';
-		}
-	}
-
-	private function inQuotes($symbol = '') {
-		if ($symbol == '"' || $symbol == '\\') {
+		if ($this->expression[$j++] != '{') {
 			return false;
 		}
-		return (bool)($this->symbols['params']['"'] % 2);
+
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '$') {
+			return false;
+		}
+
+		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j++])) {
+			return false;
+		}
+
+		while (isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j])) {
+			$j++;
+		}
+
+		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
+			return false;
+		}
+
+		$usermacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
+		$this->usermacros[]['expression'] = $usermacro;
+		$this->expressionShort .= $usermacro;
+		$this->pos = $j;
+		return true;
 	}
 
-	private function inParameter($symbol = '') {
-		if ($this->inQuotes($symbol)) {
+	/**
+	 * Returns true if the char is allowed in the host name, false otherwise
+	 *
+	 * @return bool
+	 */
+	private function isHostChar($c) {
+		if (($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z') || ($c >= '0' && $c <= '9')
+				|| $c == '.' || $c == ' ' || $c == '_' || $c == '-') {
 			return true;
 		}
 
-		if ($this->currExpr['part']['itemParam']) {
-			if ($symbol == '\\' && $this->inQuotes()) {
-				return false;
-			}
-			if (!isset($this->currExpr['params']['item'][$this->currExpr['params']['count']])) {
-				return false;
-			}
-			return true;
-		}
-
-		if ($this->currExpr['part']['functionParam']) {
-			if ($symbol == '\\' && $this->inQuotes()) {
-				return false;
-			}
-			if (!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']])) {
-				return false;
-			}
-			return true;
-		}
 		return false;
 	}
 
-	private function emptyParameter() {
-		if ($this->currExpr['part']['itemParam']) {
-			if (!isset($this->currExpr['params']['item'][$this->currExpr['params']['count']])) {
-				return true;
-			}
-			if (zbx_empty($this->currExpr['params']['item'][$this->currExpr['params']['count']])) {
-				return true;
-			}
+	/**
+	 * Returns true if the char is allowed in the item key, false otherwise
+	 *
+	 * @return bool
+	 */
+	private function isKeyChar($c) {
+		if (($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z') || ($c >= '0' && $c <= '9')
+				|| $c == '.' || $c == '_' || $c == '-') {
+			return true;
 		}
 
-		if ($this->currExpr['part']['functionParam']) {
-			if (!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']])) {
-				return true;
-			}
-			if (zbx_empty($this->currExpr['params']['function'][$this->currExpr['params']['count']])) {
-				return true;
-			}
-		}
 		return false;
 	}
 
-	private function parseOpenParts($symbol) {
-		if (!$this->inQuotes($symbol)) {
-			if (!$this->currExpr['part']['item'] && !$this->currExpr['part']['functionParam']) {
-				$this->parseExpression($symbol);
-			}
-			if (!$this->currExpr['part']['usermacro']
-					&& !$this->currExpr['part']['itemParam']
-					&& !$this->currExpr['part']['functionParam']) {
-				$this->parseItem($symbol);
-				$this->parseFunction($symbol);
-			}
+	/**
+	 * Returns true if the char is allowed in the function name, false otherwise
+	 *
+	 * @return bool
+	 */
+	private function isFunctionChar($c) {
+		if ($c >= 'a' && $c <= 'z') {
+			return true;
 		}
-		if (!$this->currExpr['part']['usermacro']) {
-			$this->parseParam($symbol);
-		}
+
+		return false;
 	}
 
-	private function parseExpression($symbol) {
-		// start expression
-		if ($symbol == '{') {
-			$this->currExpr = $this->newExpr;
-			$this->currExpr['part']['expression'] = true;
-			$this->currExpr['part']['host'] = true;
+	/**
+	 * Returns true if the char is allowed in the macro, false otherwise
+	 *
+	 * @return bool
+	 */
+	private function isMacroChar($c) {
+		if (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9')) {
+			return true;
 		}
 
-		// start usermacro
-		if ($symbol == '$') {
-			if ($this->previous['prelast'] == '{') {
-				$this->currExpr['part']['usermacro'] = true;
-				$this->currExpr['part']['host'] = false;
-				$this->currExpr['object']['host'] = '';
-				$this->currExpr['object']['usermacro'] = $this->currExpr['object']['expression'];
-			}
-		}
-	}
-
-	private function parseMacro($symbol) {
-		if ($symbol == '}' && isset($this->allowed['macros'][$this->currExpr['object']['expression']])) {
-			$this->currExpr['object']['macro'] = '{'.$this->currExpr['object']['host'].'}';
-			$this->currExpr['object']['host'] = '';
-		}
-	}
-
-	private function parseItem($symbol) {
-		// start item
-		if ($symbol == ':') {
-			$this->currExpr['part']['host'] = false;
-			$this->currExpr['part']['item'] = true;
-		}
-
-		if ($symbol == ']') {
-			if (!$this->inParameter() && !$this->currExpr['part']['item']) {
-				throw new Exception('Unexpected Square Bracket symbol in trigger expression.');
-			}
-		}
-	}
-
-	private function parseFunction($symbol) {
-		// start function
-		if ($symbol == '(') {
-			if (!$this->currExpr['part']['item']) {
-				return;
-			}
-
-			$this->currExpr['part']['item'] = false;
-			$this->currExpr['part']['itemParam'] = false;
-			$this->currExpr['part']['function'] = true;
-
-			$lastDot = strrpos($this->currExpr['object']['item'], '.');
-
-			$this->currExpr['object']['functionName'] = substr($this->currExpr['object']['item'], $lastDot + 1);
-			$this->currExpr['object']['function'] = substr($this->currExpr['object']['item'], $lastDot + 1);
-			$this->currExpr['object']['item'] = substr($this->currExpr['object']['item'], 0, $lastDot);
-		}
-	}
-
-	private function parseParam($symbol) {
-		if ($symbol == ' ') {
-			return;
-		}
-
-		// start params
-		if ($this->currExpr['part']['itemParam'] || $this->currExpr['part']['functionParam']) {
-			if ($this->inParameter() || $symbol == '"') {
-				if ($this->inQuotes()) {
-					if ($symbol == '"' && !$this->isSlashed(true)) {
-						$this->symbols['params'][$symbol]++;
-						$this->currExpr['params']['quoteClose'] = true;
-					}
-					$this->writeParams($symbol);
-				}
-				else {
-					if ($symbol == ']' && $this->currExpr['part']['itemParam']) {
-						$this->symbols['params'][$symbol]++;
-					}
-					elseif ($symbol == ')' && $this->currExpr['part']['functionParam']) {
-						$this->symbols['close'][$symbol]++;
-						$this->symbols['params'][$symbol]++;
-						$this->currExpr['params']['count']++;
-					}
-					elseif ($symbol == ',') {
-						$this->currExpr['params']['count']++;
-						$this->currExpr['params']['comma']++;
-						$this->currExpr['params']['quoteClose'] = false;
-					}
-					else {
-						if ($symbol == '"' && $this->emptyParameter()) {
-							$this->symbols['params'][$symbol]++;
-						}
-						if ($this->currExpr['params']['quoteClose']) {
-							throw new Exception('Incorrect quote usage in trigger expression.');
-						}
-						$this->writeParams($symbol);
-					}
-				}
-			}
-			else {
-				if (isset($this->symbols['params'][$symbol]) && !($this->currExpr['part']['itemParam'] && $symbol != ',' && $symbol != ']')) {
-					$this->symbols['params'][$symbol]++;
-				}
-
-				if ($symbol == ',') {
-					$this->writeParams();
-					$this->currExpr['params']['count']++;
-					$this->currExpr['params']['comma']++;
-				}
-				elseif ($this->currExpr['params']['count'] > 0) {
-					$this->writeParams($symbol);
-				}
-			}
-		}
-
-		if (!$this->inParameter()) {
-			if ($this->currExpr['params']['count'] == 0) {
-				if ($symbol == '[' && $this->currExpr['part']['item']) {
-					$this->symbols['params'][$symbol]++;
-
-					$this->currExpr['part']['itemParam'] = true;
-					$this->writeParams();
-				}
-
-				if ($symbol == '(' && $this->currExpr['part']['function']) {
-					$this->symbols['params'][$symbol]++;
-
-					$this->currExpr['part']['functionParam'] = true;
-					$this->writeParams();
-				}
-			}
-		}
-	}
-
-	private function parseCloseParts($symbol) {
-		if (!$this->inQuotes($symbol)) {
-			if (!$this->inParameter()) {
-				// close symbols
-				$this->parseExpressionClose($symbol);
-
-				if ($symbol == '}') {
-					$this->expressions[] = $this->currExpr['object'];
-					return;
-				}
-			}
-			if (!$this->currExpr['part']['usermacro']) {
-				$this->parseParamClose($symbol);
-			}
-		}
-		$this->writeParts($symbol);
-	}
-
-	private function parseExpressionClose($symbol) {
-		// end expression
-		if ($symbol == '}') {
-			$this->currExpr['part']['expression'] = false;
-			$this->currExpr['part']['usermacro'] = false;
-			$this->currExpr['part']['host'] = false;
-			$this->currExpr['part']['item'] = false;
-			$this->currExpr['part']['itemParam'] = false;
-			$this->currExpr['part']['function'] = false;
-			$this->currExpr['part']['functionParam'] = false;
-
-			$this->currExpr['object']['expression'] = '{'.$this->currExpr['object']['expression'].'}';
-			$this->currExpr['object']['host'] = rtrim($this->currExpr['object']['host'], ':');
-			$this->currExpr['object']['itemParamList'] = $this->currExpr['params']['item'];
-			$this->currExpr['object']['functionName'] = rtrim($this->currExpr['object']['functionName'], '(');
-			$this->currExpr['object']['functionParamList'] = $this->currExpr['params']['function'];
-		}
-
-		if ($symbol == '}' && isset($this->allowed['macros'][$this->currExpr['object']['expression']])) {
-			$this->currExpr['object']['macro'] = '{'.$this->currExpr['object']['host'].'}';
-			$this->currExpr['object']['host'] = '';
-		}
-
-		if ($symbol == '}' && !zbx_empty($this->currExpr['object']['usermacro'])) {
-			$this->currExpr['object']['usermacro'] = '{'.$this->currExpr['object']['usermacro'].'}';
-		}
-
-		if ($this->currExpr['part']['function'] && !$this->currExpr['part']['functionParam']) {
-			throw new Exception('Unexpected symbol "'.$symbol.'" in trigger function.');
-		}
-	}
-
-	private function parseParamClose($symbol) {
-		if ($symbol == ' ') {
-			return;
-		}
-		// end params
-		if (!$this->inQuotes()) {
-			if ($symbol == ']' && $this->currExpr['part']['itemParam']) {
-				// +1 because (parseParam is not counted this symbol yet)
-				if ($this->symbols['params']['['] == ($this->symbols['params'][']'] + 1)) {
-					$this->symbols['params'][$symbol]++;
-
-					$this->writeParams();
-					// count points to the last param index
-					if ($this->currExpr['params']['count'] != $this->currExpr['params']['comma']) {
-						throw new Exception('Incorrect item parameters syntax is used.');
-					}
-
-					// do not turn of item part, till function is started
-					$this->currExpr['part']['itemParam'] = false;
-					$this->currExpr['params']['quoteClose'] = false;
-					$this->currExpr['params']['count'] = 0;
-					$this->currExpr['params']['comma'] = 0;
-				}
-			}
-
-			if ($symbol == ')' && $this->currExpr['part']['functionParam']) {
-				// +1 because (checkSequence is not counted this symbol yet)
-				if ($this->symbols['params']['('] == ($this->symbols['params'][')'] + 1)) {
-					$this->symbols['params'][$symbol]++;
-
-					$this->writeParams();
-					// count points to the last param index
-					if ($this->currExpr['params']['count'] != $this->currExpr['params']['comma']) {
-						throw new Exception('Incorrect trigger function parameters syntax is used.');
-					}
-
-					// no need to close function part, it will be closed by expression end symbol
-					$this->currExpr['part']['functionParam'] = false;
-					$this->currExpr['params']['quoteClose'] = false;
-					$this->currExpr['params']['count'] = 0;
-					$this->currExpr['params']['comma'] = 0;
-				}
-			}
-		}
-	}
-
-	// write expression parts
-	private function writeParts($symbol) {
-		if ($this->currExpr['part']['expression']) {
-			$this->currExpr['object']['expression'] .= $symbol;
-		}
-		if ($this->currExpr['part']['usermacro']) {
-			$this->currExpr['object']['usermacro'] .= $symbol;
-		}
-		if ($this->currExpr['part']['host']) {
-			$this->currExpr['object']['host'] .= $symbol;
-		}
-		if ($this->currExpr['part']['item']) {
-			$this->currExpr['object']['item'] .= $symbol;
-		}
-		if ($this->currExpr['part']['function']) {
-			$this->currExpr['object']['function'] .= $symbol;
-		}
-		if ($this->currExpr['part']['itemParam']) {
-			$this->currExpr['object']['itemParamReal'] .= $symbol;
-		}
-		if ($this->currExpr['part']['functionParam']) {
-			$this->currExpr['object']['functionParamReal'] .= $symbol;
-		}
-		if ($symbol == ' ' && !$this->inParameter()) {
-			return;
-		}
-		if ($this->currExpr['part']['itemParam']) {
-			$this->currExpr['object']['itemParam'] .= $symbol;
-		}
-		if ($this->currExpr['part']['functionParam']) {
-			$this->currExpr['object']['functionParam'] .= $symbol;
-		}
-	}
-
-	private function writeParams($symbol = '') {
-		if ($this->currExpr['part']['itemParam']) {
-			if (!isset($this->currExpr['params']['item'][$this->currExpr['params']['count']])) {
-				$this->currExpr['params']['item'][$this->currExpr['params']['count']] = '';
-			}
-			$this->currExpr['params']['item'][$this->currExpr['params']['count']] .= $symbol;
-		}
-		elseif ($this->currExpr['part']['functionParam']) {
-			if (!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']])) {
-				$this->currExpr['params']['function'][$this->currExpr['params']['count']] = '';
-			}
-			$this->currExpr['params']['function'][$this->currExpr['params']['count']] .= $symbol;
-		}
-	}
-
-	private function checkSymbolSequence($symbol) {
-		// check close symbols
-		if ($symbol == '}' && $this->symbols['open']['{'] <= $this->symbols['close']['}']) {
-			throw new Exception('Incorrect closing curly braces in trigger expression.');
-		}
-
-		if ($symbol == ')' && ($this->symbols['open']['('] <= $this->symbols['close'][')'])) {
-			throw new Exception('Incorrect closing parenthesis in trigger expression.');
-		}
-
-		// check symbol sequence
-		if ($symbol != '-' && isset($this->symbols['linkage'][$symbol]) && isset($this->symbols['linkage'][$this->previous['lastNoSpace']])) {
-			throw new Exception('Incorrect symbol sequence in trigger expression.');
-		}
-
-		// we shouldn't count open braces in params
-		if (!$this->currExpr['part']['itemParam'] && !$this->currExpr['part']['functionParam']) {
-			if(isset($this->symbols['open'][$symbol])) {
-				$this->symbols['open'][$symbol]++;
-			}
-		}
-
-		if (isset($this->symbols['close'][$symbol])) {
-			$this->symbols['close'][$symbol]++;
-		}
-		if (isset($this->symbols['expr'][$symbol])) {
-			$this->symbols['expr'][$symbol]++;
-		}
-		if (isset($this->symbols['linkage'][$symbol])) {
-			$this->symbols['linkage'][$symbol]++;
-		}
-	}
-
-	private function setPreviousSymbol($symbol) {
-		$this->previous['prelast'] = $this->previous['last'];
-
-		if ($this->previous['last'] == $symbol) {
-			$this->previous['sequence'] = $this->symbols['sequence'];
-			$this->symbols['sequence']++;
-		}
-		else {
-			$this->previous['sequence'] = $this->symbols['sequence'];
-			$this->symbols['sequence'] = 1;
-
-			$this->previous['last'] = $symbol;
-		}
-
-		if ($symbol != ' ') {
-			$this->previous['preLastNoSpace'] = $this->previous['lastNoSpace'];
-			$this->previous['lastNoSpace'] = $symbol;
-		}
-	}
-
-	private function initializeVars() {
-		$this->allowed = INIT_TRIGGER_EXPRESSION_STRUCTURES();
-		$this->errors = array();
-		$this->expressions = array();
-		$this->data = array(
-			'hosts' => array(),
-			'usermacros' => array(),
-			'macros' => array(),
-			'items' => array(),
-			'itemParams' => array(),
-			'functions' => array(),
-			'functionParams' => array()
-		);
-
-		$this->newExpr = array(
-			'part' => array(
-				'expression' => false,
-				'usermacro' => false,
-				'host' => false,
-				'item' => false,
-				'itemParam' => false,
-				'function' => false,
-				'functionParam' => false
-			),
-			'object' => array(
-				'expression' => '',
-				'macro' => '',
-				'usermacro' => '',
-				'host' => '',
-				'item' => '',
-				'itemParam' => '',
-				'itemParamReal' => '',
-				'itemParamList' => '',
-				'function' => '',
-				'functionName' => '',
-				'functionParam' => '',
-				'functionParamReal' => '',
-				'functionParamList' => ''
-			),
-			'params' => array(
-				'quoteClose' => false,
-				'comma' => 0,
-				'count' => 0,
-				'item' => array(),
-				'function' => array()
-			)
-		);
-		$this->currExpr = $this->newExpr;
-
-		$this->symbols = array(
-			'sequence' => 0,
-			'open' => array(
-				'(' => 0,	// parenthesis
-				'{' => 0	// curly brace
-			),
-			'close' => array(
-				')' => 0,	// parenthesis
-				'}' => 0	// curly brace
-			),
-			'linkage' => array(
-				'+' => 0,	// addition
-				'-' => 0,	// subtraction
-				'*' => 0,	// multiplication
-				'/' => 0,	// division
-				'#' => 0,	// not equals
-				'=' => 0,	// equals
-				'<' => 0,	// less than
-				'>' => 0,	// greater than
-				'&' => 0,	// logical and
-				'|' => 0	// logical or
-			),
-			'expr' => array(
-				'$' => 0,	// dollar
-				'\\' => 0,	// backslash
-				':' => 0,	// colon
-				'.' => 0	// dot
-			),
-			'params' => array(
-				'"' => 0,	// quote
-				'[' => 0,	// open square brace
-				']' => 0,	// close square brace
-				'(' => 0,	// open brace
-				')' => 0	// close brace
-			)
-		);
-
-		$this->previous = array(
-			'sequence' => '',
-			'last' => '',
-			'prelast' => '',
-			'lastNoSpace' => '',
-			'preLastNoSpace' => ''
-		);
+		return false;
 	}
 }
-?>

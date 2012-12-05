@@ -1080,13 +1080,18 @@ COpt::memoryPick();
 		$result = false;
 
 		if(!isset($object['hostid']) && !isset($object['host'])){
-			$expr = new CTriggerExpression($object);
-			$expression = $object['expression'];
+			$expressionData = new CTriggerExpression($object['expression']);
+			if (!$expressionData->parse($object['expression'])) {
+				return false;
+			}
 
-			if(!empty($expr->errors)) return false;
-			if(empty($expr->data['hosts'])) return false;
+			$expressionHosts = $expressionData->getHosts();
 
-			$object['host'] = reset($expr->data['hosts']);
+			if (empty($expressionHosts)) {
+				return false;
+			}
+
+			$object['host'] = reset($expressionHosts);
 		}
 
 		$options = array(
@@ -1144,20 +1149,22 @@ COpt::memoryPick();
 				}
 
 // Permission check by trigger hosts {{{
-				$expressionData = new CTriggerExpression($trigger);
-				if(!empty($expressionData->errors)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($trigger['expression'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
+				$expressionHosts = $expressionData->getHosts();
+
 				$hosts = CHost::get(array(
-					'filter' => array('host' => $expressionData->data['hosts']),
+					'filter' => array('host' => $expressionHosts),
 					'editable' => true,
 					'output' => array('hostid', 'host'),
 					'templated_hosts' => true,
 					'preservekeys' => true
 				));
 				$hosts = zbx_toHash($hosts, 'host');
-				foreach($expressionData->data['hosts'] as $host){
+				foreach ($expressionHosts as $host){
 					if(!isset($hosts[$host]))
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}

@@ -33,7 +33,9 @@ $definedErrorPhrases = array(
 			EXPRESSION_VALUE_TYPE_UNKNOWN => S_EXPRESSION_VALUE_TYPE_UNKNOWN,
 			EXPRESSION_HOST_UNKNOWN => S_EXPRESSION_HOST_UNKNOWN,
 			EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
-			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
+			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR,
+			EXPRESSION_FUNCTION_UNKNOWN => S_INCORRECT_FUNCTION_IS_USED
+);
 
 include_once('include/page_header.php');
 ?>
@@ -44,7 +46,6 @@ include_once('include/page_header.php');
 	$expression = urldecode(get_request('expression', ''));
 
 	define('NO_LINK_IN_TESTING', true);
-	$triggerExpr = new CTriggerExpression(array('expression' => $expression));
 	list($outline, $eHTMLTree) = analyze_expression($expression);
 
 // test data (create table, create check fields)
@@ -60,15 +61,18 @@ include_once('include/page_header.php');
 	$rplcts = array();
 	$allowedTesting = true;
 
-	if(empty($triggerExpr->errors)){
+	$expressionData = new CTriggerExpression();
+	if ($expressionData->parse($expression)) {
 		$macrosData = array();
 
-		foreach($triggerExpr->expressions as $exprPart){
-			$macrosId = md5($exprPart['expression']);
+		$expressions = array_merge($expressionData->expressions, $expressionData->macros, $expressionData->usermacros);
 
-			if(isset($macrosData[$exprPart['expression']])) continue;
+		foreach ($expressions as $exprPart) {
+			if (isset($macrosData[$exprPart['expression']])) {
+				continue;
+			}
 
-			$fname = 'test_data_'.$macrosId;
+			$fname = 'test_data_'.md5($exprPart['expression']);
 			$macrosData[$exprPart['expression']] = get_request($fname, '');
 
 			$info = get_item_function_info($exprPart['expression']);

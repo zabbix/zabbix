@@ -649,13 +649,15 @@
 				$macro = substr_replace($macro, $replaceHost, 1, 10);
 			}
 
-			$trigExpr = new CTriggerExpression(array('expression' => $macro));
-			if(!empty($trigExpr->errors)) continue;
+			$expressionData = new CTriggerExpression();
+			if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
+				continue;
+			}
 
-			$itemHost = reset($trigExpr->data['hosts']);
-			$key = reset($trigExpr->data['items']);
-			$function = reset($trigExpr->data['functions']);
-			$parameter = reset($trigExpr->data['functionParams']);
+			$itemHost = $expressionData->expressions[0]['host'];
+			$key = $expressionData->expressions[0]['item'];
+			$function = $expressionData->expressions[0]['functionName'];
+			$parameter = $expressionData->expressions[0]['functionParam'];
 
 			$item = CItem::get(array(
 				'filter' => array('host' => $itemHost, 'key_' => $key),
