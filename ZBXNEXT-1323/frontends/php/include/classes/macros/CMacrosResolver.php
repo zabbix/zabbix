@@ -209,7 +209,7 @@ class CMacrosResolver {
 			return array();
 		}
 
-		return $macros = API::UserMacro()->getMacros(array('macros' => $matches, 'hostid' => $hostId));
+		return API::UserMacro()->getMacros(array('macros' => $matches, 'hostid' => $hostId));
 	}
 
 	/**
