@@ -39,6 +39,19 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+var_dump(API::Trigger()->get(array(
+	'output' => API_OUTPUT_EXTEND,
+//'actionids' => array('5'),
+'output' => array('description', 'expression'),
+	'expandDescription' => 1,
+	'expandExpression' => 1,
+//	'selectOperations' => array('opconditions', 'opcommand_grp', 'opcommand_hst', 'opcommand'),
+//	'select_acknowledges' => array('message', 'alias'),
+	'limit' => 300,
+)));
+
+require_once dirname(__FILE__).'/include/page_footer.php';
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),

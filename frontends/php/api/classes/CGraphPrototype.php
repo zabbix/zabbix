@@ -128,10 +128,6 @@ class CGraphPrototype extends CGraphGeneral {
 							' AND rr.permission='.PERM_DENY.'))';
 		}
 
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -288,9 +284,6 @@ class CGraphPrototype extends CGraphGeneral {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
-
-		// output
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$graphids = array();
 

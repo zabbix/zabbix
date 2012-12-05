@@ -95,19 +95,6 @@ class CHostGroup extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $params);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['groups']);
-
-			$dbTable = DB::getSchema('groups');
-			$sqlParts['select']['groupid'] = 'g.groupid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'g.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
@@ -313,24 +300,6 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['groups'] = 'g.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT g.groupid) AS rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('groups g', $options, $sqlParts);
@@ -351,6 +320,7 @@ class CHostGroup extends CZBXAPI {
 
 		$groupids = array();
 
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($group = DBfetch($res)) {
