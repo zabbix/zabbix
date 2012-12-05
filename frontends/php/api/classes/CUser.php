@@ -87,19 +87,6 @@ class CUser extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['users']);
-
-			$dbTable = DB::getSchema('users');
-			$sqlParts['select']['userid'] = ' u.userid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'u.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// permission check
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -152,17 +139,6 @@ class CUser extends CZBXAPI {
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['users'] = 'u.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT u.userid) AS rowscount');
-		}
-
 		// filter
 		if (is_array($options['filter'])) {
 			if (isset($options['filter']['passwd'])) {
@@ -187,38 +163,10 @@ class CUser extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		$userids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
 			if (!is_null($options['countOutput'])) {
@@ -229,10 +177,6 @@ class CUser extends CZBXAPI {
 
 				if (!isset($result[$user['userid']])) {
 					$result[$user['userid']] = array();
-				}
-
-				if ($options['selectUsrgrps'] && !isset($result[$user['userid']]['usrgrps'])) {
-					$result[$user['userid']]['usrgrps'] = array();
 				}
 
 				// usrgrpids
@@ -1145,71 +1089,49 @@ class CUser extends CZBXAPI {
 		$userids = zbx_objectValues($result, 'userid');
 
 		// adding usergroups
-		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], array(API_OUTPUT_REFER, API_OUTPUT_EXTEND))) {
-			foreach ($result as &$user) {
-				$user['usrgrps'] = array();
-			}
-			unset($user);
-
+		if ($options['selectUsrgrps'] !== null && $options['selectUsrgrps'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'userid', 'usrgrpid', 'users_groups');
 			$usrgrps = API::UserGroup()->get(array(
 				'output' => $options['selectUsrgrps'],
-				'userids' => $userids,
+				'usrgrpids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			foreach ($usrgrps as $usrgrp) {
-				$uusers = $usrgrp['users'];
-				unset($usrgrp['users']);
-				$usrgrps = $this->unsetExtraFields($usrgrps, $options['selectUsrgrps']);
-
-				foreach ($uusers as $user) {
-					$result[$user['userid']]['usrgrps'][] = $usrgrp;
-				}
-			}
+			$result = $relationMap->mapMany($result, $usrgrps, 'usrgrps');
 		}
 
 		// adding medias
-		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], array(API_OUTPUT_REFER, API_OUTPUT_EXTEND))) {
-			foreach ($result as &$user) {
-				$user['medias'] = array();
-			}
-			unset($user);
-
+		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
 			$userMedias = API::UserMedia()->get(array(
-				'output' => $options['selectMedias'],
+				'output' => $this->outputExtend('media', array('userid', 'mediaid'), $options['selectMedias']),
 				'userids' => $userids,
 				'preservekeys' => true
 			));
-			$userMedias = $this->unsetExtraFields($userMedias, $options['selectMedias']);
 
-			foreach ($userMedias as $mediaid => $media) {
-				$result[$media['userid']]['medias'][] = $media;
+			$relationMap = $this->createRelationMap($userMedias, 'userid', 'mediaid');
+
+			// unset unrequested fields
+			foreach ($userMedias as &$userMedia) {
+				if (!$this->outputIsRequested('userid', $options['selectMedias'])) {
+					unset($userMedia['userid']);
+				}
+				if (!$this->outputIsRequested('mediaid', $options['selectMedias'])) {
+					unset($userMedia['mediaid']);
+				}
 			}
+			unset($interface);
+
+			$result = $relationMap->mapMany($result, $userMedias, 'medias');
 		}
 
 		// adding media types
-		if (!is_null($options['selectMediatypes'])) {
-			foreach ($result as &$user) {
-				$user['mediatypes'] = array();
-			}
-			unset($user);
-
-			$mediatypes = API::Mediatype()->get(array(
+		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'userid', 'mediatypeid', 'media');
+			$mediaTypes = API::Mediatype()->get(array(
 				'output' => $options['selectMediatypes'],
-				'userids' => $userids,
-				'selectUsers' => API_OUTPUT_REFER,
+				'mediatypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			foreach ($mediatypes as $mediatype) {
-				$users = $mediatype['users'];
-				unset($mediatype['users']);
-				$mediatype = $this->unsetExtraFields($mediatype, $options['selectMediatypes']);
-
-				foreach ($users as $user) {
-					if (!empty($result[$user['userid']])) {
-						$result[$user['userid']]['mediatypes'][] = $mediatype;
-					}
-				}
-			}
+			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 
 		return $result;
