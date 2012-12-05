@@ -105,7 +105,7 @@ class CApplication extends CZBXAPI {
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
 						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE '.$this->tableAlias.'.hostid=hgg.hostid'.
+				' WHERE a.hostid=hgg.hostid'.
 				' GROUP BY hgg.hostid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';
