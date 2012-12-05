@@ -202,12 +202,13 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		// monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts, with_hosts_and_templates
-		if (!is_null($options['monitored_hosts'])) {
+		if (!is_null($options['monitored_hosts']) && is_null($options['with_graphs'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'h.hostid=hg.hostid';
-			$sqlParts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+			$sqlParts['where'][] = 'EXISTS (SELECT h.hostid FROM hosts_groups hg,hosts h'.
+											' WHERE hg.groupid=g.groupid AND h.hostid=hg.hostid'.
+											' AND h.status='.HOST_STATUS_MONITORED.')';
 		}
 		elseif (!is_null($options['real_hosts'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -240,9 +241,9 @@ class CHostGroup extends CZBXAPI {
 
 		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid)';
+			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid'.
+											' FROM items i, hosts_groups hg'.
+											' WHERE hg.hostid=i.hostid and hg.groupid=g.groupid)';
 		}
 		elseif (!is_null($options['with_monitored_items'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -305,12 +306,11 @@ class CHostGroup extends CZBXAPI {
 
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'EXISTS (SELECT 1'.
-											' FROM items i,graphs_items gi'.
-											' WHERE i.hostid=hg.hostid'.
-												' AND i.itemid=gi.itemid '.zbx_limit(1).')';
+			$sqlParts['where'][] = 'EXISTS (SELECT i.itemid'.
+											' FROM items i,graphs_items gi, hosts_groups hg, hosts h'.
+											' WHERE i.hostid=hg.hostid and hg.groupid=g.groupid'.
+												' AND i.itemid=gi.itemid and h.hostid=hg.hostid'.
+												' AND h.status='.HOST_STATUS_MONITORED.')';
 		}
 
 		if (!is_null($options['with_applications'])) {

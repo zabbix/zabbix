@@ -914,22 +914,17 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	}
 
 	if (USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']) {
-			$def_sql['from']['hg'] = 'hosts_groups hg';
-			$def_sql['from']['r'] = 'rights r';
-			$def_sql['from']['ug'] = 'users_groups ug';
-			$def_sql['where']['hgh'] = 'hg.hostid=h.hostid';
-			$def_sql['where'][] = 'r.id=hg.groupid ';
-			$def_sql['where'][] = 'r.groupid=ug.usrgrpid';
-			$def_sql['where'][] = 'ug.userid='.$userid;
-			$def_sql['where'][] = 'r.permission>='.$perm;
-			$def_sql['where'][] = 'NOT EXISTS ('.
-									' SELECT hgg.groupid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid=hg.hostid'.
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$perm.')';
+		$userGroups = getUserGroupsByUserId($userid);
+		$sqlParts['where'][] = 'EXISTS ('.
+			'SELECT hgg.hostid'.
+			' FROM hosts_groups hgg'.
+			' JOIN rights r'.
+				' ON r.id=hgg.groupid'.
+					' AND '.DBcondition('r.groupid', $userGroups).
+			' WHERE h.hostid=hgg.hostid'.
+			' GROUP BY hgg.hostid'.
+			' HAVING MIN(r.permission)>='.$perm.
+			')';
 	}
 
 	// nodes
