@@ -1435,16 +1435,32 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_condition_alloc                                            *
+ *                                                                            *
+ * Purpose: takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condidion is generated from the given  *
+ *          list of values as a mix of <fieldname> BETWEEN <id1> AND <idN>"   *
+ *          and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.            *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of numerical values sorted in          *
+ *                               ascending order to be included in WHERE      *
+ *             num        - [IN] number of elemnts in 'values' array          *
+ *                                                                            *
+ ******************************************************************************/
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
 
-	int		i, j, start, end, len, seq_num, first;
-	int		btwn_num;	/* number of "between ... and ..." constructions used */
-	int		in_num;		/* number of values packed into "in (...)" constructions */
-	int		in_cnt;		/* counter of values packed into an "in (...)" construction */
+	int		i, start, len, seq_num, first;
+	int		between_num = 0, in_num = 0, in_cnt;
 	zbx_uint64_t	value;
 	int		*seq_len = NULL;
 
@@ -1453,59 +1469,45 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
 
-	/* if only one value in an array we return " <field name>=<id>"*/
-
 	if (1 == num)
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname, values[0]);
 		return;
 	}
 
-	/* ... else we return "the best mix" of " <field name> between <id1> and <idN>" and */
-	/* "<field name> in (<id1>,<id2>,...,<idN>)" */
-
-	/* Set up an array "seq_len" for lengths of consecutive sequences of values. */
-	/* An isolated value will be represented as a sequence with length 1. */
-	/* A consecutive sequence will be represented by its length > 1. */
+	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
+	/* An isolated value is represented as a sequence with length 1. */
 	seq_len = zbx_malloc(seq_len, num * sizeof(int));
 
-	for (i = 0; i < num; i++)
-		seq_len[i] = 0;
-
-	for (seq_num = 0, value = values[0], len = 1, start = 0, end = 1; end < num; end++)
+	for (i = 1, seq_num = 0, value = values[0], len = 1; i < num; i++)
 	{
-		if (values[end] == ++value)
-		{	/* consecutive sequence continues */
-			len++;
-		}
-		else
+		if (values[i] != ++value)
 		{
+			if (MIN_NUM_BETWEEN <= len)
+				between_num++;
+			else
+				in_num += len;
+
 			seq_len[seq_num++] = len;
 			len = 1;
-			value = values[end];
-			start = end;
+			value = values[i];
 		}
-	}
-	if (0 < len)
-		seq_len[seq_num] = len;
-
-	/* count number of "between"s and "in"s */
-	for (btwn_num = 0, in_num = 0, i = 0; i < num; i++)
-	{
-		if (MIN_NUM_BETWEEN <= seq_len[i])
-			btwn_num++;
-		else if (1 <= seq_len[i])
-			in_num += seq_len[i];
 		else
-			break;
+			len++;
 	}
 
-	/* opening '(' necessary ? */
-	if (MAX_EXPRESSIONS < in_num || 1 < btwn_num || (0 < in_num && 0 < btwn_num))
+	if (MIN_NUM_BETWEEN <= len)
+		between_num++;
+	else
+		in_num += len;
+
+	seq_len[seq_num++] = len;
+
+	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
-	/* compose "between"s first */
-	for (first = 1, start = 0, i = 0; i < num; i++)
+	/* compose "between"s */
+	for (i = 0, first = 1, start = 0; i < seq_num; i++)
 	{
 		if (MIN_NUM_BETWEEN <= seq_len[i])
 		{
@@ -1517,24 +1519,21 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 			first = 0;
 		}
 
-		if (0 == seq_len[i])
-			break;
-
 		start += seq_len[i];
 	}
 
-	if (0 < in_num && 0 < btwn_num)
+	if (0 < in_num && 0 < between_num)
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
 
-	/* compose "in"s */
-	for (in_cnt = 0, start = 0, i = 0; i < num; i++)
-	{
-		if (0 == seq_len[i])
-			break;
+	if (1 < in_num)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
 
+	/* compose "in"s */
+	for (i = 0, in_cnt = 0, start = 0; i < seq_num; i++)
+	{
 		if (MIN_NUM_BETWEEN > seq_len[i])
 		{
-			if (1 == in_num)	/* special case - only 1 value for "in"*/
+			if (1 == in_num)
 			{
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname,
 						values[start]);
@@ -1542,24 +1541,23 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 			}
 			else
 			{
-				for (j = start; j < start + seq_len[i]; j++)
+				do
 				{
-					if (0 == (in_cnt % MAX_EXPRESSIONS))
+					if (MAX_EXPRESSIONS == in_cnt)
 					{
-						if (0 != in_cnt)
-						{
-							(*sql_offset)--;
-							zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
-						}
-						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+						in_cnt = 0;
+						(*sql_offset)--;
+						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (", fieldname);
 					}
 
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[j]);
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
 					in_cnt++;
 				}
+				while (0 != --seq_len[i]);
 			}
 		}
-		start += seq_len[i];
+		else
+			start += seq_len[i];
 	}
 
 	if (1 < in_num)
@@ -1570,11 +1568,8 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	zbx_free(seq_len);
 
-	/* closing ')' necessary ? */
-	if (MAX_EXPRESSIONS < in_num || 1 < btwn_num || (0 < in_num && 0 < btwn_num))
+	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
-
-	return;
 }
 
 static char	buf_string[640];
