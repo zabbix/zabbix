@@ -450,18 +450,42 @@ class CEvent extends CZBXAPI {
 		}
 
 		// adding acknowledges
-		if (!is_null($options['select_acknowledges'])) {
+		if ($options['select_acknowledges'] !== null) {
 			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
-				$res = DBselect(
-					'SELECT a.*,u.alias'.
-					' FROM acknowledges a'.
-						' LEFT JOIN users u ON u.userid=a.userid'.
-					' WHERE '.DBcondition('a.eventid', $eventids).
-					' ORDER BY a.clock DESC'
-				);
-				while ($ack = DBfetch($res)) {
-					$result[$ack['eventid']]['acknowledges'][] = $ack;
+				// create the base query
+				$sqlParts = API::getApi()->createSelectQueryParts('acknowledges', 'a', array(
+					'output' => $this->outputExtend('acknowledges',
+						array('acknowledgeid', 'eventid', 'clock'), $options['select_acknowledges']
+					),
+					'filter' => array('eventid' => $eventids)
+				));
+				$sqlParts['order'][] = 'a.clock DESC';
+
+				// if the user alias is requested, join the users table
+				if ($this->outputIsRequested('alias', $options['select_acknowledges'])) {
+					$sqlParts = $this->addQuerySelect('u.alias', $sqlParts);
+					$sqlParts['from'][] = 'users u';
+					$sqlParts['where'][] = 'a.userid=u.userid';
 				}
+
+				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
+				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
+
+				// unset unrequested fields
+				foreach ($acknowledges as &$acknowledge) {
+					if (!$this->outputIsRequested('eventid', $options['select_acknowledges'])) {
+						unset($acknowledge['eventid']);
+					}
+					if (!$this->outputIsRequested('acknowledgeid', $options['select_acknowledges'])) {
+						unset($acknowledge['acknowledgeid']);
+					}
+					if (!$this->outputIsRequested('clock', $options['select_acknowledges'])) {
+						unset($acknowledge['clock']);
+					}
+				}
+				unset($acknowledge);
+
+				$result = $relationMap->mapMany($result, $acknowledges, 'acknowledges');
 			}
 			else {
 				$res = DBselect(
