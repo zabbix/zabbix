@@ -53,9 +53,6 @@ class CAction extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('actionid', 'name', 'status');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('actions' => 'a.actionid'),
 			'from'		=> array('actions' => 'actions a'),
@@ -204,9 +201,6 @@ class CAction extends CZBXAPI {
 				')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// actionids
 		if (!is_null($options['actionids'])) {
 			zbx_value2array($options['actionids']);
@@ -341,9 +335,6 @@ class CAction extends CZBXAPI {
 
 				if (!isset($result[$action['actionid']])) {
 					$result[$action['actionid']] = array();
-				}
-				if (!is_null($options['selectOperations']) && !isset($result[$action['actionid']]['operations'])) {
-					$result[$action['actionid']]['operations'] = array();
 				}
 
 				$result[$action['actionid']] += $action;
@@ -577,26 +568,27 @@ class CAction extends CZBXAPI {
 		}
 
 		// adding operations
-		if (!is_null($options['selectOperations']) && str_in_array($options['selectOperations'], $subselectsAllowedOutputs)) {
-			$operations = array();
-			$operationids = array();
-			$res = DBselect(
-				'SELECT o.*'.
-				' FROM operations o'.
-				' WHERE '.DBcondition('o.actionid', $actionids)
-			);
-			while ($operation = DBfetch($res)) {
-				$operation['opconditions'] = array();
-				$operations[$operation['operationid']] = $operation;
-				$operationids[$operation['operationid']] = $operation['operationid'];
-			}
+		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
+			$operations = API::getApi()->select('operations', array(
+				'output' => $this->outputExtend('operations',
+					array('operationid', 'actionid', 'operationtype'), $options['selectOperations']
+				),
+				'filter' => array('actionid' => $actionids),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($operations, 'actionid', 'operationid');
+			$operationIds = $relationMap->getRelatedIds();
 
-			$res = DBselect('SELECT op.* FROM opconditions op WHERE '.DBcondition('op.operationid', $operationids));
-			while ($opcondition = DBfetch($res)) {
-				if (!isset($operations[$opcondition['operationid']]['opconditions'])) {
-					$operations[$opcondition['operationid']]['opconditions'] = array();
+			if ($this->outputIsRequested('opconditions', $options['selectOperations'])) {
+				foreach ($operations as &$operation) {
+					$operation['opconditions'] = array();
 				}
-				$operations[$opcondition['operationid']]['opconditions'][] = $opcondition;
+				unset($operation);
+
+				$res = DBselect('SELECT op.* FROM opconditions op WHERE '.DBcondition('op.operationid', $operationIds));
+				while ($opcondition = DBfetch($res)) {
+					$operations[$opcondition['operationid']]['opconditions'][] = $opcondition;
+				}
 			}
 
 			$opmessage = $opcommand = $opgroup = $optemplate = array();
@@ -625,100 +617,151 @@ class CAction extends CZBXAPI {
 
 			// get OPERATION_TYPE_MESSAGE data
 			if (!empty($opmessage)) {
-				$dbOpmessages = DBselect(
-					'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
-					' FROM opmessage o'.
-					' WHERE '.DBcondition('operationid', $opmessage)
-				);
-				while ($dbOpmessage = DBfetch($dbOpmessages)) {
-					$operations[$dbOpmessage['operationid']]['opmessage_grp'] = array();
-					$operations[$dbOpmessage['operationid']]['opmessage_usr'] = array();
-					$operations[$dbOpmessage['operationid']]['opmessage'] = $dbOpmessage;
+				if ($this->outputIsRequested('opmessage', $options['selectOperations'])) {
+					foreach ($opmessage as $operationId) {
+						$operations[$operationId]['opmessage'] = array();
+					}
+
+					$dbOpmessages = DBselect(
+						'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+						' FROM opmessage o'.
+						' WHERE '.DBcondition('operationid', $opmessage)
+					);
+					while ($dbOpmessage = DBfetch($dbOpmessages)) {
+						$operations[$dbOpmessage['operationid']]['opmessage'] = $dbOpmessage;
+					}
 				}
 
-				$dbOpmessageGrp = DBselect(
-					'SELECT og.operationid,og.usrgrpid'.
-					' FROM opmessage_grp og'.
-					' WHERE '.DBcondition('operationid', $opmessage)
-				);
-				while ($opmessageGrp = DBfetch($dbOpmessageGrp)) {
-					$operations[$opmessageGrp['operationid']]['opmessage_grp'][] = $opmessageGrp;
+				if ($this->outputIsRequested('opmessage_grp', $options['selectOperations'])) {
+					foreach ($opmessage as $operationId) {
+						$operations[$operationId]['opmessage_grp'] = array();
+					}
+
+					$dbOpmessageGrp = DBselect(
+						'SELECT og.operationid,og.usrgrpid'.
+						' FROM opmessage_grp og'.
+						' WHERE '.DBcondition('operationid', $opmessage)
+					);
+					while ($opmessageGrp = DBfetch($dbOpmessageGrp)) {
+						$operations[$opmessageGrp['operationid']]['opmessage_grp'][] = $opmessageGrp;
+					}
 				}
 
-				$dbOpmessageUsr = DBselect(
-					'SELECT ou.operationid,ou.userid'.
-					' FROM opmessage_usr ou'.
-					' WHERE '.DBcondition('operationid', $opmessage)
-				);
-				while ($opmessageUsr = DBfetch($dbOpmessageUsr)) {
-					$operations[$opmessageUsr['operationid']]['opmessage_usr'][] = $opmessageUsr;
+				if ($this->outputIsRequested('opmessage_usr', $options['selectOperations'])) {
+					foreach ($opmessage as $operationId) {
+						$operations[$operationId]['opmessage_usr'] = array();
+					}
+
+					$dbOpmessageUsr = DBselect(
+						'SELECT ou.operationid,ou.userid'.
+						' FROM opmessage_usr ou'.
+						' WHERE '.DBcondition('operationid', $opmessage)
+					);
+					while ($opmessageUsr = DBfetch($dbOpmessageUsr)) {
+						$operations[$opmessageUsr['operationid']]['opmessage_usr'][] = $opmessageUsr;
+					}
 				}
 			}
 
 			// get OPERATION_TYPE_COMMAND data
 			if (!empty($opcommand)) {
-				$dbOpcommands = DBselect(
-					'SELECT o.*'.
-					' FROM opcommand o'.
-					' WHERE '.DBcondition('operationid', $opcommand)
-				);
-				while ($dbOpcommand = DBfetch($dbOpcommands)) {
-					$operations[$dbOpcommand['operationid']]['opcommand_grp'] = array();
-					$operations[$dbOpcommand['operationid']]['opcommand_hst'] = array();
-					$operations[$dbOpcommand['operationid']]['opcommand'] = $dbOpcommand;
+				if ($this->outputIsRequested('opcommand', $options['selectOperations'])) {
+					foreach ($opcommand as $operationId) {
+						$operations[$operationId]['opcommand'] = array();
+					}
+
+					$dbOpcommands = DBselect(
+						'SELECT o.*'.
+						' FROM opcommand o'.
+						' WHERE '.DBcondition('operationid', $opcommand)
+					);
+					while ($dbOpcommand = DBfetch($dbOpcommands)) {
+						$operations[$dbOpcommand['operationid']]['opcommand'] = $dbOpcommand;
+					}
 				}
 
-				$dbOpcommandHst = DBselect(
-					'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
-					' FROM opcommand_hst oh'.
-					' WHERE '.DBcondition('operationid', $opcommand)
-				);
-				while ($opcommandHst = DBfetch($dbOpcommandHst)) {
-					$operations[$opcommandHst['operationid']]['opcommand_hst'][] = $opcommandHst;
+				if ($this->outputIsRequested('opcommand_hst', $options['selectOperations'])) {
+					foreach ($opcommand as $operationId) {
+						$operations[$operationId]['opcommand_hst'] = array();
+					}
+
+					$dbOpcommandHst = DBselect(
+						'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
+						' FROM opcommand_hst oh'.
+						' WHERE '.DBcondition('operationid', $opcommand)
+					);
+					while ($opcommandHst = DBfetch($dbOpcommandHst)) {
+						$operations[$opcommandHst['operationid']]['opcommand_hst'][] = $opcommandHst;
+					}
 				}
 
-				$dbOpcommandGrp = DBselect(
-					'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
-					' FROM opcommand_grp og'.
-					' WHERE '.DBcondition('operationid', $opcommand)
-				);
-				while ($opcommandGrp = DBfetch($dbOpcommandGrp)) {
-					$operations[$opcommandGrp['operationid']]['opcommand_grp'][] = $opcommandGrp;
+				if ($this->outputIsRequested('opcommand_grp', $options['selectOperations'])) {
+					foreach ($opcommand as $operationId) {
+						$operations[$operationId]['opcommand_grp'] = array();
+					}
+
+					$dbOpcommandGrp = DBselect(
+						'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
+						' FROM opcommand_grp og'.
+						' WHERE '.DBcondition('operationid', $opcommand)
+					);
+					while ($opcommandGrp = DBfetch($dbOpcommandGrp)) {
+						$operations[$opcommandGrp['operationid']]['opcommand_grp'][] = $opcommandGrp;
+					}
 				}
 			}
 
 			// get OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE data
 			if (!empty($opgroup)) {
-				$dbOpgroup = DBselect(
-					'SELECT o.operationid,o.groupid'.
-					' FROM opgroup o'.
-					' WHERE '.DBcondition('operationid', $opgroup)
-				);
-				while ($opgroup = DBfetch($dbOpgroup)) {
-					if (!isset($operations[$opgroup['operationid']]['opgroup'])) {
-						$operations[$opgroup['operationid']]['opgroup'] = array();
+				if ($this->outputIsRequested('opgroup', $options['selectOperations'])) {
+					foreach ($opgroup as $operationId) {
+						$operations[$operationId]['opgroup'] = array();
 					}
-					$operations[$opgroup['operationid']]['opgroup'][] = $opgroup;
+
+					$dbOpgroup = DBselect(
+						'SELECT o.operationid,o.groupid'.
+						' FROM opgroup o'.
+						' WHERE '.DBcondition('operationid', $opgroup)
+					);
+					while ($opgroup = DBfetch($dbOpgroup)) {
+						$operations[$opgroup['operationid']]['opgroup'][] = $opgroup;
+					}
 				}
 			}
 
 			// get OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE data
 			if (!empty($optemplate)) {
-				$dbOptemplate = DBselect(
-					'SELECT o.operationid,o.templateid'.
-					' FROM optemplate o'.
-					' WHERE '.DBcondition('operationid', $optemplate)
-				);
-				while ($optemplate = DBfetch($dbOptemplate)) {
-					if (!isset($operations[$optemplate['operationid']]['optemplate'])) {
-						$operations[$optemplate['operationid']]['optemplate'] = array();
+				if ($this->outputIsRequested('optemplate', $options['selectOperations'])) {
+					foreach ($optemplate as $operationId) {
+						$operations[$operationId]['optemplate'] = array();
 					}
-					$operations[$optemplate['operationid']]['optemplate'][] = $optemplate;
+
+					$dbOptemplate = DBselect(
+						'SELECT o.operationid,o.templateid'.
+						' FROM optemplate o'.
+						' WHERE '.DBcondition('operationid', $optemplate)
+					);
+					while ($optemplate = DBfetch($dbOptemplate)) {
+						$operations[$optemplate['operationid']]['optemplate'][] = $optemplate;
+					}
 				}
 			}
-			foreach ($operations as $operation) {
-				$result[$operation['actionid']]['operations'][] = $operation;
+
+			// unset unrequested fields
+			foreach ($operations as &$operation) {
+				if (!$this->outputIsRequested('operationid', $options['selectOperations'])) {
+					unset($operation['operationid']);
+				}
+				if (!$this->outputIsRequested('actionid', $options['selectOperations'])) {
+					unset($operation['operationid']);
+				}
+				if (!$this->outputIsRequested('operationtype', $options['selectOperations'])) {
+					unset($operation['operationtype']);
+				}
 			}
+			unset($operation);
+
+			$result = $relationMap->mapMany($result, $operations, 'operations');
 		}
 
 		// removing keys (hash -> array)
