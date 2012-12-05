@@ -85,7 +85,7 @@ function getActionMapBySysmap($sysmap) {
 	}
 	unset($selement);
 
-	$scripts_by_hosts = API::Script()->getScriptsByHostIds($hostids);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),

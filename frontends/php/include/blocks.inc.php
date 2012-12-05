@@ -810,7 +810,7 @@ function make_latest_issues(array $filter = array()) {
 	));
 
 	// fetch trigger scripts
-	$scripts_by_hosts = API::Script()->getScriptsByHostIds($hostIds);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
 
 	// indicator of sort field
 	$sortDiv = new CDiv(SPACE, $options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
