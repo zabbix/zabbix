@@ -1149,6 +1149,7 @@ function getSelementsInfo($sysmap) {
 		$triggers = API::Trigger()->get(array(
 			'hostids' => $monitored_hostids,
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectHosts' => array('hostid'),
 			'nopermissions' => true,
 			'filter' => array('value_flags' => null),
 			'nodeids' => get_current_nodeid(true),

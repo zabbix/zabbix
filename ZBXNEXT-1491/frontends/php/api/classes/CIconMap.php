@@ -150,9 +150,9 @@ class CIconMap extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+		}
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
