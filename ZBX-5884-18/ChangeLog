@@ -1,5 +1,6 @@
 Changes for 1.8.16rc1
 
+..F....... [ZBX-5884] improved the trigger expression constructor to work with parentheses (Sasha)
 A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
 A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
 ..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)

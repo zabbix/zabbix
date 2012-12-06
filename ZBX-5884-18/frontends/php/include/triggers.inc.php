@@ -1131,12 +1131,14 @@ function implode_exp($expression, $triggerid) {
 	}
 	unset($newFunction);
 
-	$expr = $expressionData->expressionShort;
-	foreach ($expressionData->expressions as $exprPart) {
-		$expr = str_replace('{'.$exprPart['index'].'}', '{'.$newFunctions[$exprPart['expression']].'}', $expr);
+	$exprPart = end($expressionData->expressions);
+	do {
+		$expression = substr_replace($expression, '{'.$newFunctions[$exprPart['expression']].'}',
+				$exprPart['pos'], strlen($exprPart['expression']));
 	}
+	while ($exprPart = prev($expressionData->expressions));
 
-	return $expr;
+	return $expression;
 }
 
 	function update_trigger_comments($triggerids,$comments){
@@ -2646,819 +2648,713 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 	return $table;
 	}
 
-
-
-/*
- * Function: analyze_expression
+/**
+ * Analyze an expression and returns expression html tree
  *
- * Description:
- *	 analyze trigger expression
+ * @param string $expression
  *
- * Author:
- *	 Maxim Andruhovich (AM / Zabbix Team)
- *
- * Comments:
- *
+ * @return array
  */
-	function analyze_expression($expression){
-		if(empty($expression)) return array('', null);
-
-		$expr = new CTriggerExpression(array('expression' => $expression));
-		if(!empty($expr->errors)){
-			foreach($expr->errors as $error) error($error);
-			return false;
-		}
-
-		$pasedData = parseTriggerExpressions($expression, true);
-//SDII($expr);
-		$next = array();
-		$nextletter = 'A';
-		$ret = build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
-	return $ret;
+function analyzeExpression($expression) {
+	if (empty($expression)) {
+		return array('', null);
 	}
 
-	function showExpressionErrors($expression, $errors) {
-		if(!is_array($errors))
-			return false;
-
-		$totalBreak = false;
-		foreach($errors as $errData) {
-			$checkExprFrom = S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1.SPACE.zbx_substr($expression, $errData['errStart']).SPACE.S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2;
-
-			switch($errData['errorCode']) {
-				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); $totalBreak = true; break;
-				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
-				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.SPACE.$checkExprFrom); break;
-				case 10:
-					info(S_FUNCTION.SPACE.'('.$errData['function'].')'.SPACE.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.SPACE.'['.implode(',',$errData['validTypes']).']');
-					error(S_INCORRECT_VALUE_TYPE.SPACE.'['.item_value_type2str($errData['value_type']).']'.SPACE.S_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom);
-				break;
-				case 11: error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
-				case 12: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
-				case 13: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
-				case 14: error(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1.SPACE.$errData['function'].SPACE.S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2.SPACE.$checkExprFrom); break;
-				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.SPACE.$checkExprFrom); break;
-				case 16: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
-			}
-			if($totalBreak) break;
-		}
+	$expressionData = new CTriggerExpression();
+	if (!$expressionData->parse($expression)) {
+		error($expressionData->error);
+		return false;
 	}
 
-/*
- * Function: make_expression_tree
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+
+	$next = array();
+	$letterNum = 0;
+	return buildExpressionHtmlTree($expressionTree, $next, $letterNum);
+}
+
+/**
+ * Builds expression html tree
  *
- * Description:
+ * @param array $expressionTree output of getExpressionTree() function
+ * @param array $next           parameter only for recursive call; should be empty array
+ * @param int $letterNum        parameter only for recursive call; should be 0
+ * @param int $level            parameter only for recursive call
+ * @param string $operand       parameter only for recursive call
  *
- *
- * Author:
- *	 KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
- *
- * Comments:
- *
+ * @return bool                 returns true if element is found, false - otherwise
  */
-	function make_expression_tree(&$node, &$nodeid){
-		$expr = $node['expr'];
-		$pos = find_divide_pos($expr);
-		if($pos === false) return;
+function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operand = null) {
+	$treeList = array();
+	$outline = '';
 
-		$node['expr'] = substr($expr, $pos, 1);
+	end($expressionTree);
+	$lastKey = key($expressionTree);
 
-		/* left */
-		$left = substr($expr, 0, $pos);
-		$node['left'] = array('parent' => $node['id'], 'id' => $nodeid++, 'expr' => trim_extra_bracket($left));
-		make_expression_tree($node['left'], $nodeid);
-
-		/* right */
-		$right = substr($expr, $pos + 1);
-		$node['right'] = array('parent' => $node['id'], 'id' => $nodeid++, 'expr' => trim_extra_bracket($right));
-		make_expression_tree($node['right'], $nodeid);
-	}
-
-/*
- * Function: find_divide_pos
- *
- * Description:
- *
- *
- * Author:
- *	 KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
- *
- * Comments:
- *
- */
-	function find_divide_pos($expr){
-		if(empty($expr)) return false;
-
-		$candidate = PHP_INT_MAX;
-		$depth = 0;
-		$pos = 0;
-		$priority = 0;
-
-		foreach (str_split($expr) as $i => $c){
-			$priority = false;
-			switch ($c){
-				case '|': $priority = 1; break;
-				case '&': $priority = 2; break;
-				case '(': ++$depth; break;
-				case ')': --$depth; break;
-				default: break;
-			}
-
-			if($priority === false) continue;
-
-			$priority += $depth * 10;
-
-			if($priority < $candidate){
-				$candidate = $priority;
-				$pos = $i;
-			}
-		}
-
-	return $pos == 0 ? false : $pos;
-	}
-
-/*
- * Function: trim_extra_bracket
- *
- * Description:
- *
- *
- * Author:
- *	 KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
- *
- * Comments:
- *
- */
-	function trim_extra_bracket($expr){
-		$len = zbx_strlen($expr);
-
-		if($expr[0] == '(' || $expr[$len - 1] == ')'){
-			$open = substr_count($expr, '(');
-			$close = substr_count($expr, ')');
-
-			if($expr[0] == '(' && $open > $close) $expr = substr($expr, 1);
-			else if($expr[$len - 1] == ')' && $close > $open) $expr = substr($expr, 0, $len - 1);
-			else if($expr[0] == '(' && $expr[$len - 1] == ')' && $open == $close) $expr = substr($expr, 1, $len - 1);
-			else return $expr;
-
-			do { $bak = $expr; } while(($expr = trim_extra_bracket($expr)) != $bak);
-		}
-
-	return $expr;
-	}
-
-/*
- * Function: create_node_list
- *
- * Description:
- *
- *
- * Author:
- *	 KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
- *
- * Comments:
- *
- */
-	function create_node_list($node, &$arr, $depth = 0, $parent_expr = null){
-		$add = 0;
-		if($parent_expr != $node['expr']){
-			$expr = $node['expr'];
-			$expr = $expr == '&' ? S_AND_BIG : ($expr == '|' ? S_OR_BIG : $expr);
-			array_push($arr, array('id' => $node['id'], 'expr' => $expr, 'depth' => $depth));
-			$add = 1;
-		}
-
-		if(isset($node['left'])){
-			create_node_list($node['left'], $arr, $depth + $add, $node['expr']);
-			create_node_list($node['right'], $arr, $depth + $add, $node['expr']);
-		}
-	}
-
-/*
- * Function: build_expression_html_tree
- *
- * Description:
- *	 build trigger expression html (with zabbix html classes) tree
- *
- * Author:
- *	 Maxim Andruhovich (AM / Zabbix Team)
- *
- * Comments:
- *
- */
-	function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$nextletter, &$secondLetters=null) {
-		$treeList = Array();
-		$outline = '';
-		$expr = Array();
-		if($level > 0) expressionLevelDraw($next, $level, $expr);
-
-		$letterLevel = true;
-		if($treeLevel['levelType'] == 'independent' || $treeLevel['levelType'] == 'grouping') {
-			$sStart = !isset($treeLevel['openSymbol']) ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+zbx_strlen($treeLevel['openSymbol']);
-			$sEnd = !isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbolNum'] : $treeLevel['closeSymbolNum']-zbx_strlen($treeLevel['closeSymbol']);
-
-			if(isset($treeLevel['parts'])) $parts =& $treeLevel['parts'];
-			else $parts = Array();
-
-			$fPart = reset($parts);
-
-			if(count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
-				$next[$level] = false;
-				list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter, $secondLetters);
-				$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '').$outline.(isset($treeLevel['closeSymbol'])  && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
-				return Array($outline, $treeList);
-			}
-
-			$operand = '|';
-			reset($parts);
-			$bParts = Array();
-			$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
-
-			if(!is_int($opPos) || $opPos >= $sEnd) {
-				$operand = '&';
-				reset($parts);
-				$bParts = Array();
-				$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
-			}
-
-			if(is_int($opPos) && $opPos < $sEnd) {
-				$letterLevel = false;
-				$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
-				array_push($expr, SPACE, italic($operand == '&' ? S_AND_BIG : S_OR_BIG));
-				unset($expDetails);
+	foreach ($expressionTree as $key => $element) {
+		switch ($element['type']) {
+			case 'operand':
+				$next[$level] = ($key != $lastKey);
+				$expr = expressionLevelDraw($next, $level);
+				$expr[] = SPACE;
+				$expr[] = italic($element['operand'] == '&' ? S_AND_BIG : S_OR_BIG);
 				$levelDetails = array(
 					'list' => $expr,
-					'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'],
+					'id' => $element['id'],
 					'expression' => array(
-						'start' => $treeLevel['openSymbolNum'],
-						'end' => $treeLevel['closeSymbolNum'],
-						'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']: NULL,
-						'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : NULL,
-						'value' => $expValue
+						'value' => $element['expression']
 					)
 				);
-				$levelErrors = expressionHighLevelErrors($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']);
-				if(count($levelErrors) > 0) $levelDetails['expression']['levelErrors'] = $levelErrors;
-				array_push($treeList, $levelDetails);
-				$prev = $sStart;
-				$levelOutline = '';
-				while (is_int($opPos) && $opPos < $sEnd || $prev < $sEnd) {
-					unset($newTreeLevel);
-					$strStart = $prev+($prev > $sStart ? zbx_strlen($operand):0);
-					$strEnd = is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand):$sEnd;
 
-					if(count($bParts) == 1) $fbPart = reset($bParts);
-
-					if(count($bParts) == 1 &&
-						zbx_substr($expression, $fbPart['openSymbolNum'], $fbPart['closeSymbolNum']-$fbPart['openSymbolNum']+1) == trim(zbx_substr($expression, $strStart, $strEnd-$strStart+1))) {
-						$newTreeLevel =& $bParts[key($bParts)];
-					}else{
-						$newTreeLevel = Array(
-							'levelType' => 'grouping',
-							'openSymbolNum' => $strStart,
-							'closeSymbolNum' => $strEnd
-						);
-
-						if(is_array($bParts) && count($bParts) > 0) {
-							$newTreeLevel['parts'] =& $bParts;
-						}
-					}
-//					SDI("{$treeLevel['levelType']} parts:".(isset($treeLevel['parts']) ? count($treeLevel['parts']): 0));
-					unset($bParts);
-					$bParts = Array();
-					$prev = is_int($opPos) && $opPos < $sEnd ? $opPos : $sEnd;
-					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $bParts, $operand);
-
-//					SDI('>>>>>>>>>>>>>>>>>>>newTreeLevel parts count:'.(isset($newTreeLevel['parts']) ? count($newTreeLevel['parts']) : 0));
-					$next[$level] = is_int($prev) && $prev < $sEnd ? true : false;
-					list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level+1, $next, $nextletter, $secondLetters);
-					$treeList = array_merge($treeList, $treeLst);
-					$levelOutline .= trim($outln).(is_int($prev) && $prev < $sEnd ? ' '.$operand.' ':'');
-//					SDI("After {$treeLevel['levelType']} parts:".(isset($treeLevel['parts']) ? count($treeLevel['parts']): 0));
+				$levelErrors = expressionHighLevelErrors($element['expression']);
+				if (count($levelErrors) > 0) {
+					$levelDetails['expression']['levelErrors'] = $levelErrors;
 				}
-				$outline .= zbx_strlen($levelOutline) > 0 ? (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'].' ' : '').$levelOutline.(isset($treeLevel['closeSymbol']) ? ' '.$treeLevel['closeSymbol'] : '') : '';
-			}
-		}
+				$treeList[] = $levelDetails;
 
-		if($letterLevel){
-			if(!$nextletter) $nextletter = 'A';
+				list($subOutline, $subTreeList) = buildExpressionHtmlTree($element['elements'], $next, $letterNum,
+						$level + 1, $element['operand']);
+				$treeList = array_merge($treeList, $subTreeList);
 
-			if ($nextletter > 'Z'){
-				if(!$secondLetters) $secondLetters = 'AA';
-				if($secondLetters[1] > 'Z'){
-					$secondLetters[1] = 'A';
-					$secondLetters[0] = chr(ord($secondLetters[0])+1);
+				$outline .= ($level == 0) ? $subOutline : '('.$subOutline.')';
+				if ($operand !== null && $next[$level]) {
+					$outline .= ' '.$operand.' ';
 				}
-				if($secondLetters[0] > 'Z') $secondLetters[0] = 'A';
-				$newch = $secondLetters;
-			}
-			else{
-				$newch = $nextletter;
-			}
+				break;
+			case 'expression':
+				$next[$level] = ($key != $lastKey);
 
-			array_push($expr, SPACE, bold($newch), SPACE);
-			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
-			if(!defined('NO_LINK_IN_TESTING')) {
-				$url =  new CSpan($expValue, 'link');
-				$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
-				$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
-			}else{
-				$url = new CSpan($expValue);
-			}
-			$expr[] = $url;
-			$glue = '';
-			if(isset($secondLetters[1])){
-				$glue = ($secondLetters[1] == 'A'?"&nbsp;\r\n":' ');
-				$secondLetters[1] = chr(ord($secondLetters[1])+1);
-			}
-			else{
-				$nextletter = chr(ord($nextletter)+1);
-			}
-			$outline = $glue.$newch.' ';
+				$letter = num2letter($letterNum++);
+				$outline .= $letter;
+				if ($operand !== null && $next[$level]) {
+					$outline .= ' '.$operand.' ';
+				}
 
-			$levelDetails = Array(
-					'start' => $treeLevel['openSymbolNum'],
-					'end' => $treeLevel['closeSymbolNum'],
-					'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']:NULL,
-					'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol']:NULL,
-					'value' => $expValue);
-			$errors = expressionHighLevelErrors($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']);
-			if(count($errors) > 0) $levelDetails['levelErrors'] = $errors;
+				if (defined('NO_LINK_IN_TESTING')) {
+					$url = new CSpan($element['expression']);
+				}
+				else {
+					$expressionId = 'expr_'.$element['id'];
 
-			array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => $levelDetails));
+					$url = new CSpan($element['expression'], 'link');
+					$url->setAttribute('id', $expressionId);
+					$url->setAttribute('onclick', 'javascript: copy_expression("'.$expressionId.'");');
+				}
+				$expr = expressionLevelDraw($next, $level);
+				$expr[] = SPACE;
+				$expr[] = bold($letter);
+				$expr[] = SPACE;
+				$expr[] = $url;
+
+				$levelDetails = array(
+					'list' => $expr,
+					'id' => $element['id'],
+					'expression' => array(
+						'value' => $element['expression']
+					)
+				);
+
+				$levelErrors = expressionHighLevelErrors($element['expression']);
+				if (count($levelErrors) > 0) {
+					$levelDetails['expression']['levelErrors'] = $levelErrors;
+				}
+				$treeList[] = $levelDetails;
+				break;
 		}
+	}
+	return array($outline, $treeList);
+}
 
-		return Array($outline, $treeList);
+function expressionHighLevelErrors($expression) {
+	static $errors, $definedErrorPhrases;
+
+	if (!isset($errors)) {
+		$definedErrorPhrases = array(
+			EXPRESSION_VALUE_TYPE_UNKNOWN => S_EXPRESSION_VALUE_TYPE_UNKNOWN,
+			EXPRESSION_HOST_UNKNOWN => S_EXPRESSION_HOST_UNKNOWN,
+			EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
+			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR,
+			EXPRESSION_FUNCTION_UNKNOWN => S_INCORRECT_FUNCTION_IS_USED
+		);
+		$errors = array();
 	}
 
-	function expressionHighLevelErrors($expression, $start, $end) {
-		static $errors, $definedErrorPhrases;
+	if (!isset($errors[$expression])) {
+		$errors[$expression] = array();
+		$expressionData = new CTriggerExpression();
+		if ($expressionData->parse($expression)) {
+			foreach ($expressionData->expressions as $exprPart) {
+				$info = get_item_function_info($exprPart['expression']);
 
-		if(!isset($errors)) {
-			$definedErrorPhrases = array(
-				EXPRESSION_VALUE_TYPE_UNKNOWN => S_EXPRESSION_VALUE_TYPE_UNKNOWN,
-				EXPRESSION_HOST_UNKNOWN => S_EXPRESSION_HOST_UNKNOWN,
-				EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
-				EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
-			$errors = array();
-		}
-
-		if(!isset($errors[$expression])) {
-			$errors[$expression] = array();
-			$expressionData = parseTriggerExpressions($expression, true);
-			if(isset($expressionData[$expression]['expressions']) && is_array($expressionData[$expression]['expressions'])) {
-				foreach($expressionData[$expression]['expressions'] as $expPart) {
-					$expValue = zbx_substr($expression, $expPart['openSymbolNum'], $expPart['closeSymbolNum']-$expPart['openSymbolNum']+1);
-					$info = get_item_function_info($expValue);
-					if(!is_array($info) && isset($definedErrorPhrases[$info])) {
-						if(!isset($errors[$expression][$expValue])) $errors[$expression][$expValue] = array();
-						$errors[$expression][$expValue][] = array(
-							'start' => $expPart['openSymbolNum'],
-							'end' => $expPart['closeSymbolNum'],
-							'error' => &$definedErrorPhrases[$info]);
+				if (!is_array($info) && isset($definedErrorPhrases[$info])) {
+					if (!isset($errors[$expression][$exprPart['expression']])) {
+						$errors[$expression][$exprPart['expression']] = $definedErrorPhrases[$info];
 					}
 				}
 			}
 		}
+	}
 
-		$ret = array();
-		if(count($errors[$expression]) > 0) {
-			foreach($errors[$expression] as $expValue => $errsPos) {
-				foreach($errsPos as $errData) {
-					if($errData['start'] >= $start && $errData['end'] <= $end && !isset($ret[$expValue]))
-						$ret[$expValue] =& $errData['error'];
-				}
-			}
-		}
-
+	$ret = array();
+	if (count($errors[$expression]) == 0) {
 		return $ret;
 	}
-/*
- * Function: expressionLevelDraw
- *
- * Description:
- *	 draw level for trigger expression builder tree
- *
- * Author:
- *	 Maxim Andruhovich (AM / Zabbix Team)
- *
- * Comments:
- *
- */
-	function expressionLevelDraw(&$next, $level, &$expr) {
-		for($i = 0; $i < $level; $i++) {
-			if($i+1 == $level) $expr[] = new CImg('images/general/tr_'.($next[$i] ? 'top_right_bottom':'top_right').'.gif','tr', 12, 12);
-			else $expr[] = new CImg('images/general/tr_'.($next[$i] ? 'top_bottom':'space').'.gif', 'tr', 12, 12);
+
+	$expressionData = new CTriggerExpression();
+	if ($expressionData->parse($expression)) {
+		foreach ($expressionData->expressions as $exprPart) {
+			if (isset($errors[$expression][$exprPart['expression']])) {
+				$ret[$exprPart['expression']] = $errors[$expression][$exprPart['expression']];
+			}
 		}
 	}
+	return $ret;
+}
 
-/*
- * Function: find_next_operand
+/**
+ * Draw level for trigger expression builder tree
  *
- * Description:
- *	 get next operand in expression current level
+ * @param array $next
+ * @param int $level
  *
- * Author:
- *	 Maxim Andruhovich (AM / Zabbix Team)
- *
- * Comments:
- *
+ * @return array
  */
-	function find_next_operand($expression, $sStart, $sEnd, &$parts, &$betweenParts, $operand) {
-		if($sStart >= $sEnd)
-			return false;
-
-//		SDI("Looking for: {$operand}; Start: {$sStart}; End: {$sEnd}; Parts Index: {$i}; Look In: ".zbx_substr($expression, $sStart, $sEnd-$sStart).";");
-		$position = is_int($sStart) && $sStart < $sEnd ? mb_strpos($expression, $operand, $sStart) : $sEnd;
-//		SDI("Found at: {$position}");
-
-		$cKey = key($parts);
-//		SDI("find_next_operand parts: ".count($parts));
-//		SDI("Current Index: $cKey");
-		while($cKey !== NULL && $cKey !== false) {
-//			SDI("levelType: {$parts[$i]['levelType']}");
-//			SDI("Position: $position; openSymbolNum: {$parts[$i]['openSymbolNum']}; closeSymbolNum: {$parts[$i]['closeSymbolNum']};");
-//			SDI("Grouping Value (From {$parts[$i]['openSymbolNum']}, To {$parts[$i]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i]['openSymbolNum'], $parts[$i]['closeSymbolNum']-$parts[$i]['openSymbolNum']+1).";");
-//			if(isset($parts[$i+1]))
-//			SDI("Grouping Value (From {$parts[$i+1]['openSymbolNum']}, To {$parts[$i+1]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i+1]['openSymbolNum'], $parts[$i+1]['closeSymbolNum']-$parts[$i+1]['openSymbolNum']+1).";");
-			if(is_int($position) && $parts[$cKey]['openSymbolNum'] <= $position && $position <= $parts[$cKey]['closeSymbolNum']) {
-//				SDI("Position is inside child: {$parts[$i]['levelType']}");
-				$position = $parts[$cKey]['closeSymbolNum'] < $sEnd ? mb_strpos($expression, $operand, $parts[$cKey]['closeSymbolNum']) : $sEnd;
-				$betweenParts[$cKey] =& $parts[$cKey];
-			}else if (is_int($position) && $position < $parts[$cKey]['openSymbolNum']) {
-//				SDI('breaking loop');
-				break;
-			}elseif(!is_int($position) || $position > $parts[$cKey]['closeSymbolNum']) {
-//				SDI('moving to the next');
-				$betweenParts[$cKey] =& $parts[$cKey];
-			}
-			next($parts);
-			$cKey = key($parts);
+function expressionLevelDraw(array $next, $level) {
+	$expr = array();
+	for ($i = 1; $i <= $level; $i++) {
+		if ($i == $level) {
+			$image = $next[$i] ? 'top_right_bottom' : 'top_right';
 		}
-//		SDI("Returning position: {$position}");
-		return $position;
+		else {
+			$image = $next[$i] ? 'top_bottom' : 'space';
+		}
+		$expr[] = new CImg('images/general/tr_'.$image.'.gif', 'tr', 12, 12);
 	}
-
-/*
- * Function: rebuild_expression_tree
- *
- * Description:
- *	 add/delete/edit part of expression tree or whole expression
- *
- * Author:
- *	 Maxim Andruhovich (AM / Zabbix Team)
- *
- * Comments:
- *
- */
-	function rebuild_expression_tree($expression, &$treeLevel, $action, $actionid, $newPart) {
-		$newExp = '';
-		$lastLevel = true;
-
-		if($actionid != $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'] && ($treeLevel['levelType'] == 'independent' || $treeLevel['levelType'] == 'grouping')) {
-			$sStart = !isset($treeLevel['openSymbol']) ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+zbx_strlen($treeLevel['openSymbol']);
-			$sEnd = !isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbolNum']: $treeLevel['closeSymbolNum']-zbx_strlen($treeLevel['closeSymbol']);
-			/*$sStart = $treeLevel['levelType'] == 'independent' ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+(isset($treeLevel['openSymbol']) ? zbx_strlen($treeLevel['openSymbol']) : 0);
-			$sEnd = $treeLevel['levelType'] == 'independent' ? $treeLevel['closeSymbolNum']+1 : $treeLevel['closeSymbolNum'];*/
-
-//			SDI("Total start: {$sStart}; Total end: {$sEnd};");
-
-			if(isset($treeLevel['parts'])) $parts =& $treeLevel['parts'];
-			else $parts = Array();
-
-			$fPart = reset($parts);
-
-			if(count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
-				return (isset($fPart['openSymbol']) && $fPart['levelType'] == 'grouping' ? $fPart['openSymbol']:'').trim(rebuild_expression_tree($expression, $fPart, $action, $actionid, $newPart)).(isset($fPart['closeSymbol']) && $fPart['levelType'] == 'grouping' ? $fPart['closeSymbol']:'');
-			}
-
-			$operand = '|';
-			reset($parts);
-			$bParts = Array();
-			$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
-
-			if(!is_int($opPos) || $opPos >= $sEnd) {
-				$operand = '&';
-				reset($parts);
-				$bParts = Array();
-				$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
-			}
-
-			if(is_int($opPos) && $opPos < $sEnd) {
-				$lastLevel = false;
-				$prev = $sStart;
-
-				$levelNewExpression = Array();
-				while (is_int($opPos) && $opPos < $sEnd || $prev < $sEnd) {
-					unset($newTreeLevel);
-
-					if(count($bParts) == 1) $fbPart = reset($bParts);
-
-					if(count($bParts) == 1 &&
-						zbx_substr($expression, $fbPart['openSymbolNum'], $fbPart['closeSymbolNum']-$fbPart['openSymbolNum']+(isset($fbPart['closeSymbol']) ? zbx_strlen($fbPart['closeSymbol']) : 0)) == trim(zbx_substr($expression, $prev+($prev > $sStart ? zbx_strlen($operand): 0), (is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand): $sEnd)-$prev))) {
-						$newTreeLevel =& $bParts[key($bParts)];
-					}else{
-						$newTreeLevel = Array(
-							'levelType' => 'grouping',
-							'openSymbolNum' => $prev+($prev > $sStart ? zbx_strlen($operand): 0),
-							'closeSymbolNum' => is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand): $sEnd
-						);
-
-						if(is_array($bParts) && count($bParts) > 0) {
-							$newTreeLevel['parts'] =& $bParts;
-						}
-					}
-//					SDI("{$treeLevel['levelType']} parts:".count($treeLevel['parts']));
-					unset($bParts);
-					$bParts = Array();
-					$prev = is_int($opPos) && $opPos < $sEnd ? $opPos : $sEnd;
-					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $bParts, $operand);
-
-//					SDI('>>>>>>>>>>>>>>>>>>>newTreeLevel parts count:'.(isset($newTreeLevel['parts']) ? count($newTreeLevel['parts']): 0));
-
-//					if(isset($newTreeLevel['parts'])) SDII($newTreeLevel['parts']);
-
-					$newLevelExpression = rebuild_expression_tree($expression, $newTreeLevel, $action, $actionid, $newPart);
-					if($newLevelExpression)
-						$levelNewExpression[] = (isset($newTreeLevel['openSymbol']) && $newTreeLevel['levelType'] == 'grouping' ? $newTreeLevel['openSymbol']:'').trim($newLevelExpression).(isset($newTreeLevel['closeSymbol']) && $newTreeLevel['levelType'] == 'grouping' ? $newTreeLevel['closeSymbol']:'');
-
-//					SDI("After {$treeLevel['levelType']} parts:".count($treeLevel['parts']));
-				}
-				$newExp .= implode(' '.$operand.' ', $levelNewExpression);
-			}
-		}
-
-		if($lastLevel) {
-			$curLevelVal = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
-			if($actionid == $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']) {
-				switch($action) {
-					case 'R': /* remove */
-					break;
-					case 'r': /* Replace */
-						$newExp .= $newPart;
-					break;
-					case '&': /* add */
-					case '|': /* add */
-						$newExp .= $curLevelVal.' '.$action.' '.$newPart;
-					break;
-				}
-			}else{
-				$newExp .= $curLevelVal;
-			}
-		}
-
-//		SDI("<<<<<<<<<<<<<<<<<<<<<<<<< New expression return: {$newExp}");
-		return $newExp;
-	}
-
-	function make_disp_tree($tree, $map, $action = false){
-		$res = array();
-		foreach ($tree as $i => $n){
-			$expr = array();
-			for ($j = 0; $j < $n['depth']; ++$j){
-				$next = $finder($tree, $i + 1, $j + 1);
-				if($j + 1 == $n['depth']) $expr[] = new CImg('images/general/tr_'.($next ? 'top_right_bottom':'top_right').'.gif','tr', 12, 12);
-				else $expr[] = new CImg('images/general/tr_'.($next ? 'top_bottom':'space').'.gif', 'tr', 12, 12);
-			}
-
-			$key = null;
-
-			if(zbx_strlen($n['expr']) == 1){
-				$key = $n['expr'];
-				$tgt = $map[$key];
-
-				array_push($expr, SPACE, bold($n['expr']),SPACE);
-
-				$e = $tgt['expression'].$tgt['sign'].$tgt['value'];
-				if($action){
-					$url = new CSpan($e, 'link');
-					$url->setAttribute('id', 'expr' . $n['id']);
-					$url->setAttribute('onclick', 'javascript: copy_expression("expr'. $n['id'] .'");');
-					$expr[] = $url;
-				}else{
-					$expr[] = $e;
-				}
-			} else {
-				array_push($expr, SPACE, italic($n['expr']));
-			}
-
-			array_push($res, array('id' => $n['id'], 'expr' => $expr, 'key' => $key));
-		}
-
-	return $res;
-	}
-
-/*
- * Function: remake_expression
- *
- * Description:
- *	prepares data for rebuild_expression_tree
- *
- * Author:
- *	 Maxim Andruhovich (AM / Zabbix Team)
- *
- * Comments:
- *
- */
-	function remake_expression($expression, $actionid, $action, $new_expr){
-//		SDI("REBUILD STARTS HERE!-----------------------------------------------------------------------------------");
-		if(empty($expression)) return '';
-
-		$pasedData = parseTriggerExpressions($expression, true);
-
-		if(!isset($pasedData[$expression]['errors'])) {
-//			SDII($pasedData[$expression]['tree']);
-			$ret = rebuild_expression_tree($expression, $pasedData[$expression]['tree'], $action, $actionid, $new_expr);
-//			SDII($pasedData[$expression]['tree']);
-			return $ret;
-		}else{
-			return false;
-		}
-	}
-
-/*
- * Function: find_node
- *
- * Description:
- *
- *
- * Author:
- *	 KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
- *
- * Comments:
- *
- */
-	function &find_node(&$node, $nodeid){
-		if($node['id'] == $nodeid) return $node;
-
-		if(isset($node['left'])){
-			$res = &find_node($node['left'], $nodeid);
-			if(!is_array($res)) $res = &find_node($node['right'], $nodeid);
-
-			return $res;
-		}
-
-	return $nodeid;
-	}
-
-/*
- * Function: make_expression
- *
- * Description:
- *
- *
- * Author:
- *	 KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
- *
- * Comments:
- *
- */
-	function make_expression($node, &$map, $parent_expr = null){
-		$expr = '';
-
-		if(isset($node['left'])){
-			$left = make_expression($node['left'], $map, $node['expr']);
-			$right = make_expression($node['right'], $map, $node['expr']);
-			$expr = $left . ' ' . $node['expr'] . ' ' . $right;
-			if($node['expr'] != $parent_expr && isset($node['parent'])) $expr = '(' . $expr . ')';
-		}
-		else if(isset($node['expr'])){
-			$i = $map[$node['expr']];
-			$expr = $i['expression'] . $i['sign'] . $i['value'];
-		}
-
 	return $expr;
-	}
+}
 
-	function get_item_function_info($expr){
-		global $ZBX_TR_EXPR_SIMPLE_MACROS;
-
-		$value_type = array(
-			ITEM_VALUE_TYPE_UINT64	=> S_NUMERIC_UINT64,
-			ITEM_VALUE_TYPE_FLOAT	=> S_NUMERIC_FLOAT,
-			ITEM_VALUE_TYPE_STR		=> S_CHARACTER,
-			ITEM_VALUE_TYPE_LOG		=> S_LOG,
-			ITEM_VALUE_TYPE_TEXT	=> S_TEXT
-			);
-
-		$type_of_value_type = array(
-			ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
-			ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
-			ITEM_VALUE_TYPE_STR	=> T_ZBX_STR,
-			ITEM_VALUE_TYPE_LOG	=> T_ZBX_STR,
-			ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
-			);
-
-		$function_info = array(
-			'abschange' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'count' =>		array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
-			'date' =>		array('value_type' => 'YYYYMMDD',	'type' => T_ZBX_INT,		'validation' => '{}>=19700101&&{}<=99991231'),
-			'dayofmonth' =>		array('value_type' => '1-31',		'type' => T_ZBX_INT,		'validation' => '{}>=1&&{}<=31'),
-			'dayofweek' =>		array('value_type' => '1-7',		'type' => T_ZBX_INT,		'validation' => IN('1,2,3,4,5,6,7')),
-			'delta' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'diff' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'fuzzytime' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'iregexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'last' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'logeventid' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'logseverity' =>	array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
-			'logsource' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'max' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'min' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'nodata' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'now' =>		array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
-			'prev' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'regexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'str' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
-			'strlen' =>		array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
-			'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,		'validation' => 'zbx_strlen({})==6'));
-
-		if(isset($ZBX_TR_EXPR_SIMPLE_MACROS[$expr])){
-			$result = array(
-				'value_type'	=> S_0_OR_1,
-				'type'			=> T_ZBX_INT,
-				'validation'	=> IN('0,1')
-			);
-		}
-		else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expr)){
-			$result = array(
-				'value_type'	=> S_0_OR_1,
-				'type'			=> T_ZBX_INT,
-				'validation'	=> NOT_EMPTY
-			);
-		}
-		else{
-			$hostId = $itemId = $function = null;
-			$triggerExpr = new CTriggerExpression(array('expression' => $expr));
-			if(empty($triggerExpr->errors)){
-
-				if(count($triggerExpr->data['macros']) > 0){
-					$result = array(
-						'value_type'    => S_NUMERIC_FLOAT,
-						'type'			=> T_ZBX_DBL,
-						'validation'	=> NOT_EMPTY
-					);
+/**
+ * Returns number of elements in a trigger expression
+ * Element is expression between two operands.
+ *
+ * For example:
+ * expression "{host.key.last(0)}=0 & ({host2:key.last(0)}=0 & {host3.key.last(0)}=0)" has two elements:
+ * "{host.key.last(0)}=0" and "({host2:key.last(0)}=0 & {host3.key.last(0)}=0)"
+ *
+ * @param CTriggerExpression $expressionData
+ * @param int $start
+ * @param int $end
+ *
+ * @return integer
+ */
+function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $end)
+{
+	for ($i = $start, $level = 0, $expressionElementsNum = 1; $i <= $end; $i++) {
+		switch ($expressionData->expression[$i]) {
+			case '(':
+				$level++;
+				break;
+			case ')':
+				$level--;
+				break;
+			case '|':
+			case '&':
+				if ($level == 0) {
+					$expressionElementsNum++;
 				}
-				else if(count($triggerExpr->expressions) > 0){
-					$function = reset($triggerExpr->data['functions']);
-					$hostFound = CHost::get(array(
-						'filter' => array('host' => $triggerExpr->data['hosts']),
-						'templated_hosts' => true
-					));
-
-					if(empty($hostFound)) return EXPRESSION_HOST_UNKNOWN;
-
-					$itemFound = CItem::get(array(
-						'hostids' => zbx_objectValues($hostFound, 'hostid'),
-						'filter' => array('key_' => $triggerExpr->data['items']),
-						'webitems' => true
-					));
-					if(empty($itemFound)) return EXPRESSION_HOST_ITEM_UNKNOWN;
-
-					unset($triggerExpr);
-
-					$result = $function_info[$function];
-
-					if(is_array($result['value_type'])){
-						$value_type = null;
-						$item_data = CItem::get(array(
-							'itemids'=>zbx_objectValues($itemFound, 'itemid'),
-							'output'=>API_OUTPUT_EXTEND,
-							'webitems'=> true
-						));
-
-						if($item_data = reset($item_data)){
-							$value_type = $item_data['value_type'];
-						}
-
-						if($value_type == null) return VALUE_TYPE_UNKNOWN;
-
-						$result['value_type'] = $result['value_type'][$value_type];
-						$result['type'] = $result['type'][$value_type];
-
-						if($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL){
-							$result['type'] = T_ZBX_STR;
-							$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
-						}
+				break;
+			case '{':
+				foreach ($expressionData->expressions as $exprPart) {
+					if ($exprPart['pos'] == $i) {
+						$i += strlen($exprPart['expression']) - 1;
+						break;
 					}
 				}
-				else{
-					return EXPRESSION_NOT_A_MACRO_ERROR;
+				break;
+		}
+	}
+	return $expressionElementsNum;
+}
+
+/**
+ * Makes tree of expression elements
+ *
+ * Expression:
+ *   "{host1:system.cpu.util[,iowait].last(0)} > 50 & {host2:system.cpu.util[,iowait].last(0)} > 50"
+ * Result:
+ *   array(
+ *     [0] => array(
+ *       'id' => '0_92',
+ *       'type' => 'operand',
+ *       'operand' => '&',
+ *       'elements' => array(
+ *         [0] => array(
+ *           'id' => '0_44',
+ *           'type' => 'expression',
+ *           'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
+ *         ),
+ *         [1] => array(
+ *           'id' => '48_92',
+ *           'type' => 'expression',
+ *           'expression' => '{host2:system.cpu.util[,iowait].last(0)} > 50'
+ *         )
+ *       )
+ *     )
+ *   )
+ *
+ * @param CTriggerExpression $expressionData
+ * @param int $start
+ * @param int $end
+ *
+ * @return array
+ */
+function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
+	$expressionTree = array();
+
+	foreach (array('|', '&') as $operand) {
+		$operandFound = false;
+		$lParentheses = -1;
+		$rParentheses = -1;
+		$expressions = array();
+		$openSymbolNum = $start;
+
+		for ($i = $start, $level = 0; $i <= $end; $i++) {
+			switch ($expressionData->expression[$i]) {
+				case ' ':
+					if ($openSymbolNum == $i) {
+						$openSymbolNum++;
+					}
+					break;
+				case '(':
+					if ($level == 0) {
+						$lParentheses = $i;
+					}
+					$level++;
+					break;
+				case ')':
+					$level--;
+					if ($level == 0) {
+						$rParentheses = $i;
+					}
+					break;
+				case $operand:
+					if ($level == 0) {
+						$closeSymbolNum = $i - 1;
+						while ($expressionData->expression[$closeSymbolNum] == ' ') {
+							$closeSymbolNum--;
+						}
+
+						$expressionElementsNum = getExpressionElementsNum($expressionData, $openSymbolNum, $closeSymbolNum);
+						if ($expressionElementsNum == 1 && $openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
+							$openSymbolNum++;
+							$closeSymbolNum--;
+						}
+
+						$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
+						$openSymbolNum = $i + 1;
+						$operandFound = true;
+					}
+					break;
+				case '{':
+					foreach ($expressionData->expressions as $exprPart) {
+						if ($exprPart['pos'] == $i) {
+							$i += strlen($exprPart['expression']) - 1;
+							break;
+						}
+					}
+					break;
+			}
+		}
+
+		$closeSymbolNum = $end;
+		while ($expressionData->expression[$closeSymbolNum] == ' ') {
+			$closeSymbolNum--;
+		}
+
+		if ($operandFound) {
+			$expressionElementsNum = getExpressionElementsNum($expressionData, $openSymbolNum, $closeSymbolNum);
+			if ($expressionElementsNum == 1 && $openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
+				$openSymbolNum++;
+				$closeSymbolNum--;
+			}
+
+			$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
+
+			$openSymbolNum = $start;
+			while ($expressionData->expression[$openSymbolNum] == ' ') {
+				$openSymbolNum++;
+			}
+
+			$closeSymbolNum = $end;
+			while ($expressionData->expression[$closeSymbolNum] == ' ') {
+				$closeSymbolNum--;
+			}
+
+			$expressionTree = array(
+				'id' => $openSymbolNum.'_'.$closeSymbolNum,
+				'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+				'type' => 'operand',
+				'operand' => $operand,
+				'elements' => $expressions
+			);
+			break;
+		}
+		elseif ($operand == '&') {
+			if ($openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
+				$openSymbolNum++;
+				$closeSymbolNum--;
+
+				$expressionTree = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
+			}
+			else {
+				$expressionTree = array(
+					'id' => $openSymbolNum.'_'.$closeSymbolNum,
+					'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+					'type' => 'expression'
+				);
+			}
+		}
+	}
+
+	return $expressionTree;
+}
+
+/**
+ * Recreate an expression depending on action
+ *
+ * @param string $expression
+ * @param string $expressionId  element identifier like "0_55"
+ * @param string $action        one of &/|/r/R (AND/OR/replace/Remove)
+ * @param string $newExpression expression for AND, OR or replace actions
+ *
+ * @return bool                 returns new expression or false if expression is incorrect
+ */
+function remakeExpression($expression, $expressionId, $action, $newExpression) {
+	if (empty($expression)) {
+		return false;
+	}
+
+	$expressionData = new CTriggerExpression();
+	if ($action != 'R' && !$expressionData->parse($newExpression)) {
+		error($expressionData->error);
+		return false;
+	}
+
+	if (!$expressionData->parse($expression)) {
+		error($expressionData->error);
+		return false;
+	}
+
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+
+	if (rebuildExpressionTree($expressionTree, $expressionId, $action, $newExpression)) {
+		$expression = makeExpression($expressionTree);
+	}
+	return $expression;
+}
+
+/**
+ * Rebuild expression depending on action
+ *
+ * Example:
+ *   $expressionTree = array(
+ *     [0] => array(
+ *       'id' => '0_92',
+ *       'type' => 'operand',
+ *       'operand' => '&',
+ *       'elements' => array(
+ *         [0] => array(
+ *           'id' => '0_44',
+ *           'type' => 'expression',
+ *           'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
+ *         ),
+ *         [1] => array(
+ *           'id' => '48_92',
+ *           'type' => 'expression',
+ *           'expression' => '{host2:system.cpu.util[,iowait].last(0)} > 50'
+ *         )
+ *       )
+ *     )
+ *   )
+ *   $action = 'R'
+ *   $expressionId = '48_92'
+ *
+ * Result:
+ *   $expressionTree = array(
+ *     [0] => array(
+ *       'id' => '0_44',
+ *       'type' => 'expression',
+ *       'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
+ *     )
+ *   )
+ *
+ * @param array $expressionTree
+ * @param string $expressionId  element identifier like "0_55"
+ * @param string $action        one of &/|/r/R (AND/OR/replace/Remove)
+ * @param string $newExpression expression for AND, OR or replace actions
+ * @param string $operand       parameter only for recursive call
+ *
+ * @return bool                 returns true if element is found, false - otherwise
+ */
+function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $newExpression, $operand = null)
+{
+	foreach ($expressionTree as $key => $expression) {
+		if ($expressionId == $expressionTree[$key]['id']) {
+			switch ($action) {
+				// AND and OR
+				case '&':
+				case '|':
+					switch ($expressionTree[$key]['type']) {
+						case 'operand':
+							if ($expressionTree[$key]['operand'] == $action) {
+								$expressionTree[$key]['elements'][] = array(
+									'expression' => $newExpression,
+									'type' => 'expression'
+								);
+							}
+							else {
+								$element = array(
+									'type' => 'operand',
+									'operand' => $action,
+									'elements' => array(
+										$expressionTree[$key],
+										array(
+											'expression' => $newExpression,
+											'type' => 'expression'
+										)
+									)
+								);
+								$expressionTree[$key] = $element;
+							}
+							break;
+						case 'expression':
+							if (!$operand || $operand != $action) {
+								$element = array(
+									'type' => 'operand',
+									'operand' => $action,
+									'elements' => array(
+										$expressionTree[$key],
+										array(
+											'expression' => $newExpression,
+											'type' => 'expression'
+										)
+									)
+								);
+								$expressionTree[$key] = $element;
+							}
+							else {
+								$expressionTree[] = array(
+									'expression' => $newExpression,
+									'type' => 'expression'
+								);
+							}
+							break;
+					}
+					break;
+				// replace
+				case 'r':
+					$expressionTree[$key]['expression'] = $newExpression;
+					if ($expressionTree[$key]['type'] == 'operand') {
+						$expressionTree[$key]['type'] = 'expression';
+						unset($expressionTree[$key]['operand'], $expressionTree[$key]['elements']);
+					}
+					break;
+				// remove
+				case 'R':
+					unset($expressionTree[$key]);
+					break;
+			}
+			return true;
+		}
+
+		if ($expressionTree[$key]['type'] == 'operand') {
+			if (rebuildExpressionTree($expressionTree[$key]['elements'], $expressionId, $action, $newExpression,
+					$expressionTree[$key]['operand'])) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/**
+ * Makes expression by expression tree
+ *
+ * Example:
+ *   $expressionTree = array(
+ *     [0] => array(
+ *       'type' => 'operand',
+ *       'operand' => '&',
+ *       'elements' => array(
+ *         [0] => array(
+ *           'type' => 'expression',
+ *           'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
+ *         ),
+ *         [1] => array(
+ *           'type' => 'expression',
+ *           'expression' => '{host2:system.cpu.util[,iowait].last(0)} > 50'
+ *         )
+ *       )
+ *     )
+ *   )
+ *
+ * Result:
+ *   "{host1:system.cpu.util[,iowait].last(0)} > 50 & {host2:system.cpu.util[,iowait].last(0)} > 50"
+ *
+ * @param array $expressionTree
+ * @param int $level        parameter only for recursive call
+ * @param string $operand       parameter only for recursive call
+ *
+ * @return string
+ */
+function makeExpression(array $expressionTree, $level = 0, $operand = null)
+{
+	$expression = '';
+
+	end($expressionTree);
+	$lastKey = key($expressionTree);
+
+	foreach ($expressionTree as $key => $element) {
+		switch ($element['type']) {
+			case 'operand':
+				$subExpression = makeExpression($element['elements'], $level + 1, $element['operand']);
+
+				$expression .= ($level == 0) ? $subExpression : '('.$subExpression.')';
+				break;
+			case 'expression':
+				$expression .= $element['expression'];
+				break;
+		}
+		if ($operand !== null && $key != $lastKey) {
+			$expression .= ' '.$operand.' ';
+		}
+	}
+	return $expression;
+}
+
+function get_item_function_info($expr) {
+	$value_type = array(
+		ITEM_VALUE_TYPE_UINT64	=> S_NUMERIC_UINT64,
+		ITEM_VALUE_TYPE_FLOAT	=> S_NUMERIC_FLOAT,
+		ITEM_VALUE_TYPE_STR		=> S_CHARACTER,
+		ITEM_VALUE_TYPE_LOG		=> S_LOG,
+		ITEM_VALUE_TYPE_TEXT	=> S_TEXT
+	);
+
+	$type_of_value_type = array(
+		ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
+		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
+		ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
+		ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
+		ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
+	);
+
+	$function_info = array(
+		'abschange' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'count' =>		array('value_type' => S_NUMERIC_UINT64, 'type' => T_ZBX_INT, 		'validation' => NOT_EMPTY),
+		'date' =>		array('value_type' => 'YYYYMMDD',	'type' => T_ZBX_INT,			'validation' => '{}>=19700101&&{}<=99991231'),
+		'dayofmonth' =>	array('value_type' => '1-31',		'type' => T_ZBX_INT,			'validation' => '{}>=1&&{}<=31'),
+		'dayofweek' =>	array('value_type' => '1-7',		'type' => T_ZBX_INT,			'validation' => IN('1,2,3,4,5,6,7')),
+		'delta' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'diff' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'fuzzytime' =>	array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'iregexp' =>	array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'last' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'logeventid' =>	array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'logseverity' =>array('value_type' => S_NUMERIC_UINT64, 'type' => T_ZBX_INT, 		'validation' => NOT_EMPTY),
+		'logsource' =>	array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'max' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'min' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'nodata' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'now' =>		array('value_type' => S_NUMERIC_UINT64, 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
+		'prev' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'regexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'str' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+		'strlen' =>		array('value_type' => S_NUMERIC_UINT64, 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
+		'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6')
+	);
+
+	$expressionData = new CTriggerExpression();
+
+	if ($expressionData->parse($expr)) {
+		if (isset($expressionData->macros[0])) {
+			$result = array(
+				'value_type' => S_0_OR_1,
+				'type' => T_ZBX_INT,
+				'validation' => IN('0,1')
+			);
+		}
+		elseif (isset($expressionData->usermacros[0])) {
+			$result = array(
+				'value_type' => S_0_OR_1,
+				'type' => T_ZBX_INT,
+				'validation' => NOT_EMPTY
+			);
+		}
+		elseif (isset($expressionData->expressions[0])) {
+			$exprPart = reset($expressionData->expressions);
+
+			if (!isset($function_info[$exprPart['functionName']])) {
+				return EXPRESSION_FUNCTION_UNKNOWN;
+			}
+
+			$hostFound = CHost::get(array(
+				'filter' => array('host' => array($exprPart['host'])),
+				'templated_hosts' => true
+			));
+
+			if (empty($hostFound)) {
+				return EXPRESSION_HOST_UNKNOWN;
+			}
+
+			$itemFound = CItem::get(array(
+				'hostids' => zbx_objectValues($hostFound, 'hostid'),
+				'filter' => array(
+					'key_' => array($exprPart['item']),
+				),
+				'webitems' => true
+			));
+			if (empty($itemFound)) {
+				return EXPRESSION_HOST_ITEM_UNKNOWN;
+			}
+
+			$result = $function_info[$exprPart['functionName']];
+
+			if (is_array($result['value_type'])) {
+				$value_type = null;
+				$item_data = CItem::get(array(
+					'itemids' => zbx_objectValues($itemFound, 'itemid'),
+					'output' => API_OUTPUT_EXTEND,
+					'webitems' => true
+				));
+
+				if ($item_data = reset($item_data)) {
+					$value_type = $item_data['value_type'];
+				}
+
+				if ($value_type == null) {
+					return EXPRESSION_VALUE_TYPE_UNKNOWN;
+				}
+
+				$result['value_type'] = $result['value_type'][$value_type];
+				$result['type'] = $result['type'][$value_type];
+
+				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL) {
+					$result['type'] = T_ZBX_STR;
+					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 				}
 			}
 		}
+		else {
+			return EXPRESSION_NOT_A_MACRO_ERROR;
+		}
+	}
 
 	return $result;
-	}
+}
 
 	function convert($value){
 		$value = trim($value);

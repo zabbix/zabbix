@@ -54,8 +54,8 @@ class CTriggerExpression {
 	 * Example:
 	 *   'expressions' => array(
 	 *     0 => array(
-	 *       'index' => 0
 	 *       'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *       'pos' => 0,
 	 *       'host' => 'Zabbix server',
 	 *       'item' => 'agent.ping',
 	 *       'function' => 'last(0)',
@@ -106,23 +106,11 @@ class CTriggerExpression {
 	public $usermacros = array();
 
 	/**
-	 * An expression with trigger functions replaced by indexes like {0}, {1}, ...
-	 * The each index corresponds 'index' variable from 'expressions' array
-	 *
-	 * Example:
-	 *   $expression : "{Zabbix server:agent.ping.last(0)}=0"
-	 *   $expressions : array(
-	 *       0 => array(
-	 *         'index' => 0
-	 *         'expression' => '{Zabbix server:agent.ping.last(0)}',
-	 *         ...
-	 *       )
-	 *     )
-	 *   $expressionShort : "{0}=0"
+	 * An initial expression
 	 *
 	 * @var string
 	 */
-	public $expressionShort = '';
+	public $expression;
 
 	/**
 	 * A current position on a parsed element
@@ -132,22 +120,8 @@ class CTriggerExpression {
 	private $pos;
 
 	/**
-	 * A number of elements in an 'expressions' array
-	 *
-	 * @var integer
-	 */
-	private $expressionNum = 0;
-
-	/**
-	 * An initial expression
-	 *
-	 * @var string
-	 */
-	private $expression;
-
-	/**
 	 * Parse a trigger expression and set public variables $this->isValid, $this->error, $this->expressions,
-	 *   $this->macros, $this->usermacros and $this->expressionShort
+	 *   $this->macros and $this->usermacros
 	 *
 	 * Examples:
 	 *   expression:
@@ -157,8 +131,8 @@ class CTriggerExpression {
 	 *     $this->error : ''
 	 *     $this->expressions : array(
 	 *       0 => array(
-	 *         'index' => 0
 	 *         'expression' => '{Zabbix server:agent.ping.last(0)}',
+	 *         'pos' => 0,
 	 *         'host' => 'Zabbix server',
 	 *         'item' => 'agent.ping',
 	 *         'function' => 'last(0)',
@@ -177,7 +151,6 @@ class CTriggerExpression {
 	 *         'expression' => '{$TRIGGER.VALUE}'
 	 *       )
 	 *     )
-	 *     $this->expressionShort : {0}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
 	 *
 	 * @param string $expression
 	 *
@@ -190,10 +163,8 @@ class CTriggerExpression {
 		$this->expressions = array();
 		$this->macros = array();
 		$this->usermacros = array();
-		$this->expressionShort = '';
 
 		$this->pos = 0;
-		$this->expressionNum = 0;
 		$this->expression = $expression;
 
 		$state = self::STATE_INIT;
@@ -206,14 +177,11 @@ class CTriggerExpression {
 				case self::STATE_AFTER_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
-							$this->expressionShort .= $this->expression[$this->pos];
 							break;
 						case '-':
-							$this->expressionShort .= $this->expression[$this->pos];
 							$state = self::STATE_AFTER_MINUS;
 							break;
 						case '(':
-							$this->expressionShort .= $this->expression[$this->pos];
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
@@ -227,10 +195,8 @@ class CTriggerExpression {
 				case self::STATE_AFTER_MINUS:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
-							$this->expressionShort .= $this->expression[$this->pos];
 							break;
 						case '(':
-							$this->expressionShort .= $this->expression[$this->pos];
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
@@ -245,7 +211,6 @@ class CTriggerExpression {
 				case self::STATE_AFTER_CONSTANT:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
-							$this->expressionShort .= $this->expression[$this->pos];
 							break;
 						case '=':
 						case '#':
@@ -257,11 +222,9 @@ class CTriggerExpression {
 						case '-':
 						case '/':
 						case '*':
-							$this->expressionShort .= $this->expression[$this->pos];
 							$state = self::STATE_AFTER_OPERATOR;
 							break;
 						case ')':
-							$this->expressionShort .= $this->expression[$this->pos];
 							$state = self::STATE_AFTER_CLOSE_BRACE;
 							if ($level == 0) {
 								break 3;
@@ -347,16 +310,16 @@ class CTriggerExpression {
 			return false;
 		}
 
-		$this->expressions[$this->expressionNum]['index'] = $this->expressionNum;
-		$this->expressions[$this->expressionNum]['expression'] = substr($this->expression, $this->pos, $j - $this->pos + 1);
-		$this->expressions[$this->expressionNum]['host'] = $host;
-		$this->expressions[$this->expressionNum]['item'] = $item;
-		$this->expressions[$this->expressionNum]['function'] = $function;
-		$this->expressions[$this->expressionNum]['functionName'] = substr($function, 0, strpos($function, '('));
-		$this->expressions[$this->expressionNum]['functionParam'] = substr($function, strpos($function, '(') + 1, -1);
-		$this->expressions[$this->expressionNum]['functionParamList'] = $functionParamList;
-		$this->expressionShort .= '{'.$this->expressionNum.'}';
-		$this->expressionNum++;
+		$this->expressions[] = array(
+			'expression' => substr($this->expression, $this->pos, $j - $this->pos + 1),
+			'pos' => $this->pos,
+			'host' => $host,
+			'item' => $item,
+			'function' => $function,
+			'functionName' => substr($function, 0, strpos($function, '(')),
+			'functionParam' => substr($function, strpos($function, '(') + 1, -1),
+			'functionParamList' => $functionParamList
+		);
 		$this->pos = $j;
 		return true;
 	}
@@ -643,7 +606,6 @@ class CTriggerExpression {
 			$j++;
 		}
 
-		$this->expressionShort .= substr($this->expression, $this->pos, $j - $this->pos);
 		$this->pos = $j - 1;
 		return true;
 	}
@@ -664,8 +626,7 @@ class CTriggerExpression {
 				continue;
 			}
 
-			$this->macros[]['expression'] = $macro;
-			$this->expressionShort .= $macro;
+			$this->macros[] = array('expression' => $macro);
 			$this->pos += $len - 1;
 			return true;
 		}
@@ -702,8 +663,7 @@ class CTriggerExpression {
 		}
 
 		$usermacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
-		$this->usermacros[]['expression'] = $usermacro;
-		$this->expressionShort .= $usermacro;
+		$this->usermacros[] = array('expression' => $usermacro);
 		$this->pos = $j;
 		return true;
 	}

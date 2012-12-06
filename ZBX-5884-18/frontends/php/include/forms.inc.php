@@ -2639,16 +2639,17 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addRow(S_NAME, new CTextBox('description',$description,90, $limited));
 
 		if($input_method == IM_TREE){
-			$alz = analyze_expression($expression);
+			$alz = analyzeExpression($expression);
 
 			if($alz !== false){
 				list($outline, $eHTMLTree) = $alz;
 				if(isset($_REQUEST['expr_action']) && $eHTMLTree != null){
 
-					$new_expr = remake_expression($expression, $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expr_temp);
+					$new_expr = remakeExpression($expression, $_REQUEST['expr_target_single'],
+							$_REQUEST['expr_action'], $expr_temp);
 					if($new_expr !== false){
 						$expression = $new_expr;
-						$alz = analyze_expression($expression);
+						$alz = analyzeExpression($expression);
 
 						if($alz !== false) list($outline, $eHTMLTree) = $alz;
 						else show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);

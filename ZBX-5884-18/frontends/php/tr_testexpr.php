@@ -46,7 +46,7 @@ include_once('include/page_header.php');
 	$expression = urldecode(get_request('expression', ''));
 
 	define('NO_LINK_IN_TESTING', true);
-	list($outline, $eHTMLTree) = analyze_expression($expression);
+	list($outline, $eHTMLTree) = analyzeExpression($expression);
 
 // test data (create table, create check fields)
 
