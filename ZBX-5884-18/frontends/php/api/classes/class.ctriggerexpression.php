@@ -366,6 +366,15 @@ class CTriggerExpression {
 				$j--;
 			}
 		}
+		// for instance, ssh,22 or tcp,{$PORT} (Simple checks)
+		elseif (isset($this->expression[$j]) && $this->expression[$j++] == ',') {
+			if (isset($this->expression[$j]) && $this->expression[$j] != '.') {
+				if (!$this->__parseUserMacro($j) && !$this->__parseInteger($j)) {
+					return null;
+				}
+				$j++;
+			}
+		}
 		// for instance, net.tcp.port[,80]
 		elseif (isset($this->expression[$j]) && $this->expression[$j] == '[') {
 			$level = 0;
@@ -634,13 +643,38 @@ class CTriggerExpression {
 	}
 
 	/**
-	 * Parses an user macro constant in the trigger expression and
-	 * moves a current position ($this->pos) on a last symbol of the macro
+	 * Parses a integer constant in the string and
+	 * moves a position ($pos) on a last symbol of the number
+	 *
+	 * @param int $pos
 	 *
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
-	private function parseUserMacro() {
-		$j = $this->pos;
+	private function __parseInteger(&$pos) {
+		$j = $pos;
+
+		while ($this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
+			$j++;
+		}
+
+		if ($j == $pos) {
+			return false;
+		}
+
+		$pos = --$j;
+		return true;
+	}
+
+	/**
+	 * Parses an user macro constant in the string and
+	 * moves a position ($pos) on a last symbol of the macro
+	 *
+	 * @param int $pos
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function __parseUserMacro(&$pos) {
+		$j = $pos;
 
 		if ($this->expression[$j++] != '{') {
 			return false;
@@ -661,6 +695,22 @@ class CTriggerExpression {
 		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
 			return false;
 		}
+
+		$pos = $j;
+		return true;
+	}
+
+	/**
+	 * Parses an user macro constant in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseUserMacro() {
+		$j = $this->pos;
+
+		if (!$this->__parseUserMacro($j))
+			return false;
 
 		$usermacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
 		$this->usermacros[] = array('expression' => $usermacro);
