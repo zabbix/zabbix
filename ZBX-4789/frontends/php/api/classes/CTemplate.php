@@ -122,7 +122,7 @@ class CTemplate extends CHostGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT hgg.hostid'.
+				'SELECT NULL'.
 				' FROM hosts_groups hgg'.
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
@@ -278,13 +278,13 @@ class CTemplate extends CHostGeneral {
 
 		// with_items
 		if (!is_null($options['with_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
+			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid )';
 		}
 
 		// with_triggers
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS('.
-				'SELECT i.itemid'.
+				'SELECT NULL'.
 				' FROM items i,functions f,triggers t'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=f.itemid'.
@@ -294,7 +294,7 @@ class CTemplate extends CHostGeneral {
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['where'][] = 'EXISTS('.
-				'SELECT DISTINCT i.itemid'.
+				'SELECT NULL'.
 				' FROM items i,graphs_items gi'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=gi.itemid)';
@@ -1204,7 +1204,7 @@ class CTemplate extends CHostGeneral {
 		$sql = 'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
 			' WHERE '.DBcondition('o.operationid', $operationids).
-			' AND NOT EXISTS(SELECT ot.optemplateid FROM optemplate ot WHERE ot.operationid=o.operationid)';
+			' AND NOT EXISTS(SELECT NULL FROM optemplate ot WHERE ot.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];

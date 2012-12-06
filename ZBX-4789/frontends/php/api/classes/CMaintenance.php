@@ -139,7 +139,7 @@ class CMaintenance extends CZBXAPI {
 			$sql = 'SELECT DISTINCT m.maintenanceid'.
 					' FROM maintenances m'.
 					' WHERE NOT EXISTS ('.
-						' SELECT mh3.maintenanceid'.
+						' SELECT NULL'.
 						' FROM maintenances_hosts mh3,rights r3,hosts_groups hg3'.
 						' WHERE mh3.maintenanceid=m.maintenanceid'.
 							' AND '.DBcondition('r3.groupid', $userGroups).
@@ -148,7 +148,7 @@ class CMaintenance extends CZBXAPI {
 							' AND r3.permission<'.$permission.
 					')'.
 					' AND NOT EXISTS ('.
-						'SELECT mh4.maintenanceid'.
+						'SELECT NULL'.
 						' FROM maintenances_hosts mh4'.
 						' WHERE mh4.maintenanceid=m.maintenanceid'.
 							' AND NOT EXISTS('.
@@ -160,7 +160,7 @@ class CMaintenance extends CZBXAPI {
 							')'.
 					')'.
 					' AND NOT EXISTS ('.
-						'SELECT mg2.maintenanceid'.
+						'SELECT NULL'.
 						' FROM maintenances_groups mg2,rights r3'.
 						' WHERE mg2.maintenanceid=m.maintenanceid'.
 							' AND '.DBcondition('r3.groupid', $userGroups).
@@ -168,7 +168,7 @@ class CMaintenance extends CZBXAPI {
 							' AND r3.permission<'.$permission.
 					')'.
 					' AND NOT EXISTS ('.
-						'SELECT mg3.maintenanceid'.
+						'SELECT NULL'.
 						' FROM maintenances_groups mg3'.
 						' WHERE mg3.maintenanceid=m.maintenanceid'.
 							' AND NOT EXISTS ('.
@@ -185,14 +185,14 @@ class CMaintenance extends CZBXAPI {
 				$sql .= ' AND ('.
 							// filtering using groups attached to maintenence
 							'EXISTS ('.
-								'SELECT mgf.maintenanceid'.
+								'SELECT NULL'.
 								' FROM maintenances_groups mgf'.
 								' WHERE mgf.maintenanceid=m.maintenanceid'.
 									' AND '.DBcondition('mgf.groupid', $options['groupids']).
 							')'.
 							// filtering by hostgroups of hosts attached to maintenance
 							' OR EXISTS ('.
-								' SELECT mh.maintenanceid'.
+								' SELECT NULL'.
 								' FROM maintenances_hosts mh,hosts_groups hg'.
 								' WHERE mh.maintenanceid=m.maintenanceid'.
 									' AND hg.hostid=mh.hostid'.
@@ -204,7 +204,7 @@ class CMaintenance extends CZBXAPI {
 			if (!is_null($options['hostids'])) {
 				zbx_value2array($options['hostids']);
 				$sql .= ' AND EXISTS ('.
-							' SELECT mh.maintenanceid'.
+							' SELECT NULL'.
 							' FROM maintenances_hosts mh'.
 							' WHERE mh.maintenanceid=m.maintenanceid'.
 								' AND '.DBcondition('mh.hostid', $options['hostids']).

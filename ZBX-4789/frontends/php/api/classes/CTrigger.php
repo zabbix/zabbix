@@ -162,7 +162,7 @@ class CTrigger extends CTriggerGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT hgg.hostid'.
+				'SELECT NULL'.
 				' FROM functions f,items i,hosts_groups hgg'.
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
@@ -278,11 +278,11 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['monitored'])) {
 			$sqlParts['where']['monitored'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-							' SELECT ii.itemid'.
+							' SELECT NULL'.
 							' FROM items ii,hosts hh'.
 							' WHERE ff.itemid=ii.itemid'.
 								' AND hh.hostid=ii.hostid'.
@@ -299,11 +299,11 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['active'])) {
 			$sqlParts['where']['active'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-							' SELECT ii.itemid'.
+							' SELECT NULL'.
 							' FROM items ii,hosts hh'.
 							' WHERE ff.itemid=ii.itemid'.
 								' AND hh.hostid=ii.hostid'.
@@ -317,11 +317,11 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['maintenance'])) {
 			$sqlParts['where'][] = ($options['maintenance'] == 0 ? ' NOT ' : '').
 				' EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-							' SELECT ii.itemid'.
+							' SELECT NULL'.
 							' FROM items ii,hosts hh'.
 							' WHERE ff.itemid=ii.itemid'.
 								' AND hh.hostid=ii.hostid'.
@@ -344,7 +344,7 @@ class CTrigger extends CTriggerGeneral {
 		// withUnacknowledgedEvents
 		if (!is_null($options['withUnacknowledgedEvents'])) {
 			$sqlParts['where']['unack'] = ' EXISTS ('.
-				' SELECT e.eventid'.
+				' SELECT NULL'.
 				' FROM events e'.
 				' WHERE e.objectid=t.triggerid'.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
@@ -355,7 +355,7 @@ class CTrigger extends CTriggerGeneral {
 		// withAcknowledgedEvents
 		if (!is_null($options['withAcknowledgedEvents'])) {
 			$sqlParts['where']['ack'] = 'NOT EXISTS ('.
-				' SELECT e.eventid'.
+				' SELECT NULL'.
 				' FROM events e'.
 				' WHERE e.objectid=t.triggerid'.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.

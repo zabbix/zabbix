@@ -118,7 +118,7 @@ class CAlert extends CZBXAPI {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT hgg.hostid'.
+				'SELECT NULL'.
 				' FROM events e, functions f,items i,hosts_groups hgg'.
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.

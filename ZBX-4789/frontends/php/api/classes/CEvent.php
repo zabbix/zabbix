@@ -129,7 +129,7 @@ class CEvent extends CZBXAPI {
 					$userGroups = getUserGroupsByUserId($userid);
 
 					$sqlParts['where'][] = 'EXISTS ('.
-						'SELECT hgg.hostid'.
+						'SELECT NULL'.
 						' FROM functions f,items i,hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.

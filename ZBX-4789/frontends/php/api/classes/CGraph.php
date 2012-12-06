@@ -121,7 +121,7 @@ class CGraph extends CGraphGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT hgg.hostid'.
+				'SELECT NULL'.
 				' FROM graphs_items gi,items i,hosts_groups hgg'.
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.

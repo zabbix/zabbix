@@ -119,7 +119,7 @@ class CHostInterface extends CZBXAPI {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT hgg.hostid'.
+				'SELECT NULL'.
 				' FROM hosts_groups hgg'.
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.

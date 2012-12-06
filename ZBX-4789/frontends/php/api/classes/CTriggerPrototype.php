@@ -133,7 +133,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT hgg.hostid'.
+				'SELECT NULL'.
 				' FROM functions f,items i,hosts_groups hgg'.
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
@@ -274,11 +274,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['monitored'])) {
 			$sqlParts['where']['monitored'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
+								' SELECT NULL'.
 								' FROM items ii, hosts hh'.
 								' WHERE ff.itemid=ii.itemid'.
 									' AND hh.hostid=ii.hostid'.
@@ -295,11 +295,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['active'])) {
 			$sqlParts['where']['active'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-							' SELECT ii.itemid'.
+							' SELECT NULL'.
 							' FROM items ii, hosts hh'.
 							' WHERE ff.itemid=ii.itemid'.
 								' AND hh.hostid=ii.hostid'.
@@ -313,11 +313,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['maintenance'])) {
 			$sqlParts['where'][] = (($options['maintenance'] == 0) ? ' NOT ':'').
 				' EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
+								' SELECT NULL'.
 								' FROM items ii, hosts hh'.
 								' WHERE ff.itemid=ii.itemid'.
 									' AND hh.hostid=ii.hostid'.

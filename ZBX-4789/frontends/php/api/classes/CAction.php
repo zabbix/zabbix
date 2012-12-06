@@ -117,7 +117,7 @@ class CAction extends CZBXAPI {
 			// condition hostgroup
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
+					' SELECT NULL'.
 					' FROM conditions cc'.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 						' AND cc.actionid=a.actionid'.
@@ -135,7 +135,7 @@ class CAction extends CZBXAPI {
 			// condition host or template
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
+					' SELECT NULL'.
 					' FROM conditions cc'.
 					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
 						' AND cc.actionid=a.actionid'.
@@ -153,13 +153,13 @@ class CAction extends CZBXAPI {
 			// condition trigger
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
+					' SELECT NULL'.
 					' FROM conditions cc'.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
 						' AND cc.actionid=a.actionid'.
 						' AND '.
 							' NOT EXISTS ('.
-								' SELECT f.triggerid'.
+								' SELECT NULL'.
 								' FROM functions f,items i,hosts_groups hg,rights r'.
 								' WHERE hg.groupid=r.id'.
 									' AND i.hostid=hg.hostid'.
