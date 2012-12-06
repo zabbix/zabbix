@@ -216,8 +216,6 @@ class CDService extends CZBXAPI{
 		}
 //-------
 
-		$dserviceids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -229,8 +227,6 @@ class CDService extends CZBXAPI{
 					$result = $dservice['rowscount'];
 			}
 			else{
-				$dserviceids[$dservice['dserviceid']] = $dservice['dserviceid'];
-
 				if (!isset($result[$dservice['dserviceid']])) {
 					$result[$dservice['dserviceid']]= array();
 				}
@@ -259,90 +255,8 @@ class CDService extends CZBXAPI{
 			return $result;
 		}
 
-		// Adding Objects
-		// select_drules
-		if ($options['selectDRules'] !== null && $options['selectDRules'] != API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
-			// discovered items
-			$dbRules = DBselect(
-				'SELECT ds.dserviceid,dh.druleid'.
-					' FROM dservices ds,dhosts dh'.
-					' WHERE '.DBcondition('ds.dserviceid', $dserviceids).
-					' AND ds.dhostid=dh.dhostid'
-			);
-			while ($rule = DBfetch($dbRules)) {
-				$relationMap->addRelation($rule['dserviceid'], $rule['druleid']);
-			}
-
-			$drules = API::DRule()->get(array(
-				'output' => $options['selectDRules'],
-				'nodeids' => $nodeids,
-				'druleids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			));
-			if (!is_null($options['limitSelects'])) {
-				order_result($drules, 'name');
-			}
-			$result = $relationMap->mapMany($result, $drules, 'drules');
-		}
-
-		// selectDHosts
-		if ($options['selectDHosts'] !== null && $options['selectDHosts'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'dserviceid', 'dhostid');
-			$dhosts = API::DHost()->get(array(
-				'output' => $options['selectDHosts'],
-				'nodeids' => $nodeids,
-				'dhosts' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			));
-			if (!is_null($options['limitSelects'])) {
-				order_result($dhosts, 'dhostid');
-			}
-			$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
-		}
-
-		// selectHosts
-		if (!is_null($options['selectHosts'])) {
-			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
-				$relationMap = new CRelationMap();
-				// discovered items
-				$dbRules = DBselect(
-					'SELECT ds.dserviceid,i.hostid'.
-						' FROM dservices ds,interface i'.
-						' WHERE '.DBcondition('ds.dserviceid', $dserviceids).
-						' AND ds.ip=i.ip'
-				);
-				while ($rule = DBfetch($dbRules)) {
-					$relationMap->addRelation($rule['dserviceid'], $rule['hostid']);
-				}
-
-				$hosts = API::Host()->get(array(
-					'output' => $options['selectHosts'],
-					'nodeids' => $nodeids,
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true,
-					'sortfield' => 'status'
-				));
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'hostid');
-				}
-				$result = $relationMap->mapMany($result, $hosts, 'hosts');
-			}
-			else {
-				$hosts = API::Host()->get(array(
-					'nodeids' => $nodeids,
-					'dserviceids' => $dserviceids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach ($result as $dserviceid => $dservice) {
-					if (isset($hosts[$dserviceid]))
-						$result[$dserviceid]['hosts'] = $hosts[$dserviceid]['rowscount'];
-					else
-						$result[$dserviceid]['hosts'] = 0;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 // removing keys (hash -> array)
@@ -403,6 +317,99 @@ class CDService extends CZBXAPI{
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$dserviceIds = array_keys($result);
+
+		// select_drules
+		if ($options['selectDRules'] !== null && $options['selectDRules'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT ds.dserviceid,dh.druleid'.
+					' FROM dservices ds,dhosts dh'.
+					' WHERE '.DBcondition('ds.dserviceid', $dserviceIds).
+					' AND ds.dhostid=dh.dhostid'
+			);
+			while ($rule = DBfetch($dbRules)) {
+				$relationMap->addRelation($rule['dserviceid'], $rule['druleid']);
+			}
+
+			$drules = API::DRule()->get(array(
+				'output' => $options['selectDRules'],
+				'nodeids' => $options['nodeids'],
+				'druleids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			if (!is_null($options['limitSelects'])) {
+				order_result($drules, 'name');
+			}
+			$result = $relationMap->mapMany($result, $drules, 'drules');
+		}
+
+		// selectDHosts
+		if ($options['selectDHosts'] !== null && $options['selectDHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'dserviceid', 'dhostid');
+			$dhosts = API::DHost()->get(array(
+				'output' => $options['selectDHosts'],
+				'nodeids' => $options['nodeids'],
+				'dhosts' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			if (!is_null($options['limitSelects'])) {
+				order_result($dhosts, 'dhostid');
+			}
+			$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
+		}
+
+		// selectHosts
+		if (!is_null($options['selectHosts'])) {
+			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
+				$relationMap = new CRelationMap();
+				// discovered items
+				$dbRules = DBselect(
+					'SELECT ds.dserviceid,i.hostid'.
+						' FROM dservices ds,interface i'.
+						' WHERE '.DBcondition('ds.dserviceid', $dserviceIds).
+						' AND ds.ip=i.ip'
+				);
+				while ($rule = DBfetch($dbRules)) {
+					$relationMap->addRelation($rule['dserviceid'], $rule['hostid']);
+				}
+
+				$hosts = API::Host()->get(array(
+					'output' => $options['selectHosts'],
+					'nodeids' => $nodeids,
+					'hostids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true,
+					'sortfield' => 'status'
+				));
+				if (!is_null($options['limitSelects'])) {
+					order_result($hosts, 'hostid');
+				}
+				$result = $relationMap->mapMany($result, $hosts, 'hosts');
+			}
+			else {
+				$hosts = API::Host()->get(array(
+					'nodeids' => $options['nodeids'],
+					'dserviceids' => $dserviceIds,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$hosts = zbx_toHash($hosts, 'hostid');
+				foreach ($result as $dserviceid => $dservice) {
+					if (isset($hosts[$dserviceid]))
+						$result[$dserviceid]['hosts'] = $hosts[$dserviceid]['rowscount'];
+					else
+						$result[$dserviceid]['hosts'] = 0;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 }

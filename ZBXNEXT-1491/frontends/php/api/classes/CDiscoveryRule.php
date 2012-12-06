@@ -113,9 +113,6 @@ class CDiscoveryRule extends CItemGeneral {
 					' AND rr.permission='.PERM_DENY.')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// templateids
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
@@ -229,8 +226,6 @@ class CDiscoveryRule extends CItemGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$itemids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -244,8 +239,6 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 			}
 			else {
-				$itemids[$item['itemid']] = $item['itemid'];
-
 				if (!isset($result[$item['itemid']])) {
 					$result[$item['itemid']]= array();
 				}
@@ -266,126 +259,8 @@ class CDiscoveryRule extends CItemGeneral {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding hosts
-		if ($options['selectHosts'] !== null) {
-			$relationMap = $this->createRelationMap($result, 'itemid', 'hostid');
-			$hosts = API::Host()->get(array(
-				'nodeids' => $nodeids,
-				'hostids' => $relationMap->getRelatedIds(),
-				'templated_hosts' => true,
-				'output' => $options['selectHosts'],
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		// adding items
-		if (!is_null($options['selectItems'])) {
-			if ($options['selectItems'] != API_OUTPUT_COUNT) {
-				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
-				$items = API::ItemPrototype()->get(array(
-					'output' => $options['selectItems'],
-					'nodeids' => $nodeids,
-					'itemids' => $relationMap->getRelatedIds('items'),
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
-			}
-			else {
-				$items = API::ItemPrototype()->get(array(
-					'nodeids' => $nodeids,
-					'discoveryids' => $itemids,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-
-				$items = zbx_toHash($items, 'parent_itemid');
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['items'] = isset($items[$itemid]) ? $items[$itemid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding triggers
-		if (!is_null($options['selectTriggers'])) {
-			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
-				$relationMap = new CRelationMap();
-				$res = DBselect(
-					'SELECT id.parent_itemid,f.triggerid'.
-						' FROM item_discovery id,items i,functions f'.
-						' WHERE '.DBcondition('id.parent_itemid', $itemids).
-						' AND id.itemid=i.itemid'.
-						' AND i.itemid=f.itemid'
-				);
-				while ($relation = DBfetch($res)) {
-					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
-				}
-
-				$triggers = API::TriggerPrototype()->get(array(
-					'output' => $options['selectTriggers'],
-					'nodeids' => $nodeids,
-					'triggerids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
-			}
-			else {
-				$triggers = API::TriggerPrototype()->get(array(
-					'nodeids' => $nodeids,
-					'discoveryids' => $itemids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-
-				$triggers = zbx_toHash($triggers, 'parent_itemid');
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['triggers'] = isset($triggers[$itemid]) ? $triggers[$itemid]['rowscount'] : 0;
-				}
-			}
-		}
-
-		// adding graphs
-		if (!is_null($options['selectGraphs'])) {
-			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
-				$relationMap = new CRelationMap();
-				$res = DBselect(
-					'SELECT id.parent_itemid,gi.graphid'.
-						' FROM item_discovery id,items i,graphs_items gi'.
-						' WHERE '.DBcondition('id.parent_itemid', $itemids).
-						' AND id.itemid=i.itemid'.
-						' AND i.itemid=gi.itemid'
-				);
-				while ($relation = DBfetch($res)) {
-					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
-				}
-
-				$graphs = API::GraphPrototype()->get(array(
-					'output' => $options['selectGraphs'],
-					'nodeids' => $nodeids,
-					'graphids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
-			}
-			else {
-				$graphs = API::GraphPrototype()->get(array(
-					'nodeids' => $nodeids,
-					'discoveryids' => $itemids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-
-				$graphs = zbx_toHash($graphs, 'parent_itemid');
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['graphs'] = isset($graphs[$itemid]) ? $graphs[$itemid]['rowscount'] : 0;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		if (is_null($options['preservekeys'])) {
@@ -1111,5 +986,132 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$itemIds = array_keys($result);
+
+		// adding hosts
+		if ($options['selectHosts'] !== null) {
+			$relationMap = $this->createRelationMap($result, 'itemid', 'hostid');
+			$hosts = API::Host()->get(array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
+				'output' => $options['selectHosts'],
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding items
+		if (!is_null($options['selectItems'])) {
+			if ($options['selectItems'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
+				$items = API::ItemPrototype()->get(array(
+					'output' => $options['selectItems'],
+					'nodeids' => $options['nodeids'],
+					'itemids' => $relationMap->getRelatedIds('items'),
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
+			}
+			else {
+				$items = API::ItemPrototype()->get(array(
+					'nodeids' => $options['nodeids'],
+					'discoveryids' => $itemIds,
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+
+				$items = zbx_toHash($items, 'parent_itemid');
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['items'] = isset($items[$itemid]) ? $items[$itemid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		// adding triggers
+		if (!is_null($options['selectTriggers'])) {
+			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$relationMap = new CRelationMap();
+				$res = DBselect(
+					'SELECT id.parent_itemid,f.triggerid'.
+						' FROM item_discovery id,items i,functions f'.
+						' WHERE '.DBcondition('id.parent_itemid', $itemIds).
+						' AND id.itemid=i.itemid'.
+						' AND i.itemid=f.itemid'
+				);
+				while ($relation = DBfetch($res)) {
+					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
+				}
+
+				$triggers = API::TriggerPrototype()->get(array(
+					'output' => $options['selectTriggers'],
+					'nodeids' => $options['nodeids'],
+					'triggerids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
+			}
+			else {
+				$triggers = API::TriggerPrototype()->get(array(
+					'nodeids' => $options['nodeids'],
+					'discoveryids' => $itemIds,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+
+				$triggers = zbx_toHash($triggers, 'parent_itemid');
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['triggers'] = isset($triggers[$itemid]) ? $triggers[$itemid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		// adding graphs
+		if (!is_null($options['selectGraphs'])) {
+			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$relationMap = new CRelationMap();
+				$res = DBselect(
+					'SELECT id.parent_itemid,gi.graphid'.
+						' FROM item_discovery id,items i,graphs_items gi'.
+						' WHERE '.DBcondition('id.parent_itemid', $itemIds).
+						' AND id.itemid=i.itemid'.
+						' AND i.itemid=gi.itemid'
+				);
+				while ($relation = DBfetch($res)) {
+					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
+				}
+
+				$graphs = API::GraphPrototype()->get(array(
+					'output' => $options['selectGraphs'],
+					'nodeids' => $options['nodeids'],
+					'graphids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
+			}
+			else {
+				$graphs = API::GraphPrototype()->get(array(
+					'nodeids' => $options['nodeids'],
+					'discoveryids' => $itemIds,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+
+				$graphs = zbx_toHash($graphs, 'parent_itemid');
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['graphs'] = isset($graphs[$itemid]) ? $graphs[$itemid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		return $result;
 	}
 }

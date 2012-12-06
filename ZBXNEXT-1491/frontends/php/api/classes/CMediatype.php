@@ -163,7 +163,6 @@ class CMediatype extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$mediatypeids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -177,8 +176,6 @@ class CMediatype extends CZBXAPI {
 				}
 			}
 			else {
-				$mediatypeids[$mediatype['mediatypeid']] = $mediatype['mediatypeid'];
-
 				if (!isset($result[$mediatype['mediatypeid']])) {
 					$result[$mediatype['mediatypeid']] = array();
 				}
@@ -199,18 +196,8 @@ class CMediatype extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding users
-		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
-			$users = API::User()->get(array(
-				'output' => $options['selectUsers'],
-				'userids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $users, 'users');
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -369,5 +356,22 @@ class CMediatype extends CZBXAPI {
 		DB::delete('media_type', array('mediatypeid' => $mediatypeids));
 
 		return array('mediatypeids' => $mediatypeids);
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// adding users
+		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
+			$users = API::User()->get(array(
+				'output' => $options['selectUsers'],
+				'userids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $users, 'users');
+		}
+
+		return $result;
 	}
 }

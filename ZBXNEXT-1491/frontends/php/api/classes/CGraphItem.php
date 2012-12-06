@@ -98,9 +98,6 @@ class CGraphItem extends CZBXAPI {
 					' AND rr.permission='.PERM_DENY.')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
@@ -132,8 +129,6 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$gitemids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -142,8 +137,6 @@ class CGraphItem extends CZBXAPI {
 				$result = $gitem['rowscount'];
 			}
 			else {
-				$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
-
 				if (!isset($result[$gitem['gitemid']])) {
 					$result[$gitem['gitemid']] = array();
 				}
@@ -163,16 +156,8 @@ class CGraphItem extends CZBXAPI {
 			return $result;
 		}
 
-		// adding graphs
-		if ($options['selectGraphs'] !== null) {
-			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
-			$graphs = API::Graph()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectGraphs'],
-				'gitemids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $graphs, 'graphs');
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -230,6 +215,24 @@ class CGraphItem extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// adding graphs
+		if ($options['selectGraphs'] !== null) {
+			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
+			$graphs = API::Graph()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectGraphs'],
+				'gitemids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $graphs, 'graphs');
+		}
+
+		return $result;
 	}
 }
 ?>

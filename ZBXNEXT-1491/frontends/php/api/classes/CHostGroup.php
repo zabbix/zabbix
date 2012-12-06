@@ -318,8 +318,6 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$groupids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -333,8 +331,6 @@ class CHostGroup extends CZBXAPI {
 				}
 			}
 			else {
-				$groupids[$group['groupid']] = $group['groupid'];
-
 				if (!isset($result[$group['groupid']])) {
 					$result[$group['groupid']] = array();
 				}
@@ -382,72 +378,8 @@ class CHostGroup extends CZBXAPI {
 			return $result;
 		}
 
-		// adding hosts
-		if ($options['selectHosts'] !== null) {
-			if ($options['selectHosts'] !== API_OUTPUT_COUNT) {
-				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Host()->get(array(
-					'output' => $options['selectHosts'],
-					'nodeids' => $options['nodeids'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
-				}
-				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
-			}
-			else {
-				$hosts = API::Host()->get(array(
-					'nodeids' => $options['nodeids'],
-					'groupids' => $groupids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-				$hosts = zbx_toHash($hosts, 'groupid');
-				foreach ($result as $groupid => $group) {
-					if (isset($hosts[$groupid])) {
-						$result[$groupid]['hosts'] = $hosts[$groupid]['rowscount'];
-					}
-					else {
-						$result[$groupid]['hosts'] = 0;
-					}
-				}
-			}
-		}
-
-		// adding templates
-		if ($options['selectTemplates'] !== null) {
-			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
-				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Template()->get(array(
-					'output' => $options['selectTemplates'],
-					'nodeids' => $options['nodeids'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
-				}
-				$result = $relationMap->mapMany($result, $hosts, 'templates', $options['limitSelects']);
-			}
-			else {
-				$hosts = API::Template()->get(array(
-					'nodeids' => $options['nodeids'],
-					'groupids' => $groupids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-				$hosts = zbx_toHash($hosts, 'groupid');
-				foreach ($result as $groupid => $group) {
-					if (isset($hosts[$groupid])) {
-						$result[$groupid]['templates'] = $hosts[$groupid]['rowscount'];
-					}
-					else {
-						$result[$groupid]['templates'] = 0;
-					}
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -997,5 +929,81 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$groupIds = array_keys($result);
+
+		// adding hosts
+		if ($options['selectHosts'] !== null) {
+			if ($options['selectHosts'] !== API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
+				$hosts = API::Host()->get(array(
+					'output' => $options['selectHosts'],
+					'nodeids' => $options['nodeids'],
+					'hostids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				if (!is_null($options['limitSelects'])) {
+					order_result($hosts, 'host');
+				}
+				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
+			}
+			else {
+				$hosts = API::Host()->get(array(
+					'nodeids' => $options['nodeids'],
+					'groupids' => $groupIds,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$hosts = zbx_toHash($hosts, 'groupid');
+				foreach ($result as $groupid => $group) {
+					if (isset($hosts[$groupid])) {
+						$result[$groupid]['hosts'] = $hosts[$groupid]['rowscount'];
+					}
+					else {
+						$result[$groupid]['hosts'] = 0;
+					}
+				}
+			}
+		}
+
+		// adding templates
+		if ($options['selectTemplates'] !== null) {
+			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
+				$hosts = API::Template()->get(array(
+					'output' => $options['selectTemplates'],
+					'nodeids' => $options['nodeids'],
+					'templateids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				if (!is_null($options['limitSelects'])) {
+					order_result($hosts, 'host');
+				}
+				$result = $relationMap->mapMany($result, $hosts, 'templates', $options['limitSelects']);
+			}
+			else {
+				$hosts = API::Template()->get(array(
+					'nodeids' => $options['nodeids'],
+					'groupids' => $groupIds,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$hosts = zbx_toHash($hosts, 'groupid');
+				foreach ($result as $groupid => $group) {
+					if (isset($hosts[$groupid])) {
+						$result[$groupid]['templates'] = $hosts[$groupid]['rowscount'];
+					}
+					else {
+						$result[$groupid]['templates'] = 0;
+					}
+				}
+			}
+		}
+
+		return $result;
 	}
 }

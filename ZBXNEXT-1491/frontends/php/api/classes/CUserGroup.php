@@ -148,7 +148,6 @@ class CUserGroup extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$usrgrpids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -157,8 +156,6 @@ class CUserGroup extends CZBXAPI {
 				$result = $usrgrp['rowscount'];
 			}
 			else {
-				$usrgrpids[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
-
 				if (!isset($result[$usrgrp['usrgrpid']])) {
 					$result[$usrgrp['usrgrpid']]= array();
 				}
@@ -179,19 +176,8 @@ class CUserGroup extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding users
-		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'userid', 'users_groups');
-			$users = API::User()->get(array(
-				'output' => $options['selectUsers'],
-				'userids' => $relationMap->getRelatedIds(),
-				'getAccess' => $options['selectUsers'] == API_OUTPUT_EXTEND ? true : null,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $users, 'users');
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -709,6 +695,24 @@ class CUserGroup extends CZBXAPI {
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// adding users
+		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'userid', 'users_groups');
+			$users = API::User()->get(array(
+				'output' => $options['selectUsers'],
+				'userids' => $relationMap->getRelatedIds(),
+				'getAccess' => $options['selectUsers'] == API_OUTPUT_EXTEND ? true : null,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $users, 'users');
+		}
+
+		return $result;
 	}
 
 }

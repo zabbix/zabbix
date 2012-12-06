@@ -121,7 +121,6 @@ class CScreen extends CZBXAPI {
 		}
 
 		$screenids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -327,28 +326,8 @@ class CScreen extends CZBXAPI {
 			return $result;
 		}
 
-		// adding ScreenItems
-		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApi()->select('screens_items', array(
-				'output' => $this->outputExtend('screens_items', array('screenid', 'screenitemid'), $options['selectScreenItems']),
-				'filter' => array('screenid' => $screenids),
-				'preservekeys' => true
-			));
-
-			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
-
-			// unset unrequested fields
-			foreach ($screenItems as &$screenItem) {
-				if (!$this->outputIsRequested('screenid', $options['selectScreenItems'])) {
-					unset($screenItem['screenid']);
-				}
-				if (!$this->outputIsRequested('screenitemid', $options['selectScreenItems'])) {
-					unset($screenItem['screenitemid']);
-				}
-			}
-			unset($screenItem);
-
-			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -583,5 +562,37 @@ class CScreen extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$screenIds = array_keys($result);
+
+		// adding ScreenItems
+		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
+			$screenItems = API::getApi()->select('screens_items', array(
+				'output' => $this->outputExtend('screens_items', array('screenid', 'screenitemid'), $options['selectScreenItems']),
+				'filter' => array('screenid' => $screenIds),
+				'preservekeys' => true
+			));
+
+			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
+
+			// unset unrequested fields
+			foreach ($screenItems as &$screenItem) {
+				if (!$this->outputIsRequested('screenid', $options['selectScreenItems'])) {
+					unset($screenItem['screenid']);
+				}
+				if (!$this->outputIsRequested('screenitemid', $options['selectScreenItems'])) {
+					unset($screenItem['screenitemid']);
+				}
+			}
+			unset($screenItem);
+
+			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
+		}
+
+		return $result;
 	}
 }

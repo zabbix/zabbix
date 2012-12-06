@@ -195,8 +195,9 @@ class CScript extends CZBXAPI {
 			return $result;
 		}
 
-		// add related objects
-		$result = $this->addRelatedObjects($options, $result);
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+		}
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
