@@ -367,7 +367,8 @@ class CTriggerExpression {
 			}
 		}
 		// for instance, ssh,22 or tcp,{$PORT} (Simple checks)
-		elseif (isset($this->expression[$j]) && $this->expression[$j++] == ',') {
+		elseif (isset($this->expression[$j]) && $this->expression[$j] == ',') {
+			$j++;
 			if (isset($this->expression[$j]) && $this->expression[$j] != '.') {
 				if (!$this->__parseUserMacro($j) && !$this->__parseInteger($j)) {
 					return null;
