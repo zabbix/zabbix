@@ -2231,22 +2231,22 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
 }
 
 /**
+ * Get icon id by mapping.
+ *
  * @param array $iconMap
  * @param array $inventory
  *
- * @return int icon id
+ * @return int
  */
 function getIconByMapping($iconMap, $inventory) {
-	$iconid = null;
-	$inventories = getHostInventories();
+	if (!empty($inventory['inventory'])) {
+		$inventories = getHostInventories();
 
-	if (isset($inventory['inventory'])) {
 		foreach ($iconMap['mappings'] as $mapping) {
 			try {
 				$expr = new GlobalRegExp($mapping['expression']);
 				if ($expr->match($inventory['inventory'][$inventories[$mapping['inventory_link']]['db_field']])) {
-					$iconid = $mapping['iconid'];
-					break;
+					return $mapping['iconid'];
 				}
 			}
 			catch(Exception $e) {
@@ -2254,8 +2254,6 @@ function getIconByMapping($iconMap, $inventory) {
 			}
 		}
 	}
-	if (null === $iconid) {
-		$iconid = $iconMap['default_iconid'];
-	}
-	return $iconid;
+
+	return $iconMap['default_iconid'];
 }
