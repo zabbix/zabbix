@@ -376,7 +376,8 @@ function make_hoststat_summary($filter) {
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
-		'output' => array('hostid', 'name')
+		'output' => array('hostid', 'name'),
+		'selectGroups' => array('groupid')
 	);
 	$hosts = API::Host()->get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
