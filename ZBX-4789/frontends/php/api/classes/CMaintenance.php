@@ -146,6 +146,7 @@ class CMaintenance extends CZBXAPI {
 							' ON r.id=hgg.groupid'.
 								' AND '.DBcondition('r.groupid', $userGroups).
 						' WHERE hgg.hostid='.zbx_dbcast_2bigint('mh.maintenance_hostid').
+							' AND m.maintenanceid=mh.maintenanceid'.
 						' GROUP BY hgg.hostid'.
 						' HAVING MIN(r.permission)>='.$permission.
 						')'.
@@ -156,6 +157,7 @@ class CMaintenance extends CZBXAPI {
 							' ON r.id=hgg.groupid'.
 								' AND '.DBcondition('r.groupid', $userGroups).
 						' WHERE hgg.groupid=mg.groupid'.
+							' AND m.maintenanceid=mg.maintenanceid'.
 						' GROUP BY hgg.hostid'.
 						' HAVING MIN(r.permission)>='.$permission.
 						')';
