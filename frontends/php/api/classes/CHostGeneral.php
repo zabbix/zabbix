@@ -886,7 +886,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				}
 				unset($item);
 
-				$result = $relationMap->mapMany($result, $items, 'items');
+				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
 			}
 			else {
 				$items = API::Item()->get(array(
@@ -972,7 +972,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				if (!is_null($options['limitSelects'])) {
 					order_result($triggers, 'description');
 				}
-				$result = $relationMap->mapMany($result, $triggers, 'triggers');
+				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
 				$triggers = API::Trigger()->get(array(
@@ -1013,7 +1013,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				if (!is_null($options['limitSelects'])) {
 					order_result($graphs, 'name');
 				}
-				$result = $relationMap->mapMany($result, $graphs, 'graphs');
+				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
 				$graphs = API::Graph()->get(array(

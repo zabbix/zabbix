@@ -382,7 +382,7 @@ class CDService extends CZBXAPI{
 
 				$hosts = API::Host()->get(array(
 					'output' => $options['selectHosts'],
-					'nodeids' => $nodeids,
+					'nodeids' => $options['nodeids'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true,
 					'sortfield' => 'status'
@@ -390,7 +390,7 @@ class CDService extends CZBXAPI{
 				if (!is_null($options['limitSelects'])) {
 					order_result($hosts, 'hostid');
 				}
-				$result = $relationMap->mapMany($result, $hosts, 'hosts');
+				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {
 				$hosts = API::Host()->get(array(
