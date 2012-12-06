@@ -1531,6 +1531,16 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 			}
 		}
 
+		$result = delete_function_by_triggerid($triggerid);
+		if (!$result) {
+			return false;
+		}
+
+		$expression = implode_exp($expression,$triggerid);
+		if (is_null($expression)) {
+			return false;
+		}
+
 		if(!empty($expressionHosts)){
 			$chd_hosts	= get_hosts_by_templateid($trig_host['hostid']);
 
@@ -1545,8 +1555,7 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 					$newexpression = str_replace(
 						'{'.$expHostName.':',
 						'{'.$chd_trig_host['host'].':',
-						$expression);
-
+						$expressionData->expression);
 // recursion
 					update_trigger(
 						$db_chd_trigger['triggerid'],
@@ -1562,17 +1571,6 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 					);
 				}
 			}
-		}
-
-		$result = delete_function_by_triggerid($triggerid);
-
-		if(!$result){
-			return	$result;
-		}
-
-		$expression = implode_exp($expression,$triggerid);
-		if(is_null($expression)){
-			return false;
 		}
 
 		$update_values = array();
