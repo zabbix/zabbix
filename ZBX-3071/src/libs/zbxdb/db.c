@@ -1599,6 +1599,7 @@ void	OCI_DBfree_result(DB_RESULT result)
 		}
 
 		zbx_free(result->values);
+		zbx_free(result->clobs);
 		zbx_free(result->values_alloc);
 	}
 
