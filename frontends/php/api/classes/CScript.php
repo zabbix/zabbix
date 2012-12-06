@@ -541,13 +541,15 @@ class CScript extends CZBXAPI {
 						$scriptsByHost[$hostId][$size] = $script;
 
 						// set confirmation text with resolved macros
-						if (!empty($macrosData[$hostId])) {
+						if (!empty($macrosData[$hostId]) && !empty($script['confirmation'])) {
 							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$i];
 						}
 					}
 				}
 
-				$i++;
+				if (!empty($script['confirmation'])) {
+					$i++;
+				}
 			}
 		}
 
