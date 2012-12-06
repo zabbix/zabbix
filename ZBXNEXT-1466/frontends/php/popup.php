@@ -1035,7 +1035,7 @@ elseif ($srctbl == 'triggers') {
 			);
 
 			foreach ($trigger['dependencies'] as $val) {
-				$description[] = array(CTriggerHelper::expandDescription($val), BR());
+				$description[] = array(CMacrosResolverHelper::resolveTriggerName($val), BR());
 			}
 		}
 

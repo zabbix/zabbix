@@ -542,8 +542,6 @@ class CScript extends CZBXAPI {
 
 		if (!empty($scripts)) {
 			// resolve macros
-			$macrosResolver = new CMacrosResolver();
-
 			$macrosData = array();
 			foreach ($scripts as $script) {
 				if (!empty($script['confirmation'])) {
@@ -555,7 +553,11 @@ class CScript extends CZBXAPI {
 				}
 			}
 			if (!empty($macrosData)) {
-				$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+				$macrosResolver = new CMacrosResolver();
+				$macrosData = $macrosResolver->resolve(array(
+					'config' => 'scriptConfirmation',
+					'data' => $macrosData
+				));
 			}
 
 			$i = 0;

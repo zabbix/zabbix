@@ -1193,7 +1193,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
 		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
-		$trigger['description'] = CTriggerHelper::expandReferenceMacros($trigger);
+		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
 
@@ -1398,7 +1398,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerid);
 		while ($dep_row = DBfetch($dep_res)) {
-			$dep_table->addRow(SPACE.'-'.SPACE.CTriggerHelper::expandDescriptionById($dep_row['triggerid_up']));
+			$dep_table->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dep_row['triggerid_up']));
 			$dependency = true;
 		}
 
@@ -1418,7 +1418,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerid);
 		while ($dep_row = DBfetch($dep_res)) {
-			$dep_table->addRow(SPACE.'-'.SPACE.CTriggerHelper::expandDescriptionById($dep_row['triggerid_down']));
+			$dep_table->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dep_row['triggerid_down']));
 			$dependency = true;
 		}
 
@@ -1663,7 +1663,7 @@ function make_trigger_details($trigger) {
 
 	// get visible name of the first host
 	$table->addRow(array(_('Host'), $hostSpan));
-	$table->addRow(array(_('Trigger'), CTriggerHelper::expandDescription($trigger)));
+	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(_('Expression'), $expression));
 	$table->addRow(array(_('Event generation'), _('Normal').(TRIGGER_MULT_EVENT_ENABLED == $trigger['type'] ? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));

@@ -121,9 +121,8 @@ if (isset($db_httptest['lastcheck'])) {
 	$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $db_httptest['lastcheck']).']';
 }
 
-$resolver = new CMacrosResolver();
 $httpdetailsWidget->addPageHeader(
-	array(_('DETAILS OF SCENARIO').SPACE, bold($resolver->resolveMacrosInText($db_httptest['name'], $db_httptest['hostid'])), $lastcheck),
+	array(_('DETAILS OF SCENARIO').SPACE, bold(CMacrosResolverHelper::resolveHttpTestName($db_httptest['hostid'], $db_httptest['name'])), $lastcheck),
 	array(
 		get_icon('reset', array('id' => $_REQUEST['httptestid'])),
 		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
@@ -201,7 +200,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$respItemTime = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
 
 	$httpdetailsTable->addRow(array(
-		$resolver->resolveMacrosInText($httpstep_data['name'], $db_httptest['hostid']),
+		CMacrosResolverHelper::resolveHttpTestName($db_httptest['hostid'], $httpstep_data['name']),
 		$speed,
 		($respTime == 0 ? '-' : $respItemTime),
 		$resp,
@@ -269,9 +268,9 @@ $graphDims['graphHeight'] = 150;
 
 // graph 1
 $src = 'chart3.php?'.url_param('period').
-	url_param($db_httptest['name'], false,'name').
+	url_param($db_httptest['name'], false, 'name').
 	url_param(150, false, 'height').
-	url_param(get_request('stime',0), false,'stime').
+	url_param(get_request('stime',0), false, 'stime').
 	url_param(HTTPSTEP_ITEM_TYPE_IN, false, 'http_item_type').
 	url_param($db_httptest['httptestid'], false, 'httptestid').
 	url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
@@ -292,9 +291,9 @@ zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'", '.zbx_jsvalue($timel
 
 // graph 2
 $src ='chart3.php?'.url_param('period').url_param('from').
-	url_param($db_httptest['name'], false,'name').
+	url_param($db_httptest['name'], false, 'name').
 	url_param(150, false, 'height').
-	url_param(get_request('stime',0), false,'stime').
+	url_param(get_request('stime',0), false, 'stime').
 	url_param(HTTPSTEP_ITEM_TYPE_TIME, false, 'http_item_type').
 	url_param($db_httptest['httptestid'], false, 'httptestid').
 	url_param(GRAPH_TYPE_STACKED, false, 'graphtype');

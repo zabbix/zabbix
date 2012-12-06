@@ -543,7 +543,7 @@ foreach ($triggers as $trigger) {
 		$dependenciesTable->addRow(bold(_('Depends on').':'));
 
 		foreach ($trigger['dependencies'] as $dependency) {
-			$dependenciesTable->addRow(' - '.CTriggerHelper::expandDescriptionById($dependency['triggerid']));
+			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
 		$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
@@ -558,7 +558,7 @@ foreach ($triggers as $trigger) {
 	$dependenciesTable->setAttribute('style', 'width: 200px;');
 	$dependenciesTable->addRow(bold(_('Dependent').':'));
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
-		$depTriggers = CTriggerHelper::batchExpandDescriptionById($triggerIdsDown[$trigger['triggerid']]);
+		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
 		foreach ($depTriggers as $depTrigger) {
 			$dependenciesTable->addRow(SPACE.'-'.SPACE.$depTrigger['description']);

@@ -123,10 +123,10 @@ else {
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
+
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
-
-	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {

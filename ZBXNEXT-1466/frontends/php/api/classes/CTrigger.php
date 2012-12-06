@@ -106,6 +106,7 @@ class CTrigger extends CTriggerGeneral {
 			// output
 			'expandData'					=> null,
 			'expandDescription'				=> null,
+			'expandComment'					=> null,
 			'expandExpression'				=> null,
 			'output'						=> API_OUTPUT_REFER,
 			'selectGroups'					=> null,
@@ -135,9 +136,23 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 
+			// expandDescription
 			if (!is_null($options['expandDescription'])) {
 				if (!str_in_array('description', $options['output'])) {
 					$options['expandDescription'] = null;
+				}
+				else {
+					if (!str_in_array('expression', $options['output'])) {
+						$sqlParts['select']['expression'] = ' t.expression';
+						$fieldsToUnset[] = 'expression';
+					}
+				}
+			}
+
+			// expandComment
+			if (!is_null($options['expandComment'])) {
+				if (!str_in_array('comment', $options['output'])) {
+					$options['expandComment'] = null;
 				}
 				else {
 					if (!str_in_array('expression', $options['output'])) {
@@ -174,18 +189,18 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where'][] = 'ug.userid='.$userid;
 			$sqlParts['where'][] = 'r.permission>='.$permission;
 			$sqlParts['where'][] = 'NOT EXISTS ('.
-										' SELECT ff.triggerid'.
-										' FROM functions ff,items ii'.
-										' WHERE ff.triggerid=t.triggerid'.
-											' AND ff.itemid=ii.itemid'.
-											' AND EXISTS ('.
-												' SELECT hgg.groupid'.
-												' FROM hosts_groups hgg,rights rr,users_groups gg'.
-												' WHERE hgg.hostid=ii.hostid'.
-													' AND rr.id=hgg.groupid'.
-													' AND rr.groupid=gg.usrgrpid'.
-													' AND gg.userid='.$userid.
-													' AND rr.permission='.PERM_DENY.'))';
+				' SELECT ff.triggerid'.
+				' FROM functions ff,items ii'.
+				' WHERE ff.triggerid=t.triggerid'.
+					' AND ff.itemid=ii.itemid'.
+					' AND EXISTS ('.
+						' SELECT hgg.groupid'.
+						' FROM hosts_groups hgg,rights rr,users_groups gg'.
+						' WHERE hgg.hostid=ii.hostid'.
+							' AND rr.id=hgg.groupid'.
+							' AND rr.groupid=gg.usrgrpid'.
+							' AND gg.userid='.$userid.
+							' AND rr.permission='.PERM_DENY.'))';
 		}
 
 		// groupids
@@ -643,6 +658,7 @@ class CTrigger extends CTriggerGeneral {
 						unset($trigger['hostid']);
 					}
 				}
+
 				// itemids
 				if (isset($trigger['itemid']) && is_null($options['selectItems'])) {
 					if (!isset($result[$trigger['triggerid']]['items'])) {
@@ -927,7 +943,7 @@ class CTrigger extends CTriggerGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $triggerid => $trigger) {
 					if (isset($ruleMap[$triggerid]) && isset($discoveryRules[$ruleMap[$triggerid]])) {
@@ -939,7 +955,12 @@ class CTrigger extends CTriggerGeneral {
 
 		// expandDescription
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
-			$result = CTriggerHelper::batchExpandDescription($result);
+			$result = CMacrosResolverHelper::resolveTriggerNames($result);
+		}
+
+		// expandComment
+		if (!is_null($options['expandComment']) && $result && array_key_exists('comment', reset($result))) {
+			//$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
 
 		// expand expression
@@ -964,6 +985,7 @@ class CTrigger extends CTriggerGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 

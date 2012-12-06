@@ -87,7 +87,7 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 				' FROM triggers t'.
 				' WHERE t.triggerid='.$triggerId
 		));
-		$description = CTriggerHelper::expandDescription($trigger);
+		$description = CMacrosResolverHelper::resolveTriggerName($trigger);
 
 		$this->assertEquals($expectedDescription, $description);
 	}
@@ -95,8 +95,8 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider providerReferenceMacros
 	 */
-	public function test_expandReferenceMacros($trigger, $expectedDescription) {
-		$description = CTriggerHelper::expandReferenceMacros($trigger);
+	public function test_resolveTriggerReference($trigger, $expectedDescription) {
+		$description = CMacrosResolverHelper::resolveTriggerReference($trigger);
 
 		$this->assertEquals($expectedDescription, $description);
 	}
