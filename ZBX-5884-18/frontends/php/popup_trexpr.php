@@ -306,7 +306,7 @@
 				$_REQUEST['value'] = $exprSymbols[2];
 			}
 
-			$myItem = API::Item()->get(array(
+			$myItem = CItem::get(array(
 				'filter' => array('host' => $exprPart['host'], 'key_' => $exprPart['item']),
 				'output' => API_OUTPUT_EXTEND,
 				'webitems' => true
