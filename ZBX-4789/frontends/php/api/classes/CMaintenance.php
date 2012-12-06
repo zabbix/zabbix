@@ -134,33 +134,50 @@ class CMaintenance extends CZBXAPI {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
-
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sql = 'SELECT DISTINCT m.maintenanceid'.
 					' FROM maintenances m'.
-					' WHERE EXISTS ('.
-						'SELECT hgg.hostid'.
-						' FROM maintenances_hosts mh,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
-						' WHERE hgg.hostid='.zbx_dbcast_2bigint('mh.maintenance_hostid').
-							' AND m.maintenanceid=mh.maintenanceid'.
-						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>='.$permission.
-						')'.
-					' OR EXISTS ('.
-						'SELECT hgg.hostid'.
-						' FROM maintenances_groups mg,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
-						' WHERE hgg.groupid=mg.groupid'.
-							' AND m.maintenanceid=mg.maintenanceid'.
-						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>='.$permission.
-						')';
+					' WHERE NOT EXISTS ('.
+						' SELECT mh3.maintenanceid'.
+						' FROM maintenances_hosts mh3,rights r3,hosts_groups hg3'.
+						' WHERE mh3.maintenanceid=m.maintenanceid'.
+							' AND '.DBcondition('r3.groupid', $userGroups).
+							' AND hg3.hostid=mh3.hostid'.
+							' AND r3.id=hg3.groupid'.
+							' AND r3.permission<'.$permission.
+					')'.
+					' AND NOT EXISTS ('.
+						'SELECT mh4.maintenanceid'.
+						' FROM maintenances_hosts mh4'.
+						' WHERE mh4.maintenanceid=m.maintenanceid'.
+							' AND NOT EXISTS('.
+								'SELECT r5.id'.
+								' FROM rights r5,hosts_groups hg5'.
+								' WHERE '.DBcondition('r5.groupid', $userGroups).
+									' AND hg5.hostid=mh4.hostid'.
+									' AND r5.id=hg5.groupid'.
+							')'.
+					')'.
+					' AND NOT EXISTS ('.
+						'SELECT mg2.maintenanceid'.
+						' FROM maintenances_groups mg2,rights r3'.
+						' WHERE mg2.maintenanceid=m.maintenanceid'.
+							' AND '.DBcondition('r3.groupid', $userGroups).
+							' AND r3.id=mg2.groupid'.
+							' AND r3.permission<'.$permission.
+					')'.
+					' AND NOT EXISTS ('.
+						'SELECT mg3.maintenanceid'.
+						' FROM maintenances_groups mg3'.
+						' WHERE mg3.maintenanceid=m.maintenanceid'.
+							' AND NOT EXISTS ('.
+								'SELECT r5.id'.
+								' FROM rights r5,hosts_groups hg5'.
+								' WHERE r5.id=mg3.groupid'.
+									' AND '.DBcondition('r5.groupid', $userGroups).
+							')'.
+					')';
 
 			if (!is_null($options['groupids'])) {
 				zbx_value2array($options['groupids']);
