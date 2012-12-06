@@ -70,20 +70,22 @@ class CRelationMap {
 	 */
 	public function mapMany(array $baseObjects, array $relatedObjects, $name, $limit = null) {
 		foreach ($baseObjects as $baseObjectId => &$baseObject) {
-			$matchingRelatedObjects = array();
+			$baseObject[$name] = array();
 
 			// add the related objects if there are any
-			if (isset($this->map[$baseObjectId])) {
+			if (isset($this->map[$baseObjectId]) && $this->map[$baseObjectId]) {
 				// fetch the related objects for the current base objects
 				$matchingRelatedObjects = array_intersect_key($relatedObjects, $this->map[$baseObjectId]);
 
-				// limit the number of results
-				if ($limit) {
-					$matchingRelatedObjects = array_slice($matchingRelatedObjects, 0, $limit);
+				if ($matchingRelatedObjects) {
+					// limit the number of results
+					if ($limit) {
+						$matchingRelatedObjects = array_slice($matchingRelatedObjects, 0, $limit);
+					}
+
+					$baseObject[$name] = $matchingRelatedObjects;
 				}
 			}
-
-			$baseObject[$name] = $matchingRelatedObjects;
 		}
 		unset($baseObject);
 
@@ -107,7 +109,9 @@ class CRelationMap {
 			// add the related objects if there are any
 			if (isset($this->map[$baseObjectId])) {
 				$matchingRelatedId = reset($this->map[$baseObjectId]);
-				$matchingRelatedObject = $relatedObjects[$matchingRelatedId];
+				if (isset($relatedObjects[$matchingRelatedId])) {
+					$matchingRelatedObject = $relatedObjects[$matchingRelatedId];
+				}
 			}
 
 			$baseObject[$name] = $matchingRelatedObject;
