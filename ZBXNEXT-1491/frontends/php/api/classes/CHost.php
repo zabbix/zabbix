@@ -1625,7 +1625,7 @@ class CHost extends CHostGeneral {
 				}
 				unset($interface);
 
-				$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
+				$result = $relationMap->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
 			}
 			else {
 				$interfaces = API::HostInterface()->get(array(
