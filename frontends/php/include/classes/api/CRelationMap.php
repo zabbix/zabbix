@@ -76,6 +76,7 @@ class CRelationMap {
 			if (isset($this->map[$baseObjectId]) && $this->map[$baseObjectId]) {
 				// fetch the related objects for the current base objects
 				$matchingRelatedObjects = array_intersect_key($relatedObjects, $this->map[$baseObjectId]);
+				$matchingRelatedObjects = array_values($matchingRelatedObjects);
 
 				if ($matchingRelatedObjects) {
 					// limit the number of results
