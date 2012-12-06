@@ -70,6 +70,10 @@ class CService extends CZBXAPI {
 	public function get(array $options) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
+		if ($options['selectTrigger'] !== null) {
+			$options['output'] = $this->outputExtend('services', 'triggerid', $options['output']);
+		}
+
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
 		$res = DBselect($sql, $options['limit']);
@@ -1497,18 +1501,6 @@ class CService extends CZBXAPI {
 			$sqlParts['from'][] = 'services_links slc';
 			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
 			$sqlParts['where'][] = DBcondition('slc.servicedownid', (array) $options['childids']);
-		}
-
-		return $sqlParts;
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if ($options['output'] != API_OUTPUT_COUNT) {
-			if ($options['selectTrigger']) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
-			}
 		}
 
 		return $sqlParts;
