@@ -157,11 +157,13 @@ class CMacrosResolver {
 		if (!empty($macros)) {
 			foreach ($data as $hostId => $texts) {
 				// get user macros
-				$macros[$hostId] = array_merge($macros[$hostId], $this->expandUserMacros($texts, $hostId));
+				$macros[$hostId] = !empty($macros[$hostId])
+					? array_merge($macros[$hostId], $this->expandUserMacros($texts, $hostId))
+					: $this->expandUserMacros($texts, $hostId);
 
 				// replace macros to value
-				foreach ($texts as $tnum => $text) {
-					if (!empty($macros[$hostId])) {
+				if (!empty($macros[$hostId])) {
+					foreach ($texts as $tnum => $text) {
 						preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_IP.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
 
 						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
