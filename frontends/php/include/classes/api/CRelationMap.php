@@ -24,11 +24,18 @@
 class CRelationMap {
 
 	/**
-	 * A hash with IDs of related objects as keys and arrays of base objects IDs as values.
+	 * A hash with IDs of base objects as keys and hashes of related object IDs as values.
 	 *
 	 * @var array
 	 */
 	protected $map = array();
+
+	/**
+	 * A hash of related object IDs.
+	 *
+	 * @var array
+	 */
+	protected $relatedIds = array();
 
 	/**
 	 * Adds a new relation.
@@ -37,7 +44,8 @@ class CRelationMap {
 	 * @param string $relatedObjectId
 	 */
 	public function addRelation($baseObjectId, $relatedObjectId) {
-		$this->map[$relatedObjectId][$baseObjectId] = $baseObjectId;
+		$this->map[$baseObjectId][$relatedObjectId] = $relatedObjectId;
+		$this->relatedIds[$relatedObjectId] = $relatedObjectId;
 	}
 
 	/**
@@ -46,65 +54,65 @@ class CRelationMap {
 	 * @return array
 	 */
 	public function getRelatedIds() {
-		return array_keys($this->map);
+		return array_values($this->relatedIds);
 	}
 
-	public function mapMany($baseObjects, $relatedObjects, $name, $limit = null) {
-		// create an empty array for every base object
-		foreach ($baseObjects as &$baseObject) {
-			$baseObject[$name] = array();
-		}
-		unset($baseObject);
+	/**
+	 * Maps multiple related objects to the base objects and adds them under the $name property. Each base object will
+	 * have an array of related objects.
+	 *
+	 * @param array $baseObjects        a hash of base objects with IDs as keys
+	 * @param array $relatedObjects     a hash of related objects with IDs as keys
+	 * @param string $name              the name of the property under which the related objects will be added
+	 * @param int $limit                maximum number of related objects for each base objects
+	 *
+	 * @return array
+	 */
+	public function mapMany(array $baseObjects, array $relatedObjects, $name, $limit = null) {
+		foreach ($baseObjects as $baseObjectId => &$baseObject) {
+			$matchingRelatedObjects = array();
 
-		// add related objects
-		if ($this->map) {
-			$count = array();
-			foreach ($relatedObjects as $relatedObjectId => $relatedObject) {
-				if (isset($this->map[$relatedObjectId])) {
-					foreach ($this->map[$relatedObjectId] as $baseObjectId) {
-						if (isset($baseObjects[$baseObjectId])) {
-							// limit the number of results for each object
-							if ($limit) {
-								if (!isset($count[$baseObjectId])) {
-									$count[$baseObjectId] = 0;
-								}
+			// add the related objects if there are any
+			if (isset($this->map[$baseObjectId])) {
+				// fetch the related objects for the current base objects
+				$matchingRelatedObjects = array_intersect_key($relatedObjects, $this->map[$baseObjectId]);
 
-								$count[$baseObjectId]++;
-
-								if ($count[$baseObjectId] > $limit) {
-									continue;
-								}
-							}
-
-							$baseObjects[$baseObjectId][$name][] = $relatedObjects[$relatedObjectId];
-						}
-					}
+				// limit the number of results
+				if ($limit) {
+					$matchingRelatedObjects = array_slice($matchingRelatedObjects, 0, $limit);
 				}
 			}
+
+			$baseObject[$name] = $matchingRelatedObjects;
 		}
+		unset($baseObject);
 
 		return $baseObjects;
 	}
 
-	public function mapOne($baseObjects, $relatedObjects, $name) {
-		// create an empty array for every base object
-		foreach ($baseObjects as &$baseObject) {
-			$baseObject[$name] = array();
+	/**
+	 * Maps multiple related objects to the base objects and adds them under the $name property. Each base object will
+	 * have only one related object.
+	 *
+	 * @param array $baseObjects        a hash of base objects with IDs as keys
+	 * @param array $relatedObjects     a hash of related objects with IDs as keys
+	 * @param string $name              the name of the property under which the related object will be added
+	 *
+	 * @return array
+	 */
+	public function mapOne(array $baseObjects, array $relatedObjects, $name) {
+		foreach ($baseObjects as $baseObjectId => &$baseObject) {
+			$matchingRelatedObject = array();
+
+			// add the related objects if there are any
+			if (isset($this->map[$baseObjectId])) {
+				$matchingRelatedId = reset($this->map[$baseObjectId]);
+				$matchingRelatedObject = $relatedObjects[$matchingRelatedId];
+			}
+
+			$baseObject[$name] = $matchingRelatedObject;
 		}
 		unset($baseObject);
-
-		// add related object
-		if ($this->map) {
-			foreach ($relatedObjects as $relatedObjectId => $relatedObject) {
-				if (isset($this->map[$relatedObjectId])) {
-					foreach ($this->map[$relatedObjectId] as $baseObjectId) {
-						if (isset($baseObjects[$baseObjectId])) {
-							$baseObjects[$baseObjectId][$name] = $relatedObjects[$relatedObjectId];
-						}
-					}
-				}
-			}
-		}
 
 		return $baseObjects;
 	}
