@@ -1080,7 +1080,7 @@ COpt::memoryPick();
 		$result = false;
 
 		if(!isset($object['hostid']) && !isset($object['host'])){
-			$expressionData = new CTriggerExpression($object['expression']);
+			$expressionData = new CTriggerExpression();
 			if (!$expressionData->parse($object['expression'])) {
 				return false;
 			}
