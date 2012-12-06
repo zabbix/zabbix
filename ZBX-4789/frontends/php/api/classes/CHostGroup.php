@@ -203,11 +203,8 @@ class CHostGroup extends CZBXAPI {
 
 		// monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts, with_hosts_and_templates
 		if (!is_null($options['monitored_hosts']) && is_null($options['with_graphs'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sqlParts['where'][] = 'EXISTS (SELECT h.hostid FROM hosts_groups hg,hosts h'.
-											' WHERE hg.groupid=g.groupid AND h.hostid=hg.hostid'.
+											' WHERE hg.groupid=g.groupid AND hg.groupid=g.groupid AND h.hostid=hg.hostid'.
 											' AND h.status='.HOST_STATUS_MONITORED.')';
 		}
 		elseif (!is_null($options['real_hosts'])) {
@@ -307,10 +304,9 @@ class CHostGroup extends CZBXAPI {
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['where'][] = 'EXISTS (SELECT i.itemid'.
-											' FROM items i,graphs_items gi, hosts_groups hg, hosts h'.
+											' FROM items i,graphs_items gi, hosts_groups hg'.
 											' WHERE i.hostid=hg.hostid and hg.groupid=g.groupid'.
-												' AND i.itemid=gi.itemid and h.hostid=hg.hostid'.
-												' AND h.status='.HOST_STATUS_MONITORED.')';
+												' AND i.itemid=gi.itemid)';
 		}
 
 		if (!is_null($options['with_applications'])) {
