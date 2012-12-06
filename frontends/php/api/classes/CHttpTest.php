@@ -210,8 +210,6 @@ class CHttpTest extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$httpTestIds = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -225,8 +223,6 @@ class CHttpTest extends CZBXAPI {
 				}
 			}
 			else {
-				$httpTestIds[$httpTest['httptestid']] = $httpTest['httptestid'];
-
 				if (!isset($result[$httpTest['httptestid']])) {
 					$result[$httpTest['httptestid']] = array();
 				}
@@ -239,56 +235,9 @@ class CHttpTest extends CZBXAPI {
 			return $result;
 		}
 
-		// adding hosts
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'httptestid', 'hostid');
-			$hosts = API::Host()->get(array(
-				'output' => $options['selectHosts'],
-				'hostid' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'templated_hosts' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		// adding steps
-		if ($options['selectSteps'] !== null) {
-			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
-				$httpSteps = API::getApi()->select('httpstep', array(
-					'output' => $this->outputExtend('httpstep', array('httptestid', 'httpstepid'), $options['selectSteps']),
-					'filters' => array('httptestid' => $httpTestIds),
-					'preservekeys' => true
-				));
-				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
-
-				// unset unrequested fields
-				foreach ($httpSteps as &$httpStep) {
-					if (!$this->outputIsRequested('httptestid', $options['selectSteps'])) {
-						unset($httpStep['httptestid']);
-					}
-					if (!$this->outputIsRequested('httpstepid', $options['selectSteps'])) {
-						unset($httpStep['httpstepid']);
-					}
-				}
-				unset($httpStep);
-
-				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
-			}
-			else {
-				$dbHttpSteps = DBselect(
-					'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
-						' FROM httpstep hs'.
-						' WHERE '.DBcondition('hs.httptestid', $httpTestIds).
-						' GROUP BY hs.httptestid'
-				);
-				while ($dbHttpStep = DBfetch($dbHttpSteps)) {
-					$result[$dbHttpStep['httptestid']]['steps'] = $dbHttpStep['stepscnt'];
-				}
-			}
-		}
-
 		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+
 			// expandName
 			$nameRequested = (is_array($options['output']) && in_array('name', $options['output']))
 				|| $options['output'] == API_OUTPUT_EXTEND;
@@ -296,7 +245,7 @@ class CHttpTest extends CZBXAPI {
 
 			// expandStepName
 			$stepNameRequested = $options['selectSteps'] == API_OUTPUT_EXTEND
-					|| (is_array($options['selectSteps']) && in_array('name', $options['selectSteps']));
+				|| (is_array($options['selectSteps']) && in_array('name', $options['selectSteps']));
 			$expandStepName = $options['expandStepName'] !== null && $stepNameRequested;
 
 			if ($expandName || $expandStepName) {
@@ -762,5 +711,62 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$httpTestIds = array_keys($result);
+
+		// adding hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'httptestid', 'hostid');
+			$hosts = API::Host()->get(array(
+				'output' => $options['selectHosts'],
+				'hostid' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'templated_hosts' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding steps
+		if ($options['selectSteps'] !== null) {
+			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
+				$httpSteps = API::getApi()->select('httpstep', array(
+					'output' => $this->outputExtend('httpstep', array('httptestid', 'httpstepid'), $options['selectSteps']),
+					'filters' => array('httptestid' => $httpTestIds),
+					'preservekeys' => true
+				));
+				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
+
+				// unset unrequested fields
+				foreach ($httpSteps as &$httpStep) {
+					if (!$this->outputIsRequested('httptestid', $options['selectSteps'])) {
+						unset($httpStep['httptestid']);
+					}
+					if (!$this->outputIsRequested('httpstepid', $options['selectSteps'])) {
+						unset($httpStep['httpstepid']);
+					}
+				}
+				unset($httpStep);
+
+				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
+			}
+			else {
+				$dbHttpSteps = DBselect(
+					'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
+						' FROM httpstep hs'.
+						' WHERE '.DBcondition('hs.httptestid', $httpTestIds).
+						' GROUP BY hs.httptestid'
+				);
+				while ($dbHttpStep = DBfetch($dbHttpSteps)) {
+					$result[$dbHttpStep['httptestid']]['steps'] = $dbHttpStep['stepscnt'];
+				}
+			}
+		}
+
+		return $result;
 	}
 }

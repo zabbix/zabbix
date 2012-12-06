@@ -180,8 +180,6 @@ class CDCheck extends CZBXAPI {
 					$result = $dcheck['rowscount'];
 			}
 			else{
-				$dcheckids[$dcheck['dcheckid']] = $dcheck['dcheckid'];
-
 				if (!isset($result[$dcheck['dcheckid']])) {
 					$result[$dcheck['dcheckid']]= array();
 				}
@@ -202,20 +200,8 @@ class CDCheck extends CZBXAPI {
 			return $result;
 		}
 
-		// Adding Objects
-		// select_drules
-		if ($options['selectDRules'] !== null && $options['selectDRules'] !== API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'dcheckid', 'druleid');
-			$drules = API::DRule()->get(array(
-				'output' => $options['selectDRules'],
-				'druleids' => $relationMap->getRelatedIds(),
-				'nodeids' => $nodeids,
-				'preservekeys' => 1
-			));
-			if (!is_null($options['limitSelects'])) {
-				order_result($drules, 'name');
-			}
-			$result = $relationMap->mapMany($result, $drules, 'drules', $options['limitSelects']);
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 // removing keys (hash -> array)
@@ -281,6 +267,27 @@ class CDCheck extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// select_drules
+		if ($options['selectDRules'] !== null && $options['selectDRules'] !== API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'dcheckid', 'druleid');
+			$drules = API::DRule()->get(array(
+				'output' => $options['selectDRules'],
+				'druleids' => $relationMap->getRelatedIds(),
+				'nodeids' => $options['nodeids'],
+				'preservekeys' => 1
+			));
+			if (!is_null($options['limitSelects'])) {
+				order_result($drules, 'name');
+			}
+			$result = $relationMap->mapMany($result, $drules, 'drules', $options['limitSelects']);
+		}
+
+		return $result;
 	}
 }
 ?>

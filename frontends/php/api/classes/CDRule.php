@@ -177,8 +177,6 @@ class CDRule extends CZBXAPI {
 		}
 //------------
 
-		$druleids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -190,8 +188,6 @@ class CDRule extends CZBXAPI {
 					$result = $drule['rowscount'];
 			}
 			else{
-				$druleids[$drule['druleid']] = $drule['druleid'];
-
 				// dhostids
 				if (isset($drule['dhostid']) && is_null($options['selectDHosts'])) {
 					if (!isset($result[$drule['druleid']]['dhosts']))
@@ -221,73 +217,9 @@ class CDRule extends CZBXAPI {
 			return $result;
 		}
 
-		// Adding Objects
-		// Adding Discovery Checks
-		if (!is_null($options['selectDChecks'])) {
-			if ($options['selectDChecks'] != API_OUTPUT_COUNT) {
-				$relationMap = $this->createRelationMap($result, 'druleid', 'dcheckid', 'dchecks');
-				$dchecks = API::DCheck()->get(array(
-					'output' => $options['selectDChecks'],
-					'nodeids' => $nodeids,
-					'dcheckids' => $relationMap->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				if (!is_null($options['limitSelects'])) {
-					order_result($dchecks, 'name');
-				}
-				$result = $relationMap->mapMany($result, $dchecks, 'dchecks', $options['limitSelects']);
-			}
-			else {
-				$dchecks = API::DCheck()->get(array(
-					'nodeids' => $nodeids,
-					'druleids' => $druleids,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-				$dchecks = zbx_toHash($dchecks, 'druleid');
-				foreach ($result as $druleid => $drule) {
-					if (isset($dchecks[$druleid]))
-						$result[$druleid]['dchecks'] = $dchecks[$druleid]['rowscount'];
-					else
-						$result[$druleid]['dchecks'] = 0;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
-
-		// Adding Discovery Hosts
-		if (!is_null($options['selectDHosts'])) {
-			if ($options['selectDHosts'] != API_OUTPUT_COUNT) {
-				$relationMap = $this->createRelationMap($result, 'druleid', 'dhostid', 'dhosts');
-				$dhosts = API::DHost()->get(array(
-					'output' => $options['selectDHosts'],
-					'nodeids' => $nodeids,
-					'dhostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				if (!is_null($options['limitSelects'])) {
-					order_result($dhosts, 'name');
-				}
-				$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
-			}
-			else {
-				$dhosts = API::DHost()->get(array(
-					'nodeids' => $nodeids,
-					'druleids' => $druleids,
-					'countOutput' => true,
-					'groupCount' => true
-				));
-				$dhosts = zbx_toHash($dhosts, 'druleid');
-				foreach ($result as $druleid => $drule) {
-					if (isset($dhosts[$druleid]))
-						$result[$druleid]['dhosts'] = $dhosts[$druleid]['rowscount'];
-					else
-						$result[$druleid]['dhosts'] = 0;
-				}
-			}
-		}
-
 
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -753,6 +685,80 @@ class CDRule extends CZBXAPI {
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$druleids = array_keys($result);
+
+		// Adding Discovery Checks
+		if (!is_null($options['selectDChecks'])) {
+			if ($options['selectDChecks'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'druleid', 'dcheckid', 'dchecks');
+				$dchecks = API::DCheck()->get(array(
+					'output' => $options['selectDChecks'],
+					'nodeids' => $options['nodeids'],
+					'dcheckids' => $relationMap->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				if (!is_null($options['limitSelects'])) {
+					order_result($dchecks, 'name');
+				}
+				$result = $relationMap->mapMany($result, $dchecks, 'dchecks', $options['limitSelects']);
+			}
+			else {
+				$dchecks = API::DCheck()->get(array(
+					'nodeids' => $options['nodeids'],
+					'druleids' => $druleids,
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$dchecks = zbx_toHash($dchecks, 'druleid');
+				foreach ($result as $druleid => $drule) {
+					if (isset($dchecks[$druleid]))
+						$result[$druleid]['dchecks'] = $dchecks[$druleid]['rowscount'];
+					else
+						$result[$druleid]['dchecks'] = 0;
+				}
+			}
+		}
+
+		// Adding Discovery Hosts
+		if (!is_null($options['selectDHosts'])) {
+			if ($options['selectDHosts'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'druleid', 'dhostid', 'dhosts');
+				$dhosts = API::DHost()->get(array(
+					'output' => $options['selectDHosts'],
+					'nodeids' => $options['nodeids'],
+					'dhostids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				if (!is_null($options['limitSelects'])) {
+					order_result($dhosts, 'name');
+				}
+				$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
+			}
+			else {
+				$dhosts = API::DHost()->get(array(
+					'nodeids' => $options['nodeids'],
+					'druleids' => $druleids,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$dhosts = zbx_toHash($dhosts, 'druleid');
+				foreach ($result as $druleid => $drule) {
+					if (isset($dhosts[$druleid]))
+						$result[$druleid]['dhosts'] = $dhosts[$druleid]['rowscount'];
+					else
+						$result[$druleid]['dhosts'] = 0;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 }

@@ -289,8 +289,6 @@ class CEvent extends CZBXAPI {
 			$sqlParts = $this->addQuerySelect($this->fieldId('objectid'), $sqlParts);
 		}
 
-		$eventids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -304,8 +302,6 @@ class CEvent extends CZBXAPI {
 				}
 			}
 			else {
-				$eventids[$event['eventid']] = $event['eventid'];
-
 				if (!isset($result[$event['eventid']])) {
 					$result[$event['eventid']]= array();
 				}
@@ -344,145 +340,8 @@ class CEvent extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding hosts
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
-			// discovered items
-			$dbRules = DBselect(
-				'SELECT e.eventid,i.hostid'.
-					' FROM events e,functions f,items i'.
-					' WHERE '.DBcondition('e.eventid', $eventids).
-					' AND e.objectid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER
-			);
-			while ($relation = DBfetch($dbRules)) {
-				$relationMap->addRelation($relation['eventid'], $relation['hostid']);
-			}
-
-			$hosts = API::Host()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		// adding triggers
-		if ($options['selectTriggers'] !== null && $options['selectTriggers'] != API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
-			foreach ($result as $event) {
-				if ($event['object'] == EVENT_OBJECT_TRIGGER) {
-					$relationMap->addRelation($event['eventid'], $event['objectid']);
-				}
-			}
-
-			$triggers = API::Trigger()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectTriggers'],
-				'triggerids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $triggers, 'triggers');
-		}
-
-		// adding items
-		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
-			// discovered items
-			$dbRules = DBselect(
-				'SELECT e.eventid,f.itemid'.
-					' FROM events e,functions f'.
-					' WHERE '.DBcondition('e.eventid', $eventids).
-					' AND e.objectid=f.triggerid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER
-			);
-			while ($relation = DBfetch($dbRules)) {
-				$relationMap->addRelation($relation['eventid'], $relation['itemid']);
-			}
-
-			$items = API::Item()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectItems'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'webitems' => true,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $items, 'items');
-		}
-
-		// adding alerts
-		if ($options['select_alerts'] !== null && $options['select_alerts'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
-			$alerts = API::Alert()->get(array(
-				'output' => $options['select_alerts'],
-				'selectMediatypes' => API_OUTPUT_EXTEND,
-				'nodeids' => $nodeids,
-				'alertids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN
-			));
-			$result = $relationMap->mapMany($result, $alerts, 'alerts');
-		}
-
-		// adding acknowledges
-		if ($options['select_acknowledges'] !== null) {
-			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
-				// create the base query
-				$sqlParts = API::getApi()->createSelectQueryParts('acknowledges', 'a', array(
-					'output' => $this->outputExtend('acknowledges',
-						array('acknowledgeid', 'eventid', 'clock'), $options['select_acknowledges']
-					),
-					'filter' => array('eventid' => $eventids)
-				));
-				$sqlParts['order'][] = 'a.clock DESC';
-
-				// if the user alias is requested, join the users table
-				if ($this->outputIsRequested('alias', $options['select_acknowledges'])) {
-					$sqlParts = $this->addQuerySelect('u.alias', $sqlParts);
-					$sqlParts['from'][] = 'users u';
-					$sqlParts['where'][] = 'a.userid=u.userid';
-				}
-
-				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
-				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
-
-				// unset unrequested fields
-				foreach ($acknowledges as &$acknowledge) {
-					if (!$this->outputIsRequested('eventid', $options['select_acknowledges'])) {
-						unset($acknowledge['eventid']);
-					}
-					if (!$this->outputIsRequested('acknowledgeid', $options['select_acknowledges'])) {
-						unset($acknowledge['acknowledgeid']);
-					}
-					if (!$this->outputIsRequested('clock', $options['select_acknowledges'])) {
-						unset($acknowledge['clock']);
-					}
-				}
-				unset($acknowledge);
-
-				$result = $relationMap->mapMany($result, $acknowledges, 'acknowledges');
-			}
-			else {
-				$res = DBselect(
-					'SELECT COUNT(a.acknowledgeid) AS rowscount,a.eventid'.
-					' FROM acknowledges a'.
-					' WHERE '.DBcondition('a.eventid', $eventids).
-					' GROUP BY a.eventid'
-				);
-				while ($ack = DBfetch($res)) {
-					$result[$ack['eventid']]['acknowledges'] = $ack['rowscount'];
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -540,5 +399,151 @@ class CEvent extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$eventIds = array_keys($result);
+
+		// adding hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT e.eventid,i.hostid'.
+					' FROM events e,functions f,items i'.
+					' WHERE '.DBcondition('e.eventid', $eventIds).
+					' AND e.objectid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND e.object='.EVENT_OBJECT_TRIGGER
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['eventid'], $relation['hostid']);
+			}
+
+			$hosts = API::Host()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectHosts'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding triggers
+		if ($options['selectTriggers'] !== null && $options['selectTriggers'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			foreach ($result as $event) {
+				if ($event['object'] == EVENT_OBJECT_TRIGGER) {
+					$relationMap->addRelation($event['eventid'], $event['objectid']);
+				}
+			}
+
+			$triggers = API::Trigger()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectTriggers'],
+				'triggerids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $triggers, 'triggers');
+		}
+
+		// adding items
+		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT e.eventid,f.itemid'.
+					' FROM events e,functions f'.
+					' WHERE '.DBcondition('e.eventid', $eventIds).
+					' AND e.objectid=f.triggerid'.
+					' AND e.object='.EVENT_OBJECT_TRIGGER
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['eventid'], $relation['itemid']);
+			}
+
+			$items = API::Item()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectItems'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'webitems' => true,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $items, 'items');
+		}
+
+		// adding alerts
+		if ($options['select_alerts'] !== null && $options['select_alerts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
+			$alerts = API::Alert()->get(array(
+				'output' => $options['select_alerts'],
+				'selectMediatypes' => API_OUTPUT_EXTEND,
+				'nodeids' => $options['nodeids'],
+				'alertids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true,
+				'sortfield' => 'clock',
+				'sortorder' => ZBX_SORT_DOWN
+			));
+			$result = $relationMap->mapMany($result, $alerts, 'alerts');
+		}
+
+		// adding acknowledges
+		if ($options['select_acknowledges'] !== null) {
+			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
+				// create the base query
+				$sqlParts = API::getApi()->createSelectQueryParts('acknowledges', 'a', array(
+					'output' => $this->outputExtend('acknowledges',
+						array('acknowledgeid', 'eventid', 'clock'), $options['select_acknowledges']
+					),
+					'filter' => array('eventid' => $eventIds)
+				));
+				$sqlParts['order'][] = 'a.clock DESC';
+
+				// if the user alias is requested, join the users table
+				if ($this->outputIsRequested('alias', $options['select_acknowledges'])) {
+					$sqlParts = $this->addQuerySelect('u.alias', $sqlParts);
+					$sqlParts['from'][] = 'users u';
+					$sqlParts['where'][] = 'a.userid=u.userid';
+				}
+
+				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
+				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
+
+				// unset unrequested fields
+				foreach ($acknowledges as &$acknowledge) {
+					if (!$this->outputIsRequested('eventid', $options['select_acknowledges'])) {
+						unset($acknowledge['eventid']);
+					}
+					if (!$this->outputIsRequested('acknowledgeid', $options['select_acknowledges'])) {
+						unset($acknowledge['acknowledgeid']);
+					}
+					if (!$this->outputIsRequested('clock', $options['select_acknowledges'])) {
+						unset($acknowledge['clock']);
+					}
+				}
+				unset($acknowledge);
+
+				$result = $relationMap->mapMany($result, $acknowledges, 'acknowledges');
+			}
+			else {
+				$res = DBselect(
+					'SELECT COUNT(a.acknowledgeid) AS rowscount,a.eventid'.
+						' FROM acknowledges a'.
+						' WHERE '.DBcondition('a.eventid', $eventIds).
+						' GROUP BY a.eventid'
+				);
+				while ($ack = DBfetch($res)) {
+					$result[$ack['eventid']]['acknowledges'] = $ack['rowscount'];
+				}
+			}
+		}
+
+		return $result;
 	}
 }

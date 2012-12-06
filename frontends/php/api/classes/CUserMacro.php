@@ -273,54 +273,8 @@ class CUserMacro extends CZBXAPI {
 			return $result;
 		}
 
-		if ($options['globalmacro'] === null) {
-			$hostMacroIds = array_keys($result);
-
-			/*
-			 * Adding objects
-			 */
-			// adding groups
-			if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-				$res = DBselect(
-					'SELECT hm.hostmacroid,hg.groupid'.
-					' FROM hostmacro hm,hosts_groups hg'.
-					' WHERE '.DBcondition('hm.hostmacroid', $hostMacroIds).
-						' AND hm.hostid=hg.hostid'
-				);
-				$relationMap = new CRelationMap();
-				while ($relation = DBfetch($res)) {
-					$relationMap->addRelation($relation['hostmacroid'], $relation['groupid']);
-				}
-
-				$groups = API::HostGroup()->get(array(
-					'output' => $options['selectGroups'],
-					'groupids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				$result = $relationMap->mapMany($result, $groups, 'groups');
-			}
-
-			// adding templates
-			if ($options['selectTemplates'] !== null && $options['selectTemplates'] != API_OUTPUT_COUNT) {
-				$relationMap = $this->createRelationMap($result, 'hostmacroid', 'hostid');
-				$templates = API::Template()->get(array(
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				$result = $relationMap->mapMany($result, $templates, 'templates');
-			}
-
-			// adding templates
-			if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-				$relationMap = $this->createRelationMap($result, 'hostmacroid', 'hostid');
-				$templates = API::Host()->get(array(
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				));
-				$result = $relationMap->mapMany($result, $templates, 'hosts');
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -1031,5 +985,61 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		if ($options['globalmacro'] === null) {
+			$hostMacroIds = array_keys($result);
+
+			/*
+			 * Adding objects
+			 */
+			// adding groups
+			if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+				$res = DBselect(
+					'SELECT hm.hostmacroid,hg.groupid'.
+						' FROM hostmacro hm,hosts_groups hg'.
+						' WHERE '.DBcondition('hm.hostmacroid', $hostMacroIds).
+						' AND hm.hostid=hg.hostid'
+				);
+				$relationMap = new CRelationMap();
+				while ($relation = DBfetch($res)) {
+					$relationMap->addRelation($relation['hostmacroid'], $relation['groupid']);
+				}
+
+				$groups = API::HostGroup()->get(array(
+					'output' => $options['selectGroups'],
+					'groupids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $groups, 'groups');
+			}
+
+			// adding templates
+			if ($options['selectTemplates'] !== null && $options['selectTemplates'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'hostmacroid', 'hostid');
+				$templates = API::Template()->get(array(
+					'output' => $options['selectTemplates'],
+					'templateids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $templates, 'templates');
+			}
+
+			// adding templates
+			if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'hostmacroid', 'hostid');
+				$templates = API::Host()->get(array(
+					'output' => $options['selectHosts'],
+					'hostids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $templates, 'hosts');
+			}
+		}
+
+		return $result;
 	}
 }

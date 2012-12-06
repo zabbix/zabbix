@@ -239,19 +239,14 @@ class CAlert extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$alertids = array();
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
 		while ($alert = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $alert['rowscount'];
 			}
 			else {
-				$alertids[$alert['alertid']] = $alert['alertid'];
-
 				if (!isset($result[$alert['alertid']])) {
 					$result[$alert['alertid']] = array();
 				}
@@ -288,16 +283,46 @@ class CAlert extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+		}
+
+		// removing keys (hash -> array)
+		if (is_null($options['preservekeys'])) {
+			$result = zbx_cleanHashes($result);
+		}
+
+		return $result;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectUsers'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('userid'), $sqlParts);
+			}
+
+			if ($options['selectMediatypes'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('mediatypeid'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$alertIds = array_keys($result);
+
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
 			$relationMap = new CRelationMap();
 			$res = DBselect(
 				'SELECT a.alertid,i.hostid'.
 					' FROM alerts a,events e,functions f,items i'.
-					' WHERE '.DBcondition('a.actionid', $alertids).
+					' WHERE '.DBcondition('a.actionid', $alertIds).
 					' AND a.eventid=e.eventid'.
 					' AND e.objectid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
@@ -336,27 +361,6 @@ class CAlert extends CZBXAPI {
 			$result = $relationMap->mapMany($result, $mediatypes, 'mediatypes');
 		}
 
-		// removing keys (hash -> array)
-		if (is_null($options['preservekeys'])) {
-			$result = zbx_cleanHashes($result);
-		}
-
 		return $result;
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if ($options['countOutput'] === null) {
-			if ($options['selectUsers'] !== null) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('userid'), $sqlParts);
-			}
-
-			if ($options['selectMediatypes'] !== null) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('mediatypeid'), $sqlParts);
-			}
-		}
-
-		return $sqlParts;
 	}
 }

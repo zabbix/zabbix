@@ -123,7 +123,6 @@ class CIconMap extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$iconMapids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -132,8 +131,6 @@ class CIconMap extends CZBXAPI {
 				$result = $iconMap['rowscount'];
 			}
 			else {
-				$iconMapids[$iconMap['iconmapid']] = $iconMap['iconmapid'];
-
 				if (!isset($result[$iconMap['iconmapid']])) {
 					$result[$iconMap['iconmapid']] = array();
 				}
@@ -156,27 +153,6 @@ class CIconMap extends CZBXAPI {
 		/*
 		 * Adding objects
 		 */
-		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
-			$mappings = API::getApi()->select('icon_mapping', array(
-				'output' => $this->outputExtend('icon_mapping', array('iconmapid', 'iconmappingid'), $options['selectMappings']),
-				'filter' => array('iconmapid' => $iconMapids),
-				'preservekeys' => true
-			));
-			$relationMap = $this->createRelationMap($mappings, 'iconmapid', 'iconmappingid');
-
-			// unset unrequested fields
-			foreach ($mappings as &$mapping) {
-				if (!$this->outputIsRequested('iconmapid', $options['selectMappings'])) {
-					unset($mapping['iconmapid']);
-				}
-				if (!$this->outputIsRequested('iconmappingid', $options['selectMappings'])) {
-					unset($mapping['iconmappingid']);
-				}
-			}
-			unset($mapping);
-
-			$result = $relationMap->mapMany($result, $mappings, 'mappings');
-		}
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -491,6 +467,36 @@ class CIconMap extends CZBXAPI {
 				$uniqField[$mapping['inventory_link'].$mapping['expression']] = true;
 			}
 		}
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$iconMapIds = array_keys($result);
+
+		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
+			$mappings = API::getApi()->select('icon_mapping', array(
+				'output' => $this->outputExtend('icon_mapping', array('iconmapid', 'iconmappingid'), $options['selectMappings']),
+				'filter' => array('iconmapid' => $iconMapIds),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($mappings, 'iconmapid', 'iconmappingid');
+
+			// unset unrequested fields
+			foreach ($mappings as &$mapping) {
+				if (!$this->outputIsRequested('iconmapid', $options['selectMappings'])) {
+					unset($mapping['iconmapid']);
+				}
+				if (!$this->outputIsRequested('iconmappingid', $options['selectMappings'])) {
+					unset($mapping['iconmappingid']);
+				}
+			}
+			unset($mapping);
+
+			$result = $relationMap->mapMany($result, $mappings, 'mappings');
+		}
+
+		return $result;
 	}
 }
 ?>

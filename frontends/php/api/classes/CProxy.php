@@ -91,9 +91,6 @@ class CProxy extends CZBXAPI {
 			}
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
@@ -132,7 +129,6 @@ class CProxy extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$proxyids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -141,7 +137,6 @@ class CProxy extends CZBXAPI {
 				$result = $proxy['rowscount'];
 			}
 			else {
-				$proxyids[$proxy['hostid']] = $proxy['hostid'];
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
 
@@ -153,62 +148,12 @@ class CProxy extends CZBXAPI {
 			}
 		}
 
-		if (!is_null($options['countOutput']) || empty($proxyids)) {
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// selectHosts
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$hosts = API::Host()->get(array(
-				'output' => $this->outputExtend('hosts', array('hostid', 'proxy_hostid'), $options['selectHosts']),
-				'nodeids' => $nodeids,
-				'proxyids' => $proxyids,
-				'preservekeys' => true
-			));
-
-			$relationMap = $this->createRelationMap($hosts, 'proxy_hostid', 'hostid');
-
-			// unset unrequested fields
-			foreach ($hosts as &$host) {
-				if (!$this->outputIsRequested('proxy_hostid', $options['selectHosts'])) {
-					unset($host['proxy_hostid']);
-				}
-				if (!$this->outputIsRequested('hostid', $options['selectHosts'])) {
-					unset($host['hostid']);
-				}
-			}
-			unset($host);
-
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		// adding hostinterfaces
-		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
-			$interfaces = API::HostInterface()->get(array(
-				'output' => $this->outputExtend('interface', array('interfaceid', 'hostid'), $options['selectInterfaces']),
-				'nodeids' => $nodeids,
-				'hostids' => $proxyids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-
-			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
-
-			// unset unrequested fields
-			foreach ($interfaces as &$interface) {
-				if (!$this->outputIsRequested('proxy_hostid', $options['selectInterfaces'])) {
-					unset($interface['proxy_hostid']);
-				}
-				if (!$this->outputIsRequested('hostid', $options['selectInterfaces'])) {
-					unset($interface['hostid']);
-				}
-			}
-			unset($interface);
-
-			$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -591,5 +536,64 @@ class CProxy extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$proxyIds = array_keys($result);
+
+		// selectHosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = API::Host()->get(array(
+				'output' => $this->outputExtend('hosts', array('hostid', 'proxy_hostid'), $options['selectHosts']),
+				'nodeids' => $options['nodeids'],
+				'proxyids' => $proxyIds,
+				'preservekeys' => true
+			));
+
+			$relationMap = $this->createRelationMap($hosts, 'proxy_hostid', 'hostid');
+
+			// unset unrequested fields
+			foreach ($hosts as &$host) {
+				if (!$this->outputIsRequested('proxy_hostid', $options['selectHosts'])) {
+					unset($host['proxy_hostid']);
+				}
+				if (!$this->outputIsRequested('hostid', $options['selectHosts'])) {
+					unset($host['hostid']);
+				}
+			}
+			unset($host);
+
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding hostinterfaces
+		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+			$interfaces = API::HostInterface()->get(array(
+				'output' => $this->outputExtend('interface', array('interfaceid', 'hostid'), $options['selectInterfaces']),
+				'nodeids' => $options['nodeids'],
+				'hostids' => $proxyIds,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+
+			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
+
+			// unset unrequested fields
+			foreach ($interfaces as &$interface) {
+				if (!$this->outputIsRequested('proxy_hostid', $options['selectInterfaces'])) {
+					unset($interface['proxy_hostid']);
+				}
+				if (!$this->outputIsRequested('hostid', $options['selectInterfaces'])) {
+					unset($interface['hostid']);
+				}
+			}
+			unset($interface);
+
+			$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
+		}
+
+		return $result;
 	}
 }
