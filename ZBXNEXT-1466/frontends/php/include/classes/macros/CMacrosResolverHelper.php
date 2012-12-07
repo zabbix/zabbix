@@ -33,6 +33,7 @@ class CMacrosResolverHelper {
 	 * Resolve macros.
 	 *
 	 * @static
+	 *
 	 * @param array $options
 	 *
 	 * @return array
@@ -46,6 +47,7 @@ class CMacrosResolverHelper {
 	 * Resolve macros in http test name.
 	 *
 	 * @static
+	 *
 	 * @param int $hostId
 	 * @param string $name
 	 *
@@ -64,6 +66,7 @@ class CMacrosResolverHelper {
 	 * Resolve macros in trigger name.
 	 *
 	 * @static
+	 *
 	 * @param array $trigger
 	 *
 	 * @return string
@@ -78,6 +81,7 @@ class CMacrosResolverHelper {
 	 * Resolve macros in trigger names.
 	 *
 	 * @static
+	 *
 	 * @param array $triggers
 	 *
 	 * @return array
@@ -91,9 +95,25 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve macros in trigger description.
+	 *
+	 * @static
+	 *
+	 * @param array $trigger
+	 *
+	 * @return string
+	 */
+	public static function resolveTriggerDescription(array $trigger) {
+		$macros = self::resolveTriggerDescriptions(array($trigger));
+		$macros = reset($macros);
+		return $macros['comments'];
+	}
+
+	/**
 	 * Resolve macros in trigger descriptions.
 	 *
 	 * @static
+	 *
 	 * @param array $triggers
 	 *
 	 * @return array
@@ -110,6 +130,7 @@ class CMacrosResolverHelper {
 	 * Get trigger by id and resolve macros in trigger name.
 	 *
 	 * @static
+	 *
 	 * @param int $triggerId
 	 *
 	 * @return string
@@ -124,6 +145,7 @@ class CMacrosResolverHelper {
 	 * Get triggers by ids and resolve macros in trigger names.
 	 *
 	 * @static
+	 *
 	 * @param array $triggerIds
 	 *
 	 * @return array
@@ -160,9 +182,10 @@ class CMacrosResolverHelper {
 	 * Resolve macros in event description.
 	 *
 	 * @static
+	 *
 	 * @param array $event
 	 *
-	 * @return array
+	 * @return string
 	 */
 	public static function resolveEventDescription(array $event) {
 		self::init();

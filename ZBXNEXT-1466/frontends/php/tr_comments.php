@@ -48,20 +48,13 @@ $trigger = API::Trigger()->get(array(
 	'nodeids' => get_current_nodeid(true),
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_EXTEND,
-	'expandDescription' => true,
-	'expandComment' => true
+	'expandDescription' => true
 ));
 $trigger = reset($trigger);
+
 if (!$trigger) {
 	access_deny();
 }
-
-$triggerEditable = API::Trigger()->get(array(
-	'triggerids' => $_REQUEST['triggerid'],
-	'output' => array('triggerid'),
-	'editable' => true
-));
-$isTriggerEditable = !empty($triggerEditable);
 
 /*
  * Actions
@@ -90,18 +83,22 @@ elseif (isset($_REQUEST['cancel'])) {
 /*
  * Display
  */
-show_table_header(_('TRIGGER COMMENTS'));
+$triggerEditable = API::Trigger()->get(array(
+	'triggerids' => $_REQUEST['triggerid'],
+	'output' => array('triggerid'),
+	'editable' => true
+));
 
-$commentTable = new CFormTable(_('Comments').' for "'.$trigger['description'].'"');
-$commentTable->addVar('triggerid', $_REQUEST['triggerid']);
-$commentTable->addRow(_('Comments'), new CTextArea('comments', $trigger['comments'], array(
-	'rows' => 25, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'readonly' => !$isTriggerEditable
-)));
+$data = array(
+	'triggerid' => get_request('triggerid'),
+	'trigger' => $trigger,
+	'isTriggerEditable' => !empty($triggerEditable),
+	'isCommentExist' => !empty($trigger['comments'])
+);
 
-if ($isTriggerEditable) {
-	$commentTable->addItemToBottomRow(new CSubmit('save', _('Save')));
-}
-$commentTable->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));
-$commentTable->show();
+// render view
+$triggerCommentView = new CView('monitoring.triggerComment', $data);
+$triggerCommentView->render();
+$triggerCommentView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
