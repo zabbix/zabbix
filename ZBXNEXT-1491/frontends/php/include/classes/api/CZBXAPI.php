@@ -454,7 +454,7 @@ class CZBXAPI {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
 
 			// select columns used by group count
-			if ($options['groupCount'] !== null) {
+			if (isset($options['groupCount'])) {
 				foreach ($sqlParts['group'] as $fields) {
 					$sqlParts['select'][] = $fields;
 				}
