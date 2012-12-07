@@ -993,20 +993,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$itemIds = array_keys($result);
 
-		// adding hosts
-		if ($options['selectHosts'] !== null) {
-			$relationMap = $this->createRelationMap($result, 'itemid', 'hostid');
-			$hosts = API::Host()->get(array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'templated_hosts' => true,
-				'output' => $options['selectHosts'],
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
 		// adding items
 		if (!is_null($options['selectItems'])) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
