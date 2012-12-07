@@ -738,7 +738,7 @@ class CUserMacro extends CZBXAPI {
 		$macrosToAdd = array();
 
 		foreach ($macros as $hostid => $hostMacros) {
-			$dbHostMacros = $dbMacros[$hostid]['macros'];
+			$dbHostMacros = zbx_toHash($dbMacros[$hostid]['macros'], 'hostmacroid');
 
 			// look for db macros which hostmacroids are not in list of new macros
 			// if there are any, they should be deleted

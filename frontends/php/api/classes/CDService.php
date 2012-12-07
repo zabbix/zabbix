@@ -56,7 +56,6 @@ class CDService extends CZBXAPI{
  * @param boolean $options['selectTriggers'] select Triggers
  * @param boolean $options['selectGraphs'] select Graphs
  * @param boolean $options['selectApplications'] select Applications
- * @param boolean $options['selectMacros'] select Macros
  * @param int $options['count'] count Services, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Service name
  * @param string $options['extendPattern'] search hosts by pattern in Service name, ip and DNS
