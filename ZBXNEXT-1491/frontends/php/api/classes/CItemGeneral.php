@@ -804,18 +804,6 @@ abstract class CItemGeneral extends CZBXAPI {
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
-		// adding applications
-		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
-			$applications = API::Application()->get(array(
-				'output' => $options['selectApplications'],
-				'nodeids' => $options['nodeids'],
-				'applicationids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $applications, 'applications');
-		}
-
 		return $result;
 	}
 }
