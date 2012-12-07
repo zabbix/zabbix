@@ -656,6 +656,13 @@ static int	DBpatch_02010026()
 	return DBadd_field("httptest", &field);
 }
 
+static int	DBpatch_02010027()
+{
+	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("screens_items", &field);
+}
+
 int	DBcheck_version()
 {
 	const char	*__function_name = "DBcheck_version";
@@ -689,6 +696,7 @@ int	DBcheck_version()
 		{DBpatch_02010024, 2010024, 0, 1},
 		{DBpatch_02010025, 2010025, 0, 1},
 		{DBpatch_02010026, 2010026, 0, 1},
+		{DBpatch_02010026, 2010027, 0, 1},
 		{NULL}
 	};
 	const char	*dbversion_table_name = "dbversion";
