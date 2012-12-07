@@ -541,14 +541,7 @@ class CDRule extends CZBXAPI {
 
 			foreach ($newChecks as $newnum => $newdCheck) {
 				foreach ($dbChecks as $exnum => $exdCheck) {
-					$equal = true;
-					foreach ($exdCheck as $fieldName => $dCheckField) {
-						if (isset($newdCheck[$fieldName]) && (strcmp($dCheckField, $newdCheck[$fieldName]) !== 0)) {
-							$equal = false;
-							break;
-						}
-					}
-					if ($equal) {
+					if (!DB::recordModified('dchecks', $exdCheck, $newdCheck)) {
 						unset($dRule['dchecks'][$newnum]);
 						unset($dbChecks[$exnum]);
 					}
