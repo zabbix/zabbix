@@ -165,7 +165,7 @@ class CMaintenance extends CZBXAPI {
 						' WHERE mg2.maintenanceid=m.maintenanceid'.
 							' AND '.DBcondition('r3.groupid', $userGroups).
 							' AND r3.id=mg2.groupid'.
-							' GROUP by mh3.hostid HAVING MAX(r3.permission)<'.$permission.
+							' GROUP by r3.id HAVING MAX(r3.permission)<'.$permission.
 					')'.
 					' AND NOT EXISTS ('.
 						'SELECT NULL'.
