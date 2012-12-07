@@ -260,14 +260,12 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['select']['applicationid'] = 'a.applicationid';
+			$sqlParts['select']['applicationid'] = 'ia.applicationid';
 			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['a'] = DBcondition('a.applicationid', $options['applicationids']);
-			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
+			$sqlParts['from']['items_applications'] = 'items_applications ia';
+			$sqlParts['where']['a'] = DBcondition('ia.applicationid', $options['applicationids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['where']['fi'] = 'f.itemid=ia.itemid';
 		}
 
 		// functions

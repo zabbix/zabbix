@@ -1155,14 +1155,25 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @return CTableInfo
  */
-function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
+function get_triggers_overview($hostids, $application, $view_style = null, $screenId = null) {
 	if (is_null($view_style)) {
 		$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
+	}
+	$applicationIds = null;
+	if ($application !== '') {
+		$dbApps = API::Application()->get(array(
+			'hostids' => $hostids,
+			'filter' => array('name' => $application),
+			'output' => array('applicationid')
+		));
+		$applicationIds = zbx_objectValues($dbApps, 'applicationid');
+		$hostids = null;
 	}
 
 	// get triggers
 	$dbTriggers = API::Trigger()->get(array(
 		'hostids' => $hostids,
+		'applicationids' => $applicationIds,
 		'monitored' => true,
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,
