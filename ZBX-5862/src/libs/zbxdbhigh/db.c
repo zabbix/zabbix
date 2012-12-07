@@ -1469,12 +1469,6 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
 
-	if (1 == num)
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname, values[0]);
-		return;
-	}
-
 	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
 	/* An isolated value is represented as a sequence with length 1. */
 	seq_len = zbx_malloc(seq_len, num * sizeof(int));
