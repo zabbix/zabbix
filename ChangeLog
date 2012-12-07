@@ -1,5 +1,6 @@
 Changes for 1.8.16rc1
 
+..F....... [ZBX-5803] fixed message initialization memory leak in IE7 (Eduard)
 ..F....... [ZBX-5898] fixed Insert Macro button does not work in trigger constructor on IE7 and IE8 (Toms)
 A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
