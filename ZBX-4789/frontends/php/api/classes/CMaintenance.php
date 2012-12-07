@@ -86,7 +86,7 @@ class CMaintenance extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
-			'selectTimeperiods'         => null,
+			'selectTimeperiods'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -138,77 +138,49 @@ class CMaintenance extends CZBXAPI {
 
 			$sql = 'SELECT DISTINCT m.maintenanceid'.
 					' FROM maintenances m'.
-					' WHERE NOT EXISTS ('.
+					' LEFT JOIN maintenances_hosts mh ON mh.maintenanceid=m.maintenanceid'.
+					' LEFT JOIN maintenances_groups mg ON mg.maintenanceid=m.maintenanceid'.
+					' WHERE (EXISTS ('.
 						' SELECT NULL'.
-						' FROM maintenances_hosts mh3,rights r3,hosts_groups hg3'.
-						' WHERE mh3.maintenanceid=m.maintenanceid'.
-							' AND '.DBcondition('r3.groupid', $userGroups).
-							' AND hg3.hostid=mh3.hostid'.
-							' AND r3.id=hg3.groupid'.
-							' GROUP by mh3.hostid HAVING MAX(r3.permission)<'.$permission.
+						' FROM rights r1,hosts_groups hg1'.
+						' WHERE '.DBcondition('r1.groupid', $userGroups).
+						' AND hg1.hostid=mh.hostid'.
+						' AND r1.id=hg1.groupid'.
+						' GROUP by r1.id HAVING MIN(r1.permission)>='.$permission.
 					')'.
-					' AND NOT EXISTS ('.
+					' OR mh.maintenance_hostid IS NULL)'.
+					' AND ( EXISTS ('.
 						'SELECT NULL'.
-						' FROM maintenances_hosts mh4'.
-						' WHERE mh4.maintenanceid=m.maintenanceid'.
-							' AND NOT EXISTS('.
-								'SELECT r5.id'.
-								' FROM rights r5,hosts_groups hg5'.
-								' WHERE '.DBcondition('r5.groupid', $userGroups).
-									' AND hg5.hostid=mh4.hostid'.
-									' AND r5.id=hg5.groupid'.
-							')'.
+						' FROM rights r2'.
+						' WHERE '.DBcondition('r2.groupid', $userGroups).
+						' AND r2.id=mg.groupid'.
+						' GROUP by r2.id HAVING MIN(r2.permission)>='.$permission.
 					')'.
-					' AND NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM maintenances_groups mg2,rights r3'.
-						' WHERE mg2.maintenanceid=m.maintenanceid'.
-							' AND '.DBcondition('r3.groupid', $userGroups).
-							' AND r3.id=mg2.groupid'.
-							' GROUP by r3.id HAVING MAX(r3.permission)<'.$permission.
-					')'.
-					' AND NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM maintenances_groups mg3'.
-						' WHERE mg3.maintenanceid=m.maintenanceid'.
-							' AND NOT EXISTS ('.
-								'SELECT r5.id'.
-								' FROM rights r5,hosts_groups hg5'.
-								' WHERE r5.id=mg3.groupid'.
-									' AND '.DBcondition('r5.groupid', $userGroups).
-							')'.
-					')';
+					' OR mg.maintenance_groupid IS NULL)';
 
 			if (!is_null($options['groupids'])) {
 				zbx_value2array($options['groupids']);
 
 				$sql .= ' AND ('.
 							// filtering using groups attached to maintenence
-							'EXISTS ('.
-								'SELECT NULL'.
-								' FROM maintenances_groups mgf'.
-								' WHERE mgf.maintenanceid=m.maintenanceid'.
-									' AND '.DBcondition('mgf.groupid', $options['groupids']).
-							')'.
+							DBcondition('mg.groupid', $options['groupids']).
 							// filtering by hostgroups of hosts attached to maintenance
 							' OR EXISTS ('.
 								' SELECT NULL'.
-								' FROM maintenances_hosts mh,hosts_groups hg'.
-								' WHERE mh.maintenanceid=m.maintenanceid'.
-									' AND hg.hostid=mh.hostid'.
-									' AND '.DBcondition('hg.groupid', $options['groupids']).
+								' FROM hosts_groups hg2'.
+								' WHERE hg2.hostid=mh.hostid'.
+									' AND '.DBcondition('hg2.groupid', $options['groupids']).
 							')'.
 						')';
 			}
 
 			if (!is_null($options['hostids'])) {
 				zbx_value2array($options['hostids']);
-				$sql .= ' AND EXISTS ('.
-							' SELECT NULL'.
-							' FROM maintenances_hosts mh'.
-							' WHERE mh.maintenanceid=m.maintenanceid'.
-								' AND '.DBcondition('mh.hostid', $options['hostids']).
-							')';
+				$sql .= ' AND EXISTS ('.DBcondition('mh3.hostid', $options['hostids']).')';
+			}
+			if (!is_null($options['maintenanceids'])) {
+				zbx_value2array($options['maintenanceids']);
+				$sql .= ' AND '.DBcondition('m.maintenanceid', $options['maintenanceids']);
 			}
 			$res = DBselect($sql);
 			while ($maintenance = DBfetch($res)) {
