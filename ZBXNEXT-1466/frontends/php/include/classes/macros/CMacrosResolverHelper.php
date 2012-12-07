@@ -91,6 +91,22 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve macros in trigger descriptions.
+	 *
+	 * @static
+	 * @param array $triggers
+	 *
+	 * @return array
+	 */
+	public static function resolveTriggerDescriptions(array $triggers) {
+		self::init();
+		return self::$macrosResolver->resolve(array(
+			'config' => 'triggerDescription',
+			'data' => zbx_toHash($triggers, 'triggerid')
+		));
+	}
+
+	/**
 	 * Get trigger by id and resolve macros in trigger name.
 	 *
 	 * @static
@@ -130,13 +146,14 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $trigger
+	 * @param array  $trigger
+	 * @param string $source
 	 *
 	 * @return string
 	 */
-	public static function resolveTriggerReference(array $trigger) {
+	public static function resolveTriggerReference(array $trigger, $source = 'description') {
 		self::init();
-		return self::$macrosResolver->resolveTriggerReference($trigger);
+		return self::$macrosResolver->resolveTriggerReference($trigger, $source);
 	}
 
 	/**

@@ -48,7 +48,8 @@ $trigger = API::Trigger()->get(array(
 	'nodeids' => get_current_nodeid(true),
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_EXTEND,
-	'expandDescription' => true
+	'expandDescription' => true,
+	'expandComment' => true
 ));
 $trigger = reset($trigger);
 if (!$trigger) {
