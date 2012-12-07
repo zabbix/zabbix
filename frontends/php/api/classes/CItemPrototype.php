@@ -74,6 +74,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectApplications'		=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
+			'selectDiscoveryRule'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -774,6 +775,19 @@ class CItemPrototype extends CItemGeneral {
 					}
 				}
 			}
+		}
+
+		// adding discoveryrule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
 		return $result;
