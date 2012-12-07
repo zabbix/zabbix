@@ -118,56 +118,40 @@ class CAction extends CZBXAPI {
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT NULL'.
-					' FROM conditions cc'.
+					' FROM conditions cc, rights r'.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 						' AND cc.actionid=a.actionid'.
-						' AND ('.
-							' NOT EXISTS ('.
-								' SELECT NULL'.
-								' FROM rights r'.
-								' WHERE r.id='.zbx_dbcast_2bigint('cc.value').
-									' AND '.DBcondition('r.groupid', $userGroups).
-									' GROUP BY r.id HAVING MIN(r.permission)>='.$permission.
-							' )'.
-						')'.
+						' AND r.id='.zbx_dbcast_2bigint('cc.value').
+						' AND '.DBcondition('r.groupid', $userGroups).
+						' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
 				')';
 
 			// condition host or template
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT NULL'.
-					' FROM conditions cc'.
+					' FROM conditions cc, hosts_groups hgg,rights r'.
 					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
 						' AND cc.actionid=a.actionid'.
-						' AND '.
-							' NOT EXISTS ('.
-								' SELECT NULL'.
-								' FROM hosts_groups hgg,rights r'.
-								' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
-									' AND r.id=hgg.groupid'.
-									' AND '.DBcondition('r.groupid', $userGroups).
-									' GROUP BY r.id HAVING MIN(r.permission)>='.$permission.
-									')'.
+						' AND hgg.hostid='.zbx_dbcast_2bigint('cc.value').
+						' AND r.id=hgg.groupid'.
+						' AND '.DBcondition('r.groupid', $userGroups).
+						' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
 				')';
 
 			// condition trigger
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT NULL'.
-					' FROM conditions cc'.
+					' FROM conditions cc, functions f,items i,hosts_groups hg,rights r'.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
 						' AND cc.actionid=a.actionid'.
-						' AND '.
-							' NOT EXISTS ('.
-								' SELECT NULL'.
-								' FROM functions f,items i,hosts_groups hg,rights r'.
-								' WHERE hg.groupid=r.id'.
-									' AND i.hostid=hg.hostid'.
-									' AND f.itemid=i.itemid'.
-									' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').
-									' AND '.DBcondition('r.groupid', $userGroups).
-									' GROUP BY r.id HAVING MIN(r.permission)>='.$permission.
-								')'.
+						' AND hg.groupid=r.id'.
+						' AND i.hostid=hg.hostid'.
+						' AND f.itemid=i.itemid'.
+						' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').
+						' AND '.DBcondition('r.groupid', $userGroups).
+						' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
 					')';
 		}
 
