@@ -189,7 +189,7 @@ class CMap extends CMapElement {
 			}
 		}
 
-		if ($userType != USER_TYPE_SUPER_ADMIN || !$options['nopermissions']) {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (!empty($result)) {
 				$linkTriggers = array();
 				$dbLinkTriggers = DBselect(

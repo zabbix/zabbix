@@ -106,7 +106,7 @@ class CUserMacro extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN || !$options['nopermissions']) {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (!is_null($options['editable']) && !is_null($options['globalmacro'])) {
 				return array();
 			}

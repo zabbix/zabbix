@@ -105,7 +105,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN || !$options['nopermissions']) {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// TODO: think how we could combine templateids && hostids options
 			if (!is_null($options['templateids'])) {
 				unset($options['hostids']);
