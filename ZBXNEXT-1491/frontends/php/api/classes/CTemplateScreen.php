@@ -168,11 +168,11 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// hostids
+		$templatesChain = array();
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
 			// collecting template chain
-			$templatesChain = array();
 			$linkedTemplateids = $options['hostids'];
 			$childTemplateids = $options['hostids'];
 
@@ -189,10 +189,6 @@ class CTemplateScreen extends CScreen {
 
 					createParentToChildRelation($templatesChain, $link, 'templateid', 'hostid');
 				}
-			}
-
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['templateid'] = 's.templateid';
 			}
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['templateid'] = 's.templateid';
@@ -251,7 +247,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->addRelatedObjects($options, $result, $templatesChain);
 		}
 
 		// removing keys (hash -> array)
@@ -656,7 +652,19 @@ class CTemplateScreen extends CScreen {
 		return (count($ids) == $count);
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['hostids'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('templateid'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result, array $templatesChain = array()) {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$screenIds = array_keys($result);
