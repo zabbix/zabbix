@@ -656,9 +656,8 @@ class CTemplateScreen extends CScreen {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
-			if ($options['hostids'] !== null) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('templateid'), $sqlParts);
-			}
+			// request the templateid field for inheritance to work
+			$sqlParts = $this->addQuerySelect($this->fieldId('templateid'), $sqlParts);
 		}
 
 		return $sqlParts;
@@ -747,14 +746,14 @@ class CTemplateScreen extends CScreen {
 			// prepare items
 			if (!empty($itemids)) {
 				$tplItems = API::Item()->get(array(
-					'output' => array('itemid', 'key_'),
+					'output' => array('itemid', 'key_', 'hostid'),
 					'itemids' => $itemids,
 					'nopermissions' => true,
 					'preservekeys' => true
 				));
 
 				$dbItems = API::Item()->get(array(
-					'output' => array('itemid', 'key_'),
+					'output' => array('itemid', 'key_', 'hostid'),
 					'hostids' => $options['hostids'],
 					'filter' => array('key_' => zbx_objectValues($tplItems, 'key_')),
 					'nopermissions' => true,
