@@ -709,6 +709,7 @@ class CAction extends CZBXAPI {
 
 			if (isset($action['conditions'])) {
 				$conditionsDb = isset($updActions[$action['actionid']]['conditions']) ? $updActions[$action['actionid']]['conditions'] : array();
+				$conditionsDb = zbx_toHash($conditionsDb, 'conditionid');
 				self::validateConditions($action['conditions']);
 
 				foreach ($action['conditions'] as $condition) {
@@ -736,6 +737,7 @@ class CAction extends CZBXAPI {
 				$this->validateOperations($action['operations']);
 
 				$operationsDb = $updActions[$action['actionid']]['operations'];
+				$operationsDb = zbx_toHash($operationsDb, 'operationid');
 				foreach ($action['operations'] as $operation) {
 					$operation['actionid'] = $action['actionid'];
 
@@ -951,7 +953,8 @@ class CAction extends CZBXAPI {
 		$opconditionsCreate = array();
 
 		foreach ($operations as $operation) {
-			$operationDb = $actionsDb[$operation['actionid']]['operations'][$operation['operationid']];
+			$operationsDb = zbx_toHash($actionsDb[$operation['actionid']]['operations'], 'operationid');
+			$operationDb = $operationsDb[$operation['operationid']];
 
 			$typeChanged = false;
 			if (isset($operation['operationtype']) && ($operation['operationtype'] != $operationDb['operationtype'])) {
