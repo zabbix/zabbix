@@ -164,6 +164,7 @@ class CAction extends CZBXAPI {
 								' WHERE hg.groupid=r.id'.
 									' AND i.hostid=hg.hostid'.
 									' AND f.itemid=i.itemid'.
+									' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').
 									' AND '.DBcondition('r.groupid', $userGroups).
 									' GROUP BY r.id HAVING MIN(r.permission)>='.$permission.
 								')'.
