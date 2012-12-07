@@ -553,8 +553,7 @@ class CScript extends CZBXAPI {
 				}
 			}
 			if (!empty($macrosData)) {
-				$macrosResolver = new CMacrosResolver();
-				$macrosData = $macrosResolver->resolve(array(
+				$macrosData = CMacrosResolverHelper::resolve(array(
 					'config' => 'scriptConfirmation',
 					'data' => $macrosData
 				));

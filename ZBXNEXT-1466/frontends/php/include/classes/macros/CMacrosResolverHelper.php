@@ -30,6 +30,19 @@ class CMacrosResolverHelper {
 	private static $macrosResolver;
 
 	/**
+	 * Resolve macros.
+	 *
+	 * @static
+	 * @param array $options
+	 *
+	 * @return array
+	 */
+	public static function resolve(array $options) {
+		self::init();
+		return self::$macrosResolver->resolve($options);
+	}
+
+	/**
 	 * Resolve macros in http test name.
 	 *
 	 * @static

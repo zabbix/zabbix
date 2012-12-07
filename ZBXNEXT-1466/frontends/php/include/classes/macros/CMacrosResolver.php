@@ -19,13 +19,14 @@
 **/
 
 
-/**
- * A helper class for resolving macros.
- */
 class CMacrosResolver {
 
 	const PATTERN_HOST = '{HOSTNAME}|{HOST\.HOST}|{HOST\.NAME}';
+	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
 	const PATTERN_IP = '{IPADDRESS}|{HOST\.IP}|{HOST\.DNS}|{HOST\.CONN}';
+	const PATTERN_IP_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
+	const PATTERN_ITEM_FUNCTION = '{(ITEM\.LASTVALUE|ITEM\.VALUE)([1-9]?)}';
+	const PATTERN_ALLOWED = '{HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|ITEM\.LASTVALUE|ITEM\.VALUE[1-9]?}';
 
 	/**
 	 * Interface priorities.
@@ -63,17 +64,17 @@ class CMacrosResolver {
 			'method' => 'resolveTexts'
 		),
 		'triggerName' => array(
-			'functions' => array('host', 'ip', 'user', 'global', 'trigger'),
+			'functions' => array('host', 'ip', 'user', 'item'),
 			'source' => 'description',
 			'method' => 'resolveTrigger'
 		),
 		'triggerDescription' => array(
-			'functions' => array('host', 'ip', 'user', 'global', 'trigger'),
+			'functions' => array('host', 'ip', 'user', 'item'),
 			'source' => 'comments',
 			'method' => 'resolveTrigger'
 		),
 		'eventDescription' => array(
-			'functions' => array('host', 'ip', 'user', 'global', 'trigger'),
+			'functions' => array('host', 'ip', 'user', 'item'),
 			'source' => 'comments',
 			'method' => 'resolveTrigger'
 		)
@@ -94,7 +95,7 @@ class CMacrosResolver {
 		$this->config = $options['config'];
 
 		// call method
-		$method = $this->configs[$options['config']]['method'];
+		$method = $this->configs[$this->config]['method'];
 		return $this->$method($options);
 	}
 
@@ -102,12 +103,13 @@ class CMacrosResolver {
 	 * Is function available.
 	 *
 	 * @param string $function
-	 * @param array  $options
 	 *
 	 * @return bool
 	 */
-	private function isFunctionAvailable($function, array $options) {
-		return isset($this->configs[$options['config']]['functions'][$function]);
+	private function isFunctionAvailable($function) {
+		$functions = array_flip($this->configs[$this->config]['functions']);
+
+		return isset($functions[$function]);
 	}
 
 	/**
@@ -125,7 +127,7 @@ class CMacrosResolver {
 		$macros = array();
 
 		$isHostMacrosAvailable = false;
-		if ($this->isFunctionAvailable('host', $options)) {
+		if ($this->isFunctionAvailable('host')) {
 			foreach ($data as $hostId => $texts) {
 				$hostMacros = $this->findMacros(self::PATTERN_HOST, $texts);
 				if (!empty($hostMacros)) {
@@ -139,7 +141,7 @@ class CMacrosResolver {
 		}
 
 		$isIpMacrosAvailable = false;
-		if ($this->isFunctionAvailable('ip', $options)) {
+		if ($this->isFunctionAvailable('ip')) {
 			foreach ($data as $hostId => $texts) {
 				$ipMacros = $this->findMacros(self::PATTERN_IP, $texts);
 				if (!empty($ipMacros)) {
@@ -233,10 +235,10 @@ class CMacrosResolver {
 
 		foreach ($data as $hostId => $texts) {
 			// get user macros
-			if ($this->isFunctionAvailable('user', $options)) {
+			if ($this->isFunctionAvailable('user')) {
 				$macros[$hostId] = !empty($macros[$hostId])
-					? array_merge($macros[$hostId], $this->getUserMacros($texts, $hostId))
-					: $this->getUserMacros($texts, $hostId);
+					? array_merge($macros[$hostId], $this->getUserMacros($texts, array('hostid' => $hostId)))
+					: $this->getUserMacros($texts, array('hostid' => $hostId));
 			}
 
 			// replace macros to value
@@ -255,6 +257,120 @@ class CMacrosResolver {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Expand macros in trigger descriptions.
+	 * Reference macros: $1, $2, $3, ...
+	 * User macros: {$MACRO1}, {$MACRO2}, ...
+	 * System macros: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}, {IPADDRESS}, {HOST.IP}
+	 *     {HOST.DNS}, {HOST.CONN}, {ITEM.LASTVALUE}, {ITEM.VALUE}
+	 *
+	 * @param array $triggers
+	 *
+	 * @return array
+	 */
+	private function resolveTrigger(array $options) {
+		$triggers = $options['data'];
+
+		$isHostFunctionAvailable = $this->isFunctionAvailable('host');
+		$isIpFunctionAvailable = $this->isFunctionAvailable('ip');
+		$isItemFunctionAvailable = $this->isFunctionAvailable('item');
+		$isUserFunctionAvailable = $this->isFunctionAvailable('user');
+
+		$macros = array('host' => array(), 'ip' => array(), 'item' => array());
+		$macroValues = array();
+
+		// find macros
+		foreach ($triggers as $triggerId => $trigger) {
+			$triggers[$triggerId]['description'] = $this->resolveTriggerReference($trigger);
+
+			$functions = $this->findFunctions($trigger['expression']);
+
+			if ($isHostFunctionAvailable) {
+				foreach ($this->findFunctionMacros(self::PATTERN_HOST_FUNCTION, $trigger['description']) as $macro => $fNums) {
+					foreach ($fNums as $fNum) {
+						if (isset($functions[$fNum])) {
+							$macros['host'][$functions[$fNum]][$macro][] = $fNum;
+						}
+					}
+				}
+			}
+
+			if ($isIpFunctionAvailable) {
+				foreach ($this->findFunctionMacros(self::PATTERN_IP_FUNCTION, $trigger['description']) as $macro => $fNums) {
+					foreach ($fNums as $fNum) {
+						if (isset($functions[$fNum])) {
+							$macros['ip'][$functions[$fNum]][$macro][] = $fNum;
+						}
+					}
+				}
+			}
+
+			if ($isItemFunctionAvailable) {
+				foreach ($this->findFunctionMacros(self::PATTERN_ITEM_FUNCTION, $trigger['description']) as $macro => $fNums) {
+					foreach ($fNums as $fNum) {
+						if (isset($functions[$fNum])) {
+							$macros['item'][$functions[$fNum]][$macro][] = $fNum;
+						}
+					}
+				}
+			}
+
+			if ($isUserFunctionAvailable) {
+				$macroValues[$trigger['triggerid']] = $this->getUserMacros(array($trigger['description']), array('triggerid' => $trigger['triggerid']));
+			}
+		}
+
+		// get macro value
+		if ($isHostFunctionAvailable) {
+			$macroValues = $this->resolveHostMacros($macros['host'], $macroValues);
+		}
+		if ($isIpFunctionAvailable) {
+			$macroValues = $this->resolveIpMacros($macros['ip'], $macroValues);
+		}
+		if ($isItemFunctionAvailable) {
+			$macroValues = $this->resolveItemMacros($macros['item'], $triggers, $macroValues);
+		}
+
+		// replace values
+		foreach ($triggers as $triggerId => $trigger) {
+			$triggers[$triggerId] = $this->replaceMacroValues($trigger, $macroValues[$triggerId]);
+		}
+
+		return $triggers;
+	}
+
+	/**
+	 * Expand reference macros for trigger.
+	 * If macro reference non existing value it expands to empty string.
+	 *
+	 * @param array $trigger
+	 *
+	 * @return string
+	 */
+	public function resolveTriggerReference(array $trigger) {
+		$expression = $trigger['expression'];
+		$description = $trigger['description'];
+
+		// search for reference macros $1, $2, $3, ...
+		preg_match_all('/\$([1-9])/', $description, $refNumbers);
+		$refNumbers = $refNumbers[1];
+
+		// replace functionids with string 'function' to make values search easier
+		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
+
+		// search for numeric values in expression
+		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
+
+		$search = array();
+		$replace = array();
+		foreach ($refNumbers as $i) {
+			$search[] = '$'.$i;
+			$replace[] = isset($values[0][$i - 1]) ? $values[0][$i - 1] : '';
+		}
+
+		return str_replace($search, $replace, $description);
 	}
 
 	/**
@@ -300,99 +416,25 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Expand macros in trigger descriptions.
-	 * Reference macros: $1, $2, $3, ...
-	 * User macros: {$MACRO1}, {$MACRO2}, ...
-	 * System macros: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}, {IPADDRESS}, {HOST.IP}
-	 *     {HOST.DNS}, {HOST.CONN}, {ITEM.LASTVALUE}, {ITEM.VALUE}
+	 * Find macros with function position.
 	 *
-	 * @param array $triggers
+	 * @param string $pattern
+	 * @param string $text
 	 *
-	 * @return array
+	 * @return array where key is found macro and value is array with related function position
 	 */
-	public function resolveTrigger(array $options) {
-		$triggers = $options['data'];
+	private function findFunctionMacros($pattern, $text) {
+		$result = array();
 
-		$expandHost = array();
-		$expandIp = array();
-		$expandItem = array();
-		$macroValues = array();
+		preg_match_all('/'.$pattern.'/', $text, $matches);
 
-		foreach ($triggers as $triggerId => $trigger) {
-			$triggers[$triggerId]['description'] = $this->resolveTriggerReference($trigger);
-
-			$functions = $this->findFunctions($trigger['expression']);
-
-			foreach ($this->findHostMacros($trigger['description']) as $macro => $fNums) {
-				foreach ($fNums as $fNum) {
-					if (isset($functions[$fNum])) {
-						$expandHost[$functions[$fNum]][$macro][] = $fNum;
-					}
-				}
-			}
-
-			foreach ($this->findIpMacros($trigger['description']) as $macro => $fNums) {
-				foreach ($fNums as $fNum) {
-					if (isset($functions[$fNum])) {
-						$expandIp[$functions[$fNum]][$macro][] = $fNum;
-					}
-				}
-			}
-
-			foreach ($this->findItemMacros($trigger['description']) as $macro => $fNums) {
-				foreach ($fNums as $fNum) {
-					if (isset($functions[$fNum])) {
-						$expandItem[$functions[$fNum]][$macro][] = $fNum;
-					}
-				}
-			}
-
-			$macroValues[$trigger['triggerid']] = $this->getUserMacros(array($trigger['description']), array('triggerid' => $trigger['triggerid']));
+		foreach ($matches[1] as $num => $macro) {
+			$fNum = !empty($matches[2][$num]) ? $matches[2][$num] : 0;
+			$result[$macro][$fNum] = $fNum;
 		}
 
-		$macroValues = $this->expandHostMacros($expandHost, $macroValues);
-		$macroValues = $this->expandIpMacros($expandIp, $macroValues);
-		$macroValues = $this->expandItemMacros($expandItem, $triggers, $macroValues);
-
-		foreach ($triggers as $triggerId => $trigger) {
-			$triggers[$triggerId] = $this->replaceMacroValues($trigger, $macroValues[$triggerId]);
-		}
-
-		return $triggers;
+		return $result;
 	}
-
-	/**
-	 * Expand reference macros for trigger.
-	 * If macro reference non existing value it expands to empty string.
-	 *
-	 * @param array $trigger
-	 *
-	 * @return string
-	 */
-	public function resolveTriggerReference(array $trigger) {
-		$expression = $trigger['expression'];
-		$description = $trigger['description'];
-
-		// search for reference macros $1, $2, $3, ...
-		preg_match_all('/\$([1-9])/', $description, $refNumbers);
-		$refNumbers = $refNumbers[1];
-
-		// replace functionids with string 'function' to make values search easier
-		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
-
-		// search for numeric values in expression
-		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
-
-		$search = array();
-		$replace = array();
-		foreach ($refNumbers as $i) {
-			$search[] = '$'.$i;
-			$replace[] = isset($values[0][$i - 1]) ? $values[0][$i - 1] : '';
-		}
-
-		return str_replace($search, $replace, $description);
-	}
-
 
 	/**
 	 * Find function ids in trigger expression.
@@ -403,6 +445,7 @@ class CMacrosResolver {
 	 */
 	private function findFunctions($expression) {
 		preg_match_all('/\{([0-9]+)\}/', $expression, $matches);
+
 		$functions = array();
 		foreach ($matches[1] as $i => $functionid) {
 			$functions[$i + 1] = $functionid;
@@ -417,80 +460,26 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Find host data related macros in trigger description.
+	 * Resolve host macros.
 	 *
-	 * @param string $description
-	 *
-	 * @return array
-	 */
-	private function findHostMacros($description) {
-		return $this->findMacrosInDescription('HOSTNAME|HOST\.HOST|HOST\.NAME', $description);
-	}
-
-	/**
-	 * Find interface data related macros in trigger description.
-	 *
-	 * @param string $description
-	 *
-	 * @return array
-	 */
-	private function findIpMacros($description) {
-		return $this->findMacrosInDescription('IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN', $description);
-	}
-
-	/**
-	 * Find item data related macros in trigger description.
-	 *
-	 * @param string $description
-	 *
-	 * @return array
-	 */
-	private function findItemMacros($description) {
-		return $this->findMacrosInDescription('ITEM\.LASTVALUE|ITEM\.VALUE', $description);
-	}
-
-	/**
-	 * Find macros in trigger description.
-	 *
-	 * @param string $macrosPattern string with macros pattern for reg. expression
-	 * @param string $description
-	 *
-	 * @return array where key is found macro and value is array with related function position
-	 */
-	private function findMacrosInDescription($macrosPattern, $description) {
-		$result = array();
-
-		preg_match_all('/{('.$macrosPattern.')([1-9]?)}/', $description, $matches);
-		foreach ($matches[1] as $num => $foundMacro) {
-			$fNum = $matches[2][$num] ? $matches[2][$num] : 0;
-			$result[$foundMacro][$fNum] = $fNum;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Expand host macros.
-	 *
-	 * @param array $expandHost
+	 * @param array $macros
 	 * @param array $macroValues
 	 *
 	 * @return bool
 	 */
-	private function expandHostMacros(array $expandHost, array $macroValues = array()) {
-		if (!empty($expandHost)) {
+	private function resolveHostMacros(array $macros, array $macroValues = array()) {
+		if (!empty($macros)) {
 			$dbFuncs = DBselect(
 				'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name'.
 				' FROM functions f'.
 					' INNER JOIN items i ON f.itemid=i.itemid'.
 					' INNER JOIN hosts h ON i.hostid=h.hostid'.
-				' WHERE '.DBcondition('f.functionid', array_keys($expandHost))
+				' WHERE '.DBcondition('f.functionid', array_keys($macros))
 			);
 			while ($func = DBfetch($dbFuncs)) {
-				foreach ($expandHost[$func['functionid']] as $macro => $fNums) {
+				foreach ($macros[$func['functionid']] as $macro => $fNums) {
 					switch ($macro) {
 						case 'HOSTNAME':
-							/* fall through */
 						case 'HOST.HOST':
 							$replace = $func['host'];
 							break;
@@ -508,44 +497,38 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Expand interface macros.
+	 * Resolve interface macros.
 	 *
-	 * @param array $expandIp
+	 * @param array $macros
 	 * @param array $macroValues
 	 *
 	 * @return bool
 	 */
-	private function expandIpMacros(array $expandIp, array $macroValues = array()) {
-		if (!empty($expandIp)) {
-			$priorities = array(
-				INTERFACE_TYPE_AGENT => 4,
-				INTERFACE_TYPE_SNMP => 3,
-				INTERFACE_TYPE_JMX => 2,
-				INTERFACE_TYPE_IPMI => 1
-			);
+	private function resolveIpMacros(array $macros, array $macroValues = array()) {
+		if (!empty($macros)) {
 			$dbInterfaces = DBselect(
 				'SELECT DISTINCT f.triggerid,f.functionid,n.ip,n.dns,n.type,n.useip'.
 				' FROM functions f'.
 					' INNER JOIN items i ON f.itemid=i.itemid'.
 					' INNER JOIN interface n ON i.hostid=n.hostid'.
-				' WHERE '.DBcondition('f.functionid', array_keys($expandIp)).
+				' WHERE '.DBcondition('f.functionid', array_keys($macros)).
 					' AND n.main=1'
 			);
+
 			// macro should be resolved to interface with highest priority ($priorities)
 			$interfaces = array();
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				if (isset($interfaces[$dbInterface['functionid']])
-						&& $priorities[$interfaces[$dbInterface['functionid']]['type']] > $priorities[$dbInterface['type']]) {
+						&& $this->interfacePriorities[$interfaces[$dbInterface['functionid']]['type']] > $this->interfacePriorities[$dbInterface['type']]) {
 					continue;
 				}
 				$interfaces[$dbInterface['functionid']] = $dbInterface;
 			}
 
 			foreach ($interfaces as $interface) {
-				foreach ($expandIp[$interface['functionid']] as $macro => $fNums) {
+				foreach ($macros[$interface['functionid']] as $macro => $fNums) {
 					switch ($macro) {
 						case 'IPADDRESS':
-							/* fall through */
 						case 'HOST.IP':
 							$replace = $interface['ip'];
 							break;
@@ -566,27 +549,27 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Expand item macros.
+	 * Resolve item macros.
 	 *
-	 * @param array $expandItem
+	 * @param array $macros
 	 * @param array $triggers
 	 * @param array $macroValues
 	 *
 	 * @return bool
 	 */
-	private function expandItemMacros(array $expandItem, array $triggers, array $macroValues = array()) {
-		if (!empty($expandItem)) {
+	private function resolveItemMacros(array $macros, array $triggers, array $macroValues = array()) {
+		if (!empty($macros)) {
 			$dbFuncs = DBselect(
 				'SELECT DISTINCT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
 				' FROM functions f'.
 					' INNER JOIN items i ON f.itemid=i.itemid'.
 					' INNER JOIN hosts h ON i.hostid=h.hostid'.
 					' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
-				' WHERE '.DBcondition('f.functionid', array_keys($expandItem))
+				' WHERE '.DBcondition('f.functionid', array_keys($macros))
 			);
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
 			while ($func = DBfetch($dbFuncs, false)) {
-				foreach ($expandItem[$func['functionid']] as $macro => $fNums) {
+				foreach ($macros[$func['functionid']] as $macro => $fNums) {
 					switch ($macro) {
 						case 'ITEM.LASTVALUE':
 							$replace = $this->resolveItemLastvalueMacro($func);
@@ -605,56 +588,6 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Replace macros in trigger description by values.
-	 * All macros are resolved in one go.
-	 *
-	 * @param array $trigger
-	 * @param array $macroValues
-	 *
-	 * @return array
-	 */
-	private function replaceMacroValues(array $trigger, array $macroValues) {
-		$macroBegin = false;
-		for ($i = 0; $i < zbx_strlen($trigger['description']); $i++) {
-			$c = zbx_substr($trigger['description'], $i, 1);
-
-			switch ($c) {
-				case '{':
-					$macroBegin = $i;
-					break;
-				case '}':
-					if ($macroBegin !== false) {
-						$macro = zbx_substr($trigger['description'], $macroBegin, $i - $macroBegin + 1);
-						if (isset($macroValues[$macro])) {
-							$replace = $macroValues[$macro];
-						}
-						elseif ($this->isAllowedMacro($macro)) {
-							$replace = UNRESOLVED_MACRO_STRING;
-						}
-						else {
-							$replace = false;
-						}
-
-						if ($replace !== false) {
-							$trigger['description'] = zbx_substr_replace(
-								$trigger['description'],
-								$replace,
-								$macroBegin,
-								zbx_strlen($macro)
-							);
-							// - 1 because for loop adds 1 on next iteration
-							$i = $macroBegin + zbx_strlen($replace) - 1;
-							$macroBegin = false;
-						}
-					}
-					break;
-			}
-		}
-
-		return $trigger;
-	}
-
-	/**
 	 * Resolve {ITEM.LASTVALUE} macro.
 	 *
 	 * @param array $item
@@ -662,14 +595,9 @@ class CMacrosResolver {
 	 * @return string
 	 */
 	private function resolveItemLastvalueMacro(array $item) {
-		if (is_null($item['newvalue'])) {
-			$value = formatItemValue($item, UNRESOLVED_MACRO_STRING);
-		}
-		else {
-			$value = $item['newvalue'].' ('.$item['lastvalue'].')';
-		}
-
-		return $value;
+		return is_null($item['newvalue'])
+			? formatItemValue($item, UNRESOLVED_MACRO_STRING)
+			: $item['newvalue'].' ('.$item['lastvalue'].')';
 	}
 
 	/**
@@ -696,24 +624,63 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Check if the string is a macro supported in trigger description.
+	 * Replace macros in trigger description by values.
+	 * All macros are resolved in one go.
 	 *
-	 * @param string $macro
+	 * @param array $trigger
+	 * @param array $macroValues
 	 *
-	 * @return bool
+	 * @return array
 	 */
-	private function isAllowedMacro($macro) {
-		return preg_match('/{HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|ITEM\.LASTVALUE|ITEM\.VALUE[1-9]?}/', $macro);
+	private function replaceMacroValues(array $trigger, array $macroValues) {
+		$macroBegin = false;
+		for ($i = 0; $i < zbx_strlen($trigger['description']); $i++) {
+			$c = zbx_substr($trigger['description'], $i, 1);
+
+			switch ($c) {
+				case '{':
+					$macroBegin = $i;
+					break;
+				case '}':
+					if ($macroBegin !== false) {
+						$macro = zbx_substr($trigger['description'], $macroBegin, $i - $macroBegin + 1);
+						if (isset($macroValues[$macro])) {
+							$replace = $macroValues[$macro];
+						}
+						elseif (preg_match('/'.self::PATTERN_ALLOWED.'/', $macro)) {
+							$replace = UNRESOLVED_MACRO_STRING;
+						}
+						else {
+							$replace = false;
+						}
+
+						if ($replace !== false) {
+							$trigger['description'] = zbx_substr_replace(
+								$trigger['description'],
+								$replace,
+								$macroBegin,
+								zbx_strlen($macro)
+							);
+							// - 1 because for loop adds 1 on next iteration
+							$i = $macroBegin + zbx_strlen($replace) - 1;
+							$macroBegin = false;
+						}
+					}
+					break;
+			}
+		}
+
+		return $trigger;
 	}
 
 	/**
 	 * Add macro name with corresponding value to replace to $macroValues array.
 	 *
-	 * @param array $macroValues
-	 * @param array $fNums
-	 * @param       $triggerId
-	 * @param       $macro
-	 * @param       $replace
+	 * @param array  $macroValues
+	 * @param array  $fNums
+	 * @param int    $triggerId
+	 * @param string $macro
+	 * @param string $replace
 	 *
 	 * @return array
 	 */
