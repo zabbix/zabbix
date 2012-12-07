@@ -726,6 +726,7 @@ class CTemplateScreen extends CScreen {
 
 				$dbGraphs = API::Graph()->get(array(
 					'output' => array('graphid', 'name'),
+					'selectHosts' => array('hostid'),
 					'hostids' => $options['hostids'],
 					'filter' => array('name' => zbx_objectValues($tplGraphs, 'name')),
 					'nopermissions' => true,
