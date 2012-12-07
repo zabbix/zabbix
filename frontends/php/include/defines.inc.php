@@ -628,6 +628,7 @@
 	define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
 	define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 	define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
+	define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
 	define('AVAILABLE_NOCACHE',	0);	// take available objects not from cache
 
@@ -643,6 +644,10 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('REGEXP_INCLUDE',0);
 	define('REGEXP_EXCLUDE',1);
 
+	// suffixes
+	define('ZBX_BYTE_SUFFIXES', 'KMGT');
+	define('ZBX_TIME_SUFFIXES', 'smhdw');
+
 // PREG
 	define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 
@@ -655,7 +660,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[YZEPKMGTsmhdw]{0,1})');
+	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']{0,1})');
 
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--

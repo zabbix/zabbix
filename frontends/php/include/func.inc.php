@@ -1518,4 +1518,29 @@ function bcround($number, $precision = 0) {
 
 /************* END MATH *************/
 
-?>
+/**
+ * Converts number to letter representation.
+ * From A to Z, then from AA to ZZ etc.
+ * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
+ *
+ * @param int $number
+ *
+ * @return string
+ */
+function num2letter($number) {
+	$start = ord('A');
+	$base = 26;
+	$str = '';
+	$level = 0;
+
+	do {
+		if ($level++ > 0) {
+			$number--;
+		}
+		$remainder = $number % $base;
+		$number = ($number - $remainder) / $base;
+		$str = chr($start + $remainder).$str;
+	} while (0 != $number);
+
+	return $str;
+}

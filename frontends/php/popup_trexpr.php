@@ -280,29 +280,40 @@
 	if(isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp'){
 		$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
-		$trigExpr = new CTriggerExpression(array('expression' => $_REQUEST['expression']));
+		$expressionData = new CTriggerExpression();
 
-		if(empty($trigExpr->errors) && !empty($trigExpr->expressions)){
-			preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $match);
-			$exprSymbols = $match;
-			$expr = reset($trigExpr->expressions);
-			if(isset($expr['functionName']) && isset($exprSymbols[1])) $_REQUEST['expr_type'] = $expr['functionName'].'['.$exprSymbols[1].']';
-			if(isset($expr['functionParamList'])){
-				$_REQUEST['param'] = $expr['functionParamList'];
-				$_REQUEST['paramtype'] = 0;
+		if ($expressionData->parse($_REQUEST['expression']) && count($expressionData->expressions) == 1) {
+			$exprPart = reset($expressionData->expressions);
+			preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $exprSymbols);
+
+			if (isset($exprSymbols[1])) {
+				$_REQUEST['expr_type'] = $exprPart['functionName'].'['.$exprSymbols[1].']';
 			}
-			if(isset($exprSymbols[2])) $_REQUEST['value'] = $exprSymbols[2];
-			if(isset($expr['host']) && isset($expr['item'])){
-				$_REQUEST['description'] = $expr['host'] .':'. $expr['item'];
-				$options = array(
-						'filter' => array('host' => $expr['host'], 'key_' => $expr['item']),
-						'output'=>API_OUTPUT_EXTEND,
-						'webitems' => 1,
-				);
 
-				$myItem = CItem::get($options);
-				$myItem = reset($myItem);
-				if(isset($myItem['itemid'])) $_REQUEST['itemid'] = $myItem['itemid'];
+			$_REQUEST['description'] = $exprPart['host'] .':'. $exprPart['item'];
+			$_REQUEST['param'] = $exprPart['functionParamList'];
+
+			$param_no = in_array($exprPart['functionName'], array('regexp', 'iregexp', 'str')) ? 1 : 0;
+			if (isset($_REQUEST['param'][$param_no][0]) && $_REQUEST['param'][$param_no][0] == '#') {
+				$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
+				$_REQUEST['param'][$param_no] = substr($_REQUEST['param'][$param_no], 1);
+			}
+			else {
+				$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
+			}
+
+			if (isset($exprSymbols[2])) {
+				$_REQUEST['value'] = $exprSymbols[2];
+			}
+
+			$myItem = CItem::get(array(
+				'filter' => array('host' => $exprPart['host'], 'key_' => $exprPart['item']),
+				'output' => API_OUTPUT_EXTEND,
+				'webitems' => true
+			));
+			$myItem = reset($myItem);
+			if (isset($myItem['itemid'])) {
+				$_REQUEST['itemid'] = $myItem['itemid'];
 			}
 		}
 	}
@@ -401,13 +412,22 @@ function InsertText(obj, value){
 </script>
 <?php
 
-	if(isset($_REQUEST['insert'])){
-		$expression = sprintf('{%s:%s.%s(%s%s)}%s%s',
+	if (isset($_REQUEST['insert'])) {
+		if ($paramtype == PARAM_TYPE_COUNTS) {
+			$param_no = in_array($function, array('regexp', 'iregexp', 'str')) ? 1 : 0;
+			$param[$param_no] = '#'.$param[$param_no];
+		}
+
+		foreach ($param as &$p) {
+			$p = quoteFunctionParam($p);
+		}
+		unset($p);
+
+		$expression = sprintf('{%s:%s.%s(%s)}%s%s',
 			$item_host,
 			$item_key,
 			$function,
-			$paramtype == PARAM_TYPE_COUNTS ? '#' : '',
-			rtrim(implode(',', $param),','),
+			rtrim(implode(',', $param), ','),
 			$operator,
 			$value
 		);
