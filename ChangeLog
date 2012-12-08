@@ -1,3 +1,6 @@
+Changes for 1.8.16
+
+
 Changes for 1.8.16rc1
 
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
