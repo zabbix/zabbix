@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBXNEXT-1089] added support of user macros in global scripts (Sasha)
 A.F.I..PS. [ZBXNEXT-1526] added support of configurable number of retries per WEB scenario (Alexei)
 A.F.....S. [ZBXNEXT-1286] added support of low-level discovery macros in trigger prototype expressions (Sasha)
 A.F.I..PS. [ZBXNEXT-450] added support of SHA authentication protocol and AES privacy protocol for SNMPv3 chacks (Eduard, Sasha)
@@ -11,7 +12,7 @@ A......... [ZBXNEXT-1492] dropped support of output shorten for the API get meth
 .......PS. [ZBXNEXT-1410] increased performance of operation with historical and configuration caches (Sasha)
 ........S. [ZBXNEXT-1304] added resolving of LLD macros in an item prototype and a trigger prototype descriptions (Sasha)
 ....I...S. [ZBXNEXT-1472] added support of parallel processing of time-based functions (Sasha)
-..F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard)
+A.F....... [ZBXNEXT-1323] implemented macros in script confirmation text (Eduard)
 .......PS. [ZBX-3449] added support of multiple dynamic SNMP indexes (Sasha)
 ..F....... [ZBXNEXT-1441] added media type name to action operations description (Vedmak)
 A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression field for triggers (Sasha)
@@ -25,6 +26,9 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5904] fixed history filter by items (Eduard)
+A.F....... [ZBX-5927] fixed selectMappings returning a hash of mappings instead of an array in iconmap.get (Pavels)
+A.F....... [ZBX-5927] fixed preservekeys affecting selectSelements and selectLinks in map.get (Pavels)
 ..F....... [ZBX-5888] fixed incorrect message in trigger expression test (Oleg)
 ..F....... [ZBX-5895] fixed including map in map (Eduard)
 A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
@@ -53,6 +57,23 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.5rc1
+
+Bug fixes:
+..F....... [ZBX-5869] fixed configuration graph host id detection (Eduard)
+..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
+..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
+..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
+..F....... [ZBX-5896] fixed inserting OR condition the trigger expression constructor (Sasha)
+A.F....... [ZBX-5833] fixed inserting a macro in the trigger expression constructor (Sasha)
+..F....... [ZBX-5884] improved the trigger expression constructor to work with parentheses (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.4
+
+2.0.4rc1 was released as 2.0.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.4rc1
@@ -1200,6 +1221,16 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
+..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
+..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
+..F....... [ZBX-5896] fixed inserting OR condition the trigger expression constructor (Sasha)
+A.F....... [ZBX-5833] fixed inserting a macro in the trigger expression constructor (Sasha)
+..F....... [ZBX-4695] added support of simple check keys with user macros in the trigger expression (Sasha)
+..F....... [ZBX-5884] improved the trigger expression constructor to work with parentheses (Sasha)
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
+A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
+..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
 ..F....... [ZBX-5898] fixed Insert Macro button does not work in trigger constructor on IE7 and IE8 (Toms)
 A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
