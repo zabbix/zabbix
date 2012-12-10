@@ -21,9 +21,9 @@
 
 class CMacrosResolver {
 
-	const PATTERN_HOST = '{HOSTNAME}|{HOST\.HOST}|{HOST\.NAME}';
+	const PATTERN_HOST = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)}';
 	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
-	const PATTERN_IP = '{IPADDRESS}|{HOST\.IP}|{HOST\.DNS}|{HOST\.CONN}';
+	const PATTERN_IP = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
 	const PATTERN_IP_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
 	const PATTERN_ITEM_FUNCTION = '{(ITEM\.LASTVALUE|ITEM\.VALUE)([1-9]?)}';
 	const PATTERN_ALLOWED = '{HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|ITEM\.LASTVALUE|ITEM\.VALUE[1-9]?}';
@@ -54,7 +54,7 @@ class CMacrosResolver {
 	 */
 	private $configs = array(
 		'scriptConfirmation' => array(
-			'functions' => array('host', 'ip'),
+			'functions' => array('host', 'ip', 'user'),
 			'source' => null,
 			'method' => 'resolveTexts'
 		),
