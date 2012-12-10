@@ -344,7 +344,7 @@ class CItem extends CZBXAPI{
 
 			$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where'][] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
+			$sql_parts['where'][] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 // host
@@ -355,7 +355,7 @@ class CItem extends CZBXAPI{
 
 			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-			$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
+			$sql_parts['where'][] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
 // application
@@ -369,7 +369,7 @@ class CItem extends CZBXAPI{
 
 			$sql_parts['where']['aia'] = 'a.applicationid = ia.applicationid';
 			$sql_parts['where']['iai'] = 'ia.itemid=i.itemid';
-			$sql_parts['where'][] = ' UPPER(a.name)='.zbx_dbstr(zbx_strtoupper($options['application']));
+			$sql_parts['where'][] = ' a.name='.zbx_dbstr($options['application']);
 		}
 
 

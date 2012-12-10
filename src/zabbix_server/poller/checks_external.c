@@ -54,12 +54,13 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 
+	/* find optional parameters enclosed between the leftmost and the rightmost brackets */
 	if (NULL != (pl = strchr(item->key, '[')))
 	{
 		*pl = '\0';
 		params = pl + 1;
 
-		if (NULL != (pr = strchr(params, ']')))
+		if (NULL != (pr = strrchr(params, ']')))
 			*pr = '\0';
 		else
 		{
@@ -79,7 +80,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error), CONFIG_TIMEOUT))
 	{
-		/* we only care about the first line */
+		/* copy only the first line from the command output into result */
 		if (NULL != (p = strchr(buf, '\n')))
 			*p = '\0';
 

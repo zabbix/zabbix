@@ -488,7 +488,7 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
-			$sql_parts['where']['group'] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
+			$sql_parts['where']['group'] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 // host
@@ -504,7 +504,7 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-			$sql_parts['where']['host'] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
+			$sql_parts['where']['host'] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
 // only_true
@@ -959,7 +959,7 @@ Copt::memoryPick();
 			}
 
 			if(!empty($functionids)){
-				$sql = 'SELECT DISTINCT f.triggerid,f.functionid,h.host,i.lastvalue,m.newvalue'.
+				$sql = 'SELECT DISTINCT f.triggerid,f.functionid,h.host,i.lastvalue,i.units,m.newvalue'.
 						' FROM functions f'.
 							' INNER JOIN items i ON f.itemid=i.itemid'.
 							' INNER JOIN hosts h ON i.hostid=h.hostid'.
@@ -978,6 +978,10 @@ Copt::memoryPick();
 						}
 
 						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
+					}
+
+					if (isset($func['lastvalue'])) {
+						$func['lastvalue'] = convert_units($func['lastvalue'], $func['units']);
 					}
 
 					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
@@ -1076,13 +1080,18 @@ COpt::memoryPick();
 		$result = false;
 
 		if(!isset($object['hostid']) && !isset($object['host'])){
-			$expr = new CTriggerExpression($object);
-			$expression = $object['expression'];
+			$expressionData = new CTriggerExpression();
+			if (!$expressionData->parse($object['expression'])) {
+				return false;
+			}
 
-			if(!empty($expr->errors)) return false;
-			if(empty($expr->data['hosts'])) return false;
+			$expressionHosts = $expressionData->getHosts();
 
-			$object['host'] = reset($expr->data['hosts']);
+			if (empty($expressionHosts)) {
+				return false;
+			}
+
+			$object['host'] = reset($expressionHosts);
 		}
 
 		$options = array(
@@ -1140,20 +1149,22 @@ COpt::memoryPick();
 				}
 
 // Permission check by trigger hosts {{{
-				$expressionData = new CTriggerExpression($trigger);
-				if(!empty($expressionData->errors)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($trigger['expression'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
+				$expressionHosts = $expressionData->getHosts();
+
 				$hosts = CHost::get(array(
-					'filter' => array('host' => $expressionData->data['hosts']),
+					'filter' => array('host' => $expressionHosts),
 					'editable' => true,
 					'output' => array('hostid', 'host'),
 					'templated_hosts' => true,
 					'preservekeys' => true
 				));
 				$hosts = zbx_toHash($hosts, 'host');
-				foreach($expressionData->data['hosts'] as $host){
+				foreach ($expressionHosts as $host){
 					if(!isset($hosts[$host]))
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}

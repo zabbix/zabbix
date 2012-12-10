@@ -2220,7 +2220,7 @@
 	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	'is not a float or counter or macro for function',
 	'S_ITEM_KEY_MUST_BE_USED_IN_TRIGGER_EXPRESSION'=>	'An item key must be used in trigger expression',
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',
-	'S_TRIGGER_EXPRESSION_CANT_MIX_TEMPLATES_HOSTS' =>	'Incorrect trigger expression. Trigger expression elements cannot not belong to a template and a host simultaneously.',
+	'S_TRIGGER_EXPRESSION_CANT_MIX_TEMPLATES_HOSTS' =>	'Incorrect trigger expression. Trigger expression elements cannot belong to a template and a host simultaneously.',
 	'S_TRIGGER_BELONGS_TO_TEMPLATES_WITH_DIFFERENT_LINKS' =>	'Trigger belongs to templates with different linkages.',
 	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		'You can not use template hosts in mixed expressions.',
 	'S_ADDED_TRIGGER'=>					'Added new trigger',
