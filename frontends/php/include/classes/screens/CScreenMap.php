@@ -39,6 +39,7 @@ class CScreenMap extends CScreenBase {
 				'output' => API_OUTPUT_EXTEND,
 				'selectSelements' => API_OUTPUT_EXTEND,
 				'selectLinks' => API_OUTPUT_EXTEND,
+				'expandUrls' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
