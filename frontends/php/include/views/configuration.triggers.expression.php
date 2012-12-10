@@ -67,17 +67,22 @@ $expressionFormList->addRow(_('Function'), $functionComboBox);
 if (isset($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'])) {
 	foreach ($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'] as $pid => $pf) {
 		$paramIsReadonly = 'no';
+		$paramTypeElement = null;
 		$paramValue = isset($this->data['param'][$pid]) ? $this->data['param'][$pid] : null;
 
 		if ($pf['T'] == T_ZBX_INT) {
-			if ($pid == 0 || $pid == 1) {
+			if ($pid == 0
+				|| ($pid == 1
+					&& (substr($this->data['expr_type'], 0, 6) == 'regexp'
+						|| substr($this->data['expr_type'], 0, 7) == 'iregexp'
+						|| (substr($this->data['expr_type'], 0, 3) == 'str' && substr($this->data['expr_type'], 0, 6) != 'strlen')))) {
 				if (isset($pf['M'])) {
 					if (is_array($pf['M'])) {
 						$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype']);
 						foreach ($pf['M'] as $mid => $caption) {
 							$paramTypeElement->addItem($mid, $caption);
 						}
-						if (substr($this->data['expr_type'], 0, 4) == 'last') {
+						if (substr($this->data['expr_type'], 0, 4) == 'last' || substr($this->data['expr_type'], 0, 6) == 'strlen') {
 							$paramIsReadonly = 'yes';
 						}
 					}
@@ -95,8 +100,11 @@ if (isset($this->data['functions'][$this->data['function'].'['.$this->data['oper
 					$paramTypeElement = SPACE._('Seconds');
 				}
 			}
-			else {
-				$paramTypeElement = null;
+			if ($pid == 1
+					&& (substr($this->data['expr_type'], 0, 3) != 'str' || substr($this->data['expr_type'], 0, 6) == 'strlen')
+					&& substr($this->data['expr_type'], 0, 6) != 'regexp'
+					&& substr($this->data['expr_type'], 0, 7) != 'iregexp') {
+				$paramTypeElement = SPACE._('Seconds');
 			}
 			$expressionFormList->addRow($pf['C'].' ', array(new CNumericBox('param['.$pid.']', $paramValue, 10, $paramIsReadonly), $paramTypeElement));
 		}
