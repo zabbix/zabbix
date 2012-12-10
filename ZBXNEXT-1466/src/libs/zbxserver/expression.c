@@ -2452,7 +2452,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				}
 			}
 		}
-		else if (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION || macro_type & MACRO_TYPE_TRIGGER_COMMENTS)
+		else if (macro_type & (MACRO_TYPE_TRIGGER_DESCRIPTION | MACRO_TYPE_TRIGGER_COMMENTS))
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
