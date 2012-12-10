@@ -1,6 +1,7 @@
 Changes for 2.0.5rc1
 
 Bug fixes:
+..F....... [ZBX-5869] fixed configuration graph host id detection (Eduard)
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
 ..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
 ..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
