@@ -675,17 +675,13 @@ function get_items_data_overview($hostids, $view_style) {
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
+		'selectScreens' => $view_style != STYLE_TOP ? true : null,
+		'selectInventory' => $view_style != STYLE_TOP ? true : null,
 		'monitored_hosts' => true,
 		'hostids' => $hostids,
 		'with_monitored_items' => true,
 		'preservekeys' => true
 	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-	foreach ($hostScripts as $hostid => $scripts) {
-		$hosts[$hostid]['scripts'] = $scripts;
-	}
 
 	$items = array();
 	while ($row = DBfetch($db_items)) {
@@ -737,6 +733,10 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 	}
 	else {
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');

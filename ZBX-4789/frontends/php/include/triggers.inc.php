@@ -1153,14 +1153,10 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
 		'hostids' => $hostids,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
+		'selectScreens' => $view_style != STYLE_TOP ? true : null,
+		'selectInventory' => $view_style != STYLE_TOP ? true : null,
 		'preservekeys' => true
 	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-	foreach ($hostScripts as $hostid => $scripts) {
-		$hosts[$hostid]['scripts'] = $scripts;
-	}
 
 	$triggers = array();
 	$hostNames = array();
@@ -1213,6 +1209,10 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 		}
 	}
 	else {
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 		foreach ($triggers as $description => $triggerHosts) {
