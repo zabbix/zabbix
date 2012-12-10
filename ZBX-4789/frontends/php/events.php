@@ -669,7 +669,6 @@ else {
 			));
 
 			// fetch scripts for the host JS menu
-			$hostScripts = array();
 			if ($_REQUEST['hostid'] == 0) {
 				$hostScripts = API::Script()->getScriptsByHosts($hostids);
 			}
@@ -726,7 +725,7 @@ else {
 
 				// host JS menu link
 				$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-				$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+				$scripts = isset($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
 				$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 
 				$table->addRow(array(
