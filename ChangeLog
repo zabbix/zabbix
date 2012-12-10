@@ -26,6 +26,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5904] fixed history filter by items (Eduard)
 A.F....... [ZBX-5927] fixed selectMappings returning a hash of mappings instead of an array in iconmap.get (Pavels)
 A.F....... [ZBX-5927] fixed preservekeys affecting selectSelements and selectLinks in map.get (Pavels)
 ..F....... [ZBX-5888] fixed incorrect message in trigger expression test (Oleg)
