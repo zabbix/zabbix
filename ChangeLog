@@ -1,6 +1,7 @@
 Changes for 2.0.5rc1
 
 Bug fixes:
+A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
 A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
 ..F....... [ZBX-5809] fixed global url displaing in map screen item (Eduard)
 A......... [ZBX-5837] fixed filtering by proxy status in HostGroup API get method (Eduard)

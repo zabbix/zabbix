@@ -306,11 +306,11 @@ class CImage extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image').' [ '.$image['name'].' ] '._('already exists'));
 				}
 
-				// Decode BASE64
+				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
-				if (strlen($image['image']) > ZBX_MAX_IMAGE_SIZE) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB'));
-				}
+
+				// validate image
+				$this->checkImage($image['image']);
 
 				$imageid = get_dbid('images', 'imageid');
 				$values = array(
@@ -428,6 +428,9 @@ class CImage extends CZBXAPI {
 			if (isset($image['image'])) {
 				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
+
+				// validate image
+				$this->checkImage($image['image']);
 
 				switch ($DB['TYPE']) {
 					case ZBX_DB_POSTGRESQL:
@@ -571,5 +574,24 @@ class CImage extends CZBXAPI {
 		return array('imageids' => $imageids);
 	}
 
+	/**
+	 * Validate image.
+	 *
+	 * @param string $image string representing image, for example, result of base64_decode()
+	 *
+	 * @throws APIException if image size is 1MB or greater.
+	 * @throws APIException if file format is unsupported, GD can not create image from given string
+	 */
+	protected function checkImage($image) {
+		// check size
+		if (strlen($image) > ZBX_MAX_IMAGE_SIZE) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB.'));
+		}
+
+		// check file format
+		if (@imageCreateFromString($image) === false) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
+		}
+	}
 }
 ?>

@@ -67,13 +67,9 @@ if (isset($_REQUEST['save'])) {
 		if (isset($_FILES['image'])) {
 			$file = new CUploadFile($_FILES['image']);
 
-			if (isset($_REQUEST['imageid']) && !$file->wasUploaded()) {
-				$image = null;
-			}
-			else {
-				if ($file->getSize() > ZBX_MAX_IMAGE_SIZE) {
-					throw new Exception(_('Image size must be less than 1MB'));
-				}
+			$image = null;
+			if ($file->wasUploaded()) {
+				$file->validateImageSize();
 				$image = base64_encode($file->getContent());
 			}
 		}
