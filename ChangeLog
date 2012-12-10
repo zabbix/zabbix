@@ -1,6 +1,7 @@
 Changes for 2.0.5rc1
 
 Bug fixes:
+..F....... [ZBX-5809] fixed global url displaing in map screen item (Eduard)
 A......... [ZBX-5837] fixed filtering by proxy status in HostGroup API get method (Eduard)
 ..F....... [ZBX-5899] implement monitoring web flicker-free graph support (Eduard)
 .......PS. [ZBX-5919] removed OCI_COMMIT_ON_SUCCESS option for sql statements in transaction on Orable backend (Sasha)
