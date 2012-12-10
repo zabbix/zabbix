@@ -62,6 +62,7 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.5rc1
 
 Bug fixes:
+.......PS. [ZBX-5919] removed OCI_COMMIT_ON_SUCCESS option for sql statements in transaction on Orable backend (Sasha)
 ..F....... [ZBX-5869] fixed configuration graph host id detection (Eduard)
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
 ..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
