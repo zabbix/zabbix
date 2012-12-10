@@ -316,9 +316,14 @@ $pageFilter = new CPageFilter(array(
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 ));
+
 if (empty($_REQUEST['parent_discoveryid'])) {
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
+	if (!empty($pageFilter->groupid)) {
+		$_REQUEST['groupid'] = $pageFilter->groupid;
+	}
+	if (!empty($pageFilter->hostid)) {
+		$_REQUEST['hostid'] = $pageFilter->hostid;
+	}
 }
 
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
