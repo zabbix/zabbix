@@ -90,9 +90,9 @@ class CWebCheck extends CZBXAPI {
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
 						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE ht.applicationid=a.applicationid'.
+				' WHERE a.applicationid=ht.applicationid'.
 					' AND a.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
+				' GROUP BY a.applicationid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';
 		}

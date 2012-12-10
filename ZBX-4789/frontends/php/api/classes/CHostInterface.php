@@ -124,7 +124,7 @@ class CHostInterface extends CZBXAPI {
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
 						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE '.$this->alias.'.hostid=hgg.hostid'.
+				' WHERE hgg.hostid=hi.hostid'.
 				' GROUP BY hgg.hostid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';

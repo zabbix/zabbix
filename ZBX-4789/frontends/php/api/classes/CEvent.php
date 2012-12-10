@@ -138,7 +138,7 @@ class CEvent extends CZBXAPI {
 							' AND e.objectid=f.triggerid'.
 							' AND f.itemid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
-						' GROUP BY hgg.hostid'.
+						' GROUP BY f.triggerid'.
 						' HAVING MIN(r.permission)>='.$permission.
 						')';
 				}

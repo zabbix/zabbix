@@ -122,10 +122,10 @@ class CGraphPrototype extends CGraphGeneral {
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
 						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE '.$this->tableAlias.'.graphid=gi.graphid'.
+				' WHERE gi.graphid=g.graphid'.
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
+				' GROUP BY gi.graphid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';
 		}

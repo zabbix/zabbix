@@ -137,7 +137,7 @@ class CTemplateScreen extends CScreen {
 					' JOIN rights r'.
 						' ON r.id=hgg.groupid'.
 							' AND '.DBcondition('r.groupid', $userGroups).
-					' WHERE s.templateid=hgg.hostid'.
+					' WHERE hgg.hostid=s.templateid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>='.$permission.
 					')';

@@ -89,7 +89,7 @@ class CGraphItem extends CZBXAPI {
 						' AND '.DBcondition('r.groupid', $userGroups).
 				' WHERE gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
+				' GROUP BY i.itemid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';
 		}

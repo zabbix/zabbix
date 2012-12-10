@@ -127,7 +127,7 @@ class CTemplate extends CHostGeneral {
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
 						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE h.hostid=hgg.hostid'.
+				' WHERE hgg.hostid=h.hostid'.
 				' GROUP BY hgg.hostid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';

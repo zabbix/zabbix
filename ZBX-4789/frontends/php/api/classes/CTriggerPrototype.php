@@ -138,10 +138,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
 						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE '.$this->tableAlias.'.triggerid=f.triggerid'.
+				' WHERE t.triggerid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
+				' GROUP BY f.triggerid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';
 		}

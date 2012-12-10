@@ -129,7 +129,7 @@ class CGraph extends CGraphGeneral {
 				' WHERE '.$this->tableAlias.'.graphid=gi.graphid'.
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
+				' GROUP BY gi.graphid'.
 				' HAVING MIN(r.permission)>='.$permission.
 				')';
 		}
