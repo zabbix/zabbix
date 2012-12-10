@@ -355,9 +355,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'expandDescription' => true
 	);
 	$triggers = API::Trigger()->get($options);
-	if (count($options['triggerids'])) {
-		$triggers = API::Trigger()->get($options);
-	}
 
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
@@ -366,7 +363,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$triggerids = zbx_objectValues($triggers, 'triggerid');
 
-	if ($config['event_ack_enable'] && count($triggerids)) {
+	if ($config['event_ack_enable']) {
 		$options = array(
 			'countOutput' => true,
 			'groupCount' => true,
@@ -431,17 +428,13 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
 
-	if (count($tr_hostids)) {
-		$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
-
-		// fetch all hosts
-		$hosts = API::Host()->get(array(
-			'hostids' => $tr_hostids,
-			'preservekeys' => true,
-			'selectScreens' => API_OUTPUT_COUNT,
-			'selectInventory' => true
-			));
-	}
+	// fetch all hosts
+	$hosts = API::Host()->get(array(
+		'hostids' => $tr_hostids,
+		'preservekeys' => true,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => true
+	));
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(

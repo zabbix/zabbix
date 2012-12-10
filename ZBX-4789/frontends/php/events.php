@@ -669,7 +669,10 @@ else {
 			));
 
 			// fetch scripts for the host JS menu
-			$hostScripts = API::Script()->getScriptsByHosts($hostids);
+			$hostScripts = array();
+			if ($_REQUEST['hostid'] == 0) {
+				$hostScripts = API::Script()->getScriptsByHosts($hostids);
+			}
 
 			foreach ($events as $enum => $event) {
 				$trigger = $triggers[$event['objectid']];
