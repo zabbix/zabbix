@@ -94,7 +94,6 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
-			insert_js_function('removeSelectedItems');
 			$deleteItemButton = new CSubmit('remove_log', _('Remove selected'), "javascript: removeSelectedItems('cmbitemlist_', 'itemid')");
 		}
 
