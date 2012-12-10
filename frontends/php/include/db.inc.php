@@ -806,6 +806,8 @@ else {
 	}
 
 	function DBin_node($id_name, $nodes = null){
+		return '1=1';
+/*
 		if(is_null($nodes))	$nodes = get_current_nodeid();
 		else if(is_bool($nodes)) $nodes = get_current_nodeid($nodes);
 
@@ -832,6 +834,7 @@ else {
 
 		$sql = '('.trim($sql, 'OR ').')';
 	return $sql;
+*/
 	}
 
 	function in_node( $id_var, $nodes = null ){

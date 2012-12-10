@@ -37,6 +37,11 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
+	static char	dbnode[1];
+
+	*dbnode = '\0';
+
+/*
 	static char	dbnode[128];
 
 	if (-1 != nodeid)
@@ -46,6 +51,7 @@ const char	*DBnode(const char *fieldid, int nodeid)
 	}
 	else
 		*dbnode = '\0';
+*/
 
 	return dbnode;
 }
