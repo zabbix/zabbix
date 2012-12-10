@@ -358,12 +358,7 @@ class CHttpTestManager {
 						throw new Exception(_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name']));
 					}
 
-					// if we found existing http test by name and steps, we only add linkage, i.e. change templateid
-					// inheritance process for such steps should be stopped
-					DB::update('httptest', array(
-						'values' => array('templateid' => $httpTestId),
-						'where' => array('httptestid' => $exHttpTest['httptestid'])
-					));
+					$this->createLinkageBetweenHttpTests($httpTestId, $exHttpTest['httptestid']);
 					continue;
 				}
 
@@ -392,6 +387,50 @@ class CHttpTestManager {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Create linkage between two http tests.
+	 * If we found existing http test by name and steps, we only add linkage, i.e. change templateid
+	 *
+	 * @param $parentId
+	 * @param $childId
+	 */
+	protected function createLinkageBetweenHttpTests($parentId, $childId) {
+		DB::update('httptest', array(
+			'values' => array('templateid' => $parentId),
+			'where' => array('httptestid' => $childId)
+		));
+
+		$dbCursor = DBselect('SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+				' FROM httptestitem hti1,httptestitem hti2,items i1,items i2'.
+				' WHERE hti1.httptestid='.zbx_dbstr($parentId).
+					' AND hti2.httptestid='.zbx_dbstr($childId).
+					' AND hti1.itemid=i1.itemid'.
+					' AND hti2.itemid=i2.itemid'.
+					' AND i1.key_=i2.key_');
+		while ($dbItems = DBfetch($dbCursor)) {
+			DB::update('items', array(
+				'values' => array('templateid' => $dbItems['parentId']),
+				'where' => array('itemid' => $dbItems['childId'])
+			));
+		}
+
+		$dbCursor = DBselect('SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+				' FROM httpstepitem hsi1,httpstepitem hsi2,httpstep hs1,httpstep hs2,items i1,items i2'.
+				' WHERE hs1.httptestid='.zbx_dbstr($parentId).
+					' AND hs2.httptestid='.zbx_dbstr($childId).
+					' AND hsi1.itemid=i1.itemid'.
+					' AND hsi2.itemid=i2.itemid'.
+					' AND hs1.httpstepid=hsi1.httpstepid'.
+					' AND hs2.httpstepid=hsi2.httpstepid'.
+					' AND i1.key_=i2.key_');
+		while ($dbItems = DBfetch($dbCursor)) {
+			DB::update('items', array(
+				'values' => array('templateid' => $dbItems['parentId']),
+				'where' => array('itemid' => $dbItems['childId'])
+			));
+		}
 	}
 
 	/**
