@@ -2992,12 +2992,12 @@ size_t	zbx_utf8_char_len(const char *text)
  ******************************************************************************/
 size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 {
-	size_t	sz = 0, csz = 0;
-	char	*next;
+	size_t		sz = 0, csz = 0;
+	const char	*next;
 
 	while ('\0' != *text && 0 < utf8_maxlen && 0 != (csz = zbx_utf8_char_len(text)))
 	{
-		next = (char *)text + csz;
+		next = text + csz;
 		while (next > text)
 		{
 			if ('\0' == *text++)
