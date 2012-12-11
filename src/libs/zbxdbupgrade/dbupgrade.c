@@ -91,6 +91,7 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
+#if !defined(HAVE_SQLITE3)
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
 	switch (field->type)
@@ -425,30 +426,6 @@ static int	DBcreate_dbversion_table()
 	return ret;
 }
 
-static void	DBget_version(int *mandatory, int *optional)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	*mandatory = -1;
-	*optional = -1;
-
-	result = DBselect("select mandatory,optional from dbversion");
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*mandatory = atoi(row[0]);
-		*optional = atoi(row[1]);
-	}
-	DBfree_result(result);
-
-	if (-1 == *mandatory)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot get the database version. Exiting ...");
-		exit(EXIT_FAILURE);
-	}
-}
-
 static int	DBset_version(int version, unsigned char mandatory)
 {
 	char	sql[64];
@@ -655,10 +632,40 @@ static int	DBpatch_02010026()
 
 	return DBadd_field("httptest", &field);
 }
+#endif	/* not HAVE_SQLITE3 */
+
+static void	DBget_version(int *mandatory, int *optional)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	*mandatory = -1;
+	*optional = -1;
+
+	result = DBselect("select mandatory,optional from dbversion");
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*mandatory = atoi(row[0]);
+		*optional = atoi(row[1]);
+	}
+	DBfree_result(result);
+
+	if (-1 == *mandatory)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot get the database version. Exiting ...");
+		exit(EXIT_FAILURE);
+	}
+}
 
 int	DBcheck_version()
 {
 	const char	*__function_name = "DBcheck_version";
+	const char	*dbversion_table_name = "dbversion";
+	int		db_mandatory, db_optional, required, ret = FAIL;
+
+#if !defined(HAVE_SQLITE3)
+	int		i, total = 0, current = 0, completed, last_completed = -1;
 
 	zbx_dbpatch_t	patches[] =
 	{
@@ -689,11 +696,12 @@ int	DBcheck_version()
 		{DBpatch_02010024, 2010024, 0, 1},
 		{DBpatch_02010025, 2010025, 0, 1},
 		{DBpatch_02010026, 2010026, 0, 1},
+		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
-	const char	*dbversion_table_name = "dbversion";
-	int		db_mandatory, db_optional, required, i, ret = FAIL,
-			total = 0, current = 0, completed, last_completed = -1;
+#else
+	required = 2010026;	/* <---- Update mandatory DBpatch for SQLite here. */
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -701,6 +709,7 @@ int	DBcheck_version()
 
 	if (SUCCEED != DBtable_exists(dbversion_table_name))
 	{
+#if !defined(HAVE_SQLITE3)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" doesn't exist",
 				__function_name, dbversion_table_name);
 
@@ -713,10 +722,18 @@ int	DBcheck_version()
 
 		if (SUCCEED != DBcreate_dbversion_table())
 			goto out;
+#else
+		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
+				" Current database version (mandatory/optional): UNKNOWN."
+				" Required mandatory version: %08d.",
+				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy", required);
+		goto out;
+#endif
 	}
 
 	DBget_version(&db_mandatory, &db_optional);
 
+#if !defined(HAVE_SQLITE3)
 	required = ZBX_FIRST_DB_VERSION;
 
 	for (i = 0; NULL != patches[i].function; i++)
@@ -729,6 +746,9 @@ int	DBcheck_version()
 	}
 
 	if (required < db_mandatory)
+#else
+	if (required != db_mandatory)
+#endif
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): %08d/%08d."
@@ -744,6 +764,7 @@ int	DBcheck_version()
 
 	ret = SUCCEED;
 
+#if !defined(HAVE_SQLITE3)
 	if (0 == total)
 		goto out;
 
@@ -781,6 +802,8 @@ int	DBcheck_version()
 		zabbix_log(LOG_LEVEL_WARNING, "database upgrade fully completed");
 	else
 		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed");
+#endif	/* not HAVE_SQLITE3 */
+
 out:
 	DBclose();
 
