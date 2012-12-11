@@ -1076,6 +1076,101 @@ function check_db_fields($db_fields, &$args) {
 	return true;
 }
 
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ * The WHERE condidion is generated from the given list of values as a mix of
+ * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array $values      array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool $notIn        builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionInt($fieldName, array $values, $notIn = false) {
+	// maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
+	$MAX_EXPRESSIONS = 950;
+	// minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
+	$MIN_NUM_BETWEEN = 5;
+
+	if (count($values) == 0) {
+		return ' 1=0';
+	}
+
+	$condition = ' ';
+
+	$betweens = array();
+	$ins = array();
+
+	$pos = 1;
+	$len = 1;
+	$valueL = reset($values);
+	while ($valueR = next($values)) {
+		if ($valueR != ++$valueL) {
+			if ($len >= $MIN_NUM_BETWEEN) {
+				$betweens[] = array($valueL - $len, $valueL - 1);
+			}
+			else {
+				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+			}
+
+			$len = 1;
+			$valueL = $valueR;
+		}
+		else {
+			$len++;
+		}
+		$pos++;
+	}
+
+	if ($len >= $MIN_NUM_BETWEEN) {
+		$betweens[] = array($valueL - $len + 1, $valueL);
+	}
+	else {
+		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+	}
+
+	$operand = $notIn ? 'AND' : 'OR';
+	$not = $notIn ? 'NOT ' : '';
+	$inNum = count($ins);
+	$betweenNum = count($betweens);
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum))
+		$condition .= '(';
+
+	// compose "BETWEEN"s
+	$first = true;
+	foreach ($betweens as $between) {
+		if (!$first) {
+			$condition .= ' '.$operand.' ';
+		}
+		$condition .= $not.$fieldName.' BETWEEN '.$between[0].' AND '.$between[1];
+		$first = false;
+	}
+
+	if (0 < $inNum && 0 < $betweenNum) {
+		$condition .= ' '.$operand.' ';
+	}
+
+	if ($inNum == 1) {
+		$condition .= $fieldName.'='.$ins[0];
+	}
+	// compose "IN"s
+	else {
+		$first = true;
+		foreach (array_chunk($ins, $MAX_EXPRESSIONS) as $in) {
+			if (!$first) {
+				$condition .= ' '.$operand.' ';
+			}
+			$condition .= $fieldName.' '.$not.'IN ('.implode(',', $in).')';
+			$first = false;
+		}
+	}
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum))
+		$condition .= ')';
+}
+
 function DBcondition($fieldname, $array, $notin = false) {
 	$condition = '';
 
