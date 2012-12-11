@@ -139,13 +139,29 @@ elseif (isset($_REQUEST['save'])) {
 
 	$result = true;
 
-	if (validateZBXTime($_REQUEST['mntc_since_year'], $_REQUEST['mntc_since_month'],
-			$_REQUEST['mntc_since_day'], $_REQUEST['mntc_since_hour'], $_REQUEST['mntc_since_minute'])) {
+	if (validateDateTime($_REQUEST['mntc_since_year'],
+			$_REQUEST['mntc_since_month'],
+			$_REQUEST['mntc_since_day'],
+			$_REQUEST['mntc_since_hour'],
+			$_REQUEST['mntc_since_minute'])) {
+		info(_s('Invalid date "%s".', _('Active since')));
+		$result = false;
+	}
+	if (validateDateInterval($_REQUEST['mntc_since_year'],
+			$_REQUEST['mntc_since_month'],
+			$_REQUEST['mntc_since_day'])) {
 		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 		$result = false;
 	}
-		if (validateZBXTime($_REQUEST['mntc_till_year'], $_REQUEST['mntc_till_month'],
-			$_REQUEST['mntc_till_day'], $_REQUEST['mntc_till_hour'], $_REQUEST['mntc_till_minute'])) {
+	if (validateDateTime($_REQUEST['mntc_till_year'],
+				$_REQUEST['mntc_till_month'],
+				$_REQUEST['mntc_till_day'],
+				$_REQUEST['mntc_till_hour'],
+				$_REQUEST['mntc_till_minute'])) {
+		info(_s('Invalid date "%s".', _('Active till')));
+		$result = false;
+	}
+	if (validateDateInterval($_REQUEST['mntc_till_year'], $_REQUEST['mntc_till_month'], $_REQUEST['mntc_till_day'])) {
 		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 		$result = false;
 	}
@@ -261,10 +277,22 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 	elseif ($new_timeperiod['hour'] > 23 || $new_timeperiod['minute'] > 59) {
 		info(_('Incorrect maintenance period'));
 	}
-	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME
-			&& validateZBXTime($_REQUEST['new_timeperiod_year'], $_REQUEST['new_timeperiod_month'],
-				$_REQUEST['new_timeperiod_day'], $_REQUEST['new_timeperiod_hour'], $_REQUEST['new_timeperiod_minute'])) {
-		error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
+	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+		if (validateDateTime($_REQUEST['new_timeperiod_year'],
+				$_REQUEST['new_timeperiod_month'],
+				$_REQUEST['new_timeperiod_day'],
+				$_REQUEST['new_timeperiod_hour'],
+				$_REQUEST['new_timeperiod_minute'])) {
+			error(_('Invalid maintenance period'));
+		}
+		elseif (validateDateInterval($_REQUEST['new_timeperiod_year'],
+				$_REQUEST['new_timeperiod_month'],
+				$_REQUEST['new_timeperiod_day'])) {
+			error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
+		}
+		else {
+			$result = true;
+		}
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY && $new_timeperiod['every'] < 1) {
 		info(_('Incorrect maintenance day period'));

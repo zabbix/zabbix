@@ -177,11 +177,41 @@ if (isset($_REQUEST['form'])) {
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
 		$_REQUEST['times'] = get_request('times', array());
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
-
+		$result = true;
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			$new_service_time['ts_from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
-			$new_service_time['ts_to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
-			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
+			if (validateDateTime($_REQUEST['downtime_since_year'],
+					$_REQUEST['downtime_since_month'],
+					$_REQUEST['downtime_since_day'],
+					$_REQUEST['downtime_since_hour'],
+					$_REQUEST['downtime_since_minute'])) {
+				$result = false;
+				error(_s('Invalid date "%s".', _('From')));
+			}
+			if (validateDateInterval($_REQUEST['downtime_since_year'],
+					$_REQUEST['downtime_since_month'],
+					$_REQUEST['downtime_since_day'])) {
+				$result = false;
+				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
+			}
+			if (validateDateTime($_REQUEST['downtime_till_year'],
+					$_REQUEST['downtime_till_month'],
+					$_REQUEST['downtime_till_day'],
+					$_REQUEST['downtime_till_hour'],
+					$_REQUEST['downtime_till_minute'])) {
+				$result = false;
+				error(_s('Invalid date "%s".', _('Till')));
+			}
+			if (validateDateInterval($_REQUEST['downtime_till_year'],
+					$_REQUEST['downtime_till_month'],
+					$_REQUEST['downtime_till_day'])) {
+				$result = false;
+				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
+			}
+			if ($result) {
+				$new_service_time['ts_from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
+				$new_service_time['ts_to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
+				$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
+			}
 		}
 		else {
 			$new_service_time['ts_from'] = dowHrMinToSec($_REQUEST['new_service_time']['from_week'], $_REQUEST['new_service_time']['from_hour'], $_REQUEST['new_service_time']['from_minute']);
@@ -189,33 +219,25 @@ if (isset($_REQUEST['form'])) {
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 
-		try {
-			if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-				if (validateZBXTime($_REQUEST['downtime_since_year'], $_REQUEST['downtime_since_month'],
-						$_REQUEST['downtime_since_day'], $_REQUEST['downtime_since_hour'], $_REQUEST['downtime_since_minute'])) {
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Service time "%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
-				}
-				if (validateZBXTime($_REQUEST['downtime_till_year'], $_REQUEST['downtime_till_month'],
-						$_REQUEST['downtime_till_day'], $_REQUEST['downtime_till_hour'], $_REQUEST['downtime_till_minute'])) {
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Service time "%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
+		if ($result) {
+			try {
+				checkServiceTime($new_service_time);
+
+				// if this time is not already there, adding it for inserting
+				if (!str_in_array($_REQUEST['times'], $new_service_time)) {
+					array_push($_REQUEST['times'], $new_service_time);
+
+					unset($_REQUEST['new_service_time']['from_week']);
+					unset($_REQUEST['new_service_time']['to_week']);
+					unset($_REQUEST['new_service_time']['from_hour']);
+					unset($_REQUEST['new_service_time']['to_hour']);
+					unset($_REQUEST['new_service_time']['from_minute']);
+					unset($_REQUEST['new_service_time']['to_minute']);
 				}
 			}
-			checkServiceTime($new_service_time);
-
-			// if this time is not already there, adding it for inserting
-			if (!str_in_array($_REQUEST['times'], $new_service_time)) {
-				array_push($_REQUEST['times'], $new_service_time);
-
-				unset($_REQUEST['new_service_time']['from_week']);
-				unset($_REQUEST['new_service_time']['to_week']);
-				unset($_REQUEST['new_service_time']['from_hour']);
-				unset($_REQUEST['new_service_time']['to_hour']);
-				unset($_REQUEST['new_service_time']['from_minute']);
-				unset($_REQUEST['new_service_time']['to_minute']);
+			catch (APIException $e) {
+				error($e->getMessage());
 			}
-		}
-		catch (APIException $e) {
-			error($e->getMessage());
 		}
 
 		show_messages();
