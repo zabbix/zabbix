@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -30,8 +30,6 @@ $page['hist_arg'] = array('httptestid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-define('ZBX_PAGE_DO_REFRESH', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -59,11 +57,7 @@ if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.httpdetails.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
-	if ($_REQUEST['favobj'] == 'timeline') {
-		if (isset($_REQUEST['favid']) && isset($_REQUEST['period'])) {
-			navigation_bar_calc('web.httptest', $_REQUEST['favid'], true);
-		}
-	}
+
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
 		if (isset($_REQUEST['favid'])) {
@@ -168,7 +162,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		}
 	}
 
-	$itemids = array();
+	$itemIds = array();
 	$db_items = DBselect(
 		'SELECT i.lastvalue,i.lastclock,i.value_type,i.valuemapid,i.units,i.itemid,hi.type AS httpitem_type'.
 			' FROM items i,httpstepitem hi'.
@@ -190,7 +184,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 			$totalTime['units'] = $item_data['units'];
 		}
 
-		$itemids[] = $item_data['itemid'];
+		$itemIds[] = $item_data['itemid'];
 	}
 
 	$speed = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
@@ -241,31 +235,25 @@ $graphsWidget->addItem(SPACE);
 $graphTable = new CTableInfo();
 $graphTable->setAttribute('id', 'graph');
 
-$graphContainer = new CCol();
-$graphContainer->setAttribute('id', 'graph_1');
-$graphTable->addRow(array(bold(_('Speed')), $graphContainer));
-
-$graphContainer = new CCol();
-$graphContainer->setAttribute('id', 'graph_2');
-$graphTable->addRow(array(bold(_('Response time')), $graphContainer));
-
-$graphsWidget->addItem($graphTable);
-
-// timeline
-$timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => 'web.httptest',
-	'profileIdx2' => get_request('httptestid'),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
-));
-$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($itemids));
-
+// dims
 $graphDims = getGraphDims();
 $graphDims['shiftYtop'] += 1;
 $graphDims['width'] = -120;
 $graphDims['graphHeight'] = 150;
 
-// graph 1
+/*
+ * Graph in
+ */
+$graphInScreen = new CScreenBase(array(
+	'resourcetype' => SCREEN_RESOURCE_GRAPH,
+	'mode' => SCREEN_MODE_PREVIEW,
+	'dataId' => 'graph_in',
+	'profileIdx' => 'web.httptest',
+	'profileIdx2' => get_request('httptestid'),
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
+));
+
 $src = 'chart3.php?'.url_param('period').
 	url_param($db_httptest['name'], false,'name').
 	url_param(150, false, 'height').
@@ -274,21 +262,45 @@ $src = 'chart3.php?'.url_param('period').
 	url_param($db_httptest['httptestid'], false, 'httptestid').
 	url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
 
-$dom_graph_id = 'graph_in';
-$objData = array(
-	'id' => $dom_graph_id,
-	'containerid' => 'graph_1',
+$graphInContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_in');
+$graphInContainer->setAttribute('style', 'position: relative');
+$graphInContainer->setAttribute('data-timestamp', time());
+$graphTable->addRow(array(bold(_('Speed')), $graphInContainer));
+
+$timeline = $graphInScreen->calculateTime(array(
+	'profileIdx' => 'web.httptest',
+	'profileIdx2' => get_request('httptestid'),
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
+));
+$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($itemIds));
+
+$timeControlData = array(
+	'id' => 'graph_in',
+	'containerid' => 'flickerfreescreen_graph_in',
 	'src' => $src,
 	'objDims' => $graphDims,
+	'loadSBox' => 1,
 	'loadImage' => 1,
-	'dynamic' => 1,
-	'mainObject' => 1,
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 );
-zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+$graphInScreen->insertFlickerfreeJs();
 
-// graph 2
+/*
+ * Graph time
+ */
+$graphTimeScreen = new CScreenBase(array(
+	'resourcetype' => SCREEN_RESOURCE_GRAPH,
+	'mode' => SCREEN_MODE_PREVIEW,
+	'dataId' => 'graph_time',
+	'profileIdx' => 'web.httptest',
+	'profileIdx2' => get_request('httptestid'),
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
+));
+
 $src ='chart3.php?'.url_param('period').url_param('from').
 	url_param($db_httptest['name'], false,'name').
 	url_param(150, false, 'height').
@@ -297,33 +309,30 @@ $src ='chart3.php?'.url_param('period').url_param('from').
 	url_param($db_httptest['httptestid'], false, 'httptestid').
 	url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
 
-$dom_graph_id = 'graph_time';
-$objData = array(
-	'id' => $dom_graph_id,
-	'containerid' => 'graph_2',
+$graphTimeContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_time');
+$graphTimeContainer->setAttribute('style', 'position: relative');
+$graphTimeContainer->setAttribute('data-timestamp', time());
+$graphTable->addRow(array(bold(_('Response time')), $graphTimeContainer));
+
+$timeControlData = array(
+	'id' => 'graph_time',
+	'containerid' => 'flickerfreescreen_graph_time',
 	'src' => $src,
 	'objDims' => $graphDims,
+	'loadSBox' => 1,
 	'loadImage' => 1,
-	'dynamic' => 1,
-	'mainObject' => 1,
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 );
-zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+$graphTimeScreen->insertFlickerfreeJs();
 
-$dom_graph_id = 'none';
-$objData = array(
-	'id' => $dom_graph_id,
-	'loadScroll' => 1,
-	'dynamic' => 1,
-	'mainObject' => 1,
-	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
-	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-);
+// scroll
+CScreenBuilder::insertScreenScrollJs(array('timeline' => $timeline, 'profileIdx' => 'web.httptest'));
+CScreenBuilder::insertScreenRefreshTimeJs();
+CScreenBuilder::insertProcessObjectsJs();
 
-zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
-zbx_add_post_js('timeControl.processObjects();');
-
+$graphsWidget->addItem($graphTable);
 $graphsWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
