@@ -168,14 +168,14 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array  $trigger
-	 * @param string $source
+	 * @param string $expression
+	 * @param string $text
 	 *
 	 * @return string
 	 */
-	public static function resolveTriggerReference(array $trigger, $source = 'description') {
+	public static function resolveTriggerReference($expression, $text) {
 		self::init();
-		return self::$macrosResolver->resolveTriggerReference($trigger, $source);
+		return self::$macrosResolver->resolveTriggerReference($expression, $text);
 	}
 
 	/**

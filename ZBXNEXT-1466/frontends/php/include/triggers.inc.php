@@ -1193,7 +1193,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
 		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
-		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger);
+		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
 
