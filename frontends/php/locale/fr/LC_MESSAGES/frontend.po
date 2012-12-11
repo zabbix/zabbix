@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-11 18:57+0200\n"
-"PO-Revision-Date: 2012-10-29 14:29+0200\n"
+"POT-Creation-Date: 2012-12-11 19:03+0200\n"
+"PO-Revision-Date: 2012-12-10 15:52+0200\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2179,7 +2179,7 @@ msgstr "Fermer"
 
 #: include/views/configuration.triggers.edit.php:233
 msgid "Close expression constructor"
-msgstr "Fermer l'éditeur d'expression"
+msgstr "Fermer le constructeur d'expression"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
@@ -2813,7 +2813,7 @@ msgstr "Écrans personnalisés"
 
 #: include/views/configuration.action.edit.php:646
 msgid "Custom script"
-msgstr "Écrans personnalisés"
+msgstr "Script personnalisé"
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
@@ -3791,7 +3791,7 @@ msgstr "Afficher les déclencheurs OK pendant"
 
 #: include/func.inc.php:1696
 msgid "Displaying"
-msgstr "Affichant"
+msgstr "Affichage de"
 
 #: search.php:219 search.php:321 search.php:446
 #, php-format
@@ -4428,7 +4428,7 @@ msgstr "Échoué"
 #: api/classes/CWebCheck.php:630
 #, php-format
 msgid "Failed step of scenario \"%s\"."
-msgstr "Échec de l'étape du scénario \"%s\"."
+msgstr "Étape d'échec du scénario \"%s\"."
 
 #: api/classes/CTemplate.php:1090
 msgid "Failed to update template"
@@ -4533,7 +4533,7 @@ msgstr "Terminé"
 
 #: include/locales.inc.php:50
 msgid "Finnish (fi_FI)"
-msgstr "Finnish (fi_FI)"
+msgstr "Finnois (fi_FI)"
 
 #: include/forms.inc.php:1597 include/maintenances.inc.php:103
 msgid "First"
@@ -9798,7 +9798,7 @@ msgstr "Sujet de récupération"
 
 #: include/views/administration.users.edit.php:121 profile.php:49 users.php:62
 msgid "Refresh (in seconds)"
-msgstr "Rafraichissement (en secondes)"
+msgstr "Rafraîchissement (en secondes)"
 
 #: include/func.inc.php:1755
 msgid "Refresh time in seconds"
@@ -9810,12 +9810,12 @@ msgstr "Multiplicateur de la période de rafraîchissement"
 
 #: adm.other.php:33 include/views/administration.general.other.edit.php:36
 msgid "Refresh unsupported items (in sec)"
-msgstr "Rafraichissement des éléments non supportés (en sec)"
+msgstr "Rafraîchissement des éléments non supportés (en sec)"
 
 #: adm.other.php:61
 #, php-format
 msgid "Refresh unsupported items (in sec) \"%1$s\"."
-msgstr "Rafraichissement des éléments non supportés (en sec) \"%1$s\"."
+msgstr "Rafraîchissement des éléments non supportés (en sec) \"%1$s\"."
 
 #: include/views/configuration.item.edit.php:341
 msgid "Regexp"
@@ -10788,7 +10788,7 @@ msgstr "Envoyer le message aux utilisateurs"
 
 #: include/views/configuration.action.edit.php:531
 msgid "Send only to"
-msgstr "Envoyé uniquement à"
+msgstr "Envoyer uniquement à"
 
 #: popup_media.php:122
 msgid "Send to"
@@ -10796,7 +10796,7 @@ msgstr "Envoyer"
 
 #: include/views/configuration.action.edit.php:515
 msgid "Send to User groups"
-msgstr "Envoyer aux groupes d'utilisateur"
+msgstr "Envoyer aux groupes d'utilisateurs"
 
 #: include/views/configuration.action.edit.php:516
 msgid "Send to Users"
@@ -11026,7 +11026,7 @@ msgstr "Afficher les valeurs des éléments"
 
 #: include/views/administration.general.gui.edit.php:47
 msgid "Show warning if Zabbix server is down"
-msgstr "Afficher une alerte sur le serveur Zabbix est arrêté"
+msgstr "Afficher une alerte si le serveur Zabbix est arrêté"
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show working time"
@@ -12995,7 +12995,7 @@ msgstr "Assistant"
 #: include/views/administration.general.workingtime.edit.php:24
 #: include/views/administration.general.workingtime.edit.php:27
 msgid "Working time"
-msgstr "Temps de travail"
+msgstr "Heures ouvrées"
 
 #: adm.workingtime.php:48
 #, php-format
@@ -13738,7 +13738,7 @@ msgstr "not in"
 
 #: include/actions.inc.php:26
 msgid "not like"
-msgstr "not like"
+msgstr "pas comme"
 
 #: include/classes/class.cserverinfo.php:37
 msgid "not running"

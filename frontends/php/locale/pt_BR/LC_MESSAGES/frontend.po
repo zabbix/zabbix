@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-11 18:57+0200\n"
-"PO-Revision-Date: 2012-11-02 18:48+0200\n"
+"POT-Creation-Date: 2012-12-11 19:03+0200\n"
+"PO-Revision-Date: 2012-11-29 15:24+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -65,8 +65,8 @@ msgstr[1] "%1$s falhas de login registradas. Última falha de login foi de %2$s 
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] "%2$d de %1$d problemas sendo exibido"
-msgstr[1] "%2$d de %1$d problemas sendo exibidos"
+msgstr[0] "%2$d de %1$d incidentes sendo exibidos"
+msgstr[1] "%2$d de %1$d incidentes sendo exibidos"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
@@ -4331,7 +4331,7 @@ msgstr "Expandir macros"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Expand single problem"
-msgstr "Expandir problemas singulares"
+msgstr "Expandir incidentes singulares"
 
 #: include/forms.inc.php:1755 include/forms.inc.php:1886
 msgid "Expected result"
@@ -5541,7 +5541,7 @@ msgstr "Ícone (manutenção)"
 
 #: include/views/js/configuration.sysmaps.js.php:252
 msgid "Icon (problem)"
-msgstr "Ícone (problema)"
+msgstr "Ícone (incidente)"
 
 #: include/views/configuration.sysmap.edit.php:81
 msgid "Icon highlight"
@@ -6895,8 +6895,8 @@ msgstr "Último"
 #, php-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] "Últimas %1$d ocorrências do problema"
-msgstr[1] "Últimos %1$d problemas"
+msgstr[0] "Últimas %1$d ocorrências do incidente"
+msgstr[1] "Últimos %1$d incidentes"
 
 #: popup_trexpr.php:222
 msgid "Last (most recent) T value is < N"
@@ -7808,11 +7808,11 @@ msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1646
 msgid "Multiple PROBLEM events"
-msgstr "Multiplos eventos de PROBLEMA"
+msgstr "Multiplos eventos de INCIDENTE"
 
 #: include/views/configuration.triggers.edit.php:242
 msgid "Multiple PROBLEM events generation"
-msgstr "Evento com geração de múltiplos problemas"
+msgstr "Evento com geração de múltiplos incidentes"
 
 #: jsLoader.php:158
 msgid "Mute"
@@ -9303,7 +9303,7 @@ msgstr "POP"
 
 #: chart5.php:197 include/maps.inc.php:624 include/triggers.inc.php:207
 msgid "PROBLEM"
-msgstr "PROBLEMA"
+msgstr "INCIDENTE"
 
 #: include/validate.inc.php:561
 msgid "Page received incorrect data"
@@ -9633,15 +9633,15 @@ msgstr ""
 #: include/maps.inc.php:682 include/maps.inc.php:772 include/maps.inc.php:870
 #: include/views/js/configuration.sysmaps.js.php:127 tr_status.php:194
 msgid "Problem"
-msgstr "Problema"
+msgstr "Incidente"
 
 #: dashconf.php:262 include/views/configuration.sysmap.edit.php:146
 msgid "Problem display"
-msgstr "Exibição de problemas"
+msgstr "Exibição de incidente"
 
 #: jsrpc.php:119
 msgid "Problem on"
-msgstr "Problema em"
+msgstr "Incidente em"
 
 #: srv_status.php:163
 msgid "Problem time"
@@ -9649,16 +9649,16 @@ msgstr ""
 
 #: include/services.inc.php:60
 msgid "Problem, if all children have problems"
-msgstr "Problema, se todos os filhos tem problemas"
+msgstr "Incidente, se todos os filhos tem incidentes"
 
 #: include/services.inc.php:59
 msgid "Problem, if at least one child has a problem"
-msgstr "Problema, se pelo menos um filho tem problema"
+msgstr "Incidente, se pelo menos um filho tem incidente"
 
 #: chart4.php:171 include/maps.inc.php:676 include/maps.inc.php:766
 #: include/maps.inc.php:864 report2.php:237 report3.php:86
 msgid "Problems"
-msgstr "Problemas"
+msgstr "Incidentes"
 
 #: include/page_header.php:246
 msgid "Profile"
@@ -12976,7 +12976,7 @@ msgstr "Com últimos eventos não reconhecidos"
 
 #: include/blocks.inc.php:347
 msgid "With problems"
-msgstr "Com problemas"
+msgstr "Com incidentes"
 
 #: include/forms.inc.php:520 include/forms.inc.php:744
 #: include/forms.inc.php:848
@@ -12989,7 +12989,7 @@ msgstr "Com eventos não reconhecidos"
 
 #: include/blocks.inc.php:346
 msgid "Without problems"
-msgstr "Sem problemas"
+msgstr "Sem incidentes"
 
 #: include/forms.inc.php:521 include/forms.inc.php:741
 msgid "Without triggers"
@@ -13875,7 +13875,7 @@ msgstr "valor"
 #: jsLoader.php:92
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #: include/maintenances.inc.php:74
 msgid "week"
@@ -13887,12 +13887,12 @@ msgstr "semanas"
 
 #: include/views/js/administration.general.valuemapping.edit.js.php:7
 msgid "whole number"
-msgstr ""
+msgstr "número inteiro"
 
 #: include/func.inc.php:456 jsLoader.php:90
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "y"
 
 # absurdo quem escreveu "não" no lugar de sim
 #: include/classes/class.frontendsetup.php:317
@@ -13915,9 +13915,9 @@ msgstr "sim"
 #: include/views/configuration.services.edit.php:183
 #: include/views/configuration.services.edit.php:200
 msgid "yyyy"
-msgstr ""
+msgstr "yyyy"
 
 #: include/func.inc.php:561
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"
