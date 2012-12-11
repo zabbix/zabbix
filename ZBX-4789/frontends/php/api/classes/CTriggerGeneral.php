@@ -169,21 +169,23 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		$expressionData = new CTriggerExpression();
 		$expressionData->parse($trigger['expression']);
 
-		$newTrigger['expression'] = $expressionData->expressionShort;
+		$newTrigger['expression'] = $trigger['expression'];
 		// replace template separately in each expression, only in beginning (host part)
-		foreach ($expressionData->expressions as $exprPart) {
+		$exprPart = end($expressionData->expressions);
+		do {
 			foreach ($triggerTemplates as $triggerTemplate) {
 				if ($triggerTemplate['host'] == $exprPart['host']) {
 					$exprPart['host'] = $chdHost['host'];
 					break;
 				}
 			}
-			$newTrigger['expression'] = str_replace(
-					'{'.$exprPart['index'].'}',
+
+			$newTrigger['expression'] = substr_replace($newTrigger['expression'],
 					'{'.$exprPart['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}',
-					$newTrigger['expression']
+					$exprPart['pos'], strlen($exprPart['expression'])
 			);
 		}
+		while ($exprPart = prev($expressionData->expressions));
 
 		// check if a child trigger already exists on the host
 		$childTriggers = $this->get(array(

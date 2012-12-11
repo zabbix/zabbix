@@ -1,3 +1,26 @@
+Changes for 2.0.5rc1
+
+Bug fixes:
+A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
+A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
+..F....... [ZBX-5809] fixed global url displaing in map screen item (Eduard)
+A......... [ZBX-5837] fixed filtering by proxy status in HostGroup API get method (Eduard)
+..F....... [ZBX-5899] implement monitoring web flicker-free graph support (Eduard)
+.......PS. [ZBX-5919] removed OCI_COMMIT_ON_SUCCESS option for sql statements in transaction on Orable backend (Sasha)
+..F....... [ZBX-5869] fixed configuration graph host id detection (Eduard)
+..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
+..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
+..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
+..F....... [ZBX-5896] fixed inserting OR condition the trigger expression constructor (Sasha)
+A.F....... [ZBX-5833] fixed inserting a macro in the trigger expression constructor (Sasha)
+..F....... [ZBX-5884] improved the trigger expression constructor to work with parentheses (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.4
+
+2.0.4rc1 was released as 2.0.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.4rc1
 
 New features:
@@ -1143,6 +1166,16 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
+..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
+..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
+..F....... [ZBX-5896] fixed inserting OR condition the trigger expression constructor (Sasha)
+A.F....... [ZBX-5833] fixed inserting a macro in the trigger expression constructor (Sasha)
+..F....... [ZBX-4695] added support of simple check keys with user macros in the trigger expression (Sasha)
+..F....... [ZBX-5884] improved the trigger expression constructor to work with parentheses (Sasha)
+A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
+A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
+..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
 A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
