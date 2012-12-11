@@ -331,7 +331,7 @@ class CPageFilter {
 	private function _initDiscoveries($druleid, $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-			'output' => array('druleid', 'name')
+			'output' => API_OUTPUT_EXTEND
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$drules = API::DRule()->get($options);
