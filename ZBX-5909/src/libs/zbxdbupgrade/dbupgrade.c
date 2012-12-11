@@ -723,9 +723,10 @@ int	DBcheck_version()
 		if (SUCCEED != DBcreate_dbversion_table())
 			goto out;
 #else
-		zabbix_log(LOG_LEVEL_CRIT, "Server or proxy database version could be used with older Zabbix version "
-				"but is outdated for this Zabbix version. Automatic version upgrade is not supported "
-				"with SQLite. Exiting ...");
+		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
+				" Current database version (mandatory/optional): UNKNOWN."
+				" Required mandatory version: %08d.",
+				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy", required);
 		goto out;
 #endif
 	}
