@@ -10,11 +10,25 @@ ALTER TABLE users_groups ALTER COLUMN userid SET WITH DEFAULT NULL
 /
 REORG TABLE users_groups
 /
-DROP INDEX users_groups_1
-/
 DELETE FROM users_groups WHERE usrgrpid NOT IN (SELECT usrgrpid FROM usrgrp)
 /
 DELETE FROM users_groups WHERE userid NOT IN (SELECT userid FROM users)
+/
+-- remove duplicates to allow unique index
+DELETE FROM users_groups
+	WHERE id IN (
+		SELECT hm1.id
+		FROM users_groups hm1
+		LEFT OUTER JOIN (
+			SELECT MIN(hm2.id) AS id
+			FROM users_groups hm2
+			GROUP BY hm2.usrgrpid,hm2.userid
+		) keep_rows ON
+			hm1.id=keep_rows.id
+		WHERE keep_rows.id IS NULL
+	)
+/
+DROP INDEX users_groups_1
 /
 CREATE UNIQUE INDEX users_groups_1 ON users_groups (usrgrpid,userid)
 /

@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -39,6 +39,7 @@ class CScreenMap extends CScreenBase {
 				'output' => API_OUTPUT_EXTEND,
 				'selectSelements' => API_OUTPUT_EXTEND,
 				'selectLinks' => API_OUTPUT_EXTEND,
+				'expandUrls' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
@@ -58,6 +59,10 @@ class CScreenMap extends CScreenBase {
 
 		$this->insertFlickerfreeJs();
 
-		return new CDiv($output, 'map-container flickerfreescreen', $this->getScreenId());
+		$div = new CDiv($output, 'map-container flickerfreescreen', $this->getScreenId());
+		$div->setAttribute('data-timestamp', $this->timestamp);
+		$div->addStyle('position: relative;');
+
+		return $div;
 	}
 }

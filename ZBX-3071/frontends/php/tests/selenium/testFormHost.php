@@ -276,25 +276,26 @@ class testFormHost extends CWebTest {
 	public function testFormHost_TemplateUnlink() {
 		// Unlink a template from a host from host properties page
 
-		$template = "Template OS Linux";
-		$host = "Template linkage test host";
+		$template = 'Template OS Linux';
+		$host = 'Template linkage test host';
+		$name = 'Visible host for template linkage';
 
-		$sql = "select hostid from hosts where host='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
-		$this->assertEquals(1, DBcount($sql), "Chuck Norris: No such host:$host");
+		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		$this->assertEquals(1, DBcount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->click('link=Visible host for template linkage');
+		$this->click('link='.$name);
 		$this->wait();
-		$this->tab_switch("Templates");
-		$this->ok("$template");
+		$this->tab_switch('Templates');
+		$this->ok($template);
 		// clicks button named "Unlink" next to a template by name
 		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']");
 
 		$this->wait();
-		$this->nok("$template");
+		$this->nok($template);
 		$this->button_click('save');
 		$this->wait();
 		$this->checkTitle('Configuration of hosts');
@@ -302,19 +303,19 @@ class testFormHost extends CWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
-		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
+		$this->href_click('items.php?filter_set=1&hostid='.$hostid.'&sid=');
 		$this->wait();
-		$this->nok("$template");
+		$this->nok($template.':');
 		// using "host navigation bar" at the top of entity list
-		$this->href_click("triggers.php?hostid=$hostid&sid=");
+		$this->href_click('triggers.php?hostid='.$hostid.'&sid=');
 		$this->wait();
-		$this->nok("$template");
-		$this->href_click("graphs.php?hostid=$hostid&sid=");
+		$this->nok($template.':');
+		$this->href_click('graphs.php?hostid='.$hostid.'&sid=');
 		$this->wait();
-		$this->nok("$template");
-		$this->href_click("applications.php?hostid=$hostid&sid=");
+		$this->nok($template.':');
+		$this->href_click('applications.php?hostid='.$hostid.'&sid=');
 		$this->wait();
-		$this->nok("$template");
+		$this->nok($template.':');
 	}
 
 	public function testFormHost_TemplateLinkUpdate() {
@@ -324,20 +325,21 @@ class testFormHost extends CWebTest {
 	public function testFormHost_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page
 
-		$template = "Template OS Linux";
+		$template = 'Template OS Linux';
+		$name = 'Visible host for template linkage';
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->click('link=Visible host for template linkage');
+		$this->click('link='.$name);
 		$this->wait();
-		$this->tab_switch("Templates");
-		$this->ok("$template");
+		$this->tab_switch('Templates');
+		$this->ok($template);
 
 		// clicks button named "Unlink and clear" next to template named $template
 		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
 
 		$this->wait();
-		$this->nok("$template");
+		$this->nok($template);
 		$this->button_click('save');
 		$this->wait();
 		$this->checkTitle('Configuration of hosts');

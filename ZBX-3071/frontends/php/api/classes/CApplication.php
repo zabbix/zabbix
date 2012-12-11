@@ -367,9 +367,8 @@ class CApplication extends CZBXAPI {
 			$objParams = array(
 				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$items = API::Item()->get($objParams);
 			foreach ($items as $itemid => $item) {
@@ -434,11 +433,14 @@ class CApplication extends CZBXAPI {
 			));
 		}
 
+		if ($update){
+			$applications = $this->extendObjects($this->tableName(), $applications, array('name'));
+		}
+
 		foreach ($applications as &$application) {
 			if (!check_db_fields($itemDbFields, $application)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 			}
-			unset($application['templateid']);
 
 			// check permissions by hostid
 			if ($create) {
@@ -452,6 +454,17 @@ class CApplication extends CZBXAPI {
 				if (!isset($dbApplications[$application['applicationid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $application)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for application "%1$s".', $application['name']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for application "%1$s".', $application['name']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			// check on operating with templated applications
@@ -668,13 +681,14 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$itemOptions = array(
+		$allowedItems = API::Item()->get(array(
 			'itemids' => $itemids,
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$allowedItems = API::Item()->get($itemOptions);
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
+		));
+
 		foreach ($items as $num => $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

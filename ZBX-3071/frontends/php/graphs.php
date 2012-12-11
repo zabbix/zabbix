@@ -316,8 +316,15 @@ $pageFilter = new CPageFilter(array(
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 ));
-$_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['hostid'] = $pageFilter->hostid;
+
+if (empty($_REQUEST['parent_discoveryid'])) {
+	if (!empty($pageFilter->groupid)) {
+		$_REQUEST['groupid'] = $pageFilter->groupid;
+	}
+	if (!empty($pageFilter->hostid)) {
+		$_REQUEST['hostid'] = $pageFilter->hostid;
+	}
+}
 
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
 	// render view
@@ -384,12 +391,14 @@ elseif (isset($_REQUEST['form'])) {
 						'selectTemplates' => API_OUTPUT_EXTEND,
 						'selectDiscoveryRule' => array('itemid')
 					));
-					$parentGraphPrototype = reset($parentGraphPrototype);
-					$parentTemplate = reset($parentGraphPrototype['templates']);
+					if ($parentGraphPrototype) {
+						$parentGraphPrototype = reset($parentGraphPrototype);
+						$parentTemplate = reset($parentGraphPrototype['templates']);
 
-					$link = new CLink($parentTemplate['name'],
-						'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['hostid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
-					);
+						$link = new CLink($parentTemplate['name'],
+							'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['hostid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
+						);
+					}
 				}
 				// parent graph link
 				else {
@@ -400,9 +409,10 @@ elseif (isset($_REQUEST['form'])) {
 						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
 					);
 				}
-				$data['templates'][] = $link;
-				$data['templates'][] = SPACE.RARR.SPACE;
-
+				if (isset($link)) {
+					$data['templates'][] = $link;
+					$data['templates'][] = SPACE.RARR.SPACE;
+				}
 				$parentGraphid = $parentGraph['templateid'];
 			} while ($parentGraphid != 0);
 			$data['templates'] = array_reverse($data['templates']);
@@ -529,18 +539,21 @@ else {
 			'output' => array('graphid', 'name', 'graphtype'),
 			'limit' => $config['search_limit'] + 1
 		);
-		if ($pageFilter->hostid > 0) {
-			$options['hostids'] = $pageFilter->hostid;
+		// get real graphs
+		if (empty($_REQUEST['parent_discoveryid'])) {
+			if ($pageFilter->hostid > 0) {
+				$options['hostids'] = $pageFilter->hostid;
+			}
+			elseif ($pageFilter->groupid > 0) {
+				$options['groupids'] = $pageFilter->groupid;
+			}
+			$data['graphs'] = API::Graph()->get($options);
 		}
-		elseif ($pageFilter->groupid > 0) {
-			$options['groupids'] = $pageFilter->groupid;
-		}
-		if (!empty($_REQUEST['parent_discoveryid'])) {
+		// get graph prototypes
+		else {
 			$options['discoveryids'] = $_REQUEST['parent_discoveryid'];
+			$data['graphs'] = API::GraphPrototype()->get($options);
 		}
-		$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
 	}
 
 	if ($sortfield == 'graphtype') {

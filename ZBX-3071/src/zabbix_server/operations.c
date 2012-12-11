@@ -146,9 +146,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
 
 		sql_offset = 0;
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "begin\n");
-#endif
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
 #endif
@@ -160,16 +158,14 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					hostgroupid++, hostid, groupids->values[i]);
-
-#ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "end;\n");
-#endif
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
 		sql_offset--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 		DBexecute("%s", sql);
 	}
 

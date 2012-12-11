@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -103,24 +103,27 @@ function item_type2str($type = null) {
 	}
 }
 
-function item_value_type2str($type = null) {
-	$types = array(
-		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR => _('Character'),
-		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
-	);
-	if (is_null($type)) {
-		natsort($types);
-		return $types;
+/**
+ * Returns human readable an item value type
+ *
+ * @param integer $valueType
+ *
+ * @return string
+ */
+function itemValueTypeString($valueType) {
+	switch ($valueType) {
+		case ITEM_VALUE_TYPE_UINT64:
+			return _('Numeric (unsigned)');
+		case ITEM_VALUE_TYPE_FLOAT:
+			return _('Numeric (float)');
+		case ITEM_VALUE_TYPE_STR:
+			return _('Character');
+		case ITEM_VALUE_TYPE_LOG:
+			return _('Log');
+		case ITEM_VALUE_TYPE_TEXT:
+			return _('Text');
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+	return _('Unknown');
 }
 
 function item_data_type2str($type = null) {
@@ -342,9 +345,11 @@ function copyItems($srcHostId, $dstHostId) {
 			}
 		}
 		unset($srcItem['itemid']);
+		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
 		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 	}
+
 	return API::Item()->create($srcItems);
 }
 
@@ -509,12 +514,14 @@ function resolveItemKeyMacros(array $item) {
 	}
 
 	if (!empty($macStack)) {
-		$dbItem = API::Item()->get(array(
+		$options = array(
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
-			'output' => API_OUTPUT_REFER
-		));
+			'output' => API_OUTPUT_REFER,
+			'filter' => array('flags' => null)
+		);
+		$dbItem = API::Item()->get($options);
 		$dbItem = reset($dbItem);
 
 		$host = reset($dbItem['hosts']);
@@ -651,7 +658,6 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 function get_items_data_overview($hostids, $view_style) {
 	global $USER_DETAILS;
 
-	$table = new CTableInfo(_('No items defined.'));
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
@@ -708,52 +714,48 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 	}
 
-	if (!isset($hostnames)) {
+	$table = new CTableInfo(_('No items defined.'));
+	if (empty($hostnames)) {
 		return $table;
 	}
-
+	$table->makeVerticalRotation();
 	order_result($hostnames);
 
-	$css = getUserTheme($USER_DETAILS);
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
 		foreach ($hostnames as $hostname) {
-			$img = new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css);
-			$img->setAttribute('id', uniqid('do_'));
-			$header = array_merge($header, array($img));
+			$header[] = new CCol($hostname, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($items as $descr => $ithosts) {
-			$table_row = array(nbsp($descr));
+			$tableRow = array(nbsp($descr));
 			foreach ($hostnames as $hostname) {
-				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
+				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
 			}
-			$table->addRow($table_row);
+			$table->addRow($tableRow);
 		}
 	}
 	else {
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
-			$img = new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css);
-			$img->setAttribute('id', uniqid('do_'));
-			$header = array_merge($header, array($img));
+			$header[] = new CCol($descr, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($hostnames as $hostid => $hostname) {
 			$host = $hosts[$hostid];
 
-			// host JS menu link
+			// host js menu link
 			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
 			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
 			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 
-			$table_row = array(new CCol($hostSpan));
+			$tableRow = array(new CCol($hostSpan));
 			foreach ($items as $ithosts) {
-				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
+				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
 			}
-			$table->addRow($table_row);
+			$table->addRow($tableRow);
 		}
 	}
 

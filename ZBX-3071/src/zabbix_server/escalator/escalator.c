@@ -500,6 +500,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 					script.authtype = (unsigned char)atoi(row[6]);
 					script.publickey = zbx_strdup(script.publickey, row[9]);
 					script.privatekey = zbx_strdup(script.privatekey, row[10]);
+					/* break; is not missing here */
 				case ZBX_SCRIPT_TYPE_TELNET:
 					script.port = zbx_strdup(script.port, row[5]);
 					script.username = zbx_strdup(script.username, row[7]);

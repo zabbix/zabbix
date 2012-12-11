@@ -47,6 +47,36 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('host', ZBX_SORT_UP);
 
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['proxyid'])) {
+	$dbProxy = API::Proxy()->get(array(
+		'proxyids' => get_request('proxyid'),
+		'selectInterfaces' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('hostid', 'host'),
+		'output' => API_OUTPUT_EXTEND
+	));
+	if (empty($dbProxy)) {
+		access_deny();
+	}
+}
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['hosts']) || !is_array($_REQUEST['hosts'])) {
+		access_deny();
+	}
+	else {
+		$dbProxyChk = API::Proxy()->get(array(
+			'proxyids' => $_REQUEST['hosts'],
+			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid', 'host'),
+			'countOutput' => true
+		));
+		if ($dbProxyChk != count($_REQUEST['hosts'])) {
+			access_deny();
+		}
+	}
+}
 $_REQUEST['go'] = get_request('go', 'none');
 
 /*
@@ -85,30 +115,19 @@ if (isset($_REQUEST['save'])) {
 	show_messages($result, $msg_ok, $msg_fail);
 
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].' ] ['.reset($proxyids['proxyids']).']');
+		add_audit($action, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($proxyids['proxyids']).']');
 		unset($_REQUEST['form']);
 	}
 	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['delete'])) {
-	$result = false;
-
-	if (isset($_REQUEST['proxyid'])) {
-		$proxies = API::Proxy()->get(array(
-			'proxyids' => $_REQUEST['proxyid'],
-			'output' => API_OUTPUT_EXTEND
-		));
-
-		$result = API::Proxy()->delete(array('proxyid' => $_REQUEST['proxyid']));
-
-		if ($result) {
-			unset($_REQUEST['form'], $_REQUEST['proxyid']);
-			$proxy = reset($proxies);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].' ] ['.$proxy['proxyid'].']');
-		}
-
-		show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
+	$result = API::Proxy()->delete(array('proxyid' => $_REQUEST['proxyid']));
+	if ($result) {
+		unset($_REQUEST['form'], $_REQUEST['proxyid']);
+		$proxy = reset($dbProxy);
 	}
+	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
+
 	unset($_REQUEST['delete']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['proxyid'])) {
@@ -180,19 +199,12 @@ if (isset($_REQUEST['form'])) {
 
 	// proxy
 	if (!empty($data['proxyid'])) {
-		$data['proxy'] = API::Proxy()->get(array(
-			'proxyids' => $data['proxyid'],
-			'selectInterfaces' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid', 'host'),
-			'output' => API_OUTPUT_EXTEND
-		));
-		$data['proxy'] = reset($data['proxy']);
-
+		$dbProxy = reset($dbProxy);
 		if (!isset($_REQUEST['form_refresh'])) {
-			$data['name'] = $data['proxy']['host'];
-			$data['status'] = $data['proxy']['status'];
-			$data['interfaces'] = $data['proxy']['interfaces'];
-			$data['hosts'] = zbx_objectValues($data['proxy']['hosts'], 'hostid');
+			$data['name'] = $dbProxy['host'];
+			$data['status'] = $dbProxy['status'];
+			$data['interfaces'] = $dbProxy['interfaces'];
+			$data['hosts'] = zbx_objectValues($dbProxy['hosts'], 'hostid');
 		}
 	}
 
@@ -265,7 +277,6 @@ else {
 		'groupCount' => 1,
 		'countOutput' => 1,
 		'proxyids' => $proxyids,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'webitems' => 1,
 		'monitored' => 1
 	));

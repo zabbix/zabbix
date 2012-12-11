@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -919,9 +919,11 @@ elseif ($srctbl == 'users') {
 		}
 		else {
 			$values = array(
-				$dstfld1 => $user[$srcfld1],
-				$dstfld2 => isset($srcfld2) ? $user[$srcfld2] : null,
+				$dstfld1 => $user[$srcfld1]
 			);
+			if (isset($srcfld2)) {
+				$values[$dstfld2] = $user[$srcfld2];
+			}
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$alias->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
@@ -1015,9 +1017,11 @@ elseif ($srctbl == 'triggers') {
 		else {
 			$values = array(
 				$dstfld1 => $trigger[$srcfld1],
-				$dstfld2 => $trigger[$srcfld2],
-				$dstfld3 => $trigger[$srcfld3]
+				$dstfld2 => $trigger[$srcfld2]
 			);
+			if (isset($srcfld3)) {
+				$values[$dstfld3] = $trigger[$srcfld3];
+			}
 			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
@@ -1099,7 +1103,6 @@ elseif ($srctbl == 'items') {
 		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'webitems' => true,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name'),
 		'preservekeys' => true
@@ -1156,7 +1159,7 @@ elseif ($srctbl == 'items') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 
@@ -1214,11 +1217,10 @@ elseif ($srctbl == 'prototypes') {
 	}
 	$table->setHeader($header);
 
-	$items = API::Item()->get(array(
+	$items = API::ItemPrototype()->get(array(
 		'nodeids' => $nodeid,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));
@@ -1257,7 +1259,7 @@ elseif ($srctbl == 'prototypes') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}
@@ -1466,8 +1468,7 @@ elseif ($srctbl == 'simple_graph') {
 			'templated' => false,
 			'filter' => array(
 				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				'status' => ITEM_STATUS_ACTIVE
 			),
 			'preservekeys' => true
 		);
@@ -1532,7 +1533,7 @@ elseif ($srctbl == 'simple_graph') {
 			$hostid > 0 ? null : $item['hostname'],
 			$description,
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type'])
+			itemValueTypeString($item['value_type'])
 		));
 	}
 
@@ -1638,10 +1639,7 @@ elseif ($srctbl == 'plain_text') {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'templated' => 0,
-		'filter' => array(
-			'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
-			'status' => ITEM_STATUS_ACTIVE
-		),
+		'filter' => array('status' => ITEM_STATUS_ACTIVE),
 		'sortfield' => 'name'
 	);
 	if (!is_null($writeonly)) {
@@ -1667,7 +1665,7 @@ elseif ($srctbl == 'plain_text') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}

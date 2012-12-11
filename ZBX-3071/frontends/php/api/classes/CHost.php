@@ -823,7 +823,6 @@ class CHost extends CHostGeneral {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
@@ -2011,12 +2010,6 @@ class CHost extends CHostGeneral {
 		// delete the items
 		$delItems = API::Item()->get(array(
 			'templateids' => $hostids,
-			'filter' => array(
-				'flags' => array(
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_CREATED
-				)
-			),
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => true,
 			'preservekeys' => true

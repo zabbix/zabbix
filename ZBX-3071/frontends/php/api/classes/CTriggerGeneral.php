@@ -162,27 +162,30 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		$newTrigger['templateid'] = $trigger['triggerid'];
 		unset($newTrigger['triggerid']);
 
-
 		if (isset($trigger['dependencies'])) {
 			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
 			$newTrigger['dependencies'] = replace_template_dependencies($deps, $chdHost['hostid']);
 		}
-		$expressionData = new CTriggerExpression($trigger);
+		$expressionData = new CTriggerExpression();
+		$expressionData->parse($trigger['expression']);
 
+		$newTrigger['expression'] = $trigger['expression'];
 		// replace template separately in each expression, only in beginning (host part)
-		foreach ($expressionData->expressions as $expr) {
-			$newExpr = '';
+		$exprPart = end($expressionData->expressions);
+		do {
 			foreach ($triggerTemplates as $triggerTemplate) {
-				$pos = strpos($expr['expression'], '{'.$triggerTemplate['host'].':');
-				if ($pos === 0) {
-					$newExpr = substr_replace($expr['expression'], '{'.$chdHost['host'].':', 0, strlen('{'.$triggerTemplate['host'].':'));
+				if ($triggerTemplate['host'] == $exprPart['host']) {
+					$exprPart['host'] = $chdHost['host'];
 					break;
 				}
 			}
-			if (!empty($newExpr)) {
-				$newTrigger['expression'] = str_replace($expr['expression'], $newExpr, $newTrigger['expression']);
-			}
+
+			$newTrigger['expression'] = substr_replace($newTrigger['expression'],
+					'{'.$exprPart['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}',
+					$exprPart['pos'], strlen($exprPart['expression'])
+			);
 		}
+		while ($exprPart = prev($expressionData->expressions));
 
 		// check if a child trigger already exists on the host
 		$childTriggers = $this->get(array(
@@ -227,6 +230,18 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$this->updateReal($newTrigger);
 		}
 		else {
+			$oldTrigger = $this->get(array(
+				'triggerids' => $trigger['triggerid'],
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+			$oldTrigger = reset($oldTrigger);
+			unset($oldTrigger['triggerid']);
+			foreach ($oldTrigger as $key => $value) {
+				if (!isset($newTrigger[$key])) {
+					$newTrigger[$key] = $oldTrigger[$key];
+				}
+			}
 			$this->createReal($newTrigger);
 			$newTrigger = reset($newTrigger);
 		}
@@ -265,8 +280,10 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$filter['hostid'] = $hostid;
 		}
 		else {
-			$expr = new CTriggerExpression($trigger);
-			$filter['host'] = reset($expr->data['hosts']);
+			$expressionData = new CTriggerExpression($trigger['expression']);
+			$expressionData->parse($trigger['expression']);
+			$expressionHosts = $expressionData->getHosts();
+			$filter['host'] = reset($expressionHosts);
 		}
 
 		$triggers = $this->get(array(

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'tr_status.php';
@@ -27,8 +27,8 @@ $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-?>
-<?php
+
+
 if($page['type'] == PAGE_TYPE_HTML){
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
@@ -37,8 +37,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // js templates
 require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
-?>
-<?php
+
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'groupid'=>				array(T_ZBX_INT, O_OPT,	 	P_SYS,	DB_ID, 					null),
@@ -165,8 +165,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	if(isset($audio) && !$mute){
 		play_sound($audio);
 	}
-?>
-<?php
+
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm('get');
@@ -401,6 +400,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 				'triggerids' => $triggerIdsWithoutUnackEvents,
 				'filter' => array(
 					'object' => EVENT_OBJECT_TRIGGER,
+					'value_changed' => TRIGGER_VALUE_CHANGED_YES
 				),
 				'nopermissions' => true
 			);
@@ -798,5 +798,3 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>

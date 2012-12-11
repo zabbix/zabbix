@@ -682,7 +682,9 @@ var hintBox = {
 	createBox: function(e, target, hintText, width, className, isStatic) {
 		var box = jQuery('<div></div>').addClass('hintbox');
 
-		hintText = hintText.replace(/\n/g, '<br />');
+		if (typeof hintText === 'string') {
+			hintText = hintText.replace(/\n/g, '<br />');
+		}
 
 		if (!empty(className)) {
 			box.append(jQuery('<span></span>').addClass(className).html(hintText));

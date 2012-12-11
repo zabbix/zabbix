@@ -22,7 +22,7 @@
 /**
  * @package API
  */
-class CItemPrototype extends CItemGeneral{
+class CItemPrototype extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
@@ -57,6 +57,9 @@ class CItemPrototype extends CItemGeneral{
 			'hostids'					=> null,
 			'itemids'					=> null,
 			'discoveryids'				=> null,
+			'graphids'					=> null,
+			'triggerids'				=> null,
+			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
@@ -175,6 +178,30 @@ class CItemPrototype extends CItemGeneral{
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
+		}
+
+		// triggerids
+		if (!is_null($options['triggerids'])) {
+			zbx_value2array($options['triggerids']);
+
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
+				$sqlParts['select']['triggerid'] = 'f.triggerid';
+			}
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
+		}
+
+		// graphids
+		if (!is_null($options['graphids'])) {
+			zbx_value2array($options['graphids']);
+
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
+				$sqlParts['select']['graphid'] = 'gi.graphid';
+			}
+			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
+			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
 // inherited
@@ -336,6 +363,12 @@ class CItemPrototype extends CItemGeneral{
 						$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
 						unset($item['graphid']);
 					}
+
+					// webitems
+					if (!is_null($options['webitems'])) {
+						unset($sqlParts['where']['webtype']);
+					}
+
 // discoveryids
 					if (isset($item['discoveryids'])) {
 						if (!isset($result[$item['itemid']]['discovery']))
@@ -368,7 +401,7 @@ class CItemPrototype extends CItemGeneral{
 				);
 				$hosts = API::Host()->get($objParams);
 
-				foreach ($hosts as $hostid => $host) {
+				foreach ($hosts as $host) {
 					$hitems = $host['items'];
 					unset($host['items']);
 					foreach ($hitems as $inum => $item) {
@@ -377,7 +410,7 @@ class CItemPrototype extends CItemGeneral{
 				}
 
 				$templates = API::Template()->get($objParams);
-				foreach ($templates as $templateid => $template) {
+				foreach ($templates as $template) {
 					$titems = $template['items'];
 					unset($template['items']);
 					foreach ($titems as $inum => $item) {
@@ -391,25 +424,29 @@ class CItemPrototype extends CItemGeneral{
 		if (!is_null($options['selectTriggers'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'itemids' => $itemids,
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($triggers, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($triggers, 'description');
+				}
+				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
 					unset($triggers[$triggerid]['items']);
-					$count = array();
 					foreach ($trigger['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
 
 						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
@@ -420,7 +457,7 @@ class CItemPrototype extends CItemGeneral{
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -454,27 +491,31 @@ class CItemPrototype extends CItemGeneral{
 		if (!is_null($options['selectGraphs'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'itemids' => $itemids,
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($graphs, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($graphs, 'name');
+				}
+				$count = array();
 				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['discoveries']);
-					$count = array();
-					foreach ($graph['discoveries'] as $item) {
+					unset($graphs[$graphid]['items']);
+					foreach ($graph['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
 
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
-
 						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
@@ -483,14 +524,16 @@ class CItemPrototype extends CItemGeneral{
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
 
-				$graphs = API::Graph()->get($objParams);
-
+				$graphs = API::GraphPrototype()->get($objParams);
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
+
 				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid]))
+					if (isset($graphs[$itemid])) {
 						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					else
+					}
+					else {
 						$result[$itemid]['graphs'] = 0;
+					}
 				}
 			}
 		}
@@ -664,117 +707,124 @@ class CItemPrototype extends CItemGeneral{
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-/**
- * Delete Itemprototypes
- *
- * @param array $ruleids
- * @return
- */
-	public function delete($prototypeids, $nopermissions=false) {
+	/**
+	 * Delete Item prototypes.
+	 *
+	 * @param int|string|array $prototypeids
+	 * @param bool             $nopermissions
+	 *
+	 * @return array
+	 */
+	public function delete($prototypeids, $nopermissions = false) {
+		if (empty($prototypeids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
 
-			if (empty($prototypeids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$prototypeids = zbx_toHash($prototypeids);
 
-			$prototypeids = zbx_toHash($prototypeids);
+		$options = array(
+			'itemids' => $prototypeids,
+			'editable' => true,
+			'preservekeys' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name')
+		);
+		$delItemPrototypes = $this->get($options);
 
-			$options = array(
-				'itemids' => $prototypeids,
-				'editable' => true,
-				'preservekeys' => true,
-				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('name')
-			);
-			$delItemPrototypes = $this->get($options);
-
-			// TODO: remove $nopermissions hack
-			if (!$nopermissions) {
-				foreach ($prototypeids as $prototypeid) {
-					if (!isset($delItemPrototypes[$prototypeid])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-					}
-					if ($delItemPrototypes[$prototypeid]['templateid'] != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
-					}
+		// TODO: remove $nopermissions hack
+		if (!$nopermissions) {
+			foreach ($prototypeids as $prototypeid) {
+				if (!isset($delItemPrototypes[$prototypeid])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				}
+				if ($delItemPrototypes[$prototypeid]['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items'));
 				}
 			}
+		}
 
-			// first delete child items
-			$parentItemids = $prototypeids;
-			$childPrototypeids = array();
-			do{
-				$dbItems = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parentItemids));
-				$parentItemids = array();
-				while ($dbItem = DBfetch($dbItems)) {
-					$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
-					$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
-				}
-			}while (!empty($parentItemids));
-
-			$options = array(
-				'output' => API_OUTPUT_EXTEND,
-				'itemids' => $childPrototypeids,
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'selectHosts' => array('name')
-			);
-			$delItemPrototypesChilds = $this->get($options);
-
-			$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChilds);
-			$prototypeids = array_merge($prototypeids, $childPrototypeids);
-
-			// delete graphs with this item prototype
-			$delGraphPrototypes = API::GraphPrototype()->get(array(
-				'itemids' => $prototypeids,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			if (!empty($delGraphPrototypes)) {
-				$result = API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
-				}
+		// first delete child items
+		$parentItemids = $prototypeids;
+		$childPrototypeids = array();
+		do {
+			$dbItems = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parentItemids));
+			$parentItemids = array();
+			while ($dbItem = DBfetch($dbItems)) {
+				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
+				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
+		} while (!empty($parentItemids));
 
-			// check if any graphs are referencing this item
-			$this->checkGraphReference($prototypeids);
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $childPrototypeids,
+			'nopermissions' => true,
+			'preservekeys' => true,
+			'selectHosts' => array('name')
+		);
+		$delItemPrototypesChilds = $this->get($options);
+
+		$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChilds);
+		$prototypeids = array_merge($prototypeids, $childPrototypeids);
+
+		// delete graphs with this item prototype
+		$delGraphPrototypes = API::GraphPrototype()->get(array(
+			'itemids' => $prototypeids,
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+		if (!empty($delGraphPrototypes)) {
+			$result = API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
+			}
+		}
+
+		// check if any graphs are referencing this item
+		$this->checkGraphReference($prototypeids);
 
 // CREATED ITEMS
-			$createdItems = array();
-			$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
-			$dbItems = DBselect($sql);
-			while ($item = DBfetch($dbItems)) {
-				$createdItems[$item['itemid']] = $item['itemid'];
+		$createdItems = array();
+		$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
+		$dbItems = DBselect($sql);
+		while ($item = DBfetch($dbItems)) {
+			$createdItems[$item['itemid']] = $item['itemid'];
+		}
+		if (!empty($createdItems)) {
+			$result = API::Item()->delete($createdItems, true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete items created by low level discovery.'));
 			}
-			if (!empty($createdItems)) {
-				$result = API::Item()->delete($createdItems, true);
-				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item prototype');
-			}
+		}
 
 
 // TRIGGER PROTOTYPES
-			$delTriggerPrototypes = API::TriggerPrototype()->get(array(
-				'itemids' => $prototypeids,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true,
-			));
-			if (!empty($delTriggerPrototypes)) {
-				$result = API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
-				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete trigger prototype');
+		$delTriggerPrototypes = API::TriggerPrototype()->get(array(
+			'itemids' => $prototypeids,
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => true,
+			'preservekeys' => true,
+		));
+		if (!empty($delTriggerPrototypes)) {
+			$result = API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype'));
 			}
+		}
 
 
 // ITEM PROTOTYPES
-			DB::delete('items', array('itemid' => $prototypeids));
+		DB::delete('items', array('itemid' => $prototypeids));
 
 
 // TODO: remove info from API
-			foreach ($delItemPrototypes as $item) {
-				$host = reset($item['hosts']);
-				info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
-			}
+		foreach ($delItemPrototypes as $item) {
+			$host = reset($item['hosts']);
+			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
+		}
 
-			return array('prototypeids' => $prototypeids);
+		return array('prototypeids' => $prototypeids);
 	}
 
 	public function syncTemplates($data) {

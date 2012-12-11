@@ -63,6 +63,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'templateids'				=> null,
 			'hostids'					=> null,
 			'itemids'					=> null,
+			'interfaceids'				=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
@@ -164,6 +165,21 @@ class CDiscoveryRule extends CItemGeneral {
 			zbx_value2array($options['itemids']);
 
 			$sqlParts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
+		}
+
+		// interfaceids
+		if (!is_null($options['interfaceids'])) {
+			zbx_value2array($options['interfaceids']);
+
+			if ($options['output'] != API_OUTPUT_EXTEND) {
+				$sqlParts['select']['interfaceid'] = 'i.interfaceid';
+			}
+
+			$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
+
+			if (!is_null($options['groupCount'])) {
+				$sqlParts['group']['i'] = 'i.interfaceid';
+			}
 		}
 
 		// inherited
@@ -414,13 +430,12 @@ class CDiscoveryRule extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => true,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
@@ -440,7 +455,7 @@ class CDiscoveryRule extends CItemGeneral {
 			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::TriggerPrototype()->get($objParams);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -454,37 +469,32 @@ class CDiscoveryRule extends CItemGeneral {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => true,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
+				'preservekeys' => true
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
+				$count = array();
 				foreach ($graphs as $graphid => $graph) {
-					unset($graphs[$graphid]['discoveries']);
-
-					$count = array();
-					foreach ($graph['discoveries'] as $item) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) {
-								$count[$item['itemid']] = 0;
-							}
-							$count[$item['itemid']]++;
-
-							if ($count[$item['itemid']] > $options['limitSelects']) {
-								continue;
-							}
+					unset($graphs[$graphid]['parent_itemid']);
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$graph['parent_itemid']])) {
+							$count[$graph['parent_itemid']] = 0;
 						}
-						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
+						$count[$graph['parent_itemid']]++;
+						if ($count[$graph['parent_itemid']] > $options['limitSelects']) {
+							continue;
+						}
 					}
+					$result[$graph['parent_itemid']]['graphs'][] = &$graphs[$graphid];
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::GraphPrototype()->get($objParams);
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -785,37 +795,19 @@ class CDiscoveryRule extends CItemGeneral {
 			return array();
 		}
 
-		$itemKeys = array();
 		foreach ($srcTriggers as $id => $trigger) {
 			// skip triggers with web items
 			if (httpItemExists($trigger['items'])) {
 				unset($srcTriggers[$id]);
 				continue;
 			}
-
-			foreach ($trigger['items'] as $item) {
-				$itemKeys[$item['key_']] = $item['key_'];
-			}
-		}
-
-		// fetch newly created items
-		$items = API::Item()->get(array(
-			'hostids' => $dstDiscovery['hostid'],
-			'filter' => array(
-				'key_' => $itemKeys
-			),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-		$dstItems = array();
-		foreach ($items as $item) {
-			$dstItems[$item['key_']] = $item;
 		}
 
 		// save new triggers
 		$dstTriggers = $srcTriggers;
 		foreach ($dstTriggers as $id => $trigger) {
-			unset($trigger['triggerid']);
+			unset($dstTriggers[$id]['templateid']);
+			unset($dstTriggers[$id]['triggerid']);
 
 			// update expression
 			$dstTriggers[$id]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
@@ -1006,6 +998,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
+		unset($dstDiscovery['templateid']);
 
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1035,6 +1028,11 @@ class CDiscoveryRule extends CItemGeneral {
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			));
+
+			foreach ($newPrototypes as $i => $newPrototype) {
+				unset($newPrototypes[$i]['templateid']);
+			}
+
 			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
@@ -1071,6 +1069,8 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
+
+				unset($prototype['templateid']);
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1153,8 +1153,10 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = API::Item()->get(array(
 			'itemids' => $srcItemIds,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
+
 		$srcItems = array();
 		$itemKeys = array();
 		foreach ($items as $item) {
@@ -1163,14 +1165,17 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// fetch newly cloned items
-		$items = array_merge($dstDiscovery['items'], API::Item()->get(array(
+		$newItems = API::Item()->get(array(
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => array(
-				'key_' => $itemKeys
+				'key_' => $itemKeys,
+				'flags' => null
 			),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		)));
+		));
+
+		$items = array_merge($dstDiscovery['items'], $newItems);
 		$dstItems = array();
 		foreach ($items as $item) {
 			$dstItems[$item['key_']] = $item;
@@ -1179,6 +1184,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$dstGraphs = $srcGraphs;
 		foreach ($dstGraphs as &$graph) {
 			unset($graph['graphid']);
+			unset($graph['templateid']);
 
 			foreach ($graph['gitems'] as &$gitem) {
 				// replace the old item with the new one with the same key

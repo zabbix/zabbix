@@ -975,11 +975,13 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 
 			if (ITEM_STATUS_NOTSUPPORTED == h->status)
 			{
+				int	errcode = SUCCEED;
+
 				h->value_orig.err = zbx_dsprintf(NULL, "Type of received value"
 						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 						h->value.dbl, zbx_item_value_type_string(h->value_type));
 
-				DCrequeue_reachable_item(h->itemid, h->status, h->clock);
+				DCrequeue_items(&h->itemid, &h->status, &h->clock, &errcode, 1);
 			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
@@ -2825,16 +2827,14 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 	if (0 != (ZBX_FLAG_DISCOVERY & flags))
 	{
+		if (NULL == GET_TEXT_RESULT(value))
+			return;
+
 		/* server processes low-level discovery (lld) items while proxy stores their values in db */
 		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
-		{
 			DBlld_process_discovery_rule(itemid, value->text, ts);
-		}
 		else
-		{
-			if (GET_TEXT_RESULT(value))
-				DCadd_history_lld(itemid, value->text, ts);
-		}
+			DCadd_history_lld(itemid, value->text, ts);
 
 		return;
 	}

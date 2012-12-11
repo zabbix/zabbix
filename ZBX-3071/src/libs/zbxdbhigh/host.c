@@ -1153,6 +1153,14 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", *triggerids, *triggerids_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
+	/* delete from profiles */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"delete from profiles"
+			" where idx='web.events.filter.triggerid'"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", *triggerids, *triggerids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
 			" where");

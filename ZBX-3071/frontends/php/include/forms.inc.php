@@ -33,6 +33,7 @@
 				$options['nodeids'] = id2nodeid($userid);
 			}
 			$users = API::User()->get($options);
+
 			$user = reset($users);
 			$data['title'] = _('User').' "'.$user['alias'].'"';
 		}
@@ -672,10 +673,11 @@
 			if ($filter_value_type == -1) {
 				if (!isset($item_params['value_types'][$item['value_type']])) {
 					$item_params['value_types'][$item['value_type']] = array(
-						'name' => item_value_type2str($item['value_type']),
+						'name' => itemValueTypeString($item['value_type']),
 						'count' => 0
 					);
 				}
+
 				$show_item = true;
 				foreach ($item['subfilters'] as $name => $value) {
 					if ($name == 'subfilter_value_types') {
@@ -951,10 +953,13 @@
 			);
 			if ($data['is_discovery_rule']) {
 				$options['hostids'] = $data['hostid'];
-				$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
 				$options['editable'] = true;
+				$data['item'] = API::DiscoveryRule()->get($options);
 			}
-			$data['item'] = API::Item()->get($options);
+			else {
+				$options['filter'] = array('flags' => null);
+				$data['item'] = API::Item()->get($options);
+			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
@@ -965,13 +970,16 @@
 				$options = array(
 					'itemids' => $itemid,
 					'output' => array('itemid', 'templateid'),
-					'selectHosts' => array('name'),
-					'selectDiscoveryRule' => array('itemid')
+					'selectHosts' => array('name')
 				);
 				if ($data['is_discovery_rule']) {
-					$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
+					$item = API::DiscoveryRule()->get($options);
 				}
-				$item = API::Item()->get($options);
+				else {
+					$options['selectDiscoveryRule'] = array('itemid');
+					$options['filter'] = array('flags' => null);
+					$item = API::Item()->get($options);
+				}
 				$item = reset($item);
 
 				if (!empty($item)) {
@@ -1317,14 +1325,15 @@
 		}
 
 		if ($data['input_method'] == IM_TREE) {
-			$analyze = analyze_expression($data['expression']);
+			$analyze = analyzeExpression($data['expression']);
 			if ($analyze !== false) {
 				list($data['outline'], $data['eHTMLTree']) = $analyze;
 				if (isset($_REQUEST['expr_action']) && $data['eHTMLTree'] != null) {
-					$new_expr = remake_expression($data['expression'], $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $data['expr_temp']);
+					$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
+							$_REQUEST['expr_action'], $data['expr_temp']);
 					if ($new_expr !== false) {
 						$data['expression'] = $new_expr;
-						$analyze = analyze_expression($data['expression']);
+						$analyze = analyzeExpression($data['expression']);
 						if ($analyze !== false) {
 							list($data['outline'], $data['eHTMLTree']) = $analyze;
 						}

@@ -39,16 +39,17 @@ form { margin: 0; }
 /* media */
 @media print {
 	.printless { visibility: hidden; display: none; }
-	.printonly { display: block; visibility:visible; }
+	.printonly { display: block; visibility: visible; }
 }
 @media screen {
-	.printless { visibility:visible; display:block; }
-	.printonly { visibility: hidden; display:none; }
+	.printless { visibility: visible; display: block; }
+	.printonly { visibility: hidden; display: none; }
 }
 
 .hidden { display: none; }
 .pre { white-space: pre; }
 .placeholder { color: #aaa; }
+.fixedfont { font-family: monospace; }
 
 /* align */
 .floatleft { float: left; }
@@ -68,18 +69,19 @@ form { margin: 0; }
 /* margins && paddings */
 .paddingless { padding: 0; }
 .marginless { margin: 0; }
+.padding_standard { padding: 5px; }
 
 /* color */
 .img { border: 1px black; }
-img.top { vertical-align:text-top; }
-img.bottom { vertical-align:text-bottom; }
+img.top { vertical-align: text-top; }
+img.bottom { vertical-align: text-bottom; }
 
-.vert { width:1px; }
+.vert { width: 1px; }
 .rarr { font-size: 16px; }
 .bold { font-weight: bold; }
 .italic { font-style: italic; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
-.delimiter { font-weight:bold; color: #000; }
+.delimiter { font-weight: bold; color: #000; }
 .pointer:hover { cursor: pointer; }
 .move { cursor: move; }
 .cell { padding: 1px 3px; white-space: nowrap; text-align: left; border: 0; height: 20px; }
@@ -441,6 +443,11 @@ table.tableinfo tr.header td.hover_grey { white-space: nowrap; word-spacing: 0; 
 table.tableinfo tr.vertical_header td { padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center; }
 table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { cursor: pointer; }
+table.tableinfo tr.vertical_header td.vertical_rotation { white-space: nowrap; align: center; font-family:arial; font-size:11px; }
+table.tableinfo tr.vertical_header td.vertical_rotation .vertical_rotation_inner {
+	transform: rotate(270deg); -moz-transform: rotate(270deg); -webkit-transform: rotate(270deg); -o-transform: rotate(270deg);
+	white-space: nowrap;
+}
 table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; padding-left: 5px; }
 table.tableinfo tr > td:first-child { width: 1px; }
 table.tableinfo tr td.wraptext { white-space: normal; }
@@ -731,12 +738,12 @@ table.invisible tr > td { border: 0; margin: 0; padding: 0; }
 table.paging { width: 100%; padding: 2px; }
 table.paging tr td { border: 0 black solid; width: 100%; font-size: 1.1em; line-height: 18px; text-align: center; vertical-align: middle; }
 
-/* header new */
-table.header_wide { width: 100%; color: #222222; border: 1px #3377AA solid; vertical-align: middle; background-color:#FFFFFF; margin-top: 2px; }
+/* header wide */
+table.header_wide { width: 100%; color: #222222; border: 1px #3377AA solid; text-align: center; vertical-align: middle; background-color:#FFFFFF; margin-top: 2px; }
 table.header_wide tr.first td.header_l { font-size: 1.3em; font-weight: bold; text-align: left; height: 24px; padding-left: 5px; color: #224488; }
-table.header_wide tr.first td.header_r { background:none; text-align: right; height: 24px; padding-right: 5px; border-width: 0; }
-table.header_wide tr.next td.header_l { background:none; text-align: left; height: 20px; padding-left: 5px; border-width: 0; }
-table.header_wide tr.next td.header_r { background:none; text-align: right; height: 20px; padding-right: 5px; border-width: 0; }
+table.header_wide tr.first td.header_r { background: none; text-align: right; height: 24px; padding-right: 5px; border-width: 0; }
+table.header_wide tr.next td.header_l { background: none; text-align: left; height: 20px; padding-left: 5px; border-width: 0; }
+table.header_wide tr.next td.header_r { background: none; text-align: right; height: 20px; padding-right: 5px; border-width: 0; }
 
 /* suggest */
 table.suggest { width: 100%; margin: 0; border-spacing: 0; background-color: #FEFEFE; }
@@ -855,7 +862,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 .icon-maintenance-abs {
 	height: 12px;
 	position: absolute;
-	right: 0px;
+	right: 0;
 	top: 4px;
 }
 
@@ -878,4 +885,4 @@ fieldset legend { margin: 0.2em 0.5em; }
 }
 
 /* flickerfreescreen */
-.flickerfreescreen { position: relative; }
+.flickerfreescreen .shadow { background-color: #000000; }

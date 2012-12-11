@@ -1096,17 +1096,18 @@ class CXmlImport18 {
 
 				if ($current_host && (!empty($rules['hosts']['updateExisting']) || !empty($rules['templates']['updateExisting']))) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
-						$host_db['templateid'] = $current_host['hostid'];
+						$host_db['templateid'] = $current_host['templateid'];
 						$result = API::Template()->update($host_db);
+						$current_hostid = $current_host['templateid'];
 					}
 					else {
 						$host_db['hostid'] = $current_host['hostid'];
 						$result = API::Host()->update($host_db);
+						$current_hostid = $current_host['hostid'];
 					}
 					if (!$result) {
 						throw new Exception();
 					}
-					$current_hostid = $current_host['hostid'];
 				}
 				if (!$current_host && (!empty($rules['hosts']['createMissing']) || !empty($rules['templates']['createMissing']))) {
 
@@ -1259,11 +1260,7 @@ class CXmlImport18 {
 						$options = array(
 							'filter' => array(
 								'hostid' => $item_db['hostid'],
-								'key_' => $item_db['key_'],
-								'flags' => array(
-									ZBX_FLAG_DISCOVERY_NORMAL,
-									ZBX_FLAG_DISCOVERY_CREATED
-								),
+								'key_' => $item_db['key_']
 							),
 							'webitems' => 1,
 							'output' => API_OUTPUT_EXTEND,
@@ -1287,6 +1284,7 @@ class CXmlImport18 {
 
 						$item_applications = array();
 						$applications_to_add = array();
+						$applicationsIds = array();
 
 						foreach ($applications as $application) {
 							$application_db = array(
@@ -1299,9 +1297,19 @@ class CXmlImport18 {
 								'output' => API_OUTPUT_EXTEND
 							));
 
+							$applicationValue = reset($current_application);
 
 							if ($current_application) {
-								$item_applications = array_unique(array_merge($item_applications, $current_application));
+								if (empty($item_applications)) {
+									$item_applications = $current_application;
+									$applicationsIds[] = $applicationValue['applicationid'];
+								}
+								else {
+									if (!in_array($applicationValue['applicationid'], $applicationsIds)) {
+										$item_applications = array_merge($item_applications, $current_application);
+										$applicationsIds[] = $applicationValue['applicationid'];
+									}
+								}
 							}
 							else {
 								$applications_to_add[] = $application_db;
@@ -1498,13 +1506,7 @@ class CXmlImport18 {
 
 							if ($current_item = API::Item()->exists($gitem_db)) {
 								$current_item = API::Item()->get(array(
-									'filter' => array(
-										'key_' => $gitem_db['key_'],
-										'flags' => array(
-											ZBX_FLAG_DISCOVERY_NORMAL,
-											ZBX_FLAG_DISCOVERY_CREATED
-										),
-									),
+									'filter' => array('key_' => $gitem_db['key_']),
 									'webitems' => 1,
 									'host' => $gitem_db['host'],
 									'output' => API_OUTPUT_EXTEND,

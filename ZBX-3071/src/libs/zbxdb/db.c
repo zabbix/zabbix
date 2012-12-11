@@ -270,21 +270,16 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				(text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
 
+		if (OCI_SUCCESS == err)
+		{
+			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp, (ub4 *)0,
+					OCI_ATTR_SERVER, oracle.errhp);
+		}
+
 		if (OCI_SUCCESS != err)
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
 			ret = ZBX_DB_DOWN;
-		}
-		else
-		{
-			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp, (ub4 *)0,
-					OCI_ATTR_SERVER, oracle.errhp);
-
-			if (OCI_SUCCESS != err)
-			{
-				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
-				ret = ZBX_DB_DOWN;
-			}
 		}
 	}
 
@@ -708,7 +703,8 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 	sword	err;
 
 	if (OCI_SUCCESS == (err = OCIStmtExecute(oracle.svchp, oracle.stmthp, oracle.errhp, (ub4)1, (ub4)0,
-			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS)))
+			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
+			0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT)))
 	{
 		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
 	}
@@ -1196,7 +1192,8 @@ error:
 	if (OCI_SUCCESS == err)
 	{
 		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4)0, (ub4)0,
-				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
+				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
+				0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT);
 	}
 
 	if (OCI_SUCCESS == err)

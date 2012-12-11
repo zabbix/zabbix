@@ -146,7 +146,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	DB_ROW		row;
 	char		*buffer = NULL;
 	size_t		buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
-	int		res = FAIL, refresh_unsupported;
+	int		res = FAIL, refresh_unsupported, now;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
 	DC_ITEM		dc_item;
@@ -171,6 +171,10 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, &hostid, error))
 		goto out;
 
+	DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED);
+
+	now = time(NULL);
+
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
 	buffer_offset = 0;
@@ -188,16 +192,6 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 			ZBX_FLAG_DISCOVERY_CHILD,
 			hostid);
 
-	if (0 != *(int *)DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED))
-	{
-		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
-				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-				refresh_unsupported, time(NULL));
-	}
-	else
-		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, " and i.status=%d", ITEM_STATUS_ACTIVE);
-
 	result = DBselect("%s", buffer);
 
 	buffer_offset = 0;
@@ -208,6 +202,15 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() Item '%s' was not found in the server cache. Not sending now.",
 					__function_name, row[0]);
 			continue;
+		}
+
+		if (ITEM_STATUS_NOTSUPPORTED == dc_item.status)
+		{
+			if (0 == refresh_unsupported || dc_item.lastclock + refresh_unsupported > now)
+			{
+				DCconfig_clean_items(&dc_item, NULL, 1);
+				continue;
+			}
 		}
 
 		DCconfig_clean_items(&dc_item, NULL, 1);
@@ -288,7 +291,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	DB_RESULT	result;
 	DB_ROW		row;
 	struct zbx_json	json;
-	int		res = FAIL, refresh_unsupported;
+	int		res = FAIL, refresh_unsupported, now;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN], *key = NULL;
 	DC_ITEM		dc_item;
@@ -321,6 +324,10 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == get_hostid_by_host(host, ip, port, &hostid, error))
 		goto error;
 
+	DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED);
+
+	now = time(NULL);
+
 	sql = zbx_malloc(sql, sql_alloc);
 
 	name_esc = DBdyn_escape_string(host);
@@ -339,16 +346,6 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			ZBX_FLAG_DISCOVERY_CHILD,
 			hostid);
 
-	if (0 != *(int *)DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED))
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
-				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-				refresh_unsupported, time(NULL));
-	}
-	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and i.status=%d", ITEM_STATUS_ACTIVE);
-
 	zbx_free(name_esc);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -363,6 +360,15 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() Item '%s' was not found in the server cache. Not sending now.", __function_name, row[0]);
 			continue;
+		}
+
+		if (ITEM_STATUS_NOTSUPPORTED == dc_item.status)
+		{
+			if (0 == refresh_unsupported || dc_item.lastclock + refresh_unsupported > now)
+			{
+				DCconfig_clean_items(&dc_item, NULL, 1);
+				continue;
+			}
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() Item '%s' was successfully found in the server cache. Sending.", __function_name, row[0]);

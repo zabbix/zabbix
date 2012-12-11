@@ -318,7 +318,7 @@ while($db_item = DBfetch($db_items)){
 		$actions = new CLink(_('Graph'),'history.php?action=showgraph&itemid='.$db_item['itemid']);
 	}
 	else{
-		$actions = new CLink(_('History'),'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
+		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
 	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
@@ -492,7 +492,7 @@ while ($db_item = DBfetch($db_items)) {
 		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$db_item['itemid']);
 	}
 	else{
-		$actions = new CLink(_('History'), 'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
+		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
 	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;

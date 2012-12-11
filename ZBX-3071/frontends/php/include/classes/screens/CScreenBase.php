@@ -39,6 +39,11 @@ class CScreenBase {
 	public $mode;
 
 	/**
+	 * @see CScreenBuilder::timestamp
+	 */
+	public $timestamp;
+
+	/**
 	 * Resource (screen) type
 	 *
 	 * @var int
@@ -107,7 +112,7 @@ class CScreenBase {
 	 *
 	 * @var string
 	 */
-	protected $dataId;
+	public $dataId;
 
 	/**
 	 * Init screen data.
@@ -116,6 +121,7 @@ class CScreenBase {
 	 * @param boolean	$options['isFlickerfree']
 	 * @param string	$options['pageFile']
 	 * @param int		$options['mode']
+	 * @param int		$options['timestamp']
 	 * @param int		$options['resourcetype']
 	 * @param int		$options['screenid']
 	 * @param array		$options['screenitem']
@@ -133,11 +139,13 @@ class CScreenBase {
 	public function __construct(array $options = array()) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
+		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;
 		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
+		$this->dataId = !empty($options['dataId']) ? $options['dataId'] : null;
 
 		// get page file
 		if (!empty($options['pageFile'])) {
@@ -224,6 +232,15 @@ class CScreenBase {
 	}
 
 	/**
+	 * Get profile url params.
+	 *
+	 * @return string
+	 */
+	public function getProfileUrlParams() {
+		return '&updateProfile='.(int) $this->updateProfile.'&profileIdx='.$this->profileIdx.'&profileIdx2='.$this->profileIdx2;
+	}
+
+	/**
 	 * Get enveloped screen inside container.
 	 *
 	 * @param object	$item
@@ -237,9 +254,17 @@ class CScreenBase {
 			$this->insertFlickerfreeJs($flickerfreeData);
 		}
 
-		return ($this->mode == SCREEN_MODE_EDIT)
-			? new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), 'flickerfreescreen', $this->getScreenId())
-			: new CDiv($item, 'flickerfreescreen', $this->getScreenId());
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$div = new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), 'flickerfreescreen', $this->getScreenId());
+		}
+		else {
+			$div = new CDiv($item, 'flickerfreescreen', $this->getScreenId());
+		}
+
+		$div->setAttribute('data-timestamp', $this->timestamp);
+		$div->addStyle('position: relative;');
+
+		return $div;
 	}
 
 	/**
@@ -254,7 +279,8 @@ class CScreenBase {
 			'pageFile' => $this->pageFile,
 			'resourcetype' => $this->resourcetype,
 			'mode' => $this->mode,
-			'refreshInterval' => CWebUser::$data['refresh'],
+			'timestamp' => $this->timestamp,
+			'interval' => CWebUser::$data['refresh'],
 			'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
 			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : $this->screenid,
 			'groupid' => $this->groupid,

@@ -59,7 +59,7 @@ class CItem extends CItemGeneral {
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
-			'where'		=> array('webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST),
+			'where'		=> array('webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST, 'flags' => 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -76,7 +76,6 @@ class CItem extends CItemGeneral {
 			'graphids'					=> null,
 			'triggerids'				=> null,
 			'applicationids'			=> null,
-			'discoveryids'				=> null,
 			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
@@ -86,7 +85,6 @@ class CItem extends CItemGeneral {
 			'group'						=> null,
 			'host'						=> null,
 			'application'				=> null,
-			'belongs'					=> null,
 			'with_triggers'				=> null,
 			// filter
 			'filter'					=> null,
@@ -271,23 +269,6 @@ class CItem extends CItemGeneral {
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['discoveryid'] = 'id.parent_itemid';
-			}
-
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
-			}
-		}
-
 		// webitems
 		if (!is_null($options['webitems'])) {
 			unset($sqlParts['where']['webtype']);
@@ -345,6 +326,10 @@ class CItem extends CItemGeneral {
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 				$sqlParts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
+			}
+
+			if (array_key_exists('flags', $options['filter']) && is_null($options['filter']['flags'])) {
+				unset($sqlParts['where']['flags']);
 			}
 		}
 
@@ -416,7 +401,6 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemids = array();
-
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
@@ -558,7 +542,7 @@ class CItem extends CItemGeneral {
 				$triggers = API::Trigger()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) {
-					order_result($triggers, 'name');
+					order_result($triggers, 'description');
 				}
 				foreach ($triggers as $triggerid => $trigger) {
 					unset($triggers[$triggerid]['items']);
@@ -882,6 +866,7 @@ class CItem extends CItemGeneral {
 		$itemids = array();
 		$data = array();
 		foreach ($items as $item) {
+			unset($item['flags']); // flags cannot be changed
 			$data[] = array('values' => $item, 'where' => array('itemid' => $item['itemid']));
 			$itemids[] = $item['itemid'];
 		}
@@ -1348,8 +1333,7 @@ class CItem extends CItemGeneral {
 				&& $options['interfaceids'] === null
 				&& $options['graphids'] === null
 				&& $options['triggerids'] === null
-				&& $options['applicationids'] === null
-				&& $options['discoveryids'] === null) {
+				&& $options['applicationids'] === null) {
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 

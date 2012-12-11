@@ -337,11 +337,17 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 			'preservekeys' => true,
 			'expandDescription' => true
 		));
-		$dbTrigger = reset($dbTrigger);
-		$host = reset($dbTrigger['hosts']);
-		$trigger = $host['name'].':'.$dbTrigger['description'];
+		// check if trigger is accessible
+		if ($dbTrigger) {
+			$dbTrigger = reset($dbTrigger);
+			$host = reset($dbTrigger['hosts']);
+			$trigger = $host['name'].':'.$dbTrigger['description'];
+		}
+		else {
+			$_REQUEST['triggerid'] = 0;
+		}
 	}
-	else {
+	if (!isset($trigger)) {
 		$trigger = '';
 	}
 
@@ -396,12 +402,8 @@ else {
 		$options['triggerids'] = $_REQUEST['triggerid'];
 	}
 	$options['object'] = EVENT_OBJECT_TRIGGER;
-	$options['filter'] = array('value_changed' => TRIGGER_VALUE_CHANGED_YES);
+	$options['filter'] = array('value_changed' => ($_REQUEST['showUnknown'] ? null : TRIGGER_VALUE_CHANGED_YES));
 	$options['nodeids'] = get_current_nodeid();
-	$options['filters'] = array(
-		'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-		'object' => EVENT_OBJECT_TRIGGER,
-	);
 }
 
 $firstEvent = API::Event()->get($options);
@@ -416,7 +418,6 @@ $till = $from + $effectiveperiod;
 $csv_disabled = true;
 
 if (empty($firstEvent)) {
-
 	$starttime = null;
 	$events = array();
 	$paging = getPagingLine($events);

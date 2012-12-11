@@ -488,7 +488,6 @@ class CEvent extends CZBXAPI {
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'webitems' => true,
 				'nopermissions' => true,
 				'preservekeys' => true

@@ -378,9 +378,9 @@ class CHostInterface extends CZBXAPI {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
 			);
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectItems'];
@@ -1019,7 +1019,6 @@ class CHostInterface extends CZBXAPI {
 			'output' => array('name'),
 			'selectHosts' => array('name'),
 			'interfaceids' => $interfaceids,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'limit' => 1

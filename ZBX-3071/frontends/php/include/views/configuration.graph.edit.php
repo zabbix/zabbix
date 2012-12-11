@@ -304,7 +304,7 @@ if (!empty($this->data['graphid'])) {
 	$deleteButton = new CButtonDelete(_('Delete graph?'), url_param('graphid').url_param('parent_discoveryid'));
 	$cloneButton = new CSubmit('clone', _('Clone'));
 
-	if (!empty($this->data['templates'])) {
+	if (!empty($this->data['templateid'])) {
 		$saveButton->setEnabled(false);
 		$deleteButton->setEnabled(false);
 		$cloneButton->setEnabled(false);
