@@ -275,6 +275,10 @@ class CMacrosResolver {
 		foreach ($options['data'] as $triggerId => $trigger) {
 			$functions = $this->findFunctions($trigger['expression']);
 
+			if ($isUserMacrosAvailable) {
+				$macroValues[$trigger['triggerid']] = $this->getUserMacros(array($trigger[$source]), array('triggerid' => $trigger['triggerid']));
+			}
+
 			if ($isHostMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_HOST_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					$macroValues[$triggerId][$macro] = UNRESOLVED_MACRO_STRING;
@@ -309,10 +313,6 @@ class CMacrosResolver {
 						}
 					}
 				}
-			}
-
-			if ($isUserMacrosAvailable) {
-				$macroValues[$trigger['triggerid']] = $this->getUserMacros(array($trigger[$source]), array('triggerid' => $trigger['triggerid']));
 			}
 
 			if ($isReferenceMacrosAvailable) {
