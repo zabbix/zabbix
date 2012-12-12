@@ -2989,20 +2989,22 @@ size_t	zbx_utf8_char_len(const char *text)
  * Purpose: calculates number of bytes in utf8 text limited by utf8_maxlen    *
  * characters                                                                 *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 {
-	size_t	sz = 0;
+	size_t		sz = 0, csz = 0;
+	const char	*next;
 
-	utf8_maxlen++;
-
-	for (; '\0' != *text; text++)
+	while ('\0' != *text && 0 < utf8_maxlen && 0 != (csz = zbx_utf8_char_len(text)))
 	{
-		if (0x80 != (0xc0 & *text) && 0 == --utf8_maxlen)
-			break;
-		sz++;
+		next = text + csz;
+		while (next > text)
+		{
+			if ('\0' == *text++)
+				return sz;
+		}
+		sz += csz;
+		utf8_maxlen--;
 	}
 
 	return sz;
