@@ -57,10 +57,12 @@ function getLocales() {
 		'fa_IR' => _('Persian (fa_IR)'),
 		'pl_PL' => _('Polish (pl_PL)'),
 		'pt_BR' => _('Portuguese (pt_BR)'),
+		'pt_PT' => _('Portuguese (pt_PT)'),
 		'ru_RU' => _('Russian (ru_RU)'),
 		'sk_SK' => _('Slovak (sk_SK)'),
 		'es_ES' => _('Spanish (es_ES)'),
 		'sv_SE' => _('Swedish (sv_SE)'),
+		'tr_TR' => _('Turkish (tr_TR)'),
 		'uk_UA' => _('Ukrainian (uk_UA)')
 	);
 
@@ -141,6 +143,7 @@ function zbx_locale_variants_win($language) {
 		'fi_fi' => array('Finnish_Finland.1252', 'finnish'),
 		'fr_fr' => array('French_France.1252', 'french'),
 		'de_de' => array('German_Germany.1252', 'german'),
+		'el_gr' => array('Greek_Greece.1253', 'greek'),
 		'hu_hu' => array('Hungarian_Hungary.1250', 'hungarian'),
 		'id_id' => array('Indonesian_indonesia.1252', 'indonesian'),
 		'it_it' => array('Italian_Italy.1252', 'italian'),
@@ -149,13 +152,14 @@ function zbx_locale_variants_win($language) {
 		'lv_lv' => array('Latvian_Latvia.1257', 'latvian'),
 		'fa_ir' => array('Farsi_Iran.1256', 'farsi'),
 		'pl_pl' => array('Polish_Poland.1250', 'polish'),
-		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese'),
+		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese-brazil'),
+		'pt_pt' => array('Portuguese_Portugal.1252', 'portuguese'),
 		'ru_ru' => array('Russian_Russia.1251', 'russian'),
 		'sk_sk' => array('Slovak_Slovakia.1250', 'slovak'),
 		'es_es' => array('Spanish_Spain.1252', 'spanish'),
 		'sv_se' => array('Swedish_Sweden.1252', 'swedish'),
-		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian'),
-		'el_gr' => array('Greek_Greece.1253', 'greek')
+		'tr_tr' => array('Turkish_Turkey.1254', 'turkish'),
+		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian')
 	);
 	return $winLanguageName[strtolower($language)];
 }
