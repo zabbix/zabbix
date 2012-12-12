@@ -33,6 +33,6 @@ class CScreenDataOverview extends CScreenBase {
 			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
 		}
 
-		return $this->getOutput(get_items_data_overview($hostids, $this->screenitem['style']));
+		return $this->getOutput(get_items_data_overview($hostids, $this->screenitem['application'], $this->screenitem['style']));
 	}
 }

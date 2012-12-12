@@ -632,6 +632,13 @@ static int	DBpatch_02010026()
 
 	return DBadd_field("httptest", &field);
 }
+
+static int	DBpatch_02010027()
+{
+	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("screens_items", &field);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -696,11 +703,12 @@ int	DBcheck_version()
 		{DBpatch_02010024, 2010024, 0, 1},
 		{DBpatch_02010025, 2010025, 0, 1},
 		{DBpatch_02010026, 2010026, 0, 1},
+		{DBpatch_02010027, 2010027, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010026;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010027;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
