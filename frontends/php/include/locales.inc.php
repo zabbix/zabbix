@@ -57,7 +57,7 @@ function getLocales() {
 		'fa_IR' => _('Persian (fa_IR)'),
 		'pl_PL' => _('Polish (pl_PL)'),
 		'pt_BR' => _('Portuguese (pt_BR)'),
-		'pt_PT' => _('Portuguese (pt_BR)'),
+		'pt_PT' => _('Portuguese (pt_PT)'),
 		'ru_RU' => _('Russian (ru_RU)'),
 		'sk_SK' => _('Slovak (sk_SK)'),
 		'es_ES' => _('Spanish (es_ES)'),
@@ -159,7 +159,7 @@ function zbx_locale_variants_win($language) {
 		'es_es' => array('Spanish_Spain.1252', 'spanish'),
 		'sv_se' => array('Swedish_Sweden.1252', 'swedish'),
 		'tr_tr' => array('Turkish_Turkey.1254', 'turkish'),
-		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian'),
+		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian')
 	);
 	return $winLanguageName[strtolower($language)];
 }
