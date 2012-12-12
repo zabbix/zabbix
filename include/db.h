@@ -195,7 +195,7 @@ zbx_graph_item_type;
 
 #ifdef HAVE_ORACLE
 #define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;\n")
+#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;")
 
 #define	ZBX_SQL_STRCMP		"%s%s%s"
 #define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
