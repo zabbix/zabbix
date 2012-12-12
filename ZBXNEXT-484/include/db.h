@@ -206,7 +206,7 @@ zbx_graph_item_type;
 
 #ifdef HAVE_ORACLE
 #define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;\n")
+#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;")
 
 #define	ZBX_SQL_STRCMP		"%s%s%s"
 #define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
@@ -457,6 +457,11 @@ void	DBinit();
 
 void	DBclose();
 
+#ifdef HAVE_ORACLE
+void	DBstatement_prepare(const char *sql);
+void	DBbind_parameter(int position, void *buffer, unsigned char type);
+int	DBstatement_execute();
+#endif
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else

@@ -159,12 +159,9 @@
 		var param = '';
 
 		jQuery(document).ready(function() {
-			if (<?php echo $this->data['is_template'] ? 'true' : 'false'; ?>) {
-				param = '&only_hostid=' + <?php echo $this->data['hostid']; ?>;
-			}
-			else {
-				param = '&real_hosts=1';
-			}
+			param = (<?php echo $this->data['is_template'] ? 'true' : 'false'; ?>)
+				? '&only_hostid=<?php echo $this->data['hostid']; ?>'
+				: '&real_hosts=1';
 		});
 
 		return param;
