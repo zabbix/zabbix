@@ -443,37 +443,6 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['triggers'] = 't.*';
-		}
-
-		// expandData
-		if (!is_null($options['expandData'])) {
-			$sqlParts['select']['hostname'] = 'h.name AS hostname';
-			$sqlParts['select']['host'] = 'h.host';
-			$sqlParts['select']['hostid'] = 'h.hostid';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT t.triggerid) as rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 		// sorting
 		if (!zbx_empty($options['sortfield'])) {
 			if (!is_array($options['sortfield'])) {
@@ -1949,6 +1918,7 @@ class CTrigger extends CTriggerGeneral {
 		if (!$options['countOutput'] !== null) {
 			// expandData
 			if (!is_null($options['expandData'])) {
+				$sqlParts['select']['hostname'] = 'h.name AS hostname';
 				$sqlParts['select']['host'] = 'h.host';
 				$sqlParts['select']['hostid'] = 'h.hostid';
 				$sqlParts['from']['functions'] = 'functions f';
