@@ -358,12 +358,7 @@ class CHttpTestManager {
 						throw new Exception(_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name']));
 					}
 
-					// if we found existing http test by name and steps, we only add linkage, i.e. change templateid
-					// inheritance process for such steps should be stopped
-					DB::update('httptest', array(
-						'values' => array('templateid' => $httpTestId),
-						'where' => array('httptestid' => $exHttpTest['httptestid'])
-					));
+					$this->createLinkageBetweenHttpTests($httpTestId, $exHttpTest['httptestid']);
 					continue;
 				}
 
@@ -392,6 +387,50 @@ class CHttpTestManager {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Create linkage between two http tests.
+	 * If we found existing http test by name and steps, we only add linkage, i.e. change templateid
+	 *
+	 * @param $parentId
+	 * @param $childId
+	 */
+	protected function createLinkageBetweenHttpTests($parentId, $childId) {
+		DB::update('httptest', array(
+			'values' => array('templateid' => $parentId),
+			'where' => array('httptestid' => $childId)
+		));
+
+		$dbCursor = DBselect('SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+				' FROM httptestitem hti1,httptestitem hti2,items i1,items i2'.
+				' WHERE hti1.httptestid='.zbx_dbstr($parentId).
+					' AND hti2.httptestid='.zbx_dbstr($childId).
+					' AND hti1.itemid=i1.itemid'.
+					' AND hti2.itemid=i2.itemid'.
+					' AND i1.key_=i2.key_');
+		while ($dbItems = DBfetch($dbCursor)) {
+			DB::update('items', array(
+				'values' => array('templateid' => $dbItems['parentId']),
+				'where' => array('itemid' => $dbItems['childId'])
+			));
+		}
+
+		$dbCursor = DBselect('SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+				' FROM httpstepitem hsi1,httpstepitem hsi2,httpstep hs1,httpstep hs2,items i1,items i2'.
+				' WHERE hs1.httptestid='.zbx_dbstr($parentId).
+					' AND hs2.httptestid='.zbx_dbstr($childId).
+					' AND hsi1.itemid=i1.itemid'.
+					' AND hsi2.itemid=i2.itemid'.
+					' AND hs1.httpstepid=hsi1.httpstepid'.
+					' AND hs2.httpstepid=hsi2.httpstepid'.
+					' AND i1.key_=i2.key_');
+		while ($dbItems = DBfetch($dbCursor)) {
+			DB::update('items', array(
+				'values' => array('templateid' => $dbItems['parentId']),
+				'where' => array('itemid' => $dbItems['childId'])
+			));
+		}
 	}
 
 	/**
@@ -587,6 +626,17 @@ class CHttpTestManager {
 			)
 		);
 
+		// if this is a template scenario, fetch the parent http items to link inherited items to them
+		$parentItems = array();
+		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
+			$parentItems = DBfetchArrayAssoc(DBselect(
+				'SELECT i.itemid,i.key_'.
+					' FROM items i,httptestitem hti'.
+					' WHERE i.itemid=hti.itemid'.
+					' AND hti.httptestid='.$httpTest['templateid']
+			), 'key_');
+		}
+
 		$insertItems = array();
 		$updateItems = array();
 		$testItemIds = array();
@@ -600,6 +650,10 @@ class CHttpTestManager {
 			$item['history'] = self::ITEM_HISTORY;
 			$item['trends'] = self::ITEM_TRENDS;
 			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+			if (isset($parentItems[$item['key_']])) {
+				$item['templateid'] = $parentItems[$item['key_']]['itemid'];
+			}
 
 			if ($dbItem) {
 				if (!empty($dbItem['templateid'])) {
@@ -660,6 +714,18 @@ class CHttpTestManager {
 		}
 		$webstepids = DB::insert('httpstep', $websteps);
 
+		// if this is a template scenario, fetch the parent http items to link inherited items to them
+		$parentStepItems = array();
+		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
+			$parentStepItems = DBfetchArrayAssoc(DBselect(
+				'SELECT i.itemid,i.key_,hsi.httpstepid'.
+					' FROM items i,httpstepitem hsi,httpstep hs'.
+					' WHERE i.itemid=hsi.itemid'.
+						' AND hsi.httpstepid=hs.httpstepid'.
+						' AND hs.httptestid='.$httpTest['templateid']
+			), 'key_');
+		}
+
 		foreach ($websteps as $snum => $webstep) {
 			$webstepid = $webstepids[$snum];
 
@@ -710,6 +776,10 @@ class CHttpTestManager {
 				$item['history'] = self::ITEM_HISTORY;
 				$item['trends'] = self::ITEM_TRENDS;
 				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+				if (isset($parentStepItems[$item['key_']])) {
+					$item['templateid'] = $parentStepItems[$item['key_']]['itemid'];
+				}
 
 				if ($dbItem) {
 					if (!empty($dbItem['templateid'])) {
