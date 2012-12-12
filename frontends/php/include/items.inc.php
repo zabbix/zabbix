@@ -657,8 +657,9 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param $hostids
- * @param null $view_style
+ * @param        $hostids
+ * @param string $application name of application to filter
+ * @param null   $view_style
  *
  * @return CTableInfo
  */
