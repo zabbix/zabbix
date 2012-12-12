@@ -1150,8 +1150,9 @@ function replace_template_dependencies($deps, $hostid) {
  * - STYLE_LEFT
  *
  * @param string|array $hostids
- * @param int $view_style	    table display style: either hosts on top, or host on the left side
- * @param string $screenId		the ID of the screen, that contains the trigger overview table
+ * @param string       $application name of application to filter
+ * @param int          $view_style  table display style: either hosts on top, or host on the left side
+ * @param string       $screenId    the ID of the screen, that contains the trigger overview table
  *
  * @return CTableInfo
  */

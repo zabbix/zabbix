@@ -373,6 +373,16 @@ class CPageFilter {
 		$this->ids['druleid'] = $druleid;
 	}
 
+	/**
+	 * Set applications related variables.
+	 *  - applications: all applications available for dropdown on page
+	 *  - application: application curently selected, can be '' for 'all' or 'not selected'
+	 *  - applicationsSelected: if an application selected, i.e. not 'not selected'
+	 * Applications are dependent on groups.
+	 *
+	 * @param $application
+	 * @param $options
+	 */
 	private function _initApplications($application, $options) {
 		$this->data['applications'] = array();
 
@@ -442,6 +452,13 @@ class CPageFilter {
 		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode);
 	}
 
+	/**
+	 * Get dropdown for application selection.
+	 *
+	 * @param bool $withNode
+	 *
+	 * @return CComboBox
+	 */
 	public function getApplicationsCB($withNode = false) {
 		return $this->_getCB('application', $this->application, $this->applications, $withNode, '');
 	}
