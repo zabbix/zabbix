@@ -582,12 +582,12 @@ class CScreenItem extends CZBXAPI {
 	protected function checkSpans(array $screenItem) {
 		if (zbx_empty($screenItem['rowspan']) || !zbx_is_int($screenItem['rowspan'])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Incorrect row span provided for screen element located at X - %1$s and Y - %1$s.', $screenItem['x'], $screenItem['y'])
+				_s('Incorrect row span provided for screen element located at X - %1$s and Y - %2$s.', $screenItem['x'], $screenItem['y'])
 			);
 		}
 		if (zbx_empty($screenItem['colspan']) || !zbx_is_int($screenItem['colspan'])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Incorrect column span provided for screen element located at X - %1$s and Y - %1$s.', $screenItem['x'], $screenItem['y'])
+				_s('Incorrect column span provided for screen element located at X - %1$s and Y - %2$s.', $screenItem['x'], $screenItem['y'])
 			);
 		}
 	}
@@ -605,12 +605,12 @@ class CScreenItem extends CZBXAPI {
 	protected function checkSpansInBounds(array $screenItem, array $screen) {
 		if ($screenItem['rowspan'] > $screen['vsize'] - $screenItem['y']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Row span of screen element located at X - %1$s and Y - %1$s is too big.', $screenItem['x'], $screenItem['y'])
+				_s('Row span of screen element located at X - %1$s and Y - %2$s is too big.', $screenItem['x'], $screenItem['y'])
 			);
 		}
 		if ($screenItem['colspan'] > $screen['hsize'] - $screenItem['x']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Column span of screen element located at X - %1$s and Y - %1$s is too big.', $screenItem['x'], $screenItem['y'])
+				_s('Column span of screen element located at X - %1$s and Y - %2$s is too big.', $screenItem['x'], $screenItem['y'])
 			);
 		}
 	}
