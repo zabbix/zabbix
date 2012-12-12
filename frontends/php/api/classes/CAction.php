@@ -1811,7 +1811,7 @@ class CAction extends CZBXAPI {
 					unset($operation['operationid']);
 				}
 				if (!$this->outputIsRequested('actionid', $options['selectOperations'])) {
-					unset($operation['operationid']);
+					unset($operation['actionid']);
 				}
 				if (!$this->outputIsRequested('operationtype', $options['selectOperations'])) {
 					unset($operation['operationtype']);
