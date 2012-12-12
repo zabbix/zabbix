@@ -1,13 +1,19 @@
 Changes for 2.0.5rc1
 
+New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
+
 Bug fixes:
+..F....... [ZBX-3402] disabled "store value" overriding for host items inherited from templates (Pavels)
+..F....... [ZBX-3402] fixed the "formula" input not being displayed when editing templated items with a disabled multiplier (Pavels)
+.......PS. [ZBX-3071] fixed reading and writing of Oracle NCLOB fields (Andris, Sasha)
 A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
 A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
-..F....... [ZBX-5809] fixed global url displaing in map screen item (Eduard)
+..F....... [ZBX-5809] fixed global URL displaying in map screen item (Eduard)
 A......... [ZBX-5837] fixed filtering by proxy status in HostGroup API get method (Eduard)
-..F....... [ZBX-5899] implement monitoring web flicker-free graph support (Eduard)
-.......PS. [ZBX-5919] removed OCI_COMMIT_ON_SUCCESS option for sql statements in transaction on Orable backend (Sasha)
-..F....... [ZBX-5869] fixed configuration graph host id detection (Eduard)
+..F....... [ZBX-5899] implemented flicker-free graph support for web monitoring (Eduard)
+.......PS. [ZBX-5919] removed OCI_COMMIT_ON_SUCCESS option for sql statements in transaction on Oracle backend (Sasha)
+..F....... [ZBX-5869] fixed configuration graph host ID detection (Eduard)
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
 ..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
 ..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
@@ -37,6 +43,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5648] changes don't allow update "templateid" in items, or create new item with predefined "templateid"  (Oleg)
 A.F....... [ZBX-5684] fixed inconsistency that CItem get() returned discovery rules and item prototypes by default (Toms)
 A......... [ZBX-5684] fixed problem when updating non normal items status, it's flag is changed to normal (Toms)
 ..F....... [ZBX-5882] fixed "Illegal string offset" errors and allowed templated trigger prototypes in trigger expressions test (Oleg)
