@@ -907,7 +907,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		if ($options['selectDiscoveries'] !== null) {
 			if ($options['selectDiscoveries'] != API_OUTPUT_COUNT) {
 				$items = API::DiscoveryRule()->get(array(
-					'output' => $this->outputExtend('httptest', array('hostid', 'itemid'), $options['selectDiscoveries']),
+					'output' => $this->outputExtend('items', array('hostid', 'itemid'), $options['selectDiscoveries']),
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,

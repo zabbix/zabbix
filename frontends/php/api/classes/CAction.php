@@ -1605,7 +1605,7 @@ class CAction extends CZBXAPI {
 		// adding conditions
 		if (!is_null($options['selectConditions']) && $options['selectConditions'] != API_OUTPUT_COUNT) {
 			$conditions = API::getApi()->select('conditions', array(
-				'output' => $this->outputExtend('item_discovery', array('actionid', 'conditionid'), $options['selectConditions']),
+				'output' => $this->outputExtend('conditions', array('actionid', 'conditionid'), $options['selectConditions']),
 				'filter' => array('actionid' => $actionIds),
 				'preservekeys' => true
 			));

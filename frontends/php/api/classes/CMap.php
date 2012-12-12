@@ -937,7 +937,7 @@ class CMap extends CMapElement {
 		// adding icon maps
 		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
 			$iconMaps = API::IconMap()->get(array(
-				'output' => $this->outputExtend('sysmaps', array('sysmapid', 'iconmapid'), $options['selectIconMap']),
+				'output' => $this->outputExtend('icon_map', array('sysmapid', 'iconmapid'), $options['selectIconMap']),
 				'sysmapids' => $sysmapIds,
 				'preservekeys' => true,
 				'nopermissions' => true
