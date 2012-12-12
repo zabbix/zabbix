@@ -1332,14 +1332,15 @@
 		}
 
 		if ($data['input_method'] == IM_TREE) {
-			$analyze = analyze_expression($data['expression']);
+			$analyze = analyzeExpression($data['expression']);
 			if ($analyze !== false) {
 				list($data['outline'], $data['eHTMLTree']) = $analyze;
 				if (isset($_REQUEST['expr_action']) && $data['eHTMLTree'] != null) {
-					$new_expr = remake_expression($data['expression'], $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $data['expr_temp']);
+					$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
+							$_REQUEST['expr_action'], $data['expr_temp']);
 					if ($new_expr !== false) {
 						$data['expression'] = $new_expr;
-						$analyze = analyze_expression($data['expression']);
+						$analyze = analyzeExpression($data['expression']);
 						if ($analyze !== false) {
 							list($data['outline'], $data['eHTMLTree']) = $analyze;
 						}

@@ -224,9 +224,98 @@ void	DBend(int ret)
 		DBtxn_operation(zbx_db_rollback);
 }
 
+#ifdef HAVE_ORACLE
 /******************************************************************************
  *                                                                            *
- * Function: DBexecute                                                        *
+ * Function: DBstatement_prepare                                              *
+ *                                                                            *
+ * Purpose: prepares a SQL statement for execution                            *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	DBstatement_prepare(const char *sql)
+{
+	int	rc;
+
+	rc = zbx_db_statement_prepare(sql);
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_statement_prepare(sql)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBbind_parameter                                                 *
+ *                                                                            *
+ * Purpose: creates an association between a program variable and             *
+ *          a placeholder in a SQL statement                                  *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	DBbind_parameter(int position, void *buffer, unsigned char type)
+{
+	int	rc;
+
+	rc = zbx_db_bind_parameter(position, buffer, type);
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_bind_parameter(position, buffer, type)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBstatement_execute                                              *
+ *                                                                            *
+ * Purpose: executes a SQL statement                                          *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	DBstatement_execute()
+{
+	int	rc;
+
+	rc = zbx_db_statement_execute();
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_statement_execute()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+
+	return rc;
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_DBexecute                                                  *
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
  *                                                                            *
@@ -236,7 +325,7 @@ void	DBend(int ret)
 int	__zbx_DBexecute(const char *fmt, ...)
 {
 	va_list	args;
-	int	rc = ZBX_DB_DOWN;
+	int	rc;
 
 	va_start(args, fmt);
 

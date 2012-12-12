@@ -499,27 +499,6 @@ function insert_js_function($fnct_name) {
 					});
 				}');
 			break;
-		case 'removeSelectedItems':
-			insert_js('
-				function removeSelectedItems(formobject, name) {
-					formobject = $(formobject);
-					if (is_null(formobject)) {
-						return false;
-					}
-					for (var i = 0; i < formobject.options.length; i++) {
-						if (!isset(i, formobject.options)) {
-							continue;
-						}
-						if (formobject.options[i].selected) {
-							var obj = $(name + "_" + formobject.options[i].value);
-							if (!is_null(obj)) {
-								obj.remove();
-							}
-						}
-					}
-				}
-			');
-			break;
 		default:
 			insert_js('throw("JS function not found ['.$fnct_name.']");');
 			break;
