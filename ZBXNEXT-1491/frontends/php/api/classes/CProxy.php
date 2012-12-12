@@ -581,11 +581,11 @@ class CProxy extends CZBXAPI {
 
 			// unset unrequested fields
 			foreach ($interfaces as &$interface) {
-				if (!$this->outputIsRequested('proxy_hostid', $options['selectInterfaces'])) {
-					unset($interface['proxy_hostid']);
-				}
 				if (!$this->outputIsRequested('hostid', $options['selectInterfaces'])) {
 					unset($interface['hostid']);
+				}
+				if (!$this->outputIsRequested('interfaceid', $options['selectInterfaces'])) {
+					unset($interface['interfaceid']);
 				}
 			}
 			unset($interface);
