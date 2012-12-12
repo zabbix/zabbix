@@ -1083,8 +1083,7 @@ class CTrigger extends CTriggerGeneral {
 				'expression' => null,
 				'error' => 'Trigger just added. No status update so far.',
 				'value' => TRIGGER_VALUE_FALSE,
-				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-				'lastchange' => time()
+				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN
 			);
 		}
 
@@ -1604,14 +1603,26 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 
+			// host trigger
 			if ($statusHost) {
 				addUnknownEvent($triggerId);
-			}
 
-			DB::update('triggers', array(
-				'values' => array('expression' => $triggerExpression[$triggerId]),
-				'where' => array('triggerid' => $triggerId)
-			));
+				DB::update('triggers', array(
+					'values' => array(
+						'expression' => $triggerExpression[$triggerId],
+						'error' => 'Trigger just added. No status update so far.',
+						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN
+					),
+					'where' => array('triggerid' => $triggerId)
+				));
+			}
+			// template trigger
+			else {
+				DB::update('triggers', array(
+					'values' => array('expression' => $triggerExpression[$triggerId]),
+					'where' => array('triggerid' => $triggerId)
+				));
+			}
 
 			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $triggersAndHosts[$triggerId])));
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerId,
