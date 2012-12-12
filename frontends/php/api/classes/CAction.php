@@ -1613,10 +1613,10 @@ class CAction extends CZBXAPI {
 
 			// unset unrequested fields
 			foreach ($conditions as &$condition) {
-				if (!$this->outputIsRequested('itemid', $options['selectConditions'])) {
+				if (!$this->outputIsRequested('actionid', $options['selectConditions'])) {
 					unset($condition['actionid']);
 				}
-				if (!$this->outputIsRequested('itemdiscoveryid', $options['selectConditions'])) {
+				if (!$this->outputIsRequested('conditionid', $options['selectConditions'])) {
 					unset($condition['conditionid']);
 				}
 			}

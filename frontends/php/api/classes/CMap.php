@@ -1006,8 +1006,8 @@ class CMap extends CMapElement {
 				if (!$this->outputIsRequested('sysmapid', $options['selectUrls'])) {
 					unset($link['sysmapid']);
 				}
-				if (!$this->outputIsRequested('linkid', $options['selectUrls'])) {
-					unset($link['linkid']);
+				if (!$this->outputIsRequested('sysmapurlid', $options['selectUrls'])) {
+					unset($link['sysmapurlid']);
 				}
 			}
 			unset($link);

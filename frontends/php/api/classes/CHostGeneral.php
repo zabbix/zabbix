@@ -880,8 +880,8 @@ abstract class CHostGeneral extends CZBXAPI {
 					if (!$this->outputIsRequested('hostid', $options['selectItems'])) {
 						unset($item['hostid']);
 					}
-					if (!$this->outputIsRequested('interfaceid', $options['selectItems'])) {
-						unset($item['interfaceid']);
+					if (!$this->outputIsRequested('itemid', $options['selectItems'])) {
+						unset($item['itemid']);
 					}
 				}
 				unset($item);
@@ -1051,8 +1051,8 @@ abstract class CHostGeneral extends CZBXAPI {
 					if (!$this->outputIsRequested('hostid', $options['selectHttpTests'])) {
 						unset($httpTest['hostid']);
 					}
-					if (!$this->outputIsRequested('interfaceid', $options['selectHttpTests'])) {
-						unset($httpTest['interfaceid']);
+					if (!$this->outputIsRequested('httptestid', $options['selectHttpTests'])) {
+						unset($httpTest['httptestid']);
 					}
 				}
 				unset($httpTest);
