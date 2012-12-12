@@ -724,9 +724,12 @@ else {
 				);
 
 				// host JS menu link
-				$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-				$scripts = isset($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-				$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+				$hostSpan = null;
+				if ($_REQUEST['hostid'] == 0) {
+					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+					$scripts = $hostScripts[$host['hostid']];
+					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+				}
 
 				$table->addRow(array(
 					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
@@ -734,7 +737,7 @@ else {
 						'action'
 					),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$_REQUEST['hostid'] ? null : $hostSpan,
+					$hostSpan,
 					new CSpan($tr_desc, 'link_menu'),
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),
