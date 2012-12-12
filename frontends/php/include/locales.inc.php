@@ -60,7 +60,7 @@ function set_zbx_locales() {
 		'fa_IR' => _('Persian (fa_IR)'),
 		'pl_PL' => _('Polish (pl_PL)'),
 		'pt_BR' => _('Portuguese (pt_BR)'),
-		'pt_PT' -> _('Portuguese (pt_BR)'),
+		'pt_PT' => _('Portuguese (pt_BR)'),
 		'ru_RU' => _('Russian (ru_RU)'),
 		'sk_SK' => _('Slovak (sk_SK)'),
 		'es_ES' => _('Spanish (es_ES)'),
@@ -144,7 +144,7 @@ function zbx_locale_variants_win($language) {
 		'fi_fi' => array('Finnish_Finland.1252', 'finnish'),
 		'fr_fr' => array('French_France.1252', 'french'),
 		'de_de' => array('German_Germany.1252', 'german'),
-		'el_gr' => array('Greek_Greece.1253', 'greek')
+		'el_gr' => array('Greek_Greece.1253', 'greek'),
 		'hu_hu' => array('Hungarian_Hungary.1250', 'hungarian'),
 		'id_id' => array('Indonesian_indonesia.1252', 'indonesian'),
 		'it_it' => array('Italian_Italy.1252', 'italian'),
