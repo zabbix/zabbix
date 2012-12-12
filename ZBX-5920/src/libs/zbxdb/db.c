@@ -1068,7 +1068,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	SQLRETURN	ret = SQL_SUCCESS;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
-	ub4		counter;
+	ub4		counter, prefetch_mem_size = 2 * ZBX_MEBIBYTE;	/* prefetch 2 MB of data */
+	ub1		attrvalue_zero = 0;
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -1182,6 +1183,22 @@ error:
 	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
+
+	if (OCI_SUCCESS == err)
+	{
+		/* Set prefetch memory size. */
+		/* By default prefetching is done by 1 row per iteration. */
+		/* More info: docs.oracle.com/cd/B28359_01/appdev.111/b28395/oci04sql.htm */
+		err = OCIAttrSet(result->stmthp, OCI_HTYPE_STMT, &prefetch_mem_size, sizeof(prefetch_mem_size),
+				OCI_ATTR_PREFETCH_MEMORY, oracle.errhp);
+	}
+
+	if (OCI_SUCCESS == err)
+	{
+		/* unset prefetch rows so that memory size takes effect */
+		err = OCIAttrSet(result->stmthp, OCI_HTYPE_STMT, &attrvalue_zero, sizeof(attrvalue_zero),
+				OCI_ATTR_PREFETCH_ROWS, oracle.errhp);
+	}
 
 	if (OCI_SUCCESS == err)
 	{
