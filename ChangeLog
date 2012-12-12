@@ -66,6 +66,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-3071] fixed reading and writing of Oracle NCLOB fields (Andris, Sasha)
 ..F....... [ZBX-3402] disabled "store value" overriding for host items inherited from templates (Pavels)
 ..F....... [ZBX-3402] fixed the "formula" input not being displayed when editing templated items with a disabled multiplier (Pavels)
 A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
@@ -104,6 +105,7 @@ A.F....... [ZBXNEXT-1447] added initial Finnish translation (Richlv)
 ........S. [ZBX-5525] renamed macro {TRIGGER.COMMENT} to {TRIGGER.DESCRIPTION} (Sasha)
 
 Bug fixes:
+A......... [ZBX-5648] changes don't allow update "templateid" in items, or create new item with predefined "templateid"  (Oleg)
 A.F....... [ZBX-5684] fixed inconsistency that CItem get() returned discovery rules and item prototypes by default (Toms)
 A......... [ZBX-5684] fixed problem when updating non normal items status, it's flag is changed to normal (Toms)
 ..F....... [ZBX-5882] fixed "Illegal string offset" errors and allowed templated trigger prototypes in trigger expressions test (Oleg)
