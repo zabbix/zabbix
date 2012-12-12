@@ -681,11 +681,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 				"insert into functions"
 				" (functionid,itemid,triggerid,function,parameter)"
 				" values ";
-#ifdef HAVE_MULTIROW_INSERT
-	const char		*row_dl = ",";
-#else
-	const char		*row_dl = ";\n";
-#endif
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -760,10 +755,10 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_functions_sql);
 #endif
 				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')%s",
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')" ZBX_ROW_DL,
 						functionid, function->itemid,
 						(0 == trigger->triggerid ? triggerid : trigger->triggerid),
-						function_esc, parameter_esc, row_dl);
+						function_esc, parameter_esc);
 
 				zbx_free(parameter_esc);
 				zbx_free(function_esc);
@@ -783,19 +778,19 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 #endif
 			expression_esc = DBdyn_escape_string_len(trigger->expression, TRIGGER_EXPRESSION_LEN);
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')%s",
+					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')" ZBX_ROW_DL,
 					trigger->triggerid, description_esc, expression_esc, (int)priority, (int)status,
 					comments_esc, url_esc, (int)type, TRIGGER_VALUE_FALSE,
-					TRIGGER_VALUE_FLAG_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED, error_esc, row_dl);
+					TRIGGER_VALUE_FLAG_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED, error_esc);
 			zbx_free(expression_esc);
 
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')%s",
+					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
 					triggerdiscoveryid, trigger->triggerid, parent_triggerid,
-					description_proto_esc, row_dl);
+					description_proto_esc);
 
 			triggerdiscoveryid++;
 		}
@@ -1157,11 +1152,6 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 			"insert into items_applications"
 			" (itemappid,itemid,applicationid)"
 			" values ";
-#ifdef HAVE_MULTIROW_INSERT
-	const char	*row_dl = ",";
-#else
-	const char	*row_dl = ";\n";
-#endif
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -1222,7 +1212,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
 						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s','%s',%d,'%s','%s',"
-						"%d,'%s','%s','%s','%s','%s',%s,%d)%s",
+						"%d,'%s','%s','%s','%s','%s',%s,%d)" ZBX_ROW_DL,
 					item->itemid, name_esc, key_esc, hostid, (int)type, (int)value_type,
 					(int)data_type, delay, delay_flex_esc, history, trends, (int)status,
 					trapper_hosts_esc, units_esc, multiplier, delta, formula_esc,
@@ -1231,14 +1221,14 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 					(int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
 					snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc,
 					publickey_esc, privatekey_esc, description_esc, DBsql_id_ins(interfaceid),
-					ZBX_FLAG_DISCOVERY_CREATED, row_dl);
+					ZBX_FLAG_DISCOVERY_CREATED);
 
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_item_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%d)%s",
-					itemdiscoveryid, item->itemid, parent_itemid, key_proto_esc, lastcheck, row_dl);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%d)" ZBX_ROW_DL,
+					itemdiscoveryid, item->itemid, parent_itemid, key_proto_esc, lastcheck);
 
 			itemdiscoveryid++;
 		}
@@ -1317,8 +1307,8 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 			zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_items_applications_sql);
 #endif
 			zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
-					itemappid, item->itemid, item->new_appids[j], row_dl);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					itemappid, item->itemid, item->new_appids[j]);
 
 			itemappid++;
 		}
@@ -1753,11 +1743,6 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 			"insert into graphs_items"
 			" (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type)"
 			" values ";
-#ifdef HAVE_MULTIROW_INSERT
-	const char	*row_dl = ",";
-#else
-	const char	*row_dl = ";\n";
-#endif
 
 	for (i = 0; i < graphs->values_num; i++)
 	{
@@ -1820,21 +1805,20 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					"(" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL ","
 						ZBX_FS_DBL ",%d,%d,%d,%d,%d," ZBX_FS_DBL ","
-						ZBX_FS_DBL ",%d,%d,%s,%s,%d)%s",
+						ZBX_FS_DBL ",%d,%d,%s,%s,%d)" ZBX_ROW_DL,
 					graph->graphid, name_esc, width, height, yaxismin, yaxismax,
 					(int)show_work_period, (int)show_triggers,
 					(int)graphtype, (int)show_legend, (int)show_3d,
 					percent_left, percent_right, (int)ymin_type, (int)ymax_type,
 					DBsql_id_ins(graph->ymin_itemid), DBsql_id_ins(graph->ymax_itemid),
-					ZBX_FLAG_DISCOVERY_CREATED, row_dl);
+					ZBX_FLAG_DISCOVERY_CREATED);
 
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_graph_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')%s",
-					graphdiscoveryid, graph->graphid, parent_graphid,
-					name_proto_esc, row_dl);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
+					graphdiscoveryid, graph->graphid, parent_graphid, name_proto_esc);
 
 			graphdiscoveryid++;
 		}
@@ -1910,10 +1894,10 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 #endif
 				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64
-							",%d,%d,'%s',%d,%d,%d)%s",
+							",%d,%d,'%s',%d,%d,%d)" ZBX_ROW_DL,
 						gitem->gitemid, graph->graphid, gitem->itemid,
 						gitem->drawtype, gitem->sortorder, color_esc,
-						gitem->yaxisside, gitem->calc_fnc, gitem->type, row_dl);
+						gitem->yaxisside, gitem->calc_fnc, gitem->type);
 			}
 
 			zbx_free(color_esc);
