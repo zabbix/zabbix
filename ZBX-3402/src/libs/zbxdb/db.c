@@ -807,7 +807,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (OCI_SUCCESS == err)
 	{
 		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4)1, (ub4)0,
-				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
+				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
+				0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT);
 
 		if (OCI_SUCCESS == err)
 		{
@@ -1055,7 +1056,8 @@ error:
 	if (OCI_SUCCESS == err)
 	{
 		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4)0, (ub4)0,
-				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
+				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
+				0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT);
 	}
 
 	if (OCI_SUCCESS == err)
