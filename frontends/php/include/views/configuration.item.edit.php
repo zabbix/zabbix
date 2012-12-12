@@ -266,12 +266,11 @@ if (!$this->data['is_discovery_rule']) {
 		$multiplierCheckBox->setAttribute('disabled', 'disabled');
 		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
-		if ($this->data['multiplier']) {
-			$multiplier[] = SPACE;
-			$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, 1);
-			$formulaTextBox->setAttribute('style', 'text-align: right;');
-			$multiplier[] = $formulaTextBox;
-		}
+
+		$multiplier[] = SPACE;
+		$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, 1);
+		$formulaTextBox->setAttribute('style', 'text-align: right;');
+		$multiplier[] = $formulaTextBox;
 	}
 	else {
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
@@ -380,10 +379,19 @@ else {
 	);
 
 	// append delta to form list
-	$deltaComboBox= new CComboBox('delta', $this->data['delta']);
-	$deltaComboBox->addItem(0, _('As is'));
-	$deltaComboBox->addItem(1, _('Delta (speed per second)'));
-	$deltaComboBox->addItem(2, _('Delta (simple change)'));
+	$deltaOptions = array(
+		0 => _('As is'),
+		1 => _('Delta (speed per second)'),
+		2 => _('Delta (simple change)')
+	);
+	if ($this->data['limited']) {
+		$itemForm->addVar('delta', $this->data['delta']);
+		$deltaComboBox = new CTextBox('delta_name', $deltaOptions[$this->data['delta']], null, 'yes');
+	}
+	else {
+		$deltaComboBox= new CComboBox('delta', $this->data['delta']);
+		$deltaComboBox->addItems($deltaOptions);
+	}
 	$itemFormList->addRow(_('Store value'), $deltaComboBox, false, 'row_delta');
 
 	// append valuemap to form list
