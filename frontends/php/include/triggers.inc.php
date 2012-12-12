@@ -1152,19 +1152,31 @@ function replace_template_dependencies($deps, $hostid) {
  * - STYLE_LEFT
  *
  * @param string|array $hostids
- * @param int $view_style	    table display style: either hosts on top, or host on the left side
- * @param string $screenId		the ID of the screen, that contains the trigger overview table
+ * @param string       $application name of application to filter
+ * @param int          $view_style  table display style: either hosts on top, or host on the left side
+ * @param string       $screenId    the ID of the screen, that contains the trigger overview table
  *
  * @return CTableInfo
  */
-function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
+function get_triggers_overview($hostids, $application, $view_style = null, $screenId = null) {
 	if (is_null($view_style)) {
 		$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
+	}
+	$applicationIds = null;
+	if ($application !== '') {
+		$dbApps = API::Application()->get(array(
+			'hostids' => $hostids,
+			'filter' => array('name' => $application),
+			'output' => array('applicationid')
+		));
+		$applicationIds = zbx_objectValues($dbApps, 'applicationid');
+		$hostids = null;
 	}
 
 	// get triggers
 	$dbTriggers = API::Trigger()->get(array(
 		'hostids' => $hostids,
+		'applicationids' => $applicationIds,
 		'monitored' => true,
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,

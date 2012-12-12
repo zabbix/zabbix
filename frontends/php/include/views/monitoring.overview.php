@@ -29,6 +29,7 @@ $typeComboBox->addItem(SHOW_DATA, _('Data'));
 
 $headerForm = new CForm('get');
 $headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$headerForm->addItem(array(SPACE, _('Application'), SPACE, $this->data['pageFilter']->getApplicationsCB(true)));
 $headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
 
 $overviewWidget->addHeader(_('Overview'), $headerForm);
@@ -82,12 +83,24 @@ $hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
 
 $overviewWidget->addHeader($hostLocationForm);
 
-$dataTable = null;
-if ($this->data['type'] == SHOW_DATA) {
-	$dataTable = get_items_data_overview(array_keys($this->data['pageFilter']->hosts), $this->data['view_style']);
+if ($this->data['pageFilter']->applicationsSelected) {
+	if ($this->data['type'] == SHOW_DATA) {
+		$dataTable = get_items_data_overview(
+			array_keys($this->data['pageFilter']->hosts),
+			$this->data['pageFilter']->application,
+			$this->data['view_style']
+		);
+	}
+	elseif ($this->data['type'] == SHOW_TRIGGERS) {
+		$dataTable = get_triggers_overview(
+			array_keys($this->data['pageFilter']->hosts),
+			$this->data['pageFilter']->application,
+			$this->data['view_style']
+		);
+	}
 }
-elseif ($this->data['type'] == SHOW_TRIGGERS) {
-	$dataTable = get_triggers_overview(array_keys($this->data['pageFilter']->hosts), $this->data['view_style']);
+else {
+	$dataTable = new CTableInfo(_('No items defined.'));
 }
 
 $overviewWidget->addItem($dataTable);

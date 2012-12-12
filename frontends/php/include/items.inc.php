@@ -657,16 +657,24 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param $hostids
- * @param null $view_style
+ * @param        $hostids
+ * @param string $application name of application to filter
+ * @param null   $view_style
  *
  * @return CTableInfo
  */
-function get_items_data_overview($hostids, $view_style) {
+function get_items_data_overview($hostids, $application, $view_style) {
+	$sqlFrom = '';
+	$sqlWhere = '';
+	if ($application !== '') {
+		$sqlFrom = 'applications a,items_applications ia,';
+		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
+	}
+
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
-		' FROM hosts h,items i'.
+		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 		' WHERE '.DBcondition('h.hostid', $hostids).
@@ -674,6 +682,7 @@ function get_items_data_overview($hostids, $view_style) {
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+				$sqlWhere.
 		' ORDER BY i.name,i.itemid'
 	);
 
