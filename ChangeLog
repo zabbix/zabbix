@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F....... [ZBXNEXT-484] added filtering by application in Monitoring->Overview and Data/Triggers overview screen elements (Vedmak)
 ........S. [ZBXNEXT-1089] added support of user macros in global scripts (Sasha)
 A.F.I..PS. [ZBXNEXT-1526] added support of configurable number of retries per WEB scenario (Alexei)
 A.F.....S. [ZBXNEXT-1286] added support of low-level discovery macros in trigger prototype expressions (Sasha)

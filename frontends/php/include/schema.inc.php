@@ -391,6 +391,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'application' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'slideshows' => array(
