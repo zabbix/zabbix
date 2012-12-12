@@ -2270,7 +2270,7 @@ void	DCsync_configuration()
 
 	int			i;
 	double			sec, csec, isec, tsec, dsec, fsec, hsec, htsec, gmsec, hmsec, ifsec,
-				csec2, isec2, tsec2, dsec2, fsec2, hsec2, htsec2, gmsec2, hmsec2, ifsec2;
+				csec2, isec2, tsec2, dsec2, fsec2, hsec2, htsec2, gmsec2, hmsec2, ifsec2, total2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2409,37 +2409,47 @@ void	DCsync_configuration()
 
 	sec = zbx_time();
 	DCsync_config(conf_result);
-	csec2 =  zbx_time() - sec;
+	csec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_items(item_result);
-	isec2 =  zbx_time() - sec;
+	isec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_triggers(trig_result);
-	tsec2 =  zbx_time() - sec;
+	tsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_trigdeps(tdep_result);
-	dsec2 =  zbx_time() - sec;
+	dsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_functions(func_result);
-	fsec2 =  zbx_time() - sec;
+	fsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_hosts(host_result);
-	hsec2 =  zbx_time() - sec;
+	hsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_htmpls(htmpl_result);
-	htsec2 =  zbx_time() - sec;
+	htsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_gmacros(gmacro_result);
-	gmsec2 =  zbx_time() - sec;
+	gmsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_hmacros(hmacro_result);
-	hmsec2 =  zbx_time() - sec;
+	hmsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_interfaces(if_result);	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
-	ifsec2 =  zbx_time() - sec;
+	ifsec2 = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
 
+	total2 = csec2 + isec2 + tsec2 + dsec2 + fsec2 + hsec2 + htsec2 + gmsec2 + hmsec2 + ifsec2;
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, csec, csec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, isec, isec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, tsec, tsec2);
@@ -2450,11 +2460,9 @@ void	DCsync_configuration()
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, gmsec, gmsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, hmsec, hmsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, ifsec, ifsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name,
-			csec2 + isec2 + tsec2 + dsec2 + fsec2 + hsec2 + htsec2 + gmsec2 + hmsec2 + ifsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total      : " ZBX_FS_DBL " sec.", __function_name,
-			csec + isec + tsec + dsec + fsec + hsec + htsec + gmsec + hmsec + ifsec +
-			csec2 + isec2 + tsec2 + dsec2 + fsec2 + hsec2 + htsec2 + gmsec2 + hmsec2 + ifsec2);
+			csec + isec + tsec + dsec + fsec + hsec + htsec + gmsec + hmsec + ifsec + total2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
