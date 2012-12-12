@@ -4,6 +4,8 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3402] disabled "store value" overriding for host items inherited from templates (Pavels)
+..F....... [ZBX-3402] fixed the "formula" input not being displayed when editing templated items with a disabled multiplier (Pavels)
 .......PS. [ZBX-3071] fixed reading of NCLOB fields and writing in them with Oracle SQL server (Andris, Sasha)
 A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
 A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
