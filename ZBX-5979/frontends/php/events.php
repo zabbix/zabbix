@@ -138,7 +138,7 @@ if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
 		),
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectFunctions' => API_OUTPUT_EXTEND,
-		'triggerids' => $_REQUEST['triggerid'],
+		'triggerids' => $_REQUEST['triggerid']
 	));
 
 	foreach ($oldTriggers as $oldTrigger) {
@@ -165,7 +165,7 @@ if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectFunctions' => API_OUTPUT_EXTEND,
 			'filter' => array('description' => $oldTrigger['description']),
-			'hostids' => $hostid,
+			'hostids' => $hostid
 		));
 
 		foreach ($newTriggers as $tnum => $newTrigger) {
@@ -616,6 +616,8 @@ else {
 			else if ($pageFilter->groupid > 0) {
 				$trigOpt['groupids'] = $pageFilter->groupid;
 			}
+
+			$trigOpt['monitored'] = true;
 
 			$triggers = API::Trigger()->get($trigOpt);
 			$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
