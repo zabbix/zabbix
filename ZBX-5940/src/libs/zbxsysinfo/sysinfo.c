@@ -348,7 +348,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
-	int		rc;
+	int		rc, ret = NOTSUPPORTED;
 	char		usr_cmd[MAX_STRING_LEN];
 	char		usr_param[MAX_STRING_LEN];
 	char		usr_command[MAX_STRING_LEN];
@@ -358,9 +358,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	assert(result);
 	init_result(result);
-
-	if (0 != (flags & PROCESS_TEST))
-		printf("%-*s", 45, in_command);
 
 	alias_expand(in_command, usr_command, sizeof(usr_command));
 
@@ -414,10 +411,30 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	else
 		goto notsupported;
 
-	return SUCCEED;
+	ret = SUCCEED;
+
 notsupported:
-	SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
-	return NOTSUPPORTED;
+
+	if (0 != (flags & PROCESS_TEST))
+	{
+
+#define	COL_WIDTH	45
+
+		int	n1, n2 = 0;
+
+		n1 = printf("%s", in_command);
+
+		if (0 < n1 && '\0' != *param)
+			n2 = printf("[%s]", param);
+
+		if (0 < n1 && 0 <= n2 && COL_WIDTH > n1 + n2)
+			printf("%-*s", COL_WIDTH - n1 - n2, " ");
+	}
+
+	if (NOTSUPPORTED == ret)
+		SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
+
+	return ret;
 }
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
