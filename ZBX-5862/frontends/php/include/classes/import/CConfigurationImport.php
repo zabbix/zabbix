@@ -807,7 +807,7 @@ class CConfigurationImport {
 							WHERE g.graphid=gi.graphid
 								AND gi.itemid=i.itemid
 								AND g.name='.zbx_dbstr($graph['name']).'
-								AND '.DBcondition('i.hostid', $graphHostIds);
+								AND '.dbConditionInt('i.hostid', $graphHostIds);
 					$graphExists = DBfetch(DBselect($sql));
 
 					if ($graphExists) {
@@ -884,7 +884,7 @@ class CConfigurationImport {
 					WHERE g.graphid=gi.graphid
 						AND gi.itemid=i.itemid
 						AND g.name='.zbx_dbstr($graph['name']).'
-						AND '.DBcondition('i.hostid', $graphHostIds);
+						AND '.dbConditionInt('i.hostid', $graphHostIds);
 			$graphExists = DBfetch(DBselect($sql));
 
 			if ($graphExists) {

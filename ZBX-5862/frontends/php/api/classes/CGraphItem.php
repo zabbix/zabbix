@@ -112,7 +112,7 @@ class CGraphItem extends CZBXAPI {
 			}
 			$sqlParts['from']['graphs'] = 'graphs g';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where'][] = DBcondition('g.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('g.graphid', $options['graphids']);
 		}
 
 		// itemids
@@ -121,7 +121,7 @@ class CGraphItem extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['itemid'] = 'gi.itemid';
 			}
-			$sqlParts['where'][] = DBcondition('gi.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('gi.itemid', $options['itemids']);
 		}
 
 		// type

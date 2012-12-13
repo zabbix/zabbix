@@ -451,7 +451,7 @@ class FrontendSetup {
 		else {
 			$current = false;
 		}
-
+$current = true;
 		$result = array(
 			'name' => _('PHP gd FreeType support'),
 			'current' => $current ? _('yes') : _('no'),

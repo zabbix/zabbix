@@ -152,7 +152,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.hostid';
@@ -163,7 +163,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('i.itemid', $options['itemids']);
 		}
 
 		// inherited
@@ -583,7 +583,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$parentItemids = $ruleids;
 		$childTuleids = array();
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.DBcondition('i.templateid', $parentItemids));
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
 			$parentItemids = array();
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
@@ -608,7 +608,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'SELECT i.itemid'.
 			' FROM item_discovery id,items i'.
 			' WHERE i.itemid=id.itemid'.
-				' AND '.DBcondition('parent_itemid', $ruleids)
+				' AND '.dbConditionInt('parent_itemid', $ruleids)
 		);
 		while ($item = DBfetch($dbItems)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];

@@ -154,13 +154,13 @@ class CUserMacro extends CZBXAPI {
 		// globalmacroids
 		if (!is_null($options['globalmacroids'])) {
 			zbx_value2array($options['globalmacroids']);
-			$sqlPartsGlobal['where'][] = DBcondition('gm.globalmacroid', $options['globalmacroids']);
+			$sqlPartsGlobal['where'][] = dbConditionInt('gm.globalmacroid', $options['globalmacroids']);
 		}
 
 		// hostmacroids
 		if (!is_null($options['hostmacroids'])) {
 			zbx_value2array($options['hostmacroids']);
-			$sqlParts['where'][] = DBcondition('hm.hostmacroid', $options['hostmacroids']);
+			$sqlParts['where'][] = dbConditionInt('hm.hostmacroid', $options['hostmacroids']);
 		}
 
 		// groupids
@@ -170,14 +170,14 @@ class CUserMacro extends CZBXAPI {
 				$sqlParts['select']['groupid'] = 'hg.groupid';
 			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=hm.hostid';
 		}
 
 		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
-			$sqlParts['where'][] = DBcondition('hm.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('hm.hostid', $options['hostids']);
 		}
 
 		// templateids
@@ -187,7 +187,7 @@ class CUserMacro extends CZBXAPI {
 				$sqlParts['select']['templateid'] = 'ht.templateid';
 			}
 			$sqlParts['from']['macros_templates'] = 'hosts_templates ht';
-			$sqlParts['where'][] = DBcondition('ht.templateid', $options['templateids']);
+			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'hm.hostid=ht.hostid';
 		}
 

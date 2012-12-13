@@ -90,7 +90,7 @@ function activate_httptest($httptestid) {
 		$itemids[] = $itemid['itemid'];
 	}
 
-	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids));
+	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.dbConditionInt('itemid', $itemids));
 
 	return $result;
 }
@@ -114,7 +114,7 @@ function disable_httptest($httptestid) {
 		$itemids[] = $itemid['itemid'];
 	}
 
-	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids));
+	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.dbConditionInt('itemid', $itemids));
 
 	return $result;
 }
@@ -151,7 +151,7 @@ function get_httptests_by_hostid($hostids) {
 		'SELECT DISTINCT ht.*'.
 		' FROM httptest ht,applications ap'.
 		' WHERE ht.applicationid=ap.applicationid'.
-			' AND '.DBcondition('ap.hostid', $hostids)
+			' AND '.dbConditionInt('ap.hostid', $hostids)
 	);
 }
 

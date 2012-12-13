@@ -1003,7 +1003,7 @@ function make_webmon_overview($filter) {
 				' AND a.hostid=hg.hostid'.
 				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-				' AND '.DBcondition('hg.hostid', $availableHostIds).
+				' AND '.dbConditionInt('hg.hostid', $availableHostIds).
 				' AND hg.groupid='.$group['groupid']
 		);
 		while ($row = DBfetch($result)) {

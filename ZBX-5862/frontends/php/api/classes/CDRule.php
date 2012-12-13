@@ -102,7 +102,7 @@ class CDRule extends CZBXAPI {
 // druleids
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
-			$sqlParts['where']['druleid'] = DBcondition('dr.druleid', $options['druleids']);
+			$sqlParts['where']['druleid'] = dbConditionInt('dr.druleid', $options['druleids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -118,7 +118,7 @@ class CDRule extends CZBXAPI {
 			}
 
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
 			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 
 			if (!is_null($options['groupCount'])) {
@@ -141,7 +141,7 @@ class CDRule extends CZBXAPI {
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 
-			$sqlParts['where']['dserviceid'] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
@@ -769,7 +769,7 @@ class CDRule extends CZBXAPI {
 		if (!empty($actionids)) {
 			DBexecute('UPDATE actions '.
 					' SET status='.ACTION_STATUS_DISABLED.
-					' WHERE '.DBcondition('actionid', $actionids));
+					' WHERE '.dbConditionInt('actionid', $actionids));
 
 			// delete action conditions
 			DBexecute('DELETE FROM conditions '.

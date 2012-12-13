@@ -1088,10 +1088,8 @@ function check_db_fields($db_fields, &$args) {
  * @return string
  */
 function dbConditionInt($fieldName, array $values, $notIn = false) {
-	// maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
-	$MAX_EXPRESSIONS = 950;
-	// minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
-	$MIN_NUM_BETWEEN = 5;
+	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
+	$MIN_NUM_BETWEEN = 5; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
 	if (count($values) == 0) {
 		return ' 1=0';
@@ -1135,8 +1133,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	$inNum = count($ins);
 	$betweenNum = count($betweens);
 
-	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum))
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
 		$condition .= '(';
+	}
 
 	// compose "BETWEEN"s
 	$first = true;
@@ -1153,8 +1152,12 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	}
 
 	if ($inNum == 1) {
-		$condition .= $fieldName.'='.$ins[0];
+		foreach ($ins as $insValue) {
+			$condition .= $fieldName.'='.$insValue;
+			break;
+		}
 	}
+
 	// compose "IN"s
 	else {
 		$first = true;
@@ -1167,8 +1170,11 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 		}
 	}
 
-	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum))
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
 		$condition .= ')';
+	}
+
+	return $condition;
 }
 
 function DBcondition($fieldname, $array, $notin = false) {

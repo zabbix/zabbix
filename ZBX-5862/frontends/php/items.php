@@ -591,7 +591,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 				'SELECT DISTINCT h.hostid'.
 				' FROM hosts h,hosts_groups hg'.
 				' WHERE h.hostid=hg.hostid'.
-					' AND '.DBcondition('hg.groupid', $group_ids)
+					' AND '.dbConditionInt('hg.groupid', $group_ids)
 			);
 			while ($db_host = DBfetch($db_hosts)) {
 				$hosts_ids[] = $db_host['hostid'];
@@ -613,7 +613,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
 	$go_result = delete_history_by_itemid($_REQUEST['group_itemid']);
-	DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE '.DBcondition('itemid', $_REQUEST['group_itemid']));
+	DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE '.dbConditionInt('itemid', $_REQUEST['group_itemid']));
 
 	foreach ($_REQUEST['group_itemid'] as $id) {
 		if (!$item = get_item_by_itemid($id)) {
@@ -904,7 +904,7 @@ else {
 				'SELECT i.itemid,h.name,h.hostid'.
 				' FROM hosts h,items i'.
 				' WHERE i.hostid=h.hostid'.
-					' AND '.DBcondition('i.itemid', zbx_objectValues($data['items'], 'templateid'))
+					' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
 		);
 		while ($dbHostItem = DBfetch($dbHostItems)) {
 			foreach ($data['items'] as $itemid => $item) {
