@@ -67,6 +67,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5985] fixed DB error in "Configuration of web monitoring" for PostgreSQL (Oleg)
 ..F....... [ZBX-5699] fixed configuration graph host id passing in navigation (Eduard)
 A......... [ZBX-1946] improved error messages when validating screen item row and column spans (Pavels)
 ..F....... [ZBX-3402] disabled "store value" overriding for host items inherited from templates (Pavels)
