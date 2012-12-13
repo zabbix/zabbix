@@ -67,6 +67,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5979] fixed monitoring events page, hidden triggers with not monitored items (Oleg)
 ..F....... [ZBX-5985] fixed DB error in "Configuration of web monitoring" for PostgreSQL (Oleg)
 ..F....... [ZBX-5699] fixed configuration graph host id passing in navigation (Eduard)
 A......... [ZBX-1946] improved error messages when validating screen item row and column spans (Pavels)
