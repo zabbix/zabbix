@@ -1082,8 +1082,8 @@ function check_db_fields($db_fields, &$args) {
  * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
  *
  * @param string $fieldName  field name to be used in SQL WHERE condition
- * @param array $values      array of numerical values sorted in ascending order to be included in WHERE
- * @param bool $notIn        builds inverted condition
+ * @param array  $values     array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
  *
  * @return string
  */
@@ -1106,7 +1106,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	while ($valueR = next($values)) {
 		if ($valueR != ++$valueL) {
 			if ($len >= $MIN_NUM_BETWEEN) {
-				$betweens[] = array($valueL - $len, $valueL - 1);
+				$betweens[] = array(number_format($valueL - $len, 0, '.', ''), number_format($valueL - 1, 0, '.', ''));
 			}
 			else {
 				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
@@ -1122,7 +1122,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	}
 
 	if ($len >= $MIN_NUM_BETWEEN) {
-		$betweens[] = array($valueL - $len + 1, $valueL);
+		$betweens[] = array(number_format($valueL - $len + 1, 0, '.', ''), number_format($valueL, 0, '.', ''));
 	}
 	else {
 		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
