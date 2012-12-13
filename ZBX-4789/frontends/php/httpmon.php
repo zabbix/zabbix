@@ -99,8 +99,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // 2nd header
 	$options = array(
 		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_httptests' => 1,
+			'with_monitored_httptests' => true,
 		),
 		'hosts' => array(
 			'monitored_hosts' => 1,

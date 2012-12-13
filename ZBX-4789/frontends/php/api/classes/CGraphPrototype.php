@@ -122,7 +122,7 @@ class CGraphPrototype extends CGraphGeneral {
 				' JOIN rights r'.
 					' ON r.id=hgg.groupid'.
 						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE gi.graphid=g.graphid'.
+				' WHERE g.graphid=gi.graphid'.
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY gi.graphid'.
