@@ -100,7 +100,7 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT("wt.*") AS cnt'.
+		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT(*) AS cnt'.
 											' FROM httptest wt,applications a'.
 											' WHERE a.applicationid=wt.applicationid'.
 											' AND '.DBcondition('wt.httptestid', $_REQUEST['group_httptestid'])
