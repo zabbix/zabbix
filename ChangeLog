@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5699] fixed configuration graph host id passing in navigation (Eduard)
 A......... [ZBX-1946] improved error messages when validating screen item row and column spans (Pavels)
 ..F....... [ZBX-3402] disabled "store value" overriding for host items inherited from templates (Pavels)
 ..F....... [ZBX-3402] fixed the "formula" input not being displayed when editing templated items with a disabled multiplier (Pavels)
