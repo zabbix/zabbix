@@ -476,7 +476,7 @@ else {
 		}
 
 		$dbHttpSteps = DBselect(
-			'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
+			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
 					' FROM httpstep hs'.
 					' WHERE '.DBcondition('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
 					' GROUP BY hs.httptestid'
