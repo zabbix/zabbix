@@ -60,7 +60,6 @@ CProfile::update('web.overview.type', $data['type'], PROFILE_TYPE_INT);
 
 $data['pageFilter'] = new CPageFilter(array(
 	'groups' => array(
-		'monitored_hosts' => true,
 		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	),
 	'hosts' => array(

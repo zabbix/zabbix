@@ -209,7 +209,7 @@ $options = array(
 	'hostids' => $available_hosts,
 	'selectAppllications' => API_OUTPUT_EXTEND,
 	'selectScreens' => API_OUTPUT_COUNT,
-	'selectInventory' => true,
+	'selectInventory' => array('hostid'),
 	'selectGroups' => API_OUTPUT_REFER,
 	'preservekeys' => true
 );
@@ -232,7 +232,9 @@ if($_REQUEST['hostid']>0){
 $hosts = API::Host()->get($options);
 
 // fetch scripts for the host JS menu
-$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+if ($_REQUEST['hostid'] == 0) {
+	$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+}
 
 // select hosts
 $sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
@@ -378,14 +380,18 @@ foreach ($db_apps as $appid => $db_app) {
 
 	$col->setColSpan(5);
 	// host JS menu link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+	$hostSpan = null;
+	if ($_REQUEST['hostid'] == 0) {
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = $hostScripts[$host['hostid']];
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	}
 
 	$table->addRow(array(
 		$link,
 		get_node_name_by_elid($db_app['applicationid']),
-		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
+		$hostSpan,
 		$col
 	));
 
@@ -551,14 +557,17 @@ foreach ($db_hosts as $hostid => $db_host) {
 	$col->setColSpan(5);
 
 	// host JS menu link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	$hostSpan = null;
+	if ($_REQUEST['hostid'] == 0) {
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = $hostScripts[$host['hostid']];
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	}
 
 	$table->addRow(array(
 		$link,
 		get_node_name_by_elid($db_host['hostid']),
-		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
+		$hostSpan,
 		$col
 	));
 

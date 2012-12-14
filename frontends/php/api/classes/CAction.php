@@ -109,99 +109,57 @@ class CAction extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || !is_null($options['nopermissions'])) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// conditions are checked here by sql, operations after, by api queries
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
+			$userGroups = getUserGroupsByUserId($userid);
+
 			// condition hostgroup
-			$sqlParts['where'][] =
-				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
 					' FROM conditions cc'.
-					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND cc.actionid=a.actionid'.
-						' AND ('.
-							' NOT EXISTS ('.
-								' SELECT rr.id'.
-								' FROM rights rr,users_groups ug'.
-								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
-									' AND rr.groupid=ug.usrgrpid'.
-									' AND ug.userid='.$userid.
-									' AND rr.permission>='.$permission.
-							' )'.
-							' OR EXISTS ('.
-								' SELECT rr.id'.
-								' FROM rights rr,users_groups ugg'.
-								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
-									' AND rr.groupid=ugg.usrgrpid'.
-									' AND ugg.userid='.$userid.
-									' AND rr.permission='.PERM_DENY.
-							')'.
-						')'.
-				')';
+						' LEFT JOIN rights r'.
+							' ON r.id='.zbx_dbcast_2bigint('cc.value').
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE a.actionid=cc.actionid'.
+						' AND cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+					' GROUP BY cc.value'.
+					' HAVING MIN(r.permission) IS NULL'.
+						' OR MIN(r.permission)<'.$permission.
+					')';
 
 			// condition host or template
-			$sqlParts['where'][] =
-				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
-					' FROM conditions cc'.
-					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
-						' AND cc.actionid=a.actionid'.
-						' AND ('.
-							' NOT EXISTS ('.
-								' SELECT hgg.hostid'.
-								' FROM hosts_groups hgg,rights r,users_groups ug'.
-								' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
-									' AND r.id=hgg.groupid'.
-									' AND ug.userid='.$userid.
-									' AND r.permission>='.$permission.
-									' AND r.groupid=ug.usrgrpid)'.
-							' OR EXISTS ('.
-								' SELECT hgg.hostid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission='.PERM_DENY.')'.
-							')'.
-				')';
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM conditions cc,hosts_groups hgg'.
+						' LEFT JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE a.actionid=cc.actionid'.
+						' AND '.zbx_dbcast_2bigint('cc.value').'=hgg.hostid'.
+						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_HOST_TEMPLATE.')'.
+					' GROUP BY cc.value'.
+					' HAVING MIN(r.permission) IS NULL'.
+						' OR MIN(r.permission)<'.$permission.
+					')';
 
 			// condition trigger
-			$sqlParts['where'][] =
-				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
-					' FROM conditions cc'.
-					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
-						' AND cc.actionid=a.actionid'.
-						' AND ('.
-							' NOT EXISTS ('.
-								' SELECT f.triggerid'.
-								' FROM functions f,items i,hosts_groups hg,rights r,users_groups ug'.
-								' WHERE ug.userid='.$userid.
-									' AND r.groupid=ug.usrgrpid'.
-									' AND r.permission>='.$permission.
-									' AND hg.groupid=r.id'.
-									' AND i.hostid=hg.hostid'.
-									' AND f.itemid=i.itemid'.
-									' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').')'.
-							' OR EXISTS ('.
-								' SELECT ff.functionid'.
-								' FROM functions ff,items ii'.
-								' WHERE ff.triggerid='.zbx_dbcast_2bigint('cc.value').
-									' AND ii.itemid=ff.itemid'.
-									' AND EXISTS ('.
-										' SELECT hgg.groupid'.
-										' FROM hosts_groups hgg,rights rr,users_groups ugg'.
-										' WHERE hgg.hostid=ii.hostid'.
-											' AND rr.id=hgg.groupid'.
-											' AND rr.groupid=ugg.usrgrpid'.
-											' AND ugg.userid='.$userid.
-											' AND rr.permission='.PERM_DENY.'))'.
-					')'.
-				')';
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM conditions cc,functions f,items i,hosts_groups hgg'.
+						' LEFT JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE a.actionid=cc.actionid'.
+						' AND '.zbx_dbcast_2bigint('cc.value').'=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+						' AND cc.conditiontype='.CONDITION_TYPE_TRIGGER.
+					' GROUP BY cc.value'.
+					' HAVING MIN(r.permission) IS NULL'.
+						' OR MIN(r.permission)<'.$permission.
+					')';
 		}
 
 		// nodeids

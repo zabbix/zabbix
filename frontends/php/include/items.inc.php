@@ -686,20 +686,21 @@ function get_items_data_overview($hostids, $application, $view_style) {
 		' ORDER BY i.name,i.itemid'
 	);
 
-	// fetch data for the host JS menu
-	$hosts = API::Host()->get(array(
+	$options = array(
 		'output' => array('name', 'hostid'),
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
 		'monitored_hosts' => true,
 		'hostids' => $hostids,
 		'with_monitored_items' => true,
 		'preservekeys' => true
-	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-	foreach ($hostScripts as $hostid => $scripts) {
-		$hosts[$hostid]['scripts'] = $scripts;
+	);
+
+	if ($view_style == STYLE_LEFT) {
+		$options['selectScreens'] = API_OUTPUT_COUNT;
+		$options['selectInventory'] = array('hostid');
 	}
+
+	// fetch data for the host JS menu
+	$hosts = API::Host()->get($options);
 
 	$items = array();
 	while ($row = DBfetch($db_items)) {
@@ -751,6 +752,10 @@ function get_items_data_overview($hostids, $application, $view_style) {
 		}
 	}
 	else {
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');
@@ -762,8 +767,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 
 			// host js menu link
 			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
-			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
 
 			$tableRow = array(new CCol($hostSpan));
 			foreach ($items as $ithosts) {
