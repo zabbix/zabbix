@@ -384,7 +384,7 @@ foreach ($db_apps as $appid => $db_app) {
 	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
 		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-		$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+		$scripts = $hostScripts[$host['hostid']];
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 	}
 
