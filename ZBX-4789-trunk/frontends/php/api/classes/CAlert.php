@@ -112,39 +112,25 @@ class CAlert extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['events'] = 'events e';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT ff.triggerid'.
-				' FROM functions ff,items ii'.
-				' WHERE ff.triggerid=e.objectid'.
-					' AND ff.itemid=ii.itemid'.
-					' AND EXISTS ('.
-						' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups gg'.
-						' WHERE hgg.hostid=ii.hostid'.
-							' AND rr.id=hgg.groupid'.
-							' AND rr.groupid=gg.usrgrpid'.
-							' AND gg.userid='.$userid.
-							' AND rr.permission='.PERM_DENY.'))';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM events e,functions f,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE a.eventid=e.eventid'.
+						' AND e.objectid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' GROUP BY e.eventid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids

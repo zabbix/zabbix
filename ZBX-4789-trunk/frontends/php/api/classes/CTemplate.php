@@ -118,27 +118,21 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
-		}
-		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=h.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS('.
-				'SELECT hgg.groupid'.
-				' FROM hosts_groups hgg,rights rr,users_groups gg'.
-				' WHERE hgg.hostid=hg.hostid'.
-				' AND rr.id=hgg.groupid'.
-				' AND rr.groupid=gg.usrgrpid'.
-				' AND gg.userid='.$userid.
-				' AND rr.permission='.PERM_DENY.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE h.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -270,13 +264,13 @@ class CTemplate extends CHostGeneral {
 
 		// with_items
 		if (!is_null($options['with_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
+			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid )';
 		}
 
 		// with_triggers
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS('.
-				'SELECT i.itemid'.
+				'SELECT NULL'.
 				' FROM items i,functions f,triggers t'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=f.itemid'.
@@ -286,7 +280,7 @@ class CTemplate extends CHostGeneral {
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['where'][] = 'EXISTS('.
-				'SELECT DISTINCT i.itemid'.
+				'SELECT NULL'.
 				' FROM items i,graphs_items gi'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=gi.itemid)';
@@ -1245,7 +1239,7 @@ class CTemplate extends CHostGeneral {
 		$sql = 'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
 			' WHERE '.DBcondition('o.operationid', $operationids).
-			' AND NOT EXISTS(SELECT ot.optemplateid FROM optemplate ot WHERE ot.operationid=o.operationid)';
+			' AND NOT EXISTS(SELECT NULL FROM optemplate ot WHERE ot.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
