@@ -557,14 +557,17 @@ foreach ($db_hosts as $hostid => $db_host) {
 	$col->setColSpan(5);
 
 	// host JS menu link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	$hostSpan = null;
+	if ($_REQUEST['hostid'] == 0) {
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = $hostScripts[$host['hostid']];
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	}
 
 	$table->addRow(array(
 		$link,
 		get_node_name_by_elid($db_host['hostid']),
-		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
+		$hostSpan,
 		$col
 	));
 

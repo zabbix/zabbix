@@ -1233,7 +1233,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 
 			// host js link
 			$hostSpan = new CSpan(nbsp($hostName), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array()));
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
 
 			$tableColumns = array($hostSpan);
 			foreach ($triggers as $triggerHosts) {
@@ -1639,7 +1639,7 @@ function make_trigger_details($trigger) {
 
 	// host js link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+	$scripts = $hostScripts[$host['hostid']];
 	$hostSpan->attr('data-menu', hostMenuData($host, $scripts));
 
 	// get visible name of the first host

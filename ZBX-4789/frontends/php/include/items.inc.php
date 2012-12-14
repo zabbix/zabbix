@@ -753,8 +753,7 @@ function get_items_data_overview($hostids, $view_style) {
 
 			// host js menu link
 			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
-			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
 
 			$tableRow = array(new CCol($hostSpan));
 			foreach ($items as $ithosts) {
