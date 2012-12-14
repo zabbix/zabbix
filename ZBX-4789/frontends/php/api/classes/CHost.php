@@ -165,15 +165,15 @@ class CHost extends CHostGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM hosts_groups hgg'.
-				' JOIN rights r'.
-					' ON r.id=hgg.groupid'.
-						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE h.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
-				' HAVING MIN(r.permission)>='.$permission.
-				')';
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE h.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// hostids
@@ -367,55 +367,79 @@ class CHost extends CHostGeneral {
 
 		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid )';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+					')';
 		}
 		elseif (!is_null($options['with_monitored_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+					')';
 		}
 		elseif (!is_null($options['with_historical_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.status IN ('.ITEM_STATUS_ACTIVE.','.ITEM_STATUS_NOTSUPPORTED.')'.
+						' AND i.lastvalue IS NOT NULL'.
+					')';
 		}
 		elseif (!is_null($options['with_simple_graph_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND (i.value_type IN ('.
-			ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.') AND i.status='.ITEM_STATUS_ACTIVE.' AND i.flags IN ('.
-			ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')))';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+					')';
 		}
 
 		// with_triggers, with_monitored_triggers
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT NULL'.
-				' FROM items i,functions f,triggers t'.
-				' WHERE i.hostid=h.hostid'.
-					' AND i.itemid=f.itemid'.
-					' AND f.triggerid=t.triggerid)';
+					'SELECT NULL'.
+					' FROM items i,functions f,triggers t'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.itemid=f.itemid'.
+						' AND f.triggerid=t.triggerid'.
+					')';
 		}
 		elseif (!is_null($options['with_monitored_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT NULL'.
-				' FROM items i,functions f,triggers t'.
-				' WHERE i.hostid=h.hostid'.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND i.itemid=f.itemid'.
-					' AND f.triggerid=t.triggerid'.
-					' AND t.status='.TRIGGER_STATUS_ENABLED.')';
+					'SELECT NULL'.
+					' FROM items i,functions f,triggers t'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.itemid=f.itemid'.
+						' AND f.triggerid=t.triggerid'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.
+					')';
 		}
 
 		// with_httptests, with_monitored_httptests
 		if (!is_null($options['with_httptests'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT NULL'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid)';
+					'SELECT NULL'.
+					' FROM applications a,httptest ht'.
+					' WHERE h.hostid=a.hostid'.
+						' AND a.applicationid=ht.applicationid'.
+					')';
 		}
 		elseif (!is_null($options['with_monitored_httptests'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT NULL'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid'.
-					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+					'SELECT NULL'.
+					' FROM applications a,httptest ht'.
+					' WHERE h.hostid=a.hostid'.
+						' AND a.applicationid=ht.applicationid'.
+						' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+					')';
 		}
 
 		// with_graphs

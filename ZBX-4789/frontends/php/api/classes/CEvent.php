@@ -115,7 +115,7 @@ class CEvent extends CZBXAPI {
 				$options['object'] = EVENT_OBJECT_TRIGGER;
 			}
 
-			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGER) {
+			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGERS) {
 				if (!is_null($options['triggerids'])) {
 					$triggers = API::Trigger()->get(array(
 						'triggerids' => $options['triggerids'],
@@ -129,18 +129,18 @@ class CEvent extends CZBXAPI {
 					$userGroups = getUserGroupsByUserId($userid);
 
 					$sqlParts['where'][] = 'EXISTS ('.
-						'SELECT NULL'.
-						' FROM functions f,items i,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
-						' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid=f.triggerid'.
-							' AND f.itemid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY f.triggerid'.
-						' HAVING MIN(r.permission)>='.$permission.
-						')';
+							'SELECT NULL'.
+							' FROM functions f,items i,hosts_groups hgg'.
+								' JOIN rights r'.
+									' ON r.id=hgg.groupid'.
+										' AND '.DBcondition('r.groupid', $userGroups).
+							' WHERE e.objectid=f.triggerid'.
+								' AND f.itemid=i.itemid'.
+								' AND i.hostid=hgg.hostid'.
+								' AND e.object='.EVENT_OBJECT_TRIGGER.
+							' GROUP BY f.triggerid'.
+							' HAVING MIN(r.permission)>='.$permission.
+							')';
 				}
 			}
 		}

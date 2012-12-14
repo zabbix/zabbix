@@ -112,15 +112,15 @@ class CDiscoveryRule extends CItemGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM hosts_groups hgg'.
-				' JOIN rights r'.
-					' ON r.id=hgg.groupid'.
-						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE hgg.hostid=i.hostid'.
-				' GROUP BY hgg.hostid'.
-				' HAVING MIN(r.permission)>='.$permission.
-				')';
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE hgg.hostid=i.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids

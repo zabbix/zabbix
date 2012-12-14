@@ -162,17 +162,17 @@ class CTrigger extends CTriggerGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM functions f,items i,hosts_groups hgg'.
-				' JOIN rights r'.
-					' ON r.id=hgg.groupid'.
-						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY f.triggerid'.
-				' HAVING MIN(r.permission)>='.$permission.
-				')';
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY f.triggerid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// groupids
@@ -276,58 +276,43 @@ class CTrigger extends CTriggerGeneral {
 
 		// monitored
 		if (!is_null($options['monitored'])) {
-			$sqlParts['where']['monitored'] = ''.
-				' NOT EXISTS ('.
-					' SELECT NULL'.
-					' FROM functions ff'.
-					' WHERE ff.triggerid=t.triggerid'.
-						' AND EXISTS ('.
-							' SELECT NULL'.
-							' FROM items ii,hosts hh'.
-							' WHERE ff.itemid=ii.itemid'.
-								' AND hh.hostid=ii.hostid'.
-								' AND ('.
-									' ii.status<>'.ITEM_STATUS_ACTIVE.
-									' OR hh.status<>'.HOST_STATUS_MONITORED.
-								' )'.
-						' )'.
-				' )';
+			$sqlParts['where']['monitored'] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts h'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND ('.
+							'i.status<>'.ITEM_STATUS_ACTIVE.
+							' OR h.status<>'.HOST_STATUS_MONITORED.
+						')'.
+					')';
 			$sqlParts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
 
 		// active
 		if (!is_null($options['active'])) {
-			$sqlParts['where']['active'] = ''.
-				' NOT EXISTS ('.
-					' SELECT NULL'.
-					' FROM functions ff'.
-					' WHERE ff.triggerid=t.triggerid'.
-						' AND EXISTS ('.
-							' SELECT NULL'.
-							' FROM items ii,hosts hh'.
-							' WHERE ff.itemid=ii.itemid'.
-								' AND hh.hostid=ii.hostid'.
-								' AND  hh.status<>'.HOST_STATUS_MONITORED.
-						' )'.
-				' )';
+			$sqlParts['where']['active'] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts h'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status<>'.HOST_STATUS_MONITORED.
+					')';
 			$sqlParts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
 
 		// maintenance
 		if (!is_null($options['maintenance'])) {
-			$sqlParts['where'][] = ($options['maintenance'] == 0 ? ' NOT ' : '').
-				' EXISTS ('.
-					' SELECT NULL'.
-					' FROM functions ff'.
-					' WHERE ff.triggerid=t.triggerid'.
-						' AND EXISTS ('.
-							' SELECT NULL'.
-							' FROM items ii,hosts hh'.
-							' WHERE ff.itemid=ii.itemid'.
-								' AND hh.hostid=ii.hostid'.
-								' AND hh.maintenance_status=1'.
-						' )'.
-				' )';
+			$sqlParts['where'][] = ($options['maintenance'] == 0 ? 'NOT ' : '').'EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts h'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.maintenance_status='.HOST_MAINTENANCE_STATUS_ON.
+					')';
 			$sqlParts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
 
@@ -343,25 +328,27 @@ class CTrigger extends CTriggerGeneral {
 
 		// withUnacknowledgedEvents
 		if (!is_null($options['withUnacknowledgedEvents'])) {
-			$sqlParts['where']['unack'] = ' EXISTS ('.
-				' SELECT NULL'.
-				' FROM events e'.
-				' WHERE e.objectid=t.triggerid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-					' AND e.value='.TRIGGER_VALUE_TRUE.
-					' AND e.acknowledged=0)';
+			$sqlParts['where']['unack'] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM events e'.
+					' WHERE t.triggerid=e.objectid'.
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+						' AND e.value='.TRIGGER_VALUE_TRUE.
+						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
+					')';
 		}
 		// withAcknowledgedEvents
 		if (!is_null($options['withAcknowledgedEvents'])) {
 			$sqlParts['where']['ack'] = 'NOT EXISTS ('.
-				' SELECT NULL'.
-				' FROM events e'.
-				' WHERE e.objectid=t.triggerid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-					' AND e.value='.TRIGGER_VALUE_TRUE.
-					' AND e.acknowledged=0)';
+					'SELECT NULL'.
+					' FROM events e'.
+					' WHERE e.objectid=t.triggerid'.
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+						' AND e.value='.TRIGGER_VALUE_TRUE.
+						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
+					')';
 		}
 
 		// templated

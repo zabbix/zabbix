@@ -80,21 +80,21 @@ class CWebCheck extends CZBXAPI {
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM applications a, hosts_groups hgg'.
-				' JOIN rights r'.
-					' ON r.id=hgg.groupid'.
-						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE a.applicationid=ht.applicationid'.
-					' AND a.hostid=hgg.hostid'.
-				' GROUP BY a.applicationid'.
-				' HAVING MIN(r.permission)>='.$permission.
-				')';
+					'SELECT NULL'.
+					' FROM applications a,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE a.applicationid=ht.applicationid'.
+						' AND a.hostid=hgg.hostid'.
+					' GROUP BY a.applicationid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids

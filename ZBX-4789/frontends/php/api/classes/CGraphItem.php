@@ -82,16 +82,16 @@ class CGraphItem extends CZBXAPI {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM items i,hosts_groups hgg'.
-				' JOIN rights r'.
-					' ON r.id=hgg.groupid'.
-						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE gi.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY i.itemid'.
-				' HAVING MIN(r.permission)>='.$permission.
-				')';
+					'SELECT NULL'.
+					' FROM items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE gi.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY i.itemid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids

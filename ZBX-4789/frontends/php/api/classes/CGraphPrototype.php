@@ -117,17 +117,17 @@ class CGraphPrototype extends CGraphGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM graphs_items gi,items i,hosts_groups hgg'.
-				' JOIN rights r'.
-					' ON r.id=hgg.groupid'.
-						' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE g.graphid=gi.graphid'.
-					' AND gi.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY gi.graphid'.
-				' HAVING MIN(r.permission)>='.$permission.
-				')';
+					'SELECT NULL'.
+					' FROM graphs_items gi,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY gi.graphid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids

@@ -917,15 +917,15 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		$userGroups = getUserGroupsByUserId($userid);
 
 		$sqlParts['where'][] = 'EXISTS ('.
-			'SELECT NULL'.
-			' FROM hosts_groups hgg'.
-			' JOIN rights r'.
-				' ON r.id=hgg.groupid'.
-					' AND '.DBcondition('r.groupid', $userGroups).
-			' WHERE h.hostid=hgg.hostid'.
-			' GROUP BY hgg.hostid'.
-			' HAVING MIN(r.permission)>='.$perm.
-			')';
+				'SELECT NULL'.
+				' FROM hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.DBcondition('r.groupid', $userGroups).
+				' WHERE h.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>='.$perm.
+				')';
 	}
 
 	// nodes

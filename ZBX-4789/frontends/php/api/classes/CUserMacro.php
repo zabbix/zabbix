@@ -34,12 +34,9 @@ class CUserMacro extends CZBXAPI {
 	 * @param boolean $options['monitored_macros'] only monitored UserMacros
 	 * @param boolean $options['templated_macros'] include templates in result
 	 * @param boolean $options['with_items'] only with items
-	 * @param boolean $options['with_monitored_items'] only with monitored items
 	 * @param boolean $options['with_historical_items'] only with historical items
 	 * @param boolean $options['with_triggers'] only with triggers
-	 * @param boolean $options['with_monitored_triggers'] only with monitored triggers
 	 * @param boolean $options['with_httptests'] only with http tests
-	 * @param boolean $options['with_monitored_httptests'] only with monitored http tests
 	 * @param boolean $options['with_graphs'] only with graphs
 	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
 	 * @param int $options['count'] count UserMacros, returned column name is rowscount
@@ -118,9 +115,9 @@ class CUserMacro extends CZBXAPI {
 				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.DBcondition('r.groupid', $userGroups).
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
 					' WHERE hm.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>='.$permission.
