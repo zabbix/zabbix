@@ -47,6 +47,10 @@ class dbConditionIntTest extends PHPUnit_Framework_TestCase {
 				' (field BETWEEN 1 AND 10 OR field BETWEEN 20 AND 30)'
 			),
 			array(
+				array('field', array_merge(range(1, 4), range(1, 4), range(20, 30))),
+				' (field BETWEEN 20 AND 30 OR field IN (1,2,3,4,1,2,3,4))'
+			),
+			array(
 				array('field', array('9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806', '9223372036854775807')),
 				' field BETWEEN 9223372036854775802 AND 9223372036854775807'
 			),
