@@ -970,7 +970,7 @@ class CItem extends CItemGeneral {
 					'SELECT gii.gitemid'.
 					' FROM graphs_items gii'.
 					' WHERE gii.graphid=gi.graphid'.
-						' AND '.dbConditionInt('gii.itemid', $itemids, true, false).
+						' AND '.dbConditionInt('gii.itemid', $itemids, true).
 				')'
 		);
 		while ($dbGraph = DBfetch($dbGraphs)) {
@@ -980,7 +980,7 @@ class CItem extends CItemGeneral {
 		if (!empty($delGraphs)) {
 			$result = API::Graph()->delete($delGraphs, true);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph.'));
 			}
 		}
 
