@@ -142,19 +142,21 @@ class CMaintenance extends CZBXAPI {
 					' LEFT JOIN maintenances_groups mg ON mg.maintenanceid=m.maintenanceid'.
 					' WHERE (EXISTS ('.
 						' SELECT NULL'.
-						' FROM rights r1,hosts_groups hg1'.
+						' FROM maintenances_hosts mh2, rights r1,hosts_groups hg1'.
 						' WHERE '.DBcondition('r1.groupid', $userGroups).
-						' AND hg1.hostid=mh.hostid'.
-						' AND r1.id=hg1.groupid'.
-						' GROUP by hg1.hostid HAVING MIN(r1.permission)>='.$permission.
-					')'.
-					' OR mh.maintenance_hostid IS NULL)'.
-					' AND ( EXISTS ('.
+							' AND hg1.hostid=mh2.hostid'.
+							' AND mh2.maintenanceid=m.maintenanceid'.
+							' AND r1.id=hg1.groupid'.
+						' GROUP by mh2.maintenanceid HAVING MIN(r1.permission)='.$permission.
+						')'.
+						' OR mh.maintenance_hostid IS NULL)'.
+					' AND (EXISTS ('.
 						'SELECT NULL'.
-						' FROM rights r2'.
+						' FROM maintenances_groups mg2, rights r2'.
 						' WHERE '.DBcondition('r2.groupid', $userGroups).
-						' AND r2.id=mg.groupid'.
-						' GROUP by r2.id HAVING MIN(r2.permission)>='.$permission.
+							' AND r2.id=mg2.groupid'.
+							' AND mg2.maintenanceid=m.maintenanceid'.
+						' GROUP by mg2.maintenanceid HAVING MIN(r2.permission)='.$permission.
 					')'.
 					' OR mg.maintenance_groupid IS NULL)';
 
