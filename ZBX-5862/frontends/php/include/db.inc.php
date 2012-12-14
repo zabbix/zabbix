@@ -1124,7 +1124,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	}
 
 	if ($len >= $MIN_NUM_BETWEEN) {
-		$betweens[] = array(bcsub($valueL, $len + 1, 0), $valueL);
+		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
 	}
 	else {
 		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
