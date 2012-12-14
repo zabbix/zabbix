@@ -672,16 +672,21 @@ function get_items_data_overview($hostids, $view_style) {
 		' ORDER BY i.name,i.itemid'
 	);
 
-	// fetch data for the host JS menu
-	$hosts = API::Host()->get(array(
+	$options = array(
 		'output' => array('name', 'hostid'),
-		'selectScreens' => $view_style != STYLE_TOP ? true : null,
-		'selectInventory' => $view_style != STYLE_TOP ? true : null,
 		'monitored_hosts' => true,
 		'hostids' => $hostids,
 		'with_monitored_items' => true,
 		'preservekeys' => true
-	));
+	);
+
+	if ($view_style == STYLE_LEFT) {
+		$options['selectScreens'] = API_OUTPUT_COUNT;
+		$options['selectInventory'] = array('hostid');
+	}
+
+	// fetch data for the host JS menu
+	$hosts = API::Host()->get($options);
 
 	$items = array();
 	while ($row = DBfetch($db_items)) {

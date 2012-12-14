@@ -1026,7 +1026,7 @@ function getSelementsInfo($sysmap) {
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => true
+			'selectInventory' => array('hostid')
 		));
 	}
 

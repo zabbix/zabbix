@@ -664,7 +664,7 @@ else {
 				'hostids' => $hostids,
 				'selectAppllications' => API_OUTPUT_EXTEND,
 				'selectScreens' => API_OUTPUT_COUNT,
-				'selectInventory' => true,
+				'selectInventory' => array('hostid'),
 				'preservekeys' => true
 			));
 

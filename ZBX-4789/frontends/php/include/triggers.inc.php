@@ -1152,13 +1152,18 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 	foreach ($dbTriggers as $trigger) {
 		$hostids[] = $trigger['hosts'][0]['hostid'];
 	}
-	$hosts = API::Host()->get(array(
+
+	$options = array(
 		'output' => array('name', 'hostid'),
 		'hostids' => $hostids,
-		'selectScreens' => $view_style != STYLE_TOP ? true : null,
-		'selectInventory' => $view_style != STYLE_TOP ? true : null,
 		'preservekeys' => true
-	));
+	);
+
+	if ($view_style == STYLE_LEFT) {
+		$options['selectScreens'] = API_OUTPUT_COUNT;
+		$options['selectInventory'] = array('hostid');
+	}
+	$hosts = API::Host()->get($options);
 
 	$triggers = array();
 	$hostNames = array();
@@ -1624,9 +1629,8 @@ function make_trigger_details($trigger) {
 	$host = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
 		'hostids' => $trigger['hosts'][0]['hostid'],
-		'selectAppllications' => API_OUTPUT_EXTEND,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
+		'selectInventory' => array('hostid'),
 		'preservekeys' => true
 	));
 	$host = reset($host);
