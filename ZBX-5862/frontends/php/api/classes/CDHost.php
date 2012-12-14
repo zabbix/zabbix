@@ -178,7 +178,7 @@ class CDHost extends CZBXAPI {
 				$sqlParts['select']['dserviceids'] = 'ds.dserviceids';
 			}
 
-			$sqlParts['from']['dservicesdbConditionInt'] = 'dservices ds';
+			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
