@@ -118,19 +118,19 @@ class CAlert extends CZBXAPI {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM events e, functions f,items i,hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.DBcondition('r.groupid', $userGroups).
-				' WHERE a.eventid=e.eventid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' AND e.objectid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY e.eventid'.
-				' HAVING MIN(r.permission)>='.$permission.
-				')';
+					'SELECT NULL'.
+					' FROM events e,functions f,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE a.eventid=e.eventid'.
+						' AND e.objectid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' GROUP BY e.eventid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
