@@ -538,4 +538,26 @@ function get_accessible_nodes_by_rights(&$rights, $user_type, $perm, $perm_res =
 
 	return $result;
 }
+
+/**
+ * Returns array of user groups by $userId
+ *
+ * @param integer $userId
+ *
+ * @return array
+ */
+function getUserGroupsByUserId($userId) {
+	static $userGroups;
+
+	if (!isset($userGroups[$userId])) {
+		$userGroups[$userId] = array();
+
+		$result = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.$userId);
+		while ($row = DBfetch($result)) {
+			$userGroups[$userId][] = $row['usrgrpid'];
+		}
+	}
+	return $userGroups[$userId];
+}
+
 ?>

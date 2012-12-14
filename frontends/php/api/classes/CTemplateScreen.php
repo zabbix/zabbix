@@ -43,6 +43,7 @@ class CTemplateScreen extends CScreen {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('screenid', 'name');
@@ -104,9 +105,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else{
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// TODO: think how we could combine templateids && hostids options
 			if (!is_null($options['templateids'])) {
 				unset($options['hostids']);
@@ -130,22 +129,18 @@ class CTemplateScreen extends CScreen {
 				// TODO: get screen
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sqlParts['from']['rights'] = 'rights r';
-				$sqlParts['from']['users_groups'] = 'users_groups ug';
-				$sqlParts['where'][] = 'hg.hostid=s.templateid';
-				$sqlParts['where'][] = 'r.id=hg.groupid ';
-				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
-				$sqlParts['where'][] = 'r.permission>='.$permission;
-				$sqlParts['where'][] = 'NOT EXISTS ('.
-					' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups gg'.
-					' WHERE hgg.hostid=hg.hostid'.
-						' AND rr.id=hgg.groupid'.
-						' AND rr.groupid=gg.usrgrpid'.
-						' AND gg.userid='.self::$userData['userid'].
-						' AND rr.permission<'.$permission.')';
+				$userGroups = getUserGroupsByUserId($userid);
+
+				$sqlParts['where'][] = 'EXISTS ('.
+						'SELECT NULL'.
+						' FROM hosts_groups hgg'.
+							' JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.DBcondition('r.groupid', $userGroups).
+						' WHERE s.templateid=hgg.hostid'.
+						' GROUP BY hgg.hostid'.
+						' HAVING MIN(r.permission)>='.$permission.
+						')';
 			}
 		}
 

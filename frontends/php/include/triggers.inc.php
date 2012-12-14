@@ -1152,17 +1152,18 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 	foreach ($dbTriggers as $trigger) {
 		$hostids[] = $trigger['hosts'][0]['hostid'];
 	}
-	$hosts = API::Host()->get(array(
+
+	$options = array(
 		'output' => array('name', 'hostid'),
 		'hostids' => $hostids,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
 		'preservekeys' => true
-	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-	foreach ($hostScripts as $hostid => $scripts) {
-		$hosts[$hostid]['scripts'] = $scripts;
+	);
+
+	if ($view_style == STYLE_LEFT) {
+		$options['selectScreens'] = API_OUTPUT_COUNT;
+		$options['selectInventory'] = array('hostid');
 	}
+	$hosts = API::Host()->get($options);
 
 	$triggers = array();
 	$hostNames = array();
@@ -1215,6 +1216,10 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 		}
 	}
 	else {
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 		foreach ($triggers as $description => $triggerHosts) {
@@ -1228,7 +1233,7 @@ function get_triggers_overview($hostids, $view_style = null, $screenId = null) {
 
 			// host js link
 			$hostSpan = new CSpan(nbsp($hostName), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array()));
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
 
 			$tableColumns = array($hostSpan);
 			foreach ($triggers as $triggerHosts) {
@@ -1624,9 +1629,8 @@ function make_trigger_details($trigger) {
 	$host = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
 		'hostids' => $trigger['hosts'][0]['hostid'],
-		'selectAppllications' => API_OUTPUT_EXTEND,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
+		'selectInventory' => array('hostid'),
 		'preservekeys' => true
 	));
 	$host = reset($host);
@@ -1635,7 +1639,7 @@ function make_trigger_details($trigger) {
 
 	// host js link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+	$scripts = $hostScripts[$host['hostid']];
 	$hostSpan->attr('data-menu', hostMenuData($host, $scripts));
 
 	// get visible name of the first host

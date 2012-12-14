@@ -604,6 +604,7 @@ class CScript extends CZBXAPI {
 					$result[$scriptid]['hosts'] = API::Host()->get(array(
 						'output' => $options['selectHosts'],
 						'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+						'hostids' => ($options['hostids']) ? $options['hostids'] : null,
 						'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
 						'nodeids' => id2nodeid($script['scriptid'])
 					));

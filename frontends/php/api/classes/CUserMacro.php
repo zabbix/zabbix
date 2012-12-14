@@ -34,12 +34,9 @@ class CUserMacro extends CZBXAPI {
 	 * @param boolean $options['monitored_macros'] only monitored UserMacros
 	 * @param boolean $options['templated_macros'] include templates in result
 	 * @param boolean $options['with_items'] only with items
-	 * @param boolean $options['with_monitored_items'] only with monitored items
 	 * @param boolean $options['with_historical_items'] only with historical items
 	 * @param boolean $options['with_triggers'] only with triggers
-	 * @param boolean $options['with_monitored_triggers'] only with monitored triggers
 	 * @param boolean $options['with_httptests'] only with http tests
-	 * @param boolean $options['with_monitored_httptests'] only with monitored http tests
 	 * @param boolean $options['with_graphs'] only with graphs
 	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
 	 * @param int $options['count'] count UserMacros, returned column name is rowscount
@@ -106,30 +103,26 @@ class CUserMacro extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		elseif (!is_null($options['editable']) && !is_null($options['globalmacro'])) {
-			return array();
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			if (!is_null($options['editable']) && !is_null($options['globalmacro'])) {
+				return array();
+			}
+			else {
+				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['hgh'] = 'hg.hostid=hm.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT hgg.groupid'.
-				' FROM hosts_groups hgg,rights rr,users_groups gg'.
-				' WHERE hgg.hostid=hg.hostid'.
-					' AND rr.id=hgg.groupid'.
-					' AND rr.groupid=gg.usrgrpid'.
-					' AND gg.userid='.$userid.
-					' AND rr.permission<'.$permission.')';
+				$userGroups = getUserGroupsByUserId($userid);
+
+				$sqlParts['where'][] = 'EXISTS ('.
+						'SELECT NULL'.
+						' FROM hosts_groups hgg'.
+							' JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.DBcondition('r.groupid', $userGroups).
+						' WHERE hm.hostid=hgg.hostid'.
+						' GROUP BY hgg.hostid'.
+						' HAVING MIN(r.permission)>='.$permission.
+						')';
+			}
 		}
 
 		// nodeids

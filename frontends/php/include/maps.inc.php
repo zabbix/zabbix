@@ -85,7 +85,9 @@ function getActionMapBySysmap($sysmap) {
 	}
 	unset($selement);
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	if (count($hostids)) {
+		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	}
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
@@ -1024,7 +1026,7 @@ function getSelementsInfo($sysmap) {
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => true
+			'selectInventory' => array('hostid')
 		));
 	}
 

@@ -914,22 +914,18 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	}
 
 	if (USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']) {
-			$def_sql['from']['hg'] = 'hosts_groups hg';
-			$def_sql['from']['r'] = 'rights r';
-			$def_sql['from']['ug'] = 'users_groups ug';
-			$def_sql['where']['hgh'] = 'hg.hostid=h.hostid';
-			$def_sql['where'][] = 'r.id=hg.groupid ';
-			$def_sql['where'][] = 'r.groupid=ug.usrgrpid';
-			$def_sql['where'][] = 'ug.userid='.$userid;
-			$def_sql['where'][] = 'r.permission>='.$perm;
-			$def_sql['where'][] = 'NOT EXISTS ('.
-									' SELECT hgg.groupid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid=hg.hostid'.
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$perm.')';
+		$userGroups = getUserGroupsByUserId($userid);
+
+		$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.DBcondition('r.groupid', $userGroups).
+				' WHERE h.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>='.$perm.
+				')';
 	}
 
 	// nodes
@@ -956,25 +952,25 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	// items
 	if ($def_options['with_items']) {
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
+		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid )';
 	}
 	elseif ($def_options['with_monitored_items']) {
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
 	}
 	elseif ($def_options['with_historical_items']) {
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 	}
 
 	// triggers
 	if ($def_options['with_triggers']) {
-		$def_sql['where'][] = 'EXISTS (SELECT i.itemid'.
+		$def_sql['where'][] = 'EXISTS (SELECT NULL'.
 										' FROM items i,functions f,triggers t'.
 										' WHERE i.hostid=h.hostid'.
 											' AND i.itemid=f.itemid'.
 											' AND f.triggerid=t.triggerid)';
 	}
 	elseif ($def_options['with_monitored_triggers']) {
-		$def_sql['where'][] = 'EXISTS (SELECT i.itemid'.
+		$def_sql['where'][] = 'EXISTS (SELECT NULL'.
 										' FROM items i,functions f,triggers t'.
 										' WHERE i.hostid=h.hostid'.
 											' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -985,13 +981,13 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	// httptests
 	if ($def_options['with_httptests']) {
-		$def_sql['where'][] = 'EXISTS (SELECT a.applicationid'.
+		$def_sql['where'][] = 'EXISTS (SELECT NULL'.
 										' FROM applications a,httptest ht'.
 										' WHERE a.hostid=h.hostid'.
 											' AND ht.applicationid=a.applicationid)';
 	}
 	elseif ($def_options['with_monitored_httptests']) {
-		$def_sql['where'][] = 'EXISTS (SELECT a.applicationid'.
+		$def_sql['where'][] = 'EXISTS (SELECT NULL'.
 										' FROM applications a,httptest ht'.
 										' WHERE a.hostid=h.hostid'.
 											' AND ht.applicationid=a.applicationid'.
@@ -1000,7 +996,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	// graphs
 	if ($def_options['with_graphs']) {
-		$def_sql['where'][] = 'EXISTS (SELECT DISTINCT i.itemid'.
+		$def_sql['where'][] = 'EXISTS (SELECT NULL'.
 										' FROM items i,graphs_items gi'.
 										' WHERE i.hostid=h.hostid'.
 											' AND i.itemid=gi.itemid)';
@@ -1288,7 +1284,7 @@ function getDeletableHostGroups($groupids = null) {
 		' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
 			$sql_where.
 			' AND NOT EXISTS ('.
-				'SELECT hg.groupid'.
+				'SELECT NULL'.
 				' FROM hosts_groups hg'.
 				' WHERE g.groupid=hg.groupid'.
 					(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
