@@ -1,0 +1,64 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+require_once dirname(__FILE__).'/../../include/func.inc.php';
+require_once dirname(__FILE__).'/../../include/db.inc.php';
+
+class dbConditionIntTest extends PHPUnit_Framework_TestCase {
+
+	public static function provider() {
+		return array(
+			array(
+				array('field', array()),
+				' 1=0'
+			),
+			array(
+				array('field', range(1, 100)),
+				' field BETWEEN 1 AND 100'
+			),
+			array(
+				array('field', range(1, 20, 5)),
+				' field IN (1,6,11,16)'
+			),
+			array(
+				array('field', range(1, 100, 10)),
+				' field IN (1,11,21,31,41,51,61,71,81,91)'
+			),
+			array(
+				array('field', array_merge(range(1, 10), range(20, 30))),
+				' (field BETWEEN 1 AND 10 OR field BETWEEN 20 AND 30)'
+			),
+			array(
+				array('field', array('9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806', '9223372036854775807')),
+				' field BETWEEN 9223372036854775802 AND 9223372036854775807'
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider provider
+	 */
+	public function test($params, $expectedResult) {
+		$result = call_user_func_array('dbConditionInt', $params);
+
+		$this->assertSame($expectedResult, $result);
+	}
+}
