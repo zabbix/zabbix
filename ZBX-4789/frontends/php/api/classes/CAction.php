@@ -118,40 +118,42 @@ class CAction extends CZBXAPI {
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT NULL'.
-					' FROM conditions cc, rights r'.
+					' FROM conditions cc'.
+					' LEFT JOIN rights r ON r.id ='.zbx_dbcast_2bigint('cc.value').' AND '.DBcondition('r.groupid', $userGroups).
 					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 						' AND cc.actionid=a.actionid'.
 						' AND r.id='.zbx_dbcast_2bigint('cc.value').
 						' AND '.DBcondition('r.groupid', $userGroups).
-						' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
+					' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
+					' OR r.id IS NULL'.
 				')';
 
 			// condition host or template
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT NULL'.
-					' FROM conditions cc, hosts_groups hgg,rights r'.
+					' FROM conditions cc, hosts_groups hgg'.
+					' LEFT JOIN rights r ON r.id=hgg.groupid AND '.DBcondition('r.groupid', $userGroups).
 					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
 						' AND cc.actionid=a.actionid'.
 						' AND hgg.hostid='.zbx_dbcast_2bigint('cc.value').
-						' AND r.id=hgg.groupid'.
-						' AND '.DBcondition('r.groupid', $userGroups).
-						' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
+					' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
+					' OR r.id IS NULL'.
 				')';
 
 			// condition trigger
 			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT NULL'.
-					' FROM conditions cc, functions f,items i,hosts_groups hg,rights r'.
+					' FROM conditions cc, functions f,items i,hosts_groups hg'.
+					' LEFT JOIN rights r ON r.id = hg.groupid AND '.DBcondition('r.groupid', $userGroups).
 					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
 						' AND cc.actionid=a.actionid'.
-						' AND hg.groupid=r.id'.
 						' AND i.hostid=hg.hostid'.
 						' AND f.itemid=i.itemid'.
 						' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').
-						' AND '.DBcondition('r.groupid', $userGroups).
-						' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
+					' GROUP BY r.id HAVING MAX(r.permission)<'.$permission.
+					' OR r.id IS NULL'.
 					')';
 		}
 
