@@ -1,10 +1,13 @@
+# Translated by Yaochiu Huang. 
+# In case of wrong translation, please contact brian.huang@primillet.com
+# 20120720T0924
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 2.1\n"
+"Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:18+0200\n"
-"PO-Revision-Date: 2012-08-06 14:41+0200\n"
-"Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
+"POT-Creation-Date: 2012-12-15 23:20+0200\n"
+"PO-Revision-Date: 2012-11-06 15:57+0800\n"
+"Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +21,7 @@ msgstr ""
 #: api/classes/CMaintenance.php:590 api/classes/CMaintenance.php:595
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\"必須是在1970.01.01和2038.01.18之間."
 
 #: include/profiles.inc.php:287
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -49,19 +52,19 @@ msgstr[0] "%1$s 項"
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] "以紀錄%1$s次登入失敗. 前次登入失敗自 %2$s 位於 %3$s 之 %4$s."
+msgstr[0] "已紀錄%1$s次登入失敗. 前次登入失敗是來自 %2$s 位於 %3$s 之 %4$s."
 
 #: include/blocks.inc.php:943
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] "%2$d / %1$d 問題已展示"
+msgstr[0] "已展示%1$d之%2$d個議題"
 
 #: include/views/monitoring.discovery.php:131
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] "%d 設備"
+msgstr[0] "%d個裝置"
 
 #: include/views/configuration.action.edit.php:425
 msgid "(0 - infinitely)"
@@ -69,12 +72,12 @@ msgstr "(0 -無限地)"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr "(僅超級管理員可以新增群組)"
+msgstr "(僅超級管理員可以創建群組)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:143
 msgid "(Only superadmins can create group)"
-msgstr "(僅超級管理員可以新增群組)"
+msgstr "(僅超級管理員可以創建群組)"
 
 #: include/forms.inc.php:542 include/forms.inc.php:557
 msgid "(in days)"
@@ -86,7 +89,7 @@ msgstr "(秒計)"
 
 #: include/views/configuration.action.edit.php:435
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr "(最少 60 秒, 0 為內定值)"
+msgstr "(最少 60 秒, 0 為預設值)"
 
 #: include/views/configuration.host.edit.php:284
 #: include/views/configuration.host.massupdate.php:60
@@ -178,19 +181,19 @@ msgstr "系統可用性統計"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異是 < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異是 = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異是 > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "最末和前一個值之前的絕對差異不是 N"
 
 #: report3.php:86 srv_status.php:164
 msgid "Acceptable SLA"
@@ -223,7 +226,7 @@ msgstr "已加知悉"
 
 #: acknow.php:150 acknow.php:178
 msgid "Acknowledge alarm by"
-msgstr "知悉警報因"
+msgstr "知悉警報以"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
@@ -304,11 +307,11 @@ msgstr "動作已刪除"
 
 #: include/views/configuration.action.edit.php:400
 msgid "Action operations"
-msgstr "操作類型"
+msgstr "動作操作"
 
 #: actionconf.php:147
 msgid "Action updated"
-msgstr "動作已改"
+msgstr "動作已更新"
 
 #: events.php:568 events.php:581 include/blocks.inc.php:835
 #: include/blocks.inc.php:1364 include/events.inc.php:138
@@ -408,7 +411,7 @@ msgstr "新增組件"
 #: include/views/configuration.graph.edit.php:211
 #: include/views/configuration.graph.edit.php:269
 msgid "Add graph items first"
-msgstr "先新增圖形項"
+msgstr "先新增圖形項目"
 
 #: include/actions.inc.php:315 include/actions.inc.php:530
 msgid "Add host"
@@ -416,11 +419,11 @@ msgstr "新增主機"
 
 #: sysmap.php:150
 msgid "Add link"
-msgstr "新增鏈接"
+msgstr "新增連結"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr "新增不存在的"
+msgstr "新增缺少的"
 
 #: include/views/configuration.graph.edit.php:116
 msgid "Add prototype"
@@ -432,24 +435,24 @@ msgstr "新增服務"
 
 #: slides.php:83
 msgid "Add to"
-msgstr "新增至"
+msgstr "新增到"
 
 #: charts.php:93 history.php:93 host_screen.php:88 include/html.inc.php:256
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr "新增最愛"
+msgstr "新增到常用"
 
 #: include/actions.inc.php:534
 msgid "Add to host group"
-msgstr "新增主機群組"
+msgstr "新增到主機群組"
 
 #: include/actions.inc.php:341 include/views/configuration.action.edit.php:767
 msgid "Add to host groups"
-msgstr "新增主機群組"
+msgstr "新增到主機群組"
 
 #: auditlogs.php:134
 msgid "Added"
-msgstr "新增"
+msgstr "已新增"
 
 #: include/items.inc.php:1352 include/views/configuration.item.edit.php:213
 msgid "Additional parameters"
@@ -597,7 +600,7 @@ msgstr "應用集已更新"
 #: api/classes/CItemGeneral.php:355
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr "應用集為 \"%1$s\"不在\"%2$s\"之中."
+msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
 
 #: hosts.php:683 hosts.php:761 include/forms.inc.php:826
 #: include/html.inc.php:406 include/html.inc.php:410
@@ -675,11 +678,11 @@ msgstr "於(時:分)"
 
 #: api/classes/CMaintenance.php:422 api/classes/CMaintenance.php:614
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "應該選擇至少一個主機或群組."
 
 #: api/classes/CMaintenance.php:492 api/classes/CMaintenance.php:605
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "必須創建至少一個維修期間."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -777,7 +780,7 @@ msgstr "可用性"
 
 #: include/menu.inc.php:129 report2.php:26
 msgid "Availability report"
-msgstr "可用性統計"
+msgstr "可用性報表"
 
 #: include/classes/class.chostsinfo.php:125 popup.php:587
 msgid "Available"
@@ -794,19 +797,19 @@ msgstr "平均之"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "一個期間T的平均值是 < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "一個期間T的平均值是 = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "一個期間T的平均值是 > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "一個期間T的平均值不是 N"
 
 #: popup_bitem.php:139
 msgid "Axis side"
@@ -908,17 +911,17 @@ msgstr "應用集的組態"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr "授權"
+msgstr "授權的組態"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr "偵測規則的組態"
+msgstr "探索規則的組態"
 
 #: host_discovery.php:281
 #: include/views/configuration.host.discovery.list.php:30
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr "偵測規則的組態"
+msgstr "探索規則的組態"
 
 #: include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:32
@@ -928,7 +931,7 @@ msgstr "圖形原型的組態"
 #: include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:51
 msgid "CONFIGURATION OF GRAPHS"
-msgstr "圖表的組態"
+msgstr "圖形的組態"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
@@ -1148,11 +1151,11 @@ msgstr "無法新增自主機到模板的相依關係"
 #: include/triggers.inc.php:542
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "無法自觸發器\"%1$s:%2$s\" 新增相依關係到不存在的觸發器\"%3$s:%4$s\"."
 
 #: host_discovery.php:251
 msgid "Cannot add discovery rule"
-msgstr "無法新增自動偵測的規則"
+msgstr "無法新增自動探索的規則"
 
 #: graphs.php:226
 msgid "Cannot add graph"
@@ -1172,7 +1175,7 @@ msgstr "無法新增圖片"
 
 #: include/classes/import/CXmlImport18.php:633
 msgid "Cannot add image."
-msgstr "無法新增圖形."
+msgstr "無法新增圖片."
 
 #: disc_prototypes.php:295 items.php:476 screenedit.php:182
 msgid "Cannot add item"
@@ -1193,11 +1196,11 @@ msgstr "無法新增示警媒介類型"
 #: api/classes/CGraphGeneral.php:85
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "無法新增超過一個 \"圖形總計\"類型的項於圖形 \"%1$s\"上."
+msgstr "無法新增超過一個 \"圖形總計\"類型的項目於圖形 \"%1$s\"上."
 
 #: sysmaps.php:167
 msgid "Cannot add network map"
-msgstr "無法新增網路製圖"
+msgstr "無法新增網路拓墣圖"
 
 #: httpconf.php:201
 #, php-format
@@ -1210,7 +1213,7 @@ msgstr "無法新增節點 "
 
 #: proxies.php:111
 msgid "Cannot add proxy"
-msgstr "無法新增代理"
+msgstr "無法新增系統代理程式"
 
 #: adm.regexps.php:129
 msgid "Cannot add regular expression"
@@ -1218,7 +1221,7 @@ msgstr "無法新增正規表示式"
 
 #: screenconf.php:178
 msgid "Cannot add screen"
-msgstr "無法新增圖表"
+msgstr "無法新增篩選"
 
 #: scripts.php:87 scripts.php:91 scripts.php:117
 msgid "Cannot add script"
@@ -1230,7 +1233,7 @@ msgstr "無法新增服務"
 
 #: slideconf.php:105
 msgid "Cannot add slide show"
-msgstr "無法新增簡報"
+msgstr "無法新增簡報片展示"
 
 #: templates.php:183
 msgid "Cannot add template"
@@ -1271,7 +1274,7 @@ msgstr "無法改變授權方式為LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr "無法改變授權方式為系統內部"
+msgstr "無法改變授權方式為Zabbix內部"
 
 #: items.php:498
 msgid "Cannot clear history"
@@ -1291,7 +1294,7 @@ msgstr "無法克隆觸發器原型"
 
 #: scripts_exec.php:65
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr "無法連接到系統主機主控程序的捉捕器的埠, 但是它應該可用於執行這腳本."
+msgstr "無法連接到系統主機主控程序的捉捕器的埠, 但是它應該可用的..."
 
 #: graphs.php:290
 msgid "Cannot copy graphs"
@@ -1312,15 +1315,15 @@ msgstr "無法創建另外資料庫連線."
 
 #: api/classes/CTrigger.php:1937
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "無法創建迴圈式相依關係"
 
 #: api/classes/CTrigger.php:1909
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "無法創建在觸發器自身上的相依關係."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
-msgstr "無法創建偵測規則"
+msgstr "無法創建探索規則"
 
 #: api/classes/CHostGroup.php:600
 msgid "Cannot create group without name."
@@ -1342,7 +1345,7 @@ msgstr "無法創建同名為\"%s\"的圖示對應."
 #: include/classes/import/CXmlImport18.php:817
 #, php-format
 msgid "Cannot create map \"%s\"."
-msgstr "無法創建製圖 \"%s\"."
+msgstr "無法創建拓墣圖 \"%s\"."
 
 #: httpconf.php:154
 msgid "Cannot create new application, web scenario is already assigned to application."
@@ -1359,11 +1362,11 @@ msgstr "無法創建篩選."
 #: api/classes/CUser.php:362
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "無法刪除系統內部用戶 \"%1$s\", 試試停用那用戶."
+msgstr "無法刪除Zabbix內部用戶 \"%1$s\", 試試停用那用戶."
 
 #: actionconf.php:172
 msgid "Cannot delete action"
-msgstr "無法删除操作"
+msgstr "無法删除動作"
 
 #: applications.php:155 applications.php:186
 msgid "Cannot delete application"
@@ -1376,19 +1379,19 @@ msgstr "無法刪除相依關係"
 #: api/classes/CDiscoveryRule.php:630 discoveryconf.php:164
 #: host_discovery.php:170
 msgid "Cannot delete discovery rule"
-msgstr "無法删除偵測的規則"
+msgstr "無法删除探索規則"
 
 #: host_discovery.php:268
 msgid "Cannot delete discovery rules"
-msgstr "無法刪除發現規則"
+msgstr "無法刪除探索規則"
 
 #: graphs.php:237
 msgid "Cannot delete graph"
-msgstr "無法删除圖表"
+msgstr "無法删除圖形"
 
 #: api/classes/CItemPrototype.php:764
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "無法刪除圖形原型"
 
 #: api/classes/CItem.php:970
 msgid "Cannot delete graph."
@@ -1396,11 +1399,11 @@ msgstr "無法刪除圖形."
 
 #: graphs.php:244
 msgid "Cannot delete graphs"
-msgstr "無法删除圖表"
+msgstr "無法删除圖形"
 
 #: api/classes/CGraphPrototype.php:784
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "無法刪除由低階層發現所創建的圖形."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1436,7 +1439,7 @@ msgstr "無法刪除項目"
 
 #: api/classes/CItemPrototype.php:781
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "無法刪除由低階層發現所創建的項目."
 
 #: maintenance.php:173
 msgid "Cannot delete maintenance"
@@ -1448,7 +1451,7 @@ msgstr "無法刪除示警媒介類型"
 
 #: sysmaps.php:188
 msgid "Cannot delete network map"
-msgstr "無法刪除網路製圖"
+msgstr "無法刪除網路拓墣圖"
 
 #: nodes.php:93
 msgid "Cannot delete node"
@@ -1456,7 +1459,7 @@ msgstr "無法刪除節點 "
 
 #: proxies.php:129 proxies.php:175
 msgid "Cannot delete proxy"
-msgstr "無法刪除代理"
+msgstr "無法刪除系統代理程式"
 
 #: adm.regexps.php:163
 msgid "Cannot delete regular expression"
@@ -1473,7 +1476,7 @@ msgstr "無法删除脚本"
 
 #: api/classes/CScript.php:402
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr "無法刪除腳本.空輸入參數\"scriptids\"."
+msgstr "無法刪除腳本.空白的輸入參數\"scriptids\"."
 
 #: api/classes/CScript.php:426
 #, php-format
@@ -1483,7 +1486,7 @@ msgstr "無法刪除腳本. 腳本 \"%1$s\" 用於動作操作\"%2$s\"."
 #: api/classes/CScript.php:415
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
-msgstr "無法刪除腳本. 編碼為 \"%s\"的腳本不存在."
+msgstr "無法刪除腳本. 腳本ID為 \"%s\"的腳本不存在."
 
 #: actionconf.php:310
 msgid "Cannot delete selected actions"
@@ -1495,7 +1498,7 @@ msgstr "無法删除服務"
 
 #: slideconf.php:118 slideconf.php:139
 msgid "Cannot delete slide show"
-msgstr "無法刪除簡報展示"
+msgstr "無法刪除簡報片展示"
 
 #: templates.php:354 templates.php:372 templates.php:397
 msgid "Cannot delete template"
@@ -1511,7 +1514,7 @@ msgstr "無法刪除樣本項目."
 
 #: api/classes/CItemPrototype.php:725
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "無法刪除模板化的項目"
 
 #: api/classes/CDiscoveryRule.php:589
 msgid "Cannot delete templated items."
@@ -1520,7 +1523,7 @@ msgstr "無法刪除模板項目."
 #: api/classes/CTrigger.php:1120 api/classes/CTriggerPrototype.php:913
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "無法刪除模板觸發器 \"%1$s:%2$s\"."
+msgstr "無法刪除模板化觸發器 \"%1$s:%2$s\"."
 
 #: api/classes/CHttpTest.php:471
 #, php-format
@@ -1533,7 +1536,7 @@ msgstr "無法删除觸發器"
 
 #: api/classes/CItemPrototype.php:796
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "無法刪除觸發器原型"
 
 #: api/classes/CItem.php:986
 msgid "Cannot delete trigger."
@@ -1545,7 +1548,7 @@ msgstr "無法删除觸發器"
 
 #: api/classes/CTriggerPrototype.php:951
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "無法刪除由低階層發現所創建的觸發器."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1553,7 +1556,7 @@ msgstr "無法删除用户"
 
 #: api/classes/CUser.php:778
 msgid "Cannot delete user media."
-msgstr "無法刪除示警媒介類型"
+msgstr "無法刪除用戶示警媒介."
 
 #: adm.valuemapping.php:88
 msgid "Cannot delete value map"
@@ -1579,89 +1582,89 @@ msgstr "無法刪除示警媒介類型"
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:508
 #: include/classes/import/CXmlImport18.php:1667
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr "無法發現圖形\"%1$s\"以用於篩選 \"%2$s\"."
+msgstr "無法找到用在篩選 \"%2$s\"中的圖形\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:724
 #: include/classes/import/importers/CMapImporter.php:210
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr "無法發現群組 \"%1$s\"以用於製圖 \"%2$s\"."
+msgstr "無法找到用在拓墣圖\"%2$s\"中的群組\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:485
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr "無法發現群組\"%1$s\" 以用於篩選\"%2$s\"."
+msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:735
 #: include/classes/import/importers/CMapImporter.php:218
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr "無法發現主機\"%1$s\"以用於製圖\"%2$s\"."
+msgstr "無法找到用在拓墣圖\"%2$s\"中的主機\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:497
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr "來無法發現主機\"%1$s\"以用於篩選\"%2$s\"."
+msgstr "無法找到用在篩選\"%2$s\"中的主機\"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:1006 api/classes/CDiscoveryRule.php:1078
 #: api/classes/CItemGeneral.php:604 include/items.inc.php:289
 #: include/items.inc.php:346
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "無法發現主機介面於 \"%1$s\" 來用於項目鍵\"%2$s\"."
+msgstr "找不到用於項目鍵\"%2$s\"的主機介面於 \"%1$s\" ."
 
 #: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "無法找到用在拓墣圖 \"%2$s\"中的圖示\"%1$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "無法找到用在拓墣圖 \"%2$s\"中的圖示對應\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:521
 #: include/classes/import/CXmlImport18.php:1680
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr "無法發現項目\"%1$s\"以用於篩選 \"%2$s\"."
+msgstr "無法找到用在篩選\"%2$s\"中的項目\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:713
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr "無法發現製圖\"%1$s\"以用於匯出的製圖\"%2$s\"."
+msgstr "無法找到用在匯出的拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "無法找到用在拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:532
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr "無法發現製圖\"%1$s\"以用於篩選 \"%2$s\"."
+msgstr "無法找到用在篩選\"%2$s\"中的拓墣圖\"%1$s\"."
 
 #: include/js.inc.php:248
 msgid "Cannot find objects with name"
-msgstr "無法發現有名稱的物件"
+msgstr "無法找到有名稱的物件"
 
 #: include/classes/import/CXmlImport18.php:543
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr "無法發現篩選\"%1$s\"以用於篩選 \"%2$s\"."
+msgstr "無法找到用在篩選 \"%2$s\"中的篩選\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/CXmlImport18.php:789
@@ -1669,7 +1672,7 @@ msgstr "無法發現篩選\"%1$s\"以用於篩選 \"%2$s\"."
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "無法找到用在拓墣圖 \"%2$s\"中的觸發器\"%1$s\"."
 
 #: srv_status.php:190
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -1713,7 +1716,7 @@ msgstr "不能插入用戶示警媒介"
 
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
-msgstr "無法與模板關聯"
+msgstr "無法連結模板"
 
 #: api/classes/CUser.php:875
 msgid "Cannot logout."
@@ -1738,22 +1741,22 @@ msgstr "不能大量更新可見模板名稱"
 #: api/classes/CHostGeneral.php:157
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr "不能傳遞重複的模板IDs給這連結: %s."
+msgstr "不能傳遞重複的模板IDs給連結: %s."
 
 #: include/classes/db/DB.php:661
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr "不能完成沒有where條件的刪除(delete)命令於資料表 \"%1$s\" 上."
+msgstr "不能完成沒有where條件的刪除(delete)陳述式於資料表 \"%1$s\" 上."
 
 #: include/classes/db/DB.php:484
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr "不能完成沒有值的更新(update)命令於資料表 \"%1$s\" 上."
+msgstr "不能完成沒有值的更新(update)陳述式於資料表 \"%1$s\" 上."
 
 #: include/classes/db/DB.php:495
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr "不能完成沒有條件的更新(update)命令於資料表 \"%1$s\" 上."
+msgstr "不能完成沒有條件的更新(update)陳述式於資料表 \"%1$s\" 上."
 
 #: include/views/js/monitoring.history.js.php:35
 msgid "Cannot remove all items, at least one item should remain."
@@ -1769,41 +1772,41 @@ msgstr "無法重新命名訪客用戶."
 
 #: api/classes/CDRule.php:422
 msgid "Cannot save discovery rule without checks."
-msgstr "無法儲存沒有檢驗的偵測規則"
+msgstr "無法儲存未檢驗的探索規則"
 
 #: api/classes/CApplication.php:438
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給應用集\"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:63
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給圖形\"%1$s\"."
 
 #: api/classes/CItemGeneral.php:225
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給項目\"%1$s\"."
 
 #: api/classes/CScreen.php:403
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給篩選\"%1$s\"."
 
 #: api/classes/CTrigger.php:1105
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給觸發器\"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:747
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "無法設置 \"templateid\"給觸發器原型\"%1$s\"."
 
 #: api/classes/CHostInterface.php:507
 msgid "Cannot switch host for interface."
-msgstr "無法切換主機予介面."
+msgstr "無法為介面切換主機."
 
 #: users.php:294
 msgid "Cannot unblock users"
@@ -1819,7 +1822,7 @@ msgstr "無法斷連和清除監測應用"
 
 #: api/classes/CHostGeneral.php:545
 msgid "Cannot unlink and clear discovery rules"
-msgstr "無法斷連和清除偵測規則"
+msgstr "無法斷連和清除探索規則"
 
 #: api/classes/CHostGeneral.php:634
 msgid "Cannot unlink and clear graph prototypes"
@@ -1843,7 +1846,7 @@ msgstr "無法斷連和清除觸發器"
 
 #: api/classes/CHost.php:1849
 msgid "Cannot unlink template"
-msgstr "無法關聯模板"
+msgstr "無法斷連模板"
 
 #: api/classes/CHostGeneral.php:437
 #, php-format
@@ -1853,32 +1856,32 @@ msgstr "不能斷連觸發器\"%s\",其已有項目來自於留存連到主機�
 #: api/classes/CApplication.php:435
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給應用集\"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:60
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給圖形\"%1$s\"."
 
 #: api/classes/CItemGeneral.php:186
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給項目\"%1$s\"."
 
 #: api/classes/CScreen.php:474 api/classes/CTemplateScreen.php:739
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給篩選\"%1$s\"."
 
 #: api/classes/CTrigger.php:1102
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給觸發器\"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:819
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "無法更新\"templateid\"給觸發器原型\"%1$s\"."
 
 #: actionconf.php:147
 msgid "Cannot update action"
@@ -1904,7 +1907,7 @@ msgstr "無法更新調試模式"
 
 #: discoveryconf.php:145 host_discovery.php:247
 msgid "Cannot update discovery rule"
-msgstr "無法更新自動偵測的規則"
+msgstr "無法更新探索規則"
 
 #: usergrps.php:246
 msgid "Cannot update frontend access"
@@ -1912,7 +1915,7 @@ msgstr "無法更新前端存取"
 
 #: graphs.php:223
 msgid "Cannot update graph"
-msgstr "無法更新圖表"
+msgstr "無法更新圖形"
 
 #: hostgroups.php:115 usergrps.php:168
 msgid "Cannot update group"
@@ -1977,7 +1980,7 @@ msgstr "無法更新媒介型態"
 
 #: sysmaps.php:157
 msgid "Cannot update network map"
-msgstr "無法更新網路製圖"
+msgstr "無法更新網路拓墣圖"
 
 #: nodes.php:69
 msgid "Cannot update node"
@@ -1985,7 +1988,7 @@ msgstr "無法更新節點 "
 
 #: proxies.php:104
 msgid "Cannot update proxy"
-msgstr "無法更新代理"
+msgstr "無法更新系統代理程式"
 
 #: adm.regexps.php:123
 msgid "Cannot update regular expression"
@@ -1993,7 +1996,7 @@ msgstr "無法更新正規表示式"
 
 #: screenconf.php:153
 msgid "Cannot update screen"
-msgstr "無法更新圖表"
+msgstr "無法更新篩選"
 
 #: include/classes/import/CXmlImport18.php:1702
 msgid "Cannot update screen."
@@ -2124,7 +2127,7 @@ msgstr "檢查必需是唯一的"
 
 #: include/nodes.inc.php:252
 msgid "Child"
-msgstr "Child"
+msgstr "子"
 
 #: include/locales.inc.php:43
 msgid "Chinese (zh_CN)"
@@ -2132,31 +2135,31 @@ msgstr "中文 (zh_CN)"
 
 #: include/locales.inc.php:44
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "中文 (zh_TW)"
 
 #: api/classes/CMapElement.php:465
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr "無法創建拓墣圖組件 \"%s\"的循環連結"
+msgstr "無法創建拓墣圖組件 \"%s\"的循環式連結"
 
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr "循環引用於拓樸圖: %1$s."
+msgstr "拓樸圖中的循環式引用: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr "循環引用於篩選: %1$s."
+msgstr "篩選中的循環式引用: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr "循環引用於模板: %1$s."
+msgstr "模板中的循環式引用: %1$s."
 
 #: api/classes/CHostGeneral.php:330 api/classes/CHostGeneral.php:795
 msgid "Circular template linkage is not allowed."
-msgstr "迴圈式模板連結是不允許的."
+msgstr "循環式模板連結是不允許的."
 
 #: include/classes/core/ZBase.php:227
 msgid "Classic"
@@ -2275,7 +2278,7 @@ msgstr "命令"
 
 #: tr_comments.php:63
 msgid "Comment updated"
-msgstr "評論以更新"
+msgstr "評論已更新"
 
 #: include/acknow.inc.php:43 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:367 tr_status.php:294
@@ -2296,18 +2299,18 @@ msgstr "組合許可權"
 
 #: popup_trexpr.php:25
 msgid "Condition"
-msgstr "狀況條件"
+msgstr "條件"
 
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:899
 #: include/views/configuration.action.edit.php:967
 #: include/views/configuration.action.list.php:51
 msgid "Conditions"
-msgstr "觸發狀況條件"
+msgstr "條件"
 
 #: include/menu.inc.php:149
 msgid "Configuration"
-msgstr "系統組態"
+msgstr "組態"
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -2315,7 +2318,7 @@ msgstr "組態匯入"
 
 #: adm.gui.php:24
 msgid "Configuration of GUI"
-msgstr "圖形化介面"
+msgstr "圖形化介面的組態"
 
 #: services.php:27
 msgid "Configuration of IT services"
@@ -2323,11 +2326,11 @@ msgstr "IT服務的組態"
 
 #: include/audit.inc.php:25
 msgid "Configuration of Zabbix"
-msgstr "系統的組態"
+msgstr "Zabbix的組態"
 
 #: actionconf.php:27
 msgid "Configuration of actions"
-msgstr "操作過程的組態"
+msgstr "動作的組態"
 
 #: applications.php:26
 msgid "Configuration of applications"
@@ -2339,11 +2342,11 @@ msgstr "認證的組態"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
-msgstr "偵測的組態"
+msgstr "探索的組態"
 
 #: host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr "偵測規則的組態"
+msgstr "探索規則的組態"
 
 #: graphs.php:27
 msgid "Configuration of graphs"
@@ -2363,7 +2366,7 @@ msgstr "清理器的組態"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
-msgstr " 圖示對應的組態"
+msgstr "圖示對應的組態"
 
 #: adm.images.php:25
 msgid "Configuration of images"
@@ -2375,7 +2378,7 @@ msgstr "項目原型的組態"
 
 #: items.php:27
 msgid "Configuration of items"
-msgstr "監控項目的組態"
+msgstr "項目的組態"
 
 #: adm.macros.php:24
 msgid "Configuration of macros"
@@ -2399,11 +2402,11 @@ msgstr "節點的組態"
 
 #: proxies.php:25
 msgid "Configuration of proxies"
-msgstr "代理的組態"
+msgstr " 系統代理程式的組態"
 
 #: adm.regexps.php:26
 msgid "Configuration of regular expressions"
-msgstr "正規表示法的組態"
+msgstr "正規表示式的組態"
 
 #: screenconf.php:38 screenedit.php:27
 msgid "Configuration of screens"
@@ -2435,7 +2438,7 @@ msgstr "觸發器原型的組態"
 
 #: adm.triggerseverities.php:24
 msgid "Configuration of trigger severities"
-msgstr "觸發器示警度的組態"
+msgstr "觸發器嚴重性的組態"
 
 #: triggers.php:27 tr_status.php:513
 msgid "Configuration of triggers"
@@ -2484,17 +2487,17 @@ msgstr "所選的模板間的衝突."
 #: include/views/configuration.host.edit.php:217
 #: include/views/js/configuration.sysmaps.js.php:326
 msgid "Connect to"
-msgstr "連到"
+msgstr "連接到"
 
 #: include/page_footer.php:98
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr "連結為'%1$s'"
+msgstr "連接為'%1$s'"
 
 #: include/page_footer.php:95
 #, php-format
 msgid "Connected as '%1$s' from '%2$s'"
-msgstr "連結為'%1$s', 來自'%2$s'"
+msgstr "連接為'%1$s', 來自'%2$s'"
 
 #: api/classes/CScript.php:462
 #, php-format
@@ -2503,7 +2506,7 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
-"連線到Zabbix主機 \"%s\"失敗. 可能的原因是:\n"
+"連接到Zabbix主機 \"%s\"失敗. 可能的原因是:\n"
 "1. 不正確的IP/DNS設於\"zabbix.conf.php\";\n"
 "2. 不正確的DNS主機的組態.\n"
 
@@ -2516,7 +2519,7 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
-"連線到Zabbix主機  \"%s\" 被拒. 可能的原因是:\n"
+"連接到Zabbix主機  \"%s\" 被拒. 可能的原因是:\n"
 "1. 不正確的IP/DNS設於\"zabbix.conf.php\";\n"
 "2. 安全環境 (例如, SELinux)阻斷了連線;\n"
 "3. Zabbix主機的服務未運作;\n"
@@ -2529,7 +2532,7 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
-"連線到Zabbix主機  \"%s\" 逾時. 可能的原因是:\n"
+"連接到Zabbix主機  \"%s\" 逾時. 可能的原因是:\n"
 "1. 不正確的IP/DNS設於\"zabbix.conf.php\";\n"
 "2. 防火牆阻斷了TCP連線.\n"
 
@@ -2554,7 +2557,7 @@ msgstr "複製"
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
-msgstr "複製所選到 ..."
+msgstr "複製所選的到 ..."
 
 #: api/classes/CUser.php:980
 #, php-format
@@ -2573,7 +2576,7 @@ msgstr "計數"
 
 #: include/views/configuration.slideconf.list.php:42
 msgid "Count of slides"
-msgstr "簡報片計數"
+msgstr "簡報片數量"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
@@ -2586,7 +2589,7 @@ msgstr "創建應用集"
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:29
 msgid "Create discovery rule"
-msgstr "創建偵測規則"
+msgstr "創建探索規則"
 
 #: include/views/configuration.graph.list.php:43
 msgid "Create graph"
@@ -2611,7 +2614,7 @@ msgstr "創建主機群組"
 
 #: adm.iconmapping.php:122
 msgid "Create icon map"
-msgstr "創建圖示製圖"
+msgstr "創建圖示對應"
 
 #: adm.images.php:145
 msgid "Create image"
@@ -2643,7 +2646,7 @@ msgstr "創建節點"
 
 #: include/views/administration.proxy.list.php:32
 msgid "Create proxy"
-msgstr "創建代理"
+msgstr "創建系統代理程式"
 
 #: include/views/configuration.httpconf.list.php:33
 msgid "Create scenario"
@@ -2688,32 +2691,32 @@ msgstr "新增值對應"
 #: api/classes/managers/CApplicationManager.php:54
 #, php-format
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
-msgstr "已建: 應用集 \"%1$s\" 於 \"%2$s\"."
+msgstr "已創建: 應用集 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:853
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "已建: 偵測規則 \"%1$s\" 於 \"%2$s\"."
+msgstr "已創建: 探索規則 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CItem.php:834
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
-msgstr "已建: 項目 \"%1$s\" 於 \"%2$s\"."
+msgstr "已創建: 項目 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:624
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr "已建: 項目原型 \"%1$s\" 於 \"%2$s\"."
+msgstr "已創建: 項目原型 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CTrigger.php:1625
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
-msgstr "已建: 觸發器 \"%1$s\" 於 \"%2$s\"."
+msgstr "已創建: 觸發器 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:1001
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr "已建: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
+msgstr "已創建: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/managers/CHttpTestManager.php:116
 #, php-format
@@ -2728,7 +2731,7 @@ msgstr ""
 #: include/validate.inc.php:371
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr "關鍵錯誤. 欄位 \"%1$s\" 含有雙位元字元."
+msgstr "關鍵錯誤. 欄位 \"%1$s\" 含有多位元字元."
 
 #: include/validate.inc.php:435
 #, php-format
@@ -2753,7 +2756,7 @@ msgstr "關鍵錯誤. 欄位 \"%1$s\" 十進位數字."
 #: include/validate.inc.php:325
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "關鍵錯誤. 欄位\"%1$s\"不是整數列表或範圍."
 
 #: include/validate.inc.php:338
 #, php-format
@@ -2787,19 +2790,19 @@ msgstr "關鍵錯誤. 欄位 \"%1$s\"的值錯誤: 不能是空白."
 
 #: popup_trexpr.php:348
 msgid "Current date is < N"
-msgstr ""
+msgstr "當前日期是 < N"
 
 #: popup_trexpr.php:356
 msgid "Current date is = N"
-msgstr ""
+msgstr "當前日期是 = N"
 
 #: popup_trexpr.php:352
 msgid "Current date is > N"
-msgstr ""
+msgstr "當前日期是 > N"
 
 #: popup_trexpr.php:360
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "當前日期不是 N"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:214
@@ -2812,23 +2815,23 @@ msgstr "目前節點 "
 
 #: popup_trexpr.php:478
 msgid "Current time is < N"
-msgstr ""
+msgstr "當前日期是 < N"
 
 #: popup_trexpr.php:486
 msgid "Current time is = N"
-msgstr ""
+msgstr "當前日期是 = N"
 
 #: popup_trexpr.php:482
 msgid "Current time is > N"
-msgstr ""
+msgstr "當前日期是 > N"
 
 #: popup_trexpr.php:490
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "當前日期不是 N"
 
 #: include/setup.inc.php:191
 msgid "Current value"
-msgstr "現值"
+msgstr "目前的值"
 
 #: charts.php:26
 msgid "Custom graphs"
@@ -2841,7 +2844,7 @@ msgstr "自訂標示"
 #: api/classes/CMap.php:575
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr "自訂標示給拓墣圖 \"%2$s\"組件, 其類型 \"%1$s\"不得為空白."
+msgstr "自訂標示給類型 \"%1$s\"的拓墣圖 \"%2$s\"組件, 其不得為空白."
 
 #: disc_prototypes.php:107 include/views/configuration.item.massupdate.php:290
 #: items.php:141
@@ -2850,7 +2853,7 @@ msgstr "自訂倍數"
 
 #: screens.php:27
 msgid "Custom screens"
-msgstr "用户圖表"
+msgstr "自訂篩選"
 
 #: include/views/configuration.action.edit.php:647
 msgid "Custom script"
@@ -2858,7 +2861,7 @@ msgstr "自訂腳本"
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
-msgstr "自訂示警度"
+msgstr "自訂嚴重性"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
@@ -2866,7 +2869,7 @@ msgstr "自訂的嚴重性的名稱影響所有的語系而必須手動翻譯!"
 
 #: include/views/js/configuration.sysmaps.js.php:43
 msgid "Custom size"
-msgstr "自訂尺寸尺寸"
+msgstr "自訂尺寸"
 
 #: slides.php:27
 msgid "Custom slides"
@@ -2905,7 +2908,7 @@ msgstr "關閉"
 
 #: include/triggers.inc.php:221
 msgid "DISCOVERED"
-msgstr "偵測出"
+msgstr "探索到的"
 
 #: include/menu.inc.php:241
 msgid "DM"
@@ -2916,12 +2919,12 @@ msgstr "節點管理"
 #: include/views/js/configuration.host.edit.js.php:18 popup.php:544
 #: search.php:132
 msgid "DNS"
-msgstr "主機域名"
+msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:55
 #: include/views/configuration.host.edit.php:216
 msgid "DNS name"
-msgstr "DNS名"
+msgstr "DNS名稱"
 
 #: include/triggers.inc.php:220
 msgid "DOWN"
@@ -2939,7 +2942,7 @@ msgstr "暗橘色"
 
 #: include/reports.inc.php:551
 msgid "Darken"
-msgstr "Darken"
+msgstr "轉暗"
 
 #: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:354
 msgid "Dashboard"
@@ -2960,7 +2963,7 @@ msgstr "虛線"
 
 #: include/views/monitoring.overview.php:28
 msgid "Data"
-msgstr "數據"
+msgstr "資料"
 
 #: include/classes/class.cchart.php:2374 include/classes/class.cpie.php:702
 #, php-format
@@ -2969,12 +2972,12 @@ msgstr "資料來自 %1$s. 產生於 %2$s 秒."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
-msgstr "數據概覽"
+msgstr "資料概覽"
 
 #: include/forms.inc.php:446 include/views/configuration.item.edit.php:255
 #: include/views/configuration.item.massupdate.php:217
 msgid "Data type"
-msgstr "數據類型"
+msgstr "資料類型"
 
 #: include/setup.inc.php:249 include/setup.inc.php:352
 msgid "Database file"
@@ -3044,44 +3047,44 @@ msgstr "日"
 
 #: include/forms.inc.php:1613
 msgid "Day of month"
-msgstr "當月之日"
+msgstr "月中第幾日"
 
 #: popup_trexpr.php:380
 msgid "Day of month is < N"
-msgstr ""
+msgstr "月中第幾日是 < N"
 
 #: popup_trexpr.php:388
 msgid "Day of month is = N"
-msgstr ""
+msgstr "月中第幾日是 = N"
 
 #: popup_trexpr.php:384
 msgid "Day of month is > N"
-msgstr ""
+msgstr "月中第幾日是 > N"
 
 #: popup_trexpr.php:392
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "月中第幾日不是 N"
 
 #: include/forms.inc.php:1541 include/forms.inc.php:1584
 #: include/forms.inc.php:1609
 msgid "Day of week"
-msgstr "當週之日"
+msgstr "週中第幾日"
 
 #: popup_trexpr.php:364
 msgid "Day of week is < N"
-msgstr ""
+msgstr "週中第幾日是 < N"
 
 #: popup_trexpr.php:372
 msgid "Day of week is = N"
-msgstr ""
+msgstr "週中第幾日是 = N"
 
 #: popup_trexpr.php:368
 msgid "Day of week is > N"
-msgstr ""
+msgstr "週中第幾日是 > N"
 
 #: popup_trexpr.php:376
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "週中第幾日不是 N"
 
 #: include/forms.inc.php:1645 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3103,7 +3106,7 @@ msgstr "調試模式已更新"
 
 #: include/func.inc.php:229
 msgid "Dec"
-msgstr "十二月"
+msgstr "十二"
 
 #: include/forms.inc.php:1575 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:122
@@ -3112,7 +3115,7 @@ msgstr "十二"
 
 #: include/items.inc.php:133
 msgid "Decimal"
-msgstr "數字的"
+msgstr "十進位數字"
 
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:131
@@ -3131,7 +3134,7 @@ msgstr "預設認證方式"
 
 #: include/views/configuration.slideconf.edit.php:41 slideconf.php:39
 msgid "Default delay (in seconds)"
-msgstr "內定延遲(秒計)"
+msgstr "預設延遲(秒計)"
 
 #: include/views/configuration.action.edit.php:46
 #: include/views/configuration.action.edit.php:535
@@ -3144,16 +3147,16 @@ msgstr "預設操作步驟停留時間 "
 
 #: include/views/configuration.action.edit.php:45
 msgid "Default subject"
-msgstr "預設主題"
+msgstr "預設主旨"
 
 #: include/views/administration.general.gui.edit.php:31
 msgid "Default theme"
-msgstr "內定的佈景主題"
+msgstr "預設的佈景主題"
 
 #: adm.gui.php:70
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr "內定的佈景主題 \"%1$s\"."
+msgstr "預設的佈景主題 \"%1$s\"."
 
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:51
@@ -3178,15 +3181,15 @@ msgstr "删除"
 
 #: include/views/configuration.template.edit.php:438
 msgid "Delete and clear"
-msgstr "刪除更清除"
+msgstr "刪除並清除"
 
 #: templates.php:623
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Warning: this will delete selected templates and clear all linked hosts"
+msgstr "刪除並清除所選的模板? (警告: 所有連結的主機將被清除!)"
 
 #: include/views/configuration.template.edit.php:438
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr "刪除和清除模板? (警告: 所有連結的主機將被清除!)"
+msgstr "刪除並清除模板? (警告: 所有連結的主機將被清除!)"
 
 #: include/views/configuration.application.edit.php:75
 msgid "Delete application?"
@@ -3199,7 +3202,7 @@ msgstr "刪除目前的動作?"
 #: include/views/configuration.discovery.edit.php:82
 #: include/views/configuration.item.edit.php:488
 msgid "Delete discovery rule?"
-msgstr "刪除偵測規則?"
+msgstr "刪除探索規則?"
 
 #: include/views/configuration.triggers.edit.php:158 jsLoader.php:103
 #: tr_logform.php:333
@@ -3220,7 +3223,7 @@ msgstr "刪除所選的項目的歷史資料?"
 
 #: include/views/administration.general.iconmap.edit.php:146
 msgid "Delete icon map?"
-msgstr "刪除拓墣圖?"
+msgstr "刪除圖示對應?"
 
 #: include/views/configuration.item.edit.php:493
 msgid "Delete item?"
@@ -3244,7 +3247,7 @@ msgstr "刪除網路拓墣圖?"
 
 #: include/views/administration.proxy.edit.php:97
 msgid "Delete proxy?"
-msgstr "刪除代理?"
+msgstr "刪除系統代理程式?"
 
 #: include/views/administration.general.regularexpressions.edit.php:90
 msgid "Delete regular expression?"
@@ -3256,7 +3259,7 @@ msgstr "刪除方案?"
 
 #: include/views/configuration.screen.edit.php:55
 msgid "Delete screen?"
-msgstr "删除圖表?"
+msgstr "删除篩選?"
 
 #: include/views/administration.script.edit.php:122
 msgid "Delete script?"
@@ -3290,7 +3293,7 @@ msgstr "删除脚本?"
 #: include/views/configuration.triggers.list.php:237 sysmaps.php:298
 #: templates.php:618
 msgid "Delete selected"
-msgstr "删除所選"
+msgstr "删除所選的"
 
 #: include/views/configuration.httpconf.list.php:101
 msgid "Delete selected WEB scenarios?"
@@ -3302,12 +3305,12 @@ msgstr "刪除所選的動作?"
 
 #: include/views/configuration.application.list.php:90
 msgid "Delete selected applications?"
-msgstr "删除所選的程序?"
+msgstr "删除所選的應用集?"
 
 #: include/views/configuration.discovery.list.php:76
 #: include/views/configuration.host.discovery.list.php:110
 msgid "Delete selected discovery rules?"
-msgstr "删除所選的偵測規則?"
+msgstr "删除所選的探索規則?"
 
 #: jsLoader.php:149
 msgid "Delete selected elements?"
@@ -3315,16 +3318,16 @@ msgstr "刪除所選的組件?"
 
 #: include/views/configuration.graph.list.php:143
 msgid "Delete selected graphs?"
-msgstr "Delete selected graphs?"
+msgstr "刪除所選的圖形?"
 
 #: include/views/administration.usergroups.edit.php:138
 #: include/views/configuration.hostgroups.edit.php:76
 msgid "Delete selected group?"
-msgstr "删除所選組?"
+msgstr "删除所選的群組?"
 
 #: include/views/administration.usergroups.list.php:146
 msgid "Delete selected groups?"
-msgstr "删除所選脚本?"
+msgstr "删除所選的群組?"
 
 #: include/views/configuration.hostgroups.list.php:126
 msgid "Delete selected host groups?"
@@ -3444,52 +3447,52 @@ msgstr "已删除"
 #: api/classes/CApplication.php:578
 #, php-format
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
-msgstr "已刪: 應用集 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 應用集 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:638
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "已刪: 偵測規則 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 探索規則 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CGraph.php:772
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
-msgstr "已刪: 圖形 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 圖形 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CHost.php:2145
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
-msgstr "已刪: 主機 \"%1$s\"."
+msgstr "已刪除: 主機 \"%1$s\"."
 
 #: api/classes/CItem.php:1025
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
-msgstr "已刪: 項目 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 項目 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:808
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr "已刪: 項目原型 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 項目原型 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CProxy.php:527
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
-msgstr "已刪: 代理 \"%1$s\"."
+msgstr "已刪除: 系統代理程式\"%1$s\"."
 
 #: api/classes/CTemplate.php:1284
 #, php-format
 msgid "Deleted: Template \"%1$s\"."
-msgstr "已刪: 模板 \"%1$s\"."
+msgstr "已刪除: 模板 \"%1$s\"."
 
 #: api/classes/CTrigger.php:1340
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
-msgstr "已刪: 觸發器 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 觸發器 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:957
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr "已刪: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
+msgstr "已刪除: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
 
 #: api/classes/CHttpTest.php:531
 #, php-format
@@ -3519,18 +3522,18 @@ msgstr "禁止"
 #: include/views/configuration.triggers.edit.php:286
 #: include/views/configuration.triggers.edit.php:295
 msgid "Dependencies"
-msgstr "相依性"
+msgstr "相依關係"
 
 #: include/triggers.inc.php:1430 tr_status.php:558
 msgid "Dependent"
-msgstr "Dependent"
+msgstr "相依"
 
 #: include/triggers.inc.php:1410
 #: include/views/configuration.services.edit.php:103
 #: include/views/configuration.triggers.list.php:140 popup.php:1033
 #: tr_status.php:542
 msgid "Depends on"
-msgstr "Depends on"
+msgstr "相依於"
 
 #: include/hosts.inc.php:269
 msgid "Deployment status"
@@ -3556,7 +3559,7 @@ msgstr "描述"
 #: include/views/configuration.action.edit.php:319
 #: include/views/configuration.action.edit.php:323 jsrpc.php:137 queue.php:50
 msgid "Details"
-msgstr "詳細内容"
+msgstr "細節"
 
 #: httpdetails.php:27
 msgid "Details of scenario"
@@ -3568,63 +3571,63 @@ msgstr "裝置"
 
 #: discoveryconf.php:42 include/views/configuration.discovery.edit.php:69
 msgid "Device uniqueness criteria"
-msgstr "裝置唯一性條件"
+msgstr "裝置唯一性準則"
 
 #: popup_trexpr.php:158
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "期間T的最大與最小值的差是 < N"
 
 #: popup_trexpr.php:168
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "期間T的最大與最小值的差是 = N"
 
 #: popup_trexpr.php:163
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "期間T的最大與最小值的差是 > N"
 
 #: popup_trexpr.php:173
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "期間T的最大與最小值的差不是 N"
 
 #: popup_trexpr.php:214
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "最末和之前的值的差, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:218
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "最末和之前的值的差, 則 N 非 1, 0 - 除外"
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異是 <  N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異是 =  N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異是 >  N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "在最後與前一個值之間的差異不是 N"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
-msgstr "圖表規格 (行 x 列)"
+msgstr "圖表規格 (列 x 行)"
 
 #: include/views/administration.auditlogs.list.php:49
 msgid "Disable"
-msgstr "關閉"
+msgstr "停用"
 
 #: include/views/administration.usergroups.list.php:141
 msgid "Disable DEBUG"
-msgstr "關閉DEBUG"
+msgstr "停用調試"
 
 #: include/views/administration.usergroups.list.php:142
 msgid "Disable debug mode in selected groups?"
-msgstr "Disable debug mode in selected groups?"
+msgstr "停用所選的群組的調試模式?"
 
 #: include/actions.inc.php:324 include/actions.inc.php:533
 msgid "Disable host"
@@ -3672,7 +3675,7 @@ msgstr "停用所選的應用集?"
 #: include/views/configuration.discovery.list.php:72
 #: include/views/configuration.host.discovery.list.php:106
 msgid "Disable selected discovery rules?"
-msgstr "停用所選的偵測規則?"
+msgstr "停用所選的探索規則?"
 
 #: include/views/administration.usergroups.list.php:134
 msgid "Disable selected groups?"
@@ -3729,38 +3732,38 @@ msgstr "災難"
 
 #: include/discovery.inc.php:150
 msgid "Discovered"
-msgstr "已偵測到的"
+msgstr "已探索到的"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
-msgstr "已偵測到的裝置"
+msgstr "已探索到的裝置"
 
 #: events.php:307 hosts.php:687 hosts.php:769 include/events.inc.php:27
 #: include/html.inc.php:396 include/menu.inc.php:77 include/menu.inc.php:208
 #: include/views/configuration.action.list.php:34 templates.php:464
 #: templates.php:534
 msgid "Discovery"
-msgstr "偵測"
+msgstr "探索"
 
 #: include/views/configuration.discovery.edit.php:48
 msgid "Discovery by proxy"
-msgstr "以系統代理程式偵測"
+msgstr "由系統代理程式探索"
 
 #: include/actions.inc.php:51
 msgid "Discovery check"
-msgstr "偵測檢查"
+msgstr "探索檢查"
 
 #: popup.php:131
 msgid "Discovery checks"
-msgstr "偵測檢查"
+msgstr "探索檢查"
 
 #: include/html.inc.php:394
 msgid "Discovery list"
-msgstr "偵測清單"
+msgstr "探索清單"
 
 #: include/actions.inc.php:52
 msgid "Discovery object"
-msgstr "偵測物件"
+msgstr "探索物件"
 
 #: include/actions.inc.php:50 include/audit.inc.php:44
 #: include/blocks.inc.php:1074 include/forms.inc.php:1023
@@ -3768,39 +3771,39 @@ msgstr "偵測物件"
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
-msgstr "偵測規則"
+msgstr "探索規則"
 
 #: api/classes/CDiscoveryRule.php:936
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "偵測規則 \"%1$s\"已存在於 \"%2$s\",繼承自其它的模板."
+msgstr "探索規則 \"%1$s\"已存在於 \"%2$s\",繼承自其它的模板."
 
 #: api/classes/CDiscoveryRule.php:923
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr "偵測規則\"%1$s:%2$s\" 有不正確的存活時間: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用戶巨集)"
+msgstr "探索規則\"%1$s:%2$s\" 有不正確的存活時間: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用戶巨集)"
 
 #: api/classes/CDRule.php:595
 #, php-format
 msgid "Discovery rule \"%s\" already exists."
-msgstr "偵測規則\"%s\"已存在."
+msgstr "探索規則\"%s\"已存在."
 
 #: api/classes/CDRule.php:663
 #, php-format
 msgid "Discovery rule [%s] already exists"
-msgstr "偵測規則[%s]已存在"
+msgstr "探索規則[%s]已存在"
 
 #: discoveryconf.php:150 host_discovery.php:251
 msgid "Discovery rule created"
-msgstr "偵測規則已創建"
+msgstr "探索規則已創建"
 
 #: discoveryconf.php:164 host_discovery.php:170
 msgid "Discovery rule deleted"
-msgstr "偵測規則已删除"
+msgstr "探索規則已删除"
 
 #: discoveryconf.php:144 host_discovery.php:247
 msgid "Discovery rule updated"
-msgstr "偵測規則已更新"
+msgstr "探索規則已更新"
 
 #: include/html.inc.php:505 include/html.inc.php:509
 #: include/views/configuration.host.discovery.list.php:33
@@ -3809,27 +3812,27 @@ msgstr "偵測規則已更新"
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
 #: popup.php:127
 msgid "Discovery rules"
-msgstr "偵測規則"
+msgstr "探索規則"
 
 #: host_discovery.php:264
 msgid "Discovery rules activated"
-msgstr "偵測規則已使作用中"
+msgstr "探索規則已使作用中"
 
 #: discoveryconf.php:192 host_discovery.php:268
 msgid "Discovery rules deleted"
-msgstr "偵測規則已删除"
+msgstr "探索規則已删除"
 
 #: host_discovery.php:264
 msgid "Discovery rules disabled"
-msgstr "偵測規則已停用"
+msgstr "探索規則已停用"
 
 #: discoveryconf.php:182
 msgid "Discovery rules updated"
-msgstr "偵測規則已更新"
+msgstr "探索規則已更新"
 
 #: dashboard.php:334 include/actions.inc.php:56
 msgid "Discovery status"
-msgstr "偵測狀態"
+msgstr "探索狀態"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 msgid "Display OK triggers for"
@@ -3842,15 +3845,15 @@ msgstr "顯示"
 #: search.php:232 search.php:334 search.php:470
 #, php-format
 msgid "Displaying %1$s of %2$s found"
-msgstr "顯示%1$s 之於 %2$s 已發現"
+msgstr "顯示 已探索的 %2$s中的%1$s"
 
 #: report6.php:159
 msgid "Distribution of values for multiple items"
-msgstr "Distribution of values for multiple items"
+msgstr "多個項目的分佈的值"
 
 #: report6.php:158
 msgid "Distribution of values for multiple periods"
-msgstr "Distribution of values for multiple periods"
+msgstr "多個期間的分佈的值"
 
 #: include/services.inc.php:61
 msgid "Do not calculate"
@@ -3887,7 +3890,7 @@ msgstr "完成"
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
 #: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:147
 msgid "Dot"
-msgstr "Dot"
+msgstr "點"
 
 #: include/blocks.inc.php:1076
 msgctxt "discovery results in dashboard"
@@ -3924,11 +3927,11 @@ msgstr "拖拉這裡來改變介面類型為 \"端點代理程式\" 類型."
 
 #: include/views/configuration.graph.edit.php:74
 msgid "Draw style"
-msgstr "Draw style"
+msgstr "繪圖風格"
 
 #: include/views/administration.general.gui.edit.php:32
 msgid "Dropdown first entry"
-msgstr "Dropdown first entry"
+msgstr "下拉的第一個輸入項"
 
 #: adm.gui.php:74
 #, php-format
@@ -3943,7 +3946,7 @@ msgstr "下拉記住所選的 \"%1$s\"."
 #: api/classes/CTrigger.php:2079
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "觸發器 \"%1$s\" 中的重複相依關係."
 
 #: api/classes/CHost.php:1361
 #, php-format
@@ -3982,11 +3985,11 @@ msgstr "持續時間"
 
 #: include/views/configuration.action.edit.php:319
 msgid "Duration (sec)"
-msgstr "停留時間(秒)"
+msgstr "持續時間(秒)"
 
 #: include/locales.inc.php:46
 msgid "Dutch (nl_NL)"
-msgstr "Dutch (nl_NL)"
+msgstr "荷蘭(nl_NL)"
 
 #: include/views/configuration.screen.constructor.edit.php:613
 msgid "Dynamic item"
@@ -4152,7 +4155,7 @@ msgstr "啟用所選的應用集"
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:102
 msgid "Enable selected discovery rules?"
-msgstr "啟用所選的偵測規則?"
+msgstr "啟用所選的探索規則?"
 
 #: include/views/administration.usergroups.list.php:130
 msgid "Enable selected groups?"
@@ -4206,7 +4209,7 @@ msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:42
 msgid "English (en_US)"
-msgstr ""
+msgstr "英語(en_US)"
 
 #: include/actions.inc.php:713 include/actions.inc.php:789
 #: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
@@ -4267,11 +4270,11 @@ msgstr "事件ID"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "符合正則表示式T的最末紀錄項的事件 ID, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:431
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "符合正則表示式T的最末紀錄項的事件 ID, 則 N 非 1, 0 - 除外"
 
 #: acknow.php:119 include/actions.inc.php:59
 msgid "Event acknowledged"
@@ -4439,7 +4442,7 @@ msgstr "Ez簡訊"
 #: jsLoader.php:127
 msgctxt "Friday short"
 msgid "F"
-msgstr "五"
+msgstr "F"
 
 #: include/views/js/adm.regexprs.edit.js.php:366
 #: include/views/js/adm.regexprs.edit.js.php:375
@@ -4511,7 +4514,7 @@ msgstr "欄位\"name\"是所要的."
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr "欄位"
+msgstr "欄位:"
 
 #: api/classes/CImage.php:586
 msgid "File format is unsupported."
@@ -4529,7 +4532,7 @@ msgstr "檔案用於一個viwq不存在. 試著找\"%s\"."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
-msgstr "填滿區域"
+msgstr "填滿的區域"
 
 #: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
 #: include/classes/class.cwidget.php:134 include/forms.inc.php:577
@@ -4551,11 +4554,11 @@ msgstr "依名稱過濾"
 
 #: popup_trexpr.php:298
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "於最新的值中找字串V. N = 1 - 如果找到, 0 - 其它情況."
 
 #: popup_trexpr.php:303
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr ""
+msgstr "於最新的值中找字串V. N 非 1 - 如果找到, 0 - 其它情況."
 
 #: include/setup.inc.php:129
 msgid "Finish"
@@ -4563,11 +4566,11 @@ msgstr "完成"
 
 #: include/locales.inc.php:47
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "芬蘭語 (fi_FI)"
 
 #: include/forms.inc.php:1591 include/maintenances.inc.php:103
 msgid "First"
-msgstr "First"
+msgstr "首"
 
 #: include/func.inc.php:1626
 msgctxt "page navigation"
@@ -4640,7 +4643,7 @@ msgstr "前端訊息中"
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.template.edit.php:436
 msgid "Full clone"
-msgstr "全複製"
+msgstr "全克隆"
 
 #: include/html.inc.php:267
 msgid "Fullscreen"
@@ -4654,7 +4657,7 @@ msgstr "功能"
 #: include/classes/validators/CTriggerFunctionValidator.php:71
 #, php-format
 msgid "Function supports \"%1$s\" parameters."
-msgstr "函式有參數\"%1$s\"."
+msgstr "功能支援參數\"%1$s\"."
 
 #: include/func.inc.php:566
 msgctxt "Giga short"
@@ -4680,7 +4683,7 @@ msgstr "圖形化使用者介面存取已停用"
 
 #: include/menu.inc.php:225
 msgid "General"
-msgstr "總覽"
+msgstr "一般"
 
 #: chart4.php:180 chart5.php:201 include/classes/class.cbar.php:739
 #, php-format
@@ -4793,7 +4796,7 @@ msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目."
 #: api/classes/CTemplateScreen.php:658
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "圖形 \"%1$s\"不存在於模板\"%2$s\"中."
 
 #: include/classes/import/CXmlImport18.php:1559
 #: include/classes/import/CXmlImport18.php:1563
@@ -4868,7 +4871,7 @@ msgstr "圖形已更新"
 #: api/classes/CGraphGeneral.php:121
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "名為\"%1$s\"的圖形已經存在於圖形或圖形原型中."
 
 #: api/classes/CGraph.php:587 api/classes/CGraph.php:608
 #: api/classes/CGraphPrototype.php:605 api/classes/CGraphPrototype.php:626
@@ -4965,11 +4968,11 @@ msgstr "群組已刪除"
 
 #: include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
-msgstr "偵測出的主機的群組"
+msgstr "探索到的主機的群組"
 
 #: adm.other.php:71
 msgid "Group for discovered hosts."
-msgstr "偵測出的主機的群組"
+msgstr "探索到的主機的群組"
 
 #: include/views/administration.usergroups.edit.php:41
 #: include/views/configuration.hostgroups.edit.php:37
@@ -5072,7 +5075,7 @@ msgstr "說明"
 
 #: include/items.inc.php:134
 msgid "Hexadecimal"
-msgstr "Hexadecimal"
+msgstr "十六進位數字"
 
 #: jsLoader.php:137 sysmap.php:158
 msgid "Hidden"
@@ -5098,7 +5101,7 @@ msgstr "隱藏失效的觸發器"
 
 #: include/views/monitoring.history.php:107
 msgid "Hide selected"
-msgstr "隱藏所選"
+msgstr "隱藏所選的"
 
 #: adm.triggerseverities.php:62
 #: include/views/administration.general.triggerSeverity.edit.php:58
@@ -5217,7 +5220,7 @@ msgstr "主機資產紀錄"
 
 #: include/views/administration.script.list.php:43
 msgid "Host access"
-msgstr "Host access"
+msgstr "主機存取"
 
 #: hosts.php:326
 msgid "Host added"
@@ -5234,7 +5237,7 @@ msgstr "主機計數"
 
 #: hosts.php:508 hosts.php:532
 msgid "Host deleted"
-msgstr "已删除主機"
+msgstr "主機已删除"
 
 #: include/actions.inc.php:40 include/audit.inc.php:35
 #: include/blocks.inc.php:167 include/blocks.inc.php:345
@@ -5292,11 +5295,11 @@ msgstr "主機資產記錄概覽"
 
 #: include/views/configuration.sysmap.edit.php:102
 msgid "Host label type"
-msgstr "主機標籤類型"
+msgstr "主機標示類型"
 
 #: include/html.inc.php:359
 msgid "Host list"
-msgstr "主機列表"
+msgstr "主機清單"
 
 #: hosts.php:51 include/actions.inc.php:62
 #: include/views/configuration.host.edit.php:171
@@ -5431,7 +5434,7 @@ msgstr "清理器"
 
 #: include/locales.inc.php:51
 msgid "Hungarian (hu_HU)"
-msgstr "Hungary (hu_HU)"
+msgstr "匈牙利(hu_HU)"
 
 #: include/discovery.inc.php:69
 #: include/views/js/configuration.discovery.edit.js.php:143
@@ -5472,11 +5475,11 @@ msgstr "主機介面的IP和DNS不能是空白."
 #: include/views/configuration.discovery.edit.php:49
 #: include/views/configuration.discovery.list.php:41
 msgid "IP range"
-msgstr "IP地址段"
+msgstr "IP範圍"
 
 #: api/classes/CDRule.php:407
 msgid "IP range cannot be empty."
-msgstr "IP地址段不能為空白."
+msgstr "IP範圍不能為空白."
 
 #: include/hosts.inc.php:476 include/items.inc.php:188
 #: include/views/administration.script.edit.php:49
@@ -5493,7 +5496,7 @@ msgstr "IPMI端點代理程式"
 
 #: include/views/configuration.host.massupdate.php:141
 msgid "IPMI authentication algorithm"
-msgstr "IPMI認證語法"
+msgstr "IPMI認證演算法"
 
 #: include/views/configuration.host.edit.php:280
 msgid "IPMI interfaces"
@@ -5530,11 +5533,11 @@ msgstr "IT 服務"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
-msgstr "IT服務下層部份"
+msgstr "IT服務相依關係"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"
-msgstr "IT服務上層部份"
+msgstr "IT服務上層"
 
 #: include/menu.inc.php:82 include/menu.inc.php:212
 #: include/views/configuration.services.list.php:26 srv_status.php:26
@@ -5578,11 +5581,11 @@ msgstr "圖示標記"
 
 #: include/views/configuration.sysmap.edit.php:135
 msgid "Icon label location"
-msgstr "圖示標籤位置"
+msgstr "圖示標示位置"
 
 #: include/views/configuration.sysmap.edit.php:130
 msgid "Icon label type"
-msgstr "圖示標籤類型"
+msgstr "圖示標示類型"
 
 #: include/views/administration.general.iconmap.edit.php:138
 #: include/views/administration.general.iconmap.list.php:23
@@ -5756,7 +5759,7 @@ msgstr "不可能以不存在的資產紀錄欄位\"%s\"來過濾."
 
 #: screenedit.php:239 screenedit.php:254
 msgid "Impossible to remove last row and column."
-msgstr "不可能移除最後的列和行."
+msgstr "不可能移除最後的行和列."
 
 #: include/classes/class.ctweenbox.php:73
 #: include/classes/class.ctweenbox.php:100
@@ -5828,19 +5831,19 @@ msgstr "不正確的可接受SLA予服務\"%1$s\"."
 
 #: api/classes/CAction.php:1717
 msgid "Incorrect action condition discovery check."
-msgstr "不正確的動作條件發現檢查."
+msgstr "不正確的動作條件探索檢查."
 
 #: api/classes/CAction.php:1772
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "不正確的動作條件發現檢查. 發現檢查不存在或您沒有存取權."
+msgstr "不正確的動作條件探索檢查. 探索檢查不存在或您沒有存取權."
 
 #: api/classes/CAction.php:1769
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "不正確的動作條件發現規則. 發現規則不存在或您沒有存取權."
+msgstr "不正確的動作條件探索規則. 探索規則不存在或您沒有存取權."
 
 #: api/classes/CAction.php:1729
 msgid "Incorrect action condition discovery status."
-msgstr "不正確的動作條件發現狀態."
+msgstr "不正確的動作條件探索狀態."
 
 #: api/classes/CAction.php:1757
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
@@ -6004,7 +6007,7 @@ msgstr "不正確的延遲."
 #: include/classes/db/DB.php:502 include/classes/db/DB.php:668
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr "不正確的欄位名稱\"%1$s\"或用於資料表\"%2$s\"的where語法的值."
+msgstr "不正確的欄位名稱\"%1$s\"或用於資料表\"%2$s\"的where陳述式的值."
 
 #: api/classes/CMap.php:528
 msgid "Incorrect fields for sysmap"
@@ -6111,7 +6114,7 @@ msgstr "不正確的鍵值: %s"
 
 #: include/forms.inc.php:1178 items.php:793
 msgid "Incorrect list of items."
-msgstr "不正確的項目列表"
+msgstr "不正確的項目清單"
 
 #: maintenance.php:234
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
@@ -6399,7 +6402,7 @@ msgstr "圖形\"%1$s\"的不正確y min項目."
 
 #: include/locales.inc.php:52
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "印尼語 (id_ID)"
 
 #: include/blocks.inc.php:833 include/blocks.inc.php:1362
 #: include/classes/class.cformlist.php:65 tr_status.php:286
@@ -6520,12 +6523,12 @@ msgstr "無效的參數."
 #: api/classes/CHttpTest.php:724
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "無效的回應編碼 \"%1$s\"."
 
 #: api/classes/CHttpTest.php:719
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "無效的回應編碼範圍 \"%1$s\"."
 
 #: items.php:352
 msgid "Invalid time period"
@@ -6556,7 +6559,7 @@ msgstr "是否在線?"
 #: include/blocks.inc.php:820 include/blocks.inc.php:830
 #: include/blocks.inc.php:1360
 msgid "Issue"
-msgstr "Issue"
+msgstr "議題"
 
 #: api/classes/CUser.php:169
 msgid "It is not possible to filter by user password."
@@ -6596,7 +6599,7 @@ msgstr "項目\"%1$s\"不能填入一個不存在的主機資產紀錄欄位號�
 #: api/classes/CTemplateScreen.php:668
 #, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 
 #: include/classes/import/CXmlImport18.php:1526
 #, php-format
@@ -6621,7 +6624,7 @@ msgstr "項目\"%1$s:%2$s\"有無效的埠: \"%3$s\"."
 
 #: disc_prototypes.php:295 items.php:476 screenedit.php:182
 msgid "Item added"
-msgstr "監控項已新增"
+msgstr "項目已新增"
 
 #: include/views/administration.proxy.list.php:49
 msgid "Item count"
@@ -6648,7 +6651,7 @@ msgstr "項目原型之於"
 
 #: disc_prototypes.php:291 items.php:473 screenedit.php:175
 msgid "Item updated"
-msgstr "監控項已更新"
+msgstr "項目已更新"
 
 #: api/classes/CItemGeneral.php:248
 msgid "Item uses host interface from non-parent host."
@@ -6665,7 +6668,7 @@ msgstr "項目將不會被刷新. 請輸入正確的更新區間."
 #: api/classes/CItemGeneral.php:398
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
-msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為發現規則."
+msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為探索規則."
 
 #: api/classes/CItemGeneral.php:404
 #, php-format
@@ -6711,7 +6714,7 @@ msgstr ""
 #: search.php:139 search.php:167 search.php:190 search.php:383 search.php:408
 #: search.php:435 templates.php:460 templates.php:526
 msgid "Items"
-msgstr "監控項"
+msgstr "項目"
 
 #: include/classes/class.cserverinfo.php:55
 msgid "Items (m/d/n)"
@@ -6866,7 +6869,7 @@ msgstr "鍵值通行短語"
 
 #: tr_logform.php:299
 msgid "Keyword"
-msgstr "Keyword"
+msgstr "關鍵字"
 
 #: include/func.inc.php:564
 msgid "Kilo"
@@ -6941,23 +6944,23 @@ msgstr "末"
 #, php-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] "最末 %1$d 問題"
+msgstr[0] "最近%1$d個議題"
 
 #: popup_trexpr.php:222
 msgid "Last (most recent) T value is < N"
-msgstr ""
+msgstr "最末(最近) T值是 < N"
 
 #: popup_trexpr.php:232
 msgid "Last (most recent) T value is = N"
-msgstr ""
+msgstr "最末(最近) T值是 = N"
 
 #: popup_trexpr.php:227
 msgid "Last (most recent) T value is > N"
-msgstr ""
+msgstr "最末(最近) T值是 > N"
 
 #: popup_trexpr.php:237
 msgid "Last (most recent) T value is NOT N"
-msgstr ""
+msgstr "最末(最近) T值不是 N"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -7039,23 +7042,23 @@ msgstr "左側"
 #: include/reports.inc.php:166 include/reports.inc.php:274
 #: include/reports.inc.php:423
 msgid "Legend"
-msgstr "Legend"
+msgstr "圖例"
 
 #: popup_trexpr.php:308
 msgid "Length of last (most recent) T value in characters is < N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度是 < N"
 
 #: popup_trexpr.php:318
 msgid "Length of last (most recent) T value in characters is = N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度是 = N"
 
 #: popup_trexpr.php:313
 msgid "Length of last (most recent) T value in characters is > N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度是 > N"
 
 #: popup_trexpr.php:323
 msgid "Length of last (most recent) T value in characters is NOT N"
-msgstr ""
+msgstr "於多字元中最末(最近) T值的長度不是 N"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:333
 #: include/views/js/configuration.sysmaps.js.php:409
@@ -7070,7 +7073,7 @@ msgstr "連結"
 #: include/views/js/configuration.sysmaps.js.php:310
 #: include/views/js/configuration.sysmaps.js.php:350
 msgid "Link indicators"
-msgstr "Link indicators"
+msgstr "連結指示器"
 
 #: api/classes/CMap.php:614
 #, php-format
@@ -7118,11 +7121,11 @@ msgstr "已連結到"
 
 #: include/views/js/configuration.sysmaps.js.php:304
 msgid "Links between the selected elements"
-msgstr ""
+msgstr "所選組件之間的連結"
 
 #: include/views/js/configuration.sysmaps.js.php:293
 msgid "Links for the selected element"
-msgstr ""
+msgstr "所選組件的連結"
 
 #: include/classes/class.clist.php:33
 msgid "List is empty"
@@ -7131,11 +7134,11 @@ msgstr "清單是空的"
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
 msgid "Loading..."
-msgstr "Loading..."
+msgstr "載入中..."
 
 #: include/nodes.inc.php:258
 msgid "Local"
-msgstr "Local"
+msgstr "當地"
 
 #: include/classes/screens/CScreenHistory.php:164
 #: include/views/configuration.screen.constructor.edit.php:514
@@ -7144,7 +7147,7 @@ msgstr "當地時間"
 
 #: include/hosts.inc.php:219
 msgid "Location"
-msgstr "主機位置"
+msgstr "位置"
 
 #: include/hosts.inc.php:224
 msgid "Location latitude"
@@ -7162,27 +7165,27 @@ msgstr "日誌"
 
 #: popup_trexpr.php:436
 msgid "Log severity of the last log entry is < N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性是 < N"
 
 #: popup_trexpr.php:444
 msgid "Log severity of the last log entry is = N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性是 = N"
 
 #: popup_trexpr.php:440
 msgid "Log severity of the last log entry is > N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性是 > N"
 
 #: popup_trexpr.php:448
 msgid "Log severity of the last log entry is NOT N"
-msgstr ""
+msgstr "最末日誌項的日誌嚴重性不是 N"
 
 #: popup_trexpr.php:452
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "最末符合參數T的日誌項的日誌來源, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:457
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "最末符合參數T的日誌項的日誌來源, 則 N 非 1, 0 - 除外"
 
 #: include/views/configuration.item.edit.php:376
 #: include/views/configuration.item.massupdate.php:405
@@ -7222,7 +7225,7 @@ msgstr "登入名稱或密碼是不正確的."
 #: auditlogs.php:146 include/page_header.php:248 include/page_header.php:252
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
-msgstr "退出"
+msgstr "登出"
 
 #: include/views/administration.auditacts.list.php:28
 #: include/views/administration.auditlogs.list.php:28
@@ -7307,7 +7310,7 @@ msgstr "巨集\"%1$s\"的值太長, 不應超過64字元."
 #: api/classes/CUserMacro.php:1054
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "含globalmacroid  \"%1$s\"的巨集不存在."
 
 #: api/classes/CUserMacro.php:994
 #, php-format
@@ -7342,7 +7345,7 @@ msgstr "維修\"%s\"已存在."
 
 #: api/classes/CMaintenance.php:487 api/classes/CMaintenance.php:600
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr ""
+msgstr "維修期間\"Active since\"值不能晚於 \"Active till\"."
 
 #: maintenance.php:120
 msgid "Maintenance added"
@@ -7778,7 +7781,7 @@ msgstr "缺少主機\"%2$s\"的鍵值 \"%1$s\"."
 
 #: api/classes/CUserGroup.php:503
 msgid "Missing parameter: usrgrpids."
-msgstr ""
+msgstr "缺少參數: usrgrpids."
 
 #: include/views/administration.proxy.list.php:46 report2.php:185
 msgid "Mode"
@@ -7795,7 +7798,7 @@ msgstr "一"
 #: include/forms.inc.php:1534 include/forms.inc.php:1602
 #: include/func.inc.php:123 include/func.inc.php:207
 msgid "Monday"
-msgstr "星期一"
+msgstr "週一"
 
 #: hosts.php:797 include/html.inc.php:378
 #: include/views/configuration.host.edit.php:295
@@ -8036,7 +8039,7 @@ msgstr "次"
 
 #: queue.php:246
 msgid "Next check"
-msgstr "下個檢查查"
+msgstr "下個檢查"
 
 #: events.php:755 include/events.inc.php:298 include/events.inc.php:316
 #: include/func.inc.php:2175 include/triggers.inc.php:1684
@@ -8134,7 +8137,7 @@ msgstr "沒有數據收集"
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
-msgstr ""
+msgstr "無已定義的資料"
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
@@ -8162,20 +8165,20 @@ msgstr "沒有細節"
 
 #: include/views/monitoring.discovery.php:36
 msgid "No discoveries defined."
-msgstr "沒有已定義的發現."
+msgstr "沒有已定義的探索."
 
 #: popup.php:1919
 msgid "No discovery checks defined."
-msgstr "沒有已定義的發現檢查."
+msgstr "沒有已定義的探索檢查."
 
 #: api/classes/CDiscoveryRule.php:656
 msgid "No discovery rule IDs given."
-msgstr "沒有所稱的發現規則ID"
+msgstr "沒有所稱的探索規則ID"
 
 #: include/views/configuration.discovery.list.php:37
 #: include/views/configuration.host.discovery.list.php:43 popup.php:1903
 msgid "No discovery rules defined."
-msgstr "沒有已定義的發現規則."
+msgstr "沒有已定義的探索規則."
 
 #: jsLoader.php:171
 msgid "No elements selected!"
@@ -8187,7 +8190,7 @@ msgstr "沒有找到錯誤."
 
 #: tr_status.php:671
 msgid "No events"
-msgstr ""
+msgstr "沒有事件"
 
 #: events.php:386 include/classes/screens/CScreenEvents.php:41
 msgid "No events defined."
@@ -8534,7 +8537,7 @@ msgstr "沒有已定義的資源"
 
 #: include/classes/screens/CScreenBuilder.php:296
 msgid "No rows in screen."
-msgstr "篩選中沒有列"
+msgstr "篩選中沒有行"
 
 #: api/classes/CScreenItem.php:468
 msgid "No screen ID provided for screen element."
@@ -8698,7 +8701,7 @@ msgstr "非模板項目"
 #: api/classes/CTrigger.php:1982
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
-msgstr ""
+msgstr "並非所有的模板都連結到\"%s\"."
 
 #: api/classes/CUser.php:441
 msgid "Not allowed to set password for user \"guest\"."
@@ -8780,23 +8783,23 @@ msgstr "主機數量 (監控/未監控/模板)"
 
 #: include/blocks.inc.php:706
 msgid "Number of items (monitored/disabled/not supported)"
-msgstr "監控項數量 (監控/關閉/不支持)"
+msgstr "監控項數量 (監控/停用/不支持)"
 
 #: popup_trexpr.php:462
 msgid "Number of seconds since the Epoch is < N"
-msgstr ""
+msgstr "自Epoch起的秒數是 < N"
 
 #: popup_trexpr.php:470
 msgid "Number of seconds since the Epoch is = N"
-msgstr ""
+msgstr "自Epoch起的秒數是 = N"
 
 #: popup_trexpr.php:466
 msgid "Number of seconds since the Epoch is > N"
-msgstr ""
+msgstr "自Epoch起的秒數是 > N"
 
 #: popup_trexpr.php:474
 msgid "Number of seconds since the Epoch is NOT N"
-msgstr ""
+msgstr "自Epoch起的秒數不是 N"
 
 #: report5.php:63
 msgid "Number of status changes"
@@ -8824,7 +8827,7 @@ msgstr ""
 
 #: include/blocks.inc.php:715
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
-msgstr "觸發器數量 (啟用/關閉)[問題/未知/正常]"
+msgstr "觸發器數量 (啟用/停用)[問題/未知/正常]"
 
 #: include/blocks.inc.php:726
 msgid "Number of users (online)"
@@ -8859,7 +8862,7 @@ msgstr "OEM"
 #: include/setup.inc.php:228 include/setup.inc.php:303
 #: include/setup.inc.php:457 include/triggers.inc.php:206
 msgid "OK"
-msgstr "OK"
+msgstr "正常"
 
 #: include/hosts.inc.php:304
 msgid "OOB IP address"
@@ -8886,11 +8889,11 @@ msgstr "操作系統"
 
 #: include/hosts.inc.php:129
 msgid "OS (Full details)"
-msgstr "OS(所有細節)"
+msgstr "作業系統(所有細節)"
 
 #: include/hosts.inc.php:134
 msgid "OS (Short)"
-msgstr "作業系統 ( 簡)"
+msgstr "作業系統( 簡)"
 
 #: adm.other.php:119
 msgid "OTHER CONFIGURATION PARAMETERS"
@@ -8906,7 +8909,7 @@ msgstr "十月"
 
 #: include/items.inc.php:132
 msgid "Octal"
-msgstr "Octal"
+msgstr "八進位"
 
 #: include/forms.inc.php:1565 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:120
@@ -8922,7 +8925,7 @@ msgstr "關"
 #: include/views/administration.users.list.php:86 report2.php:238
 #: report3.php:86
 msgid "Ok"
-msgstr "Ok"
+msgstr "正常"
 
 #: jsLoader.php:135 sysmap.php:155 sysmap.php:161
 msgid "On"
@@ -9012,7 +9015,7 @@ msgstr "僅能使用字元."
 
 #: include/blocks.inc.php:707
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Only items assigned to enabled hosts are counted"
+msgstr "只計算指派給啟用的主機的項目"
 
 #: api/classes/CDRule.php:518
 msgid "Only one check can be unique."
@@ -9020,7 +9023,7 @@ msgstr "只能一個檢查可為唯一."
 
 #: api/classes/CUserGroup.php:510
 msgid "Only one user group name can be changed at a time."
-msgstr ""
+msgstr "每次僅有一個用戶群組可以被改變."
 
 #: api/classes/CProxy.php:603
 msgid "Only super admins can delete proxies."
@@ -9033,7 +9036,7 @@ msgstr "只可顯示最近的20%%的指示燈號."
 
 #: include/blocks.inc.php:716
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr "只計算指派給啟用的主機的和相依於啟用的項目的觸發器"
 
 #: include/views/configuration.httpconf.edit.php:130
 msgid "Opera"
@@ -9050,7 +9053,7 @@ msgstr "由於未認證的請求, 操作無法完成."
 
 #: include/views/configuration.action.edit.php:950
 msgid "Operation condition"
-msgstr "操作的先决條件"
+msgstr "操作的條件"
 
 #: include/views/configuration.action.edit.php:958
 msgid "Operation details"
@@ -9058,11 +9061,11 @@ msgstr "操作細節"
 
 #: api/classes/CAction.php:1613
 msgid "Operation has no group to operate."
-msgstr "操作並無群組來運作."
+msgstr "操作並無群組來操作."
 
 #: api/classes/CAction.php:1621
 msgid "Operation has no template to operate."
-msgstr "操作並無模板來運作."
+msgstr "操作並無模板來操作."
 
 #: include/views/configuration.action.edit.php:448
 msgid "Operation type"
@@ -9071,11 +9074,11 @@ msgstr "操作類型"
 #: include/views/configuration.action.edit.php:968
 #: include/views/configuration.action.list.php:52
 msgid "Operations"
-msgstr "詳細操作"
+msgstr "操作"
 
 #: include/hosts.inc.php:68
 msgid "Operator"
-msgstr "Operator"
+msgstr "操作者"
 
 #: include/views/configuration.host.massupdate.php:44
 #: include/views/configuration.host.massupdate.php:52
@@ -9121,7 +9124,7 @@ msgstr "Operator"
 #: include/views/configuration.triggers.massupdate.php:67
 #: include/views/configuration.triggers.massupdate.php:111
 msgid "Original"
-msgstr "Original"
+msgstr "原始的"
 
 #: include/classes/core/ZBase.php:228
 msgid "Original blue"
@@ -9293,11 +9296,11 @@ msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
-msgstr ""
+msgstr "PHP連線期自動啟動"
 
 #: include/classes/class.frontendsetup.php:589
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
-msgstr ""
+msgstr "PHP連線期自動啟動必須被停用 (PHP directive \"session.auto_start\")"
 
 #: include/classes/class.frontendsetup.php:570
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
@@ -9390,7 +9393,7 @@ msgstr "預期的是秒參數或用戶巨集, 得到的是\"%1$s\""
 
 #: include/views/configuration.item.edit.php:53
 msgid "Parent discovery rules"
-msgstr "上層發現規則"
+msgstr "上層探索規則"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graph"
@@ -9467,7 +9470,7 @@ msgstr "百分比線(左)"
 
 #: graphs.php:55
 msgid "Percentile line (Right)"
-msgstr "百分比線(又)"
+msgstr "百分比線(右)"
 
 #: include/views/configuration.graph.edit.php:146
 msgid "Percentile line (left)"
@@ -9487,7 +9490,7 @@ msgstr "百分比線(右)"
 #: popup_period.php:92 popup_period.php:126 report3.php:65 report4.php:96
 #: srv_status.php:180
 msgid "Period"
-msgstr "時期"
+msgstr "期間"
 
 #: include/forms.inc.php:1516
 #: include/views/configuration.maintenance.edit.php:57
@@ -9510,7 +9513,7 @@ msgstr "許可權只能被指派予用戶群組"
 
 #: include/locales.inc.php:57
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "波斯語 (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
@@ -9581,7 +9584,7 @@ msgstr "主機介面的埠不能是空白."
 
 #: include/views/js/configuration.discovery.edit.js.php:27
 msgid "Port range"
-msgstr "埠區間"
+msgstr "埠範圍"
 
 #: include/locales.inc.php:59
 msgid "Portuguese (pt_BR)"
@@ -9593,7 +9596,7 @@ msgstr ""
 
 #: tr_logform.php:303
 msgid "Position"
-msgstr "Position"
+msgstr "位置"
 
 #: include/views/configuration.httpconf.popup.php:62
 msgid "Post"
@@ -9617,19 +9620,19 @@ msgstr "前"
 
 #: popup_trexpr.php:282
 msgid "Previous value is < N"
-msgstr ""
+msgstr "前值是 < N"
 
 #: popup_trexpr.php:290
 msgid "Previous value is = N"
-msgstr ""
+msgstr "前值是 = N"
 
 #: popup_trexpr.php:286
 msgid "Previous value is > N"
-msgstr ""
+msgstr "前值是 > N"
 
 #: popup_trexpr.php:294
 msgid "Previous value is NOT N"
-msgstr ""
+msgstr "前值不是 N"
 
 #: include/hosts.inc.php:404
 msgid "Primary POC cell"
@@ -9745,7 +9748,7 @@ msgstr "主機\"%2$s\"的系統代理程式\"%1$s\"不存在."
 #: api/classes/CProxy.php:621
 #, php-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr "系統代理程式\"%1$s\"是用在發現規則\"%2$s\"上."
+msgstr "系統代理程式\"%1$s\"是用在探索規則\"%2$s\"上."
 
 #: api/classes/CProxy.php:364
 #, php-format
@@ -9837,11 +9840,11 @@ msgstr "接收者"
 
 #: include/views/configuration.screen.constructor.edit.php:367
 msgid "Recipient (ascending)"
-msgstr ""
+msgstr "接收者(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:366
 msgid "Recipient (descending)"
-msgstr ""
+msgstr "接收者(降冪)"
 
 #: include/actions.inc.php:711 include/classes/screens/CScreenActions.php:78
 #: include/classes/screens/CScreenActions.php:83
@@ -9899,19 +9902,19 @@ msgstr "正規表示式\"%s\"已存在."
 
 #: popup_trexpr.php:406
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:416
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N = 1, 0 - 除外 (大小寫不分)"
 
 #: popup_trexpr.php:411
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N 非 1, 0 - 除外"
 
 #: popup_trexpr.php:421
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "正則表示式V符合期間T的最末值, 則 N 非 1, 0 - 除外 (大小寫不分)"
 
 #: adm.regexps.php:128
 msgid "Regular expression added"
@@ -10179,11 +10182,11 @@ msgstr "可試次數"
 
 #: include/views/configuration.screen.constructor.edit.php:365
 msgid "Retries left (ascending)"
-msgstr ""
+msgstr "剩餘可試數(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:364
 msgid "Retries left (descending)"
-msgstr ""
+msgstr "剩餘可試數(降冪)"
 
 #: include/setup.inc.php:224 include/setup.inc.php:463
 #: include/views/general.warning.php:31
@@ -10202,7 +10205,7 @@ msgstr "右"
 #: include/views/configuration.screen.constructor.edit.php:609
 #: screenedit.php:46
 msgid "Row span"
-msgstr "列寬度"
+msgstr "行寬度"
 
 #: api/classes/CScreenItem.php:608
 #, php-format
@@ -10211,11 +10214,11 @@ msgstr ""
 
 #: include/views/configuration.screen.edit.php:43 screenconf.php:52
 msgid "Rows"
-msgstr "列"
+msgstr "行"
 
 #: include/views/administration.users.edit.php:123 profile.php:50 users.php:63
 msgid "Rows per page"
-msgstr "每頁列數"
+msgstr "每頁行數"
 
 #: include/views/conf.import.php:65
 msgid "Rules"
@@ -10284,7 +10287,7 @@ msgstr "篩選"
 
 #: search.php:74
 msgid "SEARCH"
-msgstr "搜索"
+msgstr "搜尋"
 
 #: include/classes/screens/CScreenClock.php:64
 msgid "SERVER"
@@ -10386,13 +10389,13 @@ msgstr "SQL計數: %s (selects: %s | 執行: %s)"
 #: include/classes/db/DB.php:678
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\""
-msgstr "SQL語法執行已失敗: \"%1$s\""
+msgstr "SQL陳述式執行已失敗: \"%1$s\""
 
 #: include/classes/db/DB.php:411 include/classes/db/DB.php:458
 #: include/classes/db/DB.php:513
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\"."
-msgstr "SQL語法執行已失敗: \"%1$s\"."
+msgstr "SQL陳述式執行已失敗: \"%1$s\"."
 
 #: include/discovery.inc.php:56
 #: include/views/configuration.action.edit.php:648
@@ -10406,7 +10409,7 @@ msgstr "SSH 端點代理程式"
 
 #: include/views/monitoring.discovery.php:28
 msgid "STATUS OF DISCOVERY"
-msgstr "偵測的狀態"
+msgstr "探索的狀態"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127 tr_status.php:177
@@ -10528,7 +10531,7 @@ msgstr "篩選 \"%1$s\" 已新增."
 
 #: api/classes/CTemplateScreen.php:816
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr ""
+msgstr "篩選\"%1$s\"已存在於模板\"%2$2\"中."
 
 #: api/classes/CScreen.php:413 api/classes/CScreen.php:487
 #: api/classes/CTemplateScreen.php:711 api/classes/CTemplateScreen.php:762
@@ -10567,7 +10570,7 @@ msgstr "篩選項目於相同格位中已存在."
 
 #: screenedit.php:238 screenedit.php:253
 msgid "Screen should contain at least one row and column."
-msgstr "篩選應包含至少一個列和行."
+msgstr "篩選應包含至少一個行和列."
 
 #: screenconf.php:153
 msgid "Screen updated"
@@ -10771,7 +10774,7 @@ msgstr "選擇原型"
 
 #: include/views/monitoring.history.php:101
 msgid "Select rows with value like"
-msgstr "選擇列含有值像"
+msgstr "選擇行含有值類似於"
 
 #: dashconf.php:174 include/views/monitoring.history.php:122
 msgid "Selected"
@@ -10921,7 +10924,7 @@ msgstr "服務"
 
 #: api/classes/CService.php:1450
 msgid "Services form a circular dependency."
-msgstr "服務形成了一個相依迴圈."
+msgstr "服務形成了一個循環式迴圈."
 
 #: api/classes/CUser.php:1023
 msgid "Session terminated, re-login, please."
@@ -10935,7 +10938,7 @@ msgstr "連線期已中斷, 請重連."
 #: include/views/configuration.triggers.massupdate.php:65 popup.php:979
 #: report5.php:62 tr_logform.php:366 tr_status.php:284
 msgid "Severity"
-msgstr "示警度"
+msgstr "嚴重性"
 
 #: include/views/configuration.screen.constructor.edit.php:344
 msgid "Severity (descending)"
@@ -10975,16 +10978,16 @@ msgstr "展示失效的觸發器"
 #: adm.gui.php:73
 #, php-format
 msgid "Show events max \"%1$s\"."
-msgstr "顯示事件最多\"%1$s\"."
+msgstr "展示事件最多\"%1$s\"."
 
 #: adm.gui.php:34 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "顯示事件不能久於(日計)"
+msgstr "展示事件不能久於(日計)"
 
 #: adm.gui.php:72
 #, php-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "顯示事件不能久於(日計)\"%1$s\"."
+msgstr "展示事件不能久於(日計)\"%1$s\"."
 
 #: include/triggers.inc.php:1362
 msgid "Show graph of item"
@@ -11045,7 +11048,7 @@ msgstr "展示項目值"
 
 #: include/views/administration.general.gui.edit.php:47
 msgid "Show warning if Zabbix server is down"
-msgstr "當Zabbix伺服器停機時顯示警告"
+msgstr "當Zabbix伺服器停機時展示警告"
 
 #: include/views/configuration.graph.edit.php:132
 msgid "Show working time"
@@ -11053,7 +11056,7 @@ msgstr "展示工作時間"
 
 #: jsLoader.php:138 sysmap.php:158
 msgid "Shown"
-msgstr "已顯示"
+msgstr "已展示"
 
 #: include/views/general.login.php:74 index.php:55 index.php:64
 msgid "Sign in"
@@ -11251,7 +11254,7 @@ msgstr "開始於"
 
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
-msgstr "State"
+msgstr "州"
 
 #: events.php:489 events.php:498 events.php:564 events.php:577 hosts.php:691
 #: httpdetails.php:134 httpmon.php:79 include/actions.inc.php:709
@@ -11284,11 +11287,11 @@ msgstr "狀態"
 
 #: include/views/configuration.screen.constructor.edit.php:363
 msgid "Status (ascending)"
-msgstr ""
+msgstr "狀態(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:362
 msgid "Status (descending)"
-msgstr ""
+msgstr "狀態(降冪)"
 
 #: include/views/configuration.services.child.list.php:39
 #: include/views/configuration.services.parent.list.php:36 services.php:409
@@ -11297,7 +11300,7 @@ msgstr "狀態統計"
 
 #: include/views/configuration.services.edit.php:56
 msgid "Status calculation algorithm"
-msgstr "狀態計算語法"
+msgstr "狀態計算演算法"
 
 #: include/views/configuration.httpconf.edit.php:186
 msgid "Status codes"
@@ -11314,11 +11317,11 @@ msgstr "Zabbix狀態"
 
 #: discovery.php:25
 msgid "Status of discovery"
-msgstr "偵測的狀態"
+msgstr "探索的狀態"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr ""
+msgstr "主機群組觸發器的狀態"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
@@ -11358,7 +11361,7 @@ msgstr "方案的步驟"
 #: include/httptest.inc.php:117
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "名為\"%s\"的步驟已存在."
 
 #: httpconf.php:50 include/views/configuration.action.edit.php:319
 #: include/views/configuration.httpconf.edit.php:267
@@ -11410,11 +11413,11 @@ msgstr ""
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
-msgstr ""
+msgstr "期間的總時間是 T = N"
 
 #: popup_trexpr.php:333
 msgid "Sum of values of a period T is > N"
-msgstr ""
+msgstr "期間的總時間是 T > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
@@ -11444,7 +11447,7 @@ msgstr "瑞士(sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "切換認證方法將重設除了此連線期之外的所有連線!繼續嗎?"
 
 #: include/users.inc.php:57 include/views/administration.users.edit.php:110
 msgid "System default"
@@ -11701,7 +11704,7 @@ msgstr[0] "此圖片是用於對應%2$s."
 #: include/views/configuration.item.list.php:100
 #, php-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "已無法發現此項目了, 將刪除於%1$s (在%2$s在%3$s)."
+msgstr "已無法探索此項目了, 將刪除於%1$s (在%2$s在%3$s)."
 
 #: queue.php:121
 msgid "The queue is empty"
@@ -11744,11 +11747,11 @@ msgstr "本月"
 
 #: include/classes/screens/CScreenBuilder.php:492
 msgid "This screen-column is not empty. Delete it?"
-msgstr "這篩選-行不是空白. 刪除它?"
+msgstr "這篩選-列不是空白. 刪除它?"
 
 #: include/classes/screens/CScreenBuilder.php:474
 msgid "This screen-row is not empty. Delete it?"
-msgstr "這篩選-列不是空白. 刪除它?"
+msgstr "這篩選-行不是空白. 刪除它?"
 
 #: srv_status.php:84
 msgid "This week"
@@ -11765,7 +11768,7 @@ msgstr "四"
 #: include/forms.inc.php:1537 include/forms.inc.php:1605
 #: include/func.inc.php:126 include/func.inc.php:210
 msgid "Thursday"
-msgstr "四"
+msgstr "週四"
 
 #: include/reports.inc.php:123 include/reports.inc.php:185
 #: include/reports.inc.php:498
@@ -11795,15 +11798,15 @@ msgstr "時間"
 
 #: include/views/configuration.screen.constructor.edit.php:359
 msgid "Time (ascending)"
-msgstr ""
+msgstr "時間(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:358
 msgid "Time (descending)"
-msgstr ""
+msgstr "時間(降冪)"
 
 #: include/actions.inc.php:47
 msgid "Time period"
-msgstr "時間範圍"
+msgstr "時間期間"
 
 #: popup_trexpr.php:54 popup_trexpr.php:96
 msgid "Time shift"
@@ -11831,11 +11834,11 @@ msgstr "時間戳"
 
 #: popup_trexpr.php:396
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "和Zabbix伺服器的時間戳記差異不超過T秒, 則 N = 1, 0 - 除外"
 
 #: popup_trexpr.php:401
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "和Zabbix伺服器的時間戳記差異不超過T秒, 則 N 非 1, 0 - 除外"
 
 #: include/reports.inc.php:163 include/reports.inc.php:270
 #: include/reports.inc.php:419
@@ -11922,7 +11925,7 @@ msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
 #: include/classes/import/CConfigurationImport.php:971
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "觸發器\"%1$s\"相依於一個不存在的觸發器\"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:871
 #, php-format
@@ -11952,7 +11955,7 @@ msgstr "觸發器已新增"
 
 #: api/classes/CTrigger.php:2025
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
-msgstr ""
+msgstr "觸發器不能相依於自己所繼承的觸發器."
 
 #: tr_comments.php:26
 msgid "Trigger comments"
@@ -12168,11 +12171,11 @@ msgstr "類型(OK)"
 
 #: include/views/configuration.screen.constructor.edit.php:361
 msgid "Type (ascending)"
-msgstr ""
+msgstr "類型(升冪)"
 
 #: include/views/configuration.screen.constructor.edit.php:360
 msgid "Type (descending)"
-msgstr ""
+msgstr "類型(降冪)"
 
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:885
@@ -12252,7 +12255,7 @@ msgstr "UTF-8"
 
 #: include/locales.inc.php:66
 msgid "Ukrainian (uk_UA)"
-msgstr "Ukrainian (uk_UA)"
+msgstr "烏克蘭語 (uk_UA)"
 
 #: include/nodes.inc.php:325
 msgid "Unable to remove local node."
@@ -12326,7 +12329,7 @@ msgstr "未知的操作"
 
 #: include/services.inc.php:370
 msgid "Unknown calculation algorithm of service status"
-msgstr "未知的服務狀態計算語法"
+msgstr "未知的服務狀態計算演算法"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:59
 msgid "Unknown function."
@@ -12382,7 +12385,7 @@ msgstr "斷連: 應用程式\"%1$s\"於\"%2$s\"."
 #: api/classes/CHostGeneral.php:554
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "未連結的: 偵測規則\"%1$s\"於\"%2$s\"."
+msgstr "未連結的: 探索規則\"%1$s\"於\"%2$s\"."
 
 #: api/classes/CHostGeneral.php:661
 #, php-format
@@ -12492,7 +12495,7 @@ msgstr "已更新: 應用程式\"%1$s\"於\"%2$s\"."
 #: api/classes/CDiscoveryRule.php:897
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr "已更新: 偵測規則\"%1$s\"於\"%2$s\"."
+msgstr "已更新: 探索規則\"%1$s\"於\"%2$s\"."
 
 #: api/classes/CItem.php:886
 #, php-format
@@ -12581,7 +12584,7 @@ msgstr "用戶不能自行改變類型"
 
 #: api/classes/CUserGroup.php:553
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "用戶不能將自己加進一個取消的群組或已取消圖形介面存取權的群組."
 
 #: include/users.inc.php:159
 msgid "User cannot change GUI access for himself."
@@ -12616,7 +12619,7 @@ msgstr "用戶群組\"%1$s\"被用於腳本\"%2$s\"."
 #: api/classes/CUserGroup.php:521
 #, php-format
 msgid "User group \"%s\" already exists."
-msgstr ""
+msgstr "用戶群組\"%s\"已存在."
 
 #: api/classes/CUserGroup.php:718
 #, php-format
@@ -12843,7 +12846,7 @@ msgstr "如果缺少主機名稱, 可見的名稱不能是空白."
 #: jsLoader.php:125
 msgctxt "Wednesday short"
 msgid "W"
-msgstr "三"
+msgstr "W"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
@@ -12882,7 +12885,7 @@ msgstr "警告. 欄位\"%1$s\"不是十進位數字"
 #: include/validate.inc.php:329
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "警告. 欄位\"%1$s\"不是整數列表或範圍."
 
 #: include/validate.inc.php:342
 #, php-format
@@ -13015,7 +13018,7 @@ msgstr "週"
 #: include/reports.inc.php:171 include/reports.inc.php:506
 #: include/reports.inc.php:514 report3.php:62 report4.php:99
 msgid "Weekly"
-msgstr "每周"
+msgstr "每週"
 
 #: popup_media.php:123
 msgid "When active"
@@ -13628,7 +13631,7 @@ msgstr "dd"
 #: include/setup.inc.php:359 include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:13
 msgid "default"
-msgstr "內定的"
+msgstr "預設的"
 
 #: include/views/js/adm.regexprs.edit.js.php:130
 msgid "delimiter"
