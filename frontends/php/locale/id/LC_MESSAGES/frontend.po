@@ -2,15 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:18+0200\n"
-"PO-Revision-Date: 2012-07-03 14:59+0300\n"
-"Last-Translator: Automatically generated\n"
+"POT-Creation-Date: 2012-12-15 23:20+0200\n"
+"PO-Revision-Date: 2012-10-30 17:14+0200\n"
+"Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.1.6\n"
 
 #: api/classes/CMaintenance.php:477 api/classes/CMaintenance.php:482
 #: api/classes/CMaintenance.php:590 api/classes/CMaintenance.php:595
@@ -31,7 +32,6 @@ msgstr ""
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
 msgstr[0] ""
-msgstr[1] ""
 
 #: chart4.php:90 chart5.php:84
 #, php-format
@@ -43,28 +43,24 @@ msgstr ""
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/page_header.php:467
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/blocks.inc.php:943
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/views/monitoring.discovery.php:131
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/views/configuration.action.edit.php:425
 msgid "(0 - infinitely)"
@@ -1465,7 +1461,6 @@ msgstr ""
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] ""
-msgstr[1] ""
 
 #: screenconf.php:226
 msgid "Cannot delete screen"
@@ -1699,14 +1694,12 @@ msgstr ""
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/classes/class.cview.php:113
 #, php-format
@@ -3407,7 +3400,6 @@ msgstr ""
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
-msgstr[1] ""
 
 #: templates.php:622
 msgid "Delete selected with linked elements"
@@ -6938,7 +6930,6 @@ msgstr ""
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
 msgstr[0] ""
-msgstr[1] ""
 
 #: popup_trexpr.php:222
 msgid "Last (most recent) T value is < N"
@@ -7535,14 +7526,12 @@ msgstr ""
 msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
-msgstr[1] ""
 
 #: api/classes/CHost.php:1347
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
-msgstr[1] ""
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
@@ -7565,7 +7554,6 @@ msgstr ""
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/forms.inc.php:1568 include/func.inc.php:108
 #: include/func.inc.php:239 jsLoader.php:115
@@ -9921,7 +9909,6 @@ msgstr ""
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/regexp.inc.php:79
 msgid "Regular expression does not exist."
@@ -11692,14 +11679,12 @@ msgstr ""
 msgid "The image is used in icon map %2$s."
 msgid_plural "The image is used in icon maps %2$s."
 msgstr[0] ""
-msgstr[1] ""
 
 #: api/classes/CImage.php:555
 #, php-format
 msgid "The image is used in map %2$s."
 msgid_plural "The image is used in maps %2$s."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/views/configuration.item.list.php:100
 #, php-format
@@ -11731,7 +11716,6 @@ msgstr ""
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/forms.inc.php:1593 include/maintenances.inc.php:105
 msgid "Third"
@@ -12928,14 +12912,12 @@ msgstr ""
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:394
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
 msgstr[0] ""
-msgstr[1] ""
 
 #: jsLoader.php:167
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
