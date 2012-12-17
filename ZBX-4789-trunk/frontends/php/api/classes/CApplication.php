@@ -106,7 +106,8 @@ class CApplication extends CZBXAPI {
 								' AND '.DBcondition('r.groupid', $userGroups).
 					' WHERE a.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>='.$permission.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
 					')';
 		}
 

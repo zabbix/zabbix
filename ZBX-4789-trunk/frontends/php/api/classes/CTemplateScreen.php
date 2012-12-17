@@ -142,7 +142,8 @@ class CTemplateScreen extends CScreen {
 									' AND '.DBcondition('r.groupid', $userGroups).
 						' WHERE s.templateid=hgg.hostid'.
 						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>='.$permission.
+						' HAVING MIN(r.permission)>'.PERM_DENY.
+							' AND MAX(r.permission)>='.$permission.
 						')';
 			}
 		}

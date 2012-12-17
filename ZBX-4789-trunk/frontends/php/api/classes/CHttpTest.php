@@ -98,7 +98,8 @@ class CHttpTest extends CZBXAPI {
 					' WHERE a.applicationid=ht.applicationid'.
 						' AND a.hostid=hgg.hostid'.
 					' GROUP BY a.applicationid'.
-					' HAVING MIN(r.permission)>='.$permission.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
 					')';
 		}
 

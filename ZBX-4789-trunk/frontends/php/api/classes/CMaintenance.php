@@ -149,7 +149,8 @@ class CMaintenance extends CZBXAPI {
 							' AND mh.hostid=hg.hostid'.
 						' GROUP by mh.hostid'.
 						' HAVING MIN(r.permission) IS NULL'.
-							' OR MIN(r.permission)<'.$permission.
+							' OR MIN(r.permission)='.PERM_DENY.
+							' OR MAX(r.permission)<'.$permission.
 						')'.
 					' AND NOT EXISTS ('.
 						'SELECT NULL'.
@@ -160,7 +161,8 @@ class CMaintenance extends CZBXAPI {
 						' WHERE m.maintenanceid=mg.maintenanceid'.
 						' GROUP by mg.groupid'.
 						' HAVING MIN(r.permission) IS NULL'.
-							' OR MIN(r.permission)<'.$permission.
+							' OR MIN(r.permission)='.PERM_DENY.
+							' OR MAX(r.permission)<'.$permission.
 						')';
 
 			if (!is_null($options['groupids'])) {

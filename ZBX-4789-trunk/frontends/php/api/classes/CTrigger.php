@@ -171,7 +171,8 @@ class CTrigger extends CTriggerGeneral {
 						' AND f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>='.$permission.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
 					')';
 		}
 
@@ -295,13 +296,14 @@ class CTrigger extends CTriggerGeneral {
 
 		// maintenance
 		if (!is_null($options['maintenance'])) {
-			$sqlParts['where'][] = ($options['maintenance'] == 0 ? 'NOT ' : '').'EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f,items i,hosts h'.
-					' WHERE t.triggerid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.maintenance_status='.HOST_MAINTENANCE_STATUS_ON.
+			$sqlParts['where'][] = ($options['maintenance'] == 0 ? 'NOT ' : '').
+					'EXISTS ('.
+						'SELECT NULL'.
+						' FROM functions f,items i,hosts h'.
+						' WHERE t.triggerid=f.triggerid'.
+							' AND f.itemid=i.itemid'.
+							' AND i.hostid=h.hostid'.
+							' AND h.maintenance_status='.HOST_MAINTENANCE_STATUS_ON.
 					')';
 			$sqlParts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}

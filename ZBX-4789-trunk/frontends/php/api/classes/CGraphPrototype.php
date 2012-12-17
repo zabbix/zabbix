@@ -114,7 +114,8 @@ class CGraphPrototype extends CGraphGeneral {
 						' AND gi.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY gi.graphid'.
-					' HAVING MIN(r.permission)>='.$permission.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
 					')';
 		}
 
