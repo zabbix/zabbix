@@ -35,8 +35,20 @@ class dbConditionIntTest extends PHPUnit_Framework_TestCase {
 				' field BETWEEN 1 AND 100'
 			),
 			array(
+				array('field', array(1)),
+				' field=1'
+			),
+			array(
+				array('field', array(1), true),
+				' field!=1'
+			),
+			array(
 				array('field', range(1, 20, 5)),
 				' field IN (1,6,11,16)'
+			),
+			array(
+				array('field', range(1, 20, 5), true),
+				' field NOT IN (1,6,11,16)'
 			),
 			array(
 				array('field', range(1, 100, 10)),
@@ -47,8 +59,24 @@ class dbConditionIntTest extends PHPUnit_Framework_TestCase {
 				' (field BETWEEN 1 AND 10 OR field BETWEEN 20 AND 30)'
 			),
 			array(
+				array('field', array_merge(range(1, 10), range(20, 30)), true),
+				' (NOT field BETWEEN 1 AND 10 AND NOT field BETWEEN 20 AND 30)'
+			),
+			array(
 				array('field', array_merge(range(1, 4), range(1, 4), range(20, 30))),
 				' (field BETWEEN 20 AND 30 OR field IN (1,2,3,4,1,2,3,4))'
+			),
+			array(
+				array('field', array_merge(range(1, 4), range(1, 4), range(20, 30)), true),
+				' (NOT field BETWEEN 20 AND 30 AND field NOT IN (1,2,3,4,1,2,3,4))'
+			),
+			array(
+				array('field', array_merge(range(20, 30), array(10))),
+				' (field BETWEEN 20 AND 30 OR field=10)'
+			),
+			array(
+				array('field', array_merge(range(20, 30), array(10)), true),
+				' (NOT field BETWEEN 20 AND 30 AND field!=10)'
 			),
 			array(
 				array('field', array('9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806', '9223372036854775807')),
