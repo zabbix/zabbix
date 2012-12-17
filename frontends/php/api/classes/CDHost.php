@@ -53,7 +53,6 @@ class CDHost extends CZBXAPI {
  * @param boolean $options['selectItems'] select Items
  * @param boolean $options['selectTriggers'] select Triggers
  * @param boolean $options['selectGraphs'] select Graphs
- * @param boolean $options['selectApplications'] select Applications
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
