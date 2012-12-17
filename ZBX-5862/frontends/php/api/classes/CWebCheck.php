@@ -503,7 +503,7 @@ class CWebCheck extends CZBXAPI {
 	protected function validateCreate(array $httpTests) {
 		$httpTestsNames = $this->checkNames($httpTests);
 
-		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.DBcondition('ht.name', $httpTestsNames), 1))) {
+		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.dbConditionString('ht.name', $httpTestsNames), 1))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $name['name']));
 		}
 
@@ -533,7 +533,7 @@ class CWebCheck extends CZBXAPI {
 		$httpTestsNames = $this->checkNames($httpTests);
 
 		$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.
-				DBcondition('ht.name', $httpTestsNames).
+				dbConditionString('ht.name', $httpTestsNames).
 				' AND '.dbConditionInt('ht.httptestid', $httpTestIds, true), 1));
 		if ($nameExists) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $nameExists['name']));
@@ -701,7 +701,7 @@ class CWebCheck extends CZBXAPI {
 		$sql = 'SELECT h.httpstepid,h.name'.
 				' FROM httpstep h'.
 				' WHERE h.httptestid='.$httpTest['httptestid'].
-					' AND '.DBcondition('h.name', $webstepsNames);
+					' AND '.dbConditionString('h.name', $webstepsNames);
 		if ($httpstepData = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstepData['name']));
 		}

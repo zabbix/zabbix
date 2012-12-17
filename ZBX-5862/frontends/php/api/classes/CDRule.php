@@ -731,7 +731,7 @@ class CDRule extends CZBXAPI {
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.DBcondition('value', $druleids);
+				' AND '.dbConditionString('value', $druleids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[] = $dbAction['actionid'];
@@ -760,7 +760,7 @@ class CDRule extends CZBXAPI {
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-				' AND '.DBcondition('value', $checkids);
+				' AND '.dbConditionString('value', $checkids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions))
 			$actionids[] = $dbAction['actionid'];
@@ -774,7 +774,7 @@ class CDRule extends CZBXAPI {
 			// delete action conditions
 			DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $checkids));
+					' AND '.dbConditionString('value', $checkids));
 		}
 
 		DB::delete('dchecks', array('dcheckid' => $checkids));

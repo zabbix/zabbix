@@ -764,7 +764,7 @@ class CHostGroup extends CZBXAPI {
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
 			' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-				' AND '.DBcondition('c.value', $groupids)
+				' AND '.dbConditionString('c.value', $groupids)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];

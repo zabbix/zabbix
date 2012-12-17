@@ -360,7 +360,7 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('Table "%1$s" doesn\'t have a field named "%2$s".', $tableName, $field));
 			}
 
-			$sqlWhere[] = DBcondition($field, zbx_toArray($value));
+			$sqlWhere[] = dbConditionString($field, zbx_toArray($value));
 		}
 
 		// build query
@@ -457,7 +457,7 @@ class DB {
 				$values = zbx_toArray($values);
 				sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
 
-				$sqlWhere[] = DBcondition($field, $values);
+				$sqlWhere[] = dbConditionString($field, $values);
 			}
 
 			// sql execution
@@ -623,7 +623,7 @@ class DB {
 			$values = zbx_toArray($values);
 			sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
 
-			$sqlWhere[] = DBcondition($field, $values);
+			$sqlWhere[] = dbConditionString($field, $values);
 		}
 
 		$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);

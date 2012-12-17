@@ -202,8 +202,8 @@ class CUserMacro extends CZBXAPI {
 			if (isset($options['filter']['macro'])) {
 				zbx_value2array($options['filter']['macro']);
 
-				$sqlParts['where'][] = DBcondition('hm.macro', $options['filter']['macro']);
-				$sqlPartsGlobal['where'][] = DBcondition('gm.macro', $options['filter']['macro']);
+				$sqlParts['where'][] = dbConditionString('hm.macro', $options['filter']['macro']);
+				$sqlPartsGlobal['where'][] = dbConditionString('gm.macro', $options['filter']['macro']);
 			}
 		}
 

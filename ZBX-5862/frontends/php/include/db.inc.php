@@ -992,7 +992,7 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 			continue;
 		}
 		zbx_value2array($value);
-		$filter[$field] = DBcondition($tableShort.'.'.$field, $value);
+		$filter[$field] = dbConditionString($tableShort.'.'.$field, $value);
 	}
 
 	if (!empty($filter)) {
@@ -1181,25 +1181,36 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	return $condition;
 }
 
-function DBcondition($fieldname, $array, $notin = false) {
-	$condition = '';
-
-	if (!is_array($array)) {
-		throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array  $values     array of string values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionString($fieldName, array $values, $notIn = false) {
+	switch (count($values)) {
+		case 0:
+			return ' 1=0';
+		case 1:
+			return $notIn
+				? ' '.$fieldName.'!='.zbx_dbstr(reset($values))
+				: ' '.$fieldName.'='.zbx_dbstr(reset($values));
 	}
 
-	$in = $notin ? ' NOT IN ':' IN ';
-	$concat = $notin ? ' AND ':' OR ';
+	$in = $notIn ? ' NOT IN ' : ' IN ';
+	$concat = $notIn ? ' AND ' : ' OR ';
+	$items = array_chunk($values, 950);
 
-	$items = array_chunk($array, 950);
+	$condition = '';
 	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldname.$in.'(' : '';
+		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
 		$condition .= implode(',', zbx_dbstr($values));
 	}
-	if (zbx_empty($condition)) {
-		return ' 1=0 ';
-	}
-	return ' ('.$fieldname.$in.'('.$condition.')) ';
+
+	return ' '.$fieldName.$in.'('.$condition.')';
 }
 
 function zero2null($val) {

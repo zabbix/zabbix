@@ -1008,7 +1008,7 @@ class CConfigurationImport {
 		$imagesToUpdate = array();
 		$allImages = zbx_toHash($allImages, 'name');
 
-		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.DBcondition('i.name', array_keys($allImages)));
+		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.dbConditionString('i.name', array_keys($allImages)));
 		while ($dbImage = DBfetch($dbImages)) {
 			$dbImage['image'] = $allImages[$dbImage['name']]['image'];
 			$imagesToUpdate[] = $dbImage;

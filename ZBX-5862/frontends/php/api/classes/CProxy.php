@@ -501,7 +501,7 @@ class CProxy extends CZBXAPI {
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
 			' WHERE c.conditiontype='.CONDITION_TYPE_PROXY.
-				' AND '.DBcondition('c.value', $proxyIds)
+				' AND '.dbConditionString('c.value', $proxyIds)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];

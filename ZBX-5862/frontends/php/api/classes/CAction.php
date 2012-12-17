@@ -225,7 +225,7 @@ class CAction extends CZBXAPI {
 				$sqlParts['select']['groupids'] = 'c.value';
 			}
 			$sqlParts['from']['conditions'] = 'conditions c';
-			$sqlParts['where'][] = DBcondition('c.value', $options['groupids']);
+			$sqlParts['where'][] = dbConditionString('c.value', $options['groupids']);
 			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST_GROUP;
 			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
@@ -238,7 +238,7 @@ class CAction extends CZBXAPI {
 				$sqlParts['select']['hostids'] = 'c.value';
 			}
 			$sqlParts['from']['conditions'] = 'conditions c';
-			$sqlParts['where'][] = DBcondition('c.value', $options['hostids']);
+			$sqlParts['where'][] = dbConditionString('c.value', $options['hostids']);
 			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST;
 			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
@@ -251,7 +251,7 @@ class CAction extends CZBXAPI {
 				$sqlParts['select']['triggerids'] = 'c.value';
 			}
 			$sqlParts['from']['conditions'] = 'conditions c';
-			$sqlParts['where'][] = DBcondition('c.value', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionString('c.value', $options['triggerids']);
 			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_TRIGGER;
 			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
