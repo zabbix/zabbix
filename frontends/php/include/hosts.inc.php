@@ -916,7 +916,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	if (USER_TYPE_SUPER_ADMIN != CWebUser::$data['type']) {
 		$userGroups = getUserGroupsByUserId($userid);
 
-		$sqlParts['where'][] = 'EXISTS ('.
+		$def_sql['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM hosts_groups hgg'.
 					' JOIN rights r'.
@@ -924,7 +924,8 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 							' AND '.DBcondition('r.groupid', $userGroups).
 				' WHERE h.hostid=hgg.hostid'.
 				' GROUP BY hgg.hostid'.
-				' HAVING MIN(r.permission)>='.$perm.
+				' HAVING MIN(r.permission)>'.PERM_DENY.
+					' AND MAX(r.permission)>='.$perm.
 				')';
 	}
 

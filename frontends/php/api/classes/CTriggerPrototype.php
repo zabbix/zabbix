@@ -142,7 +142,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 						' AND f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>='.$permission.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
 					')';
 		}
 

@@ -123,7 +123,8 @@ class CHostGroup extends CZBXAPI {
 				' WHERE g.groupid=r.id'.
 					' AND '.DBcondition('r.groupid', $userGroups).
 				' GROUP BY r.id'.
-				' HAVING MIN(r.permission)>='.$permission.
+				' HAVING MIN(r.permission)>'.PERM_DENY.
+					' AND MAX(r.permission)>='.$permission.
 				')';
 		}
 

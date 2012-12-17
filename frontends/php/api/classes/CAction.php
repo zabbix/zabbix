@@ -126,7 +126,8 @@ class CAction extends CZBXAPI {
 						' AND cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
-						' OR MIN(r.permission)<'.$permission.
+						' OR MIN(r.permission)='.PERM_DENY.
+						' OR MAX(r.permission)<'.$permission.
 					')';
 
 			// condition host or template
@@ -141,7 +142,8 @@ class CAction extends CZBXAPI {
 						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_HOST_TEMPLATE.')'.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
-						' OR MIN(r.permission)<'.$permission.
+						' OR MIN(r.permission)='.PERM_DENY.
+						' OR MAX(r.permission)<'.$permission.
 					')';
 
 			// condition trigger
@@ -158,7 +160,8 @@ class CAction extends CZBXAPI {
 						' AND cc.conditiontype='.CONDITION_TYPE_TRIGGER.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
-						' OR MIN(r.permission)<'.$permission.
+						' OR MIN(r.permission)='.PERM_DENY.
+						' OR MAX(r.permission)<'.$permission.
 					')';
 		}
 
