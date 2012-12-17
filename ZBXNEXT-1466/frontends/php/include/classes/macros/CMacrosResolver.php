@@ -286,7 +286,7 @@ class CMacrosResolver {
 			if ($isHostMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_HOST_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
-						$macroValues[$triggerId][$this->getMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
+						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
 
 						if (isset($functions[$fNum])) {
 							$macros['host'][$functions[$fNum]][$macro][] = $fNum;
@@ -298,7 +298,7 @@ class CMacrosResolver {
 			if ($isIpMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_IP_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
-						$macroValues[$triggerId][$this->getMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
+						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
 
 						if (isset($functions[$fNum])) {
 							$macros['ip'][$functions[$fNum]][$macro][] = $fNum;
@@ -310,7 +310,7 @@ class CMacrosResolver {
 			if ($isItemMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_ITEM_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
-						$macroValues[$triggerId][$this->getMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
+						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
 
 						if (isset($functions[$fNum])) {
 							$macros['item'][$functions[$fNum]][$macro][] = $fNum;
@@ -526,7 +526,7 @@ class CMacrosResolver {
 							break;
 					}
 
-					$macroValues = $this->prepareMacroValues($macroValues, $fNums, $func['triggerid'], $macro, $replace);
+					$macroValues = $this->prepareFunctionMacroValues($macroValues, $fNums, $func['triggerid'], $macro, $replace);
 				}
 			}
 		}
@@ -578,7 +578,7 @@ class CMacrosResolver {
 							break;
 					}
 
-					$macroValues = $this->prepareMacroValues($macroValues, $fNums, $interface['triggerid'], $macro, $replace);
+					$macroValues = $this->prepareFunctionMacroValues($macroValues, $fNums, $interface['triggerid'], $macro, $replace);
 				}
 			}
 		}
@@ -617,7 +617,7 @@ class CMacrosResolver {
 							break;
 					}
 
-					$macroValues = $this->prepareMacroValues($macroValues, $fNums, $func['triggerid'], $macro, $replace);
+					$macroValues = $this->prepareFunctionMacroValues($macroValues, $fNums, $func['triggerid'], $macro, $replace);
 				}
 			}
 		}
@@ -660,7 +660,7 @@ class CMacrosResolver {
 	}
 
 	/**
-	 * Add macro name with corresponding value to replace to $macroValues array.
+	 * Add function macro name with corresponding value to replace to $macroValues array.
 	 *
 	 * @param array  $macroValues
 	 * @param array  $fNums
@@ -670,9 +670,9 @@ class CMacrosResolver {
 	 *
 	 * @return array
 	 */
-	private function prepareMacroValues(array $macroValues, array $fNums, $triggerId, $macro, $replace) {
+	private function prepareFunctionMacroValues(array $macroValues, array $fNums, $triggerId, $macro, $replace) {
 		foreach ($fNums as $fNum) {
-			$macroValues[$triggerId][$this->getMacroName($macro, $fNum)] = $replace;
+			$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = $replace;
 		}
 
 		return $macroValues;
@@ -686,7 +686,7 @@ class CMacrosResolver {
 	 *
 	 * @return string
 	 */
-	private function getMacroName($macro, $fNum) {
+	private function getFunctionMacroName($macro, $fNum) {
 		return '{'.(($fNum == 0) ? $macro : $macro.$fNum).'}';
 	}
 
