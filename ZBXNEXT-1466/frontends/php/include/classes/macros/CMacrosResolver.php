@@ -66,7 +66,7 @@ class CMacrosResolver {
 			'method' => 'resolveTrigger'
 		),
 		'triggerDescription' => array(
-			'types' => array('host', 'ip', 'user', 'item', 'reference'),
+			'types' => array('host', 'ip', 'user', 'item'),
 			'source' => 'comments',
 			'method' => 'resolveTrigger'
 		),
