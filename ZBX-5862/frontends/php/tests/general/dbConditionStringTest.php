@@ -20,25 +20,23 @@
 
 
 require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../../conf/zabbix.conf.php';
-require_once dirname(__FILE__).'/../../include/classes/debug/CProfiler.php';
-require_once dirname(__FILE__).'/../../include/db.inc.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class dbConditionStringTest extends PHPUnit_Framework_TestCase {
+class dbConditionStringTest extends CZabbixTest {
 
 	public static function provider() {
 		return array(
 			array(
 				array('field', array()),
-				' 1=0'
+				'1=0'
 			),
 			array(
-				array('field', array(1)),
-				' field=1'
+				array('field', array('a')),
+				'field=\'a\''
 			),
 			array(
-				array('field', array(1), true),
-				' field!=1'
+				array('field', array('a'), true),
+				'field!=\'a\''
 			)
 		);
 	}
@@ -47,8 +45,6 @@ class dbConditionStringTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider provider
 	 */
 	public function test($params, $expectedResult) {
-		DBConnect($error);
-
 		$result = call_user_func_array('dbConditionString', $params);
 
 		$this->assertSame($expectedResult, $result);

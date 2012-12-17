@@ -1092,10 +1092,10 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	$MIN_NUM_BETWEEN = 5; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
 	if (count($values) == 0) {
-		return ' 1=0';
+		return '1=0';
 	}
 
-	$condition = ' ';
+	$condition = '';
 
 	$betweens = array();
 	$ins = array();
@@ -1193,11 +1193,11 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 function dbConditionString($fieldName, array $values, $notIn = false) {
 	switch (count($values)) {
 		case 0:
-			return ' 1=0';
+			return '1=0';
 		case 1:
 			return $notIn
-				? ' '.$fieldName.'!='.zbx_dbstr(reset($values))
-				: ' '.$fieldName.'='.zbx_dbstr(reset($values));
+				? $fieldName.'!='.zbx_dbstr(reset($values))
+				: $fieldName.'='.zbx_dbstr(reset($values));
 	}
 
 	$in = $notIn ? ' NOT IN ' : ' IN ';
@@ -1210,7 +1210,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 		$condition .= implode(',', zbx_dbstr($values));
 	}
 
-	return ' '.$fieldName.$in.'('.$condition.')';
+	return $fieldName.$in.'('.$condition.')';
 }
 
 function zero2null($val) {
