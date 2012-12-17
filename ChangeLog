@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F....... [ZBXNEXT-484] added filtering by application in Monitoring->Overview and Data/Triggers overview screen elements (Vedmak)
 ........S. [ZBXNEXT-1089] added support of user macros in global scripts (Sasha)
 A.F.I..PS. [ZBXNEXT-1526] added support of configurable number of retries per WEB scenario (Alexei)
 A.F.....S. [ZBXNEXT-1286] added support of low-level discovery macros in trigger prototype expressions (Sasha)
@@ -66,9 +67,13 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-.......PS. [ZBX-3071] fixed reading and writing of Oracle NCLOB fields (Andris, Sasha)
+..F....... [ZBX-5979] fixed monitoring events page, hidden triggers with not monitored items (Oleg)
+..F....... [ZBX-5985] fixed DB error in "Configuration of web monitoring" for PostgreSQL (Oleg)
+..F....... [ZBX-5699] fixed configuration graph host id passing in navigation (Eduard)
+A......... [ZBX-1946] improved error messages when validating screen item row and column spans (Pavels)
 ..F....... [ZBX-3402] disabled "store value" overriding for host items inherited from templates (Pavels)
 ..F....... [ZBX-3402] fixed the "formula" input not being displayed when editing templated items with a disabled multiplier (Pavels)
+.......PS. [ZBX-3071] fixed reading and writing of Oracle NCLOB fields (Andris, Sasha)
 A.F....... [ZBX-5704] fixed validation on file uploading (Eduard)
 A......... [ZBX-5737] fixed image saving using Oracle (Eduard)
 ..F....... [ZBX-5809] fixed global URL displaying in map screen item (Eduard)

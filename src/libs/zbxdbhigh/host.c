@@ -1382,6 +1382,7 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 	housekeeperid = DBget_maxid_num("housekeeper", ZBX_HISTORY_TABLES_COUNT * itemids->values_num);
 
 	sql = zbx_malloc(sql, sql_alloc);
+
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 #ifdef HAVE_MULTIROW_INSERT
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_housekeeper_sql);
@@ -1399,16 +1400,12 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-	{
 #ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	sql_offset--;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
-		DBexecute("%s", sql);
-	}
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBexecute("%s", sql);
 
 	zbx_free(sql);
 
