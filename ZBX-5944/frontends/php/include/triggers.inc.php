@@ -2396,7 +2396,8 @@ function get_item_function_info($expr) {
 }
 
 /**
- * Execute expression and return result as 'TRUE' or 'FALSE'.
+ * Execute expression and return array with keys 'result' as 'TRUE' or 'FALSE' and 'error' as error text
+ * if there is one.
  *
  * @param string $expression
  * @param array  $rplcts
