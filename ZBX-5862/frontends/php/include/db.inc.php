@@ -1155,7 +1155,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 
 	if ($inNum == 1) {
 		foreach ($ins as $insValue) {
-			$condition .= $fieldName.'='.$insValue;
+			$condition .= $notIn
+				? $fieldName.'!='.$insValue
+				: $fieldName.'='.$insValue;
 			break;
 		}
 	}
