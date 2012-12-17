@@ -916,7 +916,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	if (USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']) {
 		$userGroups = getUserGroupsByUserId($userid);
 
-		$sqlParts['where'][] = 'EXISTS ('.
+		$def_sql['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM hosts_groups hgg'.
 					' JOIN rights r'.
