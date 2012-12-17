@@ -2395,6 +2395,15 @@ function get_item_function_info($expr) {
 	return $result;
 }
 
+/**
+ * Execute expression and return result as 'TRUE' or 'FALSE'.
+ *
+ * @param string $expression
+ * @param array  $rplcts
+ * @param bool   $oct
+ *
+ * @return array
+ */
 function evalExpressionData($expression, $rplcts, $oct = false) {
 	$result = false;
 
