@@ -96,25 +96,24 @@ class CMacrosResolver {
 		// call method
 		$method = $this->configs[$this->config]['method'];
 
-		return $this->$method($options);
+		return $this->$method($options['data']);
 	}
 
 	/**
 	 * Batch resolving macros in text using host id.
 	 *
-	 * @param array $options
-	 * @param array $options['data'] (as $hostid => array(texts))
+	 * @param array $data (as $hostId => array(texts))
 	 *
-	 * @return array (as $hostid => array(texts))
+	 * @return array (as $hostId => array(texts))
 	 */
-	private function resolveTexts(array $options) {
-		$hostIds = array_keys($options['data']);
+	private function resolveTexts(array $data) {
+		$hostIds = array_keys($data);
 
 		$macros = array();
 
 		$isHostMacrosAvailable = false;
 		if ($this->isTypeAvailable('host')) {
-			foreach ($options['data'] as $hostId => $texts) {
+			foreach ($data as $hostId => $texts) {
 				$hostMacros = $this->findMacros(self::PATTERN_HOST, $texts);
 				if (!empty($hostMacros)) {
 					foreach ($hostMacros as $hostMacro) {
@@ -128,7 +127,7 @@ class CMacrosResolver {
 
 		$isIpMacrosAvailable = false;
 		if ($this->isTypeAvailable('ip')) {
-			foreach ($options['data'] as $hostId => $texts) {
+			foreach ($data as $hostId => $texts) {
 				$ipMacros = $this->findMacros(self::PATTERN_IP, $texts);
 				if (!empty($ipMacros)) {
 					foreach ($ipMacros as $ipMacro) {
@@ -145,7 +144,7 @@ class CMacrosResolver {
 			$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.DBcondition('h.hostid', $hostIds));
 			while ($dbHost = DBfetch($dbHosts)) {
 				$hostId = $dbHost['hostid'];
-				$hostMacros = $this->findMacros(self::PATTERN_HOST, $options['data'][$hostId]);
+				$hostMacros = $this->findMacros(self::PATTERN_HOST, $data[$hostId]);
 
 				if (!empty($hostMacros)) {
 					foreach ($hostMacros as $hostMacro) {
@@ -184,7 +183,7 @@ class CMacrosResolver {
 
 			if (!empty($interfaces)) {
 				foreach ($interfaces as $hostId => $interface) {
-					$ipMacros = $this->findMacros(self::PATTERN_IP, $options['data'][$hostId]);
+					$ipMacros = $this->findMacros(self::PATTERN_IP, $data[$hostId]);
 
 					if (!empty($ipMacros)) {
 						foreach ($ipMacros as $ipMacro) {
@@ -219,7 +218,7 @@ class CMacrosResolver {
 			}
 		}
 
-		foreach ($options['data'] as $hostId => $texts) {
+		foreach ($data as $hostId => $texts) {
 			// get user macros
 			if ($this->isTypeAvailable('user')) {
 				$macros[$hostId] = !empty($macros[$hostId])
@@ -238,11 +237,11 @@ class CMacrosResolver {
 					$text = substr_replace($text, $macrosValue, $matche[1], strlen($matche[0]));
 				}
 
-				$options['data'][$hostId][$tnum] = $text;
+				$data[$hostId][$tnum] = $text;
 			}
 		}
 
-		return $options['data'];
+		return $data;
 	}
 
 	/**
@@ -252,12 +251,14 @@ class CMacrosResolver {
 	 * System macros: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}, {IPADDRESS}, {HOST.IP}
 	 *     {HOST.DNS}, {HOST.CONN}, {ITEM.LASTVALUE}, {ITEM.VALUE}
 	 *
-	 * @param array $options
-	 * @param array $options['data] (as $triggerId => $trigger)
+	 * @param array  $data (as int $triggerId => array $trigger)
+	 * @param string $data[$triggerId]['expression']
+	 * @param string $data[$triggerId]['description'] depend from config
+	 * @param string $data[$triggerId]['comments'] depend from config
 	 *
 	 * @return array
 	 */
-	private function resolveTrigger(array $options) {
+	private function resolveTrigger(array $data) {
 		$macros = array('host' => array(), 'ip' => array(), 'item' => array());
 		$macroValues = array();
 
@@ -272,11 +273,11 @@ class CMacrosResolver {
 		$isReferenceMacrosAvailable = $this->isTypeAvailable('reference');
 
 		// find macros
-		foreach ($options['data'] as $triggerId => $trigger) {
+		foreach ($data as $triggerId => $trigger) {
 			$functions = $this->findFunctions($trigger['expression']);
 
 			if ($isUserMacrosAvailable) {
-				$macroValues[$trigger['triggerid']] = $this->getUserMacros(array($trigger[$source]), array('triggerid' => $trigger['triggerid']));
+				$macroValues[$triggerId] = $this->getUserMacros(array($trigger[$source]), array('triggerid' => $triggerId));
 			}
 
 			if ($isHostMacrosAvailable) {
@@ -330,11 +331,11 @@ class CMacrosResolver {
 			$macroValues = $this->resolveIpMacros($macros['ip'], $macroValues);
 		}
 		if ($isItemMacrosAvailable) {
-			$macroValues = $this->resolveItemMacros($macros['item'], $options['data'], $macroValues);
+			$macroValues = $this->resolveItemMacros($macros['item'], $data, $macroValues);
 		}
 
 		// replace macros to value
-		foreach ($options['data'] as $triggerId => $trigger) {
+		foreach ($data as $triggerId => $trigger) {
 			preg_match_all('/'.self::PATTERN_HOST_FUNCTION.
 								'|'.self::PATTERN_IP_FUNCTION.
 								'|'.self::PATTERN_ITEM_FUNCTION.
@@ -348,10 +349,10 @@ class CMacrosResolver {
 				$trigger[$source] = substr_replace($trigger[$source], $macrosValue, $matche[1], strlen($matche[0]));
 			}
 
-			$options['data'][$triggerId][$source] = $trigger[$source];
+			$data[$triggerId][$source] = $trigger[$source];
 		}
 
-		return $options['data'];
+		return $data;
 	}
 
 	/**
@@ -412,8 +413,8 @@ class CMacrosResolver {
 	 *
 	 * @param array $texts
 	 * @param array $options
-	 * @param int $options['hostid']
-	 * @param int $options['triggerid']
+	 * @param int   $options['hostid']
+	 * @param int   $options['triggerid']
 	 *
 	 * @return array
 	 */
@@ -433,7 +434,7 @@ class CMacrosResolver {
 	 * Find macros in text by pattern.
 	 *
 	 * @param string $pattern
-	 * @param array $texts
+	 * @param array  $texts
 	 *
 	 * @return array
 	 */
@@ -501,13 +502,13 @@ class CMacrosResolver {
 	 *
 	 * @return bool
 	 */
-	private function resolveHostMacros(array $macros, array $macroValues = array()) {
+	private function resolveHostMacros(array $macros, array $macroValues) {
 		if (!empty($macros)) {
 			$dbFuncs = DBselect(
-				'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name'.
+				'SELECT f.triggerid,f.functionid,h.host,h.name'.
 				' FROM functions f'.
-					' INNER JOIN items i ON f.itemid=i.itemid'.
-					' INNER JOIN hosts h ON i.hostid=h.hostid'.
+					' JOIN items i ON f.itemid=i.itemid'.
+					' JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE '.DBcondition('f.functionid', array_keys($macros))
 			);
 			while ($func = DBfetch($dbFuncs)) {
@@ -538,13 +539,13 @@ class CMacrosResolver {
 	 *
 	 * @return bool
 	 */
-	private function resolveIpMacros(array $macros, array $macroValues = array()) {
+	private function resolveIpMacros(array $macros, array $macroValues) {
 		if (!empty($macros)) {
 			$dbInterfaces = DBselect(
-				'SELECT DISTINCT f.triggerid,f.functionid,n.ip,n.dns,n.type,n.useip'.
+				'SELECT f.triggerid,f.functionid,n.ip,n.dns,n.type,n.useip'.
 				' FROM functions f'.
-					' INNER JOIN items i ON f.itemid=i.itemid'.
-					' INNER JOIN interface n ON i.hostid=n.hostid'.
+					' JOIN items i ON f.itemid=i.itemid'.
+					' JOIN interface n ON i.hostid=n.hostid'.
 				' WHERE '.DBcondition('f.functionid', array_keys($macros)).
 					' AND n.main=1'
 			);
@@ -591,13 +592,13 @@ class CMacrosResolver {
 	 *
 	 * @return bool
 	 */
-	private function resolveItemMacros(array $macros, array $triggers, array $macroValues = array()) {
+	private function resolveItemMacros(array $macros, array $triggers, array $macroValues) {
 		if (!empty($macros)) {
 			$dbFuncs = DBselect(
-				'SELECT DISTINCT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
+				'SELECT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
 				' FROM functions f'.
-					' INNER JOIN items i ON f.itemid=i.itemid'.
-					' INNER JOIN hosts h ON i.hostid=h.hostid'.
+					' JOIN items i ON f.itemid=i.itemid'.
+					' JOIN hosts h ON i.hostid=h.hostid'.
 					' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
 				' WHERE '.DBcondition('f.functionid', array_keys($macros))
 			);
@@ -688,9 +689,7 @@ class CMacrosResolver {
 	 * @return bool
 	 */
 	private function isTypeAvailable($type) {
-		$types = array_flip($this->configs[$this->config]['types']);
-
-		return isset($types[$type]);
+		return in_array($type, $this->configs[$this->config]['types']);
 	}
 
 	/**
