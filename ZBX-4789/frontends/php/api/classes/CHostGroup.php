@@ -204,7 +204,7 @@ class CHostGroup extends CZBXAPI {
 		// monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts, with_hosts_and_templates
 		if (!is_null($options['monitored_hosts'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM hosts h'.
@@ -244,7 +244,7 @@ class CHostGroup extends CZBXAPI {
 		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i'.
@@ -253,7 +253,7 @@ class CHostGroup extends CZBXAPI {
 		}
 		elseif (!is_null($options['with_monitored_items'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i,hosts h'.
@@ -265,7 +265,7 @@ class CHostGroup extends CZBXAPI {
 		}
 		elseif (!is_null($options['with_historical_items'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i'.
@@ -276,7 +276,7 @@ class CHostGroup extends CZBXAPI {
 		}
 		elseif (!is_null($options['with_simple_graph_items'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i'.
@@ -290,7 +290,7 @@ class CHostGroup extends CZBXAPI {
 		// with_triggers, with_monitored_triggers
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i,functions f'.
@@ -300,7 +300,7 @@ class CHostGroup extends CZBXAPI {
 		}
 		elseif (!is_null($options['with_monitored_triggers'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i,hosts h,functions f,triggers t'.
@@ -317,7 +317,7 @@ class CHostGroup extends CZBXAPI {
 		// with_httptests, with_monitored_httptests
 		if (!is_null($options['with_httptests'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM applications a,httptest ht'.
@@ -327,7 +327,7 @@ class CHostGroup extends CZBXAPI {
 		}
 		elseif (!is_null($options['with_monitored_httptests'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM hosts h,applications a,httptest ht'.
@@ -342,7 +342,7 @@ class CHostGroup extends CZBXAPI {
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i,graphs_items gi'.
@@ -353,11 +353,9 @@ class CHostGroup extends CZBXAPI {
 
 		if (!is_null($options['with_applications'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'h.hostid=hg.hostid';
-			$sqlParts['where'][] = 'a.hostid=h.hostid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
+			$sqlParts['where'][] = 'hg.hostid=a.hostid';
 		}
 
 		// output
