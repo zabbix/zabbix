@@ -224,10 +224,7 @@ else if (isset($_REQUEST['hostid'])) {
 	$rep2_wdgt->addFlicker($filter['form'], CProfile::get('web.avail_report.filter.state', 0));
 
 	$triggers = API::Trigger()->get($filter['options']);
-	CArrayHelper::sort($triggers, array(
-		'host',
-		'description'
-	));
+	CArrayHelper::sort($triggers, array('host', 'description'));
 
 	$table = new CTableInfo(_('No triggers defined.'));
 	$table->setHeader(array(

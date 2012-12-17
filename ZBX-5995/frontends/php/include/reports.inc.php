@@ -174,7 +174,6 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $opt
 
 	$filterForm->addRow(_('Period'), $filtertimetab);
 
-//*/
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set',_('Filter')));
 
 	$reset = new CButton("filter_rst", _('Reset'), 'javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
