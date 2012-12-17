@@ -593,9 +593,9 @@ function validateUserMacro($value) {
 }
 
 /**
- * Validate, if max time < 2038.01.19 00:00.
+ * Validate, if time <= 2147464800 (2038.01.19 00:00).
  *
- * @param string $time
+ * @param int $time
  *
  * @return bool
  */
@@ -604,13 +604,13 @@ function validateMaxTime($time) {
 }
 
 /**
- * Validate date and time.
+ * Validate if date and time are in correct range, e.g. month is not greater than 12 etc.
  *
- * @param string $year
- * @param string $month
- * @param string $day
- * @param string $minutes
- * @param string $seconds
+ * @param int $year
+ * @param int $month
+ * @param int $day
+ * @param int $minutes
+ * @param int $seconds
  *
  * @return bool
  */
@@ -624,11 +624,11 @@ function validateDateTime($year, $month, $day, $hours, $minutes, $seconds = null
 }
 
 /**
- * Validate allowed date interval(1970.01.01-2038.01.18).
+ * Validate allowed date interval (1970.01.01-2038.01.18).
  *
- * @param string $year
- * @param string $month
- * @param string $day
+ * @param int $year
+ * @param int $month
+ * @param int $day
  *
  * @return bool
  */
