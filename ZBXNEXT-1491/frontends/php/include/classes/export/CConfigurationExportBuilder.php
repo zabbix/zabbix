@@ -584,21 +584,22 @@ class CConfigurationExportBuilder {
 
 		foreach ($screenItems as $screenItem) {
 			$result[] = array(
-				'resourcetype'=> $screenItem['resourcetype'],
-				'width'=> $screenItem['width'],
-				'height'=> $screenItem['height'],
-				'x'=> $screenItem['x'],
-				'y'=> $screenItem['y'],
-				'colspan'=> $screenItem['colspan'],
-				'rowspan'=> $screenItem['rowspan'],
-				'elements'=> $screenItem['elements'],
-				'valign'=> $screenItem['valign'],
-				'halign'=> $screenItem['halign'],
-				'style'=> $screenItem['style'],
-				'url'=> $screenItem['url'],
-				'dynamic'=> $screenItem['dynamic'],
-				'sort_triggers'=> $screenItem['sort_triggers'],
-				'resource'=> $screenItem['resourceid']
+				'resourcetype' => $screenItem['resourcetype'],
+				'width' => $screenItem['width'],
+				'height' => $screenItem['height'],
+				'x' => $screenItem['x'],
+				'y' => $screenItem['y'],
+				'colspan' => $screenItem['colspan'],
+				'rowspan' => $screenItem['rowspan'],
+				'elements' => $screenItem['elements'],
+				'valign' => $screenItem['valign'],
+				'halign' => $screenItem['halign'],
+				'style' => $screenItem['style'],
+				'url' => $screenItem['url'],
+				'dynamic' => $screenItem['dynamic'],
+				'sort_triggers' => $screenItem['sort_triggers'],
+				'resource' => $screenItem['resourceid'],
+				'application' => $screenItem['application']
 			);
 		}
 		return $result;
