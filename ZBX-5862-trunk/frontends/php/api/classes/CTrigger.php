@@ -1374,7 +1374,7 @@ class CTrigger extends CTriggerGeneral {
 			'SELECT DISTINCT actionid'.
 			' FROM conditions'.
 			' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-				' AND '.dbConditionString('value', $pks, false, true)
+				' AND '.dbConditionString('value', $pks)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
