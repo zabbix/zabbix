@@ -347,9 +347,7 @@ class CAction extends CZBXAPI {
 			}
 		}
 
-		if (USER_TYPE_SUPER_ADMIN == $userType || !is_null($options['nopermissions'])) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// check hosts, templates
 			$hosts = $hostids = array();
 			$sql = 'SELECT o.actionid,och.hostid'.
