@@ -1223,7 +1223,7 @@ class CTrigger extends CTriggerGeneral {
 					$sql = 'SELECT i.itemid,i.value_type'.
 							' FROM items i,hosts h'.
 							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-								' AND'.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+								' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 								' AND h.host='.zbx_dbstr($exprPart['host']).
 								' AND h.hostid=i.hostid'.
 								' AND '.DBin_node('i.itemid');
@@ -1864,7 +1864,7 @@ class CTrigger extends CTriggerGeneral {
 				$res = DBselect(
 					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
-					' WHERE'.dbConditionInt('td.triggerid_down', $downTriggerIds)
+					' WHERE '.dbConditionInt('td.triggerid_down', $downTriggerIds)
 				);
 
 				// combine db dependencies with thouse to be added
@@ -1907,7 +1907,7 @@ class CTrigger extends CTriggerGeneral {
 					'SELECT DISTINCT ht.templateid,ht.hostid,h.host'.
 					' FROM hosts_templates ht,hosts h'.
 					' WHERE h.hostid=ht.hostid'.
-						' AND'.dbConditionInt('ht.templateid', $affectedTemplateIds)
+						' AND '.dbConditionInt('ht.templateid', $affectedTemplateIds)
 				);
 				$map = array();
 				while ($lowlvltpl = DBfetch($dbLowlvltpl)) {

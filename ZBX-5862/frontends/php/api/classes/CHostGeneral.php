@@ -170,7 +170,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			$res = DBselect(
 				'SELECT key_,COUNT(itemid) AS cnt'.
 				' FROM items'.
-				' WHERE'.dbConditionInt('hostid', $allids).
+				' WHERE '.dbConditionInt('hostid', $allids).
 				' GROUP BY key_'.
 				' HAVING COUNT(itemid)>1'
 			);
@@ -193,7 +193,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		// get DB templates which exists in all targets
-		$res = DBselect('SELECT * FROM hosts_templates WHERE'.dbConditionInt('hostid', $targetids));
+		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetids));
 		$mas = array();
 		while ($row = DBfetch($res)) {
 			if (!isset($mas[$row['templateid']])) {
