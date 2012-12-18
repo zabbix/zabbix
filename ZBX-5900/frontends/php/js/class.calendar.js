@@ -263,7 +263,7 @@ calendar.prototype = {
 			result = true;
 		}
 
-		if (y > 1970) {
+		if (y > 1969) {
 			this.sdt.setFullYear(y);
 			result = true;
 		}

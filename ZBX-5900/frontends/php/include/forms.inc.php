@@ -1639,36 +1639,36 @@
 
 			$start_date = zbxDateToTime($new_timeperiod['start_date']);
 			if (isset($_REQUEST['add_timeperiod'])) {
-				$new_timeperiod_year = get_request('new_timeperiod_year');
-				$new_timeperiod_month = get_request('new_timeperiod_month');
-				$new_timeperiod_day = get_request('new_timeperiod_day');
-				$new_timeperiod_hours = get_request('new_timeperiod_hour');
-				$new_timeperiod_minutes = get_request('new_timeperiod_minute');
+				$newTimePeriodYear = get_request('new_timeperiod_year');
+				$newTimePeriodMonth = get_request('new_timeperiod_month');
+				$newTimePeriodDay = get_request('new_timeperiod_day');
+				$newTimePeriodHours = get_request('new_timeperiod_hour');
+				$newTimePeriodMinutes = get_request('new_timeperiod_minute');
 			}
 			elseif ($start_date > 0) {
-				$new_timeperiod_year = date('Y', $start_date );
-				$new_timeperiod_month = date('m', $start_date );
-				$new_timeperiod_day = date('d', $start_date );
-				$new_timeperiod_hours = date('H', $start_date );
-				$new_timeperiod_minutes = date('i', $start_date );
+				$newTimePeriodYear = date('Y', $start_date );
+				$newTimePeriodMonth = date('m', $start_date );
+				$newTimePeriodDay = date('d', $start_date );
+				$newTimePeriodHours = date('H', $start_date );
+				$newTimePeriodMinutes = date('i', $start_date );
 			}
 			else {
-				$new_timeperiod_year = '';
-				$new_timeperiod_month = '';
-				$new_timeperiod_day = '';
-				$new_timeperiod_hours = '';
-				$new_timeperiod_minutes = '';
+				$newTimePeriodYear = '';
+				$newTimePeriodMonth = '';
+				$newTimePeriodDay = '';
+				$newTimePeriodHours = '';
+				$newTimePeriodMinutes = '';
 			}
 			$filtertimetab->addRow(array(
-				new CNumericBox('new_timeperiod_day', $new_timeperiod_day, 2),
+				new CNumericBox('new_timeperiod_day', $newTimePeriodDay, 2),
 				'/',
-				new CNumericBox('new_timeperiod_month', $new_timeperiod_month, 2),
+				new CNumericBox('new_timeperiod_month', $newTimePeriodMonth, 2),
 				'/',
-				new CNumericBox('new_timeperiod_year', $new_timeperiod_year, 4),
+				new CNumericBox('new_timeperiod_year', $newTimePeriodYear, 4),
 				SPACE,
-				new CNumericBox('new_timeperiod_hour', $new_timeperiod_hours, 2),
+				new CNumericBox('new_timeperiod_hour', $newTimePeriodHours, 2),
 				':',
-				new CNumericBox('new_timeperiod_minute', $new_timeperiod_minutes, 2),
+				new CNumericBox('new_timeperiod_minute', $newTimePeriodMinutes, 2),
 				$clndr_icon
 			));
 			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');
