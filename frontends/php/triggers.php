@@ -89,7 +89,6 @@ $_REQUEST['go'] = get_request('go', 'none');
 // validate permissions
 if (get_request('triggerid', false)) {
 	$triggers = API::Trigger()->get(array(
-		'withAcknowledgedEvents' => true,
 		'triggerids' => $_REQUEST['triggerid'],
 		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),

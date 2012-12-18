@@ -314,9 +314,8 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM applications a,httptest ht'.
-					' WHERE hg.hostid=a.hostid'.
-						' AND a.applicationid=ht.applicationid'.
+					' FROM httptest ht'.
+					' WHERE hg.hostid=ht.hostid'.
 					')';
 		}
 		elseif (!is_null($options['with_monitored_httptests'])) {
@@ -324,11 +323,8 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts h,applications a,httptest ht'.
-					' WHERE hg.hostid=h.hostid'.
-						' AND hg.hostid=a.hostid'.
-						' AND a.applicationid=ht.applicationid'.
-						' AND h.status='.HOST_STATUS_MONITORED.
+					' FROM httptest ht'.
+					' WHERE hg.hostid=ht.hostid'.
 						' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
 					')';
 		}
