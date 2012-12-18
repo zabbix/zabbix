@@ -1611,17 +1611,7 @@ class CAction extends CZBXAPI {
 			));
 			$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
 
-			// unset unrequested fields
-			foreach ($conditions as &$condition) {
-				if (!$this->outputIsRequested('actionid', $options['selectConditions'])) {
-					unset($condition['actionid']);
-				}
-				if (!$this->outputIsRequested('conditionid', $options['selectConditions'])) {
-					unset($condition['conditionid']);
-				}
-			}
-			unset($condition);
-
+			$conditions = $this->unsetExtraFields($conditions, array('actionid', 'conditionid'), $options['selectConditions']);
 			$result = $relationMap->mapMany($result, $conditions, 'conditions');
 		}
 
@@ -1805,20 +1795,9 @@ class CAction extends CZBXAPI {
 				}
 			}
 
-			// unset unrequested fields
-			foreach ($operations as &$operation) {
-				if (!$this->outputIsRequested('operationid', $options['selectOperations'])) {
-					unset($operation['operationid']);
-				}
-				if (!$this->outputIsRequested('actionid', $options['selectOperations'])) {
-					unset($operation['actionid']);
-				}
-				if (!$this->outputIsRequested('operationtype', $options['selectOperations'])) {
-					unset($operation['operationtype']);
-				}
-			}
-			unset($operation);
-
+			$operations = $this->unsetExtraFields($operations, array('operationid', 'actionid' ,'operationtype'),
+				$options['selectOperations']
+			);
 			$result = $relationMap->mapMany($result, $operations, 'operations');
 		}
 

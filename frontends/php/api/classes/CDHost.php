@@ -319,17 +319,7 @@ class CDHost extends CZBXAPI {
 				));
 				$relationMap = $this->createRelationMap($dservices, 'dhostid', 'dserviceid');
 
-				// unset unrequested fields
-				foreach ($dservices as &$condition) {
-					if (!$this->outputIsRequested('dserviceid', $options['selectDServices'])) {
-						unset($condition['dserviceid']);
-					}
-					if (!$this->outputIsRequested('dhostid', $options['selectDServices'])) {
-						unset($condition['dhostid']);
-					}
-				}
-				unset($condition);
-
+				$dservices = $this->unsetExtraFields($dservices, array('dserviceid', 'dhostid'), $options['selectDServices']);
 				if (!is_null($options['limitSelects'])) {
 					order_result($dservices, 'name');
 				}

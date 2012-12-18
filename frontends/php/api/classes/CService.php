@@ -70,10 +70,6 @@ class CService extends CZBXAPI {
 	public function get(array $options) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
-		if ($options['selectTrigger'] !== null) {
-			$options['output'] = $this->outputExtend('services', 'triggerid', $options['output']);
-		}
-
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
 		$res = DBselect($sql, $options['limit']);
@@ -97,6 +93,8 @@ class CService extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+
+			$result = $this->unsetExtraFields($result, 'triggerid', $options['output']);
 		}
 
 		if ($options['preservekeys'] === null) {
@@ -1519,17 +1517,7 @@ class CService extends CZBXAPI {
 			$dependencies = zbx_toHash($dependencies, 'linkid');
 			$relationMap = $this->createRelationMap($dependencies, 'serviceupid', 'linkid');
 
-			// unset unrequested fields
-			foreach ($dependencies as &$dependency) {
-				if (!$this->outputIsRequested('serviceupid', $options['selectDependencies'])) {
-					unset($dependency['serviceupid']);
-				}
-				if (!$this->outputIsRequested('linkid', $options['selectDependencies'])) {
-					unset($dependency['linkid']);
-				}
-			}
-			unset($dependency);
-
+			$dependencies = $this->unsetExtraFields($dependencies, array('serviceupid', 'linkid'), $options['selectDependencies']);
 			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
 		}
 
@@ -1541,17 +1529,9 @@ class CService extends CZBXAPI {
 			$dependencies = zbx_toHash($dependencies, 'linkid');
 			$relationMap = $this->createRelationMap($dependencies, 'servicedownid', 'linkid');
 
-			// unset unrequested fields
-			foreach ($dependencies as &$dependency) {
-				if (!$this->outputIsRequested('servicedownid', $options['selectParentDependencies'])) {
-					unset($dependency['servicedownid']);
-				}
-				if (!$this->outputIsRequested('linkid', $options['selectParentDependencies'])) {
-					unset($dependency['linkid']);
-				}
-			}
-			unset($dependency);
-
+			$dependencies = $this->unsetExtraFields($dependencies, array('servicedownid', 'linkid'),
+				$options['selectParentDependencies']
+			);
 			$result = $relationMap->mapMany($result, $dependencies, 'parentDependencies');
 		}
 
@@ -1576,17 +1556,7 @@ class CService extends CZBXAPI {
 			));
 			$relationMap = $this->createRelationMap($serviceTimes, 'serviceid', 'timeid');
 
-			// unset unrequested fields
-			foreach ($serviceTimes as &$serviceTime) {
-				if (!$this->outputIsRequested('serviceid', $options['selectTimes'])) {
-					unset($serviceTime['serviceid']);
-				}
-				if (!$this->outputIsRequested('timeid', $options['selectTimes'])) {
-					unset($serviceTime['timeid']);
-				}
-			}
-			unset($serviceTime);
-
+			$serviceTimes = $this->unsetExtraFields($serviceTimes, array('serviceid', 'timeid'), $options['selectTimes']);
 			$result = $relationMap->mapMany($result, $serviceTimes, 'times');
 		}
 
@@ -1599,17 +1569,9 @@ class CService extends CZBXAPI {
 			));
 			$relationMap = $this->createRelationMap($serviceAlarms, 'serviceid', 'servicealarmid');
 
-			// unset unrequested fields
-			foreach ($serviceAlarms as &$serviceAlarm) {
-				if (!$this->outputIsRequested('serviceid', $options['selectAlarms'])) {
-					unset($serviceAlarm['serviceid']);
-				}
-				if (!$this->outputIsRequested('servicealarmid', $options['selectAlarms'])) {
-					unset($serviceAlarm['servicealarmid']);
-				}
-			}
-			unset($serviceAlarm);
-
+			$serviceAlarms = $this->unsetExtraFields($serviceAlarms, array('serviceid', 'servicealarmid'),
+				$options['selectAlarms']
+			);
 			$result = $relationMap->mapMany($result, $serviceAlarms, 'alarms');
 		}
 

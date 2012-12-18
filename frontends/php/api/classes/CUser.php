@@ -1111,17 +1111,7 @@ class CUser extends CZBXAPI {
 
 			$relationMap = $this->createRelationMap($userMedias, 'userid', 'mediaid');
 
-			// unset unrequested fields
-			foreach ($userMedias as &$userMedia) {
-				if (!$this->outputIsRequested('userid', $options['selectMedias'])) {
-					unset($userMedia['userid']);
-				}
-				if (!$this->outputIsRequested('mediaid', $options['selectMedias'])) {
-					unset($userMedia['mediaid']);
-				}
-			}
-			unset($interface);
-
+			$userMedias = $this->unsetExtraFields($userMedias, array('userid', 'mediaid'), $options['selectMedias']);
 			$result = $relationMap->mapMany($result, $userMedias, 'medias');
 		}
 

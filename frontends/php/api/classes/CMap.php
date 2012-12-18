@@ -872,17 +872,6 @@ class CMap extends CMapElement {
 			));
 			$relationMap = $this->createRelationMap($selements, 'sysmapid', 'selementid');
 
-			// unset unrequested fields
-			foreach ($selements as &$selement) {
-				if (!$this->outputIsRequested('sysmapid', $options['selectSelements'])) {
-					unset($selement['sysmapid']);
-				}
-				if (!$this->outputIsRequested('selementid', $options['selectSelements'])) {
-					unset($selement['selementid']);
-				}
-			}
-			unset($selement);
-
 			// add selement URLs
 			if ($this->outputIsRequested('urls', $options['selectSelements'])) {
 				foreach ($selements as &$selement) {
@@ -931,6 +920,7 @@ class CMap extends CMapElement {
 				}
 			}
 
+			$selements = $this->unsetExtraFields($selements, array('sysmapid', 'selementid'), $options['selectSelements']);
 			$result = $relationMap->mapMany($result, $selements, 'selements');
 		}
 
@@ -944,17 +934,7 @@ class CMap extends CMapElement {
 			));
 			$relationMap = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
 
-			// unset unrequested fields
-			foreach ($iconMaps as &$iconMap) {
-				if (!$this->outputIsRequested('sysmapid', $options['selectIconMap'])) {
-					unset($iconMap['sysmapid']);
-				}
-				if (!$this->outputIsRequested('iconmapid', $options['selectIconMap'])) {
-					unset($iconMap['iconmapid']);
-				}
-			}
-			unset($iconMap);
-
+			$iconMaps = $this->unsetExtraFields($iconMaps, array('sysmapid', 'iconmapid'), $options['selectIconMap']);
 			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
 		}
 
@@ -967,17 +947,6 @@ class CMap extends CMapElement {
 			));
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'linkid');
 
-			// unset unrequested fields
-			foreach ($links as &$link) {
-				if (!$this->outputIsRequested('sysmapid', $options['selectLinks'])) {
-					unset($link['sysmapid']);
-				}
-				if (!$this->outputIsRequested('linkid', $options['selectLinks'])) {
-					unset($link['linkid']);
-				}
-			}
-			unset($link);
-
 			// add link triggers
 			if ($this->outputIsRequested('linktriggers', $options['selectLinks'])) {
 				$linkTriggers = DBFetchArrayAssoc(DBselect(
@@ -989,6 +958,7 @@ class CMap extends CMapElement {
 				$links = $linkTriggerRelationMap->mapMany($links, $linkTriggers, 'linktriggers');
 			}
 
+			$links = $this->unsetExtraFields($links, array('sysmapid', 'linkid'), $options['selectLinks']);
 			$result = $relationMap->mapMany($result, $links, 'links');
 		}
 
@@ -1001,17 +971,7 @@ class CMap extends CMapElement {
 			));
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
 
-			// unset unrequested fields
-			foreach ($links as &$link) {
-				if (!$this->outputIsRequested('sysmapid', $options['selectUrls'])) {
-					unset($link['sysmapid']);
-				}
-				if (!$this->outputIsRequested('sysmapurlid', $options['selectUrls'])) {
-					unset($link['sysmapurlid']);
-				}
-			}
-			unset($link);
-
+			$links = $this->unsetExtraFields($links, array('sysmapid', 'sysmapurlid'), $options['selectUrls']);
 			$result = $relationMap->mapMany($result, $links, 'urls');
 		}
 

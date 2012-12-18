@@ -682,7 +682,7 @@ class CTemplateScreen extends CScreen {
 			));
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
 
-			foreach ($screenItems as &$screenItem) {
+			foreach ($screenItems as $screenItem) {
 				switch ($screenItem['resourcetype']) {
 					case SCREEN_RESOURCE_GRAPH:
 						$graphids[$screenItem['resourceid']] = $screenItem['resourceid'];
@@ -692,23 +692,11 @@ class CTemplateScreen extends CScreen {
 						$itemids[$screenItem['resourceid']] = $screenItem['resourceid'];
 						break;
 				}
-
-				// unset unrequested fields
-				if (!$this->outputIsRequested('screenid', $options['selectScreenItems'])) {
-					unset($screenItem['screenid']);
-				}
-				if (!$this->outputIsRequested('screenitemid', $options['selectScreenItems'])) {
-					unset($screenItem['screenitemid']);
-				}
-				if (!$this->outputIsRequested('resourceid', $options['selectScreenItems'])) {
-					unset($screenItem['resourceid']);
-				}
-				if (!$this->outputIsRequested('resourcetype', $options['selectScreenItems'])) {
-					unset($screenItem['resourcetype']);
-				}
 			}
-			unset($screenItem);
 
+			$screenItems = $this->unsetExtraFields($screenItems, array('screenid', 'screenitemid', 'resourceid', 'resourcetype'),
+				$options['selectScreenItems']
+			);
 			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
 		}
 

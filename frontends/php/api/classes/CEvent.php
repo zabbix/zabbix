@@ -515,20 +515,9 @@ class CEvent extends CZBXAPI {
 				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
 
-				// unset unrequested fields
-				foreach ($acknowledges as &$acknowledge) {
-					if (!$this->outputIsRequested('eventid', $options['select_acknowledges'])) {
-						unset($acknowledge['eventid']);
-					}
-					if (!$this->outputIsRequested('acknowledgeid', $options['select_acknowledges'])) {
-						unset($acknowledge['acknowledgeid']);
-					}
-					if (!$this->outputIsRequested('clock', $options['select_acknowledges'])) {
-						unset($acknowledge['clock']);
-					}
-				}
-				unset($acknowledge);
-
+				$acknowledges = $this->unsetExtraFields($acknowledges, array('eventid', 'acknowledgeid', 'clock'),
+					$options['select_acknowledges']
+				);
 				$result = $relationMap->mapMany($result, $acknowledges, 'acknowledges');
 			}
 			else {
