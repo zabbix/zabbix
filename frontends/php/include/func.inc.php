@@ -2214,7 +2214,7 @@ function get_status() {
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
+				' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
 				' GROUP BY i.status');
 	while ($dbItem = DBfetch($dbItems)) {
 		switch ($dbItem['status']) {

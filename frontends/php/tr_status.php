@@ -475,7 +475,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$dep_res = DBselect(
 		'SELECT triggerid_down,triggerid_up'.
 		' FROM trigger_depends'.
-		' WHERE '.DBcondition('triggerid_up', $triggerids)
+		' WHERE '.dbConditionInt('triggerid_up', $triggerids)
 	);
 	$triggerids_down = array();
 	while ($row = DBfetch($dep_res)) {

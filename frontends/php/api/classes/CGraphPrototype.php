@@ -109,7 +109,7 @@ class CGraphPrototype extends CGraphGeneral {
 					' FROM graphs_items gi,items i,hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE g.graphid=gi.graphid'.
 						' AND gi.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
@@ -130,7 +130,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
@@ -161,7 +161,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 
@@ -174,7 +174,7 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['where'][] = DBcondition('g.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('g.graphid', $options['graphids']);
 		}
 
 		// itemids
@@ -184,7 +184,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['select']['itemid'] = 'gi.itemid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where'][] = DBcondition('gi.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('gi.itemid', $options['itemids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
@@ -200,7 +200,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
@@ -257,7 +257,7 @@ class CGraphPrototype extends CGraphGeneral {
 				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (isset($options['filter']['hostid'])) {
@@ -267,7 +267,7 @@ class CGraphPrototype extends CGraphGeneral {
 				$sqlParts['from']['items'] = 'items i';
 				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-				$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
+				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
 
@@ -482,7 +482,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,gi.graphid'.
 					' FROM item_discovery id,graphs_items gi'.
-					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
 						' AND gi.itemid=id.itemid'
 			);
 			while ($rule = DBfetch($dbRules)) {
@@ -685,8 +685,8 @@ class CGraphPrototype extends CGraphGeneral {
 		$dbLinks = DBSelect(
 			'SELECT ht.hostid,ht.templateid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.DBcondition('ht.hostid', $data['hostids']).
-				' AND '.DBcondition('ht.templateid', $data['templateids'])
+			' WHERE '.dbConditionInt('ht.hostid', $data['hostids']).
+				' AND '.dbConditionInt('ht.templateid', $data['templateids'])
 		);
 		$linkage = array();
 		while ($link = DBfetch($dbLinks)) {
@@ -751,7 +751,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$parentGraphids = $graphids;
 		do {
-			$dbGraphs = DBselect('SELECT g.graphid FROM graphs g WHERE '.DBcondition('g.templateid', $parentGraphids));
+			$dbGraphs = DBselect('SELECT g.graphid FROM graphs g WHERE '.dbConditionInt('g.templateid', $parentGraphids));
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
@@ -761,7 +761,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$createdGraphs = array();
 
-		$dbGraphs = DBselect('SELECT gd.graphid FROM graph_discovery gd WHERE '.DBcondition('gd.parent_graphid', $graphids));
+		$dbGraphs = DBselect('SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $graphids));
 		while ($graph = DBfetch($dbGraphs)) {
 			$createdGraphs[$graph['graphid']] = $graph['graphid'];
 		}

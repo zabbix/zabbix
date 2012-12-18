@@ -265,6 +265,7 @@ frontends/php/tests/experimental/tests/CHttpTest/fixtures/initial.xml -text
 frontends/php/tests/experimental/tests/CHttpTest/fixtures/testCreateOnTemplate.xml -text
 frontends/php/tests/experimental/tests/CHttpTest/fixtures/testUpdateOnTemplate.xml -text
 frontends/php/tests/experimental/tests/CHttpTest/fixtures/testUpdateStepsOnTemplate.xml -text
+frontends/php/tests/general/dbConditionIntTest.php -text
 frontends/php/tests/selenium/testFormAdministrationGeneralInstallation.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
