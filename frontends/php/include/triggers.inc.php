@@ -2395,11 +2395,22 @@ function get_item_function_info($expr) {
 	return $result;
 }
 
+/**
+ * Execute expression and return array with keys 'result' as 'TRUE' or 'FALSE' and 'error' as error text
+ * if there is one.
+ *
+ * @param string $expression
+ * @param array  $rplcts
+ * @param bool   $oct
+ *
+ * @return array
+ */
 function evalExpressionData($expression, $rplcts, $oct = false) {
 	$result = false;
 
 	$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
 	preg_match_all('/[0-9\.]+['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?/', $evStr, $arr, PREG_OFFSET_CAPTURE);
+
 	for ($i = count($arr[0]) - 1; $i >= 0; $i--) {
 		$evStr = substr_replace($evStr, convert($arr[0][$i][0]), $arr[0][$i][1], strlen($arr[0][$i][0]));
 	}
@@ -2415,9 +2426,34 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 	$switch = array('=' => '==', '#' => '!=', '&' => '&&', '|' => '||');
 	$evStr = str_replace(array_keys($switch), array_values($switch), $evStr);
 
+	// execute expression
 	eval('$result = ('.trim($evStr).');');
 
-	return ($result === true || $result && $result != '-') ? 'TRUE' : 'FALSE';
+	$result = ($result === true || $result && $result != '-') ? 'TRUE' : 'FALSE';
+	$error = '';
+
+	// remove eval() generated error message
+	global $ZBX_MESSAGES;
+	if (!empty($ZBX_MESSAGES)) {
+		$messageList = array();
+
+		foreach ($ZBX_MESSAGES as $zbxMessage) {
+			if (strpos($zbxMessage['message'], 'eval()') !== false) {
+				$error = substr($zbxMessage['message'], 0, strpos($zbxMessage['message'], '['));
+				$result = 'NULL';
+			}
+			else {
+				$messageList[] = $zbxMessage;
+			}
+		}
+
+		$ZBX_MESSAGES = $messageList;
+	}
+
+	return array(
+		'result' => $result,
+		'error' => $error
+	);
 }
 
 /**
