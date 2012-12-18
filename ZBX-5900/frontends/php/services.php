@@ -179,7 +179,7 @@ if (isset($_REQUEST['form'])) {
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
 		$result = true;
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			if (validateDateTime($_REQUEST['downtime_since_year'],
+			if (!validateDateTime($_REQUEST['downtime_since_year'],
 					$_REQUEST['downtime_since_month'],
 					$_REQUEST['downtime_since_day'],
 					$_REQUEST['downtime_since_hour'],
@@ -187,13 +187,13 @@ if (isset($_REQUEST['form'])) {
 				$result = false;
 				error(_s('Invalid date "%s".', _('From')));
 			}
-			if (validateDateInterval($_REQUEST['downtime_since_year'],
+			if (!validateDateInterval($_REQUEST['downtime_since_year'],
 					$_REQUEST['downtime_since_month'],
 					$_REQUEST['downtime_since_day'])) {
 				$result = false;
 				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
 			}
-			if (validateDateTime($_REQUEST['downtime_till_year'],
+			if (!validateDateTime($_REQUEST['downtime_till_year'],
 					$_REQUEST['downtime_till_month'],
 					$_REQUEST['downtime_till_day'],
 					$_REQUEST['downtime_till_hour'],
@@ -201,15 +201,27 @@ if (isset($_REQUEST['form'])) {
 				$result = false;
 				error(_s('Invalid date "%s".', _('Till')));
 			}
-			if (validateDateInterval($_REQUEST['downtime_till_year'],
+			if (!validateDateInterval($_REQUEST['downtime_till_year'],
 					$_REQUEST['downtime_till_month'],
 					$_REQUEST['downtime_till_day'])) {
 				$result = false;
 				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
 			}
 			if ($result) {
-				$new_service_time['ts_from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
-				$new_service_time['ts_to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
+				$new_service_time['ts_from'] = mktime($_REQUEST['downtime_since_hour'],
+						$_REQUEST['downtime_since_minute'],
+						0,
+						$_REQUEST['downtime_since_month'],
+						$_REQUEST['downtime_since_day'],
+						$_REQUEST['downtime_since_year']);
+
+				$new_service_time['ts_to'] = mktime($_REQUEST['downtime_till_hour'],
+						$_REQUEST['downtime_till_minute'],
+						0,
+						$_REQUEST['downtime_till_month'],
+						$_REQUEST['downtime_till_day'],
+						$_REQUEST['downtime_till_year']);
+
 				$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 			}
 		}
