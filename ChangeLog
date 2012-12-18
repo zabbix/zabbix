@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6003] monitoring->maps page optimization (Vedmak)
 A.F.....S. [ZBX-5862] fixed sql condition algorithm (Andris, Eduard, Sasha)
 A.F....... [ZBX-4789] improved performance of permissions check (Oleg, dotneft, Sasha)
 ..F....... [ZBX-5979] fixed monitoring events page, hidden triggers with not monitored items (Oleg)

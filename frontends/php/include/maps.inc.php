@@ -2231,3 +2231,24 @@ function getIconByMapping($iconMap, $inventory) {
 	}
 	return $iconid;
 }
+
+/**
+ * Get parent maps for current map.
+ *
+ * @param int $mapId
+ *
+ * @return array
+ */
+function getParentMaps($mapId) {
+	$parentMaps = DBfetchArrayAssoc(DBselect(
+		'SELECT s.sysmapid,s.name'.
+			' FROM sysmaps s'.
+				' JOIN sysmaps_elements se ON se.sysmapid=s.sysmapid'.
+			' WHERE se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP.
+				' AND se.elementid='.zbx_dbstr($mapId)
+	), 'sysmapid');
+
+	CArrayHelper::sort($parentMaps, array('name'));
+
+	return $parentMaps;
+}
