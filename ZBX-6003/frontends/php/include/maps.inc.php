@@ -2242,9 +2242,10 @@ function getIconByMapping($iconMap, $inventory) {
 function getParentMaps($mapId) {
 	$parentMaps = DBfetchArrayAssoc(DBselect(
 		'SELECT s.sysmapid,s.name'.
-		' FROM sysmaps s'.
-			' JOIN sysmaps_elements se ON se.sysmapid=s.sysmapid'.
-		' WHERE se.elementid='.zbx_dbstr($mapId)
+			' FROM sysmaps s'.
+				' JOIN sysmaps_elements se ON se.sysmapid=s.sysmapid'.
+			' WHERE se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP.
+				' AND se.elementid='.zbx_dbstr($mapId)
 	), 'sysmapid');
 
 	CArrayHelper::sort($parentMaps, array('name'));
