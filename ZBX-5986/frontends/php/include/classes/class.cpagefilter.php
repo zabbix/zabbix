@@ -87,6 +87,11 @@ class CPageFilter {
 
 		// profiles
 		$this->_getProfiles($options);
+		if (!isset($options['groupid'], $options['hostid'])) {
+			if (isset($options['graphid'])) {
+				$this->_updateByGraph($options);
+			}
+		}
 
 		// groups
 		if (isset($options['groups'])) {
@@ -151,6 +156,48 @@ class CPageFilter {
 		$this->_requestIds['graphid'] = isset($options['graphid']) ? $options['graphid'] : null;
 		$this->_requestIds['triggerid'] = isset($options['triggerid']) ? $options['triggerid'] : null;
 		$this->_requestIds['druleid'] = isset($options['druleid']) ? $options['druleid'] : null;
+	}
+
+	private function _updateByGraph(&$options) {
+		$graphs = API::Graph()->get(array(
+			'graphids' => $options['graphid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_REFER,
+			'selectTemplates' => API_OUTPUT_REFER,
+			'selectGroups' => API_OUTPUT_REFER
+		));
+
+		if ($graph = reset($graphs)) {
+			$groups = zbx_toHash($graph['groups'], 'groupid');
+			$hosts = zbx_toHash($graph['hosts'], 'hostid');
+			$templates = zbx_toHash($graph['templates'], 'templateid');
+
+			if (isset($groups[$this->_profileIds['groupid']])) {
+				$options['groupid'] = $this->_profileIds['groupid'];
+			}
+			else {
+				$groupids = array_keys($groups);
+				$options['groupid'] = reset($groupids);
+			}
+
+			if (isset($hosts[$this->_profileIds['hostid']])) {
+				$options['hostid'] = $this->_profileIds['hostid'];
+			}
+			else {
+				$hostids = array_keys($hosts);
+				$options['hostid'] = reset($hostids);
+			}
+
+			if (is_null($options['hostid'])) {
+				if (isset($templates[$this->_profileIds['hostid']])) {
+					$options['hostid'] = $this->_profileIds['hostid'];
+				}
+				else {
+					$templateids = array_keys($templates);
+					$options['hostid'] = reset($templateids);
+				}
+			}
+		}
 	}
 
 	private function _initGroups($groupid, $options) {
