@@ -884,7 +884,7 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 			continue;
 		}
 		zbx_value2array($value);
-		$filter[$field] = DBcondition($tableShort.'.'.$field, $value);
+		$filter[$field] = dbConditionString($tableShort.'.'.$field, $value);
 	}
 
 	if (!empty($filter)) {
@@ -968,25 +968,141 @@ function check_db_fields($db_fields, &$args) {
 	return true;
 }
 
-function DBcondition($fieldname, $array, $notin = false) {
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ * The WHERE condidion is generated from the given list of values as a mix of
+ * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array  $values     array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionInt($fieldName, array $values, $notIn = false) {
+	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
+	$MIN_NUM_BETWEEN = 5; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
+
+	if (count($values) == 0) {
+		return '1=0';
+	}
+
 	$condition = '';
 
-	if (!is_array($array)) {
-		throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
+	$betweens = array();
+	$ins = array();
+
+	$pos = 1;
+	$len = 1;
+	$valueL = reset($values);
+	while ($valueR = next($values)) {
+		$valueL = bcadd($valueL, 1, 0);
+
+		if ($valueR != $valueL) {
+			if ($len >= $MIN_NUM_BETWEEN) {
+				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
+			}
+			else {
+				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+			}
+
+			$len = 1;
+			$valueL = $valueR;
+		}
+		else {
+			$len++;
+		}
+		$pos++;
 	}
 
-	$in = $notin ? ' NOT IN ':' IN ';
-	$concat = $notin ? ' AND ':' OR ';
+	if ($len >= $MIN_NUM_BETWEEN) {
+		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
+	}
+	else {
+		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+	}
 
-	$items = array_chunk($array, 950);
+	$operand = $notIn ? 'AND' : 'OR';
+	$not = $notIn ? 'NOT ' : '';
+	$inNum = count($ins);
+	$betweenNum = count($betweens);
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
+		$condition .= '(';
+	}
+
+	// compose "BETWEEN"s
+	$first = true;
+	foreach ($betweens as $between) {
+		if (!$first) {
+			$condition .= ' '.$operand.' ';
+		}
+		$condition .= $not.$fieldName.' BETWEEN '.$between[0].' AND '.$between[1];
+		$first = false;
+	}
+
+	if (0 < $inNum && 0 < $betweenNum) {
+		$condition .= ' '.$operand.' ';
+	}
+
+	if ($inNum == 1) {
+		foreach ($ins as $insValue) {
+			$condition .= $notIn
+				? $fieldName.'!='.$insValue
+				: $fieldName.'='.$insValue;
+			break;
+		}
+	}
+
+	// compose "IN"s
+	else {
+		$first = true;
+		foreach (array_chunk($ins, $MAX_EXPRESSIONS) as $in) {
+			if (!$first) {
+				$condition .= ' '.$operand.' ';
+			}
+			$condition .= $fieldName.' '.$not.'IN ('.implode(',', $in).')';
+			$first = false;
+		}
+	}
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
+		$condition .= ')';
+	}
+
+	return $condition;
+}
+
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array  $values     array of string values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionString($fieldName, array $values, $notIn = false) {
+	switch (count($values)) {
+		case 0:
+			return '1=0';
+		case 1:
+			return $notIn
+				? $fieldName.'!='.zbx_dbstr(reset($values))
+				: $fieldName.'='.zbx_dbstr(reset($values));
+	}
+
+	$in = $notIn ? ' NOT IN ' : ' IN ';
+	$concat = $notIn ? ' AND ' : ' OR ';
+	$items = array_chunk($values, 950);
+
+	$condition = '';
 	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldname.$in.'(' : '';
+		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
 		$condition .= implode(',', zbx_dbstr($values));
 	}
-	if (zbx_empty($condition)) {
-		return ' 1=0 ';
-	}
-	return ' ('.$fieldname.$in.'('.$condition.')) ';
+
+	return $fieldName.$in.'('.$condition.')';
 }
 
 function zero2null($val) {

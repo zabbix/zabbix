@@ -170,7 +170,7 @@ class CHost extends CHostGeneral {
 					' FROM hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE h.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
@@ -181,7 +181,7 @@ class CHost extends CHostGeneral {
 		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
-			$sqlParts['where']['hostid'] = DBcondition('h.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('h.hostid', $options['hostids']);
 		}
 
 		// groupids
@@ -190,7 +190,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -203,7 +203,7 @@ class CHost extends CHostGeneral {
 			zbx_value2array($options['proxyids']);
 
 			$sqlParts['select']['proxy_hostid'] = 'h.proxy_hostid';
-			$sqlParts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
 		}
 
 		// templateids
@@ -212,7 +212,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['templateid'] = 'ht.templateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
-			$sqlParts['where'][] = DBcondition('ht.templateid', $options['templateids']);
+			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -226,7 +226,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['interfaceid'] = 'hi.interfaceid';
 			$sqlParts['from']['interface'] = 'interface hi';
-			$sqlParts['where'][] = DBcondition('hi.interfaceid', $options['interfaceids']);
+			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
 			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 		}
 
@@ -236,7 +236,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
@@ -247,7 +247,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
@@ -258,7 +258,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			$sqlParts['from']['httptest'] = 'httptest ht';
-			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['httptestids']);
+			$sqlParts['where'][] = dbConditionInt('ht.httptestid', $options['httptestids']);
 			$sqlParts['where']['aht'] = 'ht.hostid=h.hostid';
 		}
 
@@ -269,7 +269,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
@@ -280,7 +280,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['applicationid'] = 'a.applicationid';
 			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('a.applicationid', $options['applicationids']);
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
@@ -290,7 +290,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['dhostid'] = 'ds.dhostid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dhostid', $options['dhostids']);
 			$sqlParts['where']['dsh'] = 'ds.ip=h.ip';
 
 			if (!is_null($options['groupCount'])) {
@@ -305,7 +305,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['select']['dserviceid'] = 'ds.dserviceid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['from']['interface'] = 'interface i';
-			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dsh'] = 'ds.ip=i.ip';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
@@ -320,7 +320,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['select']['maintenanceid'] = 'mh.maintenanceid';
 			$sqlParts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
-			$sqlParts['where'][] = DBcondition('mh.maintenanceid', $options['maintenanceids']);
+			$sqlParts['where'][] = dbConditionInt('mh.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'h.hostid=mh.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -705,7 +705,7 @@ class CHost extends CHostGeneral {
 			$dbInventory = DBselect(
 				'SELECT '.implode(', ', $selectHIn).
 				' FROM host_inventory hin'.
-				' WHERE '.DBcondition('hin.hostid', $hostids)
+				' WHERE '.dbConditionInt('hin.hostid', $hostids)
 			);
 			while ($inventory = DBfetch($dbInventory)) {
 				$result[$inventory['hostid']]['inventory'] = $inventory;
@@ -1888,14 +1888,14 @@ class CHost extends CHostGeneral {
 		 */
 		if (isset($updateInventory)) {
 			if ($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED) {
-				$sql = 'DELETE FROM host_inventory WHERE '.DBcondition('hostid', $hostids);
+				$sql = 'DELETE FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids);
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory.'));
 				}
 			}
 			else {
 				$hostsWithInventories = array();
-				$existingInventoriesDb = DBselect('SELECT hostid FROM host_inventory WHERE '.DBcondition('hostid', $hostids));
+				$existingInventoriesDb = DBselect('SELECT hostid FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids));
 				while ($existingInventory = DBfetch($existingInventoriesDb)) {
 					$hostsWithInventories[] = $existingInventory['hostid'];
 				}
@@ -2076,7 +2076,7 @@ class CHost extends CHostGeneral {
 		$sql = 'SELECT DISTINCT actionid'.
 				' FROM conditions'.
 				' WHERE conditiontype='.CONDITION_TYPE_HOST.
-				' AND '.DBcondition('value', $hostids);
+				' AND '.dbConditionString('value', $hostids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -2086,7 +2086,7 @@ class CHost extends CHostGeneral {
 		$sql = 'SELECT DISTINCT o.actionid'.
 				' FROM operations o, opcommand_hst oh'.
 				' WHERE o.operationid=oh.operationid'.
-				' AND '.DBcondition('oh.hostid', $hostids);
+				' AND '.dbConditionInt('oh.hostid', $hostids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -2111,7 +2111,7 @@ class CHost extends CHostGeneral {
 		$operationids = array();
 		$sql = 'SELECT DISTINCT oh.operationid'.
 				' FROM opcommand_hst oh'.
-				' WHERE '.DBcondition('oh.hostid', $hostids);
+				' WHERE '.dbConditionInt('oh.hostid', $hostids);
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -2125,7 +2125,7 @@ class CHost extends CHostGeneral {
 		$delOperationids = array();
 		$sql = 'SELECT DISTINCT o.operationid'.
 				' FROM operations o'.
-				' WHERE '.DBcondition('o.operationid', $operationids).
+				' WHERE '.dbConditionInt('o.operationid', $operationids).
 				' AND NOT EXISTS(SELECT oh.opcommand_hstid FROM opcommand_hst oh WHERE oh.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {

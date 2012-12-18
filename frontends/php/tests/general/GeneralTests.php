@@ -38,6 +38,7 @@ require_once dirname(__FILE__).'/function_DBstart.php';
 require_once dirname(__FILE__).'/CTimePeriodValidatorTest.php';
 require_once dirname(__FILE__).'/zbx_limitTest.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
+require_once dirname(__FILE__).'/dbConditionIntTest.php';
 
 class GeneralTests {
 
@@ -64,6 +65,7 @@ class GeneralTests {
 		$suite->addTestSuite('CTimePeriodValidatorTest');
 		$suite->addTestSuite('zbx_limitTest');
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
+		$suite->addTestSuite('dbConditionIntTest');
 
 		return $suite;
 	}

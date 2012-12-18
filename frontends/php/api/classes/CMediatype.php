@@ -108,7 +108,7 @@ class CMediatype extends CZBXAPI {
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
-			$sqlParts['where'][] = DBcondition('mt.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionInt('mt.mediatypeid', $options['mediatypeids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -121,7 +121,7 @@ class CMediatype extends CZBXAPI {
 			zbx_value2array($options['mediaids']);
 			$sqlParts['select']['mediaid'] = 'm.mediaid';
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 
 			if (!$nodeCheck) {
@@ -135,7 +135,7 @@ class CMediatype extends CZBXAPI {
 			zbx_value2array($options['userids']);
 			$sqlParts['select']['userid'] = 'm.userid';
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.userid', $options['userids']);
+			$sqlParts['where'][] = dbConditionInt('m.userid', $options['userids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 
 			if (!$nodeCheck) {

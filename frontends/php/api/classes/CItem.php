@@ -136,7 +136,7 @@ class CItem extends CItemGeneral {
 					' FROM hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE i.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
@@ -148,7 +148,7 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('i.itemid', $options['itemids']);
 		}
 
 		// templateids
@@ -172,7 +172,7 @@ class CItem extends CItemGeneral {
 				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.hostid';
@@ -187,7 +187,7 @@ class CItem extends CItemGeneral {
 				$sqlParts['select']['interfaceid'] = 'i.interfaceid';
 			}
 
-			$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
@@ -200,7 +200,7 @@ class CItem extends CItemGeneral {
 
 			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=i.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -217,7 +217,7 @@ class CItem extends CItemGeneral {
 			}
 
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
 			$sqlParts['where'][] = 'h.hostid=i.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -231,7 +231,7 @@ class CItem extends CItemGeneral {
 
 			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
@@ -241,7 +241,7 @@ class CItem extends CItemGeneral {
 
 			$sqlParts['select']['applicationid'] = 'ia.applicationid';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('ia.applicationid', $options['applicationids']);
 			$sqlParts['where']['ia'] = 'ia.itemid=i.itemid';
 		}
 
@@ -251,7 +251,7 @@ class CItem extends CItemGeneral {
 
 			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
@@ -311,7 +311,7 @@ class CItem extends CItemGeneral {
 
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
+				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host'], false, true);
 			}
 
 			if (array_key_exists('flags', $options['filter']) && is_null($options['filter']['flags'])) {
@@ -632,7 +632,7 @@ class CItem extends CItemGeneral {
 			$dbRules = DBselect(
 				'SELECT id1.itemid,id2.parent_itemid'.
 				' FROM item_discovery id1,item_discovery id2,items i'.
-				' WHERE '.DBcondition('id1.itemid', $itemids).
+				' WHERE '.dbConditionInt('id1.itemid', $itemids).
 					' AND id1.parent_itemid=id2.itemid'.
 					' AND i.itemid=id1.itemid'.
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_CREATED
@@ -645,7 +645,7 @@ class CItem extends CItemGeneral {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,id.itemid'.
 				' FROM item_discovery id,items i'.
-				' WHERE '.DBcondition('id.itemid', $itemids).
+				' WHERE '.dbConditionInt('id.itemid', $itemids).
 					' AND i.itemid=id.itemid'.
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD
 			);
@@ -934,7 +934,7 @@ class CItem extends CItemGeneral {
 		// first delete child items
 		$parentItemids = $itemids;
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.DBcondition('i.templateid', $parentItemids));
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
 			$parentItemids = array();
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[] = $dbItem['itemid'];
@@ -947,12 +947,12 @@ class CItem extends CItemGeneral {
 		$dbGraphs = DBselect(
 			'SELECT gi.graphid'.
 			' FROM graphs_items gi'.
-			' WHERE '.DBcondition('gi.itemid', $itemids).
+			' WHERE '.dbConditionInt('gi.itemid', $itemids).
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM graphs_items gii'.
 					' WHERE gii.graphid=gi.graphid'.
-						' AND '.DBcondition('gii.itemid', $itemids, true, false).
+						' AND '.dbConditionInt('gii.itemid', $itemids, true).
 				')'
 		);
 		while ($dbGraph = DBfetch($dbGraphs)) {
@@ -962,7 +962,7 @@ class CItem extends CItemGeneral {
 		if (!empty($delGraphs)) {
 			$result = API::Graph()->delete($delGraphs, true);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph.'));
 			}
 		}
 
