@@ -408,6 +408,7 @@ class CItem extends CItemGeneral {
 		// add other related objects
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('hostid', 'interfaceid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)

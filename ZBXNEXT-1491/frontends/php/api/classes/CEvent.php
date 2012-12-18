@@ -342,6 +342,7 @@ class CEvent extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('object', 'objectid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)

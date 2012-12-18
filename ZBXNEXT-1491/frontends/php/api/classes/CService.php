@@ -93,7 +93,6 @@ class CService extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-
 			$result = $this->unsetExtraFields($result, 'triggerid', $options['output']);
 		}
 
