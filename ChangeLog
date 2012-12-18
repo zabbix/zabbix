@@ -68,6 +68,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6003] monitoring->maps page optimization (Vedmak)
 ..F....... [ZBX-5979] fixed monitoring events page, hidden triggers with not monitored items (Oleg)
 ..F....... [ZBX-5985] fixed DB error in "Configuration of web monitoring" for PostgreSQL (Oleg)
 ..F....... [ZBX-5699] fixed configuration graph host id passing in navigation (Eduard)
@@ -1251,7 +1252,6 @@ A.F....... [ZBX-5833] fixed inserting a macro in the trigger expression construc
 A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
 A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
 ..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
-..F....... [ZBX-5898] fixed Insert Macro button does not work in trigger constructor on IE7 and IE8 (Toms)
 A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
