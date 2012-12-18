@@ -37,6 +37,7 @@ A.F....... [ZBX-5927] fixed preservekeys affecting selectSelements and selectLin
 A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
 A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
 ..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
+..F....... [ZBX-5898] fixed Insert Macro button does not work in trigger constructor on IE7 and IE8 (Toms)
 A......... [ZBX-5718] fixed unknown event generation for templated triggers (Oleg)
 ..F....... [ZBX-5749] fixed macros resolving in triggers in Maps (Eduard)
 A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
