@@ -22,7 +22,7 @@
 function setHostGroupInternal($groupids, $internal = ZBX_NOT_INTERNAL_GROUP) {
 	zbx_value2array($groupids);
 
-	return DBexecute('UPDATE groups SET internal='.$internal.' WHERE '.DBcondition('groupid', $groupids));
+	return DBexecute('UPDATE groups SET internal='.$internal.' WHERE '.dbConditionInt('groupid', $groupids));
 }
 
 /**
@@ -502,7 +502,7 @@ function get_host_by_itemid($itemids) {
 		'SELECT i.itemid,h.*'.
 		' FROM hosts h,items i'.
 		' WHERE i.hostid=h.hostid'.
-			' AND '.DBcondition('i.itemid', $itemids)
+			' AND '.dbConditionInt('i.itemid', $itemids)
 	);
 	while ($hostItem = DBfetch($db_hostsItems)) {
 		$result = true;
@@ -538,7 +538,7 @@ function get_hosts_by_templateid($templateids) {
 		'SELECT h.*'.
 		' FROM hosts h,hosts_templates ht'.
 		' WHERE h.hostid=ht.hostid'.
-			' AND '.DBcondition('ht.templateid', $templateids)
+			' AND '.dbConditionInt('ht.templateid', $templateids)
 	);
 }
 
@@ -550,7 +550,7 @@ function updateHostStatus($hostids, $status) {
 	$db_hosts = DBselect(
 		'SELECT h.hostid,h.host,h.status'.
 			' FROM hosts h'.
-			' WHERE '.DBcondition('h.hostid', $hostids).
+			' WHERE '.dbConditionInt('h.hostid', $hostids).
 				' AND h.status='.$oldStatus
 	);
 	while ($host = DBfetch($db_hosts)) {
@@ -779,7 +779,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	$res = DBselect(
 		'SELECT DISTINCT '.$sql_select.
 		' FROM '.$sql_from.
-		' WHERE '.DBcondition('g.groupid', $available_groups).
+		' WHERE '.dbConditionInt('g.groupid', $available_groups).
 			$sql_where.
 		' ORDER BY '.$sql_order);
 	while ($group = DBfetch($res)) {
@@ -898,7 +898,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		zbx_value2array($groupid);
 
 		$def_sql['from'][] = 'hosts_groups hg';
-		$def_sql['where'][] = DBcondition('hg.groupid',$groupid);
+		$def_sql['where'][] = dbConditionInt('hg.groupid',$groupid);
 		$def_sql['where'][] = 'hg.hostid=h.hostid';
 	}
 
@@ -1204,7 +1204,7 @@ function validate_templates($templateid_list) {
 	$res = DBselect(
 		'SELECT key_,COUNT(*) AS cnt'.
 		' FROM items'.
-		' WHERE '.DBcondition('hostid', $templateid_list).
+		' WHERE '.dbConditionInt('hostid', $templateid_list).
 		' GROUP BY key_'.
 		' ORDER BY cnt DESC'
 	);
@@ -1218,7 +1218,7 @@ function validate_templates($templateid_list) {
 	$res = DBselect(
 		'SELECT name,COUNT(*) AS cnt'.
 		' FROM applications'.
-		' WHERE '.DBcondition('hostid',$templateid_list).
+		' WHERE '.dbConditionInt('hostid',$templateid_list).
 		' GROUP BY name'.
 		' ORDER BY cnt DESC'
 	);
@@ -1249,13 +1249,13 @@ function getUnlinkableHosts($groupids, $hostids = null) {
 
 	$sql_where = '';
 	if ($hostids !== null) {
-		$sql_where = ' AND '.DBcondition('hg.hostid', $hostids);
+		$sql_where = ' AND '.dbConditionInt('hg.hostid', $hostids);
 	}
 
 	$result = DBselect(
 		'SELECT hg.hostid,COUNT(hg.groupid) AS grp_count'.
 		' FROM hosts_groups hg'.
-		' WHERE '.DBcondition('hg.groupid', $groupids, true).
+		' WHERE '.dbConditionInt('hg.groupid', $groupids, true).
 				$sql_where.
 		' GROUP BY hg.hostid'.
 		' HAVING COUNT(hg.groupid)>0'
@@ -1275,7 +1275,7 @@ function getDeletableHostGroups($groupids = null) {
 
 	$sql_where = '';
 	if (!is_null($groupids)) {
-		$sql_where .= ' AND '.DBcondition('g.groupid', $groupids);
+		$sql_where .= ' AND '.dbConditionInt('g.groupid', $groupids);
 	}
 
 	$db_groups = DBselect(
@@ -1287,7 +1287,7 @@ function getDeletableHostGroups($groupids = null) {
 				'SELECT NULL'.
 				' FROM hosts_groups hg'.
 				' WHERE g.groupid=hg.groupid'.
-					(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
+					(!empty($hostids) ? ' AND '.dbConditionInt('hg.hostid', $hostids, true) : '').
 			')'
 	);
 	while ($group = DBfetch($db_groups)) {

@@ -141,7 +141,7 @@ class CDHost extends CZBXAPI {
 // dhostids
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
-			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -156,7 +156,7 @@ class CDHost extends CZBXAPI {
 				$sqlParts['select']['druleid'] = 'dh.druleid';
 			}
 
-			$sqlParts['where']['druleid'] = DBcondition('dh.druleid', $options['druleids']);
+			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
@@ -176,7 +176,7 @@ class CDHost extends CZBXAPI {
 			}
 
 			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -198,7 +198,7 @@ class CDHost extends CZBXAPI {
 
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['dhh'] = 'h.ip=dh.ip';
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
@@ -221,7 +221,7 @@ class CDHost extends CZBXAPI {
 			}
 
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = DBcondition('h.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('h.hostid', $options['hostids']);
 			$sqlParts['where']['dhh'] = 'h.ip=dh.ip';
 
 			if (!is_null($options['groupCount'])) {

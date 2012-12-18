@@ -160,7 +160,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			' FROM applications a,hosts h'.
 			' WHERE a.hostid=h.hostid'.
 				$sql_where.
-				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND '.dbConditionInt('h.hostid',$available_hosts).
 			order_by('a.applicationid,h.name,h.hostid','a.name')
 	);
 	while ($row = DBfetch($result)) {
@@ -178,7 +178,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			' FROM httptest wt,applications a,hosts h'.
 			' WHERE wt.applicationid=a.applicationid'.
 				' AND a.hostid=h.hostid'.
-				' AND '.DBcondition('a.applicationid', $db_appids).
+				' AND '.dbConditionInt('a.applicationid', $db_appids).
 				' AND wt.status<>1'.
 			order_by('wt.name', 'h.host')
 	);
@@ -195,7 +195,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$result = DBselect(
 			'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
 			' FROM httpstep hs'.
-			' WHERE '.DBcondition('hs.httptestid', $db_httptestids).
+			' WHERE '.dbConditionInt('hs.httptestid', $db_httptestids).
 			' GROUP BY hs.httptestid'
 	);
 	while ($row = DBfetch($result)) {
@@ -208,7 +208,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			' WHERE hti.itemid=i.itemid'.
 				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
 				' AND i.lastclock IS NOT NULL'.
-				' AND '.DBcondition('hti.httptestid', $db_httptestids)
+				' AND '.dbConditionInt('hti.httptestid', $db_httptestids)
 	);
 	while ($row = DBfetch($result)) {
 		if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {

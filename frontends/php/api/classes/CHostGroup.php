@@ -130,7 +130,7 @@ class CHostGroup extends CZBXAPI {
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
-			$sqlParts['where']['groupid'] = DBcondition('g.groupid', $options['groupids']);
+			$sqlParts['where']['groupid'] = dbConditionInt('g.groupid', $options['groupids']);
 		}
 
 		// templateids
@@ -154,7 +154,7 @@ class CHostGroup extends CZBXAPI {
 				$sqlParts['select']['hostid'] = 'hg.hostid';
 			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('hg.hostid', $options['hostids']);
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
@@ -168,7 +168,7 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
@@ -184,7 +184,7 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['from']['gi'] = 'graphs_items gi';
 			$sqlParts['from']['i'] = 'items i';
 			$sqlParts['from']['hg'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -197,7 +197,7 @@ class CHostGroup extends CZBXAPI {
 				$sqlParts['select']['maintenanceid'] = 'mg.maintenanceid';
 			}
 			$sqlParts['from']['maintenances_groups'] = 'maintenances_groups mg';
-			$sqlParts['where'][] = DBcondition('mg.maintenanceid', $options['maintenanceids']);
+			$sqlParts['where'][] = dbConditionInt('mg.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
@@ -795,7 +795,7 @@ class CHostGroup extends CZBXAPI {
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
 			' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-				' AND '.DBcondition('c.value', $groupids)
+				' AND '.dbConditionString('c.value', $groupids)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -806,7 +806,7 @@ class CHostGroup extends CZBXAPI {
 			'SELECT DISTINCT o.actionid'.
 			' FROM operations o,opgroup og'.
 			' WHERE o.operationid=og.operationid'.
-				' AND '.DBcondition('og.groupid', $groupids)
+				' AND '.dbConditionInt('og.groupid', $groupids)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -832,7 +832,7 @@ class CHostGroup extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT og.operationid'.
 			' FROM opgroup og'.
-			' WHERE '.DBcondition('og.groupid', $groupids)
+			' WHERE '.dbConditionInt('og.groupid', $groupids)
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -846,7 +846,7 @@ class CHostGroup extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
-			' WHERE '.DBcondition('o.operationid', $operationids).
+			' WHERE '.dbConditionInt('o.operationid', $operationids).
 				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
@@ -905,8 +905,8 @@ class CHostGroup extends CZBXAPI {
 		$linkedDb = DBselect(
 			'SELECT hg.hostid,hg.groupid'.
 			' FROM hosts_groups hg'.
-			' WHERE '.DBcondition('hg.hostid', $objectids).
-				' AND '.DBcondition('hg.groupid', $groupids)
+			' WHERE '.dbConditionInt('hg.hostid', $objectids).
+				' AND '.dbConditionInt('hg.groupid', $groupids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['groupid']][$pair['hostid']] = 1;
@@ -1029,7 +1029,7 @@ class CHostGroup extends CZBXAPI {
 		$dbHostGroups = DBfetchArray(DBselect(
 			'SELECT *'.
 			' FROM hosts_groups hg'.
-			' WHERE '.DBcondition('hg.groupid', $groupIds)
+			' WHERE '.dbConditionInt('hg.groupid', $groupIds)
 		));
 
 		foreach ($groupIds as $groupId) {

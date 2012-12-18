@@ -107,7 +107,7 @@ class CWebCheck extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			}
-			$sqlParts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
+			$sqlParts['where']['httptestid'] = dbConditionInt('ht.httptestid', $options['httptestids']);
 		}
 
 		// hostids
@@ -119,7 +119,7 @@ class CWebCheck extends CZBXAPI {
 			}
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
-			$sqlParts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('a.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hostid'] = 'a.hostid';
@@ -133,7 +133,7 @@ class CWebCheck extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_EXTEND) {
 				$sqlParts['select']['applicationid'] = 'a.applicationid';
 			}
-			$sqlParts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('ht.applicationid', $options['applicationids']);
 		}
 
 		// output
@@ -275,7 +275,7 @@ class CWebCheck extends CZBXAPI {
 			$dbSteps = DBselect(
 				'SELECT h.*'.
 				' FROM httpstep h'.
-				' WHERE '.DBcondition('h.httptestid', $httpTestIds)
+				' WHERE '.dbConditionInt('h.httptestid', $httpTestIds)
 			);
 			while ($step = DBfetch($dbSteps)) {
 				$stepid = $step['httpstepid'];
@@ -449,7 +449,7 @@ class CWebCheck extends CZBXAPI {
 		$dbTestItems = DBselect(
 			'SELECT hsi.itemid'.
 			' FROM httptestitem hsi'.
-			' WHERE '.DBcondition('hsi.httptestid', $httpTestIds)
+			' WHERE '.dbConditionInt('hsi.httptestid', $httpTestIds)
 		);
 		while ($testitem = DBfetch($dbTestItems)) {
 			$itemidsDel[] = $testitem['itemid'];
@@ -458,7 +458,7 @@ class CWebCheck extends CZBXAPI {
 		$dbStepItems = DBselect(
 			'SELECT DISTINCT hsi.itemid'.
 			' FROM httpstepitem hsi,httpstep hs'.
-			' WHERE '.DBcondition('hs.httptestid', $httpTestIds).
+			' WHERE '.dbConditionInt('hs.httptestid', $httpTestIds).
 				' AND hs.httpstepid=hsi.httpstepid'
 		);
 		while ($stepitem = DBfetch($dbStepItems)) {
@@ -496,7 +496,7 @@ class CWebCheck extends CZBXAPI {
 	protected function validateCreate(array $httpTests) {
 		$httpTestsNames = $this->checkNames($httpTests);
 
-		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.DBcondition('ht.name', $httpTestsNames), 1))) {
+		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.dbConditionString('ht.name', $httpTestsNames), 1))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $name['name']));
 		}
 
@@ -526,8 +526,8 @@ class CWebCheck extends CZBXAPI {
 		$httpTestsNames = $this->checkNames($httpTests);
 
 		$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.
-				DBcondition('ht.name', $httpTestsNames).
-				' AND '.DBcondition('ht.httptestid', $httpTestIds, true), 1));
+				dbConditionString('ht.name', $httpTestsNames).
+				' AND '.dbConditionInt('ht.httptestid', $httpTestIds, true), 1));
 		if ($nameExists) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $nameExists['name']));
 		}
@@ -694,7 +694,7 @@ class CWebCheck extends CZBXAPI {
 		$sql = 'SELECT h.httpstepid,h.name'.
 				' FROM httpstep h'.
 				' WHERE h.httptestid='.$httpTest['httptestid'].
-					' AND '.DBcondition('h.name', $webstepsNames);
+					' AND '.dbConditionString('h.name', $webstepsNames);
 		if ($httpstepData = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstepData['name']));
 		}
@@ -796,7 +796,7 @@ class CWebCheck extends CZBXAPI {
 		$dbKeys = DBfetchArray(DBselect(
 			'SELECT i.key_'.
 			' FROM items i,httpstepitem hi'.
-			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
+			' WHERE '.dbConditionInt('hi.httpstepid', $webstepids).
 				' AND hi.itemid=i.itemid'
 		));
 		$dbKeys = zbx_toHash($dbKeys, 'key_');
@@ -874,7 +874,7 @@ class CWebCheck extends CZBXAPI {
 		$dbStepItems = DBselect(
 			'SELECT i.itemid'.
 			' FROM items i,httpstepitem hi'.
-			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
+			' WHERE '.dbConditionInt('hi.httpstepid', $webstepids).
 				' AND hi.itemid=i.itemid'
 		);
 		while ($stepitem = DBfetch($dbStepItems)) {

@@ -188,7 +188,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['groupid'] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where']['groupid'] = dbConditionInt('hg.groupid', $options['groupids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -217,7 +217,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
@@ -230,7 +230,7 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['where']['triggerid'] = DBcondition('t.triggerid', $options['triggerids']);
+			$sqlParts['where']['triggerid'] = dbConditionInt('t.triggerid', $options['triggerids']);
 		}
 
 		// itemids
@@ -241,7 +241,7 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts['select']['itemid'] = 'f.itemid';
 			}
 			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where']['itemid'] = DBcondition('f.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('f.itemid', $options['itemids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 
 			if (!is_null($options['groupCount'])) {
@@ -259,7 +259,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['a'] = DBcondition('a.applicationid', $options['applicationids']);
+			$sqlParts['where']['a'] = dbConditionInt('a.applicationid', $options['applicationids']);
 			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
@@ -271,7 +271,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = DBcondition('f.function', $options['functions']);
+			$sqlParts['where'][] = dbConditionString('f.function', $options['functions']);
 		}
 
 		// monitored
@@ -407,7 +407,7 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])) {
@@ -417,7 +417,7 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts['from']['items'] = 'items i';
 				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-				$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
+				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
 
@@ -445,7 +445,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -661,7 +661,7 @@ class CTrigger extends CTriggerGeneral {
 				$dbResult = DBselect(
 					'SELECT d.triggerid_down,d.triggerid_up,t.value'.
 					' FROM trigger_depends d,triggers t'.
-					' WHERE '.DBcondition('d.triggerid_down', $tids).
+					' WHERE '.dbConditionInt('d.triggerid_down', $tids).
 						' AND d.triggerid_up=t.triggerid'
 				);
 				$tids = array();
@@ -706,8 +706,8 @@ class CTrigger extends CTriggerGeneral {
 				'SELECT MAX(e.eventid) AS eventid,e.objectid'.
 				' FROM events e'.
 				' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-					' AND '.DBcondition('e.objectid', $triggerids).
-					' AND '.DBcondition('e.value', array(TRIGGER_VALUE_TRUE)).
+					' AND '.dbConditionInt('e.objectid', $triggerids).
+					' AND '.dbConditionInt('e.value', array(TRIGGER_VALUE_TRUE)).
 					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 				' GROUP BY e.objectid'
 			);
@@ -719,7 +719,7 @@ class CTrigger extends CTriggerGeneral {
 			$triggersDb = DBselect(
 				'SELECT e.objectid'.
 				' FROM events e '.
-				' WHERE '.DBcondition('e.eventid', $eventids).
+				' WHERE '.dbConditionInt('e.eventid', $eventids).
 					' AND e.acknowledged=0'
 			);
 			while ($trigger = DBfetch($triggersDb)) {
@@ -750,7 +750,7 @@ class CTrigger extends CTriggerGeneral {
 			$dbDeps = DBselect(
 				'SELECT td.triggerid_up,td.triggerid_down'.
 				' FROM trigger_depends td'.
-				' WHERE '.DBcondition('td.triggerid_down', $triggerids)
+				' WHERE '.dbConditionInt('td.triggerid_down', $triggerids)
 			);
 			while ($dbDep = DBfetch($dbDeps)) {
 				if (!isset($deps[$dbDep['triggerid_down']])) {
@@ -862,7 +862,7 @@ class CTrigger extends CTriggerGeneral {
 			$res = DBselect(
 				'SELECT '.$sqlSelect.
 				' FROM functions f'.
-				' WHERE '.DBcondition('f.triggerid', $triggerids)
+				' WHERE '.dbConditionInt('f.triggerid', $triggerids)
 			);
 			while ($function = DBfetch($res)) {
 				$triggerid = $function['triggerid'];
@@ -900,7 +900,7 @@ class CTrigger extends CTriggerGeneral {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,td.triggerid'.
 				' FROM trigger_discovery td,item_discovery id,functions f'.
-				' WHERE '.DBcondition('td.triggerid', $triggerids).
+				' WHERE '.dbConditionInt('td.triggerid', $triggerids).
 					' AND td.parent_triggerid=f.triggerid'.
 					' AND f.itemid=id.itemid'
 			);
@@ -1197,7 +1197,7 @@ class CTrigger extends CTriggerGeneral {
 					$sql = 'SELECT i.itemid,i.value_type'.
 							' FROM items i,hosts h'.
 							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-								' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+								' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 								' AND h.host='.zbx_dbstr($exprPart['host']).
 								' AND h.hostid=i.hostid'.
 								' AND '.DBin_node('i.itemid');
@@ -1313,7 +1313,7 @@ class CTrigger extends CTriggerGeneral {
 		// get child triggers
 		$parentTriggerids = $triggerids;
 		do {
-			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parentTriggerids));
+			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.dbConditionInt('templateid', $parentTriggerids));
 			$parentTriggerids = array();
 			while ($dbTrigger = DBfetch($dbItems)) {
 				$parentTriggerids[] = $dbTrigger['triggerid'];
@@ -1367,13 +1367,13 @@ class CTrigger extends CTriggerGeneral {
 			'SELECT DISTINCT actionid'.
 			' FROM conditions'.
 			' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-				' AND '.DBcondition('value', $pks, false, true)
+				' AND '.dbConditionString('value', $pks, false, true)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
 		}
 
-		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.DBcondition('actionid', $actionids));
+		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.dbConditionInt('actionid', $actionids));
 
 		// delete action conditions
 		DB::delete('conditions', array(
@@ -1838,7 +1838,7 @@ class CTrigger extends CTriggerGeneral {
 				$res = DBselect(
 					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
-					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds)
+					' WHERE '.dbConditionInt('td.triggerid_down', $downTriggerIds)
 				);
 
 				// combine db dependencies with thouse to be added
@@ -1881,7 +1881,7 @@ class CTrigger extends CTriggerGeneral {
 					'SELECT DISTINCT ht.templateid,ht.hostid,h.host'.
 					' FROM hosts_templates ht,hosts h'.
 					' WHERE h.hostid=ht.hostid'.
-						' AND'.DBcondition('ht.templateid', $affectedTemplateIds)
+						' AND '.dbConditionInt('ht.templateid', $affectedTemplateIds)
 				);
 				$map = array();
 				while ($lowlvltpl = DBfetch($dbLowlvltpl)) {
@@ -1933,7 +1933,7 @@ class CTrigger extends CTriggerGeneral {
 			'SELECT templateid,triggerid'.
 			' FROM triggers'.
 			' WHERE templateid>0'.
-				' AND '.DBcondition('triggerid', $depTriggerIds)
+				' AND '.dbConditionInt('triggerid', $depTriggerIds)
 		));
 		if ($parentDepTriggers) {
 			$parentDepTriggers = zbx_toHash($parentDepTriggers, 'triggerid');
@@ -1981,7 +1981,7 @@ class CTrigger extends CTriggerGeneral {
 				$dbUpTriggers = DBselect(
 					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
-					' WHERE '.DBcondition('td.triggerid_up', $trigger['dependencies']).
+					' WHERE '.dbConditionInt('td.triggerid_up', $trigger['dependencies']).
 					' AND td.triggerid_down='.zbx_dbstr($trigger['triggerid'])
 				, 1);
 				if (DBfetch($dbUpTriggers)) {

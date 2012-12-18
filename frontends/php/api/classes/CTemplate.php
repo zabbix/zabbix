@@ -145,7 +145,7 @@ class CTemplate extends CHostGeneral {
 			}
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -162,7 +162,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['where']['templateid'] = DBcondition('h.hostid', $options['templateids']);
+			$sqlParts['where']['templateid'] = dbConditionInt('h.hostid', $options['templateids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -178,7 +178,7 @@ class CTemplate extends CHostGeneral {
 			}
 
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
-			$sqlParts['where'][] = DBcondition('ht.templateid', $options['parentTemplateids']);
+			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -200,7 +200,7 @@ class CTemplate extends CHostGeneral {
 			}
 
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
-			$sqlParts['where'][] = DBcondition('ht.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('ht.hostid', $options['hostids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.templateid';
 
 			if (!is_null($options['groupCount'])) {
@@ -222,7 +222,7 @@ class CTemplate extends CHostGeneral {
 			}
 
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if (!$nodeCheck) {
@@ -240,7 +240,7 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
@@ -260,7 +260,7 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
@@ -1143,7 +1143,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
+		DBexecute('DELETE FROM screens_items WHERE '.dbConditionInt('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
 
 		// delete host from maps
 		if (!empty($templateids)) {
@@ -1156,7 +1156,7 @@ class CTemplate extends CHostGeneral {
 		$sql = 'SELECT DISTINCT actionid'.
 			' FROM conditions'.
 			' WHERE conditiontype='.CONDITION_TYPE_HOST.
-			' AND '.DBcondition('value', $templateids);
+			' AND '.dbConditionString('value', $templateids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -1166,7 +1166,7 @@ class CTemplate extends CHostGeneral {
 		$sql = 'SELECT DISTINCT o.actionid'.
 			' FROM operations o,optemplate ot'.
 			' WHERE o.operationid=ot.operationid'.
-			' AND '.DBcondition('ot.templateid', $templateids);
+			' AND '.dbConditionInt('ot.templateid', $templateids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -1189,7 +1189,7 @@ class CTemplate extends CHostGeneral {
 		$operationids = array();
 		$sql = 'SELECT DISTINCT ot.operationid'.
 			' FROM optemplate ot'.
-			' WHERE '.DBcondition('ot.templateid', $templateids);
+			' WHERE '.dbConditionInt('ot.templateid', $templateids);
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -1203,7 +1203,7 @@ class CTemplate extends CHostGeneral {
 		$delOperationids = array();
 		$sql = 'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
-			' WHERE '.DBcondition('o.operationid', $operationids).
+			' WHERE '.dbConditionInt('o.operationid', $operationids).
 			' AND NOT EXISTS(SELECT NULL FROM optemplate ot WHERE ot.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
@@ -1378,7 +1378,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (!empty($sqlSet)) {
-			$sql = 'UPDATE hosts SET ' . implode(', ', $sqlSet) . ' WHERE ' . DBcondition('hostid', $templateids);
+			$sql = 'UPDATE hosts SET '.implode(', ', $sqlSet).' WHERE '.dbConditionInt('hostid', $templateids);
 			$result = DBexecute($sql);
 		}
 		// }}} UPDATE TEMPLATES PROPERTIES

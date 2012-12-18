@@ -127,7 +127,7 @@ class CUserGroup extends CZBXAPI {
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
 
-			$sqlParts['where'][] = DBcondition('g.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where'][] = dbConditionInt('g.usrgrpid', $options['usrgrpids']);
 		}
 
 		// userids
@@ -138,7 +138,7 @@ class CUserGroup extends CZBXAPI {
 				$sqlParts['select']['userid'] = 'ug.userid';
 			}
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = DBcondition('ug.userid', $options['userids']);
+			$sqlParts['where'][] = dbConditionInt('ug.userid', $options['userids']);
 			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
 		}
 
@@ -428,8 +428,8 @@ class CUserGroup extends CZBXAPI {
 			$linkedUsers = array();
 			$sql = 'SELECT usrgrpid, userid'.
 				' FROM users_groups'.
-				' WHERE '.DBcondition('usrgrpid', $usrgrpids).
-				' AND '.DBcondition('userid', $userids);
+				' WHERE '.dbConditionInt('usrgrpid', $usrgrpids).
+				' AND '.dbConditionInt('userid', $userids);
 			$linkedUsersDb = DBselect($sql);
 			while ($link = DBfetch($linkedUsersDb)) {
 				if (!isset($linkedUsers[$link['usrgrpid']])) $linkedUsers[$link['usrgrpid']] = array();
@@ -454,8 +454,8 @@ class CUserGroup extends CZBXAPI {
 			$linkedRights = array();
 			$sql = 'SELECT groupid, id'.
 				' FROM rights'.
-				' WHERE '.DBcondition('groupid', $usrgrpids);
-			' AND '.DBcondition('id', zbx_objectValues($rights, 'id'));
+				' WHERE '.dbConditionInt('groupid', $usrgrpids);
+			' AND '.dbConditionInt('id', zbx_objectValues($rights, 'id'));
 			$linkedRightsDb = DBselect($sql);
 			while ($link = DBfetch($linkedRightsDb)) {
 				if (!isset($linkedRights[$link['groupid']])) $linkedRights[$link['groupid']] = array();
@@ -566,7 +566,7 @@ class CUserGroup extends CZBXAPI {
 			$linkedUsers = array();
 			$sql = 'SELECT usrgrpid, userid'.
 				' FROM users_groups'.
-				' WHERE '.DBcondition('usrgrpid', $usrgrpids);
+				' WHERE '.dbConditionInt('usrgrpid', $usrgrpids);
 			$linkedUsersDb = DBselect($sql);
 			while ($link = DBfetch($linkedUsersDb)) {
 				if (!isset($linkedUsers[$link['usrgrpid']])) {
@@ -618,7 +618,7 @@ class CUserGroup extends CZBXAPI {
 			$linkedRights = array();
 			$sql = 'SELECT groupid, permission, id'.
 				' FROM rights'.
-				' WHERE '.DBcondition('groupid', $usrgrpids);
+				' WHERE '.dbConditionInt('groupid', $usrgrpids);
 			$linkedRightsDb = DBselect($sql);
 			while ($link = DBfetch($linkedRightsDb)) {
 				if (!isset($linkedRights[$link['groupid']])) {
@@ -729,7 +729,7 @@ class CUserGroup extends CZBXAPI {
 		$operationids = array();
 		$sql = 'SELECT DISTINCT om.operationid '.
 			' FROM opmessage_grp om '.
-			' WHERE '.DBcondition('om.usrgrpid', $usrgrpids);
+			' WHERE '.dbConditionInt('om.usrgrpid', $usrgrpids);
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations))
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -740,7 +740,7 @@ class CUserGroup extends CZBXAPI {
 		$delOperationids = array();
 		$sql = 'SELECT DISTINCT o.operationid '.
 			' FROM operations o '.
-			' WHERE '.DBcondition('o.operationid', $operationids).
+			' WHERE '.dbConditionInt('o.operationid', $operationids).
 			' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations))

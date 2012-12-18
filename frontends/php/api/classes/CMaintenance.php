@@ -105,7 +105,7 @@ class CMaintenance extends CZBXAPI {
 					$res = DBselect(
 						'SELECT mmg.maintenanceid'.
 						' FROM maintenances_groups mmg'.
-						' WHERE '.DBcondition('mmg.groupid', $options['groupids'])
+						' WHERE '.dbConditionInt('mmg.groupid', $options['groupids'])
 					);
 					while ($maintenance = DBfetch($res)) {
 						$maintenanceids[] = $maintenance['maintenanceid'];
@@ -118,18 +118,18 @@ class CMaintenance extends CZBXAPI {
 
 				if (!is_null($options['groupids'])) {
 					zbx_value2array($options['groupids']);
-					$sql .= ' AND '.DBcondition('hg.groupid', $options['groupids']);
+					$sql .= ' AND '.dbConditionInt('hg.groupid', $options['groupids']);
 				}
 
 				if (!is_null($options['hostids'])) {
 					zbx_value2array($options['hostids']);
-					$sql .= ' AND '.DBcondition('hg.hostid', $options['hostids']);
+					$sql .= ' AND '.dbConditionInt('hg.hostid', $options['hostids']);
 				}
 				$res = DBselect($sql);
 				while ($maintenance = DBfetch($res)) {
 					$maintenanceids[] = $maintenance['maintenanceid'];
 				}
-				$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+				$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 			}
 		}
 		else {
@@ -170,14 +170,14 @@ class CMaintenance extends CZBXAPI {
 							'SELECT NULL'.
 								' FROM maintenances_groups mg'.
 								' WHERE m.maintenanceid=mg.maintenanceid'.
-								' AND '.DBcondition('mg.groupid', $options['groupids']).
+								' AND '.dbConditionInt('mg.groupid', $options['groupids']).
 							')'.
 						' OR EXISTS ('.
 							'SELECT NULL'.
 								' FROM maintenances_hosts mh,hosts_groups hg'.
 								' WHERE m.maintenanceid=mh.maintenanceid'.
 									' AND mh.hostid=hg.hostid'.
-									' AND '.DBcondition('hg.groupid', $options['groupids']).
+									' AND '.dbConditionInt('hg.groupid', $options['groupids']).
 							')'.
 						')';
 			}
@@ -188,7 +188,7 @@ class CMaintenance extends CZBXAPI {
 						'SELECT NULL'.
 							' FROM maintenances_hosts mh'.
 							' WHERE m.maintenanceid=mh.maintenanceid'.
-								' AND '.DBcondition('mh.hostid', $options['hostids']).
+								' AND '.dbConditionInt('mh.hostid', $options['hostids']).
 						')';
 			}
 
@@ -201,7 +201,7 @@ class CMaintenance extends CZBXAPI {
 			while ($maintenance = DBfetch($res)) {
 				$maintenanceids[] = $maintenance['maintenanceid'];
 			}
-			$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 		}
 
 		// nodeids
@@ -221,7 +221,7 @@ class CMaintenance extends CZBXAPI {
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sqlParts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
+			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $options['maintenanceids']);
 		}
 
 		// output
@@ -732,7 +732,7 @@ class CMaintenance extends CZBXAPI {
 			$dbTimeperiods = DBselect(
 				'SELECT DISTINCT tp.timeperiodid'.
 				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceids).
+				' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceids).
 					' AND tp.timeperiodid=mw.timeperiodid'
 			);
 			while ($timeperiod = DBfetch($dbTimeperiods)) {
@@ -870,7 +870,7 @@ class CMaintenance extends CZBXAPI {
 			$query = DBSelect(
 				'SELECT '.implode($sqlParts['select'], ',').',mw.maintenanceid'.
 				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceIds).
+				' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceIds).
 					' AND tp.timeperiodid=mw.timeperiodid'
 			);
 			while ($tp = DBfetch($query)) {

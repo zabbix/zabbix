@@ -121,7 +121,7 @@
 			$mediaTypeDescriptions = array();
 			$dbMediaTypes = DBselect(
 				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
-					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
+					dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 			);
 			while ($dbMediaType = DBfetch($dbMediaTypes)) {
 				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
@@ -144,7 +144,7 @@
 			if (count($group_ids) == 0) {
 				$group_ids = array(-1);
 			}
-			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
+			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
 
 			$tmp_permitions = array();
 			while ($db_right = DBfetch($db_rights)) {
