@@ -111,7 +111,7 @@ class CItemPrototype extends CItemGeneral {
 					' FROM hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE i.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>='.$permission.
@@ -181,7 +181,7 @@ class CItemPrototype extends CItemGeneral {
 				$sqlParts['select']['triggerid'] = 'f.triggerid';
 			}
 			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
@@ -193,7 +193,7 @@ class CItemPrototype extends CItemGeneral {
 				$sqlParts['select']['graphid'] = 'gi.graphid';
 			}
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 

@@ -144,7 +144,7 @@ class CMaintenance extends CZBXAPI {
 						' FROM maintenances_hosts mh,hosts_groups hg'.
 							' LEFT JOIN rights r'.
 								' ON r.id=hg.groupid'.
-									' AND '.DBcondition('r.groupid', $userGroups).
+									' AND '.dbConditionInt('r.groupid', $userGroups).
 						' WHERE m.maintenanceid=mh.maintenanceid'.
 							' AND mh.hostid=hg.hostid'.
 						' GROUP by mh.hostid'.
@@ -156,7 +156,7 @@ class CMaintenance extends CZBXAPI {
 						' FROM maintenances_groups mg'.
 							' LEFT JOIN rights r'.
 								' ON r.id=mg.groupid'.
-									' AND '.DBcondition('r.groupid', $userGroups).
+									' AND '.dbConditionInt('r.groupid', $userGroups).
 						' WHERE m.maintenanceid=mg.maintenanceid'.
 						' GROUP by mg.groupid'.
 						' HAVING MIN(r.permission) IS NULL'.
@@ -194,7 +194,7 @@ class CMaintenance extends CZBXAPI {
 
 			if (!is_null($options['maintenanceids'])) {
 				zbx_value2array($options['maintenanceids']);
-				$sql .= ' AND '.DBcondition('m.maintenanceid', $options['maintenanceids']);
+				$sql .= ' AND '.dbConditionInt('m.maintenanceid', $options['maintenanceids']);
 			}
 
 			$res = DBselect($sql);

@@ -121,7 +121,7 @@ class CAction extends CZBXAPI {
 					' FROM conditions cc'.
 						' LEFT JOIN rights r'.
 							' ON r.id='.zbx_dbcast_2bigint('cc.value').
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE a.actionid=cc.actionid'.
 						' AND cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 					' GROUP BY cc.value'.
@@ -135,7 +135,7 @@ class CAction extends CZBXAPI {
 					' FROM conditions cc,hosts_groups hgg'.
 						' LEFT JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE a.actionid=cc.actionid'.
 						' AND '.zbx_dbcast_2bigint('cc.value').'=hgg.hostid'.
 						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_HOST_TEMPLATE.')'.
@@ -150,7 +150,7 @@ class CAction extends CZBXAPI {
 					' FROM conditions cc,functions f,items i,hosts_groups hgg'.
 						' LEFT JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE a.actionid=cc.actionid'.
 						' AND '.zbx_dbcast_2bigint('cc.value').'=f.triggerid'.
 						' AND f.itemid=i.itemid'.
