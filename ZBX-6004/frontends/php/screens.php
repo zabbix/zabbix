@@ -136,7 +136,7 @@ else {
 
 $data['screens'] = API::Screen()->get(array(
 	'nodeids' => get_current_nodeid(),
-	'output' => API_OUTPUT_EXTEND
+	'output' => array('screenid', 'name')
 ));
 
 // if screen name is provided it takes priority over elementid
