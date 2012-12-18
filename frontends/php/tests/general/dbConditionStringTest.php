@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,11 +19,34 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/func.inc.php';
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class function_DBcondition extends CZabbixTest {
-	public function test_DBcondition() {
-		// TODO
-		$this->markTestIncomplete();
+class dbConditionStringTest extends CZabbixTest {
+
+	public static function provider() {
+		return array(
+			array(
+				array('field', array()),
+				'1=0'
+			),
+			array(
+				array('field', array('a')),
+				'field=\'a\''
+			),
+			array(
+				array('field', array('a'), true),
+				'field!=\'a\''
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider provider
+	 */
+	public function test($params, $expectedResult) {
+		$result = call_user_func_array('dbConditionString', $params);
+
+		$this->assertSame($expectedResult, $result);
 	}
 }
