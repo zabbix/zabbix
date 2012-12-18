@@ -203,11 +203,12 @@ class CHostGroup extends CZBXAPI {
 
 		// monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts, with_hosts_and_templates
 		if (!is_null($options['monitored_hosts'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,hosts h'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=h.hostid'.
+					' FROM hosts h'.
+					' WHERE hg.hostid=h.hostid'.
 						' AND h.status='.HOST_STATUS_MONITORED.
 					')';
 		}
@@ -242,40 +243,44 @@ class CHostGroup extends CZBXAPI {
 
 		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,items i'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=i.hostid'.
+					' FROM items i'.
+					' WHERE hg.hostid=i.hostid'.
 					')';
 		}
 		elseif (!is_null($options['with_monitored_items'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,items i,hosts h'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=i.hostid'.
+					' FROM items i,hosts h'.
+					' WHERE hg.hostid=i.hostid'.
 						' AND i.hostid=h.hostid'.
 						' AND h.status='.HOST_STATUS_MONITORED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
 					')';
 		}
 		elseif (!is_null($options['with_historical_items'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,items i'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=i.hostid'.
+					' FROM items i'.
+					' WHERE hg.hostid=i.hostid'.
 						' AND i.status IN ('.ITEM_STATUS_ACTIVE.','.ITEM_STATUS_NOTSUPPORTED.')'.
 						' AND i.lastvalue IS NOT NULL'.
 					')';
 		}
 		elseif (!is_null($options['with_simple_graph_items'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,items i'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=i.hostid'.
+					' FROM items i'.
+					' WHERE hg.hostid=i.hostid'.
 						' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')'.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
 						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
@@ -284,20 +289,22 @@ class CHostGroup extends CZBXAPI {
 
 		// with_triggers, with_monitored_triggers
 		if (!is_null($options['with_triggers'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,items i,functions f'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=i.hostid'.
+					' FROM items i,functions f'.
+					' WHERE hg.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
 					')';
 		}
 		elseif (!is_null($options['with_monitored_triggers'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,items i,hosts h,functions f,triggers t'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=i.hostid'.
+					' FROM items i,hosts h,functions f,triggers t'.
+					' WHERE hg.hostid=i.hostid'.
 						' AND i.hostid=h.hostid'.
 						' AND i.itemid=f.itemid'.
 						' AND f.triggerid=t.triggerid'.
@@ -309,20 +316,22 @@ class CHostGroup extends CZBXAPI {
 
 		// with_httptests, with_monitored_httptests
 		if (!is_null($options['with_httptests'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,applications a,httptest ht'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=a.hostid'.
+					' FROM applications a,httptest ht'.
+					' WHERE hg.hostid=a.hostid'.
 						' AND a.applicationid=ht.applicationid'.
 					')';
 		}
 		elseif (!is_null($options['with_monitored_httptests'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,hosts h,applications a,httptest ht'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=h.hostid'.
+					' FROM hosts h,applications a,httptest ht'.
+					' WHERE hg.hostid=h.hostid'.
 						' AND hg.hostid=a.hostid'.
 						' AND a.applicationid=ht.applicationid'.
 						' AND h.status='.HOST_STATUS_MONITORED.
@@ -332,22 +341,21 @@ class CHostGroup extends CZBXAPI {
 
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hg,items i,graphs_items gi'.
-					' WHERE g.groupid=hg.groupid'.
-						' AND hg.hostid=i.hostid'.
+					' FROM items i,graphs_items gi'.
+					' WHERE hg.hostid=i.hostid'.
 						' AND i.itemid=gi.itemid'.
 					')';
 		}
 
 		if (!is_null($options['with_applications'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'h.hostid=hg.hostid';
-			$sqlParts['where'][] = 'a.hostid=h.hostid';
+			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
+			$sqlParts['where'][] = 'hg.hostid=a.hostid';
 		}
 
 		// output
