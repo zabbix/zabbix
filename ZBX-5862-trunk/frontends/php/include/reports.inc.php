@@ -80,7 +80,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $opt
 			$sql_cond = ' AND h.hostid='.$PAGE_HOSTS['selected'];
 		}
 		else {
-			$sql_cond = ' AND '.DBcondition('h.hostid',$PAGE_HOSTS['hostids']);
+			$sql_cond = ' AND '.dbConditionInt('h.hostid', $PAGE_HOSTS['hostids']);
 		}
 		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
 			' FROM triggers t,hosts h,items i,functions f '.

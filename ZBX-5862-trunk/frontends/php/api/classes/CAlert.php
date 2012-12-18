@@ -162,7 +162,7 @@ class CAlert extends CZBXAPI {
 			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hg'] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 		}
 
 		// hostids
@@ -172,7 +172,7 @@ class CAlert extends CZBXAPI {
 			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
@@ -182,7 +182,7 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['alertids'])) {
 			zbx_value2array($options['alertids']);
 
-			$sqlParts['where'][] = DBcondition('a.alertid', $options['alertids']);
+			$sqlParts['where'][] = dbConditionInt('a.alertid', $options['alertids']);
 		}
 
 		// triggerids
@@ -192,14 +192,14 @@ class CAlert extends CZBXAPI {
 			$sqlParts['select']['actionid'] = 'a.actionid';
 			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
 			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sqlParts['where'][] = DBcondition('e.objectid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['triggerids']);
 		}
 
 		// eventids
 		if (!is_null($options['eventids'])) {
 			zbx_value2array($options['eventids']);
 
-			$sqlParts['where'][] = DBcondition('a.eventid', $options['eventids']);
+			$sqlParts['where'][] = dbConditionInt('a.eventid', $options['eventids']);
 		}
 
 		// actionids
@@ -207,7 +207,7 @@ class CAlert extends CZBXAPI {
 			zbx_value2array($options['actionids']);
 
 			$sqlParts['select']['actionid'] = 'a.actionid';
-			$sqlParts['where'][] = DBcondition('a.actionid', $options['actionids']);
+			$sqlParts['where'][] = dbConditionInt('a.actionid', $options['actionids']);
 		}
 
 		// userids
@@ -218,7 +218,7 @@ class CAlert extends CZBXAPI {
 			if (!is_null($options['time_from']) || !is_null($options['time_till'])) {
 				$field = '(a.userid+0)';
 			}
-			$sqlParts['where'][] = DBcondition($field, $options['userids']);
+			$sqlParts['where'][] = dbConditionInt($field, $options['userids']);
 		}
 
 		// mediatypeids
@@ -226,7 +226,7 @@ class CAlert extends CZBXAPI {
 			zbx_value2array($options['mediatypeids']);
 
 			$sqlParts['select']['mediatypeid'] = 'a.mediatypeid';
-			$sqlParts['where'][] = DBcondition('a.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionInt('a.mediatypeid', $options['mediatypeids']);
 		}
 
 		// filter
@@ -387,7 +387,7 @@ class CAlert extends CZBXAPI {
 
 		// adding mediatypes
 		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs)) {
-			$res = DBselect('SELECT mt.* FROM media_type mt WHERE '.DBcondition('mt.mediatypeid', $mediatypeids));
+			$res = DBselect('SELECT mt.* FROM media_type mt WHERE '.dbConditionInt('mt.mediatypeid', $mediatypeids));
 			while ($media = DBfetch($res)) {
 				$mediatypes[$media['mediatypeid']] = $media;
 			}

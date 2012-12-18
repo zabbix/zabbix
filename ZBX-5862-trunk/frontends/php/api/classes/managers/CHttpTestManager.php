@@ -76,9 +76,11 @@ class CHttpTestManager {
 		}
 
 		if (!empty($httpSteps)) {
-			$dbCursor = DBselect('SELECT hs.httpstepid,hs.httptestid,hs.name'.
-					' FROM httpstep hs'.
-					' WHERE '.DBcondition('hs.httpstepid', array_keys($httpSteps)));
+			$dbCursor = DBselect(
+				'SELECT hs.httpstepid,hs.httptestid,hs.name'.
+				' FROM httpstep hs'.
+				' WHERE '.dbConditionInt('hs.httpstepid', array_keys($httpSteps))
+			);
 			while ($dbStep = DBfetch($dbCursor)) {
 				if ($httpSteps[$dbStep['httpstepid']] != $dbStep['name']) {
 					$result[$dbStep['httptestid']][$httpSteps[$dbStep['httpstepid']]] = $dbStep['name'];
@@ -108,10 +110,12 @@ class CHttpTestManager {
 		}
 
 		// TODO: REMOVE info
-		$dbCursor = DBselect('SELECT ht.name, h.name as hostname'.
+		$dbCursor = DBselect(
+			'SELECT ht.name,h.name AS hostname'.
 			' FROM httptest ht'.
-			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
-			' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid')));
+				' INNER JOIN hosts h ON ht.hostid=h.hostid'.
+			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
+		);
 		while ($httpTest = DBfetch($dbCursor)) {
 			info(_s('Created: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['hostname']));
 		}
@@ -145,9 +149,9 @@ class CHttpTestManager {
 			$checkItemsUpdate = $updateFields = array();
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
-						' FROM items i,httptestitem hi'.
-						' WHERE hi.httptestid='.$httpTest['httptestid'].
-						' AND hi.itemid=i.itemid'
+				' FROM items i,httptestitem hi'.
+				' WHERE hi.httptestid='.$httpTest['httptestid'].
+					' AND hi.itemid=i.itemid'
 			);
 			while ($checkitem = DBfetch($dbCheckItems)) {
 				$itemids[] = $checkitem['itemid'];
@@ -204,10 +208,11 @@ class CHttpTestManager {
 				if (isset($httpTest['applicationid'])) {
 					$dbStepIds = DBfetchColumn(DBselect(
 						'SELECT i.itemid'.
-							' FROM items i'.
+						' FROM items i'.
 							' INNER JOIN httpstepitem hi ON hi.itemid=i.itemid'.
-								' WHERE '.DBcondition('hi.httpstepid', zbx_objectValues($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid')))
-						, 'itemid');
+						' WHERE '.dbConditionInt('hi.httpstepid', zbx_objectValues($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid')))
+						, 'itemid'
+					);
 					$this->updateItemsApplications($dbStepIds, $httpTest['applicationid']);
 				}
 				if (isset($httpTest['status'])) {
@@ -228,10 +233,12 @@ class CHttpTestManager {
 		}
 
 		// TODO: REMOVE info
-		$dbCursor = DBselect('SELECT ht.name, h.name as hostname'.
+		$dbCursor = DBselect(
+			'SELECT ht.name,h.name AS hostname'.
 			' FROM httptest ht'.
-			' INNER JOIN hosts h ON ht.hostid=h.hostid'.
-			' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid')));
+				' INNER JOIN hosts h ON ht.hostid=h.hostid'.
+			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
+		);
 		while ($httpTest = DBfetch($dbCursor)) {
 			info(_s('Updated: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['hostname']));
 		}
@@ -249,18 +256,21 @@ class CHttpTestManager {
 		$hostIds = zbx_toArray($hostIds);
 
 		$httpTests = array();
-		$dbCursor = DBselect('SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.macros,ht.agent,'.
-			'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid'.
+		$dbCursor = DBselect(
+			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.macros,ht.agent,'.
+				'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid'.
 			' FROM httptest ht'.
-			' WHERE ht.hostid='.zbx_dbstr($templateId));
+			' WHERE ht.hostid='.zbx_dbstr($templateId)
+		);
 		while ($dbHttpTest = DBfetch($dbCursor)) {
 			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 		}
 
-		$dbCursor = DBselect('SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.required,'.
-				'hs.status_codes'.
-				' FROM httpstep hs'.
-				' WHERE '.DBcondition('hs.httptestid', array_keys($httpTests)));
+		$dbCursor = DBselect(
+			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.required,hs.status_codes'.
+			' FROM httpstep hs'.
+			' WHERE '.dbConditionInt('hs.httptestid', array_keys($httpTests))
+		);
 		while ($dbHttpStep = DBfetch($dbCursor)) {
 			$httpTests[$dbHttpStep['httptestid']]['steps'][] = $dbHttpStep;
 		}
@@ -304,11 +314,13 @@ class CHttpTestManager {
 	protected function getChildHostsFromHttpTests(array $httpTests, array $hostIds = array()) {
 		$hostsTemaplatesMap = array();
 
-		$sqlWhere = empty($hostIds) ? '' : ' AND '.DBcondition('ht.hostid', $hostIds);
-		$dbCursor = DBselect('SELECT ht.templateid, ht.hostid'.
-				' FROM hosts_templates ht'.
-				' WHERE '.DBcondition('ht.templateid', array_unique(zbx_objectValues($httpTests, 'hostid'))).
-				$sqlWhere);
+		$sqlWhere = empty($hostIds) ? '' : ' AND '.dbConditionInt('ht.hostid', $hostIds);
+		$dbCursor = DBselect(
+			'SELECT ht.templateid,ht.hostid'.
+			' FROM hosts_templates ht'.
+			' WHERE '.dbConditionInt('ht.templateid', array_unique(zbx_objectValues($httpTests, 'hostid'))).
+				$sqlWhere
+		);
 		while ($dbHost = DBfetch($dbCursor)) {
 			$hostsTemaplatesMap[$dbHost['hostid']] = $dbHost['templateid'];
 		}
@@ -402,13 +414,15 @@ class CHttpTestManager {
 			'where' => array('httptestid' => $childId)
 		));
 
-		$dbCursor = DBselect('SELECT i1.itemid AS parentId,i2.itemid AS childId'.
-				' FROM httptestitem hti1,httptestitem hti2,items i1,items i2'.
-				' WHERE hti1.httptestid='.zbx_dbstr($parentId).
-					' AND hti2.httptestid='.zbx_dbstr($childId).
-					' AND hti1.itemid=i1.itemid'.
-					' AND hti2.itemid=i2.itemid'.
-					' AND i1.key_=i2.key_');
+		$dbCursor = DBselect(
+			'SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+			' FROM httptestitem hti1,httptestitem hti2,items i1,items i2'.
+			' WHERE hti1.httptestid='.zbx_dbstr($parentId).
+				' AND hti2.httptestid='.zbx_dbstr($childId).
+				' AND hti1.itemid=i1.itemid'.
+				' AND hti2.itemid=i2.itemid'.
+				' AND i1.key_=i2.key_'
+		);
 		while ($dbItems = DBfetch($dbCursor)) {
 			DB::update('items', array(
 				'values' => array('templateid' => $dbItems['parentId']),
@@ -416,15 +430,17 @@ class CHttpTestManager {
 			));
 		}
 
-		$dbCursor = DBselect('SELECT i1.itemid AS parentId,i2.itemid AS childId'.
-				' FROM httpstepitem hsi1,httpstepitem hsi2,httpstep hs1,httpstep hs2,items i1,items i2'.
-				' WHERE hs1.httptestid='.zbx_dbstr($parentId).
-					' AND hs2.httptestid='.zbx_dbstr($childId).
-					' AND hsi1.itemid=i1.itemid'.
-					' AND hsi2.itemid=i2.itemid'.
-					' AND hs1.httpstepid=hsi1.httpstepid'.
-					' AND hs2.httpstepid=hsi2.httpstepid'.
-					' AND i1.key_=i2.key_');
+		$dbCursor = DBselect(
+			'SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+			' FROM httpstepitem hsi1,httpstepitem hsi2,httpstep hs1,httpstep hs2,items i1,items i2'.
+			' WHERE hs1.httptestid='.zbx_dbstr($parentId).
+				' AND hs2.httptestid='.zbx_dbstr($childId).
+				' AND hsi1.itemid=i1.itemid'.
+				' AND hsi2.itemid=i2.itemid'.
+				' AND hs1.httpstepid=hsi1.httpstepid'.
+				' AND hs2.httpstepid=hsi2.httpstepid'.
+				' AND i1.key_=i2.key_'
+		);
 		while ($dbItems = DBfetch($dbCursor)) {
 			DB::update('items', array(
 				'values' => array('templateid' => $dbItems['parentId']),
@@ -442,11 +458,13 @@ class CHttpTestManager {
 	 * @return string
 	 */
 	protected function findChildApplication($parentAppId, $childHostId) {
-		$childAppId = DBfetch(DBselect('SELECT a2.applicationid'.
-				' FROM applications a1'.
+		$childAppId = DBfetch(DBselect(
+			'SELECT a2.applicationid'.
+			' FROM applications a1'.
 				' INNER JOIN applications a2 ON a1.name=a2.name'.
-				' WHERE a1.applicationid='.zbx_dbstr($parentAppId).
-				' AND a2.hostid='.zbx_dbstr($childHostId)));
+			' WHERE a1.applicationid='.zbx_dbstr($parentAppId).
+				' AND a2.hostid='.zbx_dbstr($childHostId))
+		);
 
 		return $childAppId['applicationid'];
 	}
@@ -486,9 +504,11 @@ class CHttpTestManager {
 			$hostHttpTests[$hostid] = array('byName' => array(), 'byTemplateId' => array());
 		}
 
-		$dbCursor = DBselect('SELECT ht.httptestid,ht.name,ht.hostid,ht.templateid'.
-				' FROM httptest ht'.
-				' WHERE '.DBcondition('ht.hostid', $hostIds));
+		$dbCursor = DBselect(
+			'SELECT ht.httptestid,ht.name,ht.hostid,ht.templateid'.
+			' FROM httptest ht'.
+			' WHERE '.dbConditionInt('ht.hostid', $hostIds)
+		);
 		while ($dbHttpTest = DBfetch($dbCursor)) {
 			$hostHttpTests[$dbHttpTest['hostid']]['byName'][$dbHttpTest['name']] = $dbHttpTest;
 			if ($dbHttpTest['templateid']) {
@@ -514,10 +534,12 @@ class CHttpTestManager {
 			$firstHash .= $step['no'].$step['name'];
 		}
 
-		$dbCursor = DBselect('SELECT hs.name,hs.no'.
+		$dbCursor = DBselect(
+			'SELECT hs.name,hs.no'.
 			' FROM httpstep hs'.
 			' WHERE hs.httptestid='.zbx_dbstr($exHttpTest['httptestid']).
-			' ORDER BY hs.no');
+			' ORDER BY hs.no'
+		);
 		while ($dbHttpStep = DBfetch($dbCursor)) {
 			$secondHash .= $dbHttpStep['no'].$dbHttpStep['name'];
 		}
@@ -566,9 +588,11 @@ class CHttpTestManager {
 	 */
 	protected function prepareHttpSteps(array $steps, $exHttpTestId) {
 		$exSteps = array();
-		$dbCursor = DBselect('SELECT hs.httpstepid,hs.name'.
+		$dbCursor = DBselect(
+			'SELECT hs.httpstepid,hs.name'.
 			' FROM httpstep hs'.
-			' WHERE hs.httptestid='.zbx_dbstr($exHttpTestId));
+			' WHERE hs.httptestid='.zbx_dbstr($exHttpTestId)
+		);
 		while ($dbHttpStep = DBfetch($dbCursor)) {
 			$exSteps[$dbHttpStep['name']] = $dbHttpStep['httpstepid'];
 		}
@@ -641,8 +665,13 @@ class CHttpTestManager {
 		$updateItems = array();
 		$testItemIds = array();
 		foreach ($checkitems as $item) {
-			$dbItem = DBfetch(DBselect('SELECT i.itemid, i.templateid FROM items i'.
-					' WHERE i.key_='.zbx_dbstr($item['key_']).' AND i.hostid='.zbx_dbstr($httpTest['hostid'])));
+			$dbItem = DBfetch(DBselect(
+				'SELECT i.itemid,i.templateid'.
+				' FROM items i'.
+				' WHERE i.key_='.zbx_dbstr($item['key_']).
+					' AND i.hostid='.zbx_dbstr($httpTest['hostid'])
+			));
+
 			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 			$item['hostid'] = $httpTest['hostid'];
 			$item['delay'] = $httpTest['delay'];
@@ -719,10 +748,10 @@ class CHttpTestManager {
 		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
 			$parentStepItems = DBfetchArrayAssoc(DBselect(
 				'SELECT i.itemid,i.key_,hsi.httpstepid'.
-					' FROM items i,httpstepitem hsi,httpstep hs'.
-					' WHERE i.itemid=hsi.itemid'.
-						' AND hsi.httpstepid=hs.httpstepid'.
-						' AND hs.httptestid='.$httpTest['templateid']
+				' FROM items i,httpstepitem hsi,httpstep hs'.
+				' WHERE i.itemid=hsi.itemid'.
+					' AND hsi.httpstepid=hs.httpstepid'.
+					' AND hs.httptestid='.$httpTest['templateid']
 			), 'key_');
 		}
 
@@ -767,8 +796,13 @@ class CHttpTestManager {
 			$updateItems = array();
 			$stepItemids = array();
 			foreach ($stepitems as $item) {
-				$dbItem = DBfetch(DBselect('SELECT i.itemid, i.templateid FROM items i'.
-					' WHERE i.key_='.zbx_dbstr($item['key_']).' AND i.hostid='.zbx_dbstr($httpTest['hostid'])));
+				$dbItem = DBfetch(DBselect(
+					'SELECT i.itemid,i.templateid'.
+					' FROM items i'.
+					' WHERE i.key_='.zbx_dbstr($item['key_']).
+						' AND i.hostid='.zbx_dbstr($httpTest['hostid'])
+				));
+
 				$item['hostid'] = $httpTest['hostid'];
 				$item['delay'] = $delay;
 				$item['type'] = ITEM_TYPE_HTTPTEST;
@@ -839,10 +873,11 @@ class CHttpTestManager {
 		$webstepids = zbx_objectValues($websteps, 'httpstepid');
 		$dbKeys = DBfetchArrayAssoc(DBselect(
 			'SELECT i.key_'.
-					' FROM items i,httpstepitem hi'.
-					' WHERE '.DBcondition('hi.httpstepid', $webstepids).
-					' AND hi.itemid=i.itemid'
-		), 'key_');
+			' FROM items i,httpstepitem hi'.
+			' WHERE '.dbConditionInt('hi.httpstepid', $webstepids).
+				' AND hi.itemid=i.itemid')
+			, 'key_'
+		);
 
 		foreach ($websteps as $webstep) {
 			DB::update('httpstep', array(
@@ -855,9 +890,9 @@ class CHttpTestManager {
 			$stepitemsUpdate = $updateFields = array();
 			$dbStepItems = DBselect(
 				'SELECT i.itemid,i.key_,hi.type'.
-						' FROM items i,httpstepitem hi'.
-						' WHERE hi.httpstepid='.$webstep['httpstepid'].
-						' AND hi.itemid=i.itemid'
+				' FROM items i,httpstepitem hi'.
+				' WHERE hi.httpstepid='.$webstep['httpstepid'].
+					' AND hi.itemid=i.itemid'
 			);
 			while ($stepitem = DBfetch($dbStepItems)) {
 				$itemids[] = $stepitem['itemid'];
@@ -907,7 +942,7 @@ class CHttpTestManager {
 	 */
 	protected function deleteStepsReal($httpStepIds) {
 		$itemIds = DBfetchColumn(
-			DBselect('SELECT hi.itemid FROM httpstepitem hi WHERE '.DBcondition('hi.httpstepid', $httpStepIds)),
+			DBselect('SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $httpStepIds)),
 			'itemid'
 		);
 
@@ -928,8 +963,9 @@ class CHttpTestManager {
 		}
 		else {
 			$linkedItemIds = DBfetchColumn(
-				DBselect('SELECT ia.itemid FROM items_applications ia WHERE '.DBcondition('ia.itemid', $itemIds)),
-				'itemid');
+				DBselect('SELECT ia.itemid FROM items_applications ia WHERE '.dbConditionInt('ia.itemid', $itemIds)),
+				'itemid'
+			);
 
 			if (!empty($linkedItemIds)) {
 				DB::update('items_applications', array(

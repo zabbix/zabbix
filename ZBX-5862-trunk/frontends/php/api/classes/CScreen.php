@@ -91,7 +91,7 @@ class CScreen extends CZBXAPI {
 		// screenids
 		if (!is_null($options['screenids'])) {
 			zbx_value2array($options['screenids']);
-			$sqlParts['where'][] = DBcondition('s.screenid', $options['screenids']);
+			$sqlParts['where'][] = dbConditionInt('s.screenid', $options['screenids']);
 		}
 
 		// screenitemids
@@ -102,7 +102,7 @@ class CScreen extends CZBXAPI {
 			}
 			$sqlParts['from']['screens_items'] = 'screens_items si';
 			$sqlParts['where']['ssi'] = 'si.screenid=s.screenid';
-			$sqlParts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
+			$sqlParts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
 		}
 
 		// filter
@@ -170,7 +170,7 @@ class CScreen extends CZBXAPI {
 			$screensToCheck = array();
 			$screensItems = array();
 
-			$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.DBcondition('si.screenid', $screenids));
+			$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenids));
 			while ($sitem = DBfetch($dbSitems)) {
 				$screensItems[$sitem['screenitemid']] = $sitem;
 
@@ -336,7 +336,7 @@ class CScreen extends CZBXAPI {
 		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
 			if (!isset($screensItems)) {
 				$screensItems = array();
-				$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.DBcondition('si.screenid', $screenids));
+				$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenids));
 				while ($sitem = DBfetch($dbSitems)) {
 					$screensItems[$sitem['screenitemid']] = $sitem;
 				}

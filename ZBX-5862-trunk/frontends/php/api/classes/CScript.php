@@ -125,7 +125,7 @@ class CScript extends CZBXAPI {
 			$options['groupids'][] = 0; // include all groups scripts
 
 			$sqlParts['select']['scripts'] = 's.scriptid,s.groupid';
-			$sqlParts['where'][] = '('.DBcondition('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
+			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
 		}
 
 		// hostids
@@ -149,7 +149,7 @@ class CScript extends CZBXAPI {
 
 			$sqlParts['select']['hostid'] = 'hg.hostid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = '(('.DBcondition('hg.groupid', $hostGroupIds).' AND hg.groupid=s.groupid)'.
+			$sqlParts['where'][] = '(('.dbConditionInt('hg.groupid', $hostGroupIds).' AND hg.groupid=s.groupid)'.
 				' OR '.
 				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
 		}
@@ -160,14 +160,14 @@ class CScript extends CZBXAPI {
 			$options['usrgrpids'][] = 0; // include all usrgrps scripts
 
 			$sqlParts['select']['usrgrpid'] = 's.usrgrpid';
-			$sqlParts['where'][] = '('.DBcondition('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
+			$sqlParts['where'][] = '('.dbConditionInt('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
 		}
 
 		// scriptids
 		if (!is_null($options['scriptids'])) {
 			zbx_value2array($options['scriptids']);
 
-			$sqlParts['where'][] = DBcondition('s.scriptid', $options['scriptids']);
+			$sqlParts['where'][] = dbConditionInt('s.scriptid', $options['scriptids']);
 		}
 
 		// output

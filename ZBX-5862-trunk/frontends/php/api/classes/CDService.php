@@ -131,7 +131,7 @@ class CDService extends CZBXAPI{
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
-			$sqlParts['where']['dserviceid'] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -144,7 +144,7 @@ class CDService extends CZBXAPI{
 			zbx_value2array($options['dhostids']);
 
 			$sqlParts['select']['dhostid'] = 'ds.dhostid';
-			$sqlParts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dhostid', $options['dhostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'ds.dhostid';
@@ -165,7 +165,7 @@ class CDService extends CZBXAPI{
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dchecks'] = 'dchecks dc';
 
-			$sqlParts['where'][] = DBcondition('dc.dcheckid', $options['dcheckids']);
+			$sqlParts['where'][] = dbConditionInt('dc.dcheckid', $options['dcheckids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 
@@ -181,7 +181,7 @@ class CDService extends CZBXAPI{
 			$sqlParts['select']['druleid'] = 'dh.druleid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 
-			$sqlParts['where']['druleid'] = DBcondition('dh.druleid', $options['druleids']);
+			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {

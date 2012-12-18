@@ -464,7 +464,7 @@ else {
 		$dhosts = array();
 		$sql = 'SELECT s.dserviceid,s.dhostid,s.ip,s.dns '.
 				' FROM dservices s '.
-				' WHERE '.DBcondition('s.dhostid', $objectids);
+				' WHERE '.dbConditionInt('s.dhostid', $objectids);
 		$res = DBselect($sql);
 		while ($dservices = DBfetch($res)) {
 			$dhosts[$dservices['dhostid']] = $dservices;
@@ -474,7 +474,7 @@ else {
 		$dservices = array();
 		$sql = 'SELECT s.dserviceid,s.ip,s.dns,s.type,s.port '.
 				' FROM dservices s '.
-				' WHERE '.DBcondition('s.dserviceid', $objectids);
+				' WHERE '.dbConditionInt('s.dserviceid', $objectids);
 		$res = DBselect($sql);
 		while ($dservice = DBfetch($res)) {
 			$dservices[$dservice['dserviceid']] = $dservice;

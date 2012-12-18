@@ -317,7 +317,7 @@ function get_hosts_by_triggerid($triggerids) {
 		' FROM hosts h,functions f,items i'.
 		' WHERE i.itemid=f.itemid'.
 			' AND h.hostid=i.hostid'.
-			' AND '.DBcondition('f.triggerid', $triggerids)
+			' AND '.dbConditionInt('f.triggerid', $triggerids)
 	);
 }
 
@@ -969,7 +969,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 					'SELECT i.itemid,i.value_type,h.name'.
 					' FROM items i,hosts h'.
 					' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-						' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+						' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
 						' AND h.host='.zbx_dbstr($exprPart['host']).
 						' AND h.hostid=i.hostid'.
 						' AND '.DBin_node('i.itemid')
@@ -1031,7 +1031,7 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 		' WHERE h.hostid=i.hostid'.
 			' AND i.itemid=f.itemid'.
 			' AND f.triggerid=t.triggerid'.
-			' AND '.DBcondition('h.hostid', $hostids).
+			' AND '.dbConditionInt('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
 	);
