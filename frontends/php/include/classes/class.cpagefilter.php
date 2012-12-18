@@ -165,7 +165,7 @@ class CPageFilter {
 	private function _initGroups($groupid, $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-			'output' => API_OUTPUT_EXTEND
+			'output' => array('groupid', 'name')
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = API::HostGroup()->get($options);
@@ -259,7 +259,7 @@ class CPageFilter {
 		else {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('graphid', 'name'),
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);
@@ -315,7 +315,7 @@ class CPageFilter {
 		else {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('triggerid', 'description'),
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);
