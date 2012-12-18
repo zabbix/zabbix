@@ -352,7 +352,7 @@ class CZBXAPI {
 		if (isset($options['preservekeys'])) {
 			$rs = array();
 			foreach ($objects as $object) {
-				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($object, $options['output']);
+				$rs[$object[$this->pk($tableName)]] = $object;
 			}
 
 			return $rs;

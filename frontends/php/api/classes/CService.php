@@ -87,7 +87,7 @@ class CService extends CZBXAPI {
 			}
 			// a normal select query
 			else {
-				$result[$row[$this->pk()]] = $this->unsetExtraFields($row, $options['output']);
+				$result[$row[$this->pk()]] = $row;
 			}
 		}
 
@@ -1625,5 +1625,15 @@ class CService extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		if ($options['countOutput'] === null) {
+			if ($options['selectTrigger'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
 	}
 }

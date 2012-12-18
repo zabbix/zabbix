@@ -106,10 +106,10 @@ class CTemplateScreenItem extends CZBXAPI {
 			// normal select query
 			else {
 				if ($options['preservekeys'] !== null) {
-					$result[$row['screenitemid']] = $this->unsetExtraFields($row, $options['output']);
+					$result[$row['screenitemid']] = $row;
 				}
 				else {
-					$result[] = $this->unsetExtraFields($row, $options['output']);
+					$result[] = $row;
 				}
 			}
 		}
