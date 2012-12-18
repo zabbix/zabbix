@@ -350,17 +350,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			));
 			$relationMap = $this->createRelationMap($functions, 'triggerid', 'functionid');
 
-			// unset unrequested fields
-			foreach ($functions as &$function) {
-				if (!$this->outputIsRequested('triggerid', $options['selectFunctions'])) {
-					unset($function['triggerid']);
-				}
-				if (!$this->outputIsRequested('functionid', $options['selectFunctions'])) {
-					unset($function['functionid']);
-				}
-			}
-			unset($function);
-
+			$functions = $this->unsetExtraFields($functions, array('triggerid', 'functionid'), $options['selectFunctions']);
 			$result = $relationMap->mapMany($result, $functions, 'functions');
 		}
 

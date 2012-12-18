@@ -741,17 +741,7 @@ class CHttpTest extends CZBXAPI {
 				));
 				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
 
-				// unset unrequested fields
-				foreach ($httpSteps as &$httpStep) {
-					if (!$this->outputIsRequested('httptestid', $options['selectSteps'])) {
-						unset($httpStep['httptestid']);
-					}
-					if (!$this->outputIsRequested('httpstepid', $options['selectSteps'])) {
-						unset($httpStep['httpstepid']);
-					}
-				}
-				unset($httpStep);
-
+				$httpSteps = $this->unsetExtraFields($httpSteps, array('httptestid', 'httpstepid'), $options['selectSteps']);
 				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
 			}
 			else {

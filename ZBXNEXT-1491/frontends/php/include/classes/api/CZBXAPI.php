@@ -252,44 +252,52 @@ class CZBXAPI {
 	 * @return bool
 	 */
 	protected function outputIsRequested($field, $output) {
-		// if an array of fields is passed, check if the field is present in the array
-		if (is_array($output)) {
-			return in_array($field, $output);
-		}
 		// if all fields are requested, just return true
 		// API_OUTPUT_REFER will always return true as an exception
-		elseif ($output == API_OUTPUT_EXTEND || $output == API_OUTPUT_REFER) {
+		if ($output == API_OUTPUT_EXTEND || $output == API_OUTPUT_REFER) {
 			return true;
 		}
 		// if the number of objects is requested, return false
 		elseif ($output == API_OUTPUT_COUNT) {
 			return false;
 		}
+		// if an array of fields is passed, check if the field is present in the array
+		else {
+			return in_array($field, $output);
+		}
 	}
 
 	/**
-	 * Unsets the fields that haven't been explicitly asked for by the user, but
-	 * have been included in the resulting object for whatever reasons.
+	 * Unsets fields $field from the given objects if they are not requested in $output.
 	 *
-	 * If the $option parameter is set to API_OUTPUT_EXTEND or to API_OUTPUT_REFER, return the result as is.
-	 * If the $option parameter is an array of fields, return only them.
+	 * @param array $objects
+	 * @param string|array $fields  a single field or an array of fields
+	 * @param string|array $output  desired output
 	 *
-	 * @param array $object			The object from the database
-	 * @param array $output			The original requested output
-	 *
-	 * @return array				The resulting object
+	 * @return array
 	 */
-	protected function unsetExtraFields(array $object, $output) {
-		// if specific fields where requested, return only them
-		if (is_array($output)) {
-			foreach ($object as $field => $value) {
-				if (!in_array($field, $output)) {
-					unset($object[$field]);
-				}
+	protected function unsetExtraFields(array $objects, $fields, $output) {
+		$fields = (array) $fields;
+
+		// find the fields that have not been requested
+		$extraFields = array();
+		foreach ($fields as $field) {
+			if (!$this->outputIsRequested($field, $output)) {
+				$extraFields[] = $field;
 			}
 		}
 
-		return $object;
+		// unset these fields
+		if ($extraFields) {
+			foreach ($objects as &$object) {
+				foreach ($extraFields as $field) {
+					unset($object[$field]);
+				}
+			}
+			unset($object);
+		}
+
+		return $objects;
 	}
 
 	/**

@@ -579,17 +579,7 @@ class CScreen extends CZBXAPI {
 
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
 
-			// unset unrequested fields
-			foreach ($screenItems as &$screenItem) {
-				if (!$this->outputIsRequested('screenid', $options['selectScreenItems'])) {
-					unset($screenItem['screenid']);
-				}
-				if (!$this->outputIsRequested('screenitemid', $options['selectScreenItems'])) {
-					unset($screenItem['screenitemid']);
-				}
-			}
-			unset($screenItem);
-
+			$screenItems = $this->unsetExtraFields($screenItems, array('screenid', 'screenitemid'), $options['selectScreenItems']);
 			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
 		}
 

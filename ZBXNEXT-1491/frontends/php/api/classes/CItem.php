@@ -1154,17 +1154,9 @@ class CItem extends CItemGeneral {
 			));
 			$relationMap = $this->createRelationMap($itemDiscoveries, 'itemid', 'itemdiscoveryid');
 
-			// unset unrequested fields
-			foreach ($itemDiscoveries as &$itemDiscovery) {
-				if (!$this->outputIsRequested('itemid', $options['selectItemDiscovery'])) {
-					unset($itemDiscovery['itemid']);
-				}
-				if (!$this->outputIsRequested('itemdiscoveryid', $options['selectItemDiscovery'])) {
-					unset($itemDiscovery['itemdiscoveryid']);
-				}
-			}
-			unset($itemDiscovery);
-
+			$itemDiscoveries = $this->unsetExtraFields($itemDiscoveries, array('itemid', 'itemdiscoveryid'),
+				$options['selectItemDiscovery']
+			);
 			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
 

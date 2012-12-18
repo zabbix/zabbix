@@ -482,17 +482,7 @@ class CIconMap extends CZBXAPI {
 			));
 			$relationMap = $this->createRelationMap($mappings, 'iconmapid', 'iconmappingid');
 
-			// unset unrequested fields
-			foreach ($mappings as &$mapping) {
-				if (!$this->outputIsRequested('iconmapid', $options['selectMappings'])) {
-					unset($mapping['iconmapid']);
-				}
-				if (!$this->outputIsRequested('iconmappingid', $options['selectMappings'])) {
-					unset($mapping['iconmappingid']);
-				}
-			}
-			unset($mapping);
-
+			$mappings = $this->unsetExtraFields($mappings, array('iconmapid', 'iconmappingid'), $options['selectMappings']);
 			$result = $relationMap->mapMany($result, $mappings, 'mappings');
 		}
 

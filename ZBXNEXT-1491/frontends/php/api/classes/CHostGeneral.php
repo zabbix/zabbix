@@ -875,17 +875,7 @@ abstract class CHostGeneral extends CZBXAPI {
 
 				$relationMap = $this->createRelationMap($items, 'hostid', 'itemid');
 
-				// unset unrequested fields
-				foreach ($items as &$item) {
-					if (!$this->outputIsRequested('hostid', $options['selectItems'])) {
-						unset($item['hostid']);
-					}
-					if (!$this->outputIsRequested('itemid', $options['selectItems'])) {
-						unset($item['itemid']);
-					}
-				}
-				unset($item);
-
+				$items = $this->unsetExtraFields($items, array('hostid', 'itemid'), $options['selectItems']);
 				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
 			}
 			else {
@@ -920,17 +910,7 @@ abstract class CHostGeneral extends CZBXAPI {
 
 				$relationMap = $this->createRelationMap($items, 'hostid', 'itemid');
 
-				// unset unrequested fields
-				foreach ($items as &$item) {
-					if (!$this->outputIsRequested('hostid', $options['selectDiscoveries'])) {
-						unset($item['hostid']);
-					}
-					if (!$this->outputIsRequested('itemid', $options['selectDiscoveries'])) {
-						unset($item['itemid']);
-					}
-				}
-				unset($item);
-
+				$items = $this->unsetExtraFields($items, array('hostid', 'itemid'), $options['selectDiscoveries']);
 				$result = $relationMap->mapMany($result, $items, 'discoveries', $options['limitSelects']);
 			}
 			else {
@@ -1046,17 +1026,7 @@ abstract class CHostGeneral extends CZBXAPI {
 
 				$relationMap = $this->createRelationMap($httpTests, 'hostid', 'httptestid');
 
-				// unset unrequested fields
-				foreach ($httpTests as &$httpTest) {
-					if (!$this->outputIsRequested('hostid', $options['selectHttpTests'])) {
-						unset($httpTest['hostid']);
-					}
-					if (!$this->outputIsRequested('httptestid', $options['selectHttpTests'])) {
-						unset($httpTest['httptestid']);
-					}
-				}
-				unset($httpTest);
-
+				$httpTests = $this->unsetExtraFields($httpTests, array('hostid', 'httptestid'), $options['selectHttpTests']);
 				$result = $relationMap->mapMany($result, $httpTests, 'httpTests', $options['limitSelects']);
 			}
 			else {
@@ -1091,17 +1061,9 @@ abstract class CHostGeneral extends CZBXAPI {
 
 				$relationMap = $this->createRelationMap($applications, 'hostid', 'applicationid');
 
-				// unset unrequested fields
-				foreach ($applications as &$application) {
-					if (!$this->outputIsRequested('hostid', $options['selectApplications'])) {
-						unset($application['hostid']);
-					}
-					if (!$this->outputIsRequested('applicationid', $options['selectApplications'])) {
-						unset($application['applicationid']);
-					}
-				}
-				unset($application);
-
+				$applications = $this->unsetExtraFields($applications, array('hostid', 'applicationid'),
+					$options['selectApplications']
+				);
 				$result = $relationMap->mapMany($result, $applications, 'applications', $options['limitSelects']);
 			}
 			else {
@@ -1132,17 +1094,7 @@ abstract class CHostGeneral extends CZBXAPI {
 
 			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
 
-			// unset unrequested fields
-			foreach ($macros as &$macro) {
-				if (!$this->outputIsRequested('hostid', $options['selectMacros'])) {
-					unset($macro['hostid']);
-				}
-				if (!$this->outputIsRequested('hostmacroid', $options['selectMacros'])) {
-					unset($macro['hostmacroid']);
-				}
-			}
-			unset($macro);
-
+			$macros = $this->unsetExtraFields($macros, array('hostid', 'hostmacroid'), $options['selectMacros']);
 			$result = $relationMap->mapMany($result, $macros, 'macros', $options['limitSelects']);
 		}
 

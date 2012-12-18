@@ -553,17 +553,7 @@ class CProxy extends CZBXAPI {
 
 			$relationMap = $this->createRelationMap($hosts, 'proxy_hostid', 'hostid');
 
-			// unset unrequested fields
-			foreach ($hosts as &$host) {
-				if (!$this->outputIsRequested('proxy_hostid', $options['selectHosts'])) {
-					unset($host['proxy_hostid']);
-				}
-				if (!$this->outputIsRequested('hostid', $options['selectHosts'])) {
-					unset($host['hostid']);
-				}
-			}
-			unset($host);
-
+			$hosts = $this->unsetExtraFields($hosts, array('proxy_hostid', 'hostid'), $options['selectHosts']);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
@@ -579,17 +569,7 @@ class CProxy extends CZBXAPI {
 
 			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 
-			// unset unrequested fields
-			foreach ($interfaces as &$interface) {
-				if (!$this->outputIsRequested('hostid', $options['selectInterfaces'])) {
-					unset($interface['hostid']);
-				}
-				if (!$this->outputIsRequested('interfaceid', $options['selectInterfaces'])) {
-					unset($interface['interfaceid']);
-				}
-			}
-			unset($interface);
-
+			$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterfaces']);
 			$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
 		}
 

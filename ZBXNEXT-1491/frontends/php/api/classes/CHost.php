@@ -1614,17 +1614,7 @@ class CHost extends CHostGeneral {
 
 				$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 
-				// unset unrequested fields
-				foreach ($interfaces as &$interface) {
-					if (!$this->outputIsRequested('hostid', $options['selectInterfaces'])) {
-						unset($interface['hostid']);
-					}
-					if (!$this->outputIsRequested('interfaceid', $options['selectInterfaces'])) {
-						unset($interface['interfaceid']);
-					}
-				}
-				unset($interface);
-
+				$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterfaces']);
 				$result = $relationMap->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
 			}
 			else {
@@ -1663,14 +1653,7 @@ class CHost extends CHostGeneral {
 					$relationMap->addRelation($screen['hostid'], $key);
 				}
 
-				// unset unrequested fields
-				foreach ($screens as &$screen) {
-					if (!$this->outputIsRequested('hostid', $options['selectScreens'])) {
-						unset($screen['hostid']);
-					}
-				}
-				unset($screen);
-
+				$screens = $this->unsetExtraFields($screens, 'hostid', $options['selectScreens']);
 				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
 			}
 			else {

@@ -422,17 +422,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			));
 			$relationMap = $this->createRelationMap($gitems, 'graphid', 'gitemid');
 
-			// unset unrequested fields
-			foreach ($gitems as &$gitem) {
-				if (!$this->outputIsRequested('graphid', $options['selectGraphItems'])) {
-					unset($gitem['graphid']);
-				}
-				if (!$this->outputIsRequested('gitemid', $options['selectGraphItems'])) {
-					unset($gitem['gitemid']);
-				}
-			}
-			unset($gitem);
-
+			$gitems = $this->unsetExtraFields($gitems, array('graphid', 'gitemid'), $options['selectGraphItems']);
 			$result = $relationMap->mapMany($result, $gitems, 'gitems');
 		}
 

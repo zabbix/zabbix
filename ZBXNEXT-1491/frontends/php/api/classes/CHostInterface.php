@@ -893,17 +893,7 @@ class CHostInterface extends CZBXAPI {
 				));
 				$relationMap = $this->createRelationMap($items, 'interfaceid', 'itemid');
 
-				// unset unrequested fields
-				foreach ($items as &$item) {
-					if (!$this->outputIsRequested('interfaceid', $options['selectItems'])) {
-						unset($item['interfaceid']);
-					}
-					if (!$this->outputIsRequested('itemid', $options['selectItems'])) {
-						unset($item['itemid']);
-					}
-				}
-				unset($item);
-
+				$items = $this->unsetExtraFields($items, array('interfaceid', 'itemid'), $options['selectItems']);
 				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
 			}
 			else {
