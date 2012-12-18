@@ -197,6 +197,7 @@ class CScript extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('groupid', 'host_access'), $options['output']);
 		}
 
 		// removing keys (hash -> array)

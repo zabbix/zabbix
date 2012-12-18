@@ -258,6 +258,7 @@ class CApplication extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, 'hostid', $options['output']);
 		}
 
 		// removing keys (hash -> array)

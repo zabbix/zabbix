@@ -285,6 +285,7 @@ class CAlert extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('userid', 'mediatypeid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)

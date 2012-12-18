@@ -251,6 +251,8 @@ class CHttpTest extends CZBXAPI {
 			if ($expandName || $expandStepName) {
 				$result = resolveHttpTestMacros($result, $expandName, $expandStepName);
 			}
+
+			$result = $this->unsetExtraFields($result, 'hostid', $options['output']);
 		}
 
 		// removing keys (hash -> array)

@@ -301,6 +301,7 @@ class CItemPrototype extends CItemGeneral {
 		// add other related objects
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, 'hostid', $options['output']);
 		}
 
 		if (is_null($options['preservekeys'])) {
