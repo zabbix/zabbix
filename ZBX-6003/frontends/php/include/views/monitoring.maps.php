@@ -49,6 +49,7 @@ if (!empty($this->data['maps'])) {
 	// get map parent maps
 	$parentMaps = array();
 	foreach (getParentMaps($this->data['sysmapid']) as $parent) {
+		// check for permissions
 		if (isset($this->data['maps'][$parent['sysmapid']])) {
 			$parentMaps[] = SPACE.SPACE;
 			$parentMaps[] = new Clink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen']);
