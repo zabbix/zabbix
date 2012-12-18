@@ -382,10 +382,9 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM items i,functions f,triggers t'.
+					' FROM items i,functions f'.
 					' WHERE h.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'.
 					')';
 		}
 		elseif (!is_null($options['with_monitored_triggers'])) {
