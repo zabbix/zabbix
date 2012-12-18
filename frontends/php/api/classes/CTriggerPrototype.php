@@ -127,36 +127,24 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		// editable + permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT ff.triggerid'.
-				' FROM functions ff,items ii'.
-				' WHERE ff.triggerid=t.triggerid'.
-					' AND ff.itemid=ii.itemid'.
-					' AND EXISTS ('.
-						' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups gg'.
-						' WHERE hgg.hostid=ii.hostid'.
-							' AND rr.id=hgg.groupid'.
-							' AND rr.groupid=gg.usrgrpid'.
-							' AND gg.userid='.$userid.
-							' AND rr.permission='.PERM_DENY.'))';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY f.triggerid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -273,11 +261,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['monitored'])) {
 			$sqlParts['where']['monitored'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
+								' SELECT NULL'.
 								' FROM items ii, hosts hh'.
 								' WHERE ff.itemid=ii.itemid'.
 									' AND hh.hostid=ii.hostid'.
@@ -294,11 +282,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['active'])) {
 			$sqlParts['where']['active'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-							' SELECT ii.itemid'.
+							' SELECT NULL'.
 							' FROM items ii, hosts hh'.
 							' WHERE ff.itemid=ii.itemid'.
 								' AND hh.hostid=ii.hostid'.
@@ -312,11 +300,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['maintenance'])) {
 			$sqlParts['where'][] = (($options['maintenance'] == 0) ? ' NOT ':'').
 				' EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
+								' SELECT NULL'.
 								' FROM items ii, hosts hh'.
 								' WHERE ff.itemid=ii.itemid'.
 									' AND hh.hostid=ii.hostid'.
