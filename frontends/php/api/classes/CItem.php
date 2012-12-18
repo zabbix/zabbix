@@ -349,10 +349,10 @@ class CItem extends CItemGeneral {
 		// with_triggers
 		if (!is_null($options['with_triggers'])) {
 			if ($options['with_triggers'] == 1) {
-				$sqlParts['where'][] = ' EXISTS (SELECT NULL FROM functions ff WHERE ff.itemid=i.itemid)';
+				$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM functions ff WHERE i.itemid=ff.itemid)';
 			}
 			else {
-				$sqlParts['where'][] = 'NOT EXISTS (SELECT NULL FROM functions ff WHERE ff.itemid=i.itemid)';
+				$sqlParts['where'][] = 'NOT EXISTS (SELECT NULL FROM functions ff WHERE i.itemid=ff.itemid)';
 			}
 		}
 
