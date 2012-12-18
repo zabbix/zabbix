@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,22 +10,21 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CMaintenance class for API.
  * @package API
  */
 /**
- * Class containing methods for operations with maintenances
- *
+ * Class containing methods for operations with maintenances.
  */
 class CMaintenance extends CZBXAPI {
 
@@ -86,7 +85,7 @@ class CMaintenance extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
-			'selectTimeperiods'         => null,
+			'selectTimeperiods'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -135,93 +134,50 @@ class CMaintenance extends CZBXAPI {
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sql = 'SELECT DISTINCT m.maintenanceid'.
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sql = 'SELECT m.maintenanceid'.
 					' FROM maintenances m'.
 					' WHERE NOT EXISTS ('.
-						// deny section
-						'SELECT mh3.maintenanceid'.
-						' FROM maintenances_hosts mh3,rights r3,users_groups ug3,hosts_groups hg3'.
-						' WHERE mh3.maintenanceid=m.maintenanceid'.
-							' AND r3.groupid=ug3.usrgrpid'.
-							' AND hg3.hostid=mh3.hostid'.
-							' AND r3.id=hg3.groupid'.
-							' AND ug3.userid='.$userid.
-							' AND r3.permission='.PERM_DENY.
+						'SELECT NULL'.
+						' FROM maintenances_hosts mh,hosts_groups hg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=hg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $userGroups).
+						' WHERE m.maintenanceid=mh.maintenanceid'.
+							' AND mh.hostid=hg.hostid'.
+						' GROUP by mh.hostid'.
+						' HAVING MIN(r.permission) IS NULL'.
+							' OR MIN(r.permission)='.PERM_DENY.
+							' OR MAX(r.permission)<'.$permission.
 						')'.
-						' AND NOT EXISTS ('.
-							'SELECT mh4.maintenanceid'.
-							' FROM maintenances_hosts mh4'.
-							' WHERE mh4.maintenanceid=m.maintenanceid'.
-								' AND NOT EXISTS ('.
-									'SELECT r5.id'.
-									' FROM rights r5,users_groups ug5,hosts_groups hg5'.
-									' WHERE r5.groupid=ug5.usrgrpid'.
-										' AND hg5.hostid=mh4.hostid'.
-										' AND r5.id=hg5.groupid'.
-										' AND ug5.userid='.$userid.
-								')'.
-						')'.
-						' AND NOT EXISTS ('.
-							'SELECT mg2.maintenanceid'.
-							' FROM maintenances_groups mg2,rights r3,users_groups ug3'.
-							' WHERE mg2.maintenanceid=m.maintenanceid'.
-								' AND r3.groupid=ug3.usrgrpid'.
-								' AND r3.id=mg2.groupid'.
-								' AND ug3.userid='.$userid.
-								' AND r3.permission='.PERM_DENY.
-						')'.
-						' AND NOT EXISTS ('.
-							'SELECT mg3.maintenanceid'.
-							' FROM maintenances_groups mg3'.
-							' WHERE mg3.maintenanceid=m.maintenanceid'.
-								' AND NOT EXISTS ('.
-									'SELECT r5.id'.
-									' FROM rights r5,users_groups ug5,hosts_groups hg5'.
-									' WHERE r5.groupid=ug5.usrgrpid'.
-										' AND r5.id=mg3.groupid'.
-										' AND ug5.userid='.$userid.
-								')'.
-						')'.
-						// allow section
-						' AND (
-							EXISTS ('.
-								'SELECT mh3.maintenanceid'.
-								' FROM maintenances_hosts mh3,rights r3,users_groups ug3,hosts_groups hg3'.
-								' WHERE mh3.maintenanceid=m.maintenanceid'.
-									' AND r3.groupid=ug3.usrgrpid'.
-									' AND hg3.hostid=mh3.hostid'.
-									' AND r3.id=hg3.groupid'.
-									' AND ug3.userid='.$userid.
-									' AND r3.permission>='.$permission.
-							')'.
-							' OR EXISTS ('.
-								'SELECT mg2.maintenanceid'.
-								' FROM maintenances_groups mg2,rights r3,users_groups ug3'.
-								' WHERE mg2.maintenanceid=m.maintenanceid'.
-									' AND r3.groupid=ug3.usrgrpid'.
-									' AND r3.id=mg2.groupid'.
-									' AND ug3.userid='.$userid.
-									' AND r3.permission>='.$permission.
-							')'.
+					' AND NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM maintenances_groups mg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=mg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $userGroups).
+						' WHERE m.maintenanceid=mg.maintenanceid'.
+						' GROUP by mg.groupid'.
+						' HAVING MIN(r.permission) IS NULL'.
+							' OR MIN(r.permission)='.PERM_DENY.
+							' OR MAX(r.permission)<'.$permission.
 						')';
 
 			if (!is_null($options['groupids'])) {
 				zbx_value2array($options['groupids']);
-
 				$sql .= ' AND ('.
-							// filtering using groups attached to maintenence
-							'EXISTS ('.
-								'SELECT mgf.maintenanceid'.
-								' FROM maintenances_groups mgf'.
-								' WHERE mgf.maintenanceid=m.maintenanceid'.
-									' AND '.dbConditionInt('mgf.groupid', $options['groupids']).
+						'EXISTS ('.
+							'SELECT NULL'.
+								' FROM maintenances_groups mg'.
+								' WHERE m.maintenanceid=mg.maintenanceid'.
+								' AND '.dbConditionInt('mg.groupid', $options['groupids']).
 							')'.
-							// filtering by hostgroups of hosts attached to maintenance
-							' OR EXISTS ('.
-								' SELECT mh.maintenanceid'.
+						' OR EXISTS ('.
+							'SELECT NULL'.
 								' FROM maintenances_hosts mh,hosts_groups hg'.
-								' WHERE mh.maintenanceid=m.maintenanceid'.
-									' AND hg.hostid=mh.hostid'.
+								' WHERE m.maintenanceid=mh.maintenanceid'.
+									' AND mh.hostid=hg.hostid'.
 									' AND '.dbConditionInt('hg.groupid', $options['groupids']).
 							')'.
 						')';
@@ -230,12 +186,18 @@ class CMaintenance extends CZBXAPI {
 			if (!is_null($options['hostids'])) {
 				zbx_value2array($options['hostids']);
 				$sql .= ' AND EXISTS ('.
-							' SELECT mh.maintenanceid'.
+						'SELECT NULL'.
 							' FROM maintenances_hosts mh'.
-							' WHERE mh.maintenanceid=m.maintenanceid'.
+							' WHERE m.maintenanceid=mh.maintenanceid'.
 								' AND '.dbConditionInt('mh.hostid', $options['hostids']).
-							')';
+						')';
 			}
+
+			if (!is_null($options['maintenanceids'])) {
+				zbx_value2array($options['maintenanceids']);
+				$sql .= ' AND '.dbConditionInt('m.maintenanceid', $options['maintenanceids']);
+			}
+
 			$res = DBselect($sql);
 			while ($maintenance = DBfetch($res)) {
 				$maintenanceids[] = $maintenance['maintenanceid'];

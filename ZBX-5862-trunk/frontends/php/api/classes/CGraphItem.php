@@ -76,29 +76,23 @@ class CGraphItem extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT hgg.groupid'.
-				' FROM hosts_groups hgg,rights rr,users_groups ugg'.
-				' WHERE i.hostid=hgg.hostid'.
-					' AND rr.id=hgg.groupid'.
-					' AND rr.groupid=ugg.usrgrpid'.
-					' AND ugg.userid='.$userid.
-					' AND rr.permission='.PERM_DENY.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.DBcondition('r.groupid', $userGroups).
+					' WHERE gi.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY i.itemid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids

@@ -85,7 +85,9 @@ function getActionMapBySysmap($sysmap) {
 	}
 	unset($selement);
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	if (count($hostids)) {
+		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	}
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
@@ -1054,7 +1056,7 @@ function getSelementsInfo($sysmap) {
 			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => true
+			'selectInventory' => array('hostid')
 		));
 	}
 
@@ -2256,4 +2258,25 @@ function getIconByMapping($iconMap, $inventory) {
 	}
 
 	return $iconMap['default_iconid'];
+}
+
+/**
+ * Get parent maps for current map.
+ *
+ * @param int $mapId
+ *
+ * @return array
+ */
+function getParentMaps($mapId) {
+	$parentMaps = DBfetchArrayAssoc(DBselect(
+		'SELECT s.sysmapid,s.name'.
+			' FROM sysmaps s'.
+				' JOIN sysmaps_elements se ON se.sysmapid=s.sysmapid'.
+			' WHERE se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP.
+				' AND se.elementid='.zbx_dbstr($mapId)
+	), 'sysmapid');
+
+	CArrayHelper::sort($parentMaps, array('name'));
+
+	return $parentMaps;
 }

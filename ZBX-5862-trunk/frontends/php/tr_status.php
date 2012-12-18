@@ -433,7 +433,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'hostids' => $tr_hostids,
 		'preservekeys' => true,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true
+		'selectInventory' => array('hostid')
 	));
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
