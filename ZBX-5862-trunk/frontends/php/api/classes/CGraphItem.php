@@ -86,7 +86,7 @@ class CGraphItem extends CZBXAPI {
 					' FROM items i,hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE gi.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY i.itemid'.

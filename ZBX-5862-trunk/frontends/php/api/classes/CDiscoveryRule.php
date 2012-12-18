@@ -116,7 +116,7 @@ class CDiscoveryRule extends CItemGeneral {
 					' FROM hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
-								' AND '.DBcondition('r.groupid', $userGroups).
+								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE i.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
