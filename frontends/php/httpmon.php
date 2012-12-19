@@ -123,7 +123,7 @@ if ($pageFilter->hostsSelected) {
 				' WHERE hti.itemid=i.itemid'.
 				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
 				' AND i.lastclock IS NOT NULL'.
-				' AND '.DBcondition('hti.httptestid', array_keys($httpTests))
+				' AND '.dbConditionInt('hti.httptestid', array_keys($httpTests))
 	);
 	while ($dbStep = DBfetch($dbSteps)) {
 		if ($dbStep['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {

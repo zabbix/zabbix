@@ -106,7 +106,7 @@ class CUser extends CZBXAPI {
 		// userids
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
-			$sqlParts['where'][] = DBcondition('u.userid', $options['userids']);
+			$sqlParts['where'][] = dbConditionInt('u.userid', $options['userids']);
 		}
 
 		// usrgrpids
@@ -115,7 +115,7 @@ class CUser extends CZBXAPI {
 
 			$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where'][] = dbConditionInt('ug.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 		}
 
@@ -125,7 +125,7 @@ class CUser extends CZBXAPI {
 
 			$sqlParts['select']['mediaid'] = 'm.mediaid';
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
@@ -135,7 +135,7 @@ class CUser extends CZBXAPI {
 
 			$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
@@ -225,7 +225,7 @@ class CUser extends CZBXAPI {
 				'SELECT ug.userid,MAX(g.gui_access) AS gui_access,'.
 					' MAX(g.debug_mode) AS debug_mode,MAX(g.users_status) AS users_status'.
 					' FROM usrgrp g,users_groups ug'.
-					' WHERE '.DBcondition('ug.userid', $userids).
+					' WHERE '.dbConditionInt('ug.userid', $userids).
 						' AND g.usrgrpid=ug.usrgrpid'.
 					' GROUP BY ug.userid'
 			);
@@ -515,7 +515,7 @@ class CUser extends CZBXAPI {
 				$newUsrgrpids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
 				// deleting all relations with groups, but not touching those, where user still must be after update
-				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.DBcondition('usrgrpid', $newUsrgrpids, true));
+				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
 
 				// getting the list of groups user is currently in
 				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
@@ -571,7 +571,7 @@ class CUser extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
-			' WHERE '.DBcondition('om.userid', $userids)
+			' WHERE '.dbConditionInt('om.userid', $userids)
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -584,7 +584,7 @@ class CUser extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
-			' WHERE '.DBcondition('o.operationid', $operationids).
+			' WHERE '.dbConditionInt('o.operationid', $operationids).
 				' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
@@ -660,7 +660,7 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
 
-		$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
+		$sql = 'DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaids);
 		if (!DBexecute($sql)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
@@ -697,7 +697,7 @@ class CUser extends CZBXAPI {
 		$result = DBselect(
 			'SELECT m.mediaid'.
 			' FROM media m'.
-			' WHERE '.DBcondition('userid', $userids)
+			' WHERE '.dbConditionInt('userid', $userids)
 		);
 		while ($media = DBfetch($result)) {
 			$delMedias[$media['mediaid']] = $media;

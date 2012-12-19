@@ -78,7 +78,7 @@ class CTriggerDescription {
 		$dbTriggers = DBselect(
 			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
 				' FROM triggers t'.
-				' WHERE '.DBcondition('t.triggerid', $triggerIds)
+				' WHERE '.dbConditionInt('t.triggerid', $triggerIds)
 		);
 		$triggers = array();
 		while ($trigger = DBfetch($dbTriggers)) {
@@ -290,7 +290,7 @@ class CTriggerDescription {
 					' FROM functions f'.
 					' INNER JOIN items i ON f.itemid=i.itemid'.
 					' INNER JOIN hosts h ON i.hostid=h.hostid'.
-					' WHERE '.DBcondition('f.functionid', array_keys($expandHost))
+					' WHERE '.dbConditionInt('f.functionid', array_keys($expandHost))
 			);
 			while ($func = DBfetch($dbFuncs)) {
 				foreach ($expandHost[$func['functionid']] as $macro => $fNums) {
@@ -334,7 +334,7 @@ class CTriggerDescription {
 						' FROM functions f'.
 						' INNER JOIN items i ON f.itemid=i.itemid'.
 						' INNER JOIN interface n ON i.hostid=n.hostid'.
-						' WHERE '.DBcondition('f.functionid', array_keys($expandIp)).
+						' WHERE '.dbConditionInt('f.functionid', array_keys($expandIp)).
 							' AND n.main=1'
 			);
 			// macro should be resolved to interface with highest priority ($priorities)
@@ -388,7 +388,7 @@ class CTriggerDescription {
 						' INNER JOIN items i ON f.itemid=i.itemid'.
 						' INNER JOIN hosts h ON i.hostid=h.hostid'.
 						' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
-						' WHERE '.DBcondition('f.functionid', array_keys($expandItem))
+						' WHERE '.dbConditionInt('f.functionid', array_keys($expandItem))
 			);
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
 			while ($func = DBfetch($dbFuncs, false)) {

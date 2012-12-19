@@ -296,7 +296,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$res = DBselect(
 				'SELECT f.triggerid,hg.groupid'.
 					' FROM functions f,items i,hosts_groups hg'.
-					' WHERE '.DBcondition('f.triggerid', $triggerids).
+					' WHERE '.dbConditionInt('f.triggerid', $triggerids).
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=hg.hostid'
 			);
@@ -319,7 +319,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$res = DBselect(
 				'SELECT f.triggerid,i.hostid'.
 					' FROM functions f,items i'.
-					' WHERE '.DBcondition('f.triggerid', $triggerids).
+					' WHERE '.dbConditionInt('f.triggerid', $triggerids).
 					' AND f.itemid=i.itemid'
 			);
 			$relationMap = new CRelationMap();
