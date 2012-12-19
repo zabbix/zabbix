@@ -418,7 +418,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				'host' => $itemHost,
 				'key_' => $key
 			),
-			'output' => API_OUTPUT_EXTEND
+			'output' => array('lastclock', 'value_type', 'lastvalue', 'units')
 		));
 
 		$item = reset($item);
