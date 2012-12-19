@@ -61,9 +61,12 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 if (isset($_REQUEST['serviceid'])) {
 	if ($service = DBfetch(DBselect('SELECT DISTINCT s.serviceid,s.triggerid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
 		if (!empty($service['triggerid'])) {
-			$availableTriggers = get_accessible_triggers(PERM_READ_ONLY);
-
-			if (!isset($availableTriggers[$service['triggerid']])) {
+			$trigger = API::Trigger()->get(array(
+				'triggerids' => $service['triggerid'],
+				'countOutput' => true,
+				'editable' => true
+			));
+			if (empty($trigger)) {
 				access_deny();
 			}
 		}
