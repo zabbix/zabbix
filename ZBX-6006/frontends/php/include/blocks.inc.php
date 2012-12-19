@@ -41,17 +41,17 @@ function make_favorite_graphs() {
 
 	$options = array(
 		'graphids' => $graphids,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('name'),
+		'output' => array('name')
 	);
 	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
 
 	$options = array(
 		'itemids' => $itemids,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND,
-		'webitems' => 1
+		'selectHosts' => array('name'),
+		'output' => array('name', 'key_'),
+		'webitems' => true
 	);
 	$items = API::Item()->get($options);
 	$items = zbx_toHash($items, 'itemid');
@@ -97,7 +97,7 @@ function make_favorite_screens() {
 
 	$options = array(
 		'screenids' => $screenids,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('name', 'screenid')
 	);
 	$screens = API::Screen()->get($options);
 	$screens = zbx_toHash($screens, 'screenid');
@@ -142,7 +142,7 @@ function make_favorite_maps() {
 
 	$sysmaps = API::Map()->get(array(
 		'sysmapids' => $sysmapids,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('name')
 	));
 	foreach ($sysmaps as $sysmap) {
 		$sysmapid = $sysmap['sysmapid'];
@@ -222,7 +222,7 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('value', 'lastchange', 'priority', 'value_flags', 'description', 'error'),
 		'selectHosts' => array('name'),
 		'preservekeys' => true
 	);
@@ -353,7 +353,7 @@ function make_hoststat_summary($filter) {
 		'nodeids' => get_current_nodeid(),
 		'groupids' => $filter['groupids'],
 		'monitored_hosts' => 1,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('groupid', 'name')
 	);
 	$groups = API::HostGroup()->get($options);
 	$groups = zbx_toHash($groups, 'groupid');
@@ -392,7 +392,7 @@ function make_hoststat_summary($filter) {
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('triggerid', 'priority')
 	);
 	$triggers = API::Trigger()->get($options);
 
@@ -769,7 +769,7 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('value_flags', 'error', 'url', 'expression', 'description', 'priority', 'type')
 	);
 	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
 	$options['sortorder'] = isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN;
@@ -1036,7 +1036,7 @@ function make_webmon_overview($filter) {
 function make_discovery_status() {
 	$options = array(
 		'filter' => array('status' => DHOST_STATUS_ACTIVE),
-		'selectDHosts' => API_OUTPUT_EXTEND,
+		'selectDHosts' => array('status', 'dhostid'),
 		'output' => API_OUTPUT_EXTEND
 	);
 	$drules = API::DRule()->get($options);
@@ -1136,7 +1136,7 @@ function make_graph_submenu() {
 	$options = array(
 		'graphids' => $graphids,
 		'selectHosts' => array('hostid', 'host'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('name')
 	);
 	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
@@ -1144,7 +1144,7 @@ function make_graph_submenu() {
 	$options = array(
 		'itemids' => $itemids,
 		'selectHosts' => array('hostid', 'host'),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name', 'key_'),
 		'webitems' => 1
 	);
 	$items = API::Item()->get($options);
@@ -1228,7 +1228,7 @@ function make_sysmap_submenu() {
 
 	$options = array(
 		'sysmapids' => $sysmapids,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('name')
 	);
 	$sysmaps = API::Map()->get($options);
 	foreach ($sysmaps as $sysmap) {
@@ -1280,7 +1280,7 @@ function make_screen_submenu() {
 
 	$options = array(
 		'screenids' => $screenids,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('name', 'screenid')
 	);
 	$screens = API::Screen()->get($options);
 	$screens = zbx_toHash($screens, 'screenid');
