@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5986] fixed page filter in monitoring->graphs (Oleg)
 ..F....... [ZBX-6004] monitoring->screens page optimization (Vedmak)
 ..F....... [ZBX-6003] monitoring->maps page optimization (Vedmak)
 A.F.....S. [ZBX-5862] fixed sql condition algorithm (Andris, Eduard, Sasha)
