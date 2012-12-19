@@ -28,7 +28,7 @@ if (isset($_REQUEST['save'])) {
 	if (!isset($_REQUEST['stepid']) || (isset($_REQUEST['stepid']) && $_REQUEST['name'] != $_REQUEST['old_name'])) {
 		foreach ($_REQUEST['steps_names'] as $name) {
 			if ($name == $_REQUEST['name']) {
-				show_error_message(_s('Step with name "%s" already exists.', $name));
+				show_error_message(_s('Step with name "%1$s" already exists.', $name));
 				$result = false;
 			}
 		}
