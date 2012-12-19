@@ -85,28 +85,23 @@ class CItemPrototype extends CItemGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-// editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
-		}
-		else{
+		// editable + PERMISSION CHECK
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS( '.
-								' SELECT hgg.groupid '.
-								' FROM hosts_groups hgg, rights rr, users_groups gg '.
-								' WHERE hgg.hostid=hg.hostid '.
-									' AND rr.id=hgg.groupid '.
-									' AND rr.groupid=gg.usrgrpid '.
-									' AND gg.userid='.$userid.
-									' AND rr.permission='.PERM_DENY.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE i.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 // templateids
@@ -130,7 +125,7 @@ class CItemPrototype extends CItemGeneral {
 				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.hostid';
@@ -141,7 +136,7 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('i.itemid', $options['itemids']);
 		}
 
 // discoveryids
@@ -150,7 +145,7 @@ class CItemPrototype extends CItemGeneral {
 
 			$sqlParts['select']['discoveryid'] = 'id.parent_itemid';
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
 			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
 
 			if (!is_null($options['groupCount'])) {
@@ -164,7 +159,7 @@ class CItemPrototype extends CItemGeneral {
 
 			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
@@ -174,7 +169,7 @@ class CItemPrototype extends CItemGeneral {
 
 			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
@@ -226,7 +221,7 @@ class CItemPrototype extends CItemGeneral {
 
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['h'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 		}
 
@@ -514,7 +509,7 @@ class CItemPrototype extends CItemGeneral {
 		$parentItemids = $prototypeids;
 		$childPrototypeids = array();
 		do {
-			$dbItems = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parentItemids));
+			$dbItems = DBselect('SELECT itemid FROM items WHERE '.dbConditionInt('templateid', $parentItemids));
 			$parentItemids = array();
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
@@ -553,7 +548,7 @@ class CItemPrototype extends CItemGeneral {
 
 // CREATED ITEMS
 		$createdItems = array();
-		$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
+		$sql = 'SELECT itemid FROM item_discovery WHERE '.dbConditionInt('parent_itemid', $prototypeids);
 		$dbItems = DBselect($sql);
 		while ($item = DBfetch($dbItems)) {
 			$createdItems[$item['itemid']] = $item['itemid'];
@@ -639,7 +634,7 @@ class CItemPrototype extends CItemGeneral {
 			'SELECT i.itemid AS ruleid,id.itemid,i.hostid'.
 			' FROM items i,item_discovery id'.
 			' WHERE i.templateid=id.parent_itemid'.
-				' AND '.DBcondition('id.itemid', zbx_objectValues($items, 'itemid'))
+				' AND '.dbConditionInt('id.itemid', zbx_objectValues($items, 'itemid'))
 		);
 		while ($rule = DBfetch($dbResult)) {
 			if (!isset($ruleids[$rule['itemid']])) {

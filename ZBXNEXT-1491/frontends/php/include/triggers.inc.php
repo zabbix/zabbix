@@ -317,7 +317,7 @@ function get_hosts_by_triggerid($triggerids) {
 		' FROM hosts h,functions f,items i'.
 		' WHERE i.itemid=f.itemid'.
 			' AND h.hostid=i.hostid'.
-			' AND '.DBcondition('f.triggerid', $triggerids)
+			' AND '.dbConditionInt('f.triggerid', $triggerids)
 	);
 }
 
@@ -969,7 +969,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 					'SELECT i.itemid,i.value_type,h.name'.
 					' FROM items i,hosts h'.
 					' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-						' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+						' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
 						' AND h.host='.zbx_dbstr($exprPart['host']).
 						' AND h.hostid=i.hostid'.
 						' AND '.DBin_node('i.itemid')
@@ -1031,7 +1031,7 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 		' WHERE h.hostid=i.hostid'.
 			' AND i.itemid=f.itemid'.
 			' AND f.triggerid=t.triggerid'.
-			' AND '.DBcondition('h.hostid', $hostids).
+			' AND '.dbConditionInt('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
 	);
@@ -1189,17 +1189,18 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	foreach ($dbTriggers as $trigger) {
 		$hostids[] = $trigger['hosts'][0]['hostid'];
 	}
-	$hosts = API::Host()->get(array(
+
+	$options = array(
 		'output' => array('name', 'hostid'),
 		'hostids' => $hostids,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
 		'preservekeys' => true
-	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-	foreach ($hostScripts as $hostid => $scripts) {
-		$hosts[$hostid]['scripts'] = $scripts;
+	);
+
+	if ($view_style == STYLE_LEFT) {
+		$options['selectScreens'] = API_OUTPUT_COUNT;
+		$options['selectInventory'] = array('hostid');
 	}
+	$hosts = API::Host()->get($options);
 
 	$triggers = array();
 	$hostNames = array();
@@ -1252,6 +1253,10 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 		}
 	}
 	else {
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 		foreach ($triggers as $description => $triggerHosts) {
@@ -1265,7 +1270,7 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 
 			// host js link
 			$hostSpan = new CSpan(nbsp($hostName), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array()));
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
 
 			$tableColumns = array($hostSpan);
 			foreach ($triggers as $triggerHosts) {
@@ -1661,9 +1666,8 @@ function make_trigger_details($trigger) {
 	$host = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
 		'hostids' => $trigger['hosts'][0]['hostid'],
-		'selectAppllications' => API_OUTPUT_EXTEND,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
+		'selectInventory' => array('hostid'),
 		'preservekeys' => true
 	));
 	$host = reset($host);
@@ -1672,7 +1676,7 @@ function make_trigger_details($trigger) {
 
 	// host js link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+	$scripts = $hostScripts[$host['hostid']];
 	$hostSpan->attr('data-menu', hostMenuData($host, $scripts));
 
 	// get visible name of the first host
@@ -2395,11 +2399,22 @@ function get_item_function_info($expr) {
 	return $result;
 }
 
+/**
+ * Execute expression and return array with keys 'result' as 'TRUE' or 'FALSE' and 'error' as error text
+ * if there is one.
+ *
+ * @param string $expression
+ * @param array  $rplcts
+ * @param bool   $oct
+ *
+ * @return array
+ */
 function evalExpressionData($expression, $rplcts, $oct = false) {
 	$result = false;
 
 	$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
 	preg_match_all('/[0-9\.]+['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?/', $evStr, $arr, PREG_OFFSET_CAPTURE);
+
 	for ($i = count($arr[0]) - 1; $i >= 0; $i--) {
 		$evStr = substr_replace($evStr, convert($arr[0][$i][0]), $arr[0][$i][1], strlen($arr[0][$i][0]));
 	}
@@ -2415,9 +2430,34 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 	$switch = array('=' => '==', '#' => '!=', '&' => '&&', '|' => '||');
 	$evStr = str_replace(array_keys($switch), array_values($switch), $evStr);
 
+	// execute expression
 	eval('$result = ('.trim($evStr).');');
 
-	return ($result === true || $result && $result != '-') ? 'TRUE' : 'FALSE';
+	$result = ($result === true || $result && $result != '-') ? 'TRUE' : 'FALSE';
+	$error = '';
+
+	// remove eval() generated error message
+	global $ZBX_MESSAGES;
+	if (!empty($ZBX_MESSAGES)) {
+		$messageList = array();
+
+		foreach ($ZBX_MESSAGES as $zbxMessage) {
+			if (strpos($zbxMessage['message'], 'eval()') !== false) {
+				$error = substr($zbxMessage['message'], 0, strpos($zbxMessage['message'], '['));
+				$result = 'NULL';
+			}
+			else {
+				$messageList[] = $zbxMessage;
+			}
+		}
+
+		$ZBX_MESSAGES = $messageList;
+	}
+
+	return array(
+		'result' => $result,
+		'error' => $error
+	);
 }
 
 /**

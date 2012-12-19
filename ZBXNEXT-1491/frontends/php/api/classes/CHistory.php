@@ -132,7 +132,7 @@ class CHistory extends CZBXAPI {
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
-			$sqlParts['where']['itemid'] = DBcondition('h.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -146,7 +146,7 @@ class CHistory extends CZBXAPI {
 
 			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['hi'] = 'h.itemid=i.itemid';
 
 			if (!$nodeCheck) {

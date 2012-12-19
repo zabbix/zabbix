@@ -77,7 +77,7 @@ class CMacrosResolver {
 
 		// host macros
 		if ($isHostMacrosExist) {
-			$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.DBcondition('h.hostid', $hostIds));
+			$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.dbConditionInt('h.hostid', $hostIds));
 			while ($dbHost = DBfetch($dbHosts)) {
 				$hostId = $dbHost['hostid'];
 				$hostMacros = $this->findMacros(self::PATTERN_HOST, $data[$hostId]);
@@ -106,8 +106,8 @@ class CMacrosResolver {
 				'SELECT i.hostid,i.ip,i.dns,i.useip,i.type'.
 				' FROM interface i'.
 				' WHERE i.main=1'.
-					' AND '.DBcondition('i.hostid', $hostIds).
-					' AND '.DBcondition('i.type', $this->interfacePriorities)
+					' AND '.dbConditionInt('i.hostid', $hostIds).
+					' AND '.dbConditionInt('i.type', $this->interfacePriorities)
 			);
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				$hostId = $dbInterface['hostid'];

@@ -43,17 +43,15 @@ if (!empty($this->data['maps'])) {
 	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
 	$headerForm->addItem($mapComboBox);
 
-	$mapWidget->addHeader($this->data['maps'][$this->data['sysmapid']]['name'], $headerForm);
+	$mapWidget->addHeader($this->data['map']['name'], $headerForm);
 
 	// get map parent maps
 	$parentMaps = array();
-	foreach ($this->data['maps'] as $map) {
-		foreach ($map['selements'] as $selement) {
-			if (bccomp($selement['elementid'], $this->data['sysmapid']) == 0 && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-				$parentMaps[] = SPACE.SPACE;
-				$parentMaps[] = new Clink($map['name'], 'maps.php?sysmapid='.$map['sysmapid'].'&fullscreen='.$this->data['fullscreen']);
-				break;
-			}
+	foreach (getParentMaps($this->data['sysmapid']) as $parent) {
+		// check for permissions
+		if (isset($this->data['maps'][$parent['sysmapid']])) {
+			$parentMaps[] = SPACE.SPACE;
+			$parentMaps[] = new Clink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen']);
 		}
 	}
 	if (!empty($parentMaps)) {
@@ -61,7 +59,7 @@ if (!empty($this->data['maps'])) {
 		$mapWidget->addHeader($parentMaps);
 	}
 
-	$actionMap = getActionMapBySysmap($this->data['maps'][$this->data['sysmapid']]);
+	$actionMap = getActionMapBySysmap($this->data['map']);
 
 	$mapTable->addRow($actionMap);
 

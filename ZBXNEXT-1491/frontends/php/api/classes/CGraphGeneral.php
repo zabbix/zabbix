@@ -433,7 +433,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$dbRules = DBselect(
 				'SELECT gi.graphid,hg.groupid'.
 					' FROM graphs_items gi,items i,hosts_groups hg'.
-					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hg.hostid'
 			);
@@ -458,7 +458,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$dbRules = DBselect(
 				'SELECT gi.graphid,i.hostid'.
 					' FROM graphs_items gi,items i'.
-					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
 					' AND gi.itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
@@ -483,7 +483,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$dbRules = DBselect(
 				'SELECT gi.graphid,i.hostid'.
 					' FROM graphs_items gi,items i'.
-					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
 					' AND gi.itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {

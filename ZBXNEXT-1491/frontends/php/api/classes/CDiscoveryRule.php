@@ -90,27 +90,22 @@ class CDiscoveryRule extends CItemGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT hgg.groupid'.
-				' FROM hosts_groups hgg,rights rr,users_groups gg'.
-				' WHERE hgg.hostid=hg.hostid'.
-					' AND rr.id=hgg.groupid'.
-					' AND rr.groupid=gg.usrgrpid'.
-					' AND gg.userid='.$userid.
-					' AND rr.permission='.PERM_DENY.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE i.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// templateids
@@ -134,7 +129,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.hostid';
@@ -145,7 +140,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('i.itemid', $options['itemids']);
 		}
 
 		// interfaceids
@@ -156,7 +151,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$sqlParts['select']['interfaceid'] = 'i.interfaceid';
 			}
 
-			$sqlParts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
@@ -214,7 +209,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['h'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 		}
 
@@ -361,7 +356,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$parentItemids = $ruleids;
 		$childTuleids = array();
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.DBcondition('i.templateid', $parentItemids));
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
 			$parentItemids = array();
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
@@ -386,7 +381,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'SELECT i.itemid'.
 			' FROM item_discovery id,items i'.
 			' WHERE i.itemid=id.itemid'.
-				' AND '.DBcondition('parent_itemid', $ruleids)
+				' AND '.dbConditionInt('parent_itemid', $ruleids)
 		);
 		while ($item = DBfetch($dbItems)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
@@ -1030,7 +1025,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$res = DBselect(
 					'SELECT id.parent_itemid,f.triggerid'.
 						' FROM item_discovery id,items i,functions f'.
-						' WHERE '.DBcondition('id.parent_itemid', $itemIds).
+						' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
 						' AND id.itemid=i.itemid'.
 						' AND i.itemid=f.itemid'
 				);
@@ -1068,7 +1063,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$res = DBselect(
 					'SELECT id.parent_itemid,gi.graphid'.
 						' FROM item_discovery id,items i,graphs_items gi'.
-						' WHERE '.DBcondition('id.parent_itemid', $itemIds).
+						' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
 						' AND id.itemid=i.itemid'.
 						' AND i.itemid=gi.itemid'
 				);

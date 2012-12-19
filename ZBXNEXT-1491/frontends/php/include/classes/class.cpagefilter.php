@@ -87,6 +87,11 @@ class CPageFilter {
 
 		// profiles
 		$this->_getProfiles($options);
+		if (!isset($options['groupid'], $options['hostid'])) {
+			if (isset($options['graphid'])) {
+				$this->_updateByGraph($options);
+			}
+		}
 
 		// groups
 		if (isset($options['groups'])) {
@@ -162,10 +167,52 @@ class CPageFilter {
 		$this->_requestIds['application'] = isset($options['application']) ? $options['application'] : null;
 	}
 
+	private function _updateByGraph(&$options) {
+		$graphs = API::Graph()->get(array(
+			'graphids' => $options['graphid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_REFER,
+			'selectTemplates' => API_OUTPUT_REFER,
+			'selectGroups' => API_OUTPUT_REFER
+		));
+
+		if ($graph = reset($graphs)) {
+			$groups = zbx_toHash($graph['groups'], 'groupid');
+			$hosts = zbx_toHash($graph['hosts'], 'hostid');
+			$templates = zbx_toHash($graph['templates'], 'templateid');
+
+			if (isset($groups[$this->_profileIds['groupid']])) {
+				$options['groupid'] = $this->_profileIds['groupid'];
+			}
+			else {
+				$groupids = array_keys($groups);
+				$options['groupid'] = reset($groupids);
+			}
+
+			if (isset($hosts[$this->_profileIds['hostid']])) {
+				$options['hostid'] = $this->_profileIds['hostid'];
+			}
+			else {
+				$hostids = array_keys($hosts);
+				$options['hostid'] = reset($hostids);
+			}
+
+			if (is_null($options['hostid'])) {
+				if (isset($templates[$this->_profileIds['hostid']])) {
+					$options['hostid'] = $this->_profileIds['hostid'];
+				}
+				else {
+					$templateids = array_keys($templates);
+					$options['hostid'] = reset($templateids);
+				}
+			}
+		}
+	}
+
 	private function _initGroups($groupid, $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-			'output' => API_OUTPUT_EXTEND
+			'output' => array('groupid', 'name')
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = API::HostGroup()->get($options);
@@ -259,7 +306,7 @@ class CPageFilter {
 		else {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('graphid', 'name'),
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);
@@ -315,7 +362,7 @@ class CPageFilter {
 		else {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('triggerid', 'description'),
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);

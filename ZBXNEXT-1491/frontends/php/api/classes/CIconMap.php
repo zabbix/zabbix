@@ -93,7 +93,7 @@ class CIconMap extends CZBXAPI {
 		if (!is_null($options['iconmapids'])) {
 			zbx_value2array($options['iconmapids']);
 
-			$sqlParts['where'][] = DBcondition('im.iconmapid', $options['iconmapids']);
+			$sqlParts['where'][] = dbConditionInt('im.iconmapid', $options['iconmapids']);
 		}
 
 		// sysmapids
@@ -102,7 +102,7 @@ class CIconMap extends CZBXAPI {
 
 			$sqlParts['select']['sysmapids'] = 's.sysmapid';
 			$sqlParts['from']['sysmaps'] = 'sysmaps s';
-			$sqlParts['where'][] = DBcondition('s.sysmapid', $options['sysmapids']);
+			$sqlParts['where'][] = dbConditionInt('s.sysmapid', $options['sysmapids']);
 			$sqlParts['where']['ims'] = 'im.iconmapid=s.iconmapid';
 		}
 
@@ -327,7 +327,7 @@ class CIconMap extends CZBXAPI {
 		$sql = 'SELECT m.name as mapname, im.name as iconmapname'.
 			' FROM sysmaps m, icon_map im'.
 			' WHERE m.iconmapid=im.iconmapid'.
-			' AND '.DBcondition('m.iconmapid', $iconmapids);
+			' AND '.dbConditionInt('m.iconmapid', $iconmapids);
 		if ($names = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Icon map "%1$s" cannot be deleted. Used in map "%2$s".', $names['iconmapname'], $names['mapname'])

@@ -99,27 +99,22 @@ class CTemplate extends CHostGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
-		}
-		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=h.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS('.
-				'SELECT hgg.groupid'.
-				' FROM hosts_groups hgg,rights rr,users_groups gg'.
-				' WHERE hgg.hostid=hg.hostid'.
-				' AND rr.id=hgg.groupid'.
-				' AND rr.groupid=gg.usrgrpid'.
-				' AND gg.userid='.$userid.
-				' AND rr.permission='.PERM_DENY.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE h.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -131,7 +126,7 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -148,7 +143,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['where']['templateid'] = DBcondition('h.hostid', $options['templateids']);
+			$sqlParts['where']['templateid'] = dbConditionInt('h.hostid', $options['templateids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -162,7 +157,7 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
-			$sqlParts['where'][] = DBcondition('ht.templateid', $options['parentTemplateids']);
+			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -181,7 +176,7 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
-			$sqlParts['where'][] = DBcondition('ht.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('ht.hostid', $options['hostids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.templateid';
 
 			if (!is_null($options['groupCount'])) {
@@ -200,7 +195,7 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if (!$nodeCheck) {
@@ -216,7 +211,7 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
@@ -233,7 +228,7 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
@@ -251,13 +246,13 @@ class CTemplate extends CHostGeneral {
 
 		// with_items
 		if (!is_null($options['with_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
+			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid )';
 		}
 
 		// with_triggers
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS('.
-				'SELECT i.itemid'.
+				'SELECT NULL'.
 				' FROM items i,functions f,triggers t'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=f.itemid'.
@@ -267,7 +262,7 @@ class CTemplate extends CHostGeneral {
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['where'][] = 'EXISTS('.
-				'SELECT DISTINCT i.itemid'.
+				'SELECT NULL'.
 				' FROM items i,graphs_items gi'.
 				' WHERE i.hostid=h.hostid'.
 				' AND i.itemid=gi.itemid)';
@@ -644,7 +639,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
+		DBexecute('DELETE FROM screens_items WHERE '.dbConditionInt('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
 
 		// delete host from maps
 		if (!empty($templateids)) {
@@ -657,7 +652,7 @@ class CTemplate extends CHostGeneral {
 		$sql = 'SELECT DISTINCT actionid'.
 			' FROM conditions'.
 			' WHERE conditiontype='.CONDITION_TYPE_HOST.
-			' AND '.DBcondition('value', $templateids);
+			' AND '.dbConditionString('value', $templateids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -667,7 +662,7 @@ class CTemplate extends CHostGeneral {
 		$sql = 'SELECT DISTINCT o.actionid'.
 			' FROM operations o,optemplate ot'.
 			' WHERE o.operationid=ot.operationid'.
-			' AND '.DBcondition('ot.templateid', $templateids);
+			' AND '.dbConditionInt('ot.templateid', $templateids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -690,7 +685,7 @@ class CTemplate extends CHostGeneral {
 		$operationids = array();
 		$sql = 'SELECT DISTINCT ot.operationid'.
 			' FROM optemplate ot'.
-			' WHERE '.DBcondition('ot.templateid', $templateids);
+			' WHERE '.dbConditionInt('ot.templateid', $templateids);
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -704,8 +699,8 @@ class CTemplate extends CHostGeneral {
 		$delOperationids = array();
 		$sql = 'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
-			' WHERE '.DBcondition('o.operationid', $operationids).
-			' AND NOT EXISTS(SELECT ot.optemplateid FROM optemplate ot WHERE ot.operationid=o.operationid)';
+			' WHERE '.dbConditionInt('o.operationid', $operationids).
+			' AND NOT EXISTS(SELECT NULL FROM optemplate ot WHERE ot.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -889,7 +884,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (!empty($sqlSet)) {
-			$sql = 'UPDATE hosts SET ' . implode(', ', $sqlSet) . ' WHERE ' . DBcondition('hostid', $templateids);
+			$sql = 'UPDATE hosts SET '.implode(', ', $sqlSet).' WHERE '.dbConditionInt('hostid', $templateids);
 			$result = DBexecute($sql);
 		}
 		// }}} UPDATE TEMPLATES PROPERTIES
