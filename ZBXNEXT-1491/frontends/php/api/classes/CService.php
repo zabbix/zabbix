@@ -1589,6 +1589,8 @@ class CService extends CZBXAPI {
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
 		if ($options['countOutput'] === null) {
 			if ($options['selectTrigger'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
