@@ -101,23 +101,17 @@ $_REQUEST['go'] = get_request('go', 'none');
 /*
  * Actions
  */
-// check for duplicate step names
-$steps = get_request('steps', array());
-if (isset($_REQUEST['new_httpstep'])) {
-	$steps[] = $_REQUEST['new_httpstep'];
-}
-$isDuplicateStepsFound = !empty($_REQUEST['steps']) ? validateHttpDuplicateSteps($steps) : false;
-
 // add new steps
 if (isset($_REQUEST['new_httpstep'])) {
 	$_REQUEST['steps'] = get_request('steps', array());
+	$_REQUEST['new_httpstep']['no'] = count($_REQUEST['steps']) + 1;
+	array_push($_REQUEST['steps'], $_REQUEST['new_httpstep']);
 
-	if (!$isDuplicateStepsFound) {
-		$_REQUEST['new_httpstep']['no'] = count($_REQUEST['steps']) + 1;
-		array_push($_REQUEST['steps'], $_REQUEST['new_httpstep']);
-	}
 	unset($_REQUEST['new_httpstep']);
 }
+
+// check for duplicate step names
+$isDuplicateStepsFound = !empty($_REQUEST['steps']) ? validateHttpDuplicateSteps($_REQUEST['steps']) : false;
 
 if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	$result = false;
