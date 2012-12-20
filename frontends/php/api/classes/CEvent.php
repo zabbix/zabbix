@@ -110,14 +110,12 @@ class CEvent extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (is_null($options['source']) && is_null($options['object'])) {
 				$options['object'] = EVENT_OBJECT_TRIGGER;
 			}
 
-			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGER) {
+			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGERS) {
 				if (!is_null($options['triggerids'])) {
 					$triggers = API::Trigger()->get(array(
 						'triggerids' => $options['triggerids'],
@@ -126,34 +124,24 @@ class CEvent extends CZBXAPI {
 					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-					$sqlParts['from']['functions'] = 'functions f';
-					$sqlParts['from']['items'] = 'items i';
-					$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-					$sqlParts['from']['rights'] = 'rights r';
-					$sqlParts['from']['users_groups'] = 'users_groups ug';
-					$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-					$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
-					$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-					$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-					$sqlParts['where'][] = 'r.id=hg.groupid ';
-					$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-					$sqlParts['where'][] = 'ug.userid='.$userid;
-					$sqlParts['where'][] = 'r.permission>='.$permission;
-					$sqlParts['where'][] = 'NOT EXISTS ('.
-						' SELECT ff.triggerid'.
-						' FROM functions ff,items ii'.
-						' WHERE ff.triggerid=e.objectid'.
-							' AND ff.itemid=ii.itemid'.
-							' AND EXISTS ('.
-								' SELECT hgg.groupid'.
-								' FROM hosts_groups hgg,rights rr,users_groups gg'.
-								' WHERE hgg.hostid=ii.hostid'.
-									' AND rr.id=hgg.groupid'.
-									' AND rr.groupid=gg.usrgrpid'.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.'))';
+					$userGroups = getUserGroupsByUserId($userid);
+
+					$sqlParts['where'][] = 'EXISTS ('.
+							'SELECT NULL'.
+							' FROM functions f,items i,hosts_groups hgg'.
+								' JOIN rights r'.
+									' ON r.id=hgg.groupid'.
+										' AND '.dbConditionInt('r.groupid', $userGroups).
+							' WHERE e.objectid=f.triggerid'.
+								' AND f.itemid=i.itemid'.
+								' AND i.hostid=hgg.hostid'.
+								' AND e.object='.EVENT_OBJECT_TRIGGER.
+							' GROUP BY f.triggerid'.
+							' HAVING MIN(r.permission)>'.PERM_DENY.
+								' AND MAX(r.permission)>='.$permission.
+							')';
 				}
 			}
 		}
@@ -164,7 +152,7 @@ class CEvent extends CZBXAPI {
 		// eventids
 		if (!is_null($options['eventids'])) {
 			zbx_value2array($options['eventids']);
-			$sqlParts['where'][] = DBcondition('e.eventid', $options['eventids']);
+			$sqlParts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -175,7 +163,7 @@ class CEvent extends CZBXAPI {
 		// triggerids
 		if (!is_null($options['triggerids']) && $options['object'] == EVENT_OBJECT_TRIGGER) {
 			zbx_value2array($options['triggerids']);
-			$sqlParts['where'][] = DBcondition('e.objectid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['triggerids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['objectid'] = 'e.objectid';
@@ -195,7 +183,7 @@ class CEvent extends CZBXAPI {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hg'] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
@@ -208,7 +196,7 @@ class CEvent extends CZBXAPI {
 			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
@@ -217,24 +205,6 @@ class CEvent extends CZBXAPI {
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('e.eventid', $nodeids);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts = $this->addQuerySelect('e.*', $sqlParts);
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT e.eventid) AS rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 		// object
@@ -283,7 +253,7 @@ class CEvent extends CZBXAPI {
 		// value
 		if (!is_null($options['value'])) {
 			zbx_value2array($options['value']);
-			$sqlParts['where'][] = DBcondition('e.value', $options['value']);
+			$sqlParts['where'][] = dbConditionInt('e.value', $options['value']);
 		}
 
 		// search
@@ -309,6 +279,9 @@ class CEvent extends CZBXAPI {
 			$sqlParts = $this->addQuerySelect($this->fieldId('object'), $sqlParts);
 			$sqlParts = $this->addQuerySelect($this->fieldId('objectid'), $sqlParts);
 		}
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$eventids = array();
 		$triggerids = array();
@@ -479,7 +452,6 @@ class CEvent extends CZBXAPI {
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'webitems' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -530,7 +502,7 @@ class CEvent extends CZBXAPI {
 					'SELECT a.*,u.alias'.
 					' FROM acknowledges a'.
 						' LEFT JOIN users u ON u.userid=a.userid'.
-					' WHERE '.DBcondition('a.eventid', $eventids).
+					' WHERE '.dbConditionInt('a.eventid', $eventids).
 					' ORDER BY a.clock DESC'
 				);
 				while ($ack = DBfetch($res)) {
@@ -541,7 +513,7 @@ class CEvent extends CZBXAPI {
 				$res = DBselect(
 					'SELECT COUNT(a.acknowledgeid) AS rowscount,a.eventid'.
 					' FROM acknowledges a'.
-					' WHERE '.DBcondition('a.eventid', $eventids).
+					' WHERE '.dbConditionInt('a.eventid', $eventids).
 					' GROUP BY a.eventid'
 				);
 				while ($ack = DBfetch($res)) {
@@ -552,7 +524,7 @@ class CEvent extends CZBXAPI {
 				$res = DBselect(
 					'SELECT a.*'.
 					' FROM acknowledges a'.
-					' WHERE '.DBcondition('a.eventid', $eventids).
+					' WHERE '.dbConditionInt('a.eventid', $eventids).
 					' ORDER BY a.clock DESC'
 				);
 				while ($ack = DBfetch($res)) {
@@ -584,7 +556,7 @@ class CEvent extends CZBXAPI {
 			}
 		}
 
-		$sql = 'UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids);
+		$sql = 'UPDATE events SET acknowledged=1 WHERE '.dbConditionInt('eventid', $eventids);
 		if (!DBexecute($sql)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}

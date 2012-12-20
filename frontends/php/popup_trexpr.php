@@ -191,22 +191,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'count[<]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T > N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is < N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[>]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T < N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is > N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[=]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T = N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is = N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[#]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
@@ -239,42 +239,42 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'max[<]' => array(
-		'description' =>  _('Maximum value for period of time is T < N'),
+		'description' =>  _('Maximum value for period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[>]' => array(
-		'description' =>  _('Maximum value for period of time is T > N'),
+		'description' =>  _('Maximum value for period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[=]' => array(
-		'description' =>  _('Maximum value for period of time is T = N'),
+		'description' =>  _('Maximum value for period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[#]' => array(
-		'description' =>  _('Maximum value for period of time is T NOT N'),
+		'description' =>  _('Maximum value for period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'min[<]' => array(
-		'description' =>  _('Minimum value for period of time is T < N'),
+		'description' =>  _('Minimum value for period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[>]' => array(
-		'description' =>  _('Minimum value for period of time is T > N'),
+		'description' =>  _('Minimum value for period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[=]' => array(
-		'description' =>  _('Minimum value for period of time is T = N'),
+		'description' =>  _('Minimum value for period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[#]' => array(
-		'description' =>  _('Minimum value for period of time is T NOT N'),
+		'description' =>  _('Minimum value for period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
@@ -325,7 +325,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_str
 	),
 	'sum[<]' => array(
-		'description' =>  _('Sum of values for period of time is T < N'),
+		'description' =>  _('Sum of values of a period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
@@ -340,7 +340,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_numeric
 	),
 	'sum[#]' => array(
-		'description' =>  _('Sum of values for period of time is T NOT N'),
+		'description' =>  _('Sum of values of a period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
@@ -448,16 +448,6 @@ $functions = array(
 		'description' =>  _('Log severity of the last log entry is NOT N'),
 		'allowed_types' => $allowed_types_log
 	),
-	'logsource[<]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise'),
-		'params' => $param1_str,
-		'allowed_types' => $allowed_types_log
-	),
-	'logsource[>]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise'),
-		'params' => $param1_str,
-		'allowed_types' => $allowed_types_log
-	),
 	'logsource[=]' => array(
 		'description' =>  _('Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise'),
 		'params' => $param1_str,
@@ -501,12 +491,12 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[=]' => array(
-		'description' =>  _('No data received during period of time T, if N = 1, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T, then N = 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[#]' => array(
-		'description' =>  _('No data received during period of time T, if N NOT 1, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T, then N NOT 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	)
@@ -532,34 +522,40 @@ check_fields($fields);
 if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 	$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
-	$trigExpr = new CTriggerExpression(array('expression' => $_REQUEST['expression']));
+	$expressionData = new CTriggerExpression();
 
-	if (empty($trigExpr->errors) && !empty($trigExpr->expressions)) {
-		preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $match);
-		$exprSymbols = $match;
-		$expr = reset($trigExpr->expressions);
-		if (isset($expr['functionName']) && isset($exprSymbols[1])) {
-			$_REQUEST['expr_type'] = $expr['functionName'].'['.$exprSymbols[1].']';
+	if ($expressionData->parse($_REQUEST['expression']) && count($expressionData->expressions) == 1) {
+		$exprPart = reset($expressionData->expressions);
+		preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $exprSymbols);
+
+		if (isset($exprSymbols[1])) {
+			$_REQUEST['expr_type'] = $exprPart['functionName'].'['.$exprSymbols[1].']';
 		}
-		if (isset($expr['functionParamList'])) {
-			$_REQUEST['param'] = $expr['functionParamList'];
-			$_REQUEST['paramtype'] = 0;
+
+		$_REQUEST['description'] = $exprPart['host'] .':'. $exprPart['item'];
+		$_REQUEST['param'] = $exprPart['functionParamList'];
+
+		$param_no = in_array($exprPart['functionName'], array('regexp', 'iregexp', 'str')) ? 1 : 0;
+		if (isset($_REQUEST['param'][$param_no][0]) && $_REQUEST['param'][$param_no][0] == '#') {
+			$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
+			$_REQUEST['param'][$param_no] = substr($_REQUEST['param'][$param_no], 1);
 		}
+		else {
+			$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
+		}
+
 		if (isset($exprSymbols[2])) {
 			$_REQUEST['value'] = $exprSymbols[2];
 		}
-		if (isset($expr['host']) && isset($expr['item'])) {
-			$_REQUEST['description'] = $expr['host'] .':'. $expr['item'];
-			$options = array(
-				'filter' => array('host' => $expr['host'], 'key_' => $expr['item']),
-				'output' => API_OUTPUT_EXTEND,
-				'webitems' => true
-			);
-			$myItem = API::Item()->get($options);
-			$myItem = reset($myItem);
-			if (isset($myItem['itemid'])) {
-				$_REQUEST['itemid'] = $myItem['itemid'];
-			}
+
+		$myItem = API::Item()->get(array(
+			'filter' => array('host' => $exprPart['host'], 'key_' => $exprPart['item'], 'flags' => null),
+			'output' => API_OUTPUT_EXTEND,
+			'webitems' => true
+		));
+		$myItem = reset($myItem);
+		if (isset($myItem['itemid'])) {
+			$_REQUEST['itemid'] = $myItem['itemid'];
 		}
 	}
 }
@@ -590,7 +586,8 @@ if ($itemid) {
 		'output' => API_OUTPUT_EXTEND,
 		'itemids' => $itemid,
 		'webitems' => true,
-		'selectHosts' => API_OUTPUT_EXTEND
+		'selectHosts' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => null)
 	));
 	$item_data = reset($items_data);
 	$item_key = $item_data['key_'];
@@ -646,7 +643,8 @@ if (!empty($itemid)) {
 	// getting type of return value for the item user selected
 	$selectedItems = API::Item()->get(array(
 		'itemids' => array($itemid),
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => null)
 	));
 	if ($selectedItem = reset($selectedItems)) {
 		$data['itemValueType'] = $selectedItem['value_type'];

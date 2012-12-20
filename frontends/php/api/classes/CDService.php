@@ -42,12 +42,9 @@ class CDService extends CZBXAPI{
  * @param boolean $options['monitored_hosts'] only monitored Services
  * @param boolean $options['templated_hosts'] include templates in result
  * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_monitored_items'] only with monitored items
  * @param boolean $options['with_historical_items'] only with historical items
  * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitored triggers
  * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param boolean $options['selectGroups'] select ServiceGroups
@@ -116,18 +113,6 @@ class CDService extends CZBXAPI{
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['dservices']);
-
-			$dbTable = DB::getSchema('dservices');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 's.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 // editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -143,7 +128,7 @@ class CDService extends CZBXAPI{
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
-			$sqlParts['where']['dserviceid'] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -156,7 +141,7 @@ class CDService extends CZBXAPI{
 			zbx_value2array($options['dhostids']);
 
 			$sqlParts['select']['dhostid'] = 'ds.dhostid';
-			$sqlParts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dhostid', $options['dhostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'ds.dhostid';
@@ -177,8 +162,8 @@ class CDService extends CZBXAPI{
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dchecks'] = 'dchecks dc';
 
-			$sqlParts['where'][] = DBcondition('dc.dcheckid', $options['dcheckids']);
-			$sqlParts['where']['dhds'] = 'dh.hostid=ds.hostid';
+			$sqlParts['where'][] = dbConditionInt('dc.dcheckid', $options['dcheckids']);
+			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 
 			if (!is_null($options['groupCount'])) {
@@ -193,7 +178,7 @@ class CDService extends CZBXAPI{
 			$sqlParts['select']['druleid'] = 'dh.druleid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 
-			$sqlParts['where']['druleid'] = DBcondition('dh.druleid', $options['druleids']);
+			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -211,25 +196,6 @@ class CDService extends CZBXAPI{
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
-		}
-
-
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['dservices'] = 'ds.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT ds.dserviceid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 // filter
@@ -251,6 +217,8 @@ class CDService extends CZBXAPI{
 		}
 //-------
 
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$dserviceids = array();
 

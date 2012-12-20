@@ -76,7 +76,6 @@ abstract class CMapElement extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectUrls'				=> null,
-			'selectLinks'				=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
@@ -106,7 +105,7 @@ abstract class CMapElement extends CZBXAPI {
 // selementids
 		if (!is_null($options['selementids'])) {
 			zbx_value2array($options['selementids']);
-			$sqlParts['where']['selementid'] = DBcondition('se.selementid', $options['selementids']);
+			$sqlParts['where']['selementid'] = dbConditionInt('se.selementid', $options['selementids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -119,7 +118,7 @@ abstract class CMapElement extends CZBXAPI {
 			zbx_value2array($options['sysmapids']);
 
 			$sqlParts['select']['sysmapid'] = 'se.sysmapid';
-			$sqlParts['where']['sysmapid'] = DBcondition('se.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sysmapid'] = dbConditionInt('se.sysmapid', $options['sysmapids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['sysmapid'] = 'se.sysmapid';
@@ -204,10 +203,6 @@ abstract class CMapElement extends CZBXAPI {
 
 				if (!isset($result[$selement['selementid']])) $result[$selement['selementid']]= array();
 
-				if (!is_null($options['selectLinks']) && !isset($result[$selement['selementid']]['links'])) {
-					$result[$selement['selementid']]['links'] = array();
-				}
-
 				if (!is_null($options['selectUrls']) && !isset($result[$selement['selementid']]['urls'])) {
 					$result[$selement['selementid']]['urls'] = array();
 				}
@@ -221,7 +216,7 @@ abstract class CMapElement extends CZBXAPI {
 		$sysmapids = array();
 		$sql = 'SELECT se.sysmapid '.
 			' FROM sysmaps_elements se'.
-			' WHERE '.DBcondition('se.selementid', $selementids);
+			' WHERE '.dbConditionInt('se.selementid', $selementids);
 		$dbSysmaps = DBselect($sql);
 		while ($dbSysmap = DBfetch($dbSysmaps)) {
 			$sysmapids[$dbSysmap['sysmapid']] = $dbSysmap['sysmapid'];
@@ -236,47 +231,10 @@ abstract class CMapElement extends CZBXAPI {
 		if (!is_null($options['selectUrls']) && str_in_array($options['selectUrls'], $subselectsAllowedOutputs)) {
 			$sql = 'SELECT sysmapelementurlid, selementid, name, url  '.
 					' FROM sysmap_element_url '.
-					' WHERE '.DBcondition('selementid', $selementids);
+					' WHERE '.dbConditionInt('selementid', $selementids);
 			$dbSelementUrls = DBselect($sql);
 			while ($selementUrl = DBfetch($dbSelementUrls)) {
 				$result[$selementUrl['selementid']]['urls'][] = $selementUrl;
-			}
-		}
-// Adding Links
-		if (!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselectsAllowedOutputs)) {
-			$linkids = array();
-			$mapLinks = array();
-
-			$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
-			$dbLinks = DBselect($sql);
-			while ($link = DBfetch($dbLinks)) {
-				$link['linktriggers'] = array();
-
-				$mapLinks[$link['linkid']] = $link;
-				$linkids[$link['linkid']] = $link['linkid'];
-			}
-
-			$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
-			$dbLinkTriggers = DBselect($sql);
-			while ($linkTrigger = DBfetch($dbLinkTriggers)) {
-				$mapLinks[$linkTrigger['linkid']]['linktriggers'][] = $linkTrigger;
-			}
-
-			foreach ($mapLinks as $link) {
-				if (!isset($result[$link['selementid1']]['links']))
-					$result[$link['selementid1']]['links'] = array();
-
-				if (!isset($result[$link['selementid2']]['links']))
-					$result[$link['selementid2']]['links'] = array();
-
-				if (!is_null($options['preservekeys'])) {
-					$result[$link['selementid1']]['links'][$link['linkid']] = $link;
-					$result[$link['selementid2']]['links'][$link['linkid']] = $link;
-				}
-				else{
-					$result[$link['selementid1']]['links'][] = $link;
-					$result[$link['selementid2']]['links'][] = $link;
-				}
 			}
 		}
 
@@ -348,7 +306,7 @@ abstract class CMapElement extends CZBXAPI {
 // linkids
 		if (!is_null($options['linkids'])) {
 			zbx_value2array($options['linkids']);
-			$sqlParts['where']['linkid'] = DBcondition('sl.linkid', $options['linkids']);
+			$sqlParts['where']['linkid'] = dbConditionInt('sl.linkid', $options['linkids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -361,7 +319,7 @@ abstract class CMapElement extends CZBXAPI {
 			zbx_value2array($options['sysmapids']);
 
 			$sqlParts['select']['sysmapid'] = 'sl.sysmapid';
-			$sqlParts['where']['sysmapid'] = DBcondition('sl.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sysmapid'] = dbConditionInt('sl.sysmapid', $options['sysmapids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['sysmapid'] = 'sl.sysmapid';

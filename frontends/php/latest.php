@@ -209,7 +209,7 @@ $options = array(
 	'hostids' => $available_hosts,
 	'selectAppllications' => API_OUTPUT_EXTEND,
 	'selectScreens' => API_OUTPUT_COUNT,
-	'selectInventory' => true,
+	'selectInventory' => array('hostid'),
 	'selectGroups' => API_OUTPUT_REFER,
 	'preservekeys' => true
 );
@@ -232,14 +232,16 @@ if($_REQUEST['hostid']>0){
 $hosts = API::Host()->get($options);
 
 // fetch scripts for the host JS menu
-$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+if ($_REQUEST['hostid'] == 0) {
+	$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+}
 
 // select hosts
 $sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
 		' FROM applications a, hosts h '.$sql_from.
 		' WHERE a.hostid=h.hostid'.
 			$sql_where.
-			' AND '.DBcondition('h.hostid', $available_hosts).
+			' AND '.dbConditionInt('h.hostid', $available_hosts).
 		order_by('h.name,h.hostid','a.name,a.applicationid');
 
 $db_app_res = DBselect($sql);
@@ -255,11 +257,11 @@ $tab_rows = array();
 // select items
 $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 		' FROM items i,items_applications ia'.
-		' WHERE '.DBcondition('ia.applicationid',$db_appids).
+		' WHERE '.dbConditionInt('ia.applicationid',$db_appids).
 			' AND i.itemid=ia.itemid'.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 		order_by('i.name,i.itemid,i.lastclock');
 
 $db_items = DBselect($sql);
@@ -378,14 +380,18 @@ foreach ($db_apps as $appid => $db_app) {
 
 	$col->setColSpan(5);
 	// host JS menu link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+	$hostSpan = null;
+	if ($_REQUEST['hostid'] == 0) {
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = $hostScripts[$host['hostid']];
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	}
 
 	$table->addRow(array(
 		$link,
 		get_node_name_by_elid($db_app['applicationid']),
-		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
+		$hostSpan,
 		$col
 	));
 
@@ -406,8 +412,8 @@ $sql = 'SELECT DISTINCT h.name,h.hostid '.
 		' WHERE ia.itemid is NULL '.
 			$sql_where.
 			' AND h.hostid=i.hostid '.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.DBcondition('h.hostid', $available_hosts).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('h.hostid', $available_hosts).
 		' ORDER BY h.name';
 
 $db_host_res = DBselect($sql);
@@ -429,8 +435,8 @@ $sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 			' AND h.hostid=i.hostid '.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.DBcondition('h.hostid', $db_hostids).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('h.hostid', $db_hostids).
 		' ORDER BY i.name,i.itemid';
 $db_items = DBselect($sql);
 while ($db_item = DBfetch($db_items)) {
@@ -551,14 +557,17 @@ foreach ($db_hosts as $hostid => $db_host) {
 	$col->setColSpan(5);
 
 	// host JS menu link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	$hostSpan = null;
+	if ($_REQUEST['hostid'] == 0) {
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = $hostScripts[$host['hostid']];
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	}
 
 	$table->addRow(array(
 		$link,
 		get_node_name_by_elid($db_host['hostid']),
-		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
+		$hostSpan,
 		$col
 	));
 

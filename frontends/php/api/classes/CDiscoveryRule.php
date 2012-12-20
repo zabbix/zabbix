@@ -63,6 +63,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'templateids'				=> null,
 			'hostids'					=> null,
 			'itemids'					=> null,
+			'interfaceids'				=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
@@ -105,27 +106,22 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT hgg.groupid'.
-				' FROM hosts_groups hgg,rights rr,users_groups gg'.
-				' WHERE hgg.hostid=hg.hostid'.
-					' AND rr.id=hgg.groupid'.
-					' AND rr.groupid=gg.usrgrpid'.
-					' AND gg.userid='.$userid.
-					' AND rr.permission<'.$permission.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE i.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -152,7 +148,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.hostid';
@@ -163,7 +159,22 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('i.itemid', $options['itemids']);
+		}
+
+		// interfaceids
+		if (!is_null($options['interfaceids'])) {
+			zbx_value2array($options['interfaceids']);
+
+			if ($options['output'] != API_OUTPUT_EXTEND) {
+				$sqlParts['select']['interfaceid'] = 'i.interfaceid';
+			}
+
+			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
+
+			if (!is_null($options['groupCount'])) {
+				$sqlParts['group']['i'] = 'i.interfaceid';
+			}
 		}
 
 		// inherited
@@ -217,7 +228,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['h'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 		}
 
@@ -579,7 +590,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$parentItemids = $ruleids;
 		$childTuleids = array();
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.DBcondition('i.templateid', $parentItemids));
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
 			$parentItemids = array();
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
@@ -604,7 +615,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'SELECT i.itemid'.
 			' FROM item_discovery id,items i'.
 			' WHERE i.itemid=id.itemid'.
-				' AND '.DBcondition('parent_itemid', $ruleids)
+				' AND '.dbConditionInt('parent_itemid', $ruleids)
 		);
 		while ($item = DBfetch($dbItems)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
@@ -773,31 +784,12 @@ class CDiscoveryRule extends CItemGeneral {
 			return array();
 		}
 
-		$itemKeys = array();
 		foreach ($srcTriggers as $id => $trigger) {
 			// skip triggers with web items
 			if (httpItemExists($trigger['items'])) {
 				unset($srcTriggers[$id]);
 				continue;
 			}
-
-			foreach ($trigger['items'] as $item) {
-				$itemKeys[$item['key_']] = $item['key_'];
-			}
-		}
-
-		// fetch newly created items
-		$items = API::Item()->get(array(
-			'hostids' => $dstDiscovery['hostid'],
-			'filter' => array(
-				'key_' => $itemKeys
-			),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-		$dstItems = array();
-		foreach ($items as $item) {
-			$dstItems[$item['key_']] = $item;
 		}
 
 		// save new triggers
@@ -1150,8 +1142,10 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = API::Item()->get(array(
 			'itemids' => $srcItemIds,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
+
 		$srcItems = array();
 		$itemKeys = array();
 		foreach ($items as $item) {
@@ -1160,14 +1154,17 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// fetch newly cloned items
-		$items = array_merge($dstDiscovery['items'], API::Item()->get(array(
+		$newItems = API::Item()->get(array(
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => array(
-				'key_' => $itemKeys
+				'key_' => $itemKeys,
+				'flags' => null
 			),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		)));
+		));
+
+		$items = array_merge($dstDiscovery['items'], $newItems);
 		$dstItems = array();
 		foreach ($items as $item) {
 			$dstItems[$item['key_']] = $item;

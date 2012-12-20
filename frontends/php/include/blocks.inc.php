@@ -50,7 +50,6 @@ function make_favorite_graphs() {
 	$options = array(
 		'itemids' => $itemids,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'output' => API_OUTPUT_EXTEND,
 		'webitems' => 1
 	);
@@ -108,7 +107,7 @@ function make_favorite_screens() {
 		$sourceid = $favorite['value'];
 
 		if ('slideshowid' == $source) {
-			if (!slideshow_accessible($sourceid, PERM_READ_ONLY)) {
+			if (!slideshow_accessible($sourceid, PERM_READ)) {
 				continue;
 			}
 			if (!$slide = get_slideshow_by_slideshowid($sourceid)) {
@@ -805,7 +804,7 @@ function make_latest_issues(array $filter = array()) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
 		'output' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
-		'selectInventory' => true,
+		'selectInventory' => array('hostid'),
 		'selectScreens' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	));
@@ -841,11 +840,10 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		$hostSpan =  new CDiv(null, 'maintenance-abs-cont');
+		$hostSpan = new CDiv(null, 'maintenance-abs-cont');
 
-		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
 		$hostName = new CSpan($host['name'], 'link_menu menu-host');
-		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts));
+		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts_by_hosts[$host['hostid']]));
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($host['maintenance_status']) {
@@ -1003,7 +1001,7 @@ function make_webmon_overview($filter) {
 				' AND a.hostid=hg.hostid'.
 				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-				' AND '.DBcondition('hg.hostid', $availableHostIds).
+				' AND '.dbConditionInt('hg.hostid', $availableHostIds).
 				' AND hg.groupid='.$group['groupid']
 		);
 		while ($row = DBfetch($result)) {
@@ -1146,7 +1144,6 @@ function make_graph_submenu() {
 	$options = array(
 		'itemids' => $itemids,
 		'selectHosts' => array('hostid', 'host'),
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'output' => API_OUTPUT_EXTEND,
 		'webitems' => 1
 	);
@@ -1292,7 +1289,7 @@ function make_screen_submenu() {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 		if ('slideshowid' == $source) {
-			if (!slideshow_accessible($sourceid, PERM_READ_ONLY)) {
+			if (!slideshow_accessible($sourceid, PERM_READ)) {
 				continue;
 			}
 			if (!$slide = get_slideshow_by_slideshowid($sourceid)) {

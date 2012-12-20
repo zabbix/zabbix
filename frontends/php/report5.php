@@ -84,7 +84,7 @@ $available_hosts = API::Host()->get(array(
 	'preservekeys' => true
 ));
 $available_hosts = array_keys($available_hosts);
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+$available_triggers = get_accessible_triggers(PERM_READ, array());
 $scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
 
 $triggersEventCount = array();
@@ -95,8 +95,8 @@ $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock>'.(time() - $time_dif).
 			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-			' AND'.DBcondition('t.triggerid', $available_triggers).
-			' AND'.DBcondition('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('t.triggerid', $available_triggers).
+			' AND '.dbConditionInt('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 		' GROUP BY e.objectid'.
 		' ORDER BY cnt_event desc';
 $result = DBselect($sql, 100);

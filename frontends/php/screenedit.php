@@ -56,6 +56,7 @@ $fields = array(
 	'screen_type' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
 	'tr_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'tr_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'application' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
 	// actions
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
@@ -162,7 +163,8 @@ if (isset($_REQUEST['save'])) {
 		'rowspan' => get_request('rowspan'),
 		'dynamic' => get_request('dynamic'),
 		'elements' => get_request('elements', 0),
-		'sort_triggers' => get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC)
+		'sort_triggers' => get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
+		'application' => get_request('application', '')
 	);
 
 	DBstart();

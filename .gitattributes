@@ -7,6 +7,7 @@ bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
 create/src/data.tmpl -text
+frontends/php/api/classes/managers/CHttpTestManager.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -166,6 +167,9 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/html/CButtonPopup.php -text
+frontends/php/include/classes/parsers/CTriggerExpression.php -text
+frontends/php/include/classes/validators/CTriggerFunctionValidator.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
@@ -253,8 +257,16 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/general/CColorValidatorTest.php -text
-include/zbxdbupgrade.h -text
+frontends/php/tests/experimental/include/ZbxDbOperationTruncate.php -text
+frontends/php/tests/experimental/include/ZbxDbTestCase.php -text
+frontends/php/tests/experimental/include/fixtures/initial_users.xml -text
+frontends/php/tests/experimental/tests/CHttpTest/CHttpTestDbTest.php -text
+frontends/php/tests/experimental/tests/CHttpTest/fixtures/initial.xml -text
+frontends/php/tests/experimental/tests/CHttpTest/fixtures/testCreateOnTemplate.xml -text
+frontends/php/tests/experimental/tests/CHttpTest/fixtures/testUpdateOnTemplate.xml -text
+frontends/php/tests/experimental/tests/CHttpTest/fixtures/testUpdateStepsOnTemplate.xml -text
+frontends/php/tests/general/dbConditionIntTest.php -text
+frontends/php/tests/selenium/testFormAdministrationGeneralInstallation.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -532,8 +544,6 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-src/libs/zbxdbupgrade/Makefile.am -text
-src/libs/zbxdbupgrade/dbupgrade.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text

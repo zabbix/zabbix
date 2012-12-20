@@ -23,6 +23,7 @@
 #include "log.h"
 #include "dbcache.h"
 
+#include "zbxserver.h"
 #include "httpmacro.h"
 #include "httptest.h"
 
@@ -81,10 +82,10 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3];
+	unsigned char	types[3], statuses[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
-	int		errcodes[3];
+	int		lastclocks[3], errcodes[3];
 	size_t		i, num = 0;
 	AGENT_RESULT    value;
 
@@ -146,11 +147,17 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 				break;
 		}
 
+		items[i].status = ITEM_STATUS_ACTIVE;
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
+				items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
+
+		statuses[i] = items[i].status;
+		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -163,10 +170,10 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3];
+	unsigned char	types[3], statuses[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
-	int		errcodes[3];
+	int		lastclocks[3], errcodes[3];
 	size_t		i, num = 0;
 	AGENT_RESULT    value;
 
@@ -223,11 +230,17 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 				break;
 		}
 
+		items[i].status = ITEM_STATUS_ACTIVE;
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
+				items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
+
+		statuses[i] = items[i].status;
+		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -249,7 +262,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	process_httptest(DB_HTTPTEST *httptest)
+static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 {
 	const char	*__function_name = "process_httptest";
 
@@ -289,6 +302,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROXY, httptest->http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
@@ -311,11 +325,24 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		httpstep.httptestid = httptest->httptestid;
 		httpstep.no = atoi(row[1]);
 		httpstep.name = row[2];
+
 		httpstep.url = zbx_strdup(NULL, row[3]);
+		substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+				&httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
 		httpstep.timeout = atoi(row[4]);
+
 		httpstep.posts = zbx_strdup(NULL, row[5]);
-		httpstep.required = row[6];
-		httpstep.status_codes = row[7];
+		substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+				&httpstep.posts, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httpstep.required = zbx_strdup(NULL, row[6]);
+		substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+				&httpstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httpstep.status_codes = zbx_strdup(NULL, row[7]);
+		substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
+				&httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		memset(&stat, 0, sizeof(stat));
 
@@ -392,19 +419,19 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			goto httpstep_error;
 		}
 
-		memset(&page, 0, sizeof(page));
+		/* try to retrieve page several times depending on number of retries */
+		do
+		{
+			memset(&page, 0, sizeof(page));
 
-		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-					" error doing curl_easy_perform: %s",
-					httptest->name, httpstep.name, err_str);
+			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+				break;
 		}
-		else
+		while (0 != --httptest->retries);
+
+		if (CURLE_OK == err)
 		{
-			if ('\0' != *httpstep.required &&
-					NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
+			if ('\0' != *httpstep.required && NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() required pattern \"%s\" not found on %s",
 						__function_name, httpstep.required, httpstep.url);
@@ -451,9 +478,18 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				speed_download_num++;
 			}
 		}
+		else
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+					" error doing curl_easy_perform: %s",
+					httptest->name, httpstep.name, err_str);
+		}
 
 		zbx_free(page.data);
 httpstep_error:
+		zbx_free(httpstep.status_codes);
+		zbx_free(httpstep.required);
 		zbx_free(httpstep.posts);
 		zbx_free(httpstep.url);
 
@@ -531,14 +567,15 @@ void	process_httptests(int httppoller_num, int now)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPTEST	httptest;
+	DC_HOST		host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select t.httptestid,t.name,t.macros,t.agent,t.authentication,t.http_user,t.http_password"
-			" from httptest t,applications a,hosts h"
-			" where t.applicationid=a.applicationid"
-				" and a.hostid=h.hostid"
+			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.macros,t.agent,"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries"
+			" from httptest t,hosts h"
+			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
 				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
 				" and t.status=%d"
@@ -555,15 +592,48 @@ void	process_httptests(int httppoller_num, int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(httptest.httptestid, row[0]);
-		httptest.name = row[1];
-		httptest.macros = row[2];
-		httptest.agent = row[3];
-		httptest.authentication = atoi(row[4]);
-		httptest.http_user = row[5];
-		httptest.http_password = row[6];
+		ZBX_STR2UINT64(host.hostid, row[0]);
+		strscpy(host.host, row[1]);
+		strscpy(host.name, row[2]);
 
-		process_httptest(&httptest);
+		ZBX_STR2UINT64(httptest.httptestid, row[3]);
+		httptest.name = row[4];
+
+		httptest.macros = zbx_strdup(NULL, row[5]);
+		substitute_simple_macros(NULL, NULL, &host, NULL, NULL,
+				&httptest.macros, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httptest.agent = zbx_strdup(NULL, row[6]);
+		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+				&httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
+
+		if (HTTPTEST_AUTH_NONE != (httptest.authentication = atoi(row[7])))
+		{
+			httptest.http_user = zbx_strdup(NULL, row[8]);
+			substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+					&httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
+
+			httptest.http_password = zbx_strdup(NULL, row[9]);
+			substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+					&httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
+		}
+
+		httptest.http_proxy = zbx_strdup(NULL, row[10]);
+		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+				&httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+
+		httptest.retries = atoi(row[11]);
+
+		process_httptest(&host, &httptest);
+
+		zbx_free(httptest.http_proxy);
+		if (HTTPTEST_AUTH_NONE != httptest.authentication)
+		{
+			zbx_free(httptest.http_password);
+			zbx_free(httptest.http_user);
+		}
+		zbx_free(httptest.agent);
+		zbx_free(httptest.macros);
 	}
 	DBfree_result(result);
 

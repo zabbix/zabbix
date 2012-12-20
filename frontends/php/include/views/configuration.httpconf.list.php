@@ -17,23 +17,20 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 $httpWidget = new CWidget();
+
+// append host summary to widget header
+if (!empty($this->data['hostid'])) {
+	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+}
 
 // create new scenario button
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
-if ($this->data['hostid'] > 0) {
-	$createScenarioButton = new CSubmit('form', _('Create scenario'));
-}
-else {
-	$createScenarioButton = new CSubmit('form', _('Create scenario (select host first)'));
-	$createScenarioButton->setEnabled(false);
-}
-$createForm->addItem($createScenarioButton);
+$createForm->addItem(new CSubmit('form', _('Create scenario')));
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
 
 // header
@@ -49,79 +46,41 @@ $httpWidget->addHeaderRowNumber(array(
 ));
 
 // create form
-$httpForm = new CForm('get');
+$httpForm = new CForm();
 $httpForm->setName('scenarios');
 $httpForm->addVar('hostid', $this->data['hostid']);
-
-if (!empty($this->data['showAllApps'])) {
-	$expandLink = new CLink(new CImg('images/general/minus.png'), '?close=1'.url_param('groupid').url_param('hostid'));
-}
-else {
-	$expandLink = new CLink(new CImg('images/general/plus.png'), '?open=1'.url_param('groupid').url_param('hostid'));
-}
 
 $httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
-	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'host') : null,
-	make_sorting_header(array($expandLink, SPACE, _('Name')), 'name'),
+	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,
+	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
 	_('Update interval'),
 	make_sorting_header(_('Status'), 'status'))
 );
 
-$httpTableRows = array();
-foreach ($this->data['db_httptests'] as $httptestid => $httptest_data) {
-	$db_app = $this->data['db_apps'][$httptest_data['applicationid']];
-
-	if (!isset($httpTableRows[$db_app['applicationid']])) {
-		$httpTableRows[$db_app['applicationid']] = array();
+foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
+	$name = array();
+	if (isset($this->data['parentTemplates'][$httpTestId])) {
+		$template = $this->data['parentTemplates'][$httpTestId];
+		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], 'unknown');
+		$name[] = ':'.SPACE;
 	}
-	if (!uint_in_array($db_app['applicationid'], $_REQUEST['applications']) && !isset($this->data['showAllApps'])) {
-		continue;
-	}
+	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTest['httptestid'].'&hostid='.$httpTest['hostid']);
 
-	$httpTableRows[$db_app['applicationid']][] = array(
-		new CCheckBox('group_httptestid['.$httptest_data['httptestid'].']', null, null, $httptest_data['httptestid']),
-		is_show_all_nodes() ? SPACE : null,
-		$_REQUEST['hostid'] > 0 ? null : $db_app['hostname'],
-		new CLink($httptest_data['name'], '?form=update'.'&httptestid='.$httptest_data['httptestid'].'&hostid='.$db_app['hostid'].url_param('groupid')),
-		$httptest_data['step_count'],
-		$httptest_data['delay'],
-		new CCol(
-			new CLink(
-				httptest_status2str($httptest_data['status']),
-				'?group_httptestid[]='.$httptest_data['httptestid'].'&go='.($httptest_data['status'] ? 'activate' : 'disable'),
-				httptest_status2style($httptest_data['status'])
-			)
+	$httpTable->addRow(array(
+		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
+		$_REQUEST['hostid'] > 0 ? null : $httpTest['hostname'],
+		$name,
+		$httpTest['stepscnt'],
+		$httpTest['delay'],
+		new CLink(
+			httptest_status2str($httpTest['status']),
+			'?group_httptestid[]='.$httpTest['httptestid'].'&go='.($httpTest['status'] ? 'activate' : 'disable'),
+			httptest_status2style($httpTest['status'])
 		)
-	);
-}
-
-foreach ($httpTableRows as $appid => $app_rows) {
-	$db_app = $this->data['db_apps'][$appid];
-
-	if (uint_in_array($db_app['applicationid'], $_REQUEST['applications']) || isset($this->data['showAllApps'])) {
-		$link = new CLink(new CImg('images/general/minus.png'), '?close=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
-	}
-	else {
-		$link = new CLink(new CImg('images/general/plus.png'), '?open=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
-	}
-
-	$column = new CCol(array(
-		$link,
-		SPACE,
-		bold($db_app['name']),
-		SPACE.'('._n('%1$d scenario', '%1$d scenarios', $db_app['scenarios_cnt']).')'
 	));
-	$column->setColSpan(6);
-
-	$httpTable->addRow(array(get_node_name_by_elid($db_app['applicationid']), $column));
-
-	foreach ($app_rows as $row) {
-		$httpTable->addRow($row);
-	}
 }
 
 // create go buttons

@@ -290,6 +290,14 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
 #define ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
 
+/* item snmpv3 authentication protocol */
+#define ITEM_SNMPV3_AUTHPROTOCOL_MD5		0
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA		1
+
+/* item snmpv3 privacy protocol */
+#define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
+
 /* item multiplier types */
 #define ITEM_MULTIPLIER_DO_NOT_USE		0
 #define ITEM_MULTIPLIER_USE			1

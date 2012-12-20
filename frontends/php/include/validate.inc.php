@@ -67,17 +67,6 @@ function KEY_PARAM($var = null) {
 	return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 }
 
-function validate_sec($str) {
-	return preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1;
-}
-
-function validate_secnum($str) {
-	if (preg_match('/^[ ]*#\d+[ ]*$/', $str, $arr)) {
-		return 0;
-	}
-	return validate_sec($str);
-}
-
 function validate_ipv4($str, &$arr) {
 	if (!preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr)) {
 		return false;
@@ -305,11 +294,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_IP) {
 		if (!validate_ip($var, $arr)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not IP.', $field));
+				info(_s('Critical error. Field "%1$s" is not IP.', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field "%1$s" is not IP.', $field));
+				info(_s('Warning. Field "%1$s" is not IP.', $caption));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -319,11 +308,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_IP_RANGE) {
 		if (!validate_ip_range($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not IP range.', $field));
+				info(_s('Critical error. Field "%1$s" is not IP range.', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info(_s('Warning. Field "%1$s" is not IP range.', $field));
+				info(_s('Warning. Field "%1$s" is not IP range.', $caption));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -333,11 +322,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_INT_RANGE) {
 		if (!is_int_range($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not integer list or range.', $field));
+				info(_s('Critical error. Field "%1$s" is not integer list or range.', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field "%1$s" is not integer list or range.', $field));
+				info(_s('Warning. Field "%1$s" is not integer list or range.', $caption));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -346,44 +335,44 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 	if ($type == T_ZBX_INT && !zbx_is_int($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not integer.', $field));
+			info(_s('Critical error. Field "%1$s" is not integer.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not integer.', $field));
+			info(_s('Warning. Field "%1$s" is not integer.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
 
 	if ($type == T_ZBX_DBL && !is_numeric($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not decimal number.', $field));
+			info(_s('Critical error. Field "%1$s" is not decimal number.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not decimal number.', $field));
+			info(_s('Warning. Field "%1$s" is not decimal number.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
 
 	if ($type == T_ZBX_STR && !is_string($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not string.', $field));
+			info(_s('Critical error. Field "%1$s" is not string.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not string.', $field));
+			info(_s('Warning. Field "%1$s" is not string.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
 
 	if ($type == T_ZBX_STR && !defined('ZBX_ALLOW_UNICODE') && zbx_strlen($var) != zbx_strlen($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" contains Multibyte chars.', $field));
+			info(_s('Critical error. Field "%1$s" contains Multibyte chars.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" multibyte chars are restricted.', $field));
+			info(_s('Warning. Field "%1$s" multibyte chars are restricted.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 	}
@@ -393,7 +382,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		if (!$colorValidator->validate($var)) {
 			$var = 'FFFFFF';
 			if ($flags & P_SYS) {
-				info(_s('Critical error. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $field));
+				info(_s('Critical error. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {

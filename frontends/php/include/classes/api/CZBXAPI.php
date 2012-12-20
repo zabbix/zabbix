@@ -87,6 +87,8 @@ class CZBXAPI {
 			'searchWildcardsEnabled'=> null,
 			// output
 			'output'				=> API_OUTPUT_REFER,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 			'limit'					=> null
 		);
@@ -334,11 +336,11 @@ class CZBXAPI {
 			'limit' => null
 		);
 
-		// add output options
-		$sqlParts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
 		// add filter options
 		$sqlParts = $this->applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// add output options
+		$sqlParts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		// add node options
 		$sqlParts = $this->applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -388,6 +390,13 @@ class CZBXAPI {
 		// count
 		if (isset($options['countOutput'])) {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
+
+			// select columns used by group count
+			if ($options['groupCount'] !== null) {
+				foreach ($sqlParts['group'] as $fields) {
+					$sqlParts['select'][] = $fields;
+				}
+			}
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
@@ -403,7 +412,8 @@ class CZBXAPI {
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select'] = array($this->fieldId('*', $tableAlias));
+			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
+			$sqlParts['select'][] = $this->fieldId('*', $tableAlias);
 		}
 
 		return $sqlParts;
@@ -426,7 +436,7 @@ class CZBXAPI {
 		// pks
 		if (isset($options[$pkOption])) {
 			zbx_value2array($options[$pkOption]);
-			$sqlParts['where'][] = DBcondition($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
+			$sqlParts['where'][] = dbConditionString($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
 		}
 
 		// filters

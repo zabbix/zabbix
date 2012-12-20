@@ -599,7 +599,7 @@ class CService extends CZBXAPI {
 				$query = DBselect(
 					'SELECT *'.
 					' FROM service_alarms sa'.
-					' WHERE '.DBcondition('sa.serviceid', $usedSeviceIds).
+					' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
 						' AND ('.implode(' OR ', $intervalConditions).')'.
 					' ORDER BY sa.clock,sa.servicealarmid'
 				);
@@ -933,8 +933,8 @@ class CService extends CZBXAPI {
 			' FROM services s,triggers t'.
 			' WHERE s.status>0'.
 				' AND t.triggerid=s.triggerid'.
-				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).
-				' AND '.DBcondition('s.serviceid', $serviceIds).
+				' AND '.dbConditionInt('t.triggerid', get_accessible_triggers(PERM_READ)).
+				' AND '.dbConditionInt('s.serviceid', $serviceIds).
 			' ORDER BY s.status DESC,t.description'
 		));
 
@@ -1011,7 +1011,7 @@ class CService extends CZBXAPI {
 					LEFT OUTER JOIN service_alarms sa2 ON (sa.serviceid=sa2.serviceid AND sa.clock<sa2.clock AND sa2.clock<'.zbx_dbstr($beforeTime).')
 				WHERE sa2.servicealarmid IS NULL
 					AND sa.clock<'.zbx_dbstr($beforeTime).'
-					AND '.DBcondition('sa.serviceid', $serviceIds).'
+					AND '.dbConditionInt('sa.serviceid', $serviceIds).'
 				ORDER BY sa.servicealarmid'
 		);
 
@@ -1045,7 +1045,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.dbConditionInt($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1076,7 +1076,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.dbConditionInt($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1392,7 +1392,7 @@ class CService extends CZBXAPI {
 			$query = DBselect(
 				'SELECT s.triggerid,s.name'.
 					' FROM services s '.
-					' WHERE '.DBcondition('s.serviceid', $parentServiceIds).
+					' WHERE '.dbConditionInt('s.serviceid', $parentServiceIds).
 					' AND s.triggerid IS NOT NULL', 1);
 			if ($parentService = DBfetch($query)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1475,14 +1475,14 @@ class CService extends CZBXAPI {
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$accessibleTriggers = get_accessible_triggers(PERM_READ_ONLY);
+			$accessibleTriggers = get_accessible_triggers(PERM_READ);
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
 				$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
 			}
 			// otherwise return services with either no triggers, or any trigger accessible to the current user
 			else {
-				$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), $accessibleTriggers).')';
+				$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.dbConditionInt($this->fieldId('triggerid'), $accessibleTriggers).')';
 			}
 		}
 
@@ -1492,13 +1492,13 @@ class CService extends CZBXAPI {
 		if ($options['parentids'] !== null) {
 			$sqlParts['from'][] = 'services_links slp';
 			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid AND slp.soft=0';
-			$sqlParts['where'][] = DBcondition('slp.serviceupid', (array) $options['parentids']);
+			$sqlParts['where'][] = dbConditionInt('slp.serviceupid', (array) $options['parentids']);
 		}
 		// childids
 		if ($options['childids'] !== null) {
 			$sqlParts['from'][] = 'services_links slc';
 			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
-			$sqlParts['where'][] = DBcondition('slc.servicedownid', (array) $options['childids']);
+			$sqlParts['where'][] = dbConditionInt('slc.servicedownid', (array) $options['childids']);
 		}
 
 		return $sqlParts;

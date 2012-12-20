@@ -206,7 +206,7 @@ zbx_graph_item_type;
 
 #ifdef HAVE_ORACLE
 #define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;\n")
+#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;")
 
 #define	ZBX_SQL_STRCMP		"%s%s%s"
 #define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
@@ -240,23 +240,25 @@ zbx_graph_item_type;
 typedef struct
 {
 	zbx_uint64_t	druleid;
+	zbx_uint64_t	unique_dcheckid;
 	char		*iprange;
 	char		*name;
-	zbx_uint64_t	unique_dcheckid;
 }
 DB_DRULE;
 
 typedef struct
 {
 	zbx_uint64_t	dcheckid;
-	int		type;
 	char		*ports;
 	char		*key_;
 	char		*snmp_community;
 	char		*snmpv3_securityname;
-	int		snmpv3_securitylevel;
 	char		*snmpv3_authpassphrase;
 	char		*snmpv3_privpassphrase;
+	int		type;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
 }
 DB_DCHECK;
 
@@ -323,7 +325,6 @@ typedef struct
 	history_value_t		prevorgvalue;
 	int			lastclock;
 	int			lastns;
-	time_t 			lastcheck;
 	zbx_item_value_type_t	value_type;
 	int			delta;
 	int			multiplier;
@@ -416,7 +417,9 @@ typedef struct
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
+	char		*http_proxy;
 	int		authentication;
+	int		retries;
 }
 DB_HTTPTEST;
 
@@ -461,6 +464,11 @@ void	DBinit();
 
 void	DBclose();
 
+#ifdef HAVE_ORACLE
+void	DBstatement_prepare(const char *sql);
+void	DBbind_parameter(int position, void *buffer, unsigned char type);
+int	DBstatement_execute();
+#endif
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else

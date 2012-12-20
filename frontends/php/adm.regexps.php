@@ -93,7 +93,7 @@ if (isset($_REQUEST['go']) && !isset($_REQUEST['regexpid'])) {
 		access_deny();
 	}
 	else {
-		$regExpChk = DBfetch(DBSelect('SELECT COUNT(*) AS cnt FROM regexps re WHERE '.DBcondition('re.regexpid', $_REQUEST['regexpids'])));
+		$regExpChk = DBfetch(DBSelect('SELECT COUNT(*) AS cnt FROM regexps re WHERE '.dbConditionInt('re.regexpid', $_REQUEST['regexpids'])));
 		if ($regExpChk['cnt'] != count($_REQUEST['regexpids'])) {
 			access_deny();
 		}
@@ -154,7 +154,7 @@ elseif (isset($_REQUEST['go'])) {
 		}
 
 		DBstart();
-		$result = DBexecute('DELETE FROM regexps WHERE '.DBcondition('regexpid', $regExpids));
+		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regExpids));
 		$result = Dbend($result);
 
 		$regExpCount = count($regExpids);
@@ -247,7 +247,7 @@ else {
 
 	$data['db_exps'] = DBfetchArray(DBselect('SELECT e.* FROM expressions e WHERE '.
 			DBin_node('e.expressionid').
-			' AND '.DBcondition('e.regexpid', $data['regexpids']).
+			' AND '.dbConditionInt('e.regexpid', $data['regexpids']).
 			' ORDER BY e.expression_type'));
 
 	$regExpForm = new CView('administration.general.regularexpressions.list', $data);

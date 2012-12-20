@@ -42,12 +42,9 @@ class CDHost extends CZBXAPI {
  * @param boolean $options['monitored_hosts'] only monitored Hosts
  * @param boolean $options['templated_hosts'] include templates in result
  * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_monitored_items'] only with monitored items
  * @param boolean $options['with_historical_items'] only with historical items
  * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitored triggers
  * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param boolean $options['selectGroups'] select HostGroups
@@ -117,18 +114,6 @@ class CDHost extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['dhosts']);
-
-			$dbTable = DB::getSchema('dhosts');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'dh.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 // editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -144,7 +129,7 @@ class CDHost extends CZBXAPI {
 // dhostids
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
-			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -157,7 +142,7 @@ class CDHost extends CZBXAPI {
 			zbx_value2array($options['druleids']);
 
 			$sqlParts['select']['druleid'] = 'dh.druleid';
-			$sqlParts['where']['druleid'] = DBcondition('dh.druleid', $options['druleids']);
+			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
@@ -175,7 +160,7 @@ class CDHost extends CZBXAPI {
 
 			$sqlParts['select']['dserviceids'] = 'ds.dserviceids';
 			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -195,7 +180,7 @@ class CDHost extends CZBXAPI {
 			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['dhh'] = 'h.ip=dh.ip';
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
@@ -216,7 +201,7 @@ class CDHost extends CZBXAPI {
 
 			$sqlParts['select']['hostid'] = 'h.hostid';
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = DBcondition('h.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('h.hostid', $options['hostids']);
 			$sqlParts['where']['dhh'] = 'h.ip=dh.ip';
 
 			if (!is_null($options['groupCount'])) {
@@ -234,24 +219,6 @@ class CDHost extends CZBXAPI {
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
-		}
-
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['dhosts'] = 'dh.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT dh.dhostid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 // filter
@@ -273,6 +240,8 @@ class CDHost extends CZBXAPI {
 		}
 //-------
 
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$dhostids = array();
 

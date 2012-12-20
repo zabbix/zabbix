@@ -32,7 +32,7 @@
 		'use strict';
 
 		jQuery('#paramtype').change(function() {
-			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last') {
+			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last' || jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen') {
 				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
 					jQuery('#param_0').removeAttr('readonly');
 				}
@@ -42,7 +42,7 @@
 			}
 		});
 		jQuery(document).ready(function() {
-			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last') {
+			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last' || jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen') {
 				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
 					jQuery('#param_0').removeAttr('readonly');
 				}
@@ -55,23 +55,20 @@
 </script>
 <?php
 if (!empty($this->data['insert'])) {
-	if ($this->data['function'] == 'count' && !empty($this->data['param']['2'])) {
-		$this->data['param']['2'] = '"'.$this->data['param']['2'].'"';
+	if ($this->data['paramtype'] == PARAM_TYPE_COUNTS) {
+		$param_no = in_array($this->data['function'], array('regexp', 'iregexp', 'str')) ? 1 : 0;
+		$this->data['param'][$param_no] = '#'.$this->data['param'][$param_no];
 	}
-	if (($this->data['function'] == 'regexp'
-		|| $this->data['function'] == 'iregexp'
-		|| $this->data['function'] == 'str')
-		&& $this->data['paramtype'] == PARAM_TYPE_COUNTS) {
-		$this->data['param']['1'] = '#'.$this->data['param']['1'];
+
+	foreach ($this->data['param'] as &$param) {
+		$param = quoteFunctionParam($param);
 	}
-	$expression = sprintf('{%s:%s.%s(%s%s)}%s%s',
+	unset($param);
+
+	$expression = sprintf('{%s:%s.%s(%s)}%s%s',
 		$this->data['item_host'],
 		$this->data['item_key'],
 		$this->data['function'],
-		($this->data['paramtype'] == PARAM_TYPE_COUNTS
-			&& $this->data['function'] != 'regexp'
-			&& $this->data['function'] != 'iregexp'
-			&& $this->data['function'] != 'str') ? '#' : '',
 		rtrim(implode(',', $this->data['param']), ','),
 		$this->data['operator'],
 		$this->data['value']
