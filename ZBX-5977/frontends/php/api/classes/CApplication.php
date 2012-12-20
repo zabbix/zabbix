@@ -689,31 +689,6 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$linkedDb = DBselect(
-			'SELECT ia.itemid, ia.applicationid'.
-			' FROM items_applications ia'.
-			' WHERE '.dbConditionInt('ia.itemid', $itemids).
-				' AND '.dbConditionInt('ia.applicationid', $applicationids)
-		);
-		while ($pair = DBfetch($linkedDb)) {
-			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
-		}
-
-		$appsInsert = array();
-		foreach ($applicationids as $applicationid) {
-			foreach ($itemids as $inum => $itemid) {
-				if (isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) {
-					continue;
-				}
-				$appsInsert[] = array(
-					'itemid' => $itemid,
-					'applicationid' => $applicationid
-				);
-			}
-		}
-
-		DB::insert('items_applications', $appsInsert);
-
 		foreach ($itemids as $inum => $itemid) {
 			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.$itemid);
 			while ($child = DBfetch($dbChilds)) {

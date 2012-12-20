@@ -818,27 +818,8 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function createReal(&$items) {
 		$itemids = DB::insert('items', $items);
 
-		$itemApplications = array();
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
-
-			if (!isset($item['applications'])) {
-				continue;
-			}
-
-			foreach ($item['applications'] as $appid) {
-				if ($appid == 0) {
-					continue;
-				}
-				$itemApplications[] = array(
-					'applicationid' => $appid,
-					'itemid' => $items[$key]['itemid']
-				);
-			}
-		}
-
-		if (!empty($itemApplications)) {
-			DB::insert('items_applications', $itemApplications);
 		}
 
 		// TODO: REMOVE info
@@ -865,24 +846,8 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 		$itemids = array();
-		$itemApplications = array();
 		foreach ($items as $key => $item) {
 			$itemids[] = $item['itemid'];
-
-			if (!isset($item['applications'])) {
-				continue;
-			}
-			foreach ($item['applications'] as $appid) {
-				$itemApplications[] = array(
-					'applicationid' => $appid,
-					'itemid' => $item['itemid']
-				);
-			}
-		}
-
-		if (!empty($itemids)) {
-			DB::delete('items_applications', array('itemid' => $itemids));
-			DB::insert('items_applications', $itemApplications);
 		}
 
 		// TODO: REMOVE info
