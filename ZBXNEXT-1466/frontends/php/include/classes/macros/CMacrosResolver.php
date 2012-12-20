@@ -550,7 +550,7 @@ class CMacrosResolver {
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN interface n ON i.hostid=n.hostid'.
 				' WHERE '.DBcondition('f.functionid', array_keys($macros)).
-					' AND n.main=1'
+					' AND n.main='.INTERFACE_PRIMARY
 			);
 
 			// macro should be resolved to interface with highest priority ($priorities)
