@@ -168,7 +168,7 @@ if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
 			'hostids' => $hostid
 		));
 
-		foreach ($newTriggers as $tnum => $newTrigger) {
+		foreach ($newTriggers as $newTrigger) {
 			if (count($oldTrigger['items']) != count($newTrigger['items'])) {
 				continue;
 			}
@@ -329,11 +329,8 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
 		$dbTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
-			'output' => array(
-				'description',
-				'expression'
-			),
-			'selectHosts' => API_OUTPUT_EXTEND,
+			'output' => array('description', 'expression'),
+			'selectHosts' => array('name'),
 			'preservekeys' => true,
 			'expandDescription' => true
 		));
@@ -411,7 +408,7 @@ $firstEvent = API::Event()->get($options);
 
 $_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
 $effectiveperiod = navigation_bar_calc();
-$bstime = $_REQUEST['stime'];
+
 $from = zbxDateToTime($_REQUEST['stime']);
 $till = $from + $effectiveperiod;
 
@@ -444,10 +441,7 @@ else {
 		$options = array(
 			'source' => EVENT_SOURCE_DISCOVERY,
 			'eventids' => zbx_objectValues($dsc_events, 'eventid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'selectTriggers' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		);
 		$dsc_events = API::Event()->get($options);
 		order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
@@ -499,7 +493,7 @@ else {
 			);
 		}
 
-		foreach ($dsc_events as $num => $event_data) {
+		foreach ($dsc_events as $event_data) {
 			switch ($event_data['object']) {
 				case EVENT_OBJECT_DHOST:
 					if (isset($dhosts[$event_data['objectid']])) {
@@ -555,6 +549,7 @@ else {
 
 		}
 	}
+	// source not discovery i.e. Trigger
 	else {
 		$table->setHeader(array(
 			_('Time'),
@@ -645,9 +640,8 @@ else {
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => array('hostid'),
-				'selectTriggers' => API_OUTPUT_EXTEND,
-				'selectItems' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND
+				'selectItems' => array('name', 'value_type', 'key_'),
+				'output' => array('description', 'expression', 'priority')
 			);
 			$triggers = API::Trigger()->get($triggersOptions);
 			$triggers = zbx_toHash($triggers, 'triggerid');
@@ -664,7 +658,6 @@ else {
 					'hostid'
 				),
 				'hostids' => $hostids,
-				'selectAppllications' => API_OUTPUT_EXTEND,
 				'selectScreens' => API_OUTPUT_COUNT,
 				'selectInventory' => array('hostid'),
 				'preservekeys' => true
@@ -681,7 +674,7 @@ else {
 				$host = $hosts[$host['hostid']];
 
 				$items = array();
-				foreach ($trigger['items'] as $inum => $item) {
+				foreach ($trigger['items'] as $item) {
 					$i = array();
 					$i['itemid'] = $item['itemid'];
 					$i['value_type'] = $item['value_type']; // ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)

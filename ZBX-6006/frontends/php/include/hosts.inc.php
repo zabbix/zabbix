@@ -1301,6 +1301,9 @@ function getDeletableHostGroups($groupids = null) {
  * A helper function for building the value for the 'data-host-menu' attribute.
  *
  * @param array $host
+ * @param int $host['hostid']
+ * @param mixed $host['screens']
+ * @param mixed $host['inventory']
  * @param array $scripts
  *
  * @return array
