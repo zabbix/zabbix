@@ -98,7 +98,7 @@ $tr_event_wdgt = new CWidget();
 $tr_event_wdgt->setClass('header');
 
 // Main widget header
-$text = array(_('EVENTS').': "'.CTriggerHelper::expandDescription($trigger).'"');
+$text = array(_('EVENTS').': "'.CMacrosResolverHelper::resolveTriggerName($trigger).'"');
 
 $fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 $tr_event_wdgt->addHeader($text, $fs_icon);

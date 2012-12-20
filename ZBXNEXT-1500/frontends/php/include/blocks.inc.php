@@ -376,7 +376,8 @@ function make_hoststat_summary($filter) {
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
-		'output' => array('hostid', 'name')
+		'output' => array('hostid', 'name'),
+		'selectGroups' => array('groupid')
 	);
 	$hosts = API::Host()->get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
@@ -905,7 +906,7 @@ function make_latest_issues(array $filter = array()) {
 				$ackParams
 			);
 
-			$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
+			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
 
 			// actions
 			$actions = get_event_actions_stat_hints($event['eventid']);

@@ -50,13 +50,9 @@ class CMediatype extends CZBXAPI {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('mediatypeid');
-
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('media_type' => 'mt.mediatypeid'),
@@ -83,7 +79,6 @@ class CMediatype extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectUsers'				=> null,
-			'selectMedias'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -168,46 +163,9 @@ class CMediatype extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// output
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
-		$mediatypeids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($mediatype = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -218,19 +176,8 @@ class CMediatype extends CZBXAPI {
 				}
 			}
 			else {
-				$mediatypeids[$mediatype['mediatypeid']] = $mediatype['mediatypeid'];
-
 				if (!isset($result[$mediatype['mediatypeid']])) {
 					$result[$mediatype['mediatypeid']] = array();
-				}
-
-				// mediaids
-				if (isset($mediatype['mediaid']) && is_null($options['selectMedias'])) {
-					if (!isset($result[$mediatype['mediatypeid']]['medias'])) {
-						$result[$mediatype['mediatypeid']]['medias'] = array();
-					}
-					$result[$mediatype['mediatypeid']]['medias'][] = array('mediaid' => $mediatype['mediaid']);
-					unset($mediatype['mediaid']);
 				}
 
 				// userids
@@ -249,23 +196,8 @@ class CMediatype extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding users
-		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselectsAllowedOutputs)) {
-			$users = API::User()->get(array(
-				'output' => $options['selectUsers'],
-				'mediatypeids' => $mediatypeids,
-				'preservekeys' => true
-			));
-			foreach ($users as $user) {
-				$umediatypes = $user['mediatypes'];
-				unset($user['mediatypes']);
-				foreach ($umediatypes as $mediatype) {
-					$result[$mediatype['mediatypeid']]['users'][] = $user;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -424,5 +356,22 @@ class CMediatype extends CZBXAPI {
 		DB::delete('media_type', array('mediatypeid' => $mediatypeids));
 
 		return array('mediatypeids' => $mediatypeids);
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// adding users
+		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
+			$users = API::User()->get(array(
+				'output' => $options['selectUsers'],
+				'userids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $users, 'users');
+		}
+
+		return $result;
 	}
 }

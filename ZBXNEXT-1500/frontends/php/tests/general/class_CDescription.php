@@ -55,25 +55,16 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 	public static function providerReferenceMacros() {
 		return array(
 			array(
-				array(
-					'expression' => '{123}=1',
-					'description' => 'd $1'
-				),
-				'd 1',
+				'expression' => '{123}=1',
+				'text' => 'd $1'
 			),
 			array(
-				array(
-					'expression' => '{1}=1&{2}>2',
-					'description' => 'd $1 $2 $3'
-				),
-				'd 1 2 ',
+				'expression' => '{1}=1&{2}>2',
+				'text' => 'd $1 $2 $3'
 			),
 			array(
-				array(
-					'expression' => '{1}=123&{2}>{$MACRO}',
-					'description' => 'd $1 $2 $3'
-				),
-				'd 123  ',
+				'expression' => '{1}=123&{2}>{$MACRO}',
+				'text' => 'd $1 $2 $3'
 			),
 		);
 	}
@@ -87,7 +78,7 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 				' FROM triggers t'.
 				' WHERE t.triggerid='.$triggerId
 		));
-		$description = CTriggerHelper::expandDescription($trigger);
+		$description = CMacrosResolverHelper::resolveTriggerName($trigger);
 
 		$this->assertEquals($expectedDescription, $description);
 	}
@@ -95,9 +86,9 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider providerReferenceMacros
 	 */
-	public function test_expandReferenceMacros($trigger, $expectedDescription) {
-		$description = CTriggerHelper::expandReferenceMacros($trigger);
+	public function test_resolveTriggerReference($expression, $text) {
+		$result = CMacrosResolverHelper::resolveTriggerReference($expression, $text);
 
-		$this->assertEquals($expectedDescription, $description);
+		$this->assertEquals($text, $result);
 	}
 }

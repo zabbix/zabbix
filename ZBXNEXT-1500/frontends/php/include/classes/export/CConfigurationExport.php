@@ -455,6 +455,7 @@ class CConfigurationExport {
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => $this->dataFields['discoveryrule'],
 			'selectApplications' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => array('itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		));
@@ -473,7 +474,7 @@ class CConfigurationExport {
 				$prototype['valuemap']['name'] = $valueMaps[$prototype['valuemapid']];
 			}
 
-			$items[$prototype['parent_itemid']]['itemPrototypes'][] = $prototype;
+			$items[$prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $prototype;
 		}
 
 		// gather graph prototypes
@@ -656,6 +657,7 @@ class CConfigurationExport {
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,
+			'selectUrls' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));

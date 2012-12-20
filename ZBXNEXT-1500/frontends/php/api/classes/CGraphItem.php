@@ -45,9 +45,6 @@ class CGraphItem extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('gitemid');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('gitems' => 'gi.gitemid'),
 			'from'		=> array('graphs_items' => 'graphs_items gi'),
@@ -95,9 +92,6 @@ class CGraphItem extends CZBXAPI {
 					')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
@@ -129,47 +123,14 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// output
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
-		$gitemids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('gi.gitemid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($gitem = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				$result = $gitem['rowscount'];
 			}
 			else {
-				$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
-
 				if (!isset($result[$gitem['gitemid']])) {
 					$result[$gitem['gitemid']] = array();
 				}
@@ -189,21 +150,9 @@ class CGraphItem extends CZBXAPI {
 			return $result;
 		}
 
-		// adding graphs
-		if (!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
-			$graphs = API::Graph()->get(array(
-				'nodeids' => $nodeids,
-				'output' => $options['selectGraphs'],
-				'gitemids' => $gitemids,
-				'preservekeys' => true
-			));
-			foreach ($graphs as $graph) {
-				$gitems = $graph['gitems'];
-				unset($graph['gitems']);
-				foreach ($gitems as $item) {
-					$result[$gitem['gitemid']]['graphs'][] = $graph;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('graphid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -256,7 +205,29 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
+		if ($options['selectGraphs'] !== null) {
+			$sqlParts = $this->addQuerySelect('graphid', $sqlParts);
+		}
+
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// adding graphs
+		if ($options['selectGraphs'] !== null) {
+			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
+			$graphs = API::Graph()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectGraphs'],
+				'gitemids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $graphs, 'graphs');
+		}
+
+		return $result;
 	}
 }
 ?>

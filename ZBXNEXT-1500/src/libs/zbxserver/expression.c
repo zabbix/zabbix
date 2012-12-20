@@ -424,11 +424,8 @@ static void	expand_trigger_description_constants(char **data, zbx_uint64_t trigg
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	char	**numbers = NULL;
-	int	numbers_cnt = 0, i = 0;
-	char	*new_str = NULL;
-	char	replace[3] = "$0";
+	char		**numbers = NULL, *new_str = NULL, replace[3] = "$0";
+	int		numbers_cnt = 0, i = 0;
 
 	result = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64, triggerid);
 
@@ -2213,6 +2210,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))	/* deprecated */
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.comments);
+					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+							&replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error, maxerrlen);
 				}
 				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
 						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))	/* deprecated */
@@ -2453,32 +2452,48 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				}
 			}
 		}
-		else if (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION)
+		else if (macro_type & (MACRO_TYPE_TRIGGER_DESCRIPTION | MACRO_TYPE_TRIGGER_COMMENTS))
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
 				if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				{
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_HOST);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
+				{
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				{
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
+				{
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_DNS);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
+				{
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_CONN);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				{
 					ret = DBget_item_lastvalue(&event->trigger, &replace_to, N_functionid);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+				{
 					ret = DBget_item_value(&event->trigger, &replace_to, N_functionid,
 							event->clock, event->ns);
+				}
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
 					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
+				}
 			}
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)
