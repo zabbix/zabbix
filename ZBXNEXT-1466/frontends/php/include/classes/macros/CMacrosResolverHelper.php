@@ -155,7 +155,7 @@ class CMacrosResolverHelper {
 		$triggers = DBfetchArray(DBselect(
 			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
 			' FROM triggers t'.
-			' WHERE '.DBcondition('t.triggerid', $triggerIds)
+			' WHERE '.dbConditionInt('t.triggerid', $triggerIds)
 		));
 		return self::$macrosResolver->resolve(array(
 			'config' => 'triggerName',
