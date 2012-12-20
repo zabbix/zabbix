@@ -49,7 +49,7 @@ class CApplicationManager {
 		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
 				' FROM applications a'.
 				' INNER JOIN hosts h ON h.hostid=a.hostid'.
-				' WHERE '.DBcondition('a.applicationid', $applicationids));
+				' WHERE '.dbConditionInt('a.applicationid', $applicationids));
 		while ($app = DBfetch($dbCursor)) {
 			info(_s('Created: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
 		}
@@ -75,10 +75,12 @@ class CApplicationManager {
 		DB::update('applications', $update);
 
 		// TODO: REMOVE info
-		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
-				' FROM applications a'.
+		$dbCursor = DBselect(
+			'SELECT a.name,h.name AS hostname'.
+			' FROM applications a'.
 				' INNER JOIN hosts h ON h.hostid=a.hostid'.
-				' WHERE '.DBcondition('a.applicationid', zbx_objectValues($applications, 'applicationid')));
+			' WHERE '.dbConditionInt('a.applicationid', zbx_objectValues($applications, 'applicationid'))
+		);
 		while ($app = DBfetch($dbCursor)) {
 			info(_s('Updated: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
 		}
@@ -157,11 +159,13 @@ class CApplicationManager {
 	protected function getChildHostsFromApplications(array $applications, array $hostIds = array()) {
 		$hostsTemapltesMap = array();
 
-		$sqlWhere = empty($hostIds) ? '' : ' AND '.DBcondition('ht.hostid', $hostIds);
-		$dbCursor = DBselect('SELECT ht.templateid, ht.hostid'.
-				' FROM hosts_templates ht'.
-				' WHERE '.DBcondition('ht.templateid', array_unique(zbx_objectValues($applications, 'hostid'))).
-				$sqlWhere);
+		$sqlWhere = empty($hostIds) ? '' : ' AND '.dbConditionInt('ht.hostid', $hostIds);
+		$dbCursor = DBselect(
+			'SELECT ht.templateid,ht.hostid'.
+			' FROM hosts_templates ht'.
+			' WHERE '.dbConditionInt('ht.templateid', array_unique(zbx_objectValues($applications, 'hostid'))).
+				$sqlWhere
+		);
 		while ($dbHost = DBfetch($dbCursor)) {
 			$hostsTemapltesMap[$dbHost['hostid']] = $dbHost['templateid'];
 		}
@@ -244,9 +248,11 @@ class CApplicationManager {
 			$hostApps[$hostid] = array('byName' => array(), 'byTemplateId' => array());
 		}
 
-		$dbCursor = DBselect('SELECT a.applicationid, a.name, a.hostid, a.templateid'.
-				' FROM applications a'.
-				' WHERE '.DBcondition('a.hostid', $hostIds));
+		$dbCursor = DBselect(
+			'SELECT a.applicationid,a.name,a.hostid,a.templateid'.
+			' FROM applications a'.
+			' WHERE '.dbConditionInt('a.hostid', $hostIds)
+		);
 		while ($dbApp = DBfetch($dbCursor)) {
 			$hostApps[$dbApp['hostid']]['byName'][$dbApp['name']] = $dbApp;
 			$hostApps[$dbApp['hostid']]['byTemplateId'][$dbApp['templateid']] = $dbApp;

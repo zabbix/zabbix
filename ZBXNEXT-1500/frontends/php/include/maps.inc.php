@@ -85,7 +85,9 @@ function getActionMapBySysmap($sysmap) {
 	}
 	unset($selement);
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	if (count($hostids)) {
+		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	}
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
@@ -399,23 +401,22 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		}
 
 		// try to create valid expression
-		$trigExpr = new CTriggerExpression(array('expression' => $macro));
-		if (!empty($trigExpr->errors)) {
+		$expressionData = new CTriggerExpression();
+		if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
 			continue;
 		}
 
 		// look in DB for coressponding item
-		$itemHost = reset($trigExpr->data['hosts']);
-		$key = reset($trigExpr->data['items']);
-		$function = reset($trigExpr->data['functions']);
-		$parameter = convertFunctionValue(reset($trigExpr->data['functionParams']));
+		$itemHost = $expressionData->expressions[0]['host'];
+		$key = $expressionData->expressions[0]['item'];
+		$function = $expressionData->expressions[0]['functionName'];
+		$parameter = convertFunctionValue($expressionData->expressions[0]['functionParamList'][0]);
 
 		$item = API::Item()->get(array(
 			'webitems' => true,
 			'filter' => array(
 				'host' => $itemHost,
-				'key_' => $key,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				'key_' => $key
 			),
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -583,8 +584,7 @@ function add_elementNames(&$selements) {
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
 				$selements[$snum]['elementName'] = $hostname['name'].':'.
-						CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
-				$selements[$snum]['elementExpressionTrigger'] = $triggers[$selement['elementid']]['expression'];
+					CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 				$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
@@ -592,6 +592,37 @@ function add_elementNames(&$selements) {
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
 				$selements[$snum]['elementName'] = $images[$selement['iconid_off']]['name'];
 				break;
+		}
+	}
+
+	if (!empty($triggers)) {
+		add_triggerExpressions($selements, $triggers);
+	}
+}
+
+function add_triggerExpressions(&$selements, $triggers = array()) {
+	if (empty($triggers)) {
+		$triggerIds = array();
+
+		foreach ($selements as $selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$triggerIds[] = $selement['elementid'];
+			}
+		}
+
+		$triggers = API::Trigger()->get(array(
+			'triggerids' => $triggerIds,
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name'),
+			'nopermissions' => true,
+			'nodeids' => get_current_nodeid(true),
+			'preservekeys' => true
+		));
+	}
+
+	foreach ($selements as $snum => $selement) {
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+			$selements[$snum]['elementExpressionTrigger'] = $triggers[$selement['elementid']]['expression'];
 		}
 	}
 }
@@ -1025,7 +1056,7 @@ function getSelementsInfo($sysmap) {
 			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => true
+			'selectInventory' => array('hostid')
 		));
 	}
 
@@ -2202,22 +2233,22 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
 }
 
 /**
+ * Get icon id by mapping.
+ *
  * @param array $iconMap
  * @param array $inventory
  *
- * @return int icon id
+ * @return int
  */
 function getIconByMapping($iconMap, $inventory) {
-	$iconid = null;
-	$inventories = getHostInventories();
+	if (!empty($inventory['inventory'])) {
+		$inventories = getHostInventories();
 
-	if (isset($inventory['inventory'])) {
 		foreach ($iconMap['mappings'] as $mapping) {
 			try {
 				$expr = new GlobalRegExp($mapping['expression']);
 				if ($expr->match($inventory['inventory'][$inventories[$mapping['inventory_link']]['db_field']])) {
-					$iconid = $mapping['iconid'];
-					break;
+					return $mapping['iconid'];
 				}
 			}
 			catch(Exception $e) {
@@ -2225,8 +2256,27 @@ function getIconByMapping($iconMap, $inventory) {
 			}
 		}
 	}
-	if (null === $iconid) {
-		$iconid = $iconMap['default_iconid'];
-	}
-	return $iconid;
+
+	return $iconMap['default_iconid'];
+}
+
+/**
+ * Get parent maps for current map.
+ *
+ * @param int $mapId
+ *
+ * @return array
+ */
+function getParentMaps($mapId) {
+	$parentMaps = DBfetchArrayAssoc(DBselect(
+		'SELECT s.sysmapid,s.name'.
+			' FROM sysmaps s'.
+				' JOIN sysmaps_elements se ON se.sysmapid=s.sysmapid'.
+			' WHERE se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP.
+				' AND se.elementid='.zbx_dbstr($mapId)
+	), 'sysmapid');
+
+	CArrayHelper::sort($parentMaps, array('name'));
+
+	return $parentMaps;
 }

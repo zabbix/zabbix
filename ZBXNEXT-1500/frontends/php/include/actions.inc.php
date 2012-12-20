@@ -847,7 +847,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	if ($host = DBfetch(DBselect($sql, 1))) {
 		$hostids[$host['hostid']] = $host['hostid'];
 	}
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
+	$available_triggers = get_accessible_triggers(PERM_READ, $hostids);
 
 	$tab_hint = new CTableInfo(_('No actions found.'));
 	$tab_hint->setAttribute('style', 'width: 300px;');
@@ -866,7 +866,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND '.DBcondition('e.objectid',$available_triggers).
+				' AND '.dbConditionInt('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.alertid';
 	$result = DBselect($sql, 30);

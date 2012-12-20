@@ -520,10 +520,12 @@ class CConfigurationImport {
 		}
 
 		// create the applications and create a hash hostid->name->applicationid
-		$newApplicationsIds = API::Application()->create($applicationsToCreate);
-		foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
-			$application = $applicationsToCreate[$anum];
-			$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+		if (!empty($applicationsToCreate)) {
+			$newApplicationsIds = API::Application()->create($applicationsToCreate);
+			foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
+				$application = $applicationsToCreate[$anum];
+				$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+			}
 		}
 
 		// refresh applications beacuse templated ones can be inherited to host and used in items
@@ -805,7 +807,7 @@ class CConfigurationImport {
 							WHERE g.graphid=gi.graphid
 								AND gi.itemid=i.itemid
 								AND g.name='.zbx_dbstr($graph['name']).'
-								AND '.DBcondition('i.hostid', $graphHostIds);
+								AND '.dbConditionInt('i.hostid', $graphHostIds);
 					$graphExists = DBfetch(DBselect($sql));
 
 					if ($graphExists) {
@@ -882,7 +884,7 @@ class CConfigurationImport {
 					WHERE g.graphid=gi.graphid
 						AND gi.itemid=i.itemid
 						AND g.name='.zbx_dbstr($graph['name']).'
-						AND '.DBcondition('i.hostid', $graphHostIds);
+						AND '.dbConditionInt('i.hostid', $graphHostIds);
 			$graphExists = DBfetch(DBselect($sql));
 
 			if ($graphExists) {
@@ -1006,7 +1008,7 @@ class CConfigurationImport {
 		$imagesToUpdate = array();
 		$allImages = zbx_toHash($allImages, 'name');
 
-		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.DBcondition('i.name', array_keys($allImages)));
+		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.dbConditionString('i.name', array_keys($allImages)));
 		while ($dbImage = DBfetch($dbImages)) {
 			$dbImage['image'] = $allImages[$dbImage['name']]['image'];
 			$imagesToUpdate[] = $dbImage;

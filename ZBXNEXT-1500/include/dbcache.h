@@ -105,6 +105,7 @@ typedef struct
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	int		delay;
 	int		nextcheck;
+	int		lastclock;
 	unsigned char	status;
 	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
@@ -123,6 +124,8 @@ typedef struct
 	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
 	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 	unsigned char	flags;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
 }
 DC_ITEM;
 
@@ -240,8 +243,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 void	*DCconfig_get_config_data(void *data, int type);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
-void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
-void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastclocks, int *errcodes, size_t num);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 

@@ -386,7 +386,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$options = array(
 				'itemids' => $axisItems,
 				'output' => array('itemid'),
-				'countOutput' => 1
+				'countOutput' => true,
+				'filter' => array('flags' => null)
 			);
 			if ($tpl) {
 				$options['hostids'] = $tpl;

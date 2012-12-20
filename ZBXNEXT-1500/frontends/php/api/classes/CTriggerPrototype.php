@@ -127,36 +127,24 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		// editable + permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT ff.triggerid'.
-				' FROM functions ff,items ii'.
-				' WHERE ff.triggerid=t.triggerid'.
-					' AND ff.itemid=ii.itemid'.
-					' AND EXISTS ('.
-						' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups gg'.
-						' WHERE hgg.hostid=ii.hostid'.
-							' AND rr.id=hgg.groupid'.
-							' AND rr.groupid=gg.usrgrpid'.
-							' AND gg.userid='.$userid.
-							' AND rr.permission<'.$permission.'))';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY f.triggerid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -173,7 +161,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['groupid'] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where']['groupid'] = dbConditionInt('hg.groupid', $options['groupids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -200,7 +188,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
@@ -213,7 +201,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['where']['triggerid'] = DBcondition('t.triggerid', $options['triggerids']);
+			$sqlParts['where']['triggerid'] = dbConditionInt('t.triggerid', $options['triggerids']);
 		}
 
 		// itemids
@@ -222,7 +210,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$sqlParts['select']['itemid'] = 'f.itemid';
 			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where']['itemid'] = DBcondition('f.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('f.itemid', $options['itemids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 
 			if (!is_null($options['groupCount'])) {
@@ -238,7 +226,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['a'] = DBcondition('a.applicationid', $options['applicationids']);
+			$sqlParts['where']['a'] = dbConditionInt('a.applicationid', $options['applicationids']);
 			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
@@ -253,7 +241,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where']['fid'] = 'f.itemid=id.itemid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
@@ -266,18 +254,18 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = DBcondition('f.function', $options['functions']);
+			$sqlParts['where'][] = dbConditionString('f.function', $options['functions']);
 		}
 
 		// monitored
 		if (!is_null($options['monitored'])) {
 			$sqlParts['where']['monitored'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
+								' SELECT NULL'.
 								' FROM items ii, hosts hh'.
 								' WHERE ff.itemid=ii.itemid'.
 									' AND hh.hostid=ii.hostid'.
@@ -294,11 +282,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['active'])) {
 			$sqlParts['where']['active'] = ''.
 				' NOT EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-							' SELECT ii.itemid'.
+							' SELECT NULL'.
 							' FROM items ii, hosts hh'.
 							' WHERE ff.itemid=ii.itemid'.
 								' AND hh.hostid=ii.hostid'.
@@ -312,11 +300,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['maintenance'])) {
 			$sqlParts['where'][] = (($options['maintenance'] == 0) ? ' NOT ':'').
 				' EXISTS ('.
-					' SELECT ff.functionid'.
+					' SELECT NULL'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
+								' SELECT NULL'.
 								' FROM items ii, hosts hh'.
 								' WHERE ff.itemid=ii.itemid'.
 									' AND hh.hostid=ii.hostid'.
@@ -372,7 +360,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])) {
@@ -383,7 +371,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
-				$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
+				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
 
@@ -407,7 +395,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -646,7 +634,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$res = DBselect(
 				'SELECT '.$sqlSelect.
 				' FROM functions f'.
-				' WHERE '.DBcondition('f.triggerid', $triggerids)
+				' WHERE '.dbConditionInt('f.triggerid', $triggerids)
 			);
 			while ($function = DBfetch($res)) {
 				$triggerid = $function['triggerid'];
@@ -658,15 +646,16 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// adding items
 		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
-			$objParams = array(
+			$items = API::Item()->get(array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
-				'webitems' => 1,
+				'webitems' => true,
 				'nopermissions' => true,
-				'preservekeys' => true
-			);
-			$items = API::Item()->get($objParams);
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
+			));
+
 			foreach ($items as $item) {
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
@@ -683,7 +672,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,f.triggerid'.
 				' FROM item_discovery id,functions f'.
-				' WHERE '.DBcondition('f.triggerid', $triggerids).
+				' WHERE '.dbConditionInt('f.triggerid', $triggerids).
 					' AND f.itemid=id.itemid'
 			);
 			while ($rule = DBfetch($dbRules)) {
@@ -700,7 +689,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $triggerid => $trigger) {
 					if (isset($ruleMap[$triggerid]) && isset($discoveryRules[$ruleMap[$triggerid]])) {
@@ -746,10 +735,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
-			$expressionData = new CTriggerExpression(array('expression' => $trigger['expression']));
-
-			if (!empty($expressionData->errors)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+			$expressionData = new CTriggerExpression();
+			if (!$expressionData->parse($trigger['expression'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 			}
 
 			$this->checkIfExistsOnHost($trigger);
@@ -921,7 +909,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		// get child triggers
 		$parentTriggerids = $triggerIds;
 		do {
-			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parentTriggerids));
+			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.dbConditionInt('templateid', $parentTriggerids));
 			$parentTriggerids = array();
 			while ($dbTrigger = DBfetch($dbItems)) {
 				$parentTriggerids[] = $dbTrigger['triggerid'];
@@ -940,7 +928,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// created triggers
 		$createdTriggers = array();
-		$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.DBcondition('parent_triggerid', $triggerIds);
+		$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.dbConditionInt('parent_triggerid', $triggerIds);
 		$dbTriggers = DBselect($sql);
 		while ($trigger = DBfetch($dbTriggers)) {
 			$createdTriggers[$trigger['triggerid']] = $trigger['triggerid'];
@@ -986,9 +974,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
 
 			$hosts = array();
-			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
-			if (is_null($expression)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
+			try {
+				$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
+			}
+			catch (Exception $e) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot implode expression "%s".', $trigger['expression']).' '.$e->getMessage());
 			}
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),
@@ -1027,19 +1018,26 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			if ($descriptionChanged || $expressionChanged) {
-				$expressionData = new CTriggerExpression(array('expression' => $expressionFull));
+				$expressionData = new CTriggerExpression();
+				if (!$expressionData->parse($expressionFull)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+				}
 
-				if (!empty($expressionData->errors)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+				if (!isset($expressionData->expressions[0])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Trigger expression must contain at least one host:key reference.'));
 				}
 			}
 
 			if ($expressionChanged) {
 				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
 
-				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
-				if (is_null($trigger['expression'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expressionFull));
+				try {
+					$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
+				}
+				catch (Exception $e) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
 				}
 			}
 

@@ -482,7 +482,7 @@ else {
 		if (ZBX_DISTRIBUTED) {
 			$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
-			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
+			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.dbConditionInt('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
 			while ($node_data = DBfetch($db_nodes)) {
 				$cmbNode->addItem($node_data['nodeid'], $node_data['name']);
 				if (bccomp($nodeid , $node_data['nodeid']) == 0) {
@@ -513,19 +513,20 @@ else {
 	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'simple_graph', 'plain_text'))) {
 		$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB(true)));
 	}
-	if (str_in_array($srctbl, array('triggers', 'hosts', 'host_group', 'hosts_and_templates'))) {
-		if (zbx_empty($noempty)) {
-			$value1 = isset($_REQUEST['dstfld1']) && zbx_strpos($_REQUEST['dstfld1'], 'id') !== false ? 0 : '';
-			$value2 = isset($_REQUEST['dstfld2']) && zbx_strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
-			$value3 = isset($_REQUEST['dstfld3']) && zbx_strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
+}
 
-			$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
-			$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
-			$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
-			$epmtyScript .= ' close_window(); return false;';
+if (str_in_array($srctbl, array('applications', 'triggers', 'hosts', 'host_group', 'hosts_and_templates'))) {
+	if (zbx_empty($noempty)) {
+		$value1 = isset($_REQUEST['dstfld1']) && zbx_strpos($_REQUEST['dstfld1'], 'id') !== false ? 0 : '';
+		$value2 = isset($_REQUEST['dstfld2']) && zbx_strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
+		$value3 = isset($_REQUEST['dstfld3']) && zbx_strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
 
-			$frmTitle->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
-		}
+		$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
+		$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
+		$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
+		$epmtyScript .= ' close_window(); return false;';
+
+		$frmTitle->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
 	}
 }
 
@@ -1102,7 +1103,6 @@ elseif ($srctbl == 'items') {
 		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'webitems' => true,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name'),
 		'preservekeys' => true
@@ -1159,7 +1159,7 @@ elseif ($srctbl == 'items') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 
@@ -1259,7 +1259,7 @@ elseif ($srctbl == 'prototypes') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}
@@ -1321,7 +1321,7 @@ elseif ($srctbl == 'nodes') {
 	$table = new CTableInfo(_('No nodes defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
+	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.dbConditionInt('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST)));
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['name'], 'link');
@@ -1468,8 +1468,7 @@ elseif ($srctbl == 'simple_graph') {
 			'templated' => false,
 			'filter' => array(
 				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				'status' => ITEM_STATUS_ACTIVE
 			),
 			'preservekeys' => true
 		);
@@ -1534,7 +1533,7 @@ elseif ($srctbl == 'simple_graph') {
 			$hostid > 0 ? null : $item['hostname'],
 			$description,
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type'])
+			itemValueTypeString($item['value_type'])
 		));
 	}
 
@@ -1640,10 +1639,7 @@ elseif ($srctbl == 'plain_text') {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'templated' => 0,
-		'filter' => array(
-			'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
-			'status' => ITEM_STATUS_ACTIVE
-		),
+		'filter' => array('status' => ITEM_STATUS_ACTIVE),
 		'sortfield' => 'name'
 	);
 	if (!is_null($writeonly)) {
@@ -1669,7 +1665,7 @@ elseif ($srctbl == 'plain_text') {
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
-			item_value_type2str($item['value_type']),
+			itemValueTypeString($item['value_type']),
 			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
 		));
 	}
@@ -1699,7 +1695,7 @@ elseif ($srctbl == 'slides') {
 	$slideshows = array();
 	$result = DBselect('SELECT s.slideshowid,s.name FROM slideshows s WHERE '.DBin_node('s.slideshowid', $nodeid).' ORDER BY s.name');
 	while ($row = DBfetch($result)) {
-		if (!slideshow_accessible($row['slideshowid'], PERM_READ_ONLY)) {
+		if (!slideshow_accessible($row['slideshowid'], PERM_READ)) {
 			continue;
 		}
 		$slideshows[$row['slideshowid']] = $row;

@@ -109,7 +109,7 @@ class CIconMap extends CZBXAPI {
 		if (!is_null($options['iconmapids'])) {
 			zbx_value2array($options['iconmapids']);
 
-			$sqlParts['where'][] = DBcondition('im.iconmapid', $options['iconmapids']);
+			$sqlParts['where'][] = dbConditionInt('im.iconmapid', $options['iconmapids']);
 		}
 
 		// sysmapids
@@ -118,7 +118,7 @@ class CIconMap extends CZBXAPI {
 
 			$sqlParts['select']['sysmapids'] = 's.sysmapid';
 			$sqlParts['from']['sysmaps'] = 'sysmaps s';
-			$sqlParts['where'][] = DBcondition('s.sysmapid', $options['sysmapids']);
+			$sqlParts['where'][] = dbConditionInt('s.sysmapid', $options['sysmapids']);
 			$sqlParts['where']['ims'] = 'im.iconmapid=s.iconmapid';
 		}
 
@@ -214,9 +214,9 @@ class CIconMap extends CZBXAPI {
 		 */
 		// adding conditions
 		if (!is_null($options['selectMappings']) && str_in_array($options['selectMappings'], $subselectsAllowedOutputs)) {
-			$res = DBselect('SELECT imp.* FROM icon_mapping imp WHERE '.DBcondition('imp.iconmapid', $iconMapids));
+			$res = DBselect('SELECT imp.* FROM icon_mapping imp WHERE '.dbConditionInt('imp.iconmapid', $iconMapids));
 			while ($mapping = DBfetch($res)) {
-				$result[$mapping['iconmapid']]['mappings'][$mapping['iconmappingid']] = $mapping;
+				$result[$mapping['iconmapid']]['mappings'][] = $mapping;
 			}
 		}
 
@@ -327,7 +327,8 @@ class CIconMap extends CZBXAPI {
 			'selectMappings' => API_OUTPUT_EXTEND
 		));
 
-		$mappingsCreate = $mappingsUpdate = $mappingidsDelete = array();
+		$oldIconMappings = array();
+		$newIconMappings = array();
 		foreach ($iconMaps as $iconMap) {
 			if (!isset($iconMapsUpd[$iconMap['iconmapid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map with iconmapid "%s" does not exist.', $iconMap['iconmapid']));
@@ -349,25 +350,13 @@ class CIconMap extends CZBXAPI {
 
 			if (isset($iconMap['mappings'])) {
 				$mappingsDb = $iconMapsUpd[$iconMap['iconmapid']]['mappings'];
-
+				foreach ($mappingsDb as $mapping) {
+					$oldIconMappings[] = $mapping;
+				}
 				foreach ($iconMap['mappings'] as $mapping) {
 					$mapping['iconmapid'] = $iconMap['iconmapid'];
-
-					if (isset($mapping['iconmappingid']) && isset($mappingsDb[$mapping['iconmappingid']])) {
-						$iconmappingid = $mapping['iconmappingid'];
-						unset($mapping['iconmappingid']);
-						$mappingsUpdate[] = array(
-							'values' => $mapping,
-							'where' => array('iconmappingid' => $iconmappingid)
-						);
-						unset($mappingsDb[$iconmappingid]);
-					}
-					else {
-						$mappingsCreate[] = $mapping;
-					}
+					$newIconMappings[] = $mapping;
 				}
-
-				$mappingidsDelete = array_merge($mappingidsDelete, array_keys($mappingsDb));
 			}
 
 			$iconMapid = $iconMap['iconmapid'];
@@ -380,12 +369,8 @@ class CIconMap extends CZBXAPI {
 			}
 		}
 
-		DB::update('icon_map', $updates);
-		DB::insert('icon_mapping', $mappingsCreate);
-		DB::update('icon_mapping', $mappingsUpdate);
-		if (!empty($mappingidsDelete)) {
-			DB::delete('icon_mapping', array('iconmappingid' => $mappingidsDelete));
-		}
+		DB::save('icon_map', $iconMaps);
+		DB::replace('icon_mapping', $oldIconMappings, $newIconMappings);
 
 		return array('iconmapids' => $iconMapids);
 	}
@@ -408,7 +393,7 @@ class CIconMap extends CZBXAPI {
 		$sql = 'SELECT m.name as mapname, im.name as iconmapname'.
 				' FROM sysmaps m, icon_map im'.
 				' WHERE m.iconmapid=im.iconmapid'.
-					' AND '.DBcondition('m.iconmapid', $iconmapids);
+					' AND '.dbConditionInt('m.iconmapid', $iconmapids);
 		if ($names = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Icon map "%1$s" cannot be deleted. Used in map "%2$s".', $names['iconmapname'], $names['mapname'])

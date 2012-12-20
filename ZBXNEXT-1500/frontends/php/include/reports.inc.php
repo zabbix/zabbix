@@ -19,18 +19,18 @@
 **/
 
 /**
- * Creates the availability report page filter.
+ * Creates the availability report page filter and modifies trigger retrieval options.
  *
  * Possible $config values are AVAILABILITY_REPORT_BY_HOST or AVAILABILITY_REPORT_BY_TEMPLATE.
  *
- * @param int $config                   report mode
- * @param array $PAGE_GROUPS            the data for the host/template group filter select
- * @param array $PAGE_HOSTS             the data for the host/template filter select
- * @param string|string[] $usedHostIds  the hosts the displayed triggers belong to
+ * @param int $config			report mode
+ * @param array $PAGE_GROUPS	the data for the host/template group filter select
+ * @param array $PAGE_HOSTS		the data for the host/template filter select
+ * @param array $options		trigger retrieval options, to be modified
  *
- * @return CFormTable
+ * @return array returns form table and modified options: array('form' => CFormTable, 'options' => array)
  */
-function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $usedHostIds = null){
+function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $options){
 	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
@@ -62,8 +62,9 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 		// fetch the groups, that the used hosts belong to
 		$hostGroups = API::HostGroup()->get(array(
 			'output' => array('name', 'groupid'),
-			'hostids' => $usedHostIds,
-			'monitored_hosts' => true
+			'hostids' => $options['hostids'],
+			'monitored_hosts' => true,
+			'preservekeys' => true
 		));
 		foreach ($hostGroups as $hostGroup) {
 			$cmbHGrps->addItem(
@@ -71,12 +72,15 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 				get_node_name_by_elid($hostGroup['groupid'], null, ': ').$hostGroup['name']
 			);
 		}
+		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
+			unset($options['groupids']);
+		}
 
 		if ($PAGE_HOSTS['selected']) {
 			$sql_cond = ' AND h.hostid='.$PAGE_HOSTS['selected'];
 		}
 		else {
-			$sql_cond = ' AND '.DBcondition('h.hostid',$PAGE_HOSTS['hostids']);
+			$sql_cond = ' AND '.dbConditionInt('h.hostid', $PAGE_HOSTS['hostids']);
 		}
 		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
 			' FROM triggers t,hosts h,items i,functions f '.
@@ -89,13 +93,15 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
 			' ORDER BY t.description';
-		$result=DBselect($sql);
-
-		while ($row = DBfetch($result)) {
+		$triggers = DBfetchArrayAssoc(DBselect($sql), 'triggerid');
+		foreach ($triggers as $trigger) {
 			$cmbTrigs->addItem(
-				$row['triggerid'],
-				get_node_name_by_elid($row['triggerid'], null, ': ').$row['description']
+				$trigger['triggerid'],
+				get_node_name_by_elid($trigger['triggerid'], null, ': ').$trigger['description']
 			);
+		}
+		if (isset($_REQUEST['tpl_triggerid']) && !isset($triggers[$_REQUEST['tpl_triggerid']])) {
+			unset($options['filter']['templateid']);
 		}
 
 		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
@@ -126,7 +132,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $use
 
 	$filterForm->addItemToBottomRow($reset);
 
-	return $filterForm;
+	return array('form' => $filterForm, 'options' => $options);
 }
 
 function bar_report_form(){
@@ -437,7 +443,7 @@ function bar_report_form3(){
 // ----------
 
 // HOSTS
-//	validate_group(PERM_READ_ONLY,array('real_hosts'),'web.last.conf.groupid');
+//	validate_group(PERM_READ,array('real_hosts'),'web.last.conf.groupid');
 
 	$groupid = get_request('groupid',0);
 	$cmbGroups = new CComboBox('groupid',$groupid,'submit()');

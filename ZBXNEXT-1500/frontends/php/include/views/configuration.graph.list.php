@@ -37,6 +37,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 	}
 }
 else {
+	$createForm->addVar('hostid', $this->data['hostid']);
+
 	if (!empty($this->data['hostid'])) {
 		$createForm->addItem(new CSubmit('form', _('Create graph')));
 	}

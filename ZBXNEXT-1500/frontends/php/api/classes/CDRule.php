@@ -102,7 +102,7 @@ class CDRule extends CZBXAPI {
 // druleids
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
-			$sqlParts['where']['druleid'] = DBcondition('dr.druleid', $options['druleids']);
+			$sqlParts['where']['druleid'] = dbConditionInt('dr.druleid', $options['druleids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -116,7 +116,7 @@ class CDRule extends CZBXAPI {
 
 			$sqlParts['select']['dhostid'] = 'dh.dhostid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
 			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 
 			if (!is_null($options['groupCount'])) {
@@ -137,7 +137,7 @@ class CDRule extends CZBXAPI {
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 
-			$sqlParts['where']['dserviceid'] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
@@ -156,24 +156,6 @@ class CDRule extends CZBXAPI {
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('dr.druleid', $nodeids);
-		}
-
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['drules'] = 'dr.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT dr.druleid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
 		}
 
 // search
@@ -199,6 +181,9 @@ class CDRule extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 //------------
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$druleids = array();
 
@@ -280,7 +265,7 @@ class CDRule extends CZBXAPI {
 			}
 		}
 
-		if (($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])) {
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
@@ -488,18 +473,42 @@ class CDRule extends CZBXAPI {
 					break;
 			}
 
-
+			// set default values for snmpv3 fields
 			if (!isset($dCheck['snmpv3_securitylevel'])) {
 				$dCheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
 			}
 
 			switch ($dCheck['snmpv3_securitylevel']) {
 				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+					$dChecks[$dcnum]['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 					$dChecks[$dcnum]['snmpv3_authpassphrase'] = $dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
 					break;
 				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+					$dChecks[$dcnum]['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 					$dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
 					break;
+			}
+
+			// validate snmpv3 fields
+			if (isset($dCheck['snmpv3_securitylevel']) && $dCheck['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+				// snmpv3 authprotocol
+				if (str_in_array($dCheck['snmpv3_securitylevel'], array(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV))) {
+					if (zbx_empty($dCheck['snmpv3_authprotocol'])
+							|| (isset($dCheck['snmpv3_authprotocol'])
+									&& !str_in_array($dCheck['snmpv3_authprotocol'], array(ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA)))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for discovery rule "%1$s".', $dCheck['name']));
+					}
+				}
+
+				// snmpv3 privprotocol
+				if ($dCheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					if (zbx_empty($dCheck['snmpv3_privprotocol'])
+							|| (isset($dCheck['snmpv3_privprotocol'])
+									&& !str_in_array($dCheck['snmpv3_privprotocol'], array(ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES)))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for discovery rule "%1$s".', $dCheck['name']));
+					}
+				}
 			}
 
 			$this->validateDuplicateChecks($dChecks);
@@ -508,8 +517,6 @@ class CDRule extends CZBXAPI {
 		if ($uniq > 1) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
 		}
-
-
 	}
 
 	protected function validateRequiredFields($dRules, $on) {
@@ -723,7 +730,7 @@ class CDRule extends CZBXAPI {
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.DBcondition('value', $druleids);
+				' AND '.dbConditionString('value', $druleids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[] = $dbAction['actionid'];
@@ -752,7 +759,7 @@ class CDRule extends CZBXAPI {
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-				' AND '.DBcondition('value', $checkids);
+				' AND '.dbConditionString('value', $checkids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions))
 			$actionids[] = $dbAction['actionid'];
@@ -761,12 +768,12 @@ class CDRule extends CZBXAPI {
 		if (!empty($actionids)) {
 			DBexecute('UPDATE actions '.
 					' SET status='.ACTION_STATUS_DISABLED.
-					' WHERE '.DBcondition('actionid', $actionids));
+					' WHERE '.dbConditionInt('actionid', $actionids));
 
 			// delete action conditions
 			DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.DBcondition('value', $checkids));
+					' AND '.dbConditionString('value', $checkids));
 		}
 
 		DB::delete('dchecks', array('dcheckid' => $checkids));

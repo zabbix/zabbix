@@ -98,51 +98,26 @@ class CGraphPrototype extends CGraphGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['graphs']);
-
-			$dbTable = DB::getSchema('graphs');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'g.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT gii.graphid'.
-				' FROM graphs_items gii,items ii'.
-				' WHERE gii.graphid=g.graphid'.
-					' AND gii.itemid=ii.itemid'.
-					' AND EXISTS ('.
-						' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups ugg'.
-						' WHERE ii.hostid=hgg.hostid'.
-							' AND rr.id=hgg.groupid'.
-							' AND rr.groupid=ugg.usrgrpid'.
-							' AND ugg.userid='.$userid.
-							' AND rr.permission<'.$permission.'))';
-		}
+			$userGroups = getUserGroupsByUserId($userid);
 
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM graphs_items gi,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY gi.graphid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
+		}
 
 		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
@@ -155,7 +130,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
@@ -186,7 +161,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 
@@ -199,7 +174,7 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['where'][] = DBcondition('g.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('g.graphid', $options['graphids']);
 		}
 
 		// itemids
@@ -209,7 +184,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['select']['itemid'] = 'gi.itemid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where'][] = DBcondition('gi.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('gi.itemid', $options['itemids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
@@ -225,7 +200,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
@@ -264,24 +239,6 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['graphs'] = 'g.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT g.graphid) as rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
-		}
-
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('graphs g', $options, $sqlParts);
@@ -300,7 +257,7 @@ class CGraphPrototype extends CGraphGeneral {
 				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (isset($options['filter']['hostid'])) {
@@ -310,7 +267,7 @@ class CGraphPrototype extends CGraphGeneral {
 				$sqlParts['from']['items'] = 'items i';
 				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-				$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
+				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
 
@@ -321,6 +278,9 @@ class CGraphPrototype extends CGraphGeneral {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
+
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		$graphids = array();
 
@@ -502,8 +462,10 @@ class CGraphPrototype extends CGraphGeneral {
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
 			));
+
 			foreach ($items as $item) {
 				$igraphs = $item['graphs'];
 				unset($item['graphs']);
@@ -520,7 +482,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,gi.graphid'.
 					' FROM item_discovery id,graphs_items gi'.
-					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
 						' AND gi.itemid=id.itemid'
 			);
 			while ($rule = DBfetch($dbRules)) {
@@ -537,7 +499,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $graphid => $graph) {
 					if (isset($ruleMap[$graphid]) && isset($discoveryRules[$ruleMap[$graphid]])) {
@@ -723,8 +685,8 @@ class CGraphPrototype extends CGraphGeneral {
 		$dbLinks = DBSelect(
 			'SELECT ht.hostid,ht.templateid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.DBcondition('ht.hostid', $data['hostids']).
-				' AND '.DBcondition('ht.templateid', $data['templateids'])
+			' WHERE '.dbConditionInt('ht.hostid', $data['hostids']).
+				' AND '.dbConditionInt('ht.templateid', $data['templateids'])
 		);
 		$linkage = array();
 		while ($link = DBfetch($dbLinks)) {
@@ -789,7 +751,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$parentGraphids = $graphids;
 		do {
-			$dbGraphs = DBselect('SELECT g.graphid FROM graphs g WHERE '.DBcondition('g.templateid', $parentGraphids));
+			$dbGraphs = DBselect('SELECT g.graphid FROM graphs g WHERE '.dbConditionInt('g.templateid', $parentGraphids));
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
@@ -799,7 +761,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$createdGraphs = array();
 
-		$dbGraphs = DBselect('SELECT gd.graphid FROM graph_discovery gd WHERE '.DBcondition('gd.parent_graphid', $graphids));
+		$dbGraphs = DBselect('SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $graphids));
 		while ($graph = DBfetch($dbGraphs)) {
 			$createdGraphs[$graph['graphid']] = $graph['graphid'];
 		}
@@ -852,7 +814,8 @@ class CGraphPrototype extends CGraphGeneral {
 			'webitems' => true,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 
 		foreach ($itemids as $itemid) {

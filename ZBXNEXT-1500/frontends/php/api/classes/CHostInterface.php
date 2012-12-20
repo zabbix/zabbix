@@ -113,27 +113,22 @@ class CHostInterface extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=hi.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT hgg.groupid'.
-				' FROM hosts_groups hgg,rights rr,users_groups gg'.
-				' WHERE hgg.hostid=hg.hostid'.
-					' AND rr.id=hgg.groupid'.
-					' AND rr.groupid=gg.usrgrpid'.
-					' AND gg.userid='.$userid.
-					' AND rr.permission<'.$permission.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE hi.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -142,7 +137,7 @@ class CHostInterface extends CZBXAPI {
 		// interfaceids
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
-			$sqlParts['where']['interfaceid'] = DBcondition('hi.interfaceid', $options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -154,7 +149,7 @@ class CHostInterface extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 			$sqlParts['select']['hostid'] = 'hi.hostid';
-			$sqlParts['where']['hostid'] = DBcondition('hi.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('hi.hostid', $options['hostids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -168,7 +163,7 @@ class CHostInterface extends CZBXAPI {
 
 			$sqlParts['select']['itemid'] = 'i.itemid';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'hi.interfaceid=i.interfaceid';
 
 			if (!$nodeCheck) {
@@ -184,7 +179,7 @@ class CHostInterface extends CZBXAPI {
 			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'hi.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
@@ -369,9 +364,9 @@ class CHostInterface extends CZBXAPI {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'filter' => array('flags' => null)
 			);
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectItems'];
@@ -909,7 +904,7 @@ class CHostInterface extends CZBXAPI {
 		// gathrer missing host ids
 		$hostids = array();
 		if ($interfaceidsWithoutHostids) {
-			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.DBcondition('i.interfaceid', $interfaceidsWithoutHostids));
+			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostids));
 			while ($hostData = DBfetch($dbResult)) {
 				$hostids[$hostData['hostid']] = $hostData['hostid'];
 			}
@@ -939,7 +934,7 @@ class CHostInterface extends CZBXAPI {
 		$this->checkIfInterfaceHasItems($interfaceids);
 
 		$hostids = array();
-		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.DBcondition('i.interfaceid', $interfaceids));
+		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceids));
 		while ($hostData = DBfetch($dbResult)) {
 			$hostids[$hostData['hostid']] = $hostData['hostid'];
 		}
@@ -1010,7 +1005,6 @@ class CHostInterface extends CZBXAPI {
 			'output' => array('name'),
 			'selectHosts' => array('name'),
 			'interfaceids' => $interfaceids,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'limit' => 1

@@ -42,7 +42,8 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
+	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL,
+			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if ('#' == *parameter)
 		{
@@ -82,7 +83,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
+	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_COMMON, NULL, 0);
 clean:
 	if (SUCCEED == res)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);

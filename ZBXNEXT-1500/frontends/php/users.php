@@ -370,7 +370,7 @@ else {
 	}
 	$sql = 'SELECT s.userid,MAX(s.lastaccess) AS lastaccess,s.status'.
 			' FROM sessions s'.
-			' WHERE '.DBcondition('s.userid', zbx_objectValues($data['users'], 'userid')).
+			' WHERE '.dbConditionInt('s.userid', zbx_objectValues($data['users'], 'userid')).
 			' GROUP BY s.userid,s.status';
 	$db_sessions = DBselect($sql);
 	while ($session = DBfetch($db_sessions)) {
