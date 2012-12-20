@@ -98,7 +98,8 @@ function get_httpstep_by_no($httptestid, $no) {
 
 function get_httptests_by_hostid($hostids) {
 	zbx_value2array($hostids);
-	return DBselect('SELECT DISTINCT ht.* FROM httptest ht WHERE '.DBcondition('ht.hostid', $hostids));
+
+	return DBselect('SELECT DISTINCT ht.* FROM httptest ht WHERE '.dbConditionInt('ht.hostid', $hostids));
 }
 
 /**
@@ -152,7 +153,7 @@ function getHttpTestsParentTemplates(array $httpTests) {
 		$dbHttpTests = DBselect('SELECT ht.httptestid,ht.templateid,ht.hostid,h.name'.
 				' FROM httptest ht'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
-				' WHERE'.DBcondition('ht.httptestid', array_keys($template2testMap)));
+				' WHERE '.dbConditionInt('ht.httptestid', array_keys($template2testMap)));
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
 			foreach ($template2testMap[$dbHttpTest['httptestid']] as $testId => $data) {
 				$result[$testId] = array('name' => $dbHttpTest['name'], 'id' => $dbHttpTest['hostid']);

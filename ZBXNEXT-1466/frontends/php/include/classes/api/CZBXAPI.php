@@ -225,7 +225,7 @@ class CZBXAPI {
 	 *
 	 * @return mixed
 	 */
-	protected function extendOutputOption($tableName, $fields, $output) {
+	protected function outputExtend($tableName, $fields, $output) {
 		$fields = (array) $fields;
 
 		foreach ($fields as $field) {
@@ -244,28 +244,96 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Unsets the fields that haven't been explicitly asked for by the user, but
-	 * have been included in the resulting object for whatever reasons.
+	 * Returns true if the given field is requested in the output parameter.
 	 *
-	 * If the $option parameter is set to API_OUTPUT_EXTEND or to API_OUTPUT_REFER, return the result as is.
-	 * If the $option parameter is an array of fields, return only them.
+	 * @param $field
+	 * @param $output
 	 *
-	 * @param array $object			The object from the database
-	 * @param array $output			The original requested output
-	 *
-	 * @return array				The resulting object
+	 * @return bool
 	 */
-	protected function unsetExtraFields(array $object, $output) {
-		// if specific fields where requested, return only them
-		if (is_array($output)) {
-			foreach ($object as $field => $value) {
-				if (!in_array($field, $output)) {
-					unset($object[$field]);
-				}
+	protected function outputIsRequested($field, $output) {
+		switch ($output) {
+			// if all fields are requested, just return true
+			// API_OUTPUT_REFER will always return true as an exception
+			case API_OUTPUT_EXTEND:
+			case API_OUTPUT_REFER:
+				return true;
+			// if the number of objects is requested, return false
+			case API_OUTPUT_COUNT:
+				return false;
+			// if an array of fields is passed, check if the field is present in the array
+			default:
+				return in_array($field, $output);
+		}
+	}
+
+	/**
+	 * Unsets fields $field from the given objects if they are not requested in $output.
+	 *
+	 * @param array $objects
+	 * @param array $fields
+	 * @param string|array $output  desired output
+	 *
+	 * @return array
+	 */
+	protected function unsetExtraFields(array $objects, array $fields, $output) {
+		// find the fields that have not been requested
+		$extraFields = array();
+		foreach ($fields as $field) {
+			if (!$this->outputIsRequested($field, $output)) {
+				$extraFields[] = $field;
 			}
 		}
 
-		return $object;
+		// unset these fields
+		if ($extraFields) {
+			foreach ($objects as &$object) {
+				foreach ($extraFields as $field) {
+					unset($object[$field]);
+				}
+			}
+			unset($object);
+		}
+
+		return $objects;
+	}
+
+	/**
+	 * Creates a relation map for the given objects.
+	 *
+	 * If the $table parameter is set, the relations will be loaded from a database table, otherwise the map will be
+	 * built from two base object properties.
+	 *
+	 * @param array $objects        a hash of base objects
+	 * @param string $baseField     the base object ID field
+	 * @param string $foreignField  the related objects ID field
+	 * @param string $table         table to load the relation from
+	 *
+	 * @return CRelationMap
+	 */
+	protected function createRelationMap(array $objects, $baseField, $foreignField, $table = null) {
+		$relationMap = new CRelationMap();
+
+		// create the map from a database table
+		if ($table) {
+			$res = DBselect(API::getApi()->createSelectQuery($table, array(
+				'output' => array($baseField, $foreignField),
+				'filter' => array(
+					$baseField => array_keys($objects)
+				)
+			)));
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
+			}
+		}
+		// create a map from the base objects
+		else {
+			foreach ($objects as $object) {
+				$relationMap->addRelation($object[$baseField], $object[$foreignField]);
+			}
+		}
+
+		return $relationMap;
 	}
 
 	/**
@@ -290,7 +358,7 @@ class CZBXAPI {
 		if (isset($options['preservekeys'])) {
 			$rs = array();
 			foreach ($objects as $object) {
-				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($object, $options['output']);
+				$rs[$object[$this->pk($tableName)]] = $object;
 			}
 
 			return $rs;
@@ -392,7 +460,7 @@ class CZBXAPI {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
 
 			// select columns used by group count
-			if ($options['groupCount'] !== null) {
+			if (isset($options['groupCount'])) {
 				foreach ($sqlParts['group'] as $fields) {
 					$sqlParts['select'][] = $fields;
 				}
@@ -413,7 +481,7 @@ class CZBXAPI {
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
 			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
-			$sqlParts['select'][] = $this->fieldId('*', $tableAlias);
+			$sqlParts = $this->addQuerySelect($this->fieldId('*', $tableAlias), $sqlParts);
 		}
 
 		return $sqlParts;
@@ -436,7 +504,7 @@ class CZBXAPI {
 		// pks
 		if (isset($options[$pkOption])) {
 			zbx_value2array($options[$pkOption]);
-			$sqlParts['where'][] = DBcondition($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
+			$sqlParts['where'][] = dbConditionString($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
 		}
 
 		// filters
@@ -544,7 +612,8 @@ class CZBXAPI {
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
 	 * @param array $options
-	 * @param array $result     an object hash with PKs as keys
+	 * @param array $result             an object hash with PKs as keys
+
 	 * @return array mixed
 	 */
 	protected function addRelatedObjects(array $options, array $result) {

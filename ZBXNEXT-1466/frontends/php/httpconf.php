@@ -468,7 +468,7 @@ else {
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname'.
 				' FROM httptest ht'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
-				' WHERE '.DBcondition('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
+				' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
 		);
 		$httpTests = array();
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
@@ -476,9 +476,9 @@ else {
 		}
 
 		$dbHttpSteps = DBselect(
-			'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
+			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
 					' FROM httpstep hs'.
-					' WHERE '.DBcondition('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
+					' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
 					' GROUP BY hs.httptestid'
 		);
 		while ($dbHttpStep = DBfetch($dbHttpSteps)) {

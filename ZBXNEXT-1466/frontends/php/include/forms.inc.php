@@ -121,7 +121,7 @@
 			$mediaTypeDescriptions = array();
 			$dbMediaTypes = DBselect(
 				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
-					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
+					dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 			);
 			while ($dbMediaType = DBfetch($dbMediaTypes)) {
 				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
@@ -144,7 +144,7 @@
 			if (count($group_ids) == 0) {
 				$group_ids = array(-1);
 			}
-			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
+			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
 
 			// deny beat all, read-write beat read
 			$tmp_permitions = array();
@@ -1332,14 +1332,15 @@
 		}
 
 		if ($data['input_method'] == IM_TREE) {
-			$analyze = analyze_expression($data['expression']);
+			$analyze = analyzeExpression($data['expression']);
 			if ($analyze !== false) {
 				list($data['outline'], $data['eHTMLTree']) = $analyze;
 				if (isset($_REQUEST['expr_action']) && $data['eHTMLTree'] != null) {
-					$new_expr = remake_expression($data['expression'], $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $data['expr_temp']);
+					$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
+							$_REQUEST['expr_action'], $data['expr_temp']);
 					if ($new_expr !== false) {
 						$data['expression'] = $new_expr;
-						$analyze = analyze_expression($data['expression']);
+						$analyze = analyzeExpression($data['expression']);
 						if ($analyze !== false) {
 							list($data['outline'], $data['eHTMLTree']) = $analyze;
 						}

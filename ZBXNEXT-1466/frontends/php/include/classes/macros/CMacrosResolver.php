@@ -148,7 +148,7 @@ class CMacrosResolver {
 
 		// host macros
 		if ($isHostMacrosAvailable) {
-			$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.DBcondition('h.hostid', $hostIds));
+			$dbHosts = DBselect('SELECT h.hostid,h.name,h.host FROM hosts h WHERE '.dbConditionInt('h.hostid', $hostIds));
 			while ($dbHost = DBfetch($dbHosts)) {
 				$hostId = $dbHost['hostid'];
 				$hostMacros = $this->findMacros(self::PATTERN_HOST, $data[$hostId]);
@@ -177,8 +177,8 @@ class CMacrosResolver {
 				'SELECT i.hostid,i.ip,i.dns,i.useip,i.type'.
 				' FROM interface i'.
 				' WHERE i.main=1'.
-					' AND '.DBcondition('i.hostid', $hostIds).
-					' AND '.DBcondition('i.type', $this->interfacePriorities)
+					' AND '.dbConditionInt('i.hostid', $hostIds).
+					' AND '.dbConditionInt('i.type', $this->interfacePriorities)
 			);
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				$hostId = $dbInterface['hostid'];
@@ -225,26 +225,30 @@ class CMacrosResolver {
 			}
 		}
 
-		foreach ($data as $hostId => $texts) {
-			// get user macros
-			if ($this->isTypeAvailable('user')) {
-				$macros[$hostId] = !empty($macros[$hostId])
-					? array_merge($macros[$hostId], $this->getUserMacros($texts, array('hostid' => $hostId)))
-					: $this->getUserMacros($texts, array('hostid' => $hostId));
-			}
-
-			// replace macros to value
-			foreach ($texts as $tnum => $text) {
-				preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_IP.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
-
-				for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
-					$matche = $matches[0][$i];
-
-					$macrosValue = isset($macros[$hostId][$matche[0]]) ? $macros[$hostId][$matche[0]] : $matche[0];
-					$text = substr_replace($text, $macrosValue, $matche[1], strlen($matche[0]));
+		if (!empty($macros)) {
+			foreach ($data as $hostId => $texts) {
+				// get user macros
+				if ($this->isTypeAvailable('user')) {
+					$macros[$hostId] = !empty($macros[$hostId])
+						? array_merge($macros[$hostId], $this->getUserMacros($texts, array('hostid' => $hostId)))
+						: $this->getUserMacros($texts, array('hostid' => $hostId));
 				}
 
-				$data[$hostId][$tnum] = $text;
+				// replace macros to value
+				if (!empty($macros[$hostId])) {
+					foreach ($texts as $tnum => $text) {
+						preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_IP.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
+
+						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
+							$matche = $matches[0][$i];
+
+							$macrosValue = isset($macros[$hostId][$matche[0]]) ? $macros[$hostId][$matche[0]] : $matche[0];
+							$text = substr_replace($text, $macrosValue, $matche[1], strlen($matche[0]));
+						}
+
+						$data[$hostId][$tnum] = $text;
+					}
+				}
 			}
 		}
 
@@ -512,7 +516,7 @@ class CMacrosResolver {
 				' FROM functions f'.
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN hosts h ON i.hostid=h.hostid'.
-				' WHERE '.DBcondition('f.functionid', array_keys($macros))
+				' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 			);
 			while ($func = DBfetch($dbFuncs)) {
 				foreach ($macros[$func['functionid']] as $macro => $fNums) {
@@ -549,8 +553,8 @@ class CMacrosResolver {
 				' FROM functions f'.
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN interface n ON i.hostid=n.hostid'.
-				' WHERE '.DBcondition('f.functionid', array_keys($macros)).
-					' AND n.main='.INTERFACE_PRIMARY
+				' WHERE '.dbConditionInt('f.functionid', array_keys($macros)).
+					' AND n.main=1'
 			);
 
 			// macro should be resolved to interface with highest priority ($priorities)
@@ -603,7 +607,7 @@ class CMacrosResolver {
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN hosts h ON i.hostid=h.hostid'.
 					' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
-				' WHERE '.DBcondition('f.functionid', array_keys($macros))
+				' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 			);
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
 			while ($func = DBfetch($dbFuncs, false)) {

@@ -85,7 +85,9 @@ function getActionMapBySysmap($sysmap) {
 	}
 	unset($selement);
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	if (count($hostids)) {
+		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	}
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
@@ -1054,7 +1056,7 @@ function getSelementsInfo($sysmap) {
 			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => true
+			'selectInventory' => array('hostid')
 		));
 	}
 
@@ -1149,6 +1151,7 @@ function getSelementsInfo($sysmap) {
 		$triggers = API::Trigger()->get(array(
 			'hostids' => $monitored_hostids,
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectHosts' => array('hostid'),
 			'nopermissions' => true,
 			'filter' => array('value_flags' => null),
 			'nodeids' => get_current_nodeid(true),
@@ -2231,22 +2234,22 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
 }
 
 /**
+ * Get icon id by mapping.
+ *
  * @param array $iconMap
  * @param array $inventory
  *
- * @return int icon id
+ * @return int
  */
 function getIconByMapping($iconMap, $inventory) {
-	$iconid = null;
-	$inventories = getHostInventories();
+	if (!empty($inventory['inventory'])) {
+		$inventories = getHostInventories();
 
-	if (isset($inventory['inventory'])) {
 		foreach ($iconMap['mappings'] as $mapping) {
 			try {
 				$expr = new GlobalRegExp($mapping['expression']);
 				if ($expr->match($inventory['inventory'][$inventories[$mapping['inventory_link']]['db_field']])) {
-					$iconid = $mapping['iconid'];
-					break;
+					return $mapping['iconid'];
 				}
 			}
 			catch(Exception $e) {
@@ -2254,8 +2257,27 @@ function getIconByMapping($iconMap, $inventory) {
 			}
 		}
 	}
-	if (null === $iconid) {
-		$iconid = $iconMap['default_iconid'];
-	}
-	return $iconid;
+
+	return $iconMap['default_iconid'];
+}
+
+/**
+ * Get parent maps for current map.
+ *
+ * @param int $mapId
+ *
+ * @return array
+ */
+function getParentMaps($mapId) {
+	$parentMaps = DBfetchArrayAssoc(DBselect(
+		'SELECT s.sysmapid,s.name'.
+			' FROM sysmaps s'.
+				' JOIN sysmaps_elements se ON se.sysmapid=s.sysmapid'.
+			' WHERE se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP.
+				' AND se.elementid='.zbx_dbstr($mapId)
+	), 'sysmapid');
+
+	CArrayHelper::sort($parentMaps, array('name'));
+
+	return $parentMaps;
 }

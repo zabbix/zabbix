@@ -17,4 +17,24 @@
 			$('zbx_filter').submit();
 		}
 	}
+
+	function removeSelectedItems(objId, name) {
+		var obj = jQuery('#' + objId);
+		if (empty(obj)) {
+			return false;
+		}
+
+		jQuery('option:selected', obj).each(function(){
+			var self = jQuery(this);
+
+			if (jQuery('option', obj).length > 1) {
+				jQuery('#' + name + '_' + self.val()).remove();
+				self.remove();
+			}
+			else {
+				alert(<?php echo CJs::encodeJson(_('Cannot remove all items, at least one item should remain.')); ?>);
+				return false;
+			}
+		});
+	}
 </script>

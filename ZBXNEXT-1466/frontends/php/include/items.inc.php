@@ -220,7 +220,7 @@ function update_item_status($itemids, $status) {
 	zbx_value2array($itemids);
 	$result = true;
 
-	$db_items = DBselect('SELECT i.* FROM items i WHERE '.DBcondition('i.itemid', $itemids));
+	$db_items = DBselect('SELECT i.* FROM items i WHERE '.dbConditionInt('i.itemid', $itemids));
 	while ($item = DBfetch($db_items)) {
 		$old_status = $item['status'];
 		if ($status != $old_status) {
@@ -377,7 +377,7 @@ function activate_item($itemids) {
 
 	// first update status for child items
 	$child_items = array();
-	$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.DBcondition('i.templateid', $itemids));
+	$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
 	while ($item = DBfetch($db_items)) {
 		$child_items[$item['itemid']] = $item['itemid'];
 	}
@@ -392,7 +392,7 @@ function disable_item($itemids) {
 
 	// first update status for child items
 	$chd_items = array();
-	$db_tmp_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.DBcondition('i.templateid', $itemids));
+	$db_tmp_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
 	while ($db_tmp_item = DBfetch($db_tmp_items)) {
 		$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
 	}
@@ -404,7 +404,7 @@ function disable_item($itemids) {
 
 function get_items_by_hostid($hostids) {
 	zbx_value2array($hostids);
-	return DBselect('SELECT i.* FROM items i WHERE '.DBcondition('i.hostid', $hostids));
+	return DBselect('SELECT i.* FROM items i WHERE '.dbConditionInt('i.hostid', $hostids));
 }
 
 function get_item_by_key($key, $host = '') {
@@ -477,7 +477,7 @@ function get_same_item_for_host($item, $dest_hostids) {
 			' FROM items src,items dest'.
 			' WHERE dest.itemid='.$itemid.
 				' AND src.key_=dest.key_'.
-				' AND '.DBcondition('src.hostid', $dest_hostids)
+				' AND '.dbConditionInt('src.hostid', $dest_hostids)
 		);
 		while ($db_item = DBfetch($db_items)) {
 			if (is_array($item)) {
@@ -629,7 +629,7 @@ function get_realhost_by_itemid($itemid) {
 
 function fillItemsWithChildTemplates(&$items) {
 	$processSecondLevel = false;
-	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.DBcondition('i.itemid', zbx_objectValues($items, 'templateid')));
+	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.dbConditionInt('i.itemid', zbx_objectValues($items, 'templateid')));
 	while ($dbItem = DBfetch($dbItems)) {
 		foreach ($items as $itemid => $item) {
 			if ($item['templateid'] == $dbItem['itemid'] && !empty($dbItem['templateid'])) {
@@ -657,40 +657,50 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param $hostids
- * @param null $view_style
+ * @param        $hostids
+ * @param string $application name of application to filter
+ * @param null   $view_style
  *
  * @return CTableInfo
  */
-function get_items_data_overview($hostids, $view_style) {
+function get_items_data_overview($hostids, $application, $view_style) {
+	$sqlFrom = '';
+	$sqlWhere = '';
+	if ($application !== '') {
+		$sqlFrom = 'applications a,items_applications ia,';
+		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
+	}
+
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
-		' FROM hosts h,items i'.
+		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-		' WHERE '.DBcondition('h.hostid', $hostids).
+		' WHERE '.dbConditionInt('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+				$sqlWhere.
 		' ORDER BY i.name,i.itemid'
 	);
 
-	// fetch data for the host JS menu
-	$hosts = API::Host()->get(array(
+	$options = array(
 		'output' => array('name', 'hostid'),
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
 		'monitored_hosts' => true,
 		'hostids' => $hostids,
 		'with_monitored_items' => true,
 		'preservekeys' => true
-	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-	foreach ($hostScripts as $hostid => $scripts) {
-		$hosts[$hostid]['scripts'] = $scripts;
+	);
+
+	if ($view_style == STYLE_LEFT) {
+		$options['selectScreens'] = API_OUTPUT_COUNT;
+		$options['selectInventory'] = array('hostid');
 	}
+
+	// fetch data for the host JS menu
+	$hosts = API::Host()->get($options);
 
 	$items = array();
 	while ($row = DBfetch($db_items)) {
@@ -742,6 +752,10 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 	}
 	else {
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');
@@ -753,8 +767,7 @@ function get_items_data_overview($hostids, $view_style) {
 
 			// host js menu link
 			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
-			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
 
 			$tableRow = array(new CCol($hostSpan));
 			foreach ($items as $ithosts) {
@@ -833,7 +846,7 @@ function get_same_applications_for_host($applications, $hostid) {
 		' FROM applications a1,applications a2'.
 		' WHERE a1.name=a2.name'.
 			' AND a1.hostid='.$hostid.
-			' AND '.DBcondition('a2.applicationid', $applications)
+			' AND '.dbConditionInt('a2.applicationid', $applications)
 	);
 	while ($app = DBfetch($db_apps)) {
 		$child_applications[] = $app['applicationid'];
@@ -854,7 +867,7 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 		'SELECT DISTINCT app.'.$field.' AS result'.
 		' FROM applications app,items_applications ia'.
 		' WHERE app.applicationid=ia.applicationid'.
-			' AND '.DBcondition('ia.itemid', $itemids)
+			' AND '.dbConditionInt('ia.itemid', $itemids)
 	);
 	while ($db_application = DBfetch($db_applications)) {
 		array_push($result, $db_application['result']);
@@ -877,11 +890,11 @@ function delete_history_by_itemid($itemIds) {
 		return $result;
 	}
 
-	DBexecute('DELETE FROM history_text WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history_log WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history_uint WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history_str WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history WHERE '.DBcondition('itemid', $itemIds));
+	DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
 
 	return true;
 }
@@ -895,8 +908,8 @@ function delete_history_by_itemid($itemIds) {
  */
 function delete_trends_by_itemid($itemIds) {
 	zbx_value2array($itemIds);
-	$r1 = DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid', $itemIds));
-	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.DBcondition('itemid', $itemIds));
+	$r1 = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
+	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds));
 
 	return $r1 && $r2;
 }

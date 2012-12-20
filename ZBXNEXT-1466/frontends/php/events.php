@@ -138,7 +138,7 @@ if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
 		),
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectFunctions' => API_OUTPUT_EXTEND,
-		'triggerids' => $_REQUEST['triggerid'],
+		'triggerids' => $_REQUEST['triggerid']
 	));
 
 	foreach ($oldTriggers as $oldTrigger) {
@@ -165,7 +165,7 @@ if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectFunctions' => API_OUTPUT_EXTEND,
 			'filter' => array('description' => $oldTrigger['description']),
-			'hostids' => $hostid,
+			'hostids' => $hostid
 		));
 
 		foreach ($newTriggers as $tnum => $newTrigger) {
@@ -464,7 +464,7 @@ else {
 		$dhosts = array();
 		$sql = 'SELECT s.dserviceid,s.dhostid,s.ip,s.dns '.
 				' FROM dservices s '.
-				' WHERE '.DBcondition('s.dhostid', $objectids);
+				' WHERE '.dbConditionInt('s.dhostid', $objectids);
 		$res = DBselect($sql);
 		while ($dservices = DBfetch($res)) {
 			$dhosts[$dservices['dhostid']] = $dservices;
@@ -474,7 +474,7 @@ else {
 		$dservices = array();
 		$sql = 'SELECT s.dserviceid,s.ip,s.dns,s.type,s.port '.
 				' FROM dservices s '.
-				' WHERE '.DBcondition('s.dserviceid', $objectids);
+				' WHERE '.dbConditionInt('s.dserviceid', $objectids);
 		$res = DBselect($sql);
 		while ($dservice = DBfetch($res)) {
 			$dservices[$dservice['dserviceid']] = $dservice;
@@ -617,6 +617,8 @@ else {
 				$trigOpt['groupids'] = $pageFilter->groupid;
 			}
 
+			$trigOpt['monitored'] = true;
+
 			$triggers = API::Trigger()->get($trigOpt);
 			$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 
@@ -664,12 +666,14 @@ else {
 				'hostids' => $hostids,
 				'selectAppllications' => API_OUTPUT_EXTEND,
 				'selectScreens' => API_OUTPUT_COUNT,
-				'selectInventory' => true,
+				'selectInventory' => array('hostid'),
 				'preservekeys' => true
 			));
 
 			// fetch scripts for the host JS menu
-			$hostScripts = API::Script()->getScriptsByHosts($hostids);
+			if ($_REQUEST['hostid'] == 0) {
+				$hostScripts = API::Script()->getScriptsByHosts($hostids);
+			}
 
 			foreach ($events as $enum => $event) {
 				$trigger = $triggers[$event['objectid']];
@@ -719,9 +723,12 @@ else {
 				);
 
 				// host JS menu link
-				$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-				$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-				$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+				$hostSpan = null;
+				if ($_REQUEST['hostid'] == 0) {
+					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+					$scripts = $hostScripts[$host['hostid']];
+					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+				}
 
 				$table->addRow(array(
 					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
@@ -729,7 +736,7 @@ else {
 						'action'
 					),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$_REQUEST['hostid'] ? null : $hostSpan,
+					$hostSpan,
 					new CSpan($tr_desc, 'link_menu'),
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),

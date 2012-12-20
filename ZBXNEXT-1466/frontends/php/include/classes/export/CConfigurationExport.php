@@ -299,8 +299,11 @@ class CConfigurationExport {
 		}
 
 		// proxies
-		$dbProxies = DBselect('SELECT h.hostid, h.host FROM hosts h WHERE '.
-				DBcondition('h.hostid', zbx_objectValues($hosts, 'proxy_hostid')));
+		$dbProxies = DBselect(
+			'SELECT h.hostid,h.host'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionInt('h.hostid', zbx_objectValues($hosts, 'proxy_hostid'))
+		);
 		$proxies = array();
 		while ($proxy = DBfetch($dbProxies)) {
 			$proxies[$proxy['hostid']] = $proxy['host'];
@@ -310,7 +313,6 @@ class CConfigurationExport {
 			$host['proxy'] = $host['proxy_hostid'] ? array('name' => $proxies[$host['proxy_hostid']]) : null;
 		}
 		unset($host);
-
 
 		$this->data['hosts'] = $hosts;
 
@@ -374,7 +376,7 @@ class CConfigurationExport {
 	protected function prepareItems(array $items) {
 		// gather value maps
 		$valueMapIds = zbx_objectValues($items, 'valuemapid');
-		$dbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
+		$dbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.dbConditionInt('vm.valuemapid', $valueMapIds));
 		$valueMapNames = array();
 		while ($valueMap = DBfetch($dbValueMaps)) {
 			$valueMapNames[$valueMap['valuemapid']] = $valueMap['name'];
@@ -453,13 +455,14 @@ class CConfigurationExport {
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => $this->dataFields['discoveryrule'],
 			'selectApplications' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => array('itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		));
 
 		// gather value maps
 		$valueMapIds = zbx_objectValues($prototypes, 'valuemapid');
-		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
+		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.dbConditionInt('vm.valuemapid', $valueMapIds));
 		$valueMaps = array();
 		while ($valueMap = DBfetch($DbValueMaps)) {
 			$valueMaps[$valueMap['valuemapid']] = $valueMap['name'];
@@ -471,7 +474,7 @@ class CConfigurationExport {
 				$prototype['valuemap']['name'] = $valueMaps[$prototype['valuemapid']];
 			}
 
-			$items[$prototype['parent_itemid']]['itemPrototypes'][] = $prototype;
+			$items[$prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $prototype;
 		}
 
 		// gather graph prototypes
@@ -654,6 +657,7 @@ class CConfigurationExport {
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,
+			'selectUrls' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));

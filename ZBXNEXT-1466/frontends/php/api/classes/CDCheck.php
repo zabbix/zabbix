@@ -40,9 +40,6 @@ class CDCheck extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('dcheckid', 'druleid');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('dchecks' => 'dc.dcheckid'),
 			'from'		=> array('dchecks' => 'dchecks dc'),
@@ -70,8 +67,6 @@ class CDCheck extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectDRules'				=> null,
-			'selectDHosts'				=> null,
-			'selectHosts'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -97,7 +92,7 @@ class CDCheck extends CZBXAPI {
 // dcheckids
 		if (!is_null($options['dcheckids'])) {
 			zbx_value2array($options['dcheckids']);
-			$sqlParts['where']['dcheckid'] = DBcondition('dc.dcheckid', $options['dcheckids']);
+			$sqlParts['where']['dcheckid'] = dbConditionInt('dc.dcheckid', $options['dcheckids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -110,7 +105,7 @@ class CDCheck extends CZBXAPI {
 			zbx_value2array($options['druleids']);
 
 			$sqlParts['select']['druleid'] = 'dc.druleid';
-			$sqlParts['where'][] = DBcondition('dc.druleid', $options['druleids']);
+			$sqlParts['where'][] = dbConditionInt('dc.druleid', $options['druleids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dc.druleid';
@@ -129,7 +124,7 @@ class CDCheck extends CZBXAPI {
 			$sqlParts['select']['dservices'] = 'dh.dhostid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 
-			$sqlParts['where']['dh'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dh'] = dbConditionInt('dh.dhostid', $options['dhostids']);
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 
 			if (!is_null($options['groupCount'])) {
@@ -146,20 +141,13 @@ class CDCheck extends CZBXAPI {
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 
-			$sqlParts['where']['ds'] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where']['ds'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 			$sqlParts['where']['dhds'] = 'dh.hostid=ds.hostid';
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
 			}
-		}
-
-// node check !!!!!
-// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('dc.dcheckid', $nodeids);
 		}
 
 // filter
@@ -181,34 +169,9 @@ class CDCheck extends CZBXAPI {
 		}
 //-------
 
-		// output
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
- //SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dcheck = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -217,20 +180,8 @@ class CDCheck extends CZBXAPI {
 					$result = $dcheck['rowscount'];
 			}
 			else{
-				$dcheckids[$dcheck['dcheckid']] = $dcheck['dcheckid'];
-
-				if (!isset($result[$dcheck['dcheckid']])) $result[$dcheck['dcheckid']]= array();
-
-				if (!is_null($options['selectDRules']) && !isset($result[$dcheck['dcheckid']]['drules'])) {
-					$result[$dcheck['dcheckid']]['drules'] = array();
-				}
-
-				if (!is_null($options['selectDHosts']) && !isset($result[$dcheck['dcheckid']]['dhosts'])) {
-					$result[$dcheck['dcheckid']]['dhosts'] = array();
-				}
-
-				if (!is_null($options['selectHosts']) && !isset($result[$dcheck['dcheckid']]['hosts'])) {
-					$result[$dcheck['dcheckid']]['hosts'] = array();
+				if (!isset($result[$dcheck['dcheckid']])) {
+					$result[$dcheck['dcheckid']]= array();
 				}
 
 				// druleids
@@ -241,153 +192,18 @@ class CDCheck extends CZBXAPI {
 					$result[$dcheck['dcheckid']]['drules'][] = array('druleid' => $dcheck['druleid']);
 				}
 
-				// dhostids
-				if (isset($dcheck['dhostid']) && is_null($options['selectDHosts'])) {
-					if (!isset($result[$dcheck['dcheckid']]['dhosts']))
-						$result[$dcheck['dcheckid']]['dhosts'] = array();
-
-					$result[$dcheck['dcheckid']]['dhosts'][] = array('dhostid' => $dcheck['dhostid']);
-				}
-
 				$result[$dcheck['dcheckid']] += $dcheck;
 			}
 		}
-
 
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
-// Adding Objects
-// select_drules
-		if (!is_null($options['selectDRules'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'dcheckids' => $dcheckids,
-				'preservekeys' => 1
-			);
-
-			if (is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDRules'];
-				$drules = API::DRule()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($drules, 'name');
-				foreach ($drules as $druleid => $drule) {
-					unset($drules[$druleid]['dchecks']);
-					$count = array();
-					foreach ($drule['dchecks'] as $dnum => $dcheck) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$dcheck['dcheckid']])) $count[$dcheck['dcheckid']] = 0;
-							$count[$dcheck['dcheckid']]++;
-
-							if ($count[$dcheck['dcheckid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$dcheck['dcheckid']]['drules'][] = &$drules[$druleid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectDRules']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$drules = API::DRule()->get($objParams);
-				$drules = zbx_toHash($drules, 'dcheckid');
-				foreach ($result as $dcheckid => $dcheck) {
-					if (isset($drules[$dcheckid]))
-						$result[$dcheckid]['drules'] = $drules[$dcheckid]['rowscount'];
-					else
-						$result[$dcheckid]['drules'] = 0;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('druleid'), $options['output']);
 		}
-
-// selectDHosts
-		if (!is_null($options['selectDHosts'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'dcheckids' => $dcheckids,
-				'preservekeys' => 1
-			);
-
-			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDHosts'];
-				$dhosts = API::DHost()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($dhosts, 'dhostid');
-				foreach ($dhosts as $dhostid => $dhost) {
-					unset($dhosts[$dhostid]['dchecks']);
-					foreach ($dhost['dchecks'] as $snum => $dcheck) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$dcheck['dcheckid']])) $count[$dcheck['dcheckid']] = 0;
-							$count[$dcheck['dcheckid']]++;
-
-							if ($count[$dcheck['dcheckid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$dcheck['dcheckid']]['dhosts'][] = &$dhosts[$dhostid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectDHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$dhosts = API::DHost()->get($objParams);
-				$dhosts = zbx_toHash($dhosts, 'dhostid');
-				foreach ($result as $dcheckid => $dcheck) {
-					if (isset($dhosts[$dcheckid]))
-						$result[$dcheckid]['dhosts'] = $dhosts[$dcheckid]['rowscount'];
-					else
-						$result[$dcheckid]['dhosts'] = 0;
-				}
-			}
-		}
-
-// selectHosts
-		if (!is_null($options['selectHosts'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'dcheckids' => $dcheckids,
-				'preservekeys' => 1,
-				'sortfield' => 'status'
-			);
-
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($hosts, 'hostid');
-
-				foreach ($hosts as $hostid => $host) {
-					unset($hosts[$hostid]['dchecks']);
-					foreach ($host['dchecks'] as $dnum => $dcheck) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$dcheck['dcheckid']])) $count[$dcheck['dcheckid']] = 0;
-							$count[$dcheck['dcheckid']]++;
-
-							if ($count[$dcheck['dcheckid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$dcheck['dcheckid']]['hosts'][] = &$hosts[$hostid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$hosts = API::Host()->get($objParams);
-				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach ($result as $dcheckid => $dcheck) {
-					if (isset($hosts[$dcheckid]))
-						$result[$dcheckid]['hosts'] = $hosts[$dcheckid]['rowscount'];
-					else
-						$result[$dcheckid]['hosts'] = 0;
-				}
-			}
-		}
-
 
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -440,6 +256,39 @@ class CDCheck extends CZBXAPI {
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectDRules'] !== null) {
+				$sqlParts = $this->addQuerySelect('dc.druleid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// select_drules
+		if ($options['selectDRules'] !== null && $options['selectDRules'] !== API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'dcheckid', 'druleid');
+			$drules = API::DRule()->get(array(
+				'output' => $options['selectDRules'],
+				'druleids' => $relationMap->getRelatedIds(),
+				'nodeids' => $options['nodeids'],
+				'preservekeys' => 1
+			));
+			if (!is_null($options['limitSelects'])) {
+				order_result($drules, 'name');
+			}
+			$result = $relationMap->mapMany($result, $drules, 'drules', $options['limitSelects']);
+		}
+
+		return $result;
 	}
 }
 ?>

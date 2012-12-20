@@ -106,10 +106,10 @@ class CTemplateScreenItem extends CZBXAPI {
 			// normal select query
 			else {
 				if ($options['preservekeys'] !== null) {
-					$result[$row['screenitemid']] = $this->unsetExtraFields($row, $options['output']);
+					$result[$row['screenitemid']] = $row;
 				}
 				else {
-					$result[] = $this->unsetExtraFields($row, $options['output']);
+					$result[] = $row;
 				}
 			}
 		}
@@ -158,7 +158,7 @@ class CTemplateScreenItem extends CZBXAPI {
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
 			$sqlParts = $this->addQuerySelect($this->fieldId('screenid'), $sqlParts);
-			$sqlParts['where'][] = DBcondition($this->fieldId('screenid'), $options['screenids']);
+			$sqlParts['where'][] = dbConditionInt($this->fieldId('screenid'), $options['screenids']);
 		}
 
 		return $sqlParts;

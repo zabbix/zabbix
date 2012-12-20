@@ -191,22 +191,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'count[<]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T > N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is < N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[>]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T < N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is > N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[=]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T = N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is = N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
 	'count[#]' => array(
-		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period of time T NOT N'),
+		'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N'),
 		'params' => $param3_sec_val,
 		'allowed_types' => $allowed_types_any
 	),
@@ -239,42 +239,42 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'max[<]' => array(
-		'description' =>  _('Maximum value for period of time is T < N'),
+		'description' =>  _('Maximum value for period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[>]' => array(
-		'description' =>  _('Maximum value for period of time is T > N'),
+		'description' =>  _('Maximum value for period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[=]' => array(
-		'description' =>  _('Maximum value for period of time is T = N'),
+		'description' =>  _('Maximum value for period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'max[#]' => array(
-		'description' =>  _('Maximum value for period of time is T NOT N'),
+		'description' =>  _('Maximum value for period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'min[<]' => array(
-		'description' =>  _('Minimum value for period of time is T < N'),
+		'description' =>  _('Minimum value for period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[>]' => array(
-		'description' =>  _('Minimum value for period of time is T > N'),
+		'description' =>  _('Minimum value for period T is > N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[=]' => array(
-		'description' =>  _('Minimum value for period of time is T = N'),
+		'description' =>  _('Minimum value for period T is = N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
 	'min[#]' => array(
-		'description' =>  _('Minimum value for period of time is T NOT N'),
+		'description' =>  _('Minimum value for period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 		),
@@ -325,7 +325,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_str
 	),
 	'sum[<]' => array(
-		'description' =>  _('Sum of values for period of time is T < N'),
+		'description' =>  _('Sum of values of a period T is < N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
@@ -340,7 +340,7 @@ $functions = array(
 		'allowed_types' => $allowed_types_numeric
 	),
 	'sum[#]' => array(
-		'description' =>  _('Sum of values for period of time is T NOT N'),
+		'description' =>  _('Sum of values of a period T is NOT N'),
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
@@ -448,16 +448,6 @@ $functions = array(
 		'description' =>  _('Log severity of the last log entry is NOT N'),
 		'allowed_types' => $allowed_types_log
 	),
-	'logsource[<]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, then N < 1, 0 - otherwise'),
-		'params' => $param1_str,
-		'allowed_types' => $allowed_types_log
-	),
-	'logsource[>]' => array(
-		'description' =>  _('Log source of the last log entry matching parameter T, then N > 1, 0 - otherwise'),
-		'params' => $param1_str,
-		'allowed_types' => $allowed_types_log
-	),
 	'logsource[=]' => array(
 		'description' =>  _('Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise'),
 		'params' => $param1_str,
@@ -501,12 +491,12 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[=]' => array(
-		'description' =>  _('No data received during period of time T, if N = 1, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T, then N = 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	),
 	'nodata[#]' => array(
-		'description' =>  _('No data received during period of time T, if N NOT 1, 0 - otherwise'),
+		'description' =>  _('No data received during period of time T, then N NOT 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	)

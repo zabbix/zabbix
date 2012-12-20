@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,22 +10,21 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CMaintenance class for API.
  * @package API
  */
 /**
- * Class containing methods for operations with maintenances
- *
+ * Class containing methods for operations with maintenances.
  */
 class CMaintenance extends CZBXAPI {
 
@@ -86,7 +85,7 @@ class CMaintenance extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
-			'selectTimeperiods'         => null,
+			'selectTimeperiods'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -105,7 +104,7 @@ class CMaintenance extends CZBXAPI {
 					$res = DBselect(
 						'SELECT mmg.maintenanceid'.
 						' FROM maintenances_groups mmg'.
-						' WHERE '.DBcondition('mmg.groupid', $options['groupids'])
+						' WHERE '.dbConditionInt('mmg.groupid', $options['groupids'])
 					);
 					while ($maintenance = DBfetch($res)) {
 						$maintenanceids[] = $maintenance['maintenanceid'];
@@ -118,111 +117,68 @@ class CMaintenance extends CZBXAPI {
 
 				if (!is_null($options['groupids'])) {
 					zbx_value2array($options['groupids']);
-					$sql .= ' AND '.DBcondition('hg.groupid', $options['groupids']);
+					$sql .= ' AND '.dbConditionInt('hg.groupid', $options['groupids']);
 				}
 
 				if (!is_null($options['hostids'])) {
 					zbx_value2array($options['hostids']);
-					$sql .= ' AND '.DBcondition('hg.hostid', $options['hostids']);
+					$sql .= ' AND '.dbConditionInt('hg.hostid', $options['hostids']);
 				}
 				$res = DBselect($sql);
 				while ($maintenance = DBfetch($res)) {
 					$maintenanceids[] = $maintenance['maintenanceid'];
 				}
-				$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+				$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 			}
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sql = 'SELECT DISTINCT m.maintenanceid'.
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sql = 'SELECT m.maintenanceid'.
 					' FROM maintenances m'.
 					' WHERE NOT EXISTS ('.
-						// deny section
-						'SELECT mh3.maintenanceid'.
-						' FROM maintenances_hosts mh3,rights r3,users_groups ug3,hosts_groups hg3'.
-						' WHERE mh3.maintenanceid=m.maintenanceid'.
-							' AND r3.groupid=ug3.usrgrpid'.
-							' AND hg3.hostid=mh3.hostid'.
-							' AND r3.id=hg3.groupid'.
-							' AND ug3.userid='.$userid.
-							' AND r3.permission='.PERM_DENY.
+						'SELECT NULL'.
+						' FROM maintenances_hosts mh,hosts_groups hg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=hg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $userGroups).
+						' WHERE m.maintenanceid=mh.maintenanceid'.
+							' AND mh.hostid=hg.hostid'.
+						' GROUP by mh.hostid'.
+						' HAVING MIN(r.permission) IS NULL'.
+							' OR MIN(r.permission)='.PERM_DENY.
+							' OR MAX(r.permission)<'.$permission.
 						')'.
-						' AND NOT EXISTS ('.
-							'SELECT mh4.maintenanceid'.
-							' FROM maintenances_hosts mh4'.
-							' WHERE mh4.maintenanceid=m.maintenanceid'.
-								' AND NOT EXISTS ('.
-									'SELECT r5.id'.
-									' FROM rights r5,users_groups ug5,hosts_groups hg5'.
-									' WHERE r5.groupid=ug5.usrgrpid'.
-										' AND hg5.hostid=mh4.hostid'.
-										' AND r5.id=hg5.groupid'.
-										' AND ug5.userid='.$userid.
-								')'.
-						')'.
-						' AND NOT EXISTS ('.
-							'SELECT mg2.maintenanceid'.
-							' FROM maintenances_groups mg2,rights r3,users_groups ug3'.
-							' WHERE mg2.maintenanceid=m.maintenanceid'.
-								' AND r3.groupid=ug3.usrgrpid'.
-								' AND r3.id=mg2.groupid'.
-								' AND ug3.userid='.$userid.
-								' AND r3.permission='.PERM_DENY.
-						')'.
-						' AND NOT EXISTS ('.
-							'SELECT mg3.maintenanceid'.
-							' FROM maintenances_groups mg3'.
-							' WHERE mg3.maintenanceid=m.maintenanceid'.
-								' AND NOT EXISTS ('.
-									'SELECT r5.id'.
-									' FROM rights r5,users_groups ug5,hosts_groups hg5'.
-									' WHERE r5.groupid=ug5.usrgrpid'.
-										' AND r5.id=mg3.groupid'.
-										' AND ug5.userid='.$userid.
-								')'.
-						')'.
-						// allow section
-						' AND (
-							EXISTS ('.
-								'SELECT mh3.maintenanceid'.
-								' FROM maintenances_hosts mh3,rights r3,users_groups ug3,hosts_groups hg3'.
-								' WHERE mh3.maintenanceid=m.maintenanceid'.
-									' AND r3.groupid=ug3.usrgrpid'.
-									' AND hg3.hostid=mh3.hostid'.
-									' AND r3.id=hg3.groupid'.
-									' AND ug3.userid='.$userid.
-									' AND r3.permission>='.$permission.
-							')'.
-							' OR EXISTS ('.
-								'SELECT mg2.maintenanceid'.
-								' FROM maintenances_groups mg2,rights r3,users_groups ug3'.
-								' WHERE mg2.maintenanceid=m.maintenanceid'.
-									' AND r3.groupid=ug3.usrgrpid'.
-									' AND r3.id=mg2.groupid'.
-									' AND ug3.userid='.$userid.
-									' AND r3.permission>='.$permission.
-							')'.
+					' AND NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM maintenances_groups mg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=mg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $userGroups).
+						' WHERE m.maintenanceid=mg.maintenanceid'.
+						' GROUP by mg.groupid'.
+						' HAVING MIN(r.permission) IS NULL'.
+							' OR MIN(r.permission)='.PERM_DENY.
+							' OR MAX(r.permission)<'.$permission.
 						')';
 
 			if (!is_null($options['groupids'])) {
 				zbx_value2array($options['groupids']);
-
 				$sql .= ' AND ('.
-							// filtering using groups attached to maintenence
-							'EXISTS ('.
-								'SELECT mgf.maintenanceid'.
-								' FROM maintenances_groups mgf'.
-								' WHERE mgf.maintenanceid=m.maintenanceid'.
-									' AND '.DBcondition('mgf.groupid', $options['groupids']).
+						'EXISTS ('.
+							'SELECT NULL'.
+								' FROM maintenances_groups mg'.
+								' WHERE m.maintenanceid=mg.maintenanceid'.
+								' AND '.dbConditionInt('mg.groupid', $options['groupids']).
 							')'.
-							// filtering by hostgroups of hosts attached to maintenance
-							' OR EXISTS ('.
-								' SELECT mh.maintenanceid'.
+						' OR EXISTS ('.
+							'SELECT NULL'.
 								' FROM maintenances_hosts mh,hosts_groups hg'.
-								' WHERE mh.maintenanceid=m.maintenanceid'.
-									' AND hg.hostid=mh.hostid'.
-									' AND '.DBcondition('hg.groupid', $options['groupids']).
+								' WHERE m.maintenanceid=mh.maintenanceid'.
+									' AND mh.hostid=hg.hostid'.
+									' AND '.dbConditionInt('hg.groupid', $options['groupids']).
 							')'.
 						')';
 			}
@@ -230,21 +186,24 @@ class CMaintenance extends CZBXAPI {
 			if (!is_null($options['hostids'])) {
 				zbx_value2array($options['hostids']);
 				$sql .= ' AND EXISTS ('.
-							' SELECT mh.maintenanceid'.
+						'SELECT NULL'.
 							' FROM maintenances_hosts mh'.
-							' WHERE mh.maintenanceid=m.maintenanceid'.
-								' AND '.DBcondition('mh.hostid', $options['hostids']).
-							')';
+							' WHERE m.maintenanceid=mh.maintenanceid'.
+								' AND '.dbConditionInt('mh.hostid', $options['hostids']).
+						')';
 			}
+
+			if (!is_null($options['maintenanceids'])) {
+				zbx_value2array($options['maintenanceids']);
+				$sql .= ' AND '.dbConditionInt('m.maintenanceid', $options['maintenanceids']);
+			}
+
 			$res = DBselect($sql);
 			while ($maintenance = DBfetch($res)) {
 				$maintenanceids[] = $maintenance['maintenanceid'];
 			}
-			$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// groupids
 		if (!is_null($options['groupids'])) {
@@ -260,7 +219,7 @@ class CMaintenance extends CZBXAPI {
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sqlParts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
+			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $options['maintenanceids']);
 		}
 
 		// filter
@@ -281,45 +240,10 @@ class CMaintenance extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// output
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		$maintenanceids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('m.maintenanceid', $nodeids).
-					$sqlWhere.
-				$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($maintenance = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -334,13 +258,6 @@ class CMaintenance extends CZBXAPI {
 
 				if (!isset($result[$maintenance['maintenanceid']])) {
 					$result[$maintenance['maintenanceid']] = array();
-				}
-
-				if (!is_null($options['selectGroups']) && !isset($result[$maintenance['maintenanceid']]['groups'])) {
-					$result[$maintenance['maintenanceid']]['groups'] = array();
-				}
-				if (!is_null($options['selectHosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])) {
-					$result[$maintenance['maintenanceid']]['hosts'] = array();
 				}
 
 				// groupids
@@ -751,7 +668,7 @@ class CMaintenance extends CZBXAPI {
 			$dbTimeperiods = DBselect(
 				'SELECT DISTINCT tp.timeperiodid'.
 				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceids).
+				' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceids).
 					' AND tp.timeperiodid=mw.timeperiodid'
 			);
 			while ($timeperiod = DBfetch($dbTimeperiods)) {
@@ -837,66 +754,37 @@ class CMaintenance extends CZBXAPI {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$maintenanceIds = array_keys($result);
-
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		// selectGroups
-		if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
+			$groups = API::HostGroup()->get(array(
 				'output' => $options['selectGroups'],
-				'maintenanceids' => $maintenanceIds,
+				'hostgroupids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			);
-			$groups = API::HostGroup()->get($objParams);
-			foreach ($groups as $group) {
-				$gmaintenances = $group['maintenances'];
-				unset($group['maintenances']);
-				foreach ($gmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['groups'][] = $group;
-				}
-			}
+			));
+			$result = $relationMap->mapMany($result, $groups, 'groups');
 		}
 
 		// selectHosts
-		if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'hostid', 'maintenances_hosts');
+			$groups = API::Host()->get(array(
 				'output' => $options['selectHosts'],
-				'maintenanceids' => $maintenanceIds,
+				'hostids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			);
-			$hosts = API::Host()->get($objParams);
-			foreach ($hosts as $host) {
-				$hmaintenances = $host['maintenances'];
-				unset($host['maintenances']);
-				foreach ($hmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['hosts'][] = $host;
-				}
-			}
+			));
+			$result = $relationMap->mapMany($result, $groups, 'hosts');
 		}
 
 		// selectTimeperiods
-		if ($options['selectTimeperiods'] !== null) {
-			foreach ($result as &$maintenance) {
-				$maintenance['timeperiods'] = array();
-			}
-			unset($maintenance);
-
-			// create the SELECT part of the query
-			$sqlParts = $this->applyQueryOutputOptions('timeperiods', 'tp', array(
-				'output' => $options['selectTimeperiods']
-			), array('select' => array('tp.timeperiodid')));
-			$query = DBSelect(
-				'SELECT '.implode($sqlParts['select'], ',').',mw.maintenanceid'.
-				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceIds).
-					' AND tp.timeperiodid=mw.timeperiodid'
-			);
-			while ($tp = DBfetch($query)) {
-				$refId = $tp['maintenanceid'];
-				$tp = $this->unsetExtraFields($tp, $options['selectTimeperiods']);
-				$result[$refId]['timeperiods'][] = $tp;
-			}
+		if ($options['selectTimeperiods'] !== null && $options['selectTimeperiods'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'timeperiodid', 'maintenances_windows');
+			$timeperiods = API::getApi()->select('timeperiods', array(
+				'output' => $options['selectTimeperiods'],
+				'filter' => array('timeperiodid' => $relationMap->getRelatedIds()),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
 		}
 
 		return $result;

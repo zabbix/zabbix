@@ -376,7 +376,8 @@ function make_hoststat_summary($filter) {
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
-		'output' => array('hostid', 'name')
+		'output' => array('hostid', 'name'),
+		'selectGroups' => array('groupid')
 	);
 	$hosts = API::Host()->get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
@@ -804,7 +805,7 @@ function make_latest_issues(array $filter = array()) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
 		'output' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
-		'selectInventory' => true,
+		'selectInventory' => array('hostid'),
 		'selectScreens' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	));
@@ -840,11 +841,10 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		$hostSpan =  new CDiv(null, 'maintenance-abs-cont');
+		$hostSpan = new CDiv(null, 'maintenance-abs-cont');
 
-		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
 		$hostName = new CSpan($host['name'], 'link_menu menu-host');
-		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts));
+		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts_by_hosts[$host['hostid']]));
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($host['maintenance_status']) {
@@ -1002,7 +1002,7 @@ function make_webmon_overview($filter) {
 				' AND a.hostid=hg.hostid'.
 				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-				' AND '.DBcondition('hg.hostid', $availableHostIds).
+				' AND '.dbConditionInt('hg.hostid', $availableHostIds).
 				' AND hg.groupid='.$group['groupid']
 		);
 		while ($row = DBfetch($result)) {

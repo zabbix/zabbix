@@ -92,6 +92,9 @@ if (isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])) {
 	$map['selements'] = get_request('selements', '[]');
 	$map['selements'] = $json->decode($map['selements'], true);
 }
+else {
+	add_elementNames($map['selements']);
+}
 
 if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
 	$map['links'] = get_request('links', '[]');

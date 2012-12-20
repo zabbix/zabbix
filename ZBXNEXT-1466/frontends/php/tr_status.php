@@ -469,14 +469,14 @@ $hosts = API::Host()->get(array(
 	'hostids' => $hostIds,
 	'preservekeys' => true,
 	'selectScreens' => API_OUTPUT_COUNT,
-	'selectInventory' => true
+	'selectInventory' => array('hostid')
 ));
 
 // get trigger dependencies
 $dbTriggerDependencies = DBselect(
 	'SELECT triggerid_down,triggerid_up'.
 	' FROM trigger_depends'.
-	' WHERE '.DBcondition('triggerid_up', $triggerIds)
+	' WHERE '.dbConditionInt('triggerid_up', $triggerIds)
 );
 $triggerIdsDown = array();
 while ($row = DBfetch($dbTriggerDependencies)) {

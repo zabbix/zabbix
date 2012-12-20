@@ -38,9 +38,6 @@ class CHttpTest extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('httptestid', 'name');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('httptests' => 'ht.httptestid'),
 			'from'		=> array('httptest' => 'httptest ht'),
@@ -84,40 +81,31 @@ class CHttpTest extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
-			$sqlParts['where'][] = 'hg.hostid=a.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-									' SELECT hgg.groupid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid=hg.hostid'.
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')';
-		}
+			$userGroups = getUserGroupsByUserId($userid);
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM applications a,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE a.applicationid=ht.applicationid'.
+						' AND a.hostid=hgg.hostid'.
+					' GROUP BY a.applicationid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
+		}
 
 		// httptestids
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 
 			$sqlParts['select']['httptestid'] = 'ht.httptestid';
-			$sqlParts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
+			$sqlParts['where']['httptestid'] = dbConditionInt('ht.httptestid', $options['httptestids']);
 		}
 
 		// templateids
@@ -136,7 +124,7 @@ class CHttpTest extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['where']['hostid'] = DBcondition('ht.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('ht.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hostid'] = 'ht.hostid';
@@ -149,7 +137,7 @@ class CHttpTest extends CZBXAPI {
 
 			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=ht.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -164,7 +152,7 @@ class CHttpTest extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_EXTEND) {
 				$sqlParts['select']['applicationid'] = 'a.applicationid';
 			}
-			$sqlParts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('ht.applicationid', $options['applicationids']);
 		}
 
 		// inherited
@@ -217,44 +205,8 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
-		$httpTestIds = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('ht.httptestid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($httpTest = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -265,16 +217,8 @@ class CHttpTest extends CZBXAPI {
 				}
 			}
 			else {
-				$httpTestIds[$httpTest['httptestid']] = $httpTest['httptestid'];
-
 				if (!isset($result[$httpTest['httptestid']])) {
 					$result[$httpTest['httptestid']] = array();
-				}
-				if (!is_null($options['selectHosts']) && !isset($result[$httpTest['httptestid']]['hosts'])) {
-					$result[$httpTest['httptestid']]['hosts'] = array();
-				}
-				if (!is_null($options['selectSteps']) && !isset($result[$httpTest['httptestid']]['steps'])) {
-					$result[$httpTest['httptestid']]['steps'] = array();
 				}
 
 				$result[$httpTest['httptestid']] += $httpTest;
@@ -285,52 +229,9 @@ class CHttpTest extends CZBXAPI {
 			return $result;
 		}
 
-		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'output' => $options['selectHosts'],
-				'httptestids' => $httpTestIds,
-				'nopermissions' => true,
-				'templated_hosts' => true,
-				'preservekeys' => true
-			);
-			$hosts = API::Host()->get($objParams);
-			foreach ($hosts as $host) {
-				$hwebchecks = $host['httptests'];
-				unset($host['httptests']);
-				foreach ($hwebchecks as $hwebcheck) {
-					$result[$hwebcheck['httptestid']]['hosts'][] = $host;
-				}
-			}
-		}
-
-		// adding steps
-		if (!is_null($options['selectSteps'])) {
-			if (str_in_array($options['selectSteps'], $subselectsAllowedOutputs)) {
-				$dbSteps = DBselect(
-					'SELECT ht.*'.
-						' FROM httpstep ht'.
-						' WHERE '.DBcondition('ht.httptestid', $httpTestIds)
-				);
-				while ($step = DBfetch($dbSteps)) {
-					$step['webstepid'] = $step['httpstepid'];
-					$result[$step['httptestid']]['steps'][$step['httpstepid']] = $step;
-				}
-			}
-			elseif ($options['selectSteps'] == API_OUTPUT_COUNT) {
-				$dbHttpSteps = DBselect(
-					'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
-						' FROM httpstep hs'.
-						' WHERE '.DBcondition('hs.httptestid', $httpTestIds).
-						' GROUP BY hs.httptestid'
-				);
-				while ($dbHttpStep = DBfetch($dbHttpSteps)) {
-					$result[$dbHttpStep['httptestid']]['steps'] = $dbHttpStep['stepscnt'];
-				}
-			}
-		}
-
 		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+
 			// expandName
 			$nameRequested = (is_array($options['output']) && in_array('name', $options['output']))
 				|| $options['output'] == API_OUTPUT_EXTEND;
@@ -338,12 +239,14 @@ class CHttpTest extends CZBXAPI {
 
 			// expandStepName
 			$stepNameRequested = $options['selectSteps'] == API_OUTPUT_EXTEND
-					|| (is_array($options['selectSteps']) && in_array('name', $options['selectSteps']));
+				|| (is_array($options['selectSteps']) && in_array('name', $options['selectSteps']));
 			$expandStepName = $options['expandStepName'] !== null && $stepNameRequested;
 
 			if ($expandName || $expandStepName) {
 				$result = resolveHttpTestMacros($result, $expandName, $expandStepName);
 			}
+
+			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -402,13 +305,13 @@ class CHttpTest extends CZBXAPI {
 		$dbHttpTests = array();
 		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
 				' FROM httptest ht'.
-				' WHERE '.DBcondition('ht.httptestid', array_keys($httpTests)));
+				' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests)));
 		while ($dbHttpTest = DBfetch($dbCursor)) {
 			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 		}
 		$dbCursor = DBselect('SELECT hs.httpstepid,hs.httptestid,hs.name'.
 				' FROM httpstep hs'.
-				' WHERE '.DBcondition('hs.httptestid', array_keys($dbHttpTests)));
+				' WHERE '.dbConditionInt('hs.httptestid', array_keys($dbHttpTests)));
 		while ($dbHttpStep = DBfetch($dbCursor)) {
 			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
 		}
@@ -479,7 +382,7 @@ class CHttpTest extends CZBXAPI {
 		$parentHttpTestIds = $httpTestIds;
 		$childHttpTestIds = array();
 		do {
-			$dbTests = DBselect('SELECT ht.httptestid FROM httptest ht WHERE '.DBcondition('ht.templateid', $parentHttpTestIds));
+			$dbTests = DBselect('SELECT ht.httptestid FROM httptest ht WHERE '.dbConditionInt('ht.templateid', $parentHttpTestIds));
 			$parentHttpTestIds = array();
 			while ($dbTest = DBfetch($dbTests)) {
 				$parentHttpTestIds[] = $dbTest['httptestid'];
@@ -502,7 +405,7 @@ class CHttpTest extends CZBXAPI {
 		$dbTestItems = DBselect(
 			'SELECT hsi.itemid'.
 			' FROM httptestitem hsi'.
-			' WHERE '.DBcondition('hsi.httptestid', $httpTestIds)
+			' WHERE '.dbConditionInt('hsi.httptestid', $httpTestIds)
 		);
 		while ($testitem = DBfetch($dbTestItems)) {
 			$itemidsDel[] = $testitem['itemid'];
@@ -511,7 +414,7 @@ class CHttpTest extends CZBXAPI {
 		$dbStepItems = DBselect(
 			'SELECT DISTINCT hsi.itemid'.
 			' FROM httpstepitem hsi,httpstep hs'.
-			' WHERE '.DBcondition('hs.httptestid', $httpTestIds).
+			' WHERE '.dbConditionInt('hs.httptestid', $httpTestIds).
 				' AND hs.httpstepid=hsi.httpstepid'
 		);
 		while ($stepitem = DBfetch($dbStepItems)) {
@@ -637,8 +540,11 @@ class CHttpTest extends CZBXAPI {
 		if (!empty($appIds)) {
 			$appHostIds = array();
 
-			$dbCursor = DBselect('SELECT a.hostid, a.applicationid FROM applications a'.
-				' WHERE '.DBcondition('a.applicationid', $appIds));
+			$dbCursor = DBselect(
+				'SELECT a.hostid,a.applicationid'.
+				' FROM applications a'.
+				' WHERE '.dbConditionInt('a.applicationid', $appIds)
+			);
 			while ($dbApp = DBfetch($dbCursor)) {
 				$appHostIds[$dbApp['applicationid']] = $dbApp['hostid'];
 			}
@@ -688,10 +594,11 @@ class CHttpTest extends CZBXAPI {
 				$stepNames[] = $step['name'];
 			}
 		}
+
 		$sql = 'SELECT h.httpstepid,h.name'.
 				' FROM httpstep h'.
 				' WHERE h.httptestid='.$httpTest['httptestid'].
-				' AND '.DBcondition('h.name', $stepNames);
+				' AND '.dbConditionString('h.name', $stepNames);
 		if ($dbStep = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario Step "%1$s" already exists.', $dbStep['name']));
 		}
@@ -798,11 +705,58 @@ class CHttpTest extends CZBXAPI {
 
 		if ($options['countOutput'] === null) {
 			// make sure we request the hostid to be able to expand macros
-			if ($options['expandName'] !== null || $options['expandStepName'] !== null) {
+			if ($options['expandName'] !== null || $options['expandStepName'] !== null || $options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('hostid'), $sqlParts);
 			}
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$httpTestIds = array_keys($result);
+
+		// adding hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'httptestid', 'hostid');
+			$hosts = API::Host()->get(array(
+				'output' => $options['selectHosts'],
+				'hostid' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'templated_hosts' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding steps
+		if ($options['selectSteps'] !== null) {
+			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
+				$httpSteps = API::getApi()->select('httpstep', array(
+					'output' => $this->outputExtend('httpstep', array('httptestid', 'httpstepid'), $options['selectSteps']),
+					'filters' => array('httptestid' => $httpTestIds),
+					'preservekeys' => true
+				));
+				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
+
+				$httpSteps = $this->unsetExtraFields($httpSteps, array('httptestid', 'httpstepid'), $options['selectSteps']);
+				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
+			}
+			else {
+				$dbHttpSteps = DBselect(
+					'SELECT hs.httptestid,COUNT(hs.httpstepid) AS stepscnt'.
+						' FROM httpstep hs'.
+						' WHERE '.dbConditionInt('hs.httptestid', $httpTestIds).
+						' GROUP BY hs.httptestid'
+				);
+				while ($dbHttpStep = DBfetch($dbHttpSteps)) {
+					$result[$dbHttpStep['httptestid']]['steps'] = $dbHttpStep['stepscnt'];
+				}
+			}
+		}
+
+		return $result;
 	}
 }
