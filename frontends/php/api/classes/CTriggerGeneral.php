@@ -285,4 +285,77 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			}
 		}
 	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$triggerids = array_keys($result);
+
+		// adding groups
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$res = DBselect(
+				'SELECT f.triggerid,hg.groupid'.
+					' FROM functions f,items i,hosts_groups hg'.
+					' WHERE '.dbConditionInt('f.triggerid', $triggerids).
+					' AND f.itemid=i.itemid'.
+					' AND i.hostid=hg.hostid'
+			);
+			$relationMap = new CRelationMap();
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation['triggerid'], $relation['groupid']);
+			}
+
+			$groups = API::HostGroup()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectGroups'],
+				'groupids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $groups, 'groups');
+		}
+
+		// adding hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$res = DBselect(
+				'SELECT f.triggerid,i.hostid'.
+					' FROM functions f,items i'.
+					' WHERE '.dbConditionInt('f.triggerid', $triggerids).
+					' AND f.itemid=i.itemid'
+			);
+			$relationMap = new CRelationMap();
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation['triggerid'], $relation['hostid']);
+			}
+
+			$hosts = API::Host()->get(array(
+				'output' => $options['selectHosts'],
+				'nodeids' => $options['nodeids'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			if (!is_null($options['limitSelects'])) {
+				order_result($hosts, 'host');
+			}
+			$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
+		}
+
+		// adding functions
+		if ($options['selectFunctions'] !== null && $options['selectFunctions'] != API_OUTPUT_COUNT) {
+			$functions = API::getApi()->select('functions', array(
+				'output' => $this->outputExtend('functions', array('triggerid', 'functionid'), $options['selectFunctions']),
+				'filter' => array('triggerid' => $triggerids),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($functions, 'triggerid', 'functionid');
+
+			$functions = $this->unsetExtraFields($functions, array('triggerid', 'functionid'), $options['selectFunctions']);
+			$result = $relationMap->mapMany($result, $functions, 'functions');
+		}
+
+		return $result;
+	}
+
+
 }
