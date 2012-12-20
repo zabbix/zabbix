@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -33,55 +33,52 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'filterEnable'=>array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-	'del_groups'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-	'groupids'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-	'new_right'=>	array(T_ZBX_STR, O_OPT,	null,	null,				null),
-	'trgSeverity'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-	'grpswitch'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
-
-	'maintenance'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
-	'extAck'=>	array(T_ZBX_INT, O_OPT, P_SYS,	null,		NULL),
-
-	'form_refresh'=>array(T_ZBX_INT, O_OPT, P_SYS,	null,				NULL),
-	'save'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,				NULL),
-	'delete'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,				NULL)
+	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'del_groups' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'new_right' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
+	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
+	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
+	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null)
 );
-
 check_fields($fields);
 
-
-// ACTION /////////////////////////////////////////////////////////////////////////////
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
-// FILTER
+	// filter
 	$filterEnable = get_request('filterEnable', 0);
 	CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
 
 	if ($filterEnable == 1) {
-// GROUPS
-		$groupids = get_request('groupids', array());
-
+		// groups
+		$groupIds = get_request('groupids', array());
 		CProfile::update('web.dashconf.groups.grpswitch', $_REQUEST['grpswitch'], PROFILE_TYPE_INT);
 
 		if ($_REQUEST['grpswitch'] == 1) {
 			$result = CFavorite::remove('web.dashconf.groups.groupids');
-			foreach ($groupids as $gnum => $groupid) {
-				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupid);
+			foreach ($groupIds as $groupId) {
+				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupId);
 			}
 		}
-// HOSTS
+
+		// hosts
 		$_REQUEST['maintenance'] = get_request('maintenance', 0);
 		CProfile::update('web.dashconf.hosts.maintenance', $_REQUEST['maintenance'], PROFILE_TYPE_INT);
-// TRIGGERS
+
+		// triggers
 		$_REQUEST['trgSeverity'] = get_request('trgSeverity', array());
-		$trgSeverity = implode(';', array_keys($_REQUEST['trgSeverity']));
-		CProfile::update('web.dashconf.triggers.severity', $trgSeverity, PROFILE_TYPE_STR);
-
 		$_REQUEST['extAck'] = get_request('extAck', 0);
-		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);
 
+		CProfile::update('web.dashconf.triggers.severity', implode(';', array_keys($_REQUEST['trgSeverity'])), PROFILE_TYPE_STR);
+		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);
 	}
 
 	jsRedirect('dashboard.php');
@@ -96,141 +93,51 @@ elseif (isset($_REQUEST['new_right'])) {
 elseif (isset($_REQUEST['delete'])) {
 	$del_groups = get_request('del_groups', array());
 
-	foreach ($del_groups as $gnum => $groupid) {
-		if (!isset($_REQUEST['groupids'][$groupid])) {
+	foreach ($del_groups as $gnum => $groupId) {
+		if (!isset($_REQUEST['groupids'][$groupId])) {
 			continue;
 		}
 
-		unset($_REQUEST['groupids'][$groupid]);
+		unset($_REQUEST['groupids'][$groupId]);
 	}
 }
 
-$dashboard_wdgt = new CWidget();
+/*
+ * Display
+ */
+$data = array(
+	'form_refresh' => get_request('form_refresh', 0) + 1,
+	'config' => select_config()
+);
 
-// Header
-$dashboard_wdgt->setClass('header');
-$dashboard_wdgt->addPageHeader(_('DASHBOARD CONFIGURATION'), SPACE);
-
-//-------------
-// GROUPS
-$divTabs = new CTabView(array('remember' => 1));
-if (!isset($_REQUEST['form_refresh'])) {
-	$divTabs->setSelected(0);
-}
-
-$dashForm = new CForm();
-$dashForm->setName('dashconf');
-$dashForm->setAttribute('id', 'dashform');
-
-$form_refresh = get_request('form_refresh', 0);
-$dashForm->addVar('form_refresh', ++$form_refresh);
-
-$dashList = new CFormList('dashlist');
 if (isset($_REQUEST['form_refresh'])) {
-	$filterEnable = get_request('filterEnable', 0);
+	$data['isFilterEnable'] = get_request('filterEnable', 0);
+	$data['grpswitch'] = get_request('grpswitch', 0);
+	$data['maintenance'] = get_request('maintenance', 0);
+	$data['extAck'] = get_request('extAck', 0);
 
-	$groupids = get_request('groupids', array());
-	$groupids = zbx_toHash($groupids);
+	$data['groupIds'] = get_request('groupids', array());
+	$data['groupIds'] = zbx_toHash($data['groupIds']);
 
-	$grpswitch = get_request('grpswitch', 0);
-	$maintenance = get_request('maintenance', 0);
-	$extAck = get_request('extAck', 0);
-
-	$severity = get_request('trgSeverity', array());
-	$severity = array_keys($severity);
+	$data['severity'] = get_request('trgSeverity', array());
+	$data['severity'] = array_keys($data['severity']);
 }
 else {
-	$filterEnable = CProfile::get('web.dashconf.filter.enable', 0);
+	$data['isFilterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
+	$data['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
+	$data['maintenance'] = CProfile::get('web.dashconf.hosts.maintenance', 1);
+	$data['extAck'] = CProfile::get('web.dashconf.events.extAck', 0);
 
-	$groupids = CFavorite::get('web.dashconf.groups.groupids');
-	$groupids = zbx_objectValues($groupids, 'value');
-	$groupids = zbx_toHash($groupids);
+	$data['groupIds'] = CFavorite::get('web.dashconf.groups.groupids');
+	$data['groupIds'] = zbx_objectValues($data['groupIds'], 'value');
+	$data['groupIds'] = zbx_toHash($data['groupIds']);
 
-	$grpswitch = CProfile::get('web.dashconf.groups.grpswitch', 0);
-	$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
-	$extAck = CProfile::get('web.dashconf.events.extAck', 0);
-
-	$severity = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
-	$severity = zbx_empty($severity) ? array() : explode(';', $severity);
+	$data['severity'] = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
+	$data['severity'] = zbx_empty($data['severity']) ? array() : explode(';', $data['severity']);
 }
 
-$dashForm->addVar('filterEnable', $filterEnable);
-
-if ($filterEnable) {
-	$cbFilter = new CSpan(_('Enabled'), 'green underline pointer');
-	$cbFilter->setAttribute('onclick', "create_var('".$dashForm->getName()."', 'filterEnable', 0, true);");
-}
-else {
-	$cbFilter = new CSpan(_('Disabled'), 'red underline pointer');
-	$cbFilter->setAttribute('onclick', "$('dashform').enable(); create_var('".$dashForm->getName()."', 'filterEnable', 1, true);");
-}
-
-$dashList->addRow(_('Dashboard filter'), $cbFilter);
-
-$dashForm->addVar('groupids', $groupids);
-
-$cmbGroups = new CComboBox('grpswitch', $grpswitch, 'submit();');
-$cmbGroups->addItem(0, _('All'));
-$cmbGroups->addItem(1, _('Selected'));
-
-if (!$filterEnable) {
-	$cmbGroups->setAttribute('disabled', 'disabled');
-}
-
-$dashList->addRow(_('Host groups'), $cmbGroups);
-
-if ($grpswitch == 1) {
-	$options = array(
-		'nodeids' => get_current_nodeid(true),
-		'groupids' => $groupids,
-		'output' => API_OUTPUT_EXTEND
-	);
-	$groups = API::HostGroup()->get($options);
-
-	foreach ($groups as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid'], true, ': ');
-	}
-	unset($group);
-
-	$sortFields = array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
-		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
-	CArrayHelper::sort($groups, $sortFields);
-
-	$lstGroups = new CListBox('del_groups[]', null, 15);
-	$lstGroups->setAttribute('style', 'width: 200px;');
-	foreach ($groups as $gnum => $group) {
-		$lstGroups->addItem($group['groupid'], $group['nodename'].$group['name']);
-	}
-
-	if (!$filterEnable) {
-		$lstGroups->setAttribute('disabled', 'disabled');
-	}
-
-	$addButton = new CButton('add', _('Add'), "return PopUp('popup_right.php?dstfrm=".$dashForm->getName()."&permission=".PERM_READ_WRITE."',450,450);");
-	$addButton->setEnabled($filterEnable);
-
-	$delButton = new CSubmit('delete', _('Delete selected'));
-	$delButton->setEnabled($filterEnable);
-
-	$dashList->addRow(_('Groups'), array($lstGroups, BR(), $addButton, $delButton));
-}
-
-//HOSTS
-// SPACE added to extend CB width in Chrome
-$cbMain = new CCheckBox('maintenance', $maintenance, null, '1');
-if (!$filterEnable) {
-	$cbMain->setAttribute('disabled', 'disabled');
-}
-
-$dashList->addRow(_('Hosts'), array($cbMain, _('Show hosts in maintenance')));
-
-// Trigger
-$severity = zbx_toHash($severity);
-$trgSeverities = array();
-
-$severities = array(
+$data['severity'] = zbx_toHash($data['severity']);
+$data['severities'] = array(
 	TRIGGER_SEVERITY_NOT_CLASSIFIED,
 	TRIGGER_SEVERITY_INFORMATION,
 	TRIGGER_SEVERITY_WARNING,
@@ -238,41 +145,28 @@ $severities = array(
 	TRIGGER_SEVERITY_HIGH,
 	TRIGGER_SEVERITY_DISASTER
 );
-foreach ($severities as $snum => $sever) {
-	$cb = new CCheckBox('trgSeverity['.$sever.']', isset($severity[$sever]), '', 1);
-	$cb->setEnabled($filterEnable);
-	$trgSeverities[] = array($cb, getSeverityCaption($sever));
-	$trgSeverities[] = BR();
+
+if (!empty($data['grpswitch'])) {
+	$data['hostGroups'] = API::HostGroup()->get(array(
+		'nodeids' => get_current_nodeid(true),
+		'groupids' => $data['groupIds'],
+		'output' => API_OUTPUT_EXTEND
+	));
+
+	foreach ($data['hostGroups'] as &$hostGroup) {
+		$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+	}
+	unset($hostGroup);
+
+	CArrayHelper::sort($data['hostGroups'],
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
 }
-array_pop($trgSeverities);
 
-$dashList->addRow(_('Triggers with severity'), $trgSeverities);
-
-$config = select_config();
-$cb = new CComboBox('extAck', $extAck);
-$cb->addItems(array(
-	EXTACK_OPTION_ALL => _('All'),
-	EXTACK_OPTION_BOTH => _('Separated'),
-	EXTACK_OPTION_UNACK => _('Unacknowledged only'),
-));
-$cb->setEnabled($filterEnable && $config['event_ack_enable']);
-if (!$config['event_ack_enable']) {
-	$cb->setAttribute('title', _('Event acknowledging disabled'));
-}
-$dashList->addRow(_('Problem display'), $cb);
-//-----
-
-$divTabs->addTab('dashFilterTab', _('Filter'), $dashList);
-
-$dashForm->addItem($divTabs);
-
-// Footer
-$main = array(new CSubmit('save', _('Save')));
-$others = array();
-
-$dashForm->addItem(makeFormFooter($main, $others));
-
-$dashboard_wdgt->addItem($dashForm);
-$dashboard_wdgt->show();
+// render view
+$dashconfView = new CView('monitoring.dashconf', $data);
+$dashconfView->render();
+$dashconfView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

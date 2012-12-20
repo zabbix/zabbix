@@ -104,7 +104,7 @@ $ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
 $pageHeader = new CPageHeader(_('Installation'));
-$pageHeader->addCssFile('css.css');
+$pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');

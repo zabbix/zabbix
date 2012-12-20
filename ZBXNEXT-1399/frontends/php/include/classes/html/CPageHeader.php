@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -68,6 +68,19 @@ class CPageHeader {
 	 */
 	public function addCssFile($path) {
 		$this->cssFiles[$path] = $path;
+	}
+
+	/**
+	 * Add initial css files.
+	 *
+	 * @param string $path
+	 */
+	public function addCssInit() {
+		$this->cssFiles[] = 'styles/default.css';
+		$this->cssFiles[] = 'styles/color.css';
+		$this->cssFiles[] = 'styles/icon.css';
+		$this->cssFiles[] = 'styles/blocks.css';
+		$this->cssFiles[] = 'styles/screen.css';
 	}
 
 	/**

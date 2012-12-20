@@ -135,7 +135,7 @@ zbx_flush_post_cookies($denied_page_requested);
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($page_title);
-	$pageHeader->addCssFile('css.css');
+	$pageHeader->addCssInit();
 
 	$css = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {

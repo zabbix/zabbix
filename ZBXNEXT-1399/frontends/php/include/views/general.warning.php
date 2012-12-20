@@ -20,7 +20,7 @@
 
 
 $pageHeader = new CPageHeader('Warning [refreshed every 30 sec]');
-$pageHeader->addCssFile('css.css');
+$pageHeader->addCssInit();
 $pageHeader->display();
 ?>
 <body>
