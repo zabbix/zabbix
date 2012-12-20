@@ -1637,7 +1637,7 @@
 			$filtertimetab->setCellPadding(0);
 			$filtertimetab->setCellSpacing(0);
 
-			$start_date = zbxDateToTime($new_timeperiod['start_date']);
+			$startDate = zbxDateToTime($new_timeperiod['start_date']);
 			if (isset($_REQUEST['add_timeperiod'])) {
 				$newTimePeriodYear = get_request('new_timeperiod_year');
 				$newTimePeriodMonth = get_request('new_timeperiod_month');
@@ -1645,12 +1645,12 @@
 				$newTimePeriodHours = get_request('new_timeperiod_hour');
 				$newTimePeriodMinutes = get_request('new_timeperiod_minute');
 			}
-			elseif ($start_date > 0) {
-				$newTimePeriodYear = date('Y', $start_date );
-				$newTimePeriodMonth = date('m', $start_date );
-				$newTimePeriodDay = date('d', $start_date );
-				$newTimePeriodHours = date('H', $start_date );
-				$newTimePeriodMinutes = date('i', $start_date );
+			elseif ($startDate > 0) {
+				$newTimePeriodYear = date('Y', $startDate );
+				$newTimePeriodMonth = date('m', $startDate );
+				$newTimePeriodDay = date('d', $startDate );
+				$newTimePeriodHours = date('H', $startDate );
+				$newTimePeriodMinutes = date('i', $startDate );
 			}
 			else {
 				$newTimePeriodYear = '';
