@@ -180,7 +180,7 @@ class CHistory extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter($sqlParts['from']['history'], $options, $sqlParts);
+			$this->dbFilter($sqlParts['from']['history'], $options, $sqlParts);
 		}
 
 		// search

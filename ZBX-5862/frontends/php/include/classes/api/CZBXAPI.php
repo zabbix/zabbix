@@ -444,7 +444,7 @@ class CZBXAPI {
 
 		// filters
 		if (is_array($options['filter'])) {
-			zbx_db_filter($tableId, $options, $sqlParts);
+			$this->dbFilter($tableId, $options, $sqlParts);
 		}
 
 		// search
@@ -635,10 +635,59 @@ class CZBXAPI {
 	/**
 	 * Throws an API exception.
 	 *
+	 * @static
+	 *
 	 * @param type $code
 	 * @param type $error
 	 */
 	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
 		throw new APIException($code, $error);
+	}
+
+	/**
+	 * Apply filter conditions to sql builded query.
+	 *
+	 * @param string $table
+	 * @param array  $options
+	 * @param array  $options['filter']
+	 * @param bool   $options['searchByAny']
+	 * @param array  $sqlParts
+	 * @param string $sqlParts['where']['filter']
+	 *
+	 * @return bool
+	 */
+	protected function dbFilter($table, $options, &$sqlParts) {
+		list($table, $tableShort) = explode(' ', $table);
+
+		$tableSchema = DB::getSchema($table);
+		if (!$tableSchema) {
+			info(_s('Error in search request for table "%1$s".', $table));
+		}
+
+		$filter = array();
+		foreach ($options['filter'] as $field => $value) {
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($value)) {
+				continue;
+			}
+
+			zbx_value2array($value);
+
+			$filter[$field] = ($tableSchema['fields'][$field]['type'] == 'int')
+				? dbConditionInt($tableShort.'.'.$field, $value)
+				: dbConditionString($tableShort.'.'.$field, $value);
+		}
+
+		if (!empty($filter)) {
+			if (isset($sqlParts['where']['filter'])) {
+				$filter[] = $sqlParts['where']['filter'];
+			}
+
+			$operator = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
+			$sqlParts['where']['filter'] = implode($operator, $filter);
+
+			return true;
+		}
+
+		return false;
 	}
 }

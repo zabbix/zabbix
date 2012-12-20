@@ -119,7 +119,7 @@ class CScreen extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('screens s', $options, $sqlParts);
+			$this->dbFilter('screens s', $options, $sqlParts);
 		}
 
 		// search
