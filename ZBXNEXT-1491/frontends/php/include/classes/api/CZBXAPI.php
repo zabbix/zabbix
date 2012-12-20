@@ -252,18 +252,18 @@ class CZBXAPI {
 	 * @return bool
 	 */
 	protected function outputIsRequested($field, $output) {
-		// if all fields are requested, just return true
-		// API_OUTPUT_REFER will always return true as an exception
-		if ($output == API_OUTPUT_EXTEND || $output == API_OUTPUT_REFER) {
-			return true;
-		}
-		// if the number of objects is requested, return false
-		elseif ($output == API_OUTPUT_COUNT) {
-			return false;
-		}
-		// if an array of fields is passed, check if the field is present in the array
-		else {
-			return in_array($field, $output);
+		switch ($output) {
+			// if all fields are requested, just return true
+			// API_OUTPUT_REFER will always return true as an exception
+			case API_OUTPUT_EXTEND:
+			case API_OUTPUT_REFER:
+				return true;
+			// if the number of objects is requested, return false
+			case API_OUTPUT_COUNT:
+				return false;
+			// if an array of fields is passed, check if the field is present in the array
+			default:
+				return in_array($field, $output);
 		}
 	}
 
