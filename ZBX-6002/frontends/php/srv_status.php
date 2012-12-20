@@ -63,8 +63,7 @@ if (isset($_REQUEST['serviceid'])) {
 		if (!empty($service['triggerid'])) {
 			$trigger = API::Trigger()->get(array(
 				'triggerids' => $service['triggerid'],
-				'countOutput' => true,
-				'editable' => true
+				'countOutput' => true
 			));
 			if (empty($trigger)) {
 				access_deny();
