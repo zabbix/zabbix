@@ -405,4 +405,103 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 		return true;
 	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$graphids = array_keys($result);
+
+		// adding GraphItems
+		if ($options['selectGraphItems'] !== null && $options['selectGraphItems'] !== API_OUTPUT_COUNT) {
+			$gitems = API::GraphItem()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $this->outputExtend('graphs_items', array('graphid', 'gitemid'), $options['selectGraphItems']),
+				'graphids' => $graphids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($gitems, 'graphid', 'gitemid');
+
+			$gitems = $this->unsetExtraFields($gitems, array('graphid', 'gitemid'), $options['selectGraphItems']);
+			$result = $relationMap->mapMany($result, $gitems, 'gitems');
+		}
+
+		// adding HostGroups
+		if ($options['selectGroups'] !== null && $options['selectGroups'] !== API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT gi.graphid,hg.groupid'.
+					' FROM graphs_items gi,items i,hosts_groups hg'.
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=hg.hostid'
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['graphid'], $relation['groupid']);
+			}
+
+			$groups = API::HostGroup()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectGroups'],
+				'groupids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $groups, 'groups');
+		}
+
+		// adding Hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT gi.graphid,i.hostid'.
+					' FROM graphs_items gi,items i'.
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
+					' AND gi.itemid=i.itemid'
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
+			}
+
+			$hosts = API::Host()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectHosts'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding Templates
+		if ($options['selectTemplates'] !== null && $options['selectTemplates'] !== API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT gi.graphid,i.hostid'.
+					' FROM graphs_items gi,items i'.
+					' WHERE '.dbConditionInt('gi.graphid', $graphids).
+					' AND gi.itemid=i.itemid'
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
+			}
+
+			$templates = API::Template()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectTemplates'],
+				'templateids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $templates, 'templates');
+		}
+
+		return $result;
+	}
+
+
 }

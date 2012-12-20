@@ -609,6 +609,7 @@ abstract class CItemGeneral extends CZBXAPI {
 		// fetch all child hosts
 		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
+			'selectParentTemplates' => array('templateid'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templateids' => zbx_objectValues($itemsToInherit, 'hostid'),
 			'hostids' => $hostIds,
@@ -622,7 +623,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 		$newItems = array();
 		foreach ($chdHosts as $hostId => $host) {
-			$templateids = zbx_toHash($host['templates'], 'templateid');
+			$templateids = zbx_toHash($host['parentTemplates'], 'templateid');
 
 			// skip items not from parent templates of current host
 			$parentItems = array();
@@ -784,5 +785,25 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 			}
 		}
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// adding hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'itemid', 'hostid');
+			$hosts = API::Host()->get(array(
+				'nodeids' => $options['nodeids'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
+				'output' => $options['selectHosts'],
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		return $result;
 	}
 }
