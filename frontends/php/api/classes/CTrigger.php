@@ -101,6 +101,7 @@ class CTrigger extends CTriggerGeneral {
 			// output
 			'expandData'					=> null,
 			'expandDescription'				=> null,
+			'expandComment'					=> null,
 			'expandExpression'				=> null,
 			'output'						=> API_OUTPUT_REFER,
 			'selectGroups'					=> null,
@@ -646,7 +647,15 @@ class CTrigger extends CTriggerGeneral {
 
 		// expandDescription
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
-			$result = CTriggerHelper::batchExpandDescription($result);
+			$result = CMacrosResolverHelper::resolveTriggerNames($result);
+
+			// unset the expression if it's not requested
+			$result = $this->unsetExtraFields($result, array('expression'), $options['output']);
+		}
+
+		// expandComment
+		if (!is_null($options['expandComment']) && $result && array_key_exists('comment', reset($result))) {
+			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
 
 			// unset the expression if it's not requested
 			$result = $this->unsetExtraFields($result, array('expression'), $options['output']);
@@ -666,6 +675,7 @@ class CTrigger extends CTriggerGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
@@ -707,6 +717,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
+
 		return $result;
 	}
 
@@ -756,6 +767,7 @@ class CTrigger extends CTriggerGeneral {
 				break;
 			}
 		}
+
 		return $result;
 	}
 
@@ -959,6 +971,7 @@ class CTrigger extends CTriggerGeneral {
 				$this->addDependencies($newDeps);
 			}
 		}
+
 		return array('triggerids' => zbx_objectValues($triggers, 'triggerid'));
 	}
 
@@ -997,6 +1010,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
+
 		return array('triggerids' => $triggerids);
 	}
 
@@ -1189,6 +1203,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
+
 		return array('triggerids' => $triggerIds);
 	}
 
@@ -1827,6 +1842,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -1846,6 +1862,7 @@ class CTrigger extends CTriggerGeneral {
 			'triggerids' => $ids,
 			'countOutput' => true
 		));
+
 		return count($ids) == $count;
 	}
 
@@ -1866,6 +1883,7 @@ class CTrigger extends CTriggerGeneral {
 			'editable' => true,
 			'countOutput' => true
 		));
+
 		return count($ids) == $count;
 	}
 
@@ -1926,8 +1944,8 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['selectDependencies'] !== null && $options['selectDependencies'] != API_OUTPUT_COUNT) {
 			$res = DBselect(
 				'SELECT td.triggerid_up,td.triggerid_down'.
-					' FROM trigger_depends td'.
-					' WHERE '.dbConditionInt('td.triggerid_down', $triggerids)
+				' FROM trigger_depends td'.
+				' WHERE '.dbConditionInt('td.triggerid_down', $triggerids)
 			);
 			$relationMap = new CRelationMap();
 			while ($relation = DBfetch($res)) {
@@ -1961,8 +1979,8 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,td.triggerid'.
-					' FROM trigger_discovery td,item_discovery id,functions f'.
-					' WHERE '.dbConditionInt('td.triggerid', $triggerids).
+				' FROM trigger_discovery td,item_discovery id,functions f'.
+				' WHERE '.dbConditionInt('td.triggerid', $triggerids).
 					' AND td.parent_triggerid=f.triggerid'.
 					' AND f.itemid=id.itemid'
 			);

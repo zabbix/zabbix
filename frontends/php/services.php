@@ -34,8 +34,7 @@ if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
 }
 
 include_once('include/page_header.php');
-?>
-<?php
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -237,7 +236,7 @@ if (isset($_REQUEST['pservices'])) {
 
 	foreach ($parentServices as $key => $childService) {
 		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
 			: '-';
 	}
 
@@ -276,7 +275,7 @@ if (isset($_REQUEST['cservices'])) {
 
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
 			: '-';
 	}
 
@@ -335,7 +334,7 @@ if (isset($_REQUEST['form'])) {
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
-							? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+							? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
 							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
@@ -393,7 +392,7 @@ else {
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
 
-	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {
