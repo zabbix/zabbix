@@ -271,14 +271,12 @@ class CZBXAPI {
 	 * Unsets fields $field from the given objects if they are not requested in $output.
 	 *
 	 * @param array $objects
-	 * @param string|array $fields  a single field or an array of fields
+	 * @param array $fields
 	 * @param string|array $output  desired output
 	 *
 	 * @return array
 	 */
-	protected function unsetExtraFields(array $objects, $fields, $output) {
-		$fields = (array) $fields;
-
+	protected function unsetExtraFields(array $objects, array $fields, $output) {
 		// find the fields that have not been requested
 		$extraFields = array();
 		foreach ($fields as $field) {

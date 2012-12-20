@@ -1667,7 +1667,7 @@ class CHost extends CHostGeneral {
 					$relationMap->addRelation($screen['hostid'], $key);
 				}
 
-				$screens = $this->unsetExtraFields($screens, 'hostid', $options['selectScreens']);
+				$screens = $this->unsetExtraFields($screens, array('hostid'), $options['selectScreens']);
 				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
 			}
 			else {

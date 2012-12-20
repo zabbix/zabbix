@@ -272,7 +272,7 @@ class CUserMacro extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, 'hostid', $options['output']);
+			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)
