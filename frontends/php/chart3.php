@@ -86,11 +86,9 @@ if ($httptestid = get_request('httptestid', false)) {
 		$items[] = array('itemid' => $item['itemid'], 'color' => $itemColor);
 	}
 
-	$httptest = get_httptest_by_httptestid($httptestid);
+	$httpTest = get_httptest_by_httptestid($httptestid);
 
-	$resolver = new CMacrosResolver();
-	$httpTestName = $resolver->resolveMacrosInText($httptest['name'], $httptest['hostid']);
-	$name = $httpTestName;
+	$name = CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name']);
 }
 else {
 	$items = get_request('items', array());

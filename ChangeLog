@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-1466] implemented macros support in trigger comments (dimir, Eduard)
 A......... [ZBXNEXT-1491] implemented property array support for all get methods (Pavels)
 A......... [ZBXNEXT-1491] implemented the map.get selectUrls parameter (Pavels)
 A......... [ZBXNEXT-1491] implemented the itemprototype.get selectDiscoveryRule parameter (Pavels)

@@ -179,7 +179,6 @@ function getHttpTestsParentTemplates(array $httpTests) {
  * @return array
  */
 function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveStepName = true) {
-	$resolver = new CMacrosResolver();
 	$names = array();
 
 	$i = 0;
@@ -195,7 +194,11 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
 		}
 	}
 
-	$names = $resolver->resolveMacrosInTextBatch($names);
+	$macrosResolver = new CMacrosResolver();
+	$names = $macrosResolver->resolve(array(
+		'config' => 'httpTestName',
+		'data' => $names
+	));
 
 	$i = 0;
 	foreach ($httpTests as $tnum => $test) {
