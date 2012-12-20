@@ -31,8 +31,7 @@ $page['hist_arg'] = array();
 define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
-?>
-<?php
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
@@ -59,12 +58,16 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-$available_triggers = get_accessible_triggers(PERM_READ, array());
-
 if (isset($_REQUEST['serviceid'])) {
 	if ($service = DBfetch(DBselect('SELECT DISTINCT s.serviceid,s.triggerid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
-		if ($service['triggerid'] && !isset($available_triggers[$service['triggerid']])) {
-			access_deny();
+		if (!empty($service['triggerid'])) {
+			$trigger = API::Trigger()->get(array(
+				'triggerids' => $service['triggerid'],
+				'countOutput' => true
+			));
+			if (empty($trigger)) {
+				access_deny();
+			}
 		}
 	}
 	else {
@@ -123,10 +126,10 @@ else {
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
+
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
-
-	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {

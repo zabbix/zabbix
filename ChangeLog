@@ -1,6 +1,10 @@
 Changes for 2.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-1466] implemented macros support in trigger comments (dimir, Eduard)
+A......... [ZBXNEXT-1491] implemented property array support for all get methods (Pavels)
+A......... [ZBXNEXT-1491] implemented the map.get selectUrls parameter (Pavels)
+A......... [ZBXNEXT-1491] implemented the itemprototype.get selectDiscoveryRule parameter (Pavels)
 A.F....... [ZBXNEXT-484] added filtering by application in Monitoring->Overview and Data/Triggers overview screen elements (Vedmak)
 ........S. [ZBXNEXT-1089] added support of user macros in global scripts (Sasha)
 A.F.I..PS. [ZBXNEXT-1526] added support of configurable number of retries per WEB scenario (Alexei)
@@ -27,6 +31,12 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBXNEXT-1491] fixed alert.get hostids and groupids parameters (Pavels)
+A......... [ZBXNEXT-1491] fixed multiple subselects returning hashes instead of arrays (Pavels)
+A......... [ZBXNEXT-1491] fixed item.get selectHosts returning double template objects (Pavels)
+A......... [ZBXNEXT-1491] fixed itemprototype.get selectItems not returning web items (Pavels)
+A......... [ZBXNEXT-1491] fixed template.get selectTemplates and selectHosts not working with count (Pavels)
+A......... [ZBXNEXT-1491] fixed script.get subselects not working when not requesting the groupid and host_access properties (Pavels)
 ..F....... [ZBX-5944] fixed expression calculation displaing (Eduard)
 .......P.. [ZBX-5909] fixed proxy compilation when using '--with-sqlite3' (Andris)
 ..F....... [ZBX-5904] fixed history filter by items (Eduard)
@@ -69,6 +79,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-6002] optimized fetching latest service alarms in Service API (dotneft, Eduard)
 ..F....... [ZBX-5986] fixed page filter in monitoring->graphs (Oleg)
 ..F....... [ZBX-6004] monitoring->screens page optimization (Vedmak)
 ..F....... [ZBX-6003] monitoring->maps page optimization (Vedmak)
