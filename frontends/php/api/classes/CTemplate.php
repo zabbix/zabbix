@@ -1158,7 +1158,7 @@ class CTemplate extends CHostGeneral {
 					$relationMap->addRelation($screen['templateid'], $key);
 				}
 
-				$screens = $this->unsetExtraFields($screens, 'templateid', $options['selectScreens']);
+				$screens = $this->unsetExtraFields($screens, array('templateid'), $options['selectScreens']);
 				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
 			}
 			else {

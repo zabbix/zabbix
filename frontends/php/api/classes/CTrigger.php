@@ -649,7 +649,7 @@ class CTrigger extends CTriggerGeneral {
 			$result = CTriggerHelper::batchExpandDescription($result);
 
 			// unset the expression if it's not requested
-			$result = $this->unsetExtraFields($result, 'expression', $options['output']);
+			$result = $this->unsetExtraFields($result, array('expression'), $options['output']);
 		}
 
 		// expand expression

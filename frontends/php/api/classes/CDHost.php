@@ -213,7 +213,7 @@ class CDHost extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, 'druleid', $options['output']);
+			$result = $this->unsetExtraFields($result, array('druleid'), $options['output']);
 		}
 
 // removing keys (hash -> array)

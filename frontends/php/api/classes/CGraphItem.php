@@ -152,7 +152,7 @@ class CGraphItem extends CZBXAPI {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, 'graphid', $options['output']);
+			$result = $this->unsetExtraFields($result, array('graphid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)

@@ -244,7 +244,7 @@ class CTemplateScreen extends CScreen {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result, $templatesChain);
-			$result = $this->unsetExtraFields($result, 'templateid', $options['output']);
+			$result = $this->unsetExtraFields($result, array('templateid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)
