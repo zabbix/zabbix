@@ -1068,8 +1068,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	SQLRETURN	ret = SQL_SUCCESS;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
-	ub4		counter, prefetch_mem_size = 2 * ZBX_MEBIBYTE;	/* prefetch 2 MB of data */
-	ub4		attrvalue_zero = 0;
+	ub4		prefetch_mem_size = 2 * ZBX_MEBIBYTE;	/* prefetch 2 MB of data */
+	ub4		counter, attrvalue_zero = 0;
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
