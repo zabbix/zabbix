@@ -175,9 +175,6 @@ elseif (isset($_REQUEST['save'])) {
 					$_REQUEST['mntc_since_day'],
 					$_REQUEST['mntc_since_year']);
 		}
-		else {
-			$activeSince = time();
-		}
 		if (isset($_REQUEST['active_till'])) {
 			$activeTill = mktime($_REQUEST['mntc_till_hour'],
 					$_REQUEST['mntc_till_minute'],
@@ -185,9 +182,6 @@ elseif (isset($_REQUEST['save'])) {
 					$_REQUEST['mntc_till_month'],
 					$_REQUEST['mntc_till_day'],
 					$_REQUEST['mntc_till_year']);
-		}
-		else {
-			$activeTill = time();
 		}
 
 		$maintenance = array(

@@ -470,12 +470,12 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate maintenance active since
-			if (!validateMaxTime($maintenance['active_since'])) {
+			if (!validateMaxTime($maintenance['active_since']) || $maintenance['active_since'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 			}
 
 			// validate maintenance active till
-			if (!validateMaxTime($maintenance['active_till'])) {
+			if (!validateMaxTime($maintenance['active_till']) || $maintenance['active_till'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 			}
 
@@ -485,7 +485,7 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate timeperiods
-			if (count($maintenance['timeperiods']) == 0) {
+			if (empty($maintenance['timeperiods'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
@@ -583,12 +583,12 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate maintenance active since
-			if (!validateMaxTime($maintenance['active_since'])) {
+			if (!validateMaxTime($maintenance['active_since']) || $maintenance['active_since'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 			}
 
 			// validate maintenance active till
-			if (!validateMaxTime($maintenance['active_till'])) {
+			if (!validateMaxTime($maintenance['active_till']) || $maintenance['active_till'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 			}
 
@@ -598,7 +598,7 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate timeperiods
-			if (count($maintenance['timeperiods']) == 0) {
+			if (empty($maintenance['timeperiods'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
