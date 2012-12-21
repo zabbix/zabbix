@@ -593,14 +593,14 @@ function validateUserMacro($value) {
 }
 
 /**
- * Validate, if time <= 2147464800 (2038.01.19 00:00).
+ * Validate, if unix time in (1970.01.01 00:00:01 - 2038.01.19 00:00:00).
  *
  * @param int $time
  *
  * @return bool
  */
-function validateMaxTime($time) {
-	return (is_numeric($time) && $time <= 2147464800);
+function validateUnixTime($time) {
+	return (is_numeric($time) && $time > 0 && $time <= 2147464800);
 }
 
 /**
