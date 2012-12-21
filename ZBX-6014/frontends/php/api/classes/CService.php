@@ -1528,8 +1528,10 @@ class CService extends CZBXAPI {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
-				$trg_count = API::Trigger()->get(array('triggerids' => $options['filter']['triggerid'],
-														'countOutput' => true));
+				$trg_count = API::Trigger()->get(array(
+					'triggerids' => $options['filter']['triggerid'],
+					'countOutput' => true
+				));
 
 				if (!$trg_count) {
 					unset($options['filter']['triggerid']);
