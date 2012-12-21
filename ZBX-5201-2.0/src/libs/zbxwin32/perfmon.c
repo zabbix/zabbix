@@ -34,7 +34,7 @@ PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENT
 
 	if (ERROR_SUCCESS != (pdh_status = PdhMakeCounterPath(cpe, wcounterPath, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot make counterpath '%s': %s",
+		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot make counterpath \"%s\": %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
@@ -88,14 +88,14 @@ PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTER_DATA *counter, P
 		if (NULL != counter)
 			counter->status = PERF_COUNTER_INITIALIZED;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): PerfCounter '%s' successfully added", function, counterpath);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): PerfCounter \"%s\" successfully added", function, counterpath);
 	}
 	else
 	{
 		if (NULL != counter)
 			counter->status = PERF_COUNTER_NOTSUPPORTED;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): unable to add PerfCounter '%s': %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): unable to add PerfCounter \"%s\": %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
@@ -110,24 +110,25 @@ PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath
 
 	if (ERROR_SUCCESS != (pdh_status = PdhCollectQueryData(query)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot collect data '%s': %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot collect data \"%s\": %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
 	return pdh_status;
 }
 
-PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value)
+PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle,
+		PPDH_RAW_COUNTER value)
 {
 	PDH_STATUS	pdh_status;
 
 	if (ERROR_SUCCESS != (pdh_status = PdhGetRawCounterValue(handle, NULL, value)) ||
-		(PDH_CSTATUS_VALID_DATA != value->CStatus && PDH_CSTATUS_NEW_DATA != value->CStatus))
+			(PDH_CSTATUS_VALID_DATA != value->CStatus && PDH_CSTATUS_NEW_DATA != value->CStatus))
 	{
 		if (ERROR_SUCCESS == pdh_status)
 			pdh_status = value->CStatus;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot get counter value '%s': %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot get counter value \"%s\": %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
@@ -179,13 +180,11 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 		if (ERROR_SUCCESS == pdh_status)
 			pdh_status = counterValue.CStatus;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot calculate counter value '%s': %s",
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot calculate counter value \"%s\": %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 	else
-	{
 		*value = counterValue.doubleValue;
-	}
 remove_counter:
 	PdhRemoveCounter(handle);
 close_query:
@@ -220,9 +219,7 @@ LPTSTR	get_counter_name(DWORD pdhIndex)
 		counterName->next = PerfCounterList;
 
 		dwSize = PDH_MAX_COUNTER_NAME;
-		if (ERROR_SUCCESS == (pdh_status = PdhLookupPerfNameByIndex(NULL, pdhIndex, counterName->name, &dwSize)))
-			PerfCounterList = counterName;
-		else
+		if (ERROR_SUCCESS != (pdh_status = PdhLookupPerfNameByIndex(NULL, pdhIndex, counterName->name, &dwSize)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex() failed: %s",
 					strerror_from_module(pdh_status, L"PDH.DLL"));
@@ -230,6 +227,8 @@ LPTSTR	get_counter_name(DWORD pdhIndex)
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL", __function_name);
 			return L"UnknownPerformanceCounter";
 		}
+		else
+			PerfCounterList = counterName;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
@@ -255,14 +254,14 @@ int	check_counter_path(char *counterPath)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot get required buffer size for counter path '%s': %s",
+		zabbix_log(LOG_LEVEL_ERR, "cannot get required buffer size for counter path \"%s\": %s",
 				counterPath, strerror_from_module(status, L"PDH.DLL"));
 		goto clean;
 	}
 
 	if (ERROR_SUCCESS != (status = PdhParseCounterPath(wcounterPath, cpe, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot parse counter path '%s': %s",
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse counter path \"%s\": %s",
 				counterPath, strerror_from_module(status, L"PDH.DLL"));
 		goto clean;
 	}
@@ -280,7 +279,7 @@ int	check_counter_path(char *counterPath)
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, cpe, counterPath))
 			goto clean;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "counter path converted to '%s'", counterPath);
+		zabbix_log(LOG_LEVEL_DEBUG, "counter path converted to \"%s\"", counterPath);
 	}
 
 	ret = SUCCEED;
