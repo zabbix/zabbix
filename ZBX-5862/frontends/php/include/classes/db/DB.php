@@ -632,4 +632,21 @@ class DB {
 		}
 		return true;
 	}
+
+	/**
+	 * Check if $type is numeric field type.
+	 *
+	 * @param $type
+	 *
+	 * @return bool
+	 */
+	public static function isNumericType($type) {
+		$numTypes = array(
+			self::FIELD_TYPE_INT => true,
+			self::FIELD_TYPE_UINT => true,
+			self::FIELD_TYPE_ID => true
+		);
+
+		return isset($numTypes[$type]);
+	}
 }

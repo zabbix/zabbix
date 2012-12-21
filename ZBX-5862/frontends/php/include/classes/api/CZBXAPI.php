@@ -649,10 +649,7 @@ class CZBXAPI {
 	 *
 	 * @param string $table
 	 * @param array  $options
-	 * @param array  $options['filter']
-	 * @param bool   $options['searchByAny']
 	 * @param array  $sqlParts
-	 * @param string $sqlParts['where']['filter']
 	 *
 	 * @return bool
 	 */
@@ -660,9 +657,6 @@ class CZBXAPI {
 		list($table, $tableShort) = explode(' ', $table);
 
 		$tableSchema = DB::getSchema($table);
-		if (!$tableSchema) {
-			info(_s('Error in search request for table "%1$s".', $table));
-		}
 
 		$filter = array();
 		foreach ($options['filter'] as $field => $value) {
@@ -672,9 +666,10 @@ class CZBXAPI {
 
 			zbx_value2array($value);
 
-			$filter[$field] = ($tableSchema['fields'][$field]['type'] == 'int')
-				? dbConditionInt($tableShort.'.'.$field, $value)
-				: dbConditionString($tableShort.'.'.$field, $value);
+			$fieldName = $this->fieldId($field, $tableShort);
+			$filter[$field] = DB::isNumericType($tableSchema['fields'][$field]['type'])
+				? dbConditionInt($fieldName, $value)
+				: dbConditionString($fieldName, $value);
 		}
 
 		if (!empty($filter)) {
@@ -682,8 +677,12 @@ class CZBXAPI {
 				$filter[] = $sqlParts['where']['filter'];
 			}
 
-			$operator = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
-			$sqlParts['where']['filter'] = implode($operator, $filter);
+			if (is_null($options['searchByAny']) || $options['searchByAny'] === false) {
+				$sqlParts['where']['filter'] = implode(' AND ', $filter);
+			}
+			else {
+				$sqlParts['where']['filter'] = '('.implode(' OR ', $filter).')';
+			}
 
 			return true;
 		}

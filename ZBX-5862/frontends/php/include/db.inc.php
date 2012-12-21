@@ -1116,7 +1116,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 		if (!$first) {
 			$condition .= ' '.$operand.' ';
 		}
-		$condition .= $not.$fieldName.' BETWEEN '.$between[0].' AND '.$between[1];
+		$condition .= $not.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr($between[1]);
 		$first = false;
 	}
 
@@ -1127,8 +1127,8 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	if ($inNum == 1) {
 		foreach ($ins as $insValue) {
 			$condition .= $notIn
-				? $fieldName.'!='.$insValue
-				: $fieldName.'='.$insValue;
+				? $fieldName.'!='.zbx_dbstr($insValue)
+				: $fieldName.'='.zbx_dbstr($insValue);
 			break;
 		}
 	}
@@ -1140,6 +1140,8 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 			if (!$first) {
 				$condition .= ' '.$operand.' ';
 			}
+
+			$in = array_map('zbx_dbstr', $in);
 			$condition .= $fieldName.' '.$not.'IN ('.implode(',', $in).')';
 			$first = false;
 		}
