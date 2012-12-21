@@ -39,35 +39,83 @@ $typeComboBox = new CComboBox('maintenance_type', $this->data['maintenance_type'
 $typeComboBox->addItem(MAINTENANCE_TYPE_NORMAL, _('With data collection'));
 $typeComboBox->addItem(MAINTENANCE_TYPE_NODATA, _('No data collection'));
 $maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
-$maintenanceForm->addVar('active_since', date('YmdHi', $this->data['active_since']));
-$maintenanceForm->addVar('active_till', date('YmdHi', $this->data['active_till']));
 
 $calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
 $calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_since"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_till"].clndr.clndrhide();');
-$maintenanceSinceDay = new CNumericBox('mntc_since_day', $this->data['active_since'] > 0 ? date('d', $this->data['active_since']) : '', 2);
+
+if (isset($_REQUEST['active_since'])) {
+	$year = get_request('mntc_since_year');
+	$month = get_request('mntc_since_month');
+	$day = get_request('mntc_since_day');
+	$hours = get_request('mntc_since_hour');
+	$minutes = get_request('mntc_since_minute');
+}
+elseif ($this->data['active_since'] > 0) {
+	$year = date('Y', $this->data['active_since']);
+	$month = date('m', $this->data['active_since']);
+	$day = date('d', $this->data['active_since']);
+	$hours = date('H', $this->data['active_since']);
+	$minutes = date('i', $this->data['active_since']);
+}
+else {
+	$year = '';
+	$month = '';
+	$day = '';
+	$hours = '';
+	$minutes = '';
+}
+
+$maintenanceForm->addVar('active_since', $year.$month.$day.$hours.$minutes);
+
+$maintenanceSinceDay = new CNumericBox('mntc_since_day', $day, 2);
 $maintenanceSinceDay->setAttribute('placeholder', _('dd'));
-$maintenanceSinceMonth = new CNumericBox('mntc_since_month', $this->data['active_since'] > 0 ? date('m', $this->data['active_since']) : '', 2);
+$maintenanceSinceMonth = new CNumericBox('mntc_since_month', $month, 2);
 $maintenanceSinceMonth->setAttribute('placeholder', _('mm'));
-$maintenanceSinceYear = new CNumericBox('mntc_since_year', $this->data['active_since'] > 0 ? date('Y', $this->data['active_since']) : '', 4);
+$maintenanceSinceYear = new CNumericBox('mntc_since_year', $year, 4);
 $maintenanceSinceYear->setAttribute('placeholder', _('yyyy'));
-$maintenanceSinceHour = new CNumericBox('mntc_since_hour', $this->data['active_since'] > 0 ? date('H', $this->data['active_since']) : '', 2);
+$maintenanceSinceHour = new CNumericBox('mntc_since_hour', $hours, 2);
 $maintenanceSinceHour->setAttribute('placeholder', _('hh'));
-$maintenanceSinceMinute = new CNumericBox('mntc_since_minute', $this->data['active_since'] > 0 ? date('i', $this->data['active_since']) : '', 2);
+$maintenanceSinceMinute = new CNumericBox('mntc_since_minute', $minutes, 2);
 $maintenanceSinceMinute->setAttribute('placeholder', _('mm'));
 
 $maintenanceFormList->addRow(_('Active since'), array($maintenanceSinceDay, '/', $maintenanceSinceMonth, '/', $maintenanceSinceYear, SPACE, $maintenanceSinceHour, ':', $maintenanceSinceMinute, $calendarIcon));
 zbx_add_post_js('create_calendar(null, ["mntc_since_day", "mntc_since_month", "mntc_since_year", "mntc_since_hour", "mntc_since_minute"], "mntc_active_since", "active_since");');
 
 $calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_till"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_since"].clndr.clndrhide();');
-$maintenanceTillDay = new CNumericBox('mntc_till_day', $this->data['active_till'] > 0 ? date('d', $this->data['active_till']) : '', 2);
+
+if (isset($_REQUEST['active_till'])) {
+	$year = get_request('mntc_till_year');
+	$month = get_request('mntc_till_month');
+	$day = get_request('mntc_till_day');
+	$hours = get_request('mntc_till_hour');
+	$minutes = get_request('mntc_till_minute');
+}
+elseif ($this->data['active_till'] > 0) {
+	$year = date('Y', $this->data['active_till']);
+	$month = date('m', $this->data['active_till']);
+	$day = date('d', $this->data['active_till']);
+	$hours = date('H', $this->data['active_till']);
+	$minutes = date('i', $this->data['active_till']);
+}
+else {
+	$year = '';
+	$month = '';
+	$day = '';
+	$hours = '';
+	$minutes = '';
+}
+
+$maintenanceForm->addVar('active_till', $year.$month.$day.$hours.$minutes);
+
+$maintenanceTillDay = new CNumericBox('mntc_till_day', $day, 2);
 $maintenanceTillDay->setAttribute('placeholder', _('dd'));
-$maintenanceTillMonth = new CNumericBox('mntc_till_month', $this->data['active_till'] > 0 ? date('m', $this->data['active_till']) : '', 2);
+$maintenanceTillMonth = new CNumericBox('mntc_till_month', $month, 2);
 $maintenanceTillMonth->setAttribute('placeholder', _('mm'));
-$maintenanceTillYear = new CNumericBox('mntc_till_year', $this->data['active_till'] > 0 ? date('Y', $this->data['active_till']) : '', 4);
+$maintenanceTillYear = new CNumericBox('mntc_till_year', $year, 4);
 $maintenanceTillYear->setAttribute('placeholder', _('yyyy'));
-$maintenanceTillHour = new CNumericBox('mntc_till_hour', $this->data['active_till'] > 0 ? date('H', $this->data['active_till']) : '', 2);
+$maintenanceTillHour = new CNumericBox('mntc_till_hour', $hours, 2);
 $maintenanceTillHour->setAttribute('placeholder', _('hh'));
-$maintenanceTillMinute = new CNumericBox('mntc_till_minute', $this->data['active_till'] > 0 ? date('i', $this->data['active_till']) : '', 2);
+$maintenanceTillMinute = new CNumericBox('mntc_till_minute', $minutes, 2);
 $maintenanceTillMinute->setAttribute('placeholder', _('mm'));
 
 $maintenanceFormList->addRow(_('Active till'), array($maintenanceTillDay, '/', $maintenanceTillMonth, '/', $maintenanceTillYear, SPACE, $maintenanceTillHour, ':', $maintenanceTillMinute, $calendarIcon));
