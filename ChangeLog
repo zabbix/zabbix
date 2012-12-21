@@ -31,6 +31,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A......... [ZBXNEXT-1491] fixed alert.get hostids and groupids parameters (Pavels)
 A......... [ZBXNEXT-1491] fixed multiple subselects returning hashes instead of arrays (Pavels)
 A......... [ZBXNEXT-1491] fixed item.get selectHosts returning double template objects (Pavels)
@@ -79,6 +80,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A.F....... [ZBX-6002] optimized fetching latest service alarms in Service API (dotneft, Eduard)
 ..F....... [ZBX-5986] fixed page filter in monitoring->graphs (Oleg)
 ..F....... [ZBX-6004] monitoring->screens page optimization (Vedmak)
