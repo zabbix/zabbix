@@ -59,24 +59,21 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
+	$service = API::Service()->get(array(
+		'serviceids' => $_REQUEST['serviceid'],
+		'output' => array('serviceid'),
+	));
 
-if (isset($_REQUEST['serviceid'])) {
-	if ($service = DBfetch(DBselect('SELECT DISTINCT s.serviceid,s.triggerid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
-		if ($service['triggerid'] && !isset($available_triggers[$service['triggerid']])) {
-			access_deny();
-		}
+	if ($service) {
+		$service = zbx_objectValues($service, 'serviceid');
+		$table = new CTable(null, 'chart');
+		$table->addRow(new CImg('chart5.php?serviceid='.reset($service).url_param('path')));
+		$table->show();
 	}
 	else {
-		unset($service);
+		access_deny();
 	}
-}
-unset($_REQUEST['serviceid']);
-
-if (isset($service) && isset($_REQUEST['showgraph'])) {
-	$table = new CTable(null, 'chart');
-	$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
-	$table->show();
 }
 else {
 	$periods = array(
