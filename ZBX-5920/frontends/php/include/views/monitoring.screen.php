@@ -125,7 +125,7 @@ else {
 
 	// append screens to widget
 	$screenBuilder = new CScreenBuilder(array(
-		'screen' => $screen,
+		'screenid' => $screen['screenid'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $screen['screenid'],

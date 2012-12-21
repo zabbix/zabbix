@@ -439,7 +439,7 @@ class CZBXAPI {
 		// pks
 		if (isset($options[$pkOption])) {
 			zbx_value2array($options[$pkOption]);
-			$sqlParts['where'][] = DBcondition($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
+			$sqlParts['where'][] = dbConditionString($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
 		}
 
 		// filters

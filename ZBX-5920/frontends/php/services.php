@@ -34,37 +34,46 @@ if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
 }
 
 include_once('include/page_header.php');
-?>
-<?php
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'serviceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'group_serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'name' => 				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
-	'algorithm' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
-	'showsla' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'goodsla' => 			array(T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')),
-	'sortorder' => 			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')),
-	'times' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'trigger' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'new_service_time' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'children' =>			array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
-	'parentid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'parentname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'serviceid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'group_serviceid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'name' => 					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
+	'algorithm' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
+	'showsla' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'goodsla' => 				array(T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')),
+	'sortorder' => 				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')),
+	'times' =>					array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'triggerid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'trigger' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'new_service_time' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'downtime_since_day' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_since_month' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_since_year' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_since_hour' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_since_minute' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_till_day' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_till_month' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_till_year' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_till_hour' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'downtime_till_minute' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'children' =>				array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
+	'parentid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'parentname' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'save_service' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_service_time' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'save_service' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add_service_time' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	// ajax
-	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
-	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
+	'favobj' =>					array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
+	'favref' =>					array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
+	'favstate' =>				array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	// others
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'pservices' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'cservices' =>			array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'pservices' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'cservices' =>				array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 
@@ -168,11 +177,53 @@ if (isset($_REQUEST['form'])) {
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
 		$_REQUEST['times'] = get_request('times', array());
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
-
+		$result = true;
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			$new_service_time['ts_from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
-			$new_service_time['ts_to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
-			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
+			if (!validateDateTime($_REQUEST['downtime_since_year'],
+					$_REQUEST['downtime_since_month'],
+					$_REQUEST['downtime_since_day'],
+					$_REQUEST['downtime_since_hour'],
+					$_REQUEST['downtime_since_minute'])) {
+				$result = false;
+				error(_s('Invalid date "%s".', _('From')));
+			}
+			if (!validateDateInterval($_REQUEST['downtime_since_year'],
+					$_REQUEST['downtime_since_month'],
+					$_REQUEST['downtime_since_day'])) {
+				$result = false;
+				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
+			}
+			if (!validateDateTime($_REQUEST['downtime_till_year'],
+					$_REQUEST['downtime_till_month'],
+					$_REQUEST['downtime_till_day'],
+					$_REQUEST['downtime_till_hour'],
+					$_REQUEST['downtime_till_minute'])) {
+				$result = false;
+				error(_s('Invalid date "%s".', _('Till')));
+			}
+			if (!validateDateInterval($_REQUEST['downtime_till_year'],
+					$_REQUEST['downtime_till_month'],
+					$_REQUEST['downtime_till_day'])) {
+				$result = false;
+				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
+			}
+			if ($result) {
+				$new_service_time['ts_from'] = mktime($_REQUEST['downtime_since_hour'],
+						$_REQUEST['downtime_since_minute'],
+						0,
+						$_REQUEST['downtime_since_month'],
+						$_REQUEST['downtime_since_day'],
+						$_REQUEST['downtime_since_year']);
+
+				$new_service_time['ts_to'] = mktime($_REQUEST['downtime_till_hour'],
+						$_REQUEST['downtime_till_minute'],
+						0,
+						$_REQUEST['downtime_till_month'],
+						$_REQUEST['downtime_till_day'],
+						$_REQUEST['downtime_till_year']);
+
+				$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
+			}
 		}
 		else {
 			$new_service_time['ts_from'] = dowHrMinToSec($_REQUEST['new_service_time']['from_week'], $_REQUEST['new_service_time']['from_hour'], $_REQUEST['new_service_time']['from_minute']);
@@ -180,23 +231,25 @@ if (isset($_REQUEST['form'])) {
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 
-		try {
-			checkServiceTime($new_service_time);
+		if ($result) {
+			try {
+				checkServiceTime($new_service_time);
 
-			// if this time is not already there, adding it for inserting
-			if (!str_in_array($_REQUEST['times'], $new_service_time)) {
-				array_push($_REQUEST['times'], $new_service_time);
+				// if this time is not already there, adding it for inserting
+				if (!str_in_array($_REQUEST['times'], $new_service_time)) {
+					array_push($_REQUEST['times'], $new_service_time);
 
-				unset($_REQUEST['new_service_time']['from_week']);
-				unset($_REQUEST['new_service_time']['to_week']);
-				unset($_REQUEST['new_service_time']['from_hour']);
-				unset($_REQUEST['new_service_time']['to_hour']);
-				unset($_REQUEST['new_service_time']['from_minute']);
-				unset($_REQUEST['new_service_time']['to_minute']);
+					unset($_REQUEST['new_service_time']['from_week']);
+					unset($_REQUEST['new_service_time']['to_week']);
+					unset($_REQUEST['new_service_time']['from_hour']);
+					unset($_REQUEST['new_service_time']['to_hour']);
+					unset($_REQUEST['new_service_time']['from_minute']);
+					unset($_REQUEST['new_service_time']['to_minute']);
+				}
 			}
-		}
-		catch (APIException $e) {
-			error($e->getMessage());
+			catch (APIException $e) {
+				error($e->getMessage());
+			}
 		}
 
 		show_messages();

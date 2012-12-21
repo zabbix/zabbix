@@ -92,11 +92,8 @@ $data = array(
 );
 
 $data['maps'] = API::Map()->get(array(
-	'output' => API_OUTPUT_EXTEND,
+	'output' => array('sysmapid', 'name'),
 	'nodeids' => get_current_nodeid(),
-	'expandUrls' => true,
-	'selectSelements' => API_OUTPUT_EXTEND,
-	'selectLinks' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
 ));
 order_result($data['maps'], 'name');
@@ -124,6 +121,16 @@ if (isset($_REQUEST['sysmapid']) && !isset($data['maps'][$_REQUEST['sysmapid']])
 }
 
 $data['sysmapid'] = $_REQUEST['sysmapid'];
+
+$data['map'] = API::Map()->get(array(
+	'output' => API_OUTPUT_EXTEND,
+	'sysmapids' => $data['sysmapid'],
+	'expandUrls' => true,
+	'selectSelements' => API_OUTPUT_EXTEND,
+	'selectLinks' => API_OUTPUT_EXTEND,
+	'preservekeys' => true
+));
+$data['map'] = reset($data['map']);
 
 // render view
 $mapsView = new CView('monitoring.maps', $data);

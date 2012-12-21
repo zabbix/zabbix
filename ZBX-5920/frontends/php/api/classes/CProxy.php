@@ -101,9 +101,7 @@ class CProxy extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 			if ($permission == PERM_READ_WRITE) {
 				return array();
@@ -116,7 +114,7 @@ class CProxy extends CZBXAPI {
 		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
-			$sqlParts['where'][] = DBcondition('h.hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionInt('h.hostid', $options['proxyids']);
 		}
 
 		// filter
@@ -492,7 +490,7 @@ class CProxy extends CZBXAPI {
 		$dbProxies = DBselect(
 			'SELECT h.hostid,h.host'.
 					' FROM hosts h'.
-					' WHERE '.DBcondition('h.hostid', $proxyIds));
+					' WHERE '.dbConditionInt('h.hostid', $proxyIds));
 		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
 
 		$actionids = array();
@@ -501,7 +499,7 @@ class CProxy extends CZBXAPI {
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
 			' WHERE c.conditiontype='.CONDITION_TYPE_PROXY.
-				' AND '.DBcondition('c.value', $proxyIds)
+				' AND '.dbConditionString('c.value', $proxyIds)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -620,7 +618,7 @@ class CProxy extends CZBXAPI {
 		$dRule = DBfetch(DBselect(
 			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
 					' FROM drules dr'.
-					' WHERE '.DBcondition('dr.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
+					' WHERE '.dbConditionInt('dr.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
 		if ($dRule) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$dRule['proxy_hostid']));
 
@@ -638,7 +636,7 @@ class CProxy extends CZBXAPI {
 		$host = DBfetch(DBselect(
 			'SELECT h.name,h.proxy_hostid'.
 					' FROM hosts h'.
-					' WHERE '.DBcondition('h.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
+					' WHERE '.dbConditionInt('h.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
 		if ($host) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
 			self::exception(ZBX_API_ERROR_PARAMETERS,

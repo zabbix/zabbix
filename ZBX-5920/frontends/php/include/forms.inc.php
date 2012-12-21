@@ -121,7 +121,7 @@
 			$mediaTypeDescriptions = array();
 			$dbMediaTypes = DBselect(
 				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
-					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
+					dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 			);
 			while ($dbMediaType = DBfetch($dbMediaTypes)) {
 				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
@@ -144,7 +144,7 @@
 			if (count($group_ids) == 0) {
 				$group_ids = array(-1);
 			}
-			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
+			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
 
 			$tmp_permitions = array();
 			while ($db_right = DBfetch($db_rights)) {
@@ -1637,17 +1637,38 @@
 			$filtertimetab->setCellPadding(0);
 			$filtertimetab->setCellSpacing(0);
 
-			$start_date = zbxDateToTime($new_timeperiod['start_date']);
+			$startDate = zbxDateToTime($new_timeperiod['start_date']);
+			if (isset($_REQUEST['add_timeperiod'])) {
+				$newTimePeriodYear = get_request('new_timeperiod_year');
+				$newTimePeriodMonth = get_request('new_timeperiod_month');
+				$newTimePeriodDay = get_request('new_timeperiod_day');
+				$newTimePeriodHours = get_request('new_timeperiod_hour');
+				$newTimePeriodMinutes = get_request('new_timeperiod_minute');
+			}
+			elseif ($startDate > 0) {
+				$newTimePeriodYear = date('Y', $startDate );
+				$newTimePeriodMonth = date('m', $startDate );
+				$newTimePeriodDay = date('d', $startDate );
+				$newTimePeriodHours = date('H', $startDate );
+				$newTimePeriodMinutes = date('i', $startDate );
+			}
+			else {
+				$newTimePeriodYear = '';
+				$newTimePeriodMonth = '';
+				$newTimePeriodDay = '';
+				$newTimePeriodHours = '';
+				$newTimePeriodMinutes = '';
+			}
 			$filtertimetab->addRow(array(
-				new CNumericBox('new_timeperiod_day', ($start_date > 0) ? date('d', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_day', $newTimePeriodDay, 2),
 				'/',
-				new CNumericBox('new_timeperiod_month', ($start_date > 0) ? date('m', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_month', $newTimePeriodMonth, 2),
 				'/',
-				new CNumericBox('new_timeperiod_year', ($start_date > 0) ? date('Y', $start_date) : '', 4),
+				new CNumericBox('new_timeperiod_year', $newTimePeriodYear, 4),
 				SPACE,
-				new CNumericBox('new_timeperiod_hour', ($start_date > 0) ? date('H', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_hour', $newTimePeriodHours, 2),
 				':',
-				new CNumericBox('new_timeperiod_minute', ($start_date > 0) ? date('i', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_minute', $newTimePeriodMinutes, 2),
 				$clndr_icon
 			));
 			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');

@@ -169,7 +169,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 		'SELECT a.applicationid,a.name,a.hostid'.
 		' FROM applications a'.
 		' WHERE '.DBin_node('a.applicationid').
-			' AND '.DBcondition('a.applicationid', $applications)
+			' AND '.dbConditionInt('a.applicationid', $applications)
 	);
 	while ($db_app = DBfetch($dbApplications)) {
 		if (!isset($applications[$db_app['applicationid']])) {

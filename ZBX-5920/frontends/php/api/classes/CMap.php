@@ -41,12 +41,9 @@ class CMap extends CMapElement {
  * @param boolean $options['monitored_hosts'] only monitored Hosts
  * @param boolean $options['templated_hosts'] include templates in result
  * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_monitored_items'] only with monitored items
  * @param boolean $options['with_historical_items'] only with historical items
  * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitored triggers
  * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['count'] count Hosts, returned column name is rowscount
@@ -116,7 +113,7 @@ class CMap extends CMapElement {
 		// sysmapids
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
-			$sqlParts['where']['sysmapid'] = DBcondition('s.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sysmapid'] = dbConditionInt('s.sysmapid', $options['sysmapids']);
 		}
 
 		// search
@@ -189,15 +186,13 @@ class CMap extends CMapElement {
 			}
 		}
 
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (!empty($result)) {
 				$linkTriggers = array();
 				$dbLinkTriggers = DBselect(
 					'SELECT slt.triggerid,sl.sysmapid'.
 					' FROM sysmaps_link_triggers slt,sysmaps_links sl'.
-					' WHERE '.DBcondition('sl.sysmapid', $sysmapids).
+					' WHERE '.dbConditionInt('sl.sysmapid', $sysmapids).
 						' AND sl.linkid=slt.linkid'
 				);
 				while ($linkTrigger = DBfetch($dbLinkTriggers)) {
@@ -225,7 +220,7 @@ class CMap extends CMapElement {
 				$hostGroupsToCheck = array();
 
 				$selements = array();
-				$dbSelements = DBselect('SELECT se.* FROM sysmaps_elements se WHERE '.DBcondition('se.sysmapid', $sysmapids));
+				$dbSelements = DBselect('SELECT se.* FROM sysmaps_elements se WHERE '.dbConditionInt('se.sysmapid', $sysmapids));
 				while ($selement = DBfetch($dbSelements)) {
 					$selements[$selement['selementid']] = $selement;
 
@@ -345,7 +340,7 @@ class CMap extends CMapElement {
 			$dbSelements = DBselect(
 				'SELECT se.*'.
 				' FROM sysmaps_elements se'.
-				' WHERE '.DBcondition('se.sysmapid', $sysmapids)
+				' WHERE '.dbConditionInt('se.sysmapid', $sysmapids)
 			);
 			while ($selement = DBfetch($dbSelements)) {
 				$selement['urls'] = array();
@@ -356,7 +351,7 @@ class CMap extends CMapElement {
 				$dbMapUrls = DBselect(
 					'SELECT sysmapurlid, sysmapid, name, url, elementtype'.
 					' FROM sysmap_url'.
-					' WHERE '.DBcondition('sysmapid', $sysmapids)
+					' WHERE '.dbConditionInt('sysmapid', $sysmapids)
 				);
 				while ($mapUrl = DBfetch($dbMapUrls)) {
 					foreach ($selements as $snum => $selement) {
@@ -381,7 +376,7 @@ class CMap extends CMapElement {
 			$dbSelementUrls = DBselect(
 				'SELECT seu.sysmapelementurlid,seu.selementid,seu.name,seu.url'.
 				' FROM sysmap_element_url seu'.
-				' WHERE '.DBcondition('seu.selementid', array_keys($selements))
+				' WHERE '.dbConditionInt('seu.selementid', array_keys($selements))
 			);
 			while ($selementUrl = DBfetch($dbSelementUrls)) {
 				if (is_null($options['expandUrls'])) {
@@ -429,14 +424,14 @@ class CMap extends CMapElement {
 			$linkids = array();
 			$mapLinks = array();
 
-			$dbLinks = DBselect('SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids));
+			$dbLinks = DBselect('SELECT sl.* FROM sysmaps_links sl WHERE '.dbConditionInt('sl.sysmapid', $sysmapids));
 			while ($link = DBfetch($dbLinks)) {
 				$link['linktriggers'] = array();
 				$mapLinks[$link['linkid']] = $link;
 				$linkids[$link['linkid']] = $link['linkid'];
 			}
 
-			$dbLinkTriggers = DBselect('SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids));
+			$dbLinkTriggers = DBselect('SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.dbConditionInt('slt.linkid', $linkids));
 			while ($linkTrigger = DBfetch($dbLinkTriggers)) {
 				$mapLinks[$linkTrigger['linkid']]['linktriggers'][$linkTrigger['linktriggerid']] = $linkTrigger;
 			}
@@ -457,7 +452,7 @@ class CMap extends CMapElement {
 
 		// adding urls
 		if ($options['output'] != API_OUTPUT_SHORTEN) {
-			$dbUrls = DBselect('SELECT su.* FROM sysmap_url su WHERE '.DBcondition('su.sysmapid', $sysmapids));
+			$dbUrls = DBselect('SELECT su.* FROM sysmap_url su WHERE '.dbConditionInt('su.sysmapid', $sysmapids));
 			while ($url = DBfetch($dbUrls)) {
 				$sysmapid = $url['sysmapid'];
 				unset($url['sysmapid']);
@@ -904,7 +899,7 @@ class CMap extends CMapElement {
 
 		$dbLinks = array();
 
-		$linkTriggerResource = DBselect('SELECT * FROM sysmaps_link_triggers WHERE '.DBcondition('linkid', $updLinkids['linkids']));
+		$linkTriggerResource = DBselect('SELECT * FROM sysmaps_link_triggers WHERE '.dbConditionInt('linkid', $updLinkids['linkids']));
 		while ($dbLinkTrigger = DBfetch($linkTriggerResource))
 			zbx_subarray_push($dbLinks, $dbLinkTrigger['linkid'], $dbLinkTrigger);
 

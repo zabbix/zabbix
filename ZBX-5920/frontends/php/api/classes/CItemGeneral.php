@@ -707,7 +707,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 		$sqlWhere = array();
 		foreach ($itemKeysByHostId as $hostId => $keys) {
-			$sqlWhere[] = '(i.hostid='.$hostId.' AND '.DBcondition('i.key_', $keys).')';
+			$sqlWhere[] = '(i.hostid='.$hostId.' AND '.dbConditionString('i.key_', $keys).')';
 		}
 
 		if ($sqlWhere) {
@@ -717,7 +717,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			// if we update existing items we need to exclude them from result.
 			if ($itemIds) {
-				$sql .= ' AND '.DBcondition('i.itemid', $itemIds, true);
+				$sql .= ' AND '.dbConditionInt('i.itemid', $itemIds, true);
 			}
 			$dbItems = DBselect($sql, 1);
 			while ($dbItem = DBfetch($dbItems)) {

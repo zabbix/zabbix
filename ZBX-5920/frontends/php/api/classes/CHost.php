@@ -159,35 +159,27 @@ class CHost extends CHostGeneral {
 		}
 
 		// editable + PERMISSION CHECK
-		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
+			$userGroups = getUserGroupsByUserId($userid);
+
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT hh.hostid'.
-				' FROM hosts hh,hosts_groups hgg,rights r,users_groups ug'.
-				' WHERE hh.hostid=h.hostid'.
-					' AND hh.hostid=hgg.hostid'.
-					' AND r.id=hgg.groupid'.
-					' AND r.groupid=ug.usrgrpid'.
-					' AND ug.userid='.$userid.
-					' AND r.permission>='.$permission.
-					' AND NOT EXISTS ('.
-						' SELECT hggg.groupid'.
-						' FROM hosts_groups hggg,rights rr,users_groups gg'.
-						' WHERE hggg.hostid=hgg.hostid'.
-							' AND rr.id=hggg.groupid'.
-							' AND rr.groupid=gg.usrgrpid'.
-							' AND gg.userid='.$userid.
-							' AND rr.permission<'.$permission.
-					'))';
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE h.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
-			$sqlParts['where']['hostid'] = DBcondition('h.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('h.hostid', $options['hostids']);
 		}
 
 		// groupids
@@ -198,7 +190,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -212,7 +204,7 @@ class CHost extends CHostGeneral {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['proxy_hostid'] = 'h.proxy_hostid';
 			}
-			$sqlParts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
 		}
 
 		// templateids
@@ -223,7 +215,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
-			$sqlParts['where'][] = DBcondition('ht.templateid', $options['templateids']);
+			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -239,7 +231,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from']['interface'] = 'interface hi';
-			$sqlParts['where'][] = DBcondition('hi.interfaceid', $options['interfaceids']);
+			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
 			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 		}
 
@@ -251,7 +243,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
@@ -264,7 +256,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
@@ -278,7 +270,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['httptest'] = 'httptest ht';
-			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['httptestids']);
+			$sqlParts['where'][] = dbConditionInt('ht.httptestid', $options['httptestids']);
 			$sqlParts['where']['aht'] = 'a.applicationid=ht.applicationid';
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 		}
@@ -292,7 +284,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
@@ -305,7 +297,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('a.applicationid', $options['applicationids']);
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
@@ -317,7 +309,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dhostid', $options['dhostids']);
 			$sqlParts['where']['dsh'] = 'ds.ip=h.ip';
 
 			if (!is_null($options['groupCount'])) {
@@ -334,7 +326,7 @@ class CHost extends CHostGeneral {
 
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['from']['interface'] = 'interface i';
-			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dsh'] = 'ds.ip=i.ip';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
@@ -351,7 +343,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
-			$sqlParts['where'][] = DBcondition('mh.maintenanceid', $options['maintenanceids']);
+			$sqlParts['where'][] = dbConditionInt('mh.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'h.hostid=mh.hostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -375,55 +367,79 @@ class CHost extends CHostGeneral {
 
 		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+					')';
 		}
 		elseif (!is_null($options['with_monitored_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+					')';
 		}
 		elseif (!is_null($options['with_historical_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.status IN ('.ITEM_STATUS_ACTIVE.','.ITEM_STATUS_NOTSUPPORTED.')'.
+						' AND i.lastvalue IS NOT NULL'.
+					')';
 		}
 		elseif (!is_null($options['with_simple_graph_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.value_type IN ('.
-			ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.') AND i.status='.ITEM_STATUS_ACTIVE.' AND i.flags IN ('.
-			ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')))';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+					')';
 		}
 
 		// with_triggers, with_monitored_triggers
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT i.itemid'.
-				' FROM items i,functions f,triggers t'.
-				' WHERE i.hostid=h.hostid'.
-					' AND i.itemid=f.itemid'.
-					' AND f.triggerid=t.triggerid)';
+					'SELECT NULL'.
+					' FROM items i,functions f,triggers t'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.itemid=f.itemid'.
+						' AND f.triggerid=t.triggerid'.
+					')';
 		}
 		elseif (!is_null($options['with_monitored_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT i.itemid'.
-				' FROM items i,functions f,triggers t'.
-				' WHERE i.hostid=h.hostid'.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND i.itemid=f.itemid'.
-					' AND f.triggerid=t.triggerid'.
-					' AND t.status='.TRIGGER_STATUS_ENABLED.')';
+					'SELECT NULL'.
+					' FROM items i,functions f,triggers t'.
+					' WHERE h.hostid=i.hostid'.
+						' AND i.itemid=f.itemid'.
+						' AND f.triggerid=t.triggerid'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.
+					')';
 		}
 
 		// with_httptests, with_monitored_httptests
 		if (!is_null($options['with_httptests'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT a.applicationid'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid)';
+					'SELECT NULL'.
+					' FROM applications a,httptest ht'.
+					' WHERE h.hostid=a.hostid'.
+						' AND a.applicationid=ht.applicationid'.
+					')';
 		}
 		elseif (!is_null($options['with_monitored_httptests'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT a.applicationid'.
-				' FROM applications a,httptest ht'.
-				' WHERE a.hostid=h.hostid'.
-					' AND ht.applicationid=a.applicationid'.
-					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+					'SELECT NULL'.
+					' FROM applications a,httptest ht'.
+					' WHERE h.hostid=a.hostid'.
+						' AND a.applicationid=ht.applicationid'.
+						' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+					')';
 		}
 
 		// with_graphs
@@ -722,7 +738,7 @@ class CHost extends CHostGeneral {
 			$dbInventory = DBselect(
 				'SELECT '.implode(', ', $selectHIn).
 				' FROM host_inventory hin'.
-				' WHERE '.DBcondition('hin.hostid', $hostids)
+				' WHERE '.dbConditionInt('hin.hostid', $hostids)
 			);
 			while ($inventory = DBfetch($dbInventory)) {
 				$result[$inventory['hostid']]['inventory'] = $inventory;
@@ -1861,14 +1877,14 @@ class CHost extends CHostGeneral {
 		 */
 		if (isset($updateInventory)) {
 			if ($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED) {
-				$sql = 'DELETE FROM host_inventory WHERE '.DBcondition('hostid', $hostids);
+				$sql = 'DELETE FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids);
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory.'));
 				}
 			}
 			else {
 				$hostsWithInventories = array();
-				$existingInventoriesDb = DBselect('SELECT hostid FROM host_inventory WHERE '.DBcondition('hostid', $hostids));
+				$existingInventoriesDb = DBselect('SELECT hostid FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids));
 				while ($existingInventory = DBfetch($existingInventoriesDb)) {
 					$hostsWithInventories[] = $existingInventory['hostid'];
 				}
@@ -2049,7 +2065,7 @@ class CHost extends CHostGeneral {
 		$sql = 'SELECT DISTINCT actionid'.
 				' FROM conditions'.
 				' WHERE conditiontype='.CONDITION_TYPE_HOST.
-				' AND '.DBcondition('value', $hostids);
+				' AND '.dbConditionString('value', $hostids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -2059,7 +2075,7 @@ class CHost extends CHostGeneral {
 		$sql = 'SELECT DISTINCT o.actionid'.
 				' FROM operations o, opcommand_hst oh'.
 				' WHERE o.operationid=oh.operationid'.
-				' AND '.DBcondition('oh.hostid', $hostids);
+				' AND '.dbConditionInt('oh.hostid', $hostids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -2084,7 +2100,7 @@ class CHost extends CHostGeneral {
 		$operationids = array();
 		$sql = 'SELECT DISTINCT oh.operationid'.
 				' FROM opcommand_hst oh'.
-				' WHERE '.DBcondition('oh.hostid', $hostids);
+				' WHERE '.dbConditionInt('oh.hostid', $hostids);
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -2098,7 +2114,7 @@ class CHost extends CHostGeneral {
 		$delOperationids = array();
 		$sql = 'SELECT DISTINCT o.operationid'.
 				' FROM operations o'.
-				' WHERE '.DBcondition('o.operationid', $operationids).
+				' WHERE '.dbConditionInt('o.operationid', $operationids).
 				' AND NOT EXISTS(SELECT oh.opcommand_hstid FROM opcommand_hst oh WHERE oh.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {

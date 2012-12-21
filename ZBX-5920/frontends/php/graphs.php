@@ -340,7 +340,6 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'group_gid' => get_request('group_gid', array()),
 		'hostid' => get_request('hostid', 0),
-		'is_template' => isTemplate(get_request('hostid', 0)),
 		'normal_only' => get_request('normal_only')
 	);
 
@@ -373,7 +372,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['templates'] = array();
 
 		// if no host has been selected for the navigation panel, use the first graph host
-		if (!$data['hostid']) {
+		if (empty($data['hostid'])) {
 			$host = reset($graph['hosts']);
 			$data['hostid'] = $host['hostid'];
 		}
@@ -510,6 +509,9 @@ elseif (isset($_REQUEST['form'])) {
 	asort_by_key($data['items'], 'sortorder');
 	$data['items'] = array_values($data['items']);
 
+	// is template
+	$data['is_template'] = isTemplate($data['hostid']);
+
 	// render view
 	$graphView = new CView('configuration.graph.edit', $data);
 	$graphView->render();
@@ -522,7 +524,7 @@ else {
 
 	$data = array(
 		'pageFilter' => $pageFilter,
-		'hostid' => get_request('hostid'),
+		'hostid' => $pageFilter->hostid,
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'graphs' => array()
 	);
@@ -547,11 +549,13 @@ else {
 			elseif ($pageFilter->groupid > 0) {
 				$options['groupids'] = $pageFilter->groupid;
 			}
+
 			$data['graphs'] = API::Graph()->get($options);
 		}
 		// get graph prototypes
 		else {
 			$options['discoveryids'] = $_REQUEST['parent_discoveryid'];
+
 			$data['graphs'] = API::GraphPrototype()->get($options);
 		}
 	}
@@ -569,10 +573,12 @@ else {
 		'output' => array('graphid', 'name', 'templateid', 'graphtype', 'width', 'height'),
 		'selectDiscoveryRule' => array('itemid', 'name'),
 	);
+
 	if ($pageFilter->hostid == 0) {
 		$options['selectHosts'] = array('name');
 		$options['selectTemplates'] = array('name');
 	}
+
 	$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
 		? API::GraphPrototype()->get($options)
 		: API::Graph()->get($options);

@@ -42,12 +42,9 @@ class CDService extends CZBXAPI{
  * @param boolean $options['monitored_hosts'] only monitored Services
  * @param boolean $options['templated_hosts'] include templates in result
  * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_monitored_items'] only with monitored items
  * @param boolean $options['with_historical_items'] only with historical items
  * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitored triggers
  * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param boolean $options['selectGroups'] select ServiceGroups
@@ -143,7 +140,7 @@ class CDService extends CZBXAPI{
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
-			$sqlParts['where']['dserviceid'] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -158,7 +155,7 @@ class CDService extends CZBXAPI{
 				$sqlParts['select']['dhostid'] = 'ds.dhostid';
 			}
 
-			$sqlParts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dhostid', $options['dhostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'ds.dhostid';
@@ -181,7 +178,7 @@ class CDService extends CZBXAPI{
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dchecks'] = 'dchecks dc';
 
-			$sqlParts['where'][] = DBcondition('dc.dcheckid', $options['dcheckids']);
+			$sqlParts['where'][] = dbConditionInt('dc.dcheckid', $options['dcheckids']);
 			$sqlParts['where']['dhds'] = 'dh.hostid=ds.hostid';
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
 
@@ -199,7 +196,7 @@ class CDService extends CZBXAPI{
 
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 
-			$sqlParts['where']['druleid'] = DBcondition('dh.druleid', $options['druleids']);
+			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {

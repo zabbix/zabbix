@@ -219,7 +219,7 @@ function get_min_itemclock_by_itemid($itemids) {
 	$dbItems = DBselect(
 		'SELECT i.itemid,i.value_type'.
 		' FROM items i'.
-		' WHERE '.DBcondition('i.itemid', $itemids)
+		' WHERE '.dbConditionInt('i.itemid', $itemids)
 	);
 
 	while ($item = DBfetch($dbItems)) {
@@ -236,7 +236,7 @@ function get_min_itemclock_by_itemid($itemids) {
 
 		$sql = 'SELECT MAX(i.history) AS history,MAX(i.trends) AS trends'.
 				' FROM items i'.
-				' WHERE '.DBcondition('i.itemid', $itemids_numeric);
+				' WHERE '.dbConditionInt('i.itemid', $itemids_numeric);
 		if ($table_for_numeric = DBfetch(DBselect($sql))) {
 			$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
 			$result = time() - (SEC_PER_DAY * max($table_for_numeric['history'], $table_for_numeric['trends']));
@@ -271,7 +271,7 @@ function get_min_itemclock_by_itemid($itemids) {
 		$dbMin = DBfetch(DBselect(
 			'SELECT MIN(ht.clock) AS min_clock'.
 			' FROM '.$sql_from.' ht'.
-			' WHERE '.DBcondition('ht.itemid', $itemids)
+			' WHERE '.dbConditionInt('ht.itemid', $itemids)
 		));
 		$min = empty($min) ? $dbMin['min_clock'] : min($min, $dbMin['min_clock']);
 	}

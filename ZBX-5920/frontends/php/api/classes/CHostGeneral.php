@@ -170,7 +170,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			$res = DBselect(
 				'SELECT key_,COUNT(itemid) AS cnt'.
 				' FROM items'.
-				' WHERE'.DBcondition('hostid', $allids).
+				' WHERE '.dbConditionInt('hostid', $allids).
 				' GROUP BY key_'.
 				' HAVING COUNT(itemid)>1'
 			);
@@ -182,7 +182,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			$res = DBselect(
 				'SELECT name,COUNT(applicationid) AS cnt'.
 				' FROM applications'.
-				' WHERE '.DBcondition('hostid', $allids).
+				' WHERE '.dbConditionInt('hostid', $allids).
 				' GROUP BY name'.
 				' HAVING COUNT(applicationid)>1'
 			);
@@ -193,7 +193,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		// get DB templates which exists in all targets
-		$res = DBselect('SELECT * FROM hosts_templates WHERE'.DBcondition('hostid', $targetids));
+		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetids));
 		$mas = array();
 		while ($row = DBfetch($res)) {
 			if (!isset($mas[$row['templateid']])) {
@@ -220,10 +220,10 @@ abstract class CHostGeneral extends CZBXAPI {
 
 			$sql = 'SELECT DISTINCT h.host'.
 					' FROM trigger_depends td,functions f,items i,hosts h'.
-					' WHERE ('.DBcondition('td.triggerid_down', $triggerids).' AND f.triggerid=td.triggerid_up)'.
+					' WHERE ('.dbConditionInt('td.triggerid_down', $triggerids).' AND f.triggerid=td.triggerid_up)'.
 						' AND i.itemid=f.itemid'.
 						' AND h.hostid=i.hostid'.
-						' AND '.DBcondition('h.hostid', $commonTemplateIds, true).
+						' AND '.dbConditionInt('h.hostid', $commonTemplateIds, true).
 						' AND h.status='.HOST_STATUS_TEMPLATE;
 			if ($dbDepHost = DBfetch(DBselect($sql))) {
 				$tmpTpls = API::Template()->get(array(
@@ -240,8 +240,8 @@ abstract class CHostGeneral extends CZBXAPI {
 		$res = DBselect(
 			'SELECT hostid,templateid'.
 			' FROM hosts_templates'.
-			' WHERE '.DBcondition('hostid', $targetids).
-				' AND '.DBcondition('templateid', $templateids)
+			' WHERE '.dbConditionInt('hostid', $targetids).
+				' AND '.dbConditionInt('templateid', $templateids)
 		);
 		$linked = array();
 		while ($row = DBfetch($res)) {
@@ -277,8 +277,8 @@ abstract class CHostGeneral extends CZBXAPI {
 					' AND f.triggerid=t.triggerid'.
 					' AND i.hostid=h.hostid'.
 					' AND h.status='.HOST_STATUS_TEMPLATE.
-					' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.DBcondition('ht.hostid', $targetids).')'.
-					' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.DBcondition('ii.hostid', $templateids). ')';
+					' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.dbConditionInt('ht.hostid', $targetids).')'.
+					' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.dbConditionInt('ii.hostid', $templateids). ')';
 		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
@@ -423,13 +423,13 @@ abstract class CHostGeneral extends CZBXAPI {
 			' FROM triggers t,functions f,items i'.
 			' WHERE t.triggerid=f.triggerid'.
 			' AND f.itemid=i.itemid'.
-			' AND '.DBCondition('i.hostid', $templateids).
+			' AND '.dbConditionInt('i.hostid', $templateids).
 			' AND EXISTS ('.
 			'SELECT ff.triggerid'.
 			' FROM functions ff,items ii'.
 			' WHERE ff.itemid=ii.itemid'.
 			' AND ff.triggerid=t.triggerid'.
-			' AND '.DBCondition('ii.hostid', $templateids, true).
+			' AND '.dbConditionInt('ii.hostid', $templateids, true).
 			')'.
 			' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 		if ($dbTrigger = DBfetch(DBSelect($sql, 1))) {
@@ -446,13 +446,13 @@ abstract class CHostGeneral extends CZBXAPI {
 			' FROM functions ff,items ii'.
 			' WHERE ff.triggerid=t.templateid'.
 			' AND ii.itemid=ff.itemid'.
-			' AND '.DBCondition('ii.hostid', $templateids).')'.
-			' AND '.DBCondition('t.flags', $flags);
+			' AND '.dbConditionInt('ii.hostid', $templateids).')'.
+			' AND '.dbConditionInt('t.flags', $flags);
 
 
 		if (!is_null($targetids)) {
 			$sqlFrom = ' triggers t,functions f,items i,hosts h';
-			$sqlWhere .= ' AND '.DBCondition('i.hostid', $targetids).
+			$sqlWhere .= ' AND '.dbConditionInt('i.hostid', $targetids).
 				' AND f.itemid=i.itemid'.
 				' AND t.triggerid=f.triggerid'.
 				' AND h.hostid=i.hostid';
@@ -517,12 +517,12 @@ abstract class CHostGeneral extends CZBXAPI {
 		/* ITEMS, DISCOVERY RULES {{{ */
 		$sqlFrom = ' items i1,items i2,hosts h';
 		$sqlWhere = ' i2.itemid=i1.templateid'.
-			' AND '.DBCondition('i2.hostid', $templateids).
-			' AND '.DBCondition('i1.flags', $flags).
+			' AND '.dbConditionInt('i2.hostid', $templateids).
+			' AND '.dbConditionInt('i1.flags', $flags).
 			' AND h.hostid=i1.hostid';
 
 		if (!is_null($targetids)) {
-			$sqlWhere .= ' AND '.DBCondition('i1.hostid', $targetids);
+			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);
 		}
 		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,i1.name,i1.hostid,h.name as host'.
 			' FROM '.$sqlFrom.
@@ -602,13 +602,13 @@ abstract class CHostGeneral extends CZBXAPI {
 			' FROM graphs_items ggi,items ii'.
 			' WHERE ggi.graphid=g.templateid'.
 			' AND ii.itemid=ggi.itemid'.
-			' AND '.DBCondition('ii.hostid', $templateids).')'.
-			' AND '.DBCondition('g.flags', $flags);
+			' AND '.dbConditionInt('ii.hostid', $templateids).')'.
+			' AND '.dbConditionInt('g.flags', $flags);
 
 
 		if (!is_null($targetids)) {
 			$sqlFrom = ' graphs g,graphs_items gi,items i,hosts h';
-			$sqlWhere .= ' AND '.DBCondition('i.hostid', $targetids).
+			$sqlWhere .= ' AND '.dbConditionInt('i.hostid', $targetids).
 				' AND gi.itemid=i.itemid'.
 				' AND g.graphid=gi.graphid'.
 				' AND h.hostid=i.hostid';
@@ -669,10 +669,10 @@ abstract class CHostGeneral extends CZBXAPI {
 		/* APPLICATIONS {{{ */
 		$sqlFrom = ' applications a1,applications a2,hosts h';
 		$sqlWhere = ' a2.applicationid=a1.templateid'.
-			' AND '.DBCondition('a2.hostid', $templateids).
+			' AND '.dbConditionInt('a2.hostid', $templateids).
 			' AND h.hostid=a1.hostid';
 		if (!is_null($targetids)) {
-			$sqlWhere .= ' AND '.DBCondition('a1.hostid', $targetids);
+			$sqlWhere .= ' AND '.dbConditionInt('a1.hostid', $targetids);
 		}
 		$sql = 'SELECT DISTINCT a1.applicationid,a1.name,a1.hostid,h.name as host'.
 			' FROM '.$sqlFrom.

@@ -43,6 +43,7 @@ class CTemplateScreen extends CScreen {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
+		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('screenid', 'name');
@@ -104,9 +105,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else{
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// TODO: think how we could combine templateids && hostids options
 			if (!is_null($options['templateids'])) {
 				unset($options['hostids']);
@@ -130,22 +129,18 @@ class CTemplateScreen extends CScreen {
 				// TODO: get screen
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sqlParts['from']['rights'] = 'rights r';
-				$sqlParts['from']['users_groups'] = 'users_groups ug';
-				$sqlParts['where'][] = 'hg.hostid=s.templateid';
-				$sqlParts['where'][] = 'r.id=hg.groupid ';
-				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
-				$sqlParts['where'][] = 'r.permission>='.$permission;
-				$sqlParts['where'][] = 'NOT EXISTS ('.
-					' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups gg'.
-					' WHERE hgg.hostid=hg.hostid'.
-						' AND rr.id=hgg.groupid'.
-						' AND rr.groupid=gg.usrgrpid'.
-						' AND gg.userid='.self::$userData['userid'].
-						' AND rr.permission<'.$permission.')';
+				$userGroups = getUserGroupsByUserId($userid);
+
+				$sqlParts['where'][] = 'EXISTS ('.
+						'SELECT NULL'.
+						' FROM hosts_groups hgg'.
+							' JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $userGroups).
+						' WHERE s.templateid=hgg.hostid'.
+						' GROUP BY hgg.hostid'.
+						' HAVING MIN(r.permission)>='.$permission.
+						')';
 			}
 		}
 
@@ -155,7 +150,7 @@ class CTemplateScreen extends CScreen {
 		// screenids
 		if (!is_null($options['screenids'])) {
 			zbx_value2array($options['screenids']);
-			$sqlParts['where'][] = DBcondition('s.screenid', $options['screenids']);
+			$sqlParts['where'][] = dbConditionInt('s.screenid', $options['screenids']);
 		}
 
 		// screenitemids
@@ -166,7 +161,7 @@ class CTemplateScreen extends CScreen {
 			}
 			$sqlParts['from']['screens_items'] = 'screens_items si';
 			$sqlParts['where']['ssi'] = 'si.screenid=s.screenid';
-			$sqlParts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
+			$sqlParts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
 		}
 
 		// templateids
@@ -194,7 +189,7 @@ class CTemplateScreen extends CScreen {
 			while (is_null($options['noInheritance']) && !empty($childTemplateids)) {
 				$sql = 'SELECT ht.*'.
 					' FROM hosts_templates ht'.
-					' WHERE '.DBcondition('hostid', $childTemplateids);
+					' WHERE '.dbConditionInt('hostid', $childTemplateids);
 				$dbTemplates = DBselect($sql);
 
 				$childTemplateids = array();
@@ -212,7 +207,7 @@ class CTemplateScreen extends CScreen {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['templateid'] = 's.templateid';
 			}
-			$sqlParts['where']['templateid'] = DBcondition('s.templateid', $linkedTemplateids);
+			$sqlParts['where']['templateid'] = dbConditionInt('s.templateid', $linkedTemplateids);
 		}
 
 		// filter
@@ -334,7 +329,7 @@ class CTemplateScreen extends CScreen {
 		// adding screenitems
 		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
 			$screensItems = array();
-			$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.DBcondition('si.screenid', $screenids));
+			$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenids));
 			while ($sitem = DBfetch($dbSitems)) {
 				// sorting
 				$screensItems[$sitem['screenitemid']] = $sitem;
@@ -624,7 +619,7 @@ class CTemplateScreen extends CScreen {
 						' FROM items dest,items src'.
 						' WHERE dest.key_=src.key_'.
 						' AND dest.hostid='.$templateId.
-						' AND '.DBcondition('src.itemid', $resourceItemIds)
+						' AND '.dbConditionInt('src.itemid', $resourceItemIds)
 			);
 			while ($dbItem = DBfetch($dbItems)) {
 				$resourceItemsMap[$dbItem['srcid']] = $dbItem['destid'];
@@ -639,7 +634,7 @@ class CTemplateScreen extends CScreen {
 						' AND destgi.graphid=dest.graphid'.
 						' AND destgi.itemid=desti.itemid'.
 						' AND desti.hostid='.$templateId.
-						' AND '.DBcondition('src.graphid', $resourceGraphIds)
+						' AND '.dbConditionInt('src.graphid', $resourceGraphIds)
 			);
 			while ($dbItem = DBfetch($dbItems)) {
 				$resourceGraphsMap[$dbItem['srcid']] = $dbItem['destid'];

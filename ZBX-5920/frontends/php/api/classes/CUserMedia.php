@@ -128,7 +128,7 @@ class CUserMedia extends CZBXAPI {
 		// mediaids
 		if (!is_null($options['mediaids'])) {
 			zbx_value2array($options['mediaids']);
-			$sqlParts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -144,7 +144,7 @@ class CUserMedia extends CZBXAPI {
 				$sqlParts['select']['userid'] = 'u.userid';
 			}
 			$sqlParts['from']['users'] = 'users u';
-			$sqlParts['where'][] = DBcondition('u.userid', $options['userids']);
+			$sqlParts['where'][] = dbConditionInt('u.userid', $options['userids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 
 			if (!is_null($options['groupCount'])) {
@@ -164,7 +164,7 @@ class CUserMedia extends CZBXAPI {
 				$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
 			}
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where'][] = dbConditionInt('ug.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['mug'] = 'm.userid=ug.userid';
 
 			if (!is_null($options['groupCount'])) {
@@ -183,7 +183,7 @@ class CUserMedia extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
 			}
-			$sqlParts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediatypeid', $options['mediatypeids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['mediatypeid'] = 'm.mediatypeid';

@@ -98,7 +98,7 @@ class CImage extends CZBXAPI {
 		// imageids
 		if (!is_null($options['imageids'])) {
 			zbx_value2array($options['imageids']);
-			$sqlParts['where']['imageid'] = DBcondition('i.imageid', $options['imageids']);
+			$sqlParts['where']['imageid'] = dbConditionInt('i.imageid', $options['imageids']);
 		}
 
 		// sysmapids
@@ -108,7 +108,7 @@ class CImage extends CZBXAPI {
 			$sqlParts['select']['sm'] = 'sm.sysmapid';
 			$sqlParts['from']['sysmaps'] = 'sysmaps sm';
 			$sqlParts['from']['sysmaps_elements'] = 'sysmaps_elements se';
-			$sqlParts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sm'] = dbConditionInt('sm.sysmapid', $options['sysmapids']);
 			$sqlParts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
 			$sqlParts['where']['se'] = '('.
 				'se.iconid_off=i.imageid'.
@@ -206,7 +206,7 @@ class CImage extends CZBXAPI {
 
 		// adding objects
 		if (!is_null($options['select_image'])) {
-			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.DBCondition('i.imageid', $imageids));
+			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.dbConditionInt('i.imageid', $imageids));
 			while ($img = DBfetch($dbImg)) {
 				// PostgreSQL and SQLite images are stored escaped in the DB
 				$img['image'] = zbx_unescape_image($img['image']);
@@ -519,8 +519,8 @@ class CImage extends CZBXAPI {
 			' FROM icon_map im, icon_mapping imp '.
 			' WHERE im.iconmapid=imp.iconmapid '.
 				' AND ('.
-					DBCondition('im.default_iconid', $imageids).
-					' OR '.DBCondition('imp.iconid', $imageids).
+					dbConditionInt('im.default_iconid', $imageids).
+					' OR '.dbConditionInt('imp.iconid', $imageids).
 				')';
 		$dbIconmaps = DBselect($sql);
 
@@ -545,11 +545,11 @@ class CImage extends CZBXAPI {
 					' OR se.use_iconmap='.SYSMAP_ELEMENT_USE_ICONMAP_OFF.
 				' )'.
 				' AND ('.
-					DBCondition('se.iconid_off', $imageids).
-					' OR '.DBCondition('se.iconid_on', $imageids).
-					' OR '.DBCondition('se.iconid_disabled', $imageids).
-					' OR '.DBCondition('se.iconid_maintenance', $imageids).
-				') OR '.DBCondition('sm.backgroundid', $imageids);
+					dbConditionInt('se.iconid_off', $imageids).
+					' OR '.dbConditionInt('se.iconid_on', $imageids).
+					' OR '.dbConditionInt('se.iconid_disabled', $imageids).
+					' OR '.dbConditionInt('se.iconid_maintenance', $imageids).
+				') OR '.dbConditionInt('sm.backgroundid', $imageids);
 		$dbSysmaps = DBselect($sql);
 
 		$usedInMaps = array();

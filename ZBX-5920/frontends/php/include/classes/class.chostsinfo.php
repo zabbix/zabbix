@@ -66,7 +66,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_TRUE.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $hostIds).
+				' AND '.dbConditionInt('h.hostid', $hostIds).
 				$cond_where
 		);
 
@@ -79,7 +79,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_FALSE.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $hostIds).
+				' AND '.dbConditionInt('h.hostid', $hostIds).
 				$cond_where
 		);
 
@@ -92,7 +92,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_UNKNOWN.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $hostIds).
+				' AND '.dbConditionInt('h.hostid', $hostIds).
 				$cond_where
 		);
 
