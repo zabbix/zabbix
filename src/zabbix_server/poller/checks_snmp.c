@@ -407,7 +407,16 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 
 #ifdef HAVE_SNMP_SESSION_LOCALNAME
 	if (NULL != CONFIG_SOURCE_IP)
-		session.localname = CONFIG_SOURCE_IP;
+	{
+		/* In some cases specifying just local host (without local port) is not enough. We do */
+		/* not care about the port number though so we let the OS select one by specifying 0. */
+		/* See marc.info/?l=net-snmp-bugs&m=115624676507760 for details. */
+
+		static char	localname[64];
+
+		zbx_snprintf(localname, sizeof(localname), "%s:0", CONFIG_SOURCE_IP);
+		session.localname = localname;
+	}
 #endif
 
 	SOCK_STARTUP;
