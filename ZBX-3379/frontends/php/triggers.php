@@ -273,7 +273,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 				' WHERE t.triggerid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=h.hostid'.
-					' AND '.DBcondition('t.triggerid', $triggerIdsToUpdate).
+					' AND '.dbConditionInt('t.triggerid', $triggerIdsToUpdate).
 					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
 			);
@@ -330,7 +330,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 				'SELECT DISTINCT h.hostid'.
 				' FROM hosts h,hosts_groups hg'.
 				' WHERE h.hostid=hg.hostid'.
-					' AND '.DBcondition('hg.groupid', $group_ids)
+					' AND '.dbConditionInt('hg.groupid', $group_ids)
 			);
 			while ($db_host = DBfetch($db_hosts)) {
 				$hosts_ids[] = $db_host['hostid'];

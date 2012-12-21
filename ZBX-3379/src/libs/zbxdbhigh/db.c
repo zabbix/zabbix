@@ -207,9 +207,98 @@ void	DBrollback()
 	DBtxn_operation(zbx_db_rollback);
 }
 
+#ifdef HAVE_ORACLE
 /******************************************************************************
  *                                                                            *
- * Function: DBexecute                                                        *
+ * Function: DBstatement_prepare                                              *
+ *                                                                            *
+ * Purpose: prepares a SQL statement for execution                            *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	DBstatement_prepare(const char *sql)
+{
+	int	rc;
+
+	rc = zbx_db_statement_prepare(sql);
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_statement_prepare(sql)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBbind_parameter                                                 *
+ *                                                                            *
+ * Purpose: creates an association between a program variable and             *
+ *          a placeholder in a SQL statement                                  *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	DBbind_parameter(int position, void *buffer, unsigned char type)
+{
+	int	rc;
+
+	rc = zbx_db_bind_parameter(position, buffer, type);
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_bind_parameter(position, buffer, type)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBstatement_execute                                              *
+ *                                                                            *
+ * Purpose: executes a SQL statement                                          *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	DBstatement_execute()
+{
+	int	rc;
+
+	rc = zbx_db_statement_execute();
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_statement_execute()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+
+	return rc;
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_DBexecute                                                  *
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
  *                                                                            *
@@ -219,7 +308,7 @@ void	DBrollback()
 int	__zbx_DBexecute(const char *fmt, ...)
 {
 	va_list	args;
-	int	rc = ZBX_DB_DOWN;
+	int	rc;
 
 	va_start(args, fmt);
 
@@ -1435,67 +1524,134 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_condition_alloc                                            *
+ *                                                                            *
+ * Purpose: takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condidion is generated from the given  *
+ *          list of values as a mix of <fieldname> BETWEEN <id1> AND <idN>"   *
+ *          and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.            *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of numerical values sorted in          *
+ *                               ascending order to be included in WHERE      *
+ *             num        - [IN] number of elemnts in 'values' array          *
+ *                                                                            *
+ ******************************************************************************/
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
-	int		i;
+#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
+
+	int		i, start, len, seq_num, first;
+	int		between_num = 0, in_num = 0, in_cnt;
 	zbx_uint64_t	value;
+	int		*seq_len = NULL;
 
 	if (0 == num)
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
 
-	/* if only one value in an array we return " <field name>=<id>"*/
+	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
+	/* An isolated value is represented as a sequence with length 1. */
+	seq_len = zbx_malloc(seq_len, num * sizeof(int));
 
-	if (1 == num)
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname, values[0]);
-		return;
-	}
-
-	/* if all values in an array are consecutive we return " <field name> between <id1> and <idN>"*/
-
-	value = values[0];
-
-	for (i = 1; i < num; i++)
+	for (i = 1, seq_num = 0, value = values[0], len = 1; i < num; i++)
 	{
 		if (values[i] != ++value)
-			break;
+		{
+			if (MIN_NUM_BETWEEN <= len)
+				between_num++;
+			else
+				in_num += len;
+
+			seq_len[seq_num++] = len;
+			len = 1;
+			value = values[i];
+		}
+		else
+			len++;
 	}
 
-	if (i == num)
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-				fieldname, values[0], values[num - 1]);
-		return;
-	}
+	if (MIN_NUM_BETWEEN <= len)
+		between_num++;
+	else
+		in_num += len;
 
-	/* ... else we return " <field name> in (<id1>,<id2>,...,<idN>)"*/
+	seq_len[seq_num++] = len;
 
-	if (MAX_EXPRESSIONS < num)
+	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
-	for (i = 0; i < num; i++)
+	/* compose "between"s */
+	for (i = 0, first = 1, start = 0; i < seq_num; i++)
 	{
-		if (0 == (i % MAX_EXPRESSIONS))
+		if (MIN_NUM_BETWEEN <= seq_len[i])
 		{
-			if (0 != i)
-			{
-				(*sql_offset)--;
-				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
-			}
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+			if (1 != first)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+					fieldname, values[start], values[start + seq_len[i] - 1]);
+			first = 0;
 		}
 
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
+		start += seq_len[i];
 	}
 
-	(*sql_offset)--;
-	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+	if (0 < in_num && 0 < between_num)
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
 
-	if (MAX_EXPRESSIONS < num)
+	if (1 < in_num)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+
+	/* compose "in"s */
+	for (i = 0, in_cnt = 0, start = 0; i < seq_num; i++)
+	{
+		if (MIN_NUM_BETWEEN > seq_len[i])
+		{
+			if (1 == in_num)
+			{
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname,
+						values[start]);
+				break;
+			}
+			else
+			{
+				do
+				{
+					if (MAX_EXPRESSIONS == in_cnt)
+					{
+						in_cnt = 0;
+						(*sql_offset)--;
+						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (", fieldname);
+					}
+
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
+					in_cnt++;
+				}
+				while (0 != --seq_len[i]);
+			}
+		}
+		else
+			start += seq_len[i];
+	}
+
+	if (1 < in_num)
+	{
+		(*sql_offset)--;
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+	}
+
+	zbx_free(seq_len);
+
+	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 }
 

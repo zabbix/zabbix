@@ -77,6 +77,11 @@ require_once dirname(__FILE__).'/js.inc.php';
 require_once dirname(__FILE__).'/validate.inc.php';
 
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+	// necessary to surpress errors when calling with error control operator like @function_name()
+	if (error_reporting() === 0) {
+		return true;
+	}
+
 	$pathLength = strlen(__FILE__);
 
 	$pathLength -= 22;
@@ -594,7 +599,7 @@ function get_status() {
 		' FROM items i'.
 			' INNER JOIN hosts h ON i.hostid=h.hostid'.
 		' WHERE h.status='.HOST_STATUS_MONITORED.
-			' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
+			' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
 		' GROUP BY i.status');
 	while ($dbItem = DBfetch($dbItems)) {
 		switch ($dbItem['status']) {

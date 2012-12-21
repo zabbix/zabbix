@@ -1248,11 +1248,6 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 	int		i, j;
 	zbx_uint64_t	housekeeperid;
 	const char	*ins_housekeeper_sql = "insert into housekeeper (housekeeperid,tablename,field,value) values ";
-#ifdef HAVE_MULTIROW_INSERT
-	const char	*row_dl = ",";
-#else
-	const char	*row_dl = ";\n";
-#endif
 #define	ZBX_HISTORY_TABLES_COUNT	7
 	const char	*tables[ZBX_HISTORY_TABLES_COUNT] = {"history", "history_str", "history_uint", "history_log",
 			"history_text", "trends", "trends_uint"};
@@ -1265,6 +1260,7 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 	housekeeperid = DBget_maxid_num("housekeeper", ZBX_HISTORY_TABLES_COUNT * itemids->values_num);
 
 	sql = zbx_malloc(sql, sql_alloc);
+
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 #ifdef HAVE_MULTIROW_INSERT
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_housekeeper_sql);
@@ -1277,21 +1273,17 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_housekeeper_sql);
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 ",'%s','itemid'," ZBX_FS_UI64 ")%s",
-					housekeeperid++, tables[j], itemids->values[i], row_dl);
+					"(" ZBX_FS_UI64 ",'%s','itemid'," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					housekeeperid++, tables[j], itemids->values[i]);
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-	{
 #ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	sql_offset--;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
-		DBexecute("%s", sql);
-	}
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBexecute("%s", sql);
 
 	zbx_free(sql);
 
@@ -2455,11 +2447,6 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 				"insert into applications"
 				" (applicationid,hostid,name,templateid)"
 				" values ";
-#ifdef HAVE_MULTIROW_INSERT
-		const char	*row_dl = ",";
-#else
-		const char	*row_dl = ";\n";
-#endif
 
 		sql_offset = 0;
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -2495,8 +2482,8 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")%s",
-					applicationid++, hostid, app[i].name_esc, app[i].templateid, row_dl);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					applicationid++, hostid, app[i].name_esc, app[i].templateid);
 
 			zbx_free(app[i].name_esc);
 		}
@@ -2751,11 +2738,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		size_t		itemids_num = 0, protoids_num = 0;
 		zbx_itemapp_t	*itemapp = NULL;
 		size_t		itemapp_alloc = 0, itemapp_num = 0;
-#ifdef HAVE_MULTIROW_INSERT
-		const char	*row_dl = ",";
-#else
-		const char	*row_dl = ";\n";
-#endif
 
 		itemids = zbx_malloc(itemids, item_num * sizeof(zbx_uint64_t));
 
@@ -2847,7 +2829,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
 						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,'%s','%s',%d,'%s',"
-						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')%s",
+						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')" ZBX_ROW_DL,
 					itemid, item[i].name_esc, item[i].key_esc, hostid, (int)item[i].type,
 					(int)item[i].value_type, (int)item[i].data_type, item[i].delay,
 					item[i].delay_flex_esc, item[i].history, item[i].trends, (int)item[i].status,
@@ -2861,7 +2843,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
 					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
-					item[i].lifetime_esc, row_dl);
+					item[i].lifetime_esc);
 
 			zbx_free(item[i].key_esc);
 
@@ -2963,8 +2945,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_itemapps_sql);
 #endif
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
-						itemappid++, itemapp[i].itemid, itemapp[i].applicationid, row_dl);
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+						itemappid++, itemapp[i].itemid, itemapp[i].applicationid);
 			}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -3032,9 +3014,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_item_discovery_sql);
 #endif
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
-							itemdiscoveryid++, proto[i].itemid, proto[i].parent_itemid,
-							row_dl);
+							"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+							itemdiscoveryid++, proto[i].itemid, proto[i].parent_itemid);
 				}
 
 #ifdef HAVE_MULTIROW_INSERT

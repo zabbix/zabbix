@@ -112,7 +112,7 @@ class CScreenBase {
 	 *
 	 * @var string
 	 */
-	protected $dataId;
+	public $dataId;
 
 	/**
 	 * Init screen data.
@@ -145,6 +145,7 @@ class CScreenBase {
 		$this->action = !empty($options['action']) ? $options['action'] : null;
 		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
+		$this->dataId = !empty($options['dataId']) ? $options['dataId'] : null;
 
 		// get page file
 		if (!empty($options['pageFile'])) {

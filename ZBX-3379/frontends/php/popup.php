@@ -483,7 +483,7 @@ else {
 		if (ZBX_DISTRIBUTED) {
 			$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
-			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
+			$db_nodes = DBselect('SELECT n.* FROM nodes n WHERE '.dbConditionInt('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
 			while ($node_data = DBfetch($db_nodes)) {
 				$cmbNode->addItem($node_data['nodeid'], $node_data['name']);
 				if (bccomp($nodeid , $node_data['nodeid']) == 0) {
@@ -1321,7 +1321,7 @@ elseif ($srctbl == 'nodes') {
 	$table = new CTableInfo(_('No nodes defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.DBcondition('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
+	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.dbConditionInt('n.nodeid', get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST)));
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['name'], 'link');

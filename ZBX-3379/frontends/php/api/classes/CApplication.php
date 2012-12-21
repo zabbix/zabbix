@@ -94,27 +94,21 @@ class CApplication extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=a.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS('.
-								' SELECT hgg.groupid'.
-								' FROM hosts_groups hgg,rights rr,users_groups gg'.
-								' WHERE hgg.hostid=hg.hostid'.
-									' AND rr.id=hgg.groupid'.
-									' AND rr.groupid=gg.usrgrpid'.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE a.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -128,7 +122,7 @@ class CApplication extends CZBXAPI {
 			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['ahg'] = 'a.hostid=hg.hostid';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -155,7 +149,7 @@ class CApplication extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_EXTEND) {
 				$sqlParts['select']['hostid'] = 'a.hostid';
 			}
-			$sqlParts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('a.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hostid'] = 'a.hostid';
@@ -177,7 +171,7 @@ class CApplication extends CZBXAPI {
 				$sqlParts['select']['itemid'] = 'ia.itemid';
 			}
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where'][] = DBcondition('ia.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('ia.itemid', $options['itemids']);
 			$sqlParts['where']['aia'] = 'a.applicationid=ia.applicationid';
 		}
 
@@ -188,7 +182,7 @@ class CApplication extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['applicationid'] = 'a.applicationid';
 			}
-			$sqlParts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('a.applicationid', $options['applicationids']);
 		}
 
 		// templated
@@ -611,7 +605,7 @@ class CApplication extends CZBXAPI {
 		$parentApplicationids = $applicationids;
 		$childApplicationids = array();
 		do {
-			$dbApplications = DBselect('SELECT a.applicationid FROM applications a WHERE '.DBcondition('a.templateid', $parentApplicationids));
+			$dbApplications = DBselect('SELECT a.applicationid FROM applications a WHERE '.dbConditionInt('a.templateid', $parentApplicationids));
 			$parentApplicationids = array();
 			while ($dbApplication = DBfetch($dbApplications)) {
 				$parentApplicationids[] = $dbApplication['applicationid'];
@@ -633,7 +627,7 @@ class CApplication extends CZBXAPI {
 		// check if app is used by web scenario
 		$sql = 'SELECT ht.name,ht.applicationid'.
 				' FROM httptest ht'.
-				' WHERE '.DBcondition('ht.applicationid', $applicationids);
+				' WHERE '.dbConditionInt('ht.applicationid', $applicationids);
 		$res = DBselect($sql);
 		if ($info = DBfetch($res)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" used by scenario "%2$s" and can\'t be deleted.', $delApplications[$info['applicationid']]['name'], $info['name']));
@@ -698,8 +692,8 @@ class CApplication extends CZBXAPI {
 		$linkedDb = DBselect(
 			'SELECT ia.itemid, ia.applicationid'.
 			' FROM items_applications ia'.
-			' WHERE '.DBcondition('ia.itemid', $itemids).
-				' AND '.DBcondition('ia.applicationid', $applicationids)
+			' WHERE '.dbConditionInt('ia.itemid', $itemids).
+				' AND '.dbConditionInt('ia.applicationid', $applicationids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
@@ -728,7 +722,7 @@ class CApplication extends CZBXAPI {
 					' FROM applications a1,applications a2'.
 					' WHERE a1.name=a2.name'.
 						' AND a1.hostid='.$child['hostid'].
-						' AND '.DBcondition('a2.applicationid', $applicationids)
+						' AND '.dbConditionInt('a2.applicationid', $applicationids)
 				);
 				$childApplications = array();
 				while ($app = DBfetch($dbApps)) {

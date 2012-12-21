@@ -100,10 +100,10 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT("wt.*") AS cnt'.
+		$dbHttpTests = DBfetch(DBSelect('SELECT COUNT(*) AS cnt'.
 											' FROM httptest wt,applications a'.
 											' WHERE a.applicationid=wt.applicationid'.
-											' AND '.DBcondition('wt.httptestid', $_REQUEST['group_httptestid'])
+											' AND '.dbConditionInt('wt.httptestid', $_REQUEST['group_httptestid'])
 										));
 		if ($dbHttpTests['cnt'] != count($_REQUEST['group_httptestid'])) {
 			access_deny();
@@ -420,7 +420,7 @@ else {
 		' FROM applications a,hosts h'.
 		' WHERE a.hostid=h.hostid'.
 			($data['hostid'] > 0 ? ' AND h.hostid='.$data['hostid'] : '').
-			' AND '.DBcondition('h.hostid', $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array())
+			' AND '.dbConditionInt('h.hostid', $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array())
 	);
 	while ($db_app = DBfetch($db_app_result)) {
 		$db_app['scenarios_cnt'] = 0;
@@ -434,7 +434,7 @@ else {
 		' FROM httptest wt,applications a,hosts h'.
 		' WHERE wt.applicationid=a.applicationid'.
 			' AND a.hostid=h.hostid'.
-			' AND '.DBcondition('a.applicationid', array_keys($data['db_apps'])).
+			' AND '.dbConditionInt('a.applicationid', array_keys($data['db_apps'])).
 			($showDisabled == 0 ? ' AND wt.status='.HTTPTEST_STATUS_ACTIVE : '')
 	);
 	while ($httptest_data = DBfetch($dbHttpTests_result)) {
@@ -447,7 +447,7 @@ else {
 	$httpstep_res = DBselect(
 		'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
 		' FROM httpstep hs'.
-		' WHERE '.DBcondition('hs.httptestid', array_keys($data['db_httptests'])).
+		' WHERE '.dbConditionInt('hs.httptestid', array_keys($data['db_httptests'])).
 		' GROUP BY hs.httptestid'
 	);
 	while ($step_count = DBfetch($httpstep_res)) {

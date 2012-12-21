@@ -80,6 +80,7 @@
 		OCIError	*errhp;
 		OCISvcCtx	*svchp;
 		OCIServer	*srvhp;
+		OCIStmt		*stmthp;	/* the statement handle for execute operations */
 	}
 	zbx_oracle_db_handle_t;
 
@@ -89,9 +90,11 @@
 
 	typedef struct
 	{
-		OCIStmt		*stmthp;
+		OCIStmt		*stmthp;	/* the statement handle for select operations */
 		int 		ncolumn;
 		DB_ROW		values;
+		ub4		*values_alloc;
+		OCILobLocator	**clobs;
 	}
 	ZBX_OCI_DB_RESULT;
 
@@ -147,11 +150,17 @@
 #	define ZBX_SQL_MOD(x, y) "mod(" #x "," #y ")"
 #endif
 
+#ifdef HAVE_MULTIROW_INSERT
+#	define ZBX_ROW_DL	","
+#else
+#	define ZBX_ROW_DL	";\n"
+#endif
+
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 #ifdef HAVE_SQLITE3
 void	zbx_create_sqlite3_mutex(const char *dbname);
 void	zbx_remove_sqlite3_mutex();
-#endif	/* HAVE_SQLITE3 */
+#endif
 void	zbx_db_init(char *dbname);
 void    zbx_db_close();
 
@@ -161,6 +170,11 @@ int	zbx_db_rollback();
 int	zbx_db_txn_level();
 int	zbx_db_txn_error();
 
+#ifdef HAVE_ORACLE
+int		zbx_db_statement_prepare(const char *sql);
+int		zbx_db_bind_parameter(int position, void *buffer, unsigned char type);
+int		zbx_db_statement_execute();
+#endif
 int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(const char *query, int n);

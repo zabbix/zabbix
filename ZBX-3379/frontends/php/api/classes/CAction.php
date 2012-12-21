@@ -109,99 +109,57 @@ class CAction extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || !is_null($options['nopermissions'])) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// conditions are checked here by sql, operations after, by api queries
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
+			$userGroups = getUserGroupsByUserId($userid);
+
 			// condition hostgroup
-			$sqlParts['where'][] =
-				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
 					' FROM conditions cc'.
-					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND cc.actionid=a.actionid'.
-						' AND ('.
-							' NOT EXISTS ('.
-								' SELECT rr.id'.
-								' FROM rights rr,users_groups ug'.
-								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
-									' AND rr.groupid=ug.usrgrpid'.
-									' AND ug.userid='.$userid.
-									' AND rr.permission>='.$permission.
-							' )'.
-							' OR EXISTS ('.
-								' SELECT rr.id'.
-								' FROM rights rr,users_groups ugg'.
-								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
-									' AND rr.groupid=ugg.usrgrpid'.
-									' AND ugg.userid='.$userid.
-									' AND rr.permission<'.$permission.
-							')'.
-						')'.
-				')';
+						' LEFT JOIN rights r'.
+							' ON r.id='.zbx_dbcast_2bigint('cc.value').
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE a.actionid=cc.actionid'.
+						' AND cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+					' GROUP BY cc.value'.
+					' HAVING MIN(r.permission) IS NULL'.
+						' OR MIN(r.permission)<'.$permission.
+					')';
 
 			// condition host or template
-			$sqlParts['where'][] =
-				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
-					' FROM conditions cc'.
-					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
-						' AND cc.actionid=a.actionid'.
-						' AND ('.
-							' NOT EXISTS ('.
-								' SELECT hgg.hostid'.
-								' FROM hosts_groups hgg,rights r,users_groups ug'.
-								' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
-									' AND r.id=hgg.groupid'.
-									' AND ug.userid='.$userid.
-									' AND r.permission>='.$permission.
-									' AND r.groupid=ug.usrgrpid)'.
-							' OR EXISTS ('.
-								' SELECT hgg.hostid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')'.
-							')'.
-				')';
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM conditions cc,hosts_groups hgg'.
+						' LEFT JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE a.actionid=cc.actionid'.
+						' AND '.zbx_dbcast_2bigint('cc.value').'=hgg.hostid'.
+						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_HOST_TEMPLATE.')'.
+					' GROUP BY cc.value'.
+					' HAVING MIN(r.permission) IS NULL'.
+						' OR MIN(r.permission)<'.$permission.
+					')';
 
 			// condition trigger
-			$sqlParts['where'][] =
-				' NOT EXISTS ('.
-					' SELECT cc.conditionid'.
-					' FROM conditions cc'.
-					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
-						' AND cc.actionid=a.actionid'.
-						' AND ('.
-							' NOT EXISTS ('.
-								' SELECT f.triggerid'.
-								' FROM functions f,items i,hosts_groups hg,rights r,users_groups ug'.
-								' WHERE ug.userid='.$userid.
-									' AND r.groupid=ug.usrgrpid'.
-									' AND r.permission>='.$permission.
-									' AND hg.groupid=r.id'.
-									' AND i.hostid=hg.hostid'.
-									' AND f.itemid=i.itemid'.
-									' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').')'.
-							' OR EXISTS ('.
-								' SELECT ff.functionid'.
-								' FROM functions ff,items ii'.
-								' WHERE ff.triggerid='.zbx_dbcast_2bigint('cc.value').
-									' AND ii.itemid=ff.itemid'.
-									' AND EXISTS ('.
-										' SELECT hgg.groupid'.
-										' FROM hosts_groups hgg,rights rr,users_groups ugg'.
-										' WHERE hgg.hostid=ii.hostid'.
-											' AND rr.id=hgg.groupid'.
-											' AND rr.groupid=ugg.usrgrpid'.
-											' AND ugg.userid='.$userid.
-											' AND rr.permission<'.$permission.'))'.
-					')'.
-				')';
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM conditions cc,functions f,items i,hosts_groups hgg'.
+						' LEFT JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE a.actionid=cc.actionid'.
+						' AND '.zbx_dbcast_2bigint('cc.value').'=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+						' AND cc.conditiontype='.CONDITION_TYPE_TRIGGER.
+					' GROUP BY cc.value'.
+					' HAVING MIN(r.permission) IS NULL'.
+						' OR MIN(r.permission)<'.$permission.
+					')';
 		}
 
 		// nodeids
@@ -214,7 +172,7 @@ class CAction extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['actionid'] = 'a.actionid';
 			}
-			$sqlParts['where'][] = DBcondition('a.actionid', $options['actionids']);
+			$sqlParts['where'][] = dbConditionInt('a.actionid', $options['actionids']);
 		}
 
 		// groupids
@@ -225,7 +183,7 @@ class CAction extends CZBXAPI {
 				$sqlParts['select']['groupids'] = 'c.value';
 			}
 			$sqlParts['from']['conditions'] = 'conditions c';
-			$sqlParts['where'][] = DBcondition('c.value', $options['groupids']);
+			$sqlParts['where'][] = dbConditionString('c.value', $options['groupids']);
 			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST_GROUP;
 			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
@@ -238,7 +196,7 @@ class CAction extends CZBXAPI {
 				$sqlParts['select']['hostids'] = 'c.value';
 			}
 			$sqlParts['from']['conditions'] = 'conditions c';
-			$sqlParts['where'][] = DBcondition('c.value', $options['hostids']);
+			$sqlParts['where'][] = dbConditionString('c.value', $options['hostids']);
 			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST;
 			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
@@ -251,7 +209,7 @@ class CAction extends CZBXAPI {
 				$sqlParts['select']['triggerids'] = 'c.value';
 			}
 			$sqlParts['from']['conditions'] = 'conditions c';
-			$sqlParts['where'][] = DBcondition('c.value', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionString('c.value', $options['triggerids']);
 			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_TRIGGER;
 			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
@@ -265,7 +223,7 @@ class CAction extends CZBXAPI {
 			}
 			$sqlParts['from']['opmessage'] = 'opmessage om';
 			$sqlParts['from']['operations'] = 'operations o';
-			$sqlParts['where'][] = DBcondition('om.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionInt('om.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
 			$sqlParts['where']['oom'] = 'o.operationid=om.operationid';
 		}
@@ -280,7 +238,7 @@ class CAction extends CZBXAPI {
 			}
 			$sqlParts['from']['opmessage_grp'] = 'opmessage_grp omg';
 			$sqlParts['from']['operations'] = 'operations o';
-			$sqlParts['where'][] = DBcondition('omg.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where'][] = dbConditionInt('omg.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
 			$sqlParts['where']['oomg'] = 'o.operationid=omg.operationid';
 		}
@@ -294,7 +252,7 @@ class CAction extends CZBXAPI {
 			}
 			$sqlParts['from']['opmessage_usr'] = 'opmessage_usr omu';
 			$sqlParts['from']['operations'] = 'operations o';
-			$sqlParts['where'][] = DBcondition('omu.userid', $options['userids']);
+			$sqlParts['where'][] = dbConditionInt('omu.userid', $options['userids']);
 			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
 			$sqlParts['where']['oomu'] = 'o.operationid=omu.operationid';
 		}
@@ -309,7 +267,7 @@ class CAction extends CZBXAPI {
 			}
 			$sqlParts['from']['opmessage_usr'] = 'opcommand oc';
 			$sqlParts['from']['operations'] = 'operations o';
-			$sqlParts['where'][] = '('.DBcondition('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')' ;
+			$sqlParts['where'][] = '('.dbConditionInt('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')' ;
 			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
 			$sqlParts['where']['ooc'] = 'o.operationid=oc.operationid';
 		}
@@ -415,7 +373,7 @@ class CAction extends CZBXAPI {
 					' FROM operations o,opcommand_hst och'.
 					' WHERE o.operationid=och.operationid'.
 						' AND och.hostid<>0'.
-						' AND '.DBcondition('o.actionid', $actionids);
+						' AND '.dbConditionInt('o.actionid', $actionids);
 			$dbHosts = DBselect($sql);
 			while ($host = DBfetch($dbHosts)) {
 				if (!isset($hosts[$host['hostid']])) {
@@ -429,7 +387,7 @@ class CAction extends CZBXAPI {
 				'SELECT o.actionid,ot.templateid'.
 				' FROM operations o,optemplate ot'.
 				' WHERE o.operationid=ot.operationid'.
-					' AND '.DBcondition('o.actionid', $actionids)
+					' AND '.dbConditionInt('o.actionid', $actionids)
 			);
 			while ($template = DBfetch($dbTemplates)) {
 				if (!isset($hosts[$template['templateid']])) {
@@ -462,7 +420,7 @@ class CAction extends CZBXAPI {
 				'SELECT o.actionid,ocg.groupid'.
 				' FROM operations o,opcommand_grp ocg'.
 				' WHERE o.operationid=ocg.operationid'.
-					' AND '.DBcondition('o.actionid', $actionids)
+					' AND '.dbConditionInt('o.actionid', $actionids)
 			);
 			while ($group = DBfetch($dbGroups)) {
 				if (!isset($groups[$group['groupid']])) {
@@ -476,7 +434,7 @@ class CAction extends CZBXAPI {
 				'SELECT o.actionid,og.groupid'.
 				' FROM operations o,opgroup og'.
 				' WHERE o.operationid=og.operationid'.
-					' AND '.DBcondition('o.actionid', $actionids)
+					' AND '.dbConditionInt('o.actionid', $actionids)
 			);
 			while ($group = DBfetch($dbGroups)) {
 				if (!isset($groups[$group['groupid']])) {
@@ -508,7 +466,7 @@ class CAction extends CZBXAPI {
 				'SELECT o.actionid,oc.scriptid'.
 				' FROM operations o,opcommand oc'.
 				' WHERE o.operationid=oc.operationid'.
-					' AND '.DBcondition('o.actionid', $actionids).
+					' AND '.dbConditionInt('o.actionid', $actionids).
 					' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
 			);
 			while ($script = DBfetch($dbScripts)) {
@@ -540,7 +498,7 @@ class CAction extends CZBXAPI {
 				'SELECT o.actionid,omu.userid'.
 				' FROM operations o,opmessage_usr omu'.
 				' WHERE o.operationid=omu.operationid'.
-					' AND '.DBcondition('o.actionid', $actionids)
+					' AND '.dbConditionInt('o.actionid', $actionids)
 			);
 			while ($user = DBfetch($dbUsers)) {
 				if (!isset($users[$user['userid']])) {
@@ -570,7 +528,7 @@ class CAction extends CZBXAPI {
 				'SELECT o.actionid,omg.usrgrpid'.
 				' FROM operations o,opmessage_grp omg'.
 				' WHERE o.operationid=omg.operationid'.
-					' AND '.DBcondition('o.actionid', $actionids)
+					' AND '.dbConditionInt('o.actionid', $actionids)
 			);
 			while ($usrgrp = DBfetch($dbUsergroups)) {
 				if (!isset($usrgrps[$usrgrp['usrgrpid']])) {
@@ -605,7 +563,7 @@ class CAction extends CZBXAPI {
 		 */
 		// adding conditions
 		if (!is_null($options['selectConditions']) && str_in_array($options['selectConditions'], $subselectsAllowedOutputs)) {
-			$res = DBselect('SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids));
+			$res = DBselect('SELECT c.* FROM conditions c WHERE '.dbConditionInt('c.actionid', $actionids));
 			while ($condition = DBfetch($res)) {
 				$result[$condition['actionid']]['conditions'][$condition['conditionid']] = $condition;
 			}
@@ -618,7 +576,7 @@ class CAction extends CZBXAPI {
 			$res = DBselect(
 				'SELECT o.*'.
 				' FROM operations o'.
-				' WHERE '.DBcondition('o.actionid', $actionids)
+				' WHERE '.dbConditionInt('o.actionid', $actionids)
 			);
 			while ($operation = DBfetch($res)) {
 				$operation['opconditions'] = array();
@@ -626,7 +584,7 @@ class CAction extends CZBXAPI {
 				$operationids[$operation['operationid']] = $operation['operationid'];
 			}
 
-			$res = DBselect('SELECT op.* FROM opconditions op WHERE '.DBcondition('op.operationid', $operationids));
+			$res = DBselect('SELECT op.* FROM opconditions op WHERE '.dbConditionInt('op.operationid', $operationids));
 			while ($opcondition = DBfetch($res)) {
 				if (!isset($operations[$opcondition['operationid']]['opconditions'])) {
 					$operations[$opcondition['operationid']]['opconditions'] = array();
@@ -663,7 +621,7 @@ class CAction extends CZBXAPI {
 				$dbOpmessages = DBselect(
 					'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
 					' FROM opmessage o'.
-					' WHERE '.DBcondition('operationid', $opmessage)
+					' WHERE '.dbConditionInt('o.operationid', $opmessage)
 				);
 				while ($dbOpmessage = DBfetch($dbOpmessages)) {
 					$operations[$dbOpmessage['operationid']]['opmessage_grp'] = array();
@@ -674,7 +632,7 @@ class CAction extends CZBXAPI {
 				$dbOpmessageGrp = DBselect(
 					'SELECT og.operationid,og.usrgrpid'.
 					' FROM opmessage_grp og'.
-					' WHERE '.DBcondition('operationid', $opmessage)
+					' WHERE '.dbConditionInt('og.operationid', $opmessage)
 				);
 				while ($opmessageGrp = DBfetch($dbOpmessageGrp)) {
 					$operations[$opmessageGrp['operationid']]['opmessage_grp'][] = $opmessageGrp;
@@ -683,7 +641,7 @@ class CAction extends CZBXAPI {
 				$dbOpmessageUsr = DBselect(
 					'SELECT ou.operationid,ou.userid'.
 					' FROM opmessage_usr ou'.
-					' WHERE '.DBcondition('operationid', $opmessage)
+					' WHERE '.dbConditionInt('ou.operationid', $opmessage)
 				);
 				while ($opmessageUsr = DBfetch($dbOpmessageUsr)) {
 					$operations[$opmessageUsr['operationid']]['opmessage_usr'][] = $opmessageUsr;
@@ -695,7 +653,7 @@ class CAction extends CZBXAPI {
 				$dbOpcommands = DBselect(
 					'SELECT o.*'.
 					' FROM opcommand o'.
-					' WHERE '.DBcondition('operationid', $opcommand)
+					' WHERE '.dbConditionInt('o.operationid', $opcommand)
 				);
 				while ($dbOpcommand = DBfetch($dbOpcommands)) {
 					$operations[$dbOpcommand['operationid']]['opcommand_grp'] = array();
@@ -706,7 +664,7 @@ class CAction extends CZBXAPI {
 				$dbOpcommandHst = DBselect(
 					'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
 					' FROM opcommand_hst oh'.
-					' WHERE '.DBcondition('operationid', $opcommand)
+					' WHERE '.dbConditionInt('oh.operationid', $opcommand)
 				);
 				while ($opcommandHst = DBfetch($dbOpcommandHst)) {
 					$operations[$opcommandHst['operationid']]['opcommand_hst'][] = $opcommandHst;
@@ -715,7 +673,7 @@ class CAction extends CZBXAPI {
 				$dbOpcommandGrp = DBselect(
 					'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
 					' FROM opcommand_grp og'.
-					' WHERE '.DBcondition('operationid', $opcommand)
+					' WHERE '.dbConditionInt('og.operationid', $opcommand)
 				);
 				while ($opcommandGrp = DBfetch($dbOpcommandGrp)) {
 					$operations[$opcommandGrp['operationid']]['opcommand_grp'][] = $opcommandGrp;
@@ -727,7 +685,7 @@ class CAction extends CZBXAPI {
 				$dbOpgroup = DBselect(
 					'SELECT o.operationid,o.groupid'.
 					' FROM opgroup o'.
-					' WHERE '.DBcondition('operationid', $opgroup)
+					' WHERE '.dbConditionInt('o.operationid', $opgroup)
 				);
 				while ($opgroup = DBfetch($dbOpgroup)) {
 					if (!isset($operations[$opgroup['operationid']]['opgroup'])) {
@@ -742,7 +700,7 @@ class CAction extends CZBXAPI {
 				$dbOptemplate = DBselect(
 					'SELECT o.operationid,o.templateid'.
 					' FROM optemplate o'.
-					' WHERE '.DBcondition('operationid', $optemplate)
+					' WHERE '.dbConditionInt('o.operationid', $optemplate)
 				);
 				while ($optemplate = DBfetch($dbOptemplate)) {
 					if (!isset($operations[$optemplate['operationid']]['optemplate'])) {

@@ -98,7 +98,7 @@ class CImage extends CZBXAPI {
 		// imageids
 		if (!is_null($options['imageids'])) {
 			zbx_value2array($options['imageids']);
-			$sqlParts['where']['imageid'] = DBcondition('i.imageid', $options['imageids']);
+			$sqlParts['where']['imageid'] = dbConditionInt('i.imageid', $options['imageids']);
 		}
 
 		// sysmapids
@@ -108,7 +108,7 @@ class CImage extends CZBXAPI {
 			$sqlParts['select']['sm'] = 'sm.sysmapid';
 			$sqlParts['from']['sysmaps'] = 'sysmaps sm';
 			$sqlParts['from']['sysmaps_elements'] = 'sysmaps_elements se';
-			$sqlParts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sm'] = dbConditionInt('sm.sysmapid', $options['sysmapids']);
 			$sqlParts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
 			$sqlParts['where']['se'] = '('.
 				'se.iconid_off=i.imageid'.
@@ -206,7 +206,7 @@ class CImage extends CZBXAPI {
 
 		// adding objects
 		if (!is_null($options['select_image'])) {
-			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.DBCondition('i.imageid', $imageids));
+			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.dbConditionInt('i.imageid', $imageids));
 			while ($img = DBfetch($dbImg)) {
 				// PostgreSQL and SQLite images are stored escaped in the DB
 				$img['image'] = zbx_unescape_image($img['image']);
@@ -306,11 +306,11 @@ class CImage extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image').' [ '.$image['name'].' ] '._('already exists'));
 				}
 
-				// Decode BASE64
+				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
-				if (strlen($image['image']) > ZBX_MAX_IMAGE_SIZE) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB'));
-				}
+
+				// validate image
+				$this->checkImage($image['image']);
 
 				$imageid = get_dbid('images', 'imageid');
 				$values = array(
@@ -334,10 +334,15 @@ class CImage extends CZBXAPI {
 						}
 
 						oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
-						if (!oci_execute($stmt)) {
-							$e = oci_error($stid);
+						if (!oci_execute($stmt, OCI_DEFAULT)) {
+							$e = oci_error($stmt);
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Execute SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
 						}
+						if (!$lob->save($image['image'])) {
+							$e = oci_error($stmt);
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image load error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
+						}
+						$lob->free();
 						oci_free_statement($stmt);
 					break;
 					case ZBX_DB_DB2:
@@ -423,6 +428,9 @@ class CImage extends CZBXAPI {
 			if (isset($image['image'])) {
 				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
+
+				// validate image
+				$this->checkImage($image['image']);
 
 				switch ($DB['TYPE']) {
 					case ZBX_DB_POSTGRESQL:
@@ -511,8 +519,8 @@ class CImage extends CZBXAPI {
 			' FROM icon_map im, icon_mapping imp '.
 			' WHERE im.iconmapid=imp.iconmapid '.
 				' AND ('.
-					DBCondition('im.default_iconid', $imageids).
-					' OR '.DBCondition('imp.iconid', $imageids).
+					dbConditionInt('im.default_iconid', $imageids).
+					' OR '.dbConditionInt('imp.iconid', $imageids).
 				')';
 		$dbIconmaps = DBselect($sql);
 
@@ -537,11 +545,11 @@ class CImage extends CZBXAPI {
 					' OR se.use_iconmap='.SYSMAP_ELEMENT_USE_ICONMAP_OFF.
 				' )'.
 				' AND ('.
-					DBCondition('se.iconid_off', $imageids).
-					' OR '.DBCondition('se.iconid_on', $imageids).
-					' OR '.DBCondition('se.iconid_disabled', $imageids).
-					' OR '.DBCondition('se.iconid_maintenance', $imageids).
-				') OR '.DBCondition('sm.backgroundid', $imageids);
+					dbConditionInt('se.iconid_off', $imageids).
+					' OR '.dbConditionInt('se.iconid_on', $imageids).
+					' OR '.dbConditionInt('se.iconid_disabled', $imageids).
+					' OR '.dbConditionInt('se.iconid_maintenance', $imageids).
+				') OR '.dbConditionInt('sm.backgroundid', $imageids);
 		$dbSysmaps = DBselect($sql);
 
 		$usedInMaps = array();
@@ -566,5 +574,24 @@ class CImage extends CZBXAPI {
 		return array('imageids' => $imageids);
 	}
 
+	/**
+	 * Validate image.
+	 *
+	 * @param string $image string representing image, for example, result of base64_decode()
+	 *
+	 * @throws APIException if image size is 1MB or greater.
+	 * @throws APIException if file format is unsupported, GD can not create image from given string
+	 */
+	protected function checkImage($image) {
+		// check size
+		if (strlen($image) > ZBX_MAX_IMAGE_SIZE) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB.'));
+		}
+
+		// check file format
+		if (@imageCreateFromString($image) === false) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
+		}
+	}
 }
 ?>

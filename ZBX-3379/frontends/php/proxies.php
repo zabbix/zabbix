@@ -265,7 +265,7 @@ else {
 			' AND i.hostid=h.hostid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.delay<>0'.
-			' AND '.DBcondition('h.proxy_hostid', $proxyids).
+			' AND '.dbConditionInt('h.proxy_hostid', $proxyids).
 		' GROUP BY h.proxy_hostid'
 	);
 	while ($performance = DBfetch($dbPerformance)) {
