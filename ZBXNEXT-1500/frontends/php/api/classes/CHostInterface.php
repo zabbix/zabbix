@@ -125,7 +125,7 @@ class CHostInterface extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hi.interfaceid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hi.interfaceid', $nodeids);
 			}
 		}
 
@@ -137,7 +137,7 @@ class CHostInterface extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hi.hostid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hi.hostid', $nodeids);
 			}
 		}
 
@@ -152,7 +152,7 @@ class CHostInterface extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('i.itemid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'i.itemid', $nodeids);
 			}
 		}
 
@@ -169,15 +169,14 @@ class CHostInterface extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('f.triggerid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'f.triggerid', $nodeids);
 			}
 		}
 
 		// node check !!!!!
 		// should last, after all ****IDS checks
 		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('hi.interfaceid', $nodeids);
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hi.interfaceid', $nodeids);
 		}
 
 		// search

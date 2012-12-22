@@ -107,11 +107,11 @@ $frmMedia->addVar('media', $media);
 $frmMedia->addVar('dstfrm', $_REQUEST['dstfrm']);
 
 $cmbType = new CComboBox('mediatypeid', $mediatypeid);
-$sql = 'SELECT mediatypeid,description '.
+$types = DBselect('SELECT mediatypeid,description'.
 		' FROM media_type'.
-		' WHERE '.DBin_node('mediatypeid').
-		' ORDER BY type';
-$types = DBselect($sql);
+		whereDbNode('mediatypeid').
+		' ORDER BY type'
+);
 while ($type = DBfetch($types)) {
 	$cmbType->addItem(
 		$type['mediatypeid'],

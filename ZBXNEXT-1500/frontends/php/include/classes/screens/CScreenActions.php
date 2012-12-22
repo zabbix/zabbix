@@ -88,11 +88,11 @@ class CScreenActions extends CScreenBase {
 
 		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error'.
 				' FROM events e,alerts a'.
-					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
+					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 				' WHERE e.eventid=a.eventid'.
-					' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
+					' AND alerttype='.ALERT_TYPE_MESSAGE.
 					' AND '.dbConditionInt('e.objectid', $available_triggers).
-					' AND '.DBin_node('a.alertid').' '.
+					andDbNode('a.alertid').
 				' ORDER BY '.$sortfield.' '.$sortorder;
 		$alerts = DBfetchArray(DBselect($sql, $this->screenitem['elements']));
 

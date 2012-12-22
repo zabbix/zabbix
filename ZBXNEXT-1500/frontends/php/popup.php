@@ -1693,7 +1693,12 @@ elseif ($srctbl == 'slides') {
 	$table->setHeader($header);
 
 	$slideshows = array();
-	$result = DBselect('SELECT s.slideshowid,s.name FROM slideshows s WHERE '.DBin_node('s.slideshowid', $nodeid).' ORDER BY s.name');
+	$result = DBselect(
+			'SELECT s.slideshowid,s.name'.
+			' FROM slideshows s'.
+			whereDbNode('s.slideshowid', $nodeid).
+			' ORDER BY s.name'
+	);
 	while ($row = DBfetch($result)) {
 		if (!slideshow_accessible($row['slideshowid'], PERM_READ)) {
 			continue;
@@ -1903,7 +1908,11 @@ elseif ($srctbl == 'drules') {
 	$table = new CTableInfo(_('No discovery rules defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect('SELECT DISTINCT d.* FROM drules d WHERE '.DBin_node('d.druleid', $nodeid));
+	$result = DBselect(
+			'SELECT d.*'.
+			' FROM drules d'.
+			whereDbNode('d.druleid', $nodeid)
+	);
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['name'], 'link');
@@ -1943,11 +1952,11 @@ elseif ($srctbl == 'proxies') {
 	$table->setHeader(_('Name'));
 
 	$result = DBselect(
-		'SELECT DISTINCT h.hostid,h.host'.
-		' FROM hosts h'.
-		' WHERE '.DBin_node('h.hostid', $nodeid).
-			' AND h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-		' ORDER BY h.host,h.hostid'
+			'SELECT h.hostid,h.host'.
+			' FROM hosts h'.
+			' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
+				andDbNode('h.hostid', $nodeid).
+			' ORDER BY h.host,h.hostid'
 	);
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');

@@ -1130,7 +1130,11 @@
 			}
 		}
 		else {
-			$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v WHERE '.DBin_node('v.valuemapid')));
+			$data['valuemaps'] = DBfetchArray(DBselect(
+					'SELECT v.*'.
+					' FROM valuemaps v'.
+					whereDbNode('v.valuemapid')
+			));
 			order_result($data['valuemaps'], 'name');
 		}
 

@@ -194,7 +194,7 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 		$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name'.
 				' FROM groups hg'.
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-				' WHERE '.DBin_node('hg.groupid', $nodeid).
+				whereDbNode('hg.groupid', $nodeid).
 				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name'.
 				' ORDER BY node_name,hg.name';
 	}
@@ -205,7 +205,7 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 					' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid'.
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
 				' WHERE g.userid='.$userid.
-					' AND '.DBin_node('hg.groupid', $nodeid).
+					andDbNode('hg.groupid', $nodeid).
 				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid'.
 				' ORDER BY node_name,hg.name,permission';
 	}
@@ -357,7 +357,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 
 	array_push($where, 'h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
 	if (!is_null($nodeid)) {
-		array_push($where, DBin_node('h.hostid', $nodeid));
+		$where = sqlPartDbNode($where, 'h.hostid', $nodeid);
 	}
 	$where = count($where) ? $where = ' WHERE '.implode(' AND ', $where) : '';
 
@@ -423,7 +423,7 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res 
 	$where = array();
 
 	if (!is_null($nodeid)) {
-		array_push($where, DBin_node('g.groupid', $nodeid));
+		$where = sqlPartDbNode($where, 'g.groupid', $nodeid);
 	}
 
 	if (count($where)) {

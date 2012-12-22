@@ -101,7 +101,7 @@ class CDRule extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dr.druleid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dr.druleid', $nodeids);
 			}
 		}
 
@@ -120,7 +120,7 @@ class CDRule extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dh.dhostid', $nodeids);
 			}
 		}
 
@@ -142,15 +142,14 @@ class CDRule extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ds.dserviceid', $nodeids);
 			}
 		}
 
-// node check !!!!!
-// should be last, after all ****IDS checks
+		// node check !!!!!
+		// should be last, after all ****IDS checks
 		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('dr.druleid', $nodeids);
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dr.druleid', $nodeids);
 		}
 
 // search
