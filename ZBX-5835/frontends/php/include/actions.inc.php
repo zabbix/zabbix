@@ -20,63 +20,90 @@
 
 
 function condition_operator2str($operator) {
-	$str_op[CONDITION_OPERATOR_EQUAL] = '=';
-	$str_op[CONDITION_OPERATOR_NOT_EQUAL] = '<>';
-	$str_op[CONDITION_OPERATOR_LIKE] = _('like');
-	$str_op[CONDITION_OPERATOR_NOT_LIKE] = _('not like');
-	$str_op[CONDITION_OPERATOR_IN] = _('in');
-	$str_op[CONDITION_OPERATOR_MORE_EQUAL] = '>=';
-	$str_op[CONDITION_OPERATOR_LESS_EQUAL] = '<=';
-	$str_op[CONDITION_OPERATOR_NOT_IN] = _('not in');
-
-	if (isset($str_op[$operator])) {
-		return $str_op[$operator];
+	switch ($operator) {
+		case CONDITION_OPERATOR_EQUAL:
+			return '=';
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			return '<>';
+		case CONDITION_OPERATOR_LIKE:
+			return _('like');
+		case CONDITION_OPERATOR_NOT_LIKE:
+			return _('not like');
+		case CONDITION_OPERATOR_IN:
+			return _('in');
+		case CONDITION_OPERATOR_MORE_EQUAL:
+			return '>=';
+		case CONDITION_OPERATOR_LESS_EQUAL:
+			return '<=';
+		case CONDITION_OPERATOR_NOT_IN:
+			return _('not in');
+		default:
+			return _('Unknown');
 	}
-
-	return _('Unknown');
 }
 
-function condition_type2str($conditiontype) {
-	$str_type[CONDITION_TYPE_HOST_GROUP] = _('Host group');
-	$str_type[CONDITION_TYPE_HOST_TEMPLATE] = _('Host template');
-	$str_type[CONDITION_TYPE_TRIGGER] = _('Trigger');
-	$str_type[CONDITION_TYPE_HOST] = _('Host');
-	$str_type[CONDITION_TYPE_TRIGGER_NAME] = _('Trigger name');
-	$str_type[CONDITION_TYPE_TRIGGER_VALUE] = _('Trigger value');
-	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY] = _('Trigger severity');
-	$str_type[CONDITION_TYPE_TIME_PERIOD] = _('Time period');
-	$str_type[CONDITION_TYPE_MAINTENANCE] = _('Maintenance status');
-	$str_type[CONDITION_TYPE_NODE] = _('Node');
-	$str_type[CONDITION_TYPE_DRULE] = _('Discovery rule');
-	$str_type[CONDITION_TYPE_DCHECK] = _('Discovery check');
-	$str_type[CONDITION_TYPE_DOBJECT] = _('Discovery object');
-	$str_type[CONDITION_TYPE_DHOST_IP] = _('Host IP');
-	$str_type[CONDITION_TYPE_DSERVICE_TYPE] = _('Service type');
-	$str_type[CONDITION_TYPE_DSERVICE_PORT] = _('Service port');
-	$str_type[CONDITION_TYPE_DSTATUS] = _('Discovery status');
-	$str_type[CONDITION_TYPE_DUPTIME] = _('Uptime/Downtime');
-	$str_type[CONDITION_TYPE_DVALUE] = _('Received value');
-	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED] = _('Event acknowledged');
-	$str_type[CONDITION_TYPE_APPLICATION] = _('Application');
-	$str_type[CONDITION_TYPE_PROXY] = _('Proxy');
-	$str_type[CONDITION_TYPE_HOST_NAME] = _('Host name');
-
-	if (isset($str_type[$conditiontype])) {
-		return $str_type[$conditiontype];
+function condition_type2str($conditionType) {
+	switch ($conditionType) {
+		case CONDITION_TYPE_HOST_GROUP:
+			return _('Host group');
+		case CONDITION_TYPE_HOST_TEMPLATE:
+			return _('Host template');
+		case CONDITION_TYPE_TRIGGER:
+			return _('Trigger');
+		case CONDITION_TYPE_HOST:
+			return _('Host');
+		case CONDITION_TYPE_TRIGGER_NAME:
+			return _('Trigger name');
+		case CONDITION_TYPE_TRIGGER_VALUE:
+			return _('Trigger value');
+		case CONDITION_TYPE_TRIGGER_SEVERITY:
+			return _('Trigger severity');
+		case CONDITION_TYPE_TIME_PERIOD:
+			return _('Time period');
+		case CONDITION_TYPE_MAINTENANCE:
+			return _('Maintenance status');
+		case CONDITION_TYPE_NODE:
+			return _('Node');
+		case CONDITION_TYPE_DRULE:
+			return _('Discovery rule');
+		case CONDITION_TYPE_DCHECK:
+			return _('Discovery check');
+		case CONDITION_TYPE_DOBJECT:
+			return _('Discovery object');
+		case CONDITION_TYPE_DHOST_IP:
+			return _('Host IP');
+		case CONDITION_TYPE_DSERVICE_TYPE:
+			return _('Service type');
+		case CONDITION_TYPE_DSERVICE_PORT:
+			return _('Service port');
+		case CONDITION_TYPE_DSTATUS:
+			return _('Discovery status');
+		case CONDITION_TYPE_DUPTIME:
+			return _('Uptime/Downtime');
+		case CONDITION_TYPE_DVALUE:
+			return _('Received value');
+		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+			return _('Event acknowledged');
+		case CONDITION_TYPE_APPLICATION:
+			return _('Application');
+		case CONDITION_TYPE_PROXY:
+			return _('Proxy');
+		case CONDITION_TYPE_HOST_NAME:
+			return _('Host name');
+		default:
+			return _('Unknown');
 	}
-
-	return _('Unknown');
 }
 
 function discovery_object2str($object) {
-	$str_object[EVENT_OBJECT_DHOST] = _('Device');
-	$str_object[EVENT_OBJECT_DSERVICE] = _('Service');
-
-	if (isset($str_object[$object])) {
-		return $str_object[$object];
+	switch ($object) {
+		case EVENT_OBJECT_DHOST:
+			return _('Device');
+		case EVENT_OBJECT_DSERVICE:
+			return _('Service');
+		default:
+			return _('Unknown');
 	}
-
-	return _('Unknown');
 }
 
 function condition_value2str($conditiontype, $value) {
@@ -84,39 +111,47 @@ function condition_value2str($conditiontype, $value) {
 		case CONDITION_TYPE_HOST_GROUP:
 			$groups = API::HostGroup()->get(array(
 				'groupids' => $value,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('name'),
 				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
 
-			if (!$group = reset($groups)) {
-				error(_s('No host groups with groupid "%s".', $value));
-			}
+			if ($groups) {
+				$group = reset($groups);
 
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
+				$str_val = '';
+				if (id2nodeid($value) != get_current_nodeid()) {
+					$str_val = get_node_name_by_elid($value, true, ': ');
+				}
+				$str_val .= $group['name'];
 			}
-
-			$str_val .= $group['name'];
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_TRIGGER:
 			$trigs = API::Trigger()->get(array(
 				'triggerids' => $value,
 				'expandDescription' => true,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('description'),
 				'selectHosts' => array('name'),
 				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
-			$trig = reset($trigs);
-			$host = reset($trig['hosts']);
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
-			}
 
-			$str_val .= $host['name'].': '.$trig['description'];
+			if ($trigs) {
+				$trig = reset($trigs);
+				$host = reset($trig['hosts']);
+
+				$str_val = '';
+				if (id2nodeid($value) != get_current_nodeid()) {
+					$str_val = get_node_name_by_elid($value, true, ': ');
+				}
+				$str_val .= $host['name'].': '.$trig['description'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
@@ -193,7 +228,6 @@ function condition_value2str($conditiontype, $value) {
 			break;
 		default:
 			return _('Unknown');
-			break;
 	}
 
 	return '"'.$str_val.'"';

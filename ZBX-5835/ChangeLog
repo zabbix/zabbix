@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translati
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A.F....... [ZBX-6002] optimized fetching latest service alarms in Service API (dotneft, Eduard)
 ..F....... [ZBX-5986] fixed page filter in monitoring->graphs (Oleg)
