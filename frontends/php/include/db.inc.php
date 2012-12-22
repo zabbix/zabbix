@@ -685,11 +685,11 @@ function dbNode($fieldName, $nodes = null, $operator = '') {
 	elseif (!is_array($nodes)) {
 		if (is_string($nodes)) {
 			if (!preg_match('/^([0-9,]+)$/', $nodes)) {
-				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
+				fatal_error('Incorrect "nodes" for "dbNode". Passed ['.$nodes.']');
 			}
 		}
 		elseif (!zbx_ctype_digit($nodes)) {
-			fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
+			fatal_error('Incorrect type of "nodes" for "dbNode". Passed ['.gettype($nodes).']');
 		}
 		$nodes = zbx_toArray($nodes);
 	}
