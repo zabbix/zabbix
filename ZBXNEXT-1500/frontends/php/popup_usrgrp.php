@@ -94,7 +94,7 @@ if(form){
 
 	$result = DBselect(
 			'SELECT ug.usrgrpid,ug.name FROM usrgrp ug'.
-			whereDbNode('usrgrpid').
+			whereDbNode('ug.usrgrpid').
 			' ORDER BY ug.name'
 	);
 	while($row = DBfetch($result)){
