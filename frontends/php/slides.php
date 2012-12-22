@@ -181,9 +181,9 @@ $data = array(
 
 // get slideshows
 $db_slideshows = DBselect(
-	'SELECT s.slideshowid,s.name'.
-	' FROM slideshows s'.
-	' WHERE '.DBin_node('s.slideshowid')
+		'SELECT s.slideshowid,s.name'.
+		' FROM slideshows s'.
+		whereDbNode('s.slideshowid')
 );
 while ($slideshow = DBfetch($db_slideshows)) {
 	if (slideshow_accessible($slideshow['slideshowid'], PERM_READ)) {

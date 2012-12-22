@@ -283,10 +283,10 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	$actionids = array();
 
 	$go_result = DBselect(
-		'SELECT DISTINCT a.actionid'.
-		' FROM actions a'.
-		' WHERE '.DBin_node('a.actionid', $nodes).
-			' AND '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
+			'SELECT a.actionid'.
+			' FROM actions a'.
+			' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid']).
+				andDbNode('a.actionid', $nodes)
 	);
 	while ($row = DBfetch($go_result)) {
 		$res = DBexecute('UPDATE actions SET status='.$status.' WHERE actionid='.$row['actionid']);

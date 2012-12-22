@@ -972,7 +972,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 						' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
 						' AND h.host='.zbx_dbstr($exprPart['host']).
 						' AND h.hostid=i.hostid'.
-						' AND '.DBin_node('i.itemid')
+						andDbNode('i.itemid')
 			);
 			if ($row = DBfetch($result)) {
 				$hostnames[] = $row['name'];

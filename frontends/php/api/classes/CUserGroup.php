@@ -197,17 +197,19 @@ class CUserGroup extends CZBXAPI {
 		$result = array();
 		$usrgrpids = array();
 
-		$sql = 'SELECT g.usrgrpid '.
-			' FROM usrgrp g '.
-			' WHERE g.name='.zbx_dbstr($groupData['name']).
-			' AND '.DBin_node('g.usrgrpid', false);
-		$res = DBselect($sql);
+		$res = DBselect(
+				'SELECT g.usrgrpid'.
+				' FROM usrgrp g'.
+				' WHERE g.name='.zbx_dbstr($groupData['name']).
+					andDbNode('g.usrgrpid', false)
+		);
 		while ($group = DBfetch($res)) {
 			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
 		}
 
-		if (!empty($usrgrpids))
+		if (!empty($usrgrpids)) {
 			$result = $this->get(array('usrgrpids'=>$usrgrpids, 'output' => API_OUTPUT_EXTEND));
+		}
 
 		return $result;
 	}

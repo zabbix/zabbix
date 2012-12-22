@@ -107,7 +107,7 @@ class CMediatype extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('mt.mediatypeid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'mt.mediatypeid', $nodeids);
 			}
 		}
 
@@ -121,7 +121,7 @@ class CMediatype extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('m.mediaid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'm.mediaid', $nodeids);
 			}
 		}
 
@@ -135,14 +135,13 @@ class CMediatype extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('m.userid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'm.userid', $nodeids);
 			}
 		}
 
 		// should last, after all ****IDS checks
 		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('mt.mediatypeid', $nodeids);
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'mt.mediatypeid', $nodeids);
 		}
 
 		// filter

@@ -52,13 +52,13 @@ class CHostsInfo extends CTable {
 		));
 		$hostIds = array_keys($hosts);
 
-		$cond_from = '';
 		if (remove_nodes_from_id($this->groupid) > 0) {
-			$cond_from = ', hosts_groups hg ';
-			$cond_where = 'AND hg.hostid=h.hostid AND hg.groupid='.$this->groupid;
+			$cond_from = ',hosts_groups hg';
+			$cond_where = ' AND hg.hostid=h.hostid AND hg.groupid='.$this->groupid;
 		}
 		else {
-			$cond_where = ' AND '.DBin_node('h.hostid', $this->nodeid);
+			$cond_from = '';
+			$cond_where = andDbNode('h.hostid', $this->nodeid);
 		}
 
 		$db_host_cnt = DBselect(

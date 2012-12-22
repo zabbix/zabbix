@@ -146,7 +146,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			'SELECT h.hostid,h.status'.
 			' FROM hosts h'.
 			' WHERE h.proxy_hostid='.$hostid.
-				' AND '.DBin_node('h.hostid')
+				andDbNode('h.hostid')
 		);
 
 		while ($dbHost = DBfetch($dbHosts)) {
@@ -228,7 +228,7 @@ if (isset($_REQUEST['form'])) {
 		'SELECT h.hostid,h.proxy_hostid,h.name'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			' AND '.DBin_node('h.hostid')
+			andDbNode('h.hostid')
 	));
 	order_result($data['dbHosts'], 'name');
 

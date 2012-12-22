@@ -671,7 +671,7 @@ function id2nodeid($id_var) {
 	return (int)bcdiv("$id_var", '100000000000000');
 }
 
-function DBin_node($id_name, $nodes = null) {
+function dbNode($fieldName, $nodes = null, $operator = '') {
 	if (is_null($nodes)) {
 		$nodes = get_current_nodeid();
 	}
@@ -694,18 +694,45 @@ function DBin_node($id_name, $nodes = null) {
 		$nodes = zbx_toArray($nodes);
 	}
 
+	$sql = '';
 	if (count($nodes) == 1) {
 		$nodeid = reset($nodes);
-		$sql = $id_name.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999';
+		if ($nodeid != 0) {
+			$sql = $fieldName.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999';
+		}
 	}
 	else {
-		$sql = '';
 		foreach ($nodes as $nodeid) {
-			$sql .= '('.$id_name.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999) OR ';
+			$sql .= '('.$fieldName.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999) OR ';
 		}
 		$sql = '('.rtrim($sql, ' OR ').')';
 	}
+
+	if ($sql != '' && $operator != '') {
+		$sql = ' '.$operator.' '.$sql;
+	}
+
 	return $sql;
+}
+
+function whereDbNode($fieldName, $nodes = null)
+{
+	return dbNode($fieldName, $nodes, 'WHERE');
+}
+
+function andDbNode($fieldName, $nodes = null)
+{
+	return dbNode($fieldName, $nodes, 'AND');
+}
+
+function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null)
+{
+	$sql = dbNode($fieldName, $nodes);
+
+	if ($sql != '') {
+		$sqlPartWhere[] = $sql;
+	}
+	return $sqlPartWhere;
 }
 
 function in_node($id_var, $nodes = null) {

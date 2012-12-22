@@ -326,7 +326,12 @@ $web_mon->setFooter(new CDiv(SPACE, 'textwhite', 'hat_webovr_footer'));
 $rightColumn[] = $web_mon;
 
 // discovery info
-$drules = DBfetch(DBselect('SELECT COUNT(d.druleid) AS cnt FROM drules d WHERE '.DBin_node('d.druleid').' AND d.status='.DRULE_STATUS_ACTIVE));
+$drules = DBfetch(DBselect(
+		'SELECT COUNT(d.druleid) AS cnt'.
+		' FROM drules d'.
+		' WHERE d.status='.DRULE_STATUS_ACTIVE.
+			andDbNode('d.druleid')
+));
 if ($drules['cnt'] > 0 && check_right_on_discovery(PERM_READ)) {
 	$refresh_tab[] = array('id' => 'hat_dscvry', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_dscvry', 60));
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_dscvry'));

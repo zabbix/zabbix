@@ -522,7 +522,7 @@ if (!empty($this->data['new_operation'])) {
 			$db_mediatypes = DBselect(
 				'SELECT mt.mediatypeid,mt.description'.
 				' FROM media_type mt'.
-				' WHERE '.DBin_node('mt.mediatypeid').
+				whereDbNode('mt.mediatypeid').
 				' ORDER BY mt.description'
 			);
 			while ($db_mediatype = DBfetch($db_mediatypes)) {
