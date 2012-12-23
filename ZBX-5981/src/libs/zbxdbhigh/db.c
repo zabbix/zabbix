@@ -2174,9 +2174,9 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 
 	inventory_field = DBget_inventory_field(inventory_link + 1);
 	table = DBget_table("host_inventory");
-	assert(table);
+	assert(NULL != table);
 	field = DBget_field(table, inventory_field);
-	assert(field);
+	assert(NULL != field);
 
 	inventory_field_len[inventory_link] = field->length;
 
