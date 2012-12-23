@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+.......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 A.F.....S. [ZBXNEXT-1466] implemented macros support in trigger comments (dimir, Eduard)
 A......... [ZBXNEXT-1491] implemented property array support for all get methods (Pavels)
 A......... [ZBXNEXT-1491] implemented the map.get selectUrls parameter (Pavels)
@@ -31,6 +32,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A......... [ZBXNEXT-1491] fixed alert.get hostids and groupids parameters (Pavels)
 A......... [ZBXNEXT-1491] fixed multiple subselects returning hashes instead of arrays (Pavels)
 A......... [ZBXNEXT-1491] fixed item.get selectHosts returning double template objects (Pavels)
@@ -77,8 +79,10 @@ Changes for 2.0.5rc1
 
 New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
+.......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+.......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A.F....... [ZBX-6002] optimized fetching latest service alarms in Service API (dotneft, Eduard)
 ..F....... [ZBX-5986] fixed page filter in monitoring->graphs (Oleg)
 ..F....... [ZBX-6004] monitoring->screens page optimization (Vedmak)
