@@ -442,7 +442,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	for (i = 0; NULL != pt[i].table; i++)
 	{
-		assert(NULL != (table = DBget_table(pt[i].table)));
+		table = DBget_table(pt[i].table);
+		assert(NULL != table);
 
 		get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
 	}

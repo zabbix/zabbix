@@ -142,7 +142,8 @@ static int	validate_trigger_expressions(int nodeid)
 	size_t		new_expression_alloc = ZBX_KIBIBYTE, new_expression_offset = 0;
 	int		ret = SUCCEED;
 
-	assert(NULL != (r_table = DBget_table("functions")));
+	r_table = DBget_table("functions");
+	assert(NULL != r_table);
 
 	new_expression = zbx_malloc(NULL, new_expression_alloc);
 
@@ -194,7 +195,8 @@ static void	convert_trigger_expressions(int nodeid)
 	char		*new_expression, *new_expression_esc;
 	size_t		new_expression_alloc = ZBX_KIBIBYTE, new_expression_offset = 0;
 
-	assert(NULL != (r_table = DBget_table("functions")));
+	r_table = DBget_table("functions");
+	assert(NULL != r_table);
 
 	new_expression = zbx_malloc(NULL, new_expression_alloc);
 
@@ -262,7 +264,8 @@ static void	convert_special_field(int nodeid, const char *table_name,
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	assert(NULL != (r_table = DBget_table(rel_table_name)));
+	r_table = DBget_table(rel_table_name);
+	assert(NULL != r_table);
 
 	prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -290,7 +293,8 @@ static void	convert_condition_values(int nodeid, const char *rel_table_name, int
 	DB_ROW		row;
 	zbx_uint64_t	prefix, value;
 
-	assert(NULL != (r_table = DBget_table(rel_table_name)));
+	r_table = DBget_table(rel_table_name);
+	assert(NULL != r_table);
 
 	prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -512,7 +516,8 @@ int	change_nodeid(int nodeid)
 			/* relations */
 			else if (NULL != tables[i].fields[j].fk_table)
 			{
-				assert(NULL != (r_table = DBget_table(tables[i].fields[j].fk_table)));
+				r_table = DBget_table(tables[i].fields[j].fk_table);
+				assert(NULL != r_table);
 
 				prefix = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 				if (0 != (r_table->flags & ZBX_SYNC))
