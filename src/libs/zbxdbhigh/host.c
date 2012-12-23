@@ -760,9 +760,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 				" where hostid=" ZBX_FS_UI64
 					" and type in (%d,%d,%d,%d)"
 					" and main=1"
-					DB_NODE,
+					ZBX_SQL_NODE,
 				hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP,
-				INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX, DBnode_local("interfaceid"));
+				INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX, DBand_node_local("interfaceid"));
 
 		while (NULL != (trow = DBfetch(tresult)))
 		{

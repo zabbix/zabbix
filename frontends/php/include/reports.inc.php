@@ -82,16 +82,16 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $opt
 		else {
 			$sql_cond = ' AND '.dbConditionInt('h.hostid', $PAGE_HOSTS['hostids']);
 		}
-		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
-			' FROM triggers t,hosts h,items i,functions f '.
-			' WHERE f.itemid=i.itemid '.
-				' AND h.hostid=i.hostid '.
+		$sql = 'SELECT DISTINCT t.triggerid,t.description'.
+			' FROM triggers t,hosts h,items i,functions f'.
+			' WHERE f.itemid=i.itemid'.
+				' AND h.hostid=i.hostid'.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.triggerid=f.triggerid '.
+				' AND t.triggerid=f.triggerid'.
 				' AND h.status='.HOST_STATUS_TEMPLATE.
-				' AND '.DBin_node('t.triggerid').
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
+				andDbNode('t.triggerid').
 			' ORDER BY t.description';
 		$triggers = DBfetchArrayAssoc(DBselect($sql), 'triggerid');
 		foreach ($triggers as $trigger) {

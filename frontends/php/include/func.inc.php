@@ -2255,16 +2255,20 @@ function get_status() {
 			+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+	$row = DBfetch(DBselect(
+			'SELECT COUNT(*) AS usr_cnt'.
+			' FROM users u'.
+			whereDbNode('u.userid')
+	));
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
 	$db_sessions = DBselect(
-		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-				' FROM sessions s'.
-				' WHERE '.DBin_node('s.userid').
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' GROUP BY s.userid,s.status'
+			'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+			' FROM sessions s'.
+			' WHERE s.status='.ZBX_SESSION_ACTIVE.
+				andDbNode('s.userid').
+			' GROUP BY s.userid,s.status'
 	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {

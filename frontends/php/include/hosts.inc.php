@@ -841,7 +841,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	$def_sql = array(
 		// hostname to avoid confusion with node name
-		'select' => array('h.hostid','h.name as hostname'),
+		'select' => array('h.hostid', 'h.name as hostname'),
 		'from' => array('hosts h'),
 		'where' => array(),
 		'order' => array()
@@ -1003,6 +1003,8 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 											' AND i.itemid=gi.itemid)';
 	}
 
+	$def_sql['where'] = sqlPartDbNode($def_sql['where'], 'h.hostid', $nodeid);
+
 	$def_sql['order'][] = 'h.name';
 
 	foreach ($sql as $key => $value) {
@@ -1016,34 +1018,16 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		}
 	}
 
-	$def_sql['select'] = array_unique($def_sql['select']);
-	$def_sql['from'] = array_unique($def_sql['from']);
-	$def_sql['where'] = array_unique($def_sql['where']);
-	$def_sql['order'] = array_unique($def_sql['order']);
-
-	$sql_select = '';
-	$sql_from = '';
-	$sql_where = '';
-	$sql_order = '';
-	if (!empty($def_sql['select'])) {
-		$sql_select .= implode(',', $def_sql['select']);
-	}
-	if (!empty($def_sql['from'])) {
-		$sql_from .= implode(',', $def_sql['from']);
-	}
-	if (!empty($def_sql['where'])) {
-		$sql_where .= ' AND '.implode(' AND ', $def_sql['where']);
-	}
-	if (!empty($def_sql['order'])) {
-		$sql_order .= implode(',', $def_sql['order']);
-	}
+	$sqlSelect = implode(',', array_unique($def_sql['select']));
+	$sqlFrom = implode(',', array_unique($def_sql['from']));
+	$sqlWhere = !empty($def_sql['where']) ? ' WHERE '.implode(' AND ', array_unique($def_sql['where'])) : '';
+	$sqlOrder = !empty($def_sql['order']) ? ' ORDER BY '.implode(',', array_unique($def_sql['order'])) : '';
 
 	$res = DBselect(
-		'SELECT DISTINCT '.$sql_select.
-		' FROM '.$sql_from.
-		' WHERE '.DBin_node('h.hostid', $nodeid).
-			$sql_where.
-		' ORDER BY '.$sql_order
+			'SELECT DISTINCT '.$sqlSelect.
+			' FROM '.$sqlFrom.
+			$sqlWhere.
+			$sqlOrder
 	);
 	while ($host = DBfetch($res)) {
 		$hosts[$host['hostid']] = $host['hostname'];

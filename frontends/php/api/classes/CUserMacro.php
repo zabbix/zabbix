@@ -124,7 +124,7 @@ class CUserMacro extends CZBXAPI {
 
 		// global macro
 		if (!is_null($options['globalmacro'])) {
-			$sqlPartsGlobal['where'][] = DBin_node('gm.globalmacroid', $nodeids);
+			$sqlPartsGlobal['where'] = sqlPartDbNode($sqlPartsGlobal['where'], 'gm.globalmacroid', $nodeids);
 			$options['groupids'] = null;
 			$options['hostmacroids'] = null;
 			$options['triggerids'] = null;
@@ -135,7 +135,7 @@ class CUserMacro extends CZBXAPI {
 			$options['selectHosts'] = null;
 		}
 		else {
-			$sqlParts['where'][] = DBin_node('hm.hostmacroid', $nodeids);
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hm.hostmacroid', $nodeids);
 		}
 
 		// globalmacroids

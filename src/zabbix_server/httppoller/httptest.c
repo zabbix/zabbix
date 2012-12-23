@@ -582,13 +582,13 @@ void	process_httptests(int httppoller_num, int now)
 				" and h.proxy_hostid is null"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			now,
 			CONFIG_HTTPPOLLER_FORKS, httppoller_num - 1,
 			HTTPTEST_STATUS_MONITORED,
 			HOST_STATUS_MONITORED,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
-			DBnode_local("t.httptestid"));
+			DBand_node_local("t.httptestid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{

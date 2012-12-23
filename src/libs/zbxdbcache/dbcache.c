@@ -3327,16 +3327,15 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	table = DBget_table(table_name);
 	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
 
-	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-	max = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
+	min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
 
 	if (table->flags & ZBX_SYNC)
 	{
-		min += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
-		max += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid + (zbx_uint64_t)__UINT64_C(99999999999);
+		min += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
+		max = min + ZBX_DM_MAX_CONFIG_IDS - 1;
 	}
 	else
-		max += (zbx_uint64_t)__UINT64_C(99999999999999);
+		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 
 	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 			table->recid,
