@@ -678,7 +678,7 @@ function id2nodeid($id_var) {
  * For example, function will return " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
  *   for $fieldName = 'h.hostid', $nodes = 5, $operator = 'AND'
  *
- * Don't cause this function directly. Use wrapper functions whereDbNode(), andDbNode() and sqlPartDbNode()
+ * Don't call this function directly. Use wrapper functions whereDbNode(), andDbNode() and sqlPartDbNode()
  *
  * @param string $fieldName
  * @param mixed nodes
