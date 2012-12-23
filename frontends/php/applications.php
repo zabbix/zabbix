@@ -166,10 +166,10 @@ elseif ($_REQUEST['go'] == 'delete') {
 
 	DBstart();
 	$dbApplications = DBselect(
-		'SELECT a.applicationid,a.name,a.hostid'.
-		' FROM applications a'.
-		' WHERE '.DBin_node('a.applicationid').
-			' AND '.dbConditionInt('a.applicationid', $applications)
+			'SELECT a.applicationid,a.name,a.hostid'.
+			' FROM applications a'.
+			' WHERE '.dbConditionInt('a.applicationid', $applications).
+				andDbNode('a.applicationid')
 	);
 	while ($db_app = DBfetch($dbApplications)) {
 		if (!isset($applications[$db_app['applicationid']])) {
@@ -192,13 +192,13 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	DBstart();
 	foreach ($applications as $id => $appid) {
 		$db_items = DBselect(
-			'SELECT ia.itemid,i.hostid,i.key_'.
-			' FROM items_applications ia'.
-				' LEFT JOIN items i ON ia.itemid=i.itemid'.
-			' WHERE ia.applicationid='.$appid.
-				' AND i.hostid='.$_REQUEST['hostid'].
-				' AND i.type<>9'.
-				' AND '.DBin_node('ia.applicationid')
+				'SELECT ia.itemid,i.hostid,i.key_'.
+				' FROM items_applications ia'.
+					' LEFT JOIN items i ON ia.itemid=i.itemid'.
+				' WHERE ia.applicationid='.$appid.
+					' AND i.hostid='.$_REQUEST['hostid'].
+					' AND i.type<>'.ITEM_TYPE_HTTPTEST.
+					andDbNode('ia.applicationid')
 		);
 		while ($item = DBfetch($db_items)) {
 			if ($_REQUEST['go'] == 'activate') {

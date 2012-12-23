@@ -136,7 +136,7 @@ class CHistory extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('h.itemid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.itemid', $nodeids);
 			}
 		}
 
@@ -151,14 +151,13 @@ class CHistory extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('i.hostid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'i.hostid', $nodeids);
 			}
 		}
 
 		// should be last, after all ****IDS checks
 		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('h.itemid', $nodeids);
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.itemid', $nodeids);
 		}
 
 		// time_from
@@ -227,7 +226,6 @@ class CHistory extends CZBXAPI {
 
 		$sqlSelect = '';
 		$sqlFrom = '';
-		$sqlWhere = '';
 		$sqlOrder = '';
 		if (!empty($sqlParts['select'])) {
 			$sqlSelect .= implode(',', $sqlParts['select']);
@@ -235,9 +233,7 @@ class CHistory extends CZBXAPI {
 		if (!empty($sqlParts['from'])) {
 			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
+		$sqlWhere = !empty($sqlParts['where']) ? ' WHERE '.implode(' AND ', $sqlParts['where']) : '';
 		if (!empty($sqlParts['order'])) {
 			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
@@ -245,9 +241,8 @@ class CHistory extends CZBXAPI {
 
 		$sql = 'SELECT '.$sqlSelect.
 				' FROM '.$sqlFrom.
-				' WHERE '.
-					$sqlWhere.
-					$sqlOrder;
+				$sqlWhere.
+				$sqlOrder;
 		$dbRes = DBselect($sql, $sqlLimit);
 		$count = 0;
 		$group = array();

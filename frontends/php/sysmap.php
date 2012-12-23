@@ -248,7 +248,12 @@ else {
 }
 
 $iconList = array();
-$result = DBselect('SELECT i.imageid,i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON.' AND '.DBin_node('i.imageid'));
+$result = DBselect(
+		'SELECT i.imageid,i.name'.
+		' FROM images i'.
+		' WHERE i.imagetype='.IMAGE_TYPE_ICON.
+			andDbNode('i.imageid')
+);
 while ($row = DBfetch($result)) {
 	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
 }

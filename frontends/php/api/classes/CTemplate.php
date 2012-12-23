@@ -135,7 +135,7 @@ class CTemplate extends CHostGeneral {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hg.groupid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hg.groupid', $nodeids);
 			}
 		}
 
@@ -147,7 +147,7 @@ class CTemplate extends CHostGeneral {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('h.hostid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.hostid', $nodeids);
 			}
 		}
 
@@ -166,7 +166,7 @@ class CTemplate extends CHostGeneral {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ht.templateid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ht.templateid', $nodeids);
 			}
 		}
 
@@ -185,7 +185,7 @@ class CTemplate extends CHostGeneral {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ht.hostid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ht.hostid', $nodeids);
 			}
 		}
 
@@ -200,7 +200,7 @@ class CTemplate extends CHostGeneral {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('i.itemid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'i.itemid', $nodeids);
 			}
 		}
 
@@ -217,7 +217,7 @@ class CTemplate extends CHostGeneral {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('f.triggerid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'f.triggerid', $nodeids);
 			}
 		}
 
@@ -234,14 +234,14 @@ class CTemplate extends CHostGeneral {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('gi.graphid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'gi.graphid', $nodeids);
 			}
 		}
 
 		// node check !!!!
 		// should last, after all ****IDS checks
 		if (!$nodeCheck) {
-			$sqlParts['where'][] = DBin_node('h.hostid', $nodeids);
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.hostid', $nodeids);
 		}
 
 		// with_items

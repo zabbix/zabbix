@@ -98,25 +98,26 @@ require_once 'include/page_header.php';
 		ITEM_TYPE_CALCULATED
 	);
 
-	$sql = 'SELECT i.itemid,i.lastclock,i.name,i.key_,i.type,h.name as hostname,'.
-			'h.hostid,h.proxy_hostid,i.delay,i.delay_flex,i.interfaceid'.
-		' FROM items i,hosts h'.
-		' WHERE i.hostid=h.hostid'.
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND i.value_type NOT IN ('.ITEM_VALUE_TYPE_LOG.')'.
-			' AND NOT i.lastclock IS NULL'.
-			' AND ('.
-				' i.type IN ('.implode(',',$norm_item_types).')'.
-				' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$zbx_item_types).'))'.
-				' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$snmp_item_types).'))'.
-				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$ipmi_item_types).'))'.
-				' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
+	$result = DBselect(
+			'SELECT i.itemid,i.lastclock,i.name,i.key_,i.type,h.name as hostname,'.
+				'h.hostid,h.proxy_hostid,i.delay,i.delay_flex,i.interfaceid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.value_type<>'.ITEM_VALUE_TYPE_LOG.
+				' AND NOT i.lastclock IS NULL'.
+				' AND ('.
+					' i.type IN ('.implode(',',$norm_item_types).')'.
+					' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$zbx_item_types).'))'.
+					' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$snmp_item_types).'))'.
+					' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$ipmi_item_types).'))'.
+					' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
 				')'.
-			' AND '.DBin_node('i.itemid', get_current_nodeid()).
-			' AND i.flags NOT IN ('.ZBX_FLAG_DISCOVERY_CHILD.')'.
-		' ORDER BY i.lastclock,h.name,i.name,i.key_';
-	$result = DBselect($sql);
+				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_CHILD.
+				andDbNode('i.itemid', get_current_nodeid()).
+			' ORDER BY i.lastclock,h.name,i.name,i.key_'
+	);
 
 	$table = new CTableInfo(_('The queue is empty'));
 	$truncated = false;
