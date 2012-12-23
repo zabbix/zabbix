@@ -671,6 +671,21 @@ function id2nodeid($id_var) {
 	return (int)bcdiv("$id_var", '100000000000000');
 }
 
+/**
+ * Generates the filter by a node for the SQL statement
+ * For a standalone setup the function will return an empty string
+ *
+ * For example, function will return " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ *   for $fieldName = 'h.hostid', $nodes = 5, $operator = 'AND'
+ *
+ * Don't cause this function directly. Use wrapper functions whereDbNode(), andDbNode() and sqlPartDbNode()
+ *
+ * @param string $fieldName
+ * @param mixed nodes
+ * @param string $operator  SQL operator ('AND', 'WHERE')
+ *
+ * @return string
+ */
 function dbNode($fieldName, $nodes = null, $operator = '') {
 	if (is_null($nodes)) {
 		$nodes = get_current_nodeid();
@@ -715,16 +730,45 @@ function dbNode($fieldName, $nodes = null, $operator = '') {
 	return $sql;
 }
 
+/**
+ * Wrapper function to generate condition like " WHERE h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ * For a standalone setup the function will return an empty string
+ *
+ * @param string $fieldName
+ * @param mixed nodes
+ *
+ * @return string
+ */
 function whereDbNode($fieldName, $nodes = null)
 {
 	return dbNode($fieldName, $nodes, 'WHERE');
 }
 
+/**
+ * Wrapper function to generate condition like " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ * For a standalone setup the function will return an empty string
+ *
+ * @param string $fieldName
+ * @param mixed nodes
+ *
+ * @return string
+ */
 function andDbNode($fieldName, $nodes = null)
 {
 	return dbNode($fieldName, $nodes, 'AND');
 }
 
+/**
+ * Wrapper function to add condition like "h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ *   to an array $sqlPartWhere
+ * For a standalone setup the function will make nothing and will return $sqlPartWhere array without any changes
+ *
+ * @param array $sqlPartWhere
+ * @param string $fieldName
+ * @param mixed nodes
+ *
+ * @return array
+ */
 function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null)
 {
 	$sql = dbNode($fieldName, $nodes);
