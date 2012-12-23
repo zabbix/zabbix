@@ -2,16 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-23 02:31+0200\n"
-"PO-Revision-Date: 2012-03-21 08:20+0200\n"
-"Last-Translator: Murat <murat@profelis.com.tr>\n"
+"POT-Creation-Date: 2012-12-23 02:32+0200\n"
+"PO-Revision-Date: 2012-12-22 23:52+0200\n"
+"Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
@@ -19,15 +19,17 @@ msgstr ""
 #: maintenance.php:153 maintenance.php:165 services.php:194 services.php:208
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" 01.01.1970 - 18.01.2038 aralığında olmalıdır."
 
+# "Display OK triggers" daha baska bir yerde cevrilmis mi?
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Display OK triggers\",  \"0\" yada pozitif bir tamsayı olması gerekir."
 
+# "Triggers blink on status change"  daha önce çevrilmiş mi?
 #: include/profiles.inc.php:291
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Triggers blink on status change\", \"0\" yada pozitif bir tamsayı olması gerekir."
 
 #: include/func.inc.php:433
 #, php-format
@@ -52,22 +54,22 @@ msgstr "%1$s (yıl %2$s)"
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s madde"
+msgstr[1] "%1$s madde"
 
 #: include/page_header.php:480
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s başarısız giriş denemesi kayıt altına alındı. En son başarısız deneme  %2$s adresinden %3$s tarihinde %4$s zamanında olmuştur."
+msgstr[1] "%1$s başarısız giriş denemesi kayıt altına alındı. En son başarısız deneme  %2$s adresinden %3$s tarihinde %4$s zamanında olmuştur."
 
 #: include/blocks.inc.php:942
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Toplam %1$d sorundan %2$d sorun gösteriliyor."
+msgstr[1] "Toplam %1$d sorundan %2$d sorun gösteriliyor."
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
@@ -82,7 +84,7 @@ msgstr "(0 - belirsiz)"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Sadece süper yöneticiler grup oluşturabilir)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:143
@@ -185,23 +187,23 @@ msgstr "KULLANILIRLILIK RAPORU"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Son ve önceki değer arasındaki mutlak fark < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Son ve önceki değer arasındaki mutlak fark = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Son ve önceki değer arasındaki mutlak fark > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Son ve önceki değer arasındaki mutlak fark N değil"
 
 #: report3.php:86 srv_status.php:167
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Kabuledilebilir SLA (Hizmet Seviyesi Anlaşması)"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -289,7 +291,7 @@ msgstr "Eylem"
 #: api/classes/CAction.php:774 api/classes/CAction.php:871
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "\"%1$s\" eylemi \"esc_period\" için yanlış değere sahip (en düşük %2$s saniye)"
 
 #: api/classes/CAction.php:777 api/classes/CAction.php:791
 #: api/classes/CAction.php:880 api/classes/CAction.php:899
@@ -340,7 +342,7 @@ msgstr "Etkin"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Etkin"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:571
 #: include/views/configuration.maintenance.edit.php:81 maintenance.php:147
@@ -416,7 +418,7 @@ msgstr "Eleman ekle"
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Önce grafik öğelerini ekle"
 
 #: include/actions.inc.php:283 include/actions.inc.php:498
 msgid "Add host"
@@ -428,7 +430,7 @@ msgstr "Bağlantı ekle"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Eksik Ekle"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
@@ -436,7 +438,7 @@ msgstr "Prototip ekle"
 
 #: jsLoader.php:178
 msgid "Add service"
-msgstr ""
+msgstr "Hizmet Ekle"
 
 #: slides.php:83
 msgid "Add to"
@@ -445,7 +447,7 @@ msgstr "e ekle"
 #: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:256
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
-msgstr ""
+msgstr "Favorilere Ekle"
 
 #: include/actions.inc.php:502
 msgid "Add to host group"
@@ -488,7 +490,7 @@ msgstr "Yaşı dan küçük"
 #: include/views/monitoring.overview.php:55
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Yaş %s den az"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:114 popup.php:2022
@@ -501,7 +503,7 @@ msgstr "Aracı arabilirimleri"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Aracı yada SNMP yada JMX yada IPMI arayüzü"
 
 #: include/hosts.inc.php:119 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:897 users.php:43
@@ -576,12 +578,12 @@ msgstr "\"%2$s\" konağı için \"%1$s\" uygulaması zaten var."
 #: api/classes/CApplication.php:489
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" uygulaması zaten var."
 
 #: api/classes/CApplication.php:633
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Uygulama \"%1$s\" , \"%2$s\" senaryosu tarafından kullanılıyor ve silinemez. "
 
 #: applications.php:128
 msgid "Application added"
@@ -602,7 +604,7 @@ msgstr "Uygulama güncellendi"
 #: api/classes/CItemGeneral.php:333
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" Kimlik ID'li uygulama \"%2$s\" üzerinde geçerli değil."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
 #: include/html.inc.php:397 include/html.inc.php:401
@@ -627,7 +629,7 @@ msgstr "Uygula"
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Yaklaşan"
 
 #: include/func.inc.php:221
 msgid "Apr"
@@ -640,7 +642,7 @@ msgstr "Nisan"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Bu eylemi gerçekleştirmek isteğinize emin misiniz?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
@@ -648,11 +650,11 @@ msgstr "Silmek istediğinizden emin misiniz"
 
 #: include/views/js/configuration.sysmaps.js.php:48
 msgid "Area size"
-msgstr ""
+msgstr "Alan boyu"
 
 #: include/views/js/configuration.sysmaps.js.php:36
 msgid "Area type"
-msgstr ""
+msgstr "Alan türü"
 
 #: include/views/configuration.item.edit.php:360
 #: include/views/configuration.item.edit.php:377
@@ -676,19 +678,19 @@ msgstr "De"
 
 #: include/forms.inc.php:1682
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "(saat:dakika) da"
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "En azından bir ana bilgisayar yada grup seçilmeli."
 
 #: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "En azından bir adet bakım peryodu oluşturulmalıdır."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "En azından Mysql, PostgreSQL, Oracle, SQLite3 yada IBM DB2'den biri desteklenmelidir."
 
 #: include/menu.inc.php:266
 msgid "Audit"
@@ -696,11 +698,11 @@ msgstr "Denetim"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Denetim eylemleri"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Denetim günlükleri (logları)"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -727,15 +729,15 @@ msgstr "Kimlik doğrulama yöntemi"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Kimlik doğrulama yöntemi HTTP olarak değiştirildi."
 
 #: authentication.php:122 authentication.php:123
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "Kimlik doğrulama yöntemi LDAP olarak değiştirildi."
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "Kimlik doğrulama yöntemi Zabbix içinden olacak biçimde değiştirildi."
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -743,7 +745,7 @@ msgstr "Otomatik kaydolma"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr ""
+msgstr "Otomatik Giriş"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
@@ -756,12 +758,12 @@ msgstr "Otomatik"
 
 #: include/views/configuration.sysmap.edit.php:78
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Otomatik ikon eşleştirmesi"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:238
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Otomatik ikon seçimi"
 
 #: hosts.php:691 popup.php:544
 msgid "Availability"
@@ -786,19 +788,19 @@ msgstr "Ortalamanın alındığı"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Bir T peryodunun ortalama değeri < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Bir T peryodunun ortalama değeri = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Bir T peryodunun ortalama değeri > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Bir T peryodunun ortalama değeri N değil."
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -807,7 +809,7 @@ msgstr "Eksen yanı"
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
@@ -842,7 +844,7 @@ msgstr "Bağlama DN"
 #: authentication.php:49
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Parola Bağla"
 
 #: include/classes/core/ZBase.php:137
 msgid "Black & Blue"
@@ -850,7 +852,7 @@ msgstr "Siyah & Mavi"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
-msgstr ""
+msgstr "Yanıp Sönen"
 
 #: include/views/administration.users.list.php:83
 msgid "Blocked"
@@ -891,7 +893,7 @@ msgstr "Tetik şablonu bazında"
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "EYLEMLERİN YAPILANDIRMASI"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -900,12 +902,12 @@ msgstr "UYGULAMALARIN YAPILANDIRMASI"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "KİMLİK DOĞRULAMA KONFİGÜRASYONU"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr ""
+msgstr "KEŞİF KURALI KONFİGÜRASYONU"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
@@ -924,7 +926,7 @@ msgstr "GRAFİKLERİN YAPILANDIRMASI"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "KULLANICI ARAYÜZÜ KONFİGÜRASYONU"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -933,24 +935,24 @@ msgstr "KONAK GRUPLARININ YAPILANDIRMASI"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "ANA BİLGİSAYARLARIN KONFİGÜRASYONU"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "İDARECİ KONFİGÜRASYONU"
 
 #: adm.iconmapping.php:127
 msgid "CONFIGURATION OF ICON MAPPING"
-msgstr ""
+msgstr "İKON EŞLEŞTİRME KONFİGÜRASYONU"
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "RESİM KONFİGÜRASYONU"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "BİLİŞİM HİZMETLERİNİN KONFİGÜRASYONU"
 
 #: disc_prototypes.php:313
 #: include/views/configuration.item.prototype.list.php:29
@@ -965,7 +967,7 @@ msgstr "ÖĞELERİN YAPILANDIRMASI"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "MAKROLARIN KONFİGÜRASYONU"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -993,7 +995,7 @@ msgstr "VEKİLLERİN YAPILANDIRMASI"
 
 #: adm.regexps.php:226
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "KURALLI İFADELERİN (REGEX) KONFİGÜRASYONU"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
@@ -1016,7 +1018,7 @@ msgstr "SLAYT GÖSTERİLERİN YAPILANDIRMASI"
 
 #: templates.php:423 templates.php:443
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "ŞABLONLARIN KONFİGÜRASYONU"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:41
@@ -1026,7 +1028,7 @@ msgstr "TETİK PROTOTİPLERİNİN YAPILANDIRMASI"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
-msgstr ""
+msgstr "TRIGGER BÜYÜKLÜKLERİNİN KONFİGÜRASYONU"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
@@ -1036,11 +1038,11 @@ msgstr "TETİKLERİN YAPILANDIRMASI"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "KULLANICI KONFİGÜRASYONU"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "KULLANICI GRUPLARININ KONFİGÜRASYONU"
 
 #: include/views/administration.usergroups.list.php:31
 #: include/views/administration.users.list.php:31
@@ -1049,7 +1051,7 @@ msgstr "KULLANICI VE KULLANICI GRUPLARININ YAPILANDIRMASI"
 
 #: adm.valuemapping.php:143
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "DEĞER EŞLEMESİNİN KONFİGÜRASYONU"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
@@ -1058,7 +1060,7 @@ msgstr "WEB GÖZETLEME YAPILANDIRMASI"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "ÇALIŞMA ZAMANININ KONFİGÜRASYONU"
 
 #: adm.triggerdisplayoptions.php:89
 msgid "CONFIGURATION OF ZABBIX"
@@ -1066,7 +1068,7 @@ msgstr "ZABBIX YAPILANDIRMASI"
 
 #: include/views/configuration.services.edit.php:62 services.php:45
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "SLA (Hizmet Seviyesi Anlaşması) Hesapla, kabul edilebilir SLA (% içinde)"
 
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:162
 #: include/views/configuration.graph.edit.php:220
@@ -1075,7 +1077,7 @@ msgstr "Hesaplanmış"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Hesaplanmış izinler"
 
 #: include/hosts.inc.php:66
 msgid "Callback"
@@ -1130,12 +1132,12 @@ msgstr "Uygulama eklenemedi"
 
 #: api/classes/CTrigger.php:1825
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Bir ana bilgisayardan bir şablona bağımlılık eklenemiyor."
 
 #: include/triggers.inc.php:542
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "\"%1$s:%2$s\" tetiğinden var olmayan \"%3$s:%4$s\"  tetiğine bağımlılık eklenemiyor."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1159,7 +1161,7 @@ msgstr "Resim eklenemedi"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Resim eklenemiyor."
 
 #: disc_prototypes.php:277 items.php:450 screenedit.php:180
 msgid "Cannot add item"
@@ -1167,7 +1169,7 @@ msgstr "Öğe eklenemedi"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Makro eklenemiyor."
 
 #: maintenance.php:137
 msgid "Cannot add maintenance"
@@ -1175,12 +1177,12 @@ msgstr "Bakım eklenemedi"
 
 #: media_types.php:118
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Ortam türü eklenemiyor."
 
 #: api/classes/CGraphGeneral.php:84
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr " \"%1$s\" çizgesinde \"Çizge toplamı\" türünden birden fazla öğe eklenemiyor."
 
 #: sysmaps.php:167
 msgid "Cannot add network map"
@@ -1188,7 +1190,7 @@ msgstr "Ağ haritası eklenemedi"
 
 #: httpconf.php:256
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Yeni uygulama eklenemiyor."
 
 #: nodes.php:77
 msgid "Cannot add node"
@@ -1220,7 +1222,7 @@ msgstr "Servis eklenemedi"
 
 #: slideconf.php:105
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "Slayt gösterisi eklenemiyor."
 
 #: templates.php:183
 msgid "Cannot add template"
@@ -1241,7 +1243,7 @@ msgstr "Kullanıcı eklenemedi. Her iki parola da aynı olmalı."
 
 #: api/classes/CUserGroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Kullanıcılar eklenemiyor."
 
 #: adm.valuemapping.php:72
 msgid "Cannot add value map"
@@ -1249,15 +1251,15 @@ msgstr "Değer haritası eklenemedi"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Kimlik doğrulama yöntemi HTTP'ye değiştirilemiyor."
 
 #: authentication.php:127
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Kimlik doğrulama yöntemi LDAP'e değiştirilemiyor."
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Kimlik doğrulama yöntemi Zabbix iç işleyişine değiştirilemiyor."
 
 #: items.php:472
 msgid "Cannot clear history"
@@ -1265,19 +1267,19 @@ msgstr "Geçmiş temizlenemedi"
 
 #: api/classes/CDiscoveryRule.php:1205
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Çizge prototipleri kopyalanamıyor."
 
 #: api/classes/CDiscoveryRule.php:1090
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Öğe prototipleri kopyalanamıyor."
 
 #: api/classes/CDiscoveryRule.php:812
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Tetikleyici prototipleri kopyalanamıyor."
 
 #: scripts_exec.php:64
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "Zabbix sunucu tuzak portuna bağlanılamıyor fakat betiği çalıştırabilecek biçimde kullanılabilir."
 
 #: graphs.php:290
 msgid "Cannot copy graphs"
@@ -1290,7 +1292,7 @@ msgstr "Öğeler kopyalanamadı"
 #: include/triggers.inc.php:449
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "\"%1$s:%2$s\" tetikleyicisi kopyalanamıyor çünkü ifadede çoklu ana bilgisayar bulunuyor."
 
 #: include/db.inc.php:54
 msgid "Cannot create another database connection."
@@ -1298,32 +1300,32 @@ msgstr "Başka bir veritabanı bağlantısı oluşturulamadı"
 
 #: api/classes/CTrigger.php:1859
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Dairesel bağımlılıklar oluşturulamıyor."
 
 #: api/classes/CTrigger.php:1831
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Tetikleyicinin kendisi üzerinde bağımlılık oluşturulamıyor."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "Keşif kuralı oluşturulamıyor."
 
 #: api/classes/CHostGroup.php:647
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "İsimsiz grup oluşturulamıyor."
 
 #: api/classes/CHost.php:1778
 msgid "Cannot create host group."
-msgstr ""
+msgstr "Ana bilgisayar grubu oluşturulamıyor."
 
 #: adm.iconmapping.php:82
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "İkon haritası oluşturulamıyor."
 
 #: api/classes/CIconMap.php:259 api/classes/CIconMap.php:319
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr ""
+msgstr "\"%s\" ismiyle eş ikon haritaları oluşturulamıyor."
 
 #: include/classes/import/CXmlImport18.php:816
 #, php-format
@@ -1332,16 +1334,16 @@ msgstr "\"%s\" haritası oluşturulamadı."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
-msgstr ""
+msgstr "Yeni öğre oluşturulamıyor."
 
 #: include/classes/import/CXmlImport18.php:1709
 msgid "Cannot create screen."
-msgstr ""
+msgstr "Ekran oluşturulamıyor."
 
 #: api/classes/CUser.php:370
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "\"%1$s\" Zabbix iç kullanıcısı silinemiyor, bu kullanıcıyı devre dışı bırakmayı dene."
 
 #: actionconf.php:170
 msgid "Cannot delete action"
@@ -1353,7 +1355,7 @@ msgstr "Uygulama silinemedi"
 
 #: api/classes/CTrigger.php:1528
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "Bağımlılık silinemiyor."
 
 #: api/classes/CDiscoveryRule.php:628 discoveryconf.php:164
 #: host_discovery.php:166
@@ -1362,7 +1364,7 @@ msgstr "Keşif kuralı silienemedi"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "Keşif kuralları silinemiyor."
 
 #: graphs.php:237
 msgid "Cannot delete graph"
@@ -1370,11 +1372,11 @@ msgstr "Grafik silinemedi"
 
 #: api/classes/CItemPrototype.php:768
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Çizge prototipi silinemiyor."
 
 #: api/classes/CItem.php:981
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "Çizge silinemiyor."
 
 #: graphs.php:244
 msgid "Cannot delete graphs"
@@ -1382,7 +1384,7 @@ msgstr "Grafikler silienemedi"
 
 #: api/classes/CGraphPrototype.php:808
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "Düşük seviyeli keşifle oluşturulmuş çizgeler silinemiyor."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1394,11 +1396,11 @@ msgstr "Konak silienemedi"
 
 #: api/classes/CHost.php:1789
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "Ana bilgisayar grubu silinemiyor."
 
 #: adm.iconmapping.php:95
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "İkon haritası silinemiyor."
 
 #: adm.images.php:116
 msgid "Cannot delete image"
@@ -1406,7 +1408,7 @@ msgstr "Resim silienemedi"
 
 #: api/classes/CHost.php:1882
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "Envanter silinemiyor."
 
 #: disc_prototypes.php:188 items.php:348 screenedit.php:199
 msgid "Cannot delete item"
@@ -1418,7 +1420,7 @@ msgstr "Öğeler silinemedi"
 
 #: api/classes/CItemPrototype.php:785
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "Düşük seviyeli keşifle oluşturulmuş öğeler silinemiyor."
 
 #: maintenance.php:237
 msgid "Cannot delete maintenance"
@@ -1426,7 +1428,7 @@ msgstr "Bakım silinemedi"
 
 #: media_types.php:131 media_types.php:170
 msgid "Cannot delete media type"
-msgstr ""
+msgstr "Ortam türü silinemiyor."
 
 #: sysmaps.php:188
 msgid "Cannot delete network map"
@@ -1441,11 +1443,10 @@ msgid "Cannot delete proxy"
 msgstr "Vekil silinemedi"
 
 #: adm.regexps.php:139
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] "Düzenli ifade silienemedi"
-msgstr[1] "Düzenli ifade silienemedi"
+msgstr[0] "Düzenli ifade (Regex) silinemedi"
+msgstr[1] "Düzenli ifade (Regex)  silinemedi"
 
 #: httpconf.php:185
 msgid "Cannot delete scenario"
@@ -1453,7 +1454,7 @@ msgstr "Senaryo silienemedi"
 
 #: screenconf.php:226
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "Ekran silinemiyor."
 
 #: scripts.php:139 scripts.php:155
 msgid "Cannot delete script"
@@ -1461,7 +1462,7 @@ msgstr "Betik silienemedi"
 
 #: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr ""
+msgstr "Betikler silinemiyor. \"scriptids\" giriş parametresi boş."
 
 #: api/classes/CScript.php:437
 #, php-format
@@ -1483,7 +1484,7 @@ msgstr "Servis silienemedi"
 
 #: slideconf.php:118 slideconf.php:139
 msgid "Cannot delete slide show"
-msgstr ""
+msgstr "Slayt gösterisi silinemiyor."
 
 #: templates.php:354 templates.php:372 templates.php:397
 msgid "Cannot delete template"
@@ -1491,24 +1492,24 @@ msgstr "Şablon silienemedi"
 
 #: api/classes/CGraph.php:736 api/classes/CGraphPrototype.php:784
 msgid "Cannot delete templated graphs."
-msgstr ""
+msgstr "Şablonlanmış çizgeler silinemiyor."
 
 #: api/classes/CItem.php:945
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "Şablonlanmış öğre silinemiyor."
 
 #: api/classes/CItemPrototype.php:729
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Şablonlanmış öğeler silinemiyor."
 
 #: api/classes/CDiscoveryRule.php:587
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "Şablonlarmış öğeler silinemiyor."
 
 #: api/classes/CTrigger.php:1114 api/classes/CTriggerPrototype.php:925
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "\"%1$s:%2$s\" şablonlanmış tetikleyicisi silinemiyor."
 
 #: trigger_prototypes.php:177 triggers.php:166
 msgid "Cannot delete trigger"
@@ -1516,11 +1517,11 @@ msgstr "Tetik silienemedi"
 
 #: api/classes/CItemPrototype.php:800
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Tetikleyici prototipi silinemiyor."
 
 #: api/classes/CItem.php:997
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "Tetikleyici silinemiyor."
 
 #: trigger_prototypes.php:287 triggers.php:353
 msgid "Cannot delete triggers"
@@ -1528,7 +1529,7 @@ msgstr "Tetikler silinemedi"
 
 #: api/classes/CTriggerPrototype.php:963
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "Düşük seviyeli keşifle oluşturulmuş tetikleyiciler silinemiyor."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1536,7 +1537,7 @@ msgstr "Kullanıcı silinemedi"
 
 #: api/classes/CUser.php:786
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "Kullanıcı ortamı silinemiyor."
 
 #: adm.valuemapping.php:88
 msgid "Cannot delete value map"
@@ -1544,99 +1545,99 @@ msgstr "Değer haritası silinemedi"
 
 #: media_types.php:163
 msgid "Cannot disable media type"
-msgstr ""
+msgstr "Ortam türü etkisiz hale getirilemiyor."
 
 #: media_types.php:147
 msgid "Cannot enable media type"
-msgstr ""
+msgstr "Ortam türü etkin hale getirilemiyor."
 
 #: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" arka plan resmi bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1666
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" çizgesi bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:210
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" grubu bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:483
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" grubu bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:218
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" ana bilgisayarı bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:495
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ana bilgisayarı bulunamıyor."
 
 #: api/classes/CDiscoveryRule.php:1006 api/classes/CDiscoveryRule.php:1078
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" öğe anahtarı için \"%1$s\" üzerinde ana bilgisayar arayüzü bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" haritaısnda kullanılan \"%1$s\" ikonu bulunamıyor."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" ikon haritası bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1679
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" öğesi bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:712
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Dışa aktarılmış \"%2$s\" haritasında kullanılan \"%1$s\" haritası bulunamıyor."
 
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" haritası bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" haritası bulunamıyor."
 
 #: include/js.inc.php:248
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "İsim ile nesneler bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:541
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ekranı bulunamıyor."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
@@ -1644,15 +1645,15 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" tetikleyicisi bulunamıyor."
 
 #: srv_status.php:193
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr ""
+msgstr "Ağaç biçimlendirilemiyor. Hizmet bağlantılarındaki mantık yapısını kontrol et."
 
 #: services.php:466
 msgid "Cannot format tree."
-msgstr ""
+msgstr "Ağaç biçimlendirilemiyor."
 
 #: api/classes/CTemplate.php:1372
 msgid "Cannot have empty visible template name"
@@ -1669,24 +1670,24 @@ msgstr "\"%s\" ifadesi genişletilemedi."
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\"%2$s\" ekranı içe aktarılamıyor : \"%3$s\" alt ekranı mevcut değil."
+msgstr[1] "\"%2$s\" ekranı içe aktarılamıyor : \"%3$s\" alt ekranları mevcut değil."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] " \"%2$s\" şablonu içe aktarılamıyor,  \"%3$s\" bağlı şablonu mevcut değil."
+msgstr[1] " \"%2$s\" şablonu içe aktarılamıyor,  \"%3$s\" bağlı şablonları mevcut değil."
 
 #: include/classes/class.cview.php:113
 #, php-format
 msgid "Cannot include view file \"%s\"."
-msgstr ""
+msgstr "\"%s\" görünüm dosyası içerilemiyor."
 
 #: api/classes/CUser.php:815
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "Kullanıcı ortamı eklenemiyor."
 
 #: api/classes/CHost.php:1861
 msgid "Cannot link template"
@@ -1698,7 +1699,7 @@ msgstr "Oturum kapatılamadı."
 
 #: api/classes/CHost.php:1685
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "Ana bilgisayar adı yığın biçimde güncellenemiyor."
 
 #: api/classes/CTemplate.php:1331
 msgid "Cannot mass update template name"
@@ -1706,7 +1707,7 @@ msgstr "Şablon ismi toplu olarak güncellenmedi"
 
 #: api/classes/CHost.php:1675
 msgid "Cannot mass update visible host name."
-msgstr ""
+msgstr "Görünür ana bilgisayar adı yığın biçimde güncellenemiyor."
 
 #: api/classes/CTemplate.php:1304
 msgid "Cannot mass update visible template name"
@@ -1715,30 +1716,30 @@ msgstr "Görünen şablon ismi toplu olarak güncellenmedi"
 #: api/classes/CHostGeneral.php:157
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr ""
+msgstr "%s bağlantısı için mükerrer şablon ID'leri geçirilemiyor."
 
 #: include/classes/db/DB.php:614
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "\"%1$s\" tablosu üzerinde silme işlemi \"where\" ifadesi olmadan gerçekleştirilemiyor."
 
 #: include/classes/db/DB.php:437
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr ""
+msgstr "\"%1$s\" tablosu üzerinde değerler olmadan \"update\" ifadesi gerçekleştirilemiyor."
 
 #: include/classes/db/DB.php:448
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "%1$s\" tablosu üzerinde \"update\" ifadesi  \"where\" koşulu olmadan gerçekleştirilemiyor."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr ""
+msgstr "Makro çıkarılamıyor."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "\"guest\" misafir kullanıcısı yeniden adlandırılamıyor."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -1747,36 +1748,36 @@ msgstr "Kontroller olmaksızın keşif kuralları saklanamadı"
 #: api/classes/CApplication.php:459
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" uygulaması için \"templateid\" kurulamıyor."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" çizgesi için \"templateid\" kurulamıyor."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" öğesi için \"templateid\" kurulamıyor."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" ekranı için \"templateid\" kurulamıyor."
 
 #: api/classes/CTrigger.php:1099
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" tetikleyicisi için \"templateid\" kurulamıyor."
 
 #: api/classes/CTriggerPrototype.php:759
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" tetikleyici prototipi için \"templateid\" kurulamıyor."
 
 #: api/classes/CHostInterface.php:510
 msgid "Cannot switch host for interface."
-msgstr ""
+msgstr "Arabirim için ana bilgisayar anahtarlanamıyor."
 
 #: users.php:294
 msgid "Cannot unblock users"

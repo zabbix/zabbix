@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-23 02:31+0200\n"
-"PO-Revision-Date: 2012-11-14 22:03+0200\n"
-"Last-Translator: dotneft <dotneft@gmail.com>\n"
+"POT-Creation-Date: 2012-12-23 02:32+0200\n"
+"PO-Revision-Date: 2012-12-23 00:13+0200\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -4501,7 +4501,7 @@ msgstr "Поле:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Формат файла не поддерживается."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
@@ -5681,11 +5681,11 @@ msgstr "Тип подписи к изображению"
 #: api/classes/CImage.php:343
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Ошибка загрузки изображения [%1$s] в [%2$s]."
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "Размер изображения должен быть меньше чем 1МБ."
 
 #: adm.images.php:57
 msgid "Image updated"
@@ -7527,19 +7527,19 @@ msgstr[2] "Максимальная длина имени узла сети %2$d
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "Максимальное значение за период T < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "Максимальное значение за период T = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "Максимальное значение за период T > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "Максимальное значение за период T NOT N"
 
 #: api/classes/CHost.php:1386
 #, php-format
@@ -7716,19 +7716,19 @@ msgstr "Минимально требуемый размер PHP post - %s (ко
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "Минимальное значение за период T < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "Минимальное значение за период T = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "Минимальное значение за период T > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "Минимальное значение за период T NOT N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
@@ -8120,11 +8120,11 @@ msgstr "Нет заданных данных."
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Не получено данных за период времени T, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Не получено данных за период времени T, тогда N NOT 1, 0 - в противном случае"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -8791,19 +8791,19 @@ msgstr "Количество шагов"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период T < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период T = N"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период T > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr ""
+msgstr "Количество успешно полученных значений V (которые удовлетворяют оператору O) за период T NOT N"
 
 #: include/blocks.inc.php:715
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9217,7 +9217,7 @@ msgstr "Поддержка JPEG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:409
 msgid "PHP gd PNG image support missing"
-msgstr "Отсутствует поддержка изображений PNG в PHP gd "
+msgstr "Отсутствует поддержка изображений PNG в PHP gd"
 
 #: include/classes/class.frontendsetup.php:405
 msgid "PHP gd PNG support"
@@ -11427,7 +11427,7 @@ msgstr "Аудит успеха"
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "Сумма значений за период T < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
@@ -11439,7 +11439,7 @@ msgstr "Сумма значений за период T > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "Сумма значений за период T NOT N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -12118,7 +12118,7 @@ msgstr "Вторник"
 
 #: include/locales.inc.php:68
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "Турецкий (tr_TR)"
 
 #: jsLoader.php:148
 msgid "Two elements should be selected"

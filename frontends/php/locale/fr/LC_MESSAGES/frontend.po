@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-23 02:31+0200\n"
-"PO-Revision-Date: 2012-12-10 15:52+0200\n"
+"POT-Creation-Date: 2012-12-23 02:32+0200\n"
+"PO-Revision-Date: 2012-12-22 19:56+0200\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -4493,7 +4493,7 @@ msgstr "Champ :"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Ce format de fichier n'est pas supporté."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
@@ -5673,11 +5673,11 @@ msgstr "Type d'étiquette d'image"
 #: api/classes/CImage.php:343
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Erreur de chargement d'image [%1$s] dans [%2$s]."
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "La taille de l'image doit être inférieure à 1 Mo."
 
 #: adm.images.php:57
 msgid "Image updated"
@@ -7515,19 +7515,19 @@ msgstr[1] "La longueur maximale du nom de l'hôte est de %2$d caractères, \"%3$
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "La valeur maximale pour la période T < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "La valeur maximale pour la période T est égale à N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "La valeur maximale pour la période T > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "La valeur maximale pour la période T n'est PAS N"
 
 #: api/classes/CHost.php:1386
 #, php-format
@@ -7703,19 +7703,19 @@ msgstr "La taille des requêtes POST de PHP minimale requise est %s (option de c
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "La valeur minimale pour la période T < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "La valeur minimale pour la période T est égale à N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "La valeur minimale pour la période T > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "La valeur minimale pour la période T n'est PAS N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
@@ -8107,11 +8107,11 @@ msgstr "Aucune donnée définie."
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Si aucune donnée n'est reçue pendant la période T, alors N = 1, 0 - autrement"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Si aucune donnée n'est reçue pendant la période T, alors N n'est PAS 1, 0 - autrement"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -8778,19 +8778,19 @@ msgstr "Nombre d'étapes"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr ""
+msgstr "Le nombre de valeurs V remontées avec succès (qui respectent l'opérateur O) pour la période T est < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr ""
+msgstr "Le nombre de valeurs V remontées avec succès (qui respectent l'opérateur O) pour la période T est = N"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr ""
+msgstr "Le nombre de valeurs V remontées avec succès (qui respectent l'opérateur O) pour la période T est > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr ""
+msgstr "Le nombre de valeurs V remontées avec succès (qui respectent l'opérateur O) pour la période T n'est PAS N"
 
 #: include/blocks.inc.php:715
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -11412,7 +11412,7 @@ msgstr "Succès Audit"
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "La somme des valeurs pour une période T est < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
@@ -11424,7 +11424,7 @@ msgstr "La somme des valeurs pour une période T est > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "La somme des valeurs pour une période T n'est PAS N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -12100,7 +12100,7 @@ msgstr "Mardi"
 
 #: include/locales.inc.php:68
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "Turc (tr_TR)"
 
 #: jsLoader.php:148
 msgid "Two elements should be selected"
