@@ -2368,8 +2368,8 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 			" where h.host='%s'"
 				" and h.hostid=i.hostid"
 				" and i.key_='%s'"
-				DB_NODE,
-			ZBX_SQL_ITEM_SELECT, host_esc, key_esc, DBnode_local("h.hostid"));
+				ZBX_SQL_NODE,
+			ZBX_SQL_ITEM_SELECT, host_esc, key_esc, DBand_node_local("h.hostid"));
 
 	zbx_free(host_esc);
 	zbx_free(key_esc);

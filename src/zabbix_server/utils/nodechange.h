@@ -20,6 +20,6 @@
 #ifndef ZABBIX_NODECHANGE_H
 #define ZABBIX_NODECHANGE_H
 
-int	change_nodeid(int old_id, int new_id);
+int	change_nodeid(int nodeid);
 
 #endif

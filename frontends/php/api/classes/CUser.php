@@ -791,11 +791,11 @@ class CUser extends CZBXAPI {
 		global $ZBX_LOCALNODEID;
 
 		$login = DBfetch(DBselect(
-			'SELECT u.userid'.
+			'SELECT NULL'.
 			' FROM users u'.
 			' WHERE u.alias='.zbx_dbstr($user['user']).
 				' AND u.passwd='.zbx_dbstr(md5($user['password'])).
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 		if ($login) {
 			return true;
@@ -815,7 +815,7 @@ class CUser extends CZBXAPI {
 			' FROM sessions s'.
 			' WHERE s.sessionid='.zbx_dbstr($sessionId).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID)
+				andDbNode('s.userid', $ZBX_LOCALNODEID)
 		));
 		if (!$session) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
@@ -845,7 +845,7 @@ class CUser extends CZBXAPI {
 			'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
 			' FROM users u'.
 			' WHERE u.alias='.zbx_dbstr($name).
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 		if (!$userInfo) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
@@ -961,8 +961,8 @@ class CUser extends CZBXAPI {
 			' WHERE s.sessionid='.zbx_dbstr($sessionid).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND s.userid=u.userid'.
-				' AND ((s.lastaccess+u.autologout>'.$time.') OR (u.autologout=0))'.
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				' AND (s.lastaccess+u.autologout>'.$time.' OR u.autologout=0)'.
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 
 		if (!$userInfo) {

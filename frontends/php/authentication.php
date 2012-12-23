@@ -196,8 +196,8 @@ if (get_user_auth(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 	$data['user_list'] = DBfetchArray(DBselect(
 		'SELECT u.alias,u.userid'.
 		' FROM users u'.
-		' WHERE '.DBin_node('u.userid').
-		' ORDER BY alias'
+		whereDbNode('u.userid').
+		' ORDER BY u.alias'
 	));
 }
 

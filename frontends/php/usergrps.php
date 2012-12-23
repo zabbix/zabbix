@@ -200,11 +200,12 @@ elseif (isset($_REQUEST['delete'])) {
 elseif ($_REQUEST['go'] == 'delete') {
 	$groupids = get_request('group_groupid', array());
 	$groups = array();
-	$sql = 'SELECT ug.usrgrpid, ug.name '.
-			' FROM usrgrp ug '.
-			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.dbConditionInt('ug.usrgrpid', $groupids);
-	$db_groups = DBselect($sql);
+	$db_groups = DBselect(
+			'SELECT ug.usrgrpid,ug.name'.
+			' FROM usrgrp ug'.
+			' WHERE '.dbConditionInt('ug.usrgrpid', $groupids).
+				andDbNode('ug.usrgrpid')
+	);
 	while ($group = DBfetch($db_groups)) {
 		$groups[$group['usrgrpid']] = $group;
 	}
@@ -224,11 +225,12 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 	zbx_value2array($groupids);
 
 	$groups = array();
-	$sql = 'SELECT ug.usrgrpid, ug.name '.
-			' FROM usrgrp ug '.
-			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.dbConditionInt('ug.usrgrpid', $groupids);
-	$db_groups = DBselect($sql);
+	$db_groups = DBselect(
+			'SELECT ug.usrgrpid,ug.name'.
+			' FROM usrgrp ug'.
+			' WHERE '.dbConditionInt('ug.usrgrpid', $groupids).
+				andDbNode('ug.usrgrpid')
+	);
 	while ($group = DBfetch($db_groups)) {
 		$groups[$group['usrgrpid']] = $group;
 	}
@@ -253,11 +255,12 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 	$set_debug_mode = ($_REQUEST['go'] == 'enable_debug') ? GROUP_DEBUG_MODE_ENABLED : GROUP_DEBUG_MODE_DISABLED;
 
 	$groups = array();
-	$sql = 'SELECT ug.usrgrpid, ug.name '.
-			' FROM usrgrp ug '.
-			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.dbConditionInt('ug.usrgrpid', $groupids);
-	$db_group = DBselect($sql);
+	$db_group = DBselect(
+			'SELECT ug.usrgrpid,ug.name'.
+			' FROM usrgrp ug'.
+			' WHERE '.dbConditionInt('ug.usrgrpid', $groupids).
+				andDbNode('ug.usrgrpid')
+	);
 	while ($group = DBfetch($db_group)) {
 		$groups[$group['usrgrpid']] = $group;
 	}
@@ -281,11 +284,12 @@ elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status')))
 	$set_users_status = ($_REQUEST['go'] == 'enable_status') ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
 
 	$groups = array();
-	$sql = 'SELECT ug.usrgrpid, ug.name '.
-			' FROM usrgrp ug '.
-			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.dbConditionInt('ug.usrgrpid', $groupids);
-	$db_groups = DBselect($sql);
+	$db_groups = DBselect(
+			'SELECT ug.usrgrpid,ug.name'.
+			' FROM usrgrp ug'.
+			' WHERE '.dbConditionInt('ug.usrgrpid', $groupids).
+				andDbNode('ug.usrgrpid')
+	);
 	while ($group = DBfetch($db_groups)) {
 		$groups[$group['usrgrpid']] = $group;
 	}
@@ -371,22 +375,34 @@ if (isset($_REQUEST['form'])) {
 	order_result($data['group_rights'], 'name');
 
 	// get users
-	$sql_from = '';
-	$sql_where = '';
 	if ($data['selected_usrgrp'] > 0) {
-		$sql_from = ', users_groups g ';
-		$sql_where = ' AND u.userid=g.userid AND g.usrgrpid='.$data['selected_usrgrp'];
+		$sql_from = ',users_groups g';
+		$sql_where =
+				' WHERE '.dbConditionInt('u.userid', $data['group_users']).
+				' OR ('.
+					'u.userid=g.userid'.
+					' AND g.usrgrpid='.$data['selected_usrgrp'].
+					andDbNode('u.userid').
+				')';
 	}
-	$sql = 'SELECT DISTINCT u.userid,u.alias '.
-			' FROM users u '.$sql_from.
-			' WHERE '.dbConditionInt('u.userid', $data['group_users']).
-				' OR ('.DBin_node('u.userid').
-				$sql_where.
-			' ) ORDER BY u.alias';
-	$data['users'] = DBfetchArray(DBselect($sql));
+	else {
+		$sql_from = '';
+		$sql_where = whereDbNode('u.userid');
+	}
+	$data['users'] = DBfetchArray(DBselect(
+			'SELECT DISTINCT u.userid,u.alias'.
+			' FROM users u'.$sql_from.
+			$sql_where.
+			' ORDER BY u.alias'
+	));
 
 	// get user groups
-	$data['usergroups'] = DBfetchArray(DBselect('SELECT ug.usrgrpid,ug.name FROM usrgrp ug WHERE '.DBin_node('usrgrpid').' ORDER BY ug.name'));
+	$data['usergroups'] = DBfetchArray(DBselect(
+			'SELECT ug.usrgrpid,ug.name'.
+			' FROM usrgrp ug'.
+			whereDbNode('usrgrpid').
+			' ORDER BY ug.name'
+	));
 
 	// render view
 	$userGroupsView = new CView('administration.usergroups.edit', $data);

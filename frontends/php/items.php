@@ -772,7 +772,11 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
 
 	// valuemap
-	$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('v.valuemapid')));
+	$data['valuemaps'] = DBfetchArray(DBselect(
+			'SELECT v.valuemapid,v.name'.
+			' FROM valuemaps v'.
+			whereDbNode('v.valuemapid')
+	));
 	order_result($data['valuemaps'], 'name');
 
 	// render view

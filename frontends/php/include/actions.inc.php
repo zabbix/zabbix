@@ -867,7 +867,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 				' AND '.dbConditionInt('e.objectid',$available_triggers).
-				' AND '.DBin_node('a.alertid').
+				andDbNode('a.alertid').
 			' ORDER BY a.alertid';
 	$result = DBselect($sql, 30);
 

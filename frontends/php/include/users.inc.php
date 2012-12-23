@@ -78,7 +78,7 @@ function get_userid_by_usrgrpid($usrgrpids) {
 		' FROM users u,users_groups ug'.
 		' WHERE u.userid=ug.userid'.
 			' AND '.dbConditionInt('ug.usrgrpid', $usrgrpids).
-			' AND '.DBin_node('ug.usrgrpid', false)
+			andDbNode('ug.usrgrpid', false)
 	);
 	while($user = DBFetch($db_users)){
 		$userids[$user['userid']] = $user['userid'];

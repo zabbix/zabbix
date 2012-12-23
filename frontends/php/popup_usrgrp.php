@@ -92,7 +92,11 @@ if(form){
 		_('Name')
 		));
 
-	$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
+	$result = DBselect(
+			'SELECT ug.usrgrpid,ug.name FROM usrgrp ug'.
+			whereDbNode('ug.usrgrpid').
+			' ORDER BY ug.name'
+	);
 	while($row = DBfetch($result)){
 		$table->addRow(array(
 			new CCheckBox('new_groups['.$row['usrgrpid'].']',isset($new_groups[$row['usrgrpid']]),NULL,$row['usrgrpid']),

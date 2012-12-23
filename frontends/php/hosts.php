@@ -599,11 +599,11 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 
 	// get proxies
 	$data['proxies'] = DBfetchArray(DBselect(
-		'SELECT h.hostid,h.host'.
-		' FROM hosts h'.
-		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-			' AND '.DBin_node('h.hostid').
-		' ORDER BY h.host'
+			'SELECT h.hostid,h.host'.
+			' FROM hosts h'.
+			' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
+				andDbNode('h.hostid').
+			' ORDER BY h.host'
 	));
 
 	// get inventories

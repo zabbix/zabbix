@@ -96,7 +96,7 @@ class CDCheck extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dc.dcheckid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dc.dcheckid', $nodeids);
 			}
 		}
 
@@ -113,7 +113,7 @@ class CDCheck extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dc.druleid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dc.druleid', $nodeids);
 			}
 		}
 
@@ -148,6 +148,12 @@ class CDCheck extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
 			}
+		}
+
+		// node check !!!!
+		// should last, after all ****IDS checks
+		if (!$nodeCheck) {
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dc.dcheckid', $nodeids);
 		}
 
 // filter

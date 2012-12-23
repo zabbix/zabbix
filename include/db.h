@@ -233,6 +233,10 @@ zbx_graph_item_type;
 
 #define ZBX_MAX_SQL_LEN		65535
 
+#define ZBX_STANDALONE_MAX_IDS	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
+#define ZBX_DM_MAX_HISTORY_IDS	(zbx_uint64_t)__UINT64_C(100000000000000)
+#define ZBX_DM_MAX_CONFIG_IDS	(zbx_uint64_t)__UINT64_C(100000000000)
+
 typedef struct
 {
 	zbx_uint64_t	druleid;
@@ -446,10 +450,13 @@ typedef struct
 }
 DB_ESCALATION;
 
-#define DB_NODE			"%s"
-#define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
-const char	*DBnode(const char *fieldid, int nodeid);
-#define DBis_node_local_id(id)	DBis_node_id(id, CONFIG_NODEID)
+#define ZBX_SQL_NODE				"%s"
+#define DBand_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 0)
+#define DBwhere_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 1)
+#define DBand_node(field_name, nodeid)		__DBnode(field_name, nodeid, 0)
+#define DBwhere_node(field_name, nodeid)	__DBnode(field_name, nodeid, 1)
+const char	*__DBnode(const char *field_name, int nodeid, int op);
+#define DBis_node_local_id(id)			DBis_node_id(id, CONFIG_NODEID)
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);
