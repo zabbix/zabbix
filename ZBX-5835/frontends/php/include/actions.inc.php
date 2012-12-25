@@ -44,24 +44,26 @@ function condition_operator2str($operator) {
 
 function condition_type2str($conditionType) {
 	switch ($conditionType) {
+		case CONDITION_TYPE_TRIGGER_VALUE:
+			return _('Trigger value');
+		case CONDITION_TYPE_MAINTENANCE:
+			return _('Maintenance status');
+		case CONDITION_TYPE_TRIGGER_NAME:
+			return _('Trigger name');
+		case CONDITION_TYPE_TRIGGER_SEVERITY:
+			return _('Trigger severity');
+		case CONDITION_TYPE_TRIGGER:
+			return _('Trigger');
+		case CONDITION_TYPE_HOST_NAME:
+			return _('Host name');
 		case CONDITION_TYPE_HOST_GROUP:
 			return _('Host group');
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			return _('Host template');
-		case CONDITION_TYPE_TRIGGER:
-			return _('Trigger');
 		case CONDITION_TYPE_HOST:
 			return _('Host');
-		case CONDITION_TYPE_TRIGGER_NAME:
-			return _('Trigger name');
-		case CONDITION_TYPE_TRIGGER_VALUE:
-			return _('Trigger value');
-		case CONDITION_TYPE_TRIGGER_SEVERITY:
-			return _('Trigger severity');
 		case CONDITION_TYPE_TIME_PERIOD:
 			return _('Time period');
-		case CONDITION_TYPE_MAINTENANCE:
-			return _('Maintenance status');
 		case CONDITION_TYPE_NODE:
 			return _('Node');
 		case CONDITION_TYPE_DRULE:
@@ -88,8 +90,6 @@ function condition_type2str($conditionType) {
 			return _('Application');
 		case CONDITION_TYPE_PROXY:
 			return _('Proxy');
-		case CONDITION_TYPE_HOST_NAME:
-			return _('Host name');
 		default:
 			return _('Unknown');
 	}
@@ -155,12 +155,16 @@ function condition_value2str($conditiontype, $value) {
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$host = get_host_by_hostid($value);
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
+			if ($host = get_host_by_hostid($value)) {
+				$str_val = '';
+				if (id2nodeid($value) != get_current_nodeid()) {
+					$str_val = get_node_name_by_elid($value, true, ': ');
+				}
+				$str_val .= $host['name'];
 			}
-			$str_val.= $host['name'];
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
 		case CONDITION_TYPE_HOST_NAME:
@@ -179,28 +183,45 @@ function condition_value2str($conditiontype, $value) {
 			$str_val = _('maintenance');
 			break;
 		case CONDITION_TYPE_NODE:
-			$node = get_node_by_nodeid($value);
-			$str_val = $node['name'];
+			if ($node = get_node_by_nodeid($value)) {
+				$str_val = $node['name'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DRULE:
-			$drule = get_discovery_rule_by_druleid($value);
-			$str_val = $drule['name'];
+			if ($drule = get_discovery_rule_by_druleid($value)) {
+				$str_val = $drule['name'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DCHECK:
 			$row = DBfetch(DBselect(
-				'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
-				' FROM drules dr,dchecks c '.
-				' WHERE dr.druleid=c.druleid '.
-					' AND c.dcheckid='.$value
+					'SELECT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
+					' FROM drules dr,dchecks c'.
+					' WHERE dr.druleid=c.druleid'.
+						' AND c.dcheckid='.$value
 			));
-			$str_val = $row['name'].': '.discovery_check2str($row['type'], $row['key_'], $row['ports']);
+			if ($row) {
+				$str_val = $row['name'].': '.discovery_check2str($row['type'], $row['key_'], $row['ports']);
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DOBJECT:
 			$str_val = discovery_object2str($value);
 			break;
 		case CONDITION_TYPE_PROXY:
-			$host = get_host_by_hostid($value);
-			$str_val = $host['host'];
+			if ($host = get_host_by_hostid($value)) {
+				$str_val = $host['host'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DHOST_IP:
 			$str_val = $value;
