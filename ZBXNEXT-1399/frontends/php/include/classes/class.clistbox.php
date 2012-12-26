@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,14 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CListBox extends CComboBox {
 
@@ -32,5 +31,14 @@ class CListBox extends CComboBox {
 	public function setSize($value) {
 		$this->attr('size', $value);
 	}
+
+	public function makeModern() {
+		$this->addClass('chzn-select');
+
+		if (!defined('IS_MODERN_LISTBOX_JS_INSERTED')) {
+			define('IS_MODERN_LISTBOX_JS_INSERTED', true);
+
+			zbx_add_post_js('jQuery(".chzn-select").chosen();');
+		}
+	}
 }
-?>

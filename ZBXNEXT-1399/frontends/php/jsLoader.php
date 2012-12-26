@@ -49,16 +49,18 @@ if (isset($_GET['lang'])) {
 $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
-	'prototype.js' => '',
-	'jquery.js' => 'jquery/',
-	'jquery-ui.js' => 'jquery/',
-	'activity-indicator.js' => 'vendors/',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
+	// vendors
+	'prototype.js' => '',
+	'jquery.js' => 'jquery/',
+	'jquery-ui.js' => 'jquery/',
+	'activity-indicator.js' => 'vendors/',
+	'chosen.js' => 'vendors/chosen/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -202,6 +204,7 @@ if (empty($_GET['files'])) {
 		'menu.js',
 		'init.js'
 	);
+
 	// load frontend messaging only for pages with menus
 	if (isset($_GET['isMenu']) && $_GET['isMenu']) {
 		$files[] = 'class.cmessages.js';

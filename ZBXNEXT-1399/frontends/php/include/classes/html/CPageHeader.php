@@ -72,8 +72,6 @@ class CPageHeader {
 
 	/**
 	 * Add initial css files.
-	 *
-	 * @param string $path
 	 */
 	public function addCssInit() {
 		$this->cssFiles[] = 'styles/default.css';
@@ -81,6 +79,17 @@ class CPageHeader {
 		$this->cssFiles[] = 'styles/icon.css';
 		$this->cssFiles[] = 'styles/blocks.css';
 		$this->cssFiles[] = 'styles/screen.css';
+	}
+
+	/**
+	 * Add css files by scripts.
+	 *
+	 * @param array $scripts
+	 */
+	public function addCssByScripts($scripts) {
+		if (in_array('chosen.js', $scripts)) {
+			$this->cssFiles[] = 'js/vendors/chosen/chosen.css';
+		}
 	}
 
 	/**

@@ -55,8 +55,13 @@ if (!$this->data['isFilterEnable']) {
 $dashconfFormList->addRow(_('Host groups'), $groupsComboBox);
 
 if (!empty($this->data['grpswitch'])) {
-	$groupListBox = new CListBox('del_groups[]', null, 15);
-	$groupListBox->setAttribute('style', 'width: 200px;');
+	$groupListBox = new CListBox('del_groups[]');
+	$groupListBox->makeModern();
+
+	// test data
+	/*for ($i = 0; $i < 30; $i++) {
+		$groupListBox->addItem($i, 'lajksdhlfkjashldf='.$i);
+	}*/
 
 	if (!$this->data['isFilterEnable']) {
 		$groupListBox->setAttribute('disabled', 'disabled');
@@ -66,13 +71,7 @@ if (!empty($this->data['grpswitch'])) {
 		$groupListBox->addItem($hostGroup['groupid'], $hostGroup['nodename'].$hostGroup['name']);
 	}
 
-	$addButton = new CButton('add', _('Add'), "return PopUp('popup_right.php?dstfrm=".$dashconfForm->getName()."&permission=".PERM_READ_WRITE."', 450, 450);");
-	$addButton->setEnabled($this->data['isFilterEnable']);
-
-	$delButton = new CSubmit('delete', _('Delete selected'));
-	$delButton->setEnabled($this->data['isFilterEnable']);
-
-	$dashconfFormList->addRow(_('Groups'), array($groupListBox, BR(), $addButton, $delButton));
+	$dashconfFormList->addRow(_('Groups'), $groupListBox);
 }
 
 // append host in maintenance checkbox to form list
@@ -99,7 +98,7 @@ $extAckComboBox = new CComboBox('extAck', $this->data['extAck']);
 $extAckComboBox->addItems(array(
 	EXTACK_OPTION_ALL => _('All'),
 	EXTACK_OPTION_BOTH => _('Separated'),
-	EXTACK_OPTION_UNACK => _('Unacknowledged only'),
+	EXTACK_OPTION_UNACK => _('Unacknowledged only')
 ));
 $extAckComboBox->setEnabled($this->data['isFilterEnable'] && $this->data['config']['event_ack_enable']);
 if (!$this->data['config']['event_ack_enable']) {
