@@ -417,7 +417,6 @@ notsupported:
 
 	if (0 != (flags & PROCESS_TEST))
 	{
-
 #define	COL_WIDTH	45
 
 		int	n1, n2 = 0;
