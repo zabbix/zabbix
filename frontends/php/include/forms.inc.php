@@ -1623,9 +1623,51 @@
 			$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
 			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-			$start_date = zbxDateToTime($new_timeperiod['start_date']);
+			$clndr_icon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
+			$clndr_icon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_timeperiod_start_date_calendar"].clndr.clndrshow(pos.top, pos.left);');
 
-			$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $start_date)));
+			$filtertimetab = new CTable(null, 'calendar');
+			$filtertimetab->setAttribute('width', '10%');
+			$filtertimetab->setCellPadding(0);
+			$filtertimetab->setCellSpacing(0);
+
+			$startDate = zbxDateToTime($new_timeperiod['start_date']);
+			if (isset($_REQUEST['add_timeperiod'])) {
+				$newTimePeriodYear = get_request('new_timeperiod_start_date_year');
+				$newTimePeriodMonth = get_request('new_timeperiod_start_date_month');
+				$newTimePeriodDay = get_request('new_timeperiod_start_date_day');
+				$newTimePeriodHours = get_request('new_timeperiod_start_date_hour');
+				$newTimePeriodMinutes = get_request('new_timeperiod_start_date_minute');
+			}
+			elseif ($startDate > 0) {
+				$newTimePeriodYear = date('Y', $startDate );
+				$newTimePeriodMonth = date('m', $startDate );
+				$newTimePeriodDay = date('d', $startDate );
+				$newTimePeriodHours = date('H', $startDate );
+				$newTimePeriodMinutes = date('i', $startDate );
+			}
+			else {
+				$newTimePeriodYear = '';
+				$newTimePeriodMonth = '';
+				$newTimePeriodDay = '';
+				$newTimePeriodHours = '';
+				$newTimePeriodMinutes = '';
+			}
+
+			$tblPeriod->addRow(array(_('Date'), array(
+				new CNumericBox('new_timeperiod_start_date_day', $newTimePeriodDay, 2),
+				'/',
+				new CNumericBox('new_timeperiod_start_date_month', $newTimePeriodMonth, 2),
+				'/',
+				new CNumericBox('new_timeperiod_start_date_year', $newTimePeriodYear, 4),
+				SPACE,
+				new CNumericBox('new_timeperiod_start_date_hour', $newTimePeriodHours, 2),
+				':',
+				new CNumericBox('new_timeperiod_start_date_minute', $newTimePeriodMinutes, 2),
+				$clndr_icon
+			)));
+			zbx_add_post_js('create_calendar(null, ["new_timeperiod_start_date_day", "new_timeperiod_start_date_month", "new_timeperiod_start_date_year", "new_timeperiod_start_date_hour", "new_timeperiod_start_date_minute"], "new_timeperiod_start_date_calendar", "new_timeperiod_start_date");');
+
 		}
 
 		if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
