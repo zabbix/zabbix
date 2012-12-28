@@ -24,6 +24,7 @@
 #include "log.h"
 #include "proxy.h"
 #include "snmptrapper.h"
+#include "zbxserver.h"
 
 static int	trap_fd = -1;
 static int	trap_lastsize;
@@ -33,6 +34,8 @@ static void	DBget_lastsize()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	DBbegin();
 
 	result = DBselect("select snmp_lastsize from globalvars");
 
@@ -45,6 +48,8 @@ static void	DBget_lastsize()
 		trap_lastsize = atoi(row[0]);
 
 	DBfree_result(result);
+
+	DBcommit();
 }
 
 static void	DBupdate_lastsize()
@@ -52,45 +57,6 @@ static void	DBupdate_lastsize()
 	DBbegin();
 	DBexecute("update globalvars set snmp_lastsize=%d", trap_lastsize);
 	DBcommit();
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: set_item_value                                                   *
- *                                                                            *
- * Purpose: set item value for an SNMP Trap item                              *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
-{
-	AGENT_RESULT	value;
-	int		errcode = SUCCEED;
-
-	init_result(&value);
-
-	if (SUCCEED == set_result_type(&value, item->value_type, item->data_type, trap))
-	{
-		int	timestamp = 0;
-
-		if (ITEM_VALUE_TYPE_LOG == item->value_type)
-			calc_timestamp(trap, &timestamp, item->logtimefmt);
-
-		item->status = ITEM_STATUS_ACTIVE;
-		dc_add_history(item->itemid, item->value_type, item->flags, &value,
-				ts, item->status, NULL, timestamp, NULL, 0, 0, 0, 0);
-	}
-	else
-	{
-		item->status = ITEM_STATUS_NOTSUPPORTED;
-		dc_add_history(item->itemid, item->value_type, item->flags, NULL,
-				ts, item->status, value.msg, 0, NULL, 0, 0, 0, 0);
-	}
-
-	DCrequeue_items(&item->itemid, &item->status, &ts->sec, &errcode, 1);
-
-	free_result(&value);
 }
 
 /******************************************************************************
@@ -108,38 +74,142 @@ static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
 	DC_ITEM		*items = NULL;
-	char		cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN];
+	char		cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
 	size_t		num, i;
-	int		ret = FAIL, fallback = -1;
+	int		ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, timestamp;
+	zbx_uint64_t	*itemids = NULL;
+	unsigned char	*statuses = NULL;
+	AGENT_RESULT	*results = NULL;
+	ZBX_REGEXP	*regexps = NULL;
+	int		regexps_alloc = 0, regexps_num = 0;
 
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
+	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
+	statuses = zbx_malloc(statuses, sizeof(unsigned char) * num);
+	lastclocks = zbx_malloc(lastclocks, sizeof(int) * num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * num);
+	results = zbx_malloc(results, sizeof(AGENT_RESULT) * num);
+
 	for (i = 0; i < num; i++)
 	{
-		if (0 == parse_command(items[i].key_orig, cmd, sizeof(cmd), params, sizeof(params)))
-			continue;
+		init_result(&results[i]);
+		errcodes[i] = FAIL;
 
-		if (0 == strcmp(cmd, "snmptrap.fallback"))
+		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
+		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
+				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
-			fallback = i;
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = NOTSUPPORTED;
 			continue;
 		}
 
-		if (0 != strcmp(cmd, "snmptrap") || 0 != get_param(params, 1, regex, sizeof(regex)))
+		if (0 == strcmp(items[i].key, "snmptrap.fallback"))
+		{
+			fb = i;
+			continue;
+		}
+
+		if (0 == parse_command(items[i].key, cmd, sizeof(cmd), params, sizeof(params)))
 			continue;
 
-		if (NULL == zbx_regexp_match(trap, regex, NULL))
+		if (0 != strcmp(cmd, "snmptrap"))
 			continue;
 
+		if (1 < num_param(params))
+			continue;
+
+		if (0 != get_param(params, 1, regex, sizeof(regex)))
+			continue;
+
+		if ('@' == *regex)
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
+			char		*regex_esc;
+
+			regexps_num = 0;
+
+			regex_esc = DBdyn_escape_string(regex + 1);
+			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+					" from regexps r,expressions e"
+					" where r.regexpid=e.regexpid"
+						" and r.name='%s'",
+					regex_esc);
+			zbx_free(regex_esc);
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+						regex + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
+			}
+			DBfree_result(result);
+		}
+
+
+		if (SUCCEED != regexp_match_ex(regexps, regexps_num, trap, regex, ZBX_CASE_SENSITIVE))
+			continue;
+
+		if (SUCCEED == set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
+			errcodes[i] = SUCCEED;
+		else
+			errcodes[i] = NOTSUPPORTED;
 		ret = SUCCEED;
-		set_item_value(&items[i], trap, ts);
 	}
 
-	if (FAIL == ret && -1 != fallback)
+	zbx_free(regexps);
+
+	if (FAIL == ret && -1 != fb)
 	{
+		if (SUCCEED == set_result_type(&results[fb], items[fb].value_type, items[fb].data_type, trap))
+			errcodes[fb] = SUCCEED;
+		else
+			errcodes[fb] = NOTSUPPORTED;
 		ret = SUCCEED;
-		set_item_value(&items[fallback], trap, ts);
 	}
+
+	for (i = 0; i < num; i++)
+	{
+		switch (errcodes[i])
+		{
+			case SUCCEED:
+				timestamp = 0;
+
+				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
+					calc_timestamp(trap, &timestamp, items[i].logtimefmt);
+
+				items[i].status = ITEM_STATUS_ACTIVE;
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
+						ts, items[i].status, NULL, timestamp, NULL, 0, 0, 0, 0);
+
+				itemids[i] = items[i].itemid;
+				statuses[i] = items[i].status;
+				lastclocks[i] = ts->sec;
+				break;
+			case NOTSUPPORTED:
+				items[i].status = ITEM_STATUS_NOTSUPPORTED;
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
+						ts, items[i].status, results[i].msg, 0, NULL, 0, 0, 0, 0);
+
+				itemids[i] = items[i].itemid;
+				statuses[i] = items[i].status;
+				lastclocks[i] = ts->sec;
+				break;
+		}
+
+		zbx_free(items[i].key);
+		free_result(&results[i]);
+	}
+
+	zbx_free(results);
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
+
+	zbx_free(errcodes);
+	zbx_free(lastclocks);
+	zbx_free(statuses);
+	zbx_free(itemids);
 
 	DCconfig_clean_items(items, NULL, num);
 	zbx_free(items);

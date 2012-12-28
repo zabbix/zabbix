@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ja
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+.......PS. [ZBX-6012] added support of user macros and global regular expressions in SNMP trap item key parameter (Sasha)
 ...G...... [ZBX-5940] fixed displaying default key parameters when agent is used with option -p (Andris)
 .......PS. [ZBX-5981] fixed incorrect use of function assert() if build option -DNDEBUG was used, it caused random crashes (Alexei)
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)

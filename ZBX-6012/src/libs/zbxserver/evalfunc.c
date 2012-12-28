@@ -135,7 +135,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DB_ROW		row;
 
 		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
 					" and r.name='%s'",
@@ -145,7 +145,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		while (NULL != (row = DBfetch(result)))
 		{
 			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
 		}
 		DBfree_result(result);
 	}
@@ -1638,7 +1638,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
 	{
 		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
 					" and r.name='%s'",
@@ -1648,7 +1648,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 		while (NULL != (row = DBfetch(result)))
 		{
 			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
 		}
 		DBfree_result(result);
 	}
