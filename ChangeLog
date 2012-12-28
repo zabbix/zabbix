@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ja
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(), DBlld_process_discovery_rule(). Thanks to Takanori Suzuki for patch (Andris, Sasha)
 ...G...... [ZBX-5940] fixed displaying default key parameters when agent is used with option -p (Andris)
 .......PS. [ZBX-5981] fixed incorrect use of function assert() if build option -DNDEBUG was used, it caused random crashes (Alexei)
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
@@ -1187,6 +1188,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
 ..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
 ..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
