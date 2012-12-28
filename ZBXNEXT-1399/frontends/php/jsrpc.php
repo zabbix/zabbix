@@ -216,6 +216,26 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'chosen.get':
+		if ($data['objectName'] == 'hostGroup') {
+			$dbDatas = API::HostGroup()->get(array(
+				'output' => array('groupid', 'name'),
+				'search' => array('name' => $data['search']),
+				'editable' => true
+			));
+			foreach ($dbDatas as $dbData) {
+				$result[] = array(
+					'value' => $dbData['groupid'],
+					'text' => $dbData['name']
+				);
+			}
+		}
+
+		$json = new CJSON();
+		echo $json->encode($result);
+		exit;
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }

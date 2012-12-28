@@ -35,16 +35,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'del_groups' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'new_right' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
 	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
 	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null)
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null)
 );
 check_fields($fields);
 
@@ -58,10 +55,11 @@ if (isset($_REQUEST['save'])) {
 
 	if ($filterEnable == 1) {
 		// groups
-		$groupIds = get_request('groupids', array());
 		CProfile::update('web.dashconf.groups.grpswitch', $_REQUEST['grpswitch'], PROFILE_TYPE_INT);
 
 		if ($_REQUEST['grpswitch'] == 1) {
+			$groupIds = get_request('groupids', array());
+
 			$result = CFavorite::remove('web.dashconf.groups.groupids');
 			foreach ($groupIds as $groupId) {
 				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupId);
@@ -82,30 +80,11 @@ if (isset($_REQUEST['save'])) {
 
 	jsRedirect('dashboard.php');
 }
-elseif (isset($_REQUEST['new_right'])) {
-	$_REQUEST['groupids'] = get_request('groupids', array());
-
-	foreach ($_REQUEST['new_right'] as $id => $group) {
-		$_REQUEST['groupids'][$id] = $id;
-	}
-}
-elseif (isset($_REQUEST['delete'])) {
-	$del_groups = get_request('del_groups', array());
-
-	foreach ($del_groups as $gnum => $groupId) {
-		if (!isset($_REQUEST['groupids'][$groupId])) {
-			continue;
-		}
-
-		unset($_REQUEST['groupids'][$groupId]);
-	}
-}
 
 /*
  * Display
  */
 $data = array(
-	'form_refresh' => get_request('form_refresh', 0) + 1,
 	'config' => select_config()
 );
 
@@ -146,18 +125,18 @@ $data['severities'] = array(
 );
 
 if (!empty($data['grpswitch'])) {
-	$data['hostGroups'] = API::HostGroup()->get(array(
+	$data['groups'] = API::HostGroup()->get(array(
 		'nodeids' => get_current_nodeid(true),
 		'groupids' => $data['groupIds'],
 		'output' => API_OUTPUT_EXTEND
 	));
 
-	foreach ($data['hostGroups'] as &$hostGroup) {
-		$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+	foreach ($data['groups'] as &$group) {
+		$group['nodename'] = get_node_name_by_elid($group['groupid'], true, ': ');
 	}
-	unset($hostGroup);
+	unset($group);
 
-	CArrayHelper::sort($data['hostGroups'],
+	CArrayHelper::sort($data['groups'],
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	);

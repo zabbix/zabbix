@@ -32,13 +32,44 @@ class CListBox extends CComboBox {
 		$this->attr('size', $value);
 	}
 
-	public function makeModern() {
-		$this->addClass('chzn-select');
+	/**
+	 * Apply chosen jQuery plugin to listbox.
+	 *
+	 * @param int    $options['width']		default = 400px
+	 * @param string $options['objectName']
+	 */
+	public function makeModern(array $options = array()) {
+		$this->setAttribute('class', 'chzn-select-'.$options['objectName']);
 
-		if (!defined('IS_MODERN_LISTBOX_JS_INSERTED')) {
-			define('IS_MODERN_LISTBOX_JS_INSERTED', true);
-
-			zbx_add_post_js('jQuery(".chzn-select").chosen();');
+		// width
+		if (empty($options['width'])) {
+			$options['width'] = 400;
 		}
+		$this->setAttribute('style', 'width: '.$options['width'].'px;');
+
+		// apply ajax-chosen
+		zbx_add_post_js('
+			var ajaxUrl = new Curl("jsrpc.php");
+			ajaxUrl.setArgument("type", 9); // PAGE_TYPE_TEXT
+			ajaxUrl.setArgument("method", "chosen.get");
+			ajaxUrl.setArgument("objectName", "'.$options['objectName'].'");
+
+			jQuery(".chzn-select-'.$options['objectName'].'").ajaxChosen({
+				type: "GET",
+				url: ajaxUrl.getUrl(),
+				dataType: "json"
+			}, function (data) {
+				var results = [];
+
+				jQuery.each(data, function (i, val) {
+					results.push({
+						value: val.value,
+						text: val.text
+					});
+				});
+
+				return results;
+			});'
+		);
 	}
 }

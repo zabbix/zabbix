@@ -27,9 +27,7 @@ $dashconfWidget->addPageHeader(_('DASHBOARD CONFIGURATION'));
 $dashconfForm = new CForm();
 $dashconfForm->setName('dashconf');
 $dashconfForm->setAttribute('id', 'dashform');
-$dashconfForm->addVar('form_refresh', $this->data['form_refresh']);
 $dashconfForm->addVar('filterEnable', $this->data['isFilterEnable']);
-$dashconfForm->addVar('groupids', $this->data['groupIds']);
 
 // create form list
 $dashconfFormList = new CFormList('dashconfFormList');
@@ -55,20 +53,15 @@ if (!$this->data['isFilterEnable']) {
 $dashconfFormList->addRow(_('Host groups'), $groupsComboBox);
 
 if (!empty($this->data['grpswitch'])) {
-	$groupListBox = new CListBox('del_groups[]');
-	$groupListBox->makeModern();
-
-	// test data
-	/*for ($i = 0; $i < 30; $i++) {
-		$groupListBox->addItem($i, 'lajksdhlfkjashldf='.$i);
-	}*/
+	$groupListBox = new CListBox('groupids[]');
+	$groupListBox->makeModern(array('objectName' => 'hostGroup'));
 
 	if (!$this->data['isFilterEnable']) {
 		$groupListBox->setAttribute('disabled', 'disabled');
 	}
 
-	foreach ($this->data['hostGroups'] as $hostGroup) {
-		$groupListBox->addItem($hostGroup['groupid'], $hostGroup['nodename'].$hostGroup['name']);
+	foreach ($this->data['groups'] as $group) {
+		$groupListBox->addItem($group['groupid'], $group['nodename'].$group['name'], true);
 	}
 
 	$dashconfFormList->addRow(_('Groups'), $groupListBox);

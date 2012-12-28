@@ -1,4 +1,4 @@
-.chzn-select { width:250px; }
+ul.chzn-choices li { clear: none; }
 
 /* @group Base */
 .chzn-container {
