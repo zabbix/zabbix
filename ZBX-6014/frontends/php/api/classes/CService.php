@@ -549,16 +549,12 @@ class CService extends CZBXAPI {
 	 * @return array    as array(serviceId2 => data1, serviceId2 => data2, ...)
 	 */
 	public function getSla(array $options) {
-		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
 		$intervals = (isset($options['intervals'])) ? zbx_toArray($options['intervals']) : array();
 
-		// fetch services
 		$services = $this->get(array(
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
-			'selectTrigger' => API_OUTPUT_EXTEND,
-			'serviceids' => $serviceIds,
 			'preservekeys' => true
 		));
 
@@ -597,7 +593,7 @@ class CService extends CZBXAPI {
 					$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
 				}
 				$query = DBselect(
-					'SELECT *'.
+					'SELECT sa.servicealarmid,sa.serviceid,sa.clock,sa.value'.
 					' FROM service_alarms sa'.
 					' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
 						' AND ('.implode(' OR ', $intervalConditions).')'.
@@ -928,34 +924,12 @@ class CService extends CZBXAPI {
 	 * @return array    in the form of array(serviceId1 => array(triggerId => trigger), ...)
 	 */
 	protected function fetchProblemTriggers(array $serviceIds) {
-		$sql = 'SELECT s.serviceid,t.*'.
+		$sql = 'SELECT s.serviceid,t.triggerid'.
 				' FROM services s,triggers t'.
 				' WHERE s.status>0'.
-					' AND t.triggerid=s.triggerid';
+					' AND t.triggerid=s.triggerid'.
+					' AND '.dbConditionInt('s.serviceid', $serviceIds);
 
-		// add permission filter
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$userid = self::$userData['userid'];
-			$userGroups = getUserGroupsByUserId($userid);
-
-			$sql .= ' AND (EXISTS ('.
-						'SELECT NULL'.
-						' FROM functions f,items i,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-						' WHERE '.$this->fieldId('triggerid').'=f.triggerid'.
-							' AND f.itemid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY f.triggerid'.
-						' HAVING MIN(r.permission)>='.PERM_READ_ONLY.
-						')'.
-					' OR '.$this->fieldId('triggerid').' IS NULL'.
-			')';
-		}
-
-			$sql .= ' AND '.dbConditionInt('s.serviceid', $serviceIds).
-					' ORDER BY s.status DESC,t.description';
 		// get service reason
 		$triggers = DBfetchArray(DBSelect($sql));
 
@@ -1674,10 +1648,12 @@ class CService extends CZBXAPI {
 
 		// selectTrigger
 		if ($options['selectTrigger'] !== null) {
-			$triggers = API::getApi()->select('triggers', array(
+			$triggers = API::Trigger()->get(array(
 				'output' => $options['selectTrigger'],
 				'triggerids' => array_unique(zbx_objectValues($result, 'triggerid')),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nopermissions' => true,
+				'expandDescription' => true
 			));
 			foreach ($result as &$service) {
 				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();

@@ -113,41 +113,21 @@ else {
 	// fetch services
 	$services = API::Service()->get(array(
 		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
-		'selectParent' => API_OUTPUT_EXTEND,
+		'selectParent' => array('serviceid'),
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
-		'selectTrigger' => array('description', 'triggerid', 'expression'),
+		'selectTrigger' => array('description', 'triggerid'),
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
-	// expand trigger descriptions
-	$triggers = zbx_objectValues($services, 'trigger');
-
-	$triggers = CTriggerHelper::batchExpandDescription($triggers);
-
-	foreach ($services as &$service) {
-		if ($service['trigger']) {
-			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
-		}
-	}
-	unset($service);
 
 	// fetch sla
 	$slaData = API::Service()->getSla(array(
-		'serviceids' => zbx_objectValues($services, 'serviceid'),
 		'intervals' => array(array(
 			'from' => $period_start,
 			'to' => $period_end
 		))
 	));
-	// expand problem trigger descriptions
-	foreach ($slaData as &$serviceSla) {
-		foreach ($serviceSla['problems'] as &$problemTrigger) {
-			$problemTrigger['description'] = $triggers[$problemTrigger['triggerid']]['description'];
-		}
-		unset($problemTrigger);
-	}
-	unset($serviceSla);
 
 	$treeData = array();
 	createServiceMonitoringTree($services, $slaData, $period, $treeData);
