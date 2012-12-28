@@ -162,21 +162,117 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	$downtimeSince = date('YmdHis');
 	$downtimeTill = date('YmdHis', time() + 86400);
 
-	$servicesForm->addVar('new_service_time[from]', $downtimeSince);
-	$servicesForm->addVar('new_service_time[to]', $downtimeTill);
-
 	$downtimeSince = zbxDateToTime($downtimeSince);
 	$downtimeTill = zbxDateToTime($downtimeTill);
 
 	// create calendar table
 	$timeCalendarTable = new CTable();
 
+	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_service_time_from_calendar"]
+		.clndr.clndrshow(pos.top, pos.left); CLNDR["new_service_time_to_calendar"].clndr.clndrhide();';
+	$calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
+	$calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_service_time_from_calendar"].clndr.clndrshow(pos.top, pos.left); CLNDR["new_service_time_to_calendar"].clndr.clndrhide();');
+
 	// downtime since
+	if (isset($_REQUEST['new_service_time']['from'])) {
+		$year = get_request('new_service_time_from_year');
+		$month = get_request('new_service_time_from_month');
+		$day = get_request('new_service_time_from_day');
+		$hours = get_request('new_service_time_from_hour');
+		$minutes = get_request('new_service_time_from_minute');
+	}
+	elseif ($downtimeSince > 0) {
+		$year = date('Y', $downtimeSince);
+		$month = date('m', $downtimeSince);
+		$day = date('d', $downtimeSince);
+		$hours = date('H', $downtimeSince);
+		$minutes = date('i', $downtimeSince);
+	}
+	else {
+		$year = '';
+		$month = '';
+		$day = '';
+		$hours = '';
+		$minutes = '';
+	}
+
+	$servicesForm->addVar('new_service_time[from]', $year.$month.$day.$hours.$minutes);
+
+	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_service_time_to_calendar"]
+		.clndr.clndrshow(pos.top, pos.left); CLNDR["new_service_time_from_calendar"].clndr.clndrhide();';
+
 	$noteTextBox = new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 	$noteTextBox->setAttribute('placeholder', _('short description'));
+	$downtimeSinceDay = new CNumericBox('new_service_time_from_day', $day, 2);
+	$downtimeSinceDay->setAttribute('placeholder', _('dd'));
+	$downtimeSinceMonth = new CNumericBox('new_service_time_from_month', $month, 2);
+	$downtimeSinceMonth->setAttribute('placeholder', _('mm'));
+	$downtimeSinceYear = new CNumericBox('new_service_time_from_year', $year, 4);
+	$downtimeSinceYear->setAttribute('placeholder', _('yyyy'));
+	$downtimeSinceHour = new CNumericBox('new_service_time_from_hour', $hours, 2);
+	$downtimeSinceHour->setAttribute('placeholder', _('hh'));
+	$downtimeSinceMinute = new CNumericBox('new_service_time_from_minute', $minutes, 2);
+	$downtimeSinceMinute->setAttribute('placeholder', _('mm'));
+
 	$timeCalendarTable->addRow(array(_('Note'), $noteTextBox));
-	$timeCalendarTable->addRow(array(_('From'), createDateSelector('new_service_time_from', $downtimeSince, 'new_service_time_to')));
-	$timeCalendarTable->addRow(array(_('Till'), createDateSelector('new_service_time_to', $downtimeTill, 'new_service_time_from')));
+	$timeCalendarTable->addRow(array(_('From'), new CCol(array($downtimeSinceDay, '/', $downtimeSinceMonth, '/',
+		$downtimeSinceYear, SPACE, $downtimeSinceHour, ':', $downtimeSinceMinute, $calendarIcon))));
+	zbx_add_post_js('create_calendar(null,'.
+		'["new_service_time_from_day","new_service_time_from_month","new_service_time_from_year",'.
+		'"new_service_time_from_hour",'.
+		'"new_service_time_from_minute"],'.
+		'"new_service_time_from_calendar",'.
+		'"new_service_time_from");'
+	);
+
+	// downtime till
+	if (isset($_REQUEST['new_service_time']['to'])) {
+		$year = get_request('new_service_time_to_year');
+		$month = get_request('new_service_time_to_month');
+		$day = get_request('new_service_time_to_day');
+		$hours = get_request('new_service_time_to_hour');
+		$minutes = get_request('new_service_time_to_minute');
+	}
+	elseif ($downtimeTill > 0) {
+		$year = date('Y', $downtimeTill);
+		$month = date('m', $downtimeTill);
+		$day = date('d', $downtimeTill);
+		$hours = date('H', $downtimeTill);
+		$minutes = date('i', $downtimeTill);
+	}
+	else {
+		$year = '';
+		$month = '';
+		$day = '';
+		$hours = '';
+		$minutes = '';
+	}
+
+	$servicesForm->addVar('new_service_time[to]', $year.$month.$day.$hours.$minutes);
+
+	$calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["new_service_time_to_calendar"].clndr.clndrshow(pos.top, pos.left); CLNDR["new_service_time_from_calendar"].clndr.clndrhide();');
+
+	$downtimeTillDay = new CNumericBox('new_service_time_to_day', $day, 2);
+	$downtimeTillDay->setAttribute('placeholder', _('dd'));
+	$downtimeTillMonth = new CNumericBox('new_service_time_to_month', $month, 2);
+	$downtimeTillMonth->setAttribute('placeholder', _('mm'));
+	$downtimeTillYear = new CNumericBox('new_service_time_to_year', $year, 4);
+	$downtimeTillYear->setAttribute('placeholder', _('yyyy'));
+	$downtimeTillHour = new CNumericBox('new_service_time_to_hour', $hours, 2);
+	$downtimeTillHour->setAttribute('placeholder', _('hh'));
+	$downtimeTillMinute = new CNumericBox('new_service_time_to_minute', $minutes, 2);
+	$downtimeTillMinute->setAttribute('placeholder', _('mm'));
+
+	$timeCalendarTable->addRow(array(_('Till'), new CCol(array($downtimeTillDay, '/', $downtimeTillMonth, '/',
+		$downtimeTillYear, SPACE, $downtimeTillHour, ':', $downtimeTillMinute, $calendarIcon))));
+	zbx_add_post_js('create_calendar(null,'.
+		'["new_service_time_to_day","new_service_time_to_month","new_service_time_to_year",'.
+		'"new_service_time_to_hour",'.
+		'"new_service_time_to_minute"],'.
+		'"new_service_time_to_calendar",'.
+		'"new_service_time_to");'
+	);
+
 	$serviceTimeTable->addRow($timeCalendarTable);
 }
 else {
