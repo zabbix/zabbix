@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-23 02:32+0200\n"
-"PO-Revision-Date: 2012-12-23 00:13+0200\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"PO-Revision-Date: 2012-12-27 08:01+0200\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -6465,7 +6465,7 @@ msgstr "Ошибочный запрос."
 #: maintenance.php:147 maintenance.php:161 services.php:188 services.php:202
 #, php-format
 msgid "Invalid date \"%s\"."
-msgstr ""
+msgstr "Ошибочная дата \"%s\"."
 
 #: api/classes/CUserMacro.php:920
 #, php-format
@@ -6479,7 +6479,7 @@ msgstr "Ошибочный формат ключа элемента данных
 
 #: maintenance.php:309
 msgid "Invalid maintenance period"
-msgstr ""
+msgstr "Ошибочный период обслуживания."
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
@@ -9569,7 +9569,7 @@ msgstr "Португальский (pt_BR)"
 
 #: include/locales.inc.php:63
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "Португальский (pt_PT)"
 
 #: tr_logform.php:303
 msgid "Position"
