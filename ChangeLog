@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
 A.F.....S. [ZBXNEXT-1500] added support of full 64 bit address space for object IDs in non-DM setup (Sasha)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 A.F.....S. [ZBXNEXT-1466] implemented macros support in trigger comments (dimir, Eduard)
