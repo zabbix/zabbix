@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ja
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)
 .D........ [ZBXNEXT-894] fixed generate_events comment to say that events are generated after maintenance if trigger changed its state during the maintenance at all (Richlv)
 .......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(), DBlld_process_discovery_rule(). Thanks to Takanori Suzuki for patch (Andris, Sasha)
 ...G...... [ZBX-5940] fixed displaying default key parameters when agent is used with option -p (Andris)
