@@ -2197,7 +2197,7 @@ msgstr "列の結合"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの列の幅が大きすぎます。"
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -5947,7 +5947,7 @@ msgstr "色\"%1$s\"が正しくありません。"
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの列の幅が正しくありません。"
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -6180,7 +6180,7 @@ msgstr "スクリーンのリソースタイプが正しくありません。"
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの行の高さが正しくありません。"
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6902,15 +6902,15 @@ msgstr "最新(T秒前/T個前)の値 < N"
 
 #: popup_trexpr.php:232
 msgid "Last (most recent) T value is = N"
-msgstr "最新(T秒前/T個前)の値 < N = N"
+msgstr "最新(T秒前/T個前)の値 = N"
 
 #: popup_trexpr.php:227
 msgid "Last (most recent) T value is > N"
-msgstr "最新(T秒前/T個前)の値 < N > N"
+msgstr "最新(T秒前/T個前)の値 > N"
 
 #: popup_trexpr.php:237
 msgid "Last (most recent) T value is NOT N"
-msgstr "最新(T秒前/T個前)の値 < N NOT N"
+msgstr "最新(T秒前/T個前)の値 NOT N"
 
 #: srv_status.php:90
 msgid "Last 24 hours"
@@ -7500,19 +7500,19 @@ msgstr[0] "ホスト名は最大%2$d文字です。\"%3$s\"は%1$d文字あり�
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "期間Tの値の最大値 < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "期間Tの値の最大値 = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "期間Tの値の最大値 > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "期間Tの値の最大値 NOT N"
 
 #: api/classes/CHost.php:1386
 #, php-format
@@ -7687,19 +7687,19 @@ msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定オ�
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "期間Tの値の最小値 < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "期間Tの値の最小値 = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "期間Tの値の最小値 > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "期間Tの値の最小値 NOT N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
@@ -8091,11 +8091,11 @@ msgstr "データが設定されていません。"
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "期間Tの間にデータが存在しない N= 1、それ以外 N = 0"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "期間Tの間にデータが存在しない N NOT 1、それ以外 N NOT 0"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -8762,19 +8762,19 @@ msgstr "ステップ数"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr ""
+msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr ""
+msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 = N"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr ""
+msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr ""
+msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 NOT N"
 
 #: include/blocks.inc.php:715
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -10150,7 +10150,7 @@ msgstr "行の結合"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "X - %1$s、Y - %2$sに設定されているスクリーンの行の高さが正しくありません。"
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -11108,7 +11108,7 @@ msgstr "スライド"
 #: include/audit.inc.php:45 include/blocks.inc.php:1263
 #: include/views/monitoring.slides.php:69
 msgid "Slide show"
-msgstr "スライドショーの作成"
+msgstr "スライドショー"
 
 #: include/screens.inc.php:178 include/screens.inc.php:234
 #, php-format
