@@ -245,7 +245,6 @@ switch ($data['method']) {
 
 		$json = new CJSON();
 		$result = $json->encode($result);
-		sdff($result);
 		break;
 
 	default:
