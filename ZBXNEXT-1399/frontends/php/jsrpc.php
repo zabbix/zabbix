@@ -219,10 +219,15 @@ switch ($data['method']) {
 	case 'chosen.get':
 		if ($data['objectName'] == 'hostGroup') {
 			$hostGroups = API::HostGroup()->get(array(
-				'output' => array('groupid', 'nodename', 'name'),
+				'output' => array('groupid', 'name'),
 				'startSearch' => true,
 				'search' => array('name' => $data['search'])
 			));
+			foreach ($hostGroups as &$hostGroup) {
+				$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+			}
+			unset($hostGroup);
+
 			CArrayHelper::sort($hostGroups,
 				array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 				array('field' => 'name', 'order' => ZBX_SORT_UP)
@@ -240,6 +245,7 @@ switch ($data['method']) {
 
 		$json = new CJSON();
 		$result = $json->encode($result);
+		sdff($result);
 		break;
 
 	default:

@@ -46,7 +46,7 @@ class CListBox extends CComboBox {
 		if (empty($options['width'])) {
 			$options['width'] = ZBX_TEXTAREA_STANDARD_WIDTH;
 		}
-		$this->setAttribute('style', 'width: '.$options['width'].'px;');
+		$this->setAttribute('style', 'width:'.$options['width'].'px;');
 
 		// apply ajax-chosen
 		zbx_add_post_js('
