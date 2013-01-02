@@ -1,6 +1,7 @@
 Changes for 2.0.5rc1
 
 New features:
+...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 by system.uname check (Sasha)
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Japanese, Latvian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
