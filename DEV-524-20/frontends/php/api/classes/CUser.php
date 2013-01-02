@@ -822,7 +822,7 @@ class CUser extends CZBXAPI {
 	// ******************************************************************************
 	// LOGIN Methods
 	// ******************************************************************************
-	public function ldapLogin($user) {
+	protected function ldapLogin($user) {
 		$cnf = isset($user['cnf']) ? $user['cnf'] : null;
 
 		if (is_null($cnf)) {
