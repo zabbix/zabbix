@@ -809,7 +809,6 @@ static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 	};
 
 #define	LEN_STR(x)	sizeof(x) - 1, x
-
 	static ZBX_MIB_NORM mibs[]=
 	{
 		/* the most popular items first */
@@ -835,6 +834,7 @@ static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 		{LEN_STR("ifOutQLen"),		"1.3.6.1.2.1.2.2.1.21"},
 		{0}
 	};
+#undef	LEN_STR
 
 	int		found = 0, i;
 
