@@ -551,12 +551,18 @@ class CService extends CZBXAPI {
 	public function getSla(array $options) {
 		$intervals = (isset($options['intervals'])) ? zbx_toArray($options['intervals']) : array();
 
-		$services = $this->get(array(
+		$srvOpt = array(
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
 			'preservekeys' => true
-		));
+		);
+
+		if (isset($options['serviceids'])) {
+			$srvOpt['serviceids'] = $options['serviceids'];
+		}
+
+		$services = $this->get($srvOpt);
 
 		$rs = array();
 		if ($services) {

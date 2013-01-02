@@ -129,6 +129,17 @@ else {
 		))
 	));
 
+
+	// expand problem trigger descriptions
+	$triggers = zbx_toHash(zbx_objectValues($services, 'trigger'), 'triggerid');
+	foreach ($slaData as &$serviceSla) {
+		foreach ($serviceSla['problems'] as &$problemTrigger) {
+			$problemTrigger['description'] = $triggers[$problemTrigger['triggerid']]['description'];
+		}
+		unset($problemTrigger);
+	}
+	unset($serviceSla);
+
 	$treeData = array();
 	createServiceMonitoringTree($services, $slaData, $period, $treeData);
 	$tree = new CServiceTree('service_status_tree',
