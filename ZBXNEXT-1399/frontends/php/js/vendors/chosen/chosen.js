@@ -1099,7 +1099,7 @@ Copyright (c) 2011 by Harvest
 		}
 
 		defaultOptions = {
-			minTermLength: 3,
+			minTermLength: 1,
 			afterTypeDelay: 500,
 			jsonTermKey: 'search',
 			keepTypingMsg: 'Keep typing...',

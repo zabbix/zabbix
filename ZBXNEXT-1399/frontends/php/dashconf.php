@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,9 +35,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
+	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'hgroupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
 	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
@@ -58,11 +59,20 @@ if (isset($_REQUEST['save'])) {
 		CProfile::update('web.dashconf.groups.grpswitch', $_REQUEST['grpswitch'], PROFILE_TYPE_INT);
 
 		if ($_REQUEST['grpswitch'] == 1) {
+			// show groups
 			$groupIds = get_request('groupids', array());
 
 			$result = CFavorite::remove('web.dashconf.groups.groupids');
 			foreach ($groupIds as $groupId) {
 				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupId);
+			}
+
+			// hide groups
+			$hgroupIds = get_request('hgroupids', array());
+
+			$result = CFavorite::remove('web.dashconf.groups.hgroupids');
+			foreach ($hgroupIds as $hgroupId) {
+				$result &= CFavorite::add('web.dashconf.groups.hgroupids', $hgroupId);
 			}
 		}
 
@@ -90,28 +100,36 @@ $data = array(
 
 if (isset($_REQUEST['form_refresh'])) {
 	$data['isFilterEnable'] = get_request('filterEnable', 0);
-	$data['grpswitch'] = get_request('grpswitch', 0);
 	$data['maintenance'] = get_request('maintenance', 0);
 	$data['extAck'] = get_request('extAck', 0);
 
-	$data['groupIds'] = get_request('groupids', array());
-	$data['groupIds'] = zbx_toHash($data['groupIds']);
-
 	$data['severity'] = get_request('trgSeverity', array());
 	$data['severity'] = array_keys($data['severity']);
+
+	// groups
+	$data['grpswitch'] = get_request('grpswitch', 0);
+	$data['groupIds'] = get_request('groupids', array());
+	$data['groupIds'] = zbx_toHash($data['groupIds']);
+	$data['hgroupIds'] = get_request('hgroupids', array());
+	$data['hgroupIds'] = zbx_toHash($data['hgroupIds']);
 }
 else {
 	$data['isFilterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
-	$data['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
+	$data['hgrpswitch'] = CProfile::get('web.dashconf.groups.hgrpswitch', 0);
 	$data['maintenance'] = CProfile::get('web.dashconf.hosts.maintenance', 1);
 	$data['extAck'] = CProfile::get('web.dashconf.events.extAck', 0);
 
+	$data['severity'] = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
+	$data['severity'] = zbx_empty($data['severity']) ? array() : explode(';', $data['severity']);
+
+	// groups
+	$data['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
 	$data['groupIds'] = CFavorite::get('web.dashconf.groups.groupids');
 	$data['groupIds'] = zbx_objectValues($data['groupIds'], 'value');
 	$data['groupIds'] = zbx_toHash($data['groupIds']);
-
-	$data['severity'] = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
-	$data['severity'] = zbx_empty($data['severity']) ? array() : explode(';', $data['severity']);
+	$data['hgroupIds'] = CFavorite::get('web.dashconf.groups.hgroupids');
+	$data['hgroupIds'] = zbx_objectValues($data['hgroupIds'], 'value');
+	$data['hgroupIds'] = zbx_toHash($data['hgroupIds']);
 }
 
 $data['severity'] = zbx_toHash($data['severity']);
@@ -125,6 +143,7 @@ $data['severities'] = array(
 );
 
 if (!empty($data['grpswitch'])) {
+	// show groups
 	$data['groups'] = API::HostGroup()->get(array(
 		'nodeids' => get_current_nodeid(true),
 		'groupids' => $data['groupIds'],
@@ -137,6 +156,22 @@ if (!empty($data['grpswitch'])) {
 	unset($group);
 
 	CArrayHelper::sort($data['groups'],
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+
+	// hide groups
+	$data['hgroups'] = API::HostGroup()->get(array(
+		'nodeids' => get_current_nodeid(true),
+		'groupids' => $data['hgroupIds'],
+		'output' => API_OUTPUT_EXTEND
+	));
+	foreach ($data['hgroups'] as &$hgroup) {
+		$hgroup['nodename'] = get_node_name_by_elid($hgroup['groupid'], true, ': ');
+	}
+	unset($hgroup);
+
+	CArrayHelper::sort($data['hgroups'],
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,15 +35,16 @@ class CListBox extends CComboBox {
 	/**
 	 * Apply chosen jQuery plugin to listbox.
 	 *
-	 * @param int    $options['width']		default = 400px
+	 * @param int    $options['width']
 	 * @param string $options['objectName']
 	 */
 	public function makeModern(array $options = array()) {
-		$this->setAttribute('class', 'chzn-select-'.$options['objectName']);
+		$name = str_replace('[]', '', $this->getName());
+		$this->setAttribute('class', 'chzn-select-'.$name);
 
 		// width
 		if (empty($options['width'])) {
-			$options['width'] = 400;
+			$options['width'] = ZBX_TEXTAREA_STANDARD_WIDTH;
 		}
 		$this->setAttribute('style', 'width: '.$options['width'].'px;');
 
@@ -54,7 +55,7 @@ class CListBox extends CComboBox {
 			ajaxUrl.setArgument("method", "chosen.get");
 			ajaxUrl.setArgument("objectName", "'.$options['objectName'].'");
 
-			jQuery(".chzn-select-'.$options['objectName'].'").ajaxChosen({
+			jQuery(".chzn-select-'.$name.'").ajaxChosen({
 				type: "GET",
 				url: ajaxUrl.getUrl(),
 				dataType: "json"

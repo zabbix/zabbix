@@ -52,7 +52,7 @@ $result = array();
 switch ($data['method']) {
 	case 'host.get':
 		$result = API::Host()->get(array(
-			'startSearch' => 1,
+			'startSearch' => true,
 			'search' => $data['params']['search'],
 			'output' => array('hostid', 'host', 'name'),
 			'sortfield' => 'name',
@@ -218,22 +218,28 @@ switch ($data['method']) {
 
 	case 'chosen.get':
 		if ($data['objectName'] == 'hostGroup') {
-			$dbDatas = API::HostGroup()->get(array(
-				'output' => array('groupid', 'name'),
-				'search' => array('name' => $data['search']),
-				'editable' => true
+			$hostGroups = API::HostGroup()->get(array(
+				'output' => array('groupid', 'nodename', 'name'),
+				'startSearch' => true,
+				'search' => array('name' => $data['search'])
 			));
-			foreach ($dbDatas as $dbData) {
+			CArrayHelper::sort($hostGroups,
+				array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+				array('field' => 'name', 'order' => ZBX_SORT_UP)
+			);
+
+			foreach ($hostGroups as $hostGroup) {
 				$result[] = array(
-					'value' => $dbData['groupid'],
-					'text' => $dbData['name']
+					'value' => $hostGroup['groupid'],
+					'text' => !empty($hostGroup['nodename'])
+						? $hostGroup['nodename'].': '.$hostGroup['name']
+						: $hostGroup['name']
 				);
 			}
 		}
 
 		$json = new CJSON();
-		echo $json->encode($result);
-		exit;
+		$result = $json->encode($result);
 		break;
 
 	default:

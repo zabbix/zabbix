@@ -2,7 +2,7 @@ ul.chzn-choices li { clear: none; }
 
 /* @group Base */
 .chzn-container {
-	font-size: 13px;
+	font-size: 1em;
 	position: relative;
 	display: inline-block;
 	zoom: 1;

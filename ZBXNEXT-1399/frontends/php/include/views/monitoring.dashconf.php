@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,15 +44,16 @@ else {
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
 
 // append host groups to form list
-$groupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit();');
-$groupsComboBox->addItem(0, _('All'));
-$groupsComboBox->addItem(1, _('Selected'));
+$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit();');
+$hostGroupsComboBox->addItem(0, _('All'));
+$hostGroupsComboBox->addItem(1, _('Selected'));
 if (!$this->data['isFilterEnable']) {
-	$groupsComboBox->setAttribute('disabled', 'disabled');
+	$hostGroupsComboBox->setAttribute('disabled', 'disabled');
 }
-$dashconfFormList->addRow(_('Host groups'), $groupsComboBox);
+$dashconfFormList->addRow(_('Host groups'), $hostGroupsComboBox);
 
 if (!empty($this->data['grpswitch'])) {
+	// show groups
 	$groupListBox = new CListBox('groupids[]');
 	$groupListBox->makeModern(array('objectName' => 'hostGroup'));
 
@@ -64,7 +65,21 @@ if (!empty($this->data['grpswitch'])) {
 		$groupListBox->addItem($group['groupid'], $group['nodename'].$group['name'], true);
 	}
 
-	$dashconfFormList->addRow(_('Groups'), $groupListBox);
+	$dashconfFormList->addRow(_('Show selected groups'), $groupListBox);
+
+	// hide groups
+	$hideGroupListBox = new CListBox('hgroupids[]');
+	$hideGroupListBox->makeModern(array('objectName' => 'hostGroup'));
+
+	if (!$this->data['isFilterEnable']) {
+		$hideGroupListBox->setAttribute('disabled', 'disabled');
+	}
+
+	foreach ($this->data['hgroups'] as $hgroup) {
+		$hideGroupListBox->addItem($hgroup['groupid'], $hgroup['nodename'].$hgroup['name'], true);
+	}
+
+	$dashconfFormList->addRow(_('Hide selected groups'), $hideGroupListBox);
 }
 
 // append host in maintenance checkbox to form list
