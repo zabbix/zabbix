@@ -772,7 +772,7 @@ class CUser extends CZBXAPI {
 	 *
 	 * @return bool
 	 */
-	public function ldapLogin(array $user) {
+	protected function ldapLogin(array $user) {
 		$config = select_config();
 		$cnf = array();
 		foreach ($config as $id => $value) {
