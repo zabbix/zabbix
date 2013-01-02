@@ -228,10 +228,10 @@ switch ($data['method']) {
 			}
 			unset($hostGroup);
 
-			CArrayHelper::sort($hostGroups,
+			CArrayHelper::sort($hostGroups, array(
 				array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 				array('field' => 'name', 'order' => ZBX_SORT_UP)
-			);
+			));
 
 			foreach ($hostGroups as $hostGroup) {
 				$result[] = array(

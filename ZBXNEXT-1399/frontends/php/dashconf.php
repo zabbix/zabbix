@@ -155,10 +155,10 @@ if (!empty($data['grpswitch'])) {
 	}
 	unset($group);
 
-	CArrayHelper::sort($data['groups'],
+	CArrayHelper::sort($data['groups'], array(
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
+	));
 
 	// hide groups
 	$data['hgroups'] = API::HostGroup()->get(array(
@@ -171,10 +171,10 @@ if (!empty($data['grpswitch'])) {
 	}
 	unset($hgroup);
 
-	CArrayHelper::sort($data['hgroups'],
+	CArrayHelper::sort($data['hgroups'], array(
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
+	));
 }
 
 // render view
