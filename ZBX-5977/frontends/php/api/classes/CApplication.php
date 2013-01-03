@@ -689,6 +689,40 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
+		$noDiscovery = array();
+		foreach ($allowedItems as $item) {
+			if ($item['flags'] != ZBX_FLAG_DISCOVERY) {
+				$noDiscovery[] = $item['itemid'];
+			}
+		}
+
+		if (!empty($noDiscovery)) {
+			$linkedDb = DBselect(
+				'SELECT ia.itemid, ia.applicationid'.
+				' FROM items_applications ia'.
+				' WHERE '.dbConditionInt('ia.itemid', $noDiscovery).
+					' AND '.dbConditionInt('ia.applicationid', $applicationids)
+			);
+			while ($pair = DBfetch($linkedDb)) {
+				$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
+			}
+
+			$appsInsert = array();
+			foreach ($applicationids as $applicationid) {
+				foreach ($noDiscovery as $inum => $itemid) {
+					if (isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) {
+						continue;
+					}
+					$appsInsert[] = array(
+						'itemid' => $itemid,
+						'applicationid' => $applicationid
+					);
+				}
+			}
+
+			DB::insert('items_applications', $appsInsert);
+	}
+
 		foreach ($itemids as $inum => $itemid) {
 			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.$itemid);
 			while ($child = DBfetch($dbChilds)) {
