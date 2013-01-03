@@ -197,7 +197,7 @@ class CApplication extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('applications a', $options, $sqlParts);
+			$this->dbFilter('applications a', $options, $sqlParts);
 		}
 
 		// sorting
