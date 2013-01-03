@@ -2036,15 +2036,14 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 	public function test_parse($expression, $result, $rc) {
 		$expressionData = new CTriggerExpression();
 		if ($expressionData->parse($expression)) {
-			$this->assertEquals($rc,true);
+			$this->assertEquals($rc, true);
 			$this->assertEquals($rc, $expressionData->isValid);
 		if (isset($result)){
 			$this->assertEquals($result['error'], $expressionData->error);
 			$this->assertEquals($result['expressions'], $expressionData->expressions);
 			$this->assertEquals($result['macros'], $expressionData->macros);
 			$this->assertEquals($result['usermacros'], $expressionData->usermacros);
-		}
-//			var_dump($expressionData);
+			}
 		}
 		else {
 			$this->assertEquals($rc,false, "\nError with expression $expression: ".$expressionData->error);
