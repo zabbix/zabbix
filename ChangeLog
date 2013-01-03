@@ -34,6 +34,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6049] fixed "Undefined index" in Web scenario steps (Oleg)
 ....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A......... [ZBXNEXT-1491] fixed alert.get hostids and groupids parameters (Pavels)
