@@ -224,7 +224,7 @@ class CMaintenance extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('maintenances m', $options, $sqlParts);
+			$this->dbFilter('maintenances m', $options, $sqlParts);
 		}
 
 		// search

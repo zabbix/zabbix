@@ -107,7 +107,7 @@ class CMap extends CMapElement {
 
 		// filter
 		if (!is_null($options['filter'])) {
-			zbx_db_filter('sysmaps s', $options, $sqlParts);
+			$this->dbFilter('sysmaps s', $options, $sqlParts);
 		}
 
 		// sorting

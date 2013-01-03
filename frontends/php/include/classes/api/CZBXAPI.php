@@ -509,7 +509,7 @@ class CZBXAPI {
 
 		// filters
 		if (is_array($options['filter'])) {
-			zbx_db_filter($tableId, $options, $sqlParts);
+			$this->dbFilter($tableId, $options, $sqlParts);
 		}
 
 		// search
@@ -701,10 +701,58 @@ class CZBXAPI {
 	/**
 	 * Throws an API exception.
 	 *
+	 * @static
+	 *
 	 * @param type $code
 	 * @param type $error
 	 */
 	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
 		throw new APIException($code, $error);
+	}
+
+	/**
+	 * Apply filter conditions to sql builded query.
+	 *
+	 * @param string $table
+	 * @param array  $options
+	 * @param array  $sqlParts
+	 *
+	 * @return bool
+	 */
+	protected function dbFilter($table, $options, &$sqlParts) {
+		list($table, $tableShort) = explode(' ', $table);
+
+		$tableSchema = DB::getSchema($table);
+
+		$filter = array();
+		foreach ($options['filter'] as $field => $value) {
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($value)) {
+				continue;
+			}
+
+			zbx_value2array($value);
+
+			$fieldName = $this->fieldId($field, $tableShort);
+			$filter[$field] = DB::isNumericFieldType($tableSchema['fields'][$field]['type'])
+				? dbConditionInt($fieldName, $value)
+				: dbConditionString($fieldName, $value);
+		}
+
+		if (!empty($filter)) {
+			if (isset($sqlParts['where']['filter'])) {
+				$filter[] = $sqlParts['where']['filter'];
+			}
+
+			if (is_null($options['searchByAny']) || $options['searchByAny'] === false || count($filter) == 1) {
+				$sqlParts['where']['filter'] = implode(' AND ', $filter);
+			}
+			else {
+				$sqlParts['where']['filter'] = '('.implode(' OR ', $filter).')';
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 }

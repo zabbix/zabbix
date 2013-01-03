@@ -132,7 +132,7 @@ class CUserGroup extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('usrgrp g', $options, $sqlParts);
+			$this->dbFilter('usrgrp g', $options, $sqlParts);
 		}
 
 		// search
