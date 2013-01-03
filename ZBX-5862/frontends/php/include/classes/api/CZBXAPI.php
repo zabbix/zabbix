@@ -667,7 +667,7 @@ class CZBXAPI {
 			zbx_value2array($value);
 
 			$fieldName = $this->fieldId($field, $tableShort);
-			$filter[$field] = DB::isNumericType($tableSchema['fields'][$field]['type'])
+			$filter[$field] = DB::isNumericFieldType($tableSchema['fields'][$field]['type'])
 				? dbConditionInt($fieldName, $value)
 				: dbConditionString($fieldName, $value);
 		}

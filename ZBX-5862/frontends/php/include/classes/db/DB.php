@@ -640,7 +640,7 @@ class DB {
 	 *
 	 * @return bool
 	 */
-	public static function isNumericType($type) {
+	public static function isNumericFieldType($type) {
 		switch ($type) {
 			case self::FIELD_TYPE_ID:
 			case self::FIELD_TYPE_INT:
