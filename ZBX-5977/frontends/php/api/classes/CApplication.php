@@ -696,7 +696,7 @@ class CApplication extends CZBXAPI {
 		}
 
 		$linkedDb = DBselect(
-			'SELECT ia.itemid, ia.applicationid'.
+			'SELECT ia.itemid,ia.applicationid'.
 			' FROM items_applications ia'.
 			' WHERE '.dbConditionInt('ia.itemid', $itemids).
 				' AND '.dbConditionInt('ia.applicationid', $applicationids)
