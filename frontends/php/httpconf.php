@@ -55,7 +55,7 @@ $fields = array(
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
 	'http_proxy'      => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'new_application' => array(T_ZBX_STR, O_OPT, null, null, null),
-	'hostname'        => array(T_ZBX_STR, O_OPT, null, null, null),
+	'hostname'        => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Host')),
 	'templated'       => array(T_ZBX_STR, O_OPT, null, null, null),
 
 	// actions
