@@ -1074,7 +1074,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	$pos = 1;
 	$len = 1;
 	$valueL = reset($values);
-	while ($valueR = next($values)) {
+	while (false !== ($valueR = next($values))) {
 		$valueL = bcadd($valueL, 1, 0);
 
 		if ($valueR != $valueL) {
