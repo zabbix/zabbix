@@ -1,9 +1,17 @@
 Changes for 2.0.5rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Japanese, Latvian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
+.......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)
+.D........ [ZBXNEXT-894] fixed generate_events comment to say that events are generated after maintenance if trigger changed its state during the maintenance at all (Richlv)
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(), DBlld_process_discovery_rule(). Thanks to Takanori Suzuki for patch (Andris, Sasha)
+...G...... [ZBX-5940] fixed displaying default key parameters when agent is used with option -p (Andris)
+.......PS. [ZBX-5981] fixed incorrect use of function assert() if build option -DNDEBUG was used, it caused random crashes (Alexei)
+.......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
+A.F....... [ZBX-6002] optimized fetching latest service alarms in Service API (dotneft, Eduard)
 ..F....... [ZBX-5986] fixed page filter in monitoring->graphs (Oleg)
 ..F....... [ZBX-6004] monitoring->screens page optimization (Vedmak)
 ..F....... [ZBX-6003] monitoring->maps page optimization (Vedmak)
@@ -1182,6 +1190,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.16rc1
 
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
 ..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
 ..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)

@@ -160,9 +160,6 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	$downtimeSince = date('YmdHis');
 	$downtimeTill = date('YmdHis', time() + 86400);
 
-	$servicesForm->addVar('new_service_time[from]', $downtimeSince);
-	$servicesForm->addVar('new_service_time[to]', $downtimeTill);
-
 	$downtimeSince = zbxDateToTime($downtimeSince);
 	$downtimeTill = zbxDateToTime($downtimeTill);
 
@@ -173,17 +170,41 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	$calendarIcon->addAction('onclick', "javascript: var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_since'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_till'].clndr.clndrhide();");
 
 	// downtime since
+	if (isset($_REQUEST['new_service_time']['from'])) {
+		$year = get_request('downtime_since_year');
+		$month = get_request('downtime_since_month');
+		$day = get_request('downtime_since_day');
+		$hours = get_request('downtime_since_hour');
+		$minutes = get_request('downtime_since_minute');
+	}
+	elseif ($downtimeSince > 0) {
+		$year = date('Y', $downtimeSince);
+		$month = date('m', $downtimeSince);
+		$day = date('d', $downtimeSince);
+		$hours = date('H', $downtimeSince);
+		$minutes = date('i', $downtimeSince);
+	}
+	else {
+		$year = '';
+		$month = '';
+		$day = '';
+		$hours = '';
+		$minutes = '';
+	}
+
+	$servicesForm->addVar('new_service_time[from]', $year.$month.$day.$hours.$minutes);
+
 	$noteTextBox = new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 	$noteTextBox->setAttribute('placeholder', _('short description'));
-	$downtimeSinceDay = new CNumericBox('downtime_since_day', $downtimeSince > 0 ? date('d', $downtimeSince) : '', 2);
+	$downtimeSinceDay = new CNumericBox('downtime_since_day', $day, 2);
 	$downtimeSinceDay->setAttribute('placeholder', _('dd'));
-	$downtimeSinceMonth = new CNumericBox('downtime_since_month', $downtimeSince > 0 ? date('m', $downtimeSince) : '', 2);
+	$downtimeSinceMonth = new CNumericBox('downtime_since_month', $month, 2);
 	$downtimeSinceMonth->setAttribute('placeholder', _('mm'));
-	$downtimeSinceYear = new CNumericBox('downtime_since_year', $downtimeSince > 0 ? date('Y', $downtimeSince) : '', 4);
+	$downtimeSinceYear = new CNumericBox('downtime_since_year', $year, 4);
 	$downtimeSinceYear->setAttribute('placeholder', _('yyyy'));
-	$downtimeSinceHour = new CNumericBox('downtime_since_hour', $downtimeSince > 0 ? date('H', $downtimeSince) : '', 2);
+	$downtimeSinceHour = new CNumericBox('downtime_since_hour', $hours, 2);
 	$downtimeSinceHour->setAttribute('placeholder', _('hh'));
-	$downtimeSinceMinute = new CNumericBox('downtime_since_minute', $downtimeSince > 0 ? date('i', $downtimeSince) : '', 2);
+	$downtimeSinceMinute = new CNumericBox('downtime_since_minute', $minutes, 2);
 	$downtimeSinceMinute->setAttribute('placeholder', _('mm'));
 
 	$timeCalendarTable->addRow(array(_('Note'), $noteTextBox));
@@ -191,16 +212,40 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	zbx_add_post_js('create_calendar(null, ["downtime_since_day", "downtime_since_month", "downtime_since_year", "downtime_since_hour", "downtime_since_minute"], "downtime_since", "new_service_time_from");');
 
 	// downtime till
+	if (isset($_REQUEST['new_service_time']['to'])) {
+		$year = get_request('downtime_till_year');
+		$month = get_request('downtime_till_month');
+		$day = get_request('downtime_till_day');
+		$hours = get_request('downtime_till_hour');
+		$minutes = get_request('downtime_till_minute');
+	}
+	elseif ($downtimeTill > 0) {
+		$year = date('Y', $downtimeTill);
+		$month = date('m', $downtimeTill);
+		$day = date('d', $downtimeTill);
+		$hours = date('H', $downtimeTill);
+		$minutes = date('i', $downtimeTill);
+	}
+	else {
+		$year = '';
+		$month = '';
+		$day = '';
+		$hours = '';
+		$minutes = '';
+	}
+
+	$servicesForm->addVar('new_service_time[to]', $year.$month.$day.$hours.$minutes);
+
 	$calendarIcon->addAction('onclick', "javascript: var pos = getPosition(this); pos.top -= 203; pos.left += 16; CLNDR['downtime_till'].clndr.clndrshow(pos.top, pos.left); CLNDR['downtime_since'].clndr.clndrhide();");
-	$downtimeTillDay = new CNumericBox('downtime_till_day', $downtimeTill > 0 ? date('d', $downtimeTill) : '', 2);
+	$downtimeTillDay = new CNumericBox('downtime_till_day', $day, 2);
 	$downtimeTillDay->setAttribute('placeholder', _('dd'));
-	$downtimeTillMonth = new CNumericBox('downtime_till_month', $downtimeTill > 0 ? date('m', $downtimeTill) : '', 2);
+	$downtimeTillMonth = new CNumericBox('downtime_till_month', $month, 2);
 	$downtimeTillMonth->setAttribute('placeholder', _('mm'));
-	$downtimeTillYear = new CNumericBox('downtime_till_year', $downtimeTill > 0 ? date('Y', $downtimeTill) : '', 4);
+	$downtimeTillYear = new CNumericBox('downtime_till_year', $year, 4);
 	$downtimeTillYear->setAttribute('placeholder', _('yyyy'));
-	$downtimeTillHour = new CNumericBox('downtime_till_hour', $downtimeTill > 0 ? date('H', $downtimeTill) : '', 2);
+	$downtimeTillHour = new CNumericBox('downtime_till_hour', $hours, 2);
 	$downtimeTillHour->setAttribute('placeholder', _('hh'));
-	$downtimeTillMinute = new CNumericBox('downtime_till_minute', $downtimeTill > 0 ? date('i', $downtimeTill) : '', 2);
+	$downtimeTillMinute = new CNumericBox('downtime_till_minute', $minutes, 2);
 	$downtimeTillMinute->setAttribute('placeholder', _('mm'));
 
 	$timeCalendarTable->addRow(array(_('Till'), new CCol(array($downtimeTillDay, '/', $downtimeTillMonth, '/', $downtimeTillYear, SPACE, $downtimeTillHour, ':', $downtimeTillMinute, $calendarIcon))));

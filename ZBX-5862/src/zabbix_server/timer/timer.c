@@ -422,9 +422,8 @@ out:
  * Function: generate_events                                                  *
  *                                                                            *
  * Purpose: generate events for triggers after maintenance period             *
- *          The events will be generated only in case of trigger was FALSE    *
- *          before maintenance and became TRUE after maintenance, also in     *
- *          case if it was TRUE before and FALSE after.                       *
+ *          The events will be generated if trigger changed its state during  *
+ *          the maintenance                                                   *
  *                                                                            *
  * Parameters: hostid - host identifier from database                         *
  *             maintenance_from, maintenance_to - maintenance period bounds   *
