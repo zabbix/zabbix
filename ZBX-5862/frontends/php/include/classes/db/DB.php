@@ -636,17 +636,17 @@ class DB {
 	/**
 	 * Check if $type is numeric field type.
 	 *
-	 * @param $type
+	 * @param int $type
 	 *
 	 * @return bool
 	 */
 	public static function isNumericType($type) {
-		$numTypes = array(
-			self::FIELD_TYPE_INT => true,
-			self::FIELD_TYPE_UINT => true,
-			self::FIELD_TYPE_ID => true
-		);
-
-		return isset($numTypes[$type]);
+		switch ($type) {
+			case self::FIELD_TYPE_ID:
+			case self::FIELD_TYPE_INT:
+			case self::FIELD_TYPE_UINT:
+				return true;
+		}
+		return false;
 	}
 }
