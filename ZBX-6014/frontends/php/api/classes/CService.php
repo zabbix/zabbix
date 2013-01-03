@@ -1654,15 +1654,23 @@ class CService extends CZBXAPI {
 
 		// selectTrigger
 		if ($options['selectTrigger'] !== null) {
+			$triggerids = array_unique(zbx_objectValues($result, 'triggerid'));
+			foreach ($triggerids as $key => $triggerid) {
+				if ($triggerid == 0) {
+					unset($triggerids[$key]);
+				}
+			}
 			$triggers = API::Trigger()->get(array(
 				'output' => $options['selectTrigger'],
-				'triggerids' => array_unique(zbx_objectValues($result, 'triggerid')),
+				'triggerids' => $triggerids,
 				'preservekeys' => true,
 				'nopermissions' => true,
 				'expandDescription' => true
 			));
 			foreach ($result as &$service) {
 				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
+				$service['trigger'] = (isset($service['triggerid']) && $service['triggerid'] != 0)
+						? $triggers[$service['triggerid']] : array();
 			}
 			unset($service);
 		}
