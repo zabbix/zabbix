@@ -36,8 +36,20 @@ class dbConditionIntTest extends CZabbixTest {
 				"field BETWEEN '1' AND '100'"
 			),
 			array(
+				array('field', array(0)),
+				"field='0'"
+			),
+			array(
 				array('field', array(1)),
 				"field='1'"
+			),
+			array(
+				array('field', array(0, 1)),
+				"field IN ('0','1')"
+			),
+			array(
+				array('field', array(1, 0)),
+				"field IN ('1','0')"
 			),
 			array(
 				array('field', array(1), true),
