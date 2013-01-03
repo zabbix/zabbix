@@ -520,52 +520,53 @@ function resolveItemKeyMacros(array $item) {
 	}
 
 	if (!empty($macStack)) {
-		$options = array(
+		$dbItem = API::Item()->get(array(
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'webitems' => true,
 			'output' => API_OUTPUT_REFER,
 			'filter' => array('flags' => null)
-		);
-		$dbItem = API::Item()->get($options);
-		$dbItem = reset($dbItem);
+		));
 
-		$host = reset($dbItem['hosts']);
-		$interface = reset($dbItem['interfaces']);
+		if (!empty($dbItem)) {
+			$dbItem = reset($dbItem);
+			$host = reset($dbItem['hosts']);
+			$interface = reset($dbItem['interfaces']);
 
-		// if item without interface or template item, resolve interface related macros to *UNKNOWN*
-		if (!$interface) {
-			$interface = array(
-				'ip' => UNRESOLVED_MACRO_STRING,
-				'dns' => UNRESOLVED_MACRO_STRING,
-				'useip' => false,
-			);
-		}
+			// if item without interface or template item, resolve interface related macros to *UNKNOWN*
+			if (!$interface) {
+				$interface = array(
+					'ip' => UNRESOLVED_MACRO_STRING,
+					'dns' => UNRESOLVED_MACRO_STRING,
+					'useip' => false
+				);
+			}
 
-		foreach ($macStack as $macro) {
-			switch ($macro) {
-				case '{HOST.NAME}':
-					$key = str_replace('{HOST.NAME}', $host['name'], $key);
-					break;
-				case '{HOSTNAME}': // deprecated
-					$key = str_replace('{HOSTNAME}', $host['host'], $key);
-					break;
-				case '{HOST.HOST}':
-					$key = str_replace('{HOST.HOST}', $host['host'], $key);
-					break;
-				case '{HOST.IP}':
-					$key = str_replace('{HOST.IP}', $interface['ip'], $key);
-					break;
-				case '{IPADDRESS}': // deprecated
-					$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-					break;
-				case '{HOST.DNS}':
-					$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-					break;
-				case '{HOST.CONN}':
-					$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-					break;
+			foreach ($macStack as $macro) {
+				switch ($macro) {
+					case '{HOST.NAME}':
+						$key = str_replace('{HOST.NAME}', $host['name'], $key);
+						break;
+					case '{HOSTNAME}': // deprecated
+						$key = str_replace('{HOSTNAME}', $host['host'], $key);
+						break;
+					case '{HOST.HOST}':
+						$key = str_replace('{HOST.HOST}', $host['host'], $key);
+						break;
+					case '{HOST.IP}':
+						$key = str_replace('{HOST.IP}', $interface['ip'], $key);
+						break;
+					case '{IPADDRESS}': // deprecated
+						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
+						break;
+					case '{HOST.DNS}':
+						$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
+						break;
+					case '{HOST.CONN}':
+						$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
+						break;
+				}
 			}
 		}
 	}

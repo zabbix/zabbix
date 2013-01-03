@@ -144,7 +144,7 @@ class CUser extends CZBXAPI {
 			if (isset($options['filter']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
 			}
-			zbx_db_filter('users u', $options, $sqlParts);
+			$this->dbFilter('users u', $options, $sqlParts);
 		}
 
 		// search

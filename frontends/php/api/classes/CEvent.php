@@ -259,7 +259,7 @@ class CEvent extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('events e', $options, $sqlParts);
+			$this->dbFilter('events e', $options, $sqlParts);
 		}
 
 		// sorting
