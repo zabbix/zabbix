@@ -220,13 +220,12 @@ elseif (isset($_REQUEST['save'])) {
 				'selectSteps' => API_OUTPUT_EXTEND
 			));
 			$dbHttpTest = reset($dbHttpTest);
+			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
-			$httpTest = unsetEqualValues($httpTest, $dbHttpTest);
+			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest);
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (isset($step['httpstepid'])) {
-					$stepId = $step['httpstepid'];
-					$newStep = unsetEqualValues($step, $dbHttpTest['steps'][$step['httpstepid']]);
-					$newStep['httpstepid'] = $stepId;
+					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], array('httpstepid'));
 					$httpTest['steps'][$snum] = $newStep;
 				}
 			}
