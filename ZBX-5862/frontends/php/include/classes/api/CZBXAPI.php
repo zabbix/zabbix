@@ -677,7 +677,7 @@ class CZBXAPI {
 				$filter[] = $sqlParts['where']['filter'];
 			}
 
-			if (is_null($options['searchByAny']) || $options['searchByAny'] === false) {
+			if (is_null($options['searchByAny']) || $options['searchByAny'] === false || count($filter) == 1) {
 				$sqlParts['where']['filter'] = implode(' AND ', $filter);
 			}
 			else {
