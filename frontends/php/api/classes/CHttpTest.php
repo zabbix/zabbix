@@ -741,7 +741,16 @@ class CHttpTest extends CZBXAPI {
 				));
 				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
 
+				// add the deprecated webstepid parameter if it's requested
+				if ($this->outputIsRequested('webstepid', $options['selectSteps'])) {
+					foreach ($httpSteps as &$httpStep) {
+						$httpStep['webstepid'] = $httpStep['httpstepid'];
+					}
+					unset($httpStep);
+				}
+
 				$httpSteps = $this->unsetExtraFields($httpSteps, array('httptestid', 'httpstepid'), $options['selectSteps']);
+
 				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
 			}
 			else {
