@@ -680,7 +680,13 @@ class CApplication extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array(
+				'flags' => array(
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_CHILD,
+					ZBX_FLAG_DISCOVERY_CREATED
+				)
+			)
 		));
 
 		foreach ($items as $num => $item) {
@@ -689,39 +695,31 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$noDiscovery = array();
-		foreach ($allowedItems as $item) {
-			if ($item['flags'] != ZBX_FLAG_DISCOVERY) {
-				$noDiscovery[] = $item['itemid'];
+		$linkedDb = DBselect(
+			'SELECT ia.itemid, ia.applicationid'.
+			' FROM items_applications ia'.
+			' WHERE '.dbConditionInt('ia.itemid', $itemids).
+				' AND '.dbConditionInt('ia.applicationid', $applicationids)
+		);
+
+		while ($pair = DBfetch($linkedDb)) {
+			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
+		}
+			$appsInsert = array();
+
+		foreach ($applicationids as $applicationid) {
+			foreach ($itemids as $inum => $itemid) {
+				if (isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) {
+					continue;
+				}
+				$appsInsert[] = array(
+					'itemid' => $itemid,
+					'applicationid' => $applicationid
+				);
 			}
 		}
 
-		if (!empty($noDiscovery)) {
-			$linkedDb = DBselect(
-				'SELECT ia.itemid, ia.applicationid'.
-				' FROM items_applications ia'.
-				' WHERE '.dbConditionInt('ia.itemid', $noDiscovery).
-					' AND '.dbConditionInt('ia.applicationid', $applicationids)
-			);
-			while ($pair = DBfetch($linkedDb)) {
-				$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
-			}
-
-			$appsInsert = array();
-			foreach ($applicationids as $applicationid) {
-				foreach ($noDiscovery as $inum => $itemid) {
-					if (isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) {
-						continue;
-					}
-					$appsInsert[] = array(
-						'itemid' => $itemid,
-						'applicationid' => $applicationid
-					);
-				}
-			}
-
 			DB::insert('items_applications', $appsInsert);
-	}
 
 		foreach ($itemids as $inum => $itemid) {
 			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.$itemid);
