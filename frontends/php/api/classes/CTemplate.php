@@ -302,7 +302,7 @@ class CTemplate extends CHostGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('hosts h', $options, $sqlParts);
+			$this->dbFilter('hosts h', $options, $sqlParts);
 		}
 
 		// search

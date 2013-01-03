@@ -396,7 +396,7 @@ class CTrigger extends CTriggerGeneral {
 				);
 			}
 
-			zbx_db_filter('triggers t', $options, $sqlParts);
+			$this->dbFilter('triggers t', $options, $sqlParts);
 
 			if (isset($options['filter']['host']) && !is_null($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
