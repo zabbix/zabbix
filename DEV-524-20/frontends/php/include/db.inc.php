@@ -978,35 +978,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	return false;
 }
 
-function zbx_db_filter($table, $options, &$sql_parts) {
-	list($table, $tableShort) = explode(' ', $table);
-
-	$tableSchema = DB::getSchema($table);
-	if (!$tableSchema) {
-		info(_s('Error in search request for table "%1$s".', $table));
-	}
-
-	$filter = array();
-	foreach ($options['filter'] as $field => $value) {
-		if (!isset($tableSchema['fields'][$field]) || zbx_empty($value)) {
-			continue;
-		}
-		zbx_value2array($value);
-		$filter[$field] = dbConditionString($tableShort.'.'.$field, $value);
-	}
-
-	if (!empty($filter)) {
-		if (isset($sql_parts['where']['filter'])) {
-			$filter[] = $sql_parts['where']['filter'];
-		}
-
-		$glue = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
-		$sql_parts['where']['filter'] = '( '.implode($glue, $filter).' )';
-		return true;
-	}
-	return false;
-}
-
 function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 	if (!zbx_empty($options['sortfield'])) {
 		if (!is_array($options['sortfield'])) {
@@ -1103,7 +1074,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	$pos = 1;
 	$len = 1;
 	$valueL = reset($values);
-	while ($valueR = next($values)) {
+	while (false !== ($valueR = next($values))) {
 		$valueL = bcadd($valueL, 1, 0);
 
 		if ($valueR != $valueL) {
@@ -1145,7 +1116,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 		if (!$first) {
 			$condition .= ' '.$operand.' ';
 		}
-		$condition .= $not.$fieldName.' BETWEEN '.$between[0].' AND '.$between[1];
+		$condition .= $not.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr($between[1]);
 		$first = false;
 	}
 
@@ -1156,8 +1127,8 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	if ($inNum == 1) {
 		foreach ($ins as $insValue) {
 			$condition .= $notIn
-				? $fieldName.'!='.$insValue
-				: $fieldName.'='.$insValue;
+				? $fieldName.'!='.zbx_dbstr($insValue)
+				: $fieldName.'='.zbx_dbstr($insValue);
 			break;
 		}
 	}
@@ -1169,6 +1140,8 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 			if (!$first) {
 				$condition .= ' '.$operand.' ';
 			}
+
+			$in = array_map('zbx_dbstr', $in);
 			$condition .= $fieldName.' '.$not.'IN ('.implode(',', $in).')';
 			$first = false;
 		}

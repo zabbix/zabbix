@@ -224,7 +224,7 @@ class CHostInterface extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('interface hi', $options, $sqlParts);
+			$this->dbFilter('interface hi', $options, $sqlParts);
 		}
 
 		// sorting

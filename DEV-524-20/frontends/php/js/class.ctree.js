@@ -81,7 +81,7 @@ CTree.prototype = {
 
 	openNode: function(nodes) {
 		for (var i = 0, size = nodes.length; i < size; i++) {
-			document.getElementById('id_' + nodes[i]).style.display = IE ? 'block' : 'table-row';
+			jQuery('#id_' + nodes[i]).show();
 
 			if (this.getNodeStatus(nodes[i]) == 'open') {
 				this.openNode(this.nodes[nodes[i]].nodelist.split(','));
@@ -91,7 +91,7 @@ CTree.prototype = {
 
 	closeNode: function(nodes) {
 		for (var i = 0, size = nodes.length; i < size; i++) {
-			document.getElementById('id_' + nodes[i]).style.display = 'none';
+			jQuery('#id_' + nodes[i]).hide();
 
 			if (this.checkParent(nodes[i])) {
 				if (this.getNodeStatus(nodes[i]) == 'open') {
