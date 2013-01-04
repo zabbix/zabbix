@@ -345,9 +345,12 @@ function getLastEvents($options) {
 			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
 		'sortfield' => 'eventid',
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['limit']
+		'sortorder' => ZBX_SORT_DOWN
 	);
+
+	if (!isset($options['eventNoLimit'])) {
+		$eventOptions['limit'] = $options['limit'];
+	}
 
 	if (isset($options['nodeids'])) {
 		$triggerOptions['nodeids'] = $options['nodeids'];
