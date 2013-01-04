@@ -350,11 +350,8 @@ void	collect_perfstat()
 				(PERF_COUNTER_INITIALIZED < cptr->status ? &cptr->rawValues[cptr->olderRawValue] : NULL),	/* the older value */
 				&value);
 
-		if (ERROR_SUCCESS != pdh_status || (PDH_CSTATUS_VALID_DATA != value.CStatus && PDH_CSTATUS_NEW_DATA != value.CStatus))
-		{
-			if (ERROR_SUCCESS == pdh_status)
-				pdh_status = value.CStatus;
-		}
+		if (ERROR_SUCCESS == pdh_status && PDH_CSTATUS_VALID_DATA != value.CStatus && PDH_CSTATUS_NEW_DATA != value.CStatus)
+			pdh_status = value.CStatus;
 
 		if (PDH_CSTATUS_INVALID_DATA == pdh_status)
 		{
