@@ -164,7 +164,7 @@ class CScript extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('scripts s', $options, $sqlParts);
+			$this->dbFilter('scripts s', $options, $sqlParts);
 		}
 
 		// sorting

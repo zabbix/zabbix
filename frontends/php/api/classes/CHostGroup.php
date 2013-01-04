@@ -334,7 +334,7 @@ class CHostGroup extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('groups g', $options, $sqlParts);
+			$this->dbFilter('groups g', $options, $sqlParts);
 		}
 
 		// search
