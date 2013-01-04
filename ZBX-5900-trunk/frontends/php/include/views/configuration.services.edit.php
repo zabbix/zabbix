@@ -159,9 +159,6 @@ $servicesTimeFormList->addRow(
 // create service time table
 $serviceTimeTable = new CTable(null, 'formElementTable');
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-	$downtimeSince = date('YmdHis');
-	$downtimeTill = date('YmdHis', time() + 86400);
-
 	// downtime since
 	if (isset($_REQUEST['new_service_time']['from'])) {
 		$fromYear = get_request('new_service_time_from_year');
@@ -179,11 +176,7 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		$serviceTimeFrom = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
 	}
 	else {
-		$fromYear = date('Y', $downtimeSince);
-		$fromMonth = date('m', $downtimeSince);
-		$fromDay = date('d', $downtimeSince);
-		$fromHours = date('H', $downtimeSince);
-		$fromMinutes = date('i', $downtimeSince);
+		$downtimeSince = date('YmdHis');
 		$fromDate = zbxDateToTime($downtimeSince);
 		$serviceTimeFrom = $downtimeSince;
 	}
@@ -206,11 +199,7 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		$serviceTimeTo = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
 	}
 	else {
-		$toYear = date('Y', $downtimeTill);
-		$toMonth = date('m', $downtimeTill);
-		$toDay = date('d', $downtimeTill);
-		$toHours = date('H', $downtimeTill);
-		$toMinutes = date('i', $downtimeTill);
+		$downtimeTill = date('YmdHis', time() + 86400);
 		$toDate = zbxDateToTime($downtimeTill);
 		$serviceTimeTo = $downtimeTill;
 	}

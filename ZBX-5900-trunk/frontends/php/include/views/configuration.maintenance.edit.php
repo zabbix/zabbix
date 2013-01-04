@@ -59,11 +59,6 @@ if (isset($_REQUEST['active_since'])) {
 	$activeSince = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
 }
 else {
-	$fromYear = date('Y', $this->data['active_since']);
-	$fromMonth = date('m', $this->data['active_since']);
-	$fromDay = date('d', $this->data['active_since']);
-	$fromHours = date('H', $this->data['active_since']);
-	$fromMinutes = date('i', $this->data['active_since']);
 	$fromDate = zbxDateToTime($this->data['active_since']);
 	$activeSince = $this->data['active_since'];
 }
@@ -86,11 +81,6 @@ if (isset($_REQUEST['active_till'])) {
 	$activeTill = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
 }
 else {
-	$toYear = date('Y', $this->data['active_till']);
-	$toMonth = date('m', $this->data['active_till']);
-	$toDay = date('d', $this->data['active_till']);
-	$toHours = date('H', $this->data['active_till']);
-	$toMinutes = date('i', $this->data['active_till']);
 	$toDate = zbxDateToTime($this->data['active_till']);
 	$activeTill = $this->data['active_till'];
 }

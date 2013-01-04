@@ -1624,17 +1624,12 @@
 			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
 			if (isset($_REQUEST['add_timeperiod'])) {
-				$year = get_request('new_timeperiod_start_date_year');
-				$month = get_request('new_timeperiod_start_date_month');
-				$day = get_request('new_timeperiod_start_date_day');
-				$hours = get_request('new_timeperiod_start_date_hour');
-				$minutes = get_request('new_timeperiod_start_date_minute');
 				$date = array(
-					'y' => $year,
-					'm' => $month,
-					'd' => $day,
-					'h' => $hours,
-					'i' => $minutes
+					'y' => get_request('new_timeperiod_start_date_year'),
+					'm' => get_request('new_timeperiod_start_date_month'),
+					'd' => get_request('new_timeperiod_start_date_day'),
+					'h' => get_request('new_timeperiod_start_date_hour'),
+					'i' => get_request('new_timeperiod_start_date_minute')
 				);
 			}
 			else {
