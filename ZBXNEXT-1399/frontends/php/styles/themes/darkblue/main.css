@@ -19,6 +19,7 @@
 
 /* Black and Blue Theme by Aly*/
 @import "jquery-ui.css";
+@import "chosen.css";
 
 @media print {
 	body{

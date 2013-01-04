@@ -19,6 +19,8 @@
 
 /* Dark Orange Theme by Aly */
 @import "jquery-ui.css";
+@import "chosen.css";
+
 @media print { body{ background-color:#A5A5A5; } }
 @media screen { body{ background-color:#1A1A1A; color: #FF5500; } }
 

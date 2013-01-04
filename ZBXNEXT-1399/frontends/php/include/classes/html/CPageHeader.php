@@ -87,7 +87,7 @@ class CPageHeader {
 	 * @param array $scripts
 	 */
 	public function addCssByScripts($scripts) {
-		if (in_array('chosen.js', $scripts)) {
+		if (in_array('chosen.jquery.js', $scripts)) {
 			$this->cssFiles[] = 'js/vendors/chosen/chosen.css';
 		}
 	}

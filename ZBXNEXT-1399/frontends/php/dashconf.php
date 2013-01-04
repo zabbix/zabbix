@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('chosen.js');
+$page['scripts'] = array('chosen.jquery.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -37,7 +37,7 @@ $fields = array(
 	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'hgroupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'hidegroupids' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
 	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
@@ -68,11 +68,11 @@ if (isset($_REQUEST['save'])) {
 			}
 
 			// hide groups
-			$hgroupIds = get_request('hgroupids', array());
+			$hideGroupIds = get_request('hidegroupids', array());
 
-			$result = CFavorite::remove('web.dashconf.groups.hgroupids');
-			foreach ($hgroupIds as $hgroupId) {
-				$result &= CFavorite::add('web.dashconf.groups.hgroupids', $hgroupId);
+			$result = CFavorite::remove('web.dashconf.groups.hide.groupids');
+			foreach ($hideGroupIds as $hideGroupId) {
+				$result &= CFavorite::add('web.dashconf.groups.hide.groupids', $hideGroupId);
 			}
 		}
 
@@ -110,8 +110,8 @@ if (isset($_REQUEST['form_refresh'])) {
 	$data['grpswitch'] = get_request('grpswitch', 0);
 	$data['groupIds'] = get_request('groupids', array());
 	$data['groupIds'] = zbx_toHash($data['groupIds']);
-	$data['hgroupIds'] = get_request('hgroupids', array());
-	$data['hgroupIds'] = zbx_toHash($data['hgroupIds']);
+	$data['hideGroupIds'] = get_request('hidegroupids', array());
+	$data['hideGroupIds'] = zbx_toHash($data['hideGroupIds']);
 }
 else {
 	$data['isFilterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
@@ -127,9 +127,9 @@ else {
 	$data['groupIds'] = CFavorite::get('web.dashconf.groups.groupids');
 	$data['groupIds'] = zbx_objectValues($data['groupIds'], 'value');
 	$data['groupIds'] = zbx_toHash($data['groupIds']);
-	$data['hgroupIds'] = CFavorite::get('web.dashconf.groups.hgroupids');
-	$data['hgroupIds'] = zbx_objectValues($data['hgroupIds'], 'value');
-	$data['hgroupIds'] = zbx_toHash($data['hgroupIds']);
+	$data['hideGroupIds'] = CFavorite::get('web.dashconf.groups.hide.groupids');
+	$data['hideGroupIds'] = zbx_objectValues($data['hideGroupIds'], 'value');
+	$data['hideGroupIds'] = zbx_toHash($data['hideGroupIds']);
 }
 
 $data['severity'] = zbx_toHash($data['severity']);
@@ -161,17 +161,17 @@ if (!empty($data['grpswitch'])) {
 	));
 
 	// hide groups
-	$data['hgroups'] = API::HostGroup()->get(array(
+	$data['hideGroups'] = API::HostGroup()->get(array(
 		'nodeids' => get_current_nodeid(true),
-		'groupids' => $data['hgroupIds'],
+		'groupids' => $data['hideGroupIds'],
 		'output' => API_OUTPUT_EXTEND
 	));
-	foreach ($data['hgroups'] as &$hgroup) {
-		$hgroup['nodename'] = get_node_name_by_elid($hgroup['groupid'], true, ': ');
+	foreach ($data['hideGroups'] as &$hideGroup) {
+		$hideGroup['nodename'] = get_node_name_by_elid($hideGroup['groupid'], true, ': ');
 	}
-	unset($hgroup);
+	unset($hideGroup);
 
-	CArrayHelper::sort($data['hgroups'], array(
+	CArrayHelper::sort($data['hideGroups'], array(
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));

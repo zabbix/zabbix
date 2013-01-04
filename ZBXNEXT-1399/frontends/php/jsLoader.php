@@ -60,7 +60,7 @@ $availableJScripts = array(
 	'jquery.js' => 'jquery/',
 	'jquery-ui.js' => 'jquery/',
 	'activity-indicator.js' => 'vendors/',
-	'chosen.js' => 'vendors/chosen/',
+	'chosen.jquery.js' => 'vendors/chosen/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',

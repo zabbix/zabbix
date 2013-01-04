@@ -1,8 +1,6 @@
-ul.chzn-choices li { clear: none; }
-
 /* @group Base */
 .chzn-container {
-	font-size: 1em;
+	font-size: 13px;
 	position: relative;
 	display: inline-block;
 	zoom: 1;

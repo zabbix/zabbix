@@ -45,7 +45,6 @@ class CTag extends CObject {
 	 */
 	protected $valueEncStrategy = self::ENC_ALL;
 
-
 	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
 		parent::__construct();
 		$this->attributes = array();

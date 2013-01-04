@@ -65,7 +65,7 @@ if ($dashconf['filterEnable'] == 1) {
 	}
 	else {
 		$dashconf['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-		$hidenGroups = zbx_objectValues(CFavorite::get('web.dashconf.groups.hgroupids'), 'value');
+		$hidenGroups = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
 		$dashconf['groupids'] = array_diff($dashconf['groupids'], $hidenGroups);
 	}
 

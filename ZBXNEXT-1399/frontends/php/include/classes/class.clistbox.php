@@ -38,8 +38,8 @@ class CListBox extends CComboBox {
 	 * @param int    $options['width']
 	 * @param string $options['objectName']
 	 */
-	public function makeModern(array $options = array()) {
-		$name = str_replace('[]', '', $this->getName());
+	public function makeDynamic(array $options = array()) {
+		$name = zbx_formatDomId($this->getName());
 		$this->setAttribute('class', 'chzn-select-'.$name);
 
 		// width
@@ -51,7 +51,7 @@ class CListBox extends CComboBox {
 		// apply ajax-chosen
 		zbx_add_post_js('
 			var ajaxUrl = new Curl("jsrpc.php");
-			ajaxUrl.setArgument("type", 9); // PAGE_TYPE_TEXT
+			ajaxUrl.setArgument("type", '.PAGE_TYPE_TEXT.');
 			ajaxUrl.setArgument("method", "chosen.get");
 			ajaxUrl.setArgument("objectName", "'.$options['objectName'].'");
 

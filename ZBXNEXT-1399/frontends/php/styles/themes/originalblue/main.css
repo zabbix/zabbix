@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 @import "jquery-ui.css";
+@import "chosen.css";
 
 .unknown, a.unknown { color: #777; }
 a.unknown:hover { color: #999; }

@@ -55,7 +55,7 @@ $dashconfFormList->addRow(_('Host groups'), $hostGroupsComboBox);
 if (!empty($this->data['grpswitch'])) {
 	// show groups
 	$groupListBox = new CListBox('groupids[]');
-	$groupListBox->makeModern(array('objectName' => 'hostGroup'));
+	$groupListBox->makeDynamic(array('objectName' => 'hostGroup'));
 
 	if (!$this->data['isFilterEnable']) {
 		$groupListBox->setAttribute('disabled', 'disabled');
@@ -68,15 +68,15 @@ if (!empty($this->data['grpswitch'])) {
 	$dashconfFormList->addRow(_('Show selected groups'), $groupListBox);
 
 	// hide groups
-	$hideGroupListBox = new CListBox('hgroupids[]');
-	$hideGroupListBox->makeModern(array('objectName' => 'hostGroup'));
+	$hideGroupListBox = new CListBox('hidegroupids[]');
+	$hideGroupListBox->makeDynamic(array('objectName' => 'hostGroup'));
 
 	if (!$this->data['isFilterEnable']) {
 		$hideGroupListBox->setAttribute('disabled', 'disabled');
 	}
 
-	foreach ($this->data['hgroups'] as $hgroup) {
-		$hideGroupListBox->addItem($hgroup['groupid'], $hgroup['nodename'].$hgroup['name'], true);
+	foreach ($this->data['hideGroups'] as $hideGroup) {
+		$hideGroupListBox->addItem($hideGroup['groupid'], $hideGroup['nodename'].$hideGroup['name'], true);
 	}
 
 	$dashconfFormList->addRow(_('Hide selected groups'), $hideGroupListBox);
