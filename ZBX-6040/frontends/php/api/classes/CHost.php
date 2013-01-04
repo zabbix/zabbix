@@ -476,9 +476,9 @@ class CHost extends CHostGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('hosts h', $options, $sqlParts);
+			$this->dbFilter('hosts h', $options, $sqlParts);
 
-			if (zbx_db_filter('interface hi', $options, $sqlParts)) {
+			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
 				$sqlParts['from']['interface'] = 'interface hi';
 				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 			}

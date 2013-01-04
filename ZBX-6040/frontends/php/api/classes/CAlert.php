@@ -227,7 +227,7 @@ class CAlert extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('alerts a', $options, $sqlParts);
+			$this->dbFilter('alerts a', $options, $sqlParts);
 		}
 
 		// search

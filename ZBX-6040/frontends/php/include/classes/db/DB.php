@@ -632,4 +632,21 @@ class DB {
 		}
 		return true;
 	}
+
+	/**
+	 * Check if $type is numeric field type.
+	 *
+	 * @param int $type
+	 *
+	 * @return bool
+	 */
+	public static function isNumericFieldType($type) {
+		switch ($type) {
+			case self::FIELD_TYPE_ID:
+			case self::FIELD_TYPE_INT:
+			case self::FIELD_TYPE_UINT:
+				return true;
+		}
+		return false;
+	}
 }

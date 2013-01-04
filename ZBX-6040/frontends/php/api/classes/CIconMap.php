@@ -126,7 +126,7 @@ class CIconMap extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('icon_map im', $options, $sqlParts);
+			$this->dbFilter('icon_map im', $options, $sqlParts);
 		}
 		// search
 		if (is_array($options['search'])) {

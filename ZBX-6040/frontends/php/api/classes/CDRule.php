@@ -187,7 +187,7 @@ class CDRule extends CZBXAPI {
 
 // filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('drules dr', $options, $sqlParts);
+			$this->dbFilter('drules dr', $options, $sqlParts);
 		}
 
 // search
