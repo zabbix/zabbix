@@ -1764,10 +1764,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 					'macros' => array(
 						0 => array(
 							'expression' => '{TRIGGER.VALUE}'
-							),
+						),
 						1 => array(
 							'expression' => '{TRIGGER.VALUE}'
-							)
+						)
 					),
 					'usermacros' => array(
 						0 => array(
@@ -1784,398 +1784,291 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				true
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6<7#8=9m',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALUE}+{$M}',
 				null,
 				true
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6<7#8=9',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALUE}+{$M',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALUE}+{$',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALUE}+{',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALUE}+',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALUE}',
 				null,
 				true
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6<7#8=',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALUE',
 				null,
 				false
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6<7#8',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VALU',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VAL',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.VA',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.V',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER.',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGER',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGGE',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIGG',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRIG',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TRI',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{TR',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{T',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+{',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+					'+',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)',
 				null,
 				true
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6<7#',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1',
 				null,
 				false
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6<7',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)',
 				null,
 				true
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6<',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5',
 				null,
 				false
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>6',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+',
+				null,
+				false
+			),
+			array(
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)',
 				null,
 				true
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5>',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3',
 				null,
 				false
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&5',
-				null,
-				true
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4&',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(',
 				null,
 				false
 			),
 			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|4',
-				null,
-				true
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3|',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -',
 				null,
 				false
 			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+3',
-				null,
-				true
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2+',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-2',
-				null,
-				true
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1-',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/1',
-				null,
-				true
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0/',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*0',
-				null,
-				true
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}*',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])}',
-				null,
-				true
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0])',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0]',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param0',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",param',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",para',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",par',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",pa',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",p',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"",',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\""',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\"',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC\\',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aramC',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'aram',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'ara',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'ar',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p'.
-					'a',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","p',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2","',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2",',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2"',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB2',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"paramB',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"param',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"para',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"par',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"pa',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"p',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,"',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1,',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA1',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(paramA',
-				null,
-				false
-			),
-			array(
-				'{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(param',
-				null,
-				false
-			),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(para', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(par', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(pa', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(p', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function(', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].function', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].functio', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].functi', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].funct', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].func', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].fun', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].fu',	null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].f', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)].', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)]', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0)', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param0', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",param', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",para', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",par', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",pa', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",p', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"",', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\"', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC\\', null,false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","paramC', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","param', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","para', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","par', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","pa', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","p', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2","', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2",', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2"', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB2', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"paramB', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"param', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"para', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"par', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"pa', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"p', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,"', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1,', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA1', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[paramA', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[param', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[para', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[par', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[pa', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[p', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10[', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C10', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C1', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_C', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-_', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02-', null, false),
-			array('{hostNAME.01- B5_:keyNAME.02', null, false),
-			array('{hostNAME.01- B5_:keyNAME.0', null, false),
-			array('{hostNAME.01- B5_:keyNAME.', null, false),
-			array('{hostNAME.01- B5_:keyNAME', null, false),
-			array('{hostNAME.01- B5_:keyNAM', null, false),
-			array('{hostNAME.01- B5_:keyNA', null, false),
-			array('{hostNAME.01- B5_:keyN', null, false),
-			array('{hostNAME.01- B5_:key', null, false),
-			array('{hostNAME.01- B5_:ke', null, false),
-			array('{hostNAME.01- B5_:k', null, false),
-			array('{hostNAME.01- B5_:', null, false),
-			array('{hostNAME.01- B5_', null, false),
-			array('{hostNAME.01- B5', null, false),
-			array('{hostNAME.01- B', null, false),
-			array('{hostNAME.01- ', null, false),
-			array('{hostNAME.01-', null, false),
-			array('{hostNAME.01', null, false),
-			array('{hostNAME.0', null, false),
-			array('{hostNAME.', null, false),
-			array('{hostNAME', null, false),
-			array('{hostNAM', null, false),
-			array('{hostNA', null, false),
-			array('{hostN', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & ', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m &', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m ', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" ', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\""', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\\', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", ', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3",', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3"', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, ', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1,', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].fun', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].fu', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].f', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ]', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\""', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\\', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4', null, false),
+			array('{host:key[p1, p2 ,"p3", "p', null, false),
+			array('{host:key[p1, p2 ,"p3", "', null, false),
+			array('{host:key[p1, p2 ,"p3", ', null, false),
+			array('{host:key[p1, p2 ,"p3",', null, false),
+			array('{host:key[p1, p2 ,"p3"', null, false),
+			array('{host:key[p1, p2 ,"p3', null, false),
+			array('{host:key[p1, p2 ,"p', null, false),
+			array('{host:key[p1, p2 ,"', null, false),
+			array('{host:key[p1, p2 ,', null, false),
+			array('{host:key[p1, p2 ', null, false),
+			array('{host:key[p1, p2', null, false),
+			array('{host:key[p1, p', null, false),
+			array('{host:key[p1, ', null, false),
+			array('{host:key[p1,', null, false),
+			array('{host:key[p1', null, false),
+			array('{host:key[p', null, false),
+			array('{host:key[', null, false),
+			array('{host:key', null, false),
+			array('{host:ke', null, false),
+			array('{host:k', null, false),
+			array('{host:', null, false),
 			array('{host', null, false),
 			array('{hos', null, false),
 			array('{ho', null, false),
