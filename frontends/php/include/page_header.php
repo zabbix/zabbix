@@ -169,9 +169,8 @@ CSS;
 	$pageHeader->addJsFile('js/browsers.js');
 	$pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
-	// show GUI messages in pages with menus and in fullscreen mode
-	$showGUIMessaging =  (!defined('ZBX_PAGE_NO_MENU') || (isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'])) ? 1 : 0;
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGUIMessaging='.$showGUIMessaging;
+	// is menu is frontend messaging
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&isMenu='.(defined('ZBX_PAGE_NO_MENU') ? 0 : 1);
 	$pageHeader->addJsFile($path);
 
 	if (!empty($page['scripts']) && is_array($page['scripts'])) {
@@ -456,7 +455,7 @@ if ($denied_page_requested) {
 	access_deny();
 }
 
-if ($page['type'] == PAGE_TYPE_HTML && $showGUIMessaging) {
+if ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	zbx_add_post_js('var msglistid = initMessages({});');
 }
 
