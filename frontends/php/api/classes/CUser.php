@@ -822,15 +822,12 @@ class CUser extends CZBXAPI {
 	// ******************************************************************************
 	// LOGIN Methods
 	// ******************************************************************************
-	public function ldapLogin($user) {
-		$cnf = isset($user['cnf']) ? $user['cnf'] : null;
-
-		if (is_null($cnf)) {
-			$config = select_config();
-			foreach ($config as $id => $value) {
-				if (zbx_strpos($id, 'ldap_') !== false) {
-					$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-				}
+	protected function ldapLogin($user) {
+		$config = select_config();
+		$cnf = array();
+		foreach ($config as $id => $value) {
+			if (zbx_strpos($id, 'ldap_') !== false) {
+				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
 			}
 		}
 
