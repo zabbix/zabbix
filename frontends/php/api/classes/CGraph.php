@@ -235,7 +235,7 @@ class CGraph extends CGraphGeneral {
 				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
 			}
 
-			zbx_db_filter('graphs g', $options, $sqlParts);
+			$this->dbFilter('graphs g', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);

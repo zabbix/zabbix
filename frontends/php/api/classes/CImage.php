@@ -113,7 +113,7 @@ class CImage extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('images i', $options, $sqlParts);
+			$this->dbFilter('images i', $options, $sqlParts);
 		}
 
 		// search

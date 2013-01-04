@@ -170,6 +170,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/html/CButtonPopup.php -text
 frontends/php/include/classes/macros/CMacrosResolverHelper.php -text
 frontends/php/include/classes/parsers/CTriggerExpression.php -text
+frontends/php/include/classes/validators/CLdapAuthValidator.php -text
 frontends/php/include/classes/validators/CTriggerFunctionValidator.php -text
 frontends/php/include/views/js/monitoring.triggerComment.js.php -text
 frontends/php/include/views/monitoring.triggerComment.php -text

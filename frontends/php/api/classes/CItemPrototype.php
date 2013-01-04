@@ -214,7 +214,7 @@ class CItemPrototype extends CItemGeneral {
 
 // --- FILTER ---
 		if (is_array($options['filter'])) {
-			zbx_db_filter('items i', $options, $sqlParts);
+			$this->dbFilter('items i', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
