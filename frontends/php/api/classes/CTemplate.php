@@ -29,6 +29,18 @@ class CTemplate extends CHostGeneral {
 	protected $tableAlias = 'h';
 
 	/**
+	 * Overrides the parent function so that templateids will be used instead of hostids for the template API.
+	 */
+	public function pkOption($tableName = null) {
+		if ($tableName && $tableName != $this->tableName()) {
+			return parent::pkOption($tableName);
+		}
+		else {
+			return 'templateids';
+		}
+	}
+
+	/**
 	 * Get Template data
 	 *
 	 * @param array $options
