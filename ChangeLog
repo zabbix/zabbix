@@ -3,7 +3,7 @@ Changes for 2.1.0
 New features:
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
 A.F.....S. [ZBXNEXT-1500] added support of full 64 bit address space for object IDs in non-DM setup (Sasha)
-.......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
+.......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 A.F.....S. [ZBXNEXT-1466] implemented macros support in trigger comments (dimir, Eduard)
 A......... [ZBXNEXT-1491] implemented property array support for all get methods (Pavels)
 A......... [ZBXNEXT-1491] implemented the map.get selectUrls parameter (Pavels)
@@ -82,7 +82,7 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.5rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese, French and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Japanese, Latvian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
@@ -1272,6 +1272,9 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.16
+
+
 Changes for 1.8.16rc1
 
 .......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
@@ -1285,6 +1288,8 @@ A.F....... [ZBX-5833] fixed inserting a macro in the trigger expression construc
 A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
 A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
 ..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
+..F....... [ZBX-5803] fixed message initialization memory leak in IE7 (Eduard)
+..F....... [ZBX-5898] fixed Insert Macro button does not work in trigger constructor on IE7 and IE8 (Toms)
 A......... [ZBX-5822] fixed macro in trigger names for unixtime and other types of units (Oleg)
 .......PS. [ZBX-5697] fixed processing of external check parameters with the right square bracket (Sasha)
 ........S. [ZBX-5454] fixed encoding of long email subject line as required by RFC-2047; thanks to Jairo Eduardo Lopez Fuentes Nacarino (Andris)
