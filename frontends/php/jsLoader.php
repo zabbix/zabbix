@@ -202,8 +202,8 @@ if (empty($_GET['files'])) {
 		'menu.js',
 		'init.js'
 	);
-	// load frontend messaging only for pages with menus
-	if (isset($_GET['isMenu']) && $_GET['isMenu']) {
+	// load frontend messaging only for some pages
+	if (isset($_GET['showGUIMessaging']) && $_GET['showGUIMessaging']) {
 		$files[] = 'class.cmessages.js';
 	}
 }
