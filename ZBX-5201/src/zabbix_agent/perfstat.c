@@ -235,13 +235,15 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 	}
 
 	if (ERROR_SUCCESS != zbx_PdhOpenQuery(__function_name, &ppsd->pdh_query))
-		return FAIL;
+		goto out;
 
 	ppsd->nextcheck = time(NULL) + UNSUPPORTED_REFRESH_PERIOD;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return SUCCEED;
+	return ret;
 }
 
 void	free_perf_collector()
