@@ -193,7 +193,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('history', '54');
 		$this->assertElementValue('trends', '55');
 		$this->assertElementText('description', 'description');
-		$this->assertElementValue('delta', 'Delta (simple change)');
+		$this->assertElementValue('delta_name', 'Delta (simple change)');
 	}
 
 	/**
