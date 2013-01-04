@@ -24,6 +24,9 @@
  */
 abstract class CHostGeneral extends CZBXAPI {
 
+	protected $tableName = 'hosts';
+	protected $tableAlias = 'h';
+
 	/**
 	 * Allows to:
 	 * - add hosts to groups;
