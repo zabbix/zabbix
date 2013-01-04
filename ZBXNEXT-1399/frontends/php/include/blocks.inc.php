@@ -744,9 +744,19 @@ function make_status_of_zbx() {
 }
 
 /**
- * Create and return a DIV with latest problem triggers.
+ * Create DIV with latest problem triggers.
  *
- * @param array $filter
+ * @param array  $filter['screenid']
+ * @param array  $filter['groupids']
+ * @param array  $filter['hideGroupIds']
+ * @param array  $filter['hostids']
+ * @param array  $filter['maintenance']
+ * @param int    $filter['extAck']
+ * @param int    $filter['severity']
+ * @param int    $filter['limit']
+ * @param string $filter['sortfield']
+ * @param string $filter['sortorder']
+ * @param string $filter['backUrl']
  *
  * @return CDiv
  */
@@ -775,6 +785,23 @@ function make_latest_issues(array $filter = array()) {
 	$options['sortorder'] = isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN;
 	$options['limit'] = isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT;
 
+	// get available host if disabled group exist
+	if (!empty($filter['hideGroupIds'])) {
+		$availableHosts = API::Host()->get(array(
+			'groupids' => $filter['groupids'],
+			'output' => array('hostid')
+		));
+		$availableHostIds = zbx_objectValues($availableHosts, 'hostid');
+
+		$disabledHosts = API::Host()->get(array(
+			'groupids' => $filter['hideGroupIds'],
+			'output' => array('hostid')
+		));
+		$disabledHostIds = zbx_objectValues($disabledHosts, 'hostid');
+
+		$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
+	}
+
 	if (isset($filter['hostids'])) {
 		$options['hostids'] = $filter['hostids'];
 	}
@@ -785,7 +812,7 @@ function make_latest_issues(array $filter = array()) {
 	unset($options['limit']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
-	foreach($triggers as $tnum => $trigger) {
+	foreach ($triggers as $tnum => $trigger) {
 		// if trigger is lost(broken expression) we skip it
 		if (empty($trigger['hosts'])) {
 			unset($triggers[$tnum]);
@@ -813,7 +840,7 @@ function make_latest_issues(array $filter = array()) {
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
 
 	// indicator of sort field
-	$sortDiv = new CDiv(SPACE, $options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+	$sortDiv = new CDiv(SPACE, ($options['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 	$sortDiv->addStyle('float: left');
 	$hostHeaderDiv = new CDiv(array(_('Host'), SPACE));
 	$hostHeaderDiv->addStyle('float: left');
@@ -826,9 +853,9 @@ function make_latest_issues(array $filter = array()) {
 	$table->setHeader(
 		array(
 			is_show_all_nodes() ? _('Node') : null,
-			$options['sortfield'] === 'hostname' ? array($hostHeaderDiv, $sortDiv) : _('Host'),
-			$options['sortfield'] === 'priority' ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
-			$options['sortfield'] === 'lastchange' ? array($lastChangeHeaderDiv, $sortDiv) : _('Last change'),
+			($options['sortfield'] === 'hostname') ? array($hostHeaderDiv, $sortDiv) : _('Host'),
+			($options['sortfield'] === 'priority') ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
+			($options['sortfield'] === 'lastchange') ? array($lastChangeHeaderDiv, $sortDiv) : _('Last change'),
 			_('Age'),
 			_('Info'),
 			$config['event_ack_enable'] ? _('Ack') : null,

@@ -61,12 +61,31 @@ if ($dashconf['filterEnable'] == 1) {
 	// groups
 	$dashconf['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
 	if ($dashconf['grpswitch'] == 0) {
-		$dashconf['groupids'] = null;
+		$dashconf['groupids'] = null; // null mean all groups
 	}
 	else {
 		$dashconf['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-		$hidenGroups = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-		$dashconf['groupids'] = array_diff($dashconf['groupids'], $hidenGroups);
+		$hideGroups = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+
+		if (!empty($hideGroups)) {
+			$dashconf['hideGroupIds'] = $hideGroups;
+
+			// get all groups if no selected groups defined
+			if (empty($dashconf['groupids'])) {
+				$groups = API::HostGroup()->get(array(
+					'nodeids' => get_current_nodeid(true),
+					'output' => array('groupid')
+				));
+				$dashconf['groupids'] = zbx_objectValues($groups, 'groupid');
+			}
+
+			$dashconf['groupids'] = array_diff($dashconf['groupids'], $dashconf['hideGroupIds']);
+		}
+		else {
+			if (empty($dashconf['groupids'])) {
+				$dashconf['groupids'] = null; // null mean all groups
+			}
+		}
 	}
 
 	// hosts
