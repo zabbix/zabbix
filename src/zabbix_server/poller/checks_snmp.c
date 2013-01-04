@@ -36,7 +36,6 @@ zbx_snmp_index_t;
 static zbx_snmp_index_t	*snmpidx = NULL;
 static int		snmpidx_count = 0, snmpidx_alloc = 16;
 
-
 static char	*zbx_get_snmp_type_error(u_char type)
 {
 	switch (type)
@@ -264,6 +263,9 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
+
+	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* milliseconds */
+	session.retries = 0;
 
 #ifdef HAVE_IPV6
 	if (SUCCEED != get_address_family(item->interface.addr, &family, err, MAX_STRING_LEN))
