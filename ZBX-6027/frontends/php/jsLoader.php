@@ -202,7 +202,7 @@ if (empty($_GET['files'])) {
 		'init.js'
 	);
 	// load frontend messaging only for some pages
-	if (isset($_GET['showGUIMessaging']) && $_GET['showGUIMessaging']) {
+	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
 		$files[] = 'class.cmessages.js';
 	}
 }
