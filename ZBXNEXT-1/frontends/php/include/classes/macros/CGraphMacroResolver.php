@@ -61,11 +61,12 @@ class CGraphMacroResolver {
 		$graphIds = zbx_objectValues($data, 'graphid');
 
 		$items = DBfetchArray(DBselect(
-			'SELECT i.hostid, gi.graphid'.
+			'SELECT i.hostid,gi.graphid'.
 			' FROM graphs_items gi,items i'.
-			' WHERE gi.itemid=i.itemid AND '.DBcondition('gi.graphid', $graphIds).
-			' ORDER BY gi.sortorder')
-		);
+			' WHERE gi.itemid=i.itemid'.
+				' AND '.DBcondition('gi.graphid', $graphIds).
+			' ORDER BY gi.sortorder'
+		));
 
 		$itemsByGraphId = array();
 		foreach ($items as $item) {
