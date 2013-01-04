@@ -1,5 +1,4 @@
-ul.chzn-choices li { clear: none; }
 .chzn-container { font-size: 1em; }
-.chzn-container-multi .chzn-choices .search-choice { margin-right: 1px; }
+.chzn-container .chzn-choices li { clear: none; padding-right: 4px; }
 .chzn-container .chzn-results .highlighted { background: #4A618E; }
 .chzn-container .chzn-results .active-result em { background: #FC0; }

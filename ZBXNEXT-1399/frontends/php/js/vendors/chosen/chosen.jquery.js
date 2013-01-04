@@ -1215,11 +1215,12 @@ Copyright (c) 2011 by Harvest
 						}
 					});
 
+					select.data().chosen.no_results_clear();
+
 					if (Object.keys(items).length) {
 						select.trigger('liszt:updated');
 					}
 					else {
-						select.data().chosen.no_results_clear();
 						select.data().chosen.no_results(field.attr('value'));
 					}
 
