@@ -108,7 +108,7 @@ static void run_remote_command(char* host_name, char* command)
 		{
 			if (1 == atoi(row[6]))
 			{
-				zbx_strlcpy(item.host.ipmi_ip_orig, row[7], sizeof(item.host.ipmi_ip));
+				zbx_strlcpy(item.host.ipmi_ip_orig, row[7], sizeof(item.host.ipmi_ip_orig));
 				item.host.ipmi_port = (unsigned short)atoi(row[8]);
 				item.host.ipmi_authtype = atoi(row[9]);
 				item.host.ipmi_privilege = atoi(row[10]);
