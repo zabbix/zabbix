@@ -101,11 +101,11 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 			$config['authentication_type'] = $_REQUEST['config'];
 
 			$ldapValidator = new CLdapAuthValidator($ldap_cnf);
-			$login = $ldapValidator->validate(array(
+			$result = $ldapValidator->validate(array(
 				'user' => get_request('user', CWebUser::$data['alias']),
 				'password' => get_request('user_password', '')
 			));
-			if (!$login) {
+			if (!$result) {
 				error(_('Login name or password is incorrect.'));
 				throw new Exception();
 			}

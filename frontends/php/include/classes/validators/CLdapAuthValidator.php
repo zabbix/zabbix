@@ -35,7 +35,7 @@ class CLdapAuthValidator extends CValidator {
 	/**
 	 * Checks if the given user name and password are valid.
 	 *
-	 * The value hash must have the following attributes:
+	 * The $value array must have the following attributes:
 	 * - user       - user name
 	 * - password   - password
 	 *
