@@ -618,7 +618,7 @@ function getAvailabilityTable($host) {
  * Create array with all inputs required for date selection and calendar.
  *
  * @param string      $name
- * @param int/array   $date - unix timestamp/date array(Y,m,d,H,i)
+ * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
  * @param string|null $relatedCalendar name of the calendar which must be closed when this calendar opens
  *
  * @return array
