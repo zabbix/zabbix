@@ -170,7 +170,7 @@ class CDHost extends CZBXAPI {
 
 // filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('dhosts dh', $options, $sqlParts);
+			$this->dbFilter('dhosts dh', $options, $sqlParts);
 		}
 
 // search

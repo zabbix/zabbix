@@ -197,7 +197,7 @@ class CApplication extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('applications a', $options, $sqlParts);
+			$this->dbFilter('applications a', $options, $sqlParts);
 		}
 
 		// sorting
@@ -524,7 +524,13 @@ class CApplication extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array(
+				'flags' => array(
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_CHILD,
+					ZBX_FLAG_DISCOVERY_CREATED
+				)
+			)
 		));
 
 		foreach ($items as $num => $item) {
@@ -534,7 +540,7 @@ class CApplication extends CZBXAPI {
 		}
 
 		$linkedDb = DBselect(
-			'SELECT ia.itemid, ia.applicationid'.
+			'SELECT ia.itemid,ia.applicationid'.
 			' FROM items_applications ia'.
 			' WHERE '.dbConditionInt('ia.itemid', $itemids).
 				' AND '.dbConditionInt('ia.applicationid', $applicationids)
@@ -542,7 +548,6 @@ class CApplication extends CZBXAPI {
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
 		}
-
 		$appsInsert = array();
 		foreach ($applicationids as $applicationid) {
 			foreach ($itemids as $inum => $itemid) {
@@ -555,7 +560,6 @@ class CApplication extends CZBXAPI {
 				);
 			}
 		}
-
 		DB::insert('items_applications', $appsInsert);
 
 		foreach ($itemids as $inum => $itemid) {
