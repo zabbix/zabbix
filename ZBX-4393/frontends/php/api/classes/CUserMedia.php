@@ -181,7 +181,7 @@ class CUserMedia extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('media m', $options, $sqlParts);
+			$this->dbFilter('media m', $options, $sqlParts);
 		}
 
 		// search
