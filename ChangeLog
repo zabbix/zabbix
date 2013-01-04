@@ -34,6 +34,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-6049] fixed "Undefined index" in Web scenario steps (Oleg)
 ....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
@@ -1277,6 +1278,7 @@ Changes for 1.8.16
 
 Changes for 1.8.16rc1
 
+A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 .......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
 ..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
