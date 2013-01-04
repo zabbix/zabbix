@@ -564,7 +564,6 @@ Copyright (c) 2011 by Harvest
       }
       this.search_field_disabled();
       this.show_search_field_default();
-      this.search_field_scale();
       this.search_results.html(content);
       return this.parsing = false;
     };
