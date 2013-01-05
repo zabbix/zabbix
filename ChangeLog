@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ja
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
 ..F....... [ZBX-5986] fixed page filter to not use remembered group if selected host is not in that group (Toms)
 ..F....... [ZBX-6013] fixed table layout in Monitoring > IT services for IE10 (Toms)
 A......... [ZBX-5977] removed possibility to add an LLD rule to an application via the API in application and discovery rule (Oleg)
