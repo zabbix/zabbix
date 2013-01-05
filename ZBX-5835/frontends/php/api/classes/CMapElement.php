@@ -152,7 +152,7 @@ abstract class CMapElement extends CZBXAPI {
 
 // filter
 		if (!is_null($options['filter'])) {
-			zbx_db_filter('sysmaps_elements se', $options, $sqlParts);
+			$this->dbFilter('sysmaps_elements se', $options, $sqlParts);
 		}
 
 // output
@@ -406,7 +406,7 @@ abstract class CMapElement extends CZBXAPI {
 
 // filter
 		if (!is_null($options['filter'])) {
-			zbx_db_filter('sysmaps_links sl', $options, $sqlParts);
+			$this->dbFilter('sysmaps_links sl', $options, $sqlParts);
 		}
 
 // output

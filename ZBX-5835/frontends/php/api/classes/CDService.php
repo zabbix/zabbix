@@ -237,7 +237,7 @@ class CDService extends CZBXAPI{
 
 // filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('dservices ds', $options, $sqlParts);
+			$this->dbFilter('dservices ds', $options, $sqlParts);
 		}
 
 // search

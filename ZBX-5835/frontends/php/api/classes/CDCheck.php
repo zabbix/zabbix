@@ -201,7 +201,7 @@ class CDCheck extends CZBXAPI {
 
 // filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('dchecks dc', $options, $sqlParts);
+			$this->dbFilter('dchecks dc', $options, $sqlParts);
 		}
 
 // search

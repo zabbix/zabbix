@@ -282,7 +282,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('graphs g', $options, $sqlParts);
+			$this->dbFilter('graphs g', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
