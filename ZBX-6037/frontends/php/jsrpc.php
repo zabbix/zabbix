@@ -101,10 +101,10 @@ switch ($data['method']) {
 		$sortClock = array();
 		$sortEvent = array();
 
-		$triggerExist = array();
+		$usedTriggers = array();
 		foreach ($events as $number => $event) {
-			if (count($triggerExist) < 15) {
-				if (!isset($triggerExist[$event['objectid']])) {
+			if (count($usedTriggers) < 15) {
+				if (!isset($usedTriggers[$event['objectid']])) {
 					$trigger = $event['trigger'];
 					$host = $event['host'];
 
@@ -141,7 +141,7 @@ switch ($data['method']) {
 
 					$sortClock[$number] = $event['clock'];
 					$sortEvent[$number] = $event['eventid'];
-					$triggerExist[$event['objectid']] = true;
+					$usedTriggers[$event['objectid']] = true;
 				}
 			}
 			else {
