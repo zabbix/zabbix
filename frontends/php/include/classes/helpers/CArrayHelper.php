@@ -146,7 +146,7 @@ class CArrayHelper {
 	}
 
 	/**
-	 * Unset values that are contained in $a2 from $1. Skip arrays and keys given in $skipKeys.
+	 * Unset values that are contained in $a2 from $a1. Skip arrays and keys given in $skipKeys.
 	 *
 	 * @param array $a1         array to modify
 	 * @param array $a2         array to compare with
