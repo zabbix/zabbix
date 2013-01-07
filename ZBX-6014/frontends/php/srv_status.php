@@ -62,13 +62,12 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	$service = API::Service()->get(array(
 		'serviceids' => $_REQUEST['serviceid'],
-		'output' => array('serviceid'),
+		'preservekeys' => true
 	));
 
 	if ($service) {
-		$service = zbx_objectValues($service, 'serviceid');
 		$table = new CTable(null, 'chart');
-		$table->addRow(new CImg('chart5.php?serviceid='.reset($service).url_param('path')));
+		$table->addRow(new CImg('chart5.php?serviceid='.key($service).url_param('path')));
 		$table->show();
 	}
 	else {
@@ -128,7 +127,6 @@ else {
 			'to' => $period_end
 		))
 	));
-
 
 	// expand problem trigger descriptions
 	$triggers = zbx_toHash(zbx_objectValues($services, 'trigger'), 'triggerid');

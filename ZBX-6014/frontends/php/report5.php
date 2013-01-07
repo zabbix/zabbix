@@ -122,10 +122,10 @@ $triggers = API::Trigger()->get(array(
 	'nopermissions' => true,
 ));
 
-$hosts =array();
+$hosts = array();
 
 foreach ($triggers as $tid => $trigger) {
-	$hosts[] = $trigger['hostid'];
+	$hosts[$trigger['hostid']] = $trigger['hostid'];
 	$trigger['cnt_event'] = $triggersEventCount[$tid];
 
 	$items = $trigger['items'];
