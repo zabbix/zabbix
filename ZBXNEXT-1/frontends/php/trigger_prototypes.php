@@ -104,7 +104,7 @@ if (get_request('parent_discoveryid')) {
 	if (isset($_REQUEST['triggerid'])) {
 		$triggerPrototype = API::TriggerPrototype()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('triggerid'),
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -321,22 +321,20 @@ else {
 	$sortfield = getPageSortField('description');
 	$options = array(
 		'editable' => true,
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('triggerid'),
 		'discoveryids' => $data['parent_discoveryid'],
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	);
 	if (empty($data['showdisabled'])) {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
-	$data['triggers'] = API::Trigger()->get($options);
+	$data['triggers'] = API::TriggerPrototype()->get($options);
 	$data['paging'] = getPagingLine($data['triggers']);
 
-	$data['triggers'] = API::Trigger()->get(array(
+	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectFunctions' => API_OUTPUT_EXTEND

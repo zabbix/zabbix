@@ -38,25 +38,18 @@ class CDHost extends CZBXAPI {
  * @param _array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
- * @param array $options['hostids'] Host IDs
  * @param boolean $options['monitored_hosts'] only monitored Hosts
  * @param boolean $options['templated_hosts'] include templates in result
  * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_monitored_items'] only with monitored items
  * @param boolean $options['with_historical_items'] only with historical items
  * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitored triggers
  * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['selectTemplates'] select Templates
  * @param boolean $options['selectItems'] select Items
  * @param boolean $options['selectTriggers'] select Triggers
  * @param boolean $options['selectGraphs'] select Graphs
- * @param boolean $options['selectApplications'] select Applications
- * @param boolean $options['selectMacros'] select Macros
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -73,9 +66,6 @@ class CDHost extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('dhostid', 'druleid');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
-
 		$sqlParts = array(
 			'select'	=> array('dhosts' => 'dh.dhostid'),
 			'from'		=> array('dhosts' => 'dhosts dh'),
@@ -90,8 +80,6 @@ class CDHost extends CZBXAPI {
 			'druleids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
-			'groupids'					=> null,
-			'hostids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -105,8 +93,6 @@ class CDHost extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectDRules'				=> null,
 			'selectDServices'			=> null,
-			'selectGroups'				=> null,
-			'selectHosts'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -116,18 +102,6 @@ class CDHost extends CZBXAPI {
 			'limitSelects'				=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
-
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['dhosts']);
-
-			$dbTable = DB::getSchema('dhosts');
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'dh.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
 
 // editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
@@ -144,22 +118,20 @@ class CDHost extends CZBXAPI {
 // dhostids
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
-			$sqlParts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
+			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dh.dhostid', $nodeids);
 			}
 		}
 
 // druleids
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['druleid'] = 'dh.druleid';
-			}
 
-			$sqlParts['where']['druleid'] = DBcondition('dh.druleid', $options['druleids']);
+			$sqlParts['select']['druleid'] = 'dh.druleid';
+			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
@@ -167,19 +139,17 @@ class CDHost extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('dh.druleid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dh.druleid', $nodeids);
 			}
 		}
 
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['dserviceids'] = 'ds.dserviceids';
-			}
 
+			$sqlParts['select']['dserviceids'] = 'ds.dserviceid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {
@@ -188,83 +158,19 @@ class CDHost extends CZBXAPI {
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('ds.dserviceid', $nodeids);
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ds.dserviceid', $nodeids);
 			}
 		}
 
-// groupids
-		if (!is_null($options['groupids'])) {
-			zbx_value2array($options['groupids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['groupid'] = 'hg.groupid';
-			}
-
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sqlParts['where']['dhh'] = 'h.ip=dh.ip';
-			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
-
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['groupid'] = 'hg.groupid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('hg.groupid', $nodeids);
-			}
-		}
-
-// hostids
-		if (!is_null($options['hostids'])) {
-			zbx_value2array($options['hostids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'h.hostid';
-			}
-
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = DBcondition('h.hostid', $options['hostids']);
-			$sqlParts['where']['dhh'] = 'h.ip=dh.ip';
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['hostid'] = 'h.hostid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'][] = DBin_node('h.hostid', $nodeids);
-			}
-		}
-
-// node check !!!!!
-// should be last, after all ****IDS checks
+		// node check !!!!
+		// should be last, after all ****IDS checks
 		if (!$nodeCheck) {
-			$nodeCheck = true;
-			$sqlParts['where'][] = DBin_node('dh.dhostid', $nodeids);
-		}
-
-// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['dhosts'] = 'dh.*';
-		}
-
-// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT dh.dhostid) as rowscount');
-
-//groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
-			}
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dh.dhostid', $nodeids);
 		}
 
 // filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('dhosts dh', $options, $sqlParts);
+			$this->dbFilter('dhosts dh', $options, $sqlParts);
 		}
 
 // search
@@ -281,34 +187,9 @@ class CDHost extends CZBXAPI {
 		}
 //-------
 
-
-		$dhostids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
- //SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dhost = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -317,66 +198,11 @@ class CDHost extends CZBXAPI {
 					$result = $dhost['rowscount'];
 			}
 			else{
-				$dhostids[$dhost['dhostid']] = $dhost['dhostid'];
-//				$dips[$dhost['ip']] = $dhost['ip'];
-
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$dhost['dhostid']] = array('dhostid' => $dhost['dhostid']);
+				if (!isset($result[$dhost['dhostid']])) {
+					$result[$dhost['dhostid']]= array();
 				}
-				else{
-					if (!isset($result[$dhost['dhostid']])) $result[$dhost['dhostid']]= array();
 
-					if (!is_null($options['selectDRules']) && !isset($result[$dhost['dhostid']]['drules'])) {
-						$result[$dhost['dhostid']]['drules'] = array();
-					}
-
-					if (!is_null($options['selectDServices']) && !isset($result[$dhost['dhostid']]['dservices'])) {
-						$result[$dhost['dhostid']]['dservices'] = array();
-					}
-
-					if (!is_null($options['selectGroups']) && !isset($result[$dhost['dhostid']]['groups'])) {
-						$result[$dhost['dhostid']]['groups'] = array();
-					}
-
-					if (!is_null($options['selectHosts']) && !isset($result[$dhost['dhostid']]['hosts'])) {
-						$result[$dhost['dhostid']]['hosts'] = array();
-					}
-
-// druleids
-					if (isset($dhost['druleid']) && is_null($options['selectDRules'])) {
-						if (!isset($result[$dhost['dhostid']]['drules']))
-							$result[$dhost['dhostid']]['drules'] = array();
-
-						$result[$dhost['dhostid']]['drules'][] = array('druleid' => $dhost['druleid']);
-					}
-// dserviceids
-					if (isset($dhost['dserviceid']) && is_null($options['selectDServices'])) {
-						if (!isset($result[$dhost['dhostid']]['dservices']))
-							$result[$dhost['dhostid']]['dservices'] = array();
-
-						$result[$dhost['dhostid']]['dservices'][] = array('dserviceid' => $dhost['dserviceid']);
-						unset($dhost['dserviceid']);
-					}
-// groupids
-					if (isset($dhost['groupid']) && is_null($options['selectGroups'])) {
-						if (!isset($result[$dhost['dhostid']]['groups']))
-							$result[$dhost['dhostid']]['groups'] = array();
-
-						$result[$dhost['dhostid']]['groups'][] = array('groupid' => $dhost['groupid']);
-						unset($dhost['groupid']);
-					}
-
-// hostids
-					if (isset($dhost['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$dhost['hostid']]['hosts']))
-							$result[$dhost['dhostid']]['hosts'] = array();
-
-						$result[$dhost['dhostid']]['hosts'][] = array('hostid' => $dhost['hostid']);
-						unset($dhost['hostid']);
-					}
-
-					$result[$dhost['dhostid']] += $dhost;
-				}
+				$result[$dhost['dhostid']] += $dhost;
 			}
 		}
 
@@ -384,152 +210,9 @@ class CDHost extends CZBXAPI {
 			return $result;
 		}
 
-// Adding Objects
-// select_drules
-		if (!is_null($options['selectDRules'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'dhostids' => $dhostids,
-				'preservekeys' => 1
-			);
-
-			if (is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDRules'];
-				$drules = API::DRule()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($drules, 'name');
-				foreach ($drules as $druleid => $drule) {
-					unset($drules[$druleid]['dhosts']);
-					$count = array();
-					foreach ($drule['dhosts'] as $dnum => $dhost) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
-							$count[$dhost['dhostid']]++;
-
-							if ($count[$dhost['dhostid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$dhost['dhostid']]['drules'][] = &$drules[$druleid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectDRules']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$drules = API::DRule()->get($objParams);
-				$drules = zbx_toHash($drules, 'dhostid');
-				foreach ($result as $dhostid => $dhost) {
-					if (isset($drules[$dhostid]))
-						$result[$dhostid]['drules'] = $drules[$dhostid]['rowscount'];
-					else
-						$result[$dhostid]['drules'] = 0;
-				}
-			}
-		}
-
-// selectDServices
-		if (!is_null($options['selectDServices'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'dhostids' => $dhostids,
-				'preservekeys' => 1
-			);
-
-			if (is_array($options['selectDServices']) || str_in_array($options['selectDServices'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectDServices'];
-				$dservices = API::DService()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($dservices, 'name');
-				foreach ($dservices as $dserviceid => $dservice) {
-					unset($dservices[$dserviceid]['dhosts']);
-					foreach ($dservice['dhosts'] as $dnum => $dhost) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
-							$count[$dhost['dhostid']]++;
-
-							if ($count[$dhost['dhostid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$dhost['dhostid']]['dservices'][] = &$dservices[$dserviceid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectDServices']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$dservices = API::DService()->get($objParams);
-				$dservices = zbx_toHash($dservices, 'dhostid');
-				foreach ($result as $dhostid => $dhost) {
-					if (isset($dservices[$dhostid]))
-						$result[$dhostid]['dservices'] = $dservices[$dhostid]['rowscount'];
-					else
-						$result[$dhostid]['dservices'] = 0;
-				}
-			}
-		}
-
-// TODO :selectGroups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-					'nodeids' => $nodeids,
-					'output' => $options['selectGroups'],
-					'hostids' => $dhostids,
-					'preservekeys' => 1
-				);
-			$groups = API::HostGroup()->get($objParams);
-
-			foreach ($groups as $groupid => $group) {
-				$ghosts = $group['hosts'];
-				unset($group['hosts']);
-				foreach ($ghosts as $num => $dhost) {
-					$result[$dhost['hostid']]['groups'][] = $group;
-				}
-			}
-		}
-
-// selectHosts
-		if (!is_null($options['selectHosts'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'dhostids' => $dhostids,
-				'preservekeys' => 1
-			);
-
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) order_result($hosts, 'host');
-
-				foreach ($hosts as $hostid => $host) {
-					unset($hosts[$hostid]['dhosts']);
-					foreach ($host['dhosts'] as $dnum => $dhost) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
-							$count[$dhost['dhostid']]++;
-
-							if ($count[$dhost['dhostid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$dhost['dhostid']]['hosts'][] = &$hosts[$hostid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectHosts']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$hosts = API::Host()->get($objParams);
-				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach ($result as $dhostid => $dhost) {
-					if (isset($hosts[$dhostid]))
-						$result[$dhostid]['hosts'] = $hosts[$dhostid]['rowscount'];
-					else
-						$result[$dhostid]['hosts'] = 0;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('druleid'), $options['output']);
 		}
 
 // removing keys (hash -> array)
@@ -545,7 +228,7 @@ class CDHost extends CZBXAPI {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('dhostid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -586,6 +269,78 @@ class CDHost extends CZBXAPI {
  */
 	public function delete($dhostids) {
 
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectDRules'] !== null) {
+				$sqlParts = $this->addQuerySelect('dh.druleid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$dhostIds = array_keys($result);
+
+		// select_drules
+		if ($options['selectDRules'] !== null && $options['selectDRules'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'dhostid', 'druleid');
+			$drules = API::DRule()->get(array(
+				'output' => $options['selectDRules'],
+				'nodeids' => $options['nodeids'],
+				'druleids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+
+			if (!is_null($options['limitSelects'])) {
+				order_result($drules, 'name');
+			}
+
+			$result = $relationMap->mapMany($result, $drules, 'drules', $options['limitSelects']);
+		}
+
+		// selectDServices
+		if (!is_null($options['selectDServices'])) {
+			if ($options['selectDServices'] != API_OUTPUT_COUNT) {
+				$dservices = API::DService()->get(array(
+					'output' => $this->outputExtend('dservices', array('dserviceid', 'dhostid'), $options['selectDServices']),
+					'nodeids' => $options['nodeids'],
+					'dhostids' => $dhostIds,
+					'preservekeys' => true
+				));
+				$relationMap = $this->createRelationMap($dservices, 'dhostid', 'dserviceid');
+
+				$dservices = $this->unsetExtraFields($dservices, array('dserviceid', 'dhostid'), $options['selectDServices']);
+				if (!is_null($options['limitSelects'])) {
+					order_result($dservices, 'name');
+				}
+				$result = $relationMap->mapMany($result, $dservices, 'dservices', $options['limitSelects']);
+			}
+			else {
+				$dservices = API::DService()->get(array(
+					'output' => $options['selectDServices'],
+					'nodeids' => $options['nodeids'],
+					'dhostids' => $dhostIds,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$dservices = zbx_toHash($dservices, 'dhostid');
+				foreach ($result as $dhostid => $dhost) {
+					if (isset($dservices[$dhostid]))
+						$result[$dhostid]['dservices'] = $dservices[$dhostid]['rowscount'];
+					else
+						$result[$dhostid]['dservices'] = 0;
+				}
+			}
+		}
+
+		return $result;
 	}
 }
 ?>

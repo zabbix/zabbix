@@ -59,9 +59,9 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 					" and i.useip=1"
 					" and i.ip=ds.ip"
 					" and ds.dhostid=" ZBX_FS_UI64
-					DB_NODE
+					ZBX_SQL_NODE
 				" order by i.hostid",
-				event->objectid, DBnode_local("i.interfaceid"));
+				event->objectid, DBand_node_local("i.interfaceid"));
 			break;
 		case EVENT_OBJECT_DSERVICE:
 			zbx_snprintf(sql, sizeof(sql),
@@ -71,9 +71,9 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 					" and i.useip=1"
 					" and i.ip=ds.ip"
 					" and ds.dserviceid =" ZBX_FS_UI64
-					DB_NODE
+					ZBX_SQL_NODE
 				" order by i.hostid",
-				event->objectid, DBnode_local("i.interfaceid"));
+				event->objectid, DBand_node_local("i.interfaceid"));
 			break;
 		default:
 			goto exit;
@@ -142,18 +142,11 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	{
 		const char	*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
 		zbx_uint64_t	hostgroupid;
-#ifdef HAVE_MULTIROW_INSERT
-		const char	*row_dl = ",";
-#else
-		const char	*row_dl = ";\n";
-#endif
 
 		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
 
 		sql_offset = 0;
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "begin\n");
-#endif
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
 #endif
@@ -163,18 +156,16 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
-					hostgroupid++, hostid, groupids->values[i], row_dl);
-
-#ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "end;\n");
-#endif
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					hostgroupid++, hostid, groupids->values[i]);
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
 		sql_offset--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 		DBexecute("%s", sql);
 	}
 
@@ -280,10 +271,10 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
 							" and ds.dhostid=" ZBX_FS_UI64
-						       	DB_NODE
+							ZBX_SQL_NODE
 						" order by h.hostid",
 						dhostid,
-						DBnode_local("h.hostid"));
+						DBand_node_local("h.hostid"));
 
 				if (NULL != (row2 = DBfetch(result2)))
 				{
@@ -354,10 +345,10 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
-						DB_NODE
+						ZBX_SQL_NODE
 					" order by hostid",
 					host_esc,
-					DBnode_local("hostid"));
+					DBand_node_local("hostid"));
 
 			result2 = DBselectN(sql, 1);
 

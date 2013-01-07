@@ -68,7 +68,7 @@ if (isset($_REQUEST['favobj'])) {
 			$sysmap = API::Map()->get(array(
 				'sysmapids' => $sysmapid,
 				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => array('sysmapid')
 			));
 			$sysmap = reset($sysmap);
 			if ($sysmap === false) {
@@ -248,12 +248,20 @@ else {
 }
 
 $iconList = array();
-$result = DBselect('SELECT i.imageid,i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON.' AND '.DBin_node('i.imageid'));
+$result = DBselect(
+		'SELECT i.imageid,i.name'.
+		' FROM images i'.
+		' WHERE i.imagetype='.IMAGE_TYPE_ICON.
+			andDbNode('i.imageid')
+);
 while ($row = DBfetch($result)) {
 	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
 }
 order_result($iconList, 'name');
 
+// we need selements to be a hash for further processing
+$sysmap['selements'] = zbx_toHash($sysmap['selements'], 'selementid');
+$sysmap['links'] = zbx_toHash($sysmap['links'], 'linkid');
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
 	'sysmap' => $sysmap,
 	'iconList' => $iconList,

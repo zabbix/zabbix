@@ -123,9 +123,9 @@ $sqlWhere['till'] = ' AND a.clock<'.$till;
 
 $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
 		' FROM auditlog a,users u'.
-		' WHERE u.userid=a.userid'.
+		' WHERE a.userid=u.userid'.
 			implode('', $sqlWhere).
-			' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
+			andDbNode('u.userid', get_current_nodeid(null, PERM_READ)).
 		' ORDER BY a.clock DESC';
 $dbAudit = DBselect($sql, $config['search_limit'] + 1);
 while ($audit = DBfetch($dbAudit)) {
@@ -178,9 +178,9 @@ unset($sqlWhere['from'], $sqlWhere['till']);
 
 $sql = 'SELECT a.auditid,a.clock'.
 		' FROM auditlog a,users u'.
-		' WHERE u.userid=a.userid'.
+		' WHERE a.userid=u.userid'.
 		implode('', $sqlWhere).
-		' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
+		andDbNode('u.userid', get_current_nodeid(null, PERM_READ)).
 		' ORDER BY a.clock';
 $firstAudit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
 

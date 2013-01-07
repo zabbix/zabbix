@@ -44,7 +44,18 @@ function sdi($msg = 'SDI') {
 	echo SBR;
 }
 
-function sdii($msg = 'SDII', $for = '') {
+function sdii($msg = 'SDII', $for = '', $showInvisible = true) {
+	if ($showInvisible) {
+		if ($msg === null) {
+			$msg = 'NULL';
+		}
+		elseif ($msg === false) {
+			$msg = 'FALSE';
+		}
+		elseif ($msg === TRUE) {
+			$msg = 'TRUE';
+		}
+	}
 	echo 'DEBUG INFO: '.$for;
 	echo '<pre>'.print_r($msg, true).'</pre>';
 	echo SBR;

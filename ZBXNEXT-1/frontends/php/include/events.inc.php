@@ -50,7 +50,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	$config = select_config();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => array('triggerid'),
 		'monitored' => 1,
 		'skipDependent' => 1,
 		'limit' => $config['search_limit'] + 1
@@ -112,7 +112,7 @@ function make_event_details($event, $trigger) {
 	$config = select_config();
 	$table = new CTableInfo();
 
-	$table->addRow(array(_('Event'), CEventHelper::expandDescription(array_merge($trigger, $event))));
+	$table->addRow(array(_('Event'), CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))));
 	$table->addRow(array(_('Time'), zbx_date2str(_('d M Y H:i:s'), $event['clock'])));
 
 	if ($config['event_ack_enable']) {
@@ -389,7 +389,7 @@ function getLastEvents($options) {
 
 		//expanding description for the state where event was
 		$merged_event = array_merge($event, $triggers[$event['objectid']]);
-		$events[$enum]['trigger']['description'] = CEventHelper::expandDescription($merged_event);
+		$events[$enum]['trigger']['description'] = CMacrosResolverHelper::resolveEventDescription($merged_event);
 	}
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
 

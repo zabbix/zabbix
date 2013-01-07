@@ -66,23 +66,29 @@ static void	DBupdate_lastsize()
 static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
 {
 	AGENT_RESULT	value;
-	int		timestamp = 0;
+	int		errcode = SUCCEED;
 
 	init_result(&value);
 
 	if (SUCCEED == set_result_type(&value, item->value_type, item->data_type, trap))
 	{
+		int	timestamp = 0;
+
 		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			calc_timestamp(trap, &timestamp, item->logtimefmt);
 
+		item->status = ITEM_STATUS_ACTIVE;
 		dc_add_history(item->itemid, item->value_type, item->flags, &value,
-				ts, ITEM_STATUS_ACTIVE, NULL, timestamp, NULL, 0, 0, 0, 0);
+				ts, item->status, NULL, timestamp, NULL, 0, 0, 0, 0);
 	}
 	else
 	{
+		item->status = ITEM_STATUS_NOTSUPPORTED;
 		dc_add_history(item->itemid, item->value_type, item->flags, NULL,
-				ts, ITEM_STATUS_NOTSUPPORTED, value.msg, 0, NULL, 0, 0, 0, 0);
+				ts, item->status, value.msg, 0, NULL, 0, 0, 0, 0);
 	}
+
+	DCrequeue_items(&item->itemid, &item->status, &ts->sec, &errcode, 1);
 
 	free_result(&value);
 }
@@ -110,7 +116,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	for (i = 0; i < num; i++)
 	{
-		if (0 == parse_command(items[i].key_orig, cmd, sizeof(cmd), params, sizeof(params)))
+		if (ZBX_COMMAND_ERROR == parse_command(items[i].key_orig, cmd, sizeof(cmd), params, sizeof(params)))
 			continue;
 
 		if (0 == strcmp(cmd, "snmptrap.fallback"))
@@ -137,6 +143,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	DCconfig_clean_items(items, NULL, num);
 	zbx_free(items);
+
+	dc_flush_history();
 
 	return ret;
 }

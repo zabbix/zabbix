@@ -38,7 +38,7 @@ class CProfile {
 			'SELECT p.*'.
 			' FROM profiles p'.
 			' WHERE p.userid='.self::$userDetails['userid'].
-				' AND '.DBin_node('p.profileid', false).
+				andDbNode('p.profileid', false).
 			' ORDER BY p.userid,p.profileid'
 		);
 		while ($profile = DBfetch($db_profiles)) {
@@ -159,11 +159,11 @@ class CProfile {
 		$sql_cond = '';
 
 		if ($idx != 'web.nodes.switch_node') {
-			$sql_cond .= ' AND '.DBin_node('profileid', false);
+			$sql_cond .= andDbNode('profileid', false);
 		}
 
 		if ($idx2 > 0) {
-			$sql_cond .= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
+			$sql_cond .= ' AND idx2='.$idx2.andDbNode('idx2', false);
 		}
 
 		$value_type = self::getFieldByType($type);
@@ -220,7 +220,11 @@ function select_config($cache = true, $nodeid = null) {
 		$nodeid = $ZBX_LOCALNODEID;
 	}
 
-	$db_config = DBfetch(DBselect('SELECT c.* FROM config c WHERE '.DBin_node('c.configid', $nodeid)));
+	$db_config = DBfetch(DBselect(
+			'SELECT c.*'.
+			' FROM config c'.
+			whereDbNode('c.configid', $nodeid)
+	));
 	if (!empty($db_config)) {
 		$config = $db_config;
 		return $db_config;
@@ -251,7 +255,7 @@ function update_config($configs) {
 	if (isset($configs['discovery_groupid'])) {
 		$groupid = API::HostGroup()->get(array(
 			'groupids' => $configs['discovery_groupid'],
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('groupid'),
 			'preservekeys' => true
 		));
 		if (empty($groupid)) {
@@ -333,7 +337,11 @@ function update_config($configs) {
 		return null;
 	}
 
-	return DBexecute('UPDATE config SET '.implode(',', $update).' WHERE '.DBin_node('configid', false));
+	return DBexecute(
+			'UPDATE config'.
+			' SET '.implode(',', $update).
+			whereDbNode('configid', false)
+	);
 }
 
 /************ HISTORY **************/

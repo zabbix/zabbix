@@ -69,12 +69,12 @@ int	add_user_parameter(const char *key, char *command)
 	char		usr_cmd[MAX_STRING_LEN], usr_param[MAX_STRING_LEN];
 	unsigned	flag = 0;
 
-	if (0 == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	if (ZBX_COMMAND_ERROR == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": parsing error", key);
 		return FAIL;
 	}
-	else if (2 == i)				/* with specified parameters */
+	else if (ZBX_COMMAND_WITH_PARAMS == i)
 	{
 		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
 		{
@@ -177,9 +177,9 @@ void	free_result(AGENT_RESULT *result)
 }
 
 /*
- * return value: 0 - error;
- *               1 - command without parameters;
- *               2 - command with parameters
+ * return value: ZBX_COMMAND_ERROR - error
+ *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters
+ *               ZBX_COMMAND_WITH_PARAMS - command with parameters
  */
 int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
 {
@@ -348,7 +348,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
-	int		rc;
+	int		rc, ret = NOTSUPPORTED;
 	char		usr_cmd[MAX_STRING_LEN];
 	char		usr_param[MAX_STRING_LEN];
 	char		usr_command[MAX_STRING_LEN];
@@ -359,12 +359,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	assert(result);
 	init_result(result);
 
-	if (0 != (flags & PROCESS_TEST))
-		printf("%-*s", 45, in_command);
-
 	alias_expand(in_command, usr_command, sizeof(usr_command));
 
-	if (0 == (rc = parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	if (ZBX_COMMAND_ERROR == (rc = parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
 		goto notsupported;
 
 	for (command = commands; NULL != command->key; command++)
@@ -380,7 +377,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
 				strscpy(usr_param, command->test_param);
 		}
-		else if (2 == rc)
+		else if (ZBX_COMMAND_WITH_PARAMS == rc)
 			goto notsupported;
 
 		*param = '\0';
@@ -414,10 +411,29 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	else
 		goto notsupported;
 
-	return SUCCEED;
+	ret = SUCCEED;
+
 notsupported:
-	SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
-	return NOTSUPPORTED;
+
+	if (0 != (flags & PROCESS_TEST))
+	{
+#define	COL_WIDTH	45
+
+		int	n1, n2 = 0;
+
+		n1 = printf("%s", in_command);
+
+		if (0 < n1 && '\0' != *param)
+			n2 = printf("[%s]", param);
+
+		if (0 < n1 && 0 <= n2 && COL_WIDTH > n1 + n2)
+			printf("%-*s", COL_WIDTH - n1 - n2, " ");
+	}
+
+	if (NOTSUPPORTED == ret)
+		SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
+
+	return ret;
 }
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)

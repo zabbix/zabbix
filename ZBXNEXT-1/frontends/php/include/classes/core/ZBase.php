@@ -210,6 +210,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/macros',
 			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
+			$this->rootDir.'/include/classes/parsers',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/classes/managers',
 			$this->rootDir.'/api/rpc'
@@ -248,6 +249,11 @@ class ZBase {
 	 */
 	protected function setErrorHandler() {
 		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+			// necessary to surpress errors when calling with error control operator like @function_name()
+			if (error_reporting() === 0) {
+				return true;
+			}
+
 			$pathLength = strlen(__FILE__);
 
 			$pathLength -= 22;

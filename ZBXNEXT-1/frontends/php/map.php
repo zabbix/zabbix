@@ -92,6 +92,9 @@ if (isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])) {
 	$map['selements'] = get_request('selements', '[]');
 	$map['selements'] = $json->decode($map['selements'], true);
 }
+else {
+	add_elementNames($map['selements']);
+}
 
 if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
 	$map['links'] = get_request('links', '[]');
@@ -100,6 +103,13 @@ if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
 
 $nocalculations = get_request('nocalculations', false);
 if ($nocalculations) {
+	foreach ($map['selements'] as $selement) {
+		if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE) {
+			add_elementNames($map['selements']);
+			break;
+		}
+	}
+
 	// get default iconmap id to use for elements that use icon map
 	if ($map['iconmapid']) {
 		$iconMaps = API::IconMap()->get(array(
@@ -137,6 +147,11 @@ if ($nocalculations) {
 	$allLinks = true;
 }
 else {
+	// we need selements to be a hash for further processing
+	$map['selements'] = zbx_toHash($map['selements'], 'selementid');
+
+	add_triggerExpressions($map['selements']);
+
 	$areas = populateFromMapAreas($map);
 	$map_info = getSelementsInfo($map);
 	processAreasCoordinates($map, $areas, $map_info);

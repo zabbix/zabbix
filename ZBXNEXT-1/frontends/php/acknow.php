@@ -102,7 +102,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	}
 	elseif (isset($_REQUEST['triggers'])) {
 		$options = array(
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('eventid'),
 			'acknowledged' => 0,
 			'triggerids' => $_REQUEST['triggers'],
 			'filter'=> array('value_changed' => TRIGGER_VALUE_CHANGED_YES)
@@ -142,7 +142,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 }
 ob_end_flush();
 
-$msg = $bulk ? ' BULK ACKNOWLEDGE ' : CTriggerHelper::expandDescription($event_trigger);
+$msg = $bulk ? ' BULK ACKNOWLEDGE ' : CMacrosResolverHelper::resolveTriggerName($event_trigger);
 show_table_header(array(_('ALARM ACKNOWLEDGES').': ', $msg));
 echo SBR;
 

@@ -71,7 +71,7 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		$dbSlideshowChk = DBfetch(DBselect('SELECT COUNT(*) AS cnt FROM slideshows s WHERE'.DBcondition('s.slideshowid', $_REQUEST['shows'])));
+		$dbSlideshowChk = DBfetch(DBselect('SELECT COUNT(*) AS cnt FROM slideshows s WHERE '.dbConditionInt('s.slideshowid', $_REQUEST['shows'])));
 		if ($dbSlideshowChk['cnt'] != count($_REQUEST['shows'])) {
 			access_deny();
 		}
@@ -185,11 +185,11 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data['slides'] = DBfetchArray(DBselect(
-		'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
-		' FROM slideshows s'.
-			' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
-		' WHERE '.DBin_node('s.slideshowid').
-		' GROUP BY s.slideshowid,s.name,s.delay'
+			'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
+			' FROM slideshows s'.
+				' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
+			whereDbNode('s.slideshowid').
+			' GROUP BY s.slideshowid,s.name,s.delay'
 	));
 	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
 

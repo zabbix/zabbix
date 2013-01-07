@@ -26,21 +26,21 @@ $macrosTable->addRow(array(_('Macro'), SPACE, _('Value'), SPACE));
 
 // fields
 $macros = array_values($this->data['macros']);
-foreach ($macros as $macroid => $macro) {
-	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30, 'no', 64);
+foreach ($macros as $i => $macro) {
+	$text1 = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, 'no', 64);
 	$text1->setAttribute('placeholder', '{$MACRO}');
 	$text1->setAttribute('style', 'text-transform:uppercase;');
-	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, 'no', 255);
+	$text2 = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, 'no', 255);
 	$text2->setAttribute('placeholder', _('value'));
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');
 
-	$deleteButtonCell = array(new CButton('macros_'.$macroid.'_remove', _('Remove'), null, 'link_menu macroRemove'));
+	$deleteButtonCell = array(new CButton('macros_'.$i.'_remove', _('Remove'), null, 'link_menu macroRemove'));
 	if (isset($macro['globalmacroid'])) {
-		$deleteButtonCell[] = new CVar('macros['.$macroid.'][globalmacroid]', $macro['globalmacroid'], 'macros_'.$macroid.'_id');
+		$deleteButtonCell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid'], 'macros_'.$i.'_id');
 	}
 	if (isset($macro['hostmacroid'])) {
-		$deleteButtonCell[] = new CVar('macros['.$macroid.'][hostmacroid]', $macro['hostmacroid'], 'macros_'.$macroid.'_id');
+		$deleteButtonCell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid'], 'macros_'.$i.'_id');
 	}
 
 	$row = array($text1, $span, $text2, $deleteButtonCell);

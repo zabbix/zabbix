@@ -1618,7 +1618,7 @@ function getPagingLine(&$items) {
 
 	$pageline = array();
 
-	$table = BR();
+	$table = null;
 	if ($pagesCount > 1) {
 		$url = new Curl();
 		if ($startPage > 1) {
@@ -2214,7 +2214,7 @@ function get_status() {
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
+				' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
 				' GROUP BY i.status');
 	while ($dbItem = DBfetch($dbItems)) {
 		switch ($dbItem['status']) {
@@ -2255,16 +2255,20 @@ function get_status() {
 			+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+	$row = DBfetch(DBselect(
+			'SELECT COUNT(*) AS usr_cnt'.
+			' FROM users u'.
+			whereDbNode('u.userid')
+	));
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
 	$db_sessions = DBselect(
-		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-				' FROM sessions s'.
-				' WHERE '.DBin_node('s.userid').
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' GROUP BY s.userid,s.status'
+			'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+			' FROM sessions s'.
+			' WHERE s.status='.ZBX_SESSION_ACTIVE.
+				andDbNode('s.userid').
+			' GROUP BY s.userid,s.status'
 	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
@@ -2378,4 +2382,30 @@ function no_errors() {
 	}
 
 	return true;
+}
+
+function unsetEqualValues(array $a1, array $a2) {
+	foreach ($a1 as $key => $value) {
+		if (is_array($value) && isset($a2[$key])) {
+			$a1[$key] = unsetEqualValues($a1[$key], $a2[$key]);
+		}
+		elseif (isset($a2[$key]) && $a2[$key] == $a1[$key]) {
+			unset($a1[$key]);
+		}
+	}
+
+	return $a1;
+}
+
+/**
+ * Check if all keys from $keys exist in $array.
+ * If some keys are missing return array of missing keys, true otherwise.
+ *
+ * @param array $array
+ * @param array $keys
+ *
+ * @return array|bool
+ */
+function checkRequiredKeys(array $array, array $keys) {
+	return array_diff($keys, array_keys($array));
 }

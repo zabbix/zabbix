@@ -66,7 +66,7 @@ function user_auth_type2str($auth_type) {
 
 function unblock_user_login($userids) {
 	zbx_value2array($userids);
-	return DBexecute('UPDATE users SET attempt_failed=0 WHERE '.DBcondition('userid', $userids));
+	return DBexecute('UPDATE users SET attempt_failed=0 WHERE '.dbConditionInt('userid', $userids));
 }
 
 function get_userid_by_usrgrpid($usrgrpids) {
@@ -77,8 +77,8 @@ function get_userid_by_usrgrpid($usrgrpids) {
 		'SELECT DISTINCT u.userid'.
 		' FROM users u,users_groups ug'.
 		' WHERE u.userid=ug.userid'.
-			' AND '.DBcondition('ug.usrgrpid', $usrgrpids).
-			' AND '.DBin_node('ug.usrgrpid', false)
+			' AND '.dbConditionInt('ug.usrgrpid', $usrgrpids).
+			andDbNode('ug.usrgrpid', false)
 	);
 	while($user = DBFetch($db_users)){
 		$userids[$user['userid']] = $user['userid'];
@@ -137,7 +137,7 @@ function change_group_status($usrgrpids, $users_status) {
 	}
 
 	if ($grant) {
-		$result = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE '.DBcondition('usrgrpid', $usrgrpids));
+		$result = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
 	}
 	else {
 		error(_('User cannot change status of himself.'));
@@ -153,7 +153,7 @@ function change_group_gui_access($usrgrpids, $gui_access) {
 		$grant = granted2update_group($usrgrpids);
 	}
 	if ($grant) {
-		$result = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
+		$result = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE '.dbConditionInt('usrgrpid',$usrgrpids));
 	}
 	else {
 		error(_('User cannot change GUI access for himself.'));
@@ -163,5 +163,5 @@ function change_group_gui_access($usrgrpids, $gui_access) {
 
 function change_group_debug_mode($usrgrpids, $debug_mode){
 	zbx_value2array($usrgrpids);
-	return DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE '.DBcondition('usrgrpid', $usrgrpids));
+	return DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
 }

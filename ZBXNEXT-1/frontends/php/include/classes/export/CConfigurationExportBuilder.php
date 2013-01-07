@@ -266,7 +266,9 @@ class CConfigurationExportBuilder {
 				'allowed_hosts' => $discoveryRule['trapper_hosts'],
 				'snmpv3_securityname' => $discoveryRule['snmpv3_securityname'],
 				'snmpv3_securitylevel' => $discoveryRule['snmpv3_securitylevel'],
+				'snmpv3_authprotocol' => $discoveryRule['snmpv3_authprotocol'],
 				'snmpv3_authpassphrase' => $discoveryRule['snmpv3_authpassphrase'],
+				'snmpv3_privprotocol' => $discoveryRule['snmpv3_privprotocol'],
 				'snmpv3_privpassphrase' => $discoveryRule['snmpv3_privpassphrase'],
 				'delay_flex' => $discoveryRule['delay_flex'],
 				'params' => $discoveryRule['params'],
@@ -462,7 +464,9 @@ class CConfigurationExportBuilder {
 				'delta' => $item['delta'],
 				'snmpv3_securityname' => $item['snmpv3_securityname'],
 				'snmpv3_securitylevel' => $item['snmpv3_securitylevel'],
+				'snmpv3_authprotocol' => $item['snmpv3_authprotocol'],
 				'snmpv3_authpassphrase' => $item['snmpv3_authpassphrase'],
+				'snmpv3_privprotocol' => $item['snmpv3_privprotocol'],
 				'snmpv3_privpassphrase' => $item['snmpv3_privpassphrase'],
 				'formula' => $item['formula'],
 				'delay_flex' => $item['delay_flex'],
@@ -580,21 +584,22 @@ class CConfigurationExportBuilder {
 
 		foreach ($screenItems as $screenItem) {
 			$result[] = array(
-				'resourcetype'=> $screenItem['resourcetype'],
-				'width'=> $screenItem['width'],
-				'height'=> $screenItem['height'],
-				'x'=> $screenItem['x'],
-				'y'=> $screenItem['y'],
-				'colspan'=> $screenItem['colspan'],
-				'rowspan'=> $screenItem['rowspan'],
-				'elements'=> $screenItem['elements'],
-				'valign'=> $screenItem['valign'],
-				'halign'=> $screenItem['halign'],
-				'style'=> $screenItem['style'],
-				'url'=> $screenItem['url'],
-				'dynamic'=> $screenItem['dynamic'],
-				'sort_triggers'=> $screenItem['sort_triggers'],
-				'resource'=> $screenItem['resourceid']
+				'resourcetype' => $screenItem['resourcetype'],
+				'width' => $screenItem['width'],
+				'height' => $screenItem['height'],
+				'x' => $screenItem['x'],
+				'y' => $screenItem['y'],
+				'colspan' => $screenItem['colspan'],
+				'rowspan' => $screenItem['rowspan'],
+				'elements' => $screenItem['elements'],
+				'valign' => $screenItem['valign'],
+				'halign' => $screenItem['halign'],
+				'style' => $screenItem['style'],
+				'url' => $screenItem['url'],
+				'dynamic' => $screenItem['dynamic'],
+				'sort_triggers' => $screenItem['sort_triggers'],
+				'resource' => $screenItem['resourceid'],
+				'application' => $screenItem['application']
 			);
 		}
 		return $result;

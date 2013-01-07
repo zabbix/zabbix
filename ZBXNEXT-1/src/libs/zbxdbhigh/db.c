@@ -42,19 +42,38 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 extern int	txn_level;
 extern int	txn_error;
 
-const char	*DBnode(const char *fieldid, int nodeid)
+/******************************************************************************
+ *                                                                            *
+ * Function: __DBnode                                                         *
+ *                                                                            *
+ * Purpose: prepare a SQL statement to select records from a specific node    *
+ *                                                                            *
+ * Parameters: field_name - [IN] the name of the field                        *
+ *             nodeid     - [IN] node identificator from database             *
+ *             op         - [IN] 0 - and; 1 - where                           *
+ *                                                                            *
+ * Return value:                                                              *
+ *  An SQL condition like:                                                    *
+ *   " and hostid between 100000000000000 and 199999999999999"                *
+ *  or                                                                        *
+ *   " where hostid between 100000000000000 and 199999999999999"              *
+ *  or an empty string for a standalone setup (nodeid = 0)                    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*__DBnode(const char *field_name, int nodeid, int op)
 {
-	static char	dbnode[128];
+	static char	dbnode[62 + ZBX_FIELDNAME_LEN];
+	const char	*operators[] = {"and", "where"};
 
-	if (-1 != nodeid)
+	if (0 != nodeid)
 	{
 		zbx_uint64_t	min, max;
 
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
+		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 
-		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-				fieldid, min, max);
+		zbx_snprintf(dbnode, sizeof(dbnode), " %s %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+				operators[op], field_name, min, max);
 	}
 	else
 		*dbnode = '\0';
@@ -62,12 +81,24 @@ const char	*DBnode(const char *fieldid, int nodeid)
 	return dbnode;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBis_node_id                                                     *
+ *                                                                            *
+ * Purpose: checks belonging of an identifier to a certain node               *
+ *                                                                            *
+ * Parameters: id     - [IN] the checked identifier                           *
+ *             nodeid - [IN] node identificator from database                 *
+ *                                                                            *
+ * Return value: SUCCEED if identifier is belonging to a node, FAIL otherwise *
+ *                                                                            *
+ ******************************************************************************/
 int	DBis_node_id(zbx_uint64_t id, int nodeid)
 {
 	zbx_uint64_t	min, max;
 
-	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-	max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+	min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
+	max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 
 	return min <= id && id <= max ? SUCCEED : FAIL;
 }
@@ -224,9 +255,98 @@ void	DBend(int ret)
 		DBtxn_operation(zbx_db_rollback);
 }
 
+#ifdef HAVE_ORACLE
 /******************************************************************************
  *                                                                            *
- * Function: DBexecute                                                        *
+ * Function: DBstatement_prepare                                              *
+ *                                                                            *
+ * Purpose: prepares a SQL statement for execution                            *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	DBstatement_prepare(const char *sql)
+{
+	int	rc;
+
+	rc = zbx_db_statement_prepare(sql);
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_statement_prepare(sql)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBbind_parameter                                                 *
+ *                                                                            *
+ * Purpose: creates an association between a program variable and             *
+ *          a placeholder in a SQL statement                                  *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	DBbind_parameter(int position, void *buffer, unsigned char type)
+{
+	int	rc;
+
+	rc = zbx_db_bind_parameter(position, buffer, type);
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_bind_parameter(position, buffer, type)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBstatement_execute                                              *
+ *                                                                            *
+ * Purpose: executes a SQL statement                                          *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	DBstatement_execute()
+{
+	int	rc;
+
+	rc = zbx_db_statement_execute();
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_statement_execute()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+
+	return rc;
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_DBexecute                                                  *
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
  *                                                                            *
@@ -236,7 +356,7 @@ void	DBend(int ret)
 int	__zbx_DBexecute(const char *fmt, ...)
 {
 	va_list	args;
-	int	rc = ZBX_DB_DOWN;
+	int	rc;
 
 	va_start(args, fmt);
 
@@ -556,12 +676,12 @@ void	DBupdate_triggers_status_after_restart()
 				" and i.status in (%d)"
 				" and i.type not in (%d,%d)"
 				" and t.status in (%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
 			TRIGGER_STATUS_ENABLED,
-			DBnode_local("t.triggerid"));
+			DBand_node_local("t.triggerid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -825,7 +945,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
 				" and i.flags not in (%d)"
-				DB_NODE,
+				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
@@ -842,7 +962,7 @@ int	DBget_queue_count(int from, int to)
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_JMX,
 			ZBX_FLAG_DISCOVERY_CHILD,
-			DBnode_local("i.itemid"));
+			DBand_node_local("i.itemid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1323,6 +1443,18 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_nextid                                                     *
+ *                                                                            *
+ * Purpose: gets a new identifier(s) for a specified table                    *
+ *                                                                            *
+ * Parameters: tablename - [IN] the name of a table                           *
+ *             num       - [IN] the number of reserved records                *
+ *                                                                            *
+ * Return value: first reserved identifier                                    *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
 	const char	*__function_name = "DBget_nextid";
@@ -1330,24 +1462,28 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
 	zbx_uint64_t	min, max;
-	int		found = FAIL, dbres, nodeid;
+	int		found = FAIL, dbres;
 	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	table = DBget_table(tablename);
-	nodeid = 0 <= CONFIG_NODEID ? CONFIG_NODEID : 0;
 
-	if (0 != (table->flags & ZBX_SYNC))
+	if (0 == CONFIG_NODEID)
 	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid +
-			(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999);
+		min = 0;
+		max = ZBX_STANDALONE_MAX_IDS;
+	}
+	else if (0 != (table->flags & ZBX_SYNC))
+	{
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID +
+			ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)CONFIG_NODEID;
+		max = min + ZBX_DM_MAX_CONFIG_IDS - 1;
 	}
 	else
 	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
-		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID;
+		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 	}
 
 	while (FAIL == found)
@@ -1360,7 +1496,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 		}
 
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-				nodeid, table->table, table->recid);
+				CONFIG_NODEID, table->table, table->recid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
@@ -1388,14 +1524,14 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
 					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
-					nodeid, table->table, table->recid, ret1);
+					CONFIG_NODEID, table->table, table->recid, ret1);
 
 			if (ZBX_DB_OK > dbres)
 			{
 				/* solving the problem of an invisible record created in a parallel transaction */
 				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
 						" and field_name='%s'",
-						nodeid, table->table, table->recid);
+						CONFIG_NODEID, table->table, table->recid);
 			}
 
 			continue;
@@ -1408,15 +1544,15 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			if (ret1 < min || ret1 >= max)
 			{
 				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-						nodeid, table->table, table->recid);
+						CONFIG_NODEID, table->table, table->recid);
 				continue;
 			}
 
 			DBexecute("update ids set nextid=nextid+%d where nodeid=%d and table_name='%s' and field_name='%s'",
-					num, nodeid, table->table, table->recid);
+					num, CONFIG_NODEID, table->table, table->recid);
 
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-					nodeid, table->table, table->recid);
+					CONFIG_NODEID, table->table, table->recid);
 
 			if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			{
@@ -1452,67 +1588,134 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_condition_alloc                                            *
+ *                                                                            *
+ * Purpose: takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condidion is generated from the given  *
+ *          list of values as a mix of <fieldname> BETWEEN <id1> AND <idN>"   *
+ *          and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.            *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of numerical values sorted in          *
+ *                               ascending order to be included in WHERE      *
+ *             num        - [IN] number of elemnts in 'values' array          *
+ *                                                                            *
+ ******************************************************************************/
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
-	int		i;
+#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
+
+	int		i, start, len, seq_num, first;
+	int		between_num = 0, in_num = 0, in_cnt;
 	zbx_uint64_t	value;
+	int		*seq_len = NULL;
 
 	if (0 == num)
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
 
-	/* if only one value in an array we return " <field name>=<id>"*/
+	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
+	/* An isolated value is represented as a sequence with length 1. */
+	seq_len = zbx_malloc(seq_len, num * sizeof(int));
 
-	if (1 == num)
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname, values[0]);
-		return;
-	}
-
-	/* if all values in an array are consecutive we return " <field name> between <id1> and <idN>"*/
-
-	value = values[0];
-
-	for (i = 1; i < num; i++)
+	for (i = 1, seq_num = 0, value = values[0], len = 1; i < num; i++)
 	{
 		if (values[i] != ++value)
-			break;
+		{
+			if (MIN_NUM_BETWEEN <= len)
+				between_num++;
+			else
+				in_num += len;
+
+			seq_len[seq_num++] = len;
+			len = 1;
+			value = values[i];
+		}
+		else
+			len++;
 	}
 
-	if (i == num)
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-				fieldname, values[0], values[num - 1]);
-		return;
-	}
+	if (MIN_NUM_BETWEEN <= len)
+		between_num++;
+	else
+		in_num += len;
 
-	/* ... else we return " <field name> in (<id1>,<id2>,...,<idN>)"*/
+	seq_len[seq_num++] = len;
 
-	if (MAX_EXPRESSIONS < num)
+	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
-	for (i = 0; i < num; i++)
+	/* compose "between"s */
+	for (i = 0, first = 1, start = 0; i < seq_num; i++)
 	{
-		if (0 == (i % MAX_EXPRESSIONS))
+		if (MIN_NUM_BETWEEN <= seq_len[i])
 		{
-			if (0 != i)
-			{
-				(*sql_offset)--;
-				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
-			}
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+			if (1 != first)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+					fieldname, values[start], values[start + seq_len[i] - 1]);
+			first = 0;
 		}
 
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
+		start += seq_len[i];
 	}
 
-	(*sql_offset)--;
-	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+	if (0 < in_num && 0 < between_num)
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
 
-	if (MAX_EXPRESSIONS < num)
+	if (1 < in_num)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+
+	/* compose "in"s */
+	for (i = 0, in_cnt = 0, start = 0; i < seq_num; i++)
+	{
+		if (MIN_NUM_BETWEEN > seq_len[i])
+		{
+			if (1 == in_num)
+			{
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname,
+						values[start]);
+				break;
+			}
+			else
+			{
+				do
+				{
+					if (MAX_EXPRESSIONS == in_cnt)
+					{
+						in_cnt = 0;
+						(*sql_offset)--;
+						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (", fieldname);
+					}
+
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
+					in_cnt++;
+				}
+				while (0 != --seq_len[i]);
+			}
+		}
+		else
+			start += seq_len[i];
+	}
+
+	if (1 < in_num)
+	{
+		(*sql_offset)--;
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+	}
+
+	zbx_free(seq_len);
+
+	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 }
 
@@ -1688,9 +1891,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				" from hosts"
 				" where proxy_hostid%s"
 					" and host='%s'"
-					DB_NODE,
+					ZBX_SQL_NODE,
 				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBnode_local("hostid"));
+				DBand_node_local("hostid"));
 
 		if (NULL != DBfetch(result))
 			res = FAIL;
@@ -1707,9 +1910,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				" from autoreg_host"
 				" where proxy_hostid%s"
 					" and host='%s'"
-					DB_NODE,
+					ZBX_SQL_NODE,
 				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBnode_local("autoreg_hostid"));
+				DBand_node_local("autoreg_hostid"));
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -1849,8 +2052,8 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-				DB_NODE,
-			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBnode_local("hostid"));
+				ZBX_SQL_NODE,
+			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBand_node_local("hostid"));
 
 	zbx_free(host_name_sample_esc);
 
@@ -2034,8 +2237,10 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 		return inventory_field_len[inventory_link];
 
 	inventory_field = DBget_inventory_field(inventory_link + 1);
-	assert(table = DBget_table("host_inventory"));
-	assert(field = DBget_field(table, inventory_field));
+	table = DBget_table("host_inventory");
+	assert(NULL != table);
+	field = DBget_field(table, inventory_field);
+	assert(NULL != field);
 
 	inventory_field_len[inventory_link] = field->length;
 

@@ -27,6 +27,11 @@ class CScreenPlainText extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
+		// if screen is defined in template, then 'real_resourceid' is defined and should be used
+		if (!empty($this->screenitem['real_resourceid'])) {
+			$this->screenitem['resourceid'] = $this->screenitem['real_resourceid'];
+		}
+
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {
 			$newitemid = get_same_item_for_host($this->screenitem['resourceid'], $this->hostid);
 			$this->screenitem['resourceid'] = !empty($newitemid)? $newitemid : 0;

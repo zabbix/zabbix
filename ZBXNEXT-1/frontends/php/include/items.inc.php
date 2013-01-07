@@ -103,24 +103,27 @@ function item_type2str($type = null) {
 	}
 }
 
-function item_value_type2str($type = null) {
-	$types = array(
-		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR => _('Character'),
-		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
-	);
-	if (is_null($type)) {
-		natsort($types);
-		return $types;
+/**
+ * Returns human readable an item value type
+ *
+ * @param integer $valueType
+ *
+ * @return string
+ */
+function itemValueTypeString($valueType) {
+	switch ($valueType) {
+		case ITEM_VALUE_TYPE_UINT64:
+			return _('Numeric (unsigned)');
+		case ITEM_VALUE_TYPE_FLOAT:
+			return _('Numeric (float)');
+		case ITEM_VALUE_TYPE_STR:
+			return _('Character');
+		case ITEM_VALUE_TYPE_LOG:
+			return _('Log');
+		case ITEM_VALUE_TYPE_TEXT:
+			return _('Text');
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+	return _('Unknown');
 }
 
 function item_data_type2str($type = null) {
@@ -217,7 +220,7 @@ function update_item_status($itemids, $status) {
 	zbx_value2array($itemids);
 	$result = true;
 
-	$db_items = DBselect('SELECT i.* FROM items i WHERE '.DBcondition('i.itemid', $itemids));
+	$db_items = DBselect('SELECT i.* FROM items i WHERE '.dbConditionInt('i.itemid', $itemids));
 	while ($item = DBfetch($db_items)) {
 		$old_status = $item['status'];
 		if ($status != $old_status) {
@@ -239,9 +242,10 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 		'itemids' => $srcItemIds,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase',
-			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type',
-			'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
+			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
+			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey',
+			'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
 		),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
@@ -304,9 +308,10 @@ function copyItems($srcHostId, $dstHostId) {
 		'hostids' => $srcHostId,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase',
-			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type',
-			'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
+			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
+			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+			'flags', 'filter', 'port', 'description', 'inventory_link'
 		),
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -372,7 +377,7 @@ function activate_item($itemids) {
 
 	// first update status for child items
 	$child_items = array();
-	$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.DBcondition('i.templateid', $itemids));
+	$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
 	while ($item = DBfetch($db_items)) {
 		$child_items[$item['itemid']] = $item['itemid'];
 	}
@@ -387,7 +392,7 @@ function disable_item($itemids) {
 
 	// first update status for child items
 	$chd_items = array();
-	$db_tmp_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.DBcondition('i.templateid', $itemids));
+	$db_tmp_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
 	while ($db_tmp_item = DBfetch($db_tmp_items)) {
 		$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
 	}
@@ -399,7 +404,7 @@ function disable_item($itemids) {
 
 function get_items_by_hostid($hostids) {
 	zbx_value2array($hostids);
-	return DBselect('SELECT i.* FROM items i WHERE '.DBcondition('i.hostid', $hostids));
+	return DBselect('SELECT i.* FROM items i WHERE '.dbConditionInt('i.hostid', $hostids));
 }
 
 function get_item_by_key($key, $host = '') {
@@ -433,8 +438,8 @@ function get_item_by_itemid_limited($itemid) {
 	$row = DBfetch(DBselect(
 		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
 			'i.snmp_community,i.snmp_oid,i.value_type,i.data_type,i.trapper_hosts,i.port,i.units,i.multiplier,i.delta,'.
-			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,'.
-			'i.formula,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,'.
+			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,'.
+			'i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,'.
 			'i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.$itemid));
@@ -445,7 +450,7 @@ function get_item_by_itemid_limited($itemid) {
 	return false;
 }
 
-/*
+/**
  * Description:
  * Replace items for specified host
  *
@@ -472,7 +477,7 @@ function get_same_item_for_host($item, $dest_hostids) {
 			' FROM items src,items dest'.
 			' WHERE dest.itemid='.$itemid.
 				' AND src.key_=dest.key_'.
-				' AND '.DBcondition('src.hostid', $dest_hostids)
+				' AND '.dbConditionInt('src.hostid', $dest_hostids)
 		);
 		while ($db_item = DBfetch($db_items)) {
 			if (is_array($item)) {
@@ -519,45 +524,49 @@ function resolveItemKeyMacros(array $item) {
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
-			'output' => API_OUTPUT_REFER
+			'webitems' => true,
+			'output' => API_OUTPUT_REFER,
+			'filter' => array('flags' => null)
 		));
-		$dbItem = reset($dbItem);
 
-		$host = reset($dbItem['hosts']);
-		$interface = reset($dbItem['interfaces']);
+		if (!empty($dbItem)) {
+			$dbItem = reset($dbItem);
+			$host = reset($dbItem['hosts']);
+			$interface = reset($dbItem['interfaces']);
 
-		// if item without interface or template item, resolve interface related macros to *UNKNOWN*
-		if (!$interface) {
-			$interface = array(
-				'ip' => UNRESOLVED_MACRO_STRING,
-				'dns' => UNRESOLVED_MACRO_STRING,
-				'useip' => false,
-			);
-		}
+			// if item without interface or template item, resolve interface related macros to *UNKNOWN*
+			if (!$interface) {
+				$interface = array(
+					'ip' => UNRESOLVED_MACRO_STRING,
+					'dns' => UNRESOLVED_MACRO_STRING,
+					'useip' => false
+				);
+			}
 
-		foreach ($macStack as $macro) {
-			switch ($macro) {
-				case '{HOST.NAME}':
-					$key = str_replace('{HOST.NAME}', $host['name'], $key);
-					break;
-				case '{HOSTNAME}': // deprecated
-					$key = str_replace('{HOSTNAME}', $host['host'], $key);
-					break;
-				case '{HOST.HOST}':
-					$key = str_replace('{HOST.HOST}', $host['host'], $key);
-					break;
-				case '{HOST.IP}':
-					$key = str_replace('{HOST.IP}', $interface['ip'], $key);
-					break;
-				case '{IPADDRESS}': // deprecated
-					$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-					break;
-				case '{HOST.DNS}':
-					$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-					break;
-				case '{HOST.CONN}':
-					$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-					break;
+			foreach ($macStack as $macro) {
+				switch ($macro) {
+					case '{HOST.NAME}':
+						$key = str_replace('{HOST.NAME}', $host['name'], $key);
+						break;
+					case '{HOSTNAME}': // deprecated
+						$key = str_replace('{HOSTNAME}', $host['host'], $key);
+						break;
+					case '{HOST.HOST}':
+						$key = str_replace('{HOST.HOST}', $host['host'], $key);
+						break;
+					case '{HOST.IP}':
+						$key = str_replace('{HOST.IP}', $interface['ip'], $key);
+						break;
+					case '{IPADDRESS}': // deprecated
+						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
+						break;
+					case '{HOST.DNS}':
+						$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
+						break;
+					case '{HOST.CONN}':
+						$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
+						break;
+				}
 			}
 		}
 	}
@@ -621,7 +630,7 @@ function get_realhost_by_itemid($itemid) {
 
 function fillItemsWithChildTemplates(&$items) {
 	$processSecondLevel = false;
-	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.DBcondition('i.itemid', zbx_objectValues($items, 'templateid')));
+	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.dbConditionInt('i.itemid', zbx_objectValues($items, 'templateid')));
 	while ($dbItem = DBfetch($dbItems)) {
 		foreach ($items as $itemid => $item) {
 			if ($item['templateid'] == $dbItem['itemid'] && !empty($dbItem['templateid'])) {
@@ -649,40 +658,50 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param $hostids
- * @param null $view_style
+ * @param        $hostids
+ * @param string $application name of application to filter
+ * @param null   $view_style
  *
  * @return CTableInfo
  */
-function get_items_data_overview($hostids, $view_style) {
+function get_items_data_overview($hostids, $application, $view_style) {
+	$sqlFrom = '';
+	$sqlWhere = '';
+	if ($application !== '') {
+		$sqlFrom = 'applications a,items_applications ia,';
+		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
+	}
+
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
-		' FROM hosts h,items i'.
+		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-		' WHERE '.DBcondition('h.hostid', $hostids).
+		' WHERE '.dbConditionInt('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+				$sqlWhere.
 		' ORDER BY i.name,i.itemid'
 	);
 
-	// fetch data for the host JS menu
-	$hosts = API::Host()->get(array(
+	$options = array(
 		'output' => array('name', 'hostid'),
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true,
 		'monitored_hosts' => true,
 		'hostids' => $hostids,
 		'with_monitored_items' => true,
 		'preservekeys' => true
-	));
-	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-	foreach ($hostScripts as $hostid => $scripts) {
-		$hosts[$hostid]['scripts'] = $scripts;
+	);
+
+	if ($view_style == STYLE_LEFT) {
+		$options['selectScreens'] = API_OUTPUT_COUNT;
+		$options['selectInventory'] = array('hostid');
 	}
+
+	// fetch data for the host JS menu
+	$hosts = API::Host()->get($options);
 
 	$items = array();
 	while ($row = DBfetch($db_items)) {
@@ -734,6 +753,10 @@ function get_items_data_overview($hostids, $view_style) {
 		}
 	}
 	else {
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');
@@ -745,8 +768,7 @@ function get_items_data_overview($hostids, $view_style) {
 
 			// host js menu link
 			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
-			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
 
 			$tableRow = array(new CCol($hostSpan));
 			foreach ($items as $ithosts) {
@@ -825,7 +847,7 @@ function get_same_applications_for_host($applications, $hostid) {
 		' FROM applications a1,applications a2'.
 		' WHERE a1.name=a2.name'.
 			' AND a1.hostid='.$hostid.
-			' AND '.DBcondition('a2.applicationid', $applications)
+			' AND '.dbConditionInt('a2.applicationid', $applications)
 	);
 	while ($app = DBfetch($db_apps)) {
 		$child_applications[] = $app['applicationid'];
@@ -846,7 +868,7 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 		'SELECT DISTINCT app.'.$field.' AS result'.
 		' FROM applications app,items_applications ia'.
 		' WHERE app.applicationid=ia.applicationid'.
-			' AND '.DBcondition('ia.itemid', $itemids)
+			' AND '.dbConditionInt('ia.itemid', $itemids)
 	);
 	while ($db_application = DBfetch($db_applications)) {
 		array_push($result, $db_application['result']);
@@ -869,11 +891,11 @@ function delete_history_by_itemid($itemIds) {
 		return $result;
 	}
 
-	DBexecute('DELETE FROM history_text WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history_log WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history_uint WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history_str WHERE '.DBcondition('itemid', $itemIds));
-	DBexecute('DELETE FROM history WHERE '.DBcondition('itemid', $itemIds));
+	DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
+	DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
 
 	return true;
 }
@@ -887,8 +909,8 @@ function delete_history_by_itemid($itemIds) {
  */
 function delete_trends_by_itemid($itemIds) {
 	zbx_value2array($itemIds);
-	$r1 = DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid', $itemIds));
-	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.DBcondition('itemid', $itemIds));
+	$r1 = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
+	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds));
 
 	return $r1 && $r2;
 }
@@ -1391,4 +1413,19 @@ function getParamFieldLabelByType($itemType) {
 		default:
 			return 'params';
 	}
+}
+
+/**
+ * Quoting $param if it contain special characters.
+ *
+ * @param string $param
+ *
+ * @return string
+ */
+function quoteItemKeyParam($param) {
+	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ']'))) {
+		return $param;
+	}
+
+	return '"'.str_replace('"', '\\"', $param).'"';
 }

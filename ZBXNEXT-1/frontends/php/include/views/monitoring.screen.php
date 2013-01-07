@@ -101,8 +101,8 @@ else {
 			$params[$option] = 1;
 		}
 
-		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
-		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+		$PAGE_GROUPS = get_viewed_groups(PERM_READ, $params);
+		$PAGE_HOSTS = get_viewed_hosts(PERM_READ, $PAGE_GROUPS['selected'], $params);
 
 		validate_group_with_host($PAGE_GROUPS, $PAGE_HOSTS);
 
@@ -125,7 +125,7 @@ else {
 
 	// append screens to widget
 	$screenBuilder = new CScreenBuilder(array(
-		'screen' => $screen,
+		'screenid' => $screen['screenid'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $screen['screenid'],

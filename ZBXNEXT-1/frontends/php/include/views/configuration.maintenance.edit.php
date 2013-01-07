@@ -41,11 +41,54 @@ $typeComboBox = new CComboBox('maintenance_type', $this->data['maintenance_type'
 $typeComboBox->addItem(MAINTENANCE_TYPE_NORMAL, _('With data collection'));
 $typeComboBox->addItem(MAINTENANCE_TYPE_NODATA, _('No data collection'));
 $maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
-$maintenanceForm->addVar('active_since', date('YmdHi', $this->data['active_since']));
-$maintenanceForm->addVar('active_till', date('YmdHi', $this->data['active_till']));
 
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $this->data['active_since'], 'active_till'));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $this->data['active_till'], 'active_since'));
+// active since
+if (isset($_REQUEST['active_since'])) {
+	$fromYear = get_request('active_since_year');
+	$fromMonth = get_request('active_since_month');
+	$fromDay = get_request('active_since_day');
+	$fromHours = get_request('active_since_hour');
+	$fromMinutes = get_request('active_since_minute');
+	$fromDate = array(
+		'y' => $fromYear,
+		'm' => $fromMonth,
+		'd' => $fromDay,
+		'h' => $fromHours,
+		'i' => $fromMinutes
+	);
+	$activeSince = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
+}
+else {
+	$fromDate = zbxDateToTime($this->data['active_since']);
+	$activeSince = $this->data['active_since'];
+}
+$maintenanceForm->addVar('active_since', $activeSince);
+
+// active till
+if (isset($_REQUEST['active_till'])) {
+	$toYear = get_request('active_till_year');
+	$toMonth = get_request('active_till_month');
+	$toDay = get_request('active_till_day');
+	$toHours = get_request('active_till_hour');
+	$toMinutes = get_request('active_till_minute');
+	$toDate = array(
+		'y' => $toYear,
+		'm' => $toMonth,
+		'd' => $toDay,
+		'h' => $toHours,
+		'i' => $toMinutes,
+	);
+	$activeTill = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
+}
+else {
+	$toDate = zbxDateToTime($this->data['active_till']);
+	$activeTill = $this->data['active_till'];
+}
+$maintenanceForm->addVar('active_till', $activeTill);
+
+$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate, 'active_till'));
+$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate, 'active_since'));
+
 $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
 
 /*

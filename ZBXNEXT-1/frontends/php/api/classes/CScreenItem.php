@@ -104,10 +104,10 @@ class CScreenItem extends CZBXAPI {
 			// normal select query
 			else {
 				if ($options['preservekeys'] !== null) {
-					$result[$row['screenitemid']] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
+					$result[$row['screenitemid']] = $row;
 				}
 				else {
-					$result[] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
+					$result[] = $row;
 				}
 			}
 		}
@@ -480,7 +480,7 @@ class CScreenItem extends CZBXAPI {
 		if (!empty($hostgroups)) {
 			$result = API::HostGroup()->get(array(
 				'groupids' => $hostgroups,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('groupid'),
 				'preservekeys' => true
 			));
 			foreach ($hostgroups as $id) {
@@ -494,7 +494,7 @@ class CScreenItem extends CZBXAPI {
 		if ($hosts) {
 			$result = API::Host()->get(array(
 				'hostids' => $hosts,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('hostid'),
 				'preservekeys' => true
 			));
 			foreach ($hosts as $id) {
@@ -508,7 +508,7 @@ class CScreenItem extends CZBXAPI {
 		if ($graphs) {
 			$result = API::Graph()->get(array(
 				'graphids' => $graphs,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('graphid'),
 				'preservekeys' => true
 			));
 			foreach ($graphs as $id) {
@@ -522,7 +522,7 @@ class CScreenItem extends CZBXAPI {
 		if ($items) {
 			$result = API::Item()->get(array(
 				'itemids' => $items,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('itemid'),
 				'preservekeys' => true,
 				'webitems' => true
 			));
@@ -537,7 +537,7 @@ class CScreenItem extends CZBXAPI {
 		if ($maps) {
 			$result = API::Map()->get(array(
 				'sysmapids' => $maps,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('sysmapid'),
 				'preservekeys' => true
 			));
 			foreach ($maps as $id) {
@@ -551,7 +551,7 @@ class CScreenItem extends CZBXAPI {
 		if ($screens) {
 			$result = API::Screen()->get(array(
 				'screenids' => $screens,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('screenid'),
 				'preservekeys' => true
 			));
 			if (empty($result)) {
@@ -581,10 +581,14 @@ class CScreenItem extends CZBXAPI {
 	 */
 	protected function checkSpans(array $screenItem) {
 		if (zbx_empty($screenItem['rowspan']) || !zbx_is_int($screenItem['rowspan'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect row span provided for screen element.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Incorrect row span provided for screen element located at X - %1$s and Y - %2$s.', $screenItem['x'], $screenItem['y'])
+			);
 		}
 		if (zbx_empty($screenItem['colspan']) || !zbx_is_int($screenItem['colspan'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect column span provided for screen element.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Incorrect column span provided for screen element located at X - %1$s and Y - %2$s.', $screenItem['x'], $screenItem['y'])
+			);
 		}
 	}
 
@@ -600,10 +604,14 @@ class CScreenItem extends CZBXAPI {
 	 */
 	protected function checkSpansInBounds(array $screenItem, array $screen) {
 		if ($screenItem['rowspan'] > $screen['vsize'] - $screenItem['y']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements row span is too big.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Row span of screen element located at X - %1$s and Y - %2$s is too big.', $screenItem['x'], $screenItem['y'])
+			);
 		}
 		if ($screenItem['colspan'] > $screen['hsize'] - $screenItem['x']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen elements column span is too big.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Column span of screen element located at X - %1$s and Y - %2$s is too big.', $screenItem['x'], $screenItem['y'])
+			);
 		}
 	}
 
@@ -623,7 +631,7 @@ class CScreenItem extends CZBXAPI {
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
 			$sqlParts = $this->addQuerySelect($this->fieldId('screenid'), $sqlParts);
-			$sqlParts['where'][] = DBcondition($this->fieldId('screenid'), $options['screenids']);
+			$sqlParts['where'][] = dbConditionInt($this->fieldId('screenid'), $options['screenids']);
 		}
 
 		return $sqlParts;

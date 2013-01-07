@@ -83,6 +83,7 @@ static void	disable_all_metrics()
 		active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 }
 
+#ifdef _WINDOWS
 static void	free_active_metrics()
 {
 	int	i;
@@ -98,6 +99,7 @@ static void	free_active_metrics()
 
 	zbx_free(regexps);
 }
+#endif
 
 static int	get_min_nextcheck()
 {
@@ -270,9 +272,7 @@ static int	parse_list_of_checks(char *str)
 			mtime = 0;
 		}
 		else
-		{
 			mtime = atoi(tmp);
-		}
 
 		add_check(name, key_orig, delay, lastlogsize, mtime);
 	}
@@ -759,8 +759,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-			do { /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+			do
+			{
+				/* simple try realization */
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (5 < num_param(params))
@@ -857,8 +859,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-			do { /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+			do
+			{
+				/* simple try realization */
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (5 < num_param(params))
@@ -942,7 +946,6 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
 						break;
 				} /* while processing a log */
-
 			}
 			while (0); /* simple try realization */
 
@@ -963,8 +966,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 #ifdef _WINDOWS
-			do{ /* simple try realization */
-				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
+			do
+			{
+				/* simple try realization */
+				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
 				if (7 < num_param(params))
@@ -1081,7 +1086,6 @@ static void	process_active_checks(char *server, unsigned short port)
 				} /* while processing an eventlog */
 
 				break;
-
 			}
 			while (0); /* simple try realization */
 #endif	/* _WINDOWS */
@@ -1188,6 +1192,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 	}
 
+#ifdef _WINDOWS
 	zbx_free(activechk_args.host);
 	free_active_metrics();
 
@@ -1196,4 +1201,5 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_DO_EXIT();
 
 	zbx_thread_exit(0);
+#endif
 }
