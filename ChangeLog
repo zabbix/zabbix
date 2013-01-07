@@ -35,6 +35,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5915] fixed the host.get and template.get selectParentTemplates parameter using an incorrect property name when passing count (Pavels)
 A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-6049] fixed "Undefined index" in Web scenario steps (Oleg)
 ....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)

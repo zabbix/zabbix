@@ -853,7 +853,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				));
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['templates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
+					$result[$hostid]['parentTemplates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
