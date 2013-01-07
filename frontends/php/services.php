@@ -34,37 +34,46 @@ if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
 }
 
 include_once('include/page_header.php');
-?>
-<?php
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'serviceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'group_serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'name' => 				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
-	'algorithm' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
-	'showsla' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'goodsla' => 			array(T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')),
-	'sortorder' => 			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')),
-	'times' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'trigger' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'new_service_time' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'children' =>			array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
-	'parentid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'parentname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'serviceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'group_serviceid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'name' => 							array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
+	'algorithm' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
+	'showsla' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'goodsla' => 						array(T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')),
+	'sortorder' => 						array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')),
+	'times' =>							array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'triggerid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'trigger' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'new_service_time' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'new_service_time_from_day' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_from_month' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_from_year' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_from_hour' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_from_minute' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_to_day' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_to_month' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_to_year' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_to_hour' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_service_time_to_minute' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'children' =>						array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
+	'parentid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'parentname' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'save_service' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_service_time' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'save_service' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add_service_time' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'delete' =>							array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	// ajax
-	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
-	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
+	'favobj' =>							array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
+	'favref' =>							array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
+	'favstate' =>						array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	// others
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'pservices' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'cservices' =>			array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form' =>							array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>					array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'pservices' =>						array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'cservices' =>						array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 
@@ -168,11 +177,53 @@ if (isset($_REQUEST['form'])) {
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
 		$_REQUEST['times'] = get_request('times', array());
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
-
+		$result = true;
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			$new_service_time['ts_from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
-			$new_service_time['ts_to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
-			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
+			if (!validateDateTime($_REQUEST['new_service_time_from_year'],
+					$_REQUEST['new_service_time_from_month'],
+					$_REQUEST['new_service_time_from_day'],
+					$_REQUEST['new_service_time_from_hour'],
+					$_REQUEST['new_service_time_from_minute'])) {
+				$result = false;
+				error(_s('Invalid date "%s".', _('From')));
+			}
+			if (!validateDateInterval($_REQUEST['new_service_time_from_year'],
+					$_REQUEST['new_service_time_from_month'],
+					$_REQUEST['new_service_time_from_day'])) {
+				$result = false;
+				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
+			}
+			if (!validateDateTime($_REQUEST['new_service_time_to_year'],
+					$_REQUEST['new_service_time_to_month'],
+					$_REQUEST['new_service_time_to_day'],
+					$_REQUEST['new_service_time_to_hour'],
+					$_REQUEST['new_service_time_to_minute'])) {
+				$result = false;
+				error(_s('Invalid date "%s".', _('Till')));
+			}
+			if (!validateDateInterval($_REQUEST['new_service_time_to_year'],
+					$_REQUEST['new_service_time_to_month'],
+					$_REQUEST['new_service_time_to_day'])) {
+				$result = false;
+				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
+			}
+			if ($result) {
+				$new_service_time['ts_from'] = mktime($_REQUEST['new_service_time_from_hour'],
+						$_REQUEST['new_service_time_from_minute'],
+						0,
+						$_REQUEST['new_service_time_from_month'],
+						$_REQUEST['new_service_time_from_day'],
+						$_REQUEST['new_service_time_from_year']);
+
+				$new_service_time['ts_to'] = mktime($_REQUEST['new_service_time_to_hour'],
+						$_REQUEST['new_service_time_to_minute'],
+						0,
+						$_REQUEST['new_service_time_to_month'],
+						$_REQUEST['new_service_time_to_day'],
+						$_REQUEST['new_service_time_to_year']);
+
+				$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
+			}
 		}
 		else {
 			$new_service_time['ts_from'] = dowHrMinToSec($_REQUEST['new_service_time']['from_week'], $_REQUEST['new_service_time']['from_hour'], $_REQUEST['new_service_time']['from_minute']);
@@ -180,23 +231,25 @@ if (isset($_REQUEST['form'])) {
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 
-		try {
-			checkServiceTime($new_service_time);
+		if ($result) {
+			try {
+				checkServiceTime($new_service_time);
 
-			// if this time is not already there, adding it for inserting
-			if (!str_in_array($_REQUEST['times'], $new_service_time)) {
-				array_push($_REQUEST['times'], $new_service_time);
+				// if this time is not already there, adding it for inserting
+				if (!str_in_array($_REQUEST['times'], $new_service_time)) {
+					array_push($_REQUEST['times'], $new_service_time);
 
-				unset($_REQUEST['new_service_time']['from_week']);
-				unset($_REQUEST['new_service_time']['to_week']);
-				unset($_REQUEST['new_service_time']['from_hour']);
-				unset($_REQUEST['new_service_time']['to_hour']);
-				unset($_REQUEST['new_service_time']['from_minute']);
-				unset($_REQUEST['new_service_time']['to_minute']);
+					unset($_REQUEST['new_service_time']['from_week']);
+					unset($_REQUEST['new_service_time']['to_week']);
+					unset($_REQUEST['new_service_time']['from_hour']);
+					unset($_REQUEST['new_service_time']['to_hour']);
+					unset($_REQUEST['new_service_time']['from_minute']);
+					unset($_REQUEST['new_service_time']['to_minute']);
+				}
 			}
-		}
-		catch (APIException $e) {
-			error($e->getMessage());
+			catch (APIException $e) {
+				error($e->getMessage());
+			}
 		}
 
 		show_messages();
@@ -237,7 +290,7 @@ if (isset($_REQUEST['pservices'])) {
 
 	foreach ($parentServices as $key => $childService) {
 		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
 			: '-';
 	}
 
@@ -276,7 +329,7 @@ if (isset($_REQUEST['cservices'])) {
 
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
 			: '-';
 	}
 
@@ -335,7 +388,7 @@ if (isset($_REQUEST['form'])) {
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
-							? CTriggerHelper::expandDescriptionById($childService['triggerid'])
+							? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
 							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
@@ -393,7 +446,7 @@ else {
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
 
-	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {

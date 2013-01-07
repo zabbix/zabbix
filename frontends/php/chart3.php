@@ -86,8 +86,9 @@ if ($httptestid = get_request('httptestid', false)) {
 		$items[] = array('itemid' => $item['itemid'], 'color' => $itemColor);
 	}
 
-	$httptest = get_httptest_by_httptestid($httptestid);
-	$name = $httptest['name'];
+	$httpTest = get_httptest_by_httptestid($httptestid);
+
+	$name = CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name']);
 }
 else {
 	$items = get_request('items', array());
@@ -97,8 +98,11 @@ else {
 		'webitems' => true,
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
-		'output' => API_OUTPUT_SHORTEN
+		'output' => array('itemid'),
+		'preservekeys' => true,
+		'filter' => array('flags' => null)
 	));
+
 	$dbItems = zbx_toHash($dbItems, 'itemid');
 	foreach ($items as $item) {
 		if (!isset($dbItems[$item['itemid']])) {

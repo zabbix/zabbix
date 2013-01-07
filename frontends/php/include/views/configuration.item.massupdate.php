@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemWidget = new CWidget();
 
 if (!empty($this->data['hostid'])) {
@@ -102,7 +102,7 @@ $itemFormList->addRow(
 // append snmpv3 securityname to form list
 $itemFormList->addRow(
 	array(
-		_('SNMPv3 security name'),
+		_('Security name'),
 		SPACE,
 		new CVisibilityBox('securityname_visible', get_request('securityname_visible'), 'snmpv3_securityname', _('Original'))
 	),
@@ -116,27 +116,67 @@ $securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPri
 $securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
 $itemFormList->addRow(
 	array(
-		_('SNMPv3 security level'),
+		_('Security level'),
 		SPACE,
 		new CVisibilityBox('securitylevel_visible', get_request('securitylevel_visible'), 'snmpv3_securitylevel', _('Original'))
 	),
 	$securityLevelComboBox
 );
 
+// append snmpv3 authprotocol to form list
+$authProtocol = new CDiv(
+	array(
+		new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
+		new CLabel(_('MD5'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
+		new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA),
+		new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
+	),
+	'jqueryinputset',
+	'authprotocol_div'
+);
+$itemFormList->addRow(
+	array(
+		_('Authentication protocol'),
+		SPACE,
+		new CVisibilityBox('authprotocol_visible', get_request('authprotocol_visible'), 'authprotocol_div', _('Original'))
+	),
+	$authProtocol
+);
+
 // append snmpv3 authpassphrase to form list
 $itemFormList->addRow(
 	array(
-		_('SNMPv3 auth passphrase'),
+		_('Authentication passphrase'),
 		SPACE,
 		new CVisibilityBox('authpassphrase_visible', get_request('authpassphrase_visible'), 'snmpv3_authpassphrase', _('Original'))
 	),
 	new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE)
 );
 
+// append snmpv3 privprotocol to form list
+$privProtocol = new CDiv(
+	array(
+		new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES),
+		new CLabel(_('DES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
+		new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES),
+		new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
+	),
+	'jqueryinputset',
+	'privprotocol_div'
+);
+$itemFormList->addRow(
+	array(
+		_('Privacy protocol'),
+		SPACE,
+		new CVisibilityBox('privprotocol_visible', get_request('privprotocol_visible'), 'privprotocol_div', _('Original'))
+	),
+	$privProtocol
+);
+
 // append snmpv3 privpassphrase to form list
 $itemFormList->addRow(
 	array(
-		_('SNMPv3 priv passphrase'),
+		_('Privacy passphrase'),
 		SPACE,
 		new CVisibilityBox('privpassphras_visible', get_request('privpassphras_visible'), 'snmpv3_privpassphrase', _('Original'))
 	),
@@ -452,5 +492,5 @@ $itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), new CButto
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
+
 return $itemWidget;
-?>

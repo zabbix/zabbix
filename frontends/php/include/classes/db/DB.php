@@ -21,7 +21,7 @@
 
 class DB {
 
-	const SCHEMA_FILE = 'include/schema.inc.php';
+	const SCHEMA_FILE = 'schema.inc.php';
 
 	const DBEXECUTE_ERROR = 1;
 	const RESERVEIDS_ERROR = 2;
@@ -185,7 +185,7 @@ class DB {
 	public static function getSchema($table = null) {
 		if (is_null(self::$schema)) {
 
-			self::$schema = include(Z::getRootDir().'/'.self::SCHEMA_FILE);
+			self::$schema = include(dirname(__FILE__).'/../../'.self::SCHEMA_FILE);
 		}
 
 		if (is_null($table)) {
@@ -360,7 +360,7 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('Table "%1$s" doesn\'t have a field named "%2$s".', $tableName, $field));
 			}
 
-			$sqlWhere[] = DBcondition($field, zbx_toArray($value));
+			$sqlWhere[] = dbConditionString($field, zbx_toArray($value));
 		}
 
 		// build query
@@ -504,7 +504,7 @@ class DB {
 				$values = zbx_toArray($values);
 				sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
 
-				$sqlWhere[] = DBcondition($field, $values);
+				$sqlWhere[] = dbConditionString($field, $values);
 			}
 
 			// sql execution
@@ -670,7 +670,7 @@ class DB {
 			$values = zbx_toArray($values);
 			sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
 
-			$sqlWhere[] = DBcondition($field, $values);
+			$sqlWhere[] = dbConditionString($field, $values);
 		}
 
 		$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);
@@ -678,5 +678,22 @@ class DB {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
 		}
 		return true;
+	}
+
+	/**
+	 * Check if $type is numeric field type.
+	 *
+	 * @param int $type
+	 *
+	 * @return bool
+	 */
+	public static function isNumericFieldType($type) {
+		switch ($type) {
+			case self::FIELD_TYPE_ID:
+			case self::FIELD_TYPE_INT:
+			case self::FIELD_TYPE_UINT:
+				return true;
+		}
+		return false;
 	}
 }

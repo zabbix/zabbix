@@ -157,7 +157,7 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 		zbx_free(group);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")" DB_NODE, DBnode_local("h.hostid"));
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_SQL_NODE, DBand_node_local("h.hostid"));
 
 	result = DBselect("%s", sql);
 
@@ -348,7 +348,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	if (2 != parse_command(item->key, tmp, sizeof(tmp), params, sizeof(params)))
+	if (ZBX_COMMAND_WITH_PARAMS != parse_command(item->key, tmp, sizeof(tmp), params, sizeof(params)))
 		return NOTSUPPORTED;
 
 	if (0 == strcmp(tmp, "grpmin"))

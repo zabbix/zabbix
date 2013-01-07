@@ -87,6 +87,8 @@ class CZBXAPI {
 			'searchWildcardsEnabled'=> null,
 			// output
 			'output'				=> API_OUTPUT_REFER,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 			'limit'					=> null
 		);
@@ -223,11 +225,11 @@ class CZBXAPI {
 	 *
 	 * @return mixed
 	 */
-	protected function extendOutputOption($tableName, $fields, $output) {
+	protected function outputExtend($tableName, $fields, $output) {
 		$fields = (array) $fields;
 
 		foreach ($fields as $field) {
-			if ($output == API_OUTPUT_SHORTEN || $output == API_OUTPUT_REFER) {
+			if ($output == API_OUTPUT_REFER) {
 				$output = array(
 					$this->pk($tableName),
 					$field
@@ -242,41 +244,96 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Unsets the fields that haven't been explicitly asked for by the user, but
-	 * have been included in the resulting object for whatever reasons.
+	 * Returns true if the given field is requested in the output parameter.
 	 *
-	 * If the $option parameter is set to API_OUTPUT_SHORT, return only the private key.
-	 * If the $option parameter is set to API_OUTPUT_EXTEND or to API_OUTPUT_REFER, return the result as is.
-	 * If the $option parameter is an array of fields, return only them.
+	 * @param $field
+	 * @param $output
 	 *
-	 * @param string $tableName		The table that stores the object
-	 * @param array $object			The object from the database
-	 * @param array $output			The original requested output
-	 *
-	 * @return array				The resulting object
+	 * @return bool
 	 */
-	protected function unsetExtraFields($tableName, array $object, $output) {
-		// for API_OUTPUT_SHORTEN return only the private key
-		if ($output == API_OUTPUT_SHORTEN) {
-			$pkField = $this->pk($tableName);
+	protected function outputIsRequested($field, $output) {
+		switch ($output) {
+			// if all fields are requested, just return true
+			// API_OUTPUT_REFER will always return true as an exception
+			case API_OUTPUT_EXTEND:
+			case API_OUTPUT_REFER:
+				return true;
+			// if the number of objects is requested, return false
+			case API_OUTPUT_COUNT:
+				return false;
+			// if an array of fields is passed, check if the field is present in the array
+			default:
+				return in_array($field, $output);
+		}
+	}
 
-			if (isset($object[$pkField])) {
-				$object = array($pkField => $object[$pkField]);
-			}
-			else {
-				$object = array();
+	/**
+	 * Unsets fields $field from the given objects if they are not requested in $output.
+	 *
+	 * @param array $objects
+	 * @param array $fields
+	 * @param string|array $output  desired output
+	 *
+	 * @return array
+	 */
+	protected function unsetExtraFields(array $objects, array $fields, $output) {
+		// find the fields that have not been requested
+		$extraFields = array();
+		foreach ($fields as $field) {
+			if (!$this->outputIsRequested($field, $output)) {
+				$extraFields[] = $field;
 			}
 		}
-		// if specific fields where requested, return only them
-		elseif (is_array($output)) {
-			foreach ($object as $field => $value) {
-				if (!in_array($field, $output)) {
+
+		// unset these fields
+		if ($extraFields) {
+			foreach ($objects as &$object) {
+				foreach ($extraFields as $field) {
 					unset($object[$field]);
 				}
 			}
+			unset($object);
 		}
 
-		return $object;
+		return $objects;
+	}
+
+	/**
+	 * Creates a relation map for the given objects.
+	 *
+	 * If the $table parameter is set, the relations will be loaded from a database table, otherwise the map will be
+	 * built from two base object properties.
+	 *
+	 * @param array $objects        a hash of base objects
+	 * @param string $baseField     the base object ID field
+	 * @param string $foreignField  the related objects ID field
+	 * @param string $table         table to load the relation from
+	 *
+	 * @return CRelationMap
+	 */
+	protected function createRelationMap(array $objects, $baseField, $foreignField, $table = null) {
+		$relationMap = new CRelationMap();
+
+		// create the map from a database table
+		if ($table) {
+			$res = DBselect(API::getApi()->createSelectQuery($table, array(
+				'output' => array($baseField, $foreignField),
+				'filter' => array(
+					$baseField => array_keys($objects)
+				)
+			)));
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
+			}
+		}
+		// create a map from the base objects
+		else {
+			foreach ($objects as $object) {
+				$relationMap->addRelation($object[$baseField], $object[$foreignField]);
+			}
+		}
+
+		return $relationMap;
 	}
 
 	/**
@@ -301,7 +358,7 @@ class CZBXAPI {
 		if (isset($options['preservekeys'])) {
 			$rs = array();
 			foreach ($objects as $object) {
-				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($tableName, $object, $options['output']);
+				$rs[$object[$this->pk($tableName)]] = $object;
 			}
 
 			return $rs;
@@ -347,11 +404,11 @@ class CZBXAPI {
 			'limit' => null
 		);
 
-		// add output options
-		$sqlParts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
 		// add filter options
 		$sqlParts = $this->applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// add output options
+		$sqlParts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		// add node options
 		$sqlParts = $this->applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -401,6 +458,13 @@ class CZBXAPI {
 		// count
 		if (isset($options['countOutput'])) {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
+
+			// select columns used by group count
+			if (isset($options['groupCount'])) {
+				foreach ($sqlParts['group'] as $fields) {
+					$sqlParts['select'][] = $fields;
+				}
+			}
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
@@ -416,7 +480,8 @@ class CZBXAPI {
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select'] = array($this->fieldId('*', $tableAlias));
+			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
+			$sqlParts = $this->addQuerySelect($this->fieldId('*', $tableAlias), $sqlParts);
 		}
 
 		return $sqlParts;
@@ -439,12 +504,12 @@ class CZBXAPI {
 		// pks
 		if (isset($options[$pkOption])) {
 			zbx_value2array($options[$pkOption]);
-			$sqlParts['where'][] = DBcondition($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
+			$sqlParts['where'][] = dbConditionString($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
 		}
 
 		// filters
 		if (is_array($options['filter'])) {
-			zbx_db_filter($tableId, $options, $sqlParts);
+			$this->dbFilter($tableId, $options, $sqlParts);
 		}
 
 		// search
@@ -472,7 +537,7 @@ class CZBXAPI {
 		// if no specific ids are given, apply the node filter
 		if (!isset($options[$pkOption])) {
 			$nodeids = (isset($options['nodeids'])) ? $options['nodeids'] : get_current_nodeid();
-			$sqlParts['where'][] = DBin_node($pkFieldId, $nodeids);
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], $pkFieldId, $nodeids);
 		}
 
 		return $sqlParts;
@@ -547,7 +612,8 @@ class CZBXAPI {
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
 	 * @param array $options
-	 * @param array $result     an object hash with PKs as keys
+	 * @param array $result             an object hash with PKs as keys
+
 	 * @return array mixed
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
@@ -635,10 +701,58 @@ class CZBXAPI {
 	/**
 	 * Throws an API exception.
 	 *
+	 * @static
+	 *
 	 * @param type $code
 	 * @param type $error
 	 */
 	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
 		throw new APIException($code, $error);
+	}
+
+	/**
+	 * Apply filter conditions to sql builded query.
+	 *
+	 * @param string $table
+	 * @param array  $options
+	 * @param array  $sqlParts
+	 *
+	 * @return bool
+	 */
+	protected function dbFilter($table, $options, &$sqlParts) {
+		list($table, $tableShort) = explode(' ', $table);
+
+		$tableSchema = DB::getSchema($table);
+
+		$filter = array();
+		foreach ($options['filter'] as $field => $value) {
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($value)) {
+				continue;
+			}
+
+			zbx_value2array($value);
+
+			$fieldName = $this->fieldId($field, $tableShort);
+			$filter[$field] = DB::isNumericFieldType($tableSchema['fields'][$field]['type'])
+				? dbConditionInt($fieldName, $value)
+				: dbConditionString($fieldName, $value);
+		}
+
+		if (!empty($filter)) {
+			if (isset($sqlParts['where']['filter'])) {
+				$filter[] = $sqlParts['where']['filter'];
+			}
+
+			if (is_null($options['searchByAny']) || $options['searchByAny'] === false || count($filter) == 1) {
+				$sqlParts['where']['filter'] = implode(' AND ', $filter);
+			}
+			else {
+				$sqlParts['where']['filter'] = '('.implode(' OR ', $filter).')';
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 }

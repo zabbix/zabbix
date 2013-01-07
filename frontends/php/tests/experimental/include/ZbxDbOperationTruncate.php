@@ -19,40 +19,20 @@
 **/
 
 
-/**
- * Helper class that simplifies working with CEventDescription class.
- */
-class CEventHelper {
+class ZbxDbOperationTruncate extends PHPUnit_Extensions_Database_Operation_Truncate {
 
 	/**
-	 * @var CEventDescription
+	 * Add disabling of foreign keys for truncate operations in db tests.
+	 *
+	 * @param PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection
+	 * @param PHPUnit_Extensions_Database_DataSet_IDataSet       $dataSet
 	 */
-	private static $eDescription;
-
-	/**
-	 * Helper for CEventDescription->expand.
-	 *
-	 * @static
-	 * @see CEventDescription
-	 *
-	 * @param array $event
-	 *
-	 * @return string
-	 */
-	public static function expandDescription(array $event) {
-		self::init();
-		return self::$eDescription->expand($event);
-	}
-
-	/**
-	 * Create CEventDescription object and store in static variable.
-	 *
-	 * @static
-	 */
-	private static function init() {
-		if (self::$eDescription === null) {
-			self::$eDescription = new CEventDescription();
-		}
+	public function execute(
+			PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection,
+			PHPUnit_Extensions_Database_DataSet_IDataSet $dataSet) {
+		$connection->getConnection()->query("SET @FAKE_PREV_foreign_key_checks = @@foreign_key_checks");
+		$connection->getConnection()->query("SET foreign_key_checks = 0");
+		parent::execute($connection, $dataSet);
+		$connection->getConnection()->query("SET foreign_key_checks = @FAKE_PREV_foreign_key_checks");
 	}
 }
-

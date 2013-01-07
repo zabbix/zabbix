@@ -146,7 +146,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			'SELECT h.hostid,h.status'.
 			' FROM hosts h'.
 			' WHERE h.proxy_hostid='.$hostid.
-				' AND '.DBin_node('h.hostid')
+				andDbNode('h.hostid')
 		);
 
 		while ($dbHost = DBfetch($dbHosts)) {
@@ -228,7 +228,7 @@ if (isset($_REQUEST['form'])) {
 		'SELECT h.hostid,h.proxy_hostid,h.name'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			' AND '.DBin_node('h.hostid')
+			andDbNode('h.hostid')
 	));
 	order_result($data['dbHosts'], 'name');
 
@@ -265,7 +265,7 @@ else {
 			' AND i.hostid=h.hostid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.delay<>0'.
-			' AND '.DBcondition('h.proxy_hostid', $proxyids).
+			' AND '.dbConditionInt('h.proxy_hostid', $proxyids).
 		' GROUP BY h.proxy_hostid'
 	);
 	while ($performance = DBfetch($dbPerformance)) {
@@ -277,7 +277,6 @@ else {
 		'groupCount' => 1,
 		'countOutput' => 1,
 		'proxyids' => $proxyids,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'webitems' => 1,
 		'monitored' => 1
 	));

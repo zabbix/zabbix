@@ -54,7 +54,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'syntax error',
 		'Try to read inaccessible property',
 		'.php:',
-		'Illegal string offset'
+		'Illegal string offset',
+		'must be an array'
 	);
 
 	// List of strings that SHOULD appear on every page

@@ -42,7 +42,8 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
+	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL,
+			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if ('#' == *parameter)
 		{
@@ -82,7 +83,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
+	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_COMMON, NULL, 0);
 clean:
 	if (SUCCEED == res)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);
@@ -176,7 +177,10 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	}
 
 	if ('@' == *arg1)
+	{
+		clean_regexps_ex(regexps, &regexps_num);
 		zbx_free(regexps);
+	}
 	zbx_free(arg1);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
@@ -1710,7 +1714,10 @@ skip_get_history:
 	res = SUCCEED;
 clean:
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
+	{
+		clean_regexps_ex(regexps, &regexps_num);
 		zbx_free(regexps);
+	}
 
 	zbx_free(arg1);
 exit:
@@ -2367,8 +2374,8 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 			" where h.host='%s'"
 				" and h.hostid=i.hostid"
 				" and i.key_='%s'"
-				DB_NODE,
-			ZBX_SQL_ITEM_SELECT, host_esc, key_esc, DBnode_local("h.hostid"));
+				ZBX_SQL_NODE,
+			ZBX_SQL_ITEM_SELECT, host_esc, key_esc, DBand_node_local("h.hostid"));
 
 	zbx_free(host_esc);
 	zbx_free(key_esc);

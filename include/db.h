@@ -92,6 +92,11 @@ zbx_graph_item_type;
 #define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
 #define TRIGGER_ERROR_LEN		128
 #define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#	define TRIGGER_COMMENTS_LEN	2048
+#else
+#	define TRIGGER_COMMENTS_LEN	65535
+#endif
 
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
@@ -142,7 +147,13 @@ zbx_graph_item_type;
 #define ITEM_PUBLICKEY_LEN_MAX		ITEM_PUBLICKEY_LEN+1
 #define ITEM_PRIVATEKEY_LEN		64
 #define ITEM_PRIVATEKEY_LEN_MAX		ITEM_PRIVATEKEY_LEN+1
-#define ITEM_PARAM_LEN			65535
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+#	define ITEM_PARAM_LEN		2048
+#	define ITEM_DESCRIPTION_LEN	2048
+#else
+#	define ITEM_PARAM_LEN		65535
+#	define ITEM_DESCRIPTION_LEN	65535
+#endif
 
 #define FUNCTION_FUNCTION_LEN		12
 #define FUNCTION_FUNCTION_LEN_MAX	FUNCTION_FUNCTION_LEN+1
@@ -195,7 +206,7 @@ zbx_graph_item_type;
 
 #ifdef HAVE_ORACLE
 #define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;\n")
+#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;")
 
 #define	ZBX_SQL_STRCMP		"%s%s%s"
 #define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
@@ -222,26 +233,32 @@ zbx_graph_item_type;
 
 #define ZBX_MAX_SQL_LEN		65535
 
+#define ZBX_STANDALONE_MAX_IDS	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
+#define ZBX_DM_MAX_HISTORY_IDS	(zbx_uint64_t)__UINT64_C(100000000000000)
+#define ZBX_DM_MAX_CONFIG_IDS	(zbx_uint64_t)__UINT64_C(100000000000)
+
 typedef struct
 {
 	zbx_uint64_t	druleid;
+	zbx_uint64_t	unique_dcheckid;
 	char		*iprange;
 	char		*name;
-	zbx_uint64_t	unique_dcheckid;
 }
 DB_DRULE;
 
 typedef struct
 {
 	zbx_uint64_t	dcheckid;
-	int		type;
 	char		*ports;
 	char		*key_;
 	char		*snmp_community;
 	char		*snmpv3_securityname;
-	int		snmpv3_securitylevel;
 	char		*snmpv3_authpassphrase;
 	char		*snmpv3_privpassphrase;
+	int		type;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
 }
 DB_DCHECK;
 
@@ -308,7 +325,6 @@ typedef struct
 	history_value_t		prevorgvalue;
 	int			lastclock;
 	int			lastns;
-	time_t 			lastcheck;
 	zbx_item_value_type_t	value_type;
 	int			delta;
 	int			multiplier;
@@ -401,7 +417,9 @@ typedef struct
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
+	char		*http_proxy;
 	int		authentication;
+	int		retries;
 }
 DB_HTTPTEST;
 
@@ -432,10 +450,13 @@ typedef struct
 }
 DB_ESCALATION;
 
-#define DB_NODE			"%s"
-#define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
-const char	*DBnode(const char *fieldid, int nodeid);
-#define DBis_node_local_id(id)	DBis_node_id(id, CONFIG_NODEID)
+#define ZBX_SQL_NODE				"%s"
+#define DBand_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 0)
+#define DBwhere_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 1)
+#define DBand_node(field_name, nodeid)		__DBnode(field_name, nodeid, 0)
+#define DBwhere_node(field_name, nodeid)	__DBnode(field_name, nodeid, 1)
+const char	*__DBnode(const char *field_name, int nodeid, int op);
+#define DBis_node_local_id(id)			DBis_node_id(id, CONFIG_NODEID)
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);
@@ -443,6 +464,11 @@ void	DBinit();
 
 void	DBclose();
 
+#ifdef HAVE_ORACLE
+void	DBstatement_prepare(const char *sql);
+void	DBbind_parameter(int position, void *buffer, unsigned char type);
+int	DBstatement_execute();
+#endif
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else

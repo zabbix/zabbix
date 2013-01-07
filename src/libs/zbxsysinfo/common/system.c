@@ -180,9 +180,35 @@ static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 	zbx_strcpy_alloc(os, os_alloc, os_offset, " Microsoft Windows");
 
 	if (VER_NT_WORKSTATION == vi->wProductType)
-		zbx_strcpy_alloc(os, os_alloc, os_offset, 0 == vi->dwMinorVersion ? " Vista" : " 7");
+	{
+		switch (vi->dwMinorVersion)
+		{
+			case 0:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " Vista");
+				break;
+			case 1:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " 7");
+				break;
+			case 2:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " 8");
+				break;
+		}
+	}
 	else
-		zbx_strcpy_alloc(os, os_alloc, os_offset, 0 == vi->dwMinorVersion ? " Server 2008" : " Server 2008 R2");
+	{
+		switch (vi->dwMinorVersion)
+		{
+			case 0:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " Server 2008");
+				break;
+			case 1:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " Server 2008 R2");
+				break;
+			case 2:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " Server 2012");
+				break;
+		}
+	}
 
 	pGPI = (PGPI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetProductInfo");
 

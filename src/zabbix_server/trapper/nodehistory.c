@@ -111,13 +111,8 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 		goto error;
 
 	buffer_offset= 0;
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			"select max(%s)"
-			" from %s"
-			" where 1=1" DB_NODE,
-			table->recid,
-			table->table,
-			DBnode(table->recid, nodeid));
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "select max(%s) from %s" ZBX_SQL_NODE,
+			table->recid, table->table, DBwhere_node(table->recid, nodeid));
 
 	buffer_offset= 0;
 	result = DBselect("%s", buffer);

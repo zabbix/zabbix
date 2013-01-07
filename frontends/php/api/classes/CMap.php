@@ -59,9 +59,6 @@ class CMap extends CMapElement {
 		// allowed columns for sorting
 		$sortColumns = array('name', 'width', 'height');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('sysmaps' => 's.sysmapid'),
 			'from'		=> array('sysmaps' => 'sysmaps s'),
@@ -87,6 +84,7 @@ class CMap extends CMapElement {
 			'selectSelements'			=> null,
 			'selectLinks'				=> null,
 			'selectIconMap'				=> null,
+			'selectUrls'				=> null,
 			'countOutput'				=> null,
 			'expandUrls' 				=> null,
 			'preservekeys'				=> null,
@@ -96,23 +94,10 @@ class CMap extends CMapElement {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['sysmaps']);
-
-			$dbTable = DB::getSchema('sysmaps');
-			$sqlParts['select']['sysmapid'] = 's.sysmapid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 's.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// sysmapids
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
-			$sqlParts['where']['sysmapid'] = DBcondition('s.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sysmapid'] = dbConditionInt('s.sysmapid', $options['sysmapids']);
 		}
 
 		// search
@@ -122,18 +107,7 @@ class CMap extends CMapElement {
 
 		// filter
 		if (!is_null($options['filter'])) {
-			zbx_db_filter('sysmaps s', $options, $sqlParts);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['sysmaps'] = 's.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
+			$this->dbFilter('sysmaps s', $options, $sqlParts);
 		}
 
 		// sorting
@@ -146,6 +120,7 @@ class CMap extends CMapElement {
 
 		$sysmapids = array();
 
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($sysmap = DBfetch($res)) {
@@ -155,45 +130,27 @@ class CMap extends CMapElement {
 			else {
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$sysmap['sysmapid']] = array('sysmapid' => $sysmap['sysmapid']);
+				if (!isset($result[$sysmap['sysmapid']])) {
+					$result[$sysmap['sysmapid']] = array();
 				}
-				else {
-					if (!isset($result[$sysmap['sysmapid']])) {
-						$result[$sysmap['sysmapid']] = array();
-					}
 
-					// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
-					// leaving this block commented
-					// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
-					// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
-					// }
-					if (!is_null($options['selectSelements']) && !isset($result[$sysmap['sysmapid']]['selements'])) {
-						$result[$sysmap['sysmapid']]['selements'] = array();
-					}
-					if (!is_null($options['selectLinks']) && !isset($result[$sysmap['sysmapid']]['links'])) {
-						$result[$sysmap['sysmapid']]['links'] = array();
-					}
-					if (!is_null($options['selectIconMap']) && !isset($result[$sysmap['sysmapid']]['iconmap'])) {
-						$result[$sysmap['sysmapid']]['iconmap'] = array();
-					}
-					if (!isset($result[$sysmap['sysmapid']]['urls'])) {
-						$result[$sysmap['sysmapid']]['urls'] = array();
-					}
-					$result[$sysmap['sysmapid']] += $sysmap;
-				}
+				// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
+				// leaving this block commented
+				// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
+				// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
+				// }
+
+				$result[$sysmap['sysmapid']] += $sysmap;
 			}
 		}
 
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (!empty($result)) {
 				$linkTriggers = array();
 				$dbLinkTriggers = DBselect(
 					'SELECT slt.triggerid,sl.sysmapid'.
-					' FROM sysmaps_link_triggers slt,sysmaps_links sl'.
-					' WHERE '.DBcondition('sl.sysmapid', $sysmapids).
+						' FROM sysmaps_link_triggers slt,sysmaps_links sl'.
+						' WHERE '.dbConditionInt('sl.sysmapid', $sysmapids).
 						' AND sl.linkid=slt.linkid'
 				);
 				while ($linkTrigger = DBfetch($dbLinkTriggers)) {
@@ -204,7 +161,7 @@ class CMap extends CMapElement {
 					$trigOptions = array(
 						'triggerids' => $linkTriggers,
 						'editable' => $options['editable'],
-						'output' => API_OUTPUT_SHORTEN,
+						'output' => array('triggerid'),
 						'preservekeys' => true
 					);
 					$allTriggers = API::Trigger()->get($trigOptions);
@@ -221,7 +178,7 @@ class CMap extends CMapElement {
 				$hostGroupsToCheck = array();
 
 				$selements = array();
-				$dbSelements = DBselect('SELECT se.* FROM sysmaps_elements se WHERE '.DBcondition('se.sysmapid', $sysmapids));
+				$dbSelements = DBselect('SELECT se.* FROM sysmaps_elements se WHERE '.dbConditionInt('se.sysmapid', $sysmapids));
 				while ($selement = DBfetch($dbSelements)) {
 					$selements[$selement['selementid']] = $selement;
 
@@ -249,7 +206,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('hostid')
 					);
 					$allowedHosts = API::Host()->get($hostOptions);
 
@@ -270,7 +227,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('sysmapid')
 					);
 					$allowedMaps = $this->get($mapOptions);
 
@@ -291,7 +248,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('triggerid')
 					);
 					$allowedTriggers = API::Trigger()->get($triggeridOptions);
 
@@ -312,7 +269,7 @@ class CMap extends CMapElement {
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => API_OUTPUT_SHORTEN
+						'output' => array('groupid')
 					);
 					$allowedHostGroups = API::HostGroup()->get($hostgroupOptions);
 
@@ -333,132 +290,8 @@ class CMap extends CMapElement {
 			return $result;
 		}
 
-		// adding elements
-		if (!is_null($options['selectSelements']) && str_in_array($options['selectSelements'], $subselectsAllowedOutputs)) {
-			$sysmapids = zbx_objectValues($result, 'sysmapid');
-			$selements = array();
-
-			$dbSelements = DBselect(
-				'SELECT se.*'.
-				' FROM sysmaps_elements se'.
-				' WHERE '.DBcondition('se.sysmapid', $sysmapids)
-			);
-			while ($selement = DBfetch($dbSelements)) {
-				$selement['urls'] = array();
-				$selements[$selement['selementid']] = $selement;
-			}
-
-			if (!is_null($options['expandUrls'])) {
-				$dbMapUrls = DBselect(
-					'SELECT sysmapurlid, sysmapid, name, url, elementtype'.
-					' FROM sysmap_url'.
-					' WHERE '.DBcondition('sysmapid', $sysmapids)
-				);
-				while ($mapUrl = DBfetch($dbMapUrls)) {
-					foreach ($selements as $snum => $selement) {
-						if (bccomp($selement['sysmapid'], $mapUrl['sysmapid']) == 0 &&
-							(
-								(
-									$selement['elementtype'] == $mapUrl['elementtype'] &&
-									$selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP
-								) ||
-								(
-									$selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS &&
-									$mapUrl['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
-								)
-							)
-						) {
-							$selements[$snum]['urls'][$mapUrl['sysmapurlid']] = $this->expandUrlMacro($mapUrl, $selement);
-						}
-					}
-				}
-			}
-
-			$dbSelementUrls = DBselect(
-				'SELECT seu.sysmapelementurlid,seu.selementid,seu.name,seu.url'.
-				' FROM sysmap_element_url seu'.
-				' WHERE '.DBcondition('seu.selementid', array_keys($selements))
-			);
-			while ($selementUrl = DBfetch($dbSelementUrls)) {
-				if (is_null($options['expandUrls'])) {
-					$selements[$selementUrl['selementid']]['urls'][$selementUrl['sysmapelementurlid']] = $selementUrl;
-				}
-				else {
-					$selements[$selementUrl['selementid']]['urls'][$selementUrl['sysmapelementurlid']] = $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
-				}
-			}
-
-			foreach ($selements as $selement) {
-				if (!isset($result[$selement['sysmapid']]['selements'])) {
-					$result[$selement['sysmapid']]['selements'] = array();
-				}
-				if (!is_null($options['preservekeys'])) {
-					$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
-				}
-				else {
-					$result[$selement['sysmapid']]['selements'][] = $selement;
-				}
-			}
-		}
-
-		// adding icon maps
-		if (!is_null($options['selectIconMap']) && str_in_array($options['selectIconMap'], $subselectsAllowedOutputs)) {
-			$iconMaps = API::IconMap()->get(array(
-				'sysmapids' => $sysmapids,
-				'output' => $options['selectIconMap'],
-				'selectMappings' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-			foreach ($iconMaps as $iconMap) {
-				$isysmaps = $iconMap['sysmaps'];
-				unset($iconMap['sysmaps']);
-
-				foreach ($isysmaps as $sysmap) {
-					$result[$sysmap['sysmapid']]['iconmap'] = $iconMap;
-				}
-			}
-		}
-
-		// adding links
-		if (!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselectsAllowedOutputs)) {
-			$linkids = array();
-			$mapLinks = array();
-
-			$dbLinks = DBselect('SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids));
-			while ($link = DBfetch($dbLinks)) {
-				$link['linktriggers'] = array();
-				$mapLinks[$link['linkid']] = $link;
-				$linkids[$link['linkid']] = $link['linkid'];
-			}
-
-			$dbLinkTriggers = DBselect('SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids));
-			while ($linkTrigger = DBfetch($dbLinkTriggers)) {
-				$mapLinks[$linkTrigger['linkid']]['linktriggers'][$linkTrigger['linktriggerid']] = $linkTrigger;
-			}
-
-			foreach ($mapLinks as $link) {
-				if (!isset($result[$link['sysmapid']]['links'])) {
-					$result[$link['sysmapid']]['links'] = array();
-				}
-
-				if (!is_null($options['preservekeys'])) {
-					$result[$link['sysmapid']]['links'][$link['linkid']] = $link;
-				}
-				else {
-					$result[$link['sysmapid']]['links'][] = $link;
-				}
-			}
-		}
-
-		// adding urls
-		if ($options['output'] != API_OUTPUT_SHORTEN) {
-			$dbUrls = DBselect('SELECT su.* FROM sysmap_url su WHERE '.DBcondition('su.sysmapid', $sysmapids));
-			while ($url = DBfetch($dbUrls)) {
-				$sysmapid = $url['sysmapid'];
-				unset($url['sysmapid']);
-				$result[$sysmapid]['urls'][] = $url;
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
@@ -490,7 +323,7 @@ class CMap extends CMapElement {
 
 		$result = $this->get($options);
 
-	return $result;
+		return $result;
 	}
 
 	public function exists($object) {
@@ -498,7 +331,7 @@ class CMap extends CMapElement {
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('sysmapid'),
 			'nopermissions' => 1,
 			'limit' => 1
 		);
@@ -509,7 +342,7 @@ class CMap extends CMapElement {
 
 		$objs = $this->get($options);
 
-	return !empty($objs);
+		return !empty($objs);
 	}
 
 	public function checkInput(&$maps, $method) {
@@ -527,6 +360,7 @@ class CMap extends CMapElement {
 				'preservekeys' => true,
 				'selectLinks' => API_OUTPUT_EXTEND,
 				'selectSelements' => API_OUTPUT_EXTEND,
+				'selectUrls' => API_OUTPUT_EXTEND
 			));
 		}
 		else {
@@ -900,7 +734,7 @@ class CMap extends CMapElement {
 
 		$dbLinks = array();
 
-		$linkTriggerResource = DBselect('SELECT * FROM sysmaps_link_triggers WHERE '.DBcondition('linkid', $updLinkids['linkids']));
+		$linkTriggerResource = DBselect('SELECT * FROM sysmaps_link_triggers WHERE '.dbConditionInt('linkid', $updLinkids['linkids']));
 		while ($dbLinkTrigger = DBfetch($linkTriggerResource))
 			zbx_subarray_push($dbLinks, $dbLinkTrigger['linkid'], $dbLinkTrigger);
 
@@ -944,7 +778,7 @@ class CMap extends CMapElement {
 		$maps = zbx_toObject($sysmapids, 'sysmapid');
 		$this->checkInput($maps, __FUNCTION__);
 
-	// delete maps from selements of other maps
+		// delete maps from selements of other maps
 		DB::delete('sysmaps_elements', array(
 			'elementid' => $sysmapids,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
@@ -990,7 +824,6 @@ class CMap extends CMapElement {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -1007,7 +840,6 @@ class CMap extends CMapElement {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));
@@ -1022,5 +854,125 @@ class CMap extends CMapElement {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$sysmapIds = array_keys($result);
+
+		// adding elements
+		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
+			$selements = API::getApi()->select('sysmaps_elements', array(
+				'output' => $this->outputExtend('sysmaps_elements', array('selementid', 'sysmapid'), $options['selectSelements']),
+				'filter' => array('sysmapid' => $sysmapIds),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($selements, 'sysmapid', 'selementid');
+
+			// add selement URLs
+			if ($this->outputIsRequested('urls', $options['selectSelements'])) {
+				foreach ($selements as &$selement) {
+					$selement['urls'] = array();
+				}
+				unset($selement);
+
+				if (!is_null($options['expandUrls'])) {
+					$dbMapUrls = DBselect(
+						'SELECT sysmapurlid, sysmapid, name, url, elementtype'.
+							' FROM sysmap_url'.
+							' WHERE '.dbConditionInt('sysmapid', $sysmapIds)
+					);
+					while ($mapUrl = DBfetch($dbMapUrls)) {
+						foreach ($selements as $snum => $selement) {
+							if (bccomp($selement['sysmapid'], $mapUrl['sysmapid']) == 0 &&
+								(
+									(
+										$selement['elementtype'] == $mapUrl['elementtype'] &&
+											$selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP
+									) ||
+										(
+											$selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS &&
+												$mapUrl['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
+										)
+								)
+							) {
+								$selements[$snum]['urls'][$mapUrl['sysmapurlid']] = $this->expandUrlMacro($mapUrl, $selement);
+							}
+						}
+					}
+				}
+
+				$dbSelementUrls = DBselect(
+					'SELECT seu.sysmapelementurlid,seu.selementid,seu.name,seu.url'.
+						' FROM sysmap_element_url seu'.
+						' WHERE '.dbConditionInt('seu.selementid', array_keys($selements))
+				);
+				while ($selementUrl = DBfetch($dbSelementUrls)) {
+					if (is_null($options['expandUrls'])) {
+						$selements[$selementUrl['selementid']]['urls'][$selementUrl['sysmapelementurlid']] = $selementUrl;
+					}
+					else {
+						$selements[$selementUrl['selementid']]['urls'][$selementUrl['sysmapelementurlid']] = $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
+					}
+				}
+			}
+
+			$selements = $this->unsetExtraFields($selements, array('sysmapid', 'selementid'), $options['selectSelements']);
+			$result = $relationMap->mapMany($result, $selements, 'selements');
+		}
+
+		// adding icon maps
+		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
+			$iconMaps = API::IconMap()->get(array(
+				'output' => $this->outputExtend('icon_map', array('sysmapid', 'iconmapid'), $options['selectIconMap']),
+				'sysmapids' => $sysmapIds,
+				'preservekeys' => true,
+				'nopermissions' => true
+			));
+			$relationMap = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
+
+			$iconMaps = $this->unsetExtraFields($iconMaps, array('sysmapid', 'iconmapid'), $options['selectIconMap']);
+			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
+		}
+
+		// adding links
+		if ($options['selectLinks'] !== null && $options['selectLinks'] != API_OUTPUT_COUNT) {
+			$links = API::getApi()->select('sysmaps_links', array(
+				'output' => $this->outputExtend('sysmaps_links', array('sysmapid', 'linkid'), $options['selectLinks']),
+				'filter' => array('sysmapid' => $sysmapIds),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($links, 'sysmapid', 'linkid');
+
+			// add link triggers
+			if ($this->outputIsRequested('linktriggers', $options['selectLinks'])) {
+				$linkTriggers = DBFetchArrayAssoc(DBselect(
+					'SELECT DISTINCT slt.* '.
+						' FROM sysmaps_link_triggers slt '.
+						' WHERE '.dbConditionInt('slt.linkid', $relationMap->getRelatedIds())
+				), 'linktriggerid');
+				$linkTriggerRelationMap = $this->createRelationMap($linkTriggers, 'linkid', 'linktriggerid');
+				$links = $linkTriggerRelationMap->mapMany($links, $linkTriggers, 'linktriggers');
+			}
+
+			$links = $this->unsetExtraFields($links, array('sysmapid', 'linkid'), $options['selectLinks']);
+			$result = $relationMap->mapMany($result, $links, 'links');
+		}
+
+		// adding urls
+		if ($options['selectUrls'] !== null && $options['selectUrls'] != API_OUTPUT_COUNT) {
+			$links = API::getApi()->select('sysmap_url', array(
+				'output' => $this->outputExtend('sysmap_url', array('sysmapid', 'sysmapurlid'), $options['selectUrls']),
+				'filter' => array('sysmapid' => $sysmapIds),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
+
+			$links = $this->unsetExtraFields($links, array('sysmapid', 'sysmapurlid'), $options['selectUrls']);
+			$result = $relationMap->mapMany($result, $links, 'urls');
+		}
+
+		return $result;
 	}
 }

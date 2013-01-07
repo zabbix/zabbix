@@ -159,24 +159,60 @@ $servicesTimeFormList->addRow(
 // create service time table
 $serviceTimeTable = new CTable(null, 'formElementTable');
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-	$downtimeSince = date('YmdHis');
-	$downtimeTill = date('YmdHis', time() + 86400);
+	// downtime since
+	if (isset($_REQUEST['new_service_time']['from'])) {
+		$fromYear = get_request('new_service_time_from_year');
+		$fromMonth = get_request('new_service_time_from_month');
+		$fromDay = get_request('new_service_time_from_day');
+		$fromHours = get_request('new_service_time_from_hour');
+		$fromMinutes = get_request('new_service_time_from_minute');
+		$fromDate = array(
+			'y' => $fromYear,
+			'm' => $fromMonth,
+			'd' => $fromDay,
+			'h' => $fromHours,
+			'i' => $fromMinutes
+		);
+		$serviceTimeFrom = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
+	}
+	else {
+		$downtimeSince = date('YmdHis');
+		$fromDate = zbxDateToTime($downtimeSince);
+		$serviceTimeFrom = $downtimeSince;
+	}
+	$servicesForm->addVar('new_service_time[from]', $serviceTimeFrom);
 
-	$servicesForm->addVar('new_service_time[from]', $downtimeSince);
-	$servicesForm->addVar('new_service_time[to]', $downtimeTill);
-
-	$downtimeSince = zbxDateToTime($downtimeSince);
-	$downtimeTill = zbxDateToTime($downtimeTill);
+	// downtime till
+	if (isset($_REQUEST['new_service_time']['to'])) {
+		$toYear = get_request('new_service_time_to_year');
+		$toMonth = get_request('new_service_time_to_month');
+		$toDay = get_request('new_service_time_to_day');
+		$toHours = get_request('new_service_time_to_hour');
+		$toMinutes = get_request('new_service_time_to_minute');
+		$toDate = array(
+			'y' => $toYear,
+			'm' => $toMonth,
+			'd' => $toDay,
+			'h' => $toHours,
+			'i' => $toMinutes
+		);
+		$serviceTimeTo = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
+	}
+	else {
+		$downtimeTill = date('YmdHis', time() + 86400);
+		$toDate = zbxDateToTime($downtimeTill);
+		$serviceTimeTo = $downtimeTill;
+	}
+	$servicesForm->addVar('new_service_time[to]', $serviceTimeTo);
 
 	// create calendar table
 	$timeCalendarTable = new CTable();
 
-	// downtime since
 	$noteTextBox = new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 	$noteTextBox->setAttribute('placeholder', _('short description'));
 	$timeCalendarTable->addRow(array(_('Note'), $noteTextBox));
-	$timeCalendarTable->addRow(array(_('From'), createDateSelector('new_service_time_from', $downtimeSince, 'new_service_time_to')));
-	$timeCalendarTable->addRow(array(_('Till'), createDateSelector('new_service_time_to', $downtimeTill, 'new_service_time_from')));
+	$timeCalendarTable->addRow(array(_('From'), createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')));
+	$timeCalendarTable->addRow(array(_('Till'), createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')));
 	$serviceTimeTable->addRow($timeCalendarTable);
 }
 else {

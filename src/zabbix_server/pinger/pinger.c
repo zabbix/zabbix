@@ -75,9 +75,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 	if (NOTSUPPORTED == ping_result)
 	{
+		item.status = ITEM_STATUS_NOTSUPPORTED;
 		dc_add_history(item.itemid, item.value_type, item.flags, NULL, ts,
-				ITEM_STATUS_NOTSUPPORTED, error, 0, NULL, 0, 0, 0, 0);
-		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, ts->sec);
+				item.status, error, 0, NULL, 0, 0, 0, 0);
 	}
 	else
 	{
@@ -88,13 +88,14 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		else
 			SET_DBL_RESULT(&value, *value_dbl);
 
+		item.status = ITEM_STATUS_ACTIVE;
 		dc_add_history(item.itemid, item.value_type, item.flags, &value, ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
-
-		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_ACTIVE, ts->sec);
+				item.status, NULL, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&value);
 	}
+
+	DCrequeue_items(&item.itemid, &item.status, &ts->sec, &errcode, 1);
 clean:
 	DCconfig_clean_items(&item, &errcode, 1);
 
@@ -172,6 +173,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 		}
 	}
 
+	dc_flush_history();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -181,7 +184,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	char	cmd[16], params[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	int	num_params;
 
-	if (0 == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
+	if (ZBX_COMMAND_ERROR == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
 		return NOTSUPPORTED;
 
 	if (0 == strcmp(cmd, SERVER_ICMPPING_KEY))
@@ -374,7 +377,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 {
 	const char		*__function_name = "get_pinger_hosts";
 	DC_ITEM			items[MAX_ITEMS];
-	int			i, num, count, interval, size, timeout, rc;
+	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
@@ -406,16 +409,19 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 			zbx_timespec(&ts);
 
+			items[i].status = ITEM_STATUS_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
-					ITEM_STATUS_NOTSUPPORTED, error, 0, NULL, 0, 0, 0, 0);
+					items[i].status, error, 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, ts.sec);
+			DCrequeue_items(&items[i].itemid, &items[i].status, &ts.sec, &errcode, 1);
 		}
 
 		zbx_free(items[i].key);
 	}
 
 	DCconfig_clean_items(items, NULL, num);
+
+	dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, *icmp_items_count);
 }

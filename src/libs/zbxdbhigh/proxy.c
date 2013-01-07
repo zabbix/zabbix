@@ -106,8 +106,8 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 				" from hosts"
 				" where host='%s'"
 					" and status in (%d)"
-					DB_NODE,
-				host_esc, HOST_STATUS_PROXY_ACTIVE, DBnode_local("hostid"));
+					ZBX_SQL_NODE,
+				host_esc, HOST_STATUS_PROXY_ACTIVE, DBand_node_local("hostid"));
 
 		zbx_free(host_esc);
 
@@ -188,12 +188,10 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	if (SUCCEED == str_in_list("globalmacro,regexps,expressions,config", table->table, ','))
 	{
-		char	*field_name;
+		char	field_name[ZBX_FIELDNAME_LEN + 3];
 
-		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where 1=1" DB_NODE, DBnode_local(field_name));
-
-		zbx_free(field_name);
+		zbx_snprintf(field_name, sizeof(field_name), "t.%s", table->recid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBwhere_node_local(field_name));
 	}
 	else if (SUCCEED == str_in_list("hosts,interface,hosts_templates,hostmacro", table->table, ','))
 	{
@@ -237,23 +235,8 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	else if (0 == strcmp(table->table, "groups"))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				",config r where t.groupid=r.discovery_groupid" DB_NODE,
-				DBnode_local("r.configid"));
-	}
-	else if (0 == strcmp(table->table, "applications"))
-	{
-		if (0 == httptests->values_num)
-			goto skip_data;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" where exists ("
-					"select *"
-					" from httptest r"
-					" where t.applicationid=r.applicationid"
-						" and");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.httptestid",
-				httptests->values, httptests->values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")");
+				",config r where t.groupid=r.discovery_groupid" ZBX_SQL_NODE,
+				DBand_node_local("r.configid"));
 	}
 	else if (SUCCEED == str_in_list("httptest,httptestitem,httpstep", table->table, ','))
 	{
@@ -385,9 +368,8 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 
 	result = DBselect(
 			"select httptestid"
-			" from httptest t,applications a,hosts h"
-			" where t.applicationid=a.applicationid"
-				" and a.hostid=h.hostid"
+			" from httptest t,hosts h"
+			" where t.hostid=h.hostid"
 				" and t.status=%d"
 				" and h.proxy_hostid=" ZBX_FS_UI64
 				" and h.status=%d",
@@ -435,7 +417,6 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"expressions"},
 		{"groups"},
 		{"config"},
-		{"applications"},
 		{"httptest"},
 		{"httptestitem"},
 		{"httpstep"},
@@ -461,7 +442,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	for (i = 0; NULL != pt[i].table; i++)
 	{
-		assert(NULL != (table = DBget_table(pt[i].table)));
+		table = DBget_table(pt[i].table);
+		assert(NULL != table);
 
 		get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
 	}
@@ -1536,52 +1518,75 @@ void	calc_timestamp(char *line, int *timestamp, char *format)
  *                                 connection. NULL for proxy connection      *
  *             proxy_hostid - [IN] proxy identificator from database          *
  *             values       - [IN] array of incoming values                   *
- *             value_num    - [IN] number of elements in array                *
+ *             values_num   - [IN] number of elements in array                *
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
-		AGENT_VALUE *values, int value_num, int *processed)
+		AGENT_VALUE *values, size_t values_num, int *processed)
 {
 	const char	*__function_name = "process_mass_data";
 	AGENT_RESULT	agent;
-	DC_ITEM		item;
-	int		i;
+	DC_ITEM		*items = NULL;
+	zbx_host_key_t	*keys = NULL;
+	size_t		i;
+	zbx_uint64_t	*itemids = NULL;
+	unsigned char	*statuses = NULL;
+	int		*lastclocks = NULL, *errcodes = NULL, *errcodes2 = NULL;
+	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for (i = 0; i < value_num; i++)
+	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * values_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * values_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * values_num);
+	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * values_num);
+	statuses = zbx_malloc(statuses, sizeof(unsigned char) * values_num);
+	lastclocks = zbx_malloc(lastclocks, sizeof(int) * values_num);
+	errcodes2 = zbx_malloc(errcodes2, sizeof(int) * values_num);
+
+	for (i = 0; i < values_num; i++)
 	{
-		if (SUCCEED != DCconfig_get_item_by_key(&item, proxy_hostid, values[i].host_name, values[i].key))
+		keys[i].host = values[i].host_name;
+		keys[i].key = values[i].key;
+	}
+
+	DCconfig_get_items_by_keys(items, proxy_hostid, keys, errcodes, values_num);
+
+	for (i = 0; i < values_num; i++)
+	{
+		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_CHILD == item.flags)
-			goto clean;
+		if (ZBX_FLAG_DISCOVERY_CHILD == items[i].flags)
+			continue;
 
-		if (HOST_MAINTENANCE_STATUS_ON == item.host.maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == item.host.maintenance_type &&
-				item.host.maintenance_from <= values[i].ts.sec)
-			goto clean;
+		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type &&
+				items[i].host.maintenance_from <= values[i].ts.sec)
+			continue;
 
-		if (ITEM_TYPE_INTERNAL == item.type || ITEM_TYPE_AGGREGATE == item.type || ITEM_TYPE_CALCULATED == item.type)
-			goto clean;
+		if (ITEM_TYPE_INTERNAL == items[i].type || ITEM_TYPE_AGGREGATE == items[i].type ||
+				ITEM_TYPE_CALCULATED == items[i].type)
+			continue;
 
-		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != item.type && ITEM_TYPE_ZABBIX_ACTIVE != item.type)
-			goto clean;
+		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != items[i].type && ITEM_TYPE_ZABBIX_ACTIVE != items[i].type)
+			continue;
 
-		if (ITEM_TYPE_TRAPPER == item.type && 0 == proxy_hostid &&
-				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
+		if (ITEM_TYPE_TRAPPER == items[i].type && 0 == proxy_hostid &&
+				FAIL == zbx_tcp_check_security(sock, items[i].trapper_hosts, 1))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "process data failed: %s", zbx_tcp_strerror());
-			goto clean;
+			continue;
 		}
 
 		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
 		{
-			dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
-					ITEM_STATUS_NOTSUPPORTED, values[i].value, 0, NULL, 0, 0, 0, 0);
+			items[i].status = ITEM_STATUS_NOTSUPPORTED;
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
+					items[i].status, values[i].value, 0, NULL, 0, 0, 0, 0);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -1590,19 +1595,20 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		{
 			init_result(&agent);
 
-			if (SUCCEED == set_result_type(&agent, item.value_type,
-					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : item.data_type, values[i].value))
+			if (SUCCEED == set_result_type(&agent, items[i].value_type,
+					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type, values[i].value))
 			{
-				if (ITEM_VALUE_TYPE_LOG == item.value_type)
-					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
+				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
+					calc_timestamp(values[i].value, &values[i].timestamp, items[i].logtimefmt);
 
 				if (NULL != values[i].source)
 					zbx_replace_invalid_utf8(values[i].source);
 
-				dc_add_history(item.itemid, item.value_type, item.flags, &agent, &values[i].ts,
-						ITEM_STATUS_ACTIVE, NULL, values[i].timestamp, values[i].source,
-						values[i].severity, values[i].logeventid, values[i].lastlogsize,
-						values[i].mtime);
+				items[i].status = ITEM_STATUS_ACTIVE;
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent,
+						&values[i].ts, items[i].status, NULL, values[i].timestamp,
+						values[i].source, values[i].severity, values[i].logeventid,
+						values[i].lastlogsize, values[i].mtime);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -1610,28 +1616,47 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			else if (ISSET_MSG(&agent))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
-						item.host.host, item.key_orig, agent.msg);
+						items[i].host.host, items[i].key_orig, agent.msg);
 
-				dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
-						ITEM_STATUS_NOTSUPPORTED, agent.msg, 0, NULL, 0, 0, 0, 0);
+				items[i].status = ITEM_STATUS_NOTSUPPORTED;
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
+						&values[i].ts, items[i].status, agent.msg, 0, NULL, 0, 0, 0, 0);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
 
 			free_result(&agent);
 		}
-clean:
-		DCconfig_clean_items(&item, NULL, 1);
+
+		itemids[num] = items[i].itemid;
+		statuses[num] = items[i].status;
+		lastclocks[num] = values[i].ts.sec;
+		errcodes2[num] = SUCCEED;
+		num++;
 	}
+
+	DCconfig_clean_items(items, errcodes, values_num);
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes2, num);
+
+	zbx_free(errcodes2);
+	zbx_free(lastclocks);
+	zbx_free(statuses);
+	zbx_free(itemids);
+	zbx_free(errcodes);
+	zbx_free(items);
+	zbx_free(keys);
+
+	dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	clean_agent_values(AGENT_VALUE *values, int value_num)
+static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
 {
 	int	i;
 
-	for (i = 0; i < value_num; i++)
+	for (i = 0; i < values_num; i++)
 	{
 		zbx_free(values[i].value);
 		zbx_free(values[i].source);
@@ -1658,8 +1683,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p;
 	char			*tmp = NULL;
-	size_t			tmp_alloc = 0;
-	int			ret = FAIL, processed = 0, value_num = 0, total_num = 0;
+	size_t			tmp_alloc = 0, values_num = 0;
+	int			ret = FAIL, processed = 0, total_num = 0;
 	double			sec;
 	zbx_timespec_t		ts, proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
@@ -1707,7 +1732,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		total_num++;
 
-		av = &values[value_num];
+		av = &values[values_num];
 
 		memset(av, 0, sizeof(AGENT_VALUE));
 
@@ -1743,10 +1768,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		av->value = zbx_strdup(av->value, tmp);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, &tmp, &tmp_alloc))
-		{
-			if (SUCCEED != is_uint64(tmp, &av->lastlogsize))
-				av->lastlogsize = 0;
-		}
+			is_uint64(tmp, &av->lastlogsize);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
 			av->mtime = atoi(tmp);
@@ -1766,23 +1788,23 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATUS, &tmp, &tmp_alloc))
 			av->status = (unsigned char)atoi(tmp);
 
-		value_num++;
+		values_num++;
 
-		if (VALUES_MAX == value_num)
+		if (VALUES_MAX == values_num)
 		{
-			process_mass_data(sock, proxy_hostid, values, value_num, &processed);
+			process_mass_data(sock, proxy_hostid, values, values_num, &processed);
 
-			clean_agent_values(values, value_num);
-			value_num = 0;
+			clean_agent_values(values, values_num);
+			values_num = 0;
 		}
 	}
 
 	zbx_free(tmp);
 
-	if (0 < value_num)
-		process_mass_data(sock, proxy_hostid, values, value_num, &processed);
+	if (0 < values_num)
+		process_mass_data(sock, proxy_hostid, values, values_num, &processed);
 
-	clean_agent_values(values, value_num);
+	clean_agent_values(values, values_num);
 
 	if (NULL != info)
 	{

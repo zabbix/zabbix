@@ -131,27 +131,30 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		$newTrigger['templateid'] = $trigger['triggerid'];
 		unset($newTrigger['triggerid']);
 
-
 		if (isset($trigger['dependencies'])) {
 			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
 			$newTrigger['dependencies'] = replace_template_dependencies($deps, $chdHost['hostid']);
 		}
-		$expressionData = new CTriggerExpression($trigger);
+		$expressionData = new CTriggerExpression();
+		$expressionData->parse($trigger['expression']);
 
+		$newTrigger['expression'] = $trigger['expression'];
 		// replace template separately in each expression, only in beginning (host part)
-		foreach ($expressionData->expressions as $expr) {
-			$newExpr = '';
+		$exprPart = end($expressionData->expressions);
+		do {
 			foreach ($triggerTemplates as $triggerTemplate) {
-				$pos = strpos($expr['expression'], '{'.$triggerTemplate['host'].':');
-				if ($pos === 0) {
-					$newExpr = substr_replace($expr['expression'], '{'.$chdHost['host'].':', 0, strlen('{'.$triggerTemplate['host'].':'));
+				if ($triggerTemplate['host'] == $exprPart['host']) {
+					$exprPart['host'] = $chdHost['host'];
 					break;
 				}
 			}
-			if (!empty($newExpr)) {
-				$newTrigger['expression'] = str_replace($expr['expression'], $newExpr, $newTrigger['expression']);
-			}
+
+			$newTrigger['expression'] = substr_replace($newTrigger['expression'],
+					'{'.$exprPart['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}',
+					$exprPart['pos'], strlen($exprPart['expression'])
+			);
 		}
+		while ($exprPart = prev($expressionData->expressions));
 
 		// check if a child trigger already exists on the host
 		$childTriggers = $this->get(array(
@@ -196,6 +199,18 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$this->updateReal($newTrigger);
 		}
 		else {
+			$oldTrigger = $this->get(array(
+				'triggerids' => $trigger['triggerid'],
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+			$oldTrigger = reset($oldTrigger);
+			unset($oldTrigger['triggerid']);
+			foreach ($oldTrigger as $key => $value) {
+				if (!isset($newTrigger[$key])) {
+					$newTrigger[$key] = $oldTrigger[$key];
+				}
+			}
 			$this->createReal($newTrigger);
 			$newTrigger = reset($newTrigger);
 		}
@@ -234,8 +249,10 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$filter['hostid'] = $hostid;
 		}
 		else {
-			$expr = new CTriggerExpression($trigger);
-			$filter['host'] = reset($expr->data['hosts']);
+			$expressionData = new CTriggerExpression($trigger['expression']);
+			$expressionData->parse($trigger['expression']);
+			$expressionHosts = $expressionData->getHosts();
+			$filter['host'] = reset($expressionHosts);
 		}
 
 		$triggers = $this->get(array(
@@ -268,4 +285,77 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			}
 		}
 	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$triggerids = array_keys($result);
+
+		// adding groups
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$res = DBselect(
+				'SELECT f.triggerid,hg.groupid'.
+					' FROM functions f,items i,hosts_groups hg'.
+					' WHERE '.dbConditionInt('f.triggerid', $triggerids).
+					' AND f.itemid=i.itemid'.
+					' AND i.hostid=hg.hostid'
+			);
+			$relationMap = new CRelationMap();
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation['triggerid'], $relation['groupid']);
+			}
+
+			$groups = API::HostGroup()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectGroups'],
+				'groupids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $groups, 'groups');
+		}
+
+		// adding hosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$res = DBselect(
+				'SELECT f.triggerid,i.hostid'.
+					' FROM functions f,items i'.
+					' WHERE '.dbConditionInt('f.triggerid', $triggerids).
+					' AND f.itemid=i.itemid'
+			);
+			$relationMap = new CRelationMap();
+			while ($relation = DBfetch($res)) {
+				$relationMap->addRelation($relation['triggerid'], $relation['hostid']);
+			}
+
+			$hosts = API::Host()->get(array(
+				'output' => $options['selectHosts'],
+				'nodeids' => $options['nodeids'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			if (!is_null($options['limitSelects'])) {
+				order_result($hosts, 'host');
+			}
+			$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
+		}
+
+		// adding functions
+		if ($options['selectFunctions'] !== null && $options['selectFunctions'] != API_OUTPUT_COUNT) {
+			$functions = API::getApi()->select('functions', array(
+				'output' => $this->outputExtend('functions', array('triggerid', 'functionid'), $options['selectFunctions']),
+				'filter' => array('triggerid' => $triggerids),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($functions, 'triggerid', 'functionid');
+
+			$functions = $this->unsetExtraFields($functions, array('triggerid', 'functionid'), $options['selectFunctions']);
+			$result = $relationMap->mapMany($result, $functions, 'functions');
+		}
+
+		return $result;
+	}
+
+
 }

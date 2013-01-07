@@ -67,17 +67,6 @@ function KEY_PARAM($var = null) {
 	return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 }
 
-function validate_sec($str) {
-	return preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1;
-}
-
-function validate_secnum($str) {
-	if (preg_match('/^[ ]*#\d+[ ]*$/', $str, $arr)) {
-		return 0;
-	}
-	return validate_sec($str);
-}
-
 function validate_ipv4($str, &$arr) {
 	if (!preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr)) {
 		return false;
@@ -305,11 +294,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_IP) {
 		if (!validate_ip($var, $arr)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not IP.', $field));
+				info(_s('Critical error. Field "%1$s" is not IP.', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field "%1$s" is not IP.', $field));
+				info(_s('Warning. Field "%1$s" is not IP.', $caption));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -319,11 +308,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_IP_RANGE) {
 		if (!validate_ip_range($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not IP range.', $field));
+				info(_s('Critical error. Field "%1$s" is not IP range.', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info(_s('Warning. Field "%1$s" is not IP range.', $field));
+				info(_s('Warning. Field "%1$s" is not IP range.', $caption));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -333,11 +322,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if ($type == T_ZBX_INT_RANGE) {
 		if (!is_int_range($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field "%1$s" is not integer list or range.', $field));
+				info(_s('Critical error. Field "%1$s" is not integer list or range.', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field "%1$s" is not integer list or range.', $field));
+				info(_s('Warning. Field "%1$s" is not integer list or range.', $caption));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -346,44 +335,44 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 	if ($type == T_ZBX_INT && !zbx_is_int($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not integer.', $field));
+			info(_s('Critical error. Field "%1$s" is not integer.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not integer.', $field));
+			info(_s('Warning. Field "%1$s" is not integer.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
 
 	if ($type == T_ZBX_DBL && !is_numeric($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not decimal number.', $field));
+			info(_s('Critical error. Field "%1$s" is not decimal number.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not decimal number.', $field));
+			info(_s('Warning. Field "%1$s" is not decimal number.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
 
 	if ($type == T_ZBX_STR && !is_string($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not string.', $field));
+			info(_s('Critical error. Field "%1$s" is not string.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not string.', $field));
+			info(_s('Warning. Field "%1$s" is not string.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
 
 	if ($type == T_ZBX_STR && !defined('ZBX_ALLOW_UNICODE') && zbx_strlen($var) != zbx_strlen($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" contains Multibyte chars.', $field));
+			info(_s('Critical error. Field "%1$s" contains Multibyte chars.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" multibyte chars are restricted.', $field));
+			info(_s('Warning. Field "%1$s" multibyte chars are restricted.', $caption));
 			return ZBX_VALID_ERROR;
 		}
 	}
@@ -393,7 +382,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		if (!$colorValidator->validate($var)) {
 			$var = 'FFFFFF';
 			if ($flags & P_SYS) {
-				info(_s('Critical error. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $field));
+				info(_s('Critical error. Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {
@@ -602,6 +591,46 @@ function validateUserMacro($value) {
 	return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value);
 }
 
-function validateMaxTime($time) {
-	return $time <= 2147464800; // 2038.01.19 00:00
+/**
+ * Validate, if unix time in (1970.01.01 00:00:01 - 2038.01.19 00:00:00).
+ *
+ * @param int $time
+ *
+ * @return bool
+ */
+function validateUnixTime($time) {
+	return (is_numeric($time) && $time > 0 && $time <= 2147464800);
+}
+
+/**
+ * Validate if date and time are in correct range, e.g. month is not greater than 12 etc.
+ *
+ * @param int $year
+ * @param int $month
+ * @param int $day
+ * @param int $minutes
+ * @param int $seconds
+ *
+ * @return bool
+ */
+function validateDateTime($year, $month, $day, $hours, $minutes, $seconds = null) {
+	return !($month < 1 || $month > 12
+			|| $day < 1  || $day > 31 || (($month == 4 || $month == 6 || $month == 9 || $month == 11) && $day > 30)
+			|| ($month == 2 && ((($year % 4) == 0 && $day > 29) || (($year % 4) != 0 && $day > 28)))
+			|| $hours < 0 || $hours > 23
+			|| $minutes < 0 || $minutes > 59
+			|| (!is_null($seconds) && ($seconds < 0 || $seconds > 59)));
+}
+
+/**
+ * Validate allowed date interval (1970.01.01-2038.01.18).
+ *
+ * @param int $year
+ * @param int $month
+ * @param int $day
+ *
+ * @return bool
+ */
+function validateDateInterval($year, $month, $day) {
+	return !($year < 1970 || $year > 2038 || ($year == 2038 && (($month > 1) || ($month == 1 && $day > 18))));
 }

@@ -181,12 +181,12 @@ $data = array(
 
 // get slideshows
 $db_slideshows = DBselect(
-	'SELECT s.slideshowid,s.name'.
-	' FROM slideshows s'.
-	' WHERE '.DBin_node('s.slideshowid')
+		'SELECT s.slideshowid,s.name'.
+		' FROM slideshows s'.
+		whereDbNode('s.slideshowid')
 );
 while ($slideshow = DBfetch($db_slideshows)) {
-	if (slideshow_accessible($slideshow['slideshowid'], PERM_READ_ONLY)) {
+	if (slideshow_accessible($slideshow['slideshowid'], PERM_READ)) {
 		$data['slideshows'][$slideshow['slideshowid']] = $slideshow;
 	}
 };
@@ -219,8 +219,8 @@ if (!empty($data['screen'])) {
 			$params[$option] = 1;
 		}
 
-		$data['page_groups'] = get_viewed_groups(PERM_READ_ONLY, $params);
-		$data['page_hosts'] = get_viewed_hosts(PERM_READ_ONLY, $data['page_groups']['selected'], $params);
+		$data['page_groups'] = get_viewed_groups(PERM_READ, $params);
+		$data['page_hosts'] = get_viewed_hosts(PERM_READ, $data['page_groups']['selected'], $params);
 
 		validate_group_with_host($data['page_groups'], $data['page_hosts']);
 	}

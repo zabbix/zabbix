@@ -136,7 +136,12 @@ $data['discovery_groups'] = API::HostGroup()->get(array(
 	'editable' => true,
 	'output' => API_OUTPUT_EXTEND
 ));
-$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT u.usrgrpid,u.name FROM usrgrp u WHERE '.DBin_node('u.usrgrpid').' ORDER BY u.name'));
+$data['alert_usrgrps'] = DBfetchArray(DBselect(
+		'SELECT u.usrgrpid,u.name'.
+		' FROM usrgrp u'.
+		whereDbNode('u.usrgrpid').
+		' ORDER BY u.name'
+));
 
 $otherForm = new CView('administration.general.other.edit', $data);
 $cnf_wdgt->addItem($otherForm->render());

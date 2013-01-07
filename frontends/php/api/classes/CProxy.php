@@ -48,9 +48,6 @@ class CProxy extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('hostid', 'host', 'status');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('hostid' => 'h.hostid'),
 			'from'		=> array('hosts' => 'hosts h'),
@@ -77,51 +74,29 @@ class CProxy extends CZBXAPI {
 			'preservekeys'				=> null,
 			'selectHosts'				=> null,
 			'selectInterfaces'			=> null,
-			'limitSelects'				=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['hosts']);
-
-			$dbTable = DB::getSchema('hosts');
-			$sqlParts['select']['hostid'] = 'h.hostid';
-			foreach ($options['output'] as $field) {
-				if ($field == 'proxyid') {
-					continue;
-				}
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'h.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			if ($permission == PERM_READ_WRITE) {
 				return array();
 			}
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
-			$sqlParts['where'][] = DBcondition('h.hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionInt('h.hostid', $options['proxyids']);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('hosts h', $options, $sqlParts);
+			$this->dbFilter('hosts h', $options, $sqlParts);
 		}
 
 		// search
@@ -151,127 +126,32 @@ class CProxy extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$proxyids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-				FROM '.$sqlFrom.'
-				WHERE '.DBin_node('h.hostid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($proxy = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $proxy['rowscount'];
 			}
 			else {
-				$proxyids[$proxy['hostid']] = $proxy['hostid'];
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$proxy['proxyid']] = array('proxyid' => $proxy['proxyid']);
+				if (!isset($result[$proxy['proxyid']])) {
+					$result[$proxy['proxyid']]= array();
 				}
-				else {
-					if (!isset($result[$proxy['proxyid']])) {
-						$result[$proxy['proxyid']]= array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$proxy['proxyid']]['hosts'])) {
-						$result[$proxy['proxyid']]['hosts'] = array();
-					}
-					if (!is_null($options['selectInterfaces']) && !isset($result[$proxy['proxyid']]['interfaces'])) {
-						$result[$proxy['proxyid']]['interfaces'] = array();
-					}
-					$result[$proxy['proxyid']] += $proxy;
-				}
+
+				$result[$proxy['proxyid']] += $proxy;
 			}
 		}
 
-		if (!is_null($options['countOutput']) || empty($proxyids)) {
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// selectHosts
-		if (!is_null($options['selectHosts'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'proxyids' => $proxyids,
-				'preservekeys' => true
-			);
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($objParams);
-				foreach ($hosts as $host) {
-					$result[$host['proxy_hostid']]['hosts'][] = $host;
-				}
-			}
-		}
-
-		// adding hostinterfaces
-		if (!is_null($options['selectInterfaces'])) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'hostids' => $proxyids,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectInterfaces'];
-				$interfaces = API::HostInterface()->get($objParams);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
-				}
-
-				$count = array();
-				foreach ($interfaces as $interfaceid => $interface) {
-					if (!is_null($options['limitSelects'])) {
-						if (!isset($count[$interface['hostid']])) {
-							$count[$interface['hostid']] = 0;
-						}
-						$count[$interface['hostid']]++;
-						if ($count[$interface['hostid']] > $options['limitSelects']) {
-							continue;
-						}
-					}
-					$result[$interface['hostid']]['interfaces'][] = &$interfaces[$interfaceid];
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectInterfaces']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$interfaces = API::HostInterface()->get($objParams);
-				$interfaces = zbx_toHash($interfaces, 'hostid');
-				foreach ($result as $proxyid => $proxy) {
-					$result[$proxyid]['interfaces'] = isset($interfaces[$proxyid]) ? $interfaces[$proxyid]['rowscount'] : 0;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -492,7 +372,7 @@ class CProxy extends CZBXAPI {
 		$dbProxies = DBselect(
 			'SELECT h.hostid,h.host'.
 					' FROM hosts h'.
-					' WHERE '.DBcondition('h.hostid', $proxyIds));
+					' WHERE '.dbConditionInt('h.hostid', $proxyIds));
 		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
 
 		$actionids = array();
@@ -501,7 +381,7 @@ class CProxy extends CZBXAPI {
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
 			' WHERE c.conditiontype='.CONDITION_TYPE_PROXY.
-				' AND '.DBcondition('c.value', $proxyIds)
+				' AND '.dbConditionString('c.value', $proxyIds)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -570,7 +450,6 @@ class CProxy extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'proxyids' => $proxyids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -593,7 +472,6 @@ class CProxy extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'proxyids' => $proxyids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));
@@ -620,7 +498,7 @@ class CProxy extends CZBXAPI {
 		$dRule = DBfetch(DBselect(
 			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
 					' FROM drules dr'.
-					' WHERE '.DBcondition('dr.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
+					' WHERE '.dbConditionInt('dr.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
 		if ($dRule) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$dRule['proxy_hostid']));
 
@@ -638,11 +516,62 @@ class CProxy extends CZBXAPI {
 		$host = DBfetch(DBselect(
 			'SELECT h.name,h.proxy_hostid'.
 					' FROM hosts h'.
-					' WHERE '.DBcondition('h.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
+					' WHERE '.dbConditionInt('h.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
 		if ($host) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Host "%1$s" is monitored with proxy "%2$s".', $host['name'], $proxy['host']));
 		}
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			if ($options['selectInterfaces'] !== null) {
+				$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$proxyIds = array_keys($result);
+
+		// selectHosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = API::Host()->get(array(
+				'output' => $this->outputExtend('hosts', array('hostid', 'proxy_hostid'), $options['selectHosts']),
+				'nodeids' => $options['nodeids'],
+				'proxyids' => $proxyIds,
+				'preservekeys' => true
+			));
+
+			$relationMap = $this->createRelationMap($hosts, 'proxy_hostid', 'hostid');
+
+			$hosts = $this->unsetExtraFields($hosts, array('proxy_hostid', 'hostid'), $options['selectHosts']);
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding hostinterfaces
+		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+			$interfaces = API::HostInterface()->get(array(
+				'output' => $this->outputExtend('interface', array('interfaceid', 'hostid'), $options['selectInterfaces']),
+				'nodeids' => $options['nodeids'],
+				'hostids' => $proxyIds,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+
+			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
+
+			$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterfaces']);
+			$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
+		}
+
+		return $result;
 	}
 }

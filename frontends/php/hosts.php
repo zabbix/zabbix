@@ -250,7 +250,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			$hosts['groups'] = API::HostGroup()->get(array(
 				'groupids' => get_request('groups', array()),
 				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => array('groupid')
 			));
 			if (!empty($newgroup)) {
 				$hosts['groups'][] = $newgroup;
@@ -438,7 +438,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// clone triggers
 			$triggers = API::Trigger()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('triggerid'),
 				'hostids' => $srcHostId,
 				'inherited' => false
 			));
@@ -450,7 +450,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// clone discovery rules
 			$discoveryRules = API::DiscoveryRule()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('itemid'),
 				'hostids' => $srcHostId,
 				'inherited' => false
 			));
@@ -599,11 +599,11 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 
 	// get proxies
 	$data['proxies'] = DBfetchArray(DBselect(
-		'SELECT h.hostid,h.host'.
-		' FROM hosts h'.
-		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-			' AND '.DBin_node('h.hostid').
-		' ORDER BY h.host'
+			'SELECT h.hostid,h.host'.
+			' FROM hosts h'.
+			' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
+				andDbNode('h.hostid').
+			' ORDER BY h.host'
 	));
 
 	// get inventories
@@ -685,6 +685,7 @@ else {
 		_('Triggers'),
 		_('Graphs'),
 		_('Discovery'),
+		_('Web'),
 		_('Interface'),
 		_('Templates'),
 		make_sorting_header(_('Status'), 'status'),
@@ -736,7 +737,8 @@ else {
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT
+		'selectApplications' => API_OUTPUT_COUNT,
+		'selectHttpTests' => API_OUTPUT_COUNT
 	));
 	order_result($hosts, $sortfield, $sortorder);
 
@@ -766,6 +768,8 @@ else {
 			' ('.$host['graphs'].')');
 		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
 			' ('.$host['discoveries'].')');
+		$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
+			' ('.$host['httpTests'].')');
 
 		$description = array();
 		if ($host['proxy_hostid']) {
@@ -853,6 +857,7 @@ else {
 			$triggers,
 			$graphs,
 			$discoveries,
+			$httpTests,
 			$hostIF,
 			new CCol($hostTemplates, 'wraptext'),
 			$status,

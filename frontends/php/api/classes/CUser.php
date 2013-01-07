@@ -87,19 +87,6 @@ class CUser extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['users']);
-
-			$dbTable = DB::getSchema('users');
-			$sqlParts['select']['userid'] = ' u.userid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 'u.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// permission check
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -119,51 +106,37 @@ class CUser extends CZBXAPI {
 		// userids
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
-			$sqlParts['where'][] = DBcondition('u.userid', $options['userids']);
+			$sqlParts['where'][] = dbConditionInt('u.userid', $options['userids']);
 		}
 
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
-			}
+
+			$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where'][] = dbConditionInt('ug.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 		}
 
 		// mediaids
 		if (!is_null($options['mediaids'])) {
 			zbx_value2array($options['mediaids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['mediaid'] = 'm.mediaid';
-			}
+
+			$sqlParts['select']['mediaid'] = 'm.mediaid';
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
-			}
+
+			$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['users'] = 'u.*';
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT u.userid) AS rowscount');
 		}
 
 		// filter
@@ -171,7 +144,7 @@ class CUser extends CZBXAPI {
 			if (isset($options['filter']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
 			}
-			zbx_db_filter('users u', $options, $sqlParts);
+			$this->dbFilter('users u', $options, $sqlParts);
 		}
 
 		// search
@@ -190,38 +163,10 @@ class CUser extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
 		$userids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
 			if (!is_null($options['countOutput'])) {
@@ -230,46 +175,37 @@ class CUser extends CZBXAPI {
 			else {
 				$userids[$user['userid']] = $user['userid'];
 
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$user['userid']] = array('userid' => $user['userid']);
+				if (!isset($result[$user['userid']])) {
+					$result[$user['userid']] = array();
 				}
-				else {
-					if (!isset($result[$user['userid']])) {
-						$result[$user['userid']] = array();
-					}
 
-					if ($options['selectUsrgrps'] && !isset($result[$user['userid']]['usrgrps'])) {
+				// usrgrpids
+				if (isset($user['usrgrpid']) && is_null($options['selectUsrgrps'])) {
+					if (!isset($result[$user['userid']]['usrgrps'])) {
 						$result[$user['userid']]['usrgrps'] = array();
 					}
-
-					// usrgrpids
-					if (isset($user['usrgrpid']) && is_null($options['selectUsrgrps'])) {
-						if (!isset($result[$user['userid']]['usrgrps'])) {
-							$result[$user['userid']]['usrgrps'] = array();
-						}
-						$result[$user['userid']]['usrgrps'][] = array('usrgrpid' => $user['usrgrpid']);
-						unset($user['usrgrpid']);
-					}
-
-					// mediaids
-					if (isset($user['mediaid']) && is_null($options['selectMedias'])) {
-						if (!isset($result[$user['userid']]['medias'])) {
-							$result[$user['userid']]['medias'] = array();
-						}
-						$result[$user['userid']]['medias'][] = array('mediaid' => $user['mediaid']);
-						unset($user['mediaid']);
-					}
-
-					// mediatypeids
-					if (isset($user['mediatypeid']) && is_null($options['selectMediatypes'])) {
-						if (!isset($result[$user['userid']]['mediatypes'])) {
-							$result[$user['userid']]['mediatypes'] = array();
-						}
-						$result[$user['userid']]['mediatypes'][] = array('mediatypeid' => $user['mediatypeid']);
-						unset($user['mediatypeid']);
-					}
-					$result[$user['userid']] += $user;
+					$result[$user['userid']]['usrgrps'][] = array('usrgrpid' => $user['usrgrpid']);
+					unset($user['usrgrpid']);
 				}
+
+				// mediaids
+				if (isset($user['mediaid']) && is_null($options['selectMedias'])) {
+					if (!isset($result[$user['userid']]['medias'])) {
+						$result[$user['userid']]['medias'] = array();
+					}
+					$result[$user['userid']]['medias'][] = array('mediaid' => $user['mediaid']);
+					unset($user['mediaid']);
+				}
+
+				// mediatypeids
+				if (isset($user['mediatypeid']) && is_null($options['selectMediatypes'])) {
+					if (!isset($result[$user['userid']]['mediatypes'])) {
+						$result[$user['userid']]['mediatypes'] = array();
+					}
+					$result[$user['userid']]['mediatypes'][] = array('mediatypeid' => $user['mediatypeid']);
+					unset($user['mediatypeid']);
+				}
+				$result[$user['userid']] += $user;
 			}
 		}
 
@@ -289,7 +225,7 @@ class CUser extends CZBXAPI {
 				'SELECT ug.userid,MAX(g.gui_access) AS gui_access,'.
 					' MAX(g.debug_mode) AS debug_mode,MAX(g.users_status) AS users_status'.
 					' FROM usrgrp g,users_groups ug'.
-					' WHERE '.DBcondition('ug.userid', $userids).
+					' WHERE '.dbConditionInt('ug.userid', $userids).
 						' AND g.usrgrpid=ug.usrgrpid'.
 					' GROUP BY ug.userid'
 			);
@@ -298,7 +234,9 @@ class CUser extends CZBXAPI {
 			}
 		}
 
-		$result = $this->addRelatedObjects($options, $result);
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+		}
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -577,7 +515,7 @@ class CUser extends CZBXAPI {
 				$newUsrgrpids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
 				// deleting all relations with groups, but not touching those, where user still must be after update
-				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.DBcondition('usrgrpid', $newUsrgrpids, true));
+				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
 
 				// getting the list of groups user is currently in
 				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
@@ -633,7 +571,7 @@ class CUser extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
-			' WHERE '.DBcondition('om.userid', $userids)
+			' WHERE '.dbConditionInt('om.userid', $userids)
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -646,7 +584,7 @@ class CUser extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
-			' WHERE '.DBcondition('o.operationid', $operationids).
+			' WHERE '.dbConditionInt('o.operationid', $operationids).
 				' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
@@ -722,7 +660,7 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
 
-		$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
+		$sql = 'DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaids);
 		if (!DBexecute($sql)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
@@ -759,7 +697,7 @@ class CUser extends CZBXAPI {
 		$result = DBselect(
 			'SELECT m.mediaid'.
 			' FROM media m'.
-			' WHERE '.DBcondition('userid', $userids)
+			' WHERE '.dbConditionInt('userid', $userids)
 		);
 		while ($media = DBfetch($result)) {
 			$delMedias[$media['mediaid']] = $media;
@@ -822,15 +760,24 @@ class CUser extends CZBXAPI {
 	// ******************************************************************************
 	// LOGIN Methods
 	// ******************************************************************************
-	public function ldapLogin($user) {
-		$cnf = isset($user['cnf']) ? $user['cnf'] : null;
 
-		if (is_null($cnf)) {
-			$config = select_config();
-			foreach ($config as $id => $value) {
-				if (zbx_strpos($id, 'ldap_') !== false) {
-					$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-				}
+	/**
+	 * Authenticate a user using LDAP.
+	 *
+	 * The $user array must have the following attributes:
+	 * - user       - user name
+	 * - password   - user password
+	 *
+	 * @param array $user
+	 *
+	 * @return bool
+	 */
+	protected function ldapLogin(array $user) {
+		$config = select_config();
+		$cnf = array();
+		foreach ($config as $id => $value) {
+			if (zbx_strpos($id, 'ldap_') !== false) {
+				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
 			}
 		}
 
@@ -838,10 +785,8 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Probably php-ldap module is missing.'));
 		}
 
-		$ldap = new CLdap($cnf);
-		$ldap->connect();
-
-		if ($ldap->checkPass($user['user'], $user['password'])) {
+		$ldapValidator = new CLdapAuthValidator($cnf);
+		if ($ldapValidator->validate($user)) {
 			return true;
 		}
 		else {
@@ -853,11 +798,11 @@ class CUser extends CZBXAPI {
 		global $ZBX_LOCALNODEID;
 
 		$login = DBfetch(DBselect(
-			'SELECT u.userid'.
+			'SELECT NULL'.
 			' FROM users u'.
 			' WHERE u.alias='.zbx_dbstr($user['user']).
 				' AND u.passwd='.zbx_dbstr(md5($user['password'])).
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 		if ($login) {
 			return true;
@@ -877,7 +822,7 @@ class CUser extends CZBXAPI {
 			' FROM sessions s'.
 			' WHERE s.sessionid='.zbx_dbstr($sessionId).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID)
+				andDbNode('s.userid', $ZBX_LOCALNODEID)
 		));
 		if (!$session) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
@@ -907,7 +852,7 @@ class CUser extends CZBXAPI {
 			'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
 			' FROM users u'.
 			' WHERE u.alias='.zbx_dbstr($name).
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 		if (!$userInfo) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
@@ -1023,8 +968,8 @@ class CUser extends CZBXAPI {
 			' WHERE s.sessionid='.zbx_dbstr($sessionid).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND s.userid=u.userid'.
-				' AND ((s.lastaccess+u.autologout>'.$time.') OR (u.autologout=0))'.
-				' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)
+				' AND (s.lastaccess+u.autologout>'.$time.' OR u.autologout=0)'.
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 
 		if (!$userInfo) {
@@ -1113,7 +1058,6 @@ class CUser extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -1133,7 +1077,6 @@ class CUser extends CZBXAPI {
 		$count = $this->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));
@@ -1155,71 +1098,39 @@ class CUser extends CZBXAPI {
 		$userids = zbx_objectValues($result, 'userid');
 
 		// adding usergroups
-		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], array(API_OUTPUT_REFER, API_OUTPUT_EXTEND))) {
-			foreach ($result as &$user) {
-				$user['usrgrps'] = array();
-			}
-			unset($user);
-
+		if ($options['selectUsrgrps'] !== null && $options['selectUsrgrps'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'userid', 'usrgrpid', 'users_groups');
 			$usrgrps = API::UserGroup()->get(array(
 				'output' => $options['selectUsrgrps'],
-				'userids' => $userids,
+				'usrgrpids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			foreach ($usrgrps as $usrgrp) {
-				$uusers = $usrgrp['users'];
-				unset($usrgrp['users']);
-				$usrgrps = $this->unsetExtraFields('usrgrp', $usrgrps, $options['selectUsrgrps']);
-
-				foreach ($uusers as $user) {
-					$result[$user['userid']]['usrgrps'][] = $usrgrp;
-				}
-			}
+			$result = $relationMap->mapMany($result, $usrgrps, 'usrgrps');
 		}
 
 		// adding medias
-		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], array(API_OUTPUT_REFER, API_OUTPUT_EXTEND))) {
-			foreach ($result as &$user) {
-				$user['medias'] = array();
-			}
-			unset($user);
-
+		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
 			$userMedias = API::UserMedia()->get(array(
-				'output' => $options['selectMedias'],
+				'output' => $this->outputExtend('media', array('userid', 'mediaid'), $options['selectMedias']),
 				'userids' => $userids,
 				'preservekeys' => true
 			));
-			$userMedias = $this->unsetExtraFields('media', $userMedias, $options['selectMedias']);
 
-			foreach ($userMedias as $mediaid => $media) {
-				$result[$media['userid']]['medias'][] = $media;
-			}
+			$relationMap = $this->createRelationMap($userMedias, 'userid', 'mediaid');
+
+			$userMedias = $this->unsetExtraFields($userMedias, array('userid', 'mediaid'), $options['selectMedias']);
+			$result = $relationMap->mapMany($result, $userMedias, 'medias');
 		}
 
 		// adding media types
-		if (!is_null($options['selectMediatypes'])) {
-			foreach ($result as &$user) {
-				$user['mediatypes'] = array();
-			}
-			unset($user);
-
-			$mediatypes = API::Mediatype()->get(array(
+		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'userid', 'mediatypeid', 'media');
+			$mediaTypes = API::Mediatype()->get(array(
 				'output' => $options['selectMediatypes'],
-				'userids' => $userids,
-				'selectUsers' => API_OUTPUT_REFER,
+				'mediatypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
-			foreach ($mediatypes as $mediatype) {
-				$users = $mediatype['users'];
-				unset($mediatype['users']);
-				$mediatype = $this->unsetExtraFields('media_type', $mediatype, $options['selectMediatypes']);
-
-				foreach ($users as $user) {
-					if (!empty($result[$user['userid']])) {
-						$result[$user['userid']]['mediatypes'][] = $mediatype;
-					}
-				}
-			}
+			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 
 		return $result;

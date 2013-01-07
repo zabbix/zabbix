@@ -61,7 +61,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
-	SET_UI64_RESULT(result, sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE));
+	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE));
 
 	return SYSINFO_RET_OK;
 }

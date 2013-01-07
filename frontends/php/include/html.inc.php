@@ -295,10 +295,11 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		'graphs' => 'graphs',
 		'applications' => 'applications',
 		'screens' => 'screens',
-		'discoveries' => 'discoveries'
+		'discoveries' => 'discoveries',
+		'web' => 'web'
 	);
 	if (!empty($discoveryid)) {
-		unset($elements['applications'], $elements['screens'], $elements['discoveries']);
+		unset($elements['applications'], $elements['screens'], $elements['discoveries'], $elements['web']);
 	}
 
 	$options = array(
@@ -320,6 +321,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	}
 	if (isset($elements['discoveries'])) {
 		$options['selectDiscoveries'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['web'])) {
+		$options['selectHttpTests'] = API_OUTPUT_COUNT;
 	}
 
 	// get hosts
@@ -346,7 +350,6 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		$dbHost['screens'] = API::TemplateScreen()->get(array(
 			'editable' => true,
 			'countOutput' => true,
-			'output' => API_OUTPUT_SHORTEN,
 			'groupCount' => true,
 			'templateids' => $dbHost['hostid']
 		));
@@ -509,6 +512,18 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		}
 	}
 
+	if (isset($elements['web'])) {
+		if ($currentElement == 'web') {
+			$list->addItem(_('Web scenarios').' ('.$dbHost['httpTests'].')');
+		}
+		else {
+			$list->addItem(array(
+				new CLink(_('Web scenarios'), 'httpconf.php?hostid='.$dbHost['hostid']),
+				' ('.$dbHost['httpTests'].')'
+			));
+		}
+	}
+
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
@@ -603,7 +618,7 @@ function getAvailabilityTable($host) {
  * Create array with all inputs required for date selection and calendar.
  *
  * @param string      $name
- * @param int         $date
+ * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
  * @param string|null $relatedCalendar name of the calendar which must be closed when this calendar opens
  *
  * @return array
@@ -618,15 +633,30 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 
 	$calendarIcon->onClick($onClick);
 
-	$day = new CNumericBox($name.'_day', $date > 0 ? date('d', $date) : '', 2);
+	if (is_array($date)) {
+		$y = $date['y'];
+		$m = $date['m'];
+		$d = $date['d'];
+		$h = $date['h'];
+		$i = $date['i'];
+	}
+	else {
+		$y = date('Y', $date);
+		$m = date('m', $date);
+		$d = date('d', $date);
+		$h = date('H', $date);
+		$i = date('i', $date);
+	}
+
+	$day = new CNumericBox($name.'_day', $d, 2);
 	$day->attr('placeholder', _('dd'));
-	$month = new CNumericBox($name.'_month', $date > 0 ? date('m', $date) : '', 2);
+	$month = new CNumericBox($name.'_month', $m, 2);
 	$month->attr('placeholder', _('mm'));
-	$year = new CNumericBox($name.'_year', $date > 0 ? date('Y', $date) : '', 4);
+	$year = new CNumericBox($name.'_year', $y, 4);
 	$year->attr('placeholder', _('yyyy'));
-	$hour = new CNumericBox($name.'_hour', $date > 0 ? date('H', $date) : '', 2);
+	$hour = new CNumericBox($name.'_hour', $h, 2);
 	$hour->attr('placeholder', _('hh'));
-	$minute = new CNumericBox($name.'_minute', $date > 0 ? date('i', $date) : '', 2);
+	$minute = new CNumericBox($name.'_minute', $i, 2);
 	$minute->attr('placeholder', _('mm'));
 
 	$fields = array($day, '/', $month, '/', $year, SPACE, $hour, ':', $minute, $calendarIcon);

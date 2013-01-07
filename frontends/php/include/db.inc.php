@@ -671,7 +671,22 @@ function id2nodeid($id_var) {
 	return (int)bcdiv("$id_var", '100000000000000');
 }
 
-function DBin_node($id_name, $nodes = null) {
+/**
+ * Generates the filter by a node for the SQL statement
+ * For a standalone setup the function will return an empty string
+ *
+ * For example, function will return " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ *   for $fieldName = 'h.hostid', $nodes = 5, $operator = 'AND'
+ *
+ * Don't call this function directly. Use wrapper functions whereDbNode(), andDbNode() and sqlPartDbNode()
+ *
+ * @param string $fieldName
+ * @param mixed nodes
+ * @param string $operator  SQL operator ('AND', 'WHERE')
+ *
+ * @return string
+ */
+function dbNode($fieldName, $nodes = null, $operator = '') {
 	if (is_null($nodes)) {
 		$nodes = get_current_nodeid();
 	}
@@ -685,27 +700,83 @@ function DBin_node($id_name, $nodes = null) {
 	elseif (!is_array($nodes)) {
 		if (is_string($nodes)) {
 			if (!preg_match('/^([0-9,]+)$/', $nodes)) {
-				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
+				fatal_error('Incorrect "nodes" for "dbNode". Passed ['.$nodes.']');
 			}
 		}
 		elseif (!zbx_ctype_digit($nodes)) {
-			fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
+			fatal_error('Incorrect type of "nodes" for "dbNode". Passed ['.gettype($nodes).']');
 		}
 		$nodes = zbx_toArray($nodes);
 	}
 
+	$sql = '';
 	if (count($nodes) == 1) {
 		$nodeid = reset($nodes);
-		$sql = $id_name.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999';
+		if ($nodeid != 0) {
+			$sql = $fieldName.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999';
+		}
 	}
 	else {
-		$sql = '';
 		foreach ($nodes as $nodeid) {
-			$sql .= '('.$id_name.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999) OR ';
+			$sql .= '('.$fieldName.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999) OR ';
 		}
 		$sql = '('.rtrim($sql, ' OR ').')';
 	}
+
+	if ($sql != '' && $operator != '') {
+		$sql = ' '.$operator.' '.$sql;
+	}
+
 	return $sql;
+}
+
+/**
+ * Wrapper function to generate condition like " WHERE h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ * For a standalone setup the function will return an empty string
+ *
+ * @param string $fieldName
+ * @param mixed nodes
+ *
+ * @return string
+ */
+function whereDbNode($fieldName, $nodes = null)
+{
+	return dbNode($fieldName, $nodes, 'WHERE');
+}
+
+/**
+ * Wrapper function to generate condition like " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ * For a standalone setup the function will return an empty string
+ *
+ * @param string $fieldName
+ * @param mixed nodes
+ *
+ * @return string
+ */
+function andDbNode($fieldName, $nodes = null)
+{
+	return dbNode($fieldName, $nodes, 'AND');
+}
+
+/**
+ * Wrapper function to add condition like "h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ *   to an array $sqlPartWhere
+ * For a standalone setup the function will make nothing and will return $sqlPartWhere array without any changes
+ *
+ * @param array $sqlPartWhere
+ * @param string $fieldName
+ * @param mixed nodes
+ *
+ * @return array
+ */
+function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null)
+{
+	$sql = dbNode($fieldName, $nodes);
+
+	if ($sql != '') {
+		$sqlPartWhere[] = $sql;
+	}
+	return $sqlPartWhere;
 }
 
 function in_node($id_var, $nodes = null) {
@@ -870,35 +941,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	return false;
 }
 
-function zbx_db_filter($table, $options, &$sql_parts) {
-	list($table, $tableShort) = explode(' ', $table);
-
-	$tableSchema = DB::getSchema($table);
-	if (!$tableSchema) {
-		info(_s('Error in search request for table "%1$s".', $table));
-	}
-
-	$filter = array();
-	foreach ($options['filter'] as $field => $value) {
-		if (!isset($tableSchema['fields'][$field]) || zbx_empty($value)) {
-			continue;
-		}
-		zbx_value2array($value);
-		$filter[$field] = DBcondition($tableShort.'.'.$field, $value);
-	}
-
-	if (!empty($filter)) {
-		if (isset($sql_parts['where']['filter'])) {
-			$filter[] = $sql_parts['where']['filter'];
-		}
-
-		$glue = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
-		$sql_parts['where']['filter'] = '( '.implode($glue, $filter).' )';
-		return true;
-	}
-	return false;
-}
-
 function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 	if (!zbx_empty($options['sortfield'])) {
 		if (!is_array($options['sortfield'])) {
@@ -968,25 +1010,143 @@ function check_db_fields($db_fields, &$args) {
 	return true;
 }
 
-function DBcondition($fieldname, $array, $notin = false) {
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ * The WHERE condidion is generated from the given list of values as a mix of
+ * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array  $values     array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionInt($fieldName, array $values, $notIn = false) {
+	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
+	$MIN_NUM_BETWEEN = 5; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
+
+	if (count($values) == 0) {
+		return '1=0';
+	}
+
 	$condition = '';
 
-	if (!is_array($array)) {
-		throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
+	$betweens = array();
+	$ins = array();
+
+	$pos = 1;
+	$len = 1;
+	$valueL = reset($values);
+	while (false !== ($valueR = next($values))) {
+		$valueL = bcadd($valueL, 1, 0);
+
+		if ($valueR != $valueL) {
+			if ($len >= $MIN_NUM_BETWEEN) {
+				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
+			}
+			else {
+				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+			}
+
+			$len = 1;
+			$valueL = $valueR;
+		}
+		else {
+			$len++;
+		}
+		$pos++;
 	}
 
-	$in = $notin ? ' NOT IN ':' IN ';
-	$concat = $notin ? ' AND ':' OR ';
+	if ($len >= $MIN_NUM_BETWEEN) {
+		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
+	}
+	else {
+		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+	}
 
-	$items = array_chunk($array, 950);
+	$operand = $notIn ? 'AND' : 'OR';
+	$not = $notIn ? 'NOT ' : '';
+	$inNum = count($ins);
+	$betweenNum = count($betweens);
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
+		$condition .= '(';
+	}
+
+	// compose "BETWEEN"s
+	$first = true;
+	foreach ($betweens as $between) {
+		if (!$first) {
+			$condition .= ' '.$operand.' ';
+		}
+		$condition .= $not.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr($between[1]);
+		$first = false;
+	}
+
+	if (0 < $inNum && 0 < $betweenNum) {
+		$condition .= ' '.$operand.' ';
+	}
+
+	if ($inNum == 1) {
+		foreach ($ins as $insValue) {
+			$condition .= $notIn
+				? $fieldName.'!='.zbx_dbstr($insValue)
+				: $fieldName.'='.zbx_dbstr($insValue);
+			break;
+		}
+	}
+
+	// compose "IN"s
+	else {
+		$first = true;
+		foreach (array_chunk($ins, $MAX_EXPRESSIONS) as $in) {
+			if (!$first) {
+				$condition .= ' '.$operand.' ';
+			}
+
+			$in = array_map('zbx_dbstr', $in);
+			$condition .= $fieldName.' '.$not.'IN ('.implode(',', $in).')';
+			$first = false;
+		}
+	}
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
+		$condition .= ')';
+	}
+
+	return $condition;
+}
+
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array  $values     array of string values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionString($fieldName, array $values, $notIn = false) {
+	switch (count($values)) {
+		case 0:
+			return '1=0';
+		case 1:
+			return $notIn
+				? $fieldName.'!='.zbx_dbstr(reset($values))
+				: $fieldName.'='.zbx_dbstr(reset($values));
+	}
+
+	$in = $notIn ? ' NOT IN ' : ' IN ';
+	$concat = $notIn ? ' AND ' : ' OR ';
+	$items = array_chunk($values, 950);
+
+	$condition = '';
 	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldname.$in.'(' : '';
+		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
 		$condition .= implode(',', zbx_dbstr($values));
 	}
-	if (zbx_empty($condition)) {
-		return ' 1=0 ';
-	}
-	return ' ('.$fieldname.$in.'('.$condition.')) ';
+
+	return $fieldName.$in.'('.$condition.')';
 }
 
 function zero2null($val) {
@@ -1016,6 +1176,30 @@ function DBfetchArrayAssoc($cursor, $field) {
 	while ($row = DBfetch($cursor)) {
 		$result[$row[$field]] = $row;
 	}
+	return $result;
+}
+
+/**
+ * Fetch only values from one column to array.
+ *
+ * @param        $cursor
+ * @param string $column
+ * @param bool   $asHash
+ *
+ * @return array
+ */
+function DBfetchColumn($cursor, $column, $asHash = false) {
+	$result = array();
+
+	while ($dbResult = DBfetch($cursor)) {
+		if ($asHash) {
+			$result[$dbResult[$column]] = $dbResult[$column];
+		}
+		else {
+			$result[] = $dbResult[$column];
+		}
+	}
+
 	return $result;
 }
 

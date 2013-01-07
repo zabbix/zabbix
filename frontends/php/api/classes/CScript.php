@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,14 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
+?>
+<?php
 
 /**
  * Class containing methods for operations with Scripts
@@ -88,19 +89,6 @@ class CScript extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (is_array($options['output'])) {
-			unset($sqlParts['select']['scripts']);
-
-			$dbTable = DB::getSchema('scripts');
-			$sqlParts['select']['scriptid'] = 's.scriptid';
-			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field])) {
-					$sqlParts['select'][$field] = 's.'.$field;
-				}
-			}
-			$options['output'] = API_OUTPUT_CUSTOM;
-		}
-
 		// editable + permission check
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
@@ -123,21 +111,8 @@ class CScript extends CZBXAPI {
 			zbx_value2array($options['groupids']);
 			$options['groupids'][] = 0; // include all groups scripts
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['scripts'] = 's.scriptid,s.groupid';
-			}
-			$sqlParts['where'][] = '('.DBcondition('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
-		}
-
-		// usrgrpids
-		if (!is_null($options['usrgrpids'])) {
-			zbx_value2array($options['usrgrpids']);
-			$options['usrgrpids'][] = 0; // include all usrgrps scripts
-
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['usrgrpid'] = 's.usrgrpid';
-			}
-			$sqlParts['where'][] = '('.DBcondition('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
+			$sqlParts['select']['scripts'] = 's.scriptid,s.groupid';
+			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
 		}
 
 		// hostids
@@ -151,25 +126,35 @@ class CScript extends CZBXAPI {
 			}
 			$hostNodeIds = array_unique($hostNodeIds);
 
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'hg.hostid';
-			}
+			// return scripts that are assigned to the hosts' groups or to no group
+			$hostGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'hostids' => $options['hostids'],
+				'nodeids' => $hostNodeIds
+			));
+			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
+
+			$sqlParts['select']['hostid'] = 'hg.hostid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
+			$sqlParts['where'][] = '(('.dbConditionInt('hg.groupid', $hostGroupIds).' AND hg.groupid=s.groupid)'.
 				' OR '.
-				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
+				'(s.groupid IS NULL'.andDbNode('s.scriptid', $hostNodeIds).'))';
+		}
+
+		// usrgrpids
+		if (!is_null($options['usrgrpids'])) {
+			zbx_value2array($options['usrgrpids']);
+			$options['usrgrpids'][] = 0; // include all usrgrps scripts
+
+			$sqlParts['select']['usrgrpid'] = 's.usrgrpid';
+			$sqlParts['where'][] = '('.dbConditionInt('s.usrgrpid', $options['usrgrpids']).' OR s.usrgrpid IS NULL)';
 		}
 
 		// scriptids
 		if (!is_null($options['scriptids'])) {
 			zbx_value2array($options['scriptids']);
 
-			$sqlParts['where'][] = DBcondition('s.scriptid', $options['scriptids']);
-		}
-
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['scripts'] = 's.*';
+			$sqlParts['where'][] = dbConditionInt('s.scriptid', $options['scriptids']);
 		}
 
 		// search
@@ -179,14 +164,7 @@ class CScript extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('scripts s', $options, $sqlParts);
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-
-			$sqlParts['select'] = array('COUNT(DISTINCT s.scriptid) AS rowscount');
+			$this->dbFilter('scripts s', $options, $sqlParts);
 		}
 
 		// sorting
@@ -197,35 +175,19 @@ class CScript extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// node options
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
-		$scriptids = array();
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($script = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $script['rowscount'];
 			}
 			else {
-				$scriptids[$script['scriptid']] = $script['scriptid'];
-
-				if ($options['output'] == API_OUTPUT_SHORTEN) {
-					$result[$script['scriptid']] = array('scriptid' => $script['scriptid']);
+				if (!isset($result[$script['scriptid']])) {
+					$result[$script['scriptid']] = array();
 				}
-				else {
-					if (!isset($result[$script['scriptid']])) {
-						$result[$script['scriptid']] = array();
-					}
-					if (!is_null($options['selectGroups']) && !isset($result[$script['scriptid']]['groups'])) {
-						$result[$script['scriptid']]['groups'] = array();
-					}
-					if (!is_null($options['selectHosts']) && !isset($result[$script['scriptid']]['hosts'])) {
-						$result[$script['scriptid']]['hosts'] = array();
-					}
 
-					unset($script['hostid']);
-					$result[$script['scriptid']] += $script;
-				}
+				$result[$script['scriptid']] += $script;
 			}
 		}
 
@@ -233,13 +195,16 @@ class CScript extends CZBXAPI {
 			return $result;
 		}
 
-		// add related objects
-		$result = $this->addRelatedObjects($options, $result);
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, array('groupid', 'host_access'), $options['output']);
+		}
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
@@ -256,10 +221,10 @@ class CScript extends CZBXAPI {
 		$scriptids = array();
 
 		$dbScripts = DBselect(
-			'SELECT s.scriptid'.
-			' FROM scripts s'.
-			' WHERE '.DBin_node('s.scriptid').
-				' AND s.name='.$script['name']
+				'SELECT s.scriptid'.
+				' FROM scripts s'.
+				' WHERE s.name='.zbx_dbstr($script['name']).
+					andDbNode('s.scriptid')
 		);
 		while ($script = DBfetch($dbScripts)) {
 			$scriptids[$script['scriptid']] = $script['scriptid'];
@@ -343,7 +308,7 @@ class CScript extends CZBXAPI {
 
 		$updScripts = $this->get(array(
 			'scriptids' => $scriptids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('scriptid'),
 			'preservekeys' => true
 		));
 		$scriptNames = array();
@@ -438,7 +403,7 @@ class CScript extends CZBXAPI {
 	}
 
 	public function execute($data) {
-		global $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_MESSAGES;
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$scriptid = $data['scriptid'];
 		$hostid = $data['hostid'];
@@ -446,22 +411,13 @@ class CScript extends CZBXAPI {
 		$alowedScripts = $this->get(array(
 			'hostids' => $hostid,
 			'scriptids' => $scriptid,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('scriptid'),
 			'preservekeys' => true
 		));
 		if (!isset($alowedScripts[$scriptid])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
-		if (!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)) {
-			// remove warnings generated by fsockopen
-			foreach ($ZBX_MESSAGES as $arrayNum => $fsockErrorCheck) {
-				foreach ($fsockErrorCheck as $key => $value) {
-					if ($key == 'message' && strpos($value, 'fsockopen()') !== false) {
-						unset($ZBX_MESSAGES[$arrayNum]);
-					}
-				}
-			}
-
+		if (!$socket = @fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)) {
 			switch ($errorMsg) {
 				case 'Connection refused':
 					$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $ZBX_SERVER);
@@ -498,12 +454,11 @@ class CScript extends CZBXAPI {
 
 		$response = '';
 
-		$pbl = (ZBX_SCRIPT_BYTES_LIMIT > 8192) ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
+		$pbl = ZBX_SCRIPT_BYTES_LIMIT > 8192 ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
 		$now = time();
 		$i = 0;
 		while (!feof($socket)) {
 			$i++;
-
 			if ((time() - $now) >= ZBX_SCRIPT_TIMEOUT) {
 				self::exception(ZBX_API_ERROR_INTERNAL,
 					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value.'));
@@ -537,14 +492,14 @@ class CScript extends CZBXAPI {
 	 *
 	 * @param $hostIds
 	 *
-	 * @return array    an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...)
+	 * @return array (an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...) )
 	 */
 	public function getScriptsByHosts($hostIds) {
 		zbx_value2array($hostIds);
 
 		$scriptsByHost = array();
-		foreach ($hostIds as $hostId) {
-			$scriptsByHost[$hostId] = array();
+		foreach ($hostIds as $hostid) {
+			$scriptsByHost[$hostid] = array();
 		}
 
 		$scripts = $this->get(array(
@@ -556,31 +511,46 @@ class CScript extends CZBXAPI {
 		));
 
 		if (!empty($scripts)) {
-			$macrosResolver = new CMacrosResolver();
-
+			// resolve macros
+			$macrosData = array();
 			foreach ($scripts as $script) {
-				// get resolved macros
-				$macrosData = array();
 				if (!empty($script['confirmation'])) {
 					foreach ($script['hosts'] as $host) {
-						$macrosData[$host['hostid']] = $script['confirmation'];
+						if (isset($scriptsByHost[$host['hostid']])) {
+							$macrosData[$host['hostid']][] = $script['confirmation'];
+						}
 					}
 				}
+			}
+			if (!empty($macrosData)) {
+				$macrosData = CMacrosResolverHelper::resolve(array(
+					'config' => 'scriptConfirmation',
+					'data' => $macrosData
+				));
+			}
 
-				$macrosData = $macrosResolver->resolveMacrosInTextBatch($macrosData);
+			$i = 0;
+			foreach ($scripts as $script) {
+				$hosts = $script['hosts'];
+				unset($script['hosts']);
 
 				// set script to host
-				foreach ($script['hosts'] as $host) {
+				foreach ($hosts as $host) {
 					$hostId = $host['hostid'];
 
 					if (isset($scriptsByHost[$hostId])) {
-						$scriptsByHost[$hostId][] = $script;
+						$size = count($scriptsByHost[$hostId]);
+						$scriptsByHost[$hostId][$size] = $script;
 
 						// set confirmation text with resolved macros
-						if (!empty($macrosData[$hostId])) {
-							$scriptsByHost[$hostId][count($scriptsByHost[$hostId]) - 1]['confirmation'] = $macrosData[$hostId];
+						if (!empty($macrosData[$hostId]) && !empty($script['confirmation'])) {
+							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$i];
 						}
 					}
+				}
+
+				if (!empty($script['confirmation'])) {
+					$i++;
 				}
 			}
 		}
@@ -597,14 +567,24 @@ class CScript extends CZBXAPI {
 		return $sqlParts;
 	}
 
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['output'] != API_OUTPUT_COUNT) {
+			if ($options['selectGroups'] !== null || $options['selectHosts'] !== null) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('groupid'), $sqlParts);
+				$sqlParts = $this->addQuerySelect($this->fieldId('host_access'), $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		// adding groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
 			foreach ($result as $scriptid => $script) {
 				$result[$scriptid]['groups'] = API::HostGroup()->get(array(
 					'output' => $options['selectGroups'],
@@ -615,17 +595,28 @@ class CScript extends CZBXAPI {
 		}
 
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$processedGroups = array();
+
 			foreach ($result as $scriptid => $script) {
-				$result[$scriptid]['hosts'] = API::Host()->get(array(
-					'output' => $options['selectHosts'],
-					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
-					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
-					'nodeids' => id2nodeid($script['scriptid'])
-				));
+				if (isset($processedGroups[$script['groupid'].'_'.$script['host_access']])) {
+					$result[$scriptid]['hosts'] = $result[$processedGroups[$script['groupid'].'_'.$script['host_access']]]['hosts'];
+				}
+				else {
+					$result[$scriptid]['hosts'] = API::Host()->get(array(
+						'output' => $options['selectHosts'],
+						'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+						'hostids' => ($options['hostids']) ? $options['hostids'] : null,
+						'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
+						'nodeids' => id2nodeid($script['scriptid'])
+					));
+
+					$processedGroups[$script['groupid'].'_'.$script['host_access']] = $scriptid;
+				}
 			}
 		}
 
 		return $result;
 	}
 }
+?>
