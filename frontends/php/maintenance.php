@@ -33,36 +33,51 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hosts' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'groups' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostids' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'groupids' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hosts' =>								array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'groups' =>								array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'groupids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostid' =>								array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'groupid' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// maintenance
-	'maintenanceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
-	'maintenanceids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null),
-	'mname' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'maintenance_type' =>		array(T_ZBX_INT, O_OPT, null,	null,		'isset({save})'),
-	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'active_since' =>			array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
-	'active_till' =>			array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
-	'new_timeperiod' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
-	'timeperiods' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'del_timeperiodid' =>		array(null,      O_OPT, P_ACT,	DB_ID,		null),
-	'edit_timeperiodid' =>		array(null,      O_OPT, P_ACT,	DB_ID,		null),
-	'twb_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
+	'maintenanceids' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null),
+	'mname' =>								array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
+	'maintenance_type' =>					array(T_ZBX_INT, O_OPT, null,	null,		'isset({save})'),
+	'description' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'active_since' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
+	'active_till' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
+	'active_since_day' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_since_month' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_since_year' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_since_hour' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_since_minute' =>				array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_till_day' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_till_month' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_till_year' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_till_hour' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'active_till_minute' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_timeperiod_start_date_day' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_timeperiod_start_date_month' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_timeperiod_start_date_year' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_timeperiod_start_date_hour' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_timeperiod_start_date_minute' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
+	'new_timeperiod' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
+	'timeperiods' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'del_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
+	'edit_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
+	'twb_groupid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_timeperiod' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel_new_timeperiod' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
+	'go' =>									array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add_timeperiod' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'cancel_new_timeperiod' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'save' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'clone' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'delete' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'cancel' =>								array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>			array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'form' =>								array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>						array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -121,23 +136,71 @@ elseif (isset($_REQUEST['save'])) {
 		$msg2 = _('Cannot add maintenance');
 	}
 
-	$maintenance = array(
-		'name' => $_REQUEST['mname'],
-		'maintenance_type' => $_REQUEST['maintenance_type'],
-		'description' => $_REQUEST['description'],
-		'active_since' => zbxDateToTime(get_request('active_since', date('YmdHi'))),
-		'active_till' => zbxDateToTime(get_request('active_till')),
-		'timeperiods' => get_request('timeperiods', array()),
-		'hostids' => get_request('hostids', array()),
-		'groupids' => get_request('groupids', array())
-	);
+	$result = true;
 
-	if (isset($_REQUEST['maintenanceid'])) {
-		$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
-		$result = API::Maintenance()->update($maintenance);
+	if (!validateDateTime($_REQUEST['active_since_year'],
+			$_REQUEST['active_since_month'],
+			$_REQUEST['active_since_day'],
+			$_REQUEST['active_since_hour'],
+			$_REQUEST['active_since_minute'])) {
+		info(_s('Invalid date "%s".', _('Active since')));
+		$result = false;
 	}
-	else {
-		$result = API::Maintenance()->create($maintenance);
+	if (!validateDateInterval($_REQUEST['active_since_year'],
+			$_REQUEST['active_since_month'],
+			$_REQUEST['active_since_day'])) {
+		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
+		$result = false;
+	}
+	if (!validateDateTime($_REQUEST['active_till_year'],
+				$_REQUEST['active_till_month'],
+				$_REQUEST['active_till_day'],
+				$_REQUEST['active_till_hour'],
+				$_REQUEST['active_till_minute'])) {
+		info(_s('Invalid date "%s".', _('Active till')));
+		$result = false;
+	}
+	if (!validateDateInterval($_REQUEST['active_till_year'], $_REQUEST['active_till_month'], $_REQUEST['active_till_day'])) {
+		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
+		$result = false;
+	}
+
+	if ($result) {
+		if (isset($_REQUEST['active_since'])) {
+			$activeSince = mktime($_REQUEST['active_since_hour'],
+					$_REQUEST['active_since_minute'],
+					0,
+					$_REQUEST['active_since_month'],
+					$_REQUEST['active_since_day'],
+					$_REQUEST['active_since_year']);
+		}
+		if (isset($_REQUEST['active_till'])) {
+			$activeTill = mktime($_REQUEST['active_till_hour'],
+					$_REQUEST['active_till_minute'],
+					0,
+					$_REQUEST['active_till_month'],
+					$_REQUEST['active_till_day'],
+					$_REQUEST['active_till_year']);
+		}
+
+		$maintenance = array(
+			'name' => $_REQUEST['mname'],
+			'maintenance_type' => $_REQUEST['maintenance_type'],
+			'description' => $_REQUEST['description'],
+			'active_since' => $activeSince,
+			'active_till' => $activeTill,
+			'timeperiods' => get_request('timeperiods', array()),
+			'hostids' => get_request('hostids', array()),
+			'groupids' => get_request('groupids', array())
+		);
+
+		if (isset($_REQUEST['maintenanceid'])) {
+			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
+			$result = API::Maintenance()->update($maintenance);
+		}
+		else {
+			$result = API::Maintenance()->create($maintenance);
+		}
 	}
 
 	if ($result) {
@@ -174,7 +237,12 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 }
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
 	$new_timeperiod = $_REQUEST['new_timeperiod'];
-	$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
+	$new_timeperiod['start_date'] = mktime($_REQUEST['new_timeperiod_start_date_hour'],
+		$_REQUEST['new_timeperiod_start_date_minute'],
+		0,
+		$_REQUEST['new_timeperiod_start_date_month'],
+		$_REQUEST['new_timeperiod_start_date_day'],
+		$_REQUEST['new_timeperiod_start_date_year']);
 
 	// start time
 	$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * SEC_PER_HOUR) + ($new_timeperiod['minute'] * SEC_PER_MIN);
@@ -230,8 +298,22 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 	elseif ($new_timeperiod['hour'] > 23 || $new_timeperiod['minute'] > 59) {
 		info(_('Incorrect maintenance period'));
 	}
-	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME && $new_timeperiod['start_date'] < 1) {
-		error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
+	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+		if (!validateDateTime($_REQUEST['new_timeperiod_start_date_year'],
+				$_REQUEST['new_timeperiod_start_date_month'],
+				$_REQUEST['new_timeperiod_start_date_day'],
+				$_REQUEST['new_timeperiod_start_date_hour'],
+				$_REQUEST['new_timeperiod_start_date_minute'])) {
+			error(_('Invalid maintenance period'));
+		}
+		elseif (!validateDateInterval($_REQUEST['new_timeperiod_start_date_year'],
+				$_REQUEST['new_timeperiod_start_date_month'],
+				$_REQUEST['new_timeperiod_start_date_day'])) {
+			error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
+		}
+		else {
+			$result = true;
+		}
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY && $new_timeperiod['every'] < 1) {
 		info(_('Incorrect maintenance day period'));
@@ -354,8 +436,28 @@ if (!empty($data['form'])) {
 	else {
 		$data['mname'] = get_request('mname', '');
 		$data['maintenance_type'] = get_request('maintenance_type', 0);
-		$data['active_since'] = zbxDateToTime(get_request('active_since', date('YmdHi')));
-		$data['active_till'] = zbxDateToTime(get_request('active_till', date('YmdHi', time() + SEC_PER_DAY)));
+		if (isset($_REQUEST['active_since'])) {
+			$data['active_since'] = mktime($_REQUEST['active_since_hour'],
+					$_REQUEST['active_since_minute'],
+					0,
+					$_REQUEST['active_since_month'],
+					$_REQUEST['active_since_day'],
+					$_REQUEST['active_since_year']);
+		}
+		else {
+			$data['active_since'] = time();
+		}
+		if (isset($_REQUEST['active_till'])) {
+			$data['active_till'] = mktime($_REQUEST['active_till_hour'],
+					$_REQUEST['active_till_minute'],
+					0,
+					$_REQUEST['active_till_month'],
+					$_REQUEST['active_till_day'],
+					$_REQUEST['active_till_year']);
+		}
+		else {
+			$data['active_till'] = time() + SEC_PER_DAY;
+		}
 		$data['description'] = get_request('description', '');
 		$data['timeperiods'] = get_request('timeperiods', array());
 		$data['hostids'] = get_request('hostids', array());
