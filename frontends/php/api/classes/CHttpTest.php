@@ -193,7 +193,7 @@ class CHttpTest extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('httptest ht', $options, $sqlParts);
+			$this->dbFilter('httptest ht', $options, $sqlParts);
 		}
 
 		// sorting
