@@ -108,10 +108,6 @@ class CEvent extends CZBXAPI {
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (is_null($options['source']) && is_null($options['object'])) {
-				$options['object'] = EVENT_OBJECT_TRIGGER;
-			}
-
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGERS) {
 				if (!is_null($options['triggerids'])) {
 					$triggers = API::Trigger()->get(array(
