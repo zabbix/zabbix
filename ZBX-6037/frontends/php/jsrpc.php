@@ -91,8 +91,7 @@ switch ($data['method']) {
 			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeout)),
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 			'priority' => array_keys($msgsettings['triggers.severities']),
-			'limit' => 15,
-			'eventNoLimit' => true
+			'triggerLimit' => 15
 		);
 		if (!$msgsettings['triggers.recovery']) {
 			$options['value'] = array(TRIGGER_VALUE_TRUE);
@@ -102,10 +101,9 @@ switch ($data['method']) {
 		$sortClock = array();
 		$sortEvent = array();
 
-		$i = 0;
 		$triggerExist = array();
 		foreach ($events as $number => $event) {
-			if ($i < 15) {
+			if (count($triggerExist) < 15) {
 				if (!isset($triggerExist[$event['objectid']])) {
 					$trigger = $event['trigger'];
 					$host = $event['host'];
@@ -144,7 +142,6 @@ switch ($data['method']) {
 					$sortClock[$number] = $event['clock'];
 					$sortEvent[$number] = $event['eventid'];
 					$triggerExist[$event['objectid']] = true;
-					$i++;
 				}
 			}
 			else {

@@ -335,7 +335,7 @@ function getLastEvents($options) {
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['limit']
+		'limit' => $options['triggerLimit']
 	);
 
 	$eventOptions = array(
@@ -348,8 +348,8 @@ function getLastEvents($options) {
 		'sortorder' => ZBX_SORT_DOWN
 	);
 
-	if (!isset($options['eventNoLimit'])) {
-		$eventOptions['limit'] = $options['limit'];
+	if (isset($options['eventLimit'])) {
+		$eventOptions['limit'] = $options['eventLimit'];
 	}
 
 	if (isset($options['nodeids'])) {
