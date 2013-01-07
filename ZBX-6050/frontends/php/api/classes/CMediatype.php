@@ -146,7 +146,7 @@ class CMediatype extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('media_type mt', $options, $sqlParts);
+			$this->dbFilter('media_type mt', $options, $sqlParts);
 		}
 
 		// search

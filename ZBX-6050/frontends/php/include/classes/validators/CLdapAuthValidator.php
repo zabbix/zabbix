@@ -1,6 +1,7 @@
+<?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +18,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SNMP_H
-#define ZABBIX_CHECKS_SNMP_H
+/**
+ * A class for validating LDAP credentials.
+ */
+class CLdapAuthValidator extends CValidator {
 
-#include "common.h"
-#include "log.h"
-#include "dbcache.h"
-#include "sysinfo.h"
+	protected $options = array(
+		'host' => null,
+		'port' => null,
+		'base_dn' => null,
+		'bind_dn' => null,
+		'bind_password' => null,
+		'search_attribute' => null
+	);
 
-extern char	*CONFIG_SOURCE_IP;
-extern int	CONFIG_TIMEOUT;
+	/**
+	 * Checks if the given user name and password are valid.
+	 *
+	 * The $value array must have the following attributes:
+	 * - user       - user name
+	 * - password   - password
+	 *
+	 * @param array $value
+	 *
+	 * @return bool
+	 */
+	public function validate($value) {
+		$ldap = new CLdap($this->options);
+		$ldap->connect();
 
-int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value);
+		return $ldap->checkPass($value['user'], $value['password']);
+	}
 
-#endif
+}

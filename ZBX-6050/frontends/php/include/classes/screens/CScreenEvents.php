@@ -30,7 +30,8 @@ class CScreenEvents extends CScreenBase {
 		$options = array(
 			'monitored' => true,
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
-			'limit' => $this->screenitem['elements']
+			'triggerLimit' => $this->screenitem['elements'],
+			'eventLimit' => $this->screenitem['elements']
 		);
 
 		$showUnknown = CProfile::get('web.events.filter.showUnknown', 0);

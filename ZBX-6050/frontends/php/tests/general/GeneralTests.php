@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/CTriggerExpressionTest.php';
 require_once dirname(__FILE__).'/class_cxmlexportwriter.php';
 require_once dirname(__FILE__).'/class_cxmlimportreader.php';
 require_once dirname(__FILE__).'/function_DBcommit.php';
-require_once dirname(__FILE__).'/function_DBcondition.php';
 require_once dirname(__FILE__).'/function_DBconnect.php';
 require_once dirname(__FILE__).'/function_DBclose.php';
 require_once dirname(__FILE__).'/function_DBend.php';
@@ -39,6 +38,7 @@ require_once dirname(__FILE__).'/CTimePeriodValidatorTest.php';
 require_once dirname(__FILE__).'/zbx_limitTest.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
+require_once dirname(__FILE__).'/dbConditionStringTest.php';
 
 class GeneralTests {
 
@@ -50,7 +50,6 @@ class GeneralTests {
 		$suite->addTestSuite('class_cxmlexportwriter');
 		$suite->addTestSuite('class_cxmlimportreader');
 		$suite->addTestSuite('function_DBcommit');
-		$suite->addTestSuite('function_DBcondition');
 		$suite->addTestSuite('function_DBconnect');
 		$suite->addTestSuite('function_DBclose');
 		$suite->addTestSuite('function_DBend');
@@ -66,6 +65,7 @@ class GeneralTests {
 		$suite->addTestSuite('zbx_limitTest');
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
 		$suite->addTestSuite('dbConditionIntTest');
+		$suite->addTestSuite('dbConditionStringTest');
 
 		return $suite;
 	}
