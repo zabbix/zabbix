@@ -1046,7 +1046,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->host.ipmi_ip_orig, item->host.ipmi_port, item->host.ipmi_authtype,
+	h = init_ipmi_host(item->host.ipmi_ip, item->host.ipmi_port, item->host.ipmi_authtype,
 			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
 	if (0 == h->domain_up) {
