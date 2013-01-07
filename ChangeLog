@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+.......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
 A.F.....S. [ZBXNEXT-1500] added support of full 64 bit address space for object IDs in non-DM setup (Sasha)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
@@ -83,10 +84,13 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.5rc1
 
 New features:
+...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 by system.uname check (Sasha)
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Japanese, Latvian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle sql selects (dimir)
 
 Bug fixes:
+A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance periods validation (Oleg)
+..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
 ..F....... [ZBX-5986] fixed page filter to not use remembered group if selected host is not in that group (Toms)
 ..F....... [ZBX-6013] fixed table layout in Monitoring > IT services for IE10 (Toms)
 A......... [ZBX-5977] removed possibility to add an LLD rule to an application via the API in application and discovery rule (Oleg)

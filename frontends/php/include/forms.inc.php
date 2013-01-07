@@ -1627,9 +1627,19 @@
 			$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
 			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-			$start_date = zbxDateToTime($new_timeperiod['start_date']);
-
-			$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $start_date)));
+			if (isset($_REQUEST['add_timeperiod'])) {
+				$date = array(
+					'y' => get_request('new_timeperiod_start_date_year'),
+					'm' => get_request('new_timeperiod_start_date_month'),
+					'd' => get_request('new_timeperiod_start_date_day'),
+					'h' => get_request('new_timeperiod_start_date_hour'),
+					'i' => get_request('new_timeperiod_start_date_minute')
+				);
+			}
+			else {
+				$date = zbxDateToTime($new_timeperiod['start_date']);
+			}
+			$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $date)));
 		}
 
 		if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
