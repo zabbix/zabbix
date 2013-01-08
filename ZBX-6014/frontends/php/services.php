@@ -217,7 +217,7 @@ if (isset($_REQUEST['form'])) {
 if (isset($_REQUEST['pservices'])) {
 	$parentServices = API::Service()->get(array(
 		'output' => array('serviceid', 'name', 'algorithm'),
-		'selectTrigger' => array('triggerid', 'description'),
+		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => array('sortorder', 'name')
 	));
@@ -236,9 +236,12 @@ if (isset($_REQUEST['pservices'])) {
 		$data = array();
 	}
 
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($parentServices, 'trigger');
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
 	foreach ($parentServices as $key => $childService) {
 		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? $childService['trigger']['description']
+			? $triggers[$childService['triggerid']]['description']
 			: '-';
 	}
 
@@ -257,7 +260,7 @@ if (isset($_REQUEST['pservices'])) {
 if (isset($_REQUEST['cservices'])) {
 	$childServices = API::Service()->get(array(
 		'output' => array('serviceid', 'name', 'algorithm'),
-		'selectTrigger' => array('triggerid', 'description'),
+		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => array('sortorder', 'name')
 	));
@@ -276,9 +279,12 @@ if (isset($_REQUEST['cservices'])) {
 		$data = array();
 	}
 
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($childServices, 'trigger');
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? $childService['trigger']['description']
+			? $triggers[$childService['triggerid']]['description']
 			: '-';
 	}
 
@@ -328,17 +334,21 @@ if (isset($_REQUEST['form'])) {
 		if ($service['dependencies']) {
 			$childServices = API::Service()->get(array(
 				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
-				'selectTrigger' => array('triggerid', 'description'),
+				'selectTrigger' => array('triggerid', 'description', 'expression'),
 				'output' => array('name', 'triggerid'),
 				'preservekeys' => true,
 			));
+
+			// expand trigger descriptions
+			$triggers = zbx_objectValues($childServices, 'trigger');
+			$triggers = CTriggerHelper::batchExpandDescription($triggers);
 			foreach ($service['dependencies'] as $dependency) {
 				$childService = $childServices[$dependency['servicedownid']];
 				$data['children'][] = array(
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
-							? $childService['trigger']['description']
+							? $triggers[$childService['triggerid']]['description']
 							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
@@ -388,11 +398,21 @@ else {
 		'output' => array('name', 'serviceid', 'algorithm'),
 		'selectParent' => array('serviceid'),
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
-		'selectTrigger' => array('description', 'triggerid'),
+		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
+
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($services, 'trigger');
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+	foreach ($services as &$service) {
+		if ($service['trigger']) {
+			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
+		}
+	}
+	unset($service);
 
 	$treeData = array();
 	createServiceConfigurationTree($services, $treeData);
