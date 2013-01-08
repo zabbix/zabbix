@@ -77,7 +77,6 @@ class CEvent extends CZBXAPI {
 			'acknowledged'				=> null,
 			'nopermissions'				=> null,
 			// filter
-			'showUnknown'				=> null,
 			'value'						=> null,
 			'time_from'					=> null,
 			'time_till'					=> null,
@@ -108,10 +107,6 @@ class CEvent extends CZBXAPI {
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (is_null($options['source']) && is_null($options['object'])) {
-				$options['object'] = EVENT_OBJECT_TRIGGER;
-			}
-
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGERS) {
 				if (!is_null($options['triggerids'])) {
 					$triggers = API::Trigger()->get(array(
@@ -216,14 +211,6 @@ class CEvent extends CZBXAPI {
 		// acknowledged
 		if (!is_null($options['acknowledged'])) {
 			$sqlParts['where'][] = 'e.acknowledged='.($options['acknowledged'] ? 1 : 0);
-		}
-
-		// showUnknown
-		if (!is_null($options['showUnknown'])) {
-			if (is_null($options['filter'])) {
-				$options['filter'] = array();
-			}
-			$options['filter']['value_changed'] = null;
 		}
 
 		// time_from
