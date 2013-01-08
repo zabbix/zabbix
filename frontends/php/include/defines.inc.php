@@ -513,6 +513,7 @@ define('SCREEN_RESOURCE_EVENTS',			13);
 define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
 define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
+// used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
 define('SCREEN_RESOURCE_CHART',				18);
 

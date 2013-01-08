@@ -64,7 +64,7 @@ class CGraphMacroResolver {
 			'SELECT i.hostid,gi.graphid'.
 			' FROM graphs_items gi,items i'.
 			' WHERE gi.itemid=i.itemid'.
-				' AND '.DBcondition('gi.graphid', $graphIds).
+				' AND '.dbConditionInt('gi.graphid', $graphIds).
 			' ORDER BY gi.sortorder'
 		));
 
@@ -97,7 +97,7 @@ class CGraphMacroResolver {
 		// extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
 		// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
 		preg_match_all('/(?<macros>{'.
-			'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({(HOST.HOST|HOSTNAME)[1-9]?}))):'.
+			'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({(HOST\.HOST|HOSTNAME)[1-9]?}))):'.
 			'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
 			'(?<functions>(last|max|min|avg))\('.
 			'(?<parameters>([0-9]+[smhdw]?))'.
@@ -156,7 +156,7 @@ class CGraphMacroResolver {
 	private function resolvePositionalMacros($str, $items) {
 		// extract all macros into $matches
 		// possible to add other macros "'/\{((HOST.HOST|SOME.OTHER.MACRO)([0-9]?))\}/'"
-		preg_match_all('/{((HOST.HOST|HOSTNAME)([1-9]?))\}/', $str, $matches);
+		preg_match_all('/{((HOST\.HOST|HOSTNAME)([1-9]?))\}/', $str, $matches);
 
 		// match found groups if ever regexp should change
 		$matches['macroType'] = $matches[2];

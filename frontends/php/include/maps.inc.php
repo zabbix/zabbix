@@ -381,7 +381,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 	// find functional macro pattern
 	$pattern = (null === $replaceHosts)
 		? '/{'.ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu"
-		: '/{('.ZBX_PREG_HOST_FORMAT."|{HOSTNAME[0-9]?}|{HOST.HOST[0-9]?}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
+		: '/{('.ZBX_PREG_HOST_FORMAT."|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
 	preg_match_all($pattern, $label, $matches);
 
 	// for each functional macro
@@ -392,7 +392,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 			foreach ($replaceHosts as $i => $host) {
 				$macroTmp = $macro;
 				// repalce only macro in first position
-				$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
+				$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
 				// only one simple macro possible inside functional macro
 				if ($macro != $macroTmp) {
 					break;
