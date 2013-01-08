@@ -760,15 +760,24 @@ class CUser extends CZBXAPI {
 	// ******************************************************************************
 	// LOGIN Methods
 	// ******************************************************************************
-	public function ldapLogin($user) {
-		$cnf = isset($user['cnf']) ? $user['cnf'] : null;
 
-		if (is_null($cnf)) {
-			$config = select_config();
-			foreach ($config as $id => $value) {
-				if (zbx_strpos($id, 'ldap_') !== false) {
-					$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-				}
+	/**
+	 * Authenticate a user using LDAP.
+	 *
+	 * The $user array must have the following attributes:
+	 * - user       - user name
+	 * - password   - user password
+	 *
+	 * @param array $user
+	 *
+	 * @return bool
+	 */
+	protected function ldapLogin(array $user) {
+		$config = select_config();
+		$cnf = array();
+		foreach ($config as $id => $value) {
+			if (zbx_strpos($id, 'ldap_') !== false) {
+				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
 			}
 		}
 
@@ -776,10 +785,8 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Probably php-ldap module is missing.'));
 		}
 
-		$ldap = new CLdap($cnf);
-		$ldap->connect();
-
-		if ($ldap->checkPass($user['user'], $user['password'])) {
+		$ldapValidator = new CLdapAuthValidator($cnf);
+		if ($ldapValidator->validate($user)) {
 			return true;
 		}
 		else {

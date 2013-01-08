@@ -95,7 +95,7 @@ class CPageFilter {
 
 		// groups
 		if (isset($options['groups'])) {
-			$this->_initGroups($options['groupid'], $options['groups']);
+			$this->_initGroups($options['groupid'], $options['groups'], isset($options['hostid']) ? $options['hostid'] : null);
 		}
 
 		// hosts
@@ -209,7 +209,7 @@ class CPageFilter {
 		}
 	}
 
-	private function _initGroups($groupid, $options) {
+	private function _initGroups($groupid, $options, $hostid) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => array('groupid', 'name')
@@ -225,7 +225,18 @@ class CPageFilter {
 
 		// select remebered selection
 		if (is_null($groupid) && $this->_profileIds['groupid']) {
-			$groupid = $this->_profileIds['groupid'];
+			// set group only if host is in group or hostid is not set
+			if ($hostid) {
+				$host = API::Host()->get(array(
+					'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+					'output' => array('hostid'),
+					'hostids' => $hostid,
+					'groupids' => $this->_profileIds['groupid']
+				));
+			}
+			if (!$hostid || !empty($host)) {
+				$groupid = $this->_profileIds['groupid'];
+			}
 		}
 
 		// nonexisting or unset $groupid
