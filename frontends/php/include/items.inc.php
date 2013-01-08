@@ -941,7 +941,7 @@ function formatItemLastValue(array $item, $unknownString = '-') {
 			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
 			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
 
-		$mapping = getMappedValue($value, $item['valuemapid']);
+		$mapping = ($item['value_type'] == ITEM_VALUE_TYPE_STR) ? getMappedValue($value, $item['valuemapid']) : false;
 
 		if (zbx_strlen($value) > 20) {
 			$value = zbx_substr($value, 0, 20).'...';
