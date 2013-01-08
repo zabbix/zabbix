@@ -270,8 +270,13 @@ if (isset($_REQUEST['page'])) {
 	$frmForm->addVar('page', $_REQUEST['page'], 'page_csv');
 }
 if ($source == EVENT_SOURCE_TRIGGERS) {
-	$frmForm->addVar('groupid', $pageFilter->groupid, 'groupid_csv');
-	$frmForm->addVar('hostid', $pageFilter->hostid, 'hostid_csv');
+	if ($_REQUEST['triggerid']) {
+		$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
+	}
+	else {
+		$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+		$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+	}
 }
 $frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
