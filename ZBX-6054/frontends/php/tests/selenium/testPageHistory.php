@@ -24,7 +24,14 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testPageHistory extends CWebTest {
 	// Returns all enabled items that belong to enabled hosts
 	public static function allEnabledItems() {
-		return DBdata('select * from items left join hosts on hosts.hostid=items.hostid where hosts.status='.HOST_STATUS_MONITORED.' and items.status='.ITEM_STATUS_ACTIVE);
+		return DBdata(
+				'SELECT i.itemid'.
+				' FROM items i,hosts h'.
+				' WHERE i.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL
+		);
 	}
 
 	/**
