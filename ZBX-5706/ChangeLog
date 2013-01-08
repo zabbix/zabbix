@@ -35,6 +35,9 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5916] removed the unnecessary dhostids parameter from dcheck.get (Pavels)
+A......... [ZBX-5719] fixed event.get returning only trigger events by default for admin users (Pavels)
+A......... [ZBX-6054] fixed host write permissions being required to view screens (dotneft, Pavels)
 A......... [ZBX-5915] fixed the host.get and template.get selectParentTemplates parameter using an incorrect property name when passing count (Pavels)
 A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-6049] fixed "Undefined index" in Web scenario steps (Oleg)
@@ -90,6 +93,8 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ja
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+A......... [ZBX-6054] fixed host write permissions being required to view screens (dotneft, Pavels)
+..F....... [ZBX-6027] fixed global notification messages don't work in fullscreen frontend mode (Toms)
 ..F....... [ZBX-6037] fixed duplicate frontend messages and changed frontend messages to show last event for 15 triggers instead of last 15 events (Oleg)
 A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance periods validation (Oleg)
 ..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
