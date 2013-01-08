@@ -233,11 +233,11 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 	$options = array(
 		'groups' => array(
 			'monitored_hosts' => 1,
-			'with_items' => 1,
+			'with_items' => 1
 		),
 		'hosts' => array(
 			'monitored_hosts' => 1,
-			'with_items' => 1,
+			'with_items' => 1
 		),
 		'triggers' => array(),
 		'hostid' => get_request('hostid', null),
