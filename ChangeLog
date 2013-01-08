@@ -35,6 +35,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
 A......... [ZBX-5706] fixed trigger.adddependencies returning an object instead of an array of trigger IDs (Pavels)
 A......... [ZBX-5916] removed the unnecessary dhostids parameter from dcheck.get (Pavels)
