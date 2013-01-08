@@ -252,6 +252,9 @@ if (isset($_REQUEST['stime'])) {
 if (isset($_REQUEST['period'])) {
 	$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
 }
+if (isset($_REQUEST['page'])) {
+	$frmForm->addVar('page', $_REQUEST['page'], 'page_csv');
+}
 $frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
 $events_wdgt->addPageHeader(
