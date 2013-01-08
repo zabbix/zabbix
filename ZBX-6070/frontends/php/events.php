@@ -243,9 +243,6 @@ if (isset($_REQUEST['hostid'])) {
 if (isset($_REQUEST['source'])) {
 	$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
 }
-if (isset($_REQUEST['start'])) {
-	$frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
-}
 if (isset($_REQUEST['stime'])) {
 	$frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
 }
