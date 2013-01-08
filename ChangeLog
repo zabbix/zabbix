@@ -36,16 +36,11 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 
 Bug fixes:
 A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
-...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
 A......... [ZBX-5706] fixed trigger.adddependencies returning an object instead of an array of trigger IDs (Pavels)
 A......... [ZBX-5916] removed the unnecessary dhostids parameter from dcheck.get (Pavels)
 A......... [ZBX-5719] fixed event.get returning only trigger events by default for admin users (Pavels)
-A......... [ZBX-6054] fixed host write permissions being required to view screens (dotneft, Pavels)
 A......... [ZBX-5915] fixed the host.get and template.get selectParentTemplates parameter using an incorrect property name when passing count (Pavels)
-A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-6049] fixed "Undefined index" in Web scenario steps (Oleg)
-....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)
-.......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A......... [ZBXNEXT-1491] fixed alert.get hostids and groupids parameters (Pavels)
 A......... [ZBXNEXT-1491] fixed multiple subselects returning hashes instead of arrays (Pavels)
 A......... [ZBXNEXT-1491] fixed item.get selectHosts returning double template objects (Pavels)
@@ -59,10 +54,6 @@ A.F....... [ZBX-5927] fixed selectMappings returning a hash of mappings instead 
 A.F....... [ZBX-5927] fixed preservekeys affecting selectSelements and selectLinks in map.get (Pavels)
 ..F....... [ZBX-5888] fixed incorrect message in trigger expression test (Oleg)
 ..F....... [ZBX-5895] fixed including map in map (Eduard)
-A.F....... [ZBX-5814] fixed an incorrect error message when saving an illegal trigger expression (Sasha)
-A.F....... [ZBX-4247] fixed processing of trigger expression if item key contains another trigger expression string (Sasha)
-..F....... [ZBX-2640] fixed some issues when creating and editing log triggers (Sasha)
-..F....... [ZBX-5898] fixed Insert Macro button does not work in trigger constructor on IE7 and IE8 (Toms)
 A......... [ZBX-5718] fixed unknown event generation for templated triggers (Oleg)
 ..F....... [ZBX-5749] fixed macros resolving in triggers in Maps (Eduard)
 A......... [ZBX-5752] fixed incorrect API results, when deleted template objects (Oleg)
@@ -75,7 +66,6 @@ A.F....... [ZBX-5565] fixed html is returned on api requests if db is down (Vedm
 ..F....... [ZBX-5673] fixed incorrect Y-scale if point value > 10 PB (Oleg)
 ..F....... [ZBX-875] fixed duplicate Y-scale (Oleg)
 ..F....... [ZBX-3934] unified color codes validation in frontend (Vedmak)
-A......... [ZBX-3684] fixed template.get method returns excessive 'hostid' field (Vedmak)
 A......... [ZBX-5498] improved performance of template linkage operations in API (Vedmak)
 A......... [ZBX-5498] applications api refactoring (Vedmak)
 ..F....... [ZBX-5560] fixed recovery sound saved incorrectly in user profile (Vedmak)
@@ -102,6 +92,7 @@ A......... [ZBX-6054] fixed host write permissions being required to view screen
 ..F....... [ZBX-6037] fixed duplicate frontend messages and changed frontend messages to show last event for 15 triggers instead of last 15 events (Oleg)
 A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance periods validation (Oleg)
 ..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
+A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-5986] fixed page filter to not use remembered group if selected host is not in that group (Toms)
 ..F....... [ZBX-6013] fixed table layout in Monitoring -> IT services for IE10 (Toms)
 A......... [ZBX-5977] removed possibility to add an LLD rule to an application via the API in application and discovery rule (Oleg)
@@ -1288,13 +1279,15 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 1.8.16
+Changes for 1.8.16rc2
 
-Changes for 1.8.16rc1
-
+.......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
 A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 .......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
+
+Changes for 1.8.16rc1
+
 ..F....... [ZBX-3754] fixed "Undefined variable" in the trigger expression constructor (Sasha)
 ..F....... [ZBX-3038] fixed the trigger expression constructor to parse expressions created in log wizard (Sasha)
 ..F....... [ZBX-2793] added possibility to add macros without an item in the trigger expression (Sasha)
