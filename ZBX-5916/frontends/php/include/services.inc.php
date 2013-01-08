@@ -484,10 +484,10 @@ function checkServiceTime(array $serviceTime) {
 
 	// one-time downtime validation
 	if ($serviceTime['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-		if (!isset($serviceTime['ts_from']) || !validateMaxTime($serviceTime['ts_from'])) {
+		if (!isset($serviceTime['ts_from']) || !validateUnixTime($serviceTime['ts_from'])) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service start time.'));
 		}
-		if (!isset($serviceTime['ts_to']) || !validateMaxTime($serviceTime['ts_to'])) {
+		if (!isset($serviceTime['ts_to']) || !validateUnixTime($serviceTime['ts_to'])) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service end time.'));
 		}
 	}

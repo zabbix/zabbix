@@ -154,5 +154,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->assertAttribute("//input[@id='password']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='password']/@size", 50);
 
+		$this->click('cancel');
+
 	}
 }
