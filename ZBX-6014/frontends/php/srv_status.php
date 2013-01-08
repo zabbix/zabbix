@@ -114,11 +114,23 @@ else {
 		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
 		'selectParent' => array('serviceid'),
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
-		'selectTrigger' => array('description', 'triggerid'),
+		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
+
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($services, 'trigger');
+
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+
+	foreach ($services as &$service) {
+		if ($service['trigger']) {
+			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
+		}
+	}
+	unset($service);
 
 	// fetch sla
 	$slaData = API::Service()->getSla(array(

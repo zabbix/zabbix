@@ -1667,8 +1667,7 @@ class CService extends CZBXAPI {
 			'output' => $options['selectTrigger'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true,
-			'nopermissions' => true,
-			'expandDescription' => true
+			'nopermissions' => true
 		));
 
 		foreach ($result as &$service) {
