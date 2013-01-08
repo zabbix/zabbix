@@ -1675,7 +1675,7 @@ class CHost extends CHostGeneral {
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'countOutput' => true,
-					'groupCount' => true,
+					'groupCount' => true
 				));
 				$screens = zbx_toHash($screens, 'hostid');
 
