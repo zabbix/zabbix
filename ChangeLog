@@ -90,6 +90,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ja
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6027] fixed global notification messages don't work in fullscreen frontend mode (Toms)
 ..F....... [ZBX-6037] fixed duplicate frontend messages and changed frontend messages to show last event for 15 triggers instead of last 15 events (Oleg)
 A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance periods validation (Oleg)
 ..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
