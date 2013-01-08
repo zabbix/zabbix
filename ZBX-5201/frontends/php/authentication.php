@@ -123,7 +123,9 @@ include_once('include/page_header.php');
 
 			$result = true;
 			if(ZBX_AUTH_LDAP == $config['authentication_type']){
-				$result = CUser::ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
+				$ldap = new CLdap($ldap_cnf);
+				$ldap->connect();
+				$result = $ldap->checkPass($alias, $passwd);
 			}
 
 // If we do save and auth_type changed, reset all sessions
@@ -152,7 +154,9 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = CUser::ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
+			$ldap = new CLdap($ldap_cnf);
+			$ldap->connect();
+			$result = $ldap->checkPass($alias, $passwd);
 
 			show_messages($result, S_LDAP.SPACE.S_LOGIN.SPACE.S_SUCCESSFUL_SMALL, S_LDAP.SPACE.S_LOGIN.SPACE.S_WAS_NOT.SPACE.S_SUCCESSFUL_SMALL);
 		}
