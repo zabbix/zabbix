@@ -35,6 +35,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5916] removed the unnecessary dhostids parameter from dcheck.get (Pavels)
 A......... [ZBX-5719] fixed event.get returning only trigger events by default for admin users (Pavels)
 A......... [ZBX-6054] fixed host write permissions being required to view screens (dotneft, Pavels)
 A......... [ZBX-5915] fixed the host.get and template.get selectParentTemplates parameter using an incorrect property name when passing count (Pavels)
