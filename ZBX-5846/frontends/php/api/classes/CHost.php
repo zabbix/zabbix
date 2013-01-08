@@ -124,7 +124,6 @@ class CHost extends CHostGeneral {
 			'selectDiscoveries'			=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'selectDServices'			=> null,
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
@@ -530,7 +529,7 @@ class CHost extends CHostGeneral {
 				}
 
 				// dserviceids
-				if (isset($host['dserviceid']) && is_null($options['selectDServices'])) {
+				if (isset($host['dserviceid'])) {
 					if (!isset($result[$host['hostid']]['dservices'])) {
 						$result[$host['hostid']]['dservices'] = array();
 					}
