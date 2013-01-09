@@ -1096,6 +1096,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'templated_hosts' => true,
 			'output' => API_OUTPUT_SHORTEN
 		));
+
 		foreach ($data['hostids'] as $hostid) {
 			if (!isset($allowedHosts[$hostid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -1105,7 +1106,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$allowedTemplates = API::Template()->get(array(
 			'templateids' => $data['templateids'],
 			'preservekeys' => true,
-			'editable' => true,
 			'output' => API_OUTPUT_SHORTEN
 		));
 		foreach ($data['templateids'] as $templateid) {
