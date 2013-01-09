@@ -824,37 +824,18 @@ class CApplication extends CZBXAPI {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$options = array(
-			'hostids' => $data['hostids'],
-			'editable' => 1,
-			'preservekeys' => 1,
-			'templated_hosts' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedHosts = API::Host()->get($options);
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		if (!API::Host()->isWritable($data['hostids'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-		$options = array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedTemplates = API::Template()->get($options);
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		if (!API::Template()->isReadable($data['templateids'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$options = array(
+		$applications = $this->get(array(
 			'hostids' => $data['templateids'],
-			'preservekeys' => 1,
+			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND
-		);
-		$applications = $this->get($options);
+		));
 		$this->inherit($applications, $data['hostids']);
 
 		return true;
