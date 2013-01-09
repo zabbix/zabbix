@@ -515,19 +515,19 @@ function add_elementNames(&$selements) {
 	foreach ($selements as $selement) {
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_HOST:
-				$hostids[] = $selement['elementid'];
+				$hostids[$selement['elementid']] = $selement['elementid'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$mapids[] = $selement['elementid'];
+				$mapids[$selement['elementid']] = $selement['elementid'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$triggerids[] = $selement['elementid'];
+				$triggerids[$selement['elementid']] = $selement['elementid'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$hostgroupids[] = $selement['elementid'];
+				$hostgroupids[$selement['elementid']] = $selement['elementid'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
-				$imageids[] = $selement['iconid_off'];
+				$imageids[$selement['iconid_off']] = $selement['iconid_off'];
 				break;
 		}
 	}
