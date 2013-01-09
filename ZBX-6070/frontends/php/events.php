@@ -266,9 +266,7 @@ if (isset($_REQUEST['stime'])) {
 if (isset($_REQUEST['period'])) {
 	$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
 }
-if (isset($_REQUEST['page'])) {
-	$frmForm->addVar('page', $_REQUEST['page'], 'page_csv');
-}
+$frmForm->addVar('page', getPageNumber(), 'page_csv');
 if ($source == EVENT_SOURCE_TRIGGERS) {
 	if ($_REQUEST['triggerid']) {
 		$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
