@@ -149,7 +149,7 @@ class testFormAction extends CWebTest {
 	}
 
 	public function testActionCreate() {
-	//	DBsave_tables('actions');
+		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');
 		$this->checkTitle('Configuration of actions');
