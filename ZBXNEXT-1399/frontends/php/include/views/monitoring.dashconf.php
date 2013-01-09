@@ -52,7 +52,7 @@ if (!$this->data['isFilterEnable']) {
 }
 $dashconfFormList->addRow(_('Host groups'), $hostGroupsComboBox);
 
-if (!empty($this->data['grpswitch'])) {
+if ($this->data['grpswitch']) {
 	// show groups
 	$groupListBox = new CListBox('groupids[]');
 	$groupListBox->makeDynamic(array('objectName' => 'hostGroup'));

@@ -67,7 +67,7 @@ if ($dashconf['filterEnable'] == 1) {
 		$dashconf['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
 		$hideGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
 
-		if (!empty($hideGroupIds)) {
+		if ($hideGroupIds) {
 			// get all groups if no selected groups defined
 			if (empty($dashconf['groupids'])) {
 				$groups = API::HostGroup()->get(array(

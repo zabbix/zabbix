@@ -142,7 +142,7 @@ $data['severities'] = array(
 	TRIGGER_SEVERITY_DISASTER
 );
 
-if (!empty($data['grpswitch'])) {
+if ($data['grpswitch']) {
 	// show groups
 	$data['groups'] = API::HostGroup()->get(array(
 		'nodeids' => get_current_nodeid(true),
