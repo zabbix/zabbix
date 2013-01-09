@@ -30,6 +30,11 @@ function make_favorite_graphs() {
 	$itemids = array();
 
 	$fav_graphs = get_favorites('web.favorite.graphids');
+
+	if (!$fav_graphs) {
+		return $favList;
+	}
+
 	foreach ($fav_graphs as $favorite) {
 		if ('itemid' == $favorite['source']) {
 			$itemids[$favorite['value']] = $favorite['value'];
@@ -39,22 +44,26 @@ function make_favorite_graphs() {
 		}
 	}
 
-	$options = array(
-		'graphids' => $graphids,
-		'selectHosts' => array('name'),
-		'output' => array('name')
-	);
-	$graphs = API::Graph()->get($options);
-	$graphs = zbx_toHash($graphs, 'graphid');
+	if ($graphids) {
+		$options = array(
+			'graphids' => $graphids,
+			'selectHosts' => array('hostid', 'name'),
+			'output' => array('graphid', 'name')
+		);
+		$graphs = API::Graph()->get($options);
+		$graphs = zbx_toHash($graphs, 'graphid');
+	}
 
-	$options = array(
-		'itemids' => $itemids,
-		'selectHosts' => array('name'),
-		'output' => array('name', 'key_'),
-		'webitems' => true
-	);
-	$items = API::Item()->get($options);
-	$items = zbx_toHash($items, 'itemid');
+	if ($itemids) {
+		$options = array(
+			'itemids' => $itemids,
+			'selectHosts' => array('hostid', 'name'),
+			'output' => array('itemid', 'name', 'key_'),
+			'webitems' => true
+		);
+		$items = API::Item()->get($options);
+		$items = zbx_toHash($items, 'itemid');
+	}
 
 	foreach ($fav_graphs as $favorite) {
 		$sourceid = $favorite['value'];
@@ -88,6 +97,11 @@ function make_favorite_graphs() {
 function make_favorite_screens() {
 	$favList = new CList(null, 'favorites');
 	$fav_screens = get_favorites('web.favorite.screenids');
+
+	if (!$fav_screens) {
+		return $favList;
+	}
+
 	$screenids = array();
 	foreach ($fav_screens as $favorite) {
 		if ('screenid' == $favorite['source']) {
@@ -97,7 +111,7 @@ function make_favorite_screens() {
 
 	$options = array(
 		'screenids' => $screenids,
-		'output' => array('name', 'screenid')
+		'output' => array('screenid', 'name')
 	);
 	$screens = API::Screen()->get($options);
 	$screens = zbx_toHash($screens, 'screenid');
@@ -134,15 +148,19 @@ function make_favorite_screens() {
 function make_favorite_maps() {
 	$favList = new CList(null, 'favorites');
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
-	$sysmapids = array();
 
+	if (!$fav_sysmaps) {
+		return $favList;
+	}
+
+	$sysmapids = array();
 	foreach ($fav_sysmaps as $favorite) {
 		$sysmapids[$favorite['value']] = $favorite['value'];
 	}
 
 	$sysmaps = API::Map()->get(array(
 		'sysmapids' => $sysmapids,
-		'output' => array('name')
+		'output' => array('sysmapid', 'name')
 	));
 	foreach ($sysmaps as $sysmap) {
 		$sysmapid = $sysmap['sysmapid'];
@@ -222,7 +240,7 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => array('value', 'lastchange', 'priority', 'value_flags', 'description', 'error'),
+		'output' => array('triggerid', 'value', 'lastchange', 'priority', 'value_flags', 'description', 'error'),
 		'selectHosts' => array('name'),
 		'preservekeys' => true
 	);
@@ -769,7 +787,7 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array('value_flags', 'error', 'url', 'expression', 'description', 'priority', 'type')
+		'output' => array('triggerid', 'value_flags', 'error', 'url', 'expression', 'description', 'priority', 'type')
 	);
 	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
 	$options['sortorder'] = isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN;
@@ -1036,7 +1054,7 @@ function make_webmon_overview($filter) {
 function make_discovery_status() {
 	$options = array(
 		'filter' => array('status' => DHOST_STATUS_ACTIVE),
-		'selectDHosts' => array('status', 'dhostid'),
+		'selectDHosts' => array('druleid', 'dhostid', 'status'),
 		'output' => API_OUTPUT_EXTEND
 	);
 	$drules = API::DRule()->get($options);
@@ -1122,9 +1140,14 @@ function make_graph_menu(&$menu, &$submenu) {
 function make_graph_submenu() {
 	$graphids = array();
 	$itemids = array();
-
+	$favGraphs = array();
 	$fav_graphs = get_favorites('web.favorite.graphids');
-	foreach ($fav_graphs as $key => $favorite) {
+
+	if (!$fav_graphs) {
+		return $favGraphs;
+	}
+
+	foreach ($fav_graphs as $favorite) {
 		if ('itemid' == $favorite['source']) {
 			$itemids[$favorite['value']] = $favorite['value'];
 		}
@@ -1133,24 +1156,28 @@ function make_graph_submenu() {
 		}
 	}
 
-	$options = array(
-		'graphids' => $graphids,
-		'selectHosts' => array('hostid', 'host'),
-		'output' => array('name')
-	);
-	$graphs = API::Graph()->get($options);
-	$graphs = zbx_toHash($graphs, 'graphid');
+	if ($graphids) {
+		$options = array(
+			'graphids' => $graphids,
+			'selectHosts' => array('hostid', 'host'),
+			'output' => array('graphid', 'name')
+		);
+		$graphs = API::Graph()->get($options);
+		$graphs = zbx_toHash($graphs, 'graphid');
+	}
 
-	$options = array(
-		'itemids' => $itemids,
-		'selectHosts' => array('hostid', 'host'),
-		'output' => array('name', 'key_'),
-		'webitems' => 1
-	);
-	$items = API::Item()->get($options);
-	$items = zbx_toHash($items, 'itemid');
+	if ($itemids) {
+		$options = array(
+			'itemids' => $itemids,
+			'selectHosts' => array('hostid', 'host'),
+			'output' => array('itemid', 'name', 'key_'),
+			'webitems' => 1
+		);
+		$items = API::Item()->get($options);
+		$items = zbx_toHash($items, 'itemid');
+	}
 
-	$favGraphs = array();
+
 	foreach ($fav_graphs as $favorite) {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
@@ -1228,7 +1255,7 @@ function make_sysmap_submenu() {
 
 	$options = array(
 		'sysmapids' => $sysmapids,
-		'output' => array('name')
+		'output' => array('sysmapid', 'name')
 	);
 	$sysmaps = API::Map()->get($options);
 	foreach ($sysmaps as $sysmap) {
@@ -1270,7 +1297,13 @@ function make_screen_menu(&$menu, &$submenu) {
 }
 
 function make_screen_submenu() {
+	$favScreens = array();
 	$fav_screens = get_favorites('web.favorite.screenids');
+
+	if (!$fav_screens) {
+		return $favScreens;
+	}
+
 	$screenids = array();
 	foreach ($fav_screens as $favorite) {
 		if ('screenid' == $favorite['source']) {
@@ -1280,11 +1313,11 @@ function make_screen_submenu() {
 
 	$options = array(
 		'screenids' => $screenids,
-		'output' => array('name', 'screenid')
+		'output' => array('screenid', 'name')
 	);
 	$screens = API::Screen()->get($options);
 	$screens = zbx_toHash($screens, 'screenid');
-	$favScreens = array();
+
 	foreach ($fav_screens as $favorite) {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
