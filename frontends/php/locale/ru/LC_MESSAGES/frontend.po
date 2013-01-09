@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-09 18:59+0200\n"
-"PO-Revision-Date: 2012-11-14 22:04+0200\n"
+"POT-Creation-Date: 2013-01-09 19:02+0200\n"
+"PO-Revision-Date: 2012-12-27 08:05+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -157,7 +157,7 @@ msgstr "<вручную>"
 #: include/views/configuration.item.massupdate.php:162
 #: include/views/js/configuration.discovery.edit.js.php:75
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
@@ -756,7 +756,7 @@ msgstr ""
 #: include/views/js/configuration.discovery.edit.js.php:55
 #: include/views/js/configuration.discovery.edit.js.php:70
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Протокол аутентификации"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -1148,7 +1148,7 @@ msgstr "Не удалось подтвердить событие"
 
 #: httpconf.php:262
 msgid "Cannot activate web scenario"
-msgstr ""
+msgstr "Не удалось активировать веб-сценарий"
 
 #: actionconf.php:151
 msgid "Cannot add action"
@@ -1219,7 +1219,7 @@ msgstr "Не удалось добавить карту сети"
 #: httpconf.php:194
 #, php-format
 msgid "Cannot add new application \"%1$s\"."
-msgstr ""
+msgstr "Не удалось добавить новую группу элементов данных \"%1$s\"."
 
 #: nodes.php:77
 msgid "Cannot add node"
@@ -1276,7 +1276,7 @@ msgstr "Не удалось добавить преобразование зна
 
 #: httpconf.php:147
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "Не удалось добавить веб-сценарий"
 
 #: authentication.php:165
 msgid "Cannot change authentication method to HTTP"
@@ -1363,7 +1363,7 @@ msgstr "Не удалось создать карту сети \"%s\"."
 
 #: httpconf.php:151
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr ""
+msgstr "Не удалось создать новую группу элементов данных, веб-сценарий уже присоединен к группе элементов данных."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
@@ -1544,7 +1544,7 @@ msgstr "Не удалось удалить шаблонный триггер \"%
 #: api/classes/CHttpTest.php:374
 #, php-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "Не удалось удалить шаблонный веб-сценарий \"%1$s\"."
 
 #: trigger_prototypes.php:177 triggers.php:166
 msgid "Cannot delete trigger"
@@ -1580,7 +1580,7 @@ msgstr "Не удалось удалить преобразование знач
 
 #: httpconf.php:123 httpconf.php:302
 msgid "Cannot delete web scenario"
-msgstr ""
+msgstr "Не удалось удалить веб-сценарий"
 
 #: media_types.php:163
 msgid "Cannot disable media type"
@@ -1588,7 +1588,7 @@ msgstr "Не удалось отключить способ оповещения
 
 #: httpconf.php:262
 msgid "Cannot disable web scenario"
-msgstr ""
+msgstr "Не удалось отключить веб-сценарий"
 
 #: media_types.php:147
 msgid "Cannot enable media type"
@@ -1779,7 +1779,7 @@ msgstr "Невозможно выполнить запрос обновлени�
 
 #: include/views/js/monitoring.history.js.php:35
 msgid "Cannot remove all items, at least one item should remain."
-msgstr ""
+msgstr "Не удалось удалить все элементы данных, по крайней мере один элемент данных должен остаться."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
@@ -1833,7 +1833,7 @@ msgstr "Не удалось разблокировать пользовател�
 
 #: api/classes/CHostGeneral.php:694
 msgid "Cannot unlink and clear Web scenarios."
-msgstr ""
+msgstr "Не удалось отсоединить и очистить Веб-сценарии."
 
 #: api/classes/CHostGeneral.php:732
 msgid "Cannot unlink and clear applications"
@@ -2068,7 +2068,7 @@ msgstr "Не удалось обновить преобразование зна
 
 #: httpconf.php:142
 msgid "Cannot update web scenario"
-msgstr ""
+msgstr "Не удалось обновить веб-сценарий"
 
 #: popup_bitem.php:114 popup_period.php:114
 msgid "Caption"
@@ -2745,7 +2745,7 @@ msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
 #: api/classes/managers/CHttpTestManager.php:120
 #, php-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Создано: Веб-сценарий \"%1$s\" в \"%2$s\"."
 
 #: include/validate.inc.php:385
 #, php-format
@@ -2919,7 +2919,7 @@ msgstr "НАСТРОЙКА ПАНЕЛИ"
 #: include/views/configuration.item.massupdate.php:160
 #: include/views/js/configuration.discovery.edit.js.php:75
 msgid "DES"
-msgstr ""
+msgstr "DES"
 
 #: httpdetails.php:119
 msgid "DETAILS OF SCENARIO"
@@ -3523,7 +3523,7 @@ msgstr "Удалено: Прототип триггера \"%1$s\" из \"%2$s\"
 #: api/classes/CHttpTest.php:434
 #, php-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Удалено: Веб-сценарий \"%1$s\" из \"%2$s\"."
 
 #: include/views/administration.general.regularexpressions.edit.php:55
 msgid "Delimiter"
@@ -4545,7 +4545,7 @@ msgstr "Поле:"
 
 #: api/classes/CImage.php:554
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Формат файла не поддерживается."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
@@ -5068,7 +5068,7 @@ msgstr "HTTP аутентификация"
 
 #: include/views/configuration.httpconf.edit.php:164
 msgid "HTTP proxy"
-msgstr ""
+msgstr "HTTP прокси"
 
 #: include/discovery.inc.php:71
 #: include/views/js/configuration.discovery.edit.js.php:142
@@ -5734,11 +5734,11 @@ msgstr "Тип подписи к изображению"
 #: api/classes/CImage.php:298
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Ошибка при загрузке изображения [%1$s] в [%2$s]."
 
 #: api/classes/CImage.php:549 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "Размер изображения должен быть меньше 1МБ."
 
 #: adm.images.php:57
 msgid "Image updated"
@@ -5986,12 +5986,12 @@ msgstr "Для метода предоставлены некорректные 
 #: api/classes/CDRule.php:361
 #, php-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Некорректный протокол аутентификации для правила обнаружения \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:336
 #, php-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
-msgstr ""
+msgstr "Некорректный протокол аутентификации для элемента данных \"%1$s\"."
 
 #: api/classes/CService.php:1144
 #, php-format
