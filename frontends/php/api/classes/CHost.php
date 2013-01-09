@@ -1653,7 +1653,6 @@ class CHost extends CHostGeneral {
 					'output' => $this->outputExtend('screens', 'hostid', $options['selectScreens']),
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
-					'editable' => $options['editable'],
 					'nopermissions' => true
 				));
 				if (!is_null($options['limitSelects'])) {
@@ -1673,10 +1672,9 @@ class CHost extends CHostGeneral {
 				$screens = API::TemplateScreen()->get(array(
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
-					'editable' => $options['editable'],
 					'nopermissions' => true,
 					'countOutput' => true,
-					'groupCount' => true,
+					'groupCount' => true
 				));
 				$screens = zbx_toHash($screens, 'hostid');
 
