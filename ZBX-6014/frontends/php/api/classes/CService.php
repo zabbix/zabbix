@@ -1511,13 +1511,7 @@ class CService extends CZBXAPI {
 				$accessibleTriggers = API::Trigger()->get(array(
 					'triggerids' => $options['filter']['triggerid']
 				));
-
-				if (!empty($accessibleTriggers)) {
-					$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
-				}
-				else {
-					unset($options['filter']['triggerid']);
-				}
+				$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
 			}
 			// otherwise return services with either no triggers, or any trigger accessible to the current user
 			else {
