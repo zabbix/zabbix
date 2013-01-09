@@ -104,7 +104,6 @@ class testFormAction extends CWebTest {
 			$this->button_click('new_operation');
 			$this->wait();
 			$this->dropdown_select_wait('new_operation_operationtype', $operation['type']);
-			$this->type('esc_period', $action['esc_period']);
 
 			switch ($operation['type']) {
 				case 'Send message':
@@ -131,13 +130,13 @@ class testFormAction extends CWebTest {
 				case 'Remote command':
 					$this->button_click("add");
 					$this->button_click("//input[@name='save']");
-					sleep(1);
 					$this->type('new_operation_opcommand_command', $operation['command']);
 					break;
 			}
 			$this->button_click('add_operation');
 			$this->wait();
 		}
+		$this->type('esc_period', $action['esc_period']);
 		$this->button_click('save');
 
 		$this->wait();
@@ -153,13 +152,11 @@ class testFormAction extends CWebTest {
 		$this->checkTitle('Configuration of actions');
 
 		$this->type("name", "action test");
-		$this->type("esc_period", "123");
 		$this->type("def_shortdata", "subject");
 		$this->type("def_longdata", "message");
 
 // adding conditions
 		$this->button_click("link=Conditions");
-		sleep(1);
 		$this->type("new_condition_value", "trigger");
 		$this->button_click("add_condition");
 		$this->wait();
@@ -218,7 +215,7 @@ class testFormAction extends CWebTest {
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->dropdown_select_wait('groupid', 'Zabbix servers');
-		$this->button_click("//span[text()='Zabbix server']");
+		$this->button_click("spanid10053");
 		$this->selectWindow("null");
 		$this->button_click("//input[@name='save']");
 
@@ -230,7 +227,7 @@ class testFormAction extends CWebTest {
 		$this->button_click("select");
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
-		$this->button_click("//span[text()='Zabbix servers']");
+		$this->button_click("spanid4");
 		$this->selectWindow("null");
 
 		sleep(1);
@@ -256,6 +253,7 @@ class testFormAction extends CWebTest {
 		$this->type("new_operation_opcommand_command", "command ssh");
 		$this->button_click("add_operation");
 		$this->wait();
+		$this->type("esc_period", "123");
 		$this->ok("Run remote commands on current host");
 		$this->button_click("save");
 		$this->wait();
