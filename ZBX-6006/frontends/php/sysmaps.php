@@ -265,7 +265,7 @@ else {
 
 	$maps = API::Map()->get(array(
 		'editable' => true,
-		'output' => array('name', 'width', 'height'),
+		'output' => array('sysmapid', 'name', 'width', 'height'),
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => $config['search_limit'] + 1
