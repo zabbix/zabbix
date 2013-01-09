@@ -24,9 +24,6 @@
  */
 class CHost extends CHostGeneral {
 
-	protected $tableName = 'hosts';
-	protected $tableAlias = 'h';
-
 	/**
 	 * Get Host data
 	 *
