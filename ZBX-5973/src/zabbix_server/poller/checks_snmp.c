@@ -589,9 +589,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 
 						if (1 == bulk)
 						{
-							snprint_objid(snmp_oid, sizeof(snmp_oid) - 1,
-									vars->name, vars->name_length - 1);
-							cache_put_snmp_index(item, snmp_oid, strval,
+							cache_put_snmp_index(item, (char *)OID, strval,
 									vars->name[vars->name_length - 1]);
 						}
 
