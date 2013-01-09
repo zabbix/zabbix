@@ -349,13 +349,12 @@ function make_hoststat_summary($filter) {
 	));
 
 	// get host groups
-	$options = array(
+	$groups = API::HostGroup()->get(array(
 		'nodeids' => get_current_nodeid(),
 		'groupids' => $filter['groupids'],
 		'monitored_hosts' => 1,
 		'output' => API_OUTPUT_EXTEND
-	);
-	$groups = API::HostGroup()->get($options);
+	));
 	$groups = zbx_toHash($groups, 'groupid');
 
 	foreach($groups as &$group) {
@@ -363,53 +362,49 @@ function make_hoststat_summary($filter) {
 	}
 	unset($group);
 
-	// we need natural sort
-	$sortFields = array(
+	CArrayHelper::sort($groups, array(
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
-	CArrayHelper::sort($groups, $sortFields);
+	));
 
 	// get hosts
-	$options = array(
+	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
-		'monitored_hosts' => 1,
+		'hostids' => !empty($filter['hostids']) ? $filter['hostids'] : null,
+		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid', 'name')
-	);
-	$hosts = API::Host()->get($options);
+	));
 	$hosts = zbx_toHash($hosts, 'hostid');
 	CArrayHelper::sort($hosts, array('name'));
 
 	// get triggers
-	$options = array(
+	$triggers = API::Trigger()->get(array(
 		'nodeids' => get_current_nodeid(),
-		'monitored' => 1,
+		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'expandData' => 1,
+		'expandData' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'output' => API_OUTPUT_EXTEND
-	);
-	$triggers = API::Trigger()->get($options);
+	));
 
 	if ($filter['extAck']) {
-		$options = array(
+		$triggers_unack = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(),
-			'monitored' => 1,
+			'monitored' => true,
 			'maintenance' => $filter['maintenance'],
-			'withLastEventUnacknowledged' => 1,
+			'withLastEventUnacknowledged' => true,
 			'selectHosts' => API_OUTPUT_REFER,
 			'filter' => array(
 				'priority' => $filter['severity'],
 				'value' => TRIGGER_VALUE_TRUE
 			),
 			'output' => API_OUTPUT_REFER
-		);
-		$triggers_unack = API::Trigger()->get($options);
+		));
 		$triggers_unack = zbx_toHash($triggers_unack, 'triggerid');
 		foreach ($triggers_unack as $tunack) {
 			foreach ($tunack['hosts'] as $unack_host) {
@@ -671,6 +666,7 @@ function make_hoststat_summary($filter) {
 		}
 		$table->addRow($group_row);
 	}
+
 	$script = new CJSScript(get_js("jQuery('#hat_hoststat_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
 
 	return new CDiv(array($table, $script));
@@ -784,23 +780,6 @@ function make_latest_issues(array $filter = array()) {
 	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
 	$options['sortorder'] = isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN;
 	$options['limit'] = isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT;
-
-	// get available host if disabled group exist
-	if (!empty($filter['hideGroupIds'])) {
-		$availableHosts = API::Host()->get(array(
-			'groupids' => $filter['groupids'],
-			'output' => array('hostid')
-		));
-		$availableHostIds = zbx_objectValues($availableHosts, 'hostid');
-
-		$disabledHosts = API::Host()->get(array(
-			'groupids' => $filter['hideGroupIds'],
-			'output' => array('hostid')
-		));
-		$disabledHostIds = zbx_objectValues($disabledHosts, 'hostid');
-
-		$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
-	}
 
 	if (isset($filter['hostids'])) {
 		$options['hostids'] = $filter['hostids'];

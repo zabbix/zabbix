@@ -65,11 +65,9 @@ if ($dashconf['filterEnable'] == 1) {
 	}
 	else {
 		$dashconf['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-		$hideGroups = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+		$hideGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
 
-		if (!empty($hideGroups)) {
-			$dashconf['hideGroupIds'] = $hideGroups;
-
+		if (!empty($hideGroupIds)) {
 			// get all groups if no selected groups defined
 			if (empty($dashconf['groupids'])) {
 				$groups = API::HostGroup()->get(array(
@@ -79,7 +77,22 @@ if ($dashconf['filterEnable'] == 1) {
 				$dashconf['groupids'] = zbx_objectValues($groups, 'groupid');
 			}
 
-			$dashconf['groupids'] = array_diff($dashconf['groupids'], $dashconf['hideGroupIds']);
+			$dashconf['groupids'] = array_diff($dashconf['groupids'], $hideGroupIds);
+
+			// get available hosts
+			$availableHosts = API::Host()->get(array(
+				'groupids' => $dashconf['groupids'],
+				'output' => array('hostid')
+			));
+			$availableHostIds = zbx_objectValues($availableHosts, 'hostid');
+
+			$disabledHosts = API::Host()->get(array(
+				'groupids' => $hideGroupIds,
+				'output' => array('hostid')
+			));
+			$disabledHostIds = zbx_objectValues($disabledHosts, 'hostid');
+
+			$dashconf['hostids'] = array_diff($availableHostIds, $disabledHostIds);
 		}
 		else {
 			if (empty($dashconf['groupids'])) {
