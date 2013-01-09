@@ -53,7 +53,6 @@ class CDCheck extends CZBXAPI {
 			'nodeids'					=> null,
 			'dcheckids'					=> null,
 			'druleids'					=> null,
-			'dhostids'					=> null,
 			'dserviceids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -116,22 +115,6 @@ class CDCheck extends CZBXAPI {
 				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dc.druleid', $nodeids);
 			}
 		}
-
-// dhostids
-		if (!is_null($options['dhostids'])) {
-			zbx_value2array($options['dhostids']);
-
-			$sqlParts['select']['dservices'] = 'dh.dhostid';
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-
-			$sqlParts['where']['dh'] = dbConditionInt('dh.dhostid', $options['dhostids']);
-			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['dhostid'] = 'dh.dhostid';
-			}
-		}
-
 
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
