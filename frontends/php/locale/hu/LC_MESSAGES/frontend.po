@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-23 02:31+0200\n"
+"POT-Creation-Date: 2013-01-09 18:36+0200\n"
 "PO-Revision-Date: 2012-09-24 22:24+0200\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -43,7 +43,7 @@ msgid_plural "%1$d scenarios"
 msgstr[0] ""
 msgstr[1] ""
 
-#: chart4.php:90 chart5.php:84
+#: chart4.php:90 chart5.php:83
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr ""
@@ -55,14 +55,14 @@ msgid_plural "%1$s Items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/page_header.php:480
+#: include/page_header.php:481
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/blocks.inc.php:942
+#: include/blocks.inc.php:960
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
@@ -115,11 +115,11 @@ msgstr ""
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[CSOPORTOS VISSZAIGAZOLÁS]----"
 
-#: include/triggers.inc.php:2266 include/triggers.inc.php:2267
-#: include/triggers.inc.php:2268 include/triggers.inc.php:2270
-#: include/triggers.inc.php:2272 include/triggers.inc.php:2275
-#: include/triggers.inc.php:2278 include/triggers.inc.php:2279
-#: include/triggers.inc.php:2290 include/triggers.inc.php:2297
+#: include/triggers.inc.php:2225 include/triggers.inc.php:2226
+#: include/triggers.inc.php:2227 include/triggers.inc.php:2229
+#: include/triggers.inc.php:2231 include/triggers.inc.php:2234
+#: include/triggers.inc.php:2237 include/triggers.inc.php:2238
+#: include/triggers.inc.php:2249 include/triggers.inc.php:2256
 msgid "0 or 1"
 msgstr "0 vagy 1"
 
@@ -147,7 +147,7 @@ msgstr "5 perc"
 msgid "5 seconds"
 msgstr "5 másodperc"
 
-#: include/items.inc.php:787 include/views/monitoring.history.php:63
+#: include/items.inc.php:794 include/views/monitoring.history.php:63
 msgid "500 latest values"
 msgstr "500 legfrissebb érték"
 
@@ -159,7 +159,7 @@ msgstr "kézikönyv"
 msgid "ALARM ACKNOWLEDGES"
 msgstr "RIASZTÁSOK VISSZAIGAZOLÁSAI"
 
-#: include/triggers.inc.php:1705
+#: include/triggers.inc.php:1664
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:880
 #: include/views/configuration.triggers.edit.php:104 tr_logform.php:290
@@ -199,7 +199,7 @@ msgstr ""
 msgid "Absolute difference between last and previous value is NOT N"
 msgstr ""
 
-#: report3.php:86 srv_status.php:167
+#: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
 msgstr ""
 
@@ -207,19 +207,19 @@ msgstr ""
 msgid "Access denied!"
 msgstr "Hozzáférés megtagadva !"
 
-#: api/classes/CUser.php:919
+#: api/classes/CUser.php:916
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "A felhasználói fiók letiltva %s másodpercre"
 
-#: events.php:567 events.php:580 include/actions.inc.php:189
-#: include/blocks.inc.php:834 include/blocks.inc.php:1362
+#: events.php:565 events.php:578 include/actions.inc.php:245
+#: include/blocks.inc.php:852 include/blocks.inc.php:1395
 #: include/events.inc.php:137 include/events.inc.php:208
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
 msgstr "Nyugtázom"
 
-#: acknow.php:179 include/triggers.inc.php:1277 include/triggers.inc.php:1280
+#: acknow.php:179 include/triggers.inc.php:1236 include/triggers.inc.php:1239
 #: tr_status.php:664
 msgid "Acknowledge"
 msgstr "Visszaigazolás"
@@ -318,8 +318,8 @@ msgstr "Eljárás műveletei"
 msgid "Action updated"
 msgstr "Eljárás frissítve"
 
-#: events.php:568 events.php:581 include/blocks.inc.php:835
-#: include/blocks.inc.php:1363 include/events.inc.php:138
+#: events.php:566 events.php:579 include/blocks.inc.php:853
+#: include/blocks.inc.php:1396 include/events.inc.php:138
 #: include/menu.inc.php:193 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -354,9 +354,9 @@ msgstr "Aktív ettől"
 msgid "Active till"
 msgstr "Eddig aktív"
 
-#: dashconf.php:211 include/blocks.inc.php:1102 include/blocks.inc.php:1108
-#: include/blocks.inc.php:1212 include/blocks.inc.php:1257
-#: include/blocks.inc.php:1263 include/forms.inc.php:1705
+#: dashconf.php:211 include/blocks.inc.php:1120 include/blocks.inc.php:1126
+#: include/blocks.inc.php:1239 include/blocks.inc.php:1284
+#: include/blocks.inc.php:1290 include/forms.inc.php:1705
 #: include/forms.inc.php:2009 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
@@ -418,7 +418,7 @@ msgstr "Elem hozzáadása"
 msgid "Add graph items first"
 msgstr ""
 
-#: include/actions.inc.php:283 include/actions.inc.php:498
+#: include/actions.inc.php:338 include/actions.inc.php:553
 msgid "Add host"
 msgstr "Új hoszt"
 
@@ -447,11 +447,11 @@ msgstr "Hozzáadás"
 msgid "Add to favourites"
 msgstr "Hozzáadás a kedvencekhez"
 
-#: include/actions.inc.php:502
+#: include/actions.inc.php:557
 msgid "Add to host group"
 msgstr ""
 
-#: include/actions.inc.php:309 include/views/configuration.action.edit.php:766
+#: include/actions.inc.php:364 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
 msgstr ""
 
@@ -459,7 +459,7 @@ msgstr ""
 msgid "Added"
 msgstr "Felvéve"
 
-#: include/items.inc.php:1330 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1337 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "További paraméterek"
 
@@ -475,7 +475,7 @@ msgstr "Adminisztráció"
 msgid "Advanced labels"
 msgstr ""
 
-#: include/blocks.inc.php:832 include/blocks.inc.php:1360
+#: include/blocks.inc.php:850 include/blocks.inc.php:1393
 #: include/events.inc.php:136 include/events.inc.php:208
 #: include/events.inc.php:211 tr_status.php:288
 msgid "Age"
@@ -512,10 +512,10 @@ msgstr "Másodlagos név"
 msgid "Align icons"
 msgstr ""
 
-#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1191
-#: include/blocks.inc.php:1200 include/blocks.inc.php:1245
-#: include/blocks.inc.php:1323 include/blocks.inc.php:1332
-#: include/nodes.inc.php:156 include/page_header.php:331
+#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1218
+#: include/blocks.inc.php:1227 include/blocks.inc.php:1272
+#: include/blocks.inc.php:1356 include/blocks.inc.php:1365
+#: include/nodes.inc.php:156 include/page_header.php:332
 #: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -560,7 +560,7 @@ msgstr ""
 msgid "Any character string included"
 msgstr "Bármely szót tartalmaz"
 
-#: applications.php:136 httpconf.php:42 include/actions.inc.php:60
+#: applications.php:136 httpconf.php:42 include/actions.inc.php:90
 #: include/audit.inc.php:32 include/forms.inc.php:526
 #: include/views/configuration.application.edit.php:64
 #: include/views/configuration.application.list.php:54
@@ -568,7 +568,7 @@ msgstr "Bármely szót tartalmaz"
 msgid "Application"
 msgstr "Alkalmazás"
 
-#: api/classes/CApplication.php:795
+#: api/classes/CApplication.php:799
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
 msgstr ""
@@ -614,7 +614,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:58
 #: include/views/configuration.template.edit.php:219 popup.php:53
 #: search.php:136 search.php:160 search.php:179 search.php:368 search.php:389
-#: search.php:412 templates.php:459 templates.php:522
+#: search.php:412 templates.php:458 templates.php:521
 msgid "Applications"
 msgstr "Alkalmazások"
 
@@ -729,7 +729,7 @@ msgstr "Autentikációs mód"
 msgid "Authentication method changed to HTTP"
 msgstr ""
 
-#: authentication.php:122 authentication.php:123
+#: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
 msgstr ""
 
@@ -809,7 +809,7 @@ msgctxt "Byte short"
 msgid "B"
 msgstr ""
 
-#: include/page_header.php:224
+#: include/page_header.php:225
 msgid "BACK"
 msgstr "VISSZA"
 
@@ -875,6 +875,10 @@ msgstr "Alul"
 #: include/reports.inc.php:712
 msgid "Brighten"
 msgstr "Világosabb"
+
+#: include/locales.inc.php:46
+msgid "Bulgarian (bg_BG)"
+msgstr ""
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -977,7 +981,7 @@ msgstr "KARBANTARTÁSI IDŐSZAKOK KONFIGURÁCIÓJA"
 msgid "CONFIGURATION OF MEDIA TYPES"
 msgstr "ESZKÖZTÍPUSOK BEÁLLÍTÁSAI"
 
-#: sysmap.php:121 sysmaps.php:212
+#: sysmap.php:121 sysmaps.php:215
 msgid "CONFIGURATION OF NETWORK MAPS"
 msgstr "HÁLÓZATI TÉRKÉPEK KONFGURÁCIÓJA"
 
@@ -1014,7 +1018,7 @@ msgstr "SCRIPTEK KONFIGURÁCIÓJA"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "BEMUTATÓK KONFIGURÁCIÓJA"
 
-#: templates.php:423 templates.php:443
+#: templates.php:422 templates.php:442
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr ""
 
@@ -1081,19 +1085,19 @@ msgstr ""
 msgid "Callback"
 msgstr "Visszahívás"
 
-#: api/classes/CTemplate.php:1402
+#: api/classes/CTemplate.php:1410
 msgid "Can't add group"
 msgstr ""
 
-#: api/classes/CTemplate.php:1478 api/classes/CTemplate.php:1488
+#: api/classes/CTemplate.php:1486 api/classes/CTemplate.php:1496
 msgid "Can't link template"
 msgstr ""
 
-#: api/classes/CTemplate.php:1413
+#: api/classes/CTemplate.php:1421
 msgid "Can't remove group"
 msgstr ""
 
-#: api/classes/CTemplate.php:1449 api/classes/CTemplate.php:1467
+#: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
 msgstr ""
 
@@ -1132,7 +1136,7 @@ msgstr "Alkalmazás felvétele sikertelen"
 msgid "Cannot add dependency from a host to a template."
 msgstr ""
 
-#: include/triggers.inc.php:542
+#: include/triggers.inc.php:501
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr ""
@@ -1182,7 +1186,7 @@ msgstr ""
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
 msgstr ""
 
-#: sysmaps.php:167
+#: sysmaps.php:170
 msgid "Cannot add network map"
 msgstr "Hálózati térkép létrehozása sikertelen"
 
@@ -1251,7 +1255,7 @@ msgstr "Az érték-hozzárendelést nem lehet végrehajtani"
 msgid "Cannot change authentication method to HTTP"
 msgstr ""
 
-#: authentication.php:127
+#: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
 msgstr ""
 
@@ -1263,11 +1267,11 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr "Előzmények törlése sikertelen"
 
-#: api/classes/CDiscoveryRule.php:1205
+#: api/classes/CDiscoveryRule.php:1170
 msgid "Cannot clone graph prototypes."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:1090
+#: api/classes/CDiscoveryRule.php:1055
 msgid "Cannot clone item prototypes."
 msgstr ""
 
@@ -1287,7 +1291,7 @@ msgstr "Nem lehet másolni a grafikonokat"
 msgid "Cannot copy items"
 msgstr "Elemek másolása sikertelen"
 
-#: include/triggers.inc.php:449
+#: include/triggers.inc.php:408
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr ""
@@ -1312,7 +1316,7 @@ msgstr ""
 msgid "Cannot create group without name."
 msgstr ""
 
-#: api/classes/CHost.php:1778
+#: api/classes/CHost.php:1775
 msgid "Cannot create host group."
 msgstr ""
 
@@ -1392,7 +1396,7 @@ msgstr "Csoport törlése sikertelen"
 msgid "Cannot delete host"
 msgstr "Hoszt törlése sikertelen"
 
-#: api/classes/CHost.php:1789
+#: api/classes/CHost.php:1786
 msgid "Cannot delete host group."
 msgstr ""
 
@@ -1404,7 +1408,7 @@ msgstr ""
 msgid "Cannot delete image"
 msgstr "Nem sikerült a képet törölni"
 
-#: api/classes/CHost.php:1882
+#: api/classes/CHost.php:1879
 msgid "Cannot delete inventory."
 msgstr ""
 
@@ -1428,7 +1432,7 @@ msgstr "Karbantartás törlése sikertelen"
 msgid "Cannot delete media type"
 msgstr ""
 
-#: sysmaps.php:188
+#: sysmaps.php:191
 msgid "Cannot delete network map"
 msgstr "Hálózati térkép törlése sikertelen"
 
@@ -1485,7 +1489,7 @@ msgstr "Szolgáltatás törlése sikertelen"
 msgid "Cannot delete slide show"
 msgstr ""
 
-#: templates.php:354 templates.php:372 templates.php:397
+#: templates.php:353 templates.php:371 templates.php:396
 msgid "Cannot delete template"
 msgstr "Minta nem törölhető"
 
@@ -1587,7 +1591,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:1006 api/classes/CDiscoveryRule.php:1078
+#: api/classes/CDiscoveryRule.php:971 api/classes/CDiscoveryRule.php:1043
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
@@ -1646,15 +1650,15 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr ""
 
-#: srv_status.php:193
+#: srv_status.php:186
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr ""
 
-#: services.php:466
+#: services.php:478
 msgid "Cannot format tree."
 msgstr ""
 
-#: api/classes/CTemplate.php:1372
+#: api/classes/CTemplate.php:1380
 msgid "Cannot have empty visible template name"
 msgstr ""
 
@@ -1688,31 +1692,31 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr ""
 
-#: api/classes/CHost.php:1861
+#: api/classes/CHost.php:1858
 msgid "Cannot link template"
 msgstr "Minta csatolása sikertelen"
 
-#: api/classes/CUser.php:883
+#: api/classes/CUser.php:880
 msgid "Cannot logout."
 msgstr ""
 
-#: api/classes/CHost.php:1685
+#: api/classes/CHost.php:1682
 msgid "Cannot mass update host name."
 msgstr ""
 
-#: api/classes/CTemplate.php:1331
+#: api/classes/CTemplate.php:1339
 msgid "Cannot mass update template name"
 msgstr ""
 
-#: api/classes/CHost.php:1675
+#: api/classes/CHost.php:1672
 msgid "Cannot mass update visible host name."
 msgstr ""
 
-#: api/classes/CTemplate.php:1304
+#: api/classes/CTemplate.php:1312
 msgid "Cannot mass update visible template name"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:157
+#: api/classes/CHostGeneral.php:160
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr ""
@@ -1782,39 +1786,39 @@ msgstr ""
 msgid "Cannot unblock users"
 msgstr "Felhasználói-státusz engedélyezése sikertelen"
 
-#: api/classes/CHostGeneral.php:693
+#: api/classes/CHostGeneral.php:696
 msgid "Cannot unlink and clear applications"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:546
+#: api/classes/CHostGeneral.php:549
 msgid "Cannot unlink and clear discovery rules"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:635
+#: api/classes/CHostGeneral.php:638
 msgid "Cannot unlink and clear graph prototypes"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:653
+#: api/classes/CHostGeneral.php:656
 msgid "Cannot unlink and clear graphs."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:582
+#: api/classes/CHostGeneral.php:585
 msgid "Cannot unlink and clear item prototypes"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:564
+#: api/classes/CHostGeneral.php:567
 msgid "Cannot unlink and clear items"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:484 api/classes/CHostGeneral.php:501
+#: api/classes/CHostGeneral.php:487 api/classes/CHostGeneral.php:504
 msgid "Cannot unlink and clear triggers"
 msgstr ""
 
-#: api/classes/CHost.php:1852
+#: api/classes/CHost.php:1849
 msgid "Cannot unlink template"
 msgstr "Minta leválasztása"
 
-#: api/classes/CHostGeneral.php:438
+#: api/classes/CHostGeneral.php:441
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr ""
@@ -1944,7 +1948,7 @@ msgstr ""
 msgid "Cannot update media type"
 msgstr ""
 
-#: sysmaps.php:157
+#: sysmaps.php:160
 msgid "Cannot update network map"
 msgstr "Hálózati térkép frissítése sikertelen"
 
@@ -2030,7 +2034,7 @@ msgid "Center"
 msgstr ""
 
 #: include/classes/screens/CScreenBase.php:258
-#: include/classes/screens/CScreenBuilder.php:422
+#: include/classes/screens/CScreenBuilder.php:419
 #: include/classes/screens/CScreenMap.php:54
 #: include/views/configuration.services.edit.php:48
 msgid "Change"
@@ -2047,7 +2051,7 @@ msgid "Change password"
 msgstr "Jelszó módosítása"
 
 #: include/forms.inc.php:418 include/items.inc.php:120
-#: include/triggers.inc.php:2244 include/views/configuration.item.edit.php:217
+#: include/triggers.inc.php:2203 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:160
 msgid "Character"
 msgstr "Betű"
@@ -2094,11 +2098,11 @@ msgstr ""
 msgid "Child"
 msgstr "Vezérelt csomópont"
 
-#: include/locales.inc.php:46
+#: include/locales.inc.php:47
 msgid "Chinese (zh_CN)"
 msgstr "Kínai (zh_CN)"
 
-#: include/locales.inc.php:47
+#: include/locales.inc.php:48
 msgid "Chinese (zh_TW)"
 msgstr ""
 
@@ -2122,7 +2126,7 @@ msgstr ""
 msgid "Circular reference in templates: %1$s."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:332 api/classes/CHostGeneral.php:756
+#: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:759
 msgid "Circular template linkage is not allowed."
 msgstr ""
 
@@ -2217,8 +2221,8 @@ msgstr "Oszlopok"
 msgid "Combined result"
 msgstr "Kombinált eredmény"
 
-#: include/actions.inc.php:756 include/actions.inc.php:790
-#: include/actions.inc.php:858
+#: include/actions.inc.php:811 include/actions.inc.php:845
+#: include/actions.inc.php:900
 #: include/views/administration.auditacts.list.php:106
 #: include/views/administration.script.edit.php:68
 msgid "Command"
@@ -2244,7 +2248,7 @@ msgstr ""
 msgid "Comment updated"
 msgstr "Megjegyzés frissítve"
 
-#: include/acknow.inc.php:43 tr_comments.php:70 tr_comments.php:88
+#: include/acknow.inc.php:54 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:367 tr_status.php:294
 msgid "Comments"
 msgstr "Megjegyzés"
@@ -2388,7 +2392,7 @@ msgstr ""
 msgid "Configuration of templates"
 msgstr ""
 
-#: report5.php:152
+#: report5.php:167
 msgid "Configuration of trigger"
 msgstr ""
 
@@ -2512,7 +2516,7 @@ msgstr "Másolás"
 msgid "Copy selected to ..."
 msgstr "Kiválasztott másolása ..."
 
-#: api/classes/CUser.php:988
+#: api/classes/CUser.php:985
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr ""
@@ -2585,7 +2589,7 @@ msgstr ""
 msgid "Create maintenance period"
 msgstr "Karbantartási időszak létrehozása"
 
-#: sysmaps.php:208
+#: sysmaps.php:211
 msgid "Create map"
 msgstr ""
 
@@ -2621,7 +2625,7 @@ msgstr "Script létrehozása"
 msgid "Create slide show"
 msgstr ""
 
-#: templates.php:437
+#: templates.php:436
 msgid "Create template"
 msgstr ""
 
@@ -2650,7 +2654,7 @@ msgstr "Érték-hozzárendelés létrehozása"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:853
+#: api/classes/CDiscoveryRule.php:834
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -2761,7 +2765,7 @@ msgstr ""
 msgid "Current host"
 msgstr ""
 
-#: include/page_header.php:363
+#: include/page_header.php:364
 msgid "Current node"
 msgstr "Kiválasztott csomópont"
 
@@ -2827,7 +2831,7 @@ msgstr ""
 msgid "Custom slides"
 msgstr ""
 
-#: include/locales.inc.php:48
+#: include/locales.inc.php:49
 msgid "Czech (cs_CZ)"
 msgstr ""
 
@@ -2852,7 +2856,7 @@ msgstr "SCENARIO RÉSZLETEI"
 msgid "DISABLED"
 msgstr "LETILTVA"
 
-#: include/triggers.inc.php:221
+#: include/triggers.inc.php:180
 msgid "DISCOVERED"
 msgstr ""
 
@@ -2860,7 +2864,7 @@ msgstr ""
 msgid "DM"
 msgstr "EM (Elosztott Mód)"
 
-#: events.php:487 events.php:496 hosts.php:652
+#: events.php:484 events.php:493 hosts.php:652
 #: include/views/administration.proxy.edit.php:60
 #: include/views/js/configuration.host.edit.js.php:18 popup.php:544
 #: search.php:131
@@ -2872,13 +2876,13 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS név"
 
-#: include/triggers.inc.php:220
+#: include/triggers.inc.php:179
 msgid "DOWN"
 msgstr ""
 
 #: include/forms.inc.php:1505 include/maintenances.inc.php:35
 #: include/reports.inc.php:219 include/reports.inc.php:665
-#: include/reports.inc.php:673 report3.php:61 report4.php:98
+#: include/reports.inc.php:673 report3.php:60 report4.php:98
 msgid "Daily"
 msgstr "Napi"
 
@@ -2966,7 +2970,7 @@ msgstr ""
 msgid "Database user"
 msgstr ""
 
-#: include/forms.inc.php:1591 include/forms.inc.php:1676 jsrpc.php:138
+#: include/forms.inc.php:1591 include/forms.inc.php:1676 jsrpc.php:137
 msgid "Date"
 msgstr "Dátum"
 
@@ -2986,7 +2990,7 @@ msgstr ""
 msgid "Date HW purchased"
 msgstr ""
 
-#: include/forms.inc.php:1591 report3.php:127 report4.php:161 report5.php:45
+#: include/forms.inc.php:1591 report3.php:126 report4.php:161 report5.php:45
 #: tr_status.php:207 tr_status.php:209
 msgid "Day"
 msgstr "Nap"
@@ -3036,7 +3040,7 @@ msgstr ""
 msgid "Days"
 msgstr "Napok"
 
-#: include/page_header.php:249
+#: include/page_header.php:250
 msgid "Debug"
 msgstr "Hibakeresés"
 
@@ -3129,7 +3133,7 @@ msgstr "Törlés"
 msgid "Delete and clear"
 msgstr "Törlés ÉS kiürítés"
 
-#: templates.php:618
+#: templates.php:617
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Figyelmeztetés: Ez a művelet törli a kijelölt mintákat és eltávolítja az érintett elemeket az összes csatolt hosztról"
 
@@ -3237,8 +3241,8 @@ msgstr "Script törlése?"
 #: include/views/configuration.maintenance.list.php:76
 #: include/views/configuration.screen.list.php:68
 #: include/views/configuration.slideconf.list.php:59
-#: include/views/configuration.triggers.list.php:237 sysmaps.php:298
-#: templates.php:613
+#: include/views/configuration.triggers.list.php:237 sysmaps.php:290
+#: templates.php:612
 msgid "Delete selected"
 msgstr "Kiválasztott törlése"
 
@@ -3301,7 +3305,7 @@ msgstr "Kijelölt elemek törlése?"
 msgid "Delete selected maintenance periods?"
 msgstr "Kijelölt karbantartási időszak törlése?"
 
-#: sysmaps.php:299
+#: sysmaps.php:291
 msgid "Delete selected maps?"
 msgstr "Törli a kjelölt térképeket?"
 
@@ -3337,7 +3341,7 @@ msgstr "Törli a kiválasztott szkripteket?"
 msgid "Delete selected slide shows?"
 msgstr ""
 
-#: templates.php:614
+#: templates.php:613
 msgid "Delete selected templates?"
 msgstr "Törli a kijelölt mintákat?"
 
@@ -3364,7 +3368,7 @@ msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates.php:617
+#: templates.php:616
 msgid "Delete selected with linked elements"
 msgstr "Törli a kijelölteket a csatolt elemekkel együtt?"
 
@@ -3407,7 +3411,7 @@ msgstr ""
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:2148
+#: api/classes/CHost.php:2145
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
@@ -3427,7 +3431,7 @@ msgstr ""
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:1233
+#: api/classes/CTemplate.php:1241
 #, php-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr ""
@@ -3469,11 +3473,11 @@ msgstr "Hozzáférés megtagadva"
 msgid "Dependencies"
 msgstr ""
 
-#: include/triggers.inc.php:1398 tr_status.php:558
+#: include/triggers.inc.php:1357 tr_status.php:558
 msgid "Dependent"
 msgstr "Függő"
 
-#: include/triggers.inc.php:1378
+#: include/triggers.inc.php:1337
 #: include/views/configuration.services.edit.php:101
 #: include/views/configuration.triggers.list.php:140 popup.php:1033
 #: tr_status.php:542
@@ -3484,8 +3488,8 @@ msgstr "Függőség"
 msgid "Deployment status"
 msgstr ""
 
-#: events.php:488 events.php:497 events.php:563 events.php:576
-#: include/classes/screens/CScreenEvents.php:46
+#: events.php:485 events.php:494 events.php:561 events.php:574
+#: include/classes/screens/CScreenEvents.php:47
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.mediatypes.edit.php:34
 #: include/views/administration.mediatypes.list.php:39
@@ -3499,12 +3503,12 @@ msgstr ""
 msgid "Description"
 msgstr "Leírás"
 
-#: include/actions.inc.php:825 include/blocks.inc.php:686
+#: include/actions.inc.php:868 include/blocks.inc.php:704
 #: include/config.inc.php:341
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
-#: include/views/configuration.action.edit.php:321 jsrpc.php:137 queue.php:50
+#: include/views/configuration.action.edit.php:321 jsrpc.php:136 queue.php:50
 msgid "Details"
 msgstr "Részletek"
 
@@ -3512,7 +3516,7 @@ msgstr "Részletek"
 msgid "Details of scenario"
 msgstr "Scenario részletei"
 
-#: include/actions.inc.php:72
+#: include/actions.inc.php:101
 msgid "Device"
 msgstr "Eszköz"
 
@@ -3576,7 +3580,7 @@ msgstr "HIBAKERESŐ MÓD tiltása"
 msgid "Disable debug mode in selected groups?"
 msgstr "Letiltja a hibakereső módot a kiválasztott csoportok számára?"
 
-#: include/actions.inc.php:292 include/actions.inc.php:501
+#: include/actions.inc.php:347 include/actions.inc.php:556
 msgid "Disable host"
 msgstr "Hoszt tiltása"
 
@@ -3647,7 +3651,7 @@ msgstr "Letiltja a kijelölt triggereket?"
 
 #: auditlogs.php:152 dashboard.php:227 dashconf.php:164
 #: include/discovery.inc.php:119 include/httptest.inc.php:46
-#: include/items.inc.php:150 include/triggers.inc.php:1651
+#: include/items.inc.php:150 include/triggers.inc.php:1610
 #: include/users.inc.php:60
 #: include/views/administration.mediatypes.list.php:93
 #: include/views/administration.usergroups.list.php:58
@@ -3685,10 +3689,10 @@ msgstr "Felderítve"
 msgid "Discovered device"
 msgstr "Felderített eszköz"
 
-#: events.php:307 hosts.php:687 hosts.php:767 include/events.inc.php:27
+#: events.php:310 hosts.php:687 hosts.php:767 include/events.inc.php:27
 #: include/html.inc.php:387 include/menu.inc.php:77 include/menu.inc.php:211
-#: include/views/configuration.action.list.php:34 templates.php:464
-#: templates.php:532
+#: include/views/configuration.action.list.php:34 templates.php:463
+#: templates.php:531
 msgid "Discovery"
 msgstr "Felderítés"
 
@@ -3696,7 +3700,7 @@ msgstr "Felderítés"
 msgid "Discovery by proxy"
 msgstr "Felderítés proxy-n keresztül"
 
-#: include/actions.inc.php:51
+#: include/actions.inc.php:72
 msgid "Discovery check"
 msgstr "Felderítés"
 
@@ -3708,24 +3712,24 @@ msgstr ""
 msgid "Discovery list"
 msgstr ""
 
-#: include/actions.inc.php:52
+#: include/actions.inc.php:74
 msgid "Discovery object"
 msgstr ""
 
-#: include/actions.inc.php:50 include/audit.inc.php:44
-#: include/blocks.inc.php:1073 include/forms.inc.php:1018
+#: include/actions.inc.php:70 include/audit.inc.php:44
+#: include/blocks.inc.php:1091 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
 msgstr "Felderítési szabály"
 
-#: api/classes/CDiscoveryRule.php:936
+#: api/classes/CDiscoveryRule.php:901
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:923
+#: api/classes/CDiscoveryRule.php:888
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr ""
@@ -3777,7 +3781,7 @@ msgstr ""
 msgid "Discovery rules updated"
 msgstr "Felderítési szabályok frissítve"
 
-#: dashboard.php:334 include/actions.inc.php:56
+#: dashboard.php:334 include/actions.inc.php:82
 msgid "Discovery status"
 msgstr "Felderítés állapota"
 
@@ -3785,7 +3789,7 @@ msgstr "Felderítés állapota"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: include/func.inc.php:1696
+#: include/func.inc.php:1711
 msgid "Displaying"
 msgstr "Megjelenít"
 
@@ -3839,7 +3843,7 @@ msgstr ""
 msgid "Dot"
 msgstr "Pontozott vonal"
 
-#: include/blocks.inc.php:1075
+#: include/blocks.inc.php:1093
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr ""
@@ -3862,7 +3866,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:126
 #: include/views/configuration.services.edit.php:285
 #: include/views/monitoring.discovery.php:45
-#: include/views/monitoring.discovery.php:168 report3.php:86
+#: include/views/monitoring.discovery.php:168 report3.php:85
 msgid "Downtime"
 msgstr "Kiesés"
 
@@ -3905,12 +3909,12 @@ msgstr ""
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1364
+#: api/classes/CHost.php:1361
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr ""
 
-#: api/classes/CHost.php:1396
+#: api/classes/CHost.php:1393
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr ""
@@ -3935,7 +3939,7 @@ msgstr ""
 msgid "Duplicate user alias \"%s\"."
 msgstr ""
 
-#: events.php:566 events.php:579 include/events.inc.php:135
+#: events.php:564 events.php:577 include/events.inc.php:135
 #: include/events.inc.php:208 include/events.inc.php:211 tr_status.php:289
 msgid "Duration"
 msgstr "Időtartam"
@@ -3944,7 +3948,7 @@ msgstr "Időtartam"
 msgid "Duration (sec)"
 msgstr ""
 
-#: include/locales.inc.php:49
+#: include/locales.inc.php:50
 msgid "Dutch (nl_NL)"
 msgstr "Holland (nl_NL)"
 
@@ -3977,8 +3981,8 @@ msgstr ""
 #: include/views/configuration.screen.list.php:59
 #: include/views/configuration.triggers.edit.php:79
 #: include/views/js/configuration.sysmaps.js.php:386
-#: include/views/js/configuration.sysmaps.js.php:394 sysmaps.php:268
-#: sysmaps.php:291
+#: include/views/js/configuration.sysmaps.js.php:394 sysmaps.php:260
+#: sysmaps.php:283
 msgid "Edit"
 msgstr "Szerkesztés"
 
@@ -4023,11 +4027,11 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:716
 #: api/classes/CGraphPrototype.php:766 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
-#: api/classes/CHost.php:2008 api/classes/CIconMap.php:409
+#: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:925 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
-#: api/classes/CService.php:518 api/classes/CTemplate.php:1104
+#: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1305 api/classes/CTrigger.php:1401
 #: api/classes/CTrigger.php:1493 api/classes/CTriggerPrototype.php:907
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
@@ -4043,7 +4047,7 @@ msgstr ""
 msgid "Empty macro."
 msgstr ""
 
-#: api/classes/CService.php:1112
+#: api/classes/CService.php:1142
 msgid "Empty name."
 msgstr ""
 
@@ -4075,7 +4079,7 @@ msgstr "Engedélyezi a hibakereső módot a kiválasztott csoportok számára?"
 msgid "Enable event acknowledges"
 msgstr ""
 
-#: include/actions.inc.php:289 include/actions.inc.php:500
+#: include/actions.inc.php:344 include/actions.inc.php:555
 msgid "Enable host"
 msgstr "Hoszt engedélyezése"
 
@@ -4171,8 +4175,8 @@ msgstr "Angol (en_GB)"
 msgid "English (en_US)"
 msgstr ""
 
-#: include/actions.inc.php:681 include/actions.inc.php:757
-#: include/classes/screens/CScreenActions.php:115 include/items.inc.php:35
+#: include/actions.inc.php:736 include/actions.inc.php:812
+#: include/classes/screens/CScreenActions.php:131 include/items.inc.php:35
 #: include/views/administration.auditacts.list.php:76
 #: include/views/configuration.host.discovery.list.php:59
 #: include/views/configuration.item.list.php:64
@@ -4210,7 +4214,7 @@ msgstr ""
 msgid "Error in item key: \"%s\"."
 msgstr ""
 
-#: include/db.inc.php:930 include/db.inc.php:986
+#: include/db.inc.php:930
 #, php-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr ""
@@ -4236,7 +4240,7 @@ msgstr ""
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
 msgstr ""
 
-#: acknow.php:119 include/actions.inc.php:59
+#: acknow.php:119 include/actions.inc.php:88
 msgid "Event acknowledged"
 msgstr "Esemény visszaigazolva"
 
@@ -4253,7 +4257,7 @@ msgstr ""
 msgid "Event details"
 msgstr "Esemény részletei"
 
-#: include/triggers.inc.php:1650
+#: include/triggers.inc.php:1609
 msgid "Event generation"
 msgstr "Esemény generálás"
 
@@ -4269,7 +4273,7 @@ msgstr "Esemény forrása"
 msgid "Event source details"
 msgstr ""
 
-#: events.php:314 include/menu.inc.php:57 include/triggers.inc.php:1310
+#: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1269
 #: jsLoader.php:108 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
@@ -4309,7 +4313,7 @@ msgstr ""
 msgid "Execute on"
 msgstr ""
 
-#: include/items.inc.php:1328 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1335 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Végrehajtott szkript"
 
@@ -4344,16 +4348,16 @@ msgid "Exploded"
 msgstr "Bontott kör"
 
 #: hosts.php:864 include/views/configuration.screen.list.php:66
-#: sysmaps.php:297 templates.php:611
+#: sysmaps.php:289 templates.php:610
 msgid "Export selected"
 msgstr "Kijelölt(ek) exportálása"
 
-#: events.php:255
+#: events.php:279
 msgid "Export to CSV"
 msgstr ""
 
 #: include/forms.inc.php:1775 include/forms.inc.php:1906
-#: include/forms.inc.php:1979 include/triggers.inc.php:1649
+#: include/forms.inc.php:1979 include/triggers.inc.php:1608
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
@@ -4372,7 +4376,7 @@ msgstr ""
 msgid "Expression Variable Elements"
 msgstr ""
 
-#: include/triggers.inc.php:578
+#: include/triggers.inc.php:537
 msgid "Expression cannot be empty"
 msgstr "A kifejezés nem lehet üres"
 
@@ -4417,7 +4421,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Hiba"
 
-#: include/actions.inc.php:930 include/blocks.inc.php:984
+#: include/actions.inc.php:972 include/blocks.inc.php:1002
 msgid "Failed"
 msgstr "Hiba"
 
@@ -4426,7 +4430,7 @@ msgstr "Hiba"
 msgid "Failed step of scenario \"%s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:1084
+#: api/classes/CTemplate.php:1092
 msgid "Failed to update template"
 msgstr ""
 
@@ -4434,15 +4438,15 @@ msgstr ""
 msgid "Failure Audit"
 msgstr "Sikertelen Események"
 
-#: dashboard.php:259 include/blocks.inc.php:1095
+#: dashboard.php:259 include/blocks.inc.php:1113
 msgid "Favourite graphs"
 msgstr ""
 
-#: dashboard.php:273 include/blocks.inc.php:1210
+#: dashboard.php:273 include/blocks.inc.php:1237
 msgid "Favourite maps"
 msgstr ""
 
-#: dashboard.php:266 include/blocks.inc.php:1255
+#: dashboard.php:266 include/blocks.inc.php:1282
 msgid "Favourite screens"
 msgstr ""
 
@@ -4467,7 +4471,7 @@ msgstr "Mező"
 msgid "Field \"druleid\" is required."
 msgstr ""
 
-#: api/classes/CTemplate.php:983
+#: api/classes/CTemplate.php:991
 msgid "Field \"host\" is mandatory"
 msgstr ""
 
@@ -4527,7 +4531,7 @@ msgstr ""
 msgid "Finish"
 msgstr "Vége"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:51
 msgid "Finnish (fi_FI)"
 msgstr ""
 
@@ -4535,7 +4539,7 @@ msgstr ""
 msgid "First"
 msgstr "Első"
 
-#: include/func.inc.php:1641
+#: include/func.inc.php:1656
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -4558,7 +4562,7 @@ msgstr ""
 msgid "For guest, password must be empty"
 msgstr "A vendég felhasználó (guest) jelszavának üresnek kell lennie"
 
-#: include/items.inc.php:1332 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1339 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr ""
 
@@ -4566,7 +4570,7 @@ msgstr ""
 msgid "Fourth"
 msgstr "Negyedik"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:52
 msgid "French (fr_FR)"
 msgstr "Francia (fr_FR)"
 
@@ -4584,7 +4588,7 @@ msgstr "Péntek"
 #: include/views/configuration.services.edit.php:211
 #: include/views/configuration.services.edit.php:278
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
-#: report3.php:146 report4.php:180 services.php:188 services.php:194
+#: report3.php:145 report4.php:180 services.php:188 services.php:194
 msgid "From"
 msgstr "-tól"
 
@@ -4648,16 +4652,16 @@ msgstr ""
 msgid "General"
 msgstr "Általános"
 
-#: chart4.php:180 chart5.php:201 include/classes/class.cbar.php:739
+#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:739
 #, php-format
 msgid "Generated in %s sec"
 msgstr ""
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:53
 msgid "German (de_DE)"
 msgstr "Német (de_DE)"
 
-#: include/page_header.php:235
+#: include/page_header.php:236
 msgid "Get support"
 msgstr "Támogatás"
 
@@ -4665,7 +4669,7 @@ msgstr "Támogatás"
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1781 tr_testexpr.php:36
+#: include/triggers.inc.php:1740 tr_testexpr.php:36
 msgid "Given expression is not a macro"
 msgstr ""
 
@@ -4700,8 +4704,8 @@ msgstr ""
 #: include/views/configuration.maintenance.list.php:79
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:62
-#: include/views/configuration.triggers.list.php:240 sysmaps.php:304
-#: templates.php:622 tr_status.php:783
+#: include/views/configuration.triggers.list.php:240 sysmaps.php:296
+#: templates.php:621 tr_status.php:783
 msgid "Go"
 msgstr "Mehet"
 
@@ -4717,7 +4721,7 @@ msgstr ""
 msgid "Gradient line"
 msgstr "Meredek vonal"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1102
+#: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:60 latest.php:320 latest.php:498
@@ -4841,16 +4845,16 @@ msgstr ""
 msgid "Graph with same name but other type exist."
 msgstr ""
 
-#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1191
-#: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:795
-#: include/menu.inc.php:62 include/triggers.inc.php:1354
+#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
+#: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
+#: include/menu.inc.php:62 include/triggers.inc.php:1313
 #: include/views/configuration.graph.list.php:57
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
 #: include/views/conf.import.php:34 include/views/monitoring.charts.php:30
 #: popup.php:93 search.php:139 search.php:172 search.php:191 search.php:371
-#: search.php:401 search.php:424 templates.php:462 templates.php:528
+#: search.php:401 search.php:424 templates.php:461 templates.php:527
 msgid "Graphs"
 msgstr "Grafikonok"
 
@@ -4862,7 +4866,7 @@ msgstr "Grafikonok másolva"
 msgid "Graphs deleted"
 msgstr "Grafikonok törölve"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:54
 msgid "Greek (el_GR)"
 msgstr ""
 
@@ -4870,7 +4874,7 @@ msgstr ""
 msgid "Grid"
 msgstr ""
 
-#: events.php:295 hostinventoriesoverview.php:79 hostinventories.php:93
+#: events.php:298 hostinventoriesoverview.php:79 hostinventories.php:93
 #: hostinventories.php:158 hosts.php:642 httpmon.php:120
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
@@ -4892,7 +4896,7 @@ msgstr ""
 #: include/views/monitoring.overview.php:31
 #: include/views/monitoring.screen.php:114
 #: include/views/monitoring.slides.php:80 latest.php:124 popup.php:503
-#: templates.php:446 tr_status.php:172
+#: templates.php:445 tr_status.php:172
 msgid "Group"
 msgstr "Csoport"
 
@@ -4968,19 +4972,19 @@ msgid "H.i"
 msgstr ""
 
 #: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
-#: include/page_header.php:485
+#: include/page_header.php:486
 msgid "H:i"
 msgstr ""
 
-#: include/blocks.inc.php:336 include/blocks.inc.php:674
-#: include/blocks.inc.php:742 include/blocks.inc.php:940
-#: include/blocks.inc.php:1031 include/blocks.inc.php:1089
+#: include/blocks.inc.php:354 include/blocks.inc.php:692
+#: include/blocks.inc.php:760 include/blocks.inc.php:958
+#: include/blocks.inc.php:1049 include/blocks.inc.php:1107
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
 msgstr ""
 
-#: events.php:258
+#: events.php:282
 msgid "HISTORY OF EVENTS"
 msgstr ""
 
@@ -5024,11 +5028,11 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
-#: sysmaps.php:50 sysmaps.php:267
+#: sysmaps.php:50 sysmaps.php:259
 msgid "Height"
 msgstr "Magasság"
 
-#: include/page_header.php:233 include/views/general.login.php:38
+#: include/page_header.php:234 include/views/general.login.php:38
 msgid "Help"
 msgstr "Segítség"
 
@@ -5067,7 +5071,7 @@ msgstr "Választottak elrejtése"
 msgid "High"
 msgstr "Magas"
 
-#: history.php:27 include/forms.inc.php:853 include/page_header.php:455
+#: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:105
 #: latest.php:196 latest.php:323 latest.php:501
@@ -5103,19 +5107,19 @@ msgstr "Vízszintes"
 msgid "Horizontal align"
 msgstr "Vízszintes igazítás"
 
-#: events.php:299 events.php:512 events.php:562 events.php:575
+#: events.php:302 events.php:509 events.php:560 events.php:573
 #: hostinventories.php:157 httpconf.php:190 httpconf.php:289 httpconf.php:313
 #: httpconf.php:331 httpconf.php:351 httpmon.php:121 httpmon.php:141
-#: include/actions.inc.php:43 include/audit.inc.php:27
-#: include/blocks.inc.php:560 include/blocks.inc.php:607
-#: include/blocks.inc.php:818 include/blocks.inc.php:829
-#: include/blocks.inc.php:1358 include/classes/screens/CScreenEvents.php:45
+#: include/actions.inc.php:64 include/audit.inc.php:27
+#: include/blocks.inc.php:578 include/blocks.inc.php:625
+#: include/blocks.inc.php:836 include/blocks.inc.php:847
+#: include/blocks.inc.php:1391 include/classes/screens/CScreenEvents.php:46
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
 #: include/forms.inc.php:504 include/html.inc.php:379 include/maps.inc.php:24
 #: include/reports.inc.php:112 include/setup.inc.php:310
-#: include/triggers.inc.php:1224 include/triggers.inc.php:1646
+#: include/triggers.inc.php:1183 include/triggers.inc.php:1605
 #: include/views/configuration.application.edit.php:44
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
@@ -5145,7 +5149,7 @@ msgstr "Vízszintes igazítás"
 msgid "Host"
 msgstr "Hoszt"
 
-#: api/classes/CHost.php:1698
+#: api/classes/CHost.php:1695
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr ""
@@ -5155,7 +5159,7 @@ msgstr ""
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:996
+#: api/classes/CTemplate.php:1004
 #, php-format
 msgid "Host \"%s\" already exists."
 msgstr ""
@@ -5169,7 +5173,7 @@ msgstr ""
 msgid "Host (ascending)"
 msgstr ""
 
-#: include/actions.inc.php:53
+#: include/actions.inc.php:76
 msgid "Host IP"
 msgstr "Hoszt IP"
 
@@ -5198,9 +5202,9 @@ msgstr ""
 msgid "Host deleted"
 msgstr "Hoszt törölve"
 
-#: include/actions.inc.php:40 include/audit.inc.php:35
-#: include/blocks.inc.php:167 include/blocks.inc.php:345
-#: include/blocks.inc.php:982 include/forms.inc.php:486
+#: include/actions.inc.php:60 include/audit.inc.php:35
+#: include/blocks.inc.php:185 include/blocks.inc.php:363
+#: include/blocks.inc.php:1000 include/forms.inc.php:486
 #: include/maps.inc.php:25 include/reports.inc.php:111
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.hostgroups.edit.php:63
@@ -5260,7 +5264,7 @@ msgstr ""
 msgid "Host list"
 msgstr ""
 
-#: hosts.php:51 include/actions.inc.php:62
+#: hosts.php:51 include/actions.inc.php:58
 #: include/views/configuration.host.edit.php:170
 msgid "Host name"
 msgstr "Hoszt név"
@@ -5282,7 +5286,7 @@ msgstr ""
 msgid "Host status"
 msgstr "Hoszt státusz"
 
-#: include/triggers.inc.php:1021
+#: include/triggers.inc.php:980
 #, php-format
 msgid "Host status became \"%s\""
 msgstr ""
@@ -5295,7 +5299,7 @@ msgstr "Hoszt státusz frissítve"
 msgid "Host subnet mask"
 msgstr ""
 
-#: include/actions.inc.php:41
+#: include/actions.inc.php:62
 msgid "Host template"
 msgstr "Hoszt sablon"
 
@@ -5303,7 +5307,7 @@ msgstr "Hoszt sablon"
 msgid "Host time"
 msgstr ""
 
-#: api/classes/CHost.php:1576
+#: api/classes/CHost.php:1573
 msgid "Host update failed."
 msgstr ""
 
@@ -5311,20 +5315,20 @@ msgstr ""
 msgid "Host updated"
 msgstr "Hoszt frissítve"
 
-#: api/classes/CHost.php:1426 api/classes/CTemplate.php:1352
+#: api/classes/CHost.php:1423 api/classes/CTemplate.php:1360
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr ""
 
-#: api/classes/CHost.php:1432 api/classes/CTemplate.php:1006
-#: api/classes/CTemplate.php:1325
+#: api/classes/CHost.php:1429 api/classes/CTemplate.php:1014
+#: api/classes/CTemplate.php:1333
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr ""
 
 #: dashconf.php:227 hostinventoriesoverview.php:81 hostinventories.php:94
 #: hosts.php:644 include/forms.inc.php:224 include/forms.inc.php:818
-#: include/items.inc.php:745 include/menu.inc.php:112 include/menu.inc.php:168
+#: include/items.inc.php:752 include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:591 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
@@ -5391,7 +5395,7 @@ msgstr "Órák"
 msgid "Housekeeper"
 msgstr "Adat-karbantartó"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:55
 msgid "Hungarian (hu_HU)"
 msgstr "Magyar (hu_HU)"
 
@@ -5411,7 +5415,7 @@ msgstr "Azonosító"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:486 events.php:495 hosts.php:653
+#: events.php:483 events.php:492 hosts.php:653
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -5477,11 +5481,11 @@ msgstr "IPMI szenzor"
 msgid "IPMI username"
 msgstr "IPMI felhasználónév"
 
-#: srv_status.php:186
+#: srv_status.php:179
 msgid "IT SERVICES"
 msgstr "IT SZOLGÁLTATÁSOK"
 
-#: report3.php:77
+#: report3.php:76
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr "IT SZOLGÁLTATÁSOK RENDELKEZÉSRE-ÁLLÁSI RIPORTJAI"
 
@@ -5499,7 +5503,7 @@ msgstr ""
 
 #: include/menu.inc.php:82 include/menu.inc.php:215
 #: include/views/configuration.services.list.php:26 srv_status.php:26
-#: srv_status.php:187
+#: srv_status.php:180
 msgid "IT services"
 msgstr "IT szolgáltatások"
 
@@ -5690,7 +5694,7 @@ msgstr "Azonnal"
 
 #: hosts.php:634 include/views/configuration.screen.list.php:33
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
-#: sysmaps.php:209 templates.php:438
+#: sysmaps.php:212 templates.php:437
 msgid "Import"
 msgstr "Import"
 
@@ -5736,9 +5740,9 @@ msgstr ""
 msgid "In maintenance"
 msgstr ""
 
-#: include/actions.inc.php:709 include/actions.inc.php:783
-#: include/actions.inc.php:847 include/actions.inc.php:924
-#: include/classes/screens/CScreenActions.php:124
+#: include/actions.inc.php:764 include/actions.inc.php:838
+#: include/actions.inc.php:889 include/actions.inc.php:966
+#: include/classes/screens/CScreenActions.php:140
 #: include/views/administration.auditacts.list.php:94
 msgid "In progress"
 msgstr "Folyamatban"
@@ -5747,7 +5751,7 @@ msgstr "Folyamatban"
 msgid "Include"
 msgstr "Beleértve"
 
-#: api/classes/CService.php:1334
+#: api/classes/CService.php:1364
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr ""
@@ -5778,7 +5782,7 @@ msgstr ""
 msgid "Incorrect SNMP community."
 msgstr ""
 
-#: api/classes/CService.php:1164
+#: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr ""
@@ -5891,7 +5895,7 @@ msgstr ""
 msgid "Incorrect action operationid."
 msgstr ""
 
-#: api/classes/CService.php:1127
+#: api/classes/CService.php:1157
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr ""
@@ -5910,7 +5914,7 @@ msgstr ""
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: api/classes/CService.php:1146
+#: api/classes/CService.php:1176
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr ""
@@ -5924,17 +5928,17 @@ msgstr ""
 msgid "Incorrect characters used for Proxy name \"%s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:987
+#: api/classes/CTemplate.php:995
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr ""
 
-#: api/classes/CHost.php:1360 api/classes/CHost.php:1681
+#: api/classes/CHost.php:1357 api/classes/CHost.php:1678
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr ""
 
-#: api/classes/CTemplate.php:1357
+#: api/classes/CTemplate.php:1365
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
 msgstr ""
@@ -5984,7 +5988,7 @@ msgstr ""
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr ""
 
-#: include/triggers.inc.php:626 include/triggers.inc.php:1782
+#: include/triggers.inc.php:585 include/triggers.inc.php:1741
 #: tr_testexpr.php:37
 msgid "Incorrect function is used"
 msgstr "Hibás funkció"
@@ -6027,7 +6031,7 @@ msgstr ""
 msgid "Incorrect interface port \"%s\" provided."
 msgstr ""
 
-#: api/classes/CHost.php:1294
+#: api/classes/CHost.php:1291
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr ""
@@ -6041,7 +6045,7 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr ""
 
-#: api/classes/CTrigger.php:1206 include/triggers.inc.php:958
+#: api/classes/CTrigger.php:1206 include/triggers.inc.php:917
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr ""
@@ -6156,12 +6160,12 @@ msgstr ""
 msgid "Incorrect parameters for user group."
 msgstr ""
 
-#: api/classes/CService.php:1212
+#: api/classes/CService.php:1242
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1215
+#: api/classes/CService.php:1245
 msgid "Incorrect parent service."
 msgstr ""
 
@@ -6203,12 +6207,12 @@ msgstr ""
 msgid "Incorrect service time type."
 msgstr ""
 
-#: api/classes/CService.php:1181
+#: api/classes/CService.php:1211
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1235
+#: api/classes/CService.php:1265
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr ""
@@ -6243,12 +6247,12 @@ msgstr ""
 msgid "Incorrect time period \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1196
+#: api/classes/CService.php:1226
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr ""
 
-#: include/triggers.inc.php:637
+#: include/triggers.inc.php:596
 msgid "Incorrect trigger expression"
 msgstr "Hibás trigger kifejezés"
 
@@ -6257,7 +6261,7 @@ msgstr "Hibás trigger kifejezés"
 msgid "Incorrect trigger expression."
 msgstr ""
 
-#: include/triggers.inc.php:1098
+#: include/triggers.inc.php:1057
 #, php-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr ""
@@ -6343,11 +6347,11 @@ msgstr ""
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr ""
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:56
 msgid "Indonesian (id_ID)"
 msgstr ""
 
-#: include/blocks.inc.php:833 include/blocks.inc.php:1361
+#: include/blocks.inc.php:851 include/blocks.inc.php:1394
 #: include/classes/class.cformlist.php:65 tr_status.php:286
 msgid "Info"
 msgstr ""
@@ -6463,7 +6467,7 @@ msgstr ""
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1473 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1503 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr ""
@@ -6507,8 +6511,8 @@ msgstr ""
 msgid "Is online?"
 msgstr "Bejelentkezve?"
 
-#: include/blocks.inc.php:820 include/blocks.inc.php:830
-#: include/blocks.inc.php:1359
+#: include/blocks.inc.php:838 include/blocks.inc.php:848
+#: include/blocks.inc.php:1392
 msgid "Issue"
 msgstr "Eredmény"
 
@@ -6516,7 +6520,7 @@ msgstr "Eredmény"
 msgid "It is not possible to filter by user password."
 msgstr ""
 
-#: include/page_header.php:262
+#: include/page_header.php:263
 msgid "It is not possible to logout from HTTP authentication."
 msgstr ""
 
@@ -6524,7 +6528,7 @@ msgstr ""
 msgid "It is not possible to search by user password."
 msgstr ""
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:57
 msgid "Italian (it_IT)"
 msgstr "Olasz (it_IT)"
 
@@ -6652,7 +6656,7 @@ msgid "Item with key \"%s\" already exists."
 msgstr ""
 
 #: hosts.php:684 hosts.php:761 include/html.inc.php:421
-#: include/html.inc.php:425 include/items.inc.php:726
+#: include/html.inc.php:425 include/items.inc.php:733
 #: include/reports.inc.php:329 include/reports.inc.php:465
 #: include/views/configuration.application.list.php:73
 #: include/views/configuration.graph.edit.php:280
@@ -6662,7 +6666,7 @@ msgstr ""
 #: include/views/configuration.template.edit.php:240
 #: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:158
 #: search.php:137 search.php:164 search.php:183 search.php:369 search.php:393
-#: search.php:416 templates.php:460 templates.php:524
+#: search.php:416 templates.php:459 templates.php:523
 msgid "Items"
 msgstr "Elemek"
 
@@ -6742,7 +6746,7 @@ msgstr ""
 msgid "January"
 msgstr "Január"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:59
 msgid "Japanese (ja_JP)"
 msgstr "Japán (ja_JP)"
 
@@ -6825,7 +6829,7 @@ msgstr "Kulcsszó"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:58
 msgid "Korean (ko_KR)"
 msgstr "Koreai (ko_KR)"
 
@@ -6860,7 +6864,7 @@ msgstr ""
 msgid "LOCAL"
 msgstr ""
 
-#: include/triggers.inc.php:222
+#: include/triggers.inc.php:181
 msgid "LOST"
 msgstr ""
 
@@ -6885,7 +6889,7 @@ msgstr "Nyelv"
 msgid "Last"
 msgstr "Utolsó"
 
-#: include/func.inc.php:1681
+#: include/func.inc.php:1696
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -6913,23 +6917,23 @@ msgstr ""
 msgid "Last (most recent) T value is NOT N"
 msgstr ""
 
-#: srv_status.php:90
+#: srv_status.php:82
 msgid "Last 24 hours"
 msgstr "Utolsó 24 óra"
 
-#: srv_status.php:92
+#: srv_status.php:84
 msgid "Last 30 days"
 msgstr "Utolsó 30 nap"
 
-#: srv_status.php:93
+#: srv_status.php:85
 msgid "Last 365 days"
 msgstr "Utolsó 365 nap"
 
-#: srv_status.php:91
+#: srv_status.php:83
 msgid "Last 7 days"
 msgstr "Utolsó 7 nap"
 
-#: include/blocks.inc.php:822 include/blocks.inc.php:831 tr_status.php:287
+#: include/blocks.inc.php:840 include/blocks.inc.php:849 tr_status.php:287
 msgid "Last change"
 msgstr "Aktuális változás"
 
@@ -6946,11 +6950,11 @@ msgstr "Utolsó ellenőrzés"
 msgid "Last error message of scenario \"%s\"."
 msgstr ""
 
-#: include/items.inc.php:798
+#: include/items.inc.php:805
 msgid "Last hour graph"
 msgstr "Utolsó óra grafikonja"
 
-#: include/items.inc.php:800
+#: include/items.inc.php:807
 msgid "Last month graph"
 msgstr "Utolsó hónap grafikonja"
 
@@ -6967,11 +6971,11 @@ msgstr "Utolsó kapcsolat időpontja"
 msgid "Last value"
 msgstr "Utolsó érték"
 
-#: include/items.inc.php:799
+#: include/items.inc.php:806
 msgid "Last week graph"
 msgstr "Utolsó hét grafikonja"
 
-#: include/menu.inc.php:47 jsLoader.php:175 latest.php:26 report5.php:144
+#: include/menu.inc.php:47 jsLoader.php:175 latest.php:26 report5.php:159
 #: search.php:132 search.php:204 search.php:259 search.php:311
 msgid "Latest data"
 msgstr "Legfrissebb adat"
@@ -6980,7 +6984,7 @@ msgstr "Legfrissebb adat"
 msgid "Latest events"
 msgstr "Legfrissebb események"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:60
 msgid "Latvian (lv_LV)"
 msgstr "Litván (lv_LV)"
 
@@ -7055,11 +7059,11 @@ msgstr ""
 msgid "Link templates"
 msgstr ""
 
-#: include/actions.inc.php:504
+#: include/actions.inc.php:559
 msgid "Link to template"
 msgstr "Hozzáadás a sablonhoz"
 
-#: include/actions.inc.php:333
+#: include/actions.inc.php:388
 msgid "Link to templates"
 msgstr ""
 
@@ -7067,11 +7071,11 @@ msgstr ""
 msgid "Link with templates"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:417 templates.php:465
+#: include/views/configuration.template.edit.php:417 templates.php:464
 msgid "Linked templates"
 msgstr "Csatolt minták"
 
-#: templates.php:466
+#: templates.php:465
 msgid "Linked to"
 msgstr "Csatolva"
 
@@ -7114,7 +7118,7 @@ msgid "Location longitude"
 msgstr ""
 
 #: include/forms.inc.php:419 include/items.inc.php:122
-#: include/triggers.inc.php:2245 include/views/configuration.item.edit.php:218
+#: include/triggers.inc.php:2204 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:161
 msgid "Log"
 msgstr "Napló"
@@ -7157,7 +7161,7 @@ msgid "Logged in as"
 msgstr ""
 
 #: auditlogs.php:143 include/config.inc.php:258 include/menu.inc.php:285
-#: include/page_header.php:270
+#: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:60
@@ -7168,17 +7172,21 @@ msgstr "Belépés"
 msgid "Login as Guest"
 msgstr ""
 
-#: api/classes/CUser.php:980
+#: api/classes/CUser.php:977
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:848 api/classes/CUser.php:866
-#: api/classes/CUser.php:913
+#: authentication.php:108 authentication.php:136
+msgid "Login name or password is incorrect"
+msgstr ""
+
+#: api/classes/CUser.php:845 api/classes/CUser.php:863
+#: api/classes/CUser.php:910
 msgid "Login name or password is incorrect."
 msgstr ""
 
-#: auditlogs.php:146 include/page_header.php:261 include/page_header.php:265
+#: auditlogs.php:146 include/page_header.php:262 include/page_header.php:266
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
 msgstr "Kilépés"
@@ -7203,7 +7211,7 @@ msgctxt "Monday short"
 msgid "M"
 msgstr ""
 
-#: include/defines.inc.php:909 report3.php:117
+#: include/defines.inc.php:909 report3.php:116
 msgid "M Y"
 msgstr ""
 
@@ -7317,7 +7325,7 @@ msgstr "Karbantartási időszak hossza"
 msgid "Maintenance periods"
 msgstr ""
 
-#: include/actions.inc.php:48
+#: include/actions.inc.php:50
 msgid "Maintenance status"
 msgstr "Karbantartás állapota"
 
@@ -7329,11 +7337,11 @@ msgstr "Karbantartás típusa"
 msgid "Maintenance updated"
 msgstr "Karbantartás frissítve"
 
-#: include/blocks.inc.php:862 tr_status.php:623
+#: include/blocks.inc.php:880 tr_status.php:623
 msgid "Maintenance with data collection"
 msgstr ""
 
-#: include/blocks.inc.php:861 tr_status.php:622
+#: include/blocks.inc.php:879 tr_status.php:622
 msgid "Maintenance without data collection"
 msgstr ""
 
@@ -7355,7 +7363,7 @@ msgstr ""
 msgid "Manual Logout"
 msgstr ""
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1212
+#: include/audit.inc.php:40 include/blocks.inc.php:1239
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
@@ -7415,9 +7423,9 @@ msgstr ""
 msgid "Mappings"
 msgstr ""
 
-#: dashboard.php:274 include/blocks.inc.php:1245 include/menu.inc.php:72
+#: dashboard.php:274 include/blocks.inc.php:1272 include/menu.inc.php:72
 #: include/menu.inc.php:206 include/views/conf.import.php:36 popup.php:101
-#: sysmaps.php:259
+#: sysmaps.php:251
 msgid "Maps"
 msgstr "Térképek"
 
@@ -7494,7 +7502,7 @@ msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characte
 msgstr[0] ""
 msgstr[1] ""
 
-#: api/classes/CHost.php:1350
+#: api/classes/CHost.php:1347
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7517,7 +7525,7 @@ msgstr ""
 msgid "Maximum value for period T is NOT N"
 msgstr ""
 
-#: api/classes/CHost.php:1386
+#: api/classes/CHost.php:1383
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7599,10 +7607,10 @@ msgstr ""
 msgid "Menu"
 msgstr "Menü"
 
-#: acknow.php:208 include/actions.inc.php:351 include/actions.inc.php:360
-#: include/actions.inc.php:366 include/actions.inc.php:680
-#: include/actions.inc.php:724 include/classes/screens/CScreenActions.php:114
-#: include/classes/screens/CScreenActions.php:138
+#: acknow.php:208 include/actions.inc.php:406 include/actions.inc.php:415
+#: include/actions.inc.php:421 include/actions.inc.php:735
+#: include/actions.inc.php:779 include/classes/screens/CScreenActions.php:130
+#: include/classes/screens/CScreenActions.php:154
 #: include/views/administration.auditacts.list.php:75
 #: include/views/administration.auditacts.list.php:103
 #: include/views/configuration.action.edit.php:546
@@ -7773,13 +7781,13 @@ msgstr "Monitorozitt hoszt"
 msgid "Monitoring"
 msgstr "Felügyelet"
 
-#: include/forms.inc.php:1570 report3.php:109 report4.php:143 report5.php:47
+#: include/forms.inc.php:1570 report3.php:108 report4.php:143 report5.php:47
 msgid "Month"
 msgstr "Hónap"
 
 #: include/forms.inc.php:1507 include/maintenances.inc.php:39
 #: include/reports.inc.php:221 include/reports.inc.php:667
-#: include/reports.inc.php:675 report3.php:63 report4.php:100
+#: include/reports.inc.php:675 report3.php:62 report4.php:100
 msgid "Monthly"
 msgstr "Havi"
 
@@ -7804,7 +7812,7 @@ msgstr ""
 msgid "Mozilla Firefox"
 msgstr ""
 
-#: include/triggers.inc.php:1650
+#: include/triggers.inc.php:1609
 msgid "Multiple PROBLEM events"
 msgstr ""
 
@@ -7898,20 +7906,20 @@ msgstr ""
 #: popup.php:1920 popup.php:1943 popup.php:1972 popup.php:1979
 #: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:236
 #: screenconf.php:50 services.php:42 slideconf.php:38 sysmaps.php:48
-#: sysmaps.php:265 trigger_prototypes.php:41 triggers.php:41 tr_status.php:293
+#: sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41 tr_status.php:293
 #: users.php:44
 msgid "Name"
 msgstr "Név"
 
-#: sysmaps.php:167
+#: sysmaps.php:170
 msgid "Network map added"
 msgstr "Hálózati térkép létrehozva"
 
-#: sysmaps.php:188
+#: sysmaps.php:191
 msgid "Network map deleted"
 msgstr "Hálózati térkép törölve"
 
-#: sysmaps.php:157
+#: sysmaps.php:160
 msgid "Network map updated"
 msgstr "Hálózati térkép frissítve"
 
@@ -7990,7 +7998,7 @@ msgstr "Új szolgáltatási időszak felvétele"
 msgid "Next"
 msgstr "Következő"
 
-#: include/func.inc.php:1674
+#: include/func.inc.php:1689
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
@@ -7999,9 +8007,9 @@ msgstr ""
 msgid "Next check"
 msgstr "Következő ellenőrzés"
 
-#: events.php:760 include/config.inc.php:560 include/events.inc.php:298
-#: include/events.inc.php:316 include/forms.inc.php:1922
-#: include/triggers.inc.php:1651
+#: events.php:756 include/config.inc.php:560 include/events.inc.php:303
+#: include/events.inc.php:321 include/forms.inc.php:1922
+#: include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
 msgid "No"
@@ -8029,7 +8037,7 @@ msgstr ""
 msgid "No accessible resources"
 msgstr "Nincsenek hozzáférhető erőforrások"
 
-#: include/acknow.inc.php:42
+#: include/acknow.inc.php:53
 msgid "No acknowledges defined."
 msgstr ""
 
@@ -8038,8 +8046,8 @@ msgstr ""
 msgid "No actions defined."
 msgstr ""
 
-#: include/actions.inc.php:672 include/actions.inc.php:751
-#: include/actions.inc.php:820 include/classes/screens/CScreenActions.php:106
+#: include/actions.inc.php:727 include/actions.inc.php:806
+#: include/actions.inc.php:863 include/classes/screens/CScreenActions.php:122
 msgid "No actions found."
 msgstr ""
 
@@ -8146,7 +8154,7 @@ msgstr ""
 msgid "No events"
 msgstr ""
 
-#: events.php:386 include/classes/screens/CScreenEvents.php:41
+#: events.php:386 include/classes/screens/CScreenEvents.php:42
 msgid "No events defined."
 msgstr ""
 
@@ -8188,20 +8196,20 @@ msgstr ""
 msgid "No graphs defined."
 msgstr ""
 
-#: api/classes/CHost.php:1314 api/classes/CHost.php:1328
+#: api/classes/CHost.php:1311 api/classes/CHost.php:1325
 #, php-format
 msgid "No groups for host \"%s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1667
+#: api/classes/CHost.php:1664
 msgid "No groups for hosts."
 msgstr ""
 
-#: api/classes/CTemplate.php:1296
+#: api/classes/CTemplate.php:1304
 msgid "No groups for template"
 msgstr ""
 
-#: api/classes/CTemplate.php:946
+#: api/classes/CTemplate.php:954
 #, php-format
 msgid "No groups for template [ %s ]"
 msgstr ""
@@ -8229,7 +8237,7 @@ msgstr ""
 msgid "No host groups defined."
 msgstr ""
 
-#: include/actions.inc.php:93 include/hosts.inc.php:490
+#: include/hosts.inc.php:490
 #, php-format
 msgid "No host groups with groupid \"%s\"."
 msgstr ""
@@ -8280,7 +8288,7 @@ msgstr ""
 msgid "No interfaces defined."
 msgstr ""
 
-#: api/classes/CHost.php:1318 api/classes/CHost.php:1340
+#: api/classes/CHost.php:1315 api/classes/CHost.php:1337
 #, php-format
 msgid "No interfaces for host \"%s\"."
 msgstr ""
@@ -8313,7 +8321,7 @@ msgstr ""
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart.php:49 include/items.inc.php:718
+#: chart.php:49 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:954 popup.php:1089
 #: popup.php:1452 popup.php:1626
@@ -8336,7 +8344,7 @@ msgstr ""
 msgid "No map ID provided for screen element."
 msgstr ""
 
-#: include/views/monitoring.maps.php:27 popup.php:1559 sysmaps.php:262
+#: include/views/monitoring.maps.php:27 popup.php:1559 sysmaps.php:254
 msgid "No maps defined."
 msgstr ""
 
@@ -8410,14 +8418,14 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:927 api/classes/CUser.php:1037
+#: api/classes/CUser.php:924 api/classes/CUser.php:1034
 msgid "No permissions for system access."
 msgstr ""
 
 #: api/classes/CAction.php:854 api/classes/CAction.php:1442
 #: api/classes/CApplication.php:442 api/classes/CApplication.php:449
 #: api/classes/CApplication.php:597 api/classes/CApplication.php:674
-#: api/classes/CApplication.php:688 api/classes/CDiscoveryRule.php:584
+#: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:584
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
 #: api/classes/CDiscoveryRule.php:685 api/classes/CDiscoveryRule.php:688
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
@@ -8425,7 +8433,7 @@ msgstr ""
 #: api/classes/CGraph.php:813 api/classes/CGraphPrototype.php:860
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
-#: api/classes/CHost.php:1301 api/classes/CHost.php:1333
+#: api/classes/CHost.php:1298 api/classes/CHost.php:1330
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
@@ -8437,8 +8445,8 @@ msgstr ""
 #: api/classes/CMap.php:550 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1256
-#: api/classes/CService.php:1271 api/classes/CTemplateScreen.php:775
+#: api/classes/CScreen.php:578 api/classes/CService.php:1286
+#: api/classes/CService.php:1301 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
 #: api/classes/CTrigger.php:1444 api/classes/CTrigger.php:1702
@@ -8489,7 +8497,7 @@ msgstr ""
 msgid "No resources defined."
 msgstr ""
 
-#: include/classes/screens/CScreenBuilder.php:296
+#: include/classes/screens/CScreenBuilder.php:293
 msgid "No rows in screen."
 msgstr ""
 
@@ -8497,7 +8505,7 @@ msgstr ""
 msgid "No screen ID provided for screen element."
 msgstr ""
 
-#: include/classes/screens/CScreenBuilder.php:270
+#: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:46
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.php:37 popup.php:1743 popup.php:1801
@@ -8535,7 +8543,7 @@ msgid "No target selected."
 msgstr ""
 
 #: include/views/configuration.host.massupdate.php:87 popup.php:632
-#: popup.php:739 popup.php:793 templates.php:454
+#: popup.php:739 popup.php:793 templates.php:453
 msgid "No templates defined."
 msgstr ""
 
@@ -8547,12 +8555,12 @@ msgstr ""
 msgid "No trigger"
 msgstr "Nincs trigger"
 
-#: include/triggers.inc.php:307
+#: include/triggers.inc.php:266
 #, php-format
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
-#: chart4.php:40 include/triggers.inc.php:1194
+#: chart4.php:40 include/triggers.inc.php:1153
 #: include/views/configuration.triggers.list.php:90 popup.php:974
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8587,13 +8595,13 @@ msgstr ""
 msgid "No web scenarios defined."
 msgstr ""
 
-#: events.php:561 events.php:574 hostinventories.php:156 httpmon.php:140
-#: include/actions.inc.php:49 include/audit.inc.php:42
-#: include/blocks.inc.php:166 include/blocks.inc.php:344
-#: include/blocks.inc.php:828 include/blocks.inc.php:981
-#: include/blocks.inc.php:1072 include/blocks.inc.php:1357
-#: include/classes/screens/CScreenEvents.php:44 include/page_header.php:354
-#: include/triggers.inc.php:1625 include/views/administration.node.edit.php:83
+#: events.php:559 events.php:572 hostinventories.php:156 httpmon.php:140
+#: include/actions.inc.php:68 include/audit.inc.php:42
+#: include/blocks.inc.php:184 include/blocks.inc.php:362
+#: include/blocks.inc.php:846 include/blocks.inc.php:999
+#: include/blocks.inc.php:1090 include/blocks.inc.php:1390
+#: include/classes/screens/CScreenEvents.php:45 include/page_header.php:355
+#: include/triggers.inc.php:1584 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:493
 #: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
@@ -8617,8 +8625,8 @@ msgstr "Csomópont frissítve"
 msgid "Node with same ID already exists."
 msgstr ""
 
-#: include/actions.inc.php:674 include/actions.inc.php:753
-#: include/actions.inc.php:823 include/classes/screens/CScreenActions.php:108
+#: include/actions.inc.php:729 include/actions.inc.php:808
+#: include/actions.inc.php:866 include/classes/screens/CScreenActions.php:124
 #: include/forms.inc.php:170
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.node.list.php:25
@@ -8637,7 +8645,7 @@ msgstr "Csomópontok"
 msgid "None"
 msgstr "Nincs"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1650 popup.php:1423
+#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1423
 msgid "Normal"
 msgstr "Normál"
 
@@ -8645,7 +8653,7 @@ msgstr "Normál"
 msgid "Normal view"
 msgstr ""
 
-#: include/actions.inc.php:189 include/views/configuration.action.edit.php:937
+#: include/actions.inc.php:245 include/views/configuration.action.edit.php:937
 msgid "Not Ack"
 msgstr "Nincs nyugtázva"
 
@@ -8679,7 +8687,7 @@ msgstr "Nincs osztályozva"
 msgid "Not connected"
 msgstr "Nincs csatlakozva"
 
-#: hosts.php:801 include/html.inc.php:372 include/triggers.inc.php:1021
+#: hosts.php:801 include/html.inc.php:372 include/triggers.inc.php:980
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:76 popup.php:572
 msgid "Not monitored"
@@ -8732,11 +8740,11 @@ msgstr "November"
 msgid "Now"
 msgstr ""
 
-#: include/blocks.inc.php:697 include/blocks.inc.php:699
+#: include/blocks.inc.php:715 include/blocks.inc.php:717
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "Hosztok száma (monitorozott/nem monitorozott/minták)"
 
-#: include/blocks.inc.php:706
+#: include/blocks.inc.php:724
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "Elemek száma (monitorozott/letiltott/nem támogatott)"
 
@@ -8780,23 +8788,23 @@ msgstr ""
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
 msgstr ""
 
-#: include/blocks.inc.php:715
+#: include/blocks.inc.php:733
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
 msgstr "Triggerek száma (engedélyezett/letiltott)[hiba/ismeretlen/ok]"
 
-#: include/blocks.inc.php:726
+#: include/blocks.inc.php:744
 msgid "Number of users (online)"
 msgstr "Felhasználók száma (bejelentkezve)"
 
 #: include/forms.inc.php:417 include/items.inc.php:118
-#: include/triggers.inc.php:2243 include/views/configuration.item.edit.php:216
+#: include/triggers.inc.php:2202 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:159
 msgid "Numeric (float)"
 msgstr "Numerikus (lebegőpontos)"
 
-#: include/triggers.inc.php:2242 include/triggers.inc.php:2261
-#: include/triggers.inc.php:2271 include/triggers.inc.php:2276
-#: include/triggers.inc.php:2280
+#: include/triggers.inc.php:2201 include/triggers.inc.php:2220
+#: include/triggers.inc.php:2230 include/triggers.inc.php:2235
+#: include/triggers.inc.php:2239
 msgid "Numeric (integer 64bit)"
 msgstr "Numerikus (64 bites egész szám)"
 
@@ -8810,12 +8818,12 @@ msgstr "Numerikus (pozitív egész)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:167 chart5.php:193 httpdetails.php:146 httpdetails.php:213
+#: chart4.php:167 chart5.php:192 httpdetails.php:146 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:645 include/maps.inc.php:735 include/maps.inc.php:832
 #: include/maps.inc.php:929 include/setup.inc.php:200
 #: include/setup.inc.php:231 include/setup.inc.php:296
-#: include/setup.inc.php:449 include/triggers.inc.php:206
+#: include/setup.inc.php:449 include/triggers.inc.php:165
 msgid "OK"
 msgstr "OK"
 
@@ -8831,7 +8839,7 @@ msgstr ""
 msgid "OOB subnet mask"
 msgstr ""
 
-#: include/triggers.inc.php:1705
+#: include/triggers.inc.php:1664
 #: include/views/configuration.action.edit.php:115
 #: include/views/configuration.action.edit.php:881
 #: include/views/configuration.triggers.edit.php:111 tr_logform.php:291
@@ -8875,10 +8883,10 @@ msgstr "Október"
 msgid "Off"
 msgstr "KIKAPCSOL"
 
-#: include/actions.inc.php:927 include/blocks.inc.php:983
+#: include/actions.inc.php:969 include/blocks.inc.php:1001
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:238
-#: report3.php:86
+#: report3.php:85
 msgid "Ok"
 msgstr "Ok"
 
@@ -8968,7 +8976,7 @@ msgstr ""
 msgid "Only characters are allowed."
 msgstr ""
 
-#: include/blocks.inc.php:707
+#: include/blocks.inc.php:725
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Csak az engedélyezett hosztokhoz rendelt elemekből számítva"
 
@@ -8989,7 +8997,7 @@ msgstr ""
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr ""
 
-#: include/blocks.inc.php:716
+#: include/blocks.inc.php:734
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Csak az engedélyezett hosztokhoz rendelt, engedélyezett elemekhez tartozó triggerekből számítva"
 
@@ -9299,7 +9307,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:197 include/maps.inc.php:626 include/triggers.inc.php:207
+#: chart5.php:196 include/maps.inc.php:626 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr "HIBA"
 
@@ -9317,7 +9325,7 @@ msgstr "Paletta"
 msgid "Palette #%1$s"
 msgstr ""
 
-#: include/blocks.inc.php:684
+#: include/blocks.inc.php:702
 #: include/views/configuration.screen.constructor.edit.php:191
 #: include/views/configuration.screen.constructor.edit.php:219
 #: include/views/configuration.screen.constructor.edit.php:273
@@ -9439,8 +9447,8 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:271
 #: include/views/configuration.item.massupdate.php:314
 #: include/views/configuration.maintenance.edit.php:135 popup_period.php:27
-#: popup_period.php:92 popup_period.php:175 report3.php:65 report4.php:96
-#: srv_status.php:183
+#: popup_period.php:92 popup_period.php:175 report3.php:64 report4.php:96
+#: srv_status.php:176
 msgid "Period"
 msgstr "Időszak"
 
@@ -9463,7 +9471,7 @@ msgstr ""
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:61
 msgid "Persian (fa_IR)"
 msgstr ""
 
@@ -9508,7 +9516,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr ""
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:62
 msgid "Polish (pl_PL)"
 msgstr "Lengyel (pl_PL)"
 
@@ -9538,11 +9546,11 @@ msgstr ""
 msgid "Port range"
 msgstr ""
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Portuguese (pt_BR)"
 msgstr "Portugál (pt_BR)"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -9565,7 +9573,7 @@ msgstr "Előnézet"
 msgid "Previous"
 msgstr "Előző"
 
-#: include/func.inc.php:1647
+#: include/func.inc.php:1662
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -9614,7 +9622,7 @@ msgstr ""
 msgid "Primary POC screen name"
 msgstr ""
 
-#: include/page_header.php:240
+#: include/page_header.php:241
 msgid "Print"
 msgstr "Nyomtatás"
 
@@ -9628,7 +9636,7 @@ msgstr "Privát kulcsfájl"
 msgid "Privilege level"
 msgstr ""
 
-#: api/classes/CUser.php:838
+#: api/classes/CUser.php:835
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
@@ -9641,11 +9649,11 @@ msgstr "Hiba"
 msgid "Problem display"
 msgstr ""
 
-#: jsrpc.php:119
+#: jsrpc.php:118
 msgid "Problem on"
 msgstr ""
 
-#: srv_status.php:166
+#: srv_status.php:159
 msgid "Problem time"
 msgstr ""
 
@@ -9658,11 +9666,11 @@ msgid "Problem, if at least one child has a problem"
 msgstr "Számítás, ha legalább egy alárendelt elem állapota hibás"
 
 #: chart4.php:171 include/maps.inc.php:678 include/maps.inc.php:768
-#: include/maps.inc.php:866 report2.php:237 report3.php:86
+#: include/maps.inc.php:866 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr "Hibák"
 
-#: include/page_header.php:246
+#: include/page_header.php:247
 msgid "Profile"
 msgstr "Profil"
 
@@ -9676,7 +9684,7 @@ msgstr ""
 msgid "Proxies"
 msgstr "Proxik"
 
-#: include/actions.inc.php:61 include/audit.inc.php:46
+#: include/actions.inc.php:92 include/audit.inc.php:46
 #: include/views/administration.proxy.edit.php:86 queue.php:221
 msgid "Proxy"
 msgstr "Proxy"
@@ -9767,11 +9775,11 @@ msgstr "Csak olvasható"
 msgid "Read-write"
 msgstr "Írható-olvasható"
 
-#: srv_status.php:165
+#: srv_status.php:158
 msgid "Reason"
 msgstr "Ok"
 
-#: include/actions.inc.php:58
+#: include/actions.inc.php:86
 msgid "Received value"
 msgstr "Fogadott érték"
 
@@ -9787,9 +9795,9 @@ msgstr ""
 msgid "Recipient (descending)"
 msgstr ""
 
-#: include/actions.inc.php:679 include/classes/screens/CScreenActions.php:78
+#: include/actions.inc.php:734 include/classes/screens/CScreenActions.php:78
 #: include/classes/screens/CScreenActions.php:83
-#: include/classes/screens/CScreenActions.php:113
+#: include/classes/screens/CScreenActions.php:129
 #: include/views/administration.auditacts.list.php:74
 msgid "Recipient(s)"
 msgstr "Címzett(ek)"
@@ -9811,11 +9819,11 @@ msgstr "Visszaállás tárgya"
 msgid "Refresh (in seconds)"
 msgstr "Frissités (másodpercben)"
 
-#: include/func.inc.php:1755
+#: include/func.inc.php:1770
 msgid "Refresh time in seconds"
 msgstr ""
 
-#: include/func.inc.php:1759
+#: include/func.inc.php:1774
 msgid "Refresh time multiplier"
 msgstr ""
 
@@ -9889,14 +9897,14 @@ msgstr "Reguláris kifejezések"
 msgid "Remember me for 30 days"
 msgstr ""
 
-#: include/actions.inc.php:497
+#: include/actions.inc.php:552
 msgid "Remote command"
 msgstr "Távoli parancs"
 
-#: include/blocks.inc.php:1114 include/blocks.inc.php:1191
-#: include/blocks.inc.php:1200 include/blocks.inc.php:1217
-#: include/blocks.inc.php:1245 include/blocks.inc.php:1268
-#: include/blocks.inc.php:1323 include/blocks.inc.php:1332
+#: include/blocks.inc.php:1132 include/blocks.inc.php:1218
+#: include/blocks.inc.php:1227 include/blocks.inc.php:1244
+#: include/blocks.inc.php:1272 include/blocks.inc.php:1295
+#: include/blocks.inc.php:1356 include/blocks.inc.php:1365
 #: include/views/administration.general.iconmap.edit.php:69
 #: include/views/administration.general.iconmap.edit.php:106
 #: include/views/common.macros.php:38
@@ -9950,15 +9958,15 @@ msgstr "Eltávolítás"
 msgid "Remove from favourites"
 msgstr ""
 
-#: include/actions.inc.php:503
+#: include/actions.inc.php:558
 msgid "Remove from host group"
 msgstr ""
 
-#: include/actions.inc.php:312 include/views/configuration.action.edit.php:767
+#: include/actions.inc.php:367 include/views/configuration.action.edit.php:767
 msgid "Remove from host groups"
 msgstr ""
 
-#: include/actions.inc.php:286 include/actions.inc.php:499
+#: include/actions.inc.php:341 include/actions.inc.php:554
 msgid "Remove host"
 msgstr "Hoszt eltávolítása"
 
@@ -10027,7 +10035,7 @@ msgstr ""
 msgid "Required performance (vps)"
 msgstr ""
 
-#: include/blocks.inc.php:727
+#: include/blocks.inc.php:745
 msgid "Required server performance, new values per second"
 msgstr "Szükséges szerver teljesítmény (másodpercenkénti mérések száma))"
 
@@ -10069,7 +10077,7 @@ msgstr ""
 msgid "Reset defaults"
 msgstr ""
 
-#: jsrpc.php:114
+#: jsrpc.php:113
 msgid "Resolved"
 msgstr ""
 
@@ -10120,9 +10128,9 @@ msgstr ""
 msgid "Result type"
 msgstr "Eredmény típusa"
 
-#: include/actions.inc.php:678 include/classes/screens/CScreenActions.php:68
+#: include/actions.inc.php:733 include/classes/screens/CScreenActions.php:68
 #: include/classes/screens/CScreenActions.php:73
-#: include/classes/screens/CScreenActions.php:112
+#: include/classes/screens/CScreenActions.php:128
 #: include/views/administration.auditacts.list.php:73
 msgid "Retries left"
 msgstr "Hátralévő próbálkozások száma"
@@ -10170,47 +10178,47 @@ msgstr "Sorok oldalanként"
 msgid "Rules"
 msgstr "Szabályok"
 
-#: include/actions.inc.php:373
+#: include/actions.inc.php:428
 msgid "Run IPMI command"
 msgstr ""
 
-#: include/actions.inc.php:376
+#: include/actions.inc.php:431
 msgid "Run SSH commands"
 msgstr ""
 
-#: include/actions.inc.php:379
+#: include/actions.inc.php:434
 msgid "Run TELNET commands"
 msgstr ""
 
-#: include/actions.inc.php:399
+#: include/actions.inc.php:454
 msgid "Run commands"
 msgstr ""
 
-#: include/actions.inc.php:383
+#: include/actions.inc.php:438
 msgid "Run custom commands on Zabbix agent"
 msgstr ""
 
-#: include/actions.inc.php:386
+#: include/actions.inc.php:441
 msgid "Run custom commands on Zabbix server"
 msgstr ""
 
-#: include/actions.inc.php:396
+#: include/actions.inc.php:451
 msgid "Run global script"
 msgstr ""
 
-#: include/actions.inc.php:259
+#: include/actions.inc.php:314
 msgid "Run remote commands on current host"
 msgstr ""
 
-#: include/actions.inc.php:278
+#: include/actions.inc.php:333
 msgid "Run remote commands on host groups"
 msgstr ""
 
-#: include/actions.inc.php:266
+#: include/actions.inc.php:321
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Russian (ru_RU)"
 msgstr "Orosz (ru_RU)"
 
@@ -10239,7 +10247,7 @@ msgstr "KERESÉS"
 msgid "SERVER"
 msgstr ""
 
-#: report3.php:86 srv_status.php:167
+#: report3.php:85 srv_status.php:160
 msgid "SLA"
 msgstr "SLA"
 
@@ -10515,7 +10523,7 @@ msgstr "Scenario-k"
 msgid "Schedule"
 msgstr "Időzítés"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1257
+#: include/audit.inc.php:41 include/blocks.inc.php:1284
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:45
 #: include/views/configuration.screen.list.php:51
 #: include/views/configuration.slideconf.edit.php:48
@@ -10585,7 +10593,7 @@ msgstr ""
 msgid "Screen with name \"%s\" does not exist."
 msgstr ""
 
-#: dashboard.php:267 include/blocks.inc.php:1323 include/html.inc.php:484
+#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:484
 #: include/html.inc.php:488 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
@@ -10593,7 +10601,7 @@ msgstr ""
 #: include/views/monitoring.screen.php:86
 #: include/views/monitoring.slides.php:31 popup.php:85 popup.php:109
 #: search.php:135 search.php:207 search.php:372 search.php:405 search.php:428
-#: templates.php:463 templates.php:530
+#: templates.php:462 templates.php:529
 msgid "Screens"
 msgstr "Képernyők"
 
@@ -10638,7 +10646,7 @@ msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:262 include/views/administration.script.list.php:27
-#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:176 report5.php:145
+#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:176 report5.php:160
 #: scripts_exec.php:25
 msgid "Scripts"
 msgstr "Scriptek"
@@ -10700,7 +10708,7 @@ msgid "Seconds"
 msgstr "Másodpercek"
 
 #: events.php:358 include/forms.inc.php:489 include/forms.inc.php:507
-#: include/forms.inc.php:529 include/page_header.php:358
+#: include/forms.inc.php:529 include/page_header.php:359
 #: include/reports.inc.php:694
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
@@ -10749,7 +10757,7 @@ msgstr "Másodpercek"
 msgid "Select"
 msgstr "Kiválaszt"
 
-#: include/page_header.php:324
+#: include/page_header.php:325
 msgid "Select Nodes"
 msgstr "Csomópont kiválasztása"
 
@@ -10783,15 +10791,15 @@ msgstr "Kijelölt csoportok"
 msgid "Selected hosts"
 msgstr "Kijelölt hosztok"
 
-#: include/actions.inc.php:496
+#: include/actions.inc.php:551
 msgid "Send message"
 msgstr "Üzenetküldés"
 
-#: include/actions.inc.php:237
+#: include/actions.inc.php:292
 msgid "Send message to user groups"
 msgstr ""
 
-#: include/actions.inc.php:226
+#: include/actions.inc.php:281
 msgid "Send message to users"
 msgstr ""
 
@@ -10811,7 +10819,7 @@ msgstr ""
 msgid "Send to Users"
 msgstr ""
 
-#: include/actions.inc.php:844
+#: include/actions.inc.php:886
 msgid "Sent"
 msgstr ""
 
@@ -10849,43 +10857,47 @@ msgstr "Szerver info"
 msgid "Server time"
 msgstr "Szerver idő"
 
-#: events.php:525 include/actions.inc.php:73
+#: events.php:522 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:305
-#: include/views/configuration.services.parent.list.php:36 services.php:461
-#: srv_status.php:163
+#: include/views/configuration.services.parent.list.php:36 services.php:473
+#: srv_status.php:156
 msgid "Service"
 msgstr "Szolgáltatás"
 
-#: api/classes/CService.php:1302
+#: api/classes/CService.php:1332
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr ""
 
-#: api/classes/CService.php:1323
+#: api/classes/CService.php:1353
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr ""
 
-#: api/classes/CService.php:1402
+#: api/classes/CService.php:1432
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr ""
 
-#: api/classes/CService.php:1377
+#: api/classes/CService.php:1407
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr ""
 
-#: api/classes/CService.php:1220
+#: api/classes/CService.php:1250
 msgid "Service cannot be parent and child at the same time."
 msgstr "Egy szolgáltatás nem lehet egyszerre szülő és alárendelt."
+
+#: services.php:164
+msgid "Service created"
+msgstr ""
 
 #: services.php:116
 msgid "Service deleted"
 msgstr "Szolgáltatás törölve"
 
-#: include/actions.inc.php:55
+#: include/actions.inc.php:80
 msgid "Service port"
 msgstr "Szerviz port"
 
@@ -10897,11 +10909,11 @@ msgstr ""
 msgid "Service times"
 msgstr "Szolgáltatási időszakok"
 
-#: include/actions.inc.php:54
+#: include/actions.inc.php:78
 msgid "Service type"
 msgstr "Szerviz típus"
 
-#: services.php:157 services.php:164
+#: services.php:157
 msgid "Service updated"
 msgstr "Szolgáltatás frissítve"
 
@@ -10909,17 +10921,17 @@ msgstr "Szolgáltatás frissítve"
 msgid "Services"
 msgstr "Szolgáltatások"
 
-#: api/classes/CService.php:1453
+#: api/classes/CService.php:1483
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:1031
+#: api/classes/CUser.php:1028
 msgid "Session terminated, re-login, please."
 msgstr ""
 
-#: events.php:565 events.php:578 include/classes/screens/CScreenEvents.php:48
+#: events.php:563 events.php:576 include/classes/screens/CScreenEvents.php:49
 #: include/classes/screens/CScreenHistory.php:166
-#: include/triggers.inc.php:1648 include/views/configuration.item.list.php:109
+#: include/triggers.inc.php:1607 include/views/configuration.item.list.php:109
 #: include/views/configuration.triggers.edit.php:245
 #: include/views/configuration.triggers.list.php:93
 #: include/views/configuration.triggers.massupdate.php:65 popup.php:979
@@ -10976,7 +10988,7 @@ msgstr ""
 msgid "Show events not older than (in days) \"%1$s\"."
 msgstr ""
 
-#: include/triggers.inc.php:1330
+#: include/triggers.inc.php:1289
 msgid "Show graph of item"
 msgstr "Elemhez tartozó grafikon megjelenítése"
 
@@ -11029,7 +11041,7 @@ msgstr ""
 msgid "Show value"
 msgstr "Érték megjelenítése"
 
-#: include/triggers.inc.php:1337
+#: include/triggers.inc.php:1296
 msgid "Show values of item"
 msgstr "Elemhez tartozó értékek megjelenítése"
 
@@ -11058,11 +11070,11 @@ msgstr "Egyszerű"
 msgid "Simple check"
 msgstr "Egyszerű ellenőrzés"
 
-#: include/blocks.inc.php:1108 include/screens.inc.php:38 popup.php:97
+#: include/blocks.inc.php:1126 include/screens.inc.php:38 popup.php:97
 msgid "Simple graph"
 msgstr "Egyszerű grafikon"
 
-#: include/blocks.inc.php:1200 jsLoader.php:104
+#: include/blocks.inc.php:1227 jsLoader.php:104
 msgid "Simple graphs"
 msgstr "Egyszerű grafikonok"
 
@@ -11111,7 +11123,7 @@ msgstr ""
 msgid "Slide"
 msgstr ""
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1263
+#: include/audit.inc.php:45 include/blocks.inc.php:1290
 #: include/views/monitoring.slides.php:69
 msgid "Slide show"
 msgstr "Bemutató"
@@ -11143,12 +11155,12 @@ msgstr ""
 msgid "Slide shows"
 msgstr "Bemutatók"
 
-#: include/blocks.inc.php:1332
+#: include/blocks.inc.php:1365
 #: include/views/configuration.slideconf.edit.php:96
 msgid "Slides"
 msgstr "Bemutatók"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -11201,7 +11213,7 @@ msgstr "Sorba rendezés (0->999)"
 msgid "Sort triggers by"
 msgstr ""
 
-#: include/db.inc.php:1022
+#: include/db.inc.php:993
 #, php-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr ""
@@ -11211,11 +11223,11 @@ msgstr ""
 msgid "Sorting by field \"%s\" not allowed."
 msgstr ""
 
-#: events.php:309 include/classes/screens/CScreenHistory.php:165
+#: events.php:312 include/classes/screens/CScreenHistory.php:165
 msgid "Source"
 msgstr "Forrás"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Spanish (es_ES)"
 msgstr "Spanyol (es_ES)"
 
@@ -11243,12 +11255,12 @@ msgstr ""
 msgid "State"
 msgstr "Állapot"
 
-#: events.php:489 events.php:498 events.php:564 events.php:577 hosts.php:690
-#: httpdetails.php:133 httpmon.php:145 include/actions.inc.php:677
-#: include/actions.inc.php:755 include/actions.inc.php:826
+#: events.php:486 events.php:495 events.php:562 events.php:575 hosts.php:690
+#: httpdetails.php:133 httpmon.php:145 include/actions.inc.php:732
+#: include/actions.inc.php:810 include/actions.inc.php:869
 #: include/classes/screens/CScreenActions.php:58
 #: include/classes/screens/CScreenActions.php:63
-#: include/classes/screens/CScreenActions.php:111 include/events.inc.php:134
+#: include/classes/screens/CScreenActions.php:127 include/events.inc.php:134
 #: include/events.inc.php:208 include/events.inc.php:211
 #: include/forms.inc.php:499 include/forms.inc.php:838
 #: include/views/administration.auditacts.list.php:72
@@ -11268,7 +11280,7 @@ msgstr "Állapot"
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.triggers.list.php:97 popup_media.php:138
 #: popup.php:544 popup.php:980 popup.php:1098 popup.php:1206 popup.php:1215
-#: popup.php:1633 srv_status.php:164 tr_status.php:285
+#: popup.php:1633 srv_status.php:157 tr_status.php:285
 msgid "Status"
 msgstr "Státusz"
 
@@ -11281,7 +11293,7 @@ msgid "Status (descending)"
 msgstr ""
 
 #: include/views/configuration.services.child.list.php:39
-#: include/views/configuration.services.parent.list.php:36 services.php:462
+#: include/views/configuration.services.parent.list.php:36 services.php:474
 msgid "Status calculation"
 msgstr "Státusz számítás"
 
@@ -11327,7 +11339,7 @@ msgstr "Csak státusz"
 msgid "Status updated"
 msgstr "Státusz frissítve"
 
-#: httpdetails.php:129 include/actions.inc.php:695 include/actions.inc.php:769
+#: httpdetails.php:129 include/actions.inc.php:750 include/actions.inc.php:824
 #: include/views/configuration.action.edit.php:439
 msgid "Step"
 msgstr "Lépés"
@@ -11383,9 +11395,9 @@ msgstr "Stílus"
 msgid "Subfilter [affects only filtered data!]"
 msgstr ""
 
-#: include/actions.inc.php:350 include/actions.inc.php:359
-#: include/actions.inc.php:365 include/actions.inc.php:719
-#: include/classes/screens/CScreenActions.php:133
+#: include/actions.inc.php:405 include/actions.inc.php:414
+#: include/actions.inc.php:420 include/actions.inc.php:774
+#: include/classes/screens/CScreenActions.php:149
 #: include/views/administration.auditacts.list.php:103
 #: include/views/configuration.action.edit.php:542
 msgid "Subject"
@@ -11433,7 +11445,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Vezetéknév"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Swedish (sv_SE)"
 msgstr "Svéd (sv_SE)"
 
@@ -11534,7 +11546,7 @@ msgstr ""
 msgid "Template"
 msgstr "Minta"
 
-#: api/classes/CHost.php:1703
+#: api/classes/CHost.php:1700
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr ""
@@ -11544,7 +11556,7 @@ msgstr ""
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr ""
 
-#: api/classes/CTemplate.php:992
+#: api/classes/CTemplate.php:1000
 #, php-format
 msgid "Template \"%s\" already exists."
 msgstr ""
@@ -11553,11 +11565,11 @@ msgstr ""
 msgid "Template added"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:759
+#: api/classes/CHostGeneral.php:762
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr ""
 
-#: templates.php:354 templates.php:372 templates.php:397
+#: templates.php:353 templates.php:371 templates.php:396
 msgid "Template deleted"
 msgstr "Minta törölve"
 
@@ -11589,23 +11601,23 @@ msgstr ""
 msgid "Template updated"
 msgstr "Minta frissítve"
 
-#: api/classes/CHostGeneral.php:191 include/hosts.inc.php:1228
+#: api/classes/CHostGeneral.php:194 include/hosts.inc.php:1228
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:179 include/hosts.inc.php:1214
+#: api/classes/CHostGeneral.php:182 include/hosts.inc.php:1214
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr ""
 
-#: api/classes/CHost.php:1442 api/classes/CTemplate.php:1347
+#: api/classes/CHost.php:1439 api/classes/CTemplate.php:1355
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr ""
 
-#: api/classes/CHost.php:1448 api/classes/CTemplate.php:1002
-#: api/classes/CTemplate.php:1320
+#: api/classes/CHost.php:1445 api/classes/CTemplate.php:1010
+#: api/classes/CTemplate.php:1328
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr ""
@@ -11619,11 +11631,11 @@ msgstr "Elemek mintából"
 #: include/views/configuration.hostgroups.list.php:109
 #: include/views/conf.import.php:28 popup.php:37 search.php:263 search.php:292
 #: search.php:297 search.php:304 search.php:367 search.php:445
-#: templates.php:448 templates.php:458
+#: templates.php:447 templates.php:457
 msgid "Templates"
 msgstr "Minták"
 
-#: api/classes/CHostGeneral.php:738
+#: api/classes/CHostGeneral.php:741
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
@@ -11656,7 +11668,7 @@ msgid "Test string"
 msgstr "Teszt szöveg"
 
 #: include/forms.inc.php:420 include/items.inc.php:124
-#: include/triggers.inc.php:2246 include/views/configuration.item.edit.php:219
+#: include/triggers.inc.php:2205 include/views/configuration.item.edit.php:219
 #: include/views/configuration.item.massupdate.php:162
 msgid "Text"
 msgstr "Szöveg"
@@ -11712,23 +11724,23 @@ msgstr "Harmadik"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr ""
 
-#: srv_status.php:88
+#: srv_status.php:80
 msgid "This month"
 msgstr "Ebben a hónapban"
 
-#: include/classes/screens/CScreenBuilder.php:492
+#: include/classes/screens/CScreenBuilder.php:489
 msgid "This screen-column is not empty. Delete it?"
 msgstr ""
 
-#: include/classes/screens/CScreenBuilder.php:474
+#: include/classes/screens/CScreenBuilder.php:471
 msgid "This screen-row is not empty. Delete it?"
 msgstr ""
 
-#: srv_status.php:87
+#: srv_status.php:79
 msgid "This week"
 msgstr "Ezen a héten"
 
-#: srv_status.php:89
+#: srv_status.php:81
 msgid "This year"
 msgstr "Ebben az évben"
 
@@ -11745,18 +11757,18 @@ msgstr "Csütörtök"
 #: include/reports.inc.php:634
 #: include/views/configuration.services.edit.php:251
 #: include/views/configuration.services.edit.php:279 popup_period.php:155
-#: report3.php:146 report4.php:180 services.php:202 services.php:208
+#: report3.php:145 report4.php:180 services.php:202 services.php:208
 msgid "Till"
 msgstr "-ig"
 
-#: events.php:485 events.php:494 events.php:560 events.php:573
-#: include/acknow.inc.php:43 include/actions.inc.php:675
-#: include/actions.inc.php:698 include/actions.inc.php:754
-#: include/actions.inc.php:772 include/classes/screens/CScreenActions.php:32
+#: events.php:482 events.php:491 events.php:558 events.php:571
+#: include/acknow.inc.php:54 include/actions.inc.php:730
+#: include/actions.inc.php:753 include/actions.inc.php:809
+#: include/actions.inc.php:827 include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
 #: include/classes/screens/CScreenActions.php:43
-#: include/classes/screens/CScreenActions.php:109
-#: include/classes/screens/CScreenEvents.php:43 include/events.inc.php:116
+#: include/classes/screens/CScreenActions.php:125
+#: include/classes/screens/CScreenEvents.php:44 include/events.inc.php:116
 #: include/events.inc.php:133 include/events.inc.php:208
 #: include/events.inc.php:211
 #: include/views/administration.auditacts.list.php:70
@@ -11775,7 +11787,7 @@ msgstr ""
 msgid "Time (descending)"
 msgstr ""
 
-#: include/actions.inc.php:47
+#: include/actions.inc.php:66
 msgid "Time period"
 msgstr "Idő periódus"
 
@@ -11825,7 +11837,7 @@ msgstr ""
 msgid "To set a host interface select a single item type for all items"
 msgstr ""
 
-#: srv_status.php:86
+#: srv_status.php:78
 msgid "Today"
 msgstr "Ma"
 
@@ -11843,7 +11855,7 @@ msgstr ""
 msgid "Top"
 msgstr "Felül"
 
-#: include/blocks.inc.php:348 include/classes/class.chostsinfo.php:128
+#: include/blocks.inc.php:366 include/classes/class.chostsinfo.php:128
 #: queue.php:289
 msgid "Total"
 msgstr "Összes"
@@ -11871,10 +11883,10 @@ msgstr ""
 msgid "Trends"
 msgstr "Trendek"
 
-#: events.php:306 events.php:355 include/actions.inc.php:42
+#: events.php:309 events.php:355 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/class.cchart.php:466
-#: include/maps.inc.php:26 include/triggers.inc.php:1306
-#: include/triggers.inc.php:1647
+#: include/maps.inc.php:26 include/triggers.inc.php:1265
+#: include/triggers.inc.php:1606
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:65
 #: include/views/configuration.services.edit.php:78
@@ -11882,7 +11894,7 @@ msgstr "Trendek"
 #: include/views/configuration.triggers.edit.php:261
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:141
-#: report5.php:61 services.php:463 tr_comments.php:69 tr_logform.php:151
+#: report5.php:61 services.php:475 tr_comments.php:69 tr_logform.php:151
 #: tr_logform.php:164
 msgid "Trigger"
 msgstr "Trigger"
@@ -11956,12 +11968,12 @@ msgstr ""
 msgid "Trigger form"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:285
+#: api/classes/CHostGeneral.php:288
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:236
+#: api/classes/CHostGeneral.php:239
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr ""
@@ -11974,7 +11986,7 @@ msgstr ""
 msgid "Trigger label type"
 msgstr ""
 
-#: include/actions.inc.php:44
+#: include/actions.inc.php:52
 msgid "Trigger name"
 msgstr ""
 
@@ -12001,7 +12013,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr ""
 
-#: include/actions.inc.php:46 include/views/administration.users.edit.php:239
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:239
 msgid "Trigger severity"
 msgstr "Trigger súlyosság"
 
@@ -12014,13 +12026,13 @@ msgstr ""
 msgid "Trigger updated"
 msgstr "Trigger frissítve"
 
-#: include/actions.inc.php:45
+#: include/actions.inc.php:48
 msgid "Trigger value"
 msgstr "Trigger érték"
 
 #: hosts.php:685 hosts.php:763 include/events.inc.php:25
 #: include/forms.inc.php:517 include/html.inc.php:446 include/html.inc.php:450
-#: include/menu.inc.php:52 include/triggers.inc.php:1203
+#: include/menu.inc.php:52 include/triggers.inc.php:1162
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:369
@@ -12033,7 +12045,7 @@ msgstr "Trigger érték"
 #: include/views/monitoring.overview.php:27 jsLoader.php:107 popup.php:61
 #: search.php:133 search.php:138 search.php:168 search.php:187 search.php:205
 #: search.php:260 search.php:312 search.php:370 search.php:397 search.php:420
-#: templates.php:461 templates.php:526 tr_status.php:178
+#: templates.php:460 templates.php:525 tr_status.php:178
 msgid "Triggers"
 msgstr "Trigger-ek"
 
@@ -12087,7 +12099,7 @@ msgstr ""
 msgid "Tuesday"
 msgstr "Kedd"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -12100,10 +12112,10 @@ msgstr ""
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr ""
 
-#: hostinventories.php:160 include/actions.inc.php:676
+#: hostinventories.php:160 include/actions.inc.php:731
 #: include/classes/screens/CScreenActions.php:48
 #: include/classes/screens/CScreenActions.php:53
-#: include/classes/screens/CScreenActions.php:110 include/forms.inc.php:495
+#: include/classes/screens/CScreenActions.php:126 include/forms.inc.php:495
 #: include/hosts.inc.php:104
 #: include/views/administration.auditacts.list.php:71
 #: include/views/administration.general.image.edit.php:34
@@ -12173,11 +12185,11 @@ msgstr ""
 msgid "Types"
 msgstr "Típusok"
 
-#: include/defines.inc.php:884 include/triggers.inc.php:208
+#: include/defines.inc.php:884 include/triggers.inc.php:167
 msgid "UNKNOWN"
 msgstr "ISMERETLEN"
 
-#: include/triggers.inc.php:219
+#: include/triggers.inc.php:178
 msgid "UP"
 msgstr ""
 
@@ -12208,7 +12220,7 @@ msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:194
 #: include/views/js/configuration.sysmaps.js.php:163
-#: include/views/js/monitoring.maps.js.php:57 report5.php:143
+#: include/views/js/monitoring.maps.js.php:57 report5.php:158
 msgid "URLs"
 msgstr ""
 
@@ -12224,7 +12236,7 @@ msgstr "FELHASZNÁLÓI PROFIL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrán (uk_UA)"
 
@@ -12269,25 +12281,29 @@ msgstr "Engedélyezi a kijelölt zárolt felhasználókat?"
 msgid "Units"
 msgstr "Egységek"
 
-#: chart4.php:175 events.php:509 events.php:510 events.php:519 events.php:520
-#: events.php:521 events.php:522 hosts.php:807 httpdetails.php:159
-#: httpmon.php:249 include/actions.inc.php:36 include/actions.inc.php:68
-#: include/actions.inc.php:79 include/actions.inc.php:195
-#: include/actions.inc.php:515 include/blocks.inc.php:985
-#: include/classes/class.chostsinfo.php:127 include/discovery.inc.php:128
-#: include/discovery.inc.php:162 include/events.inc.php:29
-#: include/graphs.inc.php:37 include/graphs.inc.php:77
-#: include/hosts.inc.php:53 include/hosts.inc.php:80 include/html.inc.php:375
-#: include/httptest.inc.php:39 include/httptest.inc.php:56
-#: include/items.inc.php:41 include/items.inc.php:102
-#: include/items.inc.php:126 include/items.inc.php:143
-#: include/items.inc.php:160 include/maintenances.inc.php:41
-#: include/maps.inc.php:39 include/maps.inc.php:709 include/maps.inc.php:799
-#: include/maps.inc.php:896 include/media.inc.php:39 include/nodes.inc.php:257
-#: include/perm.inc.php:30 include/regexp.inc.php:193
-#: include/screens.inc.php:55 include/triggers.inc.php:103
-#: include/triggers.inc.php:214 include/triggers.inc.php:232
-#: include/users.inc.php:50 include/users.inc.php:65
+#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: events.php:518 events.php:519 hosts.php:807 httpdetails.php:159
+#: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
+#: include/actions.inc.php:105 include/actions.inc.php:129
+#: include/actions.inc.php:153 include/actions.inc.php:166
+#: include/actions.inc.php:190 include/actions.inc.php:198
+#: include/actions.inc.php:212 include/actions.inc.php:223
+#: include/actions.inc.php:251 include/actions.inc.php:570
+#: include/blocks.inc.php:1003 include/classes/class.chostsinfo.php:127
+#: include/discovery.inc.php:128 include/discovery.inc.php:162
+#: include/events.inc.php:29 include/graphs.inc.php:37
+#: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
+#: include/html.inc.php:375 include/httptest.inc.php:39
+#: include/httptest.inc.php:56 include/items.inc.php:41
+#: include/items.inc.php:102 include/items.inc.php:126
+#: include/items.inc.php:143 include/items.inc.php:160
+#: include/maintenances.inc.php:41 include/maps.inc.php:39
+#: include/maps.inc.php:709 include/maps.inc.php:799 include/maps.inc.php:896
+#: include/media.inc.php:39 include/nodes.inc.php:257 include/perm.inc.php:30
+#: include/regexp.inc.php:193 include/screens.inc.php:55
+#: include/triggers.inc.php:62 include/triggers.inc.php:173
+#: include/triggers.inc.php:191 include/users.inc.php:50
+#: include/users.inc.php:65
 #: include/views/js/configuration.discovery.edit.js.php:141
 #: include/views/monitoring.overview.php:47 popup.php:575 popup.php:593
 #: report2.php:239
@@ -12306,11 +12322,11 @@ msgstr "Ismeretlen szolgáltatási státusz számítási algoritmus"
 msgid "Unknown function."
 msgstr ""
 
-#: include/triggers.inc.php:1780 tr_testexpr.php:35
+#: include/triggers.inc.php:1739 tr_testexpr.php:35
 msgid "Unknown host item, no such item in selected host"
 msgstr ""
 
-#: include/triggers.inc.php:1779 tr_testexpr.php:34
+#: include/triggers.inc.php:1738 tr_testexpr.php:34
 msgid "Unknown host, no such host present in system"
 msgstr ""
 
@@ -12322,11 +12338,11 @@ msgstr ""
 msgid "Unknown resource"
 msgstr "Ismeretlen forrás"
 
-#: include/items.inc.php:947
+#: include/items.inc.php:954
 msgid "Unknown value type"
 msgstr "Ismeretlen érték típus"
 
-#: include/triggers.inc.php:1778 tr_testexpr.php:33
+#: include/triggers.inc.php:1737 tr_testexpr.php:33
 msgid "Unknown variable type, testing not available"
 msgstr ""
 
@@ -12340,50 +12356,50 @@ msgstr "Leválasztás"
 msgid "Unlink and clear"
 msgstr "Leválasztás és kiürítés"
 
-#: include/actions.inc.php:505
+#: include/actions.inc.php:560
 msgid "Unlink from template"
 msgstr "Eltávolítás a sablonból"
 
-#: include/actions.inc.php:336 include/views/configuration.action.edit.php:803
+#: include/actions.inc.php:391 include/views/configuration.action.edit.php:803
 msgid "Unlink from templates"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:702
+#: api/classes/CHostGeneral.php:705
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:555
+#: api/classes/CHostGeneral.php:558
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:662
+#: api/classes/CHostGeneral.php:665
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:644
+#: api/classes/CHostGeneral.php:647
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:573
+#: api/classes/CHostGeneral.php:576
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:591
+#: api/classes/CHostGeneral.php:594
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:493
+#: api/classes/CHostGeneral.php:496
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHostGeneral.php:510
+#: api/classes/CHostGeneral.php:513
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12402,7 +12418,7 @@ msgstr ""
 msgid "Unsupported import format \"%1$s\"."
 msgstr ""
 
-#: include/blocks.inc.php:1074
+#: include/blocks.inc.php:1092
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr ""
@@ -12444,9 +12460,9 @@ msgstr "Frissítve"
 msgid "Updated status of host"
 msgstr "Hoszt frissített státusza"
 
-#: include/blocks.inc.php:336 include/blocks.inc.php:674
-#: include/blocks.inc.php:742 include/blocks.inc.php:940
-#: include/blocks.inc.php:1031 include/blocks.inc.php:1089
+#: include/blocks.inc.php:354 include/blocks.inc.php:692
+#: include/blocks.inc.php:760 include/blocks.inc.php:958
+#: include/blocks.inc.php:1049 include/blocks.inc.php:1107
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, php-format
 msgid "Updated: %s"
@@ -12457,7 +12473,7 @@ msgstr ""
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:897
+#: api/classes/CDiscoveryRule.php:862
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12497,7 +12513,7 @@ msgstr "Felsőbb szintű térképek"
 msgid "Uptime"
 msgstr "Üzemidő"
 
-#: include/actions.inc.php:57
+#: include/actions.inc.php:84
 msgid "Uptime/Downtime"
 msgstr "Üzemidő/Kiesés"
 
@@ -12518,7 +12534,7 @@ msgstr "Használat, ha a súlyosság"
 msgid "Used in actions"
 msgstr ""
 
-#: httpconf.php:52 include/acknow.inc.php:43 include/actions.inc.php:824
+#: httpconf.php:52 include/acknow.inc.php:54 include/actions.inc.php:867
 #: include/audit.inc.php:24 include/forms.inc.php:38 include/forms.inc.php:41
 #: include/hosts.inc.php:67 include/setup.inc.php:277
 #: include/views/administration.auditlogs.list.php:56
@@ -12676,8 +12692,8 @@ msgstr "Felhasználói-státusz frissítve"
 msgid "Users unblocked"
 msgstr "Felhasználói-zárolás megszüntetve"
 
-#: include/blocks.inc.php:685 include/classes/class.cpie.php:309
-#: include/classes/screens/CScreenEvents.php:47
+#: include/blocks.inc.php:703 include/classes/class.cpie.php:309
+#: include/classes/screens/CScreenEvents.php:48
 #: include/classes/screens/CScreenHistory.php:168
 #: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:383
 #: include/views/administration.general.valuemapping.edit.php:39
@@ -12773,7 +12789,7 @@ msgstr ""
 msgid "Value: no data"
 msgstr ""
 
-#: include/items.inc.php:786 include/triggers.inc.php:1364
+#: include/items.inc.php:793 include/triggers.inc.php:1323
 #: include/views/monitoring.history.php:62
 msgid "Values"
 msgstr "Értékek"
@@ -12803,7 +12819,7 @@ msgstr ""
 msgid "Visible name"
 msgstr ""
 
-#: api/classes/CHost.php:1375
+#: api/classes/CHost.php:1372
 msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
@@ -12946,7 +12962,7 @@ msgstr "Hét"
 
 #: include/forms.inc.php:1506 include/maintenances.inc.php:37
 #: include/reports.inc.php:220 include/reports.inc.php:666
-#: include/reports.inc.php:674 report3.php:62 report4.php:99
+#: include/reports.inc.php:674 report3.php:61 report4.php:99
 msgid "Weekly"
 msgstr "Heti"
 
@@ -12959,7 +12975,7 @@ msgstr "Amikor aktív"
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
-#: sysmaps.php:49 sysmaps.php:266
+#: sysmaps.php:49 sysmaps.php:258
 msgid "Width"
 msgstr "Szélesség"
 
@@ -12972,7 +12988,7 @@ msgstr "Adatgyűjtéssel"
 msgid "With last event unacknowledged"
 msgstr ""
 
-#: include/blocks.inc.php:347
+#: include/blocks.inc.php:365
 msgid "With problems"
 msgstr "Hiba nélkül"
 
@@ -12985,7 +13001,7 @@ msgstr "Triggerekkel"
 msgid "With unacknowledged events"
 msgstr ""
 
-#: include/blocks.inc.php:346
+#: include/blocks.inc.php:364
 msgid "Without problems"
 msgstr "Hibásak"
 
@@ -13025,7 +13041,7 @@ msgstr ""
 msgid "Wrong fields for element."
 msgstr ""
 
-#: api/classes/CHost.php:1287
+#: api/classes/CHost.php:1284
 #, php-format
 msgid "Wrong fields for host \"%s\"."
 msgstr ""
@@ -13125,7 +13141,7 @@ msgstr ""
 msgid "XML file contains warning %1$s:"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:155 report3.php:99
+#: include/views/js/configuration.sysmaps.js.php:155 report3.php:98
 msgid "Y"
 msgstr "Y"
 
@@ -13182,20 +13198,20 @@ msgstr ""
 msgid "Y.m.d H:i:s"
 msgstr ""
 
-#: report3.php:73 report3.php:92 report4.php:105 report4.php:126
+#: report3.php:72 report3.php:91 report4.php:105 report4.php:126
 #: report5.php:48
 msgid "Year"
 msgstr "Év"
 
 #: include/reports.inc.php:222 include/reports.inc.php:668
-#: include/reports.inc.php:676 report3.php:64 report4.php:101
+#: include/reports.inc.php:676 report3.php:63 report4.php:101
 msgid "Yearly"
 msgstr "Évi"
 
-#: events.php:760 include/blocks.inc.php:694
+#: events.php:756 include/blocks.inc.php:712
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:560
-#: include/events.inc.php:301 include/events.inc.php:319
-#: include/forms.inc.php:1922 include/triggers.inc.php:1651
+#: include/events.inc.php:306 include/events.inc.php:324
+#: include/forms.inc.php:1922 include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:74
 msgid "Yes"
 msgstr "Igen"
@@ -13243,24 +13259,24 @@ msgstr ""
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
-#: api/classes/CApplication.php:833 api/classes/CApplication.php:844
+#: api/classes/CApplication.php:837 api/classes/CApplication.php:848
 #: api/classes/CGraph.php:660 api/classes/CGraph.php:671
 #: api/classes/CGraph.php:732 api/classes/CGraphPrototype.php:708
 #: api/classes/CGraphPrototype.php:719 api/classes/CGraphPrototype.php:781
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
 #: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
-#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1607
-#: api/classes/CHost.php:1661 api/classes/CHost.php:1975
+#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
+#: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CItem.php:1047 api/classes/CItem.php:1050
 #: api/classes/CItemPrototype.php:823 api/classes/CItemPrototype.php:826
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
 #: api/classes/CScript.php:347 api/classes/CScript.php:409
-#: api/classes/CScript.php:459 api/classes/CTemplate.php:966
-#: api/classes/CTemplate.php:1058 api/classes/CTemplate.php:1118
-#: api/classes/CTemplate.php:1258 api/classes/CTemplate.php:1290
-#: api/classes/CTemplate.php:1524 api/classes/CTemplateScreen.php:734
+#: api/classes/CScript.php:459 api/classes/CTemplate.php:974
+#: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
+#: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
+#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
 #: api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr ""
@@ -13376,7 +13392,7 @@ msgid ""
 "2. Incorrect network configuration.\n"
 msgstr ""
 
-#: include/blocks.inc.php:695
+#: include/blocks.inc.php:713
 msgid "Zabbix server IP or port is not set!"
 msgstr ""
 
@@ -13388,11 +13404,11 @@ msgstr ""
 msgid "Zabbix server info"
 msgstr ""
 
-#: jsrpc.php:168
+#: jsrpc.php:173
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr ""
 
-#: include/blocks.inc.php:693
+#: include/blocks.inc.php:711
 msgid "Zabbix server is running"
 msgstr "A Zabbix szerver fut"
 
@@ -13441,7 +13457,7 @@ msgid "agent"
 msgstr ""
 
 #: include/classes/class.cchart.php:1761
-#: include/classes/class.cpagefilter.php:457
+#: include/classes/class.cpagefilter.php:468
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:106
@@ -13495,20 +13511,20 @@ msgid "d"
 msgstr ""
 
 #: include/defines.inc.php:910 include/maintenances.inc.php:57
-#: include/page_header.php:484 include/views/configuration.item.list.php:101
-#: report3.php:135
+#: include/page_header.php:485 include/views/configuration.item.list.php:101
+#: report3.php:134
 msgid "d M Y"
 msgstr "Y M d"
 
 #: include/defines.inc.php:911
 #: include/views/configuration.services.edit.php:132
-#: include/views/configuration.services.edit.php:133 report3.php:162
+#: include/views/configuration.services.edit.php:133 report3.php:161
 msgid "d M Y H:i"
 msgstr ""
 
-#: acknow.php:162 events.php:258 httpdetails.php:115 httpmon.php:242
-#: include/acknow.inc.php:48 include/blocks.inc.php:912
-#: include/classes/screens/CScreenEvents.php:62
+#: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
+#: include/acknow.inc.php:59 include/blocks.inc.php:930
+#: include/classes/screens/CScreenEvents.php:63
 #: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:895
 #: include/defines.inc.php:896 include/defines.inc.php:902
 #: include/defines.inc.php:903 include/defines.inc.php:904
@@ -13516,13 +13532,13 @@ msgstr ""
 #: include/events.inc.php:116 include/events.inc.php:186
 #: include/events.inc.php:245
 #: include/views/administration.auditacts.list.php:113
-#: include/views/administration.auditlogs.list.php:106 jsrpc.php:138
+#: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
 #: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
 #: tr_status.php:748
 msgid "d M Y H:i:s"
 msgstr "Y M d H:i:s"
 
-#: chart4.php:127 chart5.php:138
+#: chart4.php:127 chart5.php:137
 msgid "d.M"
 msgstr ""
 
@@ -13584,7 +13600,7 @@ msgstr "minden"
 msgid "exactly"
 msgstr ""
 
-#: include/actions.inc.php:780
+#: include/actions.inc.php:835
 #: include/views/administration.auditacts.list.php:89
 msgid "executed"
 msgstr "végrehajtva"
@@ -13593,7 +13609,7 @@ msgstr "végrehajtva"
 msgid "fixed"
 msgstr ""
 
-#: include/func.inc.php:1706
+#: include/func.inc.php:1721
 msgid "found"
 msgstr "talált"
 
@@ -13627,7 +13643,7 @@ msgstr ""
 msgid "image"
 msgstr ""
 
-#: include/actions.inc.php:27
+#: include/actions.inc.php:33
 msgid "in"
 msgstr "ban / ben"
 
@@ -13641,7 +13657,7 @@ msgid "last"
 msgstr "utolsó"
 
 #: hostinventories.php:122 hosts.php:651 hosts.php:652 hosts.php:653
-#: include/actions.inc.php:25 include/forms.inc.php:457
+#: include/actions.inc.php:29 include/forms.inc.php:457
 #: include/forms.inc.php:464 include/forms.inc.php:471
 #: include/forms.inc.php:478 include/forms.inc.php:550
 #: include/forms.inc.php:561
@@ -13667,7 +13683,7 @@ msgstr ""
 msgid "macro(s)"
 msgstr ""
 
-#: include/actions.inc.php:144 include/views/configuration.action.edit.php:205
+#: include/actions.inc.php:183 include/views/configuration.action.edit.php:205
 msgid "maintenance"
 msgstr "karbantartás"
 
@@ -13731,18 +13747,18 @@ msgstr ""
 msgid "no"
 msgstr "nem"
 
-#: include/blocks.inc.php:1379 include/classes/class.cchart.php:1794
+#: include/blocks.inc.php:1412 include/classes/class.cchart.php:1794
 #: include/classes/class.cpie.php:320 include/maps.inc.php:435
 #: include/maps.inc.php:468
 #, php-format
 msgid "no data"
 msgstr "nincs adat"
 
-#: include/actions.inc.php:30
+#: include/actions.inc.php:39
 msgid "not in"
 msgstr "nem ban / ben"
 
-#: include/actions.inc.php:26
+#: include/actions.inc.php:31
 msgid "not like"
 msgstr "nem mint"
 
@@ -13750,14 +13766,14 @@ msgstr "nem mint"
 msgid "not running"
 msgstr "nem fut"
 
-#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:431
-#: include/classes/class.cpagefilter.php:457 include/forms.inc.php:1036
+#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:442
+#: include/classes/class.cpagefilter.php:468 include/forms.inc.php:1036
 #: include/hosts.inc.php:622 include/hosts.inc.php:888
 msgid "not selected"
 msgstr "nincs kiválasztva"
 
-#: include/actions.inc.php:713 include/actions.inc.php:786
-#: include/actions.inc.php:850 include/classes/screens/CScreenActions.php:128
+#: include/actions.inc.php:768 include/actions.inc.php:841
+#: include/actions.inc.php:892 include/classes/screens/CScreenActions.php:144
 #: include/views/administration.auditacts.list.php:98
 msgid "not sent"
 msgstr "nincs elküldve"
@@ -13766,8 +13782,8 @@ msgstr "nincs elküldve"
 msgid "now"
 msgstr "most"
 
-#: include/blocks.inc.php:322 include/blocks.inc.php:664
-#: include/func.inc.php:1703
+#: include/blocks.inc.php:340 include/blocks.inc.php:682
+#: include/func.inc.php:1718
 msgid "of"
 msgstr ""
 
@@ -13828,7 +13844,7 @@ msgstr "mp"
 msgid "seconds"
 msgstr "másodpercek"
 
-#: include/actions.inc.php:705 include/classes/screens/CScreenActions.php:120
+#: include/actions.inc.php:760 include/classes/screens/CScreenActions.php:136
 #: include/views/administration.auditacts.list.php:86
 msgid "sent"
 msgstr "küldve"
@@ -13846,12 +13862,12 @@ msgstr ""
 msgid "show value mappings"
 msgstr ""
 
-#: api/classes/CHostGeneral.php:153
+#: api/classes/CHostGeneral.php:156
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr ""
 
-#: include/func.inc.php:1699
+#: include/func.inc.php:1714
 msgid "to"
 msgstr "-nak/-nek"
 
