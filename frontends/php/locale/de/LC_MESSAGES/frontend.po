@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-09 18:36+0200\n"
-"PO-Revision-Date: 2012-11-04 14:31+0200\n"
-"Last-Translator: flo <florian.koch1981@googlemail.com>\n"
+"POT-Creation-Date: 2013-01-09 18:47+0200\n"
+"PO-Revision-Date: 2013-01-07 23:36+0200\n"
+"Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -83,12 +83,12 @@ msgstr "(0 - unendlich)"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr "(Nur Superadministratoren können Gruppen erstellen)"
+msgstr "(Nur Superadministratoren können eine Gruppe erstellen)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:143
 msgid "(Only superadmins can create group)"
-msgstr "(Nur Superadministratoren können Gruppen erstellen)"
+msgstr "(Nur Superadministratoren können eine Gruppe erstellen)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -158,7 +158,7 @@ msgstr "<manuell>"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
-msgstr "ALARM BESTÄTIGUNGEN"
+msgstr "ALARMBESTÄTIGUNGEN"
 
 #: include/triggers.inc.php:1664
 #: include/views/configuration.action.edit.php:114
@@ -173,10 +173,12 @@ msgid "AND / OR"
 msgstr "UND / ODER"
 
 #: include/views/administration.auditacts.list.php:31
+#, fuzzy
 msgid "AUDIT ACTIONS"
 msgstr "AUDIT-AKTIONEN"
 
 #: include/views/administration.auditlogs.list.php:31
+#, fuzzy
 msgid "AUDIT LOGS"
 msgstr "ÜBERWACHUNGS-PROTOKOLLE"
 
@@ -198,7 +200,7 @@ msgstr "Der Unterschied zwischen dem letzten und vorletzten Wert ist > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr "Der Unterschied zwischen dem letzten und vorletzten Wert ist nicht N"
+msgstr "Der Unterschied zwischen dem letzten und vorletzten Wert ist NICHT N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
@@ -800,7 +802,7 @@ msgstr "Durchnittswert in der Zeit T ist > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr "Durchnittswert in der Zeit T ist nicht N"
+msgstr "Durchnittswert in der Zeit T ist NICHT N"
 
 # nach meinem Verständnis bezieht sich das darauf, ob die Achse entweder links oder rechts bzw. oben oder unten positioniert wird. 
 #: popup_bitem.php:140
@@ -1729,7 +1731,7 @@ msgstr "Massen-Update für sichtbaren Vorlagen-Namen nicht möglich"
 #: api/classes/CHostGeneral.php:160
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr "Kann doppelte Vorlagen IDs nicht übergeben für die Verknüpfung: %s."
+msgstr "Kann doppelte Vorlagen-IDs nicht übergeben für die Verknüpfung: %s."
 
 #: include/classes/db/DB.php:614
 #, php-format
@@ -1752,7 +1754,7 @@ msgstr "Kann Makro nicht entfernen."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr "Gastebenutzer kann nicht umbenannt werden."
+msgstr "Gastbenutzer kann nicht umbenannt werden."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -2643,7 +2645,7 @@ msgstr "Erstelle Übersichtstafel"
 
 #: include/views/administration.script.list.php:24
 msgid "Create script"
-msgstr "Skript erstellen"
+msgstr "Erstelle Skript"
 
 #: include/views/configuration.slideconf.list.php:27
 msgid "Create slide show"
@@ -3143,7 +3145,7 @@ msgstr "Verzögerung"
 
 #: include/views/configuration.discovery.edit.php:48
 msgid "Delay (in sec)"
-msgstr "Verzögerung (in Sek)"
+msgstr "Verzögerung (in Sek.)"
 
 #: queue.php:247
 msgid "Delayed by"
@@ -3162,7 +3164,7 @@ msgstr "Löschen und leeren"
 
 #: templates.php:617
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Warnung: Dieser Schritt löscht die ausgewählten Vorlagen und löscht die Daten aller verbundener Hosts"
+msgstr "Warnung: Dieser Schritt löscht die ausgewählten Vorlagen und die Daten aller verbundenen Hosts!"
 
 #: include/views/configuration.template.edit.php:438
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
@@ -3578,7 +3580,7 @@ msgstr ""
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr "Unterschied zwischen letztem und vorletztem Wert ist kleiner als  N"
+msgstr "Unterschied zwischen letztem und vorletztem Wert ist kleiner als N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
@@ -4521,7 +4523,7 @@ msgstr ""
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr "Datei ist zu groß. Maximalgröße sind %1$s Bytes."
+msgstr "Datei ist zu groß. Maximalgröße beträgt %1$s Byte."
 
 #: include/classes/class.cview.php:68
 #, php-format
@@ -5294,7 +5296,7 @@ msgstr "Überblick über Systemverzeichnis"
 
 #: include/views/configuration.sysmap.edit.php:100
 msgid "Host label type"
-msgstr "Systembeschriftung Typ"
+msgstr "Systembeschriftungstyp"
 
 #: include/html.inc.php:350
 msgid "Host list"
@@ -6051,7 +6053,7 @@ msgstr "Falsche System-Gruppe."
 
 #: image.php:48
 msgid "Incorrect image index."
-msgstr "Falscher Bildindex"
+msgstr "Falscher Bildindex."
 
 #: api/classes/CHostInterface.php:804
 #, php-format
@@ -6431,7 +6433,7 @@ msgstr "Es existieren Elemente, die diese Art Interface benötigen."
 #: api/classes/CHostInterface.php:537
 #, php-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
-msgstr "Es wurde keine IP-Adresse angegeben für das Interface mit dem DNS-Namen %1$s\""
+msgstr "Es wurde keine IP-Adresse angegeben für das Interface mit dem DNS-Namen \"%1$s\"."
 
 #: api/classes/CHostInterface.php:543 api/classes/CHostInterface.php:550
 #, php-format
@@ -7307,7 +7309,7 @@ msgstr "Wert für Makro \"%1$s\" ist zu lang. Er darf 255 Zeichen nicht übersch
 #: api/classes/CUserMacro.php:888
 #, php-format
 msgid "Macro name \"%1$s\" is too long, it should not exceed 64 chars."
-msgstr "Makroname \"%1$s\" ist zu lang. Er darf nicht länger als 64 Zeichen sein."
+msgstr "Makroname \"%1$s\" ist zu lang. Er darf 64 Zeichen nicht überschreiten."
 
 #: api/classes/CUserMacro.php:1072
 #, php-format
@@ -8457,7 +8459,7 @@ msgstr "Keine Berechtigungen für Karte \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:450
 #, php-format
 msgid "No permissions for screen \"%1$s\"."
-msgstr "Keine Berechtigungen für Ansichtstafel \"%1$s\""
+msgstr "Keine Berechtigungen für Ansichtstafel \"%1$s\"."
 
 #: api/classes/CUser.php:924 api/classes/CUser.php:1034
 msgid "No permissions for system access."
@@ -8971,7 +8973,7 @@ msgstr "Nur Super-Admins können Symbole zuordnen."
 
 #: api/classes/CMediatype.php:315
 msgid "Only Super Admins can create media types."
-msgstr "Nur Super-Admins können können Medientypen anlegen."
+msgstr "Nur Super-Admins können Medientypen anlegen."
 
 #: api/classes/CUserMacro.php:498
 msgid "Only Super Admins can delete global macros."
@@ -10406,9 +10408,9 @@ msgid "SNMPv3 security name"
 msgstr "SNMPv3-Sicherheitsname"
 
 #: include/classes/debug/CProfiler.php:141
-#, fuzzy, php-format
+#, php-format
 msgid "SQL count: %s (selects: %s | executes: %s)"
-msgstr "SQL-Anzahl: % s (selects: %s | executes: %s)"
+msgstr "SQL-Zähler: %s (selects: %s | executes: %s)"
 
 #: include/classes/db/DB.php:631
 #, php-format
@@ -10976,7 +10978,7 @@ msgstr "Dienste"
 
 #: api/classes/CService.php:1483
 msgid "Services form a circular dependency."
-msgstr "Dienste bilden eine zirkläre Abhängigkeit"
+msgstr "Dienste bilden eine zirkläre Abhängigkeit."
 
 #: api/classes/CUser.php:1028
 msgid "Session terminated, re-login, please."
@@ -11381,7 +11383,7 @@ msgstr "Status von Discovery"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr ""
+msgstr "Status von Systemgruppenauslösern"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
@@ -11447,7 +11449,7 @@ msgstr "Wert speichern"
 # Autorisierungs-Form-IPMI
 #: include/hosts.inc.php:41
 msgid "Straight"
-msgstr ""
+msgstr "Straight"
 
 #: include/views/configuration.screen.constructor.edit.php:550
 msgid "Style"
@@ -11475,19 +11477,19 @@ msgstr ""
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "Summe aller Werte im Zeitraum T ist < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
-msgstr ""
+msgstr "Summe aller Werte im Zeitraum T ist gleich N"
 
 #: popup_trexpr.php:333
 msgid "Sum of values of a period T is > N"
-msgstr ""
+msgstr "Summe aller Werte im Zeitraum T ist > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "Summe aller Werte im Zeitraum T ist NICHT N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11656,7 +11658,7 @@ msgstr "Vorlagenname"
 
 #: include/views/conf.import.php:29
 msgid "Template screens"
-msgstr ""
+msgstr "Vorlagentafel"
 
 #: include/reports.inc.php:107
 msgid "Template trigger"
@@ -12023,8 +12025,9 @@ msgid "Trigger displaying options"
 msgstr "Auslöser-Anzeige"
 
 #: include/views/configuration.triggers.expression.php:125
+#, fuzzy
 msgid "Trigger expression condition"
-msgstr ""
+msgstr "Bedingung für Auslöser-Ausdruck"
 
 #: api/classes/CTrigger.php:1166 api/classes/CTriggerPrototype.php:1052
 msgid "Trigger expression must contain at least one host:key reference."
@@ -12167,7 +12170,7 @@ msgstr "Dienstag"
 
 #: include/locales.inc.php:69
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "Türkisch (tr_TR)"
 
 #: jsLoader.php:148
 msgid "Two elements should be selected"
@@ -12374,7 +12377,7 @@ msgstr "Einheit"
 #: include/views/monitoring.overview.php:47 popup.php:575 popup.php:593
 #: report2.php:239
 msgid "Unknown"
-msgstr "unbekannt"
+msgstr "Unbekannt"
 
 #: auditlogs.php:155
 msgid "Unknown action"
@@ -12402,11 +12405,11 @@ msgstr "Unbekannter Interface-Typ."
 
 #: include/audit.inc.php:62
 msgid "Unknown resource"
-msgstr "unbekannte Ressource"
+msgstr "Unbekannte Ressource"
 
 #: include/items.inc.php:954
 msgid "Unknown value type"
-msgstr "Unbekannter Werttyp."
+msgstr "Unbekannter Werttyp"
 
 #: include/triggers.inc.php:1737 tr_testexpr.php:33
 msgid "Unknown variable type, testing not available"
@@ -12631,7 +12634,7 @@ msgstr "Benutzer kann sich nicht selbst eintragen in eine deaktiverte Gruppe ode
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
-msgstr "Benutzer kann GUI-Zugriff nicht für sich selbst ändern"
+msgstr "Benutzer kann GUI-Zugriff nicht für sich selbst ändern."
 
 #: api/classes/CUserGroup.php:424
 msgid "User cannot change status of himself"
@@ -12720,7 +12723,7 @@ msgstr "Benutzerprofil"
 #: include/views/administration.users.edit.php:305
 #: include/views/administration.users.list.php:57
 msgid "User type"
-msgstr "Benutzer-Typ"
+msgstr "Benutzertyp"
 
 #: profile.php:173 users.php:189 users.php:251 users.php:271
 msgid "User updated"
@@ -12903,7 +12906,7 @@ msgstr "Warnung"
 
 #: chart7.php:76
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr "Warnung kann nicht mehr als ein Item des types \"Graph sum\". anzeigen"
+msgstr "Warnung: kann nicht mehr als ein Item vom Typ \"Graph sum\" anzeigen."
 
 #: include/validate.inc.php:440
 #, php-format
@@ -12933,7 +12936,7 @@ msgstr "Warnung. Feld \"%1$s\" ist keine Dezimalzahl."
 #: include/validate.inc.php:333
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Warnung. Feld \"%1$s\" ist keine Liste mit Ganzzahlen oder ein Bereich."
 
 #: include/validate.inc.php:346
 #, php-format
@@ -13311,11 +13314,11 @@ msgstr "Sie können diese URL nicht zeigen als ein"
 
 #: include/views/js/configuration.action.edit.js.php:319
 msgid "You did not specify host for operation."
-msgstr "Sie haben keinen Host für die Operation angegeben."
+msgstr "Sie haben keinen Host angegeben für die Operation."
 
 #: include/views/js/configuration.action.edit.js.php:304
 msgid "You did not specify host group for operation."
-msgstr "Sie haben keine Host-Gruppe für die Operation angegeben."
+msgstr "Sie haben keine angegeben Host-Gruppe für die Operation."
 
 #: api/classes/CAction.php:1580
 #, php-format
@@ -13325,7 +13328,7 @@ msgstr "Sie haben kein Ziel angegeben für das Operations-Kommando \"%s\"."
 #: api/classes/CAction.php:1577
 #, php-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr ""
+msgstr "Sie haben kein Ziel angegeben für das Operations-Kommando globales Skript \"%s\"."
 
 #: api/classes/CApplication.php:837 api/classes/CApplication.php:848
 #: api/classes/CGraph.php:660 api/classes/CGraph.php:671
@@ -13477,7 +13480,7 @@ msgstr "Zabbix-Serverinfo"
 
 #: jsrpc.php:173
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr "Zabbix-Server läuft nicht: Angezeigte Informationen sind womöglich nicht aktuell"
+msgstr "Zabbix-Server läuft nicht: Angezeigte Informationen sind womöglich nicht aktuell."
 
 #: include/blocks.inc.php:711
 msgid "Zabbix server is running"
@@ -13486,7 +13489,7 @@ msgstr "Zabbix-Server läuft"
 #: adm.gui.php:77
 #, php-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr ""
+msgstr "Prüfintervall des Zabbix-Servers ist \"%1$s\"."
 
 #: include/setup.inc.php:369
 msgid "Zabbix server name"
@@ -13669,7 +13672,6 @@ msgid "every"
 msgstr "jeden"
 
 #: hostinventories.php:123
-#, fuzzy
 msgid "exactly"
 msgstr "genau"
 
@@ -13720,7 +13722,7 @@ msgstr "Bild"
 msgid "in"
 msgstr "in"
 
-# Zabbix Server "is" läuft -- Daher leer
+# Absichtlich leer: Zabbix Server "is" läuft
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
 msgstr ""
@@ -13861,12 +13863,13 @@ msgstr "jetzt"
 msgid "of"
 msgstr "von"
 
+# jeder, jedes?
 #: include/maintenances.inc.php:74 include/maintenances.inc.php:109
 #: include/maintenances.inc.php:112
-#, fuzzy
 msgid "of every"
-msgstr "jeder"
+msgstr ""
 
+# In den ersten beiden Vorkommen "am", wie ein Tag. 3. Vorkommen unklar
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 #: include/views/monitoring.hostscreen.php:54
 #, fuzzy

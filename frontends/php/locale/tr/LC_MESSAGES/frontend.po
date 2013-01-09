@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-09 18:36+0200\n"
-"PO-Revision-Date: 2012-12-22 23:52+0200\n"
+"POT-Creation-Date: 2013-01-09 18:47+0200\n"
+"PO-Revision-Date: 2013-01-05 11:25+0200\n"
 "Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
@@ -1822,37 +1822,37 @@ msgstr "Şablonun bağlantısı kaldırılamadı"
 #: api/classes/CHostGeneral.php:441
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "\"%s\" tetikleyicisinden bağlantı koparılamıyor, ana bilgisayara bağlı kalmış şablonda öğeler bulunmaktadır."
 
 #: api/classes/CApplication.php:456
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" uygulaması için \"templateid\" güncellenemiyor."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" grafiği için \"templateid\" güncellenemiyor."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" öğesi için \"templateid\" güncellenemiyor."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" ekranı için \"templateid\" güncellenemiyor."
 
 #: api/classes/CTrigger.php:1096
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" tetikleyicisi için \"templateid\" güncellenemiyor."
 
 #: api/classes/CTriggerPrototype.php:831
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" tetikleyici prototipi için \"templateid\" güncellenemiyor."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -1882,7 +1882,7 @@ msgstr "Keşif kuralı güncellenemedi"
 
 #: usergrps.php:246
 msgid "Cannot update frontend access"
-msgstr ""
+msgstr "Ön uç erişimi güncellenemiyor."
 
 #: graphs.php:223
 msgid "Cannot update graph"
@@ -1894,7 +1894,7 @@ msgstr "Grup güncellenemedi"
 
 #: api/classes/CUserGroup.php:397
 msgid "Cannot update group."
-msgstr ""
+msgstr "Grup güncellenemiyor."
 
 #: hostgroups.php:196 hosts.php:322
 msgid "Cannot update host"
@@ -1910,7 +1910,7 @@ msgstr "Konaklar güncellenemedi"
 
 #: adm.iconmapping.php:77
 msgid "Cannot update icon map"
-msgstr ""
+msgstr "ikon haritası güncellenemiyor."
 
 #: adm.images.php:58
 msgid "Cannot update image"
@@ -1918,7 +1918,7 @@ msgstr "Resim güncellenemedi"
 
 #: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
-msgstr ""
+msgstr "Resim güncellenemiyor."
 
 #: disc_prototypes.php:273 items.php:447 screenedit.php:173
 msgid "Cannot update item"
@@ -1926,11 +1926,11 @@ msgstr "Öğe güncellenemedi"
 
 #: items.php:555
 msgid "Cannot update items"
-msgstr ""
+msgstr "Öğeler güncellenemiyor."
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr ""
+msgstr "Makro güncellenemiyor."
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
@@ -1947,7 +1947,7 @@ msgstr "\"%s\" haritası güncellenemedi."
 
 #: media_types.php:113
 msgid "Cannot update media type"
-msgstr ""
+msgstr "Ortam türü güncellenemiyor."
 
 #: sysmaps.php:160
 msgid "Cannot update network map"
@@ -1975,7 +1975,7 @@ msgstr "Ekran güncellenemedi"
 
 #: include/classes/import/CXmlImport18.php:1701
 msgid "Cannot update screen."
-msgstr ""
+msgstr "Ekran güncellenemiyor."
 
 #: scripts.php:110
 msgid "Cannot update script"
@@ -1987,7 +1987,7 @@ msgstr "Servis güncellenemedi"
 
 #: slideconf.php:97
 msgid "Cannot update slide show"
-msgstr ""
+msgstr "Slayt gösterisi güncellenemiyor."
 
 #: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
 msgid "Cannot update status"
@@ -2008,7 +2008,7 @@ msgstr "Kullanıcı güncellenemedi"
 
 #: api/classes/CUser.php:807
 msgid "Cannot update user media."
-msgstr ""
+msgstr "Kullanıcı ortamı güncellenemiyor."
 
 #: profile.php:110 users.php:147
 msgid "Cannot update user. Both passwords must be equal."
@@ -2032,7 +2032,7 @@ msgstr "Büyük/Küçük harf duyarlı"
 
 #: include/views/configuration.screen.constructor.edit.php:586
 msgid "Center"
-msgstr ""
+msgstr "Merkez"
 
 #: include/classes/screens/CScreenBase.php:258
 #: include/classes/screens/CScreenBuilder.php:419
@@ -2044,7 +2044,7 @@ msgstr "Değişim"
 #: latest.php:195
 msgctxt "noun in latest data"
 msgid "Change"
-msgstr ""
+msgstr "Değiştir"
 
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
@@ -2076,7 +2076,7 @@ msgstr "Zaten var olanı kontrol et."
 #: include/classes/parsers/CTriggerExpression.php:248
 #, php-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" dan başlayan ifade parçasını kontrol et."
 
 #: api/classes/CItemGeneral.php:262
 msgid "Check the key, please. Default example was passed."
@@ -2101,21 +2101,21 @@ msgstr "Alt"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_CN)"
-msgstr ""
+msgstr "Çince (zh_CN)"
 
 #: include/locales.inc.php:48
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "Çince (zh_TW)"
 
 #: api/classes/CMapElement.php:533
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr ""
+msgstr "\"%s\" eşleştirme elemanı için döngüsel bağlantı oluşturulamıyor."
 
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr ""
+msgstr "Haritalarda Döngüsel referans : %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
@@ -13928,9 +13928,9 @@ msgstr "evet"
 #: include/views/configuration.services.edit.php:204
 #: include/views/configuration.services.edit.php:245
 msgid "yyyy"
-msgstr ""
+msgstr "yyyy"
 
 #: include/func.inc.php:561
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"

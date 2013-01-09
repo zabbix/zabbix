@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-09 18:36+0200\n"
-"PO-Revision-Date: 2012-10-31 15:21+0200\n"
+"POT-Creation-Date: 2013-01-09 18:47+0200\n"
+"PO-Revision-Date: 2013-01-08 23:44+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -2219,7 +2219,7 @@ msgstr "Об'єднати стовпчики"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Об'єднання стовпчиків елементу комплексного екрану розміщеного на X - %1$s та Y - %2$s є занадто великим."
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -4505,7 +4505,7 @@ msgstr "Поле:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Формат файлу не підтримується."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
@@ -5685,11 +5685,11 @@ msgstr "Тип ярлика до картинки"
 #: api/classes/CImage.php:343
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Помилка завантаження зображення [%1$s] в [%2$s]."
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "Розмір зображення має бути менше 1МБ."
 
 #: adm.images.php:57
 msgid "Image updated"
@@ -5971,7 +5971,7 @@ msgstr "Некоректний колір \"%1$s\"."
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Надано некоректне об'єднання стовпчиків для елементу комплексного екрану розміщеного на X - %1$s та Y - %2$s."
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -6204,7 +6204,7 @@ msgstr "Вказано некоректний тип ресурсу для ел�
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Надано некоректне об'єднання рядків для елементу комплексного екрану розміщеного на X - %1$s та Y - %2$s."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6469,7 +6469,7 @@ msgstr "Помилковий запит."
 #: maintenance.php:147 maintenance.php:161 services.php:188 services.php:202
 #, php-format
 msgid "Invalid date \"%s\"."
-msgstr ""
+msgstr "Помилкова дата \"%s\"."
 
 #: api/classes/CUserMacro.php:920
 #, php-format
@@ -6483,7 +6483,7 @@ msgstr "Помилковий формат ключа елемента даних
 
 #: maintenance.php:309
 msgid "Invalid maintenance period"
-msgstr ""
+msgstr "Помилковий період обслуговування."
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
@@ -7534,19 +7534,19 @@ msgstr[2] "Максимальна довжина імені вузла мере�
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "Максимальне значення за період T є < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "Максимальне значення за період T є = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "Максимальне значення за період T є > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "Максимальне значення за період T НЕ є N"
 
 #: api/classes/CHost.php:1383
 #, php-format
@@ -7723,19 +7723,19 @@ msgstr "Мінімально необхідний розмір PHP post - %s (к
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "Мінімальне значення за період T є < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "Мінімальне значення за період T є = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "Мінімальне значення за період T є > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "Мінімальне значення за період T НЕ є N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
@@ -8127,11 +8127,11 @@ msgstr "Немає заданих даних."
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Не отримано даних за період часу T, тоді N = 1, 0 - в іншому випадку"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Не отримано даних за період часу T, тоді N НЕ 1, 0 - в іншому випадку"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -8798,19 +8798,19 @@ msgstr "Кількість кроків"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T є < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T є = N"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T є > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr ""
+msgstr "Кількість успішно отриманих значень V (які задовольняють оператор O) за період T НЕ є N"
 
 #: include/blocks.inc.php:733
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -9576,7 +9576,7 @@ msgstr "Португальська (pt_BR)"
 
 #: include/locales.inc.php:64
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "Португальська (pt_PT)"
 
 #: tr_logform.php:303
 msgid "Position"
@@ -10188,7 +10188,7 @@ msgstr "Об'єднати рядки"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Об'єднання рядків елементу комплексного екрану розміщеного на X - %1$s та Y - %2$s є занадто великим."
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -11437,7 +11437,7 @@ msgstr "Аудит успіхів"
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "Сума значень за період T є < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
@@ -11449,7 +11449,7 @@ msgstr "Сума значень за період T > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "Сума значень за період T НЕ є N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -12128,7 +12128,7 @@ msgstr "Вівторок"
 
 #: include/locales.inc.php:69
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "Турецька (tr_TR)"
 
 #: jsLoader.php:148
 msgid "Two elements should be selected"
