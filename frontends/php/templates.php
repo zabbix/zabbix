@@ -189,7 +189,6 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
-		$duplicatedMacros = array();
 		foreach ($macros as $mnum => $macro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
 			$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
@@ -495,7 +494,7 @@ else {
 	$options = array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),
 		'editable' => 1,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name', 'proxy_hostid'),
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'selectTemplates' => array('hostid', 'name', 'status'),
 		'selectParentTemplates' => array('hostid', 'name', 'status'),
@@ -513,7 +512,7 @@ else {
 	order_result($templates, $sortfield, $sortorder);
 //-----
 
-	foreach($templates as $tnum => $template){
+	foreach($templates as $template){
 		$templates_output = array();
 		if($template['proxy_hostid']){
 			$proxy = get_host_by_hostid($template['proxy_hostid']);
@@ -540,7 +539,7 @@ else {
 		$i = 0;
 		$linked_templates_output = array();
 		order_result($template['parentTemplates'], 'name');
-		foreach($template['parentTemplates'] as $snum => $linked_template){
+		foreach($template['parentTemplates'] as $linked_template){
 			$i++;
 			if($i > $config['max_in_table']){
 				$linked_templates_output[] = '...';
