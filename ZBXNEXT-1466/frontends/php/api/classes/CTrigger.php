@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -30,7 +30,7 @@ class CTrigger extends CTriggerGeneral {
 	protected $tableAlias = 't';
 
 	/**
-	 * Get Triggers data
+	 * Get Triggers data.
 	 *
 	 * @param array $options
 	 * @param array $options['itemids']
@@ -419,7 +419,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// sorting
-		if (!zbx_empty($options['sortfield'])) {
+		if (!zbx_empty($options['sortfield']) && is_null($options['countOutput'])) {
 			if (!is_array($options['sortfield'])) {
 				$options['sortfield'] = array($options['sortfield']);
 			}
@@ -460,11 +460,11 @@ class CTrigger extends CTriggerGeneral {
 						$sqlParts['order'][] = 'h.name '.$sortorder;
 						break;
 					case 'lastchange':
-						$sqlParts['order'][] = $sortfield.' '.$sortorder;
+						$sqlParts['order']['t.'.$sortfield] = 't.'.$sortfield.' '.$sortorder;
 						break;
 					default:
 						// if lastchange is not used for ordering, it should be the second order criteria
-						$sqlParts['order'][] = 't.'.$sortfield.' '.$sortorder;
+						$sqlParts['order']['t.'.$sortfield] = 't.'.$sortfield.' '.$sortorder;
 						break;
 				}
 
@@ -475,8 +475,9 @@ class CTrigger extends CTriggerGeneral {
 					}
 				}
 			}
+
 			if (!empty($sqlParts['order'])) {
-				$sqlParts['order'][] = 't.lastchange DESC';
+				$sqlParts['order']['t.lastchange'] = 't.lastchange DESC';
 			}
 		}
 
