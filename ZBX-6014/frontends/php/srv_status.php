@@ -141,7 +141,6 @@ else {
 	));
 
 	// expand problem trigger descriptions
-	$triggers = zbx_toHash(zbx_objectValues($services, 'trigger'), 'triggerid');
 	foreach ($slaData as &$serviceSla) {
 		foreach ($serviceSla['problems'] as &$problemTrigger) {
 			$problemTrigger['description'] = $triggers[$problemTrigger['triggerid']]['description'];

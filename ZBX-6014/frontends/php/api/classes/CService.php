@@ -81,7 +81,7 @@ class CService extends CZBXAPI {
 
 		// fetch results
 		$result = array();
-		while ($row = DBfetch($res)) {
+		while ($row = DBfetch($res, false)) {
 			// a count query, return a single result
 			if ($options['countOutput'] !== null) {
 				$result = $row['rowscount'];
@@ -599,7 +599,7 @@ class CService extends CZBXAPI {
 					$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
 				}
 				$query = DBselect(
-					'SELECT sa.servicealarmid,sa.serviceid,sa.clock,sa.value'.
+					'SELECT *'.
 					' FROM service_alarms sa'.
 					' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
 						' AND ('.implode(' OR ', $intervalConditions).')'.
@@ -1508,12 +1508,14 @@ class CService extends CZBXAPI {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
-				$trg_count = API::Trigger()->get(array(
-					'triggerids' => $options['filter']['triggerid'],
-					'countOutput' => true
+				$accessibleTriggers = API::Trigger()->get(array(
+					'triggerids' => $options['filter']['triggerid']
 				));
 
-				if (!$trg_count) {
+				if (!empty($accessibleTriggers)) {
+					$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
+				}
+				else {
 					unset($options['filter']['triggerid']);
 				}
 			}
@@ -1654,29 +1656,17 @@ class CService extends CZBXAPI {
 
 		// selectTrigger
 		if ($options['selectTrigger'] !== null) {
-			$triggerids = array();
+			$triggers = API::Trigger()->get(array(
+				'output' => $options['selectTrigger'],
+				'triggerids' => array_unique(zbx_objectValues($result, 'triggerid')),
+				'preservekeys' => true,
+				'nopermissions' => true
+			));
 			foreach ($result as &$service) {
-				if (isset($service['triggerid']) && $service['triggerid'] != 0) {
-					$triggerids[] = $service['triggerid'];
-				}
-				$service['trigger'] = array();
+				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
 			}
 			unset($service);
-
-		$triggers = API::Trigger()->get(array(
-			'output' => $options['selectTrigger'],
-			'triggerids' => $triggerids,
-			'preservekeys' => true,
-			'nopermissions' => true
-		));
-
-		foreach ($result as &$service) {
-			if (isset($service['triggerid']) && $service['triggerid'] != 0) {
-				$service['trigger'] = $triggers[$service['triggerid']];
-			}
 		}
-		unset($service);
-}
 
 		return $result;
 	}
