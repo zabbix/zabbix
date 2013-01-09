@@ -280,8 +280,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * @return string
 	 */
 	protected function updateReal($graph, $dbGraph) {
-		$dbGitems = $dbGraph['gitems'];
-		$dbGitemIds = zbx_objectValues($dbGitems, 'gitemid');
+		$dbGitems = zbx_toHash($dbGraph['gitems'], 'gitemid');
+		$dbGitemIds = zbx_toHash(zbx_objectValues($dbGitems, 'gitemid'));
 
 		// update the graph if it's modified
 		if (DB::recordModified('graphs', $dbGraph, $graph)) {
@@ -291,9 +291,10 @@ abstract class CGraphGeneral extends CZBXAPI {
 		// update graph items
 		$insertGitems = array();
 		$deleteGitemIds = array_combine($dbGitemIds, $dbGitemIds);
+
 		foreach ($graph['gitems'] as $gitem) {
 			// updating an existing item
-			if (isset($gitem['gitemid'], $dbGitems[$gitem['gitemid']])) {
+			if (!empty($gitem['gitemid']) && isset($dbGitemIds[$gitem['gitemid']])) {
 				if (DB::recordModified('graphs_items', $dbGitems[$gitem['gitemid']], $gitem)) {
 					DB::updateByPk('graphs_items', $gitem['gitemid'], $gitem);
 				}
