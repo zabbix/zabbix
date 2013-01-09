@@ -103,28 +103,6 @@ function get_httptests_by_hostid($hostids) {
 }
 
 /**
- * Cheks for duplicates in HTTP steps.
- *
- * @param type $steps
- *
- * @return boolean return true if duplicate found
- */
-function validateHttpDuplicateSteps($steps) {
-	$isDuplicateStepFound = false;
-
-	$set = array();
-	foreach ($steps as $step) {
-		if (isset($set[$step['name']])) {
-			error(_s('Step with name "%s" already exists.', $step['name']));
-			$isDuplicateStepFound = true;
-		}
-		$set[$step['name']] = 1;
-	}
-
-	return $isDuplicateStepFound;
-}
-
-/**
  * Return parent templates for http tests.
  * Result structure:
  * array(
