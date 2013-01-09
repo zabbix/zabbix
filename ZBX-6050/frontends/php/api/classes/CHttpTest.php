@@ -466,6 +466,7 @@ class CHttpTest extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
 			}
 			$this->checkSteps($httpTest);
+			$this->checkDuplicateSteps($httpTest);
 		}
 
 		$this->checkApplicationHost($httpTests);
@@ -520,7 +521,7 @@ class CHttpTest extends CZBXAPI {
 
 			if (isset($httpTest['steps'])) {
 				$this->checkSteps($httpTest);
-				$this->checkStepsOnUpdate($httpTest);
+				$this->checkDuplicateSteps($httpTest);
 			}
 		}
 
@@ -587,20 +588,9 @@ class CHttpTest extends CZBXAPI {
 	 *
 	 * @param array $httpTest
 	 */
-	protected function checkStepsOnUpdate(array $httpTest) {
-		$stepNames = array();
-		foreach ($httpTest['steps'] as $step) {
-			if (!isset($step['httpstepid'])) {
-				$stepNames[] = $step['name'];
-			}
-		}
-
-		$sql = 'SELECT h.httpstepid,h.name'.
-				' FROM httpstep h'.
-				' WHERE h.httptestid='.$httpTest['httptestid'].
-				' AND '.dbConditionString('h.name', $stepNames);
-		if ($dbStep = DBfetch(DBselect($sql))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario Step "%1$s" already exists.', $dbStep['name']));
+	protected function checkDuplicateSteps(array $httpTest) {
+		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario step "%1$s" already exists.', $duplicate['name']));
 		}
 	}
 

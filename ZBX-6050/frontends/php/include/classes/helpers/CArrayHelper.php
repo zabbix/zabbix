@@ -169,4 +169,28 @@ class CArrayHelper {
 
 		return $a1;
 	}
+
+	/**
+	 * Checks if array $a1 contains arrays with duplicate values under the $uniqueField key. If a duplicate exists,
+	 * returns the first duplicate, otherwise returns null.
+	 *
+	 * @param array $a1
+	 * @param string $uniqueField   key to be used as unique criteria
+	 *
+	 * @return null|array           the first duplicate found or null if there are no duplicates
+	 */
+	public static function findDuplicate(array $a1, $uniqueField) {
+		$uniqueValues = array();
+
+		foreach ($a1 as $array) {
+			$value = $array[$uniqueField];
+
+			if (isset($uniqueValues[$value])) {
+				return $array;
+			}
+			else {
+				$uniqueValues[$value] = $value;
+			}
+		}
+	}
 }
