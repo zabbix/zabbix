@@ -161,7 +161,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('history', '54');
 		$this->input_type('trends', '55');
 		$this->input_type('description', 'description');
-		$this->dropdown_select('delta', 'Delta (simple change)');
+		$this->dropdown_select('delta_name', 'Delta (simple change)');
 		$this->checkbox_unselect('status');
 
 		$this->click('save');
