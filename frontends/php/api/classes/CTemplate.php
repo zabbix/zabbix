@@ -24,9 +24,17 @@
  */
 class CTemplate extends CHostGeneral {
 
-	protected $tableName = 'hosts';
-
-	protected $tableAlias = 'h';
+	/**
+	 * Overrides the parent function so that templateids will be used instead of hostids for the template API.
+	 */
+	public function pkOption($tableName = null) {
+		if ($tableName && $tableName != $this->tableName()) {
+			return parent::pkOption($tableName);
+		}
+		else {
+			return 'templateids';
+		}
+	}
 
 	/**
 	 * Get Template data
@@ -1145,7 +1153,6 @@ class CTemplate extends CHostGeneral {
 					'output' => $this->outputExtend('screens', array('templateid'), $options['selectScreens']),
 					'nodeids' => $options['nodeids'],
 					'templateids' => $templateids,
-					'editable' => $options['editable'],
 					'nopermissions' => true
 				));
 				if (!is_null($options['limitSelects'])) {
@@ -1165,7 +1172,6 @@ class CTemplate extends CHostGeneral {
 				$screens = API::TemplateScreen()->get(array(
 					'nodeids' => $options['nodeids'],
 					'templateids' => $templateids,
-					'editable' => $options['editable'],
 					'nopermissions' => true,
 					'countOutput' => true,
 					'groupCount' => true
