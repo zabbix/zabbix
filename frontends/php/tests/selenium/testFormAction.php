@@ -63,7 +63,7 @@ class testFormAction extends CWebTest {
 	 * @dataProvider providerNewActions
 	 */
 	public function testActionCreateSimple($action) {
-//		DBsave_tables('actions');
+		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');
 		$this->checkTitle('Configuration of actions');
@@ -145,7 +145,7 @@ class testFormAction extends CWebTest {
 		$this->wait();
 		$this->ok('Action added');
 
-//		DBrestore_tables('actions');
+		DBrestore_tables('actions');
 	}
 
 	public function testActionCreate() {
@@ -218,7 +218,7 @@ class testFormAction extends CWebTest {
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->dropdown_select_wait('groupid', 'Zabbix servers');
-		$this->button_click("spanid10084");
+		$this->button_click("spanid10053");
 		$this->selectWindow("null");
 		$this->button_click("//input[@name='save']");
 
@@ -258,11 +258,15 @@ class testFormAction extends CWebTest {
 		$this->wait();
 		$this->type("esc_period", "123");
 		$this->ok("Run remote commands on current host");
+
+		$this->button_click('operationTab');
+		$this->wait();
+
 		$this->button_click("save");
 		$this->wait();
 		$this->ok("Action added");
 
-	//	DBrestore_tables('actions');
+		DBrestore_tables('actions');
 	}
 }
 ?>
