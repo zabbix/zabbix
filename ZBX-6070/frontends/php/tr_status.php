@@ -350,7 +350,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
-		'selectItems' => API_OUTPUT_EXTEND,
+		'selectItems' =>  array('hostid', 'name', 'key_', 'value_type'),
 		'selectDependencies' => API_OUTPUT_EXTEND,
 		'expandDescription' => true
 	);
