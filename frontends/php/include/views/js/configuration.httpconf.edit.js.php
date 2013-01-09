@@ -100,5 +100,43 @@
 				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});
+
+		// http step add pop up
+		<?php if(!$this->data['templated']) : ?>
+			$('#add_step').click(function() {
+				var form = $(this).parents('form');
+
+				// append existing step names
+				var stepNames = '';
+				form.find('input[name^=steps]').filter('input[name*=name]').each(function(i, stepName) {
+					stepNames += '&steps_names[]=' + $(stepName).val();
+				});
+
+				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames, 600, 410);
+			})
+		<?php endif ?>
+
+		// http step edit pop up
+		<?php foreach ($this->data['steps'] as $i => $step): ?>
+			$('#name_<?php echo $i ?>').click(function() {
+				// append existing step names
+				var stepNames = '';
+				var form = $(this).parents('form');
+				form.find('input[name^=steps]').filter('input[name*=name]').each(function(i, stepName) {
+					stepNames += '&steps_names[]=' + $(stepName).val();
+				});
+
+				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?php echo $this->data['templated'] ?>'
+					+ '&list_name=steps&stepid=' + jQuery(this).attr("name_step")
+					+ '<?php echo url_param($step['name'], false, 'name') ?>'
+					+ '<?php echo url_param($step['url'], false, 'url') ?>'
+					+ '<?php echo url_param($step['posts'], false, 'posts') ?>'
+					+ '<?php echo url_param($step['required'], false, 'required') ?>'
+					+ '<?php echo url_param($step['status_codes'], false, 'status_codes') ?>'
+					+ '<?php echo url_param($step['name'], false, 'old_name') ?>'
+					+ stepNames, 600, 410);
+			});
+		<?php endforeach ?>
 	});
 </script>
+

@@ -35,6 +35,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-6050] fixed duplicate step name validation in httptest.create and httptest.update (Pavels)
 A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
 A......... [ZBX-5706] fixed trigger.adddependencies returning an object instead of an array of trigger IDs (Pavels)
 A......... [ZBX-5916] removed the unnecessary dhostids parameter from dcheck.get (Pavels)
