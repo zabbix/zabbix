@@ -419,7 +419,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// sorting
-		if (!zbx_empty($options['sortfield']) && is_null($options['countOutput'])) {
+		if (!zbx_empty($options['sortfield'])) {
 			if (!is_array($options['sortfield'])) {
 				$options['sortfield'] = array($options['sortfield']);
 			}
