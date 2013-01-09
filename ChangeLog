@@ -88,6 +88,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ja
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+A.F....... [ZBX-6014] improved performance and removed get_accessible_triggers function (dotneft, Oleg)
 ..F....... [ZBX-6070] fixed event CSV export ignoring the selected page and filters (Pavels)
 ..F....... [ZBX-6006] optimized web interface API calls, which requested redundant data (Toms)
 A......... [ZBX-5806] fixed template.massadd and template.massremove returning an empty hostids array (Pavels)
