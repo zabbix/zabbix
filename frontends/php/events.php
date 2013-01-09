@@ -228,29 +228,53 @@ if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
+// page filter
+if ($source == EVENT_SOURCE_TRIGGERS) {
+	$options = array(
+		'groups' => array(
+			'monitored_hosts' => 1,
+			'with_items' => 1
+		),
+		'hosts' => array(
+			'monitored_hosts' => 1,
+			'with_items' => 1
+		),
+		'triggers' => array(),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null),
+		'triggerid' => get_request('triggerid', null)
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
+	if ($pageFilter->triggerid > 0) {
+		$_REQUEST['triggerid'] = $pageFilter->triggerid;
+	}
+}
+
 $events_wdgt = new CWidget();
 
 // header
 // allow CSV export button
 $frmForm = new CForm();
-$frmForm->cleanItems();
-if (isset($_REQUEST['groupid'])) {
-	$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
-}
-if (isset($_REQUEST['hostid'])) {
-	$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
-}
 if (isset($_REQUEST['source'])) {
 	$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
-}
-if (isset($_REQUEST['start'])) {
-	$frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
 }
 if (isset($_REQUEST['stime'])) {
 	$frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
 }
 if (isset($_REQUEST['period'])) {
 	$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
+}
+$frmForm->addVar('page', getPageNumber(), 'page_csv');
+if ($source == EVENT_SOURCE_TRIGGERS) {
+	if ($_REQUEST['triggerid']) {
+		$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
+	}
+	else {
+		$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+		$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+	}
 }
 $frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
@@ -268,29 +292,8 @@ $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addVar('stime', get_request('stime'));
 $r_form->addVar('period', get_request('period'));
 
-if (EVENT_SOURCE_TRIGGERS == $source) {
-
-	$options = array(
-		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_items' => 1,
-		),
-		'hosts' => array(
-			'monitored_hosts' => 1,
-			'with_items' => 1,
-		),
-		'triggers' => array(),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-		'triggerid' => get_request('triggerid', null)
-	);
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-	if ($pageFilter->triggerid > 0) {
-		$_REQUEST['triggerid'] = $pageFilter->triggerid;
-	}
-
+// add host and group filters to the form
+if ($source == EVENT_SOURCE_TRIGGERS) {
 	$r_form->addItem(array(
 		_('Group').SPACE,
 		$pageFilter->getGroupsCB(true)
