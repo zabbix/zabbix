@@ -162,34 +162,6 @@ class CGraphItem extends CZBXAPI {
 		return $result;
 	}
 
-	/**
-	 * Get graph items by graph id and graph item id
-	 *
-	 * @param array $gitemData
-	 * @param array $gitemData['itemid']
-	 * @param array $gitemData['graphid']
-	 * @return string|boolean graphid
-	 */
-	public function getObjects($gitemData) {
-		$result = array();
-		$gitemids = array();
-
-		$dbRes = DBselect(
-			'SELECT gi.gitemid'.
-			' FROM graphs_items gi'.
-			' WHERE gi.itemid='.$gitemData['itemid'].
-				' AND gi.graphid='.$gitemData['graphid']
-		);
-		while ($gitem = DBfetch($dbRes)) {
-			$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
-		}
-
-		if (!empty($gitemids)) {
-			$result = $this->get(array('gitemids' => $gitemids, 'output' => API_OUTPUT_EXTEND));
-		}
-		return $result;
-	}
-
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
