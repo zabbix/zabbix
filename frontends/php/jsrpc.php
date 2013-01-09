@@ -38,13 +38,8 @@ $page['type'] = detect_page_type($requestType);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-if (!is_array($data)) {
-	fatal_error('Wrong RPC call to JS RPC!');
-}
-if (!isset($data['method'])) {
-	fatal_error('Wrong RPC call to JS RPC!');
-}
-if ($requestType == PAGE_TYPE_JSON && (!isset($data['params']) || !is_array($data['params']))) {
+if (!is_array($data) || !isset($data['method'])
+		|| ($requestType == PAGE_TYPE_JSON && (!isset($data['params']) || !is_array($data['params'])))) {
 	fatal_error('Wrong RPC call to JS RPC!');
 }
 
@@ -96,7 +91,7 @@ switch ($data['method']) {
 			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeout)),
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 			'priority' => array_keys($msgsettings['triggers.severities']),
-			'limit' => 15
+			'triggerLimit' => 15
 		);
 		if (!$msgsettings['triggers.recovery']) {
 			$options['value'] = array(TRIGGER_VALUE_TRUE);
@@ -105,43 +100,53 @@ switch ($data['method']) {
 
 		$sortClock = array();
 		$sortEvent = array();
-		foreach ($events as $number => $event) {
-			$trigger = $event['trigger'];
-			$host = $event['host'];
 
-			if ($event['value'] == TRIGGER_VALUE_FALSE) {
-				$priority = 0;
-				$title = _('Resolved');
-				$sound = $msgsettings['sounds.recovery'];
+		$usedTriggers = array();
+		foreach ($events as $number => $event) {
+			if (count($usedTriggers) < 15) {
+				if (!isset($usedTriggers[$event['objectid']])) {
+					$trigger = $event['trigger'];
+					$host = $event['host'];
+
+					if ($event['value'] == TRIGGER_VALUE_FALSE) {
+						$priority = 0;
+						$title = _('Resolved');
+						$sound = $msgsettings['sounds.recovery'];
+					}
+					else {
+						$priority = $trigger['priority'];
+						$title = _('Problem on');
+						$sound = $msgsettings['sounds.'.$trigger['priority']];
+					}
+
+					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
+					$url_events = 'events.php?triggerid='.$event['objectid'];
+					$url_tr_events = 'tr_events.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'];
+
+					$result[$number] = array(
+						'type' => 3,
+						'caption' => 'events',
+						'sourceid' => $event['eventid'],
+						'time' => $event['clock'],
+						'priority' => $priority,
+						'sound' => $sound,
+						'color' => getSeverityColor($trigger['priority'], $event['value']),
+						'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, ':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
+						'body' => array(
+							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
+							_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
+						),
+						'timeout' => $msgsettings['timeout']
+					);
+
+					$sortClock[$number] = $event['clock'];
+					$sortEvent[$number] = $event['eventid'];
+					$usedTriggers[$event['objectid']] = true;
+				}
 			}
 			else {
-				$priority = $trigger['priority'];
-				$title = _('Problem on');
-				$sound = $msgsettings['sounds.'.$trigger['priority']];
+				break;
 			}
-
-			$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
-			$url_events = 'events.php?triggerid='.$event['objectid'];
-			$url_tr_events = 'tr_events.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'];
-
-			$result[$number] = array(
-				'type' => 3,
-				'caption' => 'events',
-				'sourceid' => $event['eventid'],
-				'time' => $event['clock'],
-				'priority' => $priority,
-				'sound' => $sound,
-				'color' => getSeverityColor($trigger['priority'], $event['value']),
-				'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, ':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
-				'body' => array(
-					_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
-					_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
-				),
-				'timeout' => $msgsettings['timeout']
-			);
-
-			$sortClock[$number] = $event['clock'];
-			$sortEvent[$number] = $event['eventid'];
 		}
 		array_multisort($sortClock, SORT_ASC, $sortEvent, SORT_ASC, $result);
 		break;
