@@ -240,7 +240,7 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => array('triggerid', 'value', 'lastchange', 'priority', 'value_flags', 'description', 'error'),
+		'output' =>  API_OUTPUT_EXTEND,
 		'selectHosts' => array('name'),
 		'preservekeys' => true
 	);
@@ -1142,7 +1142,7 @@ function make_graph_submenu() {
 	$graphids = array();
 	$itemids = array();
 	$favGraphs = array();
-	$fav_graphs = get_favorites('web.favorite.graphids');
+	$fav_graphs = CFavorite::get('web.favorite.graphids');
 
 	if (!$fav_graphs) {
 		return $favGraphs;
@@ -1299,7 +1299,7 @@ function make_screen_menu(&$menu, &$submenu) {
 
 function make_screen_submenu() {
 	$favScreens = array();
-	$fav_screens = get_favorites('web.favorite.screenids');
+	$fav_screens = CFavorite::get('web.favorite.screenids');
 
 	if (!$fav_screens) {
 		return $favScreens;
