@@ -55,7 +55,7 @@ $fields = array(
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
 	'http_proxy'      => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'new_application' => array(T_ZBX_STR, O_OPT, null, null, null),
-	'hostname'        => array(T_ZBX_STR, O_OPT, null, null, null),
+	'hostname'        => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Host')),
 	'templated'       => array(T_ZBX_STR, O_OPT, null, null, null),
 
 	// actions
@@ -110,9 +110,6 @@ if (isset($_REQUEST['new_httpstep'])) {
 	unset($_REQUEST['new_httpstep']);
 }
 
-// check for duplicate step names
-$isDuplicateStepsFound = !empty($_REQUEST['steps']) ? validateHttpDuplicateSteps($_REQUEST['steps']) : false;
-
 if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	$result = false;
 
@@ -156,10 +153,6 @@ elseif (isset($_REQUEST['save'])) {
 
 		$steps = get_request('steps', array());
 		if (!empty($steps)) {
-			if ($isDuplicateStepsFound) {
-				throw new Exception();
-			}
-
 			$i = 1;
 			foreach ($steps as $snum => $step) {
 				$steps[$snum]['no'] = $i++;
@@ -220,13 +213,12 @@ elseif (isset($_REQUEST['save'])) {
 				'selectSteps' => API_OUTPUT_EXTEND
 			));
 			$dbHttpTest = reset($dbHttpTest);
+			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
-			$httpTest = unsetEqualValues($httpTest, $dbHttpTest);
+			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest);
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (isset($step['httpstepid'])) {
-					$stepId = $step['httpstepid'];
-					$newStep = unsetEqualValues($step, $dbHttpTest['steps'][$step['httpstepid']]);
-					$newStep['httpstepid'] = $stepId;
+					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], array('httpstepid'));
 					$httpTest['steps'][$snum] = $newStep;
 				}
 			}
