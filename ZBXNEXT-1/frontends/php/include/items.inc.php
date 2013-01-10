@@ -935,27 +935,27 @@ function formatItemLastValue(array $item, $unknownString = '-') {
 		return $unknownString;
 	}
 
+	$mapping = false;
 	$value = formatItemValueType($item);
 
-	if ($item['value_type'] == ITEM_VALUE_TYPE_STR
-			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
-			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+	switch ($item['value_type']) {
+		case ITEM_VALUE_TYPE_STR:
+			$mapping = getMappedValue($value, $item['valuemapid']);
+			// break; is not missing here
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_LOG:
+			if (zbx_strlen($value) > 20) {
+				$value = zbx_substr($value, 0, 20).'...';
+			}
+			$value = nbsp(htmlspecialchars($value));
 
-		$mapping = ($item['value_type'] == ITEM_VALUE_TYPE_STR) ? getMappedValue($value, $item['valuemapid']) : false;
-
-		if (zbx_strlen($value) > 20) {
-			$value = zbx_substr($value, 0, 20).'...';
-		}
-		$value = nbsp(htmlspecialchars($value));
-
-		if ($mapping !== false) {
-			$value = $mapping.' ('.$value.')';
-		}
+			if ($mapping !== false) {
+				$value = $mapping.' ('.$value.')';
+			}
+			break;
+		default:
+			$value = applyValueMap($value, $item['valuemapid']);
 	}
-	else {
-		$value = applyValueMap($value, $item['valuemapid']);
-	}
-
 	return $value;
 }
 
