@@ -99,7 +99,7 @@ A......... [ZBX-6054] fixed host write permissions being required to view screen
 ..F....... [ZBX-6037] fixed duplicate frontend messages and changed frontend messages to show last event for 15 triggers instead of last 15 events (Oleg)
 A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance periods validation (Oleg)
 ..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
-A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
+A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-5986] fixed page filter to not use remembered group if selected host is not in that group (Toms)
 ..F....... [ZBX-6013] fixed table layout in Monitoring -> IT services for IE10 (Toms)
 A......... [ZBX-5977] removed possibility to add an LLD rule to an application via the API in application and discovery rule (Oleg)
@@ -1290,7 +1290,7 @@ Changes for 1.8.16rc2
 
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
-A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
+A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 .......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
 
 Changes for 1.8.16rc1
