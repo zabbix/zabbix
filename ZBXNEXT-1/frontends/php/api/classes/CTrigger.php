@@ -1161,10 +1161,7 @@ class CTrigger extends CTriggerGeneral {
 	public function addDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
 
-		$triggerIds = array();
-		foreach ($triggersData as $dep) {
-			$triggerIds[$dep['triggerid']] = $dep['triggerid'];
-		}
+		$triggerIds = array_unique(zbx_objectValues($triggersData, 'triggerid'));
 		if (!$this->isWritable($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		};

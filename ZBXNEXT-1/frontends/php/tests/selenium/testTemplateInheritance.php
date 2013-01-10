@@ -84,11 +84,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->login('templates.php');
 
 		// create an LLD rule
-		$this->click('link='.$this->templateName);
+		$this->button_click('link='.$this->templateName);
 		$this->wait();
-		$this->click('link=Discovery rules');
+		$this->button_click('link=Discovery rules');
 		$this->wait();
-		$this->click('form');
+		$this->button_click('form');
 		$this->wait();
 
 		$this->input_type('name', 'Test LLD');
@@ -101,18 +101,18 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('description', 'description');
 		$this->dropdown_select('status', 'Disabled');
 
-		$this->click('save');
+		$this->button_click('save');
 		$this->wait();
 
 		// check that the inherited rule matches the original
 		$this->open('hosts.php');
 		$this->wait();
-		$this->click('link='.$this->hostName);
+		$this->button_click('link='.$this->hostName);
 		$this->wait();
-		$this->click('link=Discovery rules');
+		$this->button_click('link=Discovery rules');
 		$this->wait();
 		$this->ok($this->templateName.': Test LLD');
-		$this->click('link=Test LLD');
+		$this->button_click('link=Test LLD');
 		$this->wait();
 
 		$this->assertElementValue('name', 'Test LLD');
@@ -138,15 +138,15 @@ class testTemplateInheritance extends CWebTest {
 		$this->login('templates.php');
 
 		// create an item prototype
-		$this->click('link='.$this->templateName);
+		$this->button_click('link='.$this->templateName);
 		$this->wait();
-		$this->click('link=Discovery rules');
+		$this->button_click('link=Discovery rules');
 		$this->wait();
-		$this->click('link=Test LLD');
+		$this->button_click('link=Test LLD');
 		$this->wait();
-		$this->click('link=Item prototypes');
+		$this->button_click('link=Item prototypes');
 		$this->wait();
-		$this->click('form');
+		$this->button_click('form');
 		$this->wait();
 
 		$this->input_type('name', 'Test LLD item');
@@ -164,22 +164,22 @@ class testTemplateInheritance extends CWebTest {
 		$this->dropdown_select('delta', 'Delta (simple change)');
 		$this->checkbox_unselect('status');
 
-		$this->click('save');
+		$this->button_click('save');
 		$this->wait();
 
 		// check that the inherited item prototype matches the original
 		$this->open('hosts.php');
 		$this->wait();
-		$this->click('link='.$this->hostName);
+		$this->button_click('link='.$this->hostName);
 		$this->wait();
-		$this->click('link=Discovery rules');
+		$this->button_click('link=Discovery rules');
 		$this->wait();
-		$this->click('link=Test LLD');
+		$this->button_click('link=Test LLD');
 		$this->wait();
-		$this->click('link=Item prototypes');
+		$this->button_click('link=Item prototypes');
 		$this->wait();
 		$this->ok($this->templateName.': Test LLD item');
-		$this->click('link=Test LLD item');
+		$this->button_click('link=Test LLD item');
 		$this->wait();
 
 		$this->assertElementValue('name', 'Test LLD item');
@@ -193,7 +193,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('history', '54');
 		$this->assertElementValue('trends', '55');
 		$this->assertElementText('description', 'description');
-		$this->assertDrowpdownValueText('delta', 'Delta (simple change)');
+		$this->assertElementValue('delta_name', 'Delta (simple change)');
 	}
 
 	/**
@@ -204,15 +204,15 @@ class testTemplateInheritance extends CWebTest {
 		$this->login('templates.php');
 
 		// create a trigger prototype
-		$this->click('link='.$this->templateName);
+		$this->button_click('link='.$this->templateName);
 		$this->wait();
-		$this->click('link=Discovery rules');
+		$this->button_click('link=Discovery rules');
 		$this->wait();
-		$this->click('link=Test LLD');
+		$this->button_click('link=Test LLD');
 		$this->wait();
-		$this->click('link=Trigger prototypes');
+		$this->button_click('link=Trigger prototypes');
 		$this->wait();
-		$this->click('form');
+		$this->button_click('form');
 		$this->wait();
 
 		$this->input_type('description', 'Test LLD trigger');
@@ -220,25 +220,25 @@ class testTemplateInheritance extends CWebTest {
 		$this->checkbox_select('type');
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
-		$this->click('severity_label_2');
+		$this->button_click('severity_label_2');
 		$this->checkbox_unselect('status');
 
-		$this->click('save');
+		$this->button_click('save');
 		$this->wait();
 
 		// check that the inherited trigger prototype matches the original
 		$this->open('hosts.php');
 		$this->wait();
-		$this->click('link='.$this->hostName);
+		$this->button_click('link='.$this->hostName);
 		$this->wait();
-		$this->click('link=Discovery rules');
+		$this->button_click('link=Discovery rules');
 		$this->wait();
-		$this->click('link=Test LLD');
+		$this->button_click('link=Test LLD');
 		$this->wait();
-		$this->click('link=Trigger prototypes');
+		$this->button_click('link=Trigger prototypes');
 		$this->wait();
 		$this->ok($this->templateName.': Test LLD trigger');
-		$this->click('link=Test LLD trigger');
+		$this->button_click('link=Test LLD trigger');
 		$this->wait();
 
 		$this->assertElementValue('description', 'Test LLD trigger');

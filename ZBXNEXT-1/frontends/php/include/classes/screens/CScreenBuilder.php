@@ -125,15 +125,12 @@ class CScreenBuilder {
 			$this->screen = $options['screen'];
 		}
 		elseif (!empty($options['screenid'])) {
-			$params = array(
+			$this->screen = API::Screen()->get(array(
 				'screenids' => $options['screenid'],
 				'output' => API_OUTPUT_EXTEND,
-				'selectScreenItems' => API_OUTPUT_EXTEND
-			);
-			if (in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_EDIT))) {
-				$params['editable'] = true;
-			}
-			$this->screen = API::Screen()->get($params);
+				'selectScreenItems' => API_OUTPUT_EXTEND,
+				'editable' => ($this->mode == SCREEN_MODE_EDIT)
+			));
 
 			if (!empty($this->screen)) {
 				$this->screen = reset($this->screen);

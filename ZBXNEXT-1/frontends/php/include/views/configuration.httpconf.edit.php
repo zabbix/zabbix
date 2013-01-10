@@ -187,14 +187,6 @@ $stepsTable->setHeader(array(
 	new CCol('', null, null, '50')
 ));
 
-// get all step names
-$steps_names = null;
-foreach ($this->data['steps'] as $step) {
-	if (isset($step['name'])) {
-		$steps_names .= url_param($step['name'], false, 'steps_names[]');
-	}
-}
-
 $i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
 	if (!isset($step['name'])) {
@@ -222,18 +214,6 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		'id' => 'name_'.$stepid,
 		'name_step' => $stepid
 	));
-	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&templated='.$this->data['templated'].
-		'&list_name=steps&stepid="+jQuery(this).attr("name_step")+"'.
-		url_param($step['name'], false, 'name').
-		url_param($step['timeout'], false, 'timeout').
-		url_param($step['url'], false, 'url').
-		url_param($step['posts'], false, 'posts').
-		url_param($step['required'], false, 'required').
-		url_param($step['status_codes'], false, 'status_codes').
-		url_param($step['name'], false, 'old_name').
-		$steps_names.
-		'", 600, 410);'
-	);
 
 	if (zbx_strlen($step['url']) > 70) {
 		$url = new CSpan(substr($step['url'], 0, 35).SPACE.'...'.SPACE.substr($step['url'], zbx_strlen($step['url']) - 25, 25));
@@ -268,10 +248,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 }
 
 if (!$this->data['templated']) {
-	$stepsTable->addRow(new CCol(
-		new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().$steps_names.'", 600, 410);', 'link_menu'),
-		null, 8)
-	);
+	$stepsTable->addRow(new CCol(new CButton('add_step', _('Add'), null, 'link_menu'), null, 8));
 }
 
 $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));

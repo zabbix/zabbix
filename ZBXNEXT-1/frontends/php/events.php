@@ -168,7 +168,7 @@ if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
 			'hostids' => $hostid
 		));
 
-		foreach ($newTriggers as $tnum => $newTrigger) {
+		foreach ($newTriggers as $newTrigger) {
 			if (count($oldTrigger['items']) != count($newTrigger['items'])) {
 				continue;
 			}
@@ -228,29 +228,53 @@ if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
+// page filter
+if ($source == EVENT_SOURCE_TRIGGERS) {
+	$options = array(
+		'groups' => array(
+			'monitored_hosts' => 1,
+			'with_items' => 1
+		),
+		'hosts' => array(
+			'monitored_hosts' => 1,
+			'with_items' => 1
+		),
+		'triggers' => array(),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null),
+		'triggerid' => get_request('triggerid', null)
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
+	if ($pageFilter->triggerid > 0) {
+		$_REQUEST['triggerid'] = $pageFilter->triggerid;
+	}
+}
+
 $events_wdgt = new CWidget();
 
 // header
 // allow CSV export button
 $frmForm = new CForm();
-$frmForm->cleanItems();
-if (isset($_REQUEST['groupid'])) {
-	$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
-}
-if (isset($_REQUEST['hostid'])) {
-	$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
-}
 if (isset($_REQUEST['source'])) {
 	$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
-}
-if (isset($_REQUEST['start'])) {
-	$frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
 }
 if (isset($_REQUEST['stime'])) {
 	$frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
 }
 if (isset($_REQUEST['period'])) {
 	$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
+}
+$frmForm->addVar('page', getPageNumber(), 'page_csv');
+if ($source == EVENT_SOURCE_TRIGGERS) {
+	if ($_REQUEST['triggerid']) {
+		$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
+	}
+	else {
+		$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+		$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+	}
 }
 $frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
@@ -268,29 +292,8 @@ $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addVar('stime', get_request('stime'));
 $r_form->addVar('period', get_request('period'));
 
-if (EVENT_SOURCE_TRIGGERS == $source) {
-
-	$options = array(
-		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_items' => 1,
-		),
-		'hosts' => array(
-			'monitored_hosts' => 1,
-			'with_items' => 1,
-		),
-		'triggers' => array(),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-		'triggerid' => get_request('triggerid', null)
-	);
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-	if ($pageFilter->triggerid > 0) {
-		$_REQUEST['triggerid'] = $pageFilter->triggerid;
-	}
-
+// add host and group filters to the form
+if ($source == EVENT_SOURCE_TRIGGERS) {
 	$r_form->addItem(array(
 		_('Group').SPACE,
 		$pageFilter->getGroupsCB(true)
@@ -329,11 +332,8 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
 		$dbTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
-			'output' => array(
-				'description',
-				'expression'
-			),
-			'selectHosts' => API_OUTPUT_EXTEND,
+			'output' => array('description', 'expression'),
+			'selectHosts' => array('name'),
 			'preservekeys' => true,
 			'expandDescription' => true
 		));
@@ -411,7 +411,7 @@ $firstEvent = API::Event()->get($options);
 
 $_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
 $effectiveperiod = navigation_bar_calc();
-$bstime = $_REQUEST['stime'];
+
 $from = zbxDateToTime($_REQUEST['stime']);
 $till = $from + $effectiveperiod;
 
@@ -444,10 +444,7 @@ else {
 		$options = array(
 			'source' => EVENT_SOURCE_DISCOVERY,
 			'eventids' => zbx_objectValues($dsc_events, 'eventid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'selectTriggers' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		);
 		$dsc_events = API::Event()->get($options);
 		order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
@@ -499,7 +496,7 @@ else {
 			);
 		}
 
-		foreach ($dsc_events as $num => $event_data) {
+		foreach ($dsc_events as $event_data) {
 			switch ($event_data['object']) {
 				case EVENT_OBJECT_DHOST:
 					if (isset($dhosts[$event_data['objectid']])) {
@@ -555,6 +552,7 @@ else {
 
 		}
 	}
+	// source not discovery i.e. Trigger
 	else {
 		$table->setHeader(array(
 			_('Time'),
@@ -645,9 +643,8 @@ else {
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => array('hostid'),
-				'selectTriggers' => API_OUTPUT_EXTEND,
-				'selectItems' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND
+				'selectItems' => array('name', 'value_type', 'key_'),
+				'output' => array('description', 'expression', 'priority')
 			);
 			$triggers = API::Trigger()->get($triggersOptions);
 			$triggers = zbx_toHash($triggers, 'triggerid');
@@ -664,7 +661,6 @@ else {
 					'hostid'
 				),
 				'hostids' => $hostids,
-				'selectAppllications' => API_OUTPUT_EXTEND,
 				'selectScreens' => API_OUTPUT_COUNT,
 				'selectInventory' => array('hostid'),
 				'preservekeys' => true
@@ -681,7 +677,7 @@ else {
 				$host = $hosts[$host['hostid']];
 
 				$items = array();
-				foreach ($trigger['items'] as $inum => $item) {
+				foreach ($trigger['items'] as $item) {
 					$i = array();
 					$i['itemid'] = $item['itemid'];
 					$i['value_type'] = $item['value_type']; // ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)

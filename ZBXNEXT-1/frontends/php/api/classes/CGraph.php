@@ -69,7 +69,6 @@ class CGraph extends CGraphGeneral {
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
-			'type'						=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
 			'editable'					=> null,
@@ -186,11 +185,6 @@ class CGraph extends CGraphGeneral {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
 			}
-		}
-
-		// type
-		if (!is_null($options['type'])) {
-			$sqlParts['where'][] = 'g.type='.$options['type'];
 		}
 
 		// templated
