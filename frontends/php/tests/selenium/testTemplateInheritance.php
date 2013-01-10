@@ -44,7 +44,7 @@ class testTemplateInheritance extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormAdministrationGeneralMacros_setup() {
-	//	DBsave_tables('items');
+		DBsave_tables('items');
 	}
 
 	/**
@@ -351,7 +351,7 @@ class testTemplateInheritance extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testFormAdministrationGeneralMacros_teardown() {
-//		DBrestore_tables('items');
+		DBrestore_tables('items');
 	}
 
 }
