@@ -1162,8 +1162,10 @@ function getSelementsInfo($sysmap) {
 
 		foreach ($triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
-				foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+				if (isset($hosts_map[$host['hostid']])) {
+					foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
+						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+					}
 				}
 			}
 		}
