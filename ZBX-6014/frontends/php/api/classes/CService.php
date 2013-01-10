@@ -1042,7 +1042,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = $this->addPermissionFilter($this->fieldId('triggerid'));
+			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1073,7 +1073,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = $this->addPermissionFilter($this->fieldId('triggerid'));
+			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1481,7 +1481,7 @@ class CService extends CZBXAPI {
 			}
 			// otherwise return services with either no triggers, or any trigger accessible to the current user
 			else {
-				$sqlParts['where'][] = $this->addPermissionFilter($this->fieldId('triggerid'));
+				$sqlParts = $this->addPermissionFilter($sqlParts);
 			}
 		}
 
@@ -1617,30 +1617,30 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Generate permission filter SQL query part
+	 * Add permission filter SQL query part
 	 *
-	 * @param int $triggerid
+	 * @param array $sqlParts
 	 *
 	 * @return string
 	 */
-	protected function addPermissionFilter($triggerid) {
+	protected function addPermissionFilter($sqlParts) {
 		$userid = self::$userData['userid'];
 		$userGroups = getUserGroupsByUserId($userid);
 
-		$result = '(EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f,items i,hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-						' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE '.$triggerid.'=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>='.PERM_READ_ONLY.
-					')'.
-				' OR '.$triggerid.' IS NULL)';
+		$sqlParts['where'][] = '(EXISTS ('.
+									'SELECT NULL'.
+									' FROM functions f,items i,hosts_groups hgg'.
+									' JOIN rights r'.
+										' ON r.id=hgg.groupid'.
+										' AND '.dbConditionInt('r.groupid', $userGroups).
+									' WHERE s.triggerid=f.triggerid'.
+										' AND f.itemid=i.itemid'.
+										' AND i.hostid=hgg.hostid'.
+									' GROUP BY f.triggerid'.
+									' HAVING MIN(r.permission)>='.PERM_READ_ONLY.
+									')'.
+								' OR s.triggerid IS NULL)';
 
-		return $result;
+		return $sqlParts;
 	}
 }
