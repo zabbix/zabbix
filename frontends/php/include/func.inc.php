@@ -1886,10 +1886,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$url = urlencode($url->toString());
 
 		$warning = new CWarning(_('You are not logged in.'), array(
-			_('You cannot view this URL as a'),
-			SPACE,
-			bold(ZBX_GUEST_USER),
-			'. ',
 			_('You must login to view this page.'),
 			BR(),
 			_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
