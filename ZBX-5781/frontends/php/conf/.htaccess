@@ -1,0 +1,7 @@
+Order Deny,Allow
+Deny from All
+
+<files *.php>
+Order Deny,Allow
+Deny from All
+</files>
