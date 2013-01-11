@@ -474,6 +474,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertAttribute('//*[@id="ymin_type"]/option[1]/@selected', 'selected');
 		$this->assertAttribute('//*[@id="ymax_type"]/option[1]/@selected', 'selected');
 		$this->ok('Template inheritance test host: Test LLD item');
+		$this->ok('Template inheritance test host: Test LLD item1');
 	}
 
 	/**
