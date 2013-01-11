@@ -159,7 +159,63 @@ class testTemplateInheritance extends CWebTest {
 	 * @todo implement the test
 	 */
 	public function testTemplateInheritance_CreateGraph() {
-		$this->markTestIncomplete();
+		$this->login('templates.php');
+
+		// create a graph
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Graphs']");
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', 'Test LLD graph1');
+		$this->input_type('width', '950');
+		$this->input_type('height', '250');
+		$this->dropdown_select('graphtype', 'Normal');
+		$this->checkbox_unselect('legend');
+		$this->checkbox_unselect('showworkperiod');
+		$this->checkbox_unselect('showtriggers');
+		$this->checkbox_select('visible_percent_left');
+		$this->input_type('percent_left', '4');
+		$this->input_type('percent_right', '5');
+		$this->checkbox_select('visible_percent_right');
+		$this->dropdown_select('ymin_type', 'Calculated');
+		$this->dropdown_select('ymax_type', 'Calculated');
+		$this->button_click('add_item');
+
+		$this->waitForPopUp("zbx_popup", "30000");
+		$this->selectWindow("name=zbx_popup");
+		$this->button_click('link=Test LLD item1');
+		$this->selectWindow(null);
+		$this->button_click('save');
+
+		// check that the inherited graph matches the original
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click('link='.$this->hostName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Graphs']");
+		$this->wait();
+
+		$this->ok($this->templateName.': Test LLD graph1');
+		$this->button_click('link=Test LLD graph1');
+		$this->wait();
+
+		$this->assertElementValue('name', 'Test LLD graph1');
+		$this->assertElementValue('width', '950');
+		$this->assertElementValue('height', '250');
+		$this->assertAttribute('//*[@id="graphtype"]/option[1]/@selected', 'selected');
+		$this->assertFalse($this->isChecked('legend'));
+		$this->assertFalse($this->isChecked('showworkperiod'));
+		$this->assertFalse($this->isChecked('showtriggers'));
+		$this->assertTrue($this->isChecked('visible_percent_left'));
+		$this->assertElementValue('percent_left', '4.00');
+		$this->assertTrue($this->isChecked('visible_percent_right'));
+		$this->assertElementValue('percent_right', '5.00');
+		$this->assertAttribute('//*[@id="ymin_type"]/option[1]/@selected', 'selected');
+		$this->assertAttribute('//*[@id="ymax_type"]/option[1]/@selected', 'selected');
+		$this->ok('Template inheritance test host: Test LLD item1');
 	}
 
 	/**
