@@ -1566,6 +1566,26 @@ function getPageSortOrder($default = ZBX_SORT_UP) {
 	return get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
 }
 
+/**
+ * Returns the list page number for the current page.
+ *
+ * The functions first looks for a page number in the HTTP request. If no number is given, falls back to the profile.
+ * Defaults to 1.
+ *
+ * @return int
+ */
+function getPageNumber() {
+	global $page;
+
+	$pageNumber = get_request('page');
+	if (!$pageNumber) {
+		$lastPage = CProfile::get('web.paging.lastpage');
+		$pageNumber = ($lastPage == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;
+	}
+
+	return $pageNumber;
+}
+
 /************* PAGING *************/
 function getPagingLine(&$items) {
 	global $page;
@@ -1582,12 +1602,7 @@ function getPagingLine(&$items) {
 	$itemsCount = count($items);
 	$pagesCount = $itemsCount > 0 ? ceil($itemsCount / $rowsPerPage) : 1;
 
-	$currentPage = get_request('page');
-	if ($currentPage === null) {
-		$last_page = CProfile::get('web.paging.lastpage');
-		$currentPage = ($last_page == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;
-	}
-
+	$currentPage = getPageNumber();
 	if ($currentPage < 1) {
 		$currentPage = 1;
 	}
@@ -2382,19 +2397,6 @@ function no_errors() {
 	}
 
 	return true;
-}
-
-function unsetEqualValues(array $a1, array $a2) {
-	foreach ($a1 as $key => $value) {
-		if (is_array($value) && isset($a2[$key])) {
-			$a1[$key] = unsetEqualValues($a1[$key], $a2[$key]);
-		}
-		elseif (isset($a2[$key]) && $a2[$key] == $a1[$key]) {
-			unset($a1[$key]);
-		}
-	}
-
-	return $a1;
 }
 
 /**

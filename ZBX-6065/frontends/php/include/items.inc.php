@@ -505,6 +505,8 @@ function get_same_item_for_host($item, $dest_hostids) {
  * Macros related to interface resolved only for host items.
  *
  * @param array $item
+ * @param string $item['key_']
+ * @param string $item['itemid']
  *
  * @return string
  */
@@ -586,6 +588,10 @@ function resolveItemKeyMacros(array $item) {
  *	result: 'Test item a, b, Zabbix-server'
  *
  * @param array $item
+ * @param string $item['key_']
+ * @param string $item['itemid']
+ * @param string $item['name']
+ *
  * @return string
  */
 function itemName($item) {

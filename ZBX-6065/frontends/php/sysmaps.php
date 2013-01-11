@@ -94,6 +94,9 @@ if (isset($_REQUEST['sysmapid'])) {
 		$sysmap = reset($maps);
 	}
 }
+else {
+	$sysmap = array();
+}
 
 if ($isExportData) {
 	$export = new CConfigurationExport(array('maps' => get_request('maps', array())));
@@ -212,18 +215,6 @@ $mapWidget = new CWidget();
 $mapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'), $form);
 
 if (isset($_REQUEST['form'])) {
-	$sysmap = array();
-
-	if (isset($_REQUEST['sysmapid'])) {
-		$sysmaps = API::Map()->get(array(
-			'sysmapids' => $_REQUEST['sysmapid'],
-			'output' => API_OUTPUT_EXTEND,
-			'selectUrls' => API_OUTPUT_EXTEND,
-			'editable' => true
-		));
-		$sysmap = reset($sysmaps);
-	}
-
 	if (!isset($_REQUEST['sysmapid']) || isset($_REQUEST['form_refresh'])) {
 		$sysmap['name'] = get_request('name', '');
 		$sysmap['width'] = get_request('width', 800);
@@ -274,7 +265,7 @@ else {
 
 	$maps = API::Map()->get(array(
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('sysmapid', 'name', 'width', 'height'),
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => $config['search_limit'] + 1
