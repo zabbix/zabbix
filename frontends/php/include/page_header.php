@@ -217,6 +217,12 @@ if (isset($_REQUEST['print'])) {
 	$printview->show();
 }
 
+// if the user is not logged in and access is denied, render the "access denied" message with no layout
+if ($denied_page_requested && !CWebUser::isLoggedIn()) {
+	access_deny(ACCESS_DENY_PAGE);
+	exit;
+}
+
 if (!defined('ZBX_PAGE_NO_MENU')) {
 	$help = new CLink(_('Help'), 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 	$help->setTarget('_blank');
@@ -452,8 +458,10 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 // unset multiple variables
 unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row, $db_nodes, $node_data, $sub_menu_table, $sub_menu_rows);
 
-if ($denied_page_requested) {
-	access_deny();
+// if the user is logged in and access is denied, render the "access denied" message with the layout
+if ($denied_page_requested && CWebUser::isLoggedIn()) {
+	access_deny(ACCESS_DENY_PAGE);
+	require_once dirname(__FILE__).'/page_footer.php';
 }
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
