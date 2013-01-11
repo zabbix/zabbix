@@ -133,6 +133,39 @@ void	DBinit()
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_dbtype                                                     *
+ *                                                                            *
+ * Purpose: get string database type                                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: IBM DB2|MySQL|Oracle|PostgreSQL|IBM DB2|SQLite               *
+ *                                                                            *
+ ******************************************************************************/
+const char	*DBget_dbtype()
+{
+	static const char	*db_types[] =
+	{
+		"IBM DB2", "MySQL", "Oracle", "PostgreSQL", "SQLite"
+	};
+
+#if defined(HAVE_IBM_DB2)
+	return db_types[0];
+#elif defined(HAVE_MYSQL)
+	return db_types[1];
+#elif defined(HAVE_ORACLE)
+	return db_types[2];
+#elif defined(HAVE_POSTGRESQL)
+	return db_types[3];
+#elif defined(HAVE_SQLITE3)
+	return db_types[4];
+#else
+	assert(0);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBtxn_operation                                                  *
  *                                                                            *
  * Purpose: helper function to loop transaction operation while DB is down    *

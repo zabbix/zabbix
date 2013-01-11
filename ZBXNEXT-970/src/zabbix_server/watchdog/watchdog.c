@@ -50,24 +50,48 @@ extern int		CONFIG_CONFSYNCER_FREQUENCY;
 
 /******************************************************************************
  *                                                                            *
- * Function: send_alerts                                                      *
+ * Function: send_db_down_alerts                                              *
  *                                                                            *
  * Purpose: send warning message to all interested                            *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: messages are sent only every ALERT_FREQUENCY seconds             *
  *                                                                            *
  ******************************************************************************/
-static void	send_alerts()
+static void	send_db_down_alerts()
 {
 	int	i, now;
+	char	alert_subject[] = "Zabbix database is not available";
 	char	error[MAX_STRING_LEN];
+	char	*alert_message = NULL;
+	size_t	alert_message_alloc = 128, alert_message_offset = 0;
 
 	now = time(NULL);
 
+	alert_message = zbx_malloc(alert_message, alert_message_alloc);
+
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset,
+			"%s database \"%s\" is not available\n",
+			DBget_dbtype(),
+			CONFIG_DBNAME);
+#if !defined(HAVE_SQLITE3)
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset,
+			"Database host: %s\n",
+			CONFIG_DBHOST);
+	if (0 != CONFIG_DBPORT)
+	{
+		zbx_snprintf(alert_message, sizeof(alert_message),
+				"Database port: %d\n",
+				CONFIG_DBPORT);
+	}
+#endif
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset,
+			"Error message: %s",
+			DBget_error());
+
 	if (now > lastsent + ALERT_FREQUENCY)
 	{
+		((ZBX_RECIPIENT *)recipients.values[i])->alert.subject = alert_subject;
+		((ZBX_RECIPIENT *)recipients.values[i])->alert.message = alert_message;
 		for (i = 0; i < recipients.values_num; i++)
 		{
 			execute_action(&((ZBX_RECIPIENT *)recipients.values[i])->alert,
@@ -76,6 +100,8 @@ static void	send_alerts()
 
 		lastsent = now;
 	}
+
+	zbx_free(alert_message);
 }
 
 /******************************************************************************
@@ -83,8 +109,6 @@ static void	send_alerts()
  * Function: sync_config                                                      *
  *                                                                            *
  * Purpose: sync list of medias to send notifications in case if DB is down   *
- *                                                                            *
- * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
 static void	sync_config()
@@ -115,7 +139,7 @@ static void	sync_config()
 	if (NULL == result || (DB_RESULT)ZBX_DB_DOWN == result)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "watchdog: database is down");
-		send_alerts();
+		send_db_down_alerts();
 		goto exit;
 	}
 
@@ -147,9 +171,6 @@ static void	sync_config()
 		STR_REPLACE(recipient->mediatype.username, row[8]);
 		STR_REPLACE(recipient->mediatype.passwd, row[9]);
 		STR_REPLACE(recipient->alert.sendto, row[10]);
-
-		if (NULL == recipient->alert.subject)
-			recipient->alert.message = recipient->alert.subject = zbx_strdup(NULL, "Zabbix database is down.");
 
 		count++;
 	}
@@ -183,7 +204,6 @@ static void	sync_config()
 		zbx_free(recipient->mediatype.username);
 		zbx_free(recipient->mediatype.passwd);
 		zbx_free(recipient->alert.sendto);
-		zbx_free(recipient->alert.subject);
 
 		zbx_free(recipient);
 	}
@@ -197,8 +217,6 @@ exit:
  *                                                                            *
  * Purpose: check database availability every DB_PING_FREQUENCY seconds and   *
  *          alert admins if it is down                                        *
- *                                                                            *
- * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
 void	main_watchdog_loop()
@@ -216,7 +234,7 @@ void	main_watchdog_loop()
 		if (ZBX_DB_OK != DBconnect(ZBX_DB_CONNECT_ONCE))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "watchdog: database is down");
-			send_alerts();
+			send_db_down_alerts();
 		}
 		else if (nextsync <= (now = (int)time(NULL)))
 		{

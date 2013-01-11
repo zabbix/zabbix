@@ -451,6 +451,7 @@ int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);
 void	DBinit();
+const char	*DBget_dbtype();
 
 void	DBclose();
 

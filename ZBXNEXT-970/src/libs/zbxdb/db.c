@@ -87,6 +87,43 @@ static const char	*zbx_oci_error(sword status)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_db_error                                                     *
+ *                                                                            *
+ * Purpose: set/get database error string                                     *
+ *                                                                            *
+ * Parameters: NULL or error string                                           *
+ *                                                                            *
+ * Return value: pointer to error string                                      *
+ *                                                                            *
+ * Comments: currently it is used by connect and select functions only        *
+ *                                                                            *
+ ******************************************************************************/
+const char *zbx_db_error(const char *error_str)
+{
+	static char	*db_error = NULL;
+	static size_t	db_error_alloc = 128, db_error_offset = 0;
+
+
+	if (NULL == error_str)
+	{
+		zbx_free(db_error);
+		db_error_alloc = 128;
+		db_error_offset = 0;
+	}
+	else
+	{
+		db_error = zbx_malloc(db_error, db_error_alloc);
+		zbx_snprintf_alloc(&db-error, &db_error_alloc, &db_error_offset,
+				"%s",
+				error_str);
+		zbx_snprintf(db_error, sizeof(db_error), "%s", error_str);
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_db_connect                                                   *
  *                                                                            *
  * Purpose: connect to the database                                           *
