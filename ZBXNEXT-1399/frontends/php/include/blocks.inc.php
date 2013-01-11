@@ -212,6 +212,7 @@ function make_system_status($filter) {
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'groupids' => $groupids,
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
@@ -744,7 +745,6 @@ function make_status_of_zbx() {
  *
  * @param array  $filter['screenid']
  * @param array  $filter['groupids']
- * @param array  $filter['hideGroupIds']
  * @param array  $filter['hostids']
  * @param array  $filter['maintenance']
  * @param int    $filter['extAck']
@@ -766,6 +766,7 @@ function make_latest_issues(array $filter = array()) {
 
 	$options = array(
 		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
 		'withLastEventUnacknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
@@ -775,15 +776,11 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
+		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
+		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
 	);
-	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
-	$options['sortorder'] = isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN;
-	$options['limit'] = isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT;
-
-	if (isset($filter['hostids'])) {
-		$options['hostids'] = $filter['hostids'];
-	}
 	$triggers = API::Trigger()->get($options);
 
 	// how many issues are there at all with given parameters
@@ -975,6 +972,7 @@ function make_webmon_overview($filter) {
 
 	$availableHosts = API::Host()->get(array(
 		'groupids' => array_keys($groups),
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid'),
@@ -990,7 +988,6 @@ function make_webmon_overview($filter) {
 		_('Failed'),
 		_('Unknown')
 	));
-
 
 	foreach ($groups as $group) {
 		$showGroup = false;

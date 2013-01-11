@@ -115,7 +115,6 @@ if (isset($_REQUEST['form_refresh'])) {
 }
 else {
 	$data['isFilterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
-	$data['hgrpswitch'] = CProfile::get('web.dashconf.groups.hgrpswitch', 0);
 	$data['maintenance'] = CProfile::get('web.dashconf.hosts.maintenance', 1);
 	$data['extAck'] = CProfile::get('web.dashconf.events.extAck', 0);
 

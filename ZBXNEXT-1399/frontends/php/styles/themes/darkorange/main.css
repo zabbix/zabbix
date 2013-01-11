@@ -468,6 +468,11 @@ div.calendar input[type="button"] {
 	background-color: #777777;
 	color: #DFDFDF;
 }
+.select:hover, .select:focus {
+	border: 1px solid #DFDFDF;
+	background-color: #2F2F2F;
+	color: #DFDFDF;
+}
 
 ul.formlist li.new { background: #2F2F2F; }
 

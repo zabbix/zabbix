@@ -1,5 +1,6 @@
 .chzn-container { font-size: 1em; }
-.chzn-container .chzn-choices li { clear: none; padding-right: 4px; }
+.chzn-container .chzn-choices { padding-right: 5px; }
+.chzn-container .chzn-choices li { clear: none; }
 .chzn-container .chzn-results .no-results { background: #2F6487; }
 .chzn-container .chzn-results { background: #2F6487; }
 .chzn-container .chzn-results .highlighted { background: #4F82A4; }
