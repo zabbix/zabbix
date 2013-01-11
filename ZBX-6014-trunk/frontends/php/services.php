@@ -161,7 +161,7 @@ if (isset($_REQUEST['form'])) {
 		else {
 			$result = API::Service()->create($serviceRequest);
 
-			show_messages($result, _('Service updated'), _('Cannot add service'));
+			show_messages($result, _('Service created'), _('Cannot add service'));
 			$serviceid = reset($result['serviceids']);
 			$audit_action = AUDIT_ACTION_ADD;
 		}
@@ -269,7 +269,8 @@ if (isset($_REQUEST['form'])) {
  */
 if (isset($_REQUEST['pservices'])) {
 	$parentServices = API::Service()->get(array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('serviceid', 'name', 'algorithm'),
+		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => array('sortorder', 'name')
 	));
@@ -289,8 +290,8 @@ if (isset($_REQUEST['pservices'])) {
 	}
 
 	foreach ($parentServices as $key => $childService) {
-		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
+		$parentServices[$key]['trigger'] = !empty($childService['trigger']['triggerid'])
+			? CMacrosResolverHelper::resolveTriggerNameById($childService['trigger']['triggerid'])
 			: '-';
 	}
 
@@ -308,7 +309,8 @@ if (isset($_REQUEST['pservices'])) {
  */
 if (isset($_REQUEST['cservices'])) {
 	$childServices = API::Service()->get(array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('serviceid', 'name', 'algorithm'),
+		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => array('sortorder', 'name')
 	));
@@ -328,8 +330,8 @@ if (isset($_REQUEST['cservices'])) {
 	}
 
 	foreach ($childServices as $key => $childService) {
-		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
+		$childServices[$key]['trigger'] = !empty($childService['trigger']['triggerid'])
+			? CMacrosResolverHelper::resolveTriggerNameById($childService['trigger']['triggerid'])
 			: '-';
 	}
 
@@ -379,6 +381,7 @@ if (isset($_REQUEST['form'])) {
 		if ($service['dependencies']) {
 			$childServices = API::Service()->get(array(
 				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
+				'selectTrigger' => array('triggerid', 'description', 'expression'),
 				'output' => array('name', 'triggerid'),
 				'preservekeys' => true,
 			));
@@ -436,7 +439,7 @@ else {
 	// fetch services
 	$services = API::Service()->get(array(
 		'output' => array('name', 'serviceid', 'algorithm'),
-		'selectParent' => API_OUTPUT_EXTEND,
+		'selectParent' => array('serviceid'),
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
 		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,

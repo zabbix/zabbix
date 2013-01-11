@@ -553,7 +553,6 @@ class CService extends CZBXAPI {
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
-			'selectTrigger' => API_OUTPUT_EXTEND,
 			'serviceids' => $serviceIds,
 			'preservekeys' => true
 		));
@@ -923,16 +922,15 @@ class CService extends CZBXAPI {
 	 * @return array    in the form of array(serviceId1 => array(triggerId => trigger), ...)
 	 */
 	protected function fetchProblemTriggers(array $serviceIds) {
+		$sql = 'SELECT s.serviceid,t.triggerid'.
+				' FROM services s,triggers t'.
+				' WHERE s.status>0'.
+					' AND t.triggerid=s.triggerid'.
+					' AND '.dbConditionInt('s.serviceid', $serviceIds).
+				' ORDER BY s.status DESC,t.description';
+
 		// get service reason
-		$triggers = DBfetchArray(DBSelect(
-			'SELECT s.serviceid,t.*'.
-			' FROM services s,triggers t'.
-			' WHERE s.status>0'.
-				' AND t.triggerid=s.triggerid'.
-				' AND '.dbConditionInt('t.triggerid', get_accessible_triggers(PERM_READ)).
-				' AND '.dbConditionInt('s.serviceid', $serviceIds).
-			' ORDER BY s.status DESC,t.description'
-		));
+		$triggers = DBfetchArray(DBSelect($sql));
 
 		$rs = array();
 		foreach ($triggers as $trigger) {
@@ -1043,7 +1041,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.dbConditionInt($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
+			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1077,7 +1075,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.dbConditionInt($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ)).')';
+			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1476,14 +1474,16 @@ class CService extends CZBXAPI {
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$accessibleTriggers = get_accessible_triggers(PERM_READ);
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
-				$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
+				$accessibleTriggers = API::Trigger()->get(array(
+					'triggerids' => $options['filter']['triggerid']
+				));
+				$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
 			}
 			// otherwise return services with either no triggers, or any trigger accessible to the current user
 			else {
-				$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.dbConditionInt($this->fieldId('triggerid'), $accessibleTriggers).')';
+				$sqlParts = $this->addPermissionFilter($sqlParts);
 			}
 		}
 
@@ -1585,6 +1585,10 @@ class CService extends CZBXAPI {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapOne($result, $triggers, 'trigger');
+			foreach ($result as &$service) {
+				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
+			}
+			unset($service);
 		}
 
 		return $result;
@@ -1598,6 +1602,34 @@ class CService extends CZBXAPI {
 				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
 			}
 		}
+
+		return $sqlParts;
+	}
+
+	/**
+	 * Add permission filter SQL query part
+	 *
+	 * @param array $sqlParts
+	 *
+	 * @return string
+	 */
+	protected function addPermissionFilter($sqlParts) {
+		$userid = self::$userData['userid'];
+		$userGroups = getUserGroupsByUserId($userid);
+
+		$sqlParts['where'][] = '(EXISTS ('.
+									'SELECT NULL'.
+									' FROM functions f,items i,hosts_groups hgg'.
+									' JOIN rights r'.
+										' ON r.id=hgg.groupid'.
+										' AND '.dbConditionInt('r.groupid', $userGroups).
+									' WHERE s.triggerid=f.triggerid'.
+										' AND f.itemid=i.itemid'.
+										' AND i.hostid=hgg.hostid'.
+									' GROUP BY f.triggerid'.
+									' HAVING MIN(r.permission)>'.PERM_DENY.
+									')'.
+								' OR s.triggerid IS NULL)';
 
 		return $sqlParts;
 	}
