@@ -1,3 +1,7 @@
+Changes for 1.8.17rc1
+
+...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
+
 Changes for 1.8.16rc2
 
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
