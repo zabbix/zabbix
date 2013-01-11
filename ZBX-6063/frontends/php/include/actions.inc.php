@@ -860,18 +860,6 @@ function get_action_cmds_for_event($event) {
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
-	$hostids = array();
-	$sql = 'SELECT DISTINCT i.hostid'.
-			' FROM events e,functions f,items i'.
-			' WHERE e.eventid='.$eventid.
-				' AND e.object='.EVENT_SOURCE_TRIGGERS.
-				' AND f.triggerid=e.objectid '.
-				' AND i.itemid=f.itemid';
-	if ($host = DBfetch(DBselect($sql, 1))) {
-		$hostids[$host['hostid']] = $host['hostid'];
-	}
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
-
 	$tab_hint = new CTableInfo(_('No actions found.'));
 	$tab_hint->setAttribute('style', 'width: 300px;');
 	$tab_hint->setHeader(array(
@@ -889,7 +877,6 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND '.dbConditionInt('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.alertid';
 	$result = DBselect($sql, 30);
