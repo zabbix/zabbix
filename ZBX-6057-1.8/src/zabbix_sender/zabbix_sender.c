@@ -242,16 +242,21 @@ static void    zbx_load_config(const char *config_file)
 		{
 			if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
 			{
+				unsigned short	port;
+
 				if (NULL != (r = strchr(cfg_active_hosts, ',')))
 					*r = '\0';
 
 				if (SUCCEED != parse_serveractive_element(cfg_active_hosts, &ZABBIX_SERVER,
-						&ZABBIX_SERVER_PORT, 0))
+						&port, 0))
 				{
 					zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid",
 							cfg_active_hosts);
 					exit(EXIT_FAILURE);
 				}
+
+				if (0 == ZABBIX_SERVER_PORT && 0 != port)
+					ZABBIX_SERVER_PORT = port;
 			}
 			else if (NULL != cfg_server)
 			{
