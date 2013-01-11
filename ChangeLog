@@ -30,7 +30,7 @@ A......... [ZBX-5977] removed possibility to add an LLD rule to an application v
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
 A.F....... [ZBX-6002] optimized fetching latest service alarms in Service API (dotneft, Eduard)
 ..F....... [ZBX-5986] fixed page filter in Monitoring -> Graphs (Oleg)
-..F....... [ZBX-6004] opt`imised Monitoring -> Screens page (Vedmak)
+..F....... [ZBX-6004] optimised Monitoring -> Screens page (Vedmak)
 ..F....... [ZBX-6003] optimised Monitoring -> Maps page (Vedmak)
 A.F.....S. [ZBX-5862] fixed SQL condition algorithm (Andris, Eduard, Sasha)
 A.F....... [ZBX-4789] improved performance of permissions check (dotneft, Oleg, Sasha)
