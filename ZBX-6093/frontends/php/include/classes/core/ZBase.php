@@ -146,11 +146,6 @@ class ZBase {
 					init_nodes();
 					$this->initLocales();
 					DBclose();
-
-					// if config file exists, only super admin user can access setup
-					if (isset(CWebUser::$data['type']) && CWebUser::$data['type'] < USER_TYPE_SUPER_ADMIN) {
-						throw new Exception('No permissions to referred object or it does not exist!');
-					}
 				}
 				catch (ConfigFileException $e) {}
 				break;

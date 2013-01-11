@@ -1868,8 +1868,9 @@ function num2letter($number) {
  * Renders an "access denied" message.
  *
  * The $mode parameters controls the layout of the message:
- * - ACCESS_DENY_OBJECT - render the message when denying access to a specific object
- * - ACCESS_DENY_PAGE   - render the message when denying access to a whole page
+ * - ACCESS_DENY_OBJECT     - render the message when denying access to a specific object
+ * - ACCESS_DENY_CONTENT    - render the access denied block when denying access to the content of a specific page
+ * - ACCESS_DENY_PAGE       - render a complete access denied page
  *
  * @param int $mode
  */
@@ -1897,7 +1898,18 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
 			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
 		));
-		$warning->show();
+
+		// render only the warning block
+		if ($mode == ACCESS_DENY_CONTENT) {
+			$warning->show();
+		}
+		// render a complete warning page
+		else {
+			$warningView = new CView('general.warning', array(
+				'warning' => $warning
+			));
+			$warningView->render();
+		}
 	}
 }
 
