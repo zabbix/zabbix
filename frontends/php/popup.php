@@ -1356,12 +1356,6 @@ elseif ($srctbl == 'graphs') {
 	$table->setHeader($header);
 
 	if ($pageFilter->hostsSelected) {
-		if ($pageFilter->hostsAll) {
-			$hostid = array_keys($pageFilter->hosts);
-		}
-		else {
-			$hostid = $pageFilter->hostid;
-		}
 		$options = array(
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
