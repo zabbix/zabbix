@@ -1030,4 +1030,6 @@ int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 
+int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
+
 #endif
