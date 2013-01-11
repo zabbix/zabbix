@@ -2462,7 +2462,11 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 
 /**
  * Resolve {TRIGGER.ID} macro in trigger url.
+ *
  * @param array $trigger trigger data with url and triggerid
+ * @param int $trigger['triggerid']
+ * @param string $trigger['url']
+ *
  * @return string
  */
 function resolveTriggerUrl($trigger) {

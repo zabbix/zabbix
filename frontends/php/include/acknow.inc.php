@@ -38,7 +38,18 @@ function get_acknowledges_by_eventid($eventid) {
 	return DBselect('SELECT a.*,u.alias FROM acknowledges a LEFT JOIN users u ON u.userid=a.userid WHERE a.eventid='.$eventid);
 }
 
-function make_acktab_by_eventid($event) {
+/**
+ * Generate acknowledgement table
+ *
+ * @param array $event
+ * @param array $event['acknowledges']
+ * @param array $event['acknowledges']['clock']
+ * @param array $event['acknowledges']['alias']
+ * @param array $event['acknowledges']['message']
+ *
+ * @return CTableInfo
+ */
+function makeAckTab($event) {
 	$table = new CTableInfo(_('No acknowledges defined.'));
 	$table->setHeader(array(_('Time'), _('User'), _('Comments')));
 

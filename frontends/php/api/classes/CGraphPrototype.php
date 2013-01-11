@@ -66,7 +66,6 @@ class CGraphPrototype extends CGraphGeneral {
 			'graphids'					=> null,
 			'itemids'					=> null,
 			'discoveryids'				=> null,
-			'type'						=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
 			'editable'					=> null,
@@ -199,11 +198,6 @@ class CGraphPrototype extends CGraphGeneral {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
-		}
-
-		// type
-		if (!is_null($options['type'] )) {
-			$sqlParts['where'][] = 'g.type='.$options['type'];
 		}
 
 		// templated
