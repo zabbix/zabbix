@@ -639,6 +639,16 @@ static int	DBpatch_02010027()
 
 	return DBadd_field("screens_items", &field);
 }
+
+static int	DBpatch_02010028()
+{
+	const char	*sql = "delete from profiles where idx='web.httpconf.showdisabled'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -704,6 +714,7 @@ int	DBcheck_version()
 		{DBpatch_02010025, 2010025, 0, 1},
 		{DBpatch_02010026, 2010026, 0, 1},
 		{DBpatch_02010027, 2010027, 0, 1},
+		{DBpatch_02010028, 2010028, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
