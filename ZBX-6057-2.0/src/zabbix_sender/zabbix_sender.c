@@ -358,8 +358,6 @@ int	main(int argc, char **argv)
 	}
 	if (0 == ZABBIX_SERVER_PORT)
 		ZABBIX_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
-printf("ZABBIX_SERVER      : %s\n", ZABBIX_SERVER);
-printf("ZABBIX_SERVER_PORT : %d\n", ZABBIX_SERVER_PORT);
 
 	if (MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT)
 	{
