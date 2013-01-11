@@ -30,6 +30,12 @@ catch (Exception $e) {
 	exit;
 }
 
+// only super admins can access the setup
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+	access_deny(ACCESS_DENY_PAGE);
+	exit;
+}
+
 require_once dirname(__FILE__).'/include/setup.inc.php';
 
 

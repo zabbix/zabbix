@@ -133,6 +133,12 @@ $sub_menus = array();
 $denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 zbx_flush_post_cookies($denied_page_requested);
 
+// if the user is not logged in and access is denied, render the "access denied" message with no layout
+if ($denied_page_requested && !CWebUser::isLoggedIn()) {
+	access_deny(ACCESS_DENY_PAGE);
+	exit;
+}
+
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($page_title);
 	$pageHeader->addCssFile('css.css');
@@ -215,12 +221,6 @@ if (isset($_REQUEST['print'])) {
 	$printview = new CDiv($link, 'printless');
 	$printview->setAttribute('style', 'border: 1px #333 dotted;');
 	$printview->show();
-}
-
-// if the user is not logged in and access is denied, render the "access denied" message with no layout
-if ($denied_page_requested && !CWebUser::isLoggedIn()) {
-	access_deny(ACCESS_DENY_PAGE);
-	exit;
 }
 
 if (!defined('ZBX_PAGE_NO_MENU')) {
@@ -460,7 +460,7 @@ unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row,
 
 // if the user is logged in and access is denied, render the "access denied" message with the layout
 if ($denied_page_requested && CWebUser::isLoggedIn()) {
-	access_deny(ACCESS_DENY_PAGE);
+	access_deny(ACCESS_DENY_CONTENT);
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
