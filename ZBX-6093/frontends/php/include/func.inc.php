@@ -1864,12 +1864,21 @@ function num2letter($number) {
 	return $str;
 }
 
-function access_deny() {
-	require_once dirname(__FILE__).'/page_header.php';
-
-	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
+/**
+ * Renders an "access denied" message.
+ *
+ * The $mode parameters controls the layout of the message:
+ * - ACCESS_DENY_OBJECT - render the message when denying access to a specific object
+ * - ACCESS_DENY_PAGE   - render the message when denying access to a whole page
+ *
+ * @param int $mode
+ */
+function access_deny($mode = ACCESS_DENY_OBJECT) {
+	// deny access to an object
+	if ($mode == ACCESS_DENY_OBJECT) {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
+	// deny access to a page
 	else {
 		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);
@@ -1890,8 +1899,6 @@ function access_deny() {
 		));
 		$warning->show();
 	}
-
-	require_once dirname(__FILE__).'/page_footer.php';
 }
 
 function detect_page_type($default = PAGE_TYPE_HTML) {
