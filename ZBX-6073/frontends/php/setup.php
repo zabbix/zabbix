@@ -103,7 +103,14 @@ $ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
 zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
-$pageHeader = new CPageHeader(_('Installation'));
+// page title
+$pageTitle = '';
+if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
+	$pageTitle = $ZBX_SERVER_NAME.': ';
+}
+$pageTitle .= _('Installation');
+
+$pageHeader = new CPageHeader($pageTitle);
 $pageHeader->addCssFile('css.css');
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
