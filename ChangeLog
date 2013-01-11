@@ -35,6 +35,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+........S. [ZBX-6065] removed useless deletes when housekeeper deletes old history (Sasha)
 A......... [ZBX-6078] fixed graph item creating (Eduards)
 A......... [ZBX-6050] fixed duplicate step name validation in httptest.create and httptest.update (Pavels)
 A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
