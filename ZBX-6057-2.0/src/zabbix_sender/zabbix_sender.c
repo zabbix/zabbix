@@ -198,8 +198,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 static void    zbx_load_config(const char *config_file)
 {
-	char	*cfg_source_ip = NULL, *cfg_server = NULL, *cfg_hostname = NULL, *c = NULL;
-	int	cfg_server_port = 0;
+	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *r = NULL;
 
 	struct cfg_line	cfg[] =
 	{
@@ -207,10 +206,8 @@ static void    zbx_load_config(const char *config_file)
 			MANDATORY,	MIN,			MAX */
 		{"SourceIP",			&cfg_source_ip,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Server",			&cfg_server,				TYPE_STRING,
+		{"ServerActive",		&cfg_active_hosts,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ServerPort",			&cfg_server_port,			TYPE_INT,
-			PARM_OPT,	MIN_ZABBIX_PORT,	MAX_ZABBIX_PORT},
 		{"Hostname",			&cfg_hostname,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
@@ -230,24 +227,28 @@ static void    zbx_load_config(const char *config_file)
 			zbx_free(cfg_source_ip);
 		}
 
-		if (NULL != cfg_server)
+		if (NULL == ZABBIX_SERVER)
 		{
-			if (NULL == ZABBIX_SERVER)
+			if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
 			{
-				/* get only first server */
-				if (NULL != (c = strchr(cfg_server, ',')))
-				{
-					*c = '\0';
-				}
-				ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, cfg_server);
-			}
-			zbx_free(cfg_server);
-		}
+				unsigned short	cfg_server_port = 0;
 
-		if (0 == ZABBIX_SERVER_PORT && 0 != cfg_server_port)
-		{
-			ZABBIX_SERVER_PORT = cfg_server_port;
+				if (NULL != (r = strchr(cfg_active_hosts, ',')))
+					*r = '\0';
+
+				if (SUCCEED != parse_serveractive_element(cfg_active_hosts, &ZABBIX_SERVER,
+						&cfg_server_port, 0))
+				{
+					zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid",
+							cfg_active_hosts);
+					exit(EXIT_FAILURE);
+				}
+
+				if (0 == ZABBIX_SERVER_PORT && 0 != cfg_server_port)
+					ZABBIX_SERVER_PORT = cfg_server_port;
+			}
 		}
+		zbx_free(cfg_active_hosts);
 
 		if (NULL != cfg_hostname)
 		{
@@ -357,6 +358,8 @@ int	main(int argc, char **argv)
 	}
 	if (0 == ZABBIX_SERVER_PORT)
 		ZABBIX_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
+printf("ZABBIX_SERVER      : %s\n", ZABBIX_SERVER);
+printf("ZABBIX_SERVER_PORT : %d\n", ZABBIX_SERVER_PORT);
 
 	if (MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT)
 	{
