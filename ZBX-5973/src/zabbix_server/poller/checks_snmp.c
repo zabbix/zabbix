@@ -810,7 +810,7 @@ static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 {
 	const char	*__function_name = "snmp_normalize";
 
-#define ZBX_MIB_NORM struct zbx_mib_norm_t
+#define ZBX_MIB_NORM	struct zbx_mib_norm_t
 
 	ZBX_MIB_NORM
 	{
