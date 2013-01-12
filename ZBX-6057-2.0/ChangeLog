@@ -1,7 +1,3 @@
-Changes for 1.8.17rc1
-
-...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
-
 Changes for 2.0.5rc1
 
 New features:
@@ -11,6 +7,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
 ..F....... [ZBX-6063] fixed graph selection pop up working incorrectly when adding a graph to a templated screen (Pavels)
 A.F....... [ZBX-6014] improved performance and removed get_accessible_triggers function (dotneft, Oleg)
 ..F....... [ZBX-6070] fixed event CSV export ignoring the selected page and filters (Pavels)
@@ -1209,6 +1206,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.17rc1
+
+...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
+
 Changes for 1.8.16rc2
 
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
