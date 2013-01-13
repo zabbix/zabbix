@@ -649,6 +649,17 @@ static int	DBpatch_02010028()
 
 	return FAIL;
 }
+
+static int	DBpatch_02010029()
+{
+	const char	*sql =
+			"delete from profiles where idx in ('web.httpconf.applications','web.httpmon.applications')";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -715,6 +726,7 @@ int	DBcheck_version()
 		{DBpatch_02010026, 2010026, 0, 1},
 		{DBpatch_02010027, 2010027, 0, 1},
 		{DBpatch_02010028, 2010028, 0, 0},
+		{DBpatch_02010029, 2010029, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
