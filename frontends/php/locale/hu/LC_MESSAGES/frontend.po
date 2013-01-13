@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-13 22:25+0200\n"
-"PO-Revision-Date: 2012-09-24 22:24+0200\n"
+"POT-Creation-Date: 2013-01-13 22:29+0200\n"
+"PO-Revision-Date: 2013-01-10 20:21+0200\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: hu\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: maintenance.php:153 maintenance.php:165 services.php:194 services.php:208
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "A \"%s\" értéknek 1970.01.01 és 2038.01.18. között kell lennie."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -33,61 +33,61 @@ msgstr ""
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d nap, "
+msgstr[1] "%1$d nap, "
 
 #: httpmon.php:295 include/views/configuration.httpconf.list.php:116
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d scenario"
+msgstr[1] "%1$d scenario"
 
 #: chart4.php:90 chart5.php:83
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (év %2$s)"
 
 #: latest.php:379 latest.php:556
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s elem"
+msgstr[1] "%1$s elem"
 
 #: include/page_header.php:481
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s hibás belépési próbálkozás történt. Legutolsó hibás próbálkozás %2$s címről %3$s %4$s-kor történt."
+msgstr[1] "%1$s hibás belépési próbálkozás történt. Legutolsó hibás próbálkozás %2$s címről %3$s %4$s-kor történt."
 
 #: include/blocks.inc.php:960
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%2$d eset a %1$d -ból/ből megjelenítve"
+msgstr[1] "%2$d eset a %1$d -ból/ből megjelenítve"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d eszköz"
+msgstr[1] "%d eszköz"
 
 #: include/views/configuration.action.edit.php:424
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - végtelenített )"
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Csak Szuper Adminisztrátorok hozhatnak létre csoportot)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:143
 msgid "(Only superadmins can create group)"
-msgstr ""
+msgstr "(Csak szuper adminisztrátorok hozhatnak létre csoportot)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -99,7 +99,7 @@ msgstr "(másodpercekben)"
 
 #: include/views/configuration.action.edit.php:434
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(minimum 60 másodperc, 0 - alapértelmezett érték használata)"
 
 #: include/views/configuration.host.edit.php:284
 #: include/views/configuration.host.massupdate.php:60
@@ -109,7 +109,7 @@ msgstr "(nincs proxy)"
 #: include/views/configuration.screen.constructor.edit.php:475 popup.php:1875
 #: popup.php:1876
 msgid "- all groups -"
-msgstr ""
+msgstr "- összes csoport -"
 
 #: acknow.php:97
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -185,23 +185,23 @@ msgstr "RENDELKEZÉSRE-ÁLLÁS JELENTÉSEK"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Abszolút különbség az utolsó és az azt megelőző érték között < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Abszolút különbség az utolsó és az azt megelőző érték között = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Abszolút különbség az utolsó és az azt megelőző érték között > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Abszolút különbség az utolsó és az azt megelőző érték között ≠ N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Elfogadható SLA"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -222,23 +222,23 @@ msgstr "Nyugtázom"
 #: acknow.php:179 include/triggers.inc.php:1236 include/triggers.inc.php:1239
 #: tr_status.php:664
 msgid "Acknowledge"
-msgstr "Visszaigazolás"
+msgstr "Nyugtáz"
 
 #: acknow.php:122
 msgid "Acknowledge added"
-msgstr "Visszaigazolás hozzáadva"
+msgstr "Nyugtázás hozzáadva"
 
 #: acknow.php:150 acknow.php:178
 msgid "Acknowledge alarm by"
-msgstr "Riasztás visszaigazolta"
+msgstr "A riasztást nyugtázta:"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Nyugtázás és visszatérés"
 
 #: tr_status.php:202
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Nyugtázás állapota"
 
 #: include/events.inc.php:122 tr_status.php:290 tr_status.php:667
 msgid "Acknowledged"
@@ -246,19 +246,19 @@ msgstr "Nyugtázva"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Nyugtázott OK (rendbejött) események"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Nyugtázott PROBLEM (meghibásodott) események"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
-msgstr "Visszaigazolások"
+msgstr "Nyugtázások"
 
 #: include/views/configuration.sysmap.edit.php:144
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Nyugtázás kikapcsolva"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -289,18 +289,18 @@ msgstr "Eljárás"
 #: api/classes/CAction.php:774 api/classes/CAction.php:871
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "A(z) \"%1$s\"eljárásnak hibás az \"esc_period\" értéke (minimum %2$s másodperc)."
 
 #: api/classes/CAction.php:777 api/classes/CAction.php:791
 #: api/classes/CAction.php:880 api/classes/CAction.php:899
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "A(z) \"%s\" eljárás már létezik."
 
 #: api/classes/CAction.php:926
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "A(z) \"%s\" eljáráshoz nincs művelet létrehozva."
 
 #: actionconf.php:149
 msgid "Action added"
@@ -352,7 +352,7 @@ msgstr "Aktív ettől"
 #: include/views/configuration.maintenance.edit.php:121 maintenance.php:161
 #: maintenance.php:165
 msgid "Active till"
-msgstr "Eddig aktív"
+msgstr "Aktív eddig"
 
 #: dashconf.php:211 include/blocks.inc.php:1120 include/blocks.inc.php:1126
 #: include/blocks.inc.php:1239 include/blocks.inc.php:1284
@@ -416,11 +416,11 @@ msgstr "Elem hozzáadása"
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Grafikus elemek hozzáadása elsőként"
 
 #: include/actions.inc.php:338 include/actions.inc.php:553
 msgid "Add host"
-msgstr "Új hoszt"
+msgstr "Új hoszt hozzáadása"
 
 #: sysmap.php:150
 msgid "Add link"
@@ -436,7 +436,7 @@ msgstr "Prototípus hozzáadása"
 
 #: jsLoader.php:178
 msgid "Add service"
-msgstr ""
+msgstr "Szolgáltatás hozzáadása"
 
 #: slides.php:83
 msgid "Add to"
@@ -449,11 +449,11 @@ msgstr "Hozzáadás a kedvencekhez"
 
 #: include/actions.inc.php:557
 msgid "Add to host group"
-msgstr ""
+msgstr "Hoszt csoporthoz adása"
 
 #: include/actions.inc.php:364 include/views/configuration.action.edit.php:766
 msgid "Add to host groups"
-msgstr ""
+msgstr "Hoszt csoportokhoz adása"
 
 #: auditlogs.php:134
 msgid "Added"
@@ -473,7 +473,7 @@ msgstr "Adminisztráció"
 
 #: include/views/configuration.sysmap.edit.php:84
 msgid "Advanced labels"
-msgstr ""
+msgstr "További cimkék"
 
 #: include/blocks.inc.php:850 include/blocks.inc.php:1393
 #: include/events.inc.php:136 include/events.inc.php:208
@@ -497,7 +497,7 @@ msgstr "Ügynök"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Ügynök interfészei"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -510,7 +510,7 @@ msgstr "Másodlagos név"
 
 #: sysmap.php:174
 msgid "Align icons"
-msgstr ""
+msgstr "Ikonok igazítása"
 
 #: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1218
 #: include/blocks.inc.php:1227 include/blocks.inc.php:1272
@@ -554,7 +554,7 @@ msgstr "Engedélyezett hosztok"
 
 #: tr_status.php:193 tr_status.php:199
 msgid "Any"
-msgstr ""
+msgstr "Bármely"
 
 #: include/regexp.inc.php:181
 msgid "Any character string included"
@@ -571,12 +571,12 @@ msgstr "Alkalmazás"
 #: api/classes/CApplication.php:799
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "A(z) \"%1$s\" alkalmazás már létezik a \"%2$s\" hosthoz."
 
 #: api/classes/CApplication.php:489
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "A(z) \"%1$s\" alkalmazás már létezik."
 
 #: api/classes/CApplication.php:633
 #, php-format
@@ -648,11 +648,11 @@ msgstr "Biztosan törölni szeretnéd"
 
 #: include/views/js/configuration.sysmaps.js.php:48
 msgid "Area size"
-msgstr ""
+msgstr "Terület nagysága"
 
 #: include/views/js/configuration.sysmaps.js.php:36
 msgid "Area type"
-msgstr ""
+msgstr "Terület típusa"
 
 #: include/views/configuration.item.edit.php:360
 #: include/views/configuration.item.edit.php:377
@@ -680,11 +680,11 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Legalább egy hostot vagy csoportot ki kell választani."
 
 #: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Legalább egy karbantartási periódust létre kell hozni."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -704,7 +704,7 @@ msgstr ""
 
 #: include/func.inc.php:225
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
 #: include/func.inc.php:242 jsLoader.php:118
@@ -727,7 +727,7 @@ msgstr "Autentikációs mód"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Autentikációs mód HTTP-re változott"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
@@ -743,7 +743,7 @@ msgstr "Automatikus regisztráció"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr ""
+msgstr "Autómatikus belépés"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
@@ -752,16 +752,16 @@ msgstr "Automatikus kijelentkezés (minimum 90 mp)"
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.host.massupdate.php:179
 msgid "Automatic"
-msgstr ""
+msgstr "Autómatikus"
 
 #: include/views/configuration.sysmap.edit.php:78
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Autómatikus ikon elhelyezés"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:238
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Autómatikus ikon kiválasztás"
 
 #: hosts.php:691 popup.php:544
 msgid "Availability"
@@ -786,28 +786,29 @@ msgstr "Átlag"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Átlagos értéke T időszak alatt < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Átlagos értéke T időszak alatt = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Átlagos értéke T időszak alatt > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Átlagos értéke T időszak alatt ≠ N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
 msgstr "Tengely elhelyezkedése"
 
+# byte
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:225
 msgid "BACK"
@@ -850,7 +851,7 @@ msgstr "Fekete & kék"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
-msgstr ""
+msgstr "Villogó"
 
 #: include/views/administration.users.list.php:83
 msgid "Blocked"
@@ -878,7 +879,7 @@ msgstr "Világosabb"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bolgár (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -1087,23 +1088,23 @@ msgstr "Visszahívás"
 
 #: api/classes/CTemplate.php:1410
 msgid "Can't add group"
-msgstr ""
+msgstr "Nem lehet a csoportot hozzáadni"
 
 #: api/classes/CTemplate.php:1486 api/classes/CTemplate.php:1496
 msgid "Can't link template"
-msgstr ""
+msgstr "Nem lehet a mintát hozzáadni"
 
 #: api/classes/CTemplate.php:1421
 msgid "Can't remove group"
-msgstr ""
+msgstr "Nem lehet a csoportot eltávolítani"
 
 #: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
-msgstr ""
+msgstr "Nem lehet a mintát leválasztani"
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "Kanadai (136 karakter)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:259
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
@@ -1163,7 +1164,7 @@ msgstr "Nem sikerült a képet hozzáadni"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Kép hozzáadása sikertelen."
 
 #: disc_prototypes.php:277 items.php:450 screenedit.php:180
 msgid "Cannot add item"
@@ -1171,7 +1172,7 @@ msgstr "Elem felvétele sikertelen"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Makro hozzáadása sikertelen."
 
 #: maintenance.php:137
 msgid "Cannot add maintenance"
@@ -1245,7 +1246,7 @@ msgstr "Felhasználó létrehozása sikertelen. A beírt jelszavak nem azonosak.
 
 #: api/classes/CUserGroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Felhasználók hozzáadása sikertelen."
 
 #: adm.valuemapping.php:72
 msgid "Cannot add value map"
@@ -1398,7 +1399,7 @@ msgstr "Hoszt törlése sikertelen"
 
 #: api/classes/CHost.php:1786
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "Hoszt csoport törlése sikertelen"
 
 #: adm.iconmapping.php:95
 msgid "Cannot delete icon map"
@@ -1445,11 +1446,10 @@ msgid "Cannot delete proxy"
 msgstr "Proxy törlése sikertelen"
 
 #: adm.regexps.php:139
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Reguláris kifejezés törlése nem sikerült"
-msgstr[1] "Reguláris kifejezés törlése nem sikerült"
+msgstr[1] "Reguláris kifejezések törlése nem sikerült"
 
 #: httpconf.php:185
 msgid "Cannot delete scenario"
@@ -1520,11 +1520,11 @@ msgstr "Trigger törlése sikertelen"
 
 #: api/classes/CItemPrototype.php:800
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Trigger prototipus törlése sikertelen"
 
 #: api/classes/CItem.php:997
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "Trigger törlése sikertelen."
 
 #: trigger_prototypes.php:287 triggers.php:353
 msgid "Cannot delete triggers"
@@ -1544,7 +1544,7 @@ msgstr ""
 
 #: adm.valuemapping.php:88
 msgid "Cannot delete value map"
-msgstr "Az érték-hozzárendelést nem lehet törölni"
+msgstr "Az érték-hozzárendelést törlése sikertelen"
 
 #: media_types.php:163
 msgid "Cannot disable media type"
@@ -7158,7 +7158,7 @@ msgstr ""
 
 #: include/classes/class.cserverinfo.php:45
 msgid "Logged in as"
-msgstr ""
+msgstr "Belépett mint"
 
 #: auditlogs.php:143 include/config.inc.php:258 include/menu.inc.php:285
 #: include/page_header.php:271
@@ -7170,7 +7170,7 @@ msgstr "Belépés"
 
 #: include/views/general.login.php:77
 msgid "Login as Guest"
-msgstr ""
+msgstr "Belépés Vendégként"
 
 #: api/classes/CUser.php:977
 #, php-format
@@ -7179,12 +7179,12 @@ msgstr ""
 
 #: authentication.php:108 authentication.php:136
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "Bejelentkezési név vagy jelszó hiba"
 
 #: api/classes/CUser.php:845 api/classes/CUser.php:863
 #: api/classes/CUser.php:910
 msgid "Login name or password is incorrect."
-msgstr ""
+msgstr "Bejelentkezési név vagy jelszó hiba"
 
 #: auditlogs.php:146 include/page_header.php:262 include/page_header.php:266
 #: include/views/administration.auditlogs.list.php:44
@@ -7204,24 +7204,24 @@ msgstr "Elveszett"
 #: include/func.inc.php:404 include/func.inc.php:565
 msgctxt "Mega short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:123
 msgctxt "Monday short"
 msgid "M"
-msgstr ""
+msgstr "H"
 
 #: include/defines.inc.php:909 report3.php:116
 msgid "M Y"
-msgstr ""
+msgstr "H É"
 
 #: hostinventories.php:164 include/hosts.inc.php:159
 msgid "MAC address A"
-msgstr ""
+msgstr "MAC cím A"
 
 #: include/hosts.inc.php:164
 msgid "MAC address B"
-msgstr ""
+msgstr "MAC cím B"
 
 #: include/maps.inc.php:719
 msgid "MAINTENANCE"
@@ -7242,7 +7242,7 @@ msgstr "LEGGYAKORIBB TRIGGER-EK (TOP 100)"
 #: include/audit.inc.php:50 include/views/common.macros.php:25
 #: include/views/configuration.item.edit.php:336
 msgid "Macro"
-msgstr ""
+msgstr "Makró"
 
 #: api/classes/CUserMacro.php:992
 #, php-format
@@ -7357,7 +7357,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:569
 #: include/views/configuration.host.massupdate.php:178
 msgid "Manual"
-msgstr ""
+msgstr "Manuális"
 
 #: index.php:47
 msgid "Manual Logout"
@@ -7540,7 +7540,7 @@ msgstr "Május"
 #: include/func.inc.php:222
 msgctxt "May short"
 msgid "May"
-msgstr ""
+msgstr "Máj"
 
 #: include/views/administration.mediatypes.edit.php:98
 #: include/views/administration.users.edit.php:161
@@ -7715,7 +7715,7 @@ msgstr ""
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
-msgstr "Percek"
+msgstr "Perc"
 
 #: api/classes/CGraph.php:793 api/classes/CGraphPrototype.php:840
 msgid "Missing \"itemid\" field for item."
@@ -8474,7 +8474,7 @@ msgstr ""
 
 #: include/views/configuration.discovery.edit.php:42
 msgid "No proxy"
-msgstr ""
+msgstr "Nincs proxy"
 
 #: api/classes/CAction.php:1517
 #, php-format
@@ -9152,7 +9152,7 @@ msgstr "Áttekintés proxinként"
 #: include/func.inc.php:568
 msgctxt "Peta short"
 msgid "P"
-msgstr ""
+msgstr "P"
 
 #: dashboard.php:225
 msgid "PERSONAL DASHBOARD"
@@ -9160,19 +9160,19 @@ msgstr "SZEMÉLYES DASHBOARD"
 
 #: include/classes/class.frontendsetup.php:316
 msgid "PHP bcmath"
-msgstr ""
+msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:320
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
-msgstr ""
+msgstr "PHP bcmath bővítmény hiányzik (PHP konfigurációs paraméter --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:547
 msgid "PHP ctype"
-msgstr ""
+msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:551
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr ""
+msgstr "PHP ctype bővítmény hiányzik (PHP konfigurációs paraméter --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:288
 msgid "PHP databases support"
@@ -9180,83 +9180,83 @@ msgstr "PHP adatbázis támogatás"
 
 #: include/classes/class.frontendsetup.php:380
 msgid "PHP gd"
-msgstr ""
+msgstr "PHP gd"
 
 #: include/classes/class.frontendsetup.php:456
 msgid "PHP gd FreeType support"
-msgstr ""
+msgstr "PHP gd FreeType támogatás"
 
 #: include/classes/class.frontendsetup.php:460
 msgid "PHP gd FreeType support missing"
-msgstr ""
+msgstr "PHP gd FreeType támogatás hiányzik"
 
 #: include/classes/class.frontendsetup.php:435
 msgid "PHP gd JPEG image support missing"
-msgstr ""
+msgstr "PHP gd JPEG kép támogatás hiányzik"
 
 #: include/classes/class.frontendsetup.php:431
 msgid "PHP gd JPEG support"
-msgstr ""
+msgstr "PHP gd JPEG támogatás"
 
 #: include/classes/class.frontendsetup.php:409
 msgid "PHP gd PNG image support missing"
-msgstr ""
+msgstr "PHP gd PNG kép támogatás hiányzik"
 
 #: include/classes/class.frontendsetup.php:405
 msgid "PHP gd PNG support"
-msgstr ""
+msgstr "PHP gd PNG támogatás"
 
 #: include/classes/class.frontendsetup.php:384
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)"
-msgstr ""
+msgstr "PHP gd bővítmény hiányzik (PHP konfigurációs paraméter --with-gd)"
 
 #: include/classes/class.frontendsetup.php:604
 msgid "PHP gettext"
-msgstr ""
+msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:608
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
-msgstr ""
+msgstr "PHP gettext bővítmény hiányzik (PHP konfigurációs paraméter --with-gettext)"
 
 #: include/classes/class.frontendsetup.php:480
 msgid "PHP libxml"
-msgstr ""
+msgstr "PHP libxml"
 
 #: include/classes/class.frontendsetup.php:484
 msgid "PHP libxml extension missing"
-msgstr ""
+msgstr "PHP libxml bővítmény hiányzik"
 
 #: include/classes/class.frontendsetup.php:335
 msgid "PHP mbstring"
-msgstr ""
+msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:339
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
-msgstr ""
+msgstr "PHP mbstring bővítmény hiányzik (PHP konfigurációs paraméter --enable-mbstring)"
 
 #: include/classes/class.frontendsetup.php:174
 msgid "PHP option max_execution_time"
-msgstr ""
+msgstr "PHP opció max_execution_time"
 
 #: include/classes/class.frontendsetup.php:193
 msgid "PHP option max_input_time"
-msgstr ""
+msgstr "PHP opció max_input_time"
 
 #: include/classes/class.frontendsetup.php:117
 msgid "PHP option memory_limit"
-msgstr ""
+msgstr "PHP opció memory_limit"
 
 #: include/classes/class.frontendsetup.php:136
 msgid "PHP option post_max_size"
-msgstr ""
+msgstr "PHP opció post_max_size"
 
 #: include/classes/class.frontendsetup.php:155
 msgid "PHP option upload_max_filesize"
-msgstr ""
+msgstr "PHP opció upload_max_filesize"
 
 #: include/classes/class.frontendsetup.php:566
 msgid "PHP session"
-msgstr ""
+msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
@@ -9280,7 +9280,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:212
 msgid "PHP time zone"
-msgstr ""
+msgstr "PHP időzóna"
 
 #: include/classes/class.frontendsetup.php:98
 msgid "PHP version"
@@ -9288,19 +9288,19 @@ msgstr "PHP verzió"
 
 #: include/classes/class.frontendsetup.php:518
 msgid "PHP xmlreader"
-msgstr ""
+msgstr "PHP xmlreader"
 
 #: include/classes/class.frontendsetup.php:522
 msgid "PHP xmlreader extension missing"
-msgstr ""
+msgstr "PHP xmlreader bővítmény hiányzik"
 
 #: include/classes/class.frontendsetup.php:499
 msgid "PHP xmlwriter"
-msgstr ""
+msgstr "PHP xmlwriter"
 
 #: include/classes/class.frontendsetup.php:503
 msgid "PHP xmlwriter extension missing"
-msgstr ""
+msgstr "PHP xmlwriter bővítmény hiányzik"
 
 #: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:128
@@ -9313,7 +9313,7 @@ msgstr "HIBA"
 
 #: include/validate.inc.php:561
 msgid "Page received incorrect data"
-msgstr ""
+msgstr "Az oldal hibás adatot kapott"
 
 #: include/reports.inc.php:714
 msgid "Palette"
@@ -9498,7 +9498,7 @@ msgstr ""
 
 #: include/views/administration.users.edit.php:182
 msgid "Play sound"
-msgstr ""
+msgstr "Hangjelzés"
 
 #: include/nodes.inc.php:329
 msgid "Please be aware that database still contains data related to the deleted node."
@@ -10333,13 +10333,13 @@ msgstr "SNMPv3 agent"
 #: include/views/configuration.item.massupdate.php:129
 #: include/views/js/configuration.discovery.edit.js.php:55
 msgid "SNMPv3 auth passphrase"
-msgstr "SNMPv3 autentikációs \"passphrase\""
+msgstr "SNMPv3 autentikációs jelszó"
 
 #: include/views/configuration.item.edit.php:157
 #: include/views/configuration.item.massupdate.php:139
 #: include/views/js/configuration.discovery.edit.js.php:60
 msgid "SNMPv3 priv passphrase"
-msgstr "SNMPv3 privát \"passphrase\""
+msgstr "SNMPv3 privát jelszó"
 
 #: include/views/configuration.item.edit.php:152
 #: include/views/configuration.item.massupdate.php:119
@@ -11463,22 +11463,22 @@ msgstr ""
 
 #: dashboard.php:303 include/screens.inc.php:41
 msgid "System status"
-msgstr "Rendszer státusz"
+msgstr "Rendszer állapota"
 
 #: include/func.inc.php:567
 msgctxt "Tera short"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: jsLoader.php:126
 msgctxt "Thursday short"
 msgid "T"
-msgstr ""
+msgstr "Cs"
 
 #: jsLoader.php:124
 msgctxt "Tuesday short"
 msgid "T"
-msgstr ""
+msgstr "K"
 
 #: include/discovery.inc.php:65
 #: include/views/js/configuration.discovery.edit.js.php:125
@@ -12778,16 +12778,16 @@ msgstr "Érték-hozzárendelés"
 
 #: include/valuemap.inc.php:121
 msgid "Value mapping must have at least one mapping."
-msgstr ""
+msgstr "Az érték-hozzárendelésnek legalább egy értéket tartalmaznia kell."
 
 #: include/valuemap.inc.php:126
 msgid "Value maps are used to create a mapping between numeric values and string representations."
-msgstr ""
+msgstr "Az érték-hozzárendelés numerikus értékhez rendel szövegeset."
 
 #: include/classes/class.cpie.php:319
 #, php-format
 msgid "Value: no data"
-msgstr ""
+msgstr "Érték: nincs adat"
 
 #: include/items.inc.php:793 include/triggers.inc.php:1323
 #: include/views/monitoring.history.php:62
@@ -13312,7 +13312,7 @@ msgstr ""
 #: include/func.inc.php:570
 msgctxt "Zetta short"
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: index.php:30
 msgid "ZABBIX"
@@ -13402,7 +13402,7 @@ msgstr ""
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Zabbix server info"
-msgstr ""
+msgstr "Zabbix szerver információk"
 
 #: jsrpc.php:173
 msgid "Zabbix server is not running: the information displayed may not be current."
@@ -13423,7 +13423,7 @@ msgstr "Zabbix szerver neve"
 
 #: include/setup.inc.php:368
 msgid "Zabbix server port"
-msgstr ""
+msgstr "Zabbix szerver port"
 
 #: include/items.inc.php:84
 msgid "Zabbix trapper"
@@ -13508,7 +13508,7 @@ msgstr "átl"
 #: include/func.inc.php:472 jsLoader.php:93
 msgctxt "day short"
 msgid "d"
-msgstr ""
+msgstr "n"
 
 #: include/defines.inc.php:910 include/maintenances.inc.php:57
 #: include/page_header.php:485 include/views/configuration.item.list.php:101
@@ -13520,7 +13520,7 @@ msgstr "Y M d"
 #: include/views/configuration.services.edit.php:132
 #: include/views/configuration.services.edit.php:133 report3.php:161
 msgid "d M Y H:i"
-msgstr ""
+msgstr "Y M d H:i"
 
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
 #: include/acknow.inc.php:59 include/blocks.inc.php:930
@@ -13549,7 +13549,7 @@ msgstr ""
 #: include/classes/class.cchart.php:1252 include/classes/class.cchart.php:1267
 #: include/classes/class.cchart.php:1286
 msgid "d.m H:i"
-msgstr ""
+msgstr "m.d H:i"
 
 #: include/defines.inc.php:916
 msgid "d.m.y"
@@ -13568,7 +13568,7 @@ msgstr "napok"
 #: include/views/configuration.services.edit.php:200
 #: include/views/configuration.services.edit.php:241
 msgid "dd"
-msgstr ""
+msgstr "nn"
 
 #: include/setup.inc.php:352 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
@@ -13577,7 +13577,7 @@ msgstr "alapértelmezett"
 
 #: jsLoader.php:88
 msgid "dynamic"
-msgstr ""
+msgstr "dinamikus"
 
 #: include/views/js/configuration.sysmaps.js.php:201
 msgid "elements"
@@ -13607,7 +13607,7 @@ msgstr "végrehajtva"
 
 #: jsLoader.php:87
 msgid "fixed"
-msgstr ""
+msgstr "fix"
 
 #: include/func.inc.php:1721
 msgid "found"
@@ -13616,7 +13616,7 @@ msgstr "talált"
 #: include/func.inc.php:480 jsLoader.php:94
 msgctxt "hour short"
 msgid "h"
-msgstr ""
+msgstr "ó"
 
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.maintenance.edit.php:117
@@ -13625,7 +13625,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:267
 #: include/views/configuration.services.edit.php:273
 msgid "hh"
-msgstr ""
+msgstr "óó"
 
 #: api/classes/CMap.php:575
 msgid "host"
@@ -13637,11 +13637,11 @@ msgstr ""
 
 #: api/classes/CMap.php:572
 msgid "icon"
-msgstr ""
+msgstr "ikon"
 
 #: api/classes/CMap.php:578
 msgid "image"
-msgstr ""
+msgstr "kép"
 
 #: include/actions.inc.php:33
 msgid "in"
@@ -13667,21 +13667,21 @@ msgstr "mint"
 #: include/func.inc.php:562
 msgctxt "Milli short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/func.inc.php:488 jsLoader.php:95
 msgctxt "minute short"
 msgid "m"
-msgstr ""
+msgstr "p"
 
 #: include/func.inc.php:464 jsLoader.php:91
 msgctxt "month short"
 msgid "m"
-msgstr ""
+msgstr "h"
 
 #: include/views/js/common.macros.js.php:53
 msgid "macro(s)"
-msgstr ""
+msgstr "makró(k)"
 
 #: include/actions.inc.php:183 include/views/configuration.action.edit.php:205
 msgid "maintenance"
@@ -13689,7 +13689,7 @@ msgstr "karbantartás"
 
 #: api/classes/CMap.php:577
 msgid "map"
-msgstr ""
+msgstr "térkép"
 
 #: include/classes/class.cchart.php:1744 include/classes/class.cchart.php:1758
 #: include/graphs.inc.php:90
@@ -13707,7 +13707,7 @@ msgstr "min"
 
 #: include/views/configuration.action.edit.php:46
 msgid "minimum 60 seconds"
-msgstr ""
+msgstr "minimum 60 másodperc"
 
 #: include/views/configuration.maintenance.edit.php:73
 #: include/views/configuration.maintenance.edit.php:79
@@ -13720,12 +13720,12 @@ msgstr ""
 #: include/views/configuration.services.edit.php:270
 #: include/views/configuration.services.edit.php:276
 msgid "mm"
-msgstr ""
+msgstr "mm"
 
 #: include/func.inc.php:442 include/func.inc.php:498
 msgctxt "millisecond short"
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
@@ -13805,9 +13805,10 @@ msgstr ""
 msgid "or"
 msgstr "vagy"
 
+# eyéb
 #: include/js.inc.php:133 include/js.inc.php:136
 msgid "other"
-msgstr ""
+msgstr "másik"
 
 #: include/page_header.php:129
 msgid "refreshed every"
@@ -13832,7 +13833,7 @@ msgstr "fut"
 #: include/func.inc.php:442 include/func.inc.php:493
 msgctxt "second short"
 msgid "s"
-msgstr ""
+msgstr "mp"
 
 #: include/page_header.php:129
 #: include/views/configuration.httpconf.edit.php:188
@@ -13851,7 +13852,7 @@ msgstr "küldve"
 
 #: include/views/configuration.services.edit.php:198
 msgid "short description"
-msgstr ""
+msgstr "rövid leírás"
 
 #: include/views/configuration.sysmap.edit.php:76
 msgid "show icon mappings"
@@ -13888,7 +13889,7 @@ msgstr "érték"
 #: jsLoader.php:92
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "h"
 
 #: include/maintenances.inc.php:74
 msgid "week"
@@ -13905,7 +13906,7 @@ msgstr ""
 #: include/func.inc.php:456 jsLoader.php:90
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "é"
 
 #: include/classes/class.frontendsetup.php:317
 #: include/classes/class.frontendsetup.php:336
@@ -13927,7 +13928,7 @@ msgstr "igen"
 #: include/views/configuration.services.edit.php:204
 #: include/views/configuration.services.edit.php:245
 msgid "yyyy"
-msgstr ""
+msgstr "éééé"
 
 #: include/func.inc.php:561
 msgctxt "Micro short"

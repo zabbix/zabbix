@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-13 22:25+0200\n"
-"PO-Revision-Date: 2012-12-27 08:01+0200\n"
+"POT-Creation-Date: 2013-01-13 22:29+0200\n"
+"PO-Revision-Date: 2013-01-09 19:38+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -884,7 +884,7 @@ msgstr "Светлее"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Болгарский (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -2219,7 +2219,7 @@ msgstr "Объединение столбцов"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s слишком большое."
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -5971,7 +5971,7 @@ msgstr "Некорректный цвет \"%1$s\"."
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Указано некорректное объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -6204,7 +6204,7 @@ msgstr "Указан некорректный тип ресурса для эл�
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Указано некорректное объединение строк у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -7201,7 +7201,7 @@ msgstr "Ошибка входа \"%s\"."
 
 #: authentication.php:108 authentication.php:136
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "Имя пользователя или пароль некорректные"
 
 #: api/classes/CUser.php:845 api/classes/CUser.php:863
 #: api/classes/CUser.php:910
@@ -10190,7 +10190,7 @@ msgstr "Объединение строк"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Объединение строк у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s слишком большое."
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -10917,7 +10917,7 @@ msgstr "Услуга не может быть родительской и под
 
 #: services.php:164
 msgid "Service created"
-msgstr ""
+msgstr "Сервис создан"
 
 #: services.php:116
 msgid "Service deleted"
