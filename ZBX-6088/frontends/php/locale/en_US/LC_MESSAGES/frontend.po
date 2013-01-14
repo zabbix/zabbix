@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-09 18:36+0200\n"
+"POT-Creation-Date: 2013-01-13 22:25+0200\n"
 "PO-Revision-Date: 2012-12-12 12:19+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
@@ -105,8 +105,8 @@ msgstr "(minimum 60 seconds, 0 - use action default)"
 msgid "(no proxy)"
 msgstr "(no proxy)"
 
-#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1881
-#: popup.php:1882
+#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1875
+#: popup.php:1876
 msgid "- all groups -"
 msgstr "- all groups -"
 
@@ -490,7 +490,7 @@ msgid "Age less than %s"
 msgstr "Age less than %s"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
-#: include/views/configuration.httpconf.edit.php:114 popup.php:2022
+#: include/views/configuration.httpconf.edit.php:114 popup.php:2016
 msgid "Agent"
 msgstr "Agent"
 
@@ -2237,8 +2237,8 @@ msgstr "Command cannot be empty."
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:723
-#: include/views/configuration.action.edit.php:727 popup.php:1974
-#: popup.php:1981
+#: include/views/configuration.action.edit.php:727 popup.php:1968
+#: popup.php:1975
 msgid "Commands"
 msgstr "Commands"
 
@@ -4056,7 +4056,7 @@ msgstr "Empty input."
 msgid "Empty macro."
 msgstr "Empty macro."
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1108
 msgid "Empty name."
 msgstr "Empty name."
 
@@ -4317,8 +4317,8 @@ msgstr "Execute SQL error [%1$s] in [%2$s]."
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
 #: include/views/configuration.action.edit.php:664
-#: include/views/js/configuration.action.edit.js.php:114 popup.php:1973
-#: popup.php:1980
+#: include/views/js/configuration.action.edit.js.php:114 popup.php:1967
+#: popup.php:1974
 msgid "Execute on"
 msgstr "Execute on"
 
@@ -4352,7 +4352,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "Expired"
 
-#: include/graphs.inc.php:27 popup.php:1420
+#: include/graphs.inc.php:27 popup.php:1414
 msgid "Exploded"
 msgstr "Exploded"
 
@@ -5152,8 +5152,8 @@ msgstr "Horizontal align"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
-#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1490
-#: popup.php:1498 popup.php:1628 queue.php:249 report2.php:235 report5.php:60
+#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
+#: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "Host"
@@ -5760,7 +5760,7 @@ msgstr "In progress"
 msgid "Include"
 msgstr "Include"
 
-#: api/classes/CService.php:1364
+#: api/classes/CService.php:1330
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
@@ -5791,7 +5791,7 @@ msgstr "Incorrect SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Incorrect SNMP community."
 
-#: api/classes/CService.php:1194
+#: api/classes/CService.php:1160
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Incorrect acceptable SLA for service \"%1$s\"."
@@ -5904,7 +5904,7 @@ msgstr "Incorrect action operation user. User does not exist or you have no acce
 msgid "Incorrect action operationid."
 msgstr "Incorrect action operationid."
 
-#: api/classes/CService.php:1157
+#: api/classes/CService.php:1123
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Incorrect algorithm for service \"%1$s\"."
@@ -5923,7 +5923,7 @@ msgstr "Incorrect arguments passed to function."
 msgid "Incorrect arguments passed to method."
 msgstr "Incorrect arguments passed to method."
 
-#: api/classes/CService.php:1176
+#: api/classes/CService.php:1142
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Incorrect calculate SLA value for service \"%1$s\"."
@@ -6169,12 +6169,12 @@ msgstr "Incorrect parameters for maintenance."
 msgid "Incorrect parameters for user group."
 msgstr "Incorrect parameters for user group."
 
-#: api/classes/CService.php:1242
+#: api/classes/CService.php:1208
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Incorrect parent for service \"%1$s\"."
 
-#: api/classes/CService.php:1245
+#: api/classes/CService.php:1211
 msgid "Incorrect parent service."
 msgstr "Incorrect parent service."
 
@@ -6216,12 +6216,12 @@ msgstr "Incorrect service start time."
 msgid "Incorrect service time type."
 msgstr "Incorrect service time type."
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1177
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Incorrect sorder order for service \"%1$s\"."
 
-#: api/classes/CService.php:1265
+#: api/classes/CService.php:1231
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Incorrect status for service \"%1$s\"."
@@ -6256,7 +6256,7 @@ msgstr "Incorrect time period \"%1$s\" start time must be less than end time."
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Incorrect time period \"%1$s\"."
 
-#: api/classes/CService.php:1226
+#: api/classes/CService.php:1192
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Incorrect trigger ID for service \"%1$s\"."
@@ -6476,7 +6476,7 @@ msgstr ""
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1503 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Invalid method parameters."
@@ -6812,7 +6812,7 @@ msgstr "Keep trends (in days)"
 #: include/views/configuration.item.list.php:57
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/js/configuration.discovery.edit.js.php:235 items.php:75
-#: popup.php:955 popup.php:1095 popup.php:1203 popup.php:1212 popup.php:1630
+#: popup.php:955 popup.php:1095 popup.php:1203 popup.php:1212 popup.php:1624
 msgid "Key"
 msgstr "Key"
 
@@ -7909,10 +7909,10 @@ msgstr "NTLM authentication"
 #: popup_httpstep.php:36 popup.php:544 popup.php:633 popup.php:681
 #: popup.php:742 popup.php:794 popup.php:839 popup.php:898 popup.php:955
 #: popup.php:978 popup.php:1094 popup.php:1202 popup.php:1211 popup.php:1287
-#: popup.php:1322 popup.php:1351 popup.php:1491 popup.php:1499 popup.php:1562
-#: popup.php:1565 popup.php:1629 popup.php:1687 popup.php:1690 popup.php:1747
-#: popup.php:1751 popup.php:1802 popup.php:1833 popup.php:1864 popup.php:1904
-#: popup.php:1920 popup.php:1943 popup.php:1972 popup.php:1979
+#: popup.php:1322 popup.php:1351 popup.php:1485 popup.php:1493 popup.php:1556
+#: popup.php:1559 popup.php:1623 popup.php:1681 popup.php:1684 popup.php:1741
+#: popup.php:1745 popup.php:1796 popup.php:1827 popup.php:1858 popup.php:1898
+#: popup.php:1914 popup.php:1937 popup.php:1966 popup.php:1973
 #: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:236
 #: screenconf.php:50 services.php:42 slideconf.php:38 sysmaps.php:48
 #: sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41 tr_status.php:293
@@ -8138,7 +8138,7 @@ msgstr "No details"
 msgid "No discoveries defined."
 msgstr "No discoveries defined."
 
-#: popup.php:1919
+#: popup.php:1913
 msgid "No discovery checks defined."
 msgstr "No discovery checks defined."
 
@@ -8147,7 +8147,7 @@ msgid "No discovery rule IDs given."
 msgstr "No discovery rule IDs given."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:43 popup.php:1903
+#: include/views/configuration.host.discovery.list.php:43 popup.php:1897
 msgid "No discovery rules defined."
 msgstr "No discovery rules defined."
 
@@ -8242,7 +8242,7 @@ msgid "No host group ID provided for screen element."
 msgstr "No host group ID provided for screen element."
 
 #: include/views/configuration.hostgroups.list.php:47 popup.php:678
-#: popup.php:1832 popup.php:1863
+#: popup.php:1826 popup.php:1857
 msgid "No host groups defined."
 msgstr "No host groups defined."
 
@@ -8333,7 +8333,7 @@ msgstr "No item with itemid=\"%1$s\"."
 #: chart.php:49 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:954 popup.php:1089
-#: popup.php:1452 popup.php:1626
+#: popup.php:1446 popup.php:1620
 msgid "No items defined."
 msgstr "No items defined."
 
@@ -8353,7 +8353,7 @@ msgstr "No maintenance period defined."
 msgid "No map ID provided for screen element."
 msgstr "No map ID provided for screen element."
 
-#: include/views/monitoring.maps.php:27 popup.php:1559 sysmaps.php:254
+#: include/views/monitoring.maps.php:27 popup.php:1553 sysmaps.php:254
 msgid "No maps defined."
 msgstr "No maps defined."
 
@@ -8454,8 +8454,8 @@ msgstr "No permissions for system access."
 #: api/classes/CMap.php:550 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1286
-#: api/classes/CService.php:1301 api/classes/CTemplateScreen.php:775
+#: api/classes/CScreen.php:578 api/classes/CService.php:1252
+#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
 #: api/classes/CTrigger.php:1444 api/classes/CTrigger.php:1702
@@ -8477,7 +8477,7 @@ msgstr "No private key file specified for action operation command \"%s\"."
 msgid "No private key file specified."
 msgstr "No private key file specified."
 
-#: include/views/administration.proxy.list.php:42 popup.php:1942
+#: include/views/administration.proxy.list.php:42 popup.php:1936
 msgid "No proxies defined."
 msgstr "No proxies defined."
 
@@ -8517,7 +8517,7 @@ msgstr "No screen ID provided for screen element."
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:46
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:37 popup.php:1743 popup.php:1801
+#: include/views/monitoring.screen.php:37 popup.php:1737 popup.php:1795
 msgid "No screens defined."
 msgstr "No screens defined."
 
@@ -8525,7 +8525,7 @@ msgstr "No screens defined."
 msgid "No script specified for action operation command."
 msgstr "No script specified for action operation command."
 
-#: include/views/administration.script.list.php:34 popup.php:1968
+#: include/views/administration.script.list.php:34 popup.php:1962
 msgid "No scripts defined."
 msgstr "No scripts defined."
 
@@ -8535,7 +8535,7 @@ msgid "No slide shows defined."
 msgstr "No slide shows defined."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:111 popup.php:1684
+#: include/views/monitoring.slides.php:111 popup.php:1678
 msgid "No slides defined."
 msgstr "No slides defined."
 
@@ -8654,7 +8654,7 @@ msgstr "Nodes"
 msgid "None"
 msgstr "None"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1423
+#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1417
 msgid "Normal"
 msgstr "Normal"
 
@@ -9488,7 +9488,7 @@ msgstr "Persian (fa_IR)"
 msgid "Peta"
 msgstr "Peta"
 
-#: include/graphs.inc.php:26 popup.php:1417
+#: include/graphs.inc.php:26 popup.php:1411
 msgid "Pie"
 msgstr "Pie"
 
@@ -10759,8 +10759,8 @@ msgstr "Seconds"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/js/configuration.sysmaps.js.php:104 popup_bitem.php:119
 #: popup.php:652 popup.php:722 popup.php:779 popup.php:876 popup.php:940
-#: popup.php:1071 popup.php:1180 popup.php:1268 popup.php:1434 popup.php:1541
-#: popup.php:1612 popup.php:1723 popup.php:1785 popup.php:2040
+#: popup.php:1071 popup.php:1180 popup.php:1268 popup.php:1428 popup.php:1535
+#: popup.php:1606 popup.php:1717 popup.php:1779 popup.php:2034
 #: popup_right.php:109 popup_usrgrp.php:102 tr_logform.php:274
 msgid "Select"
 msgstr "Select"
@@ -10852,7 +10852,7 @@ msgstr "Serial number A"
 msgid "Serial number B"
 msgstr "Serial number B"
 
-#: include/views/administration.script.list.php:67 popup.php:2025
+#: include/views/administration.script.list.php:67 popup.php:2019
 #: queue.php:186
 msgid "Server"
 msgstr "Server"
@@ -10873,27 +10873,27 @@ msgstr "Server time"
 msgid "Service"
 msgstr "Service"
 
-#: api/classes/CService.php:1332
+#: api/classes/CService.php:1298
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 
-#: api/classes/CService.php:1353
+#: api/classes/CService.php:1319
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Service \"%1$s\" cannot be dependent on itself."
 
-#: api/classes/CService.php:1432
+#: api/classes/CService.php:1398
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 
-#: api/classes/CService.php:1407
+#: api/classes/CService.php:1373
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Service \"%1$s\" is already hardlinked to a different service."
 
-#: api/classes/CService.php:1250
+#: api/classes/CService.php:1216
 msgid "Service cannot be parent and child at the same time."
 msgstr "Service cannot be parent and child at the same time."
 
@@ -10929,7 +10929,7 @@ msgstr "Service updated"
 msgid "Services"
 msgstr "Services"
 
-#: api/classes/CService.php:1483
+#: api/classes/CService.php:1449
 msgid "Services form a circular dependency."
 msgstr "Services form a circular dependency."
 
@@ -11247,7 +11247,7 @@ msgstr "Specified script does not exist or you do not have rights on it for acti
 msgid "Speed"
 msgstr "Speed"
 
-#: include/graphs.inc.php:25 popup.php:1414
+#: include/graphs.inc.php:25 popup.php:1408
 msgid "Stacked"
 msgstr "Stacked"
 
@@ -11288,7 +11288,7 @@ msgstr "State"
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.triggers.list.php:97 popup_media.php:138
 #: popup.php:544 popup.php:980 popup.php:1098 popup.php:1206 popup.php:1215
-#: popup.php:1633 srv_status.php:157 tr_status.php:285
+#: popup.php:1627 srv_status.php:157 tr_status.php:285
 msgid "Status"
 msgstr "Status"
 
@@ -12147,8 +12147,8 @@ msgstr "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory fie
 #: include/views/js/configuration.sysmaps.js.php:12
 #: include/views/js/configuration.sysmaps.js.php:355
 #: include/views/monitoring.overview.php:32 popup_media.php:121 popup.php:512
-#: popup.php:1096 popup.php:1204 popup.php:1213 popup.php:1492 popup.php:1500
-#: popup.php:1631 tr_logform.php:299 tr_logform.php:303
+#: popup.php:1096 popup.php:1204 popup.php:1213 popup.php:1486 popup.php:1494
+#: popup.php:1625 tr_logform.php:299 tr_logform.php:303
 msgid "Type"
 msgstr "Type"
 
@@ -12177,7 +12177,7 @@ msgstr "Type of calculation"
 #: include/views/configuration.item.edit.php:209
 #: include/views/configuration.item.edit.php:220
 #: include/views/configuration.item.massupdate.php:165 popup.php:1097
-#: popup.php:1205 popup.php:1214 popup.php:1493 popup.php:1501 popup.php:1632
+#: popup.php:1205 popup.php:1214 popup.php:1487 popup.php:1495 popup.php:1626
 msgid "Type of information"
 msgstr "Type of information"
 

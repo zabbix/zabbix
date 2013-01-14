@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-09 18:36+0200\n"
-"PO-Revision-Date: 2012-12-27 08:01+0200\n"
+"POT-Creation-Date: 2013-01-13 22:29+0200\n"
+"PO-Revision-Date: 2013-01-09 19:38+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -112,8 +112,8 @@ msgstr "(минимум 60 секунд, 0 - использовать из на�
 msgid "(no proxy)"
 msgstr "(без прокси)"
 
-#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1881
-#: popup.php:1882
+#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1875
+#: popup.php:1876
 msgid "- all groups -"
 msgstr "- все группы -"
 
@@ -497,7 +497,7 @@ msgid "Age less than %s"
 msgstr "Возраст менее чем %s"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
-#: include/views/configuration.httpconf.edit.php:114 popup.php:2022
+#: include/views/configuration.httpconf.edit.php:114 popup.php:2016
 msgid "Agent"
 msgstr "Агент"
 
@@ -884,7 +884,7 @@ msgstr "Светлее"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Болгарский (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -2219,7 +2219,7 @@ msgstr "Объединение столбцов"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s слишком большое."
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -2247,8 +2247,8 @@ msgstr "Команда не может быть пустой."
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:723
-#: include/views/configuration.action.edit.php:727 popup.php:1974
-#: popup.php:1981
+#: include/views/configuration.action.edit.php:727 popup.php:1968
+#: popup.php:1975
 msgid "Commands"
 msgstr "Команды"
 
@@ -4067,7 +4067,7 @@ msgstr "Ничего не введено."
 msgid "Empty macro."
 msgstr "Пустой макрос."
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1108
 msgid "Empty name."
 msgstr "Пустое имя."
 
@@ -4328,8 +4328,8 @@ msgstr "Ошибка выполнения SQL [%1$s] в [%2$s]."
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
 #: include/views/configuration.action.edit.php:664
-#: include/views/js/configuration.action.edit.js.php:114 popup.php:1973
-#: popup.php:1980
+#: include/views/js/configuration.action.edit.js.php:114 popup.php:1967
+#: popup.php:1974
 msgid "Execute on"
 msgstr "Выполнять на"
 
@@ -4363,7 +4363,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "Завершено"
 
-#: include/graphs.inc.php:27 popup.php:1420
+#: include/graphs.inc.php:27 popup.php:1414
 msgid "Exploded"
 msgstr "Расширенный круговой"
 
@@ -5163,8 +5163,8 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
-#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1490
-#: popup.php:1498 popup.php:1628 queue.php:249 report2.php:235 report5.php:60
+#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
+#: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "Узел сети"
@@ -5771,7 +5771,7 @@ msgstr "В работе"
 msgid "Include"
 msgstr "Включено"
 
-#: api/classes/CService.php:1364
+#: api/classes/CService.php:1330
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Некорректное значение поля \"нежесткая\" для зависимости у услуги \"%1$s\"."
@@ -5802,7 +5802,7 @@ msgstr "Некорректный SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Некорректное SNMP community."
 
-#: api/classes/CService.php:1194
+#: api/classes/CService.php:1160
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Некорректное допустимое SLA для услуги \"%1$s\"."
@@ -5915,7 +5915,7 @@ msgstr "Некорректный пользователь для операци�
 msgid "Incorrect action operationid."
 msgstr "Некорректный id операции действия."
 
-#: api/classes/CService.php:1157
+#: api/classes/CService.php:1123
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Некорректный алгоритм для услуги \"%1$s\"."
@@ -5934,7 +5934,7 @@ msgstr "В функцию переданы некорректные аргуме
 msgid "Incorrect arguments passed to method."
 msgstr "Для метода предоставлены некорректные аргументы."
 
-#: api/classes/CService.php:1176
+#: api/classes/CService.php:1142
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Некорректное вычисляемое значение SLA для услуги \"%1$s\"."
@@ -5971,7 +5971,7 @@ msgstr "Некорректный цвет \"%1$s\"."
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Указано некорректное объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -6180,12 +6180,12 @@ msgstr "Некорректные параметры для обслуживан�
 msgid "Incorrect parameters for user group."
 msgstr "Некорректные параметры для группы пользователей."
 
-#: api/classes/CService.php:1242
+#: api/classes/CService.php:1208
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Некорректный родитель для услуги \"%1$s\"."
 
-#: api/classes/CService.php:1245
+#: api/classes/CService.php:1211
 msgid "Incorrect parent service."
 msgstr "Некорректная родительская услуга."
 
@@ -6204,7 +6204,7 @@ msgstr "Указан некорректный тип ресурса для эл�
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Указано некорректное объединение строк у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6227,12 +6227,12 @@ msgstr "Некорректное время начала услуги."
 msgid "Incorrect service time type."
 msgstr "Некорректный тип времени услуги."
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1177
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Некорректный порядок сортировки для услуги \"%1$s\"."
 
-#: api/classes/CService.php:1265
+#: api/classes/CService.php:1231
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Некорректное состояние для услуги \"%1$s\"."
@@ -6267,7 +6267,7 @@ msgstr "Некорректный период времени \"%1$s\". Врем�
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Некорректный период времени \"%1$s\"."
 
-#: api/classes/CService.php:1226
+#: api/classes/CService.php:1192
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Некорректный ID триггера для услуги \"%1$s\"."
@@ -6487,7 +6487,7 @@ msgstr "Ошибочный период обслуживания."
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1503 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Ошибочные параметры метода."
@@ -6823,7 +6823,7 @@ msgstr "Хранение динамики изменений (дней)"
 #: include/views/configuration.item.list.php:57
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/js/configuration.discovery.edit.js.php:235 items.php:75
-#: popup.php:955 popup.php:1095 popup.php:1203 popup.php:1212 popup.php:1630
+#: popup.php:955 popup.php:1095 popup.php:1203 popup.php:1212 popup.php:1624
 msgid "Key"
 msgstr "Ключ"
 
@@ -7201,7 +7201,7 @@ msgstr "Ошибка входа \"%s\"."
 
 #: authentication.php:108 authentication.php:136
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "Имя пользователя или пароль некорректные"
 
 #: api/classes/CUser.php:845 api/classes/CUser.php:863
 #: api/classes/CUser.php:910
@@ -7925,10 +7925,10 @@ msgstr "Аутентификация NTLM"
 #: popup_httpstep.php:36 popup.php:544 popup.php:633 popup.php:681
 #: popup.php:742 popup.php:794 popup.php:839 popup.php:898 popup.php:955
 #: popup.php:978 popup.php:1094 popup.php:1202 popup.php:1211 popup.php:1287
-#: popup.php:1322 popup.php:1351 popup.php:1491 popup.php:1499 popup.php:1562
-#: popup.php:1565 popup.php:1629 popup.php:1687 popup.php:1690 popup.php:1747
-#: popup.php:1751 popup.php:1802 popup.php:1833 popup.php:1864 popup.php:1904
-#: popup.php:1920 popup.php:1943 popup.php:1972 popup.php:1979
+#: popup.php:1322 popup.php:1351 popup.php:1485 popup.php:1493 popup.php:1556
+#: popup.php:1559 popup.php:1623 popup.php:1681 popup.php:1684 popup.php:1741
+#: popup.php:1745 popup.php:1796 popup.php:1827 popup.php:1858 popup.php:1898
+#: popup.php:1914 popup.php:1937 popup.php:1966 popup.php:1973
 #: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:236
 #: screenconf.php:50 services.php:42 slideconf.php:38 sysmaps.php:48
 #: sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41 tr_status.php:293
@@ -8154,7 +8154,7 @@ msgstr "Без деталей"
 msgid "No discoveries defined."
 msgstr "Обнаружения не заданы."
 
-#: popup.php:1919
+#: popup.php:1913
 msgid "No discovery checks defined."
 msgstr "Проверки обнаружения не заданы."
 
@@ -8163,7 +8163,7 @@ msgid "No discovery rule IDs given."
 msgstr "ID правил обнаружения не указаны."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:43 popup.php:1903
+#: include/views/configuration.host.discovery.list.php:43 popup.php:1897
 msgid "No discovery rules defined."
 msgstr "Правила обнаружения не заданы."
 
@@ -8258,7 +8258,7 @@ msgid "No host group ID provided for screen element."
 msgstr "Не указан ID группы узлов сети для элемента комплексного экрана."
 
 #: include/views/configuration.hostgroups.list.php:47 popup.php:678
-#: popup.php:1832 popup.php:1863
+#: popup.php:1826 popup.php:1857
 msgid "No host groups defined."
 msgstr "Группы узлов сети не заданы."
 
@@ -8349,7 +8349,7 @@ msgstr "Нет элемента данных с itemid=\"%1$s\"."
 #: chart.php:49 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:954 popup.php:1089
-#: popup.php:1452 popup.php:1626
+#: popup.php:1446 popup.php:1620
 msgid "No items defined."
 msgstr "Элементы данных не заданы."
 
@@ -8369,7 +8369,7 @@ msgstr "Период обслуживания не задан."
 msgid "No map ID provided for screen element."
 msgstr "Не указан ID карты сети для элемента комплексного экрана."
 
-#: include/views/monitoring.maps.php:27 popup.php:1559 sysmaps.php:254
+#: include/views/monitoring.maps.php:27 popup.php:1553 sysmaps.php:254
 msgid "No maps defined."
 msgstr "Карты сети не заданы."
 
@@ -8470,8 +8470,8 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CMap.php:550 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1286
-#: api/classes/CService.php:1301 api/classes/CTemplateScreen.php:775
+#: api/classes/CScreen.php:578 api/classes/CService.php:1252
+#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
 #: api/classes/CTrigger.php:1444 api/classes/CTrigger.php:1702
@@ -8493,7 +8493,7 @@ msgstr "Не указан файл приватного ключа для ком
 msgid "No private key file specified."
 msgstr "Файл приватного ключа не указан."
 
-#: include/views/administration.proxy.list.php:42 popup.php:1942
+#: include/views/administration.proxy.list.php:42 popup.php:1936
 msgid "No proxies defined."
 msgstr "Прокси не заданы."
 
@@ -8533,7 +8533,7 @@ msgstr "Не указан ID комплексного экрана для эле
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:46
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:37 popup.php:1743 popup.php:1801
+#: include/views/monitoring.screen.php:37 popup.php:1737 popup.php:1795
 msgid "No screens defined."
 msgstr "Комплексные экраны не заданы."
 
@@ -8541,7 +8541,7 @@ msgstr "Комплексные экраны не заданы."
 msgid "No script specified for action operation command."
 msgstr "Не указан скрипт для команды в операции действия."
 
-#: include/views/administration.script.list.php:34 popup.php:1968
+#: include/views/administration.script.list.php:34 popup.php:1962
 msgid "No scripts defined."
 msgstr "Скрипты не заданы."
 
@@ -8551,7 +8551,7 @@ msgid "No slide shows defined."
 msgstr "Слайд-шоу не заданы."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:111 popup.php:1684
+#: include/views/monitoring.slides.php:111 popup.php:1678
 msgid "No slides defined."
 msgstr "Слайды не заданы."
 
@@ -8670,7 +8670,7 @@ msgstr "Нода"
 msgid "None"
 msgstr "Пусто"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1423
+#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1417
 msgid "Normal"
 msgstr "Нормальный"
 
@@ -9504,7 +9504,7 @@ msgstr "Персидский (fa_IR)"
 msgid "Peta"
 msgstr "Пета"
 
-#: include/graphs.inc.php:26 popup.php:1417
+#: include/graphs.inc.php:26 popup.php:1411
 msgid "Pie"
 msgstr "Круговой"
 
@@ -10190,7 +10190,7 @@ msgstr "Объединение строк"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Объединение строк у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s слишком большое."
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -10777,8 +10777,8 @@ msgstr "Секунд"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/js/configuration.sysmaps.js.php:104 popup_bitem.php:119
 #: popup.php:652 popup.php:722 popup.php:779 popup.php:876 popup.php:940
-#: popup.php:1071 popup.php:1180 popup.php:1268 popup.php:1434 popup.php:1541
-#: popup.php:1612 popup.php:1723 popup.php:1785 popup.php:2040
+#: popup.php:1071 popup.php:1180 popup.php:1268 popup.php:1428 popup.php:1535
+#: popup.php:1606 popup.php:1717 popup.php:1779 popup.php:2034
 #: popup_right.php:109 popup_usrgrp.php:102 tr_logform.php:274
 msgid "Select"
 msgstr "Выбрать"
@@ -10870,7 +10870,7 @@ msgstr "Серийный номер A"
 msgid "Serial number B"
 msgstr "Серийный номер B"
 
-#: include/views/administration.script.list.php:67 popup.php:2025
+#: include/views/administration.script.list.php:67 popup.php:2019
 #: queue.php:186
 msgid "Server"
 msgstr "Сервер"
@@ -10891,33 +10891,33 @@ msgstr "Время на сервере"
 msgid "Service"
 msgstr "Услуга"
 
-#: api/classes/CService.php:1332
+#: api/classes/CService.php:1298
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Услуга \"%1$s\" не может быть удалена, потому что другая услуга зависит от неё."
 
-#: api/classes/CService.php:1353
+#: api/classes/CService.php:1319
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Услуга \"%1$s\" не может зависеть сама от себя."
 
-#: api/classes/CService.php:1432
+#: api/classes/CService.php:1398
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Услуга \"%1$s\" не может быть связана с триггером и быть подчиненной одновременно."
 
-#: api/classes/CService.php:1407
+#: api/classes/CService.php:1373
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Услуга \"%1$s\" уже жестко связана с другой услугой."
 
-#: api/classes/CService.php:1250
+#: api/classes/CService.php:1216
 msgid "Service cannot be parent and child at the same time."
 msgstr "Услуга не может быть родительской и подчиненной одновременно."
 
 #: services.php:164
 msgid "Service created"
-msgstr ""
+msgstr "Сервис создан"
 
 #: services.php:116
 msgid "Service deleted"
@@ -10947,7 +10947,7 @@ msgstr "Услуга обновлена"
 msgid "Services"
 msgstr "Услуги"
 
-#: api/classes/CService.php:1483
+#: api/classes/CService.php:1449
 msgid "Services form a circular dependency."
 msgstr "Услуги образуют круговую зависимость."
 
@@ -11265,7 +11265,7 @@ msgstr "Указанный скрипт не существует или вы н
 msgid "Speed"
 msgstr "Скорость"
 
-#: include/graphs.inc.php:25 popup.php:1414
+#: include/graphs.inc.php:25 popup.php:1408
 msgid "Stacked"
 msgstr "Стэкируемый"
 
@@ -11306,7 +11306,7 @@ msgstr "Состояние"
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.triggers.list.php:97 popup_media.php:138
 #: popup.php:544 popup.php:980 popup.php:1098 popup.php:1206 popup.php:1215
-#: popup.php:1633 srv_status.php:157 tr_status.php:285
+#: popup.php:1627 srv_status.php:157 tr_status.php:285
 msgid "Status"
 msgstr "Состояние"
 
@@ -12168,8 +12168,8 @@ msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не мог�
 #: include/views/js/configuration.sysmaps.js.php:12
 #: include/views/js/configuration.sysmaps.js.php:355
 #: include/views/monitoring.overview.php:32 popup_media.php:121 popup.php:512
-#: popup.php:1096 popup.php:1204 popup.php:1213 popup.php:1492 popup.php:1500
-#: popup.php:1631 tr_logform.php:299 tr_logform.php:303
+#: popup.php:1096 popup.php:1204 popup.php:1213 popup.php:1486 popup.php:1494
+#: popup.php:1625 tr_logform.php:299 tr_logform.php:303
 msgid "Type"
 msgstr "Тип"
 
@@ -12198,7 +12198,7 @@ msgstr "Тип вычисления"
 #: include/views/configuration.item.edit.php:209
 #: include/views/configuration.item.edit.php:220
 #: include/views/configuration.item.massupdate.php:165 popup.php:1097
-#: popup.php:1205 popup.php:1214 popup.php:1493 popup.php:1501 popup.php:1632
+#: popup.php:1205 popup.php:1214 popup.php:1487 popup.php:1495 popup.php:1626
 msgid "Type of information"
 msgstr "Тип информации"
 

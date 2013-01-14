@@ -2,18 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-09 18:36+0200\n"
-"PO-Revision-Date: 2013-01-06 22:04+0200\n"
-"Last-Translator: Fahri Hasan <fahri_hasan@hotmail.com>\n"
+"POT-Creation-Date: 2013-01-13 22:29+0200\n"
+"PO-Revision-Date: 2013-01-12 23:52+0200\n"
+"Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Pootle 2.1.6\n"
-"X-Poedit-Language: Bulgarian\n"
-"X-Poedit-Country: BULGARIA\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
@@ -61,8 +59,8 @@ msgstr[1] "%1$s Елементи на данните"
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] "%1$s неуспешен опит за влизане в системата. Последният неуспешен опит е от %2$s %3$s в %4$s."
-msgstr[1] "%1$s неуспешни опити за влизане в системата. Последният неуспешен опит е от %2$s %3$s в %4$s."
+msgstr[0] "%1$s неуспешен опит за влизане в системата. Последният неуспешен опит е от IP %2$s на %3$s в %4$s."
+msgstr[1] "%1$s неуспешни опита за влизане в системата. Последният неуспешен опит е от IP %2$s на %3$s в %4$s."
 
 #: include/blocks.inc.php:960
 #, php-format
@@ -108,8 +106,8 @@ msgstr "(минимум 60 секунди, 0 - използване подраз
 msgid "(no proxy)"
 msgstr "(без прокси)"
 
-#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1881
-#: popup.php:1882
+#: include/views/configuration.screen.constructor.edit.php:475 popup.php:1875
+#: popup.php:1876
 msgid "- all groups -"
 msgstr "- всички групи -"
 
@@ -493,7 +491,7 @@ msgid "Age less than %s"
 msgstr "Възраст по-малка от %s"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
-#: include/views/configuration.httpconf.edit.php:114 popup.php:2022
+#: include/views/configuration.httpconf.edit.php:114 popup.php:2016
 msgid "Agent"
 msgstr "Агент"
 
@@ -757,6 +755,7 @@ msgid "Automatic"
 msgstr "Автоматично"
 
 #: include/views/configuration.sysmap.edit.php:78
+#, fuzzy
 msgid "Automatic icon mapping"
 msgstr "Автоматично съответствие на икона"
 
@@ -880,7 +879,7 @@ msgstr "Ярък"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Български (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -930,7 +929,7 @@ msgstr "КОНФИГУРАЦИЯ НА ГРАФИКИ"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
-msgstr "КОНФИГУРАЦИЯ НА ГРАФИЧНИЯ ПОТРЕБИТЕЛСКИ ИНТЕРФЕЙС"
+msgstr "КОНФИГУРАЦИЯ НА ГРАФИЧЕН ПОТРЕБИТЕЛСКИ ИНТЕРФЕЙС"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -946,6 +945,7 @@ msgid "CONFIGURATION OF HOUSEKEEPER"
 msgstr "КОНФИГУРАЦИЯ ИЗЧИСТВАНЕ НА ИСТОРИЯ"
 
 #: adm.iconmapping.php:127
+#, fuzzy
 msgid "CONFIGURATION OF ICON MAPPING"
 msgstr "КОНФИГУРАЦИЯ СЪОТВЕТСТВИЕ НА ИКОНА"
 
@@ -981,7 +981,7 @@ msgstr "КОНФИГУРАЦИЯ ПЕРИОДИ НА ПОДДРЪЖКА"
 #: include/views/administration.mediatypes.edit.php:23
 #: include/views/administration.mediatypes.list.php:27
 msgid "CONFIGURATION OF MEDIA TYPES"
-msgstr "КОНФИГУРАЦИЯ НА МЕТОДИ НА УВЕДОМЛЕНИЕ"
+msgstr "КОНФИГУРАЦИЯ МЕТОДИ НА УВЕДОМЛЕНИЕ"
 
 #: sysmap.php:121 sysmaps.php:215
 msgid "CONFIGURATION OF NETWORK MAPS"
@@ -1323,11 +1323,12 @@ msgid "Cannot create host group."
 msgstr "Не може да се създаде хост група."
 
 #: adm.iconmapping.php:82
+#, fuzzy
 msgid "Cannot create icon map"
 msgstr "Не може да се създаде съответствие на икона"
 
 #: api/classes/CIconMap.php:259 api/classes/CIconMap.php:319
-#, php-format
+#, fuzzy, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Не може да се създаде съответствие на икона с идентично име \"%s\"."
 
@@ -1388,7 +1389,7 @@ msgstr "Не може да се изтрият графиките"
 
 #: api/classes/CGraphPrototype.php:808
 msgid "Cannot delete graphs created by low level discovery."
-msgstr "Не може да се изтрият графиките, създадени с ниско ниво на откритие."
+msgstr "Не може да се изтрият графиките, създадени с ниско ниво на откриване."
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1403,6 +1404,7 @@ msgid "Cannot delete host group."
 msgstr "Не може да се изтрие хост групата."
 
 #: adm.iconmapping.php:95
+#, fuzzy
 msgid "Cannot delete icon map"
 msgstr "Не може да се изтрие съответствие на икона"
 
@@ -1533,7 +1535,7 @@ msgstr "Не може да се изтрият тригерите"
 
 #: api/classes/CTriggerPrototype.php:963
 msgid "Cannot delete triggers created by low level discovery."
-msgstr "Не може да се изтрият тригерите, създадени с ниско ниво на откритие."
+msgstr "Не може да се изтрият тригерите, създадени с ниско ниво на откриване."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1606,7 +1608,7 @@ msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери иконата  \"%1$s\" използвана в карта \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
-#, php-format
+#, fuzzy, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери съответствие на икона \"%1$s\" използвана в карта на мрежата \"%2$s\"."
 
@@ -1909,6 +1911,7 @@ msgid "Cannot update hosts"
 msgstr "Не може да се актуализират хостовете"
 
 #: adm.iconmapping.php:77
+#, fuzzy
 msgid "Cannot update icon map"
 msgstr "Не може да се актуализира съответствие на икона"
 
@@ -2027,8 +2030,9 @@ msgid "Caption"
 msgstr "Заглавие"
 
 #: include/forms.inc.php:1908 include/forms.inc.php:2004
+#, fuzzy
 msgid "Case sensitive"
-msgstr "Чувствително към  регистъра (отчитане на главни и малки букви)"
+msgstr "Чувствително към регистъра (отчитане на главни и малки букви)"
 
 #: include/views/configuration.screen.constructor.edit.php:586
 msgid "Center"
@@ -2146,7 +2150,7 @@ msgstr "Изчисти историята и динамиката на пром�
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251
 msgid "Clear history for selected"
-msgstr "Изчисти историята за избраното"
+msgstr "Изчисти историята за избраните"
 
 #: include/views/configuration.host.massupdate.php:119
 msgid "Clear when unlinking"
@@ -2186,7 +2190,7 @@ msgstr "Затвори"
 
 #: include/views/configuration.triggers.edit.php:233
 msgid "Close expression constructor"
-msgstr "Затвори израз конструктора"
+msgstr "Затвори конструктор на изрази"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
@@ -2206,13 +2210,14 @@ msgstr "Цвета не е коректен: очаква шестнадесет
 
 #: include/views/configuration.screen.constructor.edit.php:605
 #: screenedit.php:45
+#, fuzzy
 msgid "Column span"
 msgstr "Участък на колоната"
 
 #: api/classes/CScreenItem.php:613
-#, php-format
+#, fuzzy, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Участъка на колоната за елемент на екрана намиращ се в X - %1$s и Y - %2$s е твърде голям."
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -2240,8 +2245,8 @@ msgstr "Комапдата не може да бъде празна."
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:723
-#: include/views/configuration.action.edit.php:727 popup.php:1974
-#: popup.php:1981
+#: include/views/configuration.action.edit.php:727 popup.php:1968
+#: popup.php:1975
 msgid "Commands"
 msgstr "Команди"
 
@@ -2334,6 +2339,7 @@ msgid "Configuration of housekeeper"
 msgstr "Конфигурация автоматично изчистване на история"
 
 #: adm.iconmapping.php:24
+#, fuzzy
 msgid "Configuration of icon mapping"
 msgstr "Конфигурация съответствие на икона"
 
@@ -2359,7 +2365,7 @@ msgstr "Конфигурация на поддръжка"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr "Конфигурация на методи на уведомление"
+msgstr "Конфигурация методи на уведомление"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
@@ -2526,7 +2532,7 @@ msgstr "Копирай"
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
-msgstr "Копиране на избраното в ..."
+msgstr "Копиране на избраните в ..."
 
 #: api/classes/CUser.php:985
 #, php-format
@@ -2582,6 +2588,7 @@ msgid "Create host group"
 msgstr "Създаване на хост група"
 
 #: adm.iconmapping.php:123
+#, fuzzy
 msgid "Create icon map"
 msgstr "Създаване съответствие на икона"
 
@@ -2904,7 +2911,7 @@ msgstr "Тъмно оранжево"
 
 #: include/reports.inc.php:711
 msgid "Darken"
-msgstr "Тъмно"
+msgstr "Тъмен"
 
 #: dashboard.php:24 include/menu.inc.php:33 include/profiles.inc.php:353
 msgid "Dashboard"
@@ -3184,6 +3191,7 @@ msgid "Delete history of selected items?"
 msgstr "Изтриване историята на избраните елементи на данните?"
 
 #: include/views/administration.general.iconmap.edit.php:142
+#, fuzzy
 msgid "Delete icon map?"
 msgstr "Изтриване съответствие на икона?"
 
@@ -3256,7 +3264,7 @@ msgstr "Изтриване на скрипт?"
 #: include/views/configuration.triggers.list.php:237 sysmaps.php:290
 #: templates.php:612
 msgid "Delete selected"
-msgstr "Изтриване на избраното"
+msgstr "Изтриване на избраните"
 
 #: include/views/configuration.httpconf.list.php:142
 msgid "Delete selected WEB scenarios?"
@@ -3586,7 +3594,7 @@ msgstr "Изключване"
 
 #: include/views/administration.usergroups.list.php:141
 msgid "Disable DEBUG"
-msgstr "Изключване: Отстраняване на грешки"
+msgstr "Изключване Режим за отстраняване на грешки"
 
 #: include/views/administration.usergroups.list.php:142
 msgid "Disable debug mode in selected groups?"
@@ -3621,7 +3629,7 @@ msgstr "Изключване на хост, който се наблюдава �
 #: include/views/configuration.item.prototype.list.php:108
 #: include/views/configuration.triggers.list.php:228
 msgid "Disable selected"
-msgstr "Изключване на избраното"
+msgstr "Изключване на избраните"
 
 #: include/views/configuration.httpconf.list.php:134
 msgid "Disable selected WEB scenarios?"
@@ -3706,7 +3714,7 @@ msgstr "Открито устройство"
 #: include/views/configuration.action.list.php:34 templates.php:463
 #: templates.php:531
 msgid "Discovery"
-msgstr "Откритие"
+msgstr "Откриване"
 
 #: include/views/configuration.discovery.edit.php:46
 msgid "Discovery by proxy"
@@ -3912,7 +3920,7 @@ msgid "Dropdown first entry \"%1$s\"."
 msgstr "Първо влизане в падащо меню \"%1$s\"."
 
 #: adm.gui.php:75
-#, php-format
+#, fuzzy, php-format
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Запомни избраното в падащо меню \"%1$s\"."
 
@@ -4059,7 +4067,7 @@ msgstr "Празен вход."
 msgid "Empty macro."
 msgstr "Празно макро."
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1108
 msgid "Empty name."
 msgstr "Празно име."
 
@@ -4077,7 +4085,7 @@ msgstr "Активиране"
 
 #: include/views/administration.usergroups.list.php:137
 msgid "Enable DEBUG"
-msgstr "Активиране - отстраняване на грешки"
+msgstr "Активиране Режим за отстраняване на грешки"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
@@ -4085,7 +4093,7 @@ msgstr "Активиране на потвърждение"
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
-msgstr "Активиране на режим отстраняване на грешки в избраните групи?"
+msgstr "Активиране режим за отстраняване на грешки в избраните групи?"
 
 #: include/views/administration.general.gui.edit.php:41
 msgid "Enable event acknowledges"
@@ -4115,7 +4123,7 @@ msgstr "Активиране наблюдаване на хостове от и�
 #: include/views/configuration.item.list.php:237
 #: include/views/configuration.triggers.list.php:225
 msgid "Enable selected"
-msgstr "Активиране на избрани"
+msgstr "Активиране на избраните"
 
 #: include/views/configuration.httpconf.list.php:130
 msgid "Enable selected WEB scenarios?"
@@ -4177,7 +4185,7 @@ msgstr "Активиране на избраните тригери?"
 #: include/views/configuration.triggers.list.php:192
 #: include/views/monitoring.overview.php:44 popup_media.php:136 popup.php:1047
 msgid "Enabled"
-msgstr "Активирано"
+msgstr "Активно"
 
 #: include/locales.inc.php:44
 msgid "English (en_GB)"
@@ -4320,8 +4328,8 @@ msgstr "Грешка при изпълнение на SQL [%1$s] в [%2$s]."
 #: include/views/administration.script.edit.php:58
 #: include/views/administration.script.list.php:39
 #: include/views/configuration.action.edit.php:664
-#: include/views/js/configuration.action.edit.js.php:114 popup.php:1973
-#: popup.php:1980
+#: include/views/js/configuration.action.edit.js.php:114 popup.php:1967
+#: popup.php:1974
 msgid "Execute on"
 msgstr "Изпълнение на"
 
@@ -4355,14 +4363,14 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "Изтекъл"
 
-#: include/graphs.inc.php:27 popup.php:1420
+#: include/graphs.inc.php:27 popup.php:1414
 msgid "Exploded"
 msgstr "Разширено кръгова"
 
 #: hosts.php:864 include/views/configuration.screen.list.php:66
 #: sysmaps.php:289 templates.php:610
 msgid "Export selected"
-msgstr "Експортиране на избраното"
+msgstr "Експортиране на избраните"
 
 #: events.php:279
 msgid "Export to CSV"
@@ -4394,7 +4402,7 @@ msgstr "Изразът не може да бъде празен"
 
 #: include/views/configuration.triggers.edit.php:126
 msgid "Expression constructor"
-msgstr "Конструктор на изразяване"
+msgstr "Конструктор на изрази"
 
 #: include/forms.inc.php:1988
 msgid "Expression type"
@@ -4421,7 +4429,7 @@ msgstr "Пт"
 
 #: include/forms.inc.php:1831 include/forms.inc.php:1851
 msgid "FALSE"
-msgstr "НЕВЕРЕН"
+msgstr "ЛЪЖА"
 
 #: include/discovery.inc.php:60
 #: include/views/js/configuration.discovery.edit.js.php:120
@@ -4497,7 +4505,7 @@ msgstr "Поле:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Формата на файла не се поддържа."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
@@ -5063,7 +5071,7 @@ msgstr "Скрий"
 
 #: tr_status.php:206
 msgid "Hide all"
-msgstr "Скрий всичко"
+msgstr "Скрий всички"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Hide disabled scenarios"
@@ -5076,12 +5084,12 @@ msgstr "Скриване на изключени тригери"
 
 #: include/views/monitoring.history.php:108
 msgid "Hide selected"
-msgstr "Скрий избраното"
+msgstr "Скрий избраните"
 
 #: adm.triggerseverities.php:62
 #: include/views/administration.general.triggerSeverity.edit.php:58
 msgid "High"
-msgstr "Високо"
+msgstr "Висок"
 
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
@@ -5155,8 +5163,8 @@ msgstr "Хоризонтално подравняване"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
-#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1490
-#: popup.php:1498 popup.php:1628 queue.php:249 report2.php:235 report5.php:60
+#: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
+#: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "Хост"
@@ -5393,7 +5401,7 @@ msgstr "Хостове актуализирани"
 #: include/reports.inc.php:218 include/reports.inc.php:664
 #: include/reports.inc.php:672
 msgid "Hourly"
-msgstr "Всеки час"
+msgstr "Ежечасово"
 
 #: include/forms.inc.php:1699
 msgid "Hours"
@@ -5563,67 +5571,72 @@ msgstr "Икона етикет за тип"
 
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.iconmap.list.php:23
+#, fuzzy
 msgid "Icon map"
 msgstr "Съответствие на икона"
 
 #: api/classes/CIconMap.php:421
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
 msgstr "Съответствие на икона \"%1$s\" не може да бъде изтрита. Използва се в картата на мрежата \"%2$s\"."
 
 #: api/classes/CIconMap.php:528
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
 msgstr "Съответствие на икона \"%1$s\" се отнася до неправилно iconid \"%2$s\"."
 
 #: api/classes/CIconMap.php:524
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
 msgstr "Съответствие на икона \"%1$s\" се отнася до неправилна връзка на инвентар \"%2$s\"."
 
 #: api/classes/CIconMap.php:276 api/classes/CIconMap.php:353
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%s\" already exists."
 msgstr "Съответствие на икона \"%s\" вече съществува."
 
 #: api/classes/CIconMap.php:538
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
 msgstr "Съответствие на икона \"%s\" не може да има съответствие с празен израз."
 
 #: api/classes/CIconMap.php:542
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
 msgstr "Съответствие на икона \"%s\" не може да има съответствие с глобален израз, които не съществува."
 
 #: api/classes/CIconMap.php:546
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%s\" has incorrect expression."
 msgstr "Съответствие на икона \"%s\" има неправилен израз."
 
 #: api/classes/CIconMap.php:499 api/classes/CIconMap.php:504
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr "Съответствие на икона \"%s\" трябва да има най-малко едно съответствие."
 
 #: adm.iconmapping.php:81
+#, fuzzy
 msgid "Icon map created"
 msgstr "Съответствие на икона създадена"
 
 #: adm.iconmapping.php:95
+#, fuzzy
 msgid "Icon map deleted"
 msgstr "Съответствие на икона изтрита"
 
 #: api/classes/CIconMap.php:256 api/classes/CIconMap.php:316
+#, fuzzy
 msgid "Icon map name cannot be empty."
 msgstr "Името на съответствие на икона не може да бъде празно."
 
 #: adm.iconmapping.php:76
+#, fuzzy
 msgid "Icon map updated"
 msgstr "Съответствие на икона актуализирана"
 
 #: api/classes/CIconMap.php:340
-#, php-format
+#, fuzzy, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr "Съответствие на икона с iconmapid \"%s\" не съществува."
 
@@ -5632,15 +5645,17 @@ msgstr "Съответствие на икона с iconmapid \"%s\" не същ
 #: adm.other.php:107 adm.regexps.php:211 adm.triggerdisplayoptions.php:76
 #: adm.triggerseverities.php:82 adm.valuemapping.php:128
 #: adm.workingtime.php:64
+#, fuzzy
 msgid "Icon mapping"
 msgstr "Съответствие на икона"
 
 #: api/classes/CIconMap.php:552
-#, php-format
+#, fuzzy, php-format
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "В запис съответствие на икона \"%1$s\" за \"%2$s\" вече съществува."
 
 #: jsLoader.php:155
+#, fuzzy
 msgid "Iconmap is not enabled"
 msgstr "Съответствие на икона не е активирано"
 
@@ -5677,11 +5692,11 @@ msgstr "Тип етикет на изображение"
 #: api/classes/CImage.php:343
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr ""
+msgstr "Грешка при зареждане на изображение [%1$s] в [%2$s]."
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "Размера на изображението трябва да бъде по-малко от 1MB."
 
 #: adm.images.php:57
 msgid "Image updated"
@@ -5763,7 +5778,7 @@ msgstr "В процес на изпълнение"
 msgid "Include"
 msgstr "Включва"
 
-#: api/classes/CService.php:1364
+#: api/classes/CService.php:1330
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Неправилна стойност на поле \"soft\" за зависимостта на услугата \"%1$s\"."
@@ -5794,7 +5809,7 @@ msgstr "Неправилен SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Неправилно SNMP community."
 
-#: api/classes/CService.php:1194
+#: api/classes/CService.php:1160
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Неправилно допустимо SLA за услуга \"%1$s\"."
@@ -5907,7 +5922,7 @@ msgstr "Неправилно действие в операция потреби
 msgid "Incorrect action operationid."
 msgstr "Неправилно действие в id на операция. "
 
-#: api/classes/CService.php:1157
+#: api/classes/CService.php:1123
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Неправилен алгоритъм за услуга \"%1$s\"."
@@ -5926,7 +5941,7 @@ msgstr "Подадени са неправилни аргументи за фу�
 msgid "Incorrect arguments passed to method."
 msgstr "Подадени са неправилни аргументи за метода."
 
-#: api/classes/CService.php:1176
+#: api/classes/CService.php:1142
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Неправилно изчислена стойност SLA за услуга \"%1$s\"."
@@ -5961,9 +5976,9 @@ msgid "Incorrect colour \"%1$s\"."
 msgstr "Неправилен цвят \"%1$s\"."
 
 #: api/classes/CScreenItem.php:590
-#, php-format
+#, fuzzy, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Зададен е невелиден диапазон за участък на колона от елемент на екрана намиращ се в X - %1$s и Y - %2$s."
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -6146,7 +6161,7 @@ msgid "Incorrect parameter for operations."
 msgstr "Неправилен параметър за операции."
 
 #: api/classes/CIconMap.php:253
-#, php-format
+#, fuzzy, php-format
 msgid "Incorrect parameter is used for icon map \"%s\"."
 msgstr "Използван е неправилен параметър за съответствие на икона \"%s\"."
 
@@ -6160,7 +6175,7 @@ msgid "Incorrect parameters for condition."
 msgstr "Неправилен параметър за състояние."
 
 #: api/classes/CIconMap.php:311
-#, php-format
+#, fuzzy, php-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
 msgstr "Неправилен параметър за съответствие на икона метод на актуализиране \"%s\"."
 
@@ -6172,12 +6187,12 @@ msgstr "Неправилен параметър за поддръжка"
 msgid "Incorrect parameters for user group."
 msgstr "Неправилен параметър за потребителска група."
 
-#: api/classes/CService.php:1242
+#: api/classes/CService.php:1208
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr "Неправилен параметър за услуга \"%1$s\"."
+msgstr "Неправилен родител за услуга \"%1$s\"."
 
-#: api/classes/CService.php:1245
+#: api/classes/CService.php:1211
 msgid "Incorrect parent service."
 msgstr "Неправилен родител за услуга."
 
@@ -6194,9 +6209,9 @@ msgid "Incorrect resource type provided for screen item."
 msgstr "Зададен е неправилен тип ресурс за елемент на данните на екрана."
 
 #: api/classes/CScreenItem.php:585
-#, php-format
+#, fuzzy, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Зададено е неправилно обединение на редовете за елемент на екрана намиращо се в X - %1$s и Y - %2$s."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6219,12 +6234,12 @@ msgstr "Неправилно време за започване на услуг�
 msgid "Incorrect service time type."
 msgstr "Неправилен тип време за услугата."
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1177
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Неправилно подреждане за услуга \"%1$s\"."
 
-#: api/classes/CService.php:1265
+#: api/classes/CService.php:1231
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Неправилно състояние за услуга  \"%1$s\"."
@@ -6259,7 +6274,7 @@ msgstr "Неправилен времеви период \"%1$s\". Начало�
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Неправилен времеви период \"%1$s\"."
 
-#: api/classes/CService.php:1226
+#: api/classes/CService.php:1192
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Неправилно ID на тригер за услуга \"%1$s\"."
@@ -6461,7 +6476,7 @@ msgstr "Невалидна заявка."
 #: maintenance.php:147 maintenance.php:161 services.php:188 services.php:202
 #, php-format
 msgid "Invalid date \"%s\"."
-msgstr ""
+msgstr "Невалидна дата \"%s\"."
 
 #: api/classes/CUserMacro.php:920
 #, php-format
@@ -6475,11 +6490,11 @@ msgstr "Невалиден формат за ключ на елемент на �
 
 #: maintenance.php:309
 msgid "Invalid maintenance period"
-msgstr ""
+msgstr "Невалиден период на поддръжка"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1503 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Невалидни параметри на метода."
@@ -6635,37 +6650,37 @@ msgstr "Елемента на данните не се обновява. Мол�
 #: api/classes/CItemGeneral.php:376
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
-msgstr "Ключ от елемента на данните \"%1$s\" вече съществува в \"%2$s\" като правило за откриване."
+msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като правило за откриване."
 
 #: api/classes/CItemGeneral.php:382
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr "Ключ от елемента на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните създаден в елемент на данните прототип."
+msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните създаден в елемент на данните прототип."
 
 #: api/classes/CItemGeneral.php:379
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
-msgstr "Ключ от елемента на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните прототип."
+msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните прототип."
 
 #: api/classes/CItemGeneral.php:373
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
-msgstr "Ключ от елемента на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните."
+msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните."
 
 #: api/classes/CItemGeneral.php:385
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
-msgstr "Ключ от елемента на данните \"%1$s\" вече съществува в \"%2$s\" като неизвестен елемент на данните."
+msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като неизвестен елемент на данните."
 
 #: api/classes/CItemGeneral.php:725
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
-msgstr "Ключ от елемента на данните \"%1$s\" вече съществува в \"%2$s\"."
+msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\"."
 
 #: api/classes/CWebCheck.php:644
 #, php-format
 msgid "Item with key \"%s\" already exists."
-msgstr "Ключ от елемента на данните \"%s\" вече съществува."
+msgstr "Ключ от елемент на данните \"%s\" вече съществува."
 
 #: hosts.php:684 hosts.php:761 include/html.inc.php:421
 #: include/html.inc.php:425 include/items.inc.php:733
@@ -6787,13 +6802,13 @@ msgstr "К"
 
 #: include/forms.inc.php:539
 msgid "Keep history"
-msgstr "Пазене история"
+msgstr "Пазене на история"
 
 #: disc_prototypes.php:109 include/views/configuration.item.edit.php:351
 #: include/views/configuration.item.massupdate.php:331 items.php:82
 #: items.php:174
 msgid "Keep history (in days)"
-msgstr "Пазене история (в дни)"
+msgstr "Пазене на история (в дни)"
 
 #: include/views/configuration.item.edit.php:320
 msgid "Keep lost resources period (in days)"
@@ -6807,7 +6822,7 @@ msgstr "Пазене динамиката на промените"
 #: include/views/configuration.item.massupdate.php:341 items.php:89
 #: items.php:175
 msgid "Keep trends (in days)"
-msgstr "Пазене динамиката на промените (в дни)"
+msgstr "Пазене динамика на промените (в дни)"
 
 #: disc_prototypes.php:45 include/forms.inc.php:561
 #: include/views/configuration.host.discovery.list.php:55
@@ -6815,7 +6830,7 @@ msgstr "Пазене динамиката на промените (в дни)"
 #: include/views/configuration.item.list.php:57
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/js/configuration.discovery.edit.js.php:235 items.php:75
-#: popup.php:955 popup.php:1095 popup.php:1203 popup.php:1212 popup.php:1630
+#: popup.php:955 popup.php:1095 popup.php:1203 popup.php:1212 popup.php:1624
 msgid "Key"
 msgstr "Ключ"
 
@@ -7191,7 +7206,7 @@ msgstr "Неуспешно влизане \"%s\"."
 
 #: authentication.php:108 authentication.php:136
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "Неправилно въведено потребителско име или парола."
 
 #: api/classes/CUser.php:845 api/classes/CUser.php:863
 #: api/classes/CUser.php:910
@@ -7335,11 +7350,11 @@ msgstr "Продължителност на поддръжката"
 
 #: include/views/configuration.maintenance.list.php:33
 msgid "Maintenance periods"
-msgstr "Периоди на поддръжката"
+msgstr "Периоди на поддръжка"
 
 #: include/actions.inc.php:50
 msgid "Maintenance status"
-msgstr "Състояние на поддръжката"
+msgstr "Състояние на поддръжка"
 
 #: include/views/configuration.maintenance.edit.php:41
 msgid "Maintenance type"
@@ -7460,7 +7475,7 @@ msgstr "Маркирай останалите"
 
 #: include/views/monitoring.history.php:109
 msgid "Mark selected"
-msgstr "Маркирай избраното"
+msgstr "Маркирай избраните"
 
 #: hosts.php:865 include/views/configuration.host.massupdate.php:225
 #: include/views/configuration.item.list.php:245
@@ -7491,7 +7506,7 @@ msgstr "Главната възлова точка вече съществува
 
 #: adm.gui.php:38 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
-msgstr "Максимален брой елементи, които да се показват вътре в клетката на таблицата"
+msgstr "Максимален брой елементи, които да се показват в клетката на таблицата"
 
 #: adm.gui.php:76
 #, php-format
@@ -7500,7 +7515,7 @@ msgstr "Максимален брой елементи, които да се п�
 
 #: adm.gui.php:35 include/views/administration.general.gui.edit.php:45
 msgid "Max count of events per trigger to show"
-msgstr "Максимален брой на събитията, които се показват в тригера"
+msgstr "Максимален брой събитията, които да се показват в тригера"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
 #: include/config.inc.php:343
@@ -7523,19 +7538,19 @@ msgstr[1] "Максималната дължина на името на хост
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "Максималната стойност за период T е < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "Максималната стойност за период T е = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "Максималната стойност за период T е > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "Максималната стойност за период T НЕ е N"
 
 #: api/classes/CHost.php:1383
 #, php-format
@@ -7638,12 +7653,14 @@ msgid "Message text limit"
 msgstr "Ограничение на текстово съобщение"
 
 #: include/views/administration.users.edit.php:181
+#, fuzzy
 msgid "Message timeout"
-msgstr "Съобщението просрочи времето"
+msgstr "Време преди изключване на съобщенията"
 
 #: include/views/administration.users.edit.php:176
+#, fuzzy
 msgid "Message timeout (seconds)"
-msgstr "Съобщението просрочи времето (секунди)"
+msgstr "Време преди изключване на съобщенията (секунди)"
 
 #: jsLoader.php:160
 msgid "Messages"
@@ -7664,7 +7681,7 @@ msgstr "Микро"
 #: include/reports.inc.php:710
 #: include/views/configuration.screen.constructor.edit.php:600
 msgid "Middle"
-msgstr "Средно"
+msgstr "Средeн"
 
 #: include/func.inc.php:562
 msgid "Milli"
@@ -7711,19 +7728,19 @@ msgstr "Минимално изискване за размер на PHP пос�
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "Минималната стойност за период T е < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "Минималната стойност за период T е = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "Минималната стойност за период T е > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "Минималната стойност за период T НЕ е N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
@@ -7778,12 +7795,12 @@ msgstr "Понеделник"
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:75 popup.php:569
 msgid "Monitored"
-msgstr "Наблюдавано"
+msgstr "Наблюдава се"
 
 #: include/views/configuration.host.edit.php:292
 #: include/views/configuration.host.massupdate.php:66
 msgid "Monitored by proxy"
-msgstr "Наблюдавано чрез прокси"
+msgstr "Наблюдава се чрез прокси"
 
 #: include/views/monitoring.discovery.php:44
 msgid "Monitored host"
@@ -7801,7 +7818,7 @@ msgstr "Месец"
 #: include/reports.inc.php:221 include/reports.inc.php:667
 #: include/reports.inc.php:675 report3.php:62 report4.php:100
 msgid "Monthly"
-msgstr "Месечен"
+msgstr "Ежемесечно"
 
 #: queue.php:164 queue.php:227
 msgid "More than 10 minutes"
@@ -7912,10 +7929,10 @@ msgstr "NTLM автентификация"
 #: popup_httpstep.php:36 popup.php:544 popup.php:633 popup.php:681
 #: popup.php:742 popup.php:794 popup.php:839 popup.php:898 popup.php:955
 #: popup.php:978 popup.php:1094 popup.php:1202 popup.php:1211 popup.php:1287
-#: popup.php:1322 popup.php:1351 popup.php:1491 popup.php:1499 popup.php:1562
-#: popup.php:1565 popup.php:1629 popup.php:1687 popup.php:1690 popup.php:1747
-#: popup.php:1751 popup.php:1802 popup.php:1833 popup.php:1864 popup.php:1904
-#: popup.php:1920 popup.php:1943 popup.php:1972 popup.php:1979
+#: popup.php:1322 popup.php:1351 popup.php:1485 popup.php:1493 popup.php:1556
+#: popup.php:1559 popup.php:1623 popup.php:1681 popup.php:1684 popup.php:1741
+#: popup.php:1745 popup.php:1796 popup.php:1827 popup.php:1858 popup.php:1898
+#: popup.php:1914 popup.php:1937 popup.php:1966 popup.php:1973
 #: popup_right.php:75 popup_usrgrp.php:92 queue.php:250 report2.php:236
 #: screenconf.php:50 services.php:42 slideconf.php:38 sysmaps.php:48
 #: sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41 tr_status.php:293
@@ -8115,11 +8132,11 @@ msgstr "Не са дефинирани данни."
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Няма получени данни през период от време T, тогава N = 1, 0 - в противен случай"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Няма получени данни през период от време T, тогава N НЕ е 1, 0 - в противен случай"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -8141,7 +8158,7 @@ msgstr "Няма подробности"
 msgid "No discoveries defined."
 msgstr "Не са дефинирани откривания."
 
-#: popup.php:1919
+#: popup.php:1913
 msgid "No discovery checks defined."
 msgstr "Не са дефинирани проверки за откриване."
 
@@ -8150,7 +8167,7 @@ msgid "No discovery rule IDs given."
 msgstr "Не уточнено ID на правило за откриване."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:43 popup.php:1903
+#: include/views/configuration.host.discovery.list.php:43 popup.php:1897
 msgid "No discovery rules defined."
 msgstr "Не са дефинирани правила за откриване."
 
@@ -8195,7 +8212,7 @@ msgstr "За елемент от екрана не е уточнено ID на �
 #: include/graphs.inc.php:289
 #, php-format
 msgid "No graph item with graphid \"%s\"."
-msgstr "Няма елемент от графика с graphid \"%s\"."
+msgstr "Няма елемент на графика с graphid \"%s\"."
 
 #: include/views/configuration.graph.list.php:74
 msgid "No graph prototypes defined."
@@ -8245,7 +8262,7 @@ msgid "No host group ID provided for screen element."
 msgstr "Не е определено ID на хост група за елемент от екрана."
 
 #: include/views/configuration.hostgroups.list.php:47 popup.php:678
-#: popup.php:1832 popup.php:1863
+#: popup.php:1826 popup.php:1857
 msgid "No host groups defined."
 msgstr "Не е дефинирана хост група"
 
@@ -8275,6 +8292,7 @@ msgid "No icon for map element \"%s\"."
 msgstr "Няма икона за елемент от карта на мрежата \"%s\"."
 
 #: include/views/administration.general.iconmap.list.php:22
+#, fuzzy
 msgid "No icon map defined."
 msgstr "Не е дефинирано съответствие на икона."
 
@@ -8336,7 +8354,7 @@ msgstr "Няма елемент на данните с itemid=\"%1$s\"."
 #: chart.php:49 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:954 popup.php:1089
-#: popup.php:1452 popup.php:1626
+#: popup.php:1446 popup.php:1620
 msgid "No items defined."
 msgstr "Не са дефинирани елементи на данните."
 
@@ -8356,7 +8374,7 @@ msgstr "Не е дефиниран периода на поддръжката."
 msgid "No map ID provided for screen element."
 msgstr "Не е определено ID на карта на мрежата за елемент от екрана."
 
-#: include/views/monitoring.maps.php:27 popup.php:1559 sysmaps.php:254
+#: include/views/monitoring.maps.php:27 popup.php:1553 sysmaps.php:254
 msgid "No maps defined."
 msgstr "Не са дефинирани карти на мрежата."
 
@@ -8457,8 +8475,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CMap.php:550 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1286
-#: api/classes/CService.php:1301 api/classes/CTemplateScreen.php:775
+#: api/classes/CScreen.php:578 api/classes/CService.php:1252
+#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
 #: api/classes/CTrigger.php:1444 api/classes/CTrigger.php:1702
@@ -8480,7 +8498,7 @@ msgstr "Не е уточнен файла с личен ключ за коман
 msgid "No private key file specified."
 msgstr "Не е уточнен файла с личен ключ."
 
-#: include/views/administration.proxy.list.php:42 popup.php:1942
+#: include/views/administration.proxy.list.php:42 popup.php:1936
 msgid "No proxies defined."
 msgstr "Не са дефинирани проксита."
 
@@ -8520,7 +8538,7 @@ msgstr "Не е определено ID на екран за елемент от
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:46
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:37 popup.php:1743 popup.php:1801
+#: include/views/monitoring.screen.php:37 popup.php:1737 popup.php:1795
 msgid "No screens defined."
 msgstr "Не са дефинирани екрани."
 
@@ -8528,7 +8546,7 @@ msgstr "Не са дефинирани екрани."
 msgid "No script specified for action operation command."
 msgstr "Не е уточнен скрипт за команда в операция на действие."
 
-#: include/views/administration.script.list.php:34 popup.php:1968
+#: include/views/administration.script.list.php:34 popup.php:1962
 msgid "No scripts defined."
 msgstr "Не е дефиниран скрипт."
 
@@ -8538,7 +8556,7 @@ msgid "No slide shows defined."
 msgstr "Не е дефиниран слайдшоу."
 
 #: include/views/configuration.slideconf.edit.php:42
-#: include/views/monitoring.slides.php:111 popup.php:1684
+#: include/views/monitoring.slides.php:111 popup.php:1678
 msgid "No slides defined."
 msgstr "Не са дефинирани слайдове."
 
@@ -8657,7 +8675,7 @@ msgstr "Възлови точки"
 msgid "None"
 msgstr "Нищо"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1423
+#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1417
 msgid "Normal"
 msgstr "Нормално"
 
@@ -8786,27 +8804,27 @@ msgstr "Брой стъпки"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr ""
+msgstr "Броя на успешно извлечени стойности V (които отговарят на оператор O) за период T е < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr ""
+msgstr "Броя на успешно извлечени стойности V (които отговарят на оператор O) за период T е = N"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr ""
+msgstr "Броя на успешно извлечени стойности V (които отговарят на оператор O) за период T е > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr ""
+msgstr "Броя на успешно извлечени стойности V (които отговарят на оператор O) за период T НЕ е N"
 
 #: include/blocks.inc.php:733
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
-msgstr "Брой на тригери (включени/изключени) [проблем/неизвестен/OK]"
+msgstr "Брой тригери (включени/изключени) [проблем/неизвестен/OK]"
 
 #: include/blocks.inc.php:744
 msgid "Number of users (online)"
-msgstr "Брой на потребителите (на линия)"
+msgstr "Брой потребители (на линия)"
 
 #: include/forms.inc.php:417 include/items.inc.php:118
 #: include/triggers.inc.php:2202 include/views/configuration.item.edit.php:216
@@ -8936,6 +8954,7 @@ msgid "Only Super Admins can create host groups."
 msgstr "Само Супер Администраторите могат да създават хост групи."
 
 #: api/classes/CIconMap.php:244
+#, fuzzy
 msgid "Only Super Admins can create icon maps."
 msgstr "Само Супер Администраторите могат да създават съответствие на икона."
 
@@ -8965,6 +8984,7 @@ msgid "Only Super Admins can update global macros."
 msgstr "Само Супер Администраторите могат да актуализират глобални макроси."
 
 #: api/classes/CIconMap.php:300
+#, fuzzy
 msgid "Only Super Admins can update icon maps."
 msgstr "Само Супер Администраторите могат да актуализират съответствие на икона."
 
@@ -9329,13 +9349,13 @@ msgstr "Страницата получи неверни данни"
 
 #: include/reports.inc.php:714
 msgid "Palette"
-msgstr "Палитрата"
+msgstr "Палитра"
 
 #: include/reports.inc.php:704 include/reports.inc.php:705
 #: include/reports.inc.php:706 include/reports.inc.php:707
 #, php-format
 msgid "Palette #%1$s"
-msgstr "Палитрата #%1$s"
+msgstr "Палитра #%1$s"
 
 #: include/blocks.inc.php:702
 #: include/views/configuration.screen.constructor.edit.php:191
@@ -9491,7 +9511,7 @@ msgstr "Персийски (fa_IR)"
 msgid "Peta"
 msgstr "Пета"
 
-#: include/graphs.inc.php:26 popup.php:1417
+#: include/graphs.inc.php:26 popup.php:1411
 msgid "Pie"
 msgstr "Кръгов"
 
@@ -9564,7 +9584,7 @@ msgstr "Португалски (pt_BR)"
 
 #: include/locales.inc.php:64
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "Португалски (pt_PT)"
 
 #: tr_logform.php:303
 msgid "Position"
@@ -9987,7 +10007,7 @@ msgstr "Премахни връзката"
 
 #: include/views/monitoring.history.php:98
 msgid "Remove selected"
-msgstr "Премахни избраното"
+msgstr "Премахни избраните"
 
 #: include/views/configuration.host.massupdate.php:115
 #: include/views/configuration.triggers.edit.php:118
@@ -10027,14 +10047,17 @@ msgid "Required"
 msgstr "Необходимо"
 
 #: api/classes/CIconMap.php:514
+#, fuzzy
 msgid "Required field \"expression\" is missing in icon mapping."
 msgstr "Задължителното поле \"expression\" липсва в съответствие на икона."
 
 #: api/classes/CIconMap.php:520
+#, fuzzy
 msgid "Required field \"iconid\" is missing in icon mapping."
 msgstr "Задължителното поле \"iconid\" липсва в съответствие на икона."
 
 #: api/classes/CIconMap.php:517
+#, fuzzy
 msgid "Required field \"inventory_link\" is missing in icon mapping."
 msgstr "Задължителното поле \"inventory_link\" липсва в съответствие на икона."
 
@@ -10048,7 +10071,7 @@ msgstr "Необходима производителност (vps)"
 
 #: include/blocks.inc.php:745
 msgid "Required server performance, new values per second"
-msgstr "Необходимата производителност на сървъра, нови стойности за секунда"
+msgstr "Необходима производителност на сървъра, нови стойности за секунда"
 
 #: include/views/configuration.httpconf.popup.php:64
 msgid "Required status codes"
@@ -10173,9 +10196,9 @@ msgid "Row span"
 msgstr "Обединение на редове"
 
 #: api/classes/CScreenItem.php:608
-#, php-format
+#, fuzzy, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Обединението на редове за елемент от екрана намиращо се в X - %1$s и Y - %2$s е твърде голямо."
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -10762,8 +10785,8 @@ msgstr "Секунди"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/js/configuration.sysmaps.js.php:104 popup_bitem.php:119
 #: popup.php:652 popup.php:722 popup.php:779 popup.php:876 popup.php:940
-#: popup.php:1071 popup.php:1180 popup.php:1268 popup.php:1434 popup.php:1541
-#: popup.php:1612 popup.php:1723 popup.php:1785 popup.php:2040
+#: popup.php:1071 popup.php:1180 popup.php:1268 popup.php:1428 popup.php:1535
+#: popup.php:1606 popup.php:1717 popup.php:1779 popup.php:2034
 #: popup_right.php:109 popup_usrgrp.php:102 tr_logform.php:274
 msgid "Select"
 msgstr "Изберете"
@@ -10855,7 +10878,7 @@ msgstr "Сериен номер А"
 msgid "Serial number B"
 msgstr "Сериен номер Б"
 
-#: include/views/administration.script.list.php:67 popup.php:2025
+#: include/views/administration.script.list.php:67 popup.php:2019
 #: queue.php:186
 msgid "Server"
 msgstr "Сървър"
@@ -10876,33 +10899,33 @@ msgstr "Време на сървъра"
 msgid "Service"
 msgstr "Услуга"
 
-#: api/classes/CService.php:1332
+#: api/classes/CService.php:1298
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Услуга \"%1$s\" не може да бъде изтрита, защото друга услуга зависи от нея."
 
-#: api/classes/CService.php:1353
+#: api/classes/CService.php:1319
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Услуга \"%1$s\" не може да бъде зависима от себе си."
 
-#: api/classes/CService.php:1432
+#: api/classes/CService.php:1398
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Услуга \"%1$s\" не може да бъде свързан към тригер и да бъде подчинена едновременно."
 
-#: api/classes/CService.php:1407
+#: api/classes/CService.php:1373
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Услуга \"%1$s\" е здраво свързана с друга услуга."
 
-#: api/classes/CService.php:1250
+#: api/classes/CService.php:1216
 msgid "Service cannot be parent and child at the same time."
 msgstr "Услугата не може да бъде родител и подчинен в същото време."
 
 #: services.php:164
 msgid "Service created"
-msgstr ""
+msgstr "Услуга създадена"
 
 #: services.php:116
 msgid "Service deleted"
@@ -10932,7 +10955,7 @@ msgstr "Услуга актуализирана"
 msgid "Services"
 msgstr "Услуги"
 
-#: api/classes/CService.php:1483
+#: api/classes/CService.php:1449
 msgid "Services form a circular dependency."
 msgstr "Услугите образуват кръгова зависимост."
 
@@ -11001,19 +11024,19 @@ msgstr "Покажи събития не по-стари от (в дни) \"%1$s
 
 #: include/triggers.inc.php:1289
 msgid "Show graph of item"
-msgstr "Понажи графика за елемент на данните"
+msgstr "Покажи графика за елемент на данните"
 
 #: dashconf.php:227 tr_status.php:246
 msgid "Show hosts in maintenance"
-msgstr "Понажи хостове в поддръжка"
+msgstr "Покажи хостове в поддръжка"
 
 #: latest.php:136
 msgid "Show items with name like"
-msgstr "Понажи елементи на данните, съдържащи в името"
+msgstr "Покажи елементи на данните, съдържащи в името"
 
 #: latest.php:137
 msgid "Show items without data"
-msgstr "Понажи елементи на данните без данни"
+msgstr "Покажи елементи на данните без данни"
 
 #: include/views/configuration.graph.edit.php:126
 msgid "Show legend"
@@ -11250,7 +11273,7 @@ msgstr "Уточненият скрипт не съществува или не 
 msgid "Speed"
 msgstr "Скорост"
 
-#: include/graphs.inc.php:25 popup.php:1414
+#: include/graphs.inc.php:25 popup.php:1408
 msgid "Stacked"
 msgstr "Подредени"
 
@@ -11291,7 +11314,7 @@ msgstr "Състояние"
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.triggers.list.php:97 popup_media.php:138
 #: popup.php:544 popup.php:980 popup.php:1098 popup.php:1206 popup.php:1215
-#: popup.php:1633 srv_status.php:157 tr_status.php:285
+#: popup.php:1627 srv_status.php:157 tr_status.php:285
 msgid "Status"
 msgstr "Състояние"
 
@@ -11424,7 +11447,7 @@ msgstr "Успешен одит"
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "Сумата от стойностите на период T е < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
@@ -11436,7 +11459,7 @@ msgstr "Сумата на стойностите за период T е > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "Сумата от стойностите на период T НЕ е N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11502,7 +11525,7 @@ msgstr "TELNET агент"
 
 #: httpdetails.php:218
 msgid "TOTAL"
-msgstr "ВСИЧКО"
+msgstr "ОБЩО"
 
 #: tr_comments.php:78
 msgid "TRIGGER COMMENTS"
@@ -11510,7 +11533,7 @@ msgstr "ТРИГЕР КОМЕНТАРИ"
 
 #: include/forms.inc.php:1829 include/forms.inc.php:1848
 msgid "TRUE"
-msgstr "ВЯРНО"
+msgstr "ИСТИНА"
 
 #: include/classes/db/DB.php:198
 #, php-format
@@ -11685,7 +11708,7 @@ msgid "Text"
 msgstr "Текст"
 
 #: api/classes/CImage.php:534
-#, php-format
+#, fuzzy, php-format
 msgid "The image is used in icon map %2$s."
 msgid_plural "The image is used in icon maps %2$s."
 msgstr[0] "Изображението се използва в съответствие на икона %2$s."
@@ -12112,7 +12135,7 @@ msgstr "Вторник"
 
 #: include/locales.inc.php:69
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "Турски (tr_TR)"
 
 #: jsLoader.php:148
 msgid "Two elements should be selected"
@@ -12150,8 +12173,8 @@ msgstr "Двата елемента на данните (\"%1$s\" и \"%2$s\") �
 #: include/views/js/configuration.sysmaps.js.php:12
 #: include/views/js/configuration.sysmaps.js.php:355
 #: include/views/monitoring.overview.php:32 popup_media.php:121 popup.php:512
-#: popup.php:1096 popup.php:1204 popup.php:1213 popup.php:1492 popup.php:1500
-#: popup.php:1631 tr_logform.php:299 tr_logform.php:303
+#: popup.php:1096 popup.php:1204 popup.php:1213 popup.php:1486 popup.php:1494
+#: popup.php:1625 tr_logform.php:299 tr_logform.php:303
 msgid "Type"
 msgstr "Тип"
 
@@ -12180,7 +12203,7 @@ msgstr "Тип на изчислението"
 #: include/views/configuration.item.edit.php:209
 #: include/views/configuration.item.edit.php:220
 #: include/views/configuration.item.massupdate.php:165 popup.php:1097
-#: popup.php:1205 popup.php:1214 popup.php:1493 popup.php:1501 popup.php:1632
+#: popup.php:1205 popup.php:1214 popup.php:1487 popup.php:1495 popup.php:1626
 msgid "Type of information"
 msgstr "Тип на информацията"
 
@@ -12521,6 +12544,7 @@ msgstr "Ниво на горните карти"
 #: include/views/configuration.services.edit.php:284
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:165
+#, fuzzy
 msgid "Uptime"
 msgstr "Време без прекъсване - достъпно (Ъптайм)"
 
@@ -12539,7 +12563,7 @@ msgstr "Потребителски множител"
 
 #: popup_media.php:133
 msgid "Use if severity"
-msgstr "Използвай, ако важността"
+msgstr "Използвай, ако важността е"
 
 #: include/views/administration.mediatypes.list.php:42
 msgid "Used in actions"
@@ -12837,7 +12861,7 @@ msgstr "Видимото име не може да бъде празно, ако
 #: jsLoader.php:125
 msgctxt "Wednesday short"
 msgid "W"
-msgstr "W"
+msgstr "Ср"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
@@ -12975,7 +12999,7 @@ msgstr "Седмица"
 #: include/reports.inc.php:220 include/reports.inc.php:666
 #: include/reports.inc.php:674 report3.php:61 report4.php:99
 msgid "Weekly"
-msgstr "Седмично"
+msgstr "Ежеседмично"
 
 #: popup_media.php:123
 msgid "When active"
@@ -13217,7 +13241,7 @@ msgstr "Година"
 #: include/reports.inc.php:222 include/reports.inc.php:668
 #: include/reports.inc.php:676 report3.php:63 report4.php:101
 msgid "Yearly"
-msgstr "Годишно"
+msgstr "Ежегодно"
 
 #: events.php:756 include/blocks.inc.php:712
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:560
@@ -13232,8 +13256,9 @@ msgid "Yotta"
 msgstr "Йотта"
 
 #: include/views/administration.users.edit.php:105
+#, fuzzy
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
-msgstr "Вие не може да изберете някои от езиците, защото локали за тях не са инсталира на уеб сървъра."
+msgstr "Вие не може да изберете някои от езиците, защото не е инсталирана локализация за тях на уеб сървъра."
 
 #: api/classes/CUser.php:432
 #, php-format
@@ -13485,7 +13510,7 @@ msgstr "агент"
 #: include/views/js/configuration.graph.edit.js.php:45 report4.php:84
 #: report4.php:273
 msgid "all"
-msgstr "Всичко"
+msgstr "Всички"
 
 #: api/classes/CImage.php:306 api/classes/CImage.php:421
 #: api/classes/CUserGroup.php:345
@@ -13829,7 +13854,7 @@ msgstr "обновяване на всеки"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
-msgstr "запомни избраното"
+msgstr "запомни избраните"
 
 #: include/services.inc.php:104 include/services.inc.php:107
 #: include/services.inc.php:200
@@ -13868,6 +13893,7 @@ msgid "short description"
 msgstr "кратко описание"
 
 #: include/views/configuration.sysmap.edit.php:76
+#, fuzzy
 msgid "show icon mappings"
 msgstr "покажи съответствие на икони"
 
