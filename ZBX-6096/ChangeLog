@@ -35,6 +35,10 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6073] fixed page title in Zabbix installation page (Oleg)
+..F....... [ZBX-6102] fixed type of web.httpconf.showdisabled profile record (Sasha)
+A.F....... [ZBX-6099] fixed event.get select_acknowledges count returning incorrect results if no acknowledges exist (Pavels)
+........S. [ZBX-6065] removed useless deletes when housekeeper deletes old history (Sasha)
 A......... [ZBX-6078] fixed graph item creating (Eduards)
 A......... [ZBX-6050] fixed duplicate step name validation in httptest.create and httptest.update (Pavels)
 A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
@@ -85,10 +89,11 @@ Changes for 2.0.5rc1
 New features:
 A.F....... [ZBX-1357] added Bulgarian translation (Richlv)
 ...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 for system.uname check (Sasha)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6063] fixed graph selection pop up working incorrectly when adding a graph to a templated screen (Pavels)
 A.F....... [ZBX-6014] improved performance and removed get_accessible_triggers function (dotneft, Oleg)
 ..F....... [ZBX-6070] fixed event CSV export ignoring the selected page and filters (Pavels)
 ..F....... [ZBX-6006] optimized web interface API calls, which requested redundant data (Toms)
@@ -99,7 +104,7 @@ A......... [ZBX-6054] fixed host write permissions being required to view screen
 ..F....... [ZBX-6037] fixed duplicate frontend messages and changed frontend messages to show last event for 15 triggers instead of last 15 events (Oleg)
 A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance periods validation (Oleg)
 ..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
-A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
+A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-5986] fixed page filter to not use remembered group if selected host is not in that group (Toms)
 ..F....... [ZBX-6013] fixed table layout in Monitoring -> IT services for IE10 (Toms)
 A......... [ZBX-5977] removed possibility to add an LLD rule to an application via the API in application and discovery rule (Oleg)
@@ -1290,7 +1295,7 @@ Changes for 1.8.16rc2
 
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
-A......... [DEV-524] fixed the ability to override LDAP configuration when calling user.login (Pavels)
+A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 .......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
 
 Changes for 1.8.16rc1

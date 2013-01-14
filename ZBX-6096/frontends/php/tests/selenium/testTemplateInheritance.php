@@ -48,30 +48,174 @@ class testTemplateInheritance extends CWebTest {
 	}
 
 	/**
-	 * Creates a new item on the template and checks that the inherited item matches the original.
+	 * Creates a new item on the template and checks that the item matches the original.
 	 *
-	 * @todo implement the test
+	 * @todo
 	 */
 	public function testTemplateInheritance_CreateItem() {
-		$this->markTestIncomplete();
+		$this->login('templates.php');
+
+		// create an item
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click('link=Items');
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', 'Test LLD item1');
+		$this->input_type('key', 'test-general-item');
+		$this->dropdown_select('type', 'Simple check');
+		$this->dropdown_select('value_type', 'Numeric (unsigned)');
+		$this->dropdown_select('data_type', 'Octal');
+		$this->input_type('units', 'units');
+		$this->checkbox_select('multiplier');
+		$this->input_type('formula', 3);
+		$this->input_type('delay', '33');
+		$this->input_type('history', '54');
+		$this->input_type('trends', '55');
+		$this->input_type('description', 'description');
+		$this->dropdown_select('delta', 'Delta (simple change)');
+		$this->dropdown_select('status','Enabled');
+
+		$this->button_click('save');
+		$this->wait();
+
+		// check that the inherited item matches the original
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click('link='.$this->hostName);
+		$this->wait();
+		$this->button_click('link=Items');
+		$this->wait();
+		$this->ok($this->templateName.': Test LLD item1');
+		$this->button_click('link=Test LLD item1');
+		$this->wait();
+		$this->assertElementValue('name', 'Test LLD item1');
+		$this->assertElementValue('key', 'test-general-item');
+		$this->assertElementValue('typename', 'Simple check');
+		$this->assertElementValue('value_type_name', 'Numeric (unsigned)');
+		$this->assertElementValue('data_type_name', 'Octal');
+		$this->assertElementValue('units', 'units');
+		$this->assertElementValue('formula', 3);
+		$this->assertElementValue('delay', '33');
+		$this->assertElementValue('history', '54');
+		$this->assertElementValue('trends', '55');
+		$this->assertElementText('description', 'description');
+		$this->assertElementValue('delta_name', 'Delta (simple change)');
 	}
 
 	/**
 	 * Creates a new trigger on the template and checks that the inherited trigger matches the original.
 	 *
-	 * @todo implement the test
+	 * @todo
 	 */
 	public function testTemplateInheritance_CreateTrigger() {
-		$this->markTestIncomplete();
+		$this->login('templates.php');
+
+		// create a trigger
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Triggers']");
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('description', 'Test LLD trigger1');
+		$this->input_type('expression', '{Inheritance test template:test-general-item.last(0)}=0');
+		$this->checkbox_select('type');
+		$this->input_type('comments', 'comments');
+		$this->input_type('url', 'url');
+		$this->button_click('severity_label_2');
+		$this->checkbox_unselect('status');
+
+		$this->button_click('save');
+		$this->wait();
+
+		// check that the inherited trigger matches the original
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click('link='.$this->hostName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Triggers']");
+		$this->wait();
+
+		$this->ok($this->templateName.': Test LLD trigger1');
+		$this->button_click('link=Test LLD trigger1');
+		$this->wait();
+
+		$this->assertElementValue('description', 'Test LLD trigger1');
+		$this->assertElementValue('expression', '{Template inheritance test host:test-general-item.last(0)}=0');
+		$this->assertTrue($this->isChecked('type'));
+		$this->assertElementText('comments', 'comments');
+		$this->assertElementValue('url', 'url');
+		$this->assertTrue($this->isChecked('severity_2'));
+		$this->assertFalse($this->isChecked('status'));
 	}
 
 	/**
 	 * Creates a new graph on the template and checks that the inherited graph matches the original.
 	 *
-	 * @todo implement the test
+	 * @todo
 	 */
 	public function testTemplateInheritance_CreateGraph() {
-		$this->markTestIncomplete();
+		$this->login('templates.php');
+
+		// create a graph
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Graphs']");
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', 'Test LLD graph1');
+		$this->input_type('width', '950');
+		$this->input_type('height', '250');
+		$this->dropdown_select('graphtype', 'Normal');
+		$this->checkbox_unselect('legend');
+		$this->checkbox_unselect('showworkperiod');
+		$this->checkbox_unselect('showtriggers');
+		$this->checkbox_select('visible_percent_left');
+		$this->input_type('percent_left', '4');
+		$this->input_type('percent_right', '5');
+		$this->checkbox_select('visible_percent_right');
+		$this->dropdown_select('ymin_type', 'Calculated');
+		$this->dropdown_select('ymax_type', 'Calculated');
+		$this->button_click('add_item');
+
+		$this->waitForPopUp("zbx_popup", "30000");
+		$this->selectWindow("name=zbx_popup");
+		$this->button_click('link=Test LLD item1');
+		$this->selectWindow(null);
+		$this->button_click('save');
+
+		// check that the inherited graph matches the original
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click('link='.$this->hostName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Graphs']");
+		$this->wait();
+
+		$this->ok($this->templateName.': Test LLD graph1');
+		$this->button_click('link=Test LLD graph1');
+		$this->wait();
+
+		$this->assertElementValue('name', 'Test LLD graph1');
+		$this->assertElementValue('width', '950');
+		$this->assertElementValue('height', '250');
+		$this->assertAttribute('//*[@id="graphtype"]/option[1]/@selected', 'selected');
+		$this->assertFalse($this->isChecked('legend'));
+		$this->assertFalse($this->isChecked('showworkperiod'));
+		$this->assertFalse($this->isChecked('showtriggers'));
+		$this->assertTrue($this->isChecked('visible_percent_left'));
+		$this->assertElementValue('percent_left', '4.00');
+		$this->assertTrue($this->isChecked('visible_percent_right'));
+		$this->assertElementValue('percent_right', '5.00');
+		$this->assertAttribute('//*[@id="ymin_type"]/option[1]/@selected', 'selected');
+		$this->assertAttribute('//*[@id="ymax_type"]/option[1]/@selected', 'selected');
+		$this->ok('Template inheritance test host: Test LLD item1');
 	}
 
 	/**
@@ -253,10 +397,84 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Creates a new graph prototype on the template and checks that the inherited graph prototype matches the original.
 	 *
-	 * @todo implement the test
+	 * @todo
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
-		$this->markTestIncomplete();
+		$this->login('templates.php');
+
+		// create a graph
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click('link=Discovery rules');
+		$this->wait();
+		$this->button_click('link=Test LLD');
+		$this->wait();
+		$this->button_click('link=Graph prototypes');
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', 'Test LLD graph');
+		$this->input_type('width', '950');
+		$this->input_type('height', '250');
+		$this->dropdown_select('graphtype', 'Normal');
+		$this->checkbox_unselect('legend');
+		$this->checkbox_unselect('showworkperiod');
+		$this->checkbox_unselect('showtriggers');
+		$this->checkbox_select('visible_percent_left');
+		$this->input_type('percent_left', '4');
+		$this->input_type('percent_right', '5');
+		$this->checkbox_select('visible_percent_right');
+		$this->dropdown_select('ymin_type', 'Calculated');
+		$this->dropdown_select('ymax_type', 'Calculated');
+
+		$this->button_click('add_protoitem');
+		$this->waitForPopUp("zbx_popup", "30000");
+		$this->selectWindow("name=zbx_popup");
+		$this->button_click("//span[text()='Test LLD item']");
+		$this->selectWindow(null);
+		sleep(1);
+
+		$this->button_click('add_item');
+		$this->waitForPopUp("zbx_popup", "30000");
+		$this->selectWindow("name=zbx_popup");
+		$this->button_click('link=Test LLD item1');
+		$this->selectWindow(null);
+		sleep(1);
+
+		$this->button_click('save');
+
+		// check that the inherited graph matches the original
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click('link='.$this->hostName);
+		$this->wait();
+		$this->button_click('link=Discovery rules');
+		$this->wait();
+		$this->button_click('link=Test LLD');
+		$this->wait();
+		$this->button_click('link=Graph prototypes');
+		$this->wait();
+
+		$this->ok($this->templateName.': Test LLD graph');
+		$this->button_click('link=Test LLD graph');
+		$this->wait();
+
+		$this->assertElementValue('name', 'Test LLD graph');
+		$this->assertElementValue('width', '950');
+		$this->assertElementValue('height', '250');
+		$this->assertAttribute('//*[@id="graphtype"]/option[1]/@selected', 'selected');
+		$this->assertFalse($this->isChecked('legend'));
+		$this->assertFalse($this->isChecked('showworkperiod'));
+		$this->assertFalse($this->isChecked('showtriggers'));
+		$this->assertTrue($this->isChecked('visible_percent_left'));
+		$this->assertElementValue('percent_left', '4.00');
+		$this->assertTrue($this->isChecked('visible_percent_right'));
+		$this->assertElementValue('percent_right', '5.00');
+		$this->assertAttribute('//*[@id="ymin_type"]/option[1]/@selected', 'selected');
+		$this->assertAttribute('//*[@id="ymax_type"]/option[1]/@selected', 'selected');
+		$this->ok('Template inheritance test host: Test LLD item');
+		$this->ok('Template inheritance test host: Test LLD item1');
 	}
 
 	/**
