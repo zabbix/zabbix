@@ -209,6 +209,8 @@ else {
 	CWebUser::setDefault();
 }
 
+require_once dirname(__FILE__).'/translateDefines.inc.php';
+
 set_zbx_locales();
 
 // init mb strings if it's available
