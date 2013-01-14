@@ -447,8 +447,8 @@ class CZBXAPI {
 	 *
 	 * @param string $tableName
 	 * @param string $tableAlias
-	 * @param array $options
-	 * @param array $sqlParts
+	 * @param array  $options
+	 * @param array  $sqlParts
 	 *
 	 * @return array         The resulting SQL parts array
 	 */
@@ -482,6 +482,15 @@ class CZBXAPI {
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
 			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
 			$sqlParts = $this->addQuerySelect($this->fieldId('*', $tableAlias), $sqlParts);
+		}
+
+		// add fields from order to select if multiple tables are used
+		if (!empty($sqlParts['order'])) {
+			if (count($sqlParts['from']) > 1) {
+				foreach ($sqlParts['order'] as $fieldName => $fieldValue) {
+					$sqlParts['select'][] = $fieldName;
+				}
+			}
 		}
 
 		return $sqlParts;

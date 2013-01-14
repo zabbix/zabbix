@@ -459,11 +459,7 @@ class CTrigger extends CTriggerGeneral {
 						$sqlParts['where'][] = 'i.hostid = h.hostid';
 						$sqlParts['order'][] = 'h.name '.$sortorder;
 						break;
-					case 'lastchange':
-						$sqlParts['order']['t.'.$sortfield] = 't.'.$sortfield.' '.$sortorder;
-						break;
 					default:
-						// if lastchange is not used for ordering, it should be the second order criteria
 						$sqlParts['order']['t.'.$sortfield] = 't.'.$sortfield.' '.$sortorder;
 						break;
 				}
