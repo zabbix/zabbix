@@ -46,9 +46,7 @@ $fields = array(
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	null)
 );
-if (!check_fields($fields)) {
-	exit();
-}
+check_fields($fields);
 
 /*
  * Ajax
@@ -254,27 +252,23 @@ $graphInScreen = new CScreenBase(array(
 	'period' => get_request('period'),
 	'stime' => get_request('stime')
 ));
+$graphInScreen->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($itemIds));
 
-$src = 'chart3.php?'.url_param('period').
+$src = 'chart3.php?'.
 	url_param($db_httptest['name'], false, 'name').
 	url_param(150, false, 'height').
-	url_param(get_request('stime',0), false, 'stime').
 	url_param(HTTPSTEP_ITEM_TYPE_IN, false, 'http_item_type').
 	url_param($db_httptest['httptestid'], false, 'httptestid').
-	url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
+	url_param(GRAPH_TYPE_STACKED, false, 'graphtype').
+	url_param($graphInScreen->timeline['period'], false, 'period').
+	url_param($graphInScreen->timeline['stime'], false, 'stime').
+	url_param($graphInScreen->profileIdx, false, 'profileIdx').
+	url_param($graphInScreen->profileIdx2, false, 'profileIdx2');
 
 $graphInContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_in');
 $graphInContainer->setAttribute('style', 'position: relative');
 $graphInContainer->setAttribute('data-timestamp', time());
 $graphTable->addRow(array(bold(_('Speed')), $graphInContainer));
-
-$timeline = $graphInScreen->calculateTime(array(
-	'profileIdx' => 'web.httptest',
-	'profileIdx2' => get_request('httptestid'),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
-));
-$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($itemIds));
 
 $timeControlData = array(
 	'id' => 'graph_in',
@@ -286,7 +280,7 @@ $timeControlData = array(
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 );
-zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($graphInScreen->timeline).', '.zbx_jsvalue($timeControlData).');');
 $graphInScreen->insertFlickerfreeJs();
 
 /*
@@ -302,13 +296,17 @@ $graphTimeScreen = new CScreenBase(array(
 	'stime' => get_request('stime')
 ));
 
-$src ='chart3.php?'.url_param('period').url_param('from').
+$src ='chart3.php?'.
+	url_param('from').
 	url_param($db_httptest['name'], false, 'name').
 	url_param(150, false, 'height').
-	url_param(get_request('stime',0), false, 'stime').
 	url_param(HTTPSTEP_ITEM_TYPE_TIME, false, 'http_item_type').
 	url_param($db_httptest['httptestid'], false, 'httptestid').
-	url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
+	url_param(GRAPH_TYPE_STACKED, false, 'graphtype').
+	url_param($graphTimeScreen->timeline['period'], false, 'period').
+	url_param($graphTimeScreen->timeline['stime'], false, 'stime').
+	url_param($graphTimeScreen->profileIdx, false, 'profileIdx').
+	url_param($graphTimeScreen->profileIdx2, false, 'profileIdx2');
 
 $graphTimeContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_time');
 $graphTimeContainer->setAttribute('style', 'position: relative');
@@ -325,11 +323,11 @@ $timeControlData = array(
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 );
-zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graphInScreen->timeline).', '.zbx_jsvalue($timeControlData).');');
 $graphTimeScreen->insertFlickerfreeJs();
 
 // scroll
-CScreenBuilder::insertScreenScrollJs(array('timeline' => $timeline, 'profileIdx' => 'web.httptest'));
+CScreenBuilder::insertScreenScrollJs(array('timeline' => $graphInScreen->timeline));
 CScreenBuilder::insertScreenRefreshTimeJs();
 CScreenBuilder::insertProcessObjectsJs();
 
