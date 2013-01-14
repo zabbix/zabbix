@@ -43,7 +43,7 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testFormAdministrationGeneralMacros_setup() {
+	public function testTemplateInheritance_setup() {
 		DBsave_tables('items');
 	}
 
@@ -271,7 +271,7 @@ class testTemplateInheritance extends CWebTest {
 	}
 
 	/**
-	 * Creates a new trigger prototype on the template and checks that the inherited trigger prototype matches
+	 * Creates a new trigger prototype on the template and checks that the inherited item prototype matches
 	 * the original.
 	 *
 	 * @todo match fields for different item types
@@ -343,6 +343,7 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Creates a new trigger prototype on the template and checks that the inherited trigger prototype matches
 	 * the original.
+	 *
 	 */
 	public function testTemplateInheritance_CreateTriggerPrototype() {
 		$this->login('templates.php');
@@ -397,7 +398,6 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Creates a new graph prototype on the template and checks that the inherited graph prototype matches the original.
 	 *
-	 * @todo
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
 		$this->login('templates.php');
@@ -478,10 +478,221 @@ class testTemplateInheritance extends CWebTest {
 	}
 
 	/**
-	 * Restore the original tables.
+	 * Checks all error messages and inccorect entries for a new item on the inheritance template.
+	 *
 	 */
-	public function testFormAdministrationGeneralMacros_teardown() {
-		DBrestore_tables('items');
+	public function testTemplateInheritance_ItemError(){
+		$this->login('templates.php');
+
+		// create an item
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click('link=Items');
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', 'Test LLD itemErr');
+		$this->input_type('key', 'test-error-item');
+		$this->dropdown_select('type', 'Simple check');
+		$this->dropdown_select('value_type', 'Numeric (unsigned)');
+		$this->dropdown_select('data_type', 'Octal');
+		$this->input_type('units', 'units');
+		$this->checkbox_select('multiplier');
+		$this->input_type('formula', 3);
+		$this->input_type('delay', '33');
+		$this->input_type('history', '54');
+		$this->input_type('trends', '55');
+		$this->input_type('description', 'description');
+		$this->dropdown_select('delta', 'Delta (simple change)');
+		$this->dropdown_select('status','Enabled');
+		$this->button_click('save');
+		$this->wait();
+
+		$this->button_click('form');
+		$this->wait();
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "Name": cannot be empty.');
+
+		$this->input_type('name', 'Test LLD itemErr');
+		$this->input_type('key', 'test-error-item');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot add item');
+		$this->ok('Item with key "test-error-item" already exists on "Inheritance test template".');
+
+		$this->input_type('key', '');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "Key": cannot be empty.');
+		$this->input_type('key', 'test-error-item');
+
+		$this->input_type('delay', 'error');
+		$this->button_click('save');
+		$this->wait();
+		$this->nok('Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.');
+
+		$this->input_type('delay', '86401');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.');
+		$this->input_type('delay', '0');
+
+		$this->input_type('new_delay_flex_delay','50000');
+		$this->input_type('new_delay_flex_period','1-11,00:00-24:00');
+		$this->button_click('add_delay_flex');
+		$this->wait();
+		$this->ok('ERROR: Invalid time period');
+		$this->ok('Incorrect time period "1-11,00:00-24:00".');
+
+		$this->input_type('new_delay_flex_delay','50000');
+		$this->input_type('new_delay_flex_period','1-7,00:00-25:00');
+		$this->button_click('add_delay_flex');
+		$this->wait();
+		$this->ok('ERROR: Invalid time period');
+		$this->ok('Incorrect time period "1-7,00:00-25:00".');
+
+		$this->input_type('new_delay_flex_period','1-7,24:00-09:00');
+		$this->button_click('add_delay_flex');
+		$this->wait();
+		$this->ok('ERROR: Invalid time period');
+		$this->ok('Incorrect time period "1-7,24:00-09:00" start time must be less than end time.');
 	}
 
+	/**
+	 * Checks all error messages and inccorect entries for a new trigger on the inheritance template.
+	 *
+	 */
+	public function testTemplateInheritance_TriggerError(){
+		$this->login('templates.php');
+
+		// create a trigger
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Triggers']");
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "Name": cannot be empty.');
+
+		$this->input_type('description', 'Test LLD triggerErr');
+		$this->input_type('expression', '');
+		$this->checkbox_select('type');
+		$this->input_type('comments', 'comments');
+		$this->input_type('url', 'url');
+		$this->button_click('severity_label_2');
+		$this->checkbox_unselect('status');
+		$this->button_click('save');
+		$this->wait();
+
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "expression": cannot be empty.');
+
+		$this->input_type('expression', '123');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot add trigger');
+		$this->ok('Trigger expression must contain at least one host:key reference.');
+
+		$this->input_type('expression', 'abcd');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot add trigger');
+		$this->ok('Incorrect trigger expression. Check expression part starting from "abcd".');
+	}
+
+	/**
+	 * Checks error messages and inccorect entries for a new graph on the inheritance template.
+	 *
+	 */
+	public function testTemplateInheritance_GraphError(){
+		$this->login('templates.php');
+
+		// create a graph
+		$this->button_click('link='.$this->templateName);
+		$this->wait();
+		$this->button_click("//div[@class='w']//a[text()='Graphs']");
+		$this->wait();
+		$this->button_click('form');
+		$this->wait();
+
+		$this->input_type('name', 'Test LLD graphErr');
+		$this->dropdown_select('graphtype', 'Normal');
+		$this->checkbox_unselect('legend');
+		$this->checkbox_unselect('showworkperiod');
+		$this->checkbox_unselect('showtriggers');
+		$this->checkbox_select('visible_percent_left');
+		$this->input_type('percent_left', '4');
+		$this->input_type('percent_right', '5');
+		$this->checkbox_select('visible_percent_right');
+		$this->dropdown_select('ymin_type', 'Calculated');
+		$this->dropdown_select('ymax_type', 'Calculated');
+		$this->button_click('add_item');
+		$this->waitForPopUp("zbx_popup", "30000");
+		$this->selectWindow("name=zbx_popup");
+		sleep(1);
+		$this->button_click('link=Test LLD itemErr');
+		$this->selectWindow(null);
+		$this->button_click('save');
+		$this->wait();
+
+		$this->button_click('form');
+		$this->wait();
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "Name": cannot be empty.');
+
+		$this->input_type('name', 'Test LLD graphErr');
+		$this->input_type('width', '-1');
+		$this->input_type('height', '-2');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.');
+		$this->ok('Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.');
+
+		$this->input_type('width', '65536');
+		$this->input_type('height', '19');
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Page received incorrect data');
+		$this->ok('Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.');
+		$this->ok('Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.');
+
+		$this->input_type('width', 'a');
+		$this->input_type('height', 'b');
+		$this->button_click('save');
+		$this->wait();
+		$this->assertElementValue('width', '0');
+		$this->assertElementValue('height', '0');
+
+		$this->input_type('width', '900');
+		$this->input_type('height', '200');
+		$this->button_click('add_item');
+		$this->waitForPopUp("zbx_popup", "30000");
+		$this->selectWindow("name=zbx_popup");
+		sleep(1);
+		$this->button_click('link=Test LLD itemErr');
+		$this->selectWindow(null);
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('ERROR: Cannot add graph');
+		$this->ok('Graph with name "Test LLD graphErr" already exists in graphs or graph prototypes');
+	}
+
+	/**
+	 * Restore the original tables.
+	 */
+	public function testTemplateInheritance_teardown() {
+		DBrestore_tables('items');
+	}
 }
