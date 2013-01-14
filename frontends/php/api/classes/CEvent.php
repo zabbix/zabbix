@@ -496,15 +496,21 @@ class CEvent extends CZBXAPI {
 				$result = $relationMap->mapMany($result, $acknowledges, 'acknowledges');
 			}
 			else {
-				$res = DBselect(
+				$acknowledges = DBFetchArrayAssoc(DBselect(
 					'SELECT COUNT(a.acknowledgeid) AS rowscount,a.eventid'.
 						' FROM acknowledges a'.
 						' WHERE '.dbConditionInt('a.eventid', $eventIds).
 						' GROUP BY a.eventid'
-				);
-				while ($ack = DBfetch($res)) {
-					$result[$ack['eventid']]['acknowledges'] = $ack['rowscount'];
+				), 'eventid');
+				foreach ($result as &$event) {
+					if ((isset($acknowledges[$event['eventid']]))) {
+						$event['acknowledges'] = $acknowledges[$event['eventid']]['rowscount'];
+					}
+					else {
+						$event['acknowledges'] = 0;
+					}
 				}
+				unset($event);
 			}
 		}
 
