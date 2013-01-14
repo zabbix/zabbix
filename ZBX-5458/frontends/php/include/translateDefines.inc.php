@@ -41,6 +41,7 @@ define('REPORT4_ANNUALLY_DATE_FORMAT', _x('Y', 'date format'));
 define('REPORT4_MONTHLY_DATE_FORMAT', _('M Y'));
 define('REPORT4_DAILY_DATE_FORMAT', _('d M Y'));
 define('REPORT4_WEEKLY_DATE_FORMAT', _('d M Y H:i'));
+define('FILTER_TIMEBAR_DATE_FORMAT', _('d M Y H:i'));
 define('REPORTS_BAR_REPORT_DATE_FORMAT', _('d M Y H:i:s'));
 define('POPUP_PERIOD_CAPTION_DATE_FORMAT', _('d M Y H:i:s'));
 define('MAPS_DATE_FORMAT', _('Y.m.d H:i:s'));

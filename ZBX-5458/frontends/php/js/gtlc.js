@@ -1057,10 +1057,10 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
 
 		// info left
-		this.dom.info_left.innerHTML = new Date((usertime - period) * 1000).format(locale['S_date_dmyhi']);
+		this.dom.info_left.innerHTML = new Date((usertime - period) * 1000).format(locale['S_DATE_FORMAT']);
 
 		// info right
-		var right_info = new Date(usertime * 1000).format(locale['S_date_dmyhi']);
+		var right_info = new Date(usertime * 1000).format(locale['S_DATE_FORMAT']);
 
 		if (timeControl.timeline.now()) {
 			right_info += ' (' + locale['S_NOW_SMALL'] + '!) ';
