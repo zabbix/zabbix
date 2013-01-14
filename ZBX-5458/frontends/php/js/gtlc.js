@@ -1054,17 +1054,13 @@ var CScrollBar = Class.create(CDebug, {
 			return;
 		}
 
-		var userstarttime = usertime - period;
-
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
 
 		// info left
-		var date = this.dateToArray(userstarttime);
-		this.dom.info_left.innerHTML = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
+		this.dom.info_left.innerHTML = new Date((usertime - period) * 1000).format(locale['S_date_dmyhi']);
 
 		// info right
-		var date = this.dateToArray(usertime);
-		var right_info = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
+		var right_info = new Date(usertime * 1000).format(locale['S_date_dmyhi']);
 
 		if (timeControl.timeline.now()) {
 			right_info += ' (' + locale['S_NOW_SMALL'] + '!) ';
@@ -1073,19 +1069,6 @@ var CScrollBar = Class.create(CDebug, {
 
 		// seting zoom link styles
 		this.setZoomLinksStyle();
-	},
-
-	dateToArray: function(unixtime) {
-		var date = new CDate(unixtime * 1000),
-			dateArray = [date.getDate(), date.getMonth() + 1, date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds()];
-
-		for (var i = 0; i < dateArray.length; i++) {
-			if ((dateArray[i] + '').length < 2) {
-				dateArray[i] = '0' + dateArray[i];
-			}
-		}
-
-		return dateArray;
 	},
 
 	getmousexy: function(e) {
