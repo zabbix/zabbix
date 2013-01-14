@@ -193,7 +193,7 @@ class CUserMedia extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'm');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'm');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

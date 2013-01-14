@@ -250,7 +250,7 @@ class CEvent extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, $this->tableAlias());
+		$this->dbSorting($sqlParts, $options, $sortColumns, $this->tableAlias());
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

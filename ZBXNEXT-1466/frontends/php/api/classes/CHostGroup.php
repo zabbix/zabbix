@@ -343,7 +343,7 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'g');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'g');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

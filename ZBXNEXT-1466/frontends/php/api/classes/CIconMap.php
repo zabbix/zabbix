@@ -116,7 +116,7 @@ class CIconMap extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'im');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'im');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

@@ -484,15 +484,6 @@ class CZBXAPI {
 			$sqlParts = $this->addQuerySelect($this->fieldId('*', $tableAlias), $sqlParts);
 		}
 
-		// add fields from order to select if multiple tables are used
-		if (!empty($sqlParts['order'])) {
-			if (count($sqlParts['from']) > 1) {
-				foreach ($sqlParts['order'] as $fieldName => $fieldValue) {
-					$sqlParts['select'][] = $fieldName;
-				}
-			}
-		}
-
 		return $sqlParts;
 	}
 
@@ -565,7 +556,7 @@ class CZBXAPI {
 	 */
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if ($this->sortColumns && $options['countOutput'] === null) {
-			zbx_db_sorting($sqlParts, $options, $this->sortColumns, $tableAlias);
+			$this->dbSorting($sqlParts, $options, $this->sortColumns, $tableAlias);
 		}
 
 		return $sqlParts;
@@ -763,5 +754,81 @@ class CZBXAPI {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Apply sort fields to sql builded query.
+	 *
+	 * @param array  $sqlParts
+	 * @param array  $options
+	 * @param array  $sortColumns
+	 * @param string $alias
+	 *
+	 * @throws APIException
+	 */
+	protected function dbSorting(&$sqlParts, $options, $sortColumns, $alias) {
+		if (!zbx_empty($options['sortfield'])) {
+			$options['sortfield'] = is_array($options['sortfield'])
+				? array_unique($options['sortfield'])
+				: array($options['sortfield']);
+
+			foreach ($options['sortfield'] as $i => $sortfield) {
+				// validate sortfield
+				if (!str_in_array($sortfield, $sortColumns)) {
+					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
+				}
+
+				// add sort field to order
+				$sortorder = '';
+				if (is_array($options['sortorder'])) {
+					if (!empty($options['sortorder'][$i])) {
+						$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
+					}
+				}
+				else {
+					$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
+				}
+
+				$this->dbSortingFieldProcessing($sqlParts, $sortfield, $sortorder, $alias);
+
+				// add sort field to select if distinct is used
+				if (count($sqlParts['from']) > 1) {
+					if (!str_in_array($alias.'.'.$sortfield, $sqlParts['select']) && !str_in_array($alias.'.*', $sqlParts['select'])) {
+						$sqlParts['select'][$sortfield] = $alias.'.'.$sortfield;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Process sort field during $this->dbSorting().
+	 *
+	 * @param array  $sqlParts
+	 * @param string $sortfield
+	 * @param string $sortorder
+	 * @param string $alias
+	 */
+	protected function dbSortingFieldProcessing(&$sqlParts, $sortfield, $sortorder, $alias) {
+		$sqlParts['order'][] = $alias.'.'.$sortfield.$sortorder;
+	}
+
+	/**
+	 * Add new sort field to options.
+	 *
+	 * @param array  $options
+	 * @param string $sortfield
+	 * @param string $sortorder
+	 */
+	protected function addDbSortingField(&$options, $sortfield, $sortorder) {
+		if (!is_array($options['sortfield'])) {
+			$options['sortfield'] = array($options['sortfield']);
+		}
+		if (!is_array($options['sortorder'])) {
+			$options['sortorder'] = array($options['sortorder']);
+		}
+
+		$options['sortfield'][] = $sortfield;
+		$options['sortorder'][] = $sortorder;
 	}
 }

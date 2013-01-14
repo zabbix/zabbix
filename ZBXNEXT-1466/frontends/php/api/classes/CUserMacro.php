@@ -195,8 +195,8 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'hm');
-		zbx_db_sorting($sqlPartsGlobal, $options, $sortColumns, 'gm');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'hm');
+		$this->dbSorting($sqlPartsGlobal, $options, $sortColumns, 'gm');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

@@ -197,7 +197,7 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'ht');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'ht');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

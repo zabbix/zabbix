@@ -202,7 +202,7 @@ class CDService extends CZBXAPI{
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'ds');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'ds');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

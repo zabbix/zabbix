@@ -382,7 +382,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 't');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 't');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

@@ -116,7 +116,7 @@ class CGraphItem extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'gi');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'gi');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

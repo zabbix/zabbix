@@ -201,7 +201,7 @@ class CApplication extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'a');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'a');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

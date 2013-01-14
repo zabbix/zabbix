@@ -203,7 +203,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 's');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 's');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

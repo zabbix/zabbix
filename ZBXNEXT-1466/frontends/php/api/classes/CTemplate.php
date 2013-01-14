@@ -284,7 +284,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'h');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'h');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

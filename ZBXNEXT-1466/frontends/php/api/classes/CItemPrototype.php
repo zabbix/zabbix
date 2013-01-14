@@ -226,7 +226,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'i');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'i');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

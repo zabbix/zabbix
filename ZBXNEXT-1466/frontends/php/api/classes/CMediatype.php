@@ -155,7 +155,7 @@ class CMediatype extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'mt');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'mt');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

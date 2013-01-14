@@ -150,7 +150,7 @@ class CDCheck extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'dc');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'dc');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

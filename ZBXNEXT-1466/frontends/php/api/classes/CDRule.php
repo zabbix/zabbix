@@ -168,7 +168,7 @@ class CDRule extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'dr');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'dr');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

@@ -156,7 +156,7 @@ class CUser extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'u');
+		$this->dbSorting($sqlParts, $options, $sortColumns, 'u');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
