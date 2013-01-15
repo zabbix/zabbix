@@ -1043,13 +1043,6 @@ class CItem extends CItemGeneral {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-		if (!API::Template()->isReadable($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
@@ -1062,7 +1055,7 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true,
 			'selectApplications' => API_OUTPUT_REFER,
 			'output' => $selectFields,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
 		foreach ($items as $inum => $item) {
