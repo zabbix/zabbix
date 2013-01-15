@@ -252,18 +252,17 @@ $graphInScreen = new CScreenBase(array(
 	'period' => get_request('period'),
 	'stime' => get_request('stime')
 ));
-$graphInScreen->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($itemIds));
+$graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemIds));
 
-$src = 'chart3.php?'.
-	url_param($db_httptest['name'], false, 'name').
-	url_param(150, false, 'height').
-	url_param(HTTPSTEP_ITEM_TYPE_IN, false, 'http_item_type').
-	url_param($db_httptest['httptestid'], false, 'httptestid').
-	url_param(GRAPH_TYPE_STACKED, false, 'graphtype').
-	url_param($graphInScreen->timeline['period'], false, 'period').
-	url_param($graphInScreen->timeline['stime'], false, 'stime').
-	url_param($graphInScreen->profileIdx, false, 'profileIdx').
-	url_param($graphInScreen->profileIdx2, false, 'profileIdx2');
+$src = 'chart3.php?height=150'.
+	'&name='.$db_httptest['name'].
+	'&http_item_type='.HTTPSTEP_ITEM_TYPE_IN.
+	'&httptestid='.$db_httptest['httptestid'].
+	'&graphtype='.GRAPH_TYPE_STACKED.
+	'&period='.$graphInScreen->timeline['period'].
+	'&stime='.$graphInScreen->timeline['stime'].
+	'&profileIdx='.$graphInScreen->profileIdx.
+	'&profileIdx2='.$graphInScreen->profileIdx2;
 
 $graphInContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_in');
 $graphInContainer->setAttribute('style', 'position: relative');
@@ -296,17 +295,16 @@ $graphTimeScreen = new CScreenBase(array(
 	'stime' => get_request('stime')
 ));
 
-$src ='chart3.php?'.
-	url_param('from').
-	url_param($db_httptest['name'], false, 'name').
-	url_param(150, false, 'height').
-	url_param(HTTPSTEP_ITEM_TYPE_TIME, false, 'http_item_type').
-	url_param($db_httptest['httptestid'], false, 'httptestid').
-	url_param(GRAPH_TYPE_STACKED, false, 'graphtype').
-	url_param($graphTimeScreen->timeline['period'], false, 'period').
-	url_param($graphTimeScreen->timeline['stime'], false, 'stime').
-	url_param($graphTimeScreen->profileIdx, false, 'profileIdx').
-	url_param($graphTimeScreen->profileIdx2, false, 'profileIdx2');
+$src = 'chart3.php?height=150'.
+	'&name='.$db_httptest['name'].
+	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
+	'&httptestid='.$db_httptest['httptestid'].
+	'&graphtype='.GRAPH_TYPE_STACKED.
+	'&period='.$graphTimeScreen->timeline['period'].
+	'&stime='.$graphTimeScreen->timeline['stime'].
+	'&profileIdx='.$graphTimeScreen->profileIdx.
+	'&profileIdx2='.$graphTimeScreen->profileIdx2
+	.url_param('from');
 
 $graphTimeContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_time');
 $graphTimeContainer->setAttribute('style', 'position: relative');

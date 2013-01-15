@@ -356,12 +356,12 @@ class CScreenBase {
 
 			if ($stimeUnix > $time || zbxAddSecondsToUnixtime($options['period'], $stimeUnix) > $time) {
 				$stimeNow = $options['stime'];
-				$options['stime'] = date('YmdHis', $time - $options['period']);
-				$usertime = date('YmdHis', $time);
+				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
+				$usertime = date(TIMESTAMP_FORMAT, $time);
 				$isNow = true;
 			}
 			else {
-				$usertime = date('YmdHis', zbxAddSecondsToUnixtime($options['period'], $stimeUnix));
+				$usertime = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime($options['period'], $stimeUnix));
 				$isNow = false;
 			}
 
@@ -374,9 +374,9 @@ class CScreenBase {
 			if (!empty($options['profileIdx'])) {
 				$isNow = CProfile::get($options['profileIdx'].'.isnow', null, $options['profileIdx2']);
 				if ($isNow) {
-					$options['stime'] = date('YmdHis', $time - $options['period']);
-					$usertime = date('YmdHis', $time);
-					$stimeNow = date('YmdHis', zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
+					$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
+					$usertime = date(TIMESTAMP_FORMAT, $time);
+					$stimeNow = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
 
 					if ($options['updateProfile']) {
 						CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
@@ -384,14 +384,14 @@ class CScreenBase {
 				}
 				else {
 					$options['stime'] = CProfile::get($options['profileIdx'].'.stime', null, $options['profileIdx2']);
-					$usertime = date('YmdHis', zbxAddSecondsToUnixtime($options['period'], $options['stime']));
+					$usertime = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime($options['period'], $options['stime']));
 				}
 			}
 
 			if (empty($options['stime'])) {
-				$options['stime'] = date('YmdHis', $time - $options['period']);
-				$usertime = date('YmdHis', $time);
-				$stimeNow = date('YmdHis', zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
+				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
+				$usertime = date(TIMESTAMP_FORMAT, $time);
+				$stimeNow = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
 				$isNow = true;
 
 				if ($options['updateProfile'] && !empty($options['profileIdx'])) {
@@ -405,7 +405,7 @@ class CScreenBase {
 			'period' => $options['period'],
 			'stime' => $options['stime'],
 			'stimeNow' => !empty($stimeNow) ? $stimeNow : $options['stime'],
-			'starttime' => date('YmdHis', $time - ZBX_MAX_PERIOD),
+			'starttime' => date(TIMESTAMP_FORMAT, $time - ZBX_MAX_PERIOD),
 			'usertime' => $usertime,
 			'isNow' => $isNow
 		);
