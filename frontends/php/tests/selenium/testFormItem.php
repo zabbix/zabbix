@@ -53,7 +53,12 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormItem_CheckLayout($itemTypeID, $itemType ) {
 
-		$this->login('items.php');
+		$this->login('hosts.php');
+		$this->button_click('link=Visible host for template linkage');
+		$this->wait();
+		$this->button_click('link=Items');
+		$this->wait();
+
 		$this->checkTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
 
