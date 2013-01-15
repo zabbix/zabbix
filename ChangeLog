@@ -35,6 +35,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6111] removed unused profile key: web.popup.itemtype (Oleg)
 ..F....... [ZBX-6073] fixed page title in Zabbix installation page (Oleg)
 ..F....... [ZBX-6102] fixed type of web.httpconf.showdisabled profile record (Sasha)
 A.F....... [ZBX-6099] fixed event.get select_acknowledges count returning incorrect results if no acknowledges exist (Pavels)
