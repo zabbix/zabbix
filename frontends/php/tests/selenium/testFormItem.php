@@ -48,21 +48,12 @@ class testFormItem extends CWebTest {
 		);
 	}
 
-	public function testFormItem_setup() {
-		DBsave_tables('items');
-	}
-
 	/**
 	 * @dataProvider itemTypes
 	 */
 	public function testFormItem_CheckLayout($itemTypeID, $itemType ) {
 
-		$this->login('hosts.php');
-		$this->button_click('link=Visible host for template linkage');
-		$this->wait();
-		$this->button_click('link=Items');
-		$this->wait();
-
+		$this->login('items.php');
 		$this->checkTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
 
@@ -289,10 +280,6 @@ class testFormItem extends CWebTest {
 				$this->ok('Key');
 				break;
 		}
-	}
-
-	public function testFormItem_teardown() {
-		DBrestore_tables('items');
 	}
 }
 ?>
