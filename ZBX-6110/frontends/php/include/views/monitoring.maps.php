@@ -22,7 +22,6 @@
 require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
 require_once dirname(__FILE__).'/js/monitoring.maps.js.php';
 
-
 $mapWidget = new CWidget('hat_maps');
 $mapTable = new CTable(_('No maps defined.'), 'map map-container');
 $mapTable->setAttribute('style', 'margin-top: 4px;');
@@ -30,14 +29,9 @@ $mapTable->setAttribute('style', 'margin-top: 4px;');
 $icon = $fsIcon = null;
 
 if (!empty($this->data['maps'])) {
-	// no profile record when get by name
-	if (!empty($this->data['mapname'])) {
-		CProfile::update('web.maps.sysmapid', $this->data['sysmapid'], PROFILE_TYPE_ID);
-	}
-
 	$mapComboBox = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
-	foreach ($this->data['maps'] as $sysmapid => $map) {
-		$mapComboBox->addItem($sysmapid, get_node_name_by_elid($sysmapid, null, ': ').$map['name']);
+	foreach ($this->data['maps'] as $sysmapId => $map) {
+		$mapComboBox->addItem($sysmapId, get_node_name_by_elid($sysmapId, null, ': ').$map['name']);
 	}
 
 	$headerForm = new CForm('get');
