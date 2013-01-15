@@ -376,7 +376,7 @@ class CScreenBase {
 				if ($isNow) {
 					$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
 					$usertime = date(TIMESTAMP_FORMAT, $time);
-					$stimeNow = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
+					$stimeNow = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(SEC_PER_YEAR, $options['stime']));
 
 					if ($options['updateProfile']) {
 						CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
@@ -391,7 +391,7 @@ class CScreenBase {
 			if (empty($options['stime'])) {
 				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
 				$usertime = date(TIMESTAMP_FORMAT, $time);
-				$stimeNow = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(31536000, $options['stime'])); // 31536000 = 86400 * 365 = 1 year
+				$stimeNow = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(SEC_PER_YEAR, $options['stime']));
 				$isNow = true;
 
 				if ($options['updateProfile'] && !empty($options['profileIdx'])) {
