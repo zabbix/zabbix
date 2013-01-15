@@ -577,7 +577,7 @@ class CZBXAPI {
 					$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
 				}
 
-				$this->applyQuerySortField($sqlParts, $sortfield, $sortorder, $tableAlias);
+				$this->applyQuerySortField($sortfield, $sortorder, $tableAlias, $sqlParts);
 
 				// add sort field to select if distinct is used
 				if (count($sqlParts['from']) > 1) {
@@ -592,16 +592,16 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Process sort field during $this->applyQuerySortOptions().
+	 * Adds a specific property from the 'sortfield' parameter to the $sqlParts array.
 	 *
-	 * @param array  $sqlParts
 	 * @param string $sortfield
 	 * @param string $sortorder
 	 * @param string $alias
+	 * @param array  $sqlParts
 	 *
 	 * @return array
 	 */
-	protected function applyQuerySortField($sqlParts, $sortfield, $sortorder, $alias) {
+	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		$sqlParts['order'][$alias.'.'.$sortfield] = $alias.'.'.$sortfield.$sortorder;
 
 		return $sqlParts;

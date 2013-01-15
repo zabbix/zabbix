@@ -1946,7 +1946,7 @@ class CTrigger extends CTriggerGeneral {
 		return $sqlParts;
 	}
 
-	protected function applyQuerySortField($sqlParts, $sortfield, $sortorder, $alias) {
+	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		if ($sortfield == 'hostname') {
 			$sqlParts['select']['hostname'] = 'h.name';
 			$sqlParts['from']['functions'] = 'functions f';
@@ -1958,7 +1958,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['order'][] = 'h.name '.$sortorder;
 		}
 		else {
-			parent::applyQuerySortField($sqlParts, $sortfield, $sortorder, $alias);
+			parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
 		}
 	}
 }
