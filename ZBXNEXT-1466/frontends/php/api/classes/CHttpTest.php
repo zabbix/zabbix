@@ -20,8 +20,10 @@
 
 
 class CHttpTest extends CZBXAPI {
+
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
+	protected $sortColumns = array('httptestid', 'name');
 
 	/**
 	 * Get data about web scenarios.
@@ -34,9 +36,6 @@ class CHttpTest extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('httptestid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('httptests' => 'ht.httptestid'),
@@ -196,15 +195,13 @@ class CHttpTest extends CZBXAPI {
 			$this->dbFilter('httptest ht', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'ht');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($httpTest = DBfetch($res)) {

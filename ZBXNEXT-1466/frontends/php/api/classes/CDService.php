@@ -29,8 +29,8 @@
 class CDService extends CZBXAPI{
 
 	protected $tableName = 'dservices';
-
 	protected $tableAlias = 'ds';
+	protected $sortColumns = array('dserviceid', 'dhostid', 'ip');
 
 /**
  * Get Service data
@@ -64,9 +64,6 @@ class CDService extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('dserviceid', 'dhostid', 'ip');
 
 		$sqlParts = array(
 			'select'	=> array('dservices' => 'ds.dserviceid'),
@@ -201,9 +198,6 @@ class CDService extends CZBXAPI{
 			zbx_db_search('dservices ds', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'ds');
-
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -211,6 +205,7 @@ class CDService extends CZBXAPI{
 //-------
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dservice = DBfetch($res)) {

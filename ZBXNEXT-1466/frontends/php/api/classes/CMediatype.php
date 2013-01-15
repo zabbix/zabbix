@@ -30,6 +30,7 @@ class CMediatype extends CZBXAPI {
 
 	protected $tableName = 'media_type';
 	protected $tableAlias = 'mt';
+	protected $sortColumns = array('mediatypeid');
 
 	/**
 	 * Get Media types data
@@ -50,9 +51,6 @@ class CMediatype extends CZBXAPI {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('mediatypeid');
 
 		$sqlParts = array(
 			'select'	=> array('media_type' => 'mt.mediatypeid'),
@@ -154,15 +152,13 @@ class CMediatype extends CZBXAPI {
 			zbx_db_search('media_type mt', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'mt');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($mediatype = DBfetch($res)) {

@@ -25,8 +25,8 @@
 class CTemplate extends CHostGeneral {
 
 	protected $tableName = 'hosts';
-
 	protected $tableAlias = 'h';
+	protected $sortColumns = array('hostid', 'host', 'name');
 
 	/**
 	 * Get Template data
@@ -39,9 +39,6 @@ class CTemplate extends CHostGeneral {
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('hostid', 'host', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('templates' => 'h.hostid'),
@@ -283,15 +280,13 @@ class CTemplate extends CHostGeneral {
 			zbx_db_search('hosts h', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'h');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($template = DBfetch($res)) {

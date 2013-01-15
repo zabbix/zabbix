@@ -33,6 +33,7 @@ class CIconMap extends CZBXAPI {
 
 	protected $tableName = 'icon_map';
 	protected $tableAlias = 'im';
+	protected $sortColumns = array('iconmapid', 'name');
 
 	/**
 	 * Get IconMap data.
@@ -48,9 +49,6 @@ class CIconMap extends CZBXAPI {
 	 */
 	public function get(array $options = array()) {
 		$result = array();
-
-		// allowed columns for sorting
-		$sortColumns = array('iconmapid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('icon_map' => 'im.iconmapid'),
@@ -115,15 +113,13 @@ class CIconMap extends CZBXAPI {
 			zbx_db_search('icon_map im', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'im');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($iconMap = DBfetch($dbRes)) {

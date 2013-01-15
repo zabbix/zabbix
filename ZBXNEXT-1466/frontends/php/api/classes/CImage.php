@@ -26,8 +26,8 @@
 class CImage extends CZBXAPI {
 
 	protected $tableName = 'images';
-
 	protected $tableAlias = 'i';
+	protected $sortColumns = array('imageid', 'name');
 
 	/**
 	 * Get images data
@@ -48,9 +48,6 @@ class CImage extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-
-		// allowed columns for sorting
-		$sortColumns = array('imageid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('images' => 'i.imageid'),
@@ -121,9 +118,6 @@ class CImage extends CZBXAPI {
 			zbx_db_search('images i', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'i');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -131,6 +125,7 @@ class CImage extends CZBXAPI {
 
 		$imageids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($image = DBfetch($res)) {

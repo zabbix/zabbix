@@ -25,6 +25,7 @@ class CAlert extends CZBXAPI {
 
 	protected $tableName = 'alerts';
 	protected $tableAlias = 'a';
+	protected $sortColumns = array('alertid', 'clock', 'eventid', 'status');
 
 	/**
 	 * Get Alerts data.
@@ -49,9 +50,6 @@ class CAlert extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('alertid', 'clock', 'eventid', 'status');
 
 		$sqlParts = array(
 			'select'	=> array('alerts' => 'a.alertid'),
@@ -218,15 +216,13 @@ class CAlert extends CZBXAPI {
 			$sqlParts['where'][] = 'a.clock<'.$options['time_till'];
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'a');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($alert = DBfetch($dbRes)) {

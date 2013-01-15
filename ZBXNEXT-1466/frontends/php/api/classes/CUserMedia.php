@@ -30,6 +30,7 @@ class CUserMedia extends CZBXAPI {
 
 	protected $tableName = 'media';
 	protected $tableAlias = 'm';
+	protected $sortColumns = array('mediaid', 'userid', 'mediatypeid');
 
 	/**
 	 * Get Users data
@@ -51,9 +52,6 @@ class CUserMedia extends CZBXAPI {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('mediaid', 'userid', 'mediatypeid');
 
 		$sqlParts = array(
 			'select'	=> array('media' => 'm.mediaid'),
@@ -192,9 +190,6 @@ class CUserMedia extends CZBXAPI {
 			zbx_db_search('media m', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'm');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -202,6 +197,7 @@ class CUserMedia extends CZBXAPI {
 
 		$mediaids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($media = DBfetch($res)) {

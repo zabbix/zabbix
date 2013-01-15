@@ -29,6 +29,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
+	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
 
 	public function __construct() {
 		parent::__construct();
@@ -41,9 +42,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
 
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
@@ -213,15 +211,13 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'i');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {

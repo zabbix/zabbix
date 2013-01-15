@@ -29,8 +29,8 @@
 class CDRule extends CZBXAPI {
 
 	protected $tableName = 'drules';
-
 	protected $tableAlias = 'dr';
+	protected $sortColumns = array('druleid', 'name');
 
 /**
 * Get drule data
@@ -42,9 +42,6 @@ class CDRule extends CZBXAPI {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('druleid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('drules' => 'dr.druleid'),
@@ -167,9 +164,6 @@ class CDRule extends CZBXAPI {
 			zbx_db_search('drules dr', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'dr');
-
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -177,6 +171,7 @@ class CDRule extends CZBXAPI {
 //------------
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($drule = DBfetch($dbRes)) {

@@ -26,6 +26,7 @@ class CTemplateScreen extends CScreen {
 
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
+	protected $sortColumns = array('screenid', 'name');
 
 	/**
 	 * Get Screen data
@@ -44,9 +45,6 @@ class CTemplateScreen extends CScreen {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('screenid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('screens' => 's.screenid, s.templateid'),
@@ -202,15 +200,13 @@ class CTemplateScreen extends CScreen {
 			zbx_db_search('screens s', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 's');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {

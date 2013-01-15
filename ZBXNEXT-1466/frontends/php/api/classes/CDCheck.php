@@ -29,16 +29,13 @@
 class CDCheck extends CZBXAPI {
 
 	protected $tableName = 'dchecks';
-
 	protected $tableAlias = 'dc';
+	protected $sortColumns = array('dcheckid', 'druleid');
 
 	public function get($options) {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('dcheckid', 'druleid');
 
 		$sqlParts = array(
 			'select'	=> array('dchecks' => 'dc.dcheckid'),
@@ -149,9 +146,6 @@ class CDCheck extends CZBXAPI {
 			zbx_db_search('dchecks dc', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'dc');
-
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -159,6 +153,7 @@ class CDCheck extends CZBXAPI {
 //-------
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dcheck = DBfetch($res)) {

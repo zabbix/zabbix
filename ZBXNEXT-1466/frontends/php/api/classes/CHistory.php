@@ -29,13 +29,17 @@
  */
 class CHistory extends CZBXAPI {
 
+	protected $tableName = 'history';
+	protected $tableAlias = 'h';
+	protected $sortColumns = array('itemid', 'clock');
+
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
 	}
 
 	/**
-	 * Get history data
+	 * Get history data.
 	 *
 	 * @param array $options
 	 * @param array $options['itemids']
@@ -43,14 +47,12 @@ class CHistory extends CZBXAPI {
 	 * @param string $options['pattern']
 	 * @param int $options['limit']
 	 * @param string $options['order']
+	 *
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-
-		// allowed columns for sorting
-		$sortColumns = array('itemid', 'clock');
 
 		$sqlParts = array(
 			'select'	=> array('history' => 'h.itemid'),
@@ -210,7 +212,7 @@ class CHistory extends CZBXAPI {
 		}
 
 		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'h');
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

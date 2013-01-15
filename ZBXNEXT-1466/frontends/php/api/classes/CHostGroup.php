@@ -25,6 +25,7 @@ class CHostGroup extends CZBXAPI {
 
 	protected $tableName = 'groups';
 	protected $tableAlias = 'g';
+	protected $sortColumns = array('groupid', 'name');
 
 	/**
 	 * Get host groups.
@@ -37,9 +38,6 @@ class CHostGroup extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('groupid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('groups' => 'g.groupid'),
@@ -342,15 +340,13 @@ class CHostGroup extends CZBXAPI {
 			zbx_db_search('groups g', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'g');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($group = DBfetch($res)) {

@@ -28,6 +28,7 @@ class CEvent extends CZBXAPI {
 
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
+	protected $sortColumns = array('eventid', 'object', 'objectid');
 
 	/**
 	 * Get events data.
@@ -52,9 +53,6 @@ class CEvent extends CZBXAPI {
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('eventid', 'object', 'objectid');
 
 		$sqlParts = array(
 			'select'	=> array($this->fieldId('eventid')),
@@ -249,9 +247,6 @@ class CEvent extends CZBXAPI {
 			$this->dbFilter('events e', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, $this->tableAlias());
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -264,6 +259,7 @@ class CEvent extends CZBXAPI {
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {

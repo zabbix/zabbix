@@ -30,6 +30,7 @@ class CGraphItem extends CZBXAPI {
 
 	protected $tableName = 'graphs_items';
 	protected $tableAlias = 'gi';
+	protected $sortColumns = array('gitemid');
 
 	/**
 	 * Get GraphItems data
@@ -41,9 +42,6 @@ class CGraphItem extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('gitemid');
 
 		$sqlParts = array(
 			'select'	=> array('gitems' => 'gi.gitemid'),
@@ -115,15 +113,13 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['where'][] = 'gi.type='.$options['type'];
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'gi');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($gitem = DBfetch($dbRes)) {

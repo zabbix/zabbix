@@ -1937,16 +1937,16 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if (!zbx_empty($options['sortfield']) && $options['countOutput'] === null) {
-			$this->addDbSortingField($options, 'lastchange', ZBX_SORT_DOWN);
+		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
 
-			$this->dbSorting($sqlParts, $options, $this->sortColumns, $tableAlias);
+		if (!zbx_empty($options['sortfield'])) {
+			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
 		}
 
 		return $sqlParts;
 	}
 
-	protected function dbSortingFieldProcessing(&$sqlParts, $sortfield, $sortorder, $alias) {
+	protected function applyQuerySortField($sqlParts, $sortfield, $sortorder, $alias) {
 		if ($sortfield == 'hostname') {
 			$sqlParts['select']['hostname'] = 'h.name';
 			$sqlParts['from']['functions'] = 'functions f';
@@ -1958,7 +1958,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['order'][] = 'h.name '.$sortorder;
 		}
 		else {
-			parent::dbSortingFieldProcessing($sqlParts, $sortfield, $sortorder, $alias);
+			parent::applyQuerySortField($sqlParts, $sortfield, $sortorder, $alias);
 		}
 	}
 }

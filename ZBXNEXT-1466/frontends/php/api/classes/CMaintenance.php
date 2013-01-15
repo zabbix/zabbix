@@ -29,8 +29,8 @@
 class CMaintenance extends CZBXAPI {
 
 	protected $tableName = 'maintenances';
-
 	protected $tableAlias = 'm';
+	protected $sortColumns = array('maintenanceid', 'name', 'maintenance_type');
 
 	/**
 	 * Get maintenances data
@@ -53,9 +53,6 @@ class CMaintenance extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('maintenanceid', 'name', 'maintenance_type');
 
 		$sqlParts = array(
 			'select'	=> array('maintenance' => 'm.maintenanceid'),
@@ -232,9 +229,6 @@ class CMaintenance extends CZBXAPI {
 			zbx_db_search('maintenances m', $options, $sqlParts);
 		}
 
-		// sorting
-		$this->dbSorting($sqlParts, $options, $sortColumns, 'm');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -242,6 +236,7 @@ class CMaintenance extends CZBXAPI {
 
 		$maintenanceids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($maintenance = DBfetch($res)) {
