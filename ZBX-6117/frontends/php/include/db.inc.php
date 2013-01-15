@@ -583,7 +583,7 @@ function DBfetch(&$cursor, $convertNulls = true) {
 				$result = array();
 				foreach ($row as $key => $value) {
 					$field_type = zbx_strtolower(oci_field_type($cursor, $key));
-					$value = (str_in_array($field_type, array('varchar', 'varchar2', 'blob', 'clob')) && is_null($value)) ? '' : $value;
+					$value = (str_in_array($field_type, array('varchar', 'varchar2', 'blob', 'clob')) && is_null($value)) ? null : $value;
 
 					if (is_object($value) && (zbx_stristr($field_type, 'lob') !== false)) {
 						$value = $value->load();
