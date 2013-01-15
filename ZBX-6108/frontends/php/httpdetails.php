@@ -28,7 +28,6 @@ $page['title'] = _('Details of scenario');
 $page['file'] = 'httpdetails.php';
 $page['hist_arg'] = array('httptestid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
-
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -72,18 +71,18 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Collect data
  */
-$db_httptest = API::HttpTest()->get(array(
-	'httptestids' => $_REQUEST['httptestid'],
+$httpTest = API::HttpTest()->get(array(
+	'httptestids' => get_request('httptestid'),
 	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
 ));
-$db_httptest = reset($db_httptest);
-if (!$db_httptest) {
+$httpTest = reset($httpTest);
+if (!$httpTest) {
 	access_deny();
 }
 
-$db_httptest['lastfailedstep'] = 0;
-$db_httptest['error'] = '';
+$httpTest['lastfailedstep'] = 0;
+$httpTest['error'] = '';
 
 $result = DBselect(
 	'SELECT hti.httptestid,hti.type,i.lastvalue,i.lastclock'.
@@ -91,15 +90,15 @@ $result = DBselect(
 	' WHERE hti.itemid=i.itemid'.
 		' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
 		' AND i.lastclock IS NOT NULL'.
-		' AND hti.httptestid='.$db_httptest['httptestid']
+		' AND hti.httptestid='.$httpTest['httptestid']
 );
 while ($row = DBfetch($result)) {
 	if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
-		$db_httptest['lastcheck'] = $row['lastclock'];
-		$db_httptest['lastfailedstep'] = $row['lastvalue'];
+		$httpTest['lastcheck'] = $row['lastclock'];
+		$httpTest['lastfailedstep'] = $row['lastvalue'];
 	}
 	else {
-		$db_httptest['error'] = $row['lastvalue'];
+		$httpTest['error'] = $row['lastvalue'];
 	}
 }
 
@@ -109,15 +108,15 @@ while ($row = DBfetch($result)) {
 $httpdetailsWidget = new CWidget();
 
 $lastcheck = null;
-if (isset($db_httptest['lastcheck'])) {
-	$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $db_httptest['lastcheck']).']';
+if (isset($httpTest['lastcheck'])) {
+	$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $httpTest['lastcheck']).']';
 }
 
 $httpdetailsWidget->addPageHeader(
-	array(_('DETAILS OF SCENARIO').SPACE, bold(CMacrosResolverHelper::resolveHttpTestName($db_httptest['hostid'], $db_httptest['name'])), $lastcheck),
+	array(_('DETAILS OF SCENARIO').SPACE, bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])), $lastcheck),
 	array(
-		get_icon('reset', array('id' => $_REQUEST['httptestid'])),
-		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
+		get_icon('reset', array('id' => get_request('httptestid'))),
+		get_icon('fullscreen', array('fullscreen' => get_request('fullscreen')))
 	)
 );
 
@@ -131,7 +130,7 @@ $httpdetailsTable->setHeader(array(
 	_('Status')
 ));
 
-$db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.$db_httptest['httptestid'].' ORDER BY no');
+$db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.$httpTest['httptestid'].' ORDER BY no');
 
 $totalTime = array(
 	'lastvalue' => 0,
@@ -145,16 +144,16 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$status['msg'] = _('OK');
 	$status['style'] = 'enabled';
 
-	if (!isset($db_httptest['lastcheck'])) {
+	if (!isset($httpTest['lastcheck'])) {
 		$status['msg'] = _('Never executed');
 		$status['style'] = 'unknown';
 	}
-	elseif ($db_httptest['lastfailedstep'] != 0) {
-		if ($db_httptest['lastfailedstep'] == $httpstep_data['no']) {
-			$status['msg'] = _s('Error: %1$s', $db_httptest['error']);
+	elseif ($httpTest['lastfailedstep'] != 0) {
+		if ($httpTest['lastfailedstep'] == $httpstep_data['no']) {
+			$status['msg'] = _s('Error: %1$s', $httpTest['error']);
 			$status['style'] = 'disabled';
 		}
-		elseif ($db_httptest['lastfailedstep'] < $httpstep_data['no']) {
+		elseif ($httpTest['lastfailedstep'] < $httpstep_data['no']) {
 			$status['msg'] = _('Unknown');
 			$status['style'] = 'unknown';
 			$status['skip'] = true;
@@ -192,7 +191,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$respItemTime = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
 
 	$httpdetailsTable->addRow(array(
-		CMacrosResolverHelper::resolveHttpTestName($db_httptest['hostid'], $httpstep_data['name']),
+		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpstep_data['name']),
 		$speed,
 		($respTime == 0 ? '-' : $respItemTime),
 		$resp,
@@ -200,12 +199,12 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	));
 }
 
-if (!isset($db_httptest['lastcheck'])) {
+if (!isset($httpTest['lastcheck'])) {
 	$status['msg'] = _('Never executed');
 	$status['style'] = 'unknown';
 }
-elseif ($db_httptest['lastfailedstep'] != 0) {
-	$status['msg'] = _s('Error: %1$s', $db_httptest['error']);
+elseif ($httpTest['lastfailedstep'] != 0) {
+	$status['msg'] = _s('Error: %1$s', $httpTest['error']);
 	$status['style'] = 'disabled';
 }
 else {
@@ -255,9 +254,9 @@ $graphInScreen = new CScreenBase(array(
 $graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemIds));
 
 $src = 'chart3.php?height=150'.
-	'&name='.$db_httptest['name'].
+	'&name='.$httpTest['name'].
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_IN.
-	'&httptestid='.$db_httptest['httptestid'].
+	'&httptestid='.$httpTest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
 	'&period='.$graphInScreen->timeline['period'].
 	'&stime='.$graphInScreen->timeline['stime'].
@@ -296,9 +295,9 @@ $graphTimeScreen = new CScreenBase(array(
 ));
 
 $src = 'chart3.php?height=150'.
-	'&name='.$db_httptest['name'].
+	'&name='.$httpTest['name'].
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
-	'&httptestid='.$db_httptest['httptestid'].
+	'&httptestid='.$httpTest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
 	'&period='.$graphTimeScreen->timeline['period'].
 	'&stime='.$graphTimeScreen->timeline['stime'].
