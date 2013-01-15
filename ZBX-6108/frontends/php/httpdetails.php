@@ -303,8 +303,7 @@ $src = 'chart3.php?height=150'.
 	'&period='.$graphTimeScreen->timeline['period'].
 	'&stime='.$graphTimeScreen->timeline['stime'].
 	'&profileIdx='.$graphTimeScreen->profileIdx.
-	'&profileIdx2='.$graphTimeScreen->profileIdx2
-	.url_param('from');
+	'&profileIdx2='.$graphTimeScreen->profileIdx2;
 
 $graphTimeContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_time');
 $graphTimeContainer->setAttribute('style', 'position: relative');
