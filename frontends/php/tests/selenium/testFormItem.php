@@ -48,6 +48,10 @@ class testFormItem extends CWebTest {
 		);
 	}
 
+	public function testFormItem_setup() {
+		DBsave_tables('items');
+	}
+
 	/**
 	 * @dataProvider itemTypes
 	 */
@@ -285,6 +289,10 @@ class testFormItem extends CWebTest {
 				$this->ok('Key');
 				break;
 		}
+	}
+
+	public function testFormItem_teardown() {
+		DBrestore_tables('items');
 	}
 }
 ?>
