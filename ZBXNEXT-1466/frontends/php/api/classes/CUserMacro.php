@@ -193,8 +193,8 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		// sorting
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), 'hm', $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), 'gm', $options, $sqlPartsGlobal);
+		$sqlParts = $this->applyQuerySortOptions('hostmacro', 'hm', $options, $sqlParts);
+		$sqlPartsGlobal = $this->applyQuerySortOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

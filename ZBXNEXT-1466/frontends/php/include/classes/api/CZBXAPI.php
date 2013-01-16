@@ -547,10 +547,10 @@ class CZBXAPI {
 	 * Modifies the SQL parts to implement all of the sorting related options.
 	 * Soring is currently only supported for CZBXAPI::get() methods.
 	 *
-	 * @param $tableName
-	 * @param $tableAlias
-	 * @param array $options
-	 * @param array $sqlParts
+	 * @param string $tableName
+	 * @param string $tableAlias
+	 * @param array  $options
+	 * @param array  $sqlParts
 	 *
 	 * @return array
 	 */
