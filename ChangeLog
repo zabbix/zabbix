@@ -3,7 +3,7 @@ Changes for 2.0.5rc1
 New features:
 A.F....... [ZBX-1357] added Bulgarian translation (Richlv)
 ...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 for system.uname check (Sasha)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
