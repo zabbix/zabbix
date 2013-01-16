@@ -289,9 +289,12 @@ if (isset($_REQUEST['pservices'])) {
 		$data = array();
 	}
 
-	foreach ($parentServices as $key => $childService) {
-		$parentServices[$key]['trigger'] = !empty($childService['trigger']['triggerid'])
-			? CMacrosResolverHelper::resolveTriggerNameById($childService['trigger']['triggerid'])
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($parentServices, 'trigger');
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	foreach ($parentServices as $key => $parentService) {
+		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
+			? $triggers[$parentService['trigger']['triggerid']]['description']
 			: '-';
 	}
 
@@ -329,9 +332,12 @@ if (isset($_REQUEST['cservices'])) {
 		$data = array();
 	}
 
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($childServices, 'trigger');
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 	foreach ($childServices as $key => $childService) {
-		$childServices[$key]['trigger'] = !empty($childService['trigger']['triggerid'])
-			? CMacrosResolverHelper::resolveTriggerNameById($childService['trigger']['triggerid'])
+		$childServices[$key]['trigger'] = !empty($childService['trigger'])
+			? $triggers[$childService['trigger']['triggerid']]['description']
 			: '-';
 	}
 
@@ -385,13 +391,17 @@ if (isset($_REQUEST['form'])) {
 				'output' => array('name', 'triggerid'),
 				'preservekeys' => true,
 			));
+
+			// expand trigger descriptions
+			$triggers = zbx_objectValues($childServices, 'trigger');
+			$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 			foreach ($service['dependencies'] as $dependency) {
 				$childService = $childServices[$dependency['servicedownid']];
 				$data['children'][] = array(
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
-							? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
+							? $triggers[$childService['trigger']['triggerid']]['description']
 							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
