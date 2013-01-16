@@ -335,17 +335,29 @@ abstract class CHostGeneral extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
+		// permission check
+		if (!API::Host()->isWritable($targetids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+		$templateIdsTmp = array();
+		foreach ($targetids as $targetid) {
+			foreach ($templateids as $templateid) {
+				if (!isset($linked[$targetid]) || !isset($linked[$targetid][$templateid])) {
+					$templateIdsTmp[] = $templateid;
+				}
+			}
+		}
+		if ($templateIdsTmp) {
+			if (!API::Template()->isReadable($templateIdsTmp)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		// sync templates
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
-				}
-
-				if (!API::Host()->isWritable(zbx_toArray($targetid))) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
-				if (!API::Template()->isReadable(zbx_toArray($templateid))) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 
 				API::Application()->syncTemplates(array(
