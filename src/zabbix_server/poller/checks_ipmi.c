@@ -28,6 +28,7 @@
 #include <OpenIPMI/ipmi_lan.h>
 #include <OpenIPMI/ipmi_sdr.h>
 #include <OpenIPMI/ipmi_msgbits.h>
+#include <OpenIPMI/ipmi_auth.h>
 
 typedef union
 {
@@ -463,8 +464,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 	s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
 	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
 
-	/* discrete value are 16-bit (ie: [0,2^16-1], so 2^16 = fail) */
-	/* we're using a 64-bit uint, so this is kosher */
+	/* Discrete values are 16-bit (ie: [0,2^16-1], so 2^16 = fail). We're using a 64-bit uint. */
 	s->value.discrete = 65536;
 
 	for (i = 0; i < 15; i++)
@@ -882,6 +882,7 @@ static void	my_vlog(os_handler_t *handler, const char *format, enum ipmi_log_typ
 int	init_ipmi_handler()
 {
 	const char	*__function_name = "init_ipmi_handler";
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -893,7 +894,12 @@ int	init_ipmi_handler()
 
 	os_hnd->set_log_handler(os_hnd, my_vlog);
 
-	ipmi_init(os_hnd);
+	if (0 != (ret = ipmi_init(os_hnd)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "unable to initialize the OpenIPMI library."
+				" ipmi_init() return error: 0x%x", ret);
+		return FAIL;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -973,7 +979,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	ports[0] = zbx_dsprintf(NULL, "%d", h->port);
 
 	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1,
-			h->authtype == -1 ? (unsigned int)(~0) : (unsigned int)h->authtype,
+			h->authtype == -1 ? (unsigned int)IPMI_AUTHTYPE_DEFAULT : (unsigned int)h->authtype,
 			(unsigned int)h->privilege, h->username, strlen(h->username),
 			h->password, strlen(h->password), os_hnd, NULL, &h->con)))
 	{
