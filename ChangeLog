@@ -1,3 +1,7 @@
+Changes for 1.8.16
+
+1.8.16rc2 was released as 1.8.16 without any changes
+
 Changes for 1.8.16rc2
 
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
