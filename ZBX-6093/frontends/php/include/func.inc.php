@@ -1886,15 +1886,36 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$url->setArgument('sid', null);
 		$url = urlencode($url->toString());
 
-		$warning = new CWarning(_('You are not logged in.'), array(
-			_('You must login to view this page.'),
-			BR(),
-			_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-		));
-		$warning->setButtons(array(
-			new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
-			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
-		));
+		// if the user is logged in - render the access denied message
+		if (CWebUser::isLoggedIn()) {
+			$header = _('Access denied.');
+			$message = array(
+				_s('Your are logged in as %1$s. You have no permissions to access this page.', CWebUser::$data['alias']),
+				BR(),
+				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+			);
+			$buttons = array(
+				new CButton('login', _('Switch user'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist')
+			);
+		}
+		// if the user is not logged in - offer to login
+		else {
+			$header = _('You are not logged in.');
+			$message = array(
+				_('You must login to view this page.'),
+				BR(),
+				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+			);
+			$buttons = array(
+				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist')
+			);
+		}
+
+		// add the cancel button
+		$buttons[] =new CButton('back', _('Cancel'), 'javascript: document.location = "dashboard.php"', 'formlist');
+
+		$warning = new CWarning($header, $message);
+		$warning->setButtons($buttons);
 
 		$warningView = new CView('general.warning', array(
 			'warning' => $warning
