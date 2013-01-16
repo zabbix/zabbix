@@ -37,7 +37,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'sysmapid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO,	DB_ID,					null),
-	'mapname' =>	array(T_ZBX_STR, O_OPT, P_SYS,			null,					null),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,			IN('0,1'),				null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,			null,					null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,			NOT_EMPTY,				null),
@@ -93,16 +92,7 @@ $maps = API::Map()->get(array(
 ));
 order_result($maps, 'name');
 
-if ($mapName = get_request('mapname')) {
-	unset($_REQUEST['sysmapid']);
-
-	foreach ($maps as $map) {
-		if ($map['name'] === $mapName) {
-			$_REQUEST['sysmapid'] = $map['sysmapid'];
-		}
-	}
-}
-elseif (empty($_REQUEST['sysmapid'])) {
+if (empty($_REQUEST['sysmapid'])) {
 	$_REQUEST['sysmapid'] = CProfile::get('web.maps.sysmapid');
 
 	if (!$_REQUEST['sysmapid'] && !isset($maps[$_REQUEST['sysmapid']])) {
