@@ -29,8 +29,8 @@
 class CUserGroup extends CZBXAPI {
 
 	protected $tableName = 'usrgrp';
-
 	protected $tableAlias = 'g';
+	protected $sortColumns = array('usrgrpid', 'name');
 
 	/**
 	 * Get UserGroups
@@ -51,9 +51,6 @@ class CUserGroup extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('usrgrpid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('usrgrp' => 'g.usrgrpid'),
@@ -140,15 +137,13 @@ class CUserGroup extends CZBXAPI {
 			zbx_db_search('usrgrp g', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'g');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($usrgrp = DBfetch($res)) {
