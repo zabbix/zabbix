@@ -60,16 +60,7 @@ class CListBox extends CComboBox {
 				url: ajaxUrl.getUrl(),
 				dataType: "json"
 			}, function (data) {
-				var results = [];
-
-				jQuery.each(data, function (i, val) {
-					results.push({
-						value: val.value,
-						text: val.text
-					});
-				});
-
-				return results;
+				return data;
 			});'
 		);
 	}
