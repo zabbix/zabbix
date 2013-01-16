@@ -502,7 +502,7 @@ else {
 		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true)));
 	}
 	if (str_in_array($srctbl, array('help_items'))) {
-		$itemtype = get_request('itemtype', CProfile::get('web.popup.itemtype', 0));
+		$itemtype = get_request('itemtype', 0);
 		$cmbTypes = new CComboBox('itemtype', $itemtype, 'javascript: submit();');
 
 		foreach ($allowed_item_types as $type) {
@@ -1356,12 +1356,6 @@ elseif ($srctbl == 'graphs') {
 	$table->setHeader($header);
 
 	if ($pageFilter->hostsSelected) {
-		if ($pageFilter->hostsAll) {
-			$hostid = array_keys($pageFilter->hosts);
-		}
-		else {
-			$hostid = $pageFilter->hostid;
-		}
 		$options = array(
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,

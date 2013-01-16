@@ -1,6 +1,8 @@
 Changes for 2.1.0
 
 New features:
+A.F....... [ZBXNEXT-1491] fixed builded query ordering (Eduard)
+..F....... [ZBX-6108] fixed time control position remembering in monitoring->web (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
 A.F.....S. [ZBXNEXT-1500] added support of full 64 bit address space for object IDs in non-DM setup (Sasha)
@@ -35,6 +37,11 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6111] removed unused profile key: web.popup.itemtype (Oleg)
+..F....... [ZBX-6073] fixed page title in Zabbix installation page (Oleg)
+..F....... [ZBX-6102] fixed type of web.httpconf.showdisabled profile record (Sasha)
+A.F....... [ZBX-6099] fixed event.get select_acknowledges count returning incorrect results if no acknowledges exist (Pavels)
+........S. [ZBX-6065] removed useless deletes when housekeeper deletes old history (Sasha)
 A......... [ZBX-6078] fixed graph item creating (Eduards)
 A......... [ZBX-6050] fixed duplicate step name validation in httptest.create and httptest.update (Pavels)
 A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
@@ -85,10 +92,12 @@ Changes for 2.0.5rc1
 New features:
 A.F....... [ZBX-1357] added Bulgarian translation (Richlv)
 ...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 for system.uname check (Sasha)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6113] fixed hidden input field appearing when assigning hosts to groups in IE (Pavels)
+..F....... [ZBX-6063] fixed graph selection pop up working incorrectly when adding a graph to a templated screen (Pavels)
 A.F....... [ZBX-6014] improved performance and removed get_accessible_triggers function (dotneft, Oleg)
 ..F....... [ZBX-6070] fixed event CSV export ignoring the selected page and filters (Pavels)
 ..F....... [ZBX-6006] optimized web interface API calls, which requested redundant data (Toms)
