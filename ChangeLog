@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6117] fixed item value macros resolving using non-converted to null values (Eduard)
 ..F....... [ZBX-6113] fixed hidden input field appearing when assigning hosts to groups in IE (Pavels)
 ..F....... [ZBX-6063] fixed graph selection pop up working incorrectly when adding a graph to a templated screen (Pavels)
 A.F....... [ZBX-6014] improved performance and removed get_accessible_triggers function (dotneft, Oleg)
