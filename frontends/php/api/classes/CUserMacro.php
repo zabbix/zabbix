@@ -23,6 +23,7 @@ class CUserMacro extends CZBXAPI {
 
 	protected $tableName = 'hostmacro';
 	protected $tableAlias = 'hm';
+	protected $sortColumns = array('macro');
 
 	/**
 	 * Get UserMacros data.
@@ -45,9 +46,6 @@ class CUserMacro extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('macro');
 
 		$sqlParts = array(
 			'select'	=> array('macros' => 'hm.hostmacroid'),
@@ -195,8 +193,8 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'hm');
-		zbx_db_sorting($sqlPartsGlobal, $options, $sortColumns, 'gm');
+		$sqlParts = $this->applyQuerySortOptions('hostmacro', 'hm', $options, $sqlParts);
+		$sqlPartsGlobal = $this->applyQuerySortOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

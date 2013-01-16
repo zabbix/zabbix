@@ -23,6 +23,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
+	protected $sortColumns = array('triggerid', 'description', 'status', 'priority');
 
 	/**
 	 * Get TriggerPrototypes data
@@ -46,8 +47,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		// allowed columns for sorting
-		$sortColumns = array('triggerid', 'description', 'status', 'priority');
 		$sqlParts = array(
 			'select'	=> array('triggers' => 't.triggerid'),
 			'from'		=> array('t' => 'triggers t'),
@@ -381,9 +380,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 't');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -391,6 +387,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$triggerids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
