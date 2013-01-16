@@ -1895,7 +1895,8 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 			);
 			$buttons = array(
-				new CButton('login', _('Switch user'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist')
+				new CButton('login', _('Switch user'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
+				new CButton('back', _('Go to dashboard'), 'javascript: document.location = "dashboard.php"', 'formlist')
 			);
 		}
 		// if the user is not logged in - offer to login
@@ -1910,9 +1911,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist')
 			);
 		}
-
-		// add the cancel button
-		$buttons[] =new CButton('back', _('Cancel'), 'javascript: document.location = "dashboard.php"', 'formlist');
 
 		$warning = new CWarning($header, $message);
 		$warning->setButtons($buttons);
