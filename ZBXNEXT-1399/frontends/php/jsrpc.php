@@ -216,6 +216,15 @@ switch ($data['method']) {
 		}
 		break;
 
+	/**
+	 * Create chosen data.
+	 * Supported objects: "hostGroup"
+	 *
+	 * @param string $data['objectName']
+	 * @param string $data['search']
+	 *
+	 * @return array(int => array('value' => int, 'text' => string))
+	 */
 	case 'chosen.get':
 		if ($data['objectName'] == 'hostGroup') {
 			$hostGroups = API::HostGroup()->get(array(
