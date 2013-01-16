@@ -1865,11 +1865,10 @@ function num2letter($number) {
 }
 
 /**
- * Renders an "access denied" message.
+ * Renders an "access denied" message and stops the execution of the script.
  *
  * The $mode parameters controls the layout of the message:
  * - ACCESS_DENY_OBJECT     - render the message when denying access to a specific object
- * - ACCESS_DENY_CONTENT    - render the access denied block when denying access to the content of a specific page
  * - ACCESS_DENY_PAGE       - render a complete access denied page
  *
  * @param int $mode
@@ -1877,7 +1876,9 @@ function num2letter($number) {
 function access_deny($mode = ACCESS_DENY_OBJECT) {
 	// deny access to an object
 	if ($mode == ACCESS_DENY_OBJECT) {
+		require_once dirname(__FILE__).'/page_header.php';
 		show_error_message(_('No permissions to referred object or it does not exist!'));
+		require_once dirname(__FILE__).'/page_footer.php';
 	}
 	// deny access to a page
 	else {
@@ -1895,17 +1896,11 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
 		));
 
-		// render only the warning block
-		if ($mode == ACCESS_DENY_CONTENT) {
-			$warning->show();
-		}
-		// render a complete warning page
-		else {
-			$warningView = new CView('general.warning', array(
-				'warning' => $warning
-			));
-			$warningView->render();
-		}
+		$warningView = new CView('general.warning', array(
+			'warning' => $warning
+		));
+		$warningView->render();
+		exit;
 	}
 }
 

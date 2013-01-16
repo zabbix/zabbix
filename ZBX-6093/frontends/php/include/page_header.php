@@ -133,10 +133,9 @@ $sub_menus = array();
 $denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 zbx_flush_post_cookies($denied_page_requested);
 
-// if the user is not logged in and access is denied, render the "access denied" message with no layout
-if ($denied_page_requested && !CWebUser::isLoggedIn()) {
+// render the "Deny access" page
+if ($denied_page_requested) {
 	access_deny(ACCESS_DENY_PAGE);
-	exit;
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
@@ -457,12 +456,6 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 
 // unset multiple variables
 unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row, $db_nodes, $node_data, $sub_menu_table, $sub_menu_rows);
-
-// if the user is logged in and access is denied, render the "access denied" message with the layout
-if ($denied_page_requested && CWebUser::isLoggedIn()) {
-	access_deny(ACCESS_DENY_CONTENT);
-	require_once dirname(__FILE__).'/page_footer.php';
-}
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
 	zbx_add_post_js('var msglistid = initMessages({});');
