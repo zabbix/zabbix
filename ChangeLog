@@ -1,9 +1,7 @@
 Changes for 2.1.0
 
 New features:
-..F....... [ZBX-6125] fixed empty new line in configuration of action (Eduard)
 A.F....... [ZBXNEXT-1491] fixed builded query ordering (Eduard)
-..F....... [ZBX-6108] fixed time control position remembering in monitoring->web (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
 A.F.....S. [ZBXNEXT-1500] added support of full 64 bit address space for object IDs in non-DM setup (Sasha)
@@ -38,6 +36,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6125] fixed empty new line in configuration of action (Eduard)
+..F....... [ZBX-6108] fixed time control position remembering in monitoring->web (Eduard)
 ..F....... [ZBX-6111] removed unused profile key: web.popup.itemtype (Oleg)
 ..F....... [ZBX-6073] fixed page title in Zabbix installation page (Oleg)
 ..F....... [ZBX-6102] fixed type of web.httpconf.showdisabled profile record (Sasha)
