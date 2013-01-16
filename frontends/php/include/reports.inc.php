@@ -36,8 +36,8 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $opt
 	$filterForm->setAttribute('id','zbx_filter');
 
 	$filterForm->addVar('config',$config);
-	$filterForm->addVar('filter_timesince',date('YmdHis', $_REQUEST['filter_timesince']));
-	$filterForm->addVar('filter_timetill', date('YmdHis', $_REQUEST['filter_timetill']));
+	$filterForm->addVar('filter_timesince',date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']));
+	$filterForm->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
 
 	$cmbGroups = new CComboBox('filter_groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 	$cmbHosts = new CComboBox('filter_hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
@@ -157,8 +157,8 @@ function bar_report_form(){
 
 	$reportForm->addVar('config',$config);
 	$reportForm->addVar('items',$items);
-	$reportForm->addVar('report_timesince', date('YmdHis', $report_timesince));
-	$reportForm->addVar('report_timetill',  date('YmdHis', $report_timetill));
+	$reportForm->addVar('report_timesince', date(TIMESTAMP_FORMAT, $report_timesince));
+	$reportForm->addVar('report_timetill',  date(TIMESTAMP_FORMAT, $report_timetill));
 
 	$reportForm->addRow(_('Title'), new CTextBox('title',$title,40));
 	$reportForm->addRow(_('X label'), new CTextBox('xlabel',$xlabel,40));
@@ -389,8 +389,8 @@ function bar_report_form3(){
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
-	$report_timesince = get_request('report_timesince', date('YmdHis', time() - SEC_PER_DAY));
-	$report_timetill = get_request('report_timetill', date('YmdHis'));
+	$report_timesince = get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY));
+	$report_timetill = get_request('report_timetill', date(TIMESTAMP_FORMAT));
 
 	$items = get_request('items',array());
 
@@ -410,8 +410,8 @@ function bar_report_form3(){
 		$reportForm->addVar('report_show','show');
 
 	$reportForm->addVar('config',$config);
-	$reportForm->addVar('report_timesince',date('YmdHis', $report_timesince));
-	$reportForm->addVar('report_timetill',date('YmdHis', $report_timetill));
+	$reportForm->addVar('report_timesince',date(TIMESTAMP_FORMAT, $report_timesince));
+	$reportForm->addVar('report_timetill',date(TIMESTAMP_FORMAT, $report_timetill));
 
 //	$reportForm->addVar('items',$items); 				//params are set later!!
 //	$reportForm->addVar('periods',$periods);
