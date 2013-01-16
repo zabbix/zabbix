@@ -49,6 +49,13 @@ class testFormItem extends CWebTest {
 	}
 
 	/**
+	 * Backup the tables that will be modified during the tests.
+	 */
+	public function testFormItem_setup() {
+		DBsave_tables('items');
+	}
+
+	/**
 	 * @dataProvider itemTypes
 	 */
 	public function testFormItem_CheckLayout($itemTypeID, $itemType ) {
@@ -192,33 +199,54 @@ class testFormItem extends CWebTest {
 
 	// Returns all possible item data
 	public static function dataCreate() {
-		// Ok/bad, visible host name, name, type, key, errors
+		// Ok/bad, visible host name, type, name, key, formula, delay, flex period, history, trends, errors
 		return array(
 			array(
 				ITEM_GOOD,
 				'ЗАББИКС Сервер',
-				'Checksum of $1',
 				ITEM_TYPE_ZABBIX,
+				'Checksum of $1',
 				'vfs.file.cksum[/sbin/shutdown]',
+				null,
+				null,
+				array(),
+				null,
+				null,
 				array()
 			),
 			// Duplicate item
 			array(
 				ITEM_BAD,
 				'ЗАББИКС Сервер',
-				'Checksum of $1',
 				ITEM_TYPE_ZABBIX,
+				'Checksum of $1',
 				'vfs.file.cksum[/sbin/shutdown]',
-				array('ERROR: Cannot add item', 'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on')
+				null,
+				null,
+				array(),
+				null,
+				null,
+				array(
+						'ERROR: Cannot add item',
+						'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
+					)
 			),
 			// Item name is missing
 			array(
 				ITEM_BAD,
 				'ЗАББИКС Сервер',
-				'',
 				ITEM_TYPE_ZABBIX,
-				'agent.ping123',
-				array('Page received incorrect data', 'Warning. Incorrect value for field "Name": cannot be empty.')
+				'',
+				'item-name-missing',
+				null,
+				null,
+				array(),
+				null,
+				null,
+				array(
+						'Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
 			),
 			// Item key is missing
 			array(
@@ -227,7 +255,357 @@ class testFormItem extends CWebTest {
 				ITEM_TYPE_ZABBIX,
 				'Item name',
 				'',
-				array('Page received incorrect data', 'Warning. Incorrect value for field "Key": cannot be empty.')
+				null,
+				null,
+				array(),
+				null,
+				null,
+				array(
+						'Page received incorrect data',
+						'Warning. Incorrect value for field "Key": cannot be empty.'
+					)
+			),
+			// Empty formula
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item formula',
+				'item-formula-test',
+				' ',
+				null,
+				array(),
+				null,
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is mandatory.'
+					)
+			),
+			// Incorrect formula
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item formula',
+				'item-formula-test',
+				'formula',
+				null,
+				array(),
+				null,
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "formula" is not decimal number.'
+					)
+			),
+			// Incorrect formula
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item formula',
+				'item-formula-test',
+				'a1b2c3',
+				null,
+				array(),
+				null,
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "formula" is not decimal number.'
+					)
+			),
+			// Incorrect formula
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item formula',
+				'item-formula-test',
+				'321abc',
+				null,
+				array(),
+				null,
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "formula" is not decimal number.'
+					)
+			),
+			// Empty timedelay
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item delay',
+				'item-delay-test',
+				null,
+				'0',
+				null,
+				null,
+				null,
+				array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+			),
+			// Incorrect timedelay
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item delay',
+				'item-delay-test',
+				null,
+				'-30',
+				array(),
+				null,
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+					)
+			),
+			// Incorrect timedelay
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item delay',
+				'item-delay-test',
+				null,
+				'86401',
+				null,
+				null,
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+					)
+			),
+			// Empty time flex period
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item flex',
+				'item-flex-test',
+				null,
+				null,
+				array(''),
+				null,
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+					)
+			),
+			// Incorrect flex period
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item flex',
+				'item-flex-test',
+				null,
+				null,
+				array('1-11,00:00-24:00'),
+				null,
+				null,
+				array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-11,00:00-24:00".'
+					)
+			),
+			// Incorrect flex period
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item flex',
+				'item-flex-test',
+				null,
+				null,
+				array('1-7,00:00-25:00'),
+				null,
+				null,
+				array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,00:00-25:00".'
+					)
+			),
+			// Incorrect flex period
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item flex',
+				'item-flex-test',
+				null,
+				null,
+				array('1-7,24:00-00:00'),
+				null,
+				null,
+				array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
+					)
+			),
+			// Incorrect flex period
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item flex',
+				'item-flex-test',
+				null,
+				null,
+				array('1,00:00-24:00;2,00:00-24:00'),
+				null,
+				null,
+				array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1,00:00-24:00;2,00:00-24:00".'
+					)
+			),
+			// Multiple flex periods
+			array(
+				ITEM_GOOD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item flex',
+				'item-flex-test',
+				null,
+				null,
+				array('1,00:00-24:00', '2,00:00-24:00', '1,00:00-24:00', '2,00:00-24:00'),
+				null,
+				null,
+				array()
+			),
+			// History
+			array(
+				ITEM_GOOD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item history',
+				'item-history-empty',
+				null,
+				null,
+				array(),
+				'',
+				null,
+				array()
+			),
+			// History
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item history',
+				'item-history-test',
+				null,
+				null,
+				array(),
+				'65536',
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+					)
+			),
+			// History
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item history',
+				'item-history-test',
+				null,
+				null,
+				array(),
+				'-1',
+				null,
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+					)
+			),
+			// History
+			array(
+				ITEM_GOOD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item history',
+				'item-history-test',
+				null,
+				null,
+				array(),
+				'days',
+				null,
+				array()
+			),
+			// Trends
+			array(
+				ITEM_GOOD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item trends',
+				'item-trends-empty',
+				null,
+				null,
+				array(),
+				null,
+				'',
+				array()
+			),
+			// Trends
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item trends',
+				'item-trends-test',
+				null,
+				null,
+				array(),
+				null,
+				'-1',
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+					)
+			),
+			// Trends
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item trends',
+				'item-trends-test',
+				null,
+				null,
+				array(),
+				null,
+				'65536',
+				array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+					)
+			),
+			// Trends
+			array(
+				ITEM_GOOD,
+				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
+				'Item trends',
+				'item-trends-test',
+				null,
+				null,
+				array(),
+				null,
+				'trends',
+				array()
 			)
 		);
 	}
@@ -235,7 +613,8 @@ class testFormItem extends CWebTest {
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormItem_Create($expected, $visibleHostname, $name, $type, $key, $errorMsgs) {
+	public function testFormItem_Create($expected, $visibleHostname, $type, $name, $key, $formula, $delay,
+				$flexPeriod, $history, $trends, $errorMsgs) {
 		$this->login('hosts.php');
 		$this->checkTitle('Configuration of hosts');
 		$this->ok('CONFIGURATION OF HOSTS');
@@ -260,26 +639,63 @@ class testFormItem extends CWebTest {
 		$this->input_type('name', $name);
 		$this->input_type('key', $key);
 
-		$this->button_click('save');
-		$this->wait();
-		switch ($expected) {
-			case ITEM_GOOD:
-				$this->ok('Item added');
-				$this->checkTitle('Configuration of items');
-				$this->ok('CONFIGURATION OF ITEMS');
-				break;
-
-			case ITEM_BAD:
-				$this->checkTitle('Configuration of items');
-				$this->ok('CONFIGURATION OF ITEMS');
-				foreach ($errorMsgs as $msg) {
-					$this->ok($msg);
-				}
-				$this->ok('Host');
-				$this->ok('Name');
-				$this->ok('Key');
-				break;
+		if ($formula!=null)	{
+			$this->checkbox_select('multiplier');
+			$this->input_type('formula', $formula);
 		}
+
+		if ($delay!=null)	{
+			$this->input_type('delay',$delay);
+		}
+
+		if ($flexPeriod!=null)	{
+			foreach ($flexPeriod as $period) {
+				$this->input_type('new_delay_flex_period', $period);
+				$this->button_click('add_delay_flex');
+				$this->wait();
+			}
+			foreach ($errorMsgs as $msg) {
+				$this->ok($msg);
+			}
+		}
+
+		if ($history!=null)	{
+			$this->input_type('history',$history);
+		}
+
+		if ($trends!=null)	{
+			$this->input_type('trends',$trends);
+		}
+
+		if ($flexPeriod==null){
+			$this->button_click('save');
+			$this->wait();
+			switch ($expected) {
+				case ITEM_GOOD:
+					$this->ok('Item added');
+					$this->checkTitle('Configuration of items');
+					$this->ok('CONFIGURATION OF ITEMS');
+					break;
+
+				case ITEM_BAD:
+					$this->checkTitle('Configuration of items');
+					$this->ok('CONFIGURATION OF ITEMS');
+					foreach ($errorMsgs as $msg) {
+						$this->ok($msg);
+					}
+					$this->ok('Host');
+					$this->ok('Name');
+					$this->ok('Key');
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Restore the original tables.
+	 */
+	public function testFormItem_teardown() {
+		DBrestore_tables('items');
 	}
 }
 ?>
