@@ -29,11 +29,19 @@
 #include <OpenIPMI/ipmi_sdr.h>
 #include <OpenIPMI/ipmi_msgbits.h>
 
+typedef union
+{
+	double		threshold;
+	zbx_uint64_t	discrete;
+}
+zbx_ipmi_sensor_value_t;
+
 typedef struct
 {
 	ipmi_sensor_t		*sensor;
 	char			*s_name;
-	double			value;
+	zbx_ipmi_sensor_value_t	value;
+	int			type;
 }
 zbx_ipmi_sensor_t;
 
@@ -169,11 +177,11 @@ static zbx_ipmi_sensor_t	*get_ipmi_sensor_by_name(zbx_ipmi_host_t *h, const char
 static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	const char		*__function_name = "allocate_ipmi_sensor";
-	size_t			sz;
+	int			sz;
 	zbx_ipmi_sensor_t	*s;
 	char			*s_name = NULL;
 
-	sz = (size_t)ipmi_sensor_get_id_length(sensor);
+	sz = ipmi_sensor_get_id_length(sensor);
 	s_name = zbx_malloc(s_name, sz + 1);
 	ipmi_sensor_get_id(sensor, s_name, sz);
 
@@ -188,11 +196,10 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 		h->sensors = zbx_realloc(h->sensors, sz);
 
 	s = &h->sensors[h->sensor_count - 1];
-
-	memset(s, 0, sizeof(zbx_ipmi_sensor_t));
-
 	s->sensor = sensor;
 	s->s_name = s_name;
+	memset(&s->value, 0, sizeof(s->value));
+	s->type = ipmi_sensor_get_event_reading_type(sensor);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, s);
 
@@ -385,7 +392,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 			h->ret = NOTSUPPORTED;
 			break;
 		case IPMI_BOTH_VALUES_PRESENT:
-			s->value = val;
+			s->value.threshold = val;
 
 			/* next lines only for debug logging */
 			ent = ipmi_sensor_get_entity(sensor);
@@ -420,34 +427,121 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
+static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
+{
+	const char		*__function_name = "got_discrete_states";
+
+	int			id, i, val, ret, is_state_set;
+	const char		*e_string, *s_type_string, *s_reading_type_string;
+	ipmi_entity_t		*ent;
+	zbx_ipmi_host_t		*h = cb_data;
+	zbx_ipmi_sensor_t	*s;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	s = get_ipmi_sensor(h, sensor);
+
+	if (NULL == s)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		h->err = zbx_strdup(h->err, "fatal error");
+		h->ret = NOTSUPPORTED;
+		goto out;
+	}
+
+	if (err)
+	{
+		h->err = zbx_dsprintf(h->err, "error 0x%x while reading a discrete sensor %s@[%s]:%d",
+				s->s_name, h->ip, h->port);
+		h->ret = NOTSUPPORTED;
+		goto out;
+	}
+
+	ent = ipmi_sensor_get_entity(sensor);
+	id = ipmi_entity_get_entity_id(ent);
+	e_string = ipmi_get_entity_id_string(id);
+	s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
+	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
+
+	/* discrete value are 16-bit (ie: [0,2^16-1], so 2^16 = fail) */
+	/* we're using a 64-bit uint, so this is kosher */
+	s->value.discrete = 65536;
+
+	for (i = 0; i < 15; i++)
+	{
+		ret = ipmi_sensor_discrete_event_readable(sensor, i, &val);
+		if (0 != ret || 0 == val)
+			continue;
+
+		is_state_set = ipmi_is_state_set(states, i);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
+				s->s_name, e_string, s_type_string, s_reading_type_string, i, is_state_set);
+
+		if (0 != is_state_set)
+		{
+			s->value.discrete = i;
+			break;
+		}
+	}
+out:
+	h->done = 1;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(h->ret));
+}
+
 static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 {
-	const char		*__function_name = "read_ipmi_sensor";
-	int			type, ret;
-	struct timeval		tv;
+	const char	*__function_name = "read_ipmi_sensor";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'",
-			__function_name, s->s_name, h->ip, h->port);
+	int		ret;
+	const char	*s_reading_type_string;
+	struct timeval	tv;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name, s->s_name, h->ip, h->port);
 
 	h->ret = SUCCEED;
 	h->done = 0;
 
-	type = ipmi_sensor_get_event_reading_type(s->sensor);
-
-	switch (type)
+	switch (s->type)
 	{
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
 			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, got_thresh_reading, h)))
 			{
-				h->err = zbx_dsprintf(h->err, "Cannot read sensor %s."
+				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_get_reading() return error: 0x%x",
 						s->s_name, ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
 			break;
+		case IPMI_EVENT_READING_TYPE_DISCRETE_USAGE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_STATE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_PREDICTIVE_FAILURE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_LIMIT_EXCEEDED:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_PERFORMANCE_MET:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_SEVERITY:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_PRESENCE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_ENABLE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_AVAILABILITY:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_REDUNDANCY:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_ACPI_POWER:
+		case IPMI_EVENT_READING_TYPE_SENSOR_SPECIFIC:
+			if (0 != (ret = ipmi_sensor_get_states(s->sensor, got_discrete_states, h)))
+			{
+				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
+						" ipmi_sensor_get_states() return error: 0x%x",
+						s->s_name, ret);
+				h->ret = NOTSUPPORTED;
+				goto out;
+			}
+			break;
 		default:
-			h->err = zbx_dsprintf(h->err, "discrete sensor is not supported");
+			s_reading_type_string = ipmi_sensor_get_event_reading_type_string(s->sensor);
+
+			h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
+					" IPMI reading type \"%s\" is not supported",
+					s->s_name, s_reading_type_string);
 			h->ret = NOTSUPPORTED;
 			goto out;
 	}
@@ -479,7 +573,6 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 		h->err = zbx_dsprintf(h->err, "error 0x%x while reading control", err);
 		h->ret = NETWORK_ERROR;
-		h->done = 1;
 		goto out;
 	}
 
@@ -490,7 +583,6 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "fatal error");
 		h->ret = NOTSUPPORTED;
-		h->done = 1;
 		goto out;
 	}
 
@@ -499,7 +591,6 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "no value present for control");
 		h->ret = NOTSUPPORTED;
-		h->done = 1;
 		goto out;
 	}
 
@@ -514,9 +605,9 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	sz = sizeof(int) * c->num_values;
 	memcpy(c->val, val, sz);
-
-	h->done = 1;
 out:
+	h->done = 1;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
@@ -644,7 +735,7 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
-	switch (ipmi_sensor_get_event_reading_type(sensor))
+/*	switch (ipmi_sensor_get_event_reading_type(sensor))
 	{
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
 		case IPMI_EVENT_READING_TYPE_DISCRETE_USAGE:
@@ -658,17 +749,16 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 		case IPMI_EVENT_READING_TYPE_DISCRETE_AVAILABILITY:
 		case IPMI_EVENT_READING_TYPE_DISCRETE_REDUNDANCY:
 		case IPMI_EVENT_READING_TYPE_DISCRETE_ACPI_POWER:
-			if (op == IPMI_ADDED)
-			{
-				if (NULL == get_ipmi_sensor(h, sensor))
-					allocate_ipmi_sensor(h, sensor);
-			}
-			else if (op == IPMI_DELETED)
-				delete_ipmi_sensor(h, sensor);
-			break;
-		case IPMI_EVENT_READING_TYPE_SENSOR_SPECIFIC:
-			;	/* nothing */
+		case IPMI_EVENT_READING_TYPE_SENSOR_SPECIFIC:*/
+	if (op == IPMI_ADDED)
+	{
+		if (NULL == get_ipmi_sensor(h, sensor))
+			allocate_ipmi_sensor(h, sensor);
 	}
+	else if (op == IPMI_DELETED)
+		delete_ipmi_sensor(h, sensor);
+/*			break;
+	}*/
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -983,7 +1073,12 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	}
 
 	if (NULL != s)
-		SET_DBL_RESULT(value, s->value);
+	{
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->type)
+			SET_DBL_RESULT(value, s->value.threshold);
+		else
+			SET_UI64_RESULT(value, s->value.discrete);
+	}
 	if (NULL != c)
 		SET_DBL_RESULT(value, c->val[0]);
 
