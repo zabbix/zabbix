@@ -336,21 +336,21 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		// permission check
-		if (!API::Host()->isWritable($targetids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$targetIdsTmp = array();
 		$templateIdsTmp = array();
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (!isset($linked[$targetid]) || !isset($linked[$targetid][$templateid])) {
+					$targetIdsTmp[] = $targetid;
 					$templateIdsTmp[] = $templateid;
 				}
 			}
 		}
-		if ($templateIdsTmp) {
-			if (!API::Template()->isReadable($templateIdsTmp)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (!API::Host()->isWritable($targetIdsTmp)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+		if (!API::Template()->isReadable($templateIdsTmp)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// sync templates
