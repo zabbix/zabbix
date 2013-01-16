@@ -26,6 +26,7 @@ class CAction extends CZBXAPI {
 
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
+	protected $sortColumns = array('actionid', 'name', 'status');
 
 	/**
 	 * Get Actions data
@@ -49,9 +50,6 @@ class CAction extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('actionid', 'name', 'status');
 
 		$sqlParts = array(
 			'select'	=> array('actions' => 'a.actionid'),
@@ -250,9 +248,6 @@ class CAction extends CZBXAPI {
 			zbx_db_search('actions a', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'a');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -261,6 +256,7 @@ class CAction extends CZBXAPI {
 		$actionids = array();
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($action = DBfetch($dbRes)) {
