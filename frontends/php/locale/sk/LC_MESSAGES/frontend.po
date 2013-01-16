@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-13 22:25+0200\n"
+"POT-Creation-Date: 2013-01-17 00:55+0200\n"
 "PO-Revision-Date: 2012-09-21 16:01+0200\n"
 "Last-Translator: Marcel <maco@blava.net>\n"
 "Language-Team: Zabbix translation team\n"
@@ -12118,7 +12118,7 @@ msgstr "Triggers with severity"
 msgid "Truncated"
 msgstr "Truncated"
 
-#: include/classes/class.cpagefilter.php:55
+#: include/classes/class.cpagefilter.php:166
 #, php-format
 msgid "Try to read inaccessible property \"%s\"."
 msgstr ""
@@ -13493,7 +13493,7 @@ msgid "agent"
 msgstr ""
 
 #: include/classes/class.cchart.php:1761
-#: include/classes/class.cpagefilter.php:468
+#: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:106
@@ -13803,8 +13803,8 @@ msgstr "nie ako"
 msgid "not running"
 msgstr "nebeží"
 
-#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:442
-#: include/classes/class.cpagefilter.php:468 include/forms.inc.php:1036
+#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:605
+#: include/classes/class.cpagefilter.php:631 include/forms.inc.php:1036
 #: include/hosts.inc.php:622 include/hosts.inc.php:888
 msgid "not selected"
 msgstr "nie je vybratý"

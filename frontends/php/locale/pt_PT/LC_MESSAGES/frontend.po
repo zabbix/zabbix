@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-13 22:25+0200\n"
+"POT-Creation-Date: 2013-01-17 00:55+0200\n"
 "PO-Revision-Date: 2012-11-13 13:25+0200\n"
 "Last-Translator: mario.rf.santos <mario.rf.santos@gmail.com>\n"
 "Language-Team: none\n"
@@ -12093,7 +12093,7 @@ msgstr "Triggers com severidade"
 msgid "Truncated"
 msgstr "Truncado"
 
-#: include/classes/class.cpagefilter.php:55
+#: include/classes/class.cpagefilter.php:166
 #, php-format
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "Tentativa de leitura de uma propriedade inacessível \"%s\"."
@@ -13468,7 +13468,7 @@ msgid "agent"
 msgstr "agente"
 
 #: include/classes/class.cchart.php:1761
-#: include/classes/class.cpagefilter.php:468
+#: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:106
@@ -13777,8 +13777,8 @@ msgstr "diferente de"
 msgid "not running"
 msgstr "não está em execução"
 
-#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:442
-#: include/classes/class.cpagefilter.php:468 include/forms.inc.php:1036
+#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:605
+#: include/classes/class.cpagefilter.php:631 include/forms.inc.php:1036
 #: include/hosts.inc.php:622 include/hosts.inc.php:888
 msgid "not selected"
 msgstr "não seleccionada"

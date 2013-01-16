@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-13 22:25+0200\n"
+"POT-Creation-Date: 2013-01-17 00:55+0200\n"
 "PO-Revision-Date: 2012-11-14 06:55+0200\n"
 "Last-Translator: wen <51netpro@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -12079,7 +12079,7 @@ msgstr "具示警度的触发器"
 msgid "Truncated"
 msgstr "截断的"
 
-#: include/classes/class.cpagefilter.php:55
+#: include/classes/class.cpagefilter.php:166
 #, php-format
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "尝试读取不能访问的属性\"%s\"."
@@ -13452,7 +13452,7 @@ msgid "agent"
 msgstr "代理"
 
 #: include/classes/class.cchart.php:1761
-#: include/classes/class.cpagefilter.php:468
+#: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:106
@@ -13761,8 +13761,8 @@ msgstr "不像"
 msgid "not running"
 msgstr "未运行"
 
-#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:442
-#: include/classes/class.cpagefilter.php:468 include/forms.inc.php:1036
+#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:605
+#: include/classes/class.cpagefilter.php:631 include/forms.inc.php:1036
 #: include/hosts.inc.php:622 include/hosts.inc.php:888
 msgid "not selected"
 msgstr "非所选的"
