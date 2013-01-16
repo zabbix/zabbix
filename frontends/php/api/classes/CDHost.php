@@ -29,8 +29,8 @@
 class CDHost extends CZBXAPI {
 
 	protected $tableName = 'dhosts';
-
 	protected $tableAlias = 'dh';
+	protected $sortColumns = array('dhostid', 'druleid');
 
 /**
  * Get Host data
@@ -62,9 +62,6 @@ class CDHost extends CZBXAPI {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('dhostid', 'druleid');
 
 		$sqlParts = array(
 			'select'	=> array('dhosts' => 'dh.dhostid'),
@@ -178,9 +175,6 @@ class CDHost extends CZBXAPI {
 			zbx_db_search('dhosts dh', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'dh');
-
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -188,6 +182,7 @@ class CDHost extends CZBXAPI {
 //-------
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dhost = DBfetch($res)) {

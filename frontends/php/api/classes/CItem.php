@@ -25,6 +25,7 @@ class CItem extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
+	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
 
 	/**
 	 * Get items data.
@@ -49,9 +50,6 @@ class CItem extends CItemGeneral {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
 
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
@@ -340,9 +338,6 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'i');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -350,6 +345,7 @@ class CItem extends CItemGeneral {
 
 		$itemids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
