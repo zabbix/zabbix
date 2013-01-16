@@ -314,7 +314,7 @@ class CScreenHistory extends CScreenBase {
 		if (!$this->plaintext && str_in_array($this->action, array('showvalues', 'showgraph'))) {
 			$graphDims = getGraphDims();
 
-			$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($this->item['itemid']));
+			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($this->item['itemid']));
 
 			$timeControlData = array(
 				'periodFixed' => CProfile::get('web.history.timelinefixed', 1),

@@ -920,6 +920,7 @@ define('MAPS_DATE_FORMAT', _('Y.m.d H:i:s'));
 define('SERVER_INFO_DATE_FORMAT', _('D, d M Y H:i:s O'));
 define('XML_DATE_DATE_FORMAT', _('d.m.y'));
 define('XML_TIME_DATE_FORMAT', _('H.i'));
+define('TIMESTAMP_FORMAT', 'YmdHis');
 
 // actions
 define('LONG_DESCRIPTION',	0);
