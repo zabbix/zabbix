@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBX-1334] added whitespace trimming for server lists in agent conf file (wiper)
 ..F....... [ZBX-6108] fixed time control position remembering in monitoring->web (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
