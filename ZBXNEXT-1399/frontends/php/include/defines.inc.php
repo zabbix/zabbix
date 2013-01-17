@@ -96,17 +96,18 @@ define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
-define('PAGE_TYPE_HTML',		0);
-define('PAGE_TYPE_IMAGE',		1);
-define('PAGE_TYPE_XML',			2);
-define('PAGE_TYPE_JS',			3); // javascript
-define('PAGE_TYPE_CSS',			4);
-define('PAGE_TYPE_HTML_BLOCK',	5); // simple block of html (as text)
-define('PAGE_TYPE_JSON',		6); // simple JSON
-define('PAGE_TYPE_JSON_RPC',	7); // api call
-define('PAGE_TYPE_TEXT_FILE',	8); // api call
-define('PAGE_TYPE_TEXT',		9); // simple text
-define('PAGE_TYPE_CSV',			10); // CSV format
+define('PAGE_TYPE_HTML',				0);
+define('PAGE_TYPE_IMAGE',				1);
+define('PAGE_TYPE_XML',					2);
+define('PAGE_TYPE_JS',					3); // javascript
+define('PAGE_TYPE_CSS',					4);
+define('PAGE_TYPE_HTML_BLOCK',			5); // simple block of html (as text)
+define('PAGE_TYPE_JSON',				6); // simple JSON
+define('PAGE_TYPE_JSON_RPC',			7); // api call
+define('PAGE_TYPE_TEXT_FILE',			8); // api call
+define('PAGE_TYPE_TEXT',				9); // simple text
+define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
+define('PAGE_TYPE_CSV',					10); // CSV format
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);

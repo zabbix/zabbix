@@ -270,7 +270,9 @@ if ($requestType == PAGE_TYPE_JSON) {
 		echo $json->encode($rpcResp);
 	}
 }
-elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
+elseif ($requestType == PAGE_TYPE_TEXT
+			|| $requestType == PAGE_TYPE_JS
+			|| $requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
 	echo $result;
 }
 

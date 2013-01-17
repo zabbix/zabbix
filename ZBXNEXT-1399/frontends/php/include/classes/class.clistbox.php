@@ -51,7 +51,7 @@ class CListBox extends CComboBox {
 		// apply ajax-chosen
 		zbx_add_post_js('
 			var ajaxUrl = new Curl("jsrpc.php");
-			ajaxUrl.setArgument("type", '.PAGE_TYPE_TEXT.');
+			ajaxUrl.setArgument("type", '.PAGE_TYPE_TEXT_RETURN_JSON.');
 			ajaxUrl.setArgument("method", "chosen.get");
 			ajaxUrl.setArgument("objectName", "'.$options['objectName'].'");
 
