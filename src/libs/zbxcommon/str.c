@@ -3402,8 +3402,8 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
  ******************************************************************************/
 void	zbx_trim_str_list(char *list, char delimiter)
 {
-	char *whitespace = " \t";
-	char *out, *in;
+	char	*whitespace = " \t";
+	char	*out, *in;
 
 	if (NULL == list || '\0' == *list)
 		return;
@@ -3413,7 +3413,7 @@ void	zbx_trim_str_list(char *list, char delimiter)
 	while ('\0' != *in)
 	{
 		/* trim leading spaces from list item */
-		while (strchr(whitespace, *in))
+		while (NULL != strchr(whitespace, *in))
 			in++;
 
 		/* copy list item */
@@ -3423,7 +3423,8 @@ void	zbx_trim_str_list(char *list, char delimiter)
 		/* trim trailing spaces from list item */
 		if (out > list)
 		{
-			while (strchr(whitespace, *(--out)));
+			while (NULL != strchr(whitespace, *(--out)))
+				;
 			out++;
 		}
 		if (delimiter == *in)
