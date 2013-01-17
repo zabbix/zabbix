@@ -71,7 +71,7 @@ if ($dashconf['filterEnable'] == 1) {
 			// get all groups if no selected groups defined
 			if (empty($dashconf['groupids'])) {
 				$groups = API::HostGroup()->get(array(
-					'nodeids' => get_current_nodeid(true),
+					'nodeids' => get_current_nodeid(),
 					'output' => array('groupid')
 				));
 				$dashconf['groupids'] = zbx_objectValues($groups, 'groupid');
