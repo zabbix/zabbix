@@ -62,17 +62,17 @@ if (isset($_REQUEST['save'])) {
 			// show groups
 			$groupIds = get_request('groupids', array());
 
-			$result = CFavorite::remove('web.dashconf.groups.groupids');
+			CFavorite::remove('web.dashconf.groups.groupids');
 			foreach ($groupIds as $groupId) {
-				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupId);
+				CFavorite::add('web.dashconf.groups.groupids', $groupId);
 			}
 
 			// hide groups
 			$hideGroupIds = get_request('hidegroupids', array());
 
-			$result = CFavorite::remove('web.dashconf.groups.hide.groupids');
+			CFavorite::remove('web.dashconf.groups.hide.groupids');
 			foreach ($hideGroupIds as $hideGroupId) {
-				$result &= CFavorite::add('web.dashconf.groups.hide.groupids', $hideGroupId);
+				CFavorite::add('web.dashconf.groups.hide.groupids', $hideGroupId);
 			}
 		}
 
