@@ -246,7 +246,7 @@ switch ($data['method']) {
 				$result[] = array(
 					'value' => $hostGroup['groupid'],
 					'text' => !empty($hostGroup['nodename'])
-						? $hostGroup['nodename'].': '.$hostGroup['name']
+						? $hostGroup['nodename'].$hostGroup['name']
 						: $hostGroup['name']
 				);
 			}
