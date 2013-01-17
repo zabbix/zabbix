@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+.......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 A......... [ZBX-3534] fixed templated linking using read-only template (Eduard)
 ..F....... [ZBX-5458] fixed some date strings are not being translated (Toms)
 ..F....... [ZBX-6110] fixed selected map remembering in monitoring->map (Eduard)
