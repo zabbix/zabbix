@@ -92,14 +92,22 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 
 // check permissions
 if (!empty($_REQUEST['serviceid'])) {
-	$service = API::Service()->get(array(
+	$options = array(
 		'output' => API_OUTPUT_EXTEND,
-		'selectParent' => array('serviceid', 'name'),
-		'selectDependencies' => API_OUTPUT_EXTEND,
-		'selectTimes' => API_OUTPUT_EXTEND,
-		'serviceids' => $_REQUEST['serviceid'],
-		'limit' => 1
-	));
+		'serviceids' => $_REQUEST['serviceid']
+	);
+
+	if (isset($_REQUEST['delete']) || isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
+		$options['output'] = API_OUTPUT_REFER;
+	}
+	else {
+		$options['selectParent'] = array('serviceid', 'name');
+		$options['selectDependencies'] = API_OUTPUT_EXTEND;
+		$options['selectTimes'] = API_OUTPUT_EXTEND;
+	}
+
+	$service = API::Service()->get($options);
+
 	$service = reset($service);
 	if (!$service) {
 		access_deny();
