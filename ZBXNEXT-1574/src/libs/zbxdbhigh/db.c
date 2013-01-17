@@ -548,7 +548,7 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 	generate_event = (value != new_value || value_flags != new_value_flags);
 	if (TRIGGER_TYPE_MULTIPLE_TRUE == type && 0 == generate_event)
-		generate_event = (TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
+		generate_event = (TRIGGER_VALUE_PROBLEM == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
 
 	if (0 != generate_event)
 	{
@@ -559,7 +559,7 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 			*add_event = 1;
 
 			if (value != new_value || (TRIGGER_TYPE_MULTIPLE_TRUE == type &&
-					TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags))
+					TRIGGER_VALUE_PROBLEM == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags))
 			{
 				*value_changed = TRIGGER_VALUE_CHANGED_YES;
 				new_lastchange = ts->sec;
@@ -1936,7 +1936,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		DBfree_result(result);
 
 		process_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-				autoreg_hostid, &ts, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_CHANGED_NO, 0, 1);
+				autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, TRIGGER_VALUE_CHANGED_NO, 0, 1);
 
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);

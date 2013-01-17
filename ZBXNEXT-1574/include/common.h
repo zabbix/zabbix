@@ -564,9 +564,9 @@ typedef enum
 #define TRIGGER_STATUS_DISABLED	1
 
 /* trigger values */
-#define TRIGGER_VALUE_FALSE	0
-#define TRIGGER_VALUE_TRUE	1
-#define TRIGGER_VALUE_UNKNOWN	2 /* only in "events" table */
+#define TRIGGER_VALUE_OK	0
+#define TRIGGER_VALUE_PROBLEM	1
+#define TRIGGER_VALUE_UNKNOWN	2	/* only in server code, never in DB */
 
 /* trigger value flags */
 #define TRIGGER_VALUE_FLAG_NORMAL	0
