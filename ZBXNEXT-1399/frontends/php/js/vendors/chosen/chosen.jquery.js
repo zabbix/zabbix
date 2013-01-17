@@ -145,9 +145,9 @@ Copyright (c) 2011 by Harvest
       if (this.form_field.getAttribute("data-placeholder")) {
         this.default_text = this.form_field.getAttribute("data-placeholder");
       } else if (this.is_multiple) {
-		this.default_text = this.options.placeholder_text_multiple || this.options.placeholder_text || locale["Select Some Options"];
+		this.default_text = this.options.placeholder_text_multiple || this.options.placeholder_text || locale["Select some options"];
       } else {
-		this.default_text = this.options.placeholder_text_single || this.options.placeholder_text || locale["Select an Option"];
+		this.default_text = this.options.placeholder_text_single || this.options.placeholder_text || locale["Select option"];
       }
 		return this.results_none_found = this.form_field.getAttribute("data-no_results_text") || this.options.no_results_text || locale["No results match"];
     };

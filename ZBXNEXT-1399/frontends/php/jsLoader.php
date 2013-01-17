@@ -184,8 +184,8 @@ $tranStrings = array(
 		'Delete the selected service?' => _('Delete the selected service?')
 	),
 	'chosen.jquery.js' => array(
-		'Select Some Options' => _('Select Some Options'),
-		'Select an Option' => _('Select an Option'),
+		'Select some options' => _('Select some options'),
+		'Select option' => _('Select option'),
 		'No results match' => _('No results match'),
 		'Keep typing...' => _('Keep typing...'),
 		'Looking for' => _('Looking for')
