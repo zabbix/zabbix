@@ -24,13 +24,7 @@ class CHostImporter extends CImporter {
 	public function import(array $hosts) {
 		$hostsToCreate = array();
 		$hostsToUpdate = array();
-		$hostInterfacesRefsByName = array();
 		foreach ($hosts as $host) {
-			$hostInterfacesRefsByName[$host['host']] = array();
-			foreach ($host['interfaces'] as $interface) {
-				$hostInterfacesRefsByName[$host['host']][$interface['interface_ref']] = $interface;
-			}
-
 			// preserve host related templates to massAdd them later
 			if ($this->options['templateLinkage']['createMissing'] && !empty($host['templates'])) {
 				foreach ($host['templates'] as $template) {
@@ -57,13 +51,13 @@ class CHostImporter extends CImporter {
 		$hostsToUpdate = $this->addInterfaceIds($hostsToUpdate);
 
 		// a list of hostids which were created or updated to create an interface cache for those hosts
-		$processedHosts = array();
+		$processedHostIds = array();
 		// create/update hosts
 		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
 			$newHostIds = API::Host()->create($hostsToCreate);
 			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
 				$hostHost = $hostsToCreate[$hnum]['host'];
-				$processedHosts[$hostHost] = $hostid;
+				$processedHostIds[$hostHost] = $hostid;
 				$this->referencer->addHostRef($hostHost, $hostid);
 				$this->referencer->addProcessedHost($hostHost);
 
@@ -79,7 +73,7 @@ class CHostImporter extends CImporter {
 			API::Host()->update($hostsToUpdate);
 			foreach ($hostsToUpdate as $host) {
 				$this->referencer->addProcessedHost($host['host']);
-				$processedHosts[$host['host']] = $host['hostid'];
+				$processedHostIds[$host['host']] = $host['hostid'];
 
 				if (!empty($templateLinkage[$host['host']])) {
 					API::Template()->massAdd(array(
@@ -92,27 +86,29 @@ class CHostImporter extends CImporter {
 
 		// create interfaces cache interface_ref->interfaceid
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $processedHosts,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
+			'hostids' => $processedHostIds,
+			'output' => API_OUTPUT_EXTEND
 		));
+		foreach ($hosts as $host) {
+			foreach ($host['interfaces'] as $interface) {
+				if (isset($processedHostIds[$host['host']])) {
+					$hostId = $processedHostIds[$host['host']];
+					if (!isset($this->referencer->interfacesCache[$hostId])) {
+						$this->referencer->interfacesCache[$hostId] = array();
+					}
 
-		foreach ($dbInterfaces as $dbInterface) {
-			foreach ($hostInterfacesRefsByName as $hostName => $interfaceRefs) {
-				$hostId = $this->referencer->resolveHost($hostName);
-				if (!isset($this->referencer->interfacesCache[$processedHosts[$hostName]])) {
-					$this->referencer->interfacesCache[$hostId] = array();
-				}
-
-				foreach ($interfaceRefs as $refName => $interface) {
-					if ($hostId == $dbInterface['hostid']
+					foreach ($dbInterfaces as $dbInterface) {
+						if ($hostId == $dbInterface['hostid']
 							&& $dbInterface['ip'] == $interface['ip']
 							&& $dbInterface['dns'] == $interface['dns']
 							&& $dbInterface['useip'] == $interface['useip']
 							&& $dbInterface['port'] == $interface['port']
 							&& $dbInterface['type'] == $interface['type']
 							&& $dbInterface['main'] == $interface['main']) {
-						$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
+
+							$refName = $interface['interface_ref'];
+							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
+						}
 					}
 				}
 			}
