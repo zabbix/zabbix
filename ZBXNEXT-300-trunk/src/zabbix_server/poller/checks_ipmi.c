@@ -352,6 +352,7 @@ static void	delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/* callback function invoked from OpenIPMI */
 static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_present_e value_present,
 		unsigned int raw_value, double val, ipmi_states_t *states, void *cb_data)
 {
@@ -428,6 +429,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
+/* callback function invoked from OpenIPMI */
 static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
 {
 	const char		*__function_name = "got_discrete_states";
@@ -555,6 +557,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
+/* callback function invoked from OpenIPMI */
 static void	got_control_reading(ipmi_control_t *control, int err, int *val, void *cb_data)
 {
 	const char		*__function_name = "got_control_reading";
@@ -611,6 +614,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
+/* callback function invoked from OpenIPMI */
 static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 {
 	const char		*__function_name = "got_control_setting";
@@ -728,6 +732,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
+/* callback function invoked from OpenIPMI */
 static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor_t *sensor, void *cb_data)
 {
 	const char	*__function_name = "sensor_change";
@@ -763,6 +768,7 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/* callback function invoked from OpenIPMI */
 static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_control_t *control, void *cb_data)
 {
 	const char	*__function_name = "control_change";
@@ -783,6 +789,7 @@ static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_contr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/* callback function invoked from OpenIPMI */
 static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_entity_t *entity, void *cb_data)
 {
 	const char	*__function_name = "entity_change";
@@ -803,6 +810,7 @@ static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_ent
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/* callback function invoked from OpenIPMI */
 static void	domain_closed(void *cb_data)
 {
 	const char	*__function_name = "domain_closed";
@@ -816,6 +824,7 @@ static void	domain_closed(void *cb_data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/* callback function invoked from OpenIPMI */
 static void	setup_done(ipmi_domain_t *domain, int err, unsigned int conn_num, unsigned int port_num,
 		int still_connected, void *cb_data)
 {
@@ -844,6 +853,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
+/* callback function invoked from OpenIPMI */
 static void	domain_up(ipmi_domain_t *domain, void *cb_data)
 {
 	const char	*__function_name = "domain_up";
