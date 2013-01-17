@@ -1301,6 +1301,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+.......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 
 Changes for 1.8.16
 
