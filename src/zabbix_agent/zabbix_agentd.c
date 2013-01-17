@@ -489,6 +489,9 @@ static void	zbx_load_config(int requirement)
 
 	set_defaults();
 
+	zbx_trim_str_list(CONFIG_HOSTS_ALLOWED, ',');
+	zbx_trim_str_list(active_hosts, ',');
+
 	if (ZBX_CFG_FILE_REQUIRED == requirement && NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
 	{
 		zbx_error("StartAgents is not 0, parameter Server must be defined");
