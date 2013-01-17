@@ -1886,7 +1886,11 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		if (CWebUser::isLoggedIn()) {
 			$header = _('Access denied.');
 			$message = array(
-				_s('Your are logged in as %1$s. You have no permissions to access this page.', CWebUser::$data['alias']),
+				_('Your are logged in as'),
+				' ',
+				bold(CWebUser::$data['alias']),
+				'. ',
+				_('You have no permissions to access this page.'),
 				BR(),
 				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 			);
