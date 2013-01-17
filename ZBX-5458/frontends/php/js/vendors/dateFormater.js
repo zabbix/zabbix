@@ -9,7 +9,7 @@
  *
  *  @param format PHP style date format (d:M:y, for example)
  *
- *  @return return human readable date string
+ *  @return string human readable date
  */
 Date.prototype.format = function(format) {
 	var returnStr = '';
