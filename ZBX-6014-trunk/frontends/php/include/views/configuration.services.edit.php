@@ -33,6 +33,7 @@ $servicesForm->setName('servicesForm');
 $servicesForm->addVar('form', $this->data['form']);
 $servicesForm->addVar('parentid', $this->data['parentid']);
 $servicesForm->addVar('parentname', $this->data['parentname']);
+$servicesForm->addVar('triggerid', $this->data['triggerid']);
 if (isset($this->data['service'])) {
 	$servicesForm->addVar('serviceid', $this->data['service']['serviceid']);
 }
