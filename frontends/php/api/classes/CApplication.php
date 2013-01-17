@@ -631,6 +631,4 @@ class CApplication extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }
