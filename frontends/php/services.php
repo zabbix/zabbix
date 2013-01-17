@@ -98,7 +98,7 @@ if (!empty($_REQUEST['serviceid'])) {
 	);
 
 	if (isset($_REQUEST['delete']) || isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
-		$options['output'] = API_OUTPUT_REFER;
+		$options['output'] = array('serviceid', 'name');
 	}
 	else {
 		$options['selectParent'] = array('serviceid', 'name');
