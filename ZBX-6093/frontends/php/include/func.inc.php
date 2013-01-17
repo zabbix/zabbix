@@ -1882,10 +1882,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	}
 	// deny access to a page
 	else {
-		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
-		$url->setArgument('sid', null);
-		$url = urlencode($url->toString());
-
 		// if the user is logged in - render the access denied message
 		if (CWebUser::isLoggedIn()) {
 			$header = _('Access denied.');
@@ -1894,9 +1890,20 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				BR(),
 				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 			);
-			$buttons = array(
-				new CButton('login', _('Switch user'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
-				new CButton('back', _('Go to dashboard'), 'javascript: document.location = "dashboard.php"', 'formlist')
+
+			$buttons = array();
+			// display the login button only for guest users
+			if (CWebUser::isGuest()) {
+				$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
+				$url->setArgument('sid', null);
+				$url = urlencode($url->toString());
+
+				$buttons[] = new CButton('login', _('Login'),
+					'javascript: document.location = "index.php?request='.$url.'";', 'formlist'
+				);
+			}
+			$buttons[] = new CButton('back', _('Go to dashboard'),
+				'javascript: document.location = "dashboard.php"', 'formlist'
 			);
 		}
 		// if the user is not logged in - offer to login
