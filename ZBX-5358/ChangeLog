@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXT-5358] fixed encoding of network interface names with non ASCII characters in Vista/Server 2008 + (wiper)
 A.F....... [ZBXNEXT-1491] fixed builded query ordering (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
