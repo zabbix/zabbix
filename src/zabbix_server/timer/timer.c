@@ -338,7 +338,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			maintenance_to,
-			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
+			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
 
 	result = DBselectN(sql, 1);
 
@@ -376,7 +376,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			maintenance_from,
-			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
+			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
 
 	result = DBselectN(sql, 1);
 
@@ -406,7 +406,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			maintenance_from, maintenance_to - 1,
-			*value_after == TRIGGER_VALUE_FALSE ? TRIGGER_VALUE_TRUE : TRIGGER_VALUE_FALSE);
+			*value_after == TRIGGER_VALUE_OK ? TRIGGER_VALUE_PROBLEM : TRIGGER_VALUE_OK);
 
 	if (NULL != (row = DBfetch(result)))
 		*value_inside = atoi(row[0]);

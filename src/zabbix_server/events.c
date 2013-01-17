@@ -140,7 +140,7 @@ int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t obj
 		process_actions(&event);
 
 	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed && EVENT_OBJECT_TRIGGER == event.object)
-		DBupdate_services(event.objectid, TRIGGER_VALUE_TRUE == event.value ? event.trigger.priority : 0, event.clock);
+		DBupdate_services(event.objectid, TRIGGER_VALUE_PROBLEM == event.value ? event.trigger.priority : 0, event.clock);
 
 	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed || 1 == force_actions)
 		free_trigger_info(&event);

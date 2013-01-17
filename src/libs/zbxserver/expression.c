@@ -951,9 +951,9 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
 	int		ret = FAIL;
 
 	if (problem_only)
-		zbx_snprintf(value, sizeof(value), "%d", TRIGGER_VALUE_TRUE);
+		zbx_snprintf(value, sizeof(value), "%d", TRIGGER_VALUE_PROBLEM);
 	else
-		zbx_snprintf(value, sizeof(value), "%d,%d", TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
+		zbx_snprintf(value, sizeof(value), "%d,%d", TRIGGER_VALUE_PROBLEM, TRIGGER_VALUE_OK);
 
 	result = DBselect(
 			"select count(*)"
@@ -2287,7 +2287,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_TIME))
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS))
-					replace_to = zbx_strdup(replace_to, event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
+					replace_to = zbx_strdup(replace_to, event->value == TRIGGER_VALUE_PROBLEM ? "PROBLEM" : "OK");
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
@@ -3166,10 +3166,10 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		}
 		else if (SUCCEED == cmp_double(expr_result, 0))
 		{
-			tr->new_value = TRIGGER_VALUE_FALSE;
+			tr->new_value = TRIGGER_VALUE_OK;
 		}
 		else
-			tr->new_value = TRIGGER_VALUE_TRUE;
+			tr->new_value = TRIGGER_VALUE_PROBLEM;
 	}
 
 	for (i = 0; i < triggers->values_num; i++)

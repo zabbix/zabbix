@@ -873,7 +873,7 @@ static int	DBget_service_status(zbx_uint64_t serviceid, int algorithm, zbx_uint6
 						" and status=0"
 						" and value=%d",
 					triggerid,
-					TRIGGER_VALUE_TRUE);
+					TRIGGER_VALUE_PROBLEM);
 		row = DBfetch(result);
 		if (NULL != row && SUCCEED != DBis_null(row[0]))
 		{
@@ -2201,7 +2201,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
 						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,'%s');\n",
 					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
-					url_esc, (int)type, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid,
+					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid,
 					(int)flags, error_esc);
 
 		zbx_free(error_esc);

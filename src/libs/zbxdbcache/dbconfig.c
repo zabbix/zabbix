@@ -4240,7 +4240,7 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 		for (i = 0; NULL != (next_trigdep = trigdep->dependencies[i]); i++)
 		{
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
-					TRIGGER_VALUE_TRUE == next_trigger->value &&
+					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
 					TRIGGER_VALUE_FLAG_NORMAL == next_trigger->value_flags)
 			{
 				return FAIL;
