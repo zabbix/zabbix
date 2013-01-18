@@ -710,6 +710,17 @@ static int	DBpatch_02010031()
 {
 	return DBdrop_field("events", "value_changed");
 }
+
+static int	DBpatch_02010032()
+{
+	const char	*sql =
+			"delete from profiles where idx='web.events.filter.showUnknown'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -779,6 +790,7 @@ int	DBcheck_version()
 		{DBpatch_02010029, 2010029, 0, 0},
 		{DBpatch_02010030, 2010030, 0, 1},
 		{DBpatch_02010031, 2010031, 0, 1},
+		{DBpatch_02010032, 2010032, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
