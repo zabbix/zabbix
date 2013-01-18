@@ -164,7 +164,6 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 function trigger_value2str($value) {
 	$str_val[TRIGGER_VALUE_FALSE] = _('OK');
 	$str_val[TRIGGER_VALUE_TRUE] = _('PROBLEM');
-	$str_val[TRIGGER_VALUE_UNKNOWN] = _('UNKNOWN');
 
 	if (isset($str_val[$value])) {
 		return $str_val[$value];

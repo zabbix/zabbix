@@ -288,7 +288,6 @@ class CTrigger extends CTriggerGeneral {
 					' FROM events e'.
 					' WHERE t.triggerid=e.objectid'.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
 					')';
@@ -300,7 +299,6 @@ class CTrigger extends CTriggerGeneral {
 					' FROM events e'.
 					' WHERE e.objectid=t.triggerid'.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
 					')';
@@ -548,7 +546,6 @@ class CTrigger extends CTriggerGeneral {
 				' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 					' AND '.dbConditionInt('e.objectid', $triggerids).
 					' AND '.dbConditionInt('e.value', array(TRIGGER_VALUE_TRUE)).
-					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 				' GROUP BY e.objectid'
 			);
 			while ($event = DBfetch($eventsDb)) {

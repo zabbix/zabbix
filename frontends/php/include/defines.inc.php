@@ -410,13 +410,9 @@ define('TRIGGER_STATUS_DISABLED',	1);
 
 define('TRIGGER_VALUE_FALSE', 0);   // ok
 define('TRIGGER_VALUE_TRUE',	1);    // problem
-define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
 define('TRIGGER_VALUE_FLAG_NORMAL',		0);
 define('TRIGGER_VALUE_FLAG_UNKNOWN',	1);
-
-define('TRIGGER_VALUE_CHANGED_NO',	0);
-define('TRIGGER_VALUE_CHANGED_YES', 1);
 
 define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 define('TRIGGER_SEVERITY_INFORMATION',		1);
