@@ -30,6 +30,7 @@ class CGraph extends CGraphGeneral {
 
 	protected $tableName = 'graphs';
 	protected $tableAlias = 'g';
+	protected $sortColumns = array('graphid', 'name', 'graphtype');
 
 	public function __construct() {
 		parent::__construct();
@@ -49,9 +50,6 @@ class CGraph extends CGraphGeneral {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('graphid', 'name', 'graphtype');
 
 		$sqlParts = array(
 			'select'	=> array('graphs' => 'g.graphid'),
@@ -254,9 +252,6 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'g');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -265,6 +260,7 @@ class CGraph extends CGraphGeneral {
 		$graphids = array();
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($graph = DBfetch($dbRes)) {
@@ -450,38 +446,15 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Inherit template graphs from template to host
+	 * Inherit template graphs from template to host.
 	 *
 	 * @param array $data
+	 *
 	 * @return bool
 	 */
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$allowedHosts = API::Host()->get(array(
-			'hostids' => $data['hostids'],
-			'editable' => true,
-			'preservekeys' => true,
-			'templated_hosts' => true,
-			'output' => array('hostid')
-		));
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		$allowedTemplates = API::Template()->get(array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => true,
-			'output' => array('templateid')
-		));
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
 
 		$dbLinks = DBSelect(
 			'SELECT ht.hostid,ht.templateid'.

@@ -24,8 +24,8 @@
 class CApplication extends CZBXAPI {
 
 	protected $tableName = 'applications';
-
 	protected $tableAlias = 'a';
+	protected $sortColumns = array('applicationid', 'name');
 
 	/**
 	* Get Applications data
@@ -48,7 +48,6 @@ class CApplication extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sortColumns = array('applicationid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('apps' => 'a.applicationid'),
@@ -200,9 +199,6 @@ class CApplication extends CZBXAPI {
 			$this->dbFilter('applications a', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'a');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -210,6 +206,7 @@ class CApplication extends CZBXAPI {
 
 		// output
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($application = DBfetch($res)) {
@@ -634,6 +631,4 @@ class CApplication extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }
