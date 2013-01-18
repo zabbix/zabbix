@@ -3905,6 +3905,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 			*items = zbx_realloc(*items, items_alloc * sizeof(DC_ITEM));
 		}
 
+		DCget_host(&(*items)[items_num].host, dc_host);
 		DCget_item(&(*items)[items_num], dc_item);
 		items_num++;
 	}
