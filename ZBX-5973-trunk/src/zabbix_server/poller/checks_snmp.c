@@ -197,6 +197,7 @@ static void	cache_put_snmp_index(DC_ITEM *item, char *oid, char *value, const ch
 	snmpidx[i].value = zbx_strdup(NULL, value);
 	snmpidx[i].idx = zbx_strdup(NULL, idx);
 	snmpidx_count++;
+
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -515,9 +516,9 @@ end:
  *                SUCCEED - success, variable 'idx' contains index having     *
  *                          value 'value'                                     *
  *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
+ * Comments:   When an index for the specified value is searched in OID table *
+ *             all values from the table are put into cache in 1 pass to      *
+ *             improve performance.                                           *
  *                                                                            *
  ******************************************************************************/
 static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OID, const char *value,
@@ -527,7 +528,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len = 0;
 	char			strval[MAX_STRING_LEN], *strval_dyn, snmp_oid[MAX_STRING_LEN], *error;
-	int			status, running, ret = NOTSUPPORTED;
+	int			status, running, ret = NOTSUPPORTED, found = 0;
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*vars;
 
@@ -644,7 +645,13 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 							zbx_free(error);
 						}
 
-						if (0 == strcmp(value, strval))
+						if (1 == bulk)
+						{
+							cache_put_snmp_index(item, (char *)OID, strval,
+									&snmp_oid[OID_len + 1]);
+						}
+
+						if (0 == found && 0 == strcmp(value, strval))
 						{
 							size_t	idx_offset = 0;
 
@@ -654,8 +661,11 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 										&snmp_oid[OID_len + 1]);
 								zabbix_log(LOG_LEVEL_DEBUG, "index found: '%s'", *idx);
 							}
-							ret = SUCCEED;
-							running = 0;
+
+							found = 1;
+
+							if (0 == bulk)
+								running = 0;
 						}
 
 						/* go to next variable */
@@ -713,6 +723,9 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 		if (response)
 			snmp_free_pdu(response);
 	}
+
+	if (1 == found)
+		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
