@@ -258,7 +258,6 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
  * If $event has subarray 'acknowledges', returned link will have hint with acknowledges.
  *
  * @param array			$event   event data
- * @param int			$event['value_changed']
  * @param int			$event['acknowledged']
  * @param int			$event['eventid']
  * @param int			$event['objectid']
@@ -274,10 +273,6 @@ function getEventAckState($event, $backUrl = false, $isLink = true, $params = ar
 
 	if (!$config['event_ack_enable']) {
 		return null;
-	}
-
-	if ($event['value_changed'] == TRIGGER_VALUE_CHANGED_NO) {
-		return SPACE;
 	}
 
 	if ($isLink) {
