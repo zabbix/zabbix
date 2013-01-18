@@ -642,7 +642,12 @@ static int	DBpatch_02010027()
 
 static int	DBpatch_02010028()
 {
-	const char	*sql = "delete from profiles where idx='web.httpconf.showdisabled'";
+	const char	*sql =
+			"update profiles"
+			" set value_int=case when value_str='0' then 0 else 1 end,"
+				"value_str='',"
+				"type=2"	/* PROFILE_TYPE_INT */
+			" where idx='web.httpconf.showdisabled'";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
