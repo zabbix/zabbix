@@ -27,12 +27,123 @@
  */
 class CPageFilter {
 
-	protected $data = array(); // groups, hosts, ...
-	protected $ids = array(); // groupid, hostid, ...
-	protected $isSelected = array(); // hostsSelected, groupsSelected, ...
-	protected $config = array();
-	private $_profileIdx = array(); // profiles idx
-	private $_profileIds = array();
+	/**
+	 * Configuration options.
+	 *
+	 * @var array
+	 */
+	protected $config = array(
+		// whether to allow all nodes
+		'all_nodes' => null,
+
+		// select the latest object viewed by the user on any page
+		'select_latest' => null,
+
+		// reset the remembered values if the remember first dropdown entry function is disabled
+		'DDReset' => null,
+
+		// if set to true selections will be remembered for each file separately,
+		// if set to false - for each main menu section (monitoring, inventory, configuration etc.)
+		'individual' => null,
+
+		// if set to true and the remembered object is missing from the selection, sets the filter to the first
+		// available object. If set to false, the selection will remain empty.
+		'popupDD' => null,
+
+		// Force the filter to select the given objects.
+		// works only if the host given in 'hostid' belongs to that group or 'hostid' is not set
+		'groupid' => null,
+		// works only if a host group is selected or the host group filter value is set to 'all'
+		'hostid' => null,
+		// works only if a host is selected or the host filter value is set to 'all'
+		'graphid' => null,
+		// works only if a specific host has been selected, will NOT work if the host filter is set to 'all'
+		'triggerid' => null,
+		'druleid' => null,
+
+		// API parameters to be used to retrieve filter objects
+		'groups' => null,
+		'hosts' => null,
+		'graphs' => null,
+		'triggers' => null,
+		'drules' => null
+	);
+
+	/**
+	 * Objects preset in the filter.
+	 *
+	 * @var array
+	 */
+	protected $data = array(
+		'groups' => null,
+		'hosts' => null,
+		'graphs' => null,
+		'triggers' => null,
+		'drules' => null
+	);
+
+	/**
+	 * Selected objects IDs.
+	 *
+	 * @var array
+	 */
+	protected $ids = array(
+		'groupid' => null,
+		'hostid' => null,
+		'triggerid' => null,
+		'graphid' => null,
+		'druleid' => null
+	);
+
+	/**
+	 * Contains information about the selected values.
+	 *
+	 * The '*Selected' value is set to true if a specific object is chosen or the corresponding filter is set to 'All'
+	 * and contains objects.
+	 *
+	 * The '*All' value is set to true if the corresponding filter is set to 'All' and contains objects.
+	 *
+	 * @var array
+	 */
+	protected $isSelected = array(
+		'groupsSelected' => null,
+		'groupsAll' => null,
+		'hostsSelected' => null,
+		'hostsAll' => null,
+		'graphsSelected' => null,
+		'triggersSelected' => null,
+		'drulesSelected' => null,
+		'drulesAll' => null
+	);
+
+	/**
+	 * User profile keys to be used when remembering the selected values.
+	 *
+	 * @see the 'individual' option for more info.
+	 *
+	 * @var array
+	 */
+	private $_profileIdx = array(
+		'groupid' => null,
+		'hostid' => null,
+		'triggerid' => null,
+		'graphid' => null,
+		'druleid' => null
+	);
+
+	/**
+	 * IDs of specific objects to be selected.
+	 *
+	 * @var array
+	 */
+	private $_profileIds = array(
+		'groupid' => null,
+		'hostid' => null,
+		'triggerid' => null,
+		'graphid' => null,
+		'druleid' => null
+	);
+
 	private $_requestIds = array();
 
 	const GROUP_LATEST_IDX = 'web.latest.groupid';
@@ -95,7 +206,7 @@ class CPageFilter {
 
 		// groups
 		if (isset($options['groups'])) {
-			$this->_initGroups($options['groupid'], $options['groups']);
+			$this->_initGroups($options['groupid'], $options['groups'], isset($options['hostid']) ? $options['hostid'] : null);
 		}
 
 		// hosts
@@ -119,6 +230,18 @@ class CPageFilter {
 		}
 	}
 
+	/**
+	 * Retrieve objects stored in the user profile.
+	 *
+	 * If the 'select_latest' option is used, the IDs will be loaded from the web.latest.objectid profile values,
+	 * otherwise - from the web.*.objectid field, depending on the use of the 'individial' option.
+	 *
+	 * If the 'DDReset' option is used, IDs will be reset to zeroes.
+	 *
+	 * The method also sets the scope for remembering the selected values, see the 'individual' option for more info.
+	 *
+	 * @param $options
+	 */
 	private function _getProfiles($options) {
 		global $page;
 
@@ -200,7 +323,17 @@ class CPageFilter {
 		}
 	}
 
-	private function _initGroups($groupid, $options) {
+	/**
+	 * Load available host groups, choose the selected host group and remember the selection.
+	 *
+	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
+	 * will be reset to 0.
+	 *
+	 * @param $groupid
+	 * @param $options
+	 * @param $hostid
+	 */
+	private function _initGroups($groupid, $options, $hostid) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => array('groupid', 'name')
@@ -216,7 +349,18 @@ class CPageFilter {
 
 		// select remebered selection
 		if (is_null($groupid) && $this->_profileIds['groupid']) {
-			$groupid = $this->_profileIds['groupid'];
+			// set group only if host is in group or hostid is not set
+			if ($hostid) {
+				$host = API::Host()->get(array(
+					'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+					'output' => array('hostid'),
+					'hostids' => $hostid,
+					'groupids' => $this->_profileIds['groupid']
+				));
+			}
+			if (!$hostid || !empty($host)) {
+				$groupid = $this->_profileIds['groupid'];
+			}
 		}
 
 		// nonexisting or unset $groupid
@@ -240,6 +384,14 @@ class CPageFilter {
 		$this->ids['groupid'] = $groupid;
 	}
 
+	/**
+	 * Load available hosts, choose the selected host and remember the selection.
+	 *
+	 * If no host group is selected, reset the selected host to 0.
+	 *
+	 * @param $hostid
+	 * @param $options
+	 */
 	private function _initHosts($hostid, $options) {
 		$this->data['hosts'] = array();
 
@@ -288,6 +440,14 @@ class CPageFilter {
 		$this->ids['hostid'] = $hostid;
 	}
 
+	/**
+	 * Load available graphs, choose the selected graph and remember the selection.
+	 *
+	 * If no host is selected, reset the selected graph to 0.
+	 *
+	 * @param $graphid
+	 * @param $options
+	 */
 	private function _initGraphs($graphid, $options) {
 		$this->data['graphs'] = array();
 
@@ -344,6 +504,14 @@ class CPageFilter {
 		$this->ids['graphid'] = $graphid;
 	}
 
+	/**
+	 * Load available triggers, choose the selected trigger and remember the selection.
+	 *
+	 * If no host is elected, or the host selection is set to 'All', reset the selected trigger to 0.
+	 *
+	 * @param $triggerid
+	 * @param $options
+	 */
 	private function _initTriggers($triggerid, $options) {
 		$this->data['triggers'] = array();
 
@@ -375,6 +543,12 @@ class CPageFilter {
 		$this->ids['triggerid'] = $triggerid;
 	}
 
+	/**
+	 * Load the available network discovery rules, choose the selected rule and remember the selection.
+	 *
+	 * @param $druleid
+	 * @param $options
+	 */
 	private function _initDiscoveries($druleid, $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,

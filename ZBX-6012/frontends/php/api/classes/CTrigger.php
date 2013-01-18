@@ -396,7 +396,7 @@ class CTrigger extends CTriggerGeneral {
 				);
 			}
 
-			zbx_db_filter('triggers t', $options, $sqlParts);
+			$this->dbFilter('triggers t', $options, $sqlParts);
 
 			if (isset($options['filter']['host']) && !is_null($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
@@ -1689,31 +1689,6 @@ class CTrigger extends CTriggerGeneral {
 	public function syncTemplates(array $data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$allowedHosts = API::Host()->get(array(
-			'hostids' => $data['hostids'],
-			'editable' => true,
-			'preservekeys' => true,
-			'templated_hosts' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-
-		$allowedTemplates = API::Template()->get(array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
 
 		$triggers = $this->get(array(
 			'hostids' => $data['templateids'],

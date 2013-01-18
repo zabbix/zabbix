@@ -257,10 +257,15 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
  * Create element with event acknowledges info.
  * If $event has subarray 'acknowledges', returned link will have hint with acknowledges.
  *
- * @param array       $event   event data
- * @param bool|string $backUrl if true, add backurl param to link with current page file name
- * @param bool        $isLink  if true, return link otherwise span
- * @param array       $params  additional params for link
+ * @param array			$event   event data
+ * @param int			$event['value_changed']
+ * @param int			$event['acknowledged']
+ * @param int			$event['eventid']
+ * @param int			$event['objectid']
+ * @param array			$event['acknowledges']
+ * @param bool|string	$backUrl if true, add backurl param to link with current page file name
+ * @param bool			$isLink  if true, return link otherwise span
+ * @param array			$params  additional params for link
  *
  * @return array|CLink|CSpan|null|string
  */
@@ -300,7 +305,7 @@ function getEventAckState($event, $backUrl = false, $isLink = true, $params = ar
 		else {
 			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, 'enabled');
 			if (is_array($event['acknowledges'])) {
-				$ackLinkHints = make_acktab_by_eventid($event);
+				$ackLinkHints = makeAckTab($event);
 				if (!empty($ackLinkHints)) {
 					$ackLink->setHint($ackLinkHints, '', '', false);
 				}
@@ -335,7 +340,7 @@ function getLastEvents($options) {
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['limit']
+		'limit' => $options['triggerLimit']
 	);
 
 	$eventOptions = array(
@@ -345,9 +350,12 @@ function getLastEvents($options) {
 			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
 		'sortfield' => 'eventid',
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['limit']
+		'sortorder' => ZBX_SORT_DOWN
 	);
+
+	if (isset($options['eventLimit'])) {
+		$eventOptions['limit'] = $options['eventLimit'];
+	}
 
 	if (isset($options['nodeids'])) {
 		$triggerOptions['nodeids'] = $options['nodeids'];

@@ -233,7 +233,7 @@ class CApplication extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('applications a', $options, $sqlParts);
+			$this->dbFilter('applications a', $options, $sqlParts);
 		}
 
 		// sorting
@@ -680,7 +680,13 @@ class CApplication extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array(
+				'flags' => array(
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_CHILD,
+					ZBX_FLAG_DISCOVERY_CREATED
+				)
+			)
 		));
 
 		foreach ($items as $num => $item) {
@@ -690,7 +696,7 @@ class CApplication extends CZBXAPI {
 		}
 
 		$linkedDb = DBselect(
-			'SELECT ia.itemid, ia.applicationid'.
+			'SELECT ia.itemid,ia.applicationid'.
 			' FROM items_applications ia'.
 			' WHERE '.dbConditionInt('ia.itemid', $itemids).
 				' AND '.dbConditionInt('ia.applicationid', $applicationids)
@@ -698,7 +704,6 @@ class CApplication extends CZBXAPI {
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
 		}
-
 		$appsInsert = array();
 		foreach ($applicationids as $applicationid) {
 			foreach ($itemids as $inum => $itemid) {
@@ -711,7 +716,6 @@ class CApplication extends CZBXAPI {
 				);
 			}
 		}
-
 		DB::insert('items_applications', $appsInsert);
 
 		foreach ($itemids as $inum => $itemid) {
@@ -820,37 +824,11 @@ class CApplication extends CZBXAPI {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$options = array(
-			'hostids' => $data['hostids'],
-			'editable' => 1,
-			'preservekeys' => 1,
-			'templated_hosts' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedHosts = API::Host()->get($options);
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-		$options = array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedTemplates = API::Template()->get($options);
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		$options = array(
+		$applications = $this->get(array(
 			'hostids' => $data['templateids'],
-			'preservekeys' => 1,
+			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND
-		);
-		$applications = $this->get($options);
+		));
 		$this->inherit($applications, $data['hostids']);
 
 		return true;

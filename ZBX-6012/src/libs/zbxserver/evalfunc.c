@@ -176,7 +176,10 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	}
 
 	if ('@' == *arg1)
+	{
+		clean_regexps_ex(regexps, &regexps_num);
 		zbx_free(regexps);
+	}
 	zbx_free(arg1);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
@@ -1710,7 +1713,10 @@ skip_get_history:
 	res = SUCCEED;
 clean:
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
+	{
+		clean_regexps_ex(regexps, &regexps_num);
 		zbx_free(regexps);
+	}
 
 	zbx_free(arg1);
 exit:

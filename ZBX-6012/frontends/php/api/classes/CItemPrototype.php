@@ -238,7 +238,7 @@ class CItemPrototype extends CItemGeneral {
 
 // --- FILTER ---
 		if (is_array($options['filter'])) {
-			zbx_db_filter('items i', $options, $sqlParts);
+			$this->dbFilter('items i', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
@@ -818,13 +818,6 @@ class CItemPrototype extends CItemGeneral {
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-		if (!API::Template()->isReadable($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
 
 		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {

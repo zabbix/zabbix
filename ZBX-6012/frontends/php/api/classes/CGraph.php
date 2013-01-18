@@ -272,7 +272,7 @@ class CGraph extends CGraphGeneral {
 				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
 			}
 
-			zbx_db_filter('graphs g', $options, $sqlParts);
+			$this->dbFilter('graphs g', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
@@ -639,38 +639,15 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Inherit template graphs from template to host
+	 * Inherit template graphs from template to host.
 	 *
 	 * @param array $data
+	 *
 	 * @return bool
 	 */
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$allowedHosts = API::Host()->get(array(
-			'hostids' => $data['hostids'],
-			'editable' => true,
-			'preservekeys' => true,
-			'templated_hosts' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		$allowedTemplates = API::Template()->get(array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
 
 		$dbLinks = DBSelect(
 			'SELECT ht.hostid,ht.templateid'.

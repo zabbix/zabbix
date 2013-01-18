@@ -2277,6 +2277,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_remove_lost_resources(discovery_itemid, lifetime, ts->sec);
 
+	clean_regexps_ex(regexps, &regexps_num);
 	zbx_free(regexps);
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)

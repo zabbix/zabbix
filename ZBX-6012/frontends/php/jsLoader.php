@@ -45,6 +45,8 @@ if (isset($_GET['lang'])) {
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 
+require_once dirname(__FILE__).'/include/translateDefines.inc.php';
+
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
 	'common.js' => '',
@@ -53,6 +55,7 @@ $availableJScripts = array(
 	'jquery.js' => 'jquery/',
 	'jquery-ui.js' => 'jquery/',
 	'activity-indicator.js' => 'vendors/',
+	'dateFormater.js' => 'vendors/',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
@@ -92,7 +95,8 @@ $tranStrings = array(
 		'S_WEEK_SHORT' => _x('w', 'week short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short')
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'S_DATE_FORMAT' => FILTER_TIMEBAR_DATE_FORMAT
 	),
 	'functions.js' => array(
 		'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q' => _('Do you wish to replace the conditional expression?'),
@@ -188,6 +192,7 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'activity-indicator.js',
+		'dateFormater.js',
 		'common.js',
 		'class.cdebug.js',
 		'class.cdate.js',
@@ -201,8 +206,8 @@ if (empty($_GET['files'])) {
 		'menu.js',
 		'init.js'
 	);
-	// load frontend messaging only for pages with menus
-	if (isset($_GET['isMenu']) && $_GET['isMenu']) {
+	// load frontend messaging only for some pages
+	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
 		$files[] = 'class.cmessages.js';
 	}
 }

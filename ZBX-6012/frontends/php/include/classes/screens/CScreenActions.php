@@ -84,15 +84,31 @@ class CScreenActions extends CScreenBase {
 				break;
 		}
 
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-
 		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error'.
 				' FROM events e,alerts a'.
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
 				' WHERE e.eventid=a.eventid'.
-					' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
-					' AND '.dbConditionInt('e.objectid', $available_triggers).
-					' AND '.DBin_node('a.alertid').' '.
+					' AND alerttype IN ('.ALERT_TYPE_MESSAGE.')';
+
+		// editable + PERMISSION CHECK
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			$userid = CWebUser::$data['userid'];
+			$userGroups = getUserGroupsByUserId($userid);
+			$sql .= ' AND EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE e.objectid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY f.triggerid'.
+					' HAVING MIN(r.permission)>='.PERM_READ_ONLY.
+					')';
+		}
+
+		$sql .= ' AND '.DBin_node('a.alertid').' '.
 				' ORDER BY '.$sortfield.' '.$sortorder;
 		$alerts = DBfetchArray(DBselect($sql, $this->screenitem['elements']));
 

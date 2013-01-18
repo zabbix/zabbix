@@ -171,7 +171,7 @@ class CUser extends CZBXAPI {
 			if (isset($options['filter']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
 			}
-			zbx_db_filter('users u', $options, $sqlParts);
+			$this->dbFilter('users u', $options, $sqlParts);
 		}
 
 		// search
@@ -822,15 +822,12 @@ class CUser extends CZBXAPI {
 	// ******************************************************************************
 	// LOGIN Methods
 	// ******************************************************************************
-	public function ldapLogin($user) {
-		$cnf = isset($user['cnf']) ? $user['cnf'] : null;
-
-		if (is_null($cnf)) {
-			$config = select_config();
-			foreach ($config as $id => $value) {
-				if (zbx_strpos($id, 'ldap_') !== false) {
-					$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-				}
+	protected function ldapLogin($user) {
+		$config = select_config();
+		$cnf = array();
+		foreach ($config as $id => $value) {
+			if (zbx_strpos($id, 'ldap_') !== false) {
+				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
 			}
 		}
 
