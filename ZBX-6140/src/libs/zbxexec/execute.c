@@ -290,22 +290,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		goto close;
 	}
 
-	/* get the current job limits */
-	if (0 == QueryInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits), 0))
-	{
-		zbx_snprintf(error, max_error_len, "unable to query job info: %s", strerror_from_system(GetLastError()));
-		goto close;
-	}
-
-	/* set job limits to kill all child processes when terminating the job */
-	limits.BasicLimitInformation.LimitFlags &= ~JOB_OBJECT_LIMIT_BREAKAWAY_OK;
-	limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-	if (0 == SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
-	{
-		zbx_snprintf(error, max_error_len, "unable to set job info: %s", strerror_from_system(GetLastError()));
-		goto close;
-	}
-
 	/* fill in process startup info structure */
 	memset(&si, 0, sizeof(STARTUPINFO));
 	si.cb = sizeof(STARTUPINFO);
