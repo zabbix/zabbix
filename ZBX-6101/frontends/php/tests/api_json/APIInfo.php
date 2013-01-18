@@ -33,7 +33,7 @@ class API_JSON_APIInfo extends CZabbixTest {
 		);
 
 		$this->assertTrue(isset($result['result']), "$debug");
-		$this->assertSame($result['result'], "2.0.4");
+		$this->assertSame($result['result'], "2.0.5");
 	}
 
 	public function testAPIInfo_VersionWithoutAuth() {
@@ -44,7 +44,7 @@ class API_JSON_APIInfo extends CZabbixTest {
 		);
 
 		$this->assertTrue(isset($result['result']), "$debug");
-		$this->assertSame($result['result'], "2.0.4");
+		$this->assertSame($result['result'], "2.0.5");
 	}
 
 	public function testAPIInfo_RawJson() {

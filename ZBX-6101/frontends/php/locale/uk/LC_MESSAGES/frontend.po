@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-13 22:25+0200\n"
-"PO-Revision-Date: 2013-01-08 23:44+0200\n"
+"POT-Creation-Date: 2013-01-17 00:56+0200\n"
+"PO-Revision-Date: 2013-01-16 22:42+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -884,7 +884,7 @@ msgstr "Світліше"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Болгарська (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -6483,7 +6483,7 @@ msgstr "Помилковий формат ключа елемента даних
 
 #: maintenance.php:309
 msgid "Invalid maintenance period"
-msgstr "Помилковий період обслуговування."
+msgstr "Помилковий період обслуговування"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
@@ -7200,7 +7200,7 @@ msgstr "Помилка входу \"%s\"."
 
 #: authentication.php:108 authentication.php:136
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "Ім'я користувача або пароль некоректні"
 
 #: api/classes/CUser.php:845 api/classes/CUser.php:863
 #: api/classes/CUser.php:910
@@ -10915,7 +10915,7 @@ msgstr "Послуга не може бути батьківською та пі
 
 #: services.php:164
 msgid "Service created"
-msgstr ""
+msgstr "Послугу створено"
 
 #: services.php:116
 msgid "Service deleted"
@@ -12112,7 +12112,7 @@ msgstr "Тригери із важливістю"
 msgid "Truncated"
 msgstr "Скорочено"
 
-#: include/classes/class.cpagefilter.php:55
+#: include/classes/class.cpagefilter.php:166
 #, php-format
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "Спроба читання недоступної властивості \"%s\"."
@@ -13489,7 +13489,7 @@ msgid "agent"
 msgstr "агент"
 
 #: include/classes/class.cchart.php:1761
-#: include/classes/class.cpagefilter.php:468
+#: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:106
@@ -13798,8 +13798,8 @@ msgstr "не містить"
 msgid "not running"
 msgstr "не запущено"
 
-#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:442
-#: include/classes/class.cpagefilter.php:468 include/forms.inc.php:1036
+#: hostinventoriesoverview.php:66 include/classes/class.cpagefilter.php:605
+#: include/classes/class.cpagefilter.php:631 include/forms.inc.php:1036
 #: include/hosts.inc.php:622 include/hosts.inc.php:888
 msgid "not selected"
 msgstr "не обрано"

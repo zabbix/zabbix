@@ -3,13 +3,20 @@ Changes for 2.0.5rc1
 New features:
 A.F....... [ZBX-1357] added Bulgarian translation (Richlv)
 ...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 for system.uname check (Sasha)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
 .......PS. [ZBX-6101] fixed processing of SNMP traps in maintenance "with data colleaction"; thanks to Volker Fröhlich for patch (Sasha)
+.......PS. [ZBX-6012] added support of user macros and global regular expressions in SNMP trap item key parameter (Sasha)
+.......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
+A......... [ZBX-3534] fixed templated linking using read-only template (Eduard)
+..F....... [ZBX-5458] fixed some date strings are not being translated (Toms)
+..F....... [ZBX-6110] fixed selected map remembering in monitoring->map (Eduard)
+..F....... [ZBX-6117] fixed item value macros resolving using non-converted to null values (Eduard)
+..F....... [ZBX-6113] fixed hidden input field appearing when assigning hosts to groups in IE (Pavels)
 ..F....... [ZBX-6063] fixed graph selection pop up working incorrectly when adding a graph to a templated screen (Pavels)
-A.F....... [ZBX-6014] improved performance and removed get_accessible_triggers function (dotneft, Oleg)
+A.F....... [ZBX-6014] improved performance in most it services pages and pages that retrieve trigger information (dotneft, Oleg)
 ..F....... [ZBX-6070] fixed event CSV export ignoring the selected page and filters (Pavels)
 ..F....... [ZBX-6006] optimized web interface API calls, which requested redundant data (Toms)
 A......... [ZBX-5806] fixed template.massadd and template.massremove returning an empty hostids array (Pavels)
@@ -1206,6 +1213,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.17rc1
+
+.......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
+
+Changes for 1.8.16
+
+1.8.16rc2 was released as 1.8.16 without any changes
+
 Changes for 1.8.16rc2
 
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)

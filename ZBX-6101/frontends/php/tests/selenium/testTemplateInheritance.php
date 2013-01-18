@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+define('ITEM_GOOD', 0);
+define('ITEM_BAD', 1);
+
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
@@ -43,28 +46,81 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testFormAdministrationGeneralMacros_setup() {
+	public function testTemplateInheritance_setup() {
 		DBsave_tables('items');
 	}
 
+	public function testFormItem_linkHost(){
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click('link='.$this->hostName);
+		$this->wait();
+
+		$this->button_click('tab_templateTab');
+		$this->button_click('//*[@id="add"][@value="Add"]');
+
+		$this->waitForPopUp("zbx_popup", "30000");
+		$this->selectWindow("name=zbx_popup");
+		$this->checkbox_select('//*[@value="Template App Zabbix Agent"]');
+		$this->button_click('select');
+
+		$this->selectWindow(null);
+		$this->wait();
+		$this->button_click('save');
+
+		$this->wait();
+		$this->ok('Host updated');
+	}
+	// Returns all possible item data
+	public static function dataCreate() {
+	// result, template, itemName, keyName, errorMsg
+		return array(
+			array(
+				ITEM_GOOD,
+				'Inheritance test template',
+				'Test LLD item1',
+				'test-general-item',
+				array()
+					),
+			// Dublicated item on Template inheritance test host
+			array(
+				ITEM_BAD,
+				'Template App Zabbix Agent',
+				'Test LLD item1',
+				'test-general-item',
+				array(
+						'ERROR: Cannot add item',
+						'Item "test-general-item" already exists on "Template inheritance test host", inherited from '.
+							'another template.'
+						)
+				),
+			// Item added to Template inheritance test host
+			array(
+				ITEM_GOOD,
+				'Template App Zabbix Agent',
+				'Test LLD item2',
+				'test-additional-item',
+				array()
+				)
+			);
+	}
+
 	/**
-	 * Creates a new item on the template and checks that the item matches the original.
-	 *
-	 * @todo
+	 * @dataProvider dataCreate
 	 */
-	public function testTemplateInheritance_CreateItem() {
+	public function testFormItem_Create($result, $template, $itemName, $keyName, $errorMsgs) {
 		$this->login('templates.php');
 
 		// create an item
-		$this->button_click('link='.$this->templateName);
+		$this->button_click("link=$template");
 		$this->wait();
 		$this->button_click('link=Items');
 		$this->wait();
 		$this->button_click('form');
 		$this->wait();
 
-		$this->input_type('name', 'Test LLD item1');
-		$this->input_type('key', 'test-general-item');
+		$this->input_type('name', $itemName);
+		$this->input_type('key', $keyName);
 		$this->dropdown_select('type', 'Simple check');
 		$this->dropdown_select('value_type', 'Numeric (unsigned)');
 		$this->dropdown_select('data_type', 'Octal');
@@ -81,6 +137,27 @@ class testTemplateInheritance extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
+		switch ($result) {
+			case ITEM_GOOD:
+				$this->ok('Item added');
+				$this->checkTitle('Configuration of items');
+				$this->ok('CONFIGURATION OF ITEMS');
+				break;
+
+			case ITEM_BAD:
+				$this->checkTitle('Configuration of items');
+				$this->ok('CONFIGURATION OF ITEMS');
+				foreach ($errorMsgs as $msg) {
+					$this->ok($msg);
+				}
+				$this->ok('Host');
+				$this->ok('Name');
+				$this->ok('Key');
+				break;
+		}
+
+		switch ($result) {
+			case ITEM_GOOD:
 		// check that the inherited item matches the original
 		$this->open('hosts.php');
 		$this->wait();
@@ -88,11 +165,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->wait();
 		$this->button_click('link=Items');
 		$this->wait();
-		$this->ok($this->templateName.': Test LLD item1');
-		$this->button_click('link=Test LLD item1');
+		$this->ok("$template: $itemName");
+		$this->button_click("link=$itemName");
 		$this->wait();
-		$this->assertElementValue('name', 'Test LLD item1');
-		$this->assertElementValue('key', 'test-general-item');
+		$this->assertElementValue('name', $itemName);
+		$this->assertElementValue('key', $keyName);
 		$this->assertElementValue('typename', 'Simple check');
 		$this->assertElementValue('value_type_name', 'Numeric (unsigned)');
 		$this->assertElementValue('data_type_name', 'Octal');
@@ -103,8 +180,28 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('trends', '55');
 		$this->assertElementText('description', 'description');
 		$this->assertElementValue('delta_name', 'Delta (simple change)');
+				break;
+
+			case ITEM_BAD:
+				break;
+		}
 	}
 
+	public function testFormItem_unlinkHost(){
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click('link='.$this->hostName);
+		$this->wait();
+
+		$this->button_click('tab_templateTab');
+		sleep(1);
+		$this->button_click('unlink_and_clear_10050');
+		$this->wait();
+		$this->button_click('save');
+
+		$this->wait();
+		$this->ok('Host updated');
+	}
 	/**
 	 * Creates a new trigger on the template and checks that the inherited trigger matches the original.
 	 *
@@ -271,7 +368,7 @@ class testTemplateInheritance extends CWebTest {
 	}
 
 	/**
-	 * Creates a new trigger prototype on the template and checks that the inherited trigger prototype matches
+	 * Creates a new trigger prototype on the template and checks that the inherited item prototype matches
 	 * the original.
 	 *
 	 * @todo match fields for different item types
@@ -343,6 +440,7 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Creates a new trigger prototype on the template and checks that the inherited trigger prototype matches
 	 * the original.
+	 *
 	 */
 	public function testTemplateInheritance_CreateTriggerPrototype() {
 		$this->login('templates.php');
@@ -397,7 +495,6 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Creates a new graph prototype on the template and checks that the inherited graph prototype matches the original.
 	 *
-	 * @todo
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
 		$this->login('templates.php');
@@ -480,8 +577,7 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testFormAdministrationGeneralMacros_teardown() {
+	public function testTemplateInheritance_teardown() {
 		DBrestore_tables('items');
 	}
-
 }
