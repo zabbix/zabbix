@@ -61,11 +61,9 @@ class CServerInfo extends CTable {
 			')'
 		)));
 		$this->addRow(new CCol(array(
-			_('Triggers (e/d)[p/u/o]').': '.$status['triggers_count'].
+			_('Triggers (e/d)[p/o]').': '.$status['triggers_count'].
 			'('.$status['triggers_count_enabled'].'/'.$status['triggers_count_disabled'].')[',
 			new CSpan($status['triggers_count_on'], 'on'),
-			'/',
-			new CSpan($status['triggers_count_unknown'], 'unknown'),
 			'/',
 			new CSpan($status['triggers_count_off'], 'off'),
 			']'
