@@ -1006,58 +1006,9 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 			),
 			'where' => array('triggerid' => $triggerids)
 		));
-
-		addUnknownEvent($triggerids);
 	}
 
 	return true;
-}
-
-/**
- * Create unknown type event for given triggers.
- *
- * @param int|array $triggerids triggers to whom add unknown type event
- *
- * @return array returns created event ids
- */
-function addUnknownEvent($triggerids) {
-	zbx_value2array($triggerids);
-
-	$triggers = API::Trigger()->get(array(
-		'triggerids' => $triggerids,
-		'output' => array('value'),
-		'preservekeys' => true
-	));
-
-	$eventids = array();
-	foreach ($triggerids as $triggerid) {
-		$event = array(
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'objectid' => $triggerid,
-			'clock' => time(),
-			'value' => TRIGGER_VALUE_UNKNOWN,
-			'acknowledged' => 0
-		);
-
-		// check if trigger exist in DB
-		if (isset($triggers[$event['objectid']])) {
-			if ($event['value'] != $triggers[$event['objectid']]['value']) {
-				$eventid = get_dbid('events', 'eventid');
-
-				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
-						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
-									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
-				if (!DBexecute($sql)) {
-					throw new Exception();
-				}
-
-				$eventids[$eventid] = $eventid;
-			}
-		}
-	}
-
-	return $eventids;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
