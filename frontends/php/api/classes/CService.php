@@ -1585,10 +1585,6 @@ class CService extends CZBXAPI {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapOne($result, $triggers, 'trigger');
-			foreach ($result as &$service) {
-				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
-			}
-			unset($service);
 		}
 
 		return $result;
