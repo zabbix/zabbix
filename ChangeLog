@@ -11,7 +11,7 @@ Changes for 1.8.16rc2
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
 A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
-.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(); thanks to Takanori Suzuki for patch (Andris)
 
 Changes for 1.8.16rc1
 
