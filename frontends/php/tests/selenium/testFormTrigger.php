@@ -71,6 +71,29 @@ class testFormTrigger extends CWebTest {
 		$this->assertElementPresent('expression');
 		$this->assertAttribute("//*[@id='expression']/@rows", '7');
 
+		$this->assertElementPresent("//*/span[text()='Expression constructor']");
+
+		// expression constructor
+		$this->button_click("//*/span[text()='Expression constructor']");
+		sleep(1);
+
+		$this->ok('Target');
+		$this->ok('Expression');
+		$this->ok('Error');
+		$this->ok('Action');
+		$this->ok('Close expression constructor');
+
+		$this->assertElementPresent('insert');
+		$this->assertElementPresent('insert_macro');
+		$this->assertElementPresent('expr_temp');
+		$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
+		$this->assertElementPresent("//*/span[text()='Close expression constructor']");
+
+		$this->button_click("//*/span[text()='Close expression constructor']");
+		sleep(1);
+		$this->nok('Insert macro');
+		$this->nok('Close expression constructor');
+
 		$this->assertElementPresent('type');
 		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');
 		$this->assertFalse($this->isChecked('type'));
