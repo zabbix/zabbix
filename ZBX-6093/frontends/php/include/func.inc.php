@@ -1882,6 +1882,12 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	}
 	// deny access to a page
 	else {
+
+		// url to redirect the user to after he loggs in
+		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
+		$url->setArgument('sid', null);
+		$url = urlencode($url->toString());
+
 		// if the user is logged in - render the access denied message
 		if (CWebUser::isLoggedIn()) {
 			$header = _('Access denied.');
@@ -1898,10 +1904,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			$buttons = array();
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
-				$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
-				$url->setArgument('sid', null);
-				$url = urlencode($url->toString());
-
 				$buttons[] = new CButton('login', _('Login'),
 					'javascript: document.location = "index.php?request='.$url.'";', 'formlist'
 				);
