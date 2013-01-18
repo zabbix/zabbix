@@ -137,7 +137,7 @@ class testFormAction extends CWebTest {
 			$this->wait();
 		}
 		$this->type('esc_period', $action['esc_period']);
-		$this->button_click('operationTab');
+		$this->button_click('save'); // will refresh page
 
 		$this->wait();
 		$this->button_click('save');

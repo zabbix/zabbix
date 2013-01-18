@@ -26,6 +26,7 @@ class CItemPrototype extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
+	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
 
 	/**
 	 * Get Itemprototype data
@@ -34,9 +35,6 @@ class CItemPrototype extends CItemGeneral {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
 
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
@@ -225,9 +223,6 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'i');
-
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -236,6 +231,7 @@ class CItemPrototype extends CItemGeneral {
 
 		$itemids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
@@ -592,13 +588,6 @@ class CItemPrototype extends CItemGeneral {
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-		if (!API::Template()->isReadable($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
 
 		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {
