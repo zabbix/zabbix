@@ -255,8 +255,7 @@ function make_system_status($filter) {
 			'object' => EVENT_SOURCE_TRIGGERS,
 			'triggerids' => $trigger['triggerid'],
 			'filter'=> array(
-				'value' => TRIGGER_VALUE_TRUE,
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES
+				'value' => TRIGGER_VALUE_TRUE
 			),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
@@ -269,7 +268,6 @@ function make_system_status($filter) {
 		$events = API::Event()->get($options);
 		if (empty($events)) {
 			$trigger['event'] = array(
-				'value_changed' => 0,
 				'value' => $trigger['value'],
 				'acknowledged' => true,
 				'clock' => $trigger['lastchange']
@@ -908,8 +906,7 @@ function make_latest_issues(array $filter = array()) {
 			'acknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
-				'value' => TRIGGER_VALUE_TRUE,
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES
+				'value' => TRIGGER_VALUE_TRUE
 			),
 			'sortfield' => array('eventid'),
 			'sortorder' => ZBX_SORT_DOWN,

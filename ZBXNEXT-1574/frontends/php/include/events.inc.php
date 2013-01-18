@@ -73,7 +73,6 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 		'countOutput' => 1,
 		'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => array(
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'acknowledged' => $ack ? 1 : 0
 		),
@@ -82,7 +81,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	));
 }
 
-function get_next_event($currentEvent, array $eventList = array(), $showUnknown = false) {
+function get_next_event($currentEvent, array $eventList = array()) {
 	$nextEvent = false;
 
 	foreach ($eventList as $event) {
@@ -103,7 +102,6 @@ function get_next_event($currentEvent, array $eventList = array(), $showUnknown 
 			' WHERE e.objectid='.$currentEvent['objectid'].
 				' AND e.eventid>'.$currentEvent['eventid'].
 				' AND e.object='.$currentEvent['object'].
-				($showUnknown ? '' : ' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES).
 			' ORDER BY e.object,e.objectid,e.eventid';
 	return DBfetch(DBselect($sql, 1));
 }
@@ -218,8 +216,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		'triggerids' => $triggerid,
 		'eventid_till' => $eventid,
 		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
+			'object' => EVENT_OBJECT_TRIGGER
 		),
 		'nopermissions' => 1,
 		'select_acknowledges' => API_OUTPUT_COUNT,
@@ -341,8 +338,7 @@ function getLastEvents($options) {
 	$eventOptions = array(
 		'output' => API_OUTPUT_EXTEND,
 		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
+			'object' => EVENT_OBJECT_TRIGGER
 		),
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN
