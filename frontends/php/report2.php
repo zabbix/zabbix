@@ -236,7 +236,6 @@ else if (isset($_REQUEST['hostid'])) {
 		_('Name'),
 		_('Problems'),
 		_('Ok'),
-		_('Unknown'),
 		_('Graph')
 	));
 
@@ -245,7 +244,6 @@ else if (isset($_REQUEST['hostid'])) {
 
 		$true = new CSpan(sprintf('%.4f%%', $availability['true']), 'on');
 		$false = new CSpan(sprintf('%.4f%%', $availability['false']), 'off');
-		$unknown = new CSpan(sprintf('%.4f%%', $availability['unknown']), 'unknown');
 		$actions = new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid'].'&triggerid='.$trigger['triggerid']);
 
 		$table->addRow(array(
@@ -254,7 +252,6 @@ else if (isset($_REQUEST['hostid'])) {
 			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
 			$true,
 			$false,
-			$unknown,
 			$actions
 		));
 	}

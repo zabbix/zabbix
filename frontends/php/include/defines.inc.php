@@ -408,8 +408,8 @@ define('TRIGGER_MULT_EVENT_ENABLED',	1);
 define('TRIGGER_STATUS_ENABLED',	0);
 define('TRIGGER_STATUS_DISABLED',	1);
 
-define('TRIGGER_VALUE_FALSE',	0);
-define('TRIGGER_VALUE_TRUE',	1);
+define('TRIGGER_VALUE_FALSE', 0);   // ok
+define('TRIGGER_VALUE_TRUE',	1);    // problem
 define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
 define('TRIGGER_VALUE_FLAG_NORMAL',		0);

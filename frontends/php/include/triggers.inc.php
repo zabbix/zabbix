@@ -1430,7 +1430,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 }
 
 function calculate_availability($triggerid, $period_start, $period_end) {
-	$start_value = -1;
+	$start_value = TRIGGER_VALUE_FALSE;
 	if ($period_start > 0 && $period_start <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
@@ -1470,10 +1470,8 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		else {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
-			$ret['unknown_time'] = 0;
 			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
 			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
-			$ret['unknown'] = (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 			return $ret;
 		}
 	}
@@ -1481,7 +1479,6 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$state = $start_value;
 	$true_time = 0;
 	$false_time = 0;
-	$unknown_time = 0;
 	$time = $min;
 	if ($period_start == 0 && $period_end == 0) {
 		$max = time();
@@ -1514,9 +1511,6 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 			if ($state == 1) {
 				$true_time += $diff;
 			}
-			if ($state == 2) {
-				$unknown_time += $diff;
-			}
 		}
 		elseif ($state == 0) {
 			$false_time += $diff;
@@ -1524,10 +1518,6 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		}
 		elseif ($state == 1) {
 			$true_time += $diff;
-			$state = $value;
-		}
-		elseif ($state == 2) {
-			$unknown_time += $diff;
 			$state = $value;
 		}
 		$rows++;
@@ -1544,26 +1534,19 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	elseif ($state == TRIGGER_VALUE_TRUE) {
 		$true_time = $true_time + $period_end - $time;
 	}
-	elseif ($state == TRIGGER_VALUE_UNKNOWN) {
-		$unknown_time = $unknown_time + $period_end - $time;
-	}
-	$total_time = $true_time + $false_time + $unknown_time;
+	$total_time = $true_time + $false_time;
 
 	if ($total_time == 0) {
 		$ret['true_time'] = 0;
 		$ret['false_time'] = 0;
-		$ret['unknown_time'] = 0;
 		$ret['true'] = 0;
 		$ret['false'] = 0;
-		$ret['unknown'] = 100;
 	}
 	else {
 		$ret['true_time'] = $true_time;
 		$ret['false_time'] = $false_time;
-		$ret['unknown_time'] = $unknown_time;
 		$ret['true'] = (100 * $true_time) / $total_time;
 		$ret['false'] = (100 * $false_time) / $total_time;
-		$ret['unknown'] = (100 * $unknown_time) / $total_time;
 	}
 
 	return $ret;
