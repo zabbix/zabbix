@@ -667,7 +667,12 @@ static int	DBpatch_02010027()
 
 static int	DBpatch_02010028()
 {
-	const char	*sql = "delete from profiles where idx='web.httpconf.showdisabled'";
+	const char	*sql =
+			"update profiles"
+			" set value_int=case when value_str='0' then 0 else 1 end,"
+				"value_str='',"
+				"type=2"	/* PROFILE_TYPE_INT */
+			" where idx='web.httpconf.showdisabled'";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
@@ -676,6 +681,17 @@ static int	DBpatch_02010028()
 }
 
 static int	DBpatch_02010029()
+{
+	const char	*sql =
+			"delete from profiles where idx in ('web.httpconf.applications','web.httpmon.applications')";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010030()
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"delete from events"
@@ -690,7 +706,7 @@ static int	DBpatch_02010029()
 	return FAIL;
 }
 
-static int	DBpatch_02010030()
+static int	DBpatch_02010031()
 {
 	return DBdrop_field("events", "value_changed");
 }
@@ -760,13 +776,14 @@ int	DBcheck_version()
 		{DBpatch_02010026, 2010026, 0, 1},
 		{DBpatch_02010027, 2010027, 0, 1},
 		{DBpatch_02010028, 2010028, 0, 0},
-		{DBpatch_02010029, 2010029, 0, 1},
+		{DBpatch_02010029, 2010029, 0, 0},
 		{DBpatch_02010030, 2010030, 0, 1},
+		{DBpatch_02010031, 2010031, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010030;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010031;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

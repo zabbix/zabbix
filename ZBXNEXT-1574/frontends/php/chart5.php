@@ -37,8 +37,7 @@ check_fields($fields);
  * Permissions
  */
 $service = API::Service()->get(array(
-	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
-	'selectTimes' => API_OUTPUT_EXTEND,
+	'output' => array('serviceid', 'name'),
 	'serviceids' => $_REQUEST['serviceid']
 ));
 $service = reset($service);
@@ -124,7 +123,7 @@ $sla = API::Service()->getSla(array(
 $sla = reset($sla);
 
 foreach ($sla['sla'] as $i => $intervalSla) {
-	$problem[$i] = 100 - $intervalSla['problem'];
+	$problem[$i] = 100 - $intervalSla['problemTime'];
 	$ok[$i] = $intervalSla['sla'];
 	$count_now[$i] = 1;
 }
