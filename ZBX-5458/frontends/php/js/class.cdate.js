@@ -50,6 +50,61 @@ CDate.prototype = {
 		this.tzDiff = ddTZOffset - PHP_TZ_OFFSET;
 	},
 
+	/**
+	*  Formats date according given format. Uses server timezone.
+	*
+	*  Supported formats: 'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i'
+	*
+	*  @param format PHP style date format limited to supported formats
+	*
+	*  @return string|bool human readable date or false if unsupported format given
+	*/
+	format: function(format) {
+		var shortEngMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+		var date = this.getDate(),
+			month = this.getMonth(),
+			year = this.getFullYear(),
+			hours = this.getHours(),
+			minutes = this.getMinutes(),
+			seconds = this.getSeconds();
+
+		var appendZero = function(val) {
+			return val<10 ? '0' + val : val;
+		}
+
+		var appendSuffix = function(date) {
+			if (date%10 == 1 && date != 11) {
+				return date + 'st';
+			}
+			if (date%10 == 2 && date != 12) {
+				return date + 'nd';
+			}
+			if (date%10 == 3 && date != 13) {
+				return date + 'rd';
+			}
+			return date + 'th';
+		}
+
+		switch(format) {
+			case 'd M Y H:i':
+				return appendZero(date) + ' ' + shortEngMonths[month] + ' ' + year + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+			case 'j. M Y G:i':
+				return date + '. ' + shortEngMonths[month] + ' ' + year + ' ' + hours + ':' + appendZero(minutes);
+			case 'Y/m/d H:i':
+				return year + '/' + appendZero(month + 1) + '/' + appendZero(date) + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+			case 'M jS, Y h:i A':
+				return shortEngMonths[month] + ' ' + appendSuffix(date) + ', ' + year + ' ' + appendZero((hours + 11) % 12 + 1) + ':' + appendZero(minutes) + ' ' + ((hours < 12) ? 'AM' : 'PM');
+			case 'Y M d H:i':
+				return  year + ' ' + shortEngMonths[month] + ' ' +appendZero(date) + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+			case 'd.m.Y H:i':
+				return appendZero(date) + '.' + appendZero(month + 1) + '.' + year + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+
+		}
+
+		return false;
+	},
+
 	getZBXDate: function() {
 		var thedate = [];
 		thedate[0] = this.serverDate.getDate();
