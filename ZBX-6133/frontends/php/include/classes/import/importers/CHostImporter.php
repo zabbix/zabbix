@@ -99,12 +99,12 @@ class CHostImporter extends CImporter {
 
 					foreach ($dbInterfaces as $dbInterface) {
 						if ($hostId == $dbInterface['hostid']
-							&& $dbInterface['ip'] == $interface['ip']
-							&& $dbInterface['dns'] == $interface['dns']
-							&& $dbInterface['useip'] == $interface['useip']
-							&& $dbInterface['port'] == $interface['port']
-							&& $dbInterface['type'] == $interface['type']
-							&& $dbInterface['main'] == $interface['main']) {
+								&& $dbInterface['ip'] == $interface['ip']
+								&& $dbInterface['dns'] == $interface['dns']
+								&& $dbInterface['useip'] == $interface['useip']
+								&& $dbInterface['port'] == $interface['port']
+								&& $dbInterface['type'] == $interface['type']
+								&& $dbInterface['main'] == $interface['main']) {
 
 							$refName = $interface['interface_ref'];
 							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
