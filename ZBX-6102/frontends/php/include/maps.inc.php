@@ -1080,20 +1080,23 @@ function getSelementsInfo($sysmap) {
 		$hosts = API::Host()->get(array(
 			'groupids' => array_keys($hostgroups_map),
 			'output' => array('name', 'status', 'maintenance_status', 'maintenanceid'),
+			'selectGroups' => array('groupid'),
 			'nopermissions' => true,
 			'nodeids' => get_current_nodeid(true)
 		));
 		$all_hosts = array_merge($all_hosts, $hosts);
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $group) {
-				foreach ($hostgroups_map[$group['groupid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['hosts'][$host['hostid']] = $host['hostid'];
+				if (isset($hostgroups_map[$group['groupid']])) {
+					foreach ($hostgroups_map[$group['groupid']] as $belongs_to_sel) {
+						$selements[$belongs_to_sel]['hosts'][$host['hostid']] = $host['hostid'];
 
-					// add hosts to hosts_map for trigger selection;
-					if (!isset($hosts_map[$host['hostid']])) {
-						$hosts_map[$host['hostid']] = array();
+						// add hosts to hosts_map for trigger selection;
+						if (!isset($hosts_map[$host['hostid']])) {
+							$hosts_map[$host['hostid']] = array();
+						}
+						$hosts_map[$host['hostid']][$belongs_to_sel] = $belongs_to_sel;
 					}
-					$hosts_map[$host['hostid']][$belongs_to_sel] = $belongs_to_sel;
 				}
 			}
 		}
@@ -1162,8 +1165,10 @@ function getSelementsInfo($sysmap) {
 
 		foreach ($triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
-				foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
-					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+				if (isset($hosts_map[$host['hostid']])) {
+					foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
+						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+					}
 				}
 			}
 		}

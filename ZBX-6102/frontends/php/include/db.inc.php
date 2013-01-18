@@ -941,43 +941,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	return false;
 }
 
-function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
-	if (!zbx_empty($options['sortfield'])) {
-		if (!is_array($options['sortfield'])) {
-			$options['sortfield'] = array($options['sortfield']);
-		}
-		else {
-			$options['sortfield'] = array_unique($options['sortfield']);
-		}
-
-		foreach ($options['sortfield'] as $i => $sortfield) {
-			// validate sortfield
-			if (!str_in_array($sortfield, $sort_columns)) {
-				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
-			}
-
-			// add sort field to order
-			$sortorder = '';
-			if (is_array($options['sortorder'])) {
-				if (!empty($options['sortorder'][$i])) {
-					$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
-				}
-			}
-			else {
-				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
-			}
-			$sql_parts['order'][] = $alias.'.'.$sortfield.$sortorder;
-
-			// add sort field to select if distinct is used
-			if (count($sql_parts['from']) > 1) {
-				if (!str_in_array($alias.'.'.$sortfield, $sql_parts['select']) && !str_in_array($alias.'.*', $sql_parts['select'])) {
-					$sql_parts['select'][$sortfield] = $alias.'.'.$sortfield;
-				}
-			}
-		}
-	}
-}
-
 function remove_nodes_from_id($id) {
 	return bcmod($id, '100000000000');
 }

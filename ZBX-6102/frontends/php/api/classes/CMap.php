@@ -24,8 +24,8 @@
 class CMap extends CMapElement {
 
 	protected $tableName = 'sysmaps';
-
 	protected $tableAlias = 's';
+	protected $sortColumns = array('name', 'width', 'height');
 
 	/**
 	 * Get Map data
@@ -55,9 +55,6 @@ class CMap extends CMapElement {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('name', 'width', 'height');
 
 		$sqlParts = array(
 			'select'	=> array('sysmaps' => 's.sysmapid'),
@@ -110,9 +107,6 @@ class CMap extends CMapElement {
 			$this->dbFilter('sysmaps s', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 's');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -121,6 +115,7 @@ class CMap extends CMapElement {
 		$sysmapids = array();
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($sysmap = DBfetch($res)) {
