@@ -1256,8 +1256,6 @@ class CTrigger extends CTriggerGeneral {
 
 			// host trigger
 			if ($statusHost) {
-				addUnknownEvent($triggerId);
-
 				DB::update('triggers', array(
 					'values' => array(
 						'expression' => $triggerExpression[$triggerId],
@@ -1385,8 +1383,6 @@ class CTrigger extends CTriggerGeneral {
 
 				if (isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)) {
 					if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) {
-						addUnknownEvent($trigger['triggerid']);
-
 						$trigger['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
 					}
 				}

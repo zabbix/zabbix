@@ -289,8 +289,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 					),
 					'where' => array('triggerid' => $valueTriggerIds)
 				));
-
-				addUnknownEvent($valueTriggerIds);
 			}
 		}
 
