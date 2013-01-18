@@ -177,7 +177,7 @@ class CScreenHistory extends CScreenBase {
 						$options['excludeSearch'] = 1;
 					}
 				}
-				$options['sortfield'] = 'itemid';
+				$options['sortfield'] = 'id';
 
 				$historyData = API::History()->get($options);
 
