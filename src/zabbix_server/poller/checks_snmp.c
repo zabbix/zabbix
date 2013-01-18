@@ -1062,53 +1062,55 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid
  ******************************************************************************/
 static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 {
-#define ZBX_MIB_NORM struct zbx_mib_norm_t
-
-ZBX_MIB_NORM
-{
-	char	*mib;
-	char	*replace;
-};
-
-static ZBX_MIB_NORM mibs[]=
-{
-	{"ifIndex",		"1.3.6.1.2.1.2.2.1.1"},
-	{"ifDescr",		"1.3.6.1.2.1.2.2.1.2"},
-	{"ifType",		"1.3.6.1.2.1.2.2.1.3"},
-	{"ifMtu",		"1.3.6.1.2.1.2.2.1.4"},
-	{"ifSpeed",		"1.3.6.1.2.1.2.2.1.5"},
-	{"ifPhysAddress",	"1.3.6.1.2.1.2.2.1.6"},
-	{"ifAdminStatus",	"1.3.6.1.2.1.2.2.1.7"},
-	{"ifOperStatus",	"1.3.6.1.2.1.2.2.1.8"},
-	{"ifInOctets",		"1.3.6.1.2.1.2.2.1.10"},
-	{"ifInUcastPkts",	"1.3.6.1.2.1.2.2.1.11"},
-	{"ifInNUcastPkts",	"1.3.6.1.2.1.2.2.1.12"},
-	{"ifInDiscards",	"1.3.6.1.2.1.2.2.1.13"},
-	{"ifInErrors",		"1.3.6.1.2.1.2.2.1.14"},
-	{"ifInUnknownProtos",	"1.3.6.1.2.1.2.2.1.15"},
-	{"ifOutOctets",		"1.3.6.1.2.1.2.2.1.16"},
-	{"ifOutUcastPkts",	"1.3.6.1.2.1.2.2.1.17"},
-	{"ifOutNUcastPkts",	"1.3.6.1.2.1.2.2.1.18"},
-	{"ifOutDiscards",	"1.3.6.1.2.1.2.2.1.19"},
-	{"ifOutErrors",		"1.3.6.1.2.1.2.2.1.20"},
-	{"ifOutQLen",		"1.3.6.1.2.1.2.2.1.21"},
-	{NULL}
-};
 	const char	*__function_name = "snmp_normalize";
+
+#define ZBX_MIB_NORM	struct zbx_mib_norm_t
+
+	ZBX_MIB_NORM
+	{
+		const size_t	sz;
+		const char	*mib;
+		const char	*replace;
+	};
+
+#define	LEN_STR(x)	sizeof(x) - 1, x
+	static ZBX_MIB_NORM mibs[]=
+	{
+		/* the most popular items first */
+		{LEN_STR("ifDescr"),		"1.3.6.1.2.1.2.2.1.2"},
+		{LEN_STR("ifInOctets"),		"1.3.6.1.2.1.2.2.1.10"},
+		{LEN_STR("ifOutOctets"),	"1.3.6.1.2.1.2.2.1.16"},
+		{LEN_STR("ifAdminStatus"),	"1.3.6.1.2.1.2.2.1.7"},
+		{LEN_STR("ifOperStatus"),	"1.3.6.1.2.1.2.2.1.8"},
+		{LEN_STR("ifIndex"),		"1.3.6.1.2.1.2.2.1.1"},
+		{LEN_STR("ifType"),		"1.3.6.1.2.1.2.2.1.3"},
+		{LEN_STR("ifMtu"),		"1.3.6.1.2.1.2.2.1.4"},
+		{LEN_STR("ifSpeed"),		"1.3.6.1.2.1.2.2.1.5"},
+		{LEN_STR("ifPhysAddress"),	"1.3.6.1.2.1.2.2.1.6"},
+		{LEN_STR("ifInUcastPkts"),	"1.3.6.1.2.1.2.2.1.11"},
+		{LEN_STR("ifInNUcastPkts"),	"1.3.6.1.2.1.2.2.1.12"},
+		{LEN_STR("ifInDiscards"),	"1.3.6.1.2.1.2.2.1.13"},
+		{LEN_STR("ifInErrors"),		"1.3.6.1.2.1.2.2.1.14"},
+		{LEN_STR("ifInUnknownProtos"),	"1.3.6.1.2.1.2.2.1.15"},
+		{LEN_STR("ifOutUcastPkts"),	"1.3.6.1.2.1.2.2.1.17"},
+		{LEN_STR("ifOutNUcastPkts"),	"1.3.6.1.2.1.2.2.1.18"},
+		{LEN_STR("ifOutDiscards"),	"1.3.6.1.2.1.2.2.1.19"},
+		{LEN_STR("ifOutErrors"),	"1.3.6.1.2.1.2.2.1.20"},
+		{LEN_STR("ifOutQLen"),		"1.3.6.1.2.1.2.2.1.21"},
+		{0}
+	};
+#undef	LEN_STR
+
 	int		found = 0, i;
-	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s)", __function_name, oid);
 
-	for (i = 0; mibs[i].mib != NULL; i++)
+	for (i = 0; mibs[i].sz != 0; i++)
 	{
-		sz = strlen(mibs[i].mib);
-		if (0 == strncmp(mibs[i].mib, oid, sz))
+		if (0 == strncmp(mibs[i].mib, oid, mibs[i].sz))
 		{
 			found = 1;
-			zbx_snprintf(buf, maxlen, "%s%s",
-					mibs[i].replace,
-					oid + sz);
+			zbx_snprintf(buf, maxlen, "%s%s", mibs[i].replace, oid + mibs[i].sz);
 			break;
 		}
 	}
