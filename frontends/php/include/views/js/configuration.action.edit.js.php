@@ -77,9 +77,8 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
-<br/>
-<div id="opcmdEditForm" class="objectgroup border_dotted ui-corner-all inlineblock">
-	<table class="formElementTable" style="min-width: 310px;"><tbody>
+<div id="opcmdEditForm">
+	<table class="objectgroup border_dotted ui-corner-all inlineblock" style="min-width: 310px;"><tbody>
 		<tr>
 			<td><?php echo _('Target'); ?></td>
 			<td>

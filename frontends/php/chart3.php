@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -31,6 +31,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
+	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,		null,				null),
+	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,		null,				null),
 	'httptestid' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
 	'http_item_type' =>	array(T_ZBX_INT, O_OPT, null,		null,				null),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,		null,				null),
@@ -116,13 +118,22 @@ else {
  * Display
  */
 if ($isDataValid) {
+	$profileIdx = get_request('profileIdx', 'web.httptest');
+	$profileIdx2 = get_request('httptestid', get_request('profileIdx2'));
+
+	$timeline = CScreenBase::calculateTime(array(
+		'profileIdx' => $profileIdx,
+		'profileIdx2' => $profileIdx2,
+		'period' => get_request('period'),
+		'stime' => get_request('stime')
+	));
+
+	CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
+
 	$graph = new CChart(get_request('graphtype', GRAPH_TYPE_NORMAL));
 	$graph->setHeader($name);
-
-	navigation_bar_calc();
-
-	$graph->setPeriod($_REQUEST['period']);
-	$graph->setSTime($_REQUEST['stime']);
+	$graph->setPeriod($timeline['period']);
+	$graph->setSTime($timeline['stime']);
 	$graph->setWidth(get_request('width', 900));
 	$graph->setHeight(get_request('height', 200));
 	$graph->showLegend(get_request('legend', 1));
@@ -137,7 +148,7 @@ if ($isDataValid) {
 	$graph->setLeftPercentage(get_request('percent_left', 0));
 	$graph->setRightPercentage(get_request('percent_right', 0));
 
-	foreach ($items as $inum => $item) {
+	foreach ($items as $item) {
 		$graph->addItem(
 			$item['itemid'],
 			isset($item['yaxisside']) ? $item['yaxisside'] : null,
@@ -146,8 +157,8 @@ if ($isDataValid) {
 			isset($item['drawtype']) ? $item['drawtype'] : null,
 			isset($item['type']) ? $item['type'] : null
 		);
-		unset($items[$inum]);
 	}
+
 	$graph->draw();
 }
 

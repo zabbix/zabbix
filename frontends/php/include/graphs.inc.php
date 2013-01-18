@@ -408,11 +408,11 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	if (!empty($_REQUEST['stime'])) {
 		$time = zbxDateToTime($_REQUEST['stime']);
 		if (($time + $_REQUEST['period']) > time()) {
-			$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
+			$_REQUEST['stime'] = date(TIMESTAMP_FORMAT, time() - $_REQUEST['period']);
 		}
 	}
 	else {
-		$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
+		$_REQUEST['stime'] = date(TIMESTAMP_FORMAT, time() - $_REQUEST['period']);
 	}
 
 	return $_REQUEST['period'];
