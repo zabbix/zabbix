@@ -602,7 +602,7 @@ class CMacrosResolver {
 	private function resolveItemMacros(array $macros, array $triggers, array $macroValues) {
 		if (!empty($macros)) {
 			$dbFuncs = DBselect(
-				'SELECT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
+				'SELECT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.mappingid,m.newvalue'.
 				' FROM functions f'.
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN hosts h ON i.hostid=h.hostid'.
@@ -637,7 +637,7 @@ class CMacrosResolver {
 	 * @return string
 	 */
 	private function resolveItemLastvalueMacro(array $item) {
-		return is_null($item['newvalue'])
+		return is_null($item['mappingid'])
 			? formatItemValue($item, UNRESOLVED_MACRO_STRING)
 			: $item['newvalue'].' ('.$item['lastvalue'].')';
 	}
