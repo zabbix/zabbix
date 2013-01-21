@@ -502,7 +502,7 @@ elseif (isset($_REQUEST['save'])) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	DBstart();
-	$result = API::Host()->delete(array('hostid' => $_REQUEST['hostid']));
+	$result = API::Host()->delete($_REQUEST['hostid']);
 	$result = DBend($result);
 
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
@@ -526,7 +526,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$hostids = get_request('hosts', array());
 
 	DBstart();
-	$go_result = API::Host()->delete(zbx_toObject($hostids,'hostid'));
+	$go_result = API::Host()->delete($hostids);
 	$go_result = DBend($go_result);
 
 	show_messages($go_result, _('Host deleted'), _('Cannot delete host'));
