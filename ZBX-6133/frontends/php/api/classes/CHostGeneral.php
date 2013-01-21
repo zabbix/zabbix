@@ -335,6 +335,15 @@ abstract class CHostGeneral extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
+		// permission check
+		if (!API::Host()->isWritable($targetids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+		if (!API::Template()->isReadable($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// sync templates
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
@@ -368,7 +377,6 @@ abstract class CHostGeneral extends CZBXAPI {
 					continue;
 				}
 
-				// sync triggers
 				API::Trigger()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
