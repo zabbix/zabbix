@@ -367,7 +367,7 @@ class CScreenBase {
 
 			if ($options['updateProfile'] && !empty($options['profileIdx'])) {
 				CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
-				CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
+				CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_INT, $options['profileIdx2']);
 			}
 		}
 		else {
@@ -396,7 +396,7 @@ class CScreenBase {
 
 				if ($options['updateProfile'] && !empty($options['profileIdx'])) {
 					CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
-					CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
+					CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_INT, $options['profileIdx2']);
 				}
 			}
 		}
