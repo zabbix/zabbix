@@ -95,21 +95,24 @@ class CHistory extends CZBXAPI {
 		switch ($options['history']) {
 			case ITEM_VALUE_TYPE_LOG:
 				$sqlParts['from']['history'] = 'history_log h';
-				$sortColumns[] = 'id';
+				$tableName = 'history_log';
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
 				$sqlParts['from']['history'] = 'history_text h';
-				$sortColumns[] = 'id';
+				$tableName = 'history_text';
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				$sqlParts['from']['history'] = 'history_str h';
+				$tableName = 'history_str';
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				$sqlParts['from']['history'] = 'history_uint h';
+				$tableName = 'history_uint';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			default:
 				$sqlParts['from']['history'] = 'history h';
+				$tableName = 'history';
 		}
 
 		// editable + PERMISSION CHECK
@@ -212,7 +215,7 @@ class CHistory extends CZBXAPI {
 		}
 
 		// sorting
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($tableName, $this->tableAlias(), $options, $sqlParts);
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
@@ -298,5 +301,22 @@ class CHistory extends CZBXAPI {
 	}
 
 	public function delete($itemids = array()) {
+	}
+
+	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$isIdFieldUsed = false;
+
+		if ($options['history'] == ITEM_VALUE_TYPE_LOG || $options['history'] == ITEM_VALUE_TYPE_TEXT) {
+			$this->sortColumns['id'] = 'id';
+			$isIdFieldUsed = true;
+		}
+
+		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($isIdFieldUsed) {
+			unset($this->sortColumns['id']);
+		}
+
+		return $sqlParts;
 	}
 }

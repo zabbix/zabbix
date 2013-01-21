@@ -25,11 +25,14 @@ $pageHeader->display();
 ?>
 <body>
 <?php
-// $warningMessage should be set in context where this file is included
-$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $this->get('message'));
-$warning->setButtons(array(
-	new CButton('login', _('Retry'), 'document.location.reload();', 'formlist'),
-));
+// check if a CWarning object is passed
+if(!$warning = $this->get('warning')) {
+	// if not - render a standard warning with a message
+	$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $this->get('message'));
+	$warning->setButtons(array(
+		new CButton('login', _('Retry'), 'document.location.reload();', 'formlist'),
+	));
+}
 $warning->show();
 ?>
 <script>

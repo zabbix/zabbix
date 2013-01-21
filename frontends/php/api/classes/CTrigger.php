@@ -1944,7 +1944,9 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['order'][] = 'h.name '.$sortorder;
 		}
 		else {
-			parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
+			$sqlParts = parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
 		}
+
+		return $sqlParts;
 	}
 }

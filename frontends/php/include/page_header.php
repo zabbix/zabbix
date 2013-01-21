@@ -133,6 +133,11 @@ $sub_menus = array();
 $denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 zbx_flush_post_cookies($denied_page_requested);
 
+// render the "Deny access" page
+if ($denied_page_requested) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($page_title);
 	$pageHeader->addCssFile('css.css');
@@ -451,10 +456,6 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 
 // unset multiple variables
 unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row, $db_nodes, $node_data, $sub_menu_table, $sub_menu_rows);
-
-if ($denied_page_requested) {
-	access_deny();
-}
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
 	zbx_add_post_js('var msglistid = initMessages({});');
