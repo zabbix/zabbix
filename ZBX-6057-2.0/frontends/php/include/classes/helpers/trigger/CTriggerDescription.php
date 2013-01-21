@@ -383,7 +383,7 @@ class CTriggerDescription {
 	protected function expandItemMacros(array $expandItem, array $triggers, array $macroValues = array()) {
 		if (!empty($expandItem)) {
 			$dbFuncs = DBselect(
-				'SELECT DISTINCT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
+				'SELECT DISTINCT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.mappingid,m.newvalue'.
 						' FROM functions f'.
 						' INNER JOIN items i ON f.itemid=i.itemid'.
 						' INNER JOIN hosts h ON i.hostid=h.hostid'.
@@ -468,7 +468,7 @@ class CTriggerDescription {
 	 * @return string
 	 */
 	protected function resolveItemLastvalueMacro(array $item) {
-		if (is_null($item['newvalue'])) {
+		if (is_null($item['mappingid'])) {
 			$value = formatItemValue($item, UNRESOLVED_MACRO_STRING);
 		}
 		else {
