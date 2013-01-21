@@ -198,6 +198,59 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 *
+	 * @param type $label string in which macros should be resolved
+	 * @param array $items list of graph items
+	 * @param array $items[n]['hostid'] graph n-th item corresponding host Id
+	 *
+	 * @return string label with macros replaced with corresponding values
+	 */
+	public static function resolveGraphLabel($label, $items) {
+		self::init();
+		return self::$macrosResolver->resolve(array(
+			'config' => 'graphName',
+			'data' => array('str' => $label, 'items' => $items)
+		));
+	}
+
+	/**
+	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 *
+	 * @param array $data list of graphs
+	 * @param int $data[]['graphid'] id of graph
+	 * @param string $data[]['name'] name of graph
+	 *
+	 * @return array inputed data with resolved names
+	 */
+	public static function resolveGraphNameByIds($data) {
+		self::init();
+		$graphIds = zbx_objectValues($data, 'graphid');
+
+		$items = DBfetchArray(DBselect(
+			'SELECT i.hostid,gi.graphid'.
+			' FROM graphs_items gi,items i'.
+			' WHERE gi.itemid=i.itemid'.
+				' AND '.dbConditionInt('gi.graphid', $graphIds).
+			' ORDER BY gi.sortorder'
+		));
+
+		$itemsByGraphId = array();
+		foreach ($items as $item) {
+			$itemsByGraphId[$item['graphid']][]['hostid'] = $item['hostid'];
+		}
+
+		foreach ($itemsByGraphId as $graphId => $items) {
+			$data[$graphId]['name'] = self::$macrosResolver->resolve(array(
+				'config' => 'graphName',
+				'data' => array('str' => $data[$graphId]['name'], 'items' => $items)
+			));
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Create CMacrosResolver object and store in static variable.
 	 *
 	 * @static
