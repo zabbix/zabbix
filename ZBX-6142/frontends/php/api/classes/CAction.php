@@ -1291,10 +1291,10 @@ class CAction extends CZBXAPI {
 
 						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'hostid');
 						$opcommandHstCreate = array_merge($opcommandHstCreate, $diff['first']);
-						$opCommandHostId = zbx_objectValues($diff['second'], 'opcommand_hstid');
-						if (!empty($opCommandHostId)) {
+						$opCommandHostIds = zbx_objectValues($diff['second'], 'opcommand_hstid');
+						if ($opCommandHostIds) {
 							DB::delete('opcommand_hst', array(
-								'opcommand_hstid' => $opCommandHostId
+								'opcommand_hstid' => $opCommandHostIds
 							));
 						}
 					}
