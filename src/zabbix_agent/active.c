@@ -589,17 +589,20 @@ ret:
  *                                                                            *
  * Purpose: Buffer new value or send the whole buffer to the server           *
  *                                                                            *
- * Parameters: host - IP or Hostname of Zabbix server                         *
- *             port - port of Zabbix server                                   *
- *             hostname - name of host in Zabbix database                     *
- *             key - name of metric                                           *
- *             value - string version os key value                            *
+ * Parameters: server      - IP or Hostname of Zabbix server                  *
+ *             port        - port of Zabbix server                            *
+ *             host        - name of host in Zabbix database                  *
+ *             key         - name of metric                                   *
+ *             value       - string version os key value                      *
  *             lastlogsize - size of read logfile                             *
- *             mtime - time of last file modification                         *
- *             timestamp - timestamp of read value                            *
- *             source - name of logged data source                            *
- *             severity - severity of logged data sources                     *
- *             persistent - do not overwrite old values                       *
+ *             mtime       - time of last file modification                   *
+ *             timestamp   - timestamp of read value                          *
+ *             source      - name of logged data source                       *
+ *             severity    - severity of logged data sources                  *
+ *             logeventid  - the application-specific identifier for          *
+ *                           the event; used for monitoring of Windows        *
+ *                           event logs                                       *
+ *             persistent  - do not overwrite old values                      *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
