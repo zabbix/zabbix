@@ -11,7 +11,7 @@ is a command line utility for sending data to a remote Zabbix server. On the Zab
 .SS Options
 .IP "-c, --config \fI<config-file>\fR"
 Use \fIconfig-file\fR. Zabbix sender reads server details from the agent configuration file. By default Zabbix sender does not read any configuration file.
-Absolute path should be specified. Only parameters \fBHostname\fR, \fBServer\fR, \fBServerPort\fR and \fBSourceIP\fR are supported. First entry from the \fBServer\fR parameter is used, \fBServerActive\fR is ignored.
+Absolute path should be specified. Only parameters \fBHostname\fR, \fBServerActive\fR and \fBSourceIP\fR are supported. First entry from the \fBServerActive\fR parameter is used.
 .IP "-z, --zabbix-server \fI<server>\fR"
 Hostname or IP address of Zabbix server. If a host is monitored by a proxy, proxy hostname or IP address should be used instead.
 .IP "-p, --port \fI<port>\fR"
