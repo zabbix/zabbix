@@ -727,7 +727,7 @@ foreach ($triggers as $trigger) {
 		$comments
 	), 'even_row');
 
-	if ($showEvents != EVENTS_OPTION_NOEVENT) {
+	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
 		$i = 1;
 		foreach ($trigger['events'] as $enum => $event) {
 			$i++;
