@@ -36,6 +36,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6093] unified how the "access denied" page is displayed in different scenarios (Pavels)
 ..F....... [ZBX-6125] fixed empty new line in configuration of action (Eduard)
 ..F....... [ZBX-6108] fixed time control position remembering in monitoring->web (Eduard)
 ..F....... [ZBX-6111] removed unused profile key: web.popup.itemtype (Oleg)
@@ -97,6 +98,9 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6133] fixed undefined indexes when importing hosts with "Update existing" disabled (Pavels)
+..F....... [ZBX-6122] fixed error when trying to create an IT service and submitting an incorrectly filled form (Pavels)
+.......PS. [ZBX-6101] fixed processing of SNMP traps in maintenance "with data colleaction"; thanks to Volker Fröhlich for patch (Sasha)
 .......PS. [ZBX-6012] added support of user macros and global regular expressions in SNMP trap item key parameter (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 A......... [ZBX-3534] fixed templated linking using read-only template (Eduard)
@@ -105,7 +109,7 @@ A......... [ZBX-3534] fixed templated linking using read-only template (Eduard)
 ..F....... [ZBX-6117] fixed item value macros resolving using non-converted to null values (Eduard)
 ..F....... [ZBX-6113] fixed hidden input field appearing when assigning hosts to groups in IE (Pavels)
 ..F....... [ZBX-6063] fixed graph selection pop up working incorrectly when adding a graph to a templated screen (Pavels)
-A.F....... [ZBX-6014] improved performance and removed get_accessible_triggers function (dotneft, Oleg)
+A.F....... [ZBX-6014] improved performance in most it services pages and pages that retrieve trigger information (dotneft, Oleg)
 ..F....... [ZBX-6070] fixed event CSV export ignoring the selected page and filters (Pavels)
 ..F....... [ZBX-6006] optimized web interface API calls, which requested redundant data (Toms)
 A......... [ZBX-5806] fixed template.massadd and template.massremove returning an empty hostids array (Pavels)
@@ -121,7 +125,7 @@ A......... [ZBX-6097] fixed the ability to override LDAP configuration when call
 A......... [ZBX-5977] removed possibility to add an LLD rule to an application via the API in application and discovery rule (Oleg)
 ....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)
 .D........ [ZBXNEXT-894] fixed generate_events comment to say that events are generated after maintenance if trigger changed its state during the maintenance at all (Richlv)
-.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(), DBlld_process_discovery_rule(). Thanks to Takanori Suzuki for patch (Andris, Sasha)
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(), DBlld_process_discovery_rule(); thanks to Takanori Suzuki for patch (Andris, Sasha)
 ...G...... [ZBX-5940] fixed displaying default key parameters when agent is used with option -p (Andris)
 .......PS. [ZBX-5981] fixed incorrect use of function assert() if build option -DNDEBUG was used, it caused random crashes (Alexei)
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
@@ -1315,7 +1319,7 @@ Changes for 1.8.16rc2
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
 A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
-.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(); thanks to Takanori Suzuki for patch (Andris)
 
 Changes for 1.8.16rc1
 

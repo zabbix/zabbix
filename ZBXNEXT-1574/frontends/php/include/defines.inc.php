@@ -611,6 +611,12 @@ define('GROUP_GUI_ACCESS_DISABLED', 2);
 define('GROUP_API_ACCESS_DISABLED', 0);
 define('GROUP_API_ACCESS_ENABLED',	1);
 
+/**
+ * @see access_deny()
+ */
+define('ACCESS_DENY_OBJECT', 0);
+define('ACCESS_DENY_PAGE', 1);
+
 define('GROUP_DEBUG_MODE_DISABLED', 0);
 define('GROUP_DEBUG_MODE_ENABLED',	1);
 
