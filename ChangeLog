@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6122] fixed error when trying to create an IT service and submitting an incorrectly filled form (Pavels)
 .......PS. [ZBX-6101] fixed processing of SNMP traps in maintenance "with data colleaction"; thanks to Volker Fröhlich for patch (Sasha)
 .......PS. [ZBX-6012] added support of user macros and global regular expressions in SNMP trap item key parameter (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
