@@ -239,12 +239,14 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
 	$new_timeperiod = $_REQUEST['new_timeperiod'];
 
-	$new_timeperiod['start_date'] = mktime($_REQUEST['new_timeperiod_hour'],
-		$_REQUEST['new_timeperiod_minute'],
-		0,
-		$_REQUEST['new_timeperiod_month'],
-		$_REQUEST['new_timeperiod_day'],
-		$_REQUEST['new_timeperiod_year']);
+	if ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+		$new_timeperiod['start_date'] = mktime($_REQUEST['new_timeperiod_hour'],
+			$_REQUEST['new_timeperiod_minute'],
+			0,
+			$_REQUEST['new_timeperiod_month'],
+			$_REQUEST['new_timeperiod_day'],
+			$_REQUEST['new_timeperiod_year']);
+	}
 
 	// start time
 	$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * SEC_PER_HOUR) + ($new_timeperiod['minute'] * SEC_PER_MIN);
