@@ -170,7 +170,6 @@ void	DCflush_nextchecks()
 		itemids[i] = nextchecks[i].itemid;
 
 		timespecs[i].sec = nextchecks[i].now;
-		timespecs[i].ns = 0;
 
 		errors[i] = nextchecks[i].error_msg;
 	}
@@ -189,24 +188,11 @@ void	DCflush_nextchecks()
 
 	if (0 != trigger_order.values_num)
 	{
-		typedef struct
-		{
-			zbx_uint64_t	objectid;
-			zbx_timespec_t	timespec;
-		}
-		objectid_clock_t;
-
-		char			*sql = NULL;
-		size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-		objectid_clock_t 	*events = NULL;
-		int			events_alloc, events_num = 0;
-		DC_TRIGGER		*trigger;
-		char			*error_esc;
+		char		*sql = NULL;
+		size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
+		DC_TRIGGER	*trigger;
 
 		sql = zbx_malloc(sql, sql_alloc);
-
-		events_alloc = trigger_order.values_num;
-		events = zbx_malloc(events, events_alloc * sizeof(objectid_clock_t));
 
 		DBbegin();
 
@@ -216,56 +202,18 @@ void	DCflush_nextchecks()
 		{
 			trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-			if (TRIGGER_VALUE_FLAG_UNKNOWN != trigger->value_flags)
+			if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
+					trigger->type, trigger->value, trigger->value_flags, trigger->error,
+					trigger->lastchange, TRIGGER_VALUE_UNKNOWN, trigger->new_error,
+					trigger->timespec.sec, &trigger->add_event))
 			{
-				DCconfig_set_trigger_value(trigger->triggerid, trigger->value,
-						TRIGGER_VALUE_FLAG_UNKNOWN, trigger->new_error);
-
-				error_esc = DBdyn_escape_string_len(trigger->new_error, TRIGGER_ERROR_LEN);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update triggers"
-						" set value_flags=%d,"
-							"error='%s'"
-						" where triggerid=" ZBX_FS_UI64 ";\n",
-						TRIGGER_VALUE_FLAG_UNKNOWN,
-						error_esc,
-						trigger->triggerid);
-				zbx_free(error_esc);
-
-				events[events_num].objectid = trigger->triggerid;
-				events[events_num].timespec = trigger->timespec;
-				events_num++;
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
 			zbx_free(trigger->expression);
 			zbx_free(trigger->new_error);
-		}
-
-		if (0 != events_num)
-		{
-			zbx_uint64_t	eventid;
-
-			eventid = DBget_maxid_num("events", events_num);
-
-			for (i = 0; i < events_num; i++)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"insert into events (eventid,source,object,objectid,clock,ns,"
-							"value,value_changed)"
-						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d,%d);\n",
-						eventid++,
-						EVENT_SOURCE_TRIGGERS,
-						EVENT_OBJECT_TRIGGER,
-						events[i].objectid,
-						events[i].timespec.sec,
-						events[i].timespec.ns,
-						TRIGGER_VALUE_UNKNOWN,
-						TRIGGER_VALUE_CHANGED_NO);
-
-				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-			}
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -276,7 +224,6 @@ void	DCflush_nextchecks()
 		DBcommit();
 
 		zbx_free(sql);
-		zbx_free(events);
 	}
 
 	zbx_hashset_destroy(&trigger_info);

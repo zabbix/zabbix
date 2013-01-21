@@ -827,8 +827,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value,
-				trigger->new_error, &trigger->timespec, &trigger->add_event, &trigger->value_changed))
+				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->lastchange,
+				trigger->new_value, trigger->new_error, trigger->timespec.sec, &trigger->add_event))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
@@ -861,7 +861,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+					&trigger->timespec, trigger->new_value, 0, 0);
 		}
 	}
 clean_triggers:
