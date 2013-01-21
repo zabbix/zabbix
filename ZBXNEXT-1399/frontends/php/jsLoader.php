@@ -61,6 +61,7 @@ $availableJScripts = array(
 	'jquery-ui.js' => 'jquery/',
 	'activity-indicator.js' => 'vendors/',
 	'chosen.jquery.js' => 'vendors/chosen/',
+	'chosen.js' => 'vendors/chosen/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -186,7 +187,9 @@ $tranStrings = array(
 	'chosen.jquery.js' => array(
 		'Select some options' => _('Select some options'),
 		'Select option' => _('Select option'),
-		'No results match' => _('No results match'),
+		'No results match' => _('No results match')
+	),
+	'chosen.jquery.js' => array(
 		'Keep typing...' => _('Keep typing...'),
 		'Looking for' => _('Looking for')
 	)

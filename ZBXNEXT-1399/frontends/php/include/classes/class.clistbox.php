@@ -48,20 +48,6 @@ class CListBox extends CComboBox {
 		}
 		$this->setAttribute('style', 'width:'.$options['width'].'px;');
 
-		// apply ajax-chosen
-		zbx_add_post_js('
-			var ajaxUrl = new Curl("jsrpc.php");
-			ajaxUrl.setArgument("type", '.PAGE_TYPE_TEXT_RETURN_JSON.');
-			ajaxUrl.setArgument("method", "chosen.get");
-			ajaxUrl.setArgument("objectName", "'.$options['objectName'].'");
-
-			jQuery(".chzn-select-'.$name.'").ajaxChosen({
-				type: "GET",
-				url: ajaxUrl.getUrl(),
-				dataType: "json"
-			}, function (data) {
-				return data;
-			});'
-		);
+		zbx_add_post_js('jQuery(".chzn-select-'.$name.'").zbxChosen({objectName: "'.$options['objectName'].'"});');
 	}
 }
