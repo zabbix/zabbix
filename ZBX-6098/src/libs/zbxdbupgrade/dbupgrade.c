@@ -649,6 +649,26 @@ static int	DBpatch_02010028()
 
 	return FAIL;
 }
+
+static int	DBpatch_02010029()
+{
+	const char	*sql = "delete from profiles where idx='web.items.filter_groupid'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010030()
+{
+	const char	*sql = "update profiles set value_id=value_int,value_int=0 where idx like 'web.avail_report.%.groupid' or idx like 'web.avail_report.%.hostid'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -715,6 +735,8 @@ int	DBcheck_version()
 		{DBpatch_02010026, 2010026, 0, 1},
 		{DBpatch_02010027, 2010027, 0, 1},
 		{DBpatch_02010028, 2010028, 0, 0},
+		{DBpatch_02010029, 2010029, 0, 0},
+		{DBpatch_02010030, 2010030, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
