@@ -156,7 +156,8 @@ static int	cache_get_snmp_index(DC_ITEM *item, char *oid, char *value, char **id
 		res = SUCCEED;
 	}
 end:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s idx:%s", __function_name, zbx_result_string(res),
+			res == SUCCEED ? *idx : "");
 
 	return res;
 }
@@ -537,11 +538,21 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	*err = '\0';
 
 	/* create OID from string */
-	snmp_parse_oid(OID, rootOID, &rootOID_len);
+	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
+	{
+		zbx_snprintf(err, MAX_STRING_LEN, "snmp_parse_oid(): cannot parse OID: %s.", OID);
+		ret = NOTSUPPORTED;
+		goto out;
+	}
 
 	if (NULL != idx)
 	{
-		snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len);
+		if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
+		{
+			zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is not large enough: %s.", OID);
+			ret = NOTSUPPORTED;
+			goto out;
+		}
 		OID_len = strlen(snmp_oid);
 	}
 
@@ -579,8 +590,15 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 					if (SNMP_ENDOFMIBVIEW != vars->type && SNMP_NOSUCHOBJECT != vars->type &&
 							SNMP_NOSUCHINSTANCE != vars->type)
 					{
-						snprint_objid(snmp_oid, sizeof(snmp_oid),
-								vars->name, vars->name_length);
+						if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid),
+								vars->name, vars->name_length))
+						{
+							zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is"
+									" not large enough: OID: %s snmp_OID: %s.",
+									OID, snmp_oid);
+							ret = NOTSUPPORTED;
+							running = 0;
+						}
 
 						/* not an exception value */
 						if (0 <= snmp_oid_compare(anOID, anOID_len, vars->name, vars->name_length))
@@ -726,7 +744,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 
 	if (1 == found)
 		ret = SUCCEED;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
