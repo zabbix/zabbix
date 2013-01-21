@@ -943,4 +943,6 @@ void	make_hostname(char *host);
 
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
+int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
+
 #endif
