@@ -34,8 +34,8 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, const zbx_timespec_t *timespec,
-		int value, unsigned char value_changed, int acknowledged, int force_actions)
+int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, int acknowledged, int force_actions)
 {
 	return SUCCEED;
 }

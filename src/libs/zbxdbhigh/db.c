@@ -483,7 +483,6 @@ DB_RESULT	DBselectN(const char *query, int n)
  *                                                                            *
  * Parameters: add_event      - [OUT] 0 - do not add event                    *
  *                                    1 - generate new event                  *
- *             value_changed  - [OUT] TRIGGER_VALUE_CHANGED_(NO or YES)       *
  *                                                                            *
  * Return value: SUCCEED - sql statement generated successfully               *
  *               FAIL    - trigger update isn't required                      *
@@ -494,12 +493,14 @@ DB_RESULT	DBselectN(const char *query, int n)
  *                                                                            *
  ******************************************************************************/
 int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
-		const zbx_timespec_t *ts, unsigned char *add_event, unsigned char *value_changed)
+		unsigned char type, int value, int value_flags, const char *error, int lastchange,
+		int new_value, const char *new_error, int new_lastchange, unsigned char *add_event)
 {
 	const char	*__function_name = "DBget_trigger_update_sql";
+	const char	*new_error_local;
 	char		*new_error_esc;
-	int		new_value_flags, generate_event, ret = FAIL;
+	int		new_value_flags, value_changed, value_flags_changed, multiple_problem, error_changed,
+			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
 			__function_name, triggerid, value, value_flags, new_value);
@@ -512,9 +513,6 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	else
 		new_value_flags = TRIGGER_VALUE_FLAG_NORMAL;
 
-	*add_event = 0;
-	*value_changed = TRIGGER_VALUE_CHANGED_NO;
-
 	/**************************************************************************************************/
 	/*                                                                                                */
 	/* The following table shows in which cases events should be generated:                           */
@@ -526,45 +524,39 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	/*              |                                                                                 */
 	/*  ------------+------------------------------------------------------                           */
 	/*              |                                                                                 */
-	/*  OK          |   no           yes          YES         -                                       */
+	/*  OK          |   no           T            T+E         -                                       */
 	/*              |                                                                                 */
-	/*  OK(?)       |   yes          no           YES         -                                       */
+	/*  OK(?)       |   T            T(e)         T+E         -                                       */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   YES          -            YES(M)      yes                                     */
+	/*  PROBLEM     |   T+E          -            T(m)+E(m)   T                                       */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   YES          -            YES(m)      no                                      */
+	/*  PROBLEM(?)  |   T+E          -            T+E(m)      T(e)                                    */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
 	/*                                                                                                */
-	/*  -      - should never happen                                                                  */
-	/*  no     - do not generate an event                                                             */
-	/*  yes    - generate an event                                                                    */
-	/*  YES    - generate an event with TRIGGER_VALUE_CHANGED_YES                                     */
-	/*  YES(M) - generate an event with TRIGGER_VALUE_CHANGED_YES if it is a "multiple true" trigger  */
-	/*  YES(m) - either "yes" or "YES" depending on whether it is a "multiple true" trigger or not    */
+	/*  -   - should never happen                                                                     */
+	/*  no  - do not update a trigger and do not generate an event                                    */
+	/*  T   - update a trigger                                                                        */
+	/*  E   - generate an event                                                                       */
+	/*  (m) - if it is a "multiple true" trigger                                                      */
+	/*  (e) - if an error message has changed                                                         */
 	/*                                                                                                */
 	/**************************************************************************************************/
 
-	generate_event = (value != new_value || value_flags != new_value_flags);
-	if (TRIGGER_TYPE_MULTIPLE_TRUE == type && 0 == generate_event)
-		generate_event = (TRIGGER_VALUE_PROBLEM == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
+	*add_event = 0;
+	new_error_local = (NULL == new_error ? "" : new_error);
 
-	if (0 != generate_event)
+	value_changed = (value != new_value || (0 == lastchange && TRIGGER_VALUE_FLAG_UNKNOWN != new_value_flags));
+	value_flags_changed = (value_flags != new_value_flags);
+	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == type && TRIGGER_VALUE_PROBLEM == new_value &&
+			TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
+	error_changed = (TRIGGER_VALUE_FLAG_UNKNOWN == new_value_flags && 0 != strcmp(error, new_error_local));
+
+	if (0 != value_changed || 0 != value_flags_changed || 0 != multiple_problem || 0 != error_changed)
 	{
 		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
 		{
-			int	new_lastchange = 0;
-
-			*add_event = 1;
-
-			if (value != new_value || (TRIGGER_TYPE_MULTIPLE_TRUE == type &&
-					TRIGGER_VALUE_PROBLEM == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags))
-			{
-				*value_changed = TRIGGER_VALUE_CHANGED_YES;
-				new_lastchange = ts->sec;
-			}
-
 			if (NULL == *sql)
 			{
 				*sql_alloc = 2 * ZBX_KIBIBYTE;
@@ -573,32 +565,31 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update triggers set ");
 
-			if (0 != new_lastchange)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
-
-			if (value != new_value)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
-
-			if (value_flags != new_value_flags)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value_flags=%d,", new_value_flags);
-
-			if (NULL == new_error)
+			if (0 != value_changed || 0 != multiple_problem)
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, "");
+				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error_local,
+						&new_lastchange);
 
-				if ('\0' != *error)
-					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "error='',");
+				*add_event = 1;
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 			}
 			else
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error);
+				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error_local,
+						NULL);
+			}
 
-				if (0 != strcmp(error, new_error))
-				{
-					new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "error='%s',", new_error_esc);
-					zbx_free(new_error_esc);
-				}
+			if (0 != value_changed)
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
+
+			if (0 != value_flags_changed)
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value_flags=%d,", new_value_flags);
+
+			if (0 != error_changed)
+			{
+				new_error_esc = DBdyn_escape_string_len(new_error_local, TRIGGER_ERROR_LEN);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "error='%s',", new_error_esc);
+				zbx_free(new_error_esc);
 			}
 
 			(*sql_offset)--;
@@ -608,171 +599,10 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 			ret = SUCCEED;
 		}
 	}
-	else if (TRIGGER_VALUE_FLAG_UNKNOWN == new_value_flags && 0 != strcmp(error, new_error))
-	{
-		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
-		{
-			DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error);
-
-			if (NULL == *sql)
-			{
-				*sql_alloc = 2 * ZBX_KIBIBYTE;
-				*sql = zbx_malloc(*sql, *sql_alloc);
-			}
-
-			new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
-					"update triggers"
-					" set error='%s'"
-					" where triggerid=" ZBX_FS_UI64,
-					new_error_esc, triggerid);
-			zbx_free(new_error_esc);
-
-			ret = SUCCEED;
-		}
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-void	DBupdate_triggers_status_after_restart()
-{
-	const char	*__function_name = "DBupdate_triggers_status_after_restart";
-	DB_RESULT	result;
-	DB_RESULT	result2;
-	DB_ROW		row;
-	DB_ROW		row2;
-	zbx_uint64_t	interfaceid, itemid, triggerid;
-	int		trigger_type, trigger_value, trigger_flags,
-			type, lastclock, delay, nextcheck, min_nextcheck, now;
-	const char	*trigger_error;
-	DC_TRIGGER	*tr = NULL;
-	int		tr_alloc = 0, tr_num = 0;
-	char		*sql = NULL;
-	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	zbx_timespec_t	ts;
-	unsigned char	add_event, value_changed;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	now = time(NULL);
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	DBbegin();
-
-	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
-			" from hosts h,items i,functions f,triggers t"
-			" where h.hostid=i.hostid"
-				" and i.itemid=f.itemid"
-				" and i.lastclock is not null"
-				" and f.triggerid=t.triggerid"
-				" and h.status in (%d)"
-				" and i.status in (%d)"
-				" and i.type not in (%d,%d)"
-				" and t.status in (%d)"
-				ZBX_SQL_NODE,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
-			TRIGGER_STATUS_ENABLED,
-			DBand_node_local("t.triggerid"));
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		trigger_type = atoi(row[1]);
-		trigger_value = atoi(row[2]);
-		trigger_flags = atoi(row[3]);
-		trigger_error = row[4];
-
-		result2 = DBselect(
-				"select distinct i.itemid,i.type,i.lastclock,i.delay,i.delay_flex,i.interfaceid"
-				" from items i,functions f,triggers t"
-				" where i.itemid=f.itemid"
-					" and f.triggerid=t.triggerid"
-					" and i.type not in (%d,%d)"
-					" and t.triggerid=" ZBX_FS_UI64,
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
-				triggerid);
-
-		min_nextcheck = -1;
-		while (NULL != (row2 = DBfetch(result2)))
-		{
-			ZBX_STR2UINT64(itemid, row2[0]);
-			type = atoi(row2[1]);
-			lastclock = (SUCCEED == DBis_null(row2[2]) ? 0 : atoi(row2[2]));
-			delay = atoi(row2[3]);
-			ZBX_DBROW2UINT64(interfaceid, row2[5]);
-
-			nextcheck = calculate_item_nextcheck(interfaceid, itemid, type, delay, row2[4], lastclock, NULL);
-			if (-1 == min_nextcheck || nextcheck < min_nextcheck)
-				min_nextcheck = nextcheck;
-		}
-		DBfree_result(result2);
-
-		if (-1 == min_nextcheck || min_nextcheck >= now)
-			continue;
-
-		ts.sec = min_nextcheck;
-		ts.ns = 0;
-
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, trigger_type,
-				trigger_value, trigger_flags, trigger_error, TRIGGER_VALUE_UNKNOWN,
-				"Zabbix was restarted.", &ts, &add_event, &value_changed))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		if (1 == add_event)
-		{
-			if (tr_num == tr_alloc)
-			{
-				tr_alloc += 64;
-				tr = zbx_realloc(tr, tr_alloc * sizeof(DC_TRIGGER));
-			}
-
-			tr[tr_num].triggerid = triggerid;
-			tr[tr_num].timespec = ts;
-			tr[tr_num].value_changed = value_changed;
-			tr_num++;
-		}
-	}
-	DBfree_result(result);
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
-	zbx_free(sql);
-
-	if (0 != tr_num)
-	{
-		zbx_uint64_t	eventid;
-		int		i;
-
-		eventid = DBget_maxid_num("events", tr_num);
-
-		for (i = 0; i < tr_num; i++)
-		{
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
-					&tr[i].timespec, TRIGGER_VALUE_UNKNOWN, tr[i].value_changed, 0, 0);
-		}
-	}
-
-	zbx_free(tr);
-
-	DBcommit();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
@@ -1576,6 +1406,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 {
 	if (0 == strcmp(tablename, "history_log") ||
 			0 == strcmp(tablename, "history_text") ||
+			0 == strcmp(tablename, "events") ||
 			0 == strcmp(tablename, "dservices") ||
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
@@ -1936,7 +1767,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		DBfree_result(result);
 
 		process_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-				autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, TRIGGER_VALUE_CHANGED_NO, 0, 1);
+				autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, 0, 1);
 
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);

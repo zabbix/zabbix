@@ -102,15 +102,15 @@ static void	free_trigger_info(DB_EVENT *event)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, const zbx_timespec_t *timespec,
-		int value, unsigned char value_changed, int acknowledged, int force_actions)
+int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, int acknowledged, int force_actions)
 {
 	const char	*__function_name = "process_event";
 	DB_EVENT	event;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " object:%d objectid:" ZBX_FS_UI64 " value:%d"
-			" value_changed:%d", __function_name, eventid, object, objectid, value, (int)value_changed);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " object:%d objectid:" ZBX_FS_UI64 " value:%d",
+			__function_name, eventid, object, objectid, value);
 
 	/* preparing event for processing */
 	memset(&event, 0, sizeof(DB_EVENT));
@@ -121,28 +121,28 @@ int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t obj
 	event.clock = timespec->sec;
 	event.ns = timespec->ns;
 	event.value = value;
-	event.value_changed = value_changed;
 	event.acknowledged = acknowledged;
 
-	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed || 1 == force_actions)
+	if (EVENT_SOURCE_TRIGGERS == event.source || 1 == force_actions)
+	{
 		if (SUCCEED != add_trigger_info(&event))
 			goto fail;
+	}
 
 	if (0 == event.eventid)
 		event.eventid = DBget_maxid("events");
 
-	DBexecute("insert into events (eventid,source,object,objectid,clock,ns,value,value_changed)"
-			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d,%d)",
-			event.eventid, event.source, event.object, event.objectid, event.clock, event.ns,
-			event.value, (int)event.value_changed);
+	DBexecute("insert into events (eventid,source,object,objectid,clock,ns,value)"
+			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d)",
+			event.eventid, event.source, event.object, event.objectid, event.clock, event.ns, event.value);
 
-	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed || 1 == force_actions)
+	if (EVENT_SOURCE_TRIGGERS == event.source || 1 == force_actions)
 		process_actions(&event);
 
-	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed && EVENT_OBJECT_TRIGGER == event.object)
+	if (EVENT_SOURCE_TRIGGERS == event.source)
 		DBupdate_services(event.objectid, TRIGGER_VALUE_PROBLEM == event.value ? event.trigger.priority : 0, event.clock);
 
-	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed || 1 == force_actions)
+	if (EVENT_SOURCE_TRIGGERS == event.source || 1 == force_actions)
 		free_trigger_info(&event);
 
 	ret = SUCCEED;
