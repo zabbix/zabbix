@@ -121,7 +121,7 @@ if (isset($_REQUEST['save'])) {
 	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['delete'])) {
-	$result = API::Proxy()->delete(array('proxyid' => $_REQUEST['proxyid']));
+	$result = API::Proxy()->delete(array($_REQUEST['proxyid']));
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['proxyid']);
 		$proxy = reset($dbProxy);
@@ -169,7 +169,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	$hosts = get_request('hosts', array());
 
 	DBstart();
-	$go_result = API::Proxy()->delete(zbx_toObject($hosts, 'proxyid'));
+	$go_result = API::Proxy()->delete($hosts);
 	$go_result = DBend($go_result);
 
 	show_messages($go_result, _('Proxy deleted'), _('Cannot delete proxy'));
