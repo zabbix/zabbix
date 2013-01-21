@@ -228,7 +228,7 @@ elseif (isset($_REQUEST['del_user_group'])) {
  */
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	$user = reset($users);
-	$result = API::User()->delete($users);
+	$result = API::User()->delete(array($user['userid']));
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
@@ -309,7 +309,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 			continue;
 		}
 		$user_data = $db_users[$userid];
-		$go_result |= (bool) API::User()->delete($user_data);
+		$go_result |= (bool) API::User()->delete(array($userid));
 		if ($go_result) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user_data['alias'].'] name ['.$user_data['name'].'] surname ['.$user_data['surname'].']');
 		}
