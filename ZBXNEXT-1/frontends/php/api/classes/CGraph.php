@@ -309,7 +309,7 @@ class CGraph extends CGraphGeneral {
 		}
 
 		if (isset($options['expandName'])) {
-			$result =  CMacrosResolverHelper::resolveGraphNameByIds($result);
+			$result = CMacrosResolverHelper::resolveGraphNameByIds($result);
 		}
 
 		if ($result) {
