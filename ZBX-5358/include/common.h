@@ -972,6 +972,7 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
+LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
 LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
 LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);

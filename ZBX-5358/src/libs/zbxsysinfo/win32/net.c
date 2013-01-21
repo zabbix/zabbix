@@ -23,6 +23,33 @@
 #include "zbxjson.h"
 
 /*
+ * returns interface description encoded in UTF-8 format
+ */
+static LPSTR	get_if_description(MIB_IFROW *pIfRow)
+{
+	static LPTSTR (*mb_to_unicode)(LPCSTR) = NULL;
+	LPTSTR	wdescr;
+	LPSTR	utf8_descr;
+
+	if (NULL == mb_to_unicode)
+	{
+		OSVERSIONINFO version_info = {sizeof(OSVERSIONINFO)};
+
+		/* starting with Windows Vista (Windows Server 2008) the interface description */
+		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
+		if (TRUE == GetVersionEx(&version_info) && 6 <= version_info.dwMajorVersion)
+			mb_to_unicode = zbx_oemcp_to_unicode;
+		else
+			mb_to_unicode = zbx_acp_to_unicode;
+	}
+	wdescr = mb_to_unicode(pIfRow->bDescr);
+	utf8_descr = zbx_unicode_to_utf8(wdescr);
+	zbx_free(wdescr);
+
+	return utf8_descr;
+}
+
+/*
  * returns interface statistics by IP address or interface name
  */
 static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
@@ -72,7 +99,6 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
-		LPTSTR	wdescr;
 		LPSTR	utf8_descr;
 
 		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
@@ -83,12 +109,10 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 			continue;
 		}
 
-		wdescr = zbx_acp_to_unicode(pIfRow->bDescr);
-		utf8_descr = zbx_unicode_to_utf8(wdescr);
+		utf8_descr = get_if_description(pIfRow);
 		if (0 == strcmp(if_name, utf8_descr))
 			ret = SUCCEED;
 		zbx_free(utf8_descr);
-		zbx_free(wdescr);
 
 		if (SUCCEED == ret)
 			break;
@@ -244,7 +268,6 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	MIB_IFTABLE	*pIfTable = NULL;
 	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
-	LPTSTR		wdescr;
 	LPSTR		utf8_descr;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
@@ -279,11 +302,9 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		zbx_json_addobject(&j, NULL);
 
-		wdescr = zbx_acp_to_unicode(pIfRow.bDescr);
-		utf8_descr = zbx_unicode_to_utf8(wdescr);
+		utf8_descr = get_if_description(&pIfRow);
 		zbx_json_addstring(&j, "{#IFNAME}", utf8_descr, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8_descr);
-		zbx_free(wdescr);
 
 		zbx_json_close(&j);
 	}
@@ -381,7 +402,6 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		for (i = 0; i < (int)pIfTable->dwNumEntries; i++)
 		{
-			LPTSTR	wdescr;
 			LPSTR	utf8_descr;
 
 			pIfRow.dwIndex = pIfTable->table[i].dwIndex;
@@ -410,11 +430,9 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			if (j == pIPAddrTable->dwNumEntries)
 				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " -");
 
-			wdescr = zbx_acp_to_unicode(pIfRow.bDescr);
-			utf8_descr = zbx_unicode_to_utf8(wdescr);
+			utf8_descr = get_if_description(&pIfRow);
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s\n", utf8_descr);
 			zbx_free(utf8_descr);
-			zbx_free(wdescr);
 		}
 	}
 
