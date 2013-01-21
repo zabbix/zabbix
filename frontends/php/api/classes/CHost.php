@@ -620,7 +620,6 @@ class CHost extends CHostGeneral {
 	protected function checkInput(&$hosts, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
-		$delete = ($method == 'delete');
 
 		// permissions
 		$groupids = array();
@@ -631,7 +630,7 @@ class CHost extends CHostGeneral {
 			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
 		}
 
-		if ($update || $delete) {
+		if ($update) {
 			$hostDBfields = array('hostid' => null);
 			$dbHosts = $this->get(array(
 				'output' => array('hostid', 'host'),
@@ -672,12 +671,9 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			if ($update || $delete) {
+			if ($update) {
 				if (!isset($dbHosts[$host['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-				if ($delete) {
-					$host['host'] = $dbHosts[$host['hostid']]['host'];
 				}
 			}
 			else {
@@ -693,10 +689,6 @@ class CHost extends CHostGeneral {
 				if (!isset($host['interfaces'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
 				}
-			}
-
-			if ($delete) {
-				continue;
 			}
 
 			if (isset($host['groups'])) {
@@ -1371,27 +1363,43 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Delete Host
+	 * Validates the input parameters for the delete() method.
 	 *
-	 * @param array $hosts
-	 * @param array $hosts[0, ...]['hostid'] Host ID to delete
+	 * @throws APIException if the input is invalid
 	 *
-	 * @return array|boolean
+	 * @param array $hostIds
+	 *
+	 * @return void
 	 */
-	public function delete($hosts) {
-
-		if (empty($hosts)) {
+	protected function validateDelete(array $hostIds) {
+		if (empty($hostIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$hosts = zbx_toArray($hosts);
-		$hostids = zbx_objectValues($hosts, 'hostid');
+		$this->checkPermissions($hostIds);
+	}
 
-		$this->checkInput($hosts, __FUNCTION__);
+	/**
+	 * Delete Host
+	 *
+	 * @param string|array $hostIds
+	 *
+	 * @return array|boolean
+	 */
+	public function delete($hostIds) {
+		$hostIds = zbx_toArray($hostIds);
+
+		// deprecated input support
+		if ($hostIds && is_array($hostIds[0])) {
+			$this->deprecated('Passing objects to host.delete is deprecated, use an array of IDs instead.');
+			$hostIds = zbx_objectValues($hostIds, 'hostid');
+		}
+
+		$this->validateDelete($hostIds);
 
 		// delete the discovery rules first
 		$delRules = API::DiscoveryRule()->get(array(
-			'hostids' => $hostids,
+			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
@@ -1401,7 +1409,7 @@ class CHost extends CHostGeneral {
 
 		// delete the items
 		$delItems = API::Item()->get(array(
-			'templateids' => $hostids,
+			'templateids' => $hostIds,
 			'output' => array('itemid'),
 			'nopermissions' => true,
 			'preservekeys' => true
@@ -1412,7 +1420,7 @@ class CHost extends CHostGeneral {
 
 // delete web tests
 		$delHttptests = array();
-		$dbHttptests = get_httptests_by_hostid($hostids);
+		$dbHttptests = get_httptests_by_hostid($hostIds);
 		while ($dbHttptest = DBfetch($dbHttptests)) {
 			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
 		}
@@ -1423,15 +1431,15 @@ class CHost extends CHostGeneral {
 
 // delete screen items
 		DB::delete('screens_items', array(
-			'resourceid' => $hostids,
+			'resourceid' => $hostIds,
 			'resourcetype' => SCREEN_RESOURCE_HOST_TRIGGERS
 		));
 
 // delete host from maps
-		if (!empty($hostids)) {
+		if (!empty($hostIds)) {
 			DB::delete('sysmaps_elements', array(
 				'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-				'elementid' => $hostids
+				'elementid' => $hostIds
 			));
 		}
 
@@ -1441,7 +1449,7 @@ class CHost extends CHostGeneral {
 		$sql = 'SELECT DISTINCT actionid'.
 				' FROM conditions'.
 				' WHERE conditiontype='.CONDITION_TYPE_HOST.
-				' AND '.dbConditionString('value', $hostids);
+				' AND '.dbConditionString('value', $hostIds);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -1451,7 +1459,7 @@ class CHost extends CHostGeneral {
 		$sql = 'SELECT DISTINCT o.actionid'.
 				' FROM operations o, opcommand_hst oh'.
 				' WHERE o.operationid=oh.operationid'.
-				' AND '.dbConditionInt('oh.hostid', $hostids);
+				' AND '.dbConditionInt('oh.hostid', $hostIds);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -1469,21 +1477,21 @@ class CHost extends CHostGeneral {
 // delete action conditions
 		DB::delete('conditions', array(
 			'conditiontype' => CONDITION_TYPE_HOST,
-			'value' => $hostids
+			'value' => $hostIds
 		));
 
 // delete action operation commands
 		$operationids = array();
 		$sql = 'SELECT DISTINCT oh.operationid'.
 				' FROM opcommand_hst oh'.
-				' WHERE '.dbConditionInt('oh.hostid', $hostids);
+				' WHERE '.dbConditionInt('oh.hostid', $hostIds);
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
 		DB::delete('opcommand_hst', array(
-			'hostid' => $hostids,
+			'hostid' => $hostIds,
 		));
 
 // delete empty operations
@@ -1506,18 +1514,18 @@ class CHost extends CHostGeneral {
 				'hostid',
 				'name'
 			),
-			'hostids' => $hostids,
+			'hostids' => $hostIds,
 			'nopermissions' => true
 		));
 
 // delete host inventory
-		DB::delete('host_inventory', array('hostid' => $hostids));
+		DB::delete('host_inventory', array('hostid' => $hostIds));
 
 // delete host applications
-		DB::delete('applications', array('hostid' => $hostids));
+		DB::delete('applications', array('hostid' => $hostIds));
 
 // delete host
-		DB::delete('hosts', array('hostid' => $hostids));
+		DB::delete('hosts', array('hostid' => $hostIds));
 
 // TODO: remove info from API
 		foreach ($hosts as $host) {
@@ -1525,7 +1533,7 @@ class CHost extends CHostGeneral {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
 		}
 
-		return array('hostids' => $hostids);
+		return array('hostids' => $hostIds);
 	}
 
 	public function isReadable($ids) {
@@ -1679,5 +1687,18 @@ class CHost extends CHostGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Checks if all of the given hosts are available for writing.
+	 *
+	 * @throws APIException     if any of the host is not writable
+	 *
+	 * @param array $hostIds
+	 */
+	protected function checkPermissions(array $hostIds) {
+		if (!$this->isWritable($hostIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 }
