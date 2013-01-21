@@ -99,6 +99,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+A......... [ZBX-6142] fixed "current hosts" removing in Configuration->Action->Operations (Oleg)
 ..F....... [ZBX-6131] fixed undefined indexes in maintenance periods (Oleg)
 ..F....... [ZBX-6133] fixed undefined indexes when importing hosts with "Update existing" disabled (Pavels)
 ..F....... [ZBX-6122] fixed error when trying to create an IT service and submitting an incorrectly filled form (Pavels)
