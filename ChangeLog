@@ -102,6 +102,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6114] fixed errors in graphs (invalid arguments and division by zero) (Oleg)
 ...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
 A......... [ZBX-6142] fixed "current hosts" removing in Configuration->Action->Operations (Oleg)
 ..F....... [ZBX-6131] fixed undefined indexes in maintenance periods (Oleg)
