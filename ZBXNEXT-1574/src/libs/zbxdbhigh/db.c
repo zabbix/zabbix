@@ -1767,7 +1767,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		DBfree_result(result);
 
 		process_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-				autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, 0, 1);
+				autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, 0);
 
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);

@@ -861,7 +861,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, 0, 0);
+					&trigger->timespec, trigger->new_value, 0);
 		}
 	}
 clean_triggers:

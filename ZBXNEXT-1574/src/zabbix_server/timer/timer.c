@@ -113,7 +113,7 @@ static void	process_time_functions()
 				continue;
 
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, 0, 0);
+					&trigger->timespec, trigger->new_value, 0);
 		}
 	}
 
@@ -492,7 +492,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		for (i = 0; i < tr_num; i++)
 		{
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
-					&ts, tr[i].new_value, 0, 1);
+					&ts, tr[i].new_value, 0);
 		}
 	}
 
