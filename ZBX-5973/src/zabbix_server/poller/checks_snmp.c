@@ -819,7 +819,7 @@ static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 		const char	*replace;
 	};
 
-#define	LEN_STR(x)	sizeof(x) - 1, x
+#define LEN_STR(x)	sizeof(x) - 1, x
 	static ZBX_MIB_NORM mibs[]=
 	{
 		/* the most popular items first */
@@ -845,9 +845,9 @@ static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 		{LEN_STR("ifOutQLen"),		"1.3.6.1.2.1.2.2.1.21"},
 		{0}
 	};
-#undef	LEN_STR
+#undef LEN_STR
 
-	int		found = 0, i;
+	int	found = 0, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s)", __function_name, oid);
 
