@@ -3386,3 +3386,52 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 
 	memcpy(&(*data)[l], value, sz_value);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trim_str_list                                                *
+ *                                                                            *
+ * Purpose: remove whitespace surrounding a string list item delimiters       *
+ *                                                                            *
+ * Parameters: list      - the list (a string containing items separated by   *
+ *                         delimiter)                                         *
+ *             delimiter - the list delimiter                                 *
+ *                                                                            *
+ * Author: Andris Zeila                                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_str_list(char *list, char delimiter)
+{
+	char	*whitespace = " \t";	/* NB! strchr(3): "terminating null byte is considered part of the string" */
+	char	*out, *in;
+
+	if (NULL == list || '\0' == *list)
+		return;
+
+	out = in = list;
+
+	while ('\0' != *in)
+	{
+		/* trim leading spaces from list item */
+		while ('\0' != *in && NULL != strchr(whitespace, *in))
+			in++;
+
+		/* copy list item */
+		while (delimiter != *in && '\0' != *in)
+			*out++ = *in++;
+
+		/* trim trailing spaces from list item */
+		if (out > list)
+		{
+			while (NULL != strchr(whitespace, *(--out)))
+				;
+			out++;
+		}
+		if (delimiter == *in)
+			*out++ = *in++;
+	}
+	*out = '\0';
+}
+
+
+
