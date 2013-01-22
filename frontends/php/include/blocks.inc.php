@@ -538,6 +538,10 @@ function make_hoststat_summary($filter) {
 
 	foreach ($hosts as $host) {
 		foreach ($host['groups'] as $group) {
+			if (!isset($groups[$group['groupid']])) {
+				continue;
+			}
+
 			if (!isset($groups[$group['groupid']]['hosts'])) {
 				$groups[$group['groupid']]['hosts'] = array();
 			}
@@ -558,7 +562,7 @@ function make_hoststat_summary($filter) {
 	}
 
 	foreach ($groups as $group) {
-		if (!isset($group['groupid']) || !isset($hosts_data[$group['groupid']])) {
+		if (!isset($hosts_data[$group['groupid']])) {
 			continue;
 		}
 
