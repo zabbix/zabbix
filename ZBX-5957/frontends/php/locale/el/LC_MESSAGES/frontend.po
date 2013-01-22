@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-17 00:56+0200\n"
-"PO-Revision-Date: 2013-01-15 12:38+0200\n"
+"POT-Creation-Date: 2013-01-21 23:06+0200\n"
+"PO-Revision-Date: 2013-01-21 14:09+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
 "Language: el\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.0.5\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
-#: maintenance.php:153 maintenance.php:165 services.php:194 services.php:208
+#: maintenance.php:153 maintenance.php:165 services.php:193 services.php:207
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" πρέπει να είναι μεταξύ 01/01/1970 και 18/01/2038."
@@ -438,7 +438,7 @@ msgstr "Προσθήκη απόντος"
 msgid "Add prototype"
 msgstr "Προσθήκη προτότυπου"
 
-#: jsLoader.php:178
+#: jsLoader.php:182
 msgid "Add service"
 msgstr "Προσθήκη υπηρεσίας"
 
@@ -532,7 +532,7 @@ msgstr "Ευθυγράμμιση εικονιδιων"
 #: include/views/administration.users.list.php:36
 #: include/views/configuration.action.edit.php:519
 #: include/views/configuration.hostgroups.edit.php:39
-#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:85
+#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:88
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
 msgstr "Όλα"
@@ -542,7 +542,7 @@ msgstr "Όλα"
 msgid "All groups"
 msgstr "Όλες οι ομάδες"
 
-#: jsLoader.php:151
+#: jsLoader.php:155
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Όλοι οι σύνδεσμοι πρέπει να έχουν \"Όνομα\" και \"URL\" καθορισμένο"
 
@@ -638,7 +638,7 @@ msgid "Apr"
 msgstr "Απρ"
 
 #: include/forms.inc.php:1556 include/func.inc.php:107
-#: include/func.inc.php:238 jsLoader.php:114
+#: include/func.inc.php:238 jsLoader.php:118
 msgid "April"
 msgstr "Απρίλιος"
 
@@ -711,7 +711,7 @@ msgid "Aug"
 msgstr "Αυγ"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
-#: include/func.inc.php:242 jsLoader.php:118
+#: include/func.inc.php:242 jsLoader.php:122
 msgid "August"
 msgstr "Αύγουστος"
 
@@ -1109,7 +1109,7 @@ msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 msgid "Canada (136 characters)"
 msgstr "Καναδάς (136 χαρακτήρες)"
 
-#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:259
+#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:262
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:946
@@ -1136,7 +1136,7 @@ msgstr "Αδύνατη η προσθήκη ενέργειας"
 msgid "Cannot add application"
 msgstr "Αδύνατη η προσθήκη κατηγορίας"
 
-#: api/classes/CTrigger.php:1825
+#: api/classes/CTrigger.php:1800
 msgid "Cannot add dependency from a host to a template."
 msgstr "Αδύνατη η προσθήκη εξάρτησης απο ξενιστή σε σχεδιότυπο."
 
@@ -1222,7 +1222,7 @@ msgstr "Αδύνατη η προσθήκη οθόνης"
 msgid "Cannot add script"
 msgstr "Αδύνατη η προσθήκη δέσμης ενεργειών"
 
-#: services.php:164
+#: services.php:163
 msgid "Cannot add service"
 msgstr "Αδύνατη η προσθήκη υπηρεσίας"
 
@@ -1271,15 +1271,15 @@ msgstr "Αδύνατη η αλλαγή μεθόδου ταυτοποίησης �
 msgid "Cannot clear history"
 msgstr "Αδύνατη η εκκαθάριση ιστορικού"
 
-#: api/classes/CDiscoveryRule.php:1170
+#: api/classes/CDiscoveryRule.php:1163
 msgid "Cannot clone graph prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων γραφημάτων."
 
-#: api/classes/CDiscoveryRule.php:1055
+#: api/classes/CDiscoveryRule.php:1048
 msgid "Cannot clone item prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων συλλεκτών."
 
-#: api/classes/CDiscoveryRule.php:812
+#: api/classes/CDiscoveryRule.php:805
 msgid "Cannot clone trigger prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων εναυσμάτων."
 
@@ -1304,11 +1304,11 @@ msgstr "Αδύνατη η αντιγραφή εναύσματος \"%1$s:%2$s\",
 msgid "Cannot create another database connection."
 msgstr "Αδύνατη η δημιουργία σύνδεσης άλλης βάσης δεδομένων."
 
-#: api/classes/CTrigger.php:1859
+#: api/classes/CTrigger.php:1834
 msgid "Cannot create circular dependencies."
 msgstr "Αδύνατη η δημιουργία κυκλικών εξαρτήσεων."
 
-#: api/classes/CTrigger.php:1831
+#: api/classes/CTrigger.php:1806
 msgid "Cannot create dependency on trigger itself."
 msgstr "Αδύνατη η δημιουργία εξάρτησης από το ίδιο έναυσμα."
 
@@ -1388,7 +1388,7 @@ msgstr "Αδύνατη η διαγραφή γραφήματος."
 msgid "Cannot delete graphs"
 msgstr "Αδύνατη η διαγραφή γραφημάτων"
 
-#: api/classes/CGraphPrototype.php:808
+#: api/classes/CGraphPrototype.php:785
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Αδύνατη η διαγραφή γραφημάτων δημιουργημένων από χαμηλό επίπεδο εντοπισμού."
 
@@ -1496,7 +1496,7 @@ msgstr "Αδύνατη η διαγραφή προβολής διαφάνειας
 msgid "Cannot delete template"
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου"
 
-#: api/classes/CGraph.php:736 api/classes/CGraphPrototype.php:784
+#: api/classes/CGraph.php:713 api/classes/CGraphPrototype.php:761
 msgid "Cannot delete templated graphs."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπων γραφημάτων."
 
@@ -1594,7 +1594,7 @@ msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμε
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμενο στην οθόνη \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:971 api/classes/CDiscoveryRule.php:1043
+#: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
@@ -1657,7 +1657,7 @@ msgstr "Δεν βρίσκω έναυσμα \"%1$s\" χρησιμοποιούμε
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Αδύνατον ο μορφότυπος Δένδρου. Έλεγξε την λογική δομή των συνδέσεων υπηρεσιών."
 
-#: services.php:478
+#: services.php:477
 msgid "Cannot format tree."
 msgstr "Αδύνατον ο μορφότυπος δένδρου."
 
@@ -1789,31 +1789,31 @@ msgstr "Αδύνατη η εναλλαγή ξενιστή για διεπαφή.
 msgid "Cannot unblock users"
 msgstr "Αδύνατη η απεμπλοκή χρηστών"
 
-#: api/classes/CHostGeneral.php:696
+#: api/classes/CHostGeneral.php:704
 msgid "Cannot unlink and clear applications"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κατηγοριών"
 
-#: api/classes/CHostGeneral.php:549
+#: api/classes/CHostGeneral.php:557
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κανόνων εντοπισμού"
 
-#: api/classes/CHostGeneral.php:638
+#: api/classes/CHostGeneral.php:646
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός προτότυπων γραφημάτων"
 
-#: api/classes/CHostGeneral.php:656
+#: api/classes/CHostGeneral.php:664
 msgid "Cannot unlink and clear graphs."
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός γραφημάτων."
 
-#: api/classes/CHostGeneral.php:585
+#: api/classes/CHostGeneral.php:593
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός προτότυπων συλλεκτών"
 
-#: api/classes/CHostGeneral.php:567
+#: api/classes/CHostGeneral.php:575
 msgid "Cannot unlink and clear items"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός συλλεκτών"
 
-#: api/classes/CHostGeneral.php:487 api/classes/CHostGeneral.php:504
+#: api/classes/CHostGeneral.php:495 api/classes/CHostGeneral.php:512
 msgid "Cannot unlink and clear triggers"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός εναυσμάτων"
 
@@ -1821,7 +1821,7 @@ msgstr "Αδύνατη η αποσύνδεση και καθαρισμός εν�
 msgid "Cannot unlink template"
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 
-#: api/classes/CHostGeneral.php:441
+#: api/classes/CHostGeneral.php:449
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Αδύνατη η αποσύνδεση εναύσματος \"%s\", έχει συλλέκτες από σχεδιότυπο συνδεδεμένο με ξενιστή."
@@ -2129,7 +2129,7 @@ msgstr "Κυκλική αναφορά σε οθόνες: %1$s."
 msgid "Circular reference in templates: %1$s."
 msgstr "Κυκλική αναφορά σε σχεδιότυπα: %1$s."
 
-#: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:759
+#: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:767
 msgid "Circular template linkage is not allowed."
 msgstr "Κυκλική σύνδεση σχεδιότυπου δεν επιτρέπεται."
 
@@ -2137,7 +2137,7 @@ msgstr "Κυκλική σύνδεση σχεδιότυπου δεν επιτρέ
 msgid "Classic"
 msgstr "Κλασικό"
 
-#: jsLoader.php:161
+#: jsLoader.php:165
 msgid "Clear"
 msgstr "Εκκαθάριση"
 
@@ -2181,8 +2181,8 @@ msgstr "Κλώνος"
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
-#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:145
-#: jsLoader.php:169 tr_testexpr.php:175
+#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:149
+#: jsLoader.php:173 tr_testexpr.php:175
 msgid "Close"
 msgstr "Κλείσιμο"
 
@@ -2643,7 +2643,7 @@ msgstr "Δημιουργία προβολής διαφάνειας"
 msgid "Create template"
 msgstr "Δημιουργία σχεδιότυπου"
 
-#: include/views/configuration.triggers.list.php:44 jsLoader.php:100
+#: include/views/configuration.triggers.list.php:44 jsLoader.php:104
 msgid "Create trigger"
 msgstr "Δημιουργία εναύσματος"
 
@@ -2668,7 +2668,7 @@ msgstr "Δημιουργία αντιστοίχισης τιμών"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:834
+#: api/classes/CDiscoveryRule.php:827
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
@@ -2814,7 +2814,7 @@ msgstr "Προσαρμοσμένη ετικέτα"
 #: api/classes/CMap.php:592
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr "Η Προσαρμοσμένη ετικέτα για χάρτη \"%2$s\" στοιχείων τύπου \"%1$s\" δεν πρέπει να είναι άδεια."
+msgstr "Η Προσαρμοσμένη ετικέτα για χάρτη \"%2$s\" στοιχείων τύπου \"%1$s\" δεν πρέπει να είναι κενή."
 
 #: disc_prototypes.php:103 include/views/configuration.item.massupdate.php:250
 #: items.php:134
@@ -2853,7 +2853,7 @@ msgstr "Τσέχικα (cs_CZ)"
 msgid "D"
 msgstr "D"
 
-#: include/defines.inc.php:915
+#: include/translateDefines.inc.php:48
 msgid "D, d M Y H:i:s O"
 msgstr "D, d M Y H:i:s O"
 
@@ -3074,7 +3074,7 @@ msgid "Dec"
 msgstr "Δεκ"
 
 #: include/forms.inc.php:1568 include/func.inc.php:115
-#: include/func.inc.php:246 jsLoader.php:122
+#: include/func.inc.php:246 jsLoader.php:126
 msgid "December"
 msgstr "Δεκέμβριος"
 
@@ -3088,7 +3088,7 @@ msgstr "Δεκαδικός"
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:122
 #: include/views/monitoring.screen.php:117
-#: include/views/monitoring.slides.php:85 jsLoader.php:144 popup_bitem.php:114
+#: include/views/monitoring.slides.php:85 jsLoader.php:148 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
 msgstr "Προκαθορισμένο"
@@ -3108,7 +3108,7 @@ msgstr "Προκαθορισμένο μήνυμα"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
-msgstr ""
+msgstr "Προκαθορισμένη διάρκεια βηματικής λειτουργίας"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
@@ -3139,7 +3139,7 @@ msgstr "Καθυστερημένο από"
 
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/configuration.triggers.edit.php:154 jsLoader.php:101
+#: include/views/configuration.triggers.edit.php:154 jsLoader.php:105
 #: tr_logform.php:332 tr_logform.php:349
 msgid "Delete"
 msgstr "Διαγραφή"
@@ -3169,7 +3169,7 @@ msgstr "Διαγραφή τρέχουσας ενέργειας;"
 msgid "Delete discovery rule?"
 msgstr "Διαγραφή κανόνα εντοπισμού;"
 
-#: include/views/configuration.triggers.edit.php:156 jsLoader.php:103
+#: include/views/configuration.triggers.edit.php:156 jsLoader.php:107
 #: tr_logform.php:333
 msgid "Delete expression?"
 msgstr "Διαγραφή έκφρασης;"
@@ -3194,11 +3194,11 @@ msgstr "Διαγραφή αντιστοίχισης εικονιδίων;"
 msgid "Delete item?"
 msgstr "Διαγραφή συλλέκτη;"
 
-#: jsLoader.php:102 tr_logform.php:349
+#: jsLoader.php:106 tr_logform.php:349
 msgid "Delete keyword?"
 msgstr "Διαγραφή λέξης-κλειδί;"
 
-#: jsLoader.php:153
+#: jsLoader.php:157
 msgid "Delete links between selected elements?"
 msgstr "Διαγραφή συνδέσμων μεταξύ επιλεγμένων στοιχείων;"
 
@@ -3278,7 +3278,7 @@ msgstr "Διαγραφή επιλεγμένων κατηγοριών;"
 msgid "Delete selected discovery rules?"
 msgstr "Διαγραφή επιλεγμένων κανόνων εντοπισμού;"
 
-#: jsLoader.php:149
+#: jsLoader.php:153
 msgid "Delete selected elements?"
 msgstr "Διαγραφή επιλεγμένων στοιχείων;"
 
@@ -3387,7 +3387,7 @@ msgstr[1] "Διαγραφή επιλεγμένης αντιστοίχισης τ
 msgid "Delete selected with linked elements"
 msgstr "Διαγραφή επιλεγμένων με συνδεδεμένα στοιχεία"
 
-#: jsLoader.php:180
+#: jsLoader.php:184
 msgid "Delete service"
 msgstr "Διαγραφή υπηρεσίας"
 
@@ -3399,7 +3399,7 @@ msgstr "Διαγραφή προβολής διαφάνειας;"
 msgid "Delete template?"
 msgstr "Διαγραφή σχεδιότυπου;"
 
-#: jsLoader.php:181
+#: jsLoader.php:185
 msgid "Delete the selected service?"
 msgstr "Διαγραφή επιλεγμένης υπηρεσίας;"
 
@@ -3421,7 +3421,7 @@ msgstr "Διεγράφη: Κατηγορία \"%1$s\" σε \"%2$s\"."
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CGraph.php:768
+#: api/classes/CGraph.php:745
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Γράφημα \"%1$s\" σε \"%2$s\"."
@@ -3519,7 +3519,7 @@ msgid "Description"
 msgstr "Περιγραφή"
 
 #: include/actions.inc.php:868 include/blocks.inc.php:704
-#: include/config.inc.php:341
+#: include/config.inc.php:344
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3739,15 +3739,15 @@ msgstr "Αντικείμενο εντοπισμού"
 msgid "Discovery rule"
 msgstr "Κανόνας εντοπισμού"
 
-#: api/classes/CDiscoveryRule.php:901
+#: api/classes/CDiscoveryRule.php:894
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Ο κανόνας εντοπισμού \"%1$s\" υπάρχει ήδη σε \"%2$s\", κληρονομημένος από άλλο σχεδιότυπο."
 
-#: api/classes/CDiscoveryRule.php:888
+#: api/classes/CDiscoveryRule.php:881
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr "Ο Κανόνας εντοπισμού \"%1$s:%2$s\" έχει λανθασμένο χρόνο ζωής: \"%3$s\". (ελάχιστο: %4$d, μέγιστο: %5$d, επιτρέπεται μακροεντολή χρήστη)"
+msgstr "Ο Κανόνας εντοπισμού \"%1$s:%2$s\" έχει λανθασμένη διάρκεια: \"%3$s\". (ελάχιστο: %4$d, μέγιστο: %5$d, επιτρέπεται μακροεντολή χρήστη)"
 
 #: api/classes/CDRule.php:596
 #, php-format
@@ -3845,16 +3845,16 @@ msgstr "Μην κρατάς συμβάντα παλαιότερα απο (σε �
 msgid "Do not keep events older than (in days) \"%1$s\"."
 msgstr "Μην κρατάς συμβάντα παλαιότερα απο (σε ημέρες) \"%1$s\"."
 
-#: jsLoader.php:98
+#: jsLoader.php:102
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Θέλετε να αντικαταστήσετε την υπο συνθήκη έκφραση;"
 
-#: jsLoader.php:131
+#: jsLoader.php:135
 msgid "Done"
 msgstr "Έγινε"
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
-#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:147
+#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:151
 msgid "Dot"
 msgstr "Τελεία"
 
@@ -3919,7 +3919,7 @@ msgstr "Πρώτη καταχώρηση Κυλιόμενων επιλογών \"
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Υπενθύμιση επιλεγμένης κυλιόμενης επιλογής \"%1$s\"."
 
-#: api/classes/CTrigger.php:2001
+#: api/classes/CTrigger.php:1976
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Διπλές εξαρτήσεις στο έναυσμα \"%1$s\"."
@@ -3976,7 +3976,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "Ε"
 
-#: include/config.inc.php:308
+#: include/config.inc.php:311
 msgid "ERROR"
 msgstr "ΛΑΘΟΣ"
 
@@ -3984,7 +3984,7 @@ msgstr "ΛΑΘΟΣ"
 msgid "EVENTS"
 msgstr "ΣΥΜΒΑΝΤΑ"
 
-#: jsLoader.php:152
+#: jsLoader.php:156
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Κάθε URL πρέπει να έχει μοναδικό όνομα. Βεβαιωθείτε να υπάρχει μόνο ένα ονομαζόμενο URL"
 
@@ -4009,7 +4009,7 @@ msgstr "Επεξεργασία περιόδου συντήρησης"
 msgid "Edit map element"
 msgstr "Επεξεργασία στοιχείου χάρτη"
 
-#: jsLoader.php:179
+#: jsLoader.php:183
 msgid "Edit service"
 msgstr "Επεξεργασία υπηρεσίας"
 
@@ -4039,8 +4039,8 @@ msgid "Empty action condition."
 msgstr "Κενή συνθήκη ενέργειας."
 
 #: api/classes/CAction.php:1429 api/classes/CApplication.php:656
-#: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:716
-#: api/classes/CGraphPrototype.php:766 api/classes/CHostGroup.php:672
+#: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
+#: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
 #: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:925 api/classes/CItemPrototype.php:708
@@ -4249,11 +4249,11 @@ msgstr "Αναγνωριστικό συμβάντος"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Αναγνωριστικό συμβάντος της τελευταίας καταχώρησης αρχείου καταγραφής που ταιριάζει με έκφραση Τ, τότε N = 1, 0 - αλλιώς"
 
 #: popup_trexpr.php:431
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Αναγνωριστικό συμβάντος της τελευταίας καταχώρησης αρχείου καταγραφής που ταιριάζει με έκφραση Τ, τότε N ΟΧΙ 1, 0 - αλλιώς"
 
 #: acknow.php:119 include/actions.inc.php:88
 msgid "Event acknowledged"
@@ -4289,7 +4289,7 @@ msgid "Event source details"
 msgstr "Λεπτομέρειες προέλευσης συμβάντος"
 
 #: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1269
-#: jsLoader.php:108 search.php:134 search.php:206 search.php:261
+#: jsLoader.php:112 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
 msgstr "Συμβάντα"
@@ -4418,7 +4418,7 @@ msgstr "Εξωτερικός έλεγχος"
 msgid "Ez Texting"
 msgstr "Γραπτά μηνύματα"
 
-#: jsLoader.php:127
+#: jsLoader.php:131
 msgctxt "Friday short"
 msgid "F"
 msgstr "F"
@@ -4475,7 +4475,7 @@ msgid "Feb"
 msgstr "Φεβ"
 
 #: include/forms.inc.php:1546 include/func.inc.php:105
-#: include/func.inc.php:236 jsLoader.php:112
+#: include/func.inc.php:236 jsLoader.php:116
 msgid "February"
 msgstr "Φεβρουάριος"
 
@@ -4604,7 +4604,7 @@ msgstr "Παρασκευή"
 #: include/views/configuration.services.edit.php:211
 #: include/views/configuration.services.edit.php:278
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
-#: report3.php:145 report4.php:180 services.php:188 services.php:194
+#: report3.php:145 report4.php:180 services.php:187 services.php:193
 msgid "From"
 msgstr "Από"
 
@@ -4725,7 +4725,7 @@ msgstr "Γενικές δέσμες ενεργειών"
 msgid "Go"
 msgstr "Μετάβαση"
 
-#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:174
+#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:178
 msgid "Go to"
 msgstr "Μετάβαση σε"
 
@@ -4817,12 +4817,12 @@ msgstr "Όνομα γραφήματος"
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Το πρωτότυπο γράφημα \"%1$s\" με συλλέκτες σχεδιότυπου δεν μπορεί να περιέχει συλλέκτες από άλλους ξενιστές."
 
-#: api/classes/CGraphPrototype.php:815
+#: api/classes/CGraphPrototype.php:792
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "Το πρωτότυπο γράφημα \"%s\" διεγράφη."
 
-#: api/classes/CGraphPrototype.php:878
+#: api/classes/CGraphPrototype.php:855
 msgid "Graph prototype must have at least one prototype."
 msgstr "Το πρωτότυπο γράφημα πρέπει να έχει τουλάχιστον ένα πρωτότυπο."
 
@@ -4921,7 +4921,7 @@ msgstr "Ομάδα"
 msgid "Group \"%1$s\" does not exist."
 msgstr "Η ομάδα \"%1$s\" δεν υπάρχει."
 
-#: include/classes/import/importers/CHostImporter.php:135
+#: include/classes/import/importers/CHostImporter.php:131
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Ομάδα \"%1$s\" για ξενιστή \"%2$s\" δεν υπάρχει."
@@ -4983,7 +4983,7 @@ msgstr "Ομάδες"
 msgid "Groups in maintenance"
 msgstr "Ομάδες σε συντήρηση"
 
-#: include/defines.inc.php:917
+#: include/translateDefines.inc.php:50
 msgid "H.i"
 msgstr "H:i"
 
@@ -5056,7 +5056,7 @@ msgstr "Βοήθεια"
 msgid "Hexadecimal"
 msgstr "Δεκαεξαδικό"
 
-#: jsLoader.php:137 sysmap.php:158
+#: jsLoader.php:141 sysmap.php:158
 msgid "Hidden"
 msgstr "Κρυφό"
 
@@ -5089,12 +5089,12 @@ msgstr "Υψηλή"
 
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
-#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:105
+#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:109
 #: latest.php:196 latest.php:323 latest.php:501
 msgid "History"
 msgstr "Ιστορικό"
 
-#: jsLoader.php:106
+#: jsLoader.php:110
 msgid "History and simple graphs"
 msgstr "Ιστορικό και απλά γραφήματα"
 
@@ -5158,7 +5158,7 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
-#: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
+#: items.php:624 items.php:647 jsLoader.php:143 latest.php:125 latest.php:191
 #: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
 #: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
@@ -5228,7 +5228,7 @@ msgstr "Ξενιστής διεγράφη"
 #: include/views/js/configuration.action.edit.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:28
-#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:142
+#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:146
 #: search.php:258
 msgid "Host group"
 msgstr "Ομάδα ξενιστών"
@@ -5260,7 +5260,7 @@ msgstr "Ομάδες ξενιστών"
 msgid "Host interface"
 msgstr "Διεπαφή ξενιστή"
 
-#: hostinventories.php:26 jsLoader.php:177
+#: hostinventories.php:26 jsLoader.php:181
 msgid "Host inventories"
 msgstr "Απογραφές ξενιστών"
 
@@ -5294,7 +5294,7 @@ msgid "Host router"
 msgstr "Δρομολόγηση ξενιστή"
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
-#: jsLoader.php:173
+#: jsLoader.php:177
 msgid "Host screens"
 msgstr "Οθόνες ξενιστών"
 
@@ -5644,7 +5644,7 @@ msgstr "Αντιστοιχία εικονιδίου"
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "Η εγγραφή αντιστοιχίας εικονιδίου \"%1$s\" έναντι \"%2$s\" υπάρχει ήδη."
 
-#: jsLoader.php:155
+#: jsLoader.php:159
 msgid "Iconmap is not enabled"
 msgstr "Η Αντιστοίχιση εικονιδίου είναι ανενεργή"
 
@@ -5652,7 +5652,7 @@ msgstr "Η Αντιστοίχιση εικονιδίου είναι ανενερ
 msgid "Icons"
 msgstr "Εικονίδια"
 
-#: include/config.inc.php:255
+#: include/config.inc.php:258
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Αν νομίζετε ότι το μήνυμα είναι λάθος, συμβουλευτείτε τους διαχειριστές για τις αναγκαίες άδειες."
 
@@ -5661,7 +5661,7 @@ msgstr "Αν νομίζετε ότι το μήνυμα είναι λάθος, σ
 #: include/views/administration.general.image.edit.php:38
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:47
-#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:143
+#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:147
 #: map.php:136
 msgid "Image"
 msgstr "Εικόνα"
@@ -5893,7 +5893,7 @@ msgstr "Λανθασμένη θύρα εργασίας ενέργειας \"%s\"
 
 #: api/classes/CAction.php:1471
 msgid "Incorrect action operation step duration."
-msgstr ""
+msgstr "Λανθασμένη διάρκεια ενέργειας βηματικής λειτουργίας."
 
 #: api/classes/CAction.php:1609
 msgid "Incorrect action operation type."
@@ -5909,7 +5909,7 @@ msgstr "Λανθασμένος χρήστης εργασίας ενέργεια�
 
 #: api/classes/CAction.php:943
 msgid "Incorrect action operationid."
-msgstr ""
+msgstr "Λανθασμένη ενέργεια operationid."
 
 #: api/classes/CService.php:1123
 #, php-format
@@ -5967,7 +5967,7 @@ msgstr "Λανθασμένο χρώμα \"%1$s\"."
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Λανθασμένο εύρος στήλης για στοιχείο οθόνης στη θέση X - %1$s και Y - %2$s."
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -5997,12 +5997,12 @@ msgstr "Λανθασμένο αρχείο αναφόρτωσης."
 #: api/classes/CItemGeneral.php:759
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένο ευέλικτο διάστημα \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:748
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
-msgstr ""
+msgstr "Λανθασμένο ευέλικτο διάστημα στο συλλέκτη \"%1$s\". Ευέλικτο διάστημα πρέπει να είναι συμβολοσειρά."
 
 #: include/triggers.inc.php:585 include/triggers.inc.php:1741
 #: tr_testexpr.php:37
@@ -6089,35 +6089,35 @@ msgstr "Λανθασμένο κλειδί: %s"
 msgid "Incorrect list of items."
 msgstr "Λανθασμένος κατάλογος συλλεκτών."
 
-#: maintenance.php:314
+#: maintenance.php:316
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Λανθασμένη συντήρηση - η ημερομηνία πρέπει να είναι μεταξύ 01/01/1970 και 18/01/2038"
 
-#: maintenance.php:342
+#: maintenance.php:344
 msgid "Incorrect maintenance date"
 msgstr "Λανθασμένη ημερομηνία συντήρησης"
 
-#: maintenance.php:321
+#: maintenance.php:323
 msgid "Incorrect maintenance day period"
 msgstr "Λανθασμένη περίοδος ημερησίας συντήρησης"
 
-#: maintenance.php:328 maintenance.php:339
+#: maintenance.php:330 maintenance.php:341
 msgid "Incorrect maintenance days of week"
 msgstr "Λανθασμένες ημέρες συντήρησης την εβδομάδα"
 
-#: maintenance.php:336
+#: maintenance.php:338
 msgid "Incorrect maintenance month period"
 msgstr "Λανθασμένη περίοδος μηνιαίας συντήρησης"
 
-#: maintenance.php:301
+#: maintenance.php:303
 msgid "Incorrect maintenance period"
 msgstr "Λανθασμένη περίοδος συντήρησης"
 
-#: maintenance.php:298
+#: maintenance.php:300
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Λανθασμένη περίοδος συντήρησης (ελάχιστο 5 λεπτά)"
 
-#: maintenance.php:325
+#: maintenance.php:327
 msgid "Incorrect maintenance week period"
 msgstr "Λανθασμένη περίοδος εβδομαδιαίας συντήρησης"
 
@@ -6200,7 +6200,7 @@ msgstr "Παρέχεται λανθασμένος τύπος πόρου για �
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Λανθασμένο εύρος σειράς για στοιχείο οθόνης στη θέση X - %1$s και Y - %2$s."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6209,7 +6209,7 @@ msgstr "Λανθασμένο ID οθόνης \"%s\" παρέχεται για σ
 
 #: include/screens.inc.php:169 include/screens.inc.php:225
 msgid "Incorrect screen provided for slide show."
-msgstr ""
+msgstr "Λανθασμένη οθόνη για προβολή διαφάνειας."
 
 #: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
@@ -6250,12 +6250,12 @@ msgstr "Λανθασμένη σύνταξη πλησίον του \"%1$s\"."
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr ""
+msgstr "Λανθασμένη χρονική περίοδος \"%1$s\" αρχική ημέρα πρέπει να είναι μικρότερη της τελικής."
 
 #: include/classes/validators/CTimePeriodValidator.php:98
 #, php-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr ""
+msgstr "Λανθασμένη χρονική περίοδος \"%1$s\" αρχική ώρα πρέπει να είναι μικρότερη της τελικής."
 
 #: include/classes/validators/CTimePeriodValidator.php:82
 #: include/classes/validators/CTimePeriodValidator.php:87
@@ -6351,21 +6351,21 @@ msgstr "Λανθασμένη τιμή για setMessage(): \"%s\"."
 
 #: include/profiles.inc.php:240
 msgid "Incorrect working time."
-msgstr ""
+msgstr "Λανθασμένος χρόνος εργασίας."
 
 #: include/classes/import/CXmlImport18.php:1590
 #, php-format
 msgid "Incorrect y max item for graph \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένος y max συλλέκτης για γράφημα \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1577
 #, php-format
 msgid "Incorrect y min item for graph \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένος y min συλλέκτης για γράφημα \"%1$s\"."
 
 #: include/locales.inc.php:56
 msgid "Indonesian (id_ID)"
-msgstr ""
+msgstr "Ινδονησιακά (id_ID)"
 
 #: include/blocks.inc.php:851 include/blocks.inc.php:1394
 #: include/classes/class.cformlist.php:65 tr_status.php:286
@@ -6381,7 +6381,7 @@ msgstr "Πληροφόρηση"
 msgid "Insert"
 msgstr "Εισαγωγή"
 
-#: include/forms.inc.php:1353 jsLoader.php:99
+#: include/forms.inc.php:1353 jsLoader.php:103
 msgid "Insert macro"
 msgstr "Εισαγωγή μακροεντολής"
 
@@ -6462,10 +6462,10 @@ msgstr "Άκυρο JSON. Παρουσιάστηκε σφάλμα στον εξυ
 msgid "Invalid Request."
 msgstr "Άκυρο Αίτημα."
 
-#: maintenance.php:147 maintenance.php:161 services.php:188 services.php:202
+#: maintenance.php:147 maintenance.php:161 services.php:187 services.php:201
 #, php-format
 msgid "Invalid date \"%s\"."
-msgstr ""
+msgstr "Άκυρη ημερομηνία \"%s\"."
 
 #: api/classes/CUserMacro.php:920
 #, php-format
@@ -6477,9 +6477,9 @@ msgstr "Άκυρο hostid για μακροεντολή \"%1$s\"."
 msgid "Invalid item key format."
 msgstr "Άκυρος μορφότυπος κλειδιού συλλέκτη."
 
-#: maintenance.php:309
+#: maintenance.php:311
 msgid "Invalid maintenance period"
-msgstr ""
+msgstr "Άκυρη περίοδος συντήρησης"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
@@ -6495,16 +6495,16 @@ msgstr "Άκυρες παράμετροι."
 #: api/classes/CWebCheck.php:583
 #, php-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "Άκυρος κωδικός απόκρισης \"%1$s\"."
 
 #: api/classes/CWebCheck.php:578
 #, php-format
 msgid "Invalid response code range \"%1$s\"."
-msgstr ""
+msgstr "Άκυρη περιοχή κωδικού απόκρισης \"%1$s\"."
 
 #: items.php:340
 msgid "Invalid time period"
-msgstr ""
+msgstr "Άκυρη χρονική περίοδος"
 
 #: include/classes/class.cview.php:62
 #, php-format
@@ -6538,7 +6538,7 @@ msgstr "Αδύνατο το φιλτράρισμα με κωδικό χρήστ�
 
 #: include/page_header.php:263
 msgid "It is not possible to logout from HTTP authentication."
-msgstr ""
+msgstr "Αδύνατη η αποσύνδεση από HTTP ταυτότητα."
 
 #: api/classes/CUserMedia.php:212 api/classes/CUser.php:180
 msgid "It is not possible to search by user password."
@@ -6562,7 +6562,7 @@ msgstr "Συλλέκτης"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Ο συλλέκτης \"%1$s\" υπάρχει ήδη σε \"%2$s\", κληρονομημένος απο άλλο σχεδιότυπο."
 
-#: api/classes/CItem.php:1219
+#: api/classes/CItem.php:1212
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Ο συλλέκτης \"%1$s\" δεν συμπληρώνει ελλιπές πεδίο απογραφής ξενιστή \"%2$d\". Επιλογές: απο 0 (μήν συμπληρώνεις) έως %3$d."
@@ -6570,7 +6570,7 @@ msgstr "Ο συλλέκτης \"%1$s\" δεν συμπληρώνει ελλιπ�
 #: api/classes/CTemplateScreen.php:668
 #, php-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "Συλλέκτης \"%1$s\" δεν υπάρχει στο σχεδιότυπο \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1525
 #, php-format
@@ -6586,7 +6586,7 @@ msgstr "Συλλέκτης \"%1$s\" σε \"%2$s\": κατηγορία \"%3$s\" �
 #: include/classes/import/CXmlImport18.php:1277
 #, php-format
 msgid "Item \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Συλλέκτης \"%1$s\" παραλειπόμενος - κανόνας χρήστη."
 
 #: api/classes/CItemGeneral.php:325
 #, php-format
@@ -6758,7 +6758,7 @@ msgid "Jan"
 msgstr "Ιαν"
 
 #: include/forms.inc.php:1541 include/func.inc.php:104
-#: include/func.inc.php:235 jsLoader.php:111
+#: include/func.inc.php:235 jsLoader.php:115
 msgid "January"
 msgstr "Ιανουάριος"
 
@@ -6771,7 +6771,7 @@ msgid "Jul"
 msgstr "Ιούλ"
 
 #: include/forms.inc.php:1543 include/func.inc.php:110
-#: include/func.inc.php:241 jsLoader.php:117
+#: include/func.inc.php:241 jsLoader.php:121
 msgid "July"
 msgstr "Ιούλιος"
 
@@ -6780,7 +6780,7 @@ msgid "Jun"
 msgstr "Ιούν"
 
 #: include/forms.inc.php:1566 include/func.inc.php:109
-#: include/func.inc.php:240 jsLoader.php:116
+#: include/func.inc.php:240 jsLoader.php:120
 msgid "June"
 msgstr "Ιούνιος"
 
@@ -6919,19 +6919,19 @@ msgstr[1] "Τελευταία %1$d θέματα"
 
 #: popup_trexpr.php:222
 msgid "Last (most recent) T value is < N"
-msgstr ""
+msgstr "Τελευταία (πλέον πρόσφατη) T τιμή < N"
 
 #: popup_trexpr.php:232
 msgid "Last (most recent) T value is = N"
-msgstr ""
+msgstr "Τελευταία (πλέον πρόσφατη) T τιμή = N"
 
 #: popup_trexpr.php:227
 msgid "Last (most recent) T value is > N"
-msgstr ""
+msgstr "Τελευταία (πλέον πρόσφατη) T τιμή > N"
 
 #: popup_trexpr.php:237
 msgid "Last (most recent) T value is NOT N"
-msgstr ""
+msgstr "Τελευταία (πλέον πρόσφατη) T τιμή ΟΧΙ N"
 
 #: srv_status.php:82
 msgid "Last 24 hours"
@@ -6991,7 +6991,7 @@ msgstr "Τελευταία τιμή"
 msgid "Last week graph"
 msgstr "Γράφημα τελευταίας εβδομάδος"
 
-#: include/menu.inc.php:47 jsLoader.php:175 latest.php:26 report5.php:159
+#: include/menu.inc.php:47 jsLoader.php:179 latest.php:26 report5.php:159
 #: search.php:132 search.php:204 search.php:259 search.php:311
 msgid "Latest data"
 msgstr "Τελευταία δεδομένα"
@@ -7022,19 +7022,19 @@ msgstr "Υπόμνημα"
 
 #: popup_trexpr.php:308
 msgid "Length of last (most recent) T value in characters is < N"
-msgstr ""
+msgstr "Μήκος τελευταίας (πλέον πρόσφατης) T τιμής σε χαρακτήρες < N"
 
 #: popup_trexpr.php:318
 msgid "Length of last (most recent) T value in characters is = N"
-msgstr ""
+msgstr "Μήκος τελευταίας (πλέον πρόσφατης) T τιμής σε χαρακτήρες = N"
 
 #: popup_trexpr.php:313
 msgid "Length of last (most recent) T value in characters is > N"
-msgstr ""
+msgstr "Μήκος τελευταίας (πλέον πρόσφατης) T τιμής σε χαρακτήρες > N"
 
 #: popup_trexpr.php:323
 msgid "Length of last (most recent) T value in characters is NOT N"
-msgstr ""
+msgstr "Μήκος τελευταίας (πλέον πρόσφατης) T τιμής σε χαρακτήρες ΟΧΙ N"
 
 #: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:333
 #: include/views/js/configuration.sysmaps.js.php:409
@@ -7097,15 +7097,15 @@ msgstr "Συνδεδεμένο με"
 
 #: include/views/js/configuration.sysmaps.js.php:304
 msgid "Links between the selected elements"
-msgstr ""
+msgstr "Συνδέσεις μεταξύ επιλεγμένων στοιχείων"
 
 #: include/views/js/configuration.sysmaps.js.php:293
 msgid "Links for the selected element"
-msgstr ""
+msgstr "Συνδέσεις για το επιλεγμένο στοιχείο"
 
 #: include/classes/class.clist.php:33
 msgid "List is empty"
-msgstr "Ο κατάλογος είναι άδειος"
+msgstr "Κενός κατάλογος"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
@@ -7141,27 +7141,27 @@ msgstr "Καταγραφή"
 
 #: popup_trexpr.php:436
 msgid "Log severity of the last log entry is < N"
-msgstr ""
+msgstr "Σοβαρότητα καταγραφής τελευταίας καταχώρησης < N"
 
 #: popup_trexpr.php:444
 msgid "Log severity of the last log entry is = N"
-msgstr ""
+msgstr "Σοβαρότητα καταγραφής τελευταίας καταχώρησης = N"
 
 #: popup_trexpr.php:440
 msgid "Log severity of the last log entry is > N"
-msgstr ""
+msgstr "Σοβαρότητα καταγραφής τελευταίας καταχώρησης > N"
 
 #: popup_trexpr.php:448
 msgid "Log severity of the last log entry is NOT N"
-msgstr ""
+msgstr "Σοβαρότητα καταγραφής τελευταίας καταχώρησης ΟΧΙ N"
 
 #: popup_trexpr.php:452
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Καταγραφή προέλευσης τελευταίας καταχώρησης που ταιριάζει με παράμετρο T, τότε N = 1, 0 - άλλως"
 
 #: popup_trexpr.php:457
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Καταγραφή προέλευσης τελευταίας καταχώρησης που ταιριάζει με παράμετρο T, τότε N ΟΧΙ 1, 0 - άλλως"
 
 #: include/views/configuration.item.edit.php:353
 #: include/views/configuration.item.massupdate.php:365
@@ -7176,7 +7176,7 @@ msgstr "Καταγραφή αταίριαστων SNMP traps"
 msgid "Logged in as"
 msgstr "Συνδεδεμένος ως"
 
-#: auditlogs.php:143 include/config.inc.php:258 include/menu.inc.php:285
+#: auditlogs.php:143 include/config.inc.php:261 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -7195,7 +7195,7 @@ msgstr "Σύνδεση απέτυχε \"%s\"."
 
 #: authentication.php:108 authentication.php:136
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "Λανθασμένος κωδικός ή όνομα"
 
 #: api/classes/CUser.php:845 api/classes/CUser.php:863
 #: api/classes/CUser.php:910
@@ -7222,12 +7222,12 @@ msgctxt "Mega short"
 msgid "M"
 msgstr "Μ"
 
-#: jsLoader.php:123
+#: jsLoader.php:127
 msgctxt "Monday short"
 msgid "M"
 msgstr "Μ"
 
-#: include/defines.inc.php:909 report3.php:116
+#: include/translateDefines.inc.php:41 report3.php:116
 msgid "M Y"
 msgstr "M Y"
 
@@ -7288,7 +7288,7 @@ msgstr "Τό όνομα της μακροεντολής \"%1$s\" είναι πο
 #: api/classes/CUserMacro.php:1072
 #, php-format
 msgid "Macro with globalmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "Μακροεντολή με globalmacroid \"%1$s\" δεν υπάρχει."
 
 #: api/classes/CUserMacro.php:1012
 #, php-format
@@ -7323,7 +7323,7 @@ msgstr "Η συντήρηση \"%s\" υπάρχει ήδη."
 
 #: api/classes/CMaintenance.php:468 api/classes/CMaintenance.php:581
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr ""
+msgstr "Τιμή συντήρησης \"Ενεργή από\" όχι μεγαλύτερη από \"Ενεργή έως\"."
 
 #: maintenance.php:136
 msgid "Maintenance added"
@@ -7383,7 +7383,7 @@ msgstr "Χειροκίνητη αποσύνδεση"
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
-#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:140
+#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:144
 #: map.php:25
 msgid "Map"
 msgstr "Χάρτης"
@@ -7391,7 +7391,7 @@ msgstr "Χάρτης"
 #: include/classes/import/CXmlImport18.php:667
 #, php-format
 msgid "Map \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Χάρτης \"%1$s\" παραλείφθηκε - κανόνας χρήστη."
 
 #: sysmap.php:184
 #, php-format
@@ -7450,7 +7450,7 @@ msgid "Mar"
 msgstr "Μαρ"
 
 #: include/forms.inc.php:1551 include/func.inc.php:106
-#: include/func.inc.php:237 jsLoader.php:113
+#: include/func.inc.php:237 jsLoader.php:117
 msgid "March"
 msgstr "Μάρτιος"
 
@@ -7507,7 +7507,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Μέγιστο πλήθος συμβάντων πρός εμφάνιση ανά έναυσμα"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:343
+#: include/config.inc.php:346
 msgid "Maximize"
 msgstr "Μεγιστοποίηση"
 
@@ -7527,19 +7527,19 @@ msgstr[1] "Το Μέγιστο μήκος ονόματος ξενιστή είν
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "Μέγιστη τιμή περιόδου T < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "Μέγιστη τιμή περιόδου T = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "Μέγιστη τιμή περιόδου T > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "Μέγιστη τιμή περιόδου T ΟΧΙ N"
 
 #: api/classes/CHost.php:1383
 #, php-format
@@ -7549,7 +7549,7 @@ msgstr[0] "Μέγιστο ορατό μήκος ονόματος ξενιστή 
 msgstr[1] "Μέγιστο ορατό μήκος ονόματος ξενιστή είναι %2$d χαρακτήρες, \"%3$s\" είναι %1$d χαρακτήρες."
 
 #: include/forms.inc.php:1561 include/func.inc.php:108
-#: include/func.inc.php:239 jsLoader.php:115
+#: include/func.inc.php:239 jsLoader.php:119
 msgid "May"
 msgstr "Μάιος"
 
@@ -7649,7 +7649,7 @@ msgstr "Χρονικό όριο μηνύματος"
 msgid "Message timeout (seconds)"
 msgstr "Χρονικό όριο μηνύματος (δευτερόλεπτα)"
 
-#: jsLoader.php:160
+#: jsLoader.php:164
 msgid "Messages"
 msgstr "Μηνύματα"
 
@@ -7679,7 +7679,7 @@ msgid "Min severity"
 msgstr "Ελάχιστη σοβαρότητα"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:343
+#: include/config.inc.php:346
 msgid "Minimize"
 msgstr "Ελαχιστοποίηση"
 
@@ -7715,39 +7715,39 @@ msgstr "Ελάχιστο απαιτούμενο μέγεθος του PHP post �
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "Ελάχιστη τιμή περιόδου T < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "Ελάχιστη τιμή περιόδου T = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "Ελάχιστη τιμή περιόδου T > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "Ελάχιστη τιμή περιόδου T ΟΧΙ N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
 msgstr "Λεπτά"
 
-#: api/classes/CGraph.php:793 api/classes/CGraphPrototype.php:840
+#: api/classes/CGraph.php:770 api/classes/CGraphPrototype.php:817
 msgid "Missing \"itemid\" field for item."
-msgstr ""
+msgstr "Απουσία \"itemid\" πεδίου για συλλέκτη."
 
 #: api/classes/CGraphGeneral.php:53
 msgid "Missing \"name\" field for graph."
-msgstr ""
+msgstr "Απουσία \"όνομα\" πεδίου για γράφημα."
 
 #: include/classes/import/CXmlImport18.php:1581
 #: include/classes/import/CXmlImport18.php:1594
 #, php-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
-msgstr ""
+msgstr "Απουσία συλλέκτη \"%1$s\" για ξενιστή \"%2$s\"."
 
-#: api/classes/CGraph.php:787 api/classes/CGraphPrototype.php:834
+#: api/classes/CGraph.php:764 api/classes/CGraphPrototype.php:811
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr "Απόντες συλλέκτες για γράφημα \"%1$s\"."
@@ -7759,7 +7759,7 @@ msgstr "Λείπει το κλειδί \"%1$s\" για τον ξενιστή \"%
 
 #: api/classes/CUserGroup.php:510
 msgid "Missing parameter: usrgrpids."
-msgstr ""
+msgstr "Απουσία παραμέτρου: usrgrpids."
 
 #: include/views/administration.proxy.list.php:46 report2.php:185
 msgid "Mode"
@@ -7814,13 +7814,13 @@ msgstr "Περισσότερο απο 10 λεπτά"
 #: api/classes/CGraphGeneral.php:129
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
-msgstr ""
+msgstr "Περισσότερα του ενός γραφήματα με όνομα \"%1$s\" με τον ξενιστή."
 
 #: report5.php:24
 msgid "Most busy triggers top 100"
 msgstr "Τα 100 πιο απασχολημένα εναύσματα"
 
-#: jsLoader.php:163
+#: jsLoader.php:167
 msgid "Move"
 msgstr "Μετακινώ"
 
@@ -7836,11 +7836,11 @@ msgstr "Πολλαπλά ΠΡΟΒΛΗΜΑΤΙΚΑ συμβάντα"
 msgid "Multiple PROBLEM events generation"
 msgstr "Παραγωγή συμβάντων πολλαπλών ΠΡΟΒΛΗΜΑΤΩΝ"
 
-#: jsLoader.php:158
+#: jsLoader.php:162
 msgid "Mute"
 msgstr "Σίγαση"
 
-#: include/views/monitoring.maps.php:80
+#: include/views/monitoring.maps.php:74
 msgid "NETWORK MAPS"
 msgstr "ΧΑΡΤΕΣ ΔΙΚΤΥΟΥ"
 
@@ -7967,7 +7967,7 @@ msgstr "Νέα κατηγορία"
 msgid "New condition"
 msgstr "Νέα συνθήκη"
 
-#: jsLoader.php:150
+#: jsLoader.php:154
 msgid "New element"
 msgstr "Νέο στοιχείο"
 
@@ -8023,7 +8023,7 @@ msgstr "Επόμενο"
 msgid "Next check"
 msgstr "Επόμενος έλεγχος"
 
-#: events.php:756 include/config.inc.php:560 include/events.inc.php:303
+#: events.php:756 include/config.inc.php:563 include/events.inc.php:303
 #: include/events.inc.php:321 include/forms.inc.php:1922
 #: include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:75
@@ -8034,12 +8034,12 @@ msgstr "Όχι"
 #: include/classes/import/CXmlImport18.php:1571
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
-msgstr ""
+msgstr "Χωρίς πεδίο \"ymax_type\" για γράφημα \"%s\"."
 
 #: include/classes/import/CXmlImport18.php:1567
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
-msgstr ""
+msgstr "Χωρίς πεδίο \"ymin_type\" για γράφημα \"%s\"."
 
 #: api/classes/CScreenItem.php:474
 msgid "No URL provided for screen element."
@@ -8115,15 +8115,15 @@ msgstr "Χωρίς συλλογή δεδομένων"
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:61
 msgid "No data defined."
-msgstr ""
+msgstr "Δέν ορίστηκαν δεδομένα."
 
 #: popup_trexpr.php:494
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Δεν ελήφθησαν δεδομένα στη διάρκεια περιόδου T, τότε N = 1, 0 - άλλως"
 
 #: popup_trexpr.php:499
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Δεν ελήφθησαν δεδομένα στη διάρκεια περιόδου T, τότε N ΟΧΙ 1, 0 - άλλως"
 
 #: api/classes/CHostInterface.php:1001
 #, php-format
@@ -8158,7 +8158,7 @@ msgstr "Δεν δόθηκαν IDs κανόνα εντοπισμού."
 msgid "No discovery rules defined."
 msgstr "Δεν ορίστηκαν κανόνες εντοπισμού."
 
-#: jsLoader.php:170
+#: jsLoader.php:174
 msgid "No elements selected!"
 msgstr "Δεν επιλέχθηκαν στοιχεία!"
 
@@ -8168,7 +8168,7 @@ msgstr "Δεν βρέθηκαν λάθη."
 
 #: tr_status.php:671
 msgid "No events"
-msgstr ""
+msgstr "Όχι συμβάντα"
 
 #: events.php:386 include/classes/screens/CScreenEvents.php:42
 msgid "No events defined."
@@ -8360,7 +8360,7 @@ msgstr "Δεν ορίσθηκε περίοδος συντήρησης."
 msgid "No map ID provided for screen element."
 msgstr "Δεν παρέχεται ID χάρτη για στοιχείο οθόνης."
 
-#: include/views/monitoring.maps.php:27 popup.php:1553 sysmaps.php:254
+#: include/views/monitoring.maps.php:26 popup.php:1553 sysmaps.php:254
 msgid "No maps defined."
 msgstr "Δεν ορίσθηκαν χάρτες."
 
@@ -8389,12 +8389,12 @@ msgstr "Όχι δικαιώματα για Γράφημα \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
-msgstr ""
+msgstr "Χωρίς δικαιώματα για γράφημα \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:962
 #, php-format
 msgid "No permission for host \"%1$s\"."
-msgstr ""
+msgstr "Χωρίς δικαιώματα για ξενιστή \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1516
 #, php-format
@@ -8409,11 +8409,11 @@ msgstr "Όχι δικαιώματα για σχεδιότυπο \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:1427
 #, php-format
 msgid "No permission for trigger \"%s\"."
-msgstr ""
+msgstr "Χωρίς δικαιώματα για έναυσμα \"%s\"."
 
 #: slides.php:103
 msgid "No permissions"
-msgstr ""
+msgstr "Χωρίς δικαιώματα"
 
 #: include/views/administration.usergroups.edit.php:79
 msgid "No permissions defined."
@@ -8422,17 +8422,17 @@ msgstr "Δεν ορίσθηκαν δικαιώματα."
 #: include/classes/import/CXmlImport18.php:1023
 #, php-format
 msgid "No permissions for group \"%1$s\"."
-msgstr ""
+msgstr "Χωρίς δικαιώματα για ομάδα \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:660
 #, php-format
 msgid "No permissions for map \"%1$s\"."
-msgstr ""
+msgstr "Χωρίς δικαιώματα για χάρτη \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:450
 #, php-format
 msgid "No permissions for screen \"%1$s\"."
-msgstr ""
+msgstr "Χωρίς δικαιώματα για οθόνη \"%1$s\"."
 
 #: api/classes/CUser.php:924 api/classes/CUser.php:1034
 msgid "No permissions for system access."
@@ -8443,10 +8443,10 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CApplication.php:597 api/classes/CApplication.php:674
 #: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:584
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
-#: api/classes/CDiscoveryRule.php:685 api/classes/CDiscoveryRule.php:688
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:578 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:813 api/classes/CGraphPrototype.php:860
+#: api/classes/CGraph.php:790 api/classes/CGraphPrototype.php:837
+#: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
 #: api/classes/CHost.php:1298 api/classes/CHost.php:1330
@@ -8465,13 +8465,10 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
-#: api/classes/CTrigger.php:1444 api/classes/CTrigger.php:1702
-#: api/classes/CTrigger.php:1714 api/classes/CTriggerPrototype.php:822
-#: api/classes/CTriggerPrototype.php:920
-#: api/classes/CTriggerPrototype.php:1101
-#: api/classes/CTriggerPrototype.php:1113 api/classes/CUserMacro.php:824
+#: api/classes/CTrigger.php:1444 api/classes/CTriggerPrototype.php:822
+#: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:241
+#: include/config.inc.php:244
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Χωρίς δικαιώματα σε αντικείμενο που αναφέρεται ή δεν υπάρχει!"
 
@@ -8677,10 +8674,10 @@ msgstr "Μη αναγνώριση"
 msgid "Not Templated items"
 msgstr "Μη Σχεδιότυποι συλλέκτες"
 
-#: api/classes/CTrigger.php:1904
+#: api/classes/CTrigger.php:1879
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
-msgstr ""
+msgstr "Όχι όλα τα σχεδιότυπα συνδεδεμένα σε \"%s\"."
 
 #: api/classes/CUser.php:449
 msgid "Not allowed to set password for user \"guest\"."
@@ -8748,11 +8745,11 @@ msgid "Nov"
 msgstr "Νοε"
 
 #: include/forms.inc.php:1563 include/func.inc.php:114
-#: include/func.inc.php:245 jsLoader.php:121
+#: include/func.inc.php:245 jsLoader.php:125
 msgid "November"
 msgstr "Νοέμβριος"
 
-#: jsLoader.php:130
+#: jsLoader.php:134
 msgid "Now"
 msgstr "Τώρα"
 
@@ -8766,19 +8763,19 @@ msgstr "Αριθμός συλλεκτών (ελεγχόμενοι/ανενεργ
 
 #: popup_trexpr.php:462
 msgid "Number of seconds since the Epoch is < N"
-msgstr ""
+msgstr "Αριθμός δευτερολέπτων από Εποχής < N"
 
 #: popup_trexpr.php:470
 msgid "Number of seconds since the Epoch is = N"
-msgstr ""
+msgstr "Αριθμός δευτερολέπτων από Εποχής = Ν"
 
 #: popup_trexpr.php:466
 msgid "Number of seconds since the Epoch is > N"
-msgstr ""
+msgstr "Αριθμός δευτερολέπτων από Εποχής > Ν"
 
 #: popup_trexpr.php:474
 msgid "Number of seconds since the Epoch is NOT N"
-msgstr ""
+msgstr "Αριθμός δευτερολέπτων από Εποχής ΟΧΙ Ν"
 
 #: report5.php:63
 msgid "Number of status changes"
@@ -8790,19 +8787,19 @@ msgstr "Αριθμός βημάτων"
 
 #: popup_trexpr.php:194
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr ""
+msgstr "Αριθμός επιτυχώς ανακτηθέντων τιμών V (που πληρούν τελεστή O) για περίοδο T είναι < N"
 
 #: popup_trexpr.php:204
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr ""
+msgstr "Αριθμός επιτυχώς ανακτηθέντων τιμών V (που πληρούν τελεστή O) για περίοδο T είναι = N"
 
 #: popup_trexpr.php:199
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr ""
+msgstr "Αριθμός επιτυχώς ανακτηθέντων τιμών V (που πληρούν τελεστή O) για περίοδο T είναι > N"
 
 #: popup_trexpr.php:209
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr ""
+msgstr "Αριθμός επιτυχώς ανακτηθέντων τιμών V (που πληρούν τελεστή O) για περίοδο T είναι ΟΧΙ N"
 
 #: include/blocks.inc.php:733
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
@@ -8891,11 +8888,11 @@ msgid "Octal"
 msgstr "Οκταδικό"
 
 #: include/forms.inc.php:1558 include/func.inc.php:113
-#: include/func.inc.php:244 jsLoader.php:120
+#: include/func.inc.php:244 jsLoader.php:124
 msgid "October"
 msgstr "Οκτώβριος"
 
-#: jsLoader.php:136 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:140 sysmap.php:155 sysmap.php:161
 msgid "Off"
 msgstr "Εκτός"
 
@@ -8906,7 +8903,7 @@ msgstr "Εκτός"
 msgid "Ok"
 msgstr "Ok"
 
-#: jsLoader.php:135 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:139 sysmap.php:155 sysmap.php:161
 msgid "On"
 msgstr "Επί"
 
@@ -9002,11 +8999,11 @@ msgstr "Μόνο ένας έλεγχος μπορεί να είναι μοναδ
 
 #: api/classes/CUserGroup.php:517
 msgid "Only one user group name can be changed at a time."
-msgstr ""
+msgstr "Μόνο ένα όνομα ομάδος χρήστη αλλάζει τη φορά."
 
 #: api/classes/CProxy.php:608
 msgid "Only super admins can delete proxies."
-msgstr ""
+msgstr "Μόνο υπερδιαχειριστές διαγράφουν διαμεσολαβητές."
 
 #: include/services.inc.php:299
 #, php-format
@@ -9272,15 +9269,15 @@ msgstr "PHP επιλογή upload_max_filesize"
 
 #: include/classes/class.frontendsetup.php:566
 msgid "PHP session"
-msgstr "PHP session"
+msgstr "PHP συνεδρία"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
-msgstr ""
+msgstr "PHP αυτόματη έναρξη συνεδρίας"
 
 #: include/classes/class.frontendsetup.php:589
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")"
-msgstr ""
+msgstr "PHP αυτόματη έναρξη συνεδρίας πρέπει να είναι απενεργοποιημένη (PHP οδηγία \"session.auto_start\")"
 
 #: include/classes/class.frontendsetup.php:570
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
@@ -9373,7 +9370,7 @@ msgstr "Αναμένοντας παράμετρο sec ή μακροεντολή 
 
 #: include/views/configuration.item.edit.php:53
 msgid "Parent discovery rules"
-msgstr ""
+msgstr "Γονικοί κανόνες εντοπισμού"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graph"
@@ -9381,7 +9378,7 @@ msgstr "Γονικό γράφημα"
 
 #: include/views/configuration.item.edit.php:56
 msgid "Parent items"
-msgstr ""
+msgstr "Γονικοί συλλέκτες"
 
 #: include/views/configuration.services.edit.php:46
 msgid "Parent service"
@@ -9489,7 +9486,7 @@ msgstr "Τα δικαιώματα μπορούν να εκχωρηθούν μό�
 
 #: include/locales.inc.php:61
 msgid "Persian (fa_IR)"
-msgstr ""
+msgstr "Περσικά (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
@@ -9528,7 +9525,7 @@ msgstr "Διορθώστε όλα τα θέματα και πατήστε \"Retr
 msgid "Please enter confirmation text."
 msgstr "Εισάγετε κείμενο επιβεβαίωσης."
 
-#: jsLoader.php:146
+#: jsLoader.php:150
 msgid "Please select two elements"
 msgstr "Επιλέξτε δύο στοιχεία"
 
@@ -9568,7 +9565,7 @@ msgstr "Πορτογαλικά (pt_BR)"
 
 #: include/locales.inc.php:64
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "Πορτογαλικά (pt_PT)"
 
 #: tr_logform.php:303
 msgid "Position"
@@ -9596,19 +9593,19 @@ msgstr "Προηγούμενο"
 
 #: popup_trexpr.php:282
 msgid "Previous value is < N"
-msgstr ""
+msgstr "Προηγούμενη τιμή < Ν"
 
 #: popup_trexpr.php:290
 msgid "Previous value is = N"
-msgstr ""
+msgstr "Προηγούμενη τιμή = N"
 
 #: popup_trexpr.php:286
 msgid "Previous value is > N"
-msgstr ""
+msgstr "Προηγούμενη τιμή > N"
 
 #: popup_trexpr.php:294
 msgid "Previous value is NOT N"
-msgstr ""
+msgstr "Προηγούμενη τιμή ΟΧΙ N"
 
 # Inventory contact
 #: include/hosts.inc.php:404
@@ -9706,7 +9703,7 @@ msgstr "Διαμεσολαβητές"
 msgid "Proxy"
 msgstr "Διαμεσολαβητής"
 
-#: include/classes/import/importers/CHostImporter.php:147
+#: include/classes/import/importers/CHostImporter.php:143
 #, php-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Διαμεσολαβητής \"%1$s\" για ξενιστή \"%2$s\" δεν υπάρχει."
@@ -9714,7 +9711,7 @@ msgstr "Διαμεσολαβητής \"%1$s\" για ξενιστή \"%2$s\" δ�
 #: api/classes/CProxy.php:626
 #, php-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr ""
+msgstr "Διαμεσολαβητής \"%1$s\" χρησιμοποιείται από κανόνα εντοπισμού \"%2$s\"."
 
 #: api/classes/CProxy.php:367
 #, php-format
@@ -9806,11 +9803,11 @@ msgstr "Παραλήπτης"
 
 #: include/views/configuration.screen.constructor.edit.php:365
 msgid "Recipient (ascending)"
-msgstr ""
+msgstr "Παραλήπτης (αύξουσα)"
 
 #: include/views/configuration.screen.constructor.edit.php:364
 msgid "Recipient (descending)"
-msgstr ""
+msgstr "Παραλήπτης (φθίνουσα)"
 
 #: include/actions.inc.php:734 include/classes/screens/CScreenActions.php:78
 #: include/classes/screens/CScreenActions.php:83
@@ -9869,30 +9866,29 @@ msgstr "Κανονική έκφραση \"%s\" υπάρχει ήδη."
 
 #: popup_trexpr.php:406
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Κανονική έκφραση V ταιριάζει με τελευταία τιμή στην περίοδο T, τότε N = 1, 0 - άλλως"
 
 #: popup_trexpr.php:416
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Κανονική έκφραση V ταιριάζει με τελευταία τιμή στην περίοδο T, τότε N = 1, 0 - άλλως (χωρίς διάκριση πεζών-κεφαλαίων)"
 
 #: popup_trexpr.php:411
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Κανονική έκφραση V ταιριάζει με τελευταία τιμή στην περίοδο T, τότε N ΟΧΙ 1, 0 - άλλως"
 
 #: popup_trexpr.php:421
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr ""
+msgstr "Κανονική έκφραση V ταιριάζει με τελευταία τιμή στην περίοδο T, τότε N ΟΧΙ 1, 0 - άλλως (χωρίς διάκριση πεζών-κεφαλαίων)"
 
 #: adm.regexps.php:104
 msgid "Regular expression added"
 msgstr "Κανονική έκφραση προστέθηκε"
 
 #: adm.regexps.php:138
-#, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Κανονική έκφραση διεγράφη"
-msgstr[1] "Κανονική έκφραση διεγράφη"
+msgstr[1] "Κανονικές εκφράσεις διεγράφησαν"
 
 #: include/regexp.inc.php:79
 msgid "Regular expression does not exist."
@@ -10154,11 +10150,11 @@ msgstr "Προσπάθειες έμειναν"
 
 #: include/views/configuration.screen.constructor.edit.php:363
 msgid "Retries left (ascending)"
-msgstr ""
+msgstr "Επαναλήψεις απομένουσες (αύξουσα)"
 
 #: include/views/configuration.screen.constructor.edit.php:362
 msgid "Retries left (descending)"
-msgstr ""
+msgstr "Επαναλήψεις απομένουσες (φθίνουσα)"
 
 #: include/setup.inc.php:227 include/setup.inc.php:455 warning.php:60
 msgid "Retry"
@@ -10181,7 +10177,7 @@ msgstr "Ανάπτυξη γραμμής"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Εύρος γραμμής στοιχείου οθόνης στη θέση X - %1$s και Y - %2$s είναι πολύ μεγάλο."
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -10239,12 +10235,12 @@ msgstr "Εκτέλεση απομακρυσμένων εντολών στους 
 msgid "Russian (ru_RU)"
 msgstr "Ρωσικά (ru_RU)"
 
-#: jsLoader.php:128
+#: jsLoader.php:132
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:129
+#: jsLoader.php:133
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
@@ -10555,7 +10551,7 @@ msgstr "Οθόνη \"%1$s\" προστέθηκε."
 
 #: api/classes/CTemplateScreen.php:816
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr ""
+msgstr "Οθόνη \"%1$s\" υπάρχει ήδη στο σχεδιότυπο \"%2$2\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:711 api/classes/CTemplateScreen.php:762
@@ -10568,7 +10564,7 @@ msgstr "Η οθόνη \"%1$s\" υπάρχει ήδη."
 #: include/classes/import/CXmlImport18.php:1647
 #, php-format
 msgid "Screen \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Οθόνη \"%1$s\" παραλείφθηκε - κανόνας χρήστη."
 
 #: include/classes/import/CXmlImport18.php:572
 #: include/classes/import/CXmlImport18.php:1704
@@ -10663,7 +10659,7 @@ msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Δέσμη ενεργειών με scriptid \"%s\" δεν υπάρχει."
 
 #: include/menu.inc.php:262 include/views/administration.script.list.php:27
-#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:176 report5.php:160
+#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:180 report5.php:160
 #: scripts_exec.php:25
 msgid "Scripts"
 msgstr "Δέσμες ενεργειών"
@@ -10679,7 +10675,7 @@ msgstr "Αναζήτηση ιδιοχαρακτηριστικού"
 
 #: search.php:70
 msgid "Search pattern is empty"
-msgstr "Το σχέδιο αναζήτησης είναι άδειο"
+msgstr "Το σχέδιο αναζήτησης είναι κενό"
 
 #: adm.gui.php:39 include/views/administration.general.gui.edit.php:37
 msgid "Search/Filter elements limit"
@@ -10849,7 +10845,7 @@ msgid "Separated"
 msgstr "Χωριστό"
 
 #: include/forms.inc.php:1553 include/func.inc.php:112
-#: include/func.inc.php:243 jsLoader.php:119
+#: include/func.inc.php:243 jsLoader.php:123
 msgid "September"
 msgstr "Σεπτέμβριος"
 
@@ -10877,7 +10873,7 @@ msgstr "Ώρα εξυπηρετητή"
 #: events.php:522 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:305
-#: include/views/configuration.services.parent.list.php:36 services.php:473
+#: include/views/configuration.services.parent.list.php:36 services.php:472
 #: srv_status.php:156
 msgid "Service"
 msgstr "Υπηρεσία"
@@ -10906,9 +10902,9 @@ msgstr "Η υπηρεσία \"%1$s\" είναι ήδη διασυνδεδεμέ�
 msgid "Service cannot be parent and child at the same time."
 msgstr "Η υπηρεσία δεν μπορεί να είναι γονική και θυγατρική την ίδια στιγμή."
 
-#: services.php:164
+#: services.php:163
 msgid "Service created"
-msgstr ""
+msgstr "Υπηρεσία δημιουργήθηκε"
 
 #: services.php:116
 msgid "Service deleted"
@@ -10940,7 +10936,7 @@ msgstr "Υπηρεσίες"
 
 #: api/classes/CService.php:1449
 msgid "Services form a circular dependency."
-msgstr ""
+msgstr "Οι υπηρεσίες σχηματίζουν κυκλική εξάρτηση."
 
 #: api/classes/CUser.php:1028
 msgid "Session terminated, re-login, please."
@@ -11064,13 +11060,13 @@ msgstr "Εμφάνιση τιμών συλλέκτη"
 
 #: include/views/administration.general.gui.edit.php:47
 msgid "Show warning if Zabbix server is down"
-msgstr ""
+msgstr "Εμφάνισε προειδοποίηση εάν ο εξυπηρετητής Zabbix είναι κλειστός"
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show working time"
 msgstr "Εμφάνιση χρόνου εργασίας"
 
-#: jsLoader.php:138 sysmap.php:158
+#: jsLoader.php:142 sysmap.php:158
 msgid "Shown"
 msgstr "Ορατό"
 
@@ -11091,7 +11087,7 @@ msgstr "Απλός έλεγχος"
 msgid "Simple graph"
 msgstr "Απλό γράφημα"
 
-#: include/blocks.inc.php:1227 jsLoader.php:104
+#: include/blocks.inc.php:1227 jsLoader.php:108
 msgid "Simple graphs"
 msgstr "Απλά γραφήματα"
 
@@ -11181,7 +11177,7 @@ msgstr "Διαφάνειες"
 msgid "Slovak (sk_SK)"
 msgstr "Σλοβακικά (sk_SK)"
 
-#: jsLoader.php:162
+#: jsLoader.php:166
 msgid "Snooze"
 msgstr "Αναβολή"
 
@@ -11266,7 +11262,7 @@ msgstr "Τυπικοί συλλέκτες"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Start in"
-msgstr ""
+msgstr "Έναρξη σε"
 
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
@@ -11303,14 +11299,14 @@ msgstr "Κατάσταση"
 
 #: include/views/configuration.screen.constructor.edit.php:361
 msgid "Status (ascending)"
-msgstr ""
+msgstr "Κατάσταση (αύξουσα)"
 
 #: include/views/configuration.screen.constructor.edit.php:360
 msgid "Status (descending)"
-msgstr ""
+msgstr "Κατάσταση (φθίνουσα)"
 
 #: include/views/configuration.services.child.list.php:39
-#: include/views/configuration.services.parent.list.php:36 services.php:474
+#: include/views/configuration.services.parent.list.php:36 services.php:473
 msgid "Status calculation"
 msgstr "Υπολογισμός κατάστασης"
 
@@ -11337,7 +11333,7 @@ msgstr "Κατάσταση του εντοπισμού"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr ""
+msgstr "Κατάσταση εναυσμάτων ομάδος ξενιστή"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
@@ -11373,7 +11369,7 @@ msgstr "Το βήμα \"%s\" υπάρχει ήδη."
 
 #: include/views/configuration.action.edit.php:430
 msgid "Step duration"
-msgstr ""
+msgstr "Διάρκεια βήματος"
 
 #: include/views/configuration.httpconf.popup.php:68 popup_httpstep.php:24
 msgid "Step of scenario"
@@ -11382,7 +11378,7 @@ msgstr "Βήμα σεναρίου"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "Βήμα με όνομα \"%s\" υπάρχει ήδη."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
@@ -11430,19 +11426,19 @@ msgstr "Επιτυχής επιθεώρηση"
 
 #: popup_trexpr.php:328
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "Άθροισμα τιμών περιόδου T < N"
 
 #: popup_trexpr.php:338
 msgid "Sum of values of a period T is = N"
-msgstr ""
+msgstr "Άθροισμα τιμών περιόδου T = N"
 
 #: popup_trexpr.php:333
 msgid "Sum of values of a period T is > N"
-msgstr ""
+msgstr "Άθροισμα τιμών περιόδου T > N"
 
 #: popup_trexpr.php:343
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "Άθροισμα τιμών περιόδου T ΟΧΙ N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -11468,7 +11464,7 @@ msgstr "Σουηδικά (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "Εναλλαγή μεθόδου ταυτοποίησης, θα επαναρυθμίσει τα πάντα εκτός αυτής της συνεδρίας! Συνέχεια;"
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"
@@ -11487,12 +11483,12 @@ msgctxt "Tera short"
 msgid "T"
 msgstr "Τ"
 
-#: jsLoader.php:126
+#: jsLoader.php:130
 msgctxt "Thursday short"
 msgid "T"
 msgstr "Τ"
 
-#: jsLoader.php:124
+#: jsLoader.php:128
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "Τ"
@@ -11568,7 +11564,7 @@ msgstr "Σχεδιότυπο"
 msgid "Template \"%1$s\" already exists."
 msgstr "Το σχεδιότυπο \"%1$s\" υπάρχει ήδη."
 
-#: include/classes/import/importers/CHostImporter.php:39
+#: include/classes/import/importers/CHostImporter.php:33
 #, php-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Σχεδιότυπο \"%1$s\" για ξενιστή \"%2$s\" δεν υπάρχει."
@@ -11582,9 +11578,9 @@ msgstr "Το σχεδιότυπο \"%s\" υπάρχει ήδη."
 msgid "Template added"
 msgstr "Σχεδιότυπο προστέθηκε"
 
-#: api/classes/CHostGeneral.php:762
+#: api/classes/CHostGeneral.php:770
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr ""
+msgstr "Το σχεδιότυπο δεν συνδέεται με άλλο σχεδιότυπο πλέον της μίας φοράς, ακόμη και διαμέσου άλλων σχεδιοτύπων."
 
 #: templates.php:353 templates.php:371 templates.php:396
 msgid "Template deleted"
@@ -11652,7 +11648,7 @@ msgstr "Συλλέκτες σχεδιότυπου"
 msgid "Templates"
 msgstr "Σχεδιότυπα"
 
-#: api/classes/CHostGeneral.php:741
+#: api/classes/CHostGeneral.php:749
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Σχεδιότυπα \"%1$s\" αποσυνδεδεμένα απο ξενιστές \"%2$s\"."
@@ -11774,7 +11770,7 @@ msgstr "Πέμπτη"
 #: include/reports.inc.php:634
 #: include/views/configuration.services.edit.php:251
 #: include/views/configuration.services.edit.php:279 popup_period.php:155
-#: report3.php:145 report4.php:180 services.php:202 services.php:208
+#: report3.php:145 report4.php:180 services.php:201 services.php:207
 msgid "Till"
 msgstr "Έως"
 
@@ -11792,17 +11788,17 @@ msgstr "Έως"
 #: include/views/administration.auditlogs.list.php:85
 #: include/views/configuration.services.edit.php:278
 #: include/views/configuration.services.edit.php:279
-#: include/views/configuration.services.edit.php:307 jsLoader.php:132
+#: include/views/configuration.services.edit.php:307 jsLoader.php:136
 msgid "Time"
 msgstr "Χρόνος"
 
 #: include/views/configuration.screen.constructor.edit.php:357
 msgid "Time (ascending)"
-msgstr ""
+msgstr "Ώρα (αύξουσα)"
 
 #: include/views/configuration.screen.constructor.edit.php:356
 msgid "Time (descending)"
-msgstr ""
+msgstr "Ώρα (φθίνουσα)"
 
 #: include/actions.inc.php:66
 msgid "Time period"
@@ -11830,15 +11826,15 @@ msgstr "Λήξη χρόνου"
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:62
 msgid "Timestamp"
-msgstr "Σήμανση χρόνου"
+msgstr "Χρονοσφραγίδα"
 
 #: popup_trexpr.php:396
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Χρονοσφραγίδα δεν διαφέρει απο εξυπηρετητή Zabbix πλέον των T δευτερολέπτων, τότε N = 1, 0 - άλλως"
 
 #: popup_trexpr.php:401
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Χρονοσφραγίδα δεν διαφέρει απο εξυπηρετητή Zabbix πλέον των T δευτερολέπτων, τότε Ν ΟΧΙ 1, 0 - άλλως"
 
 #: include/reports.inc.php:212 include/reports.inc.php:374
 #: include/reports.inc.php:523
@@ -11910,8 +11906,8 @@ msgstr "Τάσεις"
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:261
 #: include/views/js/configuration.sysmaps.js.php:17
-#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:141
-#: report5.php:61 services.php:475 tr_comments.php:69 tr_logform.php:151
+#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:145
+#: report5.php:61 services.php:474 tr_comments.php:69 tr_logform.php:151
 #: tr_logform.php:164
 msgid "Trigger"
 msgstr "Έναυσμα"
@@ -11925,7 +11921,7 @@ msgstr "Το έναυσμα \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 #: include/classes/import/CConfigurationImport.php:971
 #, php-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "Το έναυσμα \"%1$s\" εξαρτάται απο έναυσμα \"%2$s\", που δεν υπάρχει."
 
 #: api/classes/CTriggerPrototype.php:883
 #, php-format
@@ -11936,14 +11932,14 @@ msgstr "Το έναυσμα \"%1$s\" δεν έχει πρωτότυπο συλλ
 #: include/classes/import/CXmlImport18.php:1438
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Έναυσμα \"%1$s\" παραλείφθηκε - κανόνας χρήστη."
 
 #: api/classes/CTriggerPrototype.php:790
 #, php-format
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr "Το έναυσμα \"%1$s:%2$s\" δεν έχει πρωτότυπο συλλέκτη."
 
-#: api/classes/CTrigger.php:2043
+#: api/classes/CTrigger.php:2018
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Το έναυσμα \"%s\" ανήκει σε σχεδιότυπο με διαφορετικούς συνδέσμους."
@@ -11953,9 +11949,9 @@ msgstr "Το έναυσμα \"%s\" ανήκει σε σχεδιότυπο με �
 msgid "Trigger added"
 msgstr "Έναυσμα προστέθηκε"
 
-#: api/classes/CTrigger.php:1947
+#: api/classes/CTrigger.php:1922
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
-msgstr ""
+msgstr "Έναυσμα δεν μπορεί να εξαρτάται απο έναυσμα απο το οποίο κληρονομείται,"
 
 #: tr_comments.php:26
 msgid "Trigger comments"
@@ -12059,7 +12055,7 @@ msgstr "Τιμή εναύσματος"
 #: include/views/configuration.triggers.list.php:65
 #: include/views/conf.import.php:33
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/monitoring.overview.php:27 jsLoader.php:107 popup.php:61
+#: include/views/monitoring.overview.php:27 jsLoader.php:111 popup.php:61
 #: search.php:133 search.php:138 search.php:168 search.php:187 search.php:205
 #: search.php:260 search.php:312 search.php:370 search.php:397 search.php:420
 #: templates.php:460 templates.php:525 tr_status.php:178
@@ -12105,7 +12101,7 @@ msgstr "Κατατετμημένο"
 #: include/classes/class.cpagefilter.php:166
 #, php-format
 msgid "Try to read inaccessible property \"%s\"."
-msgstr ""
+msgstr "Προσπάθεια ανάγνωσης απροσπέλαστης ιδιότητας \"%s\"."
 
 #: include/func.inc.php:196
 msgid "Tue"
@@ -12118,13 +12114,13 @@ msgstr "Τρίτη"
 
 #: include/locales.inc.php:69
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "Τουρκικά (tr_TR)"
 
-#: jsLoader.php:148
+#: jsLoader.php:152
 msgid "Two elements should be selected"
 msgstr "Δύο στοιχεία θα πρέπει να επιλεχθούν"
 
-#: api/classes/CItem.php:1280
+#: api/classes/CItem.php:1273
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Δύο συλλέκτες (\"%1$s\" και \"%2$s\") δεν μπορούν να συμπληρώσουν ίδιο πεδίο απογραφής ξενιστή \"%3$s\", αυτό θα οδηγούσε σε σύγκρουση."
@@ -12171,11 +12167,11 @@ msgstr "Τύπος (OK)"
 
 #: include/views/configuration.screen.constructor.edit.php:359
 msgid "Type (ascending)"
-msgstr ""
+msgstr "Τύπος (αύξουσα)"
 
 #: include/views/configuration.screen.constructor.edit.php:358
 msgid "Type (descending)"
-msgstr ""
+msgstr "Τύπος (φθίνουσα)"
 
 #: include/views/configuration.action.edit.php:116
 #: include/views/configuration.action.edit.php:884
@@ -12192,17 +12188,17 @@ msgstr "Τύπος πληροφοριών"
 
 #: api/classes/CItemGeneral.php:295
 msgid "Type of information must be \"Log\" for log key."
-msgstr ""
+msgstr "Ο τύπος πληροφορίας πρέπει να είναι \"Καταγραφή\" για κλειδί καταγραφής."
 
 #: api/classes/CItemGeneral.php:291
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "Ο τύπος πληροφορίας πρέπει να είναι \"Αριθμητικό (κινητή υποδιαστολή)\" για σύνολο συλλεκτών."
 
 #: include/forms.inc.php:828
 msgid "Types"
 msgstr "Τύποι"
 
-#: include/defines.inc.php:884 include/triggers.inc.php:167
+#: include/translateDefines.inc.php:24 include/triggers.inc.php:167
 msgid "UNKNOWN"
 msgstr "ΑΓΝΩΣΤΟ"
 
@@ -12249,7 +12245,7 @@ msgstr "ΗΠΑ (160 χαρακτήρες)"
 msgid "USER PROFILE"
 msgstr "ΠΡΟΦΙΛ ΧΡΗΣΤΗ"
 
-#: include/config.inc.php:752
+#: include/config.inc.php:755
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -12381,47 +12377,47 @@ msgstr "Αποσύνδεση από σχεδιότυπο"
 msgid "Unlink from templates"
 msgstr "Αποσύνδεση από σχεδιότυπα"
 
-#: api/classes/CHostGeneral.php:705
+#: api/classes/CHostGeneral.php:713
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:558
+#: api/classes/CHostGeneral.php:566
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:665
+#: api/classes/CHostGeneral.php:673
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Γράφημα \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:647
+#: api/classes/CHostGeneral.php:655
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπο γράφημα \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:576
+#: api/classes/CHostGeneral.php:584
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:594
+#: api/classes/CHostGeneral.php:602
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:496
+#: api/classes/CHostGeneral.php:504
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Έναυσμα \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:513
+#: api/classes/CHostGeneral.php:521
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπο έναυσμα \"%1$s\" σε \"%2$s\"."
 
-#: jsLoader.php:159
+#: jsLoader.php:163
 msgid "Unmute"
 msgstr "Αναίρεση σίγασης"
 
@@ -12490,7 +12486,7 @@ msgstr "Ενημερωμένο: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:862
+#: api/classes/CDiscoveryRule.php:855
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
@@ -12519,7 +12515,7 @@ msgstr "Ενημερώθηκε: Πρωτότυπο έναυσμα \"%1$s\" σε 
 msgid "Upload"
 msgstr "Ανεβάστε"
 
-#: include/views/monitoring.maps.php:59
+#: include/views/monitoring.maps.php:53
 msgid "Upper level maps"
 msgstr "Χάρτες Άνω επίπεδο"
 
@@ -12577,7 +12573,7 @@ msgstr "Ο χρήστης δεν μπορεί να αλλάξει τον τύπ�
 
 #: api/classes/CUserGroup.php:560
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "Χρήστης δεν μπορεί να προσθέσει τον εαυτό του σε ομάδα επενεργοποιημένη ή με απενεργοποιημένη πρόσβαση GUI."
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
@@ -12612,7 +12608,7 @@ msgstr "Ομάδα χρήστη \"%1$s\" χρησιμοποιείται στη �
 #: api/classes/CUserGroup.php:528
 #, php-format
 msgid "User group \"%s\" already exists."
-msgstr ""
+msgstr "Ομάδα χρήστη \"%s\" υπάρχει ήδη."
 
 #: api/classes/CUserGroup.php:725
 #, php-format
@@ -12656,7 +12652,7 @@ msgstr "Όνομα χρήστη"
 
 #: index.php:96
 msgid "User name does not match with DB"
-msgstr ""
+msgstr "Όνομα χρήστη δεν ταιριάζει με DB"
 
 #: include/views/administration.authentication.edit.php:65
 msgid "User password"
@@ -12841,7 +12837,7 @@ msgstr "Ορατό όνομα"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Το ορατό όνομα δεν μπορεί να είναι κενό αν το όνομα ξενιστή απουσιάζει."
 
-#: jsLoader.php:125
+#: jsLoader.php:129
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "W"
@@ -12884,7 +12880,7 @@ msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι �
 #: include/validate.inc.php:333
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι κατάλογος ή περιοχή ακεραίου."
 
 #: include/validate.inc.php:346
 #, php-format
@@ -12935,7 +12931,7 @@ msgid_plural "Warning. Minimum time period to display is %1$s hours."
 msgstr[0] "Προειδοποίηση. Ελάχιστη χρονική περίοδος εμφάνισης είναι %1$s ώρα."
 msgstr[1] "Προειδοποίηση. Ελάχιστη χρονική περίοδος εμφάνισης είναι %1$s ώρες."
 
-#: jsLoader.php:166
+#: jsLoader.php:170
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Λυπούμαστε, ο μέγιστος πιθανόν αριθμός στοιχείων για υπενθύμιση έχει καλυφθεί."
 
@@ -13169,7 +13165,7 @@ msgid "Y"
 msgstr "Υ"
 
 #. GETTEXT: Date format (year). Do not translate.
-#: include/defines.inc.php:908
+#: include/translateDefines.inc.php:40
 msgctxt "date format"
 msgid "Y"
 msgstr "Y"
@@ -13195,24 +13191,25 @@ msgstr "Πλευρά άξονα ψ"
 msgid "Y label"
 msgstr "Ψ ετικέτα"
 
-#: include/defines.inc.php:899 include/defines.inc.php:900
+#: include/translateDefines.inc.php:31 include/translateDefines.inc.php:32
 msgid "Y-m-d H:i:s"
 msgstr "Y-m-d H:i:s"
 
-#: include/classes/screens/CScreenHistory.php:215 include/defines.inc.php:897
-#: include/defines.inc.php:898 include/defines.inc.php:901
+#: include/classes/screens/CScreenHistory.php:215
+#: include/translateDefines.inc.php:29 include/translateDefines.inc.php:30
+#: include/translateDefines.inc.php:33
 msgid "Y.M.d H:i:s"
 msgstr "Y.M.d H:i:s"
 
-#: include/defines.inc.php:906
+#: include/translateDefines.inc.php:38
 msgid "Y.m.d"
 msgstr "Y.m.d"
 
-#: include/defines.inc.php:905
+#: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
 msgstr "Y.m.d H:i"
 
-#: include/defines.inc.php:914 include/func.inc.php:507
+#: include/func.inc.php:507 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "Y.m.d H:i:s"
 
@@ -13227,7 +13224,7 @@ msgid "Yearly"
 msgstr "Ετησίως"
 
 #: events.php:756 include/blocks.inc.php:712
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:560
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
 #: include/events.inc.php:306 include/events.inc.php:324
 #: include/forms.inc.php:1922 include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:74
@@ -13247,7 +13244,7 @@ msgstr "Δεν μπορείται να επιλέξετε κάποια από τ
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Δεν σας επιτρέπεται να αλλοιώσετε τα προνόμια του χρήστη \"%s\"."
 
-#: include/config.inc.php:248
+#: include/config.inc.php:251
 msgid "You are not logged in."
 msgstr "Δεν έχετε συνδεθεί."
 
@@ -13255,7 +13252,7 @@ msgstr "Δεν έχετε συνδεθεί."
 msgid "You can not switch hosts for current selection."
 msgstr "Δεν μπορείτε να αλλάξετε ξενιστές για την τρέχουσα επιλογή."
 
-#: include/config.inc.php:249
+#: include/config.inc.php:252
 msgid "You cannot view this URL as a"
 msgstr "Δεν μπορείτε να δείτε αυτό το URL ως"
 
@@ -13277,17 +13274,12 @@ msgstr "Δεν καθορίσατε στόχους για εντολή εργα�
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Δεν καθορίσατε στόχους για γενική δέσμη ενεργειών εργασίας ενέργειας \"%s\"."
 
-#: api/classes/CApplication.php:837 api/classes/CApplication.php:848
-#: api/classes/CGraph.php:660 api/classes/CGraph.php:671
-#: api/classes/CGraph.php:732 api/classes/CGraphPrototype.php:708
-#: api/classes/CGraphPrototype.php:719 api/classes/CGraphPrototype.php:781
+#: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
 #: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
 #: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
-#: api/classes/CItem.php:1047 api/classes/CItem.php:1050
-#: api/classes/CItemPrototype.php:823 api/classes/CItemPrototype.php:826
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
 #: api/classes/CScript.php:347 api/classes/CScript.php:409
@@ -13319,7 +13311,7 @@ msgstr "Δεν έχετε δικαιώματα για ενημέρωση άλλ�
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Δεν έχετε δικαιώματα για ενημέρωση χρήστη ή αυτός δεν υπάρχει."
 
-#: include/config.inc.php:253
+#: include/config.inc.php:256
 msgid "You must login to view this page."
 msgstr "Πρέπει να συνδεθείτε για να δείτε αυτή τη σελίδα."
 
@@ -13343,7 +13335,7 @@ msgstr "Zabbix"
 #: include/page_footer.php:103
 #, php-format
 msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %s Πνευματικά δικαιώματα %s-%s από Zabbix SIA"
 
 #: include/views/general.login.php:47
 #, php-format
@@ -13427,7 +13419,7 @@ msgstr "Zabbix πληροφορίες εξυπηρετητή"
 
 #: jsrpc.php:173
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr ""
+msgstr "Ο Εξυπηρετητής Zabbix δεν λειτουργεί: η εμφανιζόμενη πληροφορία πιθανώς όχι τρέχουσα."
 
 #: include/blocks.inc.php:711
 msgid "Zabbix server is running"
@@ -13454,7 +13446,7 @@ msgstr "Zabbix παγιδευτής"
 msgid "Zetta"
 msgstr "Ζεττα"
 
-#: jsLoader.php:86
+#: jsLoader.php:89
 msgid "Zoom"
 msgstr "Μεγέθυνση"
 
@@ -13526,18 +13518,18 @@ msgstr "ως Κόκκινο"
 msgid "avg"
 msgstr "μ.ο."
 
-#: include/func.inc.php:472 jsLoader.php:93
+#: include/func.inc.php:472 jsLoader.php:96
 msgctxt "day short"
 msgid "d"
 msgstr "d"
 
-#: include/defines.inc.php:910 include/maintenances.inc.php:57
-#: include/page_header.php:485 include/views/configuration.item.list.php:101
-#: report3.php:134
+#: include/maintenances.inc.php:57 include/page_header.php:485
+#: include/translateDefines.inc.php:42
+#: include/views/configuration.item.list.php:101 report3.php:134
 msgid "d M Y"
 msgstr "d M Y"
 
-#: include/defines.inc.php:911
+#: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
 #: include/views/configuration.services.edit.php:132
 #: include/views/configuration.services.edit.php:133 report3.php:161
 msgid "d M Y H:i"
@@ -13546,12 +13538,12 @@ msgstr "d M Y H:i"
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
 #: include/acknow.inc.php:59 include/blocks.inc.php:930
 #: include/classes/screens/CScreenEvents.php:63
-#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:895
-#: include/defines.inc.php:896 include/defines.inc.php:902
-#: include/defines.inc.php:903 include/defines.inc.php:904
-#: include/defines.inc.php:912 include/defines.inc.php:913
-#: include/events.inc.php:116 include/events.inc.php:186
-#: include/events.inc.php:245
+#: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
+#: include/events.inc.php:186 include/events.inc.php:245
+#: include/translateDefines.inc.php:27 include/translateDefines.inc.php:28
+#: include/translateDefines.inc.php:34 include/translateDefines.inc.php:35
+#: include/translateDefines.inc.php:36 include/translateDefines.inc.php:45
+#: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
 #: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
@@ -13572,7 +13564,7 @@ msgstr "d.m"
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
-#: include/defines.inc.php:916
+#: include/translateDefines.inc.php:49
 msgid "d.m.y"
 msgstr "d.m.y"
 
@@ -13596,7 +13588,7 @@ msgstr "ηη"
 msgid "default"
 msgstr "προκαθορισμένο"
 
-#: jsLoader.php:88
+#: jsLoader.php:91
 msgid "dynamic"
 msgstr "δυναμικό"
 
@@ -13626,7 +13618,7 @@ msgstr "ακριβώς"
 msgid "executed"
 msgstr "εκτελεσμένο"
 
-#: jsLoader.php:87
+#: jsLoader.php:90
 msgid "fixed"
 msgstr "σταθερό"
 
@@ -13634,7 +13626,7 @@ msgstr "σταθερό"
 msgid "found"
 msgstr "βρέθηκαν"
 
-#: include/func.inc.php:480 jsLoader.php:94
+#: include/func.inc.php:480 jsLoader.php:97
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -13691,12 +13683,12 @@ msgctxt "Milli short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:488 jsLoader.php:95
+#: include/func.inc.php:488 jsLoader.php:98
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:464 jsLoader.php:91
+#: include/func.inc.php:464 jsLoader.php:94
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -13729,7 +13721,7 @@ msgstr "ελάχ."
 
 #: include/views/configuration.action.edit.php:46
 msgid "minimum 60 seconds"
-msgstr ""
+msgstr "ελάχιστο 60 δευτερόλεπτα"
 
 #: include/views/configuration.maintenance.edit.php:73
 #: include/views/configuration.maintenance.edit.php:79
@@ -13800,7 +13792,7 @@ msgstr "δεν επιλέχθηκε"
 msgid "not sent"
 msgstr "δεν στέλνω"
 
-#: jsLoader.php:89
+#: jsLoader.php:92
 msgid "now"
 msgstr "τώρα"
 
@@ -13907,7 +13899,7 @@ msgstr "άγνωστο"
 msgid "value"
 msgstr "τιμή"
 
-#: jsLoader.php:92
+#: jsLoader.php:95
 msgctxt "week short"
 msgid "w"
 msgstr "w"
@@ -13924,7 +13916,7 @@ msgstr "εβδομάδες"
 msgid "whole number"
 msgstr "ακέραιος"
 
-#: include/func.inc.php:456 jsLoader.php:90
+#: include/func.inc.php:456 jsLoader.php:93
 msgctxt "year short"
 msgid "y"
 msgstr "y"

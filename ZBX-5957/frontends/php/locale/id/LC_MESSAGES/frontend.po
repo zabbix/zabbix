@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-17 00:55+0200\n"
+"POT-Creation-Date: 2013-01-21 18:45+0200\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -15,7 +15,7 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
-#: maintenance.php:153 maintenance.php:165 services.php:194 services.php:208
+#: maintenance.php:153 maintenance.php:165 services.php:193 services.php:207
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" harus antara 1970.01.01 dan 2038.01.18."
@@ -427,7 +427,7 @@ msgstr "Tambah hilang"
 msgid "Add prototype"
 msgstr "Tambah bentuk dasar"
 
-#: jsLoader.php:178
+#: jsLoader.php:182
 msgid "Add service"
 msgstr "Tambah layanan"
 
@@ -521,7 +521,7 @@ msgstr "Meluruskan icon"
 #: include/views/administration.users.list.php:36
 #: include/views/configuration.action.edit.php:519
 #: include/views/configuration.hostgroups.edit.php:39
-#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:85
+#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:88
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
 msgstr "Semua"
@@ -531,7 +531,7 @@ msgstr "Semua"
 msgid "All groups"
 msgstr "Semua grup"
 
-#: jsLoader.php:151
+#: jsLoader.php:155
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Semua tautan harus memiliki \"Nama\" dan \"URL\""
 
@@ -627,7 +627,7 @@ msgid "Apr"
 msgstr "Apr"
 
 #: include/forms.inc.php:1556 include/func.inc.php:107
-#: include/func.inc.php:238 jsLoader.php:114
+#: include/func.inc.php:238 jsLoader.php:118
 msgid "April"
 msgstr "April"
 
@@ -700,7 +700,7 @@ msgid "Aug"
 msgstr "Agu"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
-#: include/func.inc.php:242 jsLoader.php:118
+#: include/func.inc.php:242 jsLoader.php:122
 msgid "August"
 msgstr "Agustus"
 
@@ -1098,7 +1098,7 @@ msgstr "Tidak dapat memutuskan hubungan template"
 msgid "Canada (136 characters)"
 msgstr "Kanada (136 karakter)"
 
-#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:259
+#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:262
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:946
@@ -1125,7 +1125,7 @@ msgstr "Tidak dapat menambah aksi"
 msgid "Cannot add application"
 msgstr "Tidak dapat menambah aplikasi"
 
-#: api/classes/CTrigger.php:1825
+#: api/classes/CTrigger.php:1800
 msgid "Cannot add dependency from a host to a template."
 msgstr "Tidak dapat menambah dependency dari host ke template."
 
@@ -1211,7 +1211,7 @@ msgstr "Tidak dapat menambah layar"
 msgid "Cannot add script"
 msgstr "Tidak dapat menambah skrip"
 
-#: services.php:164
+#: services.php:163
 msgid "Cannot add service"
 msgstr "Tidak dapat menambah service"
 
@@ -1260,15 +1260,15 @@ msgstr "Tidak dapat mengganti metode otentikasi ke Zabbix internal"
 msgid "Cannot clear history"
 msgstr "Tidak dapat membersihkan jejak"
 
-#: api/classes/CDiscoveryRule.php:1170
+#: api/classes/CDiscoveryRule.php:1163
 msgid "Cannot clone graph prototypes."
 msgstr "Tidak dapat meng-klon protipe grafik."
 
-#: api/classes/CDiscoveryRule.php:1055
+#: api/classes/CDiscoveryRule.php:1048
 msgid "Cannot clone item prototypes."
 msgstr "Tidak dapat meng-klon prototipe item."
 
-#: api/classes/CDiscoveryRule.php:812
+#: api/classes/CDiscoveryRule.php:805
 msgid "Cannot clone trigger prototypes."
 msgstr "Tidak dapat meng-klon prototipe trigger."
 
@@ -1293,11 +1293,11 @@ msgstr "Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih d
 msgid "Cannot create another database connection."
 msgstr "Tidak dapat membuat koneksi database lainnya."
 
-#: api/classes/CTrigger.php:1859
+#: api/classes/CTrigger.php:1834
 msgid "Cannot create circular dependencies."
 msgstr "Tidak dapat membuat dependensi melingkar."
 
-#: api/classes/CTrigger.php:1831
+#: api/classes/CTrigger.php:1806
 msgid "Cannot create dependency on trigger itself."
 msgstr "Tidak dapat membuat dependensi pada trigger itu sendiri."
 
@@ -1377,7 +1377,7 @@ msgstr "Tidak dapat menghapus grafik."
 msgid "Cannot delete graphs"
 msgstr "Tidak dapat menghapus grafik"
 
-#: api/classes/CGraphPrototype.php:808
+#: api/classes/CGraphPrototype.php:785
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Tidak dapat menghapus grafik yang dibuat oleh discovery tingkat bawah."
 
@@ -1484,7 +1484,7 @@ msgstr "Tidak dapat menghapus slide show"
 msgid "Cannot delete template"
 msgstr "Tidak dapat mengahapus template"
 
-#: api/classes/CGraph.php:736 api/classes/CGraphPrototype.php:784
+#: api/classes/CGraph.php:713 api/classes/CGraphPrototype.php:761
 msgid "Cannot delete templated graphs."
 msgstr "Tidap dapat menghapus grafik template."
 
@@ -1582,7 +1582,7 @@ msgstr "Tidak dapat menemukan host \"%1$s\" yang digunakan di peta \"%2$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan host \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:971 api/classes/CDiscoveryRule.php:1043
+#: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
@@ -1645,7 +1645,7 @@ msgstr "Tidak dapat menemukan trigger \"%1$s\" yang digunakan pada peta \"%2$s\"
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Tidak dapat memformat Tree. Periksa struktur logika dalam service link."
 
-#: services.php:478
+#: services.php:477
 msgid "Cannot format tree."
 msgstr "Tidak dapat memformat tree."
 
@@ -1775,31 +1775,31 @@ msgstr "Tidak bisa merubah host untuk interface."
 msgid "Cannot unblock users"
 msgstr "Tidak dapat membuka blokir user"
 
-#: api/classes/CHostGeneral.php:696
+#: api/classes/CHostGeneral.php:704
 msgid "Cannot unlink and clear applications"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan aplikasi"
 
-#: api/classes/CHostGeneral.php:549
+#: api/classes/CHostGeneral.php:557
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan aturan discovery"
 
-#: api/classes/CHostGeneral.php:638
+#: api/classes/CHostGeneral.php:646
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan prototipe grafik"
 
-#: api/classes/CHostGeneral.php:656
+#: api/classes/CHostGeneral.php:664
 msgid "Cannot unlink and clear graphs."
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan grafik."
 
-#: api/classes/CHostGeneral.php:585
+#: api/classes/CHostGeneral.php:593
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan prototipe item"
 
-#: api/classes/CHostGeneral.php:567
+#: api/classes/CHostGeneral.php:575
 msgid "Cannot unlink and clear items"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan item"
 
-#: api/classes/CHostGeneral.php:487 api/classes/CHostGeneral.php:504
+#: api/classes/CHostGeneral.php:495 api/classes/CHostGeneral.php:512
 msgid "Cannot unlink and clear triggers"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan trigger"
 
@@ -1807,7 +1807,7 @@ msgstr "Tidak dapat membatalkan hubungan dan membersihkan trigger"
 msgid "Cannot unlink template"
 msgstr "Tidak dapat membatalkan hubungan template"
 
-#: api/classes/CHostGeneral.php:441
+#: api/classes/CHostGeneral.php:449
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung."
@@ -2115,7 +2115,7 @@ msgstr "Referensi melingkar pada layar: %1$s."
 msgid "Circular reference in templates: %1$s."
 msgstr "Referensi melingkar pada template: %1$s."
 
-#: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:759
+#: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:767
 msgid "Circular template linkage is not allowed."
 msgstr "Template linkage melingkar tidak diperbolehkan."
 
@@ -2123,7 +2123,7 @@ msgstr "Template linkage melingkar tidak diperbolehkan."
 msgid "Classic"
 msgstr "Klasik"
 
-#: jsLoader.php:161
+#: jsLoader.php:165
 msgid "Clear"
 msgstr "Bersih"
 
@@ -2167,8 +2167,8 @@ msgstr "Klon"
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
-#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:145
-#: jsLoader.php:169 tr_testexpr.php:175
+#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:149
+#: jsLoader.php:173 tr_testexpr.php:175
 msgid "Close"
 msgstr "Tutup"
 
@@ -2628,7 +2628,7 @@ msgstr "Buat slide show"
 msgid "Create template"
 msgstr "Buat template"
 
-#: include/views/configuration.triggers.list.php:44 jsLoader.php:100
+#: include/views/configuration.triggers.list.php:44 jsLoader.php:104
 msgid "Create trigger"
 msgstr "Buat trigger"
 
@@ -2653,7 +2653,7 @@ msgstr "Buat peta nilai"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Dibuat: Aplikasi \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:834
+#: api/classes/CDiscoveryRule.php:827
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Dibuat: Aturan discovery \"%1$s\" pada \"%2$s\"."
@@ -2838,7 +2838,7 @@ msgstr "Czech (cs_CZ)"
 msgid "D"
 msgstr "D"
 
-#: include/defines.inc.php:915
+#: include/translateDefines.inc.php:48
 msgid "D, d M Y H:i:s O"
 msgstr "D, d M Y H:i:s O"
 
@@ -3058,7 +3058,7 @@ msgid "Dec"
 msgstr "Des"
 
 #: include/forms.inc.php:1568 include/func.inc.php:115
-#: include/func.inc.php:246 jsLoader.php:122
+#: include/func.inc.php:246 jsLoader.php:126
 msgid "December"
 msgstr "Desember"
 
@@ -3072,7 +3072,7 @@ msgstr "Desimal"
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:122
 #: include/views/monitoring.screen.php:117
-#: include/views/monitoring.slides.php:85 jsLoader.php:144 popup_bitem.php:114
+#: include/views/monitoring.slides.php:85 jsLoader.php:148 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
 msgstr "Standar"
@@ -3123,7 +3123,7 @@ msgstr "Delay oleh"
 
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/configuration.triggers.edit.php:154 jsLoader.php:101
+#: include/views/configuration.triggers.edit.php:154 jsLoader.php:105
 #: tr_logform.php:332 tr_logform.php:349
 msgid "Delete"
 msgstr "Hapus"
@@ -3153,7 +3153,7 @@ msgstr "Hapus aksi yang berlaku?"
 msgid "Delete discovery rule?"
 msgstr "Hapus aturan discovery?"
 
-#: include/views/configuration.triggers.edit.php:156 jsLoader.php:103
+#: include/views/configuration.triggers.edit.php:156 jsLoader.php:107
 #: tr_logform.php:333
 msgid "Delete expression?"
 msgstr "Hapus ekspresi?"
@@ -3178,11 +3178,11 @@ msgstr "Hapus peta ikon?"
 msgid "Delete item?"
 msgstr "Hapus item?"
 
-#: jsLoader.php:102 tr_logform.php:349
+#: jsLoader.php:106 tr_logform.php:349
 msgid "Delete keyword?"
 msgstr "Hapus kata kunci?"
 
-#: jsLoader.php:153
+#: jsLoader.php:157
 msgid "Delete links between selected elements?"
 msgstr "Hapus tautan antara elemen yang dipilih?"
 
@@ -3262,7 +3262,7 @@ msgstr "Hapus aplikasi yang dipilih?"
 msgid "Delete selected discovery rules?"
 msgstr "Hapus aturan discovery yang dipilih?"
 
-#: jsLoader.php:149
+#: jsLoader.php:153
 msgid "Delete selected elements?"
 msgstr "Hapus elemen yang dipilih?"
 
@@ -3370,7 +3370,7 @@ msgstr[0] "Hapus nilai peta yang dipilih? Ini digunakan untuk %d item!"
 msgid "Delete selected with linked elements"
 msgstr "Hapus yang dipilih dengan elemen yang terkait"
 
-#: jsLoader.php:180
+#: jsLoader.php:184
 msgid "Delete service"
 msgstr "Hapus service"
 
@@ -3382,7 +3382,7 @@ msgstr "Hapus slide show?"
 msgid "Delete template?"
 msgstr "Hapus template?"
 
-#: jsLoader.php:181
+#: jsLoader.php:185
 msgid "Delete the selected service?"
 msgstr "Hapus service yang dipilih?"
 
@@ -3404,7 +3404,7 @@ msgstr "Dihapus: Aplikasi \"%1$s\" pada \"%2$s\"."
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Dihapus: Aturan discovery \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CGraph.php:768
+#: api/classes/CGraph.php:745
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Dihapus: Grafik \"%1$s\" on \"%2$s\"."
@@ -3502,7 +3502,7 @@ msgid "Description"
 msgstr "Deskripsi"
 
 #: include/actions.inc.php:868 include/blocks.inc.php:704
-#: include/config.inc.php:341
+#: include/config.inc.php:344
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3722,12 +3722,12 @@ msgstr "Obyek penemuan"
 msgid "Discovery rule"
 msgstr "Aturan penemuan"
 
-#: api/classes/CDiscoveryRule.php:901
+#: api/classes/CDiscoveryRule.php:894
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template lain."
 
-#: api/classes/CDiscoveryRule.php:888
+#: api/classes/CDiscoveryRule.php:881
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)"
@@ -3828,16 +3828,16 @@ msgstr "Jangan simpan event yang lebih lama dari (dalam hari)"
 msgid "Do not keep events older than (in days) \"%1$s\"."
 msgstr "Jangan simpan event yang lebih lama dari (dalam hari) \"%1$s\"."
 
-#: jsLoader.php:98
+#: jsLoader.php:102
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Apakah Anda ingin mengganti ekspresi kondisional?"
 
-#: jsLoader.php:131
+#: jsLoader.php:135
 msgid "Done"
 msgstr "Selesai"
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
-#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:147
+#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:151
 msgid "Dot"
 msgstr "Titik"
 
@@ -3902,7 +3902,7 @@ msgstr "Drowdown catatan pertama \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Dropdown ingat yang dipilih \"%1$s\"."
 
-#: api/classes/CTrigger.php:2001
+#: api/classes/CTrigger.php:1976
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Duplikasi dependensi pada trigger \"%1$s\"."
@@ -3959,7 +3959,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/config.inc.php:308
+#: include/config.inc.php:311
 msgid "ERROR"
 msgstr "ERROR"
 
@@ -3967,7 +3967,7 @@ msgstr "ERROR"
 msgid "EVENTS"
 msgstr "EVENT"
 
-#: jsLoader.php:152
+#: jsLoader.php:156
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Setiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernama"
 
@@ -3992,7 +3992,7 @@ msgstr "Ubah masa pemeliharaan"
 msgid "Edit map element"
 msgstr "Ubah elemen peta"
 
-#: jsLoader.php:179
+#: jsLoader.php:183
 msgid "Edit service"
 msgstr "Ubah service"
 
@@ -4022,8 +4022,8 @@ msgid "Empty action condition."
 msgstr "Kondisi aksi kosong."
 
 #: api/classes/CAction.php:1429 api/classes/CApplication.php:656
-#: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:716
-#: api/classes/CGraphPrototype.php:766 api/classes/CHostGroup.php:672
+#: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
+#: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
 #: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:925 api/classes/CItemPrototype.php:708
@@ -4272,7 +4272,7 @@ msgid "Event source details"
 msgstr "Detail sumber event"
 
 #: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1269
-#: jsLoader.php:108 search.php:134 search.php:206 search.php:261
+#: jsLoader.php:112 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
 msgstr "Event"
@@ -4400,7 +4400,7 @@ msgstr "Periksa eksternal"
 msgid "Ez Texting"
 msgstr "Ez Texting"
 
-#: jsLoader.php:127
+#: jsLoader.php:131
 msgctxt "Friday short"
 msgid "F"
 msgstr "F"
@@ -4457,7 +4457,7 @@ msgid "Feb"
 msgstr "Feb"
 
 #: include/forms.inc.php:1546 include/func.inc.php:105
-#: include/func.inc.php:236 jsLoader.php:112
+#: include/func.inc.php:236 jsLoader.php:116
 msgid "February"
 msgstr "Februari"
 
@@ -4586,7 +4586,7 @@ msgstr "Jumat"
 #: include/views/configuration.services.edit.php:211
 #: include/views/configuration.services.edit.php:278
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
-#: report3.php:145 report4.php:180 services.php:188 services.php:194
+#: report3.php:145 report4.php:180 services.php:187 services.php:193
 msgid "From"
 msgstr "Dari"
 
@@ -4707,7 +4707,7 @@ msgstr "Skrip global"
 msgid "Go"
 msgstr "Lanjut"
 
-#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:174
+#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:178
 msgid "Go to"
 msgstr "Lanjut ke"
 
@@ -4799,12 +4799,12 @@ msgstr "Nama grafik"
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Prototipe grafik \"%1$s\" dengan kerangka item tidak boleh mengandung item dari host lain."
 
-#: api/classes/CGraphPrototype.php:815
+#: api/classes/CGraphPrototype.php:792
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "Prototipe grafik \"%s\" dihapus."
 
-#: api/classes/CGraphPrototype.php:878
+#: api/classes/CGraphPrototype.php:855
 msgid "Graph prototype must have at least one prototype."
 msgstr "Prototipe grafik setidaknya harus memiliki satu prototipe."
 
@@ -4903,7 +4903,7 @@ msgstr "Grup"
 msgid "Group \"%1$s\" does not exist."
 msgstr "Grup \"%1$s\" tidak ada."
 
-#: include/classes/import/importers/CHostImporter.php:135
+#: include/classes/import/importers/CHostImporter.php:131
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Grup \"%1$s\" untuk host \"%2$s\" tidak ada."
@@ -4965,7 +4965,7 @@ msgstr "Grup"
 msgid "Groups in maintenance"
 msgstr "Grup dalam pemeliharaan"
 
-#: include/defines.inc.php:917
+#: include/translateDefines.inc.php:50
 msgid "H.i"
 msgstr "H.i"
 
@@ -5038,7 +5038,7 @@ msgstr "Bantuan"
 msgid "Hexadecimal"
 msgstr "Heksadesimal"
 
-#: jsLoader.php:137 sysmap.php:158
+#: jsLoader.php:141 sysmap.php:158
 msgid "Hidden"
 msgstr "Tersembunyi"
 
@@ -5071,12 +5071,12 @@ msgstr "Tinggi"
 
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
-#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:105
+#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:109
 #: latest.php:196 latest.php:323 latest.php:501
 msgid "History"
 msgstr "Riwayat"
 
-#: jsLoader.php:106
+#: jsLoader.php:110
 msgid "History and simple graphs"
 msgstr "Riwayat dan grafik sederhana"
 
@@ -5140,7 +5140,7 @@ msgstr "Luruskan horisontal"
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
-#: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
+#: items.php:624 items.php:647 jsLoader.php:143 latest.php:125 latest.php:191
 #: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
 #: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
@@ -5210,7 +5210,7 @@ msgstr "Host dihapus"
 #: include/views/js/configuration.action.edit.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:28
-#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:142
+#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:146
 #: search.php:258
 msgid "Host group"
 msgstr "Host grup"
@@ -5242,7 +5242,7 @@ msgstr "Grup host"
 msgid "Host interface"
 msgstr "Antarmuka host"
 
-#: hostinventories.php:26 jsLoader.php:177
+#: hostinventories.php:26 jsLoader.php:181
 msgid "Host inventories"
 msgstr "Host inventori"
 
@@ -5276,7 +5276,7 @@ msgid "Host router"
 msgstr "Router host"
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
-#: jsLoader.php:173
+#: jsLoader.php:177
 msgid "Host screens"
 msgstr "Layar host"
 
@@ -5626,7 +5626,7 @@ msgstr "Pemetaan ikon"
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "Entri pemetaan ikon \"%1$s\" melawan \"%2$s\" sudah ada."
 
-#: jsLoader.php:155
+#: jsLoader.php:159
 msgid "Iconmap is not enabled"
 msgstr "Peta ikon tidak dinon-aktifkan"
 
@@ -5634,7 +5634,7 @@ msgstr "Peta ikon tidak dinon-aktifkan"
 msgid "Icons"
 msgstr "Ikon"
 
-#: include/config.inc.php:255
+#: include/config.inc.php:258
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan."
 
@@ -5643,7 +5643,7 @@ msgstr "Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untu
 #: include/views/administration.general.image.edit.php:38
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:47
-#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:143
+#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:147
 #: map.php:136
 msgid "Image"
 msgstr "Gambar"
@@ -6071,35 +6071,35 @@ msgstr "Kesalahan kunci: %s"
 msgid "Incorrect list of items."
 msgstr "Kesalahan daftar item."
 
-#: maintenance.php:314
+#: maintenance.php:316
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Kesalahan pemeliharaan - tanggal harus antara 1970.01.01 dan 2038.01.18"
 
-#: maintenance.php:342
+#: maintenance.php:344
 msgid "Incorrect maintenance date"
 msgstr "Kesalahan waktu pemeliharaan"
 
-#: maintenance.php:321
+#: maintenance.php:323
 msgid "Incorrect maintenance day period"
 msgstr "Kesalahan pemeliharaan periode waktu"
 
-#: maintenance.php:328 maintenance.php:339
+#: maintenance.php:330 maintenance.php:341
 msgid "Incorrect maintenance days of week"
 msgstr "Kesalahan pemeliharaan hari mingguan"
 
-#: maintenance.php:336
+#: maintenance.php:338
 msgid "Incorrect maintenance month period"
 msgstr "Kesalahan pemeliharaan periode bulan"
 
-#: maintenance.php:301
+#: maintenance.php:303
 msgid "Incorrect maintenance period"
 msgstr "Kesalahan pemeliharaan periode"
 
-#: maintenance.php:298
+#: maintenance.php:300
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Kesalahan periode pemeliharaan (minimum 5 menit)"
 
-#: maintenance.php:325
+#: maintenance.php:327
 msgid "Incorrect maintenance week period"
 msgstr "Kesalahan periode minggu pemeliharaan"
 
@@ -6363,7 +6363,7 @@ msgstr "Informasi"
 msgid "Insert"
 msgstr "Sisipkan"
 
-#: include/forms.inc.php:1353 jsLoader.php:99
+#: include/forms.inc.php:1353 jsLoader.php:103
 msgid "Insert macro"
 msgstr "Sisipkan makro"
 
@@ -6444,7 +6444,7 @@ msgstr "JSON tidak sah. Terjadi kesalahan pada server saat parsing teks JSON."
 msgid "Invalid Request."
 msgstr "Permintaan tidak sah."
 
-#: maintenance.php:147 maintenance.php:161 services.php:188 services.php:202
+#: maintenance.php:147 maintenance.php:161 services.php:187 services.php:201
 #, php-format
 msgid "Invalid date \"%s\"."
 msgstr ""
@@ -6459,7 +6459,7 @@ msgstr "Hostid tidak sah untuk makro \"%1$s\"."
 msgid "Invalid item key format."
 msgstr "Format key item tidak sah."
 
-#: maintenance.php:309
+#: maintenance.php:311
 msgid "Invalid maintenance period"
 msgstr ""
 
@@ -6544,7 +6544,7 @@ msgstr "Item"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Item \"%1$s\" sudah ada di \"%2$s\", mewarisi dari template lain."
 
-#: api/classes/CItem.php:1219
+#: api/classes/CItem.php:1212
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilang . Pilihannya : dari 0 (jangan diisi) ke %3$d."
@@ -6740,7 +6740,7 @@ msgid "Jan"
 msgstr "Jan"
 
 #: include/forms.inc.php:1541 include/func.inc.php:104
-#: include/func.inc.php:235 jsLoader.php:111
+#: include/func.inc.php:235 jsLoader.php:115
 msgid "January"
 msgstr "Januari"
 
@@ -6753,7 +6753,7 @@ msgid "Jul"
 msgstr "Jul"
 
 #: include/forms.inc.php:1543 include/func.inc.php:110
-#: include/func.inc.php:241 jsLoader.php:117
+#: include/func.inc.php:241 jsLoader.php:121
 msgid "July"
 msgstr "Juli"
 
@@ -6762,7 +6762,7 @@ msgid "Jun"
 msgstr "Jun"
 
 #: include/forms.inc.php:1566 include/func.inc.php:109
-#: include/func.inc.php:240 jsLoader.php:116
+#: include/func.inc.php:240 jsLoader.php:120
 msgid "June"
 msgstr "Juni"
 
@@ -6972,7 +6972,7 @@ msgstr "Nilai terakhir"
 msgid "Last week graph"
 msgstr "Grafik minggu terakhir"
 
-#: include/menu.inc.php:47 jsLoader.php:175 latest.php:26 report5.php:159
+#: include/menu.inc.php:47 jsLoader.php:179 latest.php:26 report5.php:159
 #: search.php:132 search.php:204 search.php:259 search.php:311
 msgid "Latest data"
 msgstr "Data terbaru"
@@ -7157,7 +7157,7 @@ msgstr "Log jebakan SNMP yang tidak sama"
 msgid "Logged in as"
 msgstr "Masuk sebagai"
 
-#: auditlogs.php:143 include/config.inc.php:258 include/menu.inc.php:285
+#: auditlogs.php:143 include/config.inc.php:261 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -7203,12 +7203,12 @@ msgctxt "Mega short"
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:123
+#: jsLoader.php:127
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
-#: include/defines.inc.php:909 report3.php:116
+#: include/translateDefines.inc.php:41 report3.php:116
 msgid "M Y"
 msgstr "M Y"
 
@@ -7364,7 +7364,7 @@ msgstr "Manual Logout"
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
-#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:140
+#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:144
 #: map.php:25
 msgid "Map"
 msgstr "Peta"
@@ -7431,7 +7431,7 @@ msgid "Mar"
 msgstr "Mar"
 
 #: include/forms.inc.php:1551 include/func.inc.php:106
-#: include/func.inc.php:237 jsLoader.php:113
+#: include/func.inc.php:237 jsLoader.php:117
 msgid "March"
 msgstr "Maret"
 
@@ -7488,7 +7488,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Hitung max dari event per trigger untuk ditampilkan"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:343
+#: include/config.inc.php:346
 msgid "Maximize"
 msgstr "Perbesar"
 
@@ -7527,7 +7527,7 @@ msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %
 msgstr[0] "Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
 
 #: include/forms.inc.php:1561 include/func.inc.php:108
-#: include/func.inc.php:239 jsLoader.php:115
+#: include/func.inc.php:239 jsLoader.php:119
 msgid "May"
 msgstr "Mei"
 
@@ -7627,7 +7627,7 @@ msgstr "Habis waktu pesan"
 msgid "Message timeout (seconds)"
 msgstr "Habis waktu pesan (detik)"
 
-#: jsLoader.php:160
+#: jsLoader.php:164
 msgid "Messages"
 msgstr "Pesan"
 
@@ -7657,7 +7657,7 @@ msgid "Min severity"
 msgstr "Keparahan minimum"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:343
+#: include/config.inc.php:346
 msgid "Minimize"
 msgstr "Perkecil"
 
@@ -7711,7 +7711,7 @@ msgstr ""
 msgid "Minutes"
 msgstr "Menit"
 
-#: api/classes/CGraph.php:793 api/classes/CGraphPrototype.php:840
+#: api/classes/CGraph.php:770 api/classes/CGraphPrototype.php:817
 msgid "Missing \"itemid\" field for item."
 msgstr "Hilangnya field \"itemid\" untuk item."
 
@@ -7725,7 +7725,7 @@ msgstr "Hilangnya field \"nama\" untuk grafik."
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Hilangnya item \"%1$s\" untuk host \"%2$s\"."
 
-#: api/classes/CGraph.php:787 api/classes/CGraphPrototype.php:834
+#: api/classes/CGraph.php:764 api/classes/CGraphPrototype.php:811
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr "Hilangnya item untuk grafik \"%1$s\"."
@@ -7798,7 +7798,7 @@ msgstr "Lebih dari satu grafik dengan nama \"%1$s\" dengan host."
 msgid "Most busy triggers top 100"
 msgstr "Trigger tersibuk 100 teratas"
 
-#: jsLoader.php:163
+#: jsLoader.php:167
 msgid "Move"
 msgstr "Pindah"
 
@@ -7814,11 +7814,11 @@ msgstr "Beberapa MASALAH event"
 msgid "Multiple PROBLEM events generation"
 msgstr "Beberapa MASALAH generasi event"
 
-#: jsLoader.php:158
+#: jsLoader.php:162
 msgid "Mute"
 msgstr "Bisu"
 
-#: include/views/monitoring.maps.php:80
+#: include/views/monitoring.maps.php:74
 msgid "NETWORK MAPS"
 msgstr "PETA JARINGAN"
 
@@ -7945,7 +7945,7 @@ msgstr "Aplikasi baru"
 msgid "New condition"
 msgstr "Kondisi baru"
 
-#: jsLoader.php:150
+#: jsLoader.php:154
 msgid "New element"
 msgstr "Element baru"
 
@@ -8001,7 +8001,7 @@ msgstr "Lanjut"
 msgid "Next check"
 msgstr "Pemeriksaan selanjutnya"
 
-#: events.php:756 include/config.inc.php:560 include/events.inc.php:303
+#: events.php:756 include/config.inc.php:563 include/events.inc.php:303
 #: include/events.inc.php:321 include/forms.inc.php:1922
 #: include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:75
@@ -8136,7 +8136,7 @@ msgstr "Tidak ada aturan ID yang diberikan pada discovery."
 msgid "No discovery rules defined."
 msgstr "Tidak ada aturan discovery yang didefinisikan."
 
-#: jsLoader.php:170
+#: jsLoader.php:174
 msgid "No elements selected!"
 msgstr "Tidak ada elemen yang dipilih!"
 
@@ -8338,7 +8338,7 @@ msgstr "Tidak ada periode pemeliharaan yang didefinisikan."
 msgid "No map ID provided for screen element."
 msgstr "Tidak ada ID peta yang disediakan untuk element layar."
 
-#: include/views/monitoring.maps.php:27 popup.php:1553 sysmaps.php:254
+#: include/views/monitoring.maps.php:26 popup.php:1553 sysmaps.php:254
 msgid "No maps defined."
 msgstr "Tidak ada peta yang didefinisikan."
 
@@ -8421,10 +8421,10 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CApplication.php:597 api/classes/CApplication.php:674
 #: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:584
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
-#: api/classes/CDiscoveryRule.php:685 api/classes/CDiscoveryRule.php:688
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:578 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:813 api/classes/CGraphPrototype.php:860
+#: api/classes/CGraph.php:790 api/classes/CGraphPrototype.php:837
+#: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
 #: api/classes/CHost.php:1298 api/classes/CHost.php:1330
@@ -8443,13 +8443,10 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
-#: api/classes/CTrigger.php:1444 api/classes/CTrigger.php:1702
-#: api/classes/CTrigger.php:1714 api/classes/CTriggerPrototype.php:822
-#: api/classes/CTriggerPrototype.php:920
-#: api/classes/CTriggerPrototype.php:1101
-#: api/classes/CTriggerPrototype.php:1113 api/classes/CUserMacro.php:824
+#: api/classes/CTrigger.php:1444 api/classes/CTriggerPrototype.php:822
+#: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:241
+#: include/config.inc.php:244
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Tidak ada izin untuk objek yang dirujuk atau objek tidak ada!"
 
@@ -8655,7 +8652,7 @@ msgstr "Bukan pemberitahuan"
 msgid "Not Templated items"
 msgstr "Bukan item yang dibuat template"
 
-#: api/classes/CTrigger.php:1904
+#: api/classes/CTrigger.php:1879
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Tidak semua template terhubung ke \"%s\"."
@@ -8726,11 +8723,11 @@ msgid "Nov"
 msgstr "Nov"
 
 #: include/forms.inc.php:1563 include/func.inc.php:114
-#: include/func.inc.php:245 jsLoader.php:121
+#: include/func.inc.php:245 jsLoader.php:125
 msgid "November"
 msgstr "November"
 
-#: jsLoader.php:130
+#: jsLoader.php:134
 msgid "Now"
 msgstr "Sekarang"
 
@@ -8869,11 +8866,11 @@ msgid "Octal"
 msgstr "Octal"
 
 #: include/forms.inc.php:1558 include/func.inc.php:113
-#: include/func.inc.php:244 jsLoader.php:120
+#: include/func.inc.php:244 jsLoader.php:124
 msgid "October"
 msgstr "Oktober"
 
-#: jsLoader.php:136 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:140 sysmap.php:155 sysmap.php:161
 msgid "Off"
 msgstr "Mati"
 
@@ -8884,7 +8881,7 @@ msgstr "Mati"
 msgid "Ok"
 msgstr "Ok"
 
-#: jsLoader.php:135 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:139 sysmap.php:155 sysmap.php:161
 msgid "On"
 msgstr "Nyala"
 
@@ -9506,7 +9503,7 @@ msgstr "Harap perbaiki semua masalah dan tekan tombol \"Coba Lagi\""
 msgid "Please enter confirmation text."
 msgstr "Silahkan masukkan teks konfirmasi."
 
-#: jsLoader.php:146
+#: jsLoader.php:150
 msgid "Please select two elements"
 msgstr "Silahkan pilih dua elemen"
 
@@ -9683,7 +9680,7 @@ msgstr "Proxy"
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/classes/import/importers/CHostImporter.php:147
+#: include/classes/import/importers/CHostImporter.php:143
 #, php-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Proxy \"%1$s\"  untuk host \"%2$s\" tidak ada."
@@ -10214,12 +10211,12 @@ msgstr "Jalankan perintah jarak jauh pada host"
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
-#: jsLoader.php:128
+#: jsLoader.php:132
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:129
+#: jsLoader.php:133
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
@@ -10638,7 +10635,7 @@ msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Skrip dengan scriptid \"%s\" tidak ada."
 
 #: include/menu.inc.php:262 include/views/administration.script.list.php:27
-#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:176 report5.php:160
+#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:180 report5.php:160
 #: scripts_exec.php:25
 msgid "Scripts"
 msgstr "Skrip"
@@ -10824,7 +10821,7 @@ msgid "Separated"
 msgstr "Dipisahkan"
 
 #: include/forms.inc.php:1553 include/func.inc.php:112
-#: include/func.inc.php:243 jsLoader.php:119
+#: include/func.inc.php:243 jsLoader.php:123
 msgid "September"
 msgstr "September"
 
@@ -10852,7 +10849,7 @@ msgstr "Waktu server"
 #: events.php:522 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:305
-#: include/views/configuration.services.parent.list.php:36 services.php:473
+#: include/views/configuration.services.parent.list.php:36 services.php:472
 #: srv_status.php:156
 msgid "Service"
 msgstr "Service"
@@ -10881,7 +10878,7 @@ msgstr " Service \"%1$s\" sudah sangat terkait kepada service lain."
 msgid "Service cannot be parent and child at the same time."
 msgstr "Service tidak dapat menjadi induk dan turunan secara bersamaan."
 
-#: services.php:164
+#: services.php:163
 msgid "Service created"
 msgstr ""
 
@@ -11045,7 +11042,7 @@ msgstr "Tampilkan peringatan jika server Zabbix mati"
 msgid "Show working time"
 msgstr "Tampilkan waktu kerja"
 
-#: jsLoader.php:138 sysmap.php:158
+#: jsLoader.php:142 sysmap.php:158
 msgid "Shown"
 msgstr "Ditampilkan"
 
@@ -11066,7 +11063,7 @@ msgstr "Pemeriksaan sederhana"
 msgid "Simple graph"
 msgstr "Grafik sederhana"
 
-#: include/blocks.inc.php:1227 jsLoader.php:104
+#: include/blocks.inc.php:1227 jsLoader.php:108
 msgid "Simple graphs"
 msgstr "Grafik sederhana"
 
@@ -11156,7 +11153,7 @@ msgstr "Slide"
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
-#: jsLoader.php:162
+#: jsLoader.php:166
 msgid "Snooze"
 msgstr "Tidur"
 
@@ -11285,7 +11282,7 @@ msgid "Status (descending)"
 msgstr "Status (descending)"
 
 #: include/views/configuration.services.child.list.php:39
-#: include/views/configuration.services.parent.list.php:36 services.php:474
+#: include/views/configuration.services.parent.list.php:36 services.php:473
 msgid "Status calculation"
 msgstr "Status kalkulasi"
 
@@ -11462,12 +11459,12 @@ msgctxt "Tera short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:126
+#: jsLoader.php:130
 msgctxt "Thursday short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:124
+#: jsLoader.php:128
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
@@ -11543,7 +11540,7 @@ msgstr "Template"
 msgid "Template \"%1$s\" already exists."
 msgstr "Template \"%1$s\" sudah ada."
 
-#: include/classes/import/importers/CHostImporter.php:39
+#: include/classes/import/importers/CHostImporter.php:33
 #, php-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Template \"%1$s\" untuk host \"%2$s\" tidak ada."
@@ -11557,7 +11554,7 @@ msgstr "Template \"%s\" sudah ada."
 msgid "Template added"
 msgstr "Template telah ditambah"
 
-#: api/classes/CHostGeneral.php:762
+#: api/classes/CHostGeneral.php:770
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Template tidak dapat dikaitkan dengan template lain lebih dari sekali bahkan melalui template lainnya."
 
@@ -11627,7 +11624,7 @@ msgstr "Item yang memiliki template"
 msgid "Templates"
 msgstr "Template"
 
-#: api/classes/CHostGeneral.php:741
+#: api/classes/CHostGeneral.php:749
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Template \"%1$s\" tidak dihubungkan dari host \"%2$s\"."
@@ -11746,7 +11743,7 @@ msgstr "Kamis"
 #: include/reports.inc.php:634
 #: include/views/configuration.services.edit.php:251
 #: include/views/configuration.services.edit.php:279 popup_period.php:155
-#: report3.php:145 report4.php:180 services.php:202 services.php:208
+#: report3.php:145 report4.php:180 services.php:201 services.php:207
 msgid "Till"
 msgstr "Hingga"
 
@@ -11764,7 +11761,7 @@ msgstr "Hingga"
 #: include/views/administration.auditlogs.list.php:85
 #: include/views/configuration.services.edit.php:278
 #: include/views/configuration.services.edit.php:279
-#: include/views/configuration.services.edit.php:307 jsLoader.php:132
+#: include/views/configuration.services.edit.php:307 jsLoader.php:136
 msgid "Time"
 msgstr "Waktu"
 
@@ -11882,8 +11879,8 @@ msgstr "Tren"
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:261
 #: include/views/js/configuration.sysmaps.js.php:17
-#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:141
-#: report5.php:61 services.php:475 tr_comments.php:69 tr_logform.php:151
+#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:145
+#: report5.php:61 services.php:474 tr_comments.php:69 tr_logform.php:151
 #: tr_logform.php:164
 msgid "Trigger"
 msgstr "Trigger"
@@ -11915,7 +11912,7 @@ msgstr "Trigger \"%1$s\" diabaikan - aturan user."
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr "Trigger \"%1$s:%2$s\" tidak memiliki prototipe item."
 
-#: api/classes/CTrigger.php:2043
+#: api/classes/CTrigger.php:2018
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Trigger \"%s\" milik template dengan linkage berbeda."
@@ -11925,7 +11922,7 @@ msgstr "Trigger \"%s\" milik template dengan linkage berbeda."
 msgid "Trigger added"
 msgstr "Trigger ditambah"
 
-#: api/classes/CTrigger.php:1947
+#: api/classes/CTrigger.php:1922
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr "Trigger tidak dapat bergantung pada trigger yang diwarisinya."
 
@@ -12031,7 +12028,7 @@ msgstr "Nilai trigger"
 #: include/views/configuration.triggers.list.php:65
 #: include/views/conf.import.php:33
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/monitoring.overview.php:27 jsLoader.php:107 popup.php:61
+#: include/views/monitoring.overview.php:27 jsLoader.php:111 popup.php:61
 #: search.php:133 search.php:138 search.php:168 search.php:187 search.php:205
 #: search.php:260 search.php:312 search.php:370 search.php:397 search.php:420
 #: templates.php:460 templates.php:525 tr_status.php:178
@@ -12092,11 +12089,11 @@ msgstr "Selasa"
 msgid "Turkish (tr_TR)"
 msgstr ""
 
-#: jsLoader.php:148
+#: jsLoader.php:152
 msgid "Two elements should be selected"
 msgstr "Dua elemen harus dipilih"
 
-#: api/classes/CItem.php:1280
+#: api/classes/CItem.php:1273
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik."
@@ -12174,7 +12171,7 @@ msgstr "Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagrega
 msgid "Types"
 msgstr "Tipe"
 
-#: include/defines.inc.php:884 include/triggers.inc.php:167
+#: include/translateDefines.inc.php:24 include/triggers.inc.php:167
 msgid "UNKNOWN"
 msgstr "TIDAK DIKENAL"
 
@@ -12221,7 +12218,7 @@ msgstr "USA (160 karakter)"
 msgid "USER PROFILE"
 msgstr "PROFIL USER"
 
-#: include/config.inc.php:752
+#: include/config.inc.php:755
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -12353,47 +12350,47 @@ msgstr "Putuskan dari template"
 msgid "Unlink from templates"
 msgstr "Putuskan dari template"
 
-#: api/classes/CHostGeneral.php:705
+#: api/classes/CHostGeneral.php:713
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Aplikasi \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:558
+#: api/classes/CHostGeneral.php:566
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Aturan discovery \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:665
+#: api/classes/CHostGeneral.php:673
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Grafik \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:647
+#: api/classes/CHostGeneral.php:655
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Prototipe grafik \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:576
+#: api/classes/CHostGeneral.php:584
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Item \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:594
+#: api/classes/CHostGeneral.php:602
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Prototipe item \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:496
+#: api/classes/CHostGeneral.php:504
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Trigger \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:513
+#: api/classes/CHostGeneral.php:521
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Prototipe trigger \"%1$s\" pada \"%2$s\"."
 
-#: jsLoader.php:159
+#: jsLoader.php:163
 msgid "Unmute"
 msgstr "Nyalakan suara"
 
@@ -12462,7 +12459,7 @@ msgstr "Diperbarui: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Diperbarui: Aplikasi \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:862
+#: api/classes/CDiscoveryRule.php:855
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Diperbarui: Aturan discovery \"%1$s\" pada \"%2$s\"."
@@ -12491,7 +12488,7 @@ msgstr "Diperbarui: Prototipe trigger \"%1$s\" pada \"%2$s\"."
 msgid "Upload"
 msgstr "Unggah"
 
-#: include/views/monitoring.maps.php:59
+#: include/views/monitoring.maps.php:53
 msgid "Upper level maps"
 msgstr "Tingkat peta lebih atas"
 
@@ -12812,7 +12809,7 @@ msgstr "Nama terlihat"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Nama terlihat tidak boleh kosong jika nama hostnya hilang."
 
-#: jsLoader.php:125
+#: jsLoader.php:129
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "W"
@@ -12904,7 +12901,7 @@ msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
 msgstr[0] "Peringatan. Maksimum periode waktu yang ditampilkan adalah %1$s jam."
 
-#: jsLoader.php:166
+#: jsLoader.php:170
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai."
 
@@ -13138,7 +13135,7 @@ msgid "Y"
 msgstr "Y"
 
 #. GETTEXT: Date format (year). Do not translate.
-#: include/defines.inc.php:908
+#: include/translateDefines.inc.php:40
 msgctxt "date format"
 msgid "Y"
 msgstr "Y"
@@ -13164,24 +13161,25 @@ msgstr "Sisi Y axis"
 msgid "Y label"
 msgstr "Label Y"
 
-#: include/defines.inc.php:899 include/defines.inc.php:900
+#: include/translateDefines.inc.php:31 include/translateDefines.inc.php:32
 msgid "Y-m-d H:i:s"
 msgstr "Y-m-d H:i:s"
 
-#: include/classes/screens/CScreenHistory.php:215 include/defines.inc.php:897
-#: include/defines.inc.php:898 include/defines.inc.php:901
+#: include/classes/screens/CScreenHistory.php:215
+#: include/translateDefines.inc.php:29 include/translateDefines.inc.php:30
+#: include/translateDefines.inc.php:33
 msgid "Y.M.d H:i:s"
 msgstr "Y.M.d H:i:s"
 
-#: include/defines.inc.php:906
+#: include/translateDefines.inc.php:38
 msgid "Y.m.d"
 msgstr "Y.m.d"
 
-#: include/defines.inc.php:905
+#: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
 msgstr "Y.m.d H:i"
 
-#: include/defines.inc.php:914 include/func.inc.php:507
+#: include/func.inc.php:507 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "Y.m.d H:i:s"
 
@@ -13196,7 +13194,7 @@ msgid "Yearly"
 msgstr "Tahunan"
 
 #: events.php:756 include/blocks.inc.php:712
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:560
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
 #: include/events.inc.php:306 include/events.inc.php:324
 #: include/forms.inc.php:1922 include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:74
@@ -13216,7 +13214,7 @@ msgstr "Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tid
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Anda tidak diizinkan mengubah hak pengguna untuk user \"%s\"."
 
-#: include/config.inc.php:248
+#: include/config.inc.php:251
 msgid "You are not logged in."
 msgstr "Anda belum login."
 
@@ -13224,7 +13222,7 @@ msgstr "Anda belum login."
 msgid "You can not switch hosts for current selection."
 msgstr "Anda tidak dapat mengganti host pada yang terpilih."
 
-#: include/config.inc.php:249
+#: include/config.inc.php:252
 msgid "You cannot view this URL as a"
 msgstr "Anda tidak dapat menampilkan URL ini sebagai"
 
@@ -13246,17 +13244,12 @@ msgstr "Anda tidak dapat menentukan target untuk perintah aksi operasi \"%s\"."
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\"."
 
-#: api/classes/CApplication.php:837 api/classes/CApplication.php:848
-#: api/classes/CGraph.php:660 api/classes/CGraph.php:671
-#: api/classes/CGraph.php:732 api/classes/CGraphPrototype.php:708
-#: api/classes/CGraphPrototype.php:719 api/classes/CGraphPrototype.php:781
+#: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
 #: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
 #: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
-#: api/classes/CItem.php:1047 api/classes/CItem.php:1050
-#: api/classes/CItemPrototype.php:823 api/classes/CItemPrototype.php:826
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
 #: api/classes/CScript.php:347 api/classes/CScript.php:409
@@ -13288,7 +13281,7 @@ msgstr "Anda tidak memiliki hak untuk perbarui user lain."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Anda tidak memiliki hak untuk perbarui user atau user tidak ada."
 
-#: include/config.inc.php:253
+#: include/config.inc.php:256
 msgid "You must login to view this page."
 msgstr "Anda harus login untuk menampilkan halaman ini."
 
@@ -13423,7 +13416,7 @@ msgstr "Jebakan Zabbix"
 msgid "Zetta"
 msgstr "Zetta"
 
-#: jsLoader.php:86
+#: jsLoader.php:89
 msgid "Zoom"
 msgstr "Perbesar"
 
@@ -13495,18 +13488,18 @@ msgstr "sebagai Merah"
 msgid "avg"
 msgstr "avg"
 
-#: include/func.inc.php:472 jsLoader.php:93
+#: include/func.inc.php:472 jsLoader.php:96
 msgctxt "day short"
 msgid "d"
 msgstr "d"
 
-#: include/defines.inc.php:910 include/maintenances.inc.php:57
-#: include/page_header.php:485 include/views/configuration.item.list.php:101
-#: report3.php:134
+#: include/maintenances.inc.php:57 include/page_header.php:485
+#: include/translateDefines.inc.php:42
+#: include/views/configuration.item.list.php:101 report3.php:134
 msgid "d M Y"
 msgstr "d M Y"
 
-#: include/defines.inc.php:911
+#: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
 #: include/views/configuration.services.edit.php:132
 #: include/views/configuration.services.edit.php:133 report3.php:161
 msgid "d M Y H:i"
@@ -13515,12 +13508,12 @@ msgstr "d M Y H:i"
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
 #: include/acknow.inc.php:59 include/blocks.inc.php:930
 #: include/classes/screens/CScreenEvents.php:63
-#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:895
-#: include/defines.inc.php:896 include/defines.inc.php:902
-#: include/defines.inc.php:903 include/defines.inc.php:904
-#: include/defines.inc.php:912 include/defines.inc.php:913
-#: include/events.inc.php:116 include/events.inc.php:186
-#: include/events.inc.php:245
+#: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
+#: include/events.inc.php:186 include/events.inc.php:245
+#: include/translateDefines.inc.php:27 include/translateDefines.inc.php:28
+#: include/translateDefines.inc.php:34 include/translateDefines.inc.php:35
+#: include/translateDefines.inc.php:36 include/translateDefines.inc.php:45
+#: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
 #: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
@@ -13541,7 +13534,7 @@ msgstr "d.m"
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
-#: include/defines.inc.php:916
+#: include/translateDefines.inc.php:49
 msgid "d.m.y"
 msgstr "d.m.y"
 
@@ -13565,7 +13558,7 @@ msgstr "dd"
 msgid "default"
 msgstr "standar"
 
-#: jsLoader.php:88
+#: jsLoader.php:91
 msgid "dynamic"
 msgstr "dinamis"
 
@@ -13595,7 +13588,7 @@ msgstr "persis"
 msgid "executed"
 msgstr "dieksekusi"
 
-#: jsLoader.php:87
+#: jsLoader.php:90
 msgid "fixed"
 msgstr "tetap"
 
@@ -13603,7 +13596,7 @@ msgstr "tetap"
 msgid "found"
 msgstr "ditemukan"
 
-#: include/func.inc.php:480 jsLoader.php:94
+#: include/func.inc.php:480 jsLoader.php:97
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -13659,12 +13652,12 @@ msgctxt "Milli short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:488 jsLoader.php:95
+#: include/func.inc.php:488 jsLoader.php:98
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:464 jsLoader.php:91
+#: include/func.inc.php:464 jsLoader.php:94
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -13768,7 +13761,7 @@ msgstr "tidak dipilih"
 msgid "not sent"
 msgstr "tidak terkirim"
 
-#: jsLoader.php:89
+#: jsLoader.php:92
 msgid "now"
 msgstr "sekarang"
 
@@ -13875,7 +13868,7 @@ msgstr "tidak diketahui"
 msgid "value"
 msgstr "nilai"
 
-#: jsLoader.php:92
+#: jsLoader.php:95
 msgctxt "week short"
 msgid "w"
 msgstr "w"
@@ -13892,7 +13885,7 @@ msgstr "minggu"
 msgid "whole number"
 msgstr "seluruh nomor"
 
-#: include/func.inc.php:456 jsLoader.php:90
+#: include/func.inc.php:456 jsLoader.php:93
 msgctxt "year short"
 msgid "y"
 msgstr "y"

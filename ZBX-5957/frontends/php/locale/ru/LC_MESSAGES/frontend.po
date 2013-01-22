@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-17 00:55+0200\n"
+"POT-Creation-Date: 2013-01-21 18:45+0200\n"
 "PO-Revision-Date: 2013-01-09 19:38+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
-#: maintenance.php:153 maintenance.php:165 services.php:194 services.php:208
+#: maintenance.php:153 maintenance.php:165 services.php:193 services.php:207
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" должно быть между 1970.01.01 и 2038.01.18."
@@ -440,7 +440,7 @@ msgstr "Добавить отсутствующее"
 msgid "Add prototype"
 msgstr "Добавить прототип"
 
-#: jsLoader.php:178
+#: jsLoader.php:182
 msgid "Add service"
 msgstr "Добавить услугу"
 
@@ -534,7 +534,7 @@ msgstr "Привязать иконки"
 #: include/views/administration.users.list.php:36
 #: include/views/configuration.action.edit.php:519
 #: include/views/configuration.hostgroups.edit.php:39
-#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:85
+#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:88
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
 msgstr "Все"
@@ -544,7 +544,7 @@ msgstr "Все"
 msgid "All groups"
 msgstr "Все группы"
 
-#: jsLoader.php:151
+#: jsLoader.php:155
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "У всех ссылок должны быть указаны \"Имя\" и \"URL\""
 
@@ -640,7 +640,7 @@ msgid "Apr"
 msgstr "Апр"
 
 #: include/forms.inc.php:1556 include/func.inc.php:107
-#: include/func.inc.php:238 jsLoader.php:114
+#: include/func.inc.php:238 jsLoader.php:118
 msgid "April"
 msgstr "Апрель"
 
@@ -713,7 +713,7 @@ msgid "Aug"
 msgstr "Авг"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
-#: include/func.inc.php:242 jsLoader.php:118
+#: include/func.inc.php:242 jsLoader.php:122
 msgid "August"
 msgstr "Август"
 
@@ -1111,7 +1111,7 @@ msgstr "Не удалось отсоединить шаблон"
 msgid "Canada (136 characters)"
 msgstr "Канада (136 символов)"
 
-#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:259
+#: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:262
 #: include/forms.inc.php:1707 include/forms.inc.php:2010
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:946
@@ -1138,7 +1138,7 @@ msgstr "Не удалось добавить действие"
 msgid "Cannot add application"
 msgstr "Не удалось добавить группу элементов данных"
 
-#: api/classes/CTrigger.php:1825
+#: api/classes/CTrigger.php:1800
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не удалось добавить зависимость от узла сети к шаблону."
 
@@ -1224,7 +1224,7 @@ msgstr "Не удалось добавить комплексный экран"
 msgid "Cannot add script"
 msgstr "Не удалось добавить скрипт"
 
-#: services.php:164
+#: services.php:163
 msgid "Cannot add service"
 msgstr "Невозможно добавить услугу"
 
@@ -1273,15 +1273,15 @@ msgstr "Не удалось изменить метод аутентификац
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
 
-#: api/classes/CDiscoveryRule.php:1170
+#: api/classes/CDiscoveryRule.php:1163
 msgid "Cannot clone graph prototypes."
 msgstr "Не удалось клонировать прототипы графиков."
 
-#: api/classes/CDiscoveryRule.php:1055
+#: api/classes/CDiscoveryRule.php:1048
 msgid "Cannot clone item prototypes."
 msgstr "Не удалось клонировать прототипы элементов данных."
 
-#: api/classes/CDiscoveryRule.php:812
+#: api/classes/CDiscoveryRule.php:805
 msgid "Cannot clone trigger prototypes."
 msgstr "Не удалось клонировать прототипы триггеров."
 
@@ -1306,11 +1306,11 @@ msgstr "Не удалось скопировать триггер \"%1$s:%2$s\",
 msgid "Cannot create another database connection."
 msgstr "Не удалось создать другое подключение к базе данных."
 
-#: api/classes/CTrigger.php:1859
+#: api/classes/CTrigger.php:1834
 msgid "Cannot create circular dependencies."
 msgstr "Не удалось создать закольцованные зависимости."
 
-#: api/classes/CTrigger.php:1831
+#: api/classes/CTrigger.php:1806
 msgid "Cannot create dependency on trigger itself."
 msgstr "Невозможно создать зависимость триггера от самого себя."
 
@@ -1390,7 +1390,7 @@ msgstr "Не удалось удалить график."
 msgid "Cannot delete graphs"
 msgstr "Не удалось удалить график"
 
-#: api/classes/CGraphPrototype.php:808
+#: api/classes/CGraphPrototype.php:785
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Невозможно удалить графики созданные низкоуровневым обнаружением."
 
@@ -1499,7 +1499,7 @@ msgstr "Не удалось удалить слайд-шоу"
 msgid "Cannot delete template"
 msgstr "Не удалось удалить шаблон"
 
-#: api/classes/CGraph.php:736 api/classes/CGraphPrototype.php:784
+#: api/classes/CGraph.php:713 api/classes/CGraphPrototype.php:761
 msgid "Cannot delete templated graphs."
 msgstr "Не удалось удалить шаблонные графики."
 
@@ -1597,7 +1597,7 @@ msgstr "Не удалось найти узел сети \"%1$s\" использ
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:971 api/classes/CDiscoveryRule.php:1043
+#: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
@@ -1660,7 +1660,7 @@ msgstr "Не удалось найти триггер \"%1$s\" использу�
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Не удалось построить дерево. Проверьте логическую структуру в соединениях между услугами."
 
-#: services.php:478
+#: services.php:477
 msgid "Cannot format tree."
 msgstr "Не удалось построить дерево."
 
@@ -1794,31 +1794,31 @@ msgstr "Не удалось переключить узел сети на инт
 msgid "Cannot unblock users"
 msgstr "Не удалось разблокировать пользователей"
 
-#: api/classes/CHostGeneral.php:696
+#: api/classes/CHostGeneral.php:704
 msgid "Cannot unlink and clear applications"
 msgstr "Не удалось отсоединить и очистить группы элементов данных"
 
-#: api/classes/CHostGeneral.php:549
+#: api/classes/CHostGeneral.php:557
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Не удалось отсоединить и очистить правила обнаружения"
 
-#: api/classes/CHostGeneral.php:638
+#: api/classes/CHostGeneral.php:646
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Не удалось отсоединить и очистить прототипы графиков"
 
-#: api/classes/CHostGeneral.php:656
+#: api/classes/CHostGeneral.php:664
 msgid "Cannot unlink and clear graphs."
 msgstr "Не удалось отсоединить и очистить графики."
 
-#: api/classes/CHostGeneral.php:585
+#: api/classes/CHostGeneral.php:593
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Не удалось отсоединить и очистить прототипы элементов данных"
 
-#: api/classes/CHostGeneral.php:567
+#: api/classes/CHostGeneral.php:575
 msgid "Cannot unlink and clear items"
 msgstr "Не удалось отсоединить и очистить элементы данных"
 
-#: api/classes/CHostGeneral.php:487 api/classes/CHostGeneral.php:504
+#: api/classes/CHostGeneral.php:495 api/classes/CHostGeneral.php:512
 msgid "Cannot unlink and clear triggers"
 msgstr "Не удалось отсоединить и очистить триггеры"
 
@@ -1826,7 +1826,7 @@ msgstr "Не удалось отсоединить и очистить триг�
 msgid "Cannot unlink template"
 msgstr "Не удалось отсоединить шаблон"
 
-#: api/classes/CHostGeneral.php:441
+#: api/classes/CHostGeneral.php:449
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Не удалось отсоединить триггер \"%s\", он содержит элементы данных из шаблона, который остается присоединенным к узлу сети."
@@ -2134,7 +2134,7 @@ msgstr "Закольцованная ссылка в комплексных эк
 msgid "Circular reference in templates: %1$s."
 msgstr "Закольцованная ссылка в шаблонах: %1$s."
 
-#: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:759
+#: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:767
 msgid "Circular template linkage is not allowed."
 msgstr "Закольцованное соединение шаблонов не допускается."
 
@@ -2142,7 +2142,7 @@ msgstr "Закольцованное соединение шаблонов не 
 msgid "Classic"
 msgstr "Классическая"
 
-#: jsLoader.php:161
+#: jsLoader.php:165
 msgid "Clear"
 msgstr "Очистить"
 
@@ -2186,8 +2186,8 @@ msgstr "Клонировать"
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
-#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:145
-#: jsLoader.php:169 tr_testexpr.php:175
+#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:149
+#: jsLoader.php:173 tr_testexpr.php:175
 msgid "Close"
 msgstr "Закрыть"
 
@@ -2648,7 +2648,7 @@ msgstr "Создать слайд-шоу"
 msgid "Create template"
 msgstr "Создать шаблон"
 
-#: include/views/configuration.triggers.list.php:44 jsLoader.php:100
+#: include/views/configuration.triggers.list.php:44 jsLoader.php:104
 msgid "Create trigger"
 msgstr "Создать триггер"
 
@@ -2673,7 +2673,7 @@ msgstr "Создать преобразование значения"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Группа элементов данных \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:834
+#: api/classes/CDiscoveryRule.php:827
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Правило обнаружения \"%1$s\" в \"%2$s\"."
@@ -2858,7 +2858,7 @@ msgstr "Чешский (cs_CZ)"
 msgid "D"
 msgstr "D"
 
-#: include/defines.inc.php:915
+#: include/translateDefines.inc.php:48
 msgid "D, d M Y H:i:s O"
 msgstr "D, d M Y H:i:s O"
 
@@ -3078,7 +3078,7 @@ msgid "Dec"
 msgstr "Дек"
 
 #: include/forms.inc.php:1568 include/func.inc.php:115
-#: include/func.inc.php:246 jsLoader.php:122
+#: include/func.inc.php:246 jsLoader.php:126
 msgid "December"
 msgstr "Декабрь"
 
@@ -3092,7 +3092,7 @@ msgstr "Десятичный"
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:122
 #: include/views/monitoring.screen.php:117
-#: include/views/monitoring.slides.php:85 jsLoader.php:144 popup_bitem.php:114
+#: include/views/monitoring.slides.php:85 jsLoader.php:148 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
 msgstr "По умолчанию"
@@ -3143,7 +3143,7 @@ msgstr "Задерживается на"
 
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/configuration.triggers.edit.php:154 jsLoader.php:101
+#: include/views/configuration.triggers.edit.php:154 jsLoader.php:105
 #: tr_logform.php:332 tr_logform.php:349
 msgid "Delete"
 msgstr "Удалить"
@@ -3173,7 +3173,7 @@ msgstr "Удалить текущее действие?"
 msgid "Delete discovery rule?"
 msgstr "Удалить правило обнаружения?"
 
-#: include/views/configuration.triggers.edit.php:156 jsLoader.php:103
+#: include/views/configuration.triggers.edit.php:156 jsLoader.php:107
 #: tr_logform.php:333
 msgid "Delete expression?"
 msgstr "Удалить выражение?"
@@ -3198,11 +3198,11 @@ msgstr "Удалить соответствие иконок?"
 msgid "Delete item?"
 msgstr "Удалить элемент данных?"
 
-#: jsLoader.php:102 tr_logform.php:349
+#: jsLoader.php:106 tr_logform.php:349
 msgid "Delete keyword?"
 msgstr "Удалить ключевое слово?"
 
-#: jsLoader.php:153
+#: jsLoader.php:157
 msgid "Delete links between selected elements?"
 msgstr "Удалить связи между выбранными элементами?"
 
@@ -3282,7 +3282,7 @@ msgstr "Удалить выбранные группы элементов дан
 msgid "Delete selected discovery rules?"
 msgstr "Удалить выбранные правила обнаружения?"
 
-#: jsLoader.php:149
+#: jsLoader.php:153
 msgid "Delete selected elements?"
 msgstr "Удалить выбранные элементы?"
 
@@ -3392,7 +3392,7 @@ msgstr[2] "Удалить выбранное преобразование зна
 msgid "Delete selected with linked elements"
 msgstr "Удалить выбранное с присоединенными элементами"
 
-#: jsLoader.php:180
+#: jsLoader.php:184
 msgid "Delete service"
 msgstr "Удалить услугу"
 
@@ -3404,7 +3404,7 @@ msgstr "Удалить слайд-шоу?"
 msgid "Delete template?"
 msgstr "Удалить шаблон?"
 
-#: jsLoader.php:181
+#: jsLoader.php:185
 msgid "Delete the selected service?"
 msgstr "Удалить выбранную услугу?"
 
@@ -3426,7 +3426,7 @@ msgstr "Удалено: Группа элементов данных \"%1$s\" и
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Правило обнаружения \"%1$s\" из \"%2$s\"."
 
-#: api/classes/CGraph.php:768
+#: api/classes/CGraph.php:745
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: График \"%1$s\" из \"%2$s\"."
@@ -3524,7 +3524,7 @@ msgid "Description"
 msgstr "Описание"
 
 #: include/actions.inc.php:868 include/blocks.inc.php:704
-#: include/config.inc.php:341
+#: include/config.inc.php:344
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:317
@@ -3744,12 +3744,12 @@ msgstr "Объект обнаружения"
 msgid "Discovery rule"
 msgstr "Правило обнаружения"
 
-#: api/classes/CDiscoveryRule.php:901
+#: api/classes/CDiscoveryRule.php:894
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Правило обнаружения \"%1$s\" уже существует у \"%2$s\", наследуется из другого шаблона."
 
-#: api/classes/CDiscoveryRule.php:888
+#: api/classes/CDiscoveryRule.php:881
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "У правила обнаружения \"%1$s:%2$s\" некорректный период хранения потерянных ресурсов: \"%3$s\". (мин: %4$d, макс: %5$d, допускается пользовательский макрос)"
@@ -3850,16 +3850,16 @@ msgstr "Не хранить события старше чем (дней)"
 msgid "Do not keep events older than (in days) \"%1$s\"."
 msgstr "Не хранить события старше чем (дней) \"%1$s\"."
 
-#: jsLoader.php:98
+#: jsLoader.php:102
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Вы хотите заменить условие выражения?"
 
-#: jsLoader.php:131
+#: jsLoader.php:135
 msgid "Done"
 msgstr "Готово"
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
-#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:147
+#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:151
 msgid "Dot"
 msgstr "Точечная линия"
 
@@ -3924,7 +3924,7 @@ msgstr "Первая запись в выпадающем меню \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Запоминать выбранное в выпадающем списке \"%1$s\"."
 
-#: api/classes/CTrigger.php:2001
+#: api/classes/CTrigger.php:1976
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублирующиеся зависимости в триггере \"%1$s\"."
@@ -3981,7 +3981,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "Э"
 
-#: include/config.inc.php:308
+#: include/config.inc.php:311
 msgid "ERROR"
 msgstr "ОШИБКА"
 
@@ -3989,7 +3989,7 @@ msgstr "ОШИБКА"
 msgid "EVENTS"
 msgstr "СОБЫТИЯ"
 
-#: jsLoader.php:152
+#: jsLoader.php:156
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "У каждого URL должно быть уникальное имя. Пожалуйста, удостоверьтесь, что есть только один URL с этим именем."
 
@@ -4014,7 +4014,7 @@ msgstr "Изменение периода обслуживания"
 msgid "Edit map element"
 msgstr "Изменение элемента карты сети"
 
-#: jsLoader.php:179
+#: jsLoader.php:183
 msgid "Edit service"
 msgstr "Изменить услугу"
 
@@ -4044,8 +4044,8 @@ msgid "Empty action condition."
 msgstr "Условие действия пустое."
 
 #: api/classes/CAction.php:1429 api/classes/CApplication.php:656
-#: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:716
-#: api/classes/CGraphPrototype.php:766 api/classes/CHostGroup.php:672
+#: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
+#: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
 #: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:925 api/classes/CItemPrototype.php:708
@@ -4294,7 +4294,7 @@ msgid "Event source details"
 msgstr "Детали источника события"
 
 #: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1269
-#: jsLoader.php:108 search.php:134 search.php:206 search.php:261
+#: jsLoader.php:112 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
 msgstr "События"
@@ -4422,7 +4422,7 @@ msgstr "Внешняя проверка"
 msgid "Ez Texting"
 msgstr "Ez Texting"
 
-#: jsLoader.php:127
+#: jsLoader.php:131
 msgctxt "Friday short"
 msgid "F"
 msgstr "Пт"
@@ -4479,7 +4479,7 @@ msgid "Feb"
 msgstr "Фев"
 
 #: include/forms.inc.php:1546 include/func.inc.php:105
-#: include/func.inc.php:236 jsLoader.php:112
+#: include/func.inc.php:236 jsLoader.php:116
 msgid "February"
 msgstr "Февраль"
 
@@ -4608,7 +4608,7 @@ msgstr "Пятница"
 #: include/views/configuration.services.edit.php:211
 #: include/views/configuration.services.edit.php:278
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
-#: report3.php:145 report4.php:180 services.php:188 services.php:194
+#: report3.php:145 report4.php:180 services.php:187 services.php:193
 msgid "From"
 msgstr "От"
 
@@ -4729,7 +4729,7 @@ msgstr "Глобальные скрипты"
 msgid "Go"
 msgstr "Выполнить"
 
-#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:174
+#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:178
 msgid "Go to"
 msgstr "Перейти к"
 
@@ -4821,12 +4821,12 @@ msgstr "Имя графика"
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Прототип графика \"%1$s\" с элементами данных из шаблона не может содержать элементы данных из других узлов сети."
 
-#: api/classes/CGraphPrototype.php:815
+#: api/classes/CGraphPrototype.php:792
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "Прототип графика \"%s\" удален."
 
-#: api/classes/CGraphPrototype.php:878
+#: api/classes/CGraphPrototype.php:855
 msgid "Graph prototype must have at least one prototype."
 msgstr "Прототип графика должен иметь как минимум один прототип."
 
@@ -4925,7 +4925,7 @@ msgstr "Группа"
 msgid "Group \"%1$s\" does not exist."
 msgstr "Группа \"%1$s\" не существует."
 
-#: include/classes/import/importers/CHostImporter.php:135
+#: include/classes/import/importers/CHostImporter.php:131
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Группа \"%1$s\" для узла сети \"%2$s\" не существует."
@@ -4987,7 +4987,7 @@ msgstr "Группы"
 msgid "Groups in maintenance"
 msgstr "Группы в обслуживании"
 
-#: include/defines.inc.php:917
+#: include/translateDefines.inc.php:50
 msgid "H.i"
 msgstr "H.i"
 
@@ -5060,7 +5060,7 @@ msgstr "Помощь"
 msgid "Hexadecimal"
 msgstr "Шестнадцатеричный"
 
-#: jsLoader.php:137 sysmap.php:158
+#: jsLoader.php:141 sysmap.php:158
 msgid "Hidden"
 msgstr "Скрыта"
 
@@ -5093,12 +5093,12 @@ msgstr "Высокая"
 
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
-#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:105
+#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:109
 #: latest.php:196 latest.php:323 latest.php:501
 msgid "History"
 msgstr "История"
 
-#: jsLoader.php:106
+#: jsLoader.php:110
 msgid "History and simple graphs"
 msgstr "История и простые графики"
 
@@ -5162,7 +5162,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
-#: items.php:624 items.php:647 jsLoader.php:139 latest.php:125 latest.php:191
+#: items.php:624 items.php:647 jsLoader.php:143 latest.php:125 latest.php:191
 #: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
 #: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
@@ -5232,7 +5232,7 @@ msgstr "Узел сети удален"
 #: include/views/js/configuration.action.edit.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:28
-#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:142
+#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:146
 #: search.php:258
 msgid "Host group"
 msgstr "Группа узлов сети"
@@ -5264,7 +5264,7 @@ msgstr "Группы узлов сети"
 msgid "Host interface"
 msgstr "Интерфейс узла сети"
 
-#: hostinventories.php:26 jsLoader.php:177
+#: hostinventories.php:26 jsLoader.php:181
 msgid "Host inventories"
 msgstr "Инвентарные данные узлов сети"
 
@@ -5298,7 +5298,7 @@ msgid "Host router"
 msgstr "Роутер узла сети"
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
-#: jsLoader.php:173
+#: jsLoader.php:177
 msgid "Host screens"
 msgstr "Комплексные экраны узла сети"
 
@@ -5648,7 +5648,7 @@ msgstr "Сответствия иконок"
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "В соответствии иконок запись \"%1$s\" для \"%2$s\" уже существует."
 
-#: jsLoader.php:155
+#: jsLoader.php:159
 msgid "Iconmap is not enabled"
 msgstr "Соответствие иконок не активировано"
 
@@ -5656,7 +5656,7 @@ msgstr "Соответствие иконок не активировано"
 msgid "Icons"
 msgstr "Иконки"
 
-#: include/config.inc.php:255
+#: include/config.inc.php:258
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Если вы считаете это сообщение ошибкой, пожалуйста, свяжитесь с вашими администраторами для получения прав доступа."
 
@@ -5665,7 +5665,7 @@ msgstr "Если вы считаете это сообщение ошибкой,
 #: include/views/administration.general.image.edit.php:38
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:47
-#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:143
+#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:147
 #: map.php:136
 msgid "Image"
 msgstr "Изображение"
@@ -6093,35 +6093,35 @@ msgstr "Некорректный ключ: %s"
 msgid "Incorrect list of items."
 msgstr "Некорректный список элементов данных."
 
-#: maintenance.php:314
+#: maintenance.php:316
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Некорректное обслуживание - дата должна быть между 1970.01.01 и 2038.01.18"
 
-#: maintenance.php:342
+#: maintenance.php:344
 msgid "Incorrect maintenance date"
 msgstr "Некорректная дата обслуживания"
 
-#: maintenance.php:321
+#: maintenance.php:323
 msgid "Incorrect maintenance day period"
 msgstr "Некорректный день периода обслуживания"
 
-#: maintenance.php:328 maintenance.php:339
+#: maintenance.php:330 maintenance.php:341
 msgid "Incorrect maintenance days of week"
 msgstr "Некорректный день недели обслуживания"
 
-#: maintenance.php:336
+#: maintenance.php:338
 msgid "Incorrect maintenance month period"
 msgstr "Некорректный месяц периода обслуживания"
 
-#: maintenance.php:301
+#: maintenance.php:303
 msgid "Incorrect maintenance period"
 msgstr "Некорректный период обслуживания"
 
-#: maintenance.php:298
+#: maintenance.php:300
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Некорректный период обслуживания (минимум 5 минут)"
 
-#: maintenance.php:325
+#: maintenance.php:327
 msgid "Incorrect maintenance week period"
 msgstr "Некорректная неделя периода обслуживания"
 
@@ -6385,7 +6385,7 @@ msgstr "Информация"
 msgid "Insert"
 msgstr "Вставить"
 
-#: include/forms.inc.php:1353 jsLoader.php:99
+#: include/forms.inc.php:1353 jsLoader.php:103
 msgid "Insert macro"
 msgstr "Вставить макрос"
 
@@ -6466,7 +6466,7 @@ msgstr "Ошибочный JSON. На сервере произошла ошиб
 msgid "Invalid Request."
 msgstr "Ошибочный запрос."
 
-#: maintenance.php:147 maintenance.php:161 services.php:188 services.php:202
+#: maintenance.php:147 maintenance.php:161 services.php:187 services.php:201
 #, php-format
 msgid "Invalid date \"%s\"."
 msgstr "Ошибочная дата \"%s\"."
@@ -6481,7 +6481,7 @@ msgstr "Ошибочный hostid для макроса \"%1$s\"."
 msgid "Invalid item key format."
 msgstr "Ошибочный формат ключа элемента данных."
 
-#: maintenance.php:309
+#: maintenance.php:311
 msgid "Invalid maintenance period"
 msgstr "Ошибочный период обслуживания."
 
@@ -6566,7 +6566,7 @@ msgstr "Элемент данных"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Элемент данных \"%1$s\" уже существует у \"%2$s\", унаследован из другого шаблона."
 
-#: api/classes/CItem.php:1219
+#: api/classes/CItem.php:1212
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Элемент данных \"%1$s\" не может заполнять отсутствующее поле под номером \"%2$d\" инвентарных данных узла сети. Выберите из: от 0 (не заполнять) до %3$d."
@@ -6762,7 +6762,7 @@ msgid "Jan"
 msgstr "Янв"
 
 #: include/forms.inc.php:1541 include/func.inc.php:104
-#: include/func.inc.php:235 jsLoader.php:111
+#: include/func.inc.php:235 jsLoader.php:115
 msgid "January"
 msgstr "Январь"
 
@@ -6775,7 +6775,7 @@ msgid "Jul"
 msgstr "Июл"
 
 #: include/forms.inc.php:1543 include/func.inc.php:110
-#: include/func.inc.php:241 jsLoader.php:117
+#: include/func.inc.php:241 jsLoader.php:121
 msgid "July"
 msgstr "Июль"
 
@@ -6784,7 +6784,7 @@ msgid "Jun"
 msgstr "Июн"
 
 #: include/forms.inc.php:1566 include/func.inc.php:109
-#: include/func.inc.php:240 jsLoader.php:116
+#: include/func.inc.php:240 jsLoader.php:120
 msgid "June"
 msgstr "Июнь"
 
@@ -6997,7 +6997,7 @@ msgstr "Последнее значение"
 msgid "Last week graph"
 msgstr "График за последнюю неделю"
 
-#: include/menu.inc.php:47 jsLoader.php:175 latest.php:26 report5.php:159
+#: include/menu.inc.php:47 jsLoader.php:179 latest.php:26 report5.php:159
 #: search.php:132 search.php:204 search.php:259 search.php:311
 msgid "Latest data"
 msgstr "Последние данные"
@@ -7182,7 +7182,7 @@ msgstr "Записывать не совпадающие SNMP трапы"
 msgid "Logged in as"
 msgstr "Вход выполнен под"
 
-#: auditlogs.php:143 include/config.inc.php:258 include/menu.inc.php:285
+#: auditlogs.php:143 include/config.inc.php:261 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
@@ -7228,12 +7228,12 @@ msgctxt "Mega short"
 msgid "M"
 msgstr "М"
 
-#: jsLoader.php:123
+#: jsLoader.php:127
 msgctxt "Monday short"
 msgid "M"
 msgstr "Пн"
 
-#: include/defines.inc.php:909 report3.php:116
+#: include/translateDefines.inc.php:41 report3.php:116
 msgid "M Y"
 msgstr "M Y"
 
@@ -7389,7 +7389,7 @@ msgstr "Принудительный выход"
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
-#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:140
+#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:144
 #: map.php:25
 msgid "Map"
 msgstr "Карта сети"
@@ -7456,7 +7456,7 @@ msgid "Mar"
 msgstr "Мар"
 
 #: include/forms.inc.php:1551 include/func.inc.php:106
-#: include/func.inc.php:237 jsLoader.php:113
+#: include/func.inc.php:237 jsLoader.php:117
 msgid "March"
 msgstr "Март"
 
@@ -7513,7 +7513,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Макс. количество отображаемых событий у триггера"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:343
+#: include/config.inc.php:346
 msgid "Maximize"
 msgstr "Развернуть"
 
@@ -7558,7 +7558,7 @@ msgstr[1] "Максимальная длина видимого имени уз�
 msgstr[2] "Максимальная длина видимого имени узла сети %2$d символа, \"%3$s\" содержит %1$d символов."
 
 #: include/forms.inc.php:1561 include/func.inc.php:108
-#: include/func.inc.php:239 jsLoader.php:115
+#: include/func.inc.php:239 jsLoader.php:119
 msgid "May"
 msgstr "Май"
 
@@ -7658,7 +7658,7 @@ msgstr "Таймаут сообщения"
 msgid "Message timeout (seconds)"
 msgstr "Таймаут сообщения (секунды)"
 
-#: jsLoader.php:160
+#: jsLoader.php:164
 msgid "Messages"
 msgstr "Сообщения"
 
@@ -7688,7 +7688,7 @@ msgid "Min severity"
 msgstr "Минимальная важность"
 
 #: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
-#: include/config.inc.php:343
+#: include/config.inc.php:346
 msgid "Minimize"
 msgstr "Свернуть"
 
@@ -7742,7 +7742,7 @@ msgstr "Минимальное значение за период T NOT N"
 msgid "Minutes"
 msgstr "Минут"
 
-#: api/classes/CGraph.php:793 api/classes/CGraphPrototype.php:840
+#: api/classes/CGraph.php:770 api/classes/CGraphPrototype.php:817
 msgid "Missing \"itemid\" field for item."
 msgstr "Отсутствует поле \"itemid\" для элемента данных."
 
@@ -7756,7 +7756,7 @@ msgstr "Отсутствует поле \"name\" для графика."
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Отсутствует элемент данных \"%1$s\" для узла сети \"%2$s\"."
 
-#: api/classes/CGraph.php:787 api/classes/CGraphPrototype.php:834
+#: api/classes/CGraph.php:764 api/classes/CGraphPrototype.php:811
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
 msgstr "Отсутствуют элементы данных у графика \"%1$s\"."
@@ -7829,7 +7829,7 @@ msgstr "Более чем один график с именем \"%1$s\" у уз
 msgid "Most busy triggers top 100"
 msgstr "100 наиболее активных триггеров"
 
-#: jsLoader.php:163
+#: jsLoader.php:167
 msgid "Move"
 msgstr "Переместить"
 
@@ -7845,11 +7845,11 @@ msgstr "Множественные события ПРОБЛЕМА"
 msgid "Multiple PROBLEM events generation"
 msgstr "Многократная генерация событий ПРОБЛЕМА"
 
-#: jsLoader.php:158
+#: jsLoader.php:162
 msgid "Mute"
 msgstr "Отключить звук"
 
-#: include/views/monitoring.maps.php:80
+#: include/views/monitoring.maps.php:74
 msgid "NETWORK MAPS"
 msgstr "КАРТЫ СЕТЕЙ"
 
@@ -7976,7 +7976,7 @@ msgstr "Новая группа элементов данных"
 msgid "New condition"
 msgstr "Новое условие"
 
-#: jsLoader.php:150
+#: jsLoader.php:154
 msgid "New element"
 msgstr "Новый элемент"
 
@@ -8032,7 +8032,7 @@ msgstr "Следующая"
 msgid "Next check"
 msgstr "Следующая проверка"
 
-#: events.php:756 include/config.inc.php:560 include/events.inc.php:303
+#: events.php:756 include/config.inc.php:563 include/events.inc.php:303
 #: include/events.inc.php:321 include/forms.inc.php:1922
 #: include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:75
@@ -8167,7 +8167,7 @@ msgstr "ID правил обнаружения не указаны."
 msgid "No discovery rules defined."
 msgstr "Правила обнаружения не заданы."
 
-#: jsLoader.php:170
+#: jsLoader.php:174
 msgid "No elements selected!"
 msgstr "Элементы не выбраны!"
 
@@ -8369,7 +8369,7 @@ msgstr "Период обслуживания не задан."
 msgid "No map ID provided for screen element."
 msgstr "Не указан ID карты сети для элемента комплексного экрана."
 
-#: include/views/monitoring.maps.php:27 popup.php:1553 sysmaps.php:254
+#: include/views/monitoring.maps.php:26 popup.php:1553 sysmaps.php:254
 msgid "No maps defined."
 msgstr "Карты сети не заданы."
 
@@ -8452,10 +8452,10 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CApplication.php:597 api/classes/CApplication.php:674
 #: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:584
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
-#: api/classes/CDiscoveryRule.php:685 api/classes/CDiscoveryRule.php:688
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:578 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:813 api/classes/CGraphPrototype.php:860
+#: api/classes/CGraph.php:790 api/classes/CGraphPrototype.php:837
+#: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
 #: api/classes/CHost.php:1298 api/classes/CHost.php:1330
@@ -8474,13 +8474,10 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
-#: api/classes/CTrigger.php:1444 api/classes/CTrigger.php:1702
-#: api/classes/CTrigger.php:1714 api/classes/CTriggerPrototype.php:822
-#: api/classes/CTriggerPrototype.php:920
-#: api/classes/CTriggerPrototype.php:1101
-#: api/classes/CTriggerPrototype.php:1113 api/classes/CUserMacro.php:824
+#: api/classes/CTrigger.php:1444 api/classes/CTriggerPrototype.php:822
+#: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:241
+#: include/config.inc.php:244
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нет прав доступа к запрашиваемому объекту или он не существует!"
 
@@ -8686,7 +8683,7 @@ msgstr "Не подтверждено"
 msgid "Not Templated items"
 msgstr "Без элементов данных из шаблона"
 
-#: api/classes/CTrigger.php:1904
+#: api/classes/CTrigger.php:1879
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не все шаблоны соединены с \"%s\"."
@@ -8757,11 +8754,11 @@ msgid "Nov"
 msgstr "Ноя"
 
 #: include/forms.inc.php:1563 include/func.inc.php:114
-#: include/func.inc.php:245 jsLoader.php:121
+#: include/func.inc.php:245 jsLoader.php:125
 msgid "November"
 msgstr "Ноябрь"
 
-#: jsLoader.php:130
+#: jsLoader.php:134
 msgid "Now"
 msgstr "Сейчас"
 
@@ -8900,11 +8897,11 @@ msgid "Octal"
 msgstr "Восьмеричный"
 
 #: include/forms.inc.php:1558 include/func.inc.php:113
-#: include/func.inc.php:244 jsLoader.php:120
+#: include/func.inc.php:244 jsLoader.php:124
 msgid "October"
 msgstr "Октябрь"
 
-#: jsLoader.php:136 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:140 sysmap.php:155 sysmap.php:161
 msgid "Off"
 msgstr "Выкл"
 
@@ -8915,7 +8912,7 @@ msgstr "Выкл"
 msgid "Ok"
 msgstr "Ok"
 
-#: jsLoader.php:135 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:139 sysmap.php:155 sysmap.php:161
 msgid "On"
 msgstr "Вкл"
 
@@ -9537,7 +9534,7 @@ msgstr "Пожалуйста, исправьте все замечания и н
 msgid "Please enter confirmation text."
 msgstr "Пожалуйста, введите текст подтверждения."
 
-#: jsLoader.php:146
+#: jsLoader.php:150
 msgid "Please select two elements"
 msgstr "Пожалуйста, выберите два элемента"
 
@@ -9714,7 +9711,7 @@ msgstr "Прокси"
 msgid "Proxy"
 msgstr "Прокси"
 
-#: include/classes/import/importers/CHostImporter.php:147
+#: include/classes/import/importers/CHostImporter.php:143
 #, php-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Прокси \"%1$s\" для узла сети \"%2$s\" не существует."
@@ -10248,12 +10245,12 @@ msgstr "Выполнить удаленные команды на узлах с�
 msgid "Russian (ru_RU)"
 msgstr "Русский (ru_RU)"
 
-#: jsLoader.php:128
+#: jsLoader.php:132
 msgctxt "Saturday short"
 msgid "S"
 msgstr "Сб"
 
-#: jsLoader.php:129
+#: jsLoader.php:133
 msgctxt "Sunday short"
 msgid "S"
 msgstr "Вс"
@@ -10672,7 +10669,7 @@ msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Скрипт с scriptid \"%s\" не существует."
 
 #: include/menu.inc.php:262 include/views/administration.script.list.php:27
-#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:176 report5.php:160
+#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:180 report5.php:160
 #: scripts_exec.php:25
 msgid "Scripts"
 msgstr "Скрипты"
@@ -10858,7 +10855,7 @@ msgid "Separated"
 msgstr "Неподтвержденные отдельно"
 
 #: include/forms.inc.php:1553 include/func.inc.php:112
-#: include/func.inc.php:243 jsLoader.php:119
+#: include/func.inc.php:243 jsLoader.php:123
 msgid "September"
 msgstr "Сентябрь"
 
@@ -10886,7 +10883,7 @@ msgstr "Время на сервере"
 #: events.php:522 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:305
-#: include/views/configuration.services.parent.list.php:36 services.php:473
+#: include/views/configuration.services.parent.list.php:36 services.php:472
 #: srv_status.php:156
 msgid "Service"
 msgstr "Услуга"
@@ -10915,7 +10912,7 @@ msgstr "Услуга \"%1$s\" уже жестко связана с другой
 msgid "Service cannot be parent and child at the same time."
 msgstr "Услуга не может быть родительской и подчиненной одновременно."
 
-#: services.php:164
+#: services.php:163
 msgid "Service created"
 msgstr "Сервис создан"
 
@@ -11079,7 +11076,7 @@ msgstr "Показывать предупреждение, если Zabbix се�
 msgid "Show working time"
 msgstr "Показывать рабочее время"
 
-#: jsLoader.php:138 sysmap.php:158
+#: jsLoader.php:142 sysmap.php:158
 msgid "Shown"
 msgstr "Показана"
 
@@ -11100,7 +11097,7 @@ msgstr "Простая проверка"
 msgid "Simple graph"
 msgstr "Простой график"
 
-#: include/blocks.inc.php:1227 jsLoader.php:104
+#: include/blocks.inc.php:1227 jsLoader.php:108
 msgid "Simple graphs"
 msgstr "Простые графики"
 
@@ -11190,7 +11187,7 @@ msgstr "Слайды"
 msgid "Slovak (sk_SK)"
 msgstr "Словацкий (sk_SK)"
 
-#: jsLoader.php:162
+#: jsLoader.php:166
 msgid "Snooze"
 msgstr "Заснуть"
 
@@ -11319,7 +11316,7 @@ msgid "Status (descending)"
 msgstr "Состояние (в порядке убывания)"
 
 #: include/views/configuration.services.child.list.php:39
-#: include/views/configuration.services.parent.list.php:36 services.php:474
+#: include/views/configuration.services.parent.list.php:36 services.php:473
 msgid "Status calculation"
 msgstr "Вычисление состояния"
 
@@ -11496,12 +11493,12 @@ msgctxt "Tera short"
 msgid "T"
 msgstr "Т"
 
-#: jsLoader.php:126
+#: jsLoader.php:130
 msgctxt "Thursday short"
 msgid "T"
 msgstr "Чт"
 
-#: jsLoader.php:124
+#: jsLoader.php:128
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "Вт"
@@ -11577,7 +11574,7 @@ msgstr "Шаблон"
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" уже существует."
 
-#: include/classes/import/importers/CHostImporter.php:39
+#: include/classes/import/importers/CHostImporter.php:33
 #, php-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Шаблон \"%1$s\" для узла сети \"%2$s\" не существует."
@@ -11591,7 +11588,7 @@ msgstr "Шаблон \"%s\" уже существует."
 msgid "Template added"
 msgstr "Шаблон добавлен"
 
-#: api/classes/CHostGeneral.php:762
+#: api/classes/CHostGeneral.php:770
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Шаблон не может быть присоединен к другому шаблону больше чем один раз, даже через другие шаблоны."
 
@@ -11661,7 +11658,7 @@ msgstr "Шаблонные элементы данных"
 msgid "Templates"
 msgstr "Шаблоны"
 
-#: api/classes/CHostGeneral.php:741
+#: api/classes/CHostGeneral.php:749
 #, php-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети \"%2$s\"."
@@ -11786,7 +11783,7 @@ msgstr "Четверг"
 #: include/reports.inc.php:634
 #: include/views/configuration.services.edit.php:251
 #: include/views/configuration.services.edit.php:279 popup_period.php:155
-#: report3.php:145 report4.php:180 services.php:202 services.php:208
+#: report3.php:145 report4.php:180 services.php:201 services.php:207
 msgid "Till"
 msgstr "До"
 
@@ -11804,7 +11801,7 @@ msgstr "До"
 #: include/views/administration.auditlogs.list.php:85
 #: include/views/configuration.services.edit.php:278
 #: include/views/configuration.services.edit.php:279
-#: include/views/configuration.services.edit.php:307 jsLoader.php:132
+#: include/views/configuration.services.edit.php:307 jsLoader.php:136
 msgid "Time"
 msgstr "Время"
 
@@ -11922,8 +11919,8 @@ msgstr "Динамика изменений"
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:261
 #: include/views/js/configuration.sysmaps.js.php:17
-#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:141
-#: report5.php:61 services.php:475 tr_comments.php:69 tr_logform.php:151
+#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:145
+#: report5.php:61 services.php:474 tr_comments.php:69 tr_logform.php:151
 #: tr_logform.php:164
 msgid "Trigger"
 msgstr "Триггер"
@@ -11955,7 +11952,7 @@ msgstr "Триггер \"%1$s\" пропущен - правило пользов
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr "Триггер \"%1$s:%2$s\" не имеет прототипа элемента данных."
 
-#: api/classes/CTrigger.php:2043
+#: api/classes/CTrigger.php:2018
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Триггер \"%s\" принадлежит шаблонам с разными присоединениями."
@@ -11965,7 +11962,7 @@ msgstr "Триггер \"%s\" принадлежит шаблонам с раз�
 msgid "Trigger added"
 msgstr "Триггер добавлен"
 
-#: api/classes/CTrigger.php:1947
+#: api/classes/CTrigger.php:1922
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr "Триггер не может зависеть от триггера, который унаследован от него."
 
@@ -12071,7 +12068,7 @@ msgstr "Значение триггера"
 #: include/views/configuration.triggers.list.php:65
 #: include/views/conf.import.php:33
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/monitoring.overview.php:27 jsLoader.php:107 popup.php:61
+#: include/views/monitoring.overview.php:27 jsLoader.php:111 popup.php:61
 #: search.php:133 search.php:138 search.php:168 search.php:187 search.php:205
 #: search.php:260 search.php:312 search.php:370 search.php:397 search.php:420
 #: templates.php:460 templates.php:525 tr_status.php:178
@@ -12132,11 +12129,11 @@ msgstr "Вторник"
 msgid "Turkish (tr_TR)"
 msgstr "Турецкий (tr_TR)"
 
-#: jsLoader.php:148
+#: jsLoader.php:152
 msgid "Two elements should be selected"
 msgstr "Должны быть выбраны два элемента"
 
-#: api/classes/CItem.php:1280
+#: api/classes/CItem.php:1273
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не могут заполнять одно поле \"%3$s\" инвентарных данных узла сети, это приведет к конфликту."
@@ -12214,7 +12211,7 @@ msgstr "Для агрегированных элементов данных ти
 msgid "Types"
 msgstr "Типы"
 
-#: include/defines.inc.php:884 include/triggers.inc.php:167
+#: include/translateDefines.inc.php:24 include/triggers.inc.php:167
 msgid "UNKNOWN"
 msgstr "НЕИЗВЕСТНО"
 
@@ -12261,7 +12258,7 @@ msgstr "США (160 символов)"
 msgid "USER PROFILE"
 msgstr "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ"
 
-#: include/config.inc.php:752
+#: include/config.inc.php:755
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -12393,47 +12390,47 @@ msgstr "Отсоединить от шаблона"
 msgid "Unlink from templates"
 msgstr "Отсоединить от шаблонов"
 
-#: api/classes/CHostGeneral.php:705
+#: api/classes/CHostGeneral.php:713
 #, php-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Группа элементов данных \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:558
+#: api/classes/CHostGeneral.php:566
 #, php-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Правило обнаружения \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:665
+#: api/classes/CHostGeneral.php:673
 #, php-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: График \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:647
+#: api/classes/CHostGeneral.php:655
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип графика \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:576
+#: api/classes/CHostGeneral.php:584
 #, php-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Элемент данных \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:594
+#: api/classes/CHostGeneral.php:602
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип элемента данных \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:496
+#: api/classes/CHostGeneral.php:504
 #, php-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Триггер \"%1$s\" от \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:513
+#: api/classes/CHostGeneral.php:521
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип триггера \"%1$s\" от \"%2$s\"."
 
-#: jsLoader.php:159
+#: jsLoader.php:163
 msgid "Unmute"
 msgstr "Включить звук"
 
@@ -12502,7 +12499,7 @@ msgstr "Обновлено: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Группа элементов данных \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:862
+#: api/classes/CDiscoveryRule.php:855
 #, php-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Правило обнаружения \"%1$s\" в \"%2$s\"."
@@ -12531,7 +12528,7 @@ msgstr "Обновлено: Прототип триггера \"%1$s\" в \"%2$s
 msgid "Upload"
 msgstr "Загрузить"
 
-#: include/views/monitoring.maps.php:59
+#: include/views/monitoring.maps.php:53
 msgid "Upper level maps"
 msgstr "Карты верхнего уровня"
 
@@ -12852,7 +12849,7 @@ msgstr "Видимое имя"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Видимое имя не может быть пустым, если имя узла сети отсутствует."
 
-#: jsLoader.php:125
+#: jsLoader.php:129
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "Ср"
@@ -12948,7 +12945,7 @@ msgstr[0] "Предупреждение. Минимально отображае
 msgstr[1] "Предупреждение. Минимально отображаемый период времени %1$s часа."
 msgstr[2] "Предупреждение. Минимально отображаемый период времени %1$s часов."
 
-#: jsLoader.php:166
+#: jsLoader.php:170
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Приносим свои извинения, достигнуто максимально возможное количество элементов."
 
@@ -13182,7 +13179,7 @@ msgid "Y"
 msgstr "Й"
 
 #. GETTEXT: Date format (year). Do not translate.
-#: include/defines.inc.php:908
+#: include/translateDefines.inc.php:40
 msgctxt "date format"
 msgid "Y"
 msgstr "Y"
@@ -13208,24 +13205,25 @@ msgstr "Расположение оси Y"
 msgid "Y label"
 msgstr "Подпись оси Y"
 
-#: include/defines.inc.php:899 include/defines.inc.php:900
+#: include/translateDefines.inc.php:31 include/translateDefines.inc.php:32
 msgid "Y-m-d H:i:s"
 msgstr "d-m-Y H:i:s"
 
-#: include/classes/screens/CScreenHistory.php:215 include/defines.inc.php:897
-#: include/defines.inc.php:898 include/defines.inc.php:901
+#: include/classes/screens/CScreenHistory.php:215
+#: include/translateDefines.inc.php:29 include/translateDefines.inc.php:30
+#: include/translateDefines.inc.php:33
 msgid "Y.M.d H:i:s"
 msgstr "d.M.Y H:i:s"
 
-#: include/defines.inc.php:906
+#: include/translateDefines.inc.php:38
 msgid "Y.m.d"
 msgstr "Y.m.d"
 
-#: include/defines.inc.php:905
+#: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
 msgstr "Y.m.d H:i"
 
-#: include/defines.inc.php:914 include/func.inc.php:507
+#: include/func.inc.php:507 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "d.m.Y H:i:s"
 
@@ -13240,7 +13238,7 @@ msgid "Yearly"
 msgstr "Ежегодно"
 
 #: events.php:756 include/blocks.inc.php:712
-#: include/classes/class.cserverinfo.php:35 include/config.inc.php:560
+#: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
 #: include/events.inc.php:306 include/events.inc.php:324
 #: include/forms.inc.php:1922 include/triggers.inc.php:1610
 #: include/views/administration.users.list.php:74
@@ -13260,7 +13258,7 @@ msgstr "Вы не можете выбрать некоторые языки, т.
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вам не разрешено менять привилегии пользователя \"%s\"."
 
-#: include/config.inc.php:248
+#: include/config.inc.php:251
 msgid "You are not logged in."
 msgstr "Вы не вошли в систему."
 
@@ -13268,7 +13266,7 @@ msgstr "Вы не вошли в систему."
 msgid "You can not switch hosts for current selection."
 msgstr "Вы не можете переключить узлы сети для текущего выбора."
 
-#: include/config.inc.php:249
+#: include/config.inc.php:252
 msgid "You cannot view this URL as a"
 msgstr "Вы не можете просмотреть этот URL как"
 
@@ -13290,17 +13288,12 @@ msgstr "Вы не указали цели для команды \"%s\" в опе
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Вы не указали цели глобального скрипта \"%s\" в операции действия."
 
-#: api/classes/CApplication.php:837 api/classes/CApplication.php:848
-#: api/classes/CGraph.php:660 api/classes/CGraph.php:671
-#: api/classes/CGraph.php:732 api/classes/CGraphPrototype.php:708
-#: api/classes/CGraphPrototype.php:719 api/classes/CGraphPrototype.php:781
+#: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
 #: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
 #: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
-#: api/classes/CItem.php:1047 api/classes/CItem.php:1050
-#: api/classes/CItemPrototype.php:823 api/classes/CItemPrototype.php:826
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
 #: api/classes/CScript.php:347 api/classes/CScript.php:409
@@ -13332,7 +13325,7 @@ msgstr "У вас нет полномочий для обновления дру
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "У вас нет полномочий для обновления пользователя или он не существует."
 
-#: include/config.inc.php:253
+#: include/config.inc.php:256
 msgid "You must login to view this page."
 msgstr "Для просмотра этой страницы вы должны войти в систему."
 
@@ -13467,7 +13460,7 @@ msgstr "Zabbix траппер"
 msgid "Zetta"
 msgstr "Зетта"
 
-#: jsLoader.php:86
+#: jsLoader.php:89
 msgid "Zoom"
 msgstr "Масштаб"
 
@@ -13539,18 +13532,18 @@ msgstr "красным"
 msgid "avg"
 msgstr "сред"
 
-#: include/func.inc.php:472 jsLoader.php:93
+#: include/func.inc.php:472 jsLoader.php:96
 msgctxt "day short"
 msgid "d"
 msgstr "д"
 
-#: include/defines.inc.php:910 include/maintenances.inc.php:57
-#: include/page_header.php:485 include/views/configuration.item.list.php:101
-#: report3.php:134
+#: include/maintenances.inc.php:57 include/page_header.php:485
+#: include/translateDefines.inc.php:42
+#: include/views/configuration.item.list.php:101 report3.php:134
 msgid "d M Y"
 msgstr "d M Y"
 
-#: include/defines.inc.php:911
+#: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
 #: include/views/configuration.services.edit.php:132
 #: include/views/configuration.services.edit.php:133 report3.php:161
 msgid "d M Y H:i"
@@ -13559,12 +13552,12 @@ msgstr "d M Y H:i"
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
 #: include/acknow.inc.php:59 include/blocks.inc.php:930
 #: include/classes/screens/CScreenEvents.php:63
-#: include/classes/screens/CScreenPlainText.php:95 include/defines.inc.php:895
-#: include/defines.inc.php:896 include/defines.inc.php:902
-#: include/defines.inc.php:903 include/defines.inc.php:904
-#: include/defines.inc.php:912 include/defines.inc.php:913
-#: include/events.inc.php:116 include/events.inc.php:186
-#: include/events.inc.php:245
+#: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
+#: include/events.inc.php:186 include/events.inc.php:245
+#: include/translateDefines.inc.php:27 include/translateDefines.inc.php:28
+#: include/translateDefines.inc.php:34 include/translateDefines.inc.php:35
+#: include/translateDefines.inc.php:36 include/translateDefines.inc.php:45
+#: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
 #: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
@@ -13585,7 +13578,7 @@ msgstr "d.m"
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
-#: include/defines.inc.php:916
+#: include/translateDefines.inc.php:49
 msgid "d.m.y"
 msgstr "d.m.y"
 
@@ -13609,7 +13602,7 @@ msgstr "дд"
 msgid "default"
 msgstr "по умолчанию"
 
-#: jsLoader.php:88
+#: jsLoader.php:91
 msgid "dynamic"
 msgstr "динам"
 
@@ -13639,7 +13632,7 @@ msgstr "ровно"
 msgid "executed"
 msgstr "выполнено"
 
-#: jsLoader.php:87
+#: jsLoader.php:90
 msgid "fixed"
 msgstr "фикс"
 
@@ -13647,7 +13640,7 @@ msgstr "фикс"
 msgid "found"
 msgstr "найденных"
 
-#: include/func.inc.php:480 jsLoader.php:94
+#: include/func.inc.php:480 jsLoader.php:97
 msgctxt "hour short"
 msgid "h"
 msgstr "ч"
@@ -13703,12 +13696,12 @@ msgctxt "Milli short"
 msgid "m"
 msgstr "м"
 
-#: include/func.inc.php:488 jsLoader.php:95
+#: include/func.inc.php:488 jsLoader.php:98
 msgctxt "minute short"
 msgid "m"
 msgstr "м"
 
-#: include/func.inc.php:464 jsLoader.php:91
+#: include/func.inc.php:464 jsLoader.php:94
 msgctxt "month short"
 msgid "m"
 msgstr "м"
@@ -13812,7 +13805,7 @@ msgstr "не выбрано"
 msgid "not sent"
 msgstr "не отправлено"
 
-#: jsLoader.php:89
+#: jsLoader.php:92
 msgid "now"
 msgstr "сейчас"
 
@@ -13919,7 +13912,7 @@ msgstr "неизвестно"
 msgid "value"
 msgstr "значение"
 
-#: jsLoader.php:92
+#: jsLoader.php:95
 msgctxt "week short"
 msgid "w"
 msgstr "н"
@@ -13936,7 +13929,7 @@ msgstr "недели"
 msgid "whole number"
 msgstr "целое число"
 
-#: include/func.inc.php:456 jsLoader.php:90
+#: include/func.inc.php:456 jsLoader.php:93
 msgctxt "year short"
 msgid "y"
 msgstr "Г"
