@@ -50,7 +50,7 @@ AC_HELP_STRING([--with-iconv=@<:@DIR@:>@], [use iconv from given base install di
 			_iconv_dir_set="yes"
 		]
 	)
-	
+
 	AC_ARG_WITH([iconv-lib],
 		AC_HELP_STRING([--with-iconv-lib=@<:@DIR@:>@],
 			[use iconv libraries from given path.]
