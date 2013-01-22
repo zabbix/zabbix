@@ -37,6 +37,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+....I..... [ZBXNEXT-1589] removed 'win32floppy' directory (Richlv)
 ..F.I..... [ZBX-6098] fixed profile keys types (Eduard)
 ..F....... [ZBX-6119] fixed events displaing in monitoring->triggers (Eduard)
 ..F....... [ZBX-6093] unified how the "access denied" page is displayed in different scenarios (Pavels)
