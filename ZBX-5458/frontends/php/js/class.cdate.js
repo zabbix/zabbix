@@ -51,36 +51,44 @@ CDate.prototype = {
 	},
 
 	/**
-	*  Formats date according given format. Uses server timezone.
+	* Formats date according given format. Uses server timezone.
+	* Supported formats: 'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i'
 	*
-	*  Supported formats: 'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i'
+	* @param format PHP style date format limited to supported formats
 	*
-	*  @param format PHP style date format limited to supported formats
-	*
-	*  @return string|bool human readable date or false if unsupported format given
+	* @return string|bool human readable date or false if unsupported format given
 	*/
 	format: function(format) {
-		var shortEngMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		var shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-		var date = this.getDate(),
-			month = this.getMonth(),
-			year = this.getFullYear(),
-			hours = this.getHours(),
-			minutes = this.getMinutes(),
-			seconds = this.getSeconds();
+		var dt = this.getDate(),
+			mnth = this.getMonth(),
+			yr = this.getFullYear(),
+			hrs = this.getHours(),
+			mnts = this.getMinutes();
 
-		var appendZero = function(val) {
-			return val<10 ? '0' + val : val;
+		/**
+		 * Transform datetime parts to two digits e.g., 2 becomes 02
+		 * @param int val
+		 * @return string
+		 */
+		var appZr = function(val) {
+			return val < 10 ? '0' + val : val;
 		}
 
-		var appendSuffix = function(date) {
-			if (date%10 == 1 && date != 11) {
+		/**
+		 * Append date suffix according to english rules e.g., 3 becomes 3rd
+		 * @param int date
+		 * @return string
+		 */
+		var appSfx = function(date) {
+			if (date % 10 == 1 && date != 11) {
 				return date + 'st';
 			}
-			if (date%10 == 2 && date != 12) {
+			if (date % 10 == 2 && date != 12) {
 				return date + 'nd';
 			}
-			if (date%10 == 3 && date != 13) {
+			if (date % 10 == 3 && date != 13) {
 				return date + 'rd';
 			}
 			return date + 'th';
@@ -88,17 +96,19 @@ CDate.prototype = {
 
 		switch(format) {
 			case 'd M Y H:i':
-				return appendZero(date) + ' ' + shortEngMonths[month] + ' ' + year + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+				return appZr(dt) + ' ' + shortMn[mnth] + ' ' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'j. M Y G:i':
-				return date + '. ' + shortEngMonths[month] + ' ' + year + ' ' + hours + ':' + appendZero(minutes);
+				return dt + '. ' + shortMn[mnth] + ' ' + yr + ' ' + hrs + ':' + appZr(mnts);
 			case 'Y/m/d H:i':
-				return year + '/' + appendZero(month + 1) + '/' + appendZero(date) + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+				return yr + '/' + appZr(mnth + 1) + '/' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'M jS, Y h:i A':
-				return shortEngMonths[month] + ' ' + appendSuffix(date) + ', ' + year + ' ' + appendZero((hours + 11) % 12 + 1) + ':' + appendZero(minutes) + ' ' + ((hours < 12) ? 'AM' : 'PM');
+				var ampm = (hrs < 12) ? 'AM' : 'PM';
+				hrs = appZr((hrs + 11) % 12 + 1);
+				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + hrs + ':' + appZr(mnts) + ' ' + ampm;
 			case 'Y M d H:i':
-				return  year + ' ' + shortEngMonths[month] + ' ' +appendZero(date) + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+				return  yr + ' ' + shortMn[mnth] + ' ' +appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'd.m.Y H:i':
-				return appendZero(date) + '.' + appendZero(month + 1) + '.' + year + ' ' + appendZero(hours) + ':' + appendZero(minutes);
+				return appZr(dt) + '.' + appZr(mnth + 1) + '.' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
 
 		}
 
