@@ -1333,10 +1333,11 @@ function zbx_toObject($value, $field) {
 /**
  * Converts the given value to a numeric array:
  * - a scalar value will be converted to an array and added as the only element;
- * - arrays with nonsequential numeric keys will be reset to plain zero-based numeric arrays;
- * - an associative array will be returned in an array as the only element.
+ * - an array with first element key containing only numeric characters will be converted to plain zero-based numeric array.
+ * This is used for reseting nonsequential numeric arrays;
+ * - an associative array will be returned in an array as the only element, except if first element key contains only numeric characters.
  *
- * @param $value
+ * @param int|array $value
  *
  * @return array
  */
