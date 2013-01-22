@@ -58,28 +58,20 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-if (isset($_REQUEST['serviceid'])) {
-	if ($service = DBfetch(DBselect('SELECT DISTINCT s.serviceid,s.triggerid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
-		if (!empty($service['triggerid'])) {
-			$trigger = API::Trigger()->get(array(
-				'triggerids' => $service['triggerid'],
-				'countOutput' => true
-			));
-			if (empty($trigger)) {
-				access_deny();
-			}
-		}
+if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
+	$service = API::Service()->get(array(
+		'serviceids' => $_REQUEST['serviceid'],
+		'preservekeys' => true
+	));
+
+	if ($service) {
+		$table = new CTable(null, 'chart');
+		$table->addRow(new CImg('chart5.php?serviceid='.key($service).url_param('path')));
+		$table->show();
 	}
 	else {
-		unset($service);
+		access_deny();
 	}
-}
-unset($_REQUEST['serviceid']);
-
-if (isset($service) && isset($_REQUEST['showgraph'])) {
-	$table = new CTable(null, 'chart');
-	$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
-	$table->show();
 }
 else {
 	$periods = array(
@@ -119,7 +111,7 @@ else {
 	// fetch services
 	$services = API::Service()->get(array(
 		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
-		'selectParent' => API_OUTPUT_EXTEND,
+		'selectParent' => array('serviceid'),
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
 		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,
@@ -140,7 +132,6 @@ else {
 
 	// fetch sla
 	$slaData = API::Service()->getSla(array(
-		'serviceids' => zbx_objectValues($services, 'serviceid'),
 		'intervals' => array(array(
 			'from' => $period_start,
 			'to' => $period_end
