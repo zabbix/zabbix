@@ -106,7 +106,7 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB'] = ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
+				$DB['DB'] = oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
 				if ($DB['DB']) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
