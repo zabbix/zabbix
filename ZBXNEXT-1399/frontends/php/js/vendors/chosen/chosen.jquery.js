@@ -659,7 +659,12 @@ Copyright (c) 2011 by Harvest
         this.search_field.val(this.default_text);
         return this.search_field.addClass("default");
       } else {
-        this.search_field.val("");
+		/*
+		 * Zabbix changes. Search field not need no clean each time when listbox is rebuild-ed.
+		 */
+		if (this.search_field.val() === locale['Select some options']) {
+			this.search_field.val('');
+		}
         return this.search_field.removeClass("default");
       }
     };

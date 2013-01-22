@@ -55,13 +55,13 @@ $availableJScripts = array(
 	'dom.js' => '',
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
+	'listbox.js' => '',
 	// vendors
 	'prototype.js' => '',
 	'jquery.js' => 'jquery/',
 	'jquery-ui.js' => 'jquery/',
 	'activity-indicator.js' => 'vendors/',
 	'chosen.jquery.js' => 'vendors/chosen/',
-	'chosen.js' => 'vendors/chosen/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -189,8 +189,7 @@ $tranStrings = array(
 		'Select option' => _('Select option'),
 		'No results match' => _('No results match')
 	),
-	'chosen.jquery.js' => array(
-		'Keep typing...' => _('Keep typing...'),
+	'listbox.js' => array(
 		'Looking for' => _('Looking for')
 	)
 );

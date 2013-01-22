@@ -27,12 +27,12 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('chosen.jquery.js', 'chosen.js');
+$page['scripts'] = array('chosen.jquery.js', 'listbox.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+//	VAR						 TYPE		 OPTIONAL FLAGS	VALIDATION		EXCEPTION
 $fields = array(
 	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),

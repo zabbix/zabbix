@@ -48,6 +48,6 @@ class CListBox extends CComboBox {
 		}
 		$this->setAttribute('style', 'width:'.$options['width'].'px;');
 
-		zbx_add_post_js('jQuery(".chzn-select-'.$name.'").zbxChosen({objectName: "'.$options['objectName'].'"});');
+		zbx_add_post_js('jQuery(".chzn-select-'.$name.'").listbox({objectName: "'.$options['objectName'].'"});');
 	}
 }
