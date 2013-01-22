@@ -2,7 +2,6 @@ Changes for 2.1.0
 
 New features:
 ...G...... [ZBXNEXT-1334] added whitespace trimming for server lists in agent conf file (wiper)
-..F....... [ZBX-6108] fixed time control position remembering in monitoring->web (Eduard)
 A.F....... [ZBXNEXT-1491] fixed builded query ordering (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
@@ -38,6 +37,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F.I..... [ZBX-6098] fixed profile keys types (Eduard)
 ..F....... [ZBX-6119] fixed events displaing in monitoring->triggers (Eduard)
 ..F....... [ZBX-6093] unified how the "access denied" page is displayed in different scenarios (Pavels)
 ..F....... [ZBX-6125] fixed empty new line in configuration of action (Eduard)
