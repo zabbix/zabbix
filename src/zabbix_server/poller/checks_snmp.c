@@ -540,7 +540,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	/* create OID from string */
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
 	{
-		zbx_snprintf(err, MAX_STRING_LEN, "snmp_parse_oid(): cannot parse OID: %s.", OID);
+		zbx_snprintf(err, MAX_STRING_LEN, "snmp_parse_oid(): cannot parse OID \"%s\".", OID);
 		ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -549,7 +549,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	{
 		if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
 		{
-			zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is not large enough: %s.", OID);
+			zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is not large enough: \"%s\".", OID);
 			ret = NOTSUPPORTED;
 			goto out;
 		}
@@ -594,7 +594,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 								vars->name, vars->name_length))
 						{
 							zbx_snprintf(err, MAX_STRING_LEN, "snprint_objid(): buffer is"
-									" not large enough: OID: %s snmp_OID: %s.",
+									" not large enough: OID: \"%s\" snmp_OID: \"%s\".",
 									OID, snmp_oid);
 							ret = NOTSUPPORTED;
 							running = 0;
@@ -1104,7 +1104,7 @@ static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 		const char	*replace;
 	};
 
-#define	LEN_STR(x)	sizeof(x) - 1, x
+#define LEN_STR(x)	sizeof(x) - 1, x
 	static ZBX_MIB_NORM mibs[]=
 	{
 		/* the most popular items first */
@@ -1130,9 +1130,9 @@ static void	snmp_normalize(char *buf, const char *oid, int maxlen)
 		{LEN_STR("ifOutQLen"),		"1.3.6.1.2.1.2.2.1.21"},
 		{0}
 	};
-#undef	LEN_STR
+#undef LEN_STR
 
-	int		found = 0, i;
+	int	found = 0, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s)", __function_name, oid);
 
