@@ -92,14 +92,22 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 
 // check permissions
 if (!empty($_REQUEST['serviceid'])) {
-	$service = API::Service()->get(array(
+	$options = array(
 		'output' => API_OUTPUT_EXTEND,
-		'selectParent' => array('serviceid', 'name'),
-		'selectDependencies' => API_OUTPUT_EXTEND,
-		'selectTimes' => API_OUTPUT_EXTEND,
-		'serviceids' => $_REQUEST['serviceid'],
-		'limit' => 1
-	));
+		'serviceids' => $_REQUEST['serviceid']
+	);
+
+	if (isset($_REQUEST['delete']) || isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
+		$options['output'] = array('serviceid', 'name');
+	}
+	else {
+		$options['selectParent'] = array('serviceid', 'name');
+		$options['selectDependencies'] = API_OUTPUT_EXTEND;
+		$options['selectTimes'] = API_OUTPUT_EXTEND;
+	}
+
+	$service = API::Service()->get($options);
+
 	$service = reset($service);
 	if (!$service) {
 		access_deny();
@@ -155,18 +163,17 @@ if (isset($_REQUEST['form'])) {
 			$result = API::Service()->update($serviceRequest);
 
 			show_messages($result, _('Service updated'), _('Cannot update service'));
-			$serviceid = $service['serviceid'];
 			$audit_action = AUDIT_ACTION_UPDATE;
 		}
 		else {
 			$result = API::Service()->create($serviceRequest);
 
-			show_messages($result, _('Service updated'), _('Cannot add service'));
-			$serviceid = reset($result['serviceids']);
+			show_messages($result, _('Service created'), _('Cannot add service'));
 			$audit_action = AUDIT_ACTION_ADD;
 		}
 
 		if ($result) {
+			$serviceid = (isset($service['serviceid'])) ? $service['serviceid'] : reset($result['serviceids']);
 			add_audit($audit_action, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 			unset($_REQUEST['form']);
 		}
@@ -269,7 +276,8 @@ if (isset($_REQUEST['form'])) {
  */
 if (isset($_REQUEST['pservices'])) {
 	$parentServices = API::Service()->get(array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('serviceid', 'name', 'algorithm'),
+		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => array('sortorder', 'name')
 	));
@@ -288,9 +296,12 @@ if (isset($_REQUEST['pservices'])) {
 		$data = array();
 	}
 
-	foreach ($parentServices as $key => $childService) {
-		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($parentServices, 'trigger');
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	foreach ($parentServices as $key => $parentService) {
+		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
+			? $triggers[$parentService['trigger']['triggerid']]['description']
 			: '-';
 	}
 
@@ -308,7 +319,8 @@ if (isset($_REQUEST['pservices'])) {
  */
 if (isset($_REQUEST['cservices'])) {
 	$childServices = API::Service()->get(array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('serviceid', 'name', 'algorithm'),
+		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => array('sortorder', 'name')
 	));
@@ -327,9 +339,12 @@ if (isset($_REQUEST['cservices'])) {
 		$data = array();
 	}
 
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($childServices, 'trigger');
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 	foreach ($childServices as $key => $childService) {
-		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
+		$childServices[$key]['trigger'] = !empty($childService['trigger'])
+			? $triggers[$childService['trigger']['triggerid']]['description']
 			: '-';
 	}
 
@@ -379,16 +394,21 @@ if (isset($_REQUEST['form'])) {
 		if ($service['dependencies']) {
 			$childServices = API::Service()->get(array(
 				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
+				'selectTrigger' => array('triggerid', 'description', 'expression'),
 				'output' => array('name', 'triggerid'),
 				'preservekeys' => true,
 			));
+
+			// expand trigger descriptions
+			$triggers = zbx_objectValues($childServices, 'trigger');
+			$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 			foreach ($service['dependencies'] as $dependency) {
 				$childService = $childServices[$dependency['servicedownid']];
 				$data['children'][] = array(
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
-							? CMacrosResolverHelper::resolveTriggerNameById($childService['triggerid'])
+							? $triggers[$childService['trigger']['triggerid']]['description']
 							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
@@ -436,7 +456,7 @@ else {
 	// fetch services
 	$services = API::Service()->get(array(
 		'output' => array('name', 'serviceid', 'algorithm'),
-		'selectParent' => API_OUTPUT_EXTEND,
+		'selectParent' => array('serviceid'),
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
 		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,

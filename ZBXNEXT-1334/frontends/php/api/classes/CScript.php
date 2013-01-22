@@ -28,6 +28,7 @@ class CScript extends CZBXAPI {
 
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';
+	protected $sortColumns = array('scriptid', 'name');
 
 	/**
 	 * Get Scripts data
@@ -50,9 +51,6 @@ class CScript extends CZBXAPI {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('scriptid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('scripts' => 's.scriptid'),
@@ -167,15 +165,13 @@ class CScript extends CZBXAPI {
 			$this->dbFilter('scripts s', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 's');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($script = DBfetch($res)) {
