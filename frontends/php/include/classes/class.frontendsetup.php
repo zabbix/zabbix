@@ -250,11 +250,11 @@ class FrontendSetup {
 			$current[] = BR();
 		}
 
-		if (function_exists('ocilogon') &&
-				function_exists('ocierror') &&
-				function_exists('ociparse') &&
-				function_exists('ociexecute') &&
-				function_exists('ocifetchinto')
+		if (function_exists('oci_connect') &&
+				function_exists('oci_error') &&
+				function_exists('oci_parse') &&
+				function_exists('oci_execute') &&
+				function_exists('oci_fetch_assoc')
 		) {
 
 			$current[] = 'Oracle';
