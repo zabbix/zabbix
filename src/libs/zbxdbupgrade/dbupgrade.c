@@ -693,6 +693,26 @@ static int	DBpatch_02010029()
 
 static int	DBpatch_02010030()
 {
+	const char	*sql = "delete from profiles where idx='web.items.filter_groupid'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010031()
+{
+	const char	*sql = "update profiles set value_id=value_int,value_int=0 where idx like 'web.avail_report.%.groupid' or idx like 'web.avail_report.%.hostid'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010032()
+{
 	if (ZBX_DB_OK <= DBexecute(
 			"delete from events"
 			" where source=%d"
@@ -706,15 +726,14 @@ static int	DBpatch_02010030()
 	return FAIL;
 }
 
-static int	DBpatch_02010031()
+static int	DBpatch_02010033()
 {
 	return DBdrop_field("events", "value_changed");
 }
 
-static int	DBpatch_02010032()
+static int	DBpatch_02010034()
 {
-	const char	*sql =
-			"delete from profiles where idx='web.events.filter.showUnknown'";
+	const char	*sql = "delete from profiles where idx='web.events.filter.showUnknown'";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
@@ -788,14 +807,16 @@ int	DBcheck_version()
 		{DBpatch_02010027, 2010027, 0, 1},
 		{DBpatch_02010028, 2010028, 0, 0},
 		{DBpatch_02010029, 2010029, 0, 0},
-		{DBpatch_02010030, 2010030, 0, 1},
-		{DBpatch_02010031, 2010031, 0, 1},
-		{DBpatch_02010032, 2010032, 0, 0},
+		{DBpatch_02010030, 2010030, 0, 0},
+		{DBpatch_02010031, 2010031, 0, 0},
+		{DBpatch_02010032, 2010032, 0, 1},
+		{DBpatch_02010033, 2010033, 0, 1},
+		{DBpatch_02010034, 2010034, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010031;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010033;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

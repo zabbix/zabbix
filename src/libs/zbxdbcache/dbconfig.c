@@ -2989,6 +2989,8 @@ void	DCload_config()
 
 	UNLOCK_CACHE;
 
+	DBfree_result(result);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

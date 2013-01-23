@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-1334] added whitespace trimming for server lists in agent conf file (wiper)
 A.F....... [ZBXNEXT-1491] fixed builded query ordering (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
@@ -36,6 +37,9 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+....I..... [ZBXNEXT-1589] removed 'win32floppy' directory (Richlv)
+..F.I..... [ZBX-6098] fixed profile keys types (Eduard)
+..F....... [ZBX-6119] fixed events displaing in monitoring->triggers (Eduard)
 ..F....... [ZBX-6093] unified how the "access denied" page is displayed in different scenarios (Pavels)
 ..F....... [ZBX-6125] fixed empty new line in configuration of action (Eduard)
 ..F....... [ZBX-6108] fixed time control position remembering in monitoring->web (Eduard)
@@ -92,19 +96,24 @@ A......... [ZBX-5498] applications api refactoring (Vedmak)
 Changes for 2.0.5rc1
 
 New features:
+....I..... [ZBX-5957] added configure options to specify iconv include/lib direcotries (wiper)
 A.F....... [ZBX-1357] added Bulgarian translation (Richlv)
 ...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 for system.uname check (Sasha)
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-5458] fixed some date strings are not being translated (Toms)
+..F....... [ZBX-6114] fixed errors in graphs (invalid arguments and division by zero) (Oleg)
+...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
+A......... [ZBX-6142] fixed "current hosts" removing in Configuration->Action->Operations (Oleg)
+..F....... [ZBX-6131] fixed undefined indexes in maintenance periods (Oleg)
 ..F....... [ZBX-6133] fixed undefined indexes when importing hosts with "Update existing" disabled (Pavels)
 ..F....... [ZBX-6122] fixed error when trying to create an IT service and submitting an incorrectly filled form (Pavels)
 .......PS. [ZBX-6101] fixed processing of SNMP traps in maintenance "with data colleaction"; thanks to Volker Fröhlich for patch (Sasha)
 .......PS. [ZBX-6012] added support of user macros and global regular expressions in SNMP trap item key parameter (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 A......... [ZBX-3534] fixed templated linking using read-only template (Eduard)
-..F....... [ZBX-5458] fixed some date strings are not being translated (Toms)
 ..F....... [ZBX-6110] fixed selected map remembering in monitoring->map (Eduard)
 ..F....... [ZBX-6117] fixed item value macros resolving using non-converted to null values (Eduard)
 ..F....... [ZBX-6113] fixed hidden input field appearing when assigning hosts to groups in IE (Pavels)
@@ -1308,6 +1317,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 
 Changes for 1.8.16
