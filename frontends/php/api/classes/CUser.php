@@ -1133,9 +1133,9 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if all of the given users are available for writing.
+	 * Checks if the current user has permissions to edit users.
 	 *
-	 * @throws APIException     if any of the users is not writable
+	 * @throws APIException     if the user has no permissions to edit users
 	 */
 	protected function checkPermissions() {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -1145,6 +1145,8 @@ class CUser extends CZBXAPI {
 
 	/**
 	 * Check if we're trying to delete the currently logged in user.
+	 *
+	 * @param array $userIds    user IDs to check
 	 *
 	 * @throws APIException  if we're deleting the current user
 	 */
@@ -1156,6 +1158,8 @@ class CUser extends CZBXAPI {
 
 	/**
 	 * Check if we're trying to delete the guest user.
+	 *
+	 * @param array $userIds    user IDs to check
 	 *
 	 * @throws APIException  if we're deleting the guest user
 	 */

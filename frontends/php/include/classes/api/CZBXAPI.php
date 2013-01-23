@@ -756,7 +756,8 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Triggers a deprecated notice. Should be called when a deprecated parameter or method is used.
+	 * Triggers a deprecated notice. Should be called when a deprecated parameter or method is used. The notice will
+	 * not be displayed in the result returned by an API method.
 	 *
 	 * @param string $error     error text
 	 */
