@@ -1133,12 +1133,14 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if the current user has permissions to edit users.
+	 * Checks if the given users are editable.
 	 *
-	 * @throws APIException     if the user has no permissions to edit users
+	 * @param array $userIds    user IDs to check
+	 *
+	 * @throws APIException     if the user has no permissions to edit users or a user does not exist
 	 */
-	protected function checkPermissions() {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+	protected function checkPermissions(array $userIds) {
+		if (!$this->isWritable($userIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}

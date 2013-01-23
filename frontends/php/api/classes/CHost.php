@@ -1692,7 +1692,7 @@ class CHost extends CHostGeneral {
 	/**
 	 * Checks if all of the given hosts are available for writing.
 	 *
-	 * @throws APIException     if any of the host is not writable
+	 * @throws APIException     if a host is not writable or does not exist
 	 *
 	 * @param array $hostIds
 	 */

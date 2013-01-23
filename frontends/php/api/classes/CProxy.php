@@ -430,7 +430,7 @@ class CProxy extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions();
+		$this->checkPermissions($proxyIds);
 		$this->checkUsedInDiscoveryRule($proxyIds);
 		$this->checkUsedForMonitoring($proxyIds);
 	}
@@ -481,12 +481,15 @@ class CProxy extends CZBXAPI {
 	}
 
 	/**
-	 * Check permission for proxies.
-	 * Only super admin have write access for proxies.
+	 * Checks if the given proxies are editable.
+	 *
+	 * @param array $proxyIds   proxy IDs to check
+	 *
+	 * @throws APIException     if the user has no permissions to edit proxies or a proxy does not exist
 	 */
-	protected function checkPermissions() {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can delete proxies.'));
+	protected function checkPermissions(array $proxyIds) {
+		if (!$this->isWritable($proxyIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
