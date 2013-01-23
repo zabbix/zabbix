@@ -204,6 +204,20 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static void	cache_del_snmp_index_by_position(int i)
+{
+	zbx_free(snmpidx[i].oid);
+	zbx_free(snmpidx[i].value);
+	memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i - 1));
+	snmpidx_count--;
+
+	if (snmpidx_count == snmpidx_alloc - 16)
+	{
+		snmpidx_alloc -= 16;
+		snmpidx = zbx_realloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
+	}
+}
+
 static void	cache_del_snmp_index(DC_ITEM *item, char *oid, char *value)
 {
 	const char		*__function_name = "cache_del_snmp_index";
@@ -221,17 +235,45 @@ static void	cache_del_snmp_index(DC_ITEM *item, char *oid, char *value)
 	s.value = value;
 
 	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
+		cache_del_snmp_index_by_position(i);
+end:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	cache_del_snmp_index_subtree(DC_ITEM *item, const char *oid)
+{
+	const char		*__function_name = "cache_del_snmp_index_subtree";
+	int			i;
+	zbx_snmp_index_t	s;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s'", __function_name, oid);
+
+	if (NULL == snmpidx)
+		goto end;
+
+	s.hostid = item->host.hostid;
+	s.port = item->snmp_port;
+	s.oid = (char *)oid;
+	s.value = "";
+
+	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)))
 	{
-		zbx_free(snmpidx[i].oid);
-		zbx_free(snmpidx[i].value);
-		memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i - 1));
-		snmpidx_count--;
+		if (snmpidx[i].hostid < s.hostid || snmpidx[i].port < s.port || -1 == strcmp(snmpidx[i].oid, s.oid))
+			i++;
 	}
 
-	if (snmpidx_count == snmpidx_alloc - 16)
+	while (i < snmpidx_count)
 	{
-		snmpidx_alloc -= 16;
-		snmpidx = zbx_realloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
+		if (snmpidx[i].hostid != s.hostid)
+			break;
+		if (snmpidx[i].port != s.port)
+			break;
+		if (0 != strcmp(snmpidx[i].oid, s.oid))
+			break;
+
+		cache_del_snmp_index_by_position(i);
+		/* No need to increment 'i'. Deleting an element from cache */
+		/* brings the next element into position 'i'. */
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -490,6 +532,9 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	/* copy rootOID to anOID */
 	memcpy(anOID, rootOID, rootOID_len * sizeof(oid));
 	anOID_len = rootOID_len;
+
+	if (1 == bulk)
+		cache_del_snmp_index_subtree(item, OID);
 
 	running = 1;
 	while (1 == running)
