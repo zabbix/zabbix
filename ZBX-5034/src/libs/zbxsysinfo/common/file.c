@@ -84,8 +84,7 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
-	int		ret = SYSINFO_RET_FAIL;
-	int		file_exists = -1;
+	int		ret = SYSINFO_RET_FAIL, file_exists = -1;
 
 	if (1 < num_param(param))
 		goto err;
@@ -103,7 +102,6 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		SET_UI64_RESULT(result, file_exists);
 		ret = SYSINFO_RET_OK;
 	}
-
 err:
 	return ret;
 }
