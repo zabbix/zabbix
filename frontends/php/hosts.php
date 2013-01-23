@@ -502,7 +502,7 @@ elseif (isset($_REQUEST['save'])) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	DBstart();
-	$result = API::Host()->delete($_REQUEST['hostid']);
+	$result = API::Host()->delete(array($_REQUEST['hostid']));
 	$result = DBend($result);
 
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
