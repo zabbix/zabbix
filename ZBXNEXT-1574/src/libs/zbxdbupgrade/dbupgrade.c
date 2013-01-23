@@ -723,7 +723,10 @@ static int	DBpatch_02010032()
 			" where source=%d"
 				" and object=%d"
 				" and (value=%d or value_changed=%d)",
-			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_CHANGED_NO))
+			EVENT_SOURCE_TRIGGERS,
+			EVENT_OBJECT_TRIGGER,
+			TRIGGER_VALUE_UNKNOWN,
+			0))	/*TRIGGER_VALUE_CHANGED_NO*/
 	{
 		return SUCCEED;
 	}

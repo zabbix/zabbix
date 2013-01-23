@@ -572,10 +572,6 @@ typedef enum
 #define TRIGGER_VALUE_FLAG_NORMAL	0
 #define TRIGGER_VALUE_FLAG_UNKNOWN	1
 
-/* trigger value change flags */
-#define TRIGGER_VALUE_CHANGED_NO	0
-#define TRIGGER_VALUE_CHANGED_YES	1
-
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
 #define TRIGGER_SEVERITY_INFORMATION	1
