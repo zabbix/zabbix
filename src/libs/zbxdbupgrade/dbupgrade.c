@@ -703,7 +703,12 @@ static int	DBpatch_02010030()
 
 static int	DBpatch_02010031()
 {
-	const char	*sql = "update profiles set value_id=value_int,value_int=0 where idx like 'web.avail_report.%.groupid' or idx like 'web.avail_report.%.hostid'";
+	const char	*sql =
+			"update profiles"
+			" set value_id=value_int,"
+				"value_int=0"
+			" where idx like 'web.avail_report.%.groupid'"
+				" or idx like 'web.avail_report.%.hostid'";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
