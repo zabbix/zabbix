@@ -191,7 +191,8 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ", table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
+			table_name);
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -700,7 +701,7 @@ static int	DBpatch_02010029()
 
 static int	DBpatch_02010030()
 {
-	const ZBX_FIELD	field = {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT_STR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("httptest", &field);
 }
