@@ -164,15 +164,13 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	}
 
 	if (0 != contents_offset)
+		contents_offset -= zbx_rtrim(contents, "\r\n");
+
+	if (0 == contents_offset) /* empty file */
 	{
-		zbx_rtrim(contents, "\r\n");
-
-		if ('\0' == *contents)
-			zbx_free(contents);
-	}
-
-	if (NULL == contents)	/* EOF */
+		zbx_free(contents);
 		contents = zbx_strdup(contents, "EOF");
+	}
 
 	SET_TEXT_RESULT(result, contents);
 
