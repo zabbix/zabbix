@@ -252,8 +252,10 @@ switch ($data['method']) {
 			}
 		}
 
-		$json = new CJSON();
-		$result = $json->encode($result);
+		if ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
+			$json = new CJSON();
+			$result = $json->encode($result);
+		}
 		break;
 
 	default:

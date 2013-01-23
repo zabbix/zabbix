@@ -81,6 +81,7 @@ switch ($page['type']) {
 		}
 		break;
 	case PAGE_TYPE_TEXT:
+	case PAGE_TYPE_TEXT_RETURN_JSON:
 		header('Content-Type: text/plain; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', 1);
@@ -89,12 +90,6 @@ switch ($page['type']) {
 	case PAGE_TYPE_TEXT_FILE:
 		header('Content-Type: text/plain; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
-		}
-		break;
-	case PAGE_TYPE_TEXT_RETURN_JSON:
-		header('Content-Type: text/plain; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', 1);
 		}
