@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-21 18:45+0200\n"
-"PO-Revision-Date: 2013-01-13 22:00+0200\n"
+"POT-Creation-Date: 2013-01-23 18:11+0200\n"
+"PO-Revision-Date: 2013-01-23 00:04+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -440,7 +440,7 @@ msgstr "Pievienot trūkstošos"
 msgid "Add prototype"
 msgstr "Pievienot prototipu"
 
-#: jsLoader.php:182
+#: jsLoader.php:181
 msgid "Add service"
 msgstr "Pievienot servisu"
 
@@ -534,7 +534,7 @@ msgstr ""
 #: include/views/administration.users.list.php:36
 #: include/views/configuration.action.edit.php:519
 #: include/views/configuration.hostgroups.edit.php:39
-#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:88
+#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:87
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
 msgstr "Viss"
@@ -544,7 +544,7 @@ msgstr "Viss"
 msgid "All groups"
 msgstr "Visas grupas"
 
-#: jsLoader.php:155
+#: jsLoader.php:154
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr ""
 
@@ -640,7 +640,7 @@ msgid "Apr"
 msgstr "Apr"
 
 #: include/forms.inc.php:1556 include/func.inc.php:107
-#: include/func.inc.php:238 jsLoader.php:118
+#: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
 msgstr "Aprīlis"
 
@@ -713,7 +713,7 @@ msgid "Aug"
 msgstr "Aug"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
-#: include/func.inc.php:242 jsLoader.php:122
+#: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
 msgstr "Augusts"
 
@@ -2142,7 +2142,7 @@ msgstr ""
 msgid "Classic"
 msgstr ""
 
-#: jsLoader.php:165
+#: jsLoader.php:164
 msgid "Clear"
 msgstr "Iztīrīt"
 
@@ -2186,8 +2186,8 @@ msgstr ""
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
-#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:149
-#: jsLoader.php:173 tr_testexpr.php:175
+#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:148
+#: jsLoader.php:172 tr_testexpr.php:175
 msgid "Close"
 msgstr "Aizvērt"
 
@@ -2637,7 +2637,7 @@ msgstr ""
 msgid "Create template"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:44 jsLoader.php:104
+#: include/views/configuration.triggers.list.php:44 jsLoader.php:103
 msgid "Create trigger"
 msgstr ""
 
@@ -3067,7 +3067,7 @@ msgid "Dec"
 msgstr ""
 
 #: include/forms.inc.php:1568 include/func.inc.php:115
-#: include/func.inc.php:246 jsLoader.php:126
+#: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
 msgstr "Decembris"
 
@@ -3081,7 +3081,7 @@ msgstr "Decimāls"
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:122
 #: include/views/monitoring.screen.php:117
-#: include/views/monitoring.slides.php:85 jsLoader.php:148 popup_bitem.php:114
+#: include/views/monitoring.slides.php:85 jsLoader.php:147 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
 msgstr "Noklusētais"
@@ -3132,7 +3132,7 @@ msgstr ""
 
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/configuration.triggers.edit.php:154 jsLoader.php:105
+#: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:332 tr_logform.php:349
 msgid "Delete"
 msgstr "Dzēst"
@@ -3162,7 +3162,7 @@ msgstr ""
 msgid "Delete discovery rule?"
 msgstr ""
 
-#: include/views/configuration.triggers.edit.php:156 jsLoader.php:107
+#: include/views/configuration.triggers.edit.php:156 jsLoader.php:106
 #: tr_logform.php:333
 msgid "Delete expression?"
 msgstr "Dzēst izteiksmi?"
@@ -3187,11 +3187,11 @@ msgstr ""
 msgid "Delete item?"
 msgstr ""
 
-#: jsLoader.php:106 tr_logform.php:349
+#: jsLoader.php:105 tr_logform.php:349
 msgid "Delete keyword?"
 msgstr "Dzēst atslēgas vārdu?"
 
-#: jsLoader.php:157
+#: jsLoader.php:156
 msgid "Delete links between selected elements?"
 msgstr ""
 
@@ -3271,7 +3271,7 @@ msgstr ""
 msgid "Delete selected discovery rules?"
 msgstr ""
 
-#: jsLoader.php:153
+#: jsLoader.php:152
 msgid "Delete selected elements?"
 msgstr "Vai dzēst iezīmētos elementus?"
 
@@ -3381,7 +3381,7 @@ msgstr[2] ""
 msgid "Delete selected with linked elements"
 msgstr ""
 
-#: jsLoader.php:184
+#: jsLoader.php:183
 msgid "Delete service"
 msgstr ""
 
@@ -3393,7 +3393,7 @@ msgstr ""
 msgid "Delete template?"
 msgstr ""
 
-#: jsLoader.php:185
+#: jsLoader.php:184
 msgid "Delete the selected service?"
 msgstr ""
 
@@ -3839,16 +3839,16 @@ msgstr "Neuzglabāt notikumus, kas vecāki par (dienās)"
 msgid "Do not keep events older than (in days) \"%1$s\"."
 msgstr ""
 
-#: jsLoader.php:102
+#: jsLoader.php:101
 msgid "Do you wish to replace the conditional expression?"
 msgstr ""
 
-#: jsLoader.php:135
+#: jsLoader.php:134
 msgid "Done"
 msgstr ""
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
-#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:151
+#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:150
 msgid "Dot"
 msgstr "Punkti"
 
@@ -3978,7 +3978,7 @@ msgstr ""
 msgid "EVENTS"
 msgstr "NOTIKUMI"
 
-#: jsLoader.php:156
+#: jsLoader.php:155
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
@@ -3993,7 +3993,7 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:394 sysmaps.php:260
 #: sysmaps.php:283
 msgid "Edit"
-msgstr ""
+msgstr "Rediģēt"
 
 #: include/views/configuration.maintenance.edit.php:171
 msgid "Edit maintenance period"
@@ -4003,7 +4003,7 @@ msgstr ""
 msgid "Edit map element"
 msgstr "Rediģēt kartes elementu"
 
-#: jsLoader.php:183
+#: jsLoader.php:182
 msgid "Edit service"
 msgstr ""
 
@@ -4283,7 +4283,7 @@ msgid "Event source details"
 msgstr ""
 
 #: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1269
-#: jsLoader.php:112 search.php:134 search.php:206 search.php:261
+#: jsLoader.php:111 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
 msgstr "Notikumi"
@@ -4307,7 +4307,7 @@ msgstr "Neiekļaut"
 #: include/views/js/administration.script.edit.js.php:66
 #: include/views/js/general.script.confirm.js.php:37
 msgid "Execute"
-msgstr ""
+msgstr "Izpildīt"
 
 #: api/classes/CImage.php:339
 #, php-format
@@ -4328,7 +4328,7 @@ msgstr ""
 
 #: include/views/js/general.script.confirm.js.php:16
 msgid "Execution confirmation"
-msgstr ""
+msgstr "Izpildes apstiprināšana"
 
 #: sysmap.php:190
 msgid "Expand macros"
@@ -4409,9 +4409,9 @@ msgstr "Ārēja pārbaude"
 #: include/media.inc.php:28
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Ez Texting"
-msgstr ""
+msgstr "Ez Texting"
 
-#: jsLoader.php:131
+#: jsLoader.php:130
 msgctxt "Friday short"
 msgid "F"
 msgstr ""
@@ -4468,7 +4468,7 @@ msgid "Feb"
 msgstr ""
 
 #: include/forms.inc.php:1546 include/func.inc.php:105
-#: include/func.inc.php:236 jsLoader.php:116
+#: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
 msgstr "Februāris"
 
@@ -4490,7 +4490,7 @@ msgstr ""
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr ""
+msgstr "Lauks:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
@@ -4606,7 +4606,7 @@ msgstr "No"
 #: include/views/administration.usergroups.list.php:49
 #: include/views/administration.users.list.php:61
 msgid "Frontend access"
-msgstr ""
+msgstr "Saskarnes piekļuve"
 
 #: usergrps.php:246
 msgid "Frontend access updated"
@@ -4718,7 +4718,7 @@ msgstr ""
 msgid "Go"
 msgstr ""
 
-#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:178
+#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
 msgstr ""
 
@@ -4961,7 +4961,7 @@ msgstr ""
 
 #: hostinventoriesoverview.php:80
 msgid "Grouping by"
-msgstr ""
+msgstr "Grupēt pēc"
 
 #: dashconf.php:217 include/reports.inc.php:546
 #: include/views/administration.users.edit.php:80
@@ -5049,7 +5049,7 @@ msgstr "Palīdzība"
 msgid "Hexadecimal"
 msgstr "Heksadecimāls"
 
-#: jsLoader.php:141 sysmap.php:158
+#: jsLoader.php:140 sysmap.php:158
 msgid "Hidden"
 msgstr "Slēpts"
 
@@ -5082,12 +5082,12 @@ msgstr "Augsts"
 
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:456
 #: include/views/configuration.item.list.php:59
-#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:109
+#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
 #: latest.php:196 latest.php:323 latest.php:501
 msgid "History"
 msgstr "Vēsture"
 
-#: jsLoader.php:110
+#: jsLoader.php:109
 msgid "History and simple graphs"
 msgstr ""
 
@@ -5151,7 +5151,7 @@ msgstr ""
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
-#: items.php:624 items.php:647 jsLoader.php:143 latest.php:125 latest.php:191
+#: items.php:624 items.php:647 jsLoader.php:142 latest.php:125 latest.php:191
 #: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
 #: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
@@ -5221,7 +5221,7 @@ msgstr ""
 #: include/views/js/configuration.action.edit.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:28
-#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:146
+#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:145
 #: search.php:258
 msgid "Host group"
 msgstr "Mezglu grupa"
@@ -5253,7 +5253,7 @@ msgstr "Mezglu grupas"
 msgid "Host interface"
 msgstr ""
 
-#: hostinventories.php:26 jsLoader.php:181
+#: hostinventories.php:26 jsLoader.php:180
 msgid "Host inventories"
 msgstr ""
 
@@ -5287,7 +5287,7 @@ msgid "Host router"
 msgstr ""
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
-#: jsLoader.php:177
+#: jsLoader.php:176
 msgid "Host screens"
 msgstr ""
 
@@ -5637,7 +5637,7 @@ msgstr ""
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr ""
 
-#: jsLoader.php:159
+#: jsLoader.php:158
 msgid "Iconmap is not enabled"
 msgstr ""
 
@@ -5654,7 +5654,7 @@ msgstr ""
 #: include/views/administration.general.image.edit.php:38
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:47
-#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:147
+#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:146
 #: map.php:136
 msgid "Image"
 msgstr "Attēls"
@@ -6374,7 +6374,7 @@ msgstr "Informācija"
 msgid "Insert"
 msgstr ""
 
-#: include/forms.inc.php:1353 jsLoader.php:103
+#: include/forms.inc.php:1353 jsLoader.php:102
 msgid "Insert macro"
 msgstr ""
 
@@ -6751,7 +6751,7 @@ msgid "Jan"
 msgstr "Jan"
 
 #: include/forms.inc.php:1541 include/func.inc.php:104
-#: include/func.inc.php:235 jsLoader.php:115
+#: include/func.inc.php:235 jsLoader.php:114
 msgid "January"
 msgstr "Janvāris"
 
@@ -6764,7 +6764,7 @@ msgid "Jul"
 msgstr "Jūl"
 
 #: include/forms.inc.php:1543 include/func.inc.php:110
-#: include/func.inc.php:241 jsLoader.php:121
+#: include/func.inc.php:241 jsLoader.php:120
 msgid "July"
 msgstr "Jūlijs"
 
@@ -6773,7 +6773,7 @@ msgid "Jun"
 msgstr "Jūn"
 
 #: include/forms.inc.php:1566 include/func.inc.php:109
-#: include/func.inc.php:240 jsLoader.php:120
+#: include/func.inc.php:240 jsLoader.php:119
 msgid "June"
 msgstr "Jūnijs"
 
@@ -6985,7 +6985,7 @@ msgstr "Pēdējā vērtība"
 msgid "Last week graph"
 msgstr ""
 
-#: include/menu.inc.php:47 jsLoader.php:179 latest.php:26 report5.php:159
+#: include/menu.inc.php:47 jsLoader.php:178 latest.php:26 report5.php:159
 #: search.php:132 search.php:204 search.php:259 search.php:311
 msgid "Latest data"
 msgstr "Jaunākā informācija"
@@ -7216,7 +7216,7 @@ msgctxt "Mega short"
 msgid "M"
 msgstr ""
 
-#: jsLoader.php:127
+#: jsLoader.php:126
 msgctxt "Monday short"
 msgid "M"
 msgstr ""
@@ -7377,7 +7377,7 @@ msgstr ""
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
-#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:144
+#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:143
 #: map.php:25
 msgid "Map"
 msgstr "Karte"
@@ -7444,7 +7444,7 @@ msgid "Mar"
 msgstr "Mar"
 
 #: include/forms.inc.php:1551 include/func.inc.php:106
-#: include/func.inc.php:237 jsLoader.php:117
+#: include/func.inc.php:237 jsLoader.php:116
 msgid "March"
 msgstr "Marts"
 
@@ -7546,7 +7546,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/forms.inc.php:1561 include/func.inc.php:108
-#: include/func.inc.php:239 jsLoader.php:119
+#: include/func.inc.php:239 jsLoader.php:118
 msgid "May"
 msgstr "Mai"
 
@@ -7646,7 +7646,7 @@ msgstr ""
 msgid "Message timeout (seconds)"
 msgstr ""
 
-#: jsLoader.php:164
+#: jsLoader.php:163
 msgid "Messages"
 msgstr "Ziņojumi"
 
@@ -7817,7 +7817,7 @@ msgstr ""
 msgid "Most busy triggers top 100"
 msgstr ""
 
-#: jsLoader.php:167
+#: jsLoader.php:166
 msgid "Move"
 msgstr "Pārvietot"
 
@@ -7833,7 +7833,7 @@ msgstr ""
 msgid "Multiple PROBLEM events generation"
 msgstr ""
 
-#: jsLoader.php:162
+#: jsLoader.php:161
 msgid "Mute"
 msgstr ""
 
@@ -7964,7 +7964,7 @@ msgstr ""
 msgid "New condition"
 msgstr "Izveidot jaunu nosacījumu"
 
-#: jsLoader.php:154
+#: jsLoader.php:153
 msgid "New element"
 msgstr ""
 
@@ -8155,7 +8155,7 @@ msgstr ""
 msgid "No discovery rules defined."
 msgstr ""
 
-#: jsLoader.php:174
+#: jsLoader.php:173
 msgid "No elements selected!"
 msgstr "Elementi netika iezīmēti"
 
@@ -8742,11 +8742,11 @@ msgid "Nov"
 msgstr "Nov"
 
 #: include/forms.inc.php:1563 include/func.inc.php:114
-#: include/func.inc.php:245 jsLoader.php:125
+#: include/func.inc.php:245 jsLoader.php:124
 msgid "November"
 msgstr "Novembris"
 
-#: jsLoader.php:134
+#: jsLoader.php:133
 msgid "Now"
 msgstr ""
 
@@ -8885,11 +8885,11 @@ msgid "Octal"
 msgstr "Oktāls"
 
 #: include/forms.inc.php:1558 include/func.inc.php:113
-#: include/func.inc.php:244 jsLoader.php:124
+#: include/func.inc.php:244 jsLoader.php:123
 msgid "October"
 msgstr "Oktobris"
 
-#: jsLoader.php:140 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:139 sysmap.php:155 sysmap.php:161
 msgid "Off"
 msgstr ""
 
@@ -8900,7 +8900,7 @@ msgstr ""
 msgid "Ok"
 msgstr ""
 
-#: jsLoader.php:139 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:138 sysmap.php:155 sysmap.php:161
 msgid "On"
 msgstr ""
 
@@ -9522,7 +9522,7 @@ msgstr ""
 msgid "Please enter confirmation text."
 msgstr ""
 
-#: jsLoader.php:150
+#: jsLoader.php:149
 msgid "Please select two elements"
 msgstr ""
 
@@ -10232,12 +10232,12 @@ msgstr ""
 msgid "Russian (ru_RU)"
 msgstr "Krievu (ru_RU)"
 
-#: jsLoader.php:132
+#: jsLoader.php:131
 msgctxt "Saturday short"
 msgid "S"
 msgstr ""
 
-#: jsLoader.php:133
+#: jsLoader.php:132
 msgctxt "Sunday short"
 msgid "S"
 msgstr ""
@@ -10656,7 +10656,7 @@ msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:262 include/views/administration.script.list.php:27
-#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:180 report5.php:160
+#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:179 report5.php:160
 #: scripts_exec.php:25
 msgid "Scripts"
 msgstr ""
@@ -10842,7 +10842,7 @@ msgid "Separated"
 msgstr ""
 
 #: include/forms.inc.php:1553 include/func.inc.php:112
-#: include/func.inc.php:243 jsLoader.php:123
+#: include/func.inc.php:243 jsLoader.php:122
 msgid "September"
 msgstr "Septembris"
 
@@ -11063,7 +11063,7 @@ msgstr ""
 msgid "Show working time"
 msgstr ""
 
-#: jsLoader.php:142 sysmap.php:158
+#: jsLoader.php:141 sysmap.php:158
 msgid "Shown"
 msgstr "Parādīts"
 
@@ -11084,7 +11084,7 @@ msgstr "Vienkārša pārbaude"
 msgid "Simple graph"
 msgstr ""
 
-#: include/blocks.inc.php:1227 jsLoader.php:108
+#: include/blocks.inc.php:1227 jsLoader.php:107
 msgid "Simple graphs"
 msgstr ""
 
@@ -11174,7 +11174,7 @@ msgstr ""
 msgid "Slovak (sk_SK)"
 msgstr "Slovāku (sk_SK)"
 
-#: jsLoader.php:166
+#: jsLoader.php:165
 msgid "Snooze"
 msgstr ""
 
@@ -11480,12 +11480,12 @@ msgctxt "Tera short"
 msgid "T"
 msgstr ""
 
-#: jsLoader.php:130
+#: jsLoader.php:129
 msgctxt "Thursday short"
 msgid "T"
 msgstr ""
 
-#: jsLoader.php:128
+#: jsLoader.php:127
 msgctxt "Tuesday short"
 msgid "T"
 msgstr ""
@@ -11788,7 +11788,7 @@ msgstr "Līdz"
 #: include/views/administration.auditlogs.list.php:85
 #: include/views/configuration.services.edit.php:278
 #: include/views/configuration.services.edit.php:279
-#: include/views/configuration.services.edit.php:307 jsLoader.php:136
+#: include/views/configuration.services.edit.php:307 jsLoader.php:135
 msgid "Time"
 msgstr "Laiks"
 
@@ -11906,7 +11906,7 @@ msgstr ""
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:261
 #: include/views/js/configuration.sysmaps.js.php:17
-#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:145
+#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:144
 #: report5.php:61 services.php:474 tr_comments.php:69 tr_logform.php:151
 #: tr_logform.php:164
 msgid "Trigger"
@@ -12055,7 +12055,7 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:65
 #: include/views/conf.import.php:33
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/monitoring.overview.php:27 jsLoader.php:111 popup.php:61
+#: include/views/monitoring.overview.php:27 jsLoader.php:110 popup.php:61
 #: search.php:133 search.php:138 search.php:168 search.php:187 search.php:205
 #: search.php:260 search.php:312 search.php:370 search.php:397 search.php:420
 #: templates.php:460 templates.php:525 tr_status.php:178
@@ -12116,7 +12116,7 @@ msgstr "Otrdiena"
 msgid "Turkish (tr_TR)"
 msgstr "Turku (tr_TR)"
 
-#: jsLoader.php:152
+#: jsLoader.php:151
 msgid "Two elements should be selected"
 msgstr "Jāiezīmē divi elementi"
 
@@ -12417,7 +12417,7 @@ msgstr ""
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: jsLoader.php:163
+#: jsLoader.php:162
 msgid "Unmute"
 msgstr ""
 
@@ -12836,7 +12836,7 @@ msgstr ""
 msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
-#: jsLoader.php:129
+#: jsLoader.php:128
 msgctxt "Wednesday short"
 msgid "W"
 msgstr ""
@@ -12932,7 +12932,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: jsLoader.php:170
+#: jsLoader.php:169
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr ""
 
@@ -13444,7 +13444,7 @@ msgstr ""
 msgid "Zetta"
 msgstr ""
 
-#: jsLoader.php:89
+#: jsLoader.php:88
 msgid "Zoom"
 msgstr ""
 
@@ -13516,7 +13516,7 @@ msgstr "sarkanas"
 msgid "avg"
 msgstr ""
 
-#: include/func.inc.php:472 jsLoader.php:96
+#: include/func.inc.php:472 jsLoader.php:95
 msgctxt "day short"
 msgid "d"
 msgstr ""
@@ -13586,7 +13586,7 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: jsLoader.php:91
+#: jsLoader.php:90
 msgid "dynamic"
 msgstr "dinamisks"
 
@@ -13616,7 +13616,7 @@ msgstr ""
 msgid "executed"
 msgstr "izpildīts"
 
-#: jsLoader.php:90
+#: jsLoader.php:89
 msgid "fixed"
 msgstr "fiksēts"
 
@@ -13624,7 +13624,7 @@ msgstr "fiksēts"
 msgid "found"
 msgstr "atrastiem"
 
-#: include/func.inc.php:480 jsLoader.php:97
+#: include/func.inc.php:480 jsLoader.php:96
 msgctxt "hour short"
 msgid "h"
 msgstr ""
@@ -13680,12 +13680,12 @@ msgctxt "Milli short"
 msgid "m"
 msgstr ""
 
-#: include/func.inc.php:488 jsLoader.php:98
+#: include/func.inc.php:488 jsLoader.php:97
 msgctxt "minute short"
 msgid "m"
 msgstr ""
 
-#: include/func.inc.php:464 jsLoader.php:94
+#: include/func.inc.php:464 jsLoader.php:93
 msgctxt "month short"
 msgid "m"
 msgstr ""
@@ -13789,7 +13789,7 @@ msgstr ""
 msgid "not sent"
 msgstr "netika nosūtīts"
 
-#: jsLoader.php:92
+#: jsLoader.php:91
 msgid "now"
 msgstr ""
 
@@ -13896,7 +13896,7 @@ msgstr ""
 msgid "value"
 msgstr ""
 
-#: jsLoader.php:95
+#: jsLoader.php:94
 msgctxt "week short"
 msgid "w"
 msgstr ""
@@ -13913,7 +13913,7 @@ msgstr "nedēļas"
 msgid "whole number"
 msgstr ""
 
-#: include/func.inc.php:456 jsLoader.php:93
+#: include/func.inc.php:456 jsLoader.php:92
 msgctxt "year short"
 msgid "y"
 msgstr ""
