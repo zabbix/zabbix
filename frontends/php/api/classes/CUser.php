@@ -539,6 +539,10 @@ class CUser extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateDelete(array $userIds) {
+		if (empty($userIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$this->checkPermissions($userIds);
 		$this->checkDeleteCurrentUser($userIds);
 		$this->checkDeleteInternal($userIds);
