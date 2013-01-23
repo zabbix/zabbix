@@ -1337,7 +1337,7 @@ function zbx_toObject($value, $field) {
  * This is used for reseting nonsequential numeric arrays;
  * - an associative array will be returned in an array as the only element, except if first element key contains only numeric characters.
  *
- * @param int|array $value
+ * @param mixed $value
  *
  * @return array
  */
