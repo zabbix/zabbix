@@ -703,7 +703,7 @@ static int	DBpatch_02010030()
 {
 	const ZBX_FIELD	field = {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBset_default("httptest", &field);
+	return DBset_default("users", &field);
 }
 #endif	/* not HAVE_SQLITE3 */
 
@@ -772,12 +772,12 @@ int	DBcheck_version()
 		{DBpatch_02010027, 2010027, 0, 1},
 		{DBpatch_02010028, 2010028, 0, 0},
 		{DBpatch_02010029, 2010029, 0, 0},
-		{DBpatch_02010030, 2010030, 0, 0},
+		{DBpatch_02010030, 2010030, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010027;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010030;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
