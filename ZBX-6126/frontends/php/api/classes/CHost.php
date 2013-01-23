@@ -1391,7 +1391,7 @@ class CHost extends CHostGeneral {
 
 		// deprecated input support
 		if ($hostIds && is_array($hostIds[0])) {
-			$this->deprecated('Passing objects to host.delete is deprecated, use an array of IDs instead.');
+			$this->deprecated('Passing objects is deprecated, use an array of IDs instead.');
 			foreach ($hostIds as $host) {
 				if (!check_db_fields(array('hostid' => null), $host)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host ID given.'));
