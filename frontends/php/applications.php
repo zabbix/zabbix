@@ -93,7 +93,7 @@ include_once('include/page_header.php');
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
-			
+
 		}
 		else {
 			$applicationid = add_application($_REQUEST['appname'], $_REQUEST['apphostid']);

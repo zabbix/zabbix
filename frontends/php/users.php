@@ -111,9 +111,9 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['save'])){
-		$config = select_config();		
+		$config = select_config();
 		$auth_type = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
-		
+
 		if(isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
 			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 		}
-		
+
 		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			if(isset($_REQUEST['userid']))
 				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
@@ -519,7 +519,7 @@ include_once('include/page_header.php');
 
 		$user_wdgt->addItem($form);
 	}
-	
+
 	$user_wdgt->show();
 
 

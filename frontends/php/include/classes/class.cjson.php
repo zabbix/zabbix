@@ -239,7 +239,7 @@ class CJSON{
 
 // Fall back to PHP-only method
 		ini_set('pcre.backtrack_limit', '10000000');
-		
+
 		$this->_level = 0;
 		$result = null;
 

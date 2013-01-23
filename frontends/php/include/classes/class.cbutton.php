@@ -31,7 +31,7 @@ class CButton extends CTag{
 	public function __construct($name='button', $caption='', $action=NULL, $submit=true){
 		parent::__construct('input','no');
 		$this->tag_body_start = '';
-		
+
 		$this->attributes['type'] = $submit?'submit':'button';
 
 		$this->setAttribute('value', $caption);

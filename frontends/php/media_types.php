@@ -76,7 +76,7 @@ include_once('include/page_header.php');
 			'username' => get_request('username'),
 			'passwd' => get_request('password')
 		);
-		
+
 		if(is_null($mediatype['passwd'])) unset($mediatype['passwd']);
 
 		if(isset($_REQUEST['mediatypeid'])){
@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 			$mediatype = reset($mediatypes);
 			$password = $mediatype['passwd'];
 		}
-		
+
 		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
 			$mediatypeid = $mediatype['mediatypeid'];
 			$type = $mediatype['type'];
@@ -188,7 +188,7 @@ include_once('include/page_header.php');
 			MEDIA_TYPE_JABBER => S_JABBER,
 		));
 		$cmbType->addItemsInGroup(S_COMMERCIAL, array(MEDIA_TYPE_EZ_TEXTING => S_EZ_TEXTING));
-		
+
 		$row = array($cmbType);
 		if($type == MEDIA_TYPE_EZ_TEXTING){
 			$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 				$frmMedia->addRow(S_PASSWORD, $pass_fields);
 				$limit_cb = new CComboBox('exec_path', $exec_path);
 				$limit_cb->addItems(array(
-					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA, 
+					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA,
 					EZ_TEXTING_LIMIT_CANADA => S_EZ_TEXTING_CANADA,
 				));
 				$frmMedia->addRow(S_MESSAGE_TEXT_LIMIT, $limit_cb);

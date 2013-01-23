@@ -25,12 +25,12 @@ function SDB($return=false){
 	foreach($backtrace as $n => $bt){
 		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].'<br/>';
 		$result .= "&nbsp;&nbsp;<b>".(isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function']).'</b>';
-		
+
 		$args = array();
 		foreach($bt['args'] as $arg){
 			$args[] = is_array($arg) ? print_r($arg, true) : $arg;
 		}
-		
+
 		$result .= '( '.implode(', ', $args).' ) <br/>';
 	}
 	if($return) return $result;
