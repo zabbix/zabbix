@@ -69,3 +69,6 @@
 
 /* Define to 1 if 'sockaddr_storage.ss_family' exists. */
 #define HAVE_SOCKADDR_STORAGE_SS_FAMILY 1
+
+/* define to 1 if you have the <errno.h> header file */
+#define HAVE_ERRNO_H 1
