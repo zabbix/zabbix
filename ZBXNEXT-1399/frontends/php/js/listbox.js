@@ -39,7 +39,7 @@ jQuery(function($) {
 
 			$('.search-field input', containerObj).bind('keyup', function() {
 				var inputObj = $(this),
-					value = $.trim(inputObj.val());
+					value = inputObj.val();
 
 				if (empty(value) || inputObj.data('lastValue') == value) {
 					return;
