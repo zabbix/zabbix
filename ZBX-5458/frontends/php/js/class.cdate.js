@@ -109,7 +109,6 @@ CDate.prototype = {
 				return  yr + ' ' + shortMn[mnth] + ' ' +appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'd.m.Y H:i':
 				return appZr(dt) + '.' + appZr(mnth + 1) + '.' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
-
 		}
 
 		return false;
