@@ -37,6 +37,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+...G...... [ZBX-5034] fixed vfs.file.exists incorrectly reporting file as not existing in the case of errors (wiper)
 ..F....... [ZBX-6162] fixed undefined indexes in Dashboard->Host status (Oleg)
 ..F....... [ZBX-6041] fixed item sort in log item filter (Oleg)
 ....I..... [ZBX-6127] fixed default value for type column in users table (Eduard)
