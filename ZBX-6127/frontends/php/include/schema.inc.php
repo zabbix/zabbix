@@ -1351,7 +1351,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => USER_TYPE_ZABBIX_USER,
+				'default' => '1',
 			),
 			'theme' => array(
 				'null' => false,
