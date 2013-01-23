@@ -365,6 +365,11 @@ class CProxy extends CZBXAPI {
 		// deprecated input support
 		if ($proxyIds && is_array($proxyIds[0])) {
 			$this->deprecated('Passing objects to proxy.delete is deprecated, use an array of IDs instead.');
+			foreach ($proxyIds as $proxy) {
+				if (!check_db_fields(array('proxyid' => null), $proxy)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No proxy ID given.'));
+				}
+			}
 			$proxyIds = zbx_objectValues($proxyIds, 'proxyid');
 		}
 
