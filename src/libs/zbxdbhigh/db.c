@@ -515,7 +515,8 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 	/**************************************************************************************************/
 	/*                                                                                                */
-	/* The following table shows in which cases events should be generated:                           */
+	/* The following table shows in which cases trigger should be updated and/or events should be     */
+	/* generated. Trigger state changes from state "from" to state "to":                              */
 	/*                                                                                                */
 	/*   _          |                                                                                 */
 	/*    \__ to    |                                                                                 */
@@ -536,10 +537,10 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	/* Legend:                                                                                        */
 	/*                                                                                                */
 	/*  -   - should never happen                                                                     */
-	/*  no  - do not update a trigger and do not generate an event                                    */
+	/*  no  - do nothing                                                                              */
 	/*  T   - update a trigger                                                                        */
 	/*  E   - generate an event                                                                       */
-	/*  (m) - if it is a "multiple true" trigger                                                      */
+	/*  (m) - if it is a "multiple PROBLEM events" trigger                                            */
 	/*  (e) - if an error message has changed                                                         */
 	/*                                                                                                */
 	/**************************************************************************************************/

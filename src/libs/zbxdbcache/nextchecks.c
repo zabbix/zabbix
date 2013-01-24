@@ -168,9 +168,7 @@ void	DCflush_nextchecks()
 	for (i = 0; i < nextcheck_num; i++)
 	{
 		itemids[i] = nextchecks[i].itemid;
-
 		timespecs[i].sec = nextchecks[i].now;
-
 		errors[i] = nextchecks[i].error_msg;
 	}
 
