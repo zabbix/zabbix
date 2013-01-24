@@ -35,7 +35,7 @@ class CApplicationManager {
 	 */
 	public function create(array $applications, $batch = false) {
 		if ($batch) {
-			$applicationids = DB::insertBatch('applications', $applications);
+			$applicationids = DbBackend::i()->insertBatch('applications', $applications);
 		}
 		else {
 			$applicationids = DB::insert('applications', $applications);

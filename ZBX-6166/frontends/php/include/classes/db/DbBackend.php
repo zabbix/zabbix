@@ -54,6 +54,97 @@ abstract class DbBackend {
 	}
 
 	/**
+	 * Insert batch data into DB
+	 *
+	 * @param string $table
+	 * @param array  $values pair of fieldname => fieldvalue
+	 * @param bool   $getids
+	 *
+	 * @return array    an array of ids with the keys preserved
+	 */
+	public function insertBatch($table, $values, $getids = true) {
+		if (empty($values)) {
+			return true;
+		}
+		$resultIds = array();
+
+		$tableSchema = DB::getSchema($table);
+		$values = DB::addMissingFields($tableSchema, $values);
+		$fields = array_keys($values[0]);
+
+		if ($getids) {
+			$id = DB::reserveIds($table, count($values));
+			$fields[] = $tableSchema['key'];
+		}
+
+		foreach ($values as $key => $row) {
+			if ($getids) {
+				$resultIds[$key] = $id;
+				$row[$tableSchema['key']] = $id;
+				$values[$key][$tableSchema['key']] = $id;
+				$id = bcadd($id, 1, 0);
+			}
+
+			DB::checkValueTypes($table, $row);
+		}
+
+		$sql = $this->insertGeneration($table, $fields, $values);
+
+		var_dump($sql);
+//		if (!DBexecute($sql)) {
+//			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+//		}
+
+		return $resultIds;
+	}
+
+	/**
+	 * !!!
+	 *
+	 * @param !!!
+	 *
+	 * @return !!!
+	 */
+	public static function i() {
+	global $DB;
+		switch ($DB['TYPE']) {
+			case ZBX_DB_MYSQL:
+				$dbBackend = new MysqlDbBackend();
+				break;
+			case ZBX_DB_POSTGRESQL:
+				$dbBackend = new PostgresqlDbBackend();
+				break;
+			case ZBX_DB_ORACLE:
+				$dbBackend = new OracleDbBackend();
+				break;
+			case ZBX_DB_DB2:
+				$dbBackend = new Db2DbBackend();
+				break;
+			case ZBX_DB_SQLITE3:
+				$dbBackend = new SqliteDbBackend();
+				break;
+		}
+		return $dbBackend;
+	}
+
+	/**
+	 * !!!
+	 *
+	 * @return !!!
+	 */
+	public function insertGeneration($table, $fields, $values) {
+		$sql = 'INSERT2 INTO '.$table.' ('.implode(',', $fields).') VALUES ';
+
+		foreach ($values as $row) {
+			$sql .= '('.implode(',', array_values($row)).'),';
+		}
+
+		$sql[strlen($sql) - 1] = ' ';
+
+		return $sql;
+	}
+
+	/**
 	 * Set error string.
 	 *
 	 * @param string $error
