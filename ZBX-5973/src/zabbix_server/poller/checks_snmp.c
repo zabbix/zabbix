@@ -139,8 +139,6 @@ static int	cache_get_snmp_index(DC_ITEM *item, char *oid, char *value, int *inde
 	int			i, res = FAIL;
 	zbx_snmp_index_t	s;
 
-	assert(index);
-
 	*index = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s'", __function_name, oid, value);
@@ -234,11 +232,7 @@ static void	cache_del_snmp_index_subtree(DC_ITEM *item, const char *oid)
 	s.oid = (char *)oid;
 	s.value = "";
 
-	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)))
-	{
-		if (snmpidx[i].hostid < s.hostid || snmpidx[i].port < s.port || -1 == strcmp(snmpidx[i].oid, s.oid))
-			i++;
-	}
+	i = get_snmpidx_nearestindex(&s);
 
 	while (i < snmpidx_count)
 	{
@@ -608,8 +602,14 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 
 						if (1 == bulk)
 						{
-							cache_put_snmp_index(item, (char *)OID, strval,
-									vars->name[vars->name_length - 1]);
+							int	i_dummy;
+
+							/* in case of non-unique values keep the smallest index */
+							if (FAIL == cache_get_snmp_index(item, (char *)OID, strval, &i_dummy))
+							{
+								cache_put_snmp_index(item, (char *)OID, strval,
+										vars->name[vars->name_length - 1]);
+							}
 						}
 
 						if (0 == found && 0 == strcmp(value, strval))
