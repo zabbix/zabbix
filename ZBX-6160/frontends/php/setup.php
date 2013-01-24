@@ -87,7 +87,10 @@ if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_e
 	$ZBX_CONFIG['allowed_db']['POSTGRESQL'] = 'PostgreSQL';
 }
 // ORACLE
-if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc'))) {
+if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
+		'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
+		'oci_bind_by_name', 'oci_free_statement'))) {
+
 	$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 }
 // IBM_DB2
