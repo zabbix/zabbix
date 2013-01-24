@@ -163,7 +163,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 					'.warning { background: #'.$config['severity_color_2'].' !important; }'."\n".
 					'.information { background: #'.$config['severity_color_1'].' !important; }'."\n".
 					'.not_classified { background: #'.$config['severity_color_0'].' !important; }'."\n".
-					'.trigger_unknown { background: #DBDBDB !important; }'."\n".
 				'</style>';
 
 			// perform Zabbix server check only for standard pages
