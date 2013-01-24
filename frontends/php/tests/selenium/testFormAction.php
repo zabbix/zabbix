@@ -259,10 +259,11 @@ class testFormAction extends CWebTest {
 		$this->type("esc_period", "123");
 		$this->ok("Run remote commands on current host");
 
-		$this->button_click("save");
-		$this->wait();
+		sleep(1);
+		$this->button_click('save');
+		sleep(1);
 
-		$this->button_click("save");
+		$this->button_click('save');
 		$this->wait();
 		$this->ok("Action added");
 
