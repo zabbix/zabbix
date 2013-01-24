@@ -218,28 +218,6 @@ static void	cache_del_snmp_index_by_position(int i)
 	}
 }
 
-static void	cache_del_snmp_index(DC_ITEM *item, char *oid, char *value)
-{
-	const char		*__function_name = "cache_del_snmp_index";
-	int			i;
-	zbx_snmp_index_t	s;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s'", __function_name, oid, value);
-
-	if (NULL == snmpidx)
-		goto end;
-
-	s.hostid = item->host.hostid;
-	s.port = item->snmp_port;
-	s.oid = oid;
-	s.value = value;
-
-	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
-		cache_del_snmp_index_by_position(i);
-end:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 static void	cache_del_snmp_index_subtree(DC_ITEM *item, const char *oid)
 {
 	const char		*__function_name = "cache_del_snmp_index_subtree";
@@ -264,11 +242,7 @@ static void	cache_del_snmp_index_subtree(DC_ITEM *item, const char *oid)
 
 	while (i < snmpidx_count)
 	{
-		if (snmpidx[i].hostid != s.hostid)
-			break;
-		if (snmpidx[i].port != s.port)
-			break;
-		if (0 != strcmp(snmpidx[i].oid, s.oid))
+		if (snmpidx[i].hostid != s.hostid || snmpidx[i].port != s.port || 0 != strcmp(snmpidx[i].oid, s.oid))
 			break;
 
 		cache_del_snmp_index_by_position(i);
@@ -976,8 +950,6 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 			if (SUCCEED != ret && SUCCEED != (ret = snmp_get_index(ss, item, oid_normalized, index_value, &idx, err, 1)))
 			{
-				cache_del_snmp_index(item, oid_normalized, index_value);
-
 				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "cannot find index [%s] of the OID [%s]: %s",
 						oid_index,
 						item->snmp_oid,
