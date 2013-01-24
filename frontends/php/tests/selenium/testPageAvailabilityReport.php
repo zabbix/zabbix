@@ -28,7 +28,7 @@ class testPageAvailabilityReport extends CWebTest {
 		$this->ok('AVAILABILITY REPORT');
 		$this->ok('Mode');
 		$this->ok('Filter');
-		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Unknown', 'Graph'));
+		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
 	}
 
 // Check that no real host or template names displayed
@@ -44,7 +44,7 @@ class testPageAvailabilityReport extends CWebTest {
 		$this->ok('AVAILABILITY REPORT');
 		$this->ok('Mode');
 		$this->ok('Filter');
-		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Unknown', 'Graph'));
+		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
 	}
 
 // Check that no real host or template names displayed
