@@ -260,7 +260,7 @@ class testFormAction extends CWebTest {
 		$this->ok("Run remote commands on current host");
 
 		sleep(1);
-		$this->input_type('new_condition_value', '');
+		$this->type('new_condition_value', '');
 		sleep(1);
 
 		$this->button_click('save');
