@@ -159,7 +159,7 @@ function make_small_eventlist($startEvent) {
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$clock = $event['clock'];
 
-		if (bccomp($startEvent['eventid'],$event['eventid']) == 0 && $nextevent = get_next_event($event, $events, true)) {
+		if (bccomp($startEvent['eventid'],$event['eventid']) == 0 && $nextevent = get_next_event($event, $events)) {
 			$duration = zbx_date2age($nextevent['clock'], $clock);
 		}
 		elseif (bccomp($startEvent['eventid'], $event['eventid']) == 0) {

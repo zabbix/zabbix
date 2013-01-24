@@ -264,7 +264,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			'where' => array('triggerid' => $triggerIdsToUpdate)
 		));
 
-		// if disable trigger, unknown event must be created
+		// if we're disabling a monitored trigger, set it's value flag to UNKNOWN
 		if ($status == TRIGGER_STATUS_DISABLED) {
 			$valueTriggerIds = array();
 			$db_triggers = DBselect(
