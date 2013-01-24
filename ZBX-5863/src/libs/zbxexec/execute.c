@@ -21,6 +21,9 @@
 #include "threads.h"
 #include "log.h"
 
+/* the size of temporary buffer used to read from output stream */
+#define PIPE_BUFFER_SIZE	4096
+
 #ifdef _WINDOWS
 
 /******************************************************************************
@@ -66,23 +69,25 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int timeout_ms)
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset, int timeout_ms)
 {
 	DWORD		in_buf_size, read_bytes;
 	struct _timeb	start_time, current_time;
+	char 		tmp_buf[PIPE_BUFFER_SIZE];
 
 	_ftime(&start_time);
 
-	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL))
+	while (0 != PeekNamedPipe(hRead, NULL, 0, NULL, &in_buf_size, NULL) &&
+			MAX_EXECUTE_OUTPUT_LEN > *offset + in_buf_size)
 	{
 		if (0 != in_buf_size)
 		{
-			if (0 != ReadFile(hRead, *buf, (DWORD)MIN(in_buf_size, buf_size), &read_bytes, NULL))
+			if (0 != ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
 			{
-				*buf += read_bytes;
-				if (0 == (buf_size -= read_bytes))
-					break;
+				tmp_buf[read_bytes] = '\0';
+				zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
 			}
+			in_buf_size = 0;
 			continue;
 		}
 
@@ -92,7 +97,12 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int tim
 
 		Sleep(20);	/* milliseconds */
 	}
-
+	if (MAX_EXECUTE_OUTPUT_LEN <= *offset + in_buf_size)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "zbx_execute() output exceeded limit of %i KB",
+				MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+		return FAIL;
+	}
 	return SUCCEED;
 }
 
@@ -243,8 +253,7 @@ exit:
  ******************************************************************************/
 int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
 {
-	char					*p = NULL;
-	size_t					buf_size = MAX_BUFFER_LEN;
+	size_t					buf_size = PIPE_BUFFER_SIZE, offset = 0;
 	int					ret = FAIL;
 #ifdef _WINDOWS
 	STARTUPINFO				si;
@@ -264,9 +273,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	if (NULL != buffer)
 	{
-		p = zbx_realloc(*buffer, buf_size);
-		*buffer = p;
-		buf_size--;	/* '\0' */
+		*buffer = zbx_realloc(*buffer, buf_size);
+		**buffer = '\0';
 	}
 
 #ifdef _WINDOWS
@@ -354,8 +362,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	if (NULL != buffer && SUCCEED == (ret = zbx_read_from_pipe(hRead, &p, buf_size, timeout)))
-		*p = '\0';
+	if (NULL != buffer)
+		ret = zbx_read_from_pipe(hRead, buffer, &buf_size, &offset, timeout);
 
 	if (TIMEOUT_ERROR != ret)
 	{
@@ -394,17 +402,16 @@ close:
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
 		int	rc = 0;
+		char	tmp_buf[PIPE_BUFFER_SIZE];
 
 		if (NULL != buffer)
 		{
-			while (0 < (rc = read(fd, p, buf_size)))
+			while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) &&
+					MAX_EXECUTE_OUTPUT_LEN > offset + rc)
 			{
-				p += rc;
-				if (0 == (buf_size -= rc))
-					break;
+				tmp_buf[rc] = '\0';
+				zbx_strcpy_alloc(buffer, &buf_size, &offset, tmp_buf);
 			}
-
-			*p = '\0';
 		}
 
 		close(fd);
@@ -421,6 +428,11 @@ close:
 				zabbix_log(LOG_LEVEL_ERR, "failed to kill [%s]: %s", command, zbx_strerror(errno));
 
 			zbx_waitpid(pid);
+		}
+		else if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "zbx_execute() output exceeded limit of %i KB",
+					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		}
 		else
 			ret = SUCCEED;

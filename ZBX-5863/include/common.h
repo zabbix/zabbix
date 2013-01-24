@@ -144,6 +144,7 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
+#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
