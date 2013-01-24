@@ -1453,16 +1453,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$diff = $clock - $time;
 		$time = $clock;
 
-		if ($state == -1) {
-			$state = $value;
-			if ($state == 0) {
-				$false_time += $diff;
-			}
-			if ($state == 1) {
-				$true_time += $diff;
-			}
-		}
-		elseif ($state == 0) {
+		if ($state == 0) {
 			$false_time += $diff;
 			$state = $value;
 		}
