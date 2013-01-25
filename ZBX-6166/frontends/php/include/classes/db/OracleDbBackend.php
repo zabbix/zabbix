@@ -39,4 +39,20 @@ class OracleDbBackend extends DbBackend {
 
 		return true;
 	}
+
+	/**
+	 * !!!
+	 *
+	 * @return !!!
+	 */
+	public function insertGeneration($table, $fields, $values) {
+		$sql = 'INSERT ALL';
+		$tableAndFields = ' INTO '.$table.' ('.implode(',', $fields).') VALUES';
+
+		foreach ($values as $row) {
+			$sql .= $tableAndFields.' ('.implode(',', array_values($row)).')';
+		}
+
+		return $sql;
+	}
 }

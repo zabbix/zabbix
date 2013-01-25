@@ -38,22 +38,4 @@ class MysqlDbBackend extends DbBackend {
 
 		return true;
 	}
-
-	/**
-	 * !!!
-	 *
-	 * @return !!!
-	 */
-
-	public function insertGeneration($table, $fields, $values) {
-		$sql = 'TEST '.$table.' ('.implode(',', $fields).') VALUES ';
-
-		foreach ($values as $row) {
-			$sql .= '('.implode(',', array_values($row)).'),';
-		}
-
-		$sql[strlen($sql) - 1] = ' ';
-
-		return $sql;
-	}
 }

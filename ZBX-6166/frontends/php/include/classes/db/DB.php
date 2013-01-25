@@ -44,7 +44,7 @@ class DB {
 	private static $maxNodeId = null;
 	private static $minNodeId = null;
 
-	private static function exception($code, $error) {
+	public static function exception($code, $error) {
 		throw new DBException($error, $code);
 	}
 

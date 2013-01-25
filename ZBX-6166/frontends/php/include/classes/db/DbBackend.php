@@ -91,9 +91,9 @@ abstract class DbBackend {
 		$sql = $this->insertGeneration($table, $fields, $values);
 
 		var_dump($sql);
-//		if (!DBexecute($sql)) {
-//			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
-//		}
+		if (!DBexecute($sql)) {
+			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+		}
 
 		return $resultIds;
 	}
@@ -133,7 +133,7 @@ abstract class DbBackend {
 	 * @return !!!
 	 */
 	public function insertGeneration($table, $fields, $values) {
-		$sql = 'INSERT2 INTO '.$table.' ('.implode(',', $fields).') VALUES ';
+		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ';
 
 		foreach ($values as $row) {
 			$sql .= '('.implode(',', array_values($row)).'),';
