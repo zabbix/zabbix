@@ -924,13 +924,13 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		url_esc = DBdyn_escape_string(row[7]);
 
 		p = NULL;
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^
- */		while (NULL != (p = zbx_json_next(jp_data, p)))
+		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*                      ^                                             */
+		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^------------------^
- */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+			/*                      ^------------------^                          */
+			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
@@ -1439,13 +1439,13 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		ZBX_DBROW2UINT64(interfaceid, row[33]);
 
 		p = NULL;
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^
- */		while (NULL != (p = zbx_json_next(jp_data, p)))
+		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*                      ^                                             */
+		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^------------------^
- */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+			/*                      ^------------------^                          */
+			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
@@ -2050,13 +2050,13 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		DBget_graphitems(sql, &gitems_proto, &gitems_proto_alloc, &gitems_proto_num);
 
 		p = NULL;
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^
- */		while (NULL != (p = zbx_json_next(jp_data, p)))
+		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*                      ^                                             */
+		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^------------------^
- */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+			/*                      ^------------------^                          */
+			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
@@ -2230,9 +2230,9 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 		goto error;
 	}
 
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                     ^-------------------------------------------^
- */	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+	/*                     ^-------------------------------------------^  */
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		error = zbx_dsprintf(error, "Cannot find the \"%s\" array in the received JSON object",
 				ZBX_PROTO_TAG_DATA);
