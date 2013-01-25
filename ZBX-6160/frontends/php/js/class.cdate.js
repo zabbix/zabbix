@@ -50,6 +50,70 @@ CDate.prototype = {
 		this.tzDiff = ddTZOffset - PHP_TZ_OFFSET;
 	},
 
+	/**
+	* Formats date according given format. Uses server timezone.
+	* Supported formats: 'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i'
+	*
+	* @param format PHP style date format limited to supported formats
+	*
+	* @return string|bool human readable date or false if unsupported format given
+	*/
+	format: function(format) {
+		var shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+		var dt = this.getDate(),
+			mnth = this.getMonth(),
+			yr = this.getFullYear(),
+			hrs = this.getHours(),
+			mnts = this.getMinutes();
+
+		/**
+		 * Transform datetime parts to two digits e.g., 2 becomes 02
+		 * @param int val
+		 * @return string
+		 */
+		var appZr = function(val) {
+			return val < 10 ? '0' + val : val;
+		}
+
+		/**
+		 * Append date suffix according to english rules e.g., 3 becomes 3rd
+		 * @param int date
+		 * @return string
+		 */
+		var appSfx = function(date) {
+			if (date % 10 == 1 && date != 11) {
+				return date + 'st';
+			}
+			if (date % 10 == 2 && date != 12) {
+				return date + 'nd';
+			}
+			if (date % 10 == 3 && date != 13) {
+				return date + 'rd';
+			}
+			return date + 'th';
+		}
+
+		switch(format) {
+			case 'd M Y H:i':
+				return appZr(dt) + ' ' + shortMn[mnth] + ' ' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			case 'j. M Y G:i':
+				return dt + '. ' + shortMn[mnth] + ' ' + yr + ' ' + hrs + ':' + appZr(mnts);
+			case 'Y/m/d H:i':
+				return yr + '/' + appZr(mnth + 1) + '/' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			case 'M jS, Y h:i A':
+				var ampm = (hrs < 12) ? 'AM' : 'PM';
+				hrs = appZr((hrs + 11) % 12 + 1);
+				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + hrs + ':' + appZr(mnts) + ' ' + ampm;
+			case 'Y M d H:i':
+				return  yr + ' ' + shortMn[mnth] + ' ' +appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			case 'd.m.Y H:i':
+				return appZr(dt) + '.' + appZr(mnth + 1) + '.' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
+		}
+
+		return false;
+	},
+
 	getZBXDate: function() {
 		var thedate = [];
 		thedate[0] = this.serverDate.getDate();
