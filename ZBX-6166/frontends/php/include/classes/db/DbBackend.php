@@ -103,7 +103,7 @@ abstract class DbBackend {
 
 // ORACLE TEST
 		$sql = 'INSERT ALL';
-		$tableAndFields = " INTO usrgrp ('usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode') VALUES";
+		$tableAndFields = " INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
 		for($i = 20;$i < 10000; $i++) {
 			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
 		}
