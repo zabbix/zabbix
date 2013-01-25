@@ -1305,7 +1305,7 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
+void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 {
 	const char	*__function_name = "DBdelete_graphs";
 	char		*sql = NULL;

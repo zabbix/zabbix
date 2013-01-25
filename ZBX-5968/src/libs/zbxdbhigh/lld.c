@@ -1976,13 +1976,37 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	graphs;
+	zbx_vector_uint64_t	graphids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&graphs);
+	zbx_vector_uint64_create(&graphids);
 	sql = zbx_malloc(sql, sql_alloc);
+
+	result = DBselect(
+			"select distinct gd.graphid"
+			" from item_discovery id,items i,graphs_items gi,graphs g"
+			" left join items i1 on i1.itemid=g.ymin_itemid"
+			" left join items i2 on i2.itemid=g.ymax_itemid"
+			" join graph_discovery gd on gd.parent_graphid=g.graphid"
+			" where id.itemid=i.itemid"
+				" and i.itemid=gi.itemid"
+				" and gi.graphid=g.graphid"
+				" and id.parent_itemid=" ZBX_FS_UI64,
+			discovery_itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	graphid;
+
+		ZBX_STR2UINT64(graphid, row[0]);
+
+		zbx_vector_uint64_append(&graphids, graphid);
+	}
+	DBfree_result(result);
 
 	result = DBselect(
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
@@ -2009,6 +2033,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d,
 				ymin_type = GRAPH_YAXIS_TYPE_CALCULATED, ymax_type = GRAPH_YAXIS_TYPE_CALCULATED,
 				ymin_flags = 0, ymax_flags = 0;
+		int		i;
 
 		ZBX_STR2UINT64(parent_graphid, row[0]);
 		name_proto = row[1];
@@ -2080,11 +2105,23 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		zbx_free(gitems_proto);
 		zbx_free(name_proto_esc);
 
+		for (i = 0; i < graphids.values_num;)
+		{
+			if (FAIL != zbx_vector_ptr_bsearch(&graphs, &graphids.values[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+				zbx_vector_uint64_remove_noorder(&graphids, i);
+			else
+				i++;
+		}
+
 		DBlld_clean_graphs(&graphs);
 	}
 	DBfree_result(result);
 
+	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_graphs(&graphids);
+
 	zbx_free(sql);
+	zbx_vector_uint64_destroy(&graphids);
 	zbx_vector_ptr_destroy(&graphs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
