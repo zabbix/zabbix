@@ -137,11 +137,12 @@ class testFormAction extends CWebTest {
 			$this->wait();
 		}
 		$this->type('esc_period', $action['esc_period']);
-		$this->button_click('save'); // will refresh page
 
-		$this->wait();
+		sleep(1);
+		$this->type('new_condition_value', '');
+		sleep(1);
+
 		$this->button_click('save');
-
 		$this->wait();
 		$this->ok('Action added');
 
