@@ -894,10 +894,32 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	triggers;
+	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&triggers);
+	zbx_vector_uint64_create(&triggerids);
+
+	result = DBselect(
+			"select distinct td.triggerid"
+			" from trigger_discovery td,triggers t,functions f,items i,item_discovery id"
+			" where td.parent_triggerid=t.triggerid"
+				" and t.triggerid=f.triggerid"
+				" and f.itemid=i.itemid"
+				" and i.itemid=id.itemid"
+				" and id.parent_itemid=" ZBX_FS_UI64,
+			discovery_itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	triggerid;
+
+		ZBX_STR2UINT64(triggerid, row[0]);
+
+		zbx_vector_uint64_append(&triggerids, triggerid);
+	}
+	DBfree_result(result);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,"
@@ -915,6 +937,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		const char	*description_proto, *expression;
 		char		*description_proto_esc, *comments_esc, *url_esc;
 		unsigned char	status, type, priority;
+		int		i;
 
 		ZBX_STR2UINT64(parent_triggerid, row[0]);
 		description_proto = row[1];
@@ -952,10 +975,25 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		zbx_free(comments_esc);
 		zbx_free(description_proto_esc);
 
+		for (i = 0; i < triggerids.values_num;)
+		{
+			if (FAIL != zbx_vector_ptr_bsearch(&triggers, &triggerids.values[i],
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_remove_noorder(&triggerids, i);
+			}
+			else
+				i++;
+		}
+
 		DBlld_clean_triggers(&triggers);
 	}
 	DBfree_result(result);
 
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_triggers(&triggerids);
+
+	zbx_vector_uint64_destroy(&triggerids);
 	zbx_vector_ptr_destroy(&triggers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2107,8 +2145,11 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 
 		for (i = 0; i < graphids.values_num;)
 		{
-			if (FAIL != zbx_vector_ptr_bsearch(&graphs, &graphids.values[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			if (FAIL != zbx_vector_ptr_bsearch(&graphs, &graphids.values[i],
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			{
 				zbx_vector_uint64_remove_noorder(&graphids, i);
+			}
 			else
 				i++;
 		}
