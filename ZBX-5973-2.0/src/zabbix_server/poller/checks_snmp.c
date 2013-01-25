@@ -693,7 +693,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	return ret;
 }
 
-static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_ITEM *item, AGENT_RESULT *value)
+static int	snmp_set_value(struct variable_list *vars, DC_ITEM *item, AGENT_RESULT *value)
 {
 	const char	*__function_name = "snmp_set_value";
 	char		*strval_dyn;
@@ -868,7 +868,7 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 
 						init_result(&snmp_value);
 
-						if (SUCCEED == snmp_set_value(snmp_oid, vars, item, &snmp_value) &&
+						if (SUCCEED == snmp_set_value(vars, item, &snmp_value) &&
 								GET_STR_RESULT(&snmp_value))
 						{
 							zbx_json_addobject(&j, NULL);
@@ -973,7 +973,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	{
 		for (vars = response->variables; vars; vars = vars->next_variable)
 		{
-			if (SUCCEED == (ret = snmp_set_value(snmp_oid, vars, item, value)))
+			if (SUCCEED == (ret = snmp_set_value(vars, item, value)))
 				break;
 		}
 	}
