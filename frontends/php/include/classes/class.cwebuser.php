@@ -147,13 +147,4 @@ class CWebUser {
 	public static function isGuest() {
 		return (self::$data['alias'] == ZBX_GUEST_USER);
 	}
-
-	/**
-	 * Return true if debug mode is enabled for the current user.
-	 *
-	 * @return bool
-	 */
-	public static function debugModeEnabled() {
-		return isset(self::$data['debug_mode']) && self::$data['debug_mode'];
-	}
 }
