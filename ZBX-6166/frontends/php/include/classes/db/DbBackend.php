@@ -89,46 +89,11 @@ abstract class DbBackend {
 			$newValues[] = $row;
 		}
 
-//		$sql = $this->insertGeneration($table, $fields, $newValues);
-
-// MYSQL TEST
-/*
-		$sql = "INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
-		for($i = 20;$i < 100; $i++) {
-			$sql .= " ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."'),";
-		}
-		$sql[strlen($sql) - 1] = ' ';
-*/
-/* --- */
-
-// ORACLE TEST
-	// 1 DUAL METHOD - OK
-
-		$sql = 'INSERT ALL';
-		$tableAndFields = " INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
-		for($i = 20;$i < 220; $i++) {
-			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
-		}
-		$sql .= ' SELECT * FROM dual';
+		$sql = $this->insertGeneration($table, $fields, $newValues);
 
 		if (!DBexecute($sql)) {
 			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 		}
-
-// DEL TESTS
-		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
-/* --- */
-
-	// 2 SHORT QUERY METHOD
-		for($i = 20;$i < 220; $i++) {
-			$md5 = md5(rand(1,1000000));
-			DBexecute("INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES ('".$i."', '".$md5."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')");
-		}
-/* --- */
-
-// DEL TESTS
-		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
-/* --- */
 
 		return $resultIds;
 	}
