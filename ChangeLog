@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete method to accept both objects and IDs (Pavels)
 ...G...... [ZBXNEXT-1334] added whitespace trimming for server lists in agent conf file (wiper)
 A.F....... [ZBXNEXT-1491] fixed builded query ordering (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
@@ -37,6 +38,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-6126] implemented empty parameter validation in user.delete (Pavels)
 ..F....... [ZBX-6160] changed the frontend to use temporary Oracle connections instead of persistent (Pavels)
 ...G...... [ZBX-5034] fixed vfs.file.exists incorrectly reporting file as not existing in the case of errors (wiper)
 ..F....... [ZBX-6162] fixed undefined indexes in Dashboard->Host status (Oleg)
