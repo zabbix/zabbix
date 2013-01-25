@@ -106,18 +106,25 @@ abstract class DbBackend {
 
 		$sql = 'INSERT ALL';
 		$tableAndFields = " INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
-		for($i = 20;$i < 120; $i++) {
+		for($i = 20;$i < 220; $i++) {
 			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
 		}
 		$sql .= ' SELECT * FROM dual';
 
-	// 2 SHORT QUERY METHOD
-
-/* --- */
-
 		if (!DBexecute($sql)) {
 			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 		}
+
+// DEL TESTS
+		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
+/* --- */
+
+	// 2 SHORT QUERY METHOD
+		for($i = 20;$i < 220; $i++) {
+			$md5 = md5(rand(1,1000000));
+			DBexecute("INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES ('".$i."', '".$md5."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')");
+		}
+/* --- */
 
 // DEL TESTS
 		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
