@@ -83,8 +83,7 @@ foreach ($this->data['children'] as $child) {
 		array(
 			new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']),
 			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
-			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid']),
-			new CVar('children['.$child['serviceid'].'][triggerid]', isset($child['triggerid']) ? $child['triggerid'] : '')
+			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
 		),
 		new CCheckBox(
 			'children['.$child['serviceid'].'][soft]',
@@ -176,7 +175,7 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		$serviceTimeFrom = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
 	}
 	else {
-		$downtimeSince = date('YmdHis');
+		$downtimeSince = date(TIMESTAMP_FORMAT);
 		$fromDate = zbxDateToTime($downtimeSince);
 		$serviceTimeFrom = $downtimeSince;
 	}
@@ -199,7 +198,7 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		$serviceTimeTo = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
 	}
 	else {
-		$downtimeTill = date('YmdHis', time() + 86400);
+		$downtimeTill = date(TIMESTAMP_FORMAT, time() + 86400);
 		$toDate = zbxDateToTime($downtimeTill);
 		$serviceTimeTo = $downtimeTill;
 	}

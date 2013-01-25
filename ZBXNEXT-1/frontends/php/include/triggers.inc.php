@@ -18,47 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-/**
- * Returns an array of trigger IDs that are available to the current user.
- *
- * @param int $perm         either PERM_READ_WRITE for writing, or PERM_READ for reading
- * @param array $hostids
- * @param int $cache
- *
- * @return array|int
- */
-function get_accessible_triggers($perm, $hostids = array(), $cache = 1) {
-	static $available_triggers;
-
-	$userid = CWebUser::$data['userid'];
-	$nodeid = get_current_nodeid();
-	$nodeid_str = is_array($nodeid) ? implode('', $nodeid) : strval($nodeid);
-	$hostid_str = implode('', $hostids);
-	$cache_hash = md5($userid.$perm.$nodeid_str.$hostid_str);
-
-	if ($cache && isset($available_triggers[$cache_hash])) {
-		return $available_triggers[$cache_hash];
-	}
-
-	$options = array(
-		'output' => array('triggerid'),
-		'nodeids' => $nodeid
-	);
-	if (!empty($hostids)) {
-		$options['hostids'] = $hostids;
-	}
-	if ($perm == PERM_READ_WRITE) {
-		$options['editable'] = true;
-	}
-
-	$result = API::Trigger()->get($options);
-	$result = zbx_objectValues($result, 'triggerid');
-	$result = zbx_toHash($result);
-
-	$available_triggers[$cache_hash] = $result;
-
-	return $result;
-}
 
 function getSeverityStyle($severity, $type = true) {
 	$styles = array(

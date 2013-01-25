@@ -250,11 +250,18 @@ class FrontendSetup {
 			$current[] = BR();
 		}
 
-		if (function_exists('ocilogon') &&
-				function_exists('ocierror') &&
-				function_exists('ociparse') &&
-				function_exists('ociexecute') &&
-				function_exists('ocifetchinto')
+		if (function_exists('oci_connect') &&
+				function_exists('oci_error') &&
+				function_exists('oci_parse') &&
+				function_exists('oci_execute') &&
+				function_exists('oci_fetch_assoc') &&
+				function_exists('oci_commit') &&
+				function_exists('oci_close') &&
+				function_exists('oci_rollback') &&
+				function_exists('oci_field_type') &&
+				function_exists('oci_new_descriptor') &&
+				function_exists('oci_bind_by_name') &&
+				function_exists('oci_free_statement')
 		) {
 
 			$current[] = 'Oracle';

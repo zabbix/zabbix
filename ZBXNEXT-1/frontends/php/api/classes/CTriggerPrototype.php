@@ -23,6 +23,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
+	protected $sortColumns = array('triggerid', 'description', 'status', 'priority');
 
 	/**
 	 * Get TriggerPrototypes data
@@ -46,8 +47,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		// allowed columns for sorting
-		$sortColumns = array('triggerid', 'description', 'status', 'priority');
 		$sqlParts = array(
 			'select'	=> array('triggers' => 't.triggerid'),
 			'from'		=> array('t' => 'triggers t'),
@@ -381,9 +380,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 't');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -391,6 +387,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$triggerids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
@@ -824,31 +821,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$allowedHosts = API::Host()->get(array(
-			'hostids' => $data['hostids'],
-			'editable' => true,
-			'preservekeys' => true,
-			'templated_hosts' => true,
-			'output' => array('hostid')
-		));
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-
-		$allowedTemplates = API::Template()->get(array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => true,
-			'editable' => true,
-			'output' => array('templateid')
-		));
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
 
 		$triggers = $this->get(array(
 			'hostids' => $data['templateids'],

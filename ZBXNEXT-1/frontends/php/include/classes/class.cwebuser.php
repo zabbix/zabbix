@@ -129,4 +129,22 @@ class CWebUser {
 	public static function getType() {
 		return self::$data['type'];
 	}
+
+	/**
+	 * Returns true if the current user is logged in.
+	 *
+	 * @return bool
+	 */
+	public static function isLoggedIn() {
+		return (self::$data['userid']);
+	}
+
+	/**
+	 * Returns true if the user is not logged in or logged in as Guest.
+	 *
+	 * @return bool
+	 */
+	public static function isGuest() {
+		return (self::$data['alias'] == ZBX_GUEST_USER);
+	}
 }

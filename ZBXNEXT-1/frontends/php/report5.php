@@ -79,14 +79,6 @@ switch ($_REQUEST['period']) {
 		break;
 }
 
-$available_hosts = API::Host()->get(array(
-	'output' => array('hostid'),
-	'preservekeys' => true
-));
-$available_hosts = array_keys($available_hosts);
-$available_triggers = get_accessible_triggers(PERM_READ, array());
-$scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
-
 $triggersEventCount = array();
 // get 100 triggerids with max even count
 $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
@@ -94,9 +86,25 @@ $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 		' WHERE t.triggerid=e.objectid'.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock>'.(time() - $time_dif).
-			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-			' AND '.dbConditionInt('t.triggerid', $available_triggers).
-			' AND '.dbConditionInt('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES;
+
+// add permission filter
+if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+	$userid = CWebUser::$data['userid'];
+	$userGroups = getUserGroupsByUserId($userid);
+	$sql .= ' AND EXISTS ('.
+			'SELECT NULL'.
+			' FROM functions f,items i,hosts_groups hgg'.
+			' JOIN rights r'.
+				' ON r.id=hgg.groupid'.
+					' AND '.dbConditionInt('r.groupid', $userGroups).
+			' WHERE t.triggerid=f.triggerid'.
+				' AND f.itemid=i.itemid'.
+				' AND i.hostid=hgg.hostid'.
+			' GROUP BY f.triggerid'.
+			' HAVING MIN(r.permission)>'.PERM_DENY.')';
+}
+$sql .= ' AND '.dbConditionInt('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 		' GROUP BY e.objectid'.
 		' ORDER BY cnt_event desc';
 $result = DBselect($sql, 100);
@@ -107,13 +115,17 @@ while ($row = DBfetch($result)) {
 $triggers = API::Trigger()->get(array(
 	'triggerids' => array_keys($triggersEventCount),
 	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'lastchange'),
-	'selectItems' => API_OUTPUT_EXTEND,
+	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
 	'expandDescription' => true,
 	'expandData' => true,
 	'preservekeys' => true,
 	'nopermissions' => true,
 ));
+
+$hosts = array();
+
 foreach ($triggers as $tid => $trigger) {
+	$hosts[$trigger['hostid']] = $trigger['hostid'];
 	$trigger['cnt_event'] = $triggersEventCount[$tid];
 
 	$items = $trigger['items'];
@@ -130,6 +142,9 @@ foreach ($triggers as $tid => $trigger) {
 }
 
 CArrayHelper::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
+
+$scripts_by_hosts = API::Script()->getScriptsByHosts($hosts);
+
 foreach ($triggers as $trigger) {
 	$menus = '';
 	$host_nodeid = id2nodeid($trigger['hostid']);

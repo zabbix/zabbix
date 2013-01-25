@@ -134,12 +134,12 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			$this->timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($resourceid));
+			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($resourceid));
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
 				.'&legend='.$legend.'&graph3d='.$graph3d.$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&period=3600&stime='.date('YmdHis', time())
+				? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time())
 				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 		else {
@@ -157,7 +157,7 @@ class CScreenGraph extends CScreenBase {
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
 				.$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&period=3600&stime='.date('YmdHis', time())
+				? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time())
 				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 
