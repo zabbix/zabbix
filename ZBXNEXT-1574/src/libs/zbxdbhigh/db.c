@@ -552,7 +552,7 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	value_flags_changed = (value_flags != new_value_flags);
 	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == type && TRIGGER_VALUE_PROBLEM == new_value &&
 			TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
-	error_changed = (TRIGGER_VALUE_FLAG_UNKNOWN == new_value_flags && 0 != strcmp(error, new_error_local));
+	error_changed = (0 != strcmp(error, new_error_local));
 
 	if (0 != value_changed || 0 != value_flags_changed || 0 != multiple_problem || 0 != error_changed)
 	{
