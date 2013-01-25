@@ -103,15 +103,16 @@ abstract class DbBackend {
 
 // ORACLE TEST
 	// 1
-/*
+
 		$sql = 'INSERT ALL';
 		$tableAndFields = " INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
 		for($i = 20;$i < 30; $i++) {
 			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
 		}
 		$sql .= ' SELECT * FROM dual';
-*/
+
 	// 2
+/*
 		$sql = 'INSERT INTO usrgrp select * from';
 		for($i = 20; $i < 30; $i++) {
 			$sql .= " (select '".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."' from dual)";
@@ -119,6 +120,7 @@ abstract class DbBackend {
 				$sql .= " union";
 			}
 		}
+*/
 /* --- */
 
 		if (!DBexecute($sql)) {
