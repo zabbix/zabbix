@@ -441,36 +441,34 @@ if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	}
 	$events = API::Event()->get($options);
 
-	$sortFields = array(
+	CArrayHelper::sort($events, array(
 		array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
-	);
-	CArrayHelper::sort($events, $sortFields);
+	));
 
 	foreach ($events as $event) {
 		$triggers[$event['objectid']]['events'][] = $event;
 	}
 }
 
-// get hosts
+// get host ids
 $hostIds = array();
 foreach ($triggers as $tnum => $trigger) {
-	$triggers[$tnum]['events'] = array();
-
-	// getting all host ids and names
 	foreach ($trigger['hosts'] as $host) {
 		$hostIds[$host['hostid']] = $host['hostid'];
 	}
 }
 
-$scriptsByHosts = API::Script()->getScriptsByHosts($hostIds);
-
+// get hosts
 $hosts = API::Host()->get(array(
 	'hostids' => $hostIds,
 	'preservekeys' => true,
 	'selectScreens' => API_OUTPUT_COUNT,
 	'selectInventory' => array('hostid')
 ));
+
+// get host scripts
+$scriptsByHosts = API::Script()->getScriptsByHosts($hostIds);
 
 // get trigger dependencies
 $dbTriggerDependencies = DBselect(
@@ -729,8 +727,7 @@ foreach ($triggers as $trigger) {
 		$comments
 	), 'even_row');
 
-
-	if ($showEvents != EVENTS_OPTION_NOEVENT) {
+	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
 		$i = 1;
 		foreach ($trigger['events'] as $enum => $event) {
 			$i++;
@@ -757,7 +754,7 @@ foreach ($triggers as $trigger) {
 			$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $event['clock']),
 				'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$event['eventid']);
 
-			$nextClock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
+			$nextClock = isset($trigger['events'][$enum - 1]) ? $trigger['events'][$enum - 1]['clock'] : time();
 
 			$emptyColumn = new CCol(SPACE);
 			$emptyColumn->setColSpan(3);
