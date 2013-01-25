@@ -572,32 +572,35 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			char	*old_name = NULL;
-
 			ZBX_STR2UINT64(h_triggerid, row[0]);
 
-			old_name = zbx_strdup(old_name, row[2]);
-			substitute_discovery_macros(&old_name, jp_row);
+			DBlld_get_trigger_functions(h_triggerid, NULL, &functions);
+			full_expression = DBlld_expand_trigger_expression(row[1], &functions);
+			DBlld_clean_trigger_functions(&functions);
 
-			if (0 == strcmp(old_name, row[3]))
+			if (0 == strcmp(trigger->full_expression, full_expression))
 			{
-				DBlld_get_trigger_functions(h_triggerid, NULL, &functions);
-				full_expression = DBlld_expand_trigger_expression(row[1], &functions);
-				DBlld_clean_trigger_functions(&functions);
-
-				if (0 == strcmp(trigger->full_expression, full_expression))
-				{
-					trigger->update_expression = 0;
-					trigger->triggerid = h_triggerid;
-				}
-
-				zbx_free(full_expression);
-
-				if (0 == trigger->triggerid && SUCCEED == DBlld_compare_trigger_items(h_triggerid, jp_row))
-					trigger->triggerid = h_triggerid;
+				trigger->update_expression = 0;
+				trigger->triggerid = h_triggerid;
 			}
 
-			zbx_free(old_name);
+			zbx_free(full_expression);
+
+			if (0 == trigger->triggerid)
+			{
+				char	*old_name = NULL;
+
+				old_name = zbx_strdup(old_name, row[2]);
+				substitute_discovery_macros(&old_name, jp_row);
+
+				if (0 == strcmp(old_name, row[3]))
+				{
+					if (SUCCEED == DBlld_compare_trigger_items(h_triggerid, jp_row))
+						trigger->triggerid = h_triggerid;
+				}
+
+				zbx_free(old_name);
+			}
 
 			if (0 != trigger->triggerid)
 				break;
