@@ -89,12 +89,34 @@ abstract class DbBackend {
 			$newValues[] = $row;
 		}
 
-		$sql = $this->insertGeneration($table, $fields, $newValues);
+//		$sql = $this->insertGeneration($table, $fields, $newValues);
 
-		var_dump($sql);
+// MYSQL TEST
+/*
+		$sql = "INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
+		for($i = 20;$i < 100; $i++) {
+			$sql .= " ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."'),";
+		}
+		$sql[strlen($sql) - 1] = ' ';
+*/
+/* --- */
+
+// ORACLE TEST
+		$sql = 'INSERT ALL';
+		$tableAndFields = " INTO usrgrp ('usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode') VALUES";
+		for($i = 20;$i < 10000; $i++) {
+			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
+		}
+		$sql .= ' SELECT * FROM dual';
+/* --- */
+
 		if (!DBexecute($sql)) {
 			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 		}
+
+// DEL TESTS
+		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
+/* --- */
 
 		return $resultIds;
 	}
