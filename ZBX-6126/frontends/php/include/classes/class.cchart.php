@@ -310,7 +310,7 @@ class CChart extends CGraphDraw {
 				$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
 				unset($row);
 			}
-			$curr_data['avg_orig'] = zbx_avg($curr_data['avg']);
+			$curr_data['avg_orig'] = is_array($curr_data['avg']) ? zbx_avg($curr_data['avg']) : null;
 
 			// calculate missed points
 			$first_idx = 0;

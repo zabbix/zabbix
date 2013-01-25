@@ -89,7 +89,7 @@ class CScreenActions extends CScreenBase {
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 				' WHERE e.eventid=a.eventid'.
 					' AND alerttype='.ALERT_TYPE_MESSAGE.
-					andDbNode('a.alertid').')';
+					andDbNode('a.alertid');
 
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			$userid = CWebUser::$data['userid'];
