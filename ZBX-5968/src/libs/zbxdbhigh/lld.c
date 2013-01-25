@@ -2134,14 +2134,14 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
 	DB_ROW			row;
 	zbx_uint64_t		itemdiscoveryid, itemid;
 	int			lastcheck, ts_delete, lifetime_sec;
-	zbx_vector_uint64_t	items;
+	zbx_vector_uint64_t	itemids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lifetime:%hu", __function_name, lifetime);
 
 	sql = zbx_malloc(sql, sql_alloc);
-	zbx_vector_uint64_create(&items);
+	zbx_vector_uint64_create(&itemids);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -2164,7 +2164,7 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
 
 		if (lastcheck < now - lifetime_sec)
 		{
-			zbx_vector_uint64_append(&items, itemid);
+			zbx_vector_uint64_append(&itemids, itemid);
 		}
 		else if (ts_delete != lastcheck + lifetime_sec)
 		{
@@ -2177,15 +2177,15 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
 	}
 	DBfree_result(result);
 
-	zbx_vector_uint64_sort(&items, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DBdelete_items(&items);
+	DBdelete_items(&itemids);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	zbx_vector_uint64_destroy(&items);
+	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
