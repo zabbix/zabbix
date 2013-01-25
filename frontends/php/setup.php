@@ -30,6 +30,12 @@ catch (Exception $e) {
 	exit;
 }
 
+// only super admins can access the setup
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+	access_deny(ACCESS_DENY_PAGE);
+	exit;
+}
+
 require_once dirname(__FILE__).'/include/setup.inc.php';
 
 
@@ -81,7 +87,10 @@ if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_e
 	$ZBX_CONFIG['allowed_db']['POSTGRESQL'] = 'PostgreSQL';
 }
 // ORACLE
-if (zbx_is_callable(array('ocilogon', 'ocierror', 'ociparse', 'ociexecute', 'ocifetchinto'))) {
+if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
+		'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
+		'oci_bind_by_name', 'oci_free_statement'))) {
+
 	$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 }
 // IBM_DB2
@@ -103,7 +112,14 @@ $ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
 zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
-$pageHeader = new CPageHeader(_('Installation'));
+// page title
+$pageTitle = '';
+if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
+	$pageTitle = $ZBX_SERVER_NAME.': ';
+}
+$pageTitle .= _('Installation');
+
+$pageHeader = new CPageHeader($pageTitle);
 $pageHeader->addCssFile('css.css');
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');

@@ -26,6 +26,7 @@ class CUser extends CZBXAPI {
 
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
+	protected $sortColumns = array('userid', 'alias');
 
 	/**
 	 * Get Users data
@@ -47,9 +48,6 @@ class CUser extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('userid', 'alias');
 
 		$sqlParts = array(
 			'select'	=> array('users' => 'u.userid'),
@@ -155,9 +153,6 @@ class CUser extends CZBXAPI {
 			zbx_db_search('users u', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'u');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -165,6 +160,7 @@ class CUser extends CZBXAPI {
 
 		$userids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($user = DBfetch($res)) {

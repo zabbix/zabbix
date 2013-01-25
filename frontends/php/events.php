@@ -780,8 +780,8 @@ $events_wdgt->addItem($table);
 // NAV BAR
 $timeline = array(
 	'period' => $effectiveperiod,
-	'starttime' => date('YmdHis', $starttime),
-	'usertime' => date('YmdHis', $till)
+	'starttime' => date(TIMESTAMP_FORMAT, $starttime),
+	'usertime' => date(TIMESTAMP_FORMAT, $till)
 );
 
 $dom_graph_id = 'scroll_events_id';

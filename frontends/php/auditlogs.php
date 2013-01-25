@@ -186,8 +186,8 @@ $firstAudit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
 
 $data['timeline'] = array(
 	'period' => $effectivePeriod,
-	'starttime' => date('YmdHis', !empty($firstAudit) ? $firstAudit['clock'] : null),
-	'usertime' => isset($_REQUEST['stime']) ? date('YmdHis', zbxDateToTime($data['stime']) + $effectivePeriod) : null
+	'starttime' => date(TIMESTAMP_FORMAT, !empty($firstAudit) ? $firstAudit['clock'] : null),
+	'usertime' => isset($_REQUEST['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
 );
 
 // render view

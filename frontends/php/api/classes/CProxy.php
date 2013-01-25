@@ -26,6 +26,7 @@ class CProxy extends CZBXAPI {
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
+	protected $sortColumns = array('hostid', 'host', 'status');
 
 	/**
 	 * Get Proxy data
@@ -44,9 +45,6 @@ class CProxy extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('hostid', 'host', 'status');
 
 		$sqlParts = array(
 			'select'	=> array('hostid' => 'h.hostid'),
@@ -118,15 +116,13 @@ class CProxy extends CZBXAPI {
 			$sqlParts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'h');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($proxy = DBfetch($res)) {

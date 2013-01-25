@@ -200,11 +200,11 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param type $label string in which macros should be resolved
-	 * @param array $items list of graph items
-	 * @param array $items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param type  $label                  string in which macros should be resolved
+	 * @param array $items                  list of graph items
+	 * @param array $items[n]['hostid']     graph n-th item corresponding host Id
 	 *
-	 * @return string label with macros replaced with corresponding values
+	 * @return string   label with macros replaced with corresponding values
 	 */
 	public static function resolveGraphLabel($label, $items) {
 		self::init();

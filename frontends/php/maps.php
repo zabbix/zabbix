@@ -28,7 +28,7 @@ $page['hist_arg'] = array('sysmapid');
 $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-if (PAGE_TYPE_HTML == $page['type']) {
+if ($page['type'] == PAGE_TYPE_HTML) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
@@ -72,7 +72,7 @@ if (isset($_REQUEST['favobj'])) {
 			}
 		}
 
-		if (PAGE_TYPE_JS == $page['type'] && $result) {
+		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			echo 'switchElementsClass("addrm_fav", "iconminus", "iconplus");';
 		}
 	}
@@ -84,43 +84,48 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 }
 
 /*
- * Display
+ * Permissions
  */
-$data = array(
-	'fullscreen' => get_request('fullscreen'),
-	'mapname' => get_request('mapname')
-);
-
-$data['maps'] = API::Map()->get(array(
+$maps = API::Map()->get(array(
 	'output' => array('sysmapid', 'name'),
 	'nodeids' => get_current_nodeid(),
 	'preservekeys' => true
 ));
-order_result($data['maps'], 'name');
+order_result($maps, 'name');
 
-if ($name = get_request('mapname')) {
+if ($mapName = get_request('mapname')) {
 	unset($_REQUEST['sysmapid']);
 
-	foreach ($data['maps'] as $map) {
-		if (strcmp($map['name'], $name) == 0) {
+	foreach ($maps as $map) {
+		if ($map['name'] === $mapName) {
 			$_REQUEST['sysmapid'] = $map['sysmapid'];
 		}
 	}
 }
-elseif (!isset($_REQUEST['sysmapid'])) {
+elseif (empty($_REQUEST['sysmapid'])) {
 	$_REQUEST['sysmapid'] = CProfile::get('web.maps.sysmapid');
-	if (is_null($_REQUEST['sysmapid']) || !isset($data['maps'][$_REQUEST['sysmapid']])) {
-		if ($first_map = reset($data['maps'])) {
-			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
+
+	if (!$_REQUEST['sysmapid'] && !isset($maps[$_REQUEST['sysmapid']])) {
+		if ($firstMap = reset($maps)) {
+			$_REQUEST['sysmapid'] = $firstMap['sysmapid'];
 		}
 	}
 }
 
-if (isset($_REQUEST['sysmapid']) && !isset($data['maps'][$_REQUEST['sysmapid']])) {
+if (isset($_REQUEST['sysmapid']) && !isset($maps[$_REQUEST['sysmapid']])) {
 	access_deny();
 }
 
-$data['sysmapid'] = $_REQUEST['sysmapid'];
+CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
+
+/*
+ * Display
+ */
+$data = array(
+	'fullscreen' => get_request('fullscreen'),
+	'sysmapid' => $_REQUEST['sysmapid'],
+	'maps' => $maps
+);
 
 $data['map'] = API::Map()->get(array(
 	'output' => API_OUTPUT_EXTEND,

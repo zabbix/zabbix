@@ -2278,7 +2278,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 
 			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
 
-			result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 					" from regexps r,expressions e"
 					" where r.regexpid=e.regexpid"
 						" and r.name='%s'",
@@ -2287,8 +2287,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 			zbx_free(f_regexp_esc);
 
 			while (NULL != (row = DBfetch(result)))
+			{
 				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-						row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
+			}
 			DBfree_result(result);
 		}
 

@@ -30,6 +30,7 @@ class CHostInterface extends CZBXAPI {
 
 	protected $tableName = 'interface';
 	protected $tableAlias = 'hi';
+	protected $sortColumns = array('interfaceid', 'dns', 'ip');
 
 	/**
 	 * Get Interface Interface data
@@ -53,9 +54,6 @@ class CHostInterface extends CZBXAPI {
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('interfaceid', 'dns', 'ip');
 
 		$sqlParts = array(
 			'select'	=> array('interface' => 'hi.interfaceid'),
@@ -189,15 +187,13 @@ class CHostInterface extends CZBXAPI {
 			$this->dbFilter('interface hi', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'hi');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($interface = DBfetch($res)) {

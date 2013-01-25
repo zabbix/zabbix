@@ -73,7 +73,7 @@ check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $showDisabled = get_request('showdisabled', 1);
-CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_STR);
+CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_INT);
 
 if (!empty($_REQUEST['steps'])) {
 	order_result($_REQUEST['steps'], 'no');
