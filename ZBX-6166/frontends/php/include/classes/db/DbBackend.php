@@ -77,6 +77,7 @@ abstract class DbBackend {
 			$fields[] = $tableSchema['key'];
 		}
 
+		$newValues = array();
 		foreach ($values as $key => $row) {
 			if ($getids) {
 				$resultIds[$key] = $id;
@@ -84,11 +85,11 @@ abstract class DbBackend {
 				$values[$key][$tableSchema['key']] = $id;
 				$id = bcadd($id, 1, 0);
 			}
-
 			DB::checkValueTypes($table, $row);
+			$newValues[] = $row;
 		}
 
-		$sql = $this->insertGeneration($table, $fields, $values);
+		$sql = $this->insertGeneration($table, $fields, $newValues);
 
 		var_dump($sql);
 		if (!DBexecute($sql)) {
