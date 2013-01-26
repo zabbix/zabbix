@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-23 18:52+0200\n"
-"PO-Revision-Date: 2013-01-23 17:53+0200\n"
+"PO-Revision-Date: 2013-01-23 18:49+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -197,7 +197,7 @@ msgstr "A diferença absoluta entre o último valor e o anterior não é N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr "A diferença absoluta entre o último valor e o anterior não é N"
+msgstr "A diferença absoluta entre o último valor e o anterior != N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
@@ -250,7 +250,7 @@ msgstr "Eventos OK vistados"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Eventos PROBLEM vistados"
+msgstr "Eventos de INCIDENTE vistados"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
@@ -428,7 +428,7 @@ msgstr "Adicionar link"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr "Adicionar faltante"
+msgstr "Adicionar faltando"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
@@ -691,7 +691,7 @@ msgstr "No mínimo um período de manutenção deverá ser criado."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "Ao menos um tipo de banco (MySQL, PostgreSQL, Oracle, SQLite3 ou IBM DB2) deverá ser suportado."
+msgstr "Pelo menos um dos MySQL, PostgreSQL, Oracle, SQLite3 ou IBM DB2 deve ser suportado."
 
 #: include/menu.inc.php:266
 msgid "Audit"
@@ -699,7 +699,7 @@ msgstr "Auditoria"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr "Auditória de Ações"
+msgstr "Auditoria de ações"
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -801,7 +801,7 @@ msgstr "O valor médio do período T não é N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr "O valor médio do período T não é N"
+msgstr "O valor médio do período T != N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -912,7 +912,7 @@ msgstr "CONFIGURAÇÃO DE AUTENTICAÇÃO"
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr "CONFIGURAÇÃO DA REGRA DE BUSCA"
+msgstr "CONFIGURAÇÃO DA REGRA DE DESCOBERTA"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
@@ -1497,7 +1497,7 @@ msgstr "Não foi possível remover template"
 
 #: api/classes/CGraph.php:713 api/classes/CGraphPrototype.php:761
 msgid "Cannot delete templated graphs."
-msgstr "Não é possível apagar gráficos do template."
+msgstr "Não é possível excluir gráficos do template."
 
 #: api/classes/CItem.php:945
 msgid "Cannot delete templated item."
@@ -5631,7 +5631,7 @@ msgstr "Mapeamento de ícone atualizado"
 #: api/classes/CIconMap.php:340
 #, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
-msgstr "O mapeamento de ícone com o ID \"%s\" não existe."
+msgstr "O mapeamento de ícone com icompapid \"%s\" não existe."
 
 #: adm.gui.php:95 adm.housekeeper.php:74 adm.iconmapping.php:112
 #: adm.iconmapping.php:168 adm.images.php:134 adm.macros.php:161
@@ -9889,11 +9889,10 @@ msgid "Regular expression added"
 msgstr "Expressão regular adicionada"
 
 #: adm.regexps.php:138
-#, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Expressão regular removida"
-msgstr[1] "Expressão regular removida"
+msgstr[1] "Expressões regulares removidas"
 
 #: include/regexp.inc.php:79
 msgid "Regular expression does not exist."
@@ -12208,9 +12207,8 @@ msgid "UNKNOWN"
 msgstr "DESCONHECIDO"
 
 #: include/triggers.inc.php:178
-#, fuzzy
 msgid "UP"
-msgstr "SUBIR"
+msgstr "PARA CIMA"
 
 #: include/views/configuration.httpconf.edit.php:132
 #: include/views/configuration.httpconf.popup.php:60
@@ -13148,7 +13146,7 @@ msgstr "O arquivo XML contém um erro %1$s:"
 #: include/classes/import/CXmlImport18.php:406
 #: include/classes/import/CXmlImport18.php:409
 msgid "XML file contains errors"
-msgstr "Arquivo XML conteem erros"
+msgstr "Arquivo XML contem erros"
 
 #: include/classes/import/readers/CXmlImportReader.php:51
 #, php-format
@@ -13162,7 +13160,7 @@ msgstr "O arquivo XML possui um alerta %1$s:"
 
 #: include/views/js/configuration.sysmaps.js.php:155 report3.php:98
 msgid "Y"
-msgstr "A"
+msgstr "Y"
 
 #: include/func.inc.php:571
 msgctxt "Yotta short"
@@ -13255,7 +13253,7 @@ msgstr "Você não está logado."
 
 #: popup.php:477
 msgid "You can not switch hosts for current selection."
-msgstr "Não é possível alterar entre hosts para a seleção atual."
+msgstr "Você não pode mudar hosts para seleção atual."
 
 #: include/config.inc.php:252
 msgid "You cannot view this URL as a"
@@ -13323,7 +13321,7 @@ msgstr "Você deve logar para ver esta página."
 
 #: include/views/administration.node.list.php:28
 msgid "Your setup is not configured for distributed monitoring."
-msgstr "A instalação atual não está configurada para monitoração distribuída."
+msgstr "Sua instalação não está configurada para monitoramento distribuído."
 
 #: include/func.inc.php:570
 msgctxt "Zetta short"
@@ -13386,7 +13384,7 @@ msgstr "Zabbix interno"
 
 #: authentication.php:182
 msgid "Zabbix internal authentication"
-msgstr "Zabbix autenticação interna."
+msgstr "Autenticação Zabbix nativa"
 
 #: warning.php:54
 msgid "Zabbix is temporarily unavailable!"
