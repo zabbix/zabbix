@@ -2270,42 +2270,40 @@ function get_item_function_info($expr) {
 				'templated_hosts' => true
 			));
 
-			if (empty($hostFound)) {
+			if (!$hostFound) {
 				return EXPRESSION_HOST_UNKNOWN;
 			}
 
 			$itemFound = API::Item()->get(array(
+				'output' => array('value_type'),
 				'hostids' => zbx_objectValues($hostFound, 'hostid'),
 				'filter' => array(
 					'key_' => array($exprPart['item']),
-					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)
 				),
 				'webitems' => true
 			));
-			if (empty($itemFound)) {
-				return EXPRESSION_HOST_ITEM_UNKNOWN;
-			}
 
-			$result = $function_info[$exprPart['functionName']];
-
-			if (is_array($result['value_type'])) {
-				$value_type = null;
-				$item_data = API::Item()->get(array(
-					'itemids' => zbx_objectValues($itemFound, 'itemid'),
-					'output' => API_OUTPUT_EXTEND,
+			if (!$itemFound) {
+				$itemFound = API::ItemPrototype()->get(array(
+					'output' => array('value_type'),
+					'hostids' => zbx_objectValues($hostFound, 'hostid'),
+					'filter' => array(
+						'key_' => array($exprPart['item']),
+					),
 					'webitems' => true
 				));
 
-				if ($item_data = reset($item_data)) {
-					$value_type = $item_data['value_type'];
+				if (!$itemFound) {
+					return EXPRESSION_HOST_ITEM_UNKNOWN;
 				}
+			}
 
-				if ($value_type == null) {
-					return EXPRESSION_VALUE_TYPE_UNKNOWN;
-				}
+			$itemFound = reset($itemFound);
+			$result = $function_info[$exprPart['functionName']];
 
-				$result['value_type'] = $result['value_type'][$value_type];
-				$result['type'] = $result['type'][$value_type];
+			if (is_array($result['value_type'])) {
+				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
+				$result['type'] = $result['type'][$itemFound['value_type']];
 
 				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL) {
 					$result['type'] = T_ZBX_STR;
