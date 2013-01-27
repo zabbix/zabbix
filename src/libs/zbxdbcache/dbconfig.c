@@ -1517,13 +1517,22 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 	{
 		strscpy(dst_host->ipmi_ip_orig, ipmihost->ipmi_ip);
-		dst_host->ipmi_ip = NULL;
 		dst_host->ipmi_port = ipmihost->ipmi_port;
 		dst_host->ipmi_authtype = ipmihost->ipmi_authtype;
 		dst_host->ipmi_privilege = ipmihost->ipmi_privilege;
 		strscpy(dst_host->ipmi_username, ipmihost->ipmi_username);
 		strscpy(dst_host->ipmi_password, ipmihost->ipmi_password);
 	}
+	else
+	{
+		*dst_host->ipmi_ip_orig = '\0';
+		dst_host->ipmi_port = 623;
+		dst_host->ipmi_authtype = 0;
+		dst_host->ipmi_privilege = 2;
+		*dst_host->ipmi_username = '\0';
+		*dst_host->ipmi_password = '\0';
+	}
+	dst_host->ipmi_ip = NULL;
 }
 
 /******************************************************************************

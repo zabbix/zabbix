@@ -30,7 +30,7 @@ function getSounds(){
 		list($filename, $type) = explode('.', $file);
 		$fileList[$filename] = $file;
 	}
-	
+
 return $fileList;
 }
 

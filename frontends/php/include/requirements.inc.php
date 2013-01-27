@@ -101,7 +101,7 @@
 
 		return $result;
 	}
-	
+
 	function check_php_upload_max_filesize(){
 		$required = 2*1024*1024;
 		$recommended = 16*1024*1024;
@@ -157,7 +157,7 @@
 
 		return $result;
 	}
-	
+
 	function check_php_max_input_time(){
 		$required = 300;
 		$recommended = 600;
@@ -460,13 +460,13 @@
 
 		return $result;
 	}
-	
+
 	function check_php_session() {
 		$current = function_exists('session_start') &&
 			function_exists('session_write_close');
-		
+
 		$req = $current ? 1 : 0;
-		
+
 		return array(
 			'name' => S_SESSION_MODULE,
 			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
@@ -475,7 +475,7 @@
 			'result' => $req,
 			'error' => S_REQUIRED_SESSION_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-session]'
 			);
-			
+
 	}
 
 	function check_php_requirements(){

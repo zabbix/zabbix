@@ -109,7 +109,7 @@
 
 		insert_js($post_script);
 
-		echo "</body>\n";		
+		echo "</body>\n";
 		echo "</html>\n";
 	}
 

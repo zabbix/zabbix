@@ -77,7 +77,7 @@ check_fields($fields);
 // NODES
 	if($nodeid == 0) $nodeids = get_current_nodeid(true);
 	else $nodeids = $nodeid;
-	
+
 	$count=0;
 	$grouplist = array();
 

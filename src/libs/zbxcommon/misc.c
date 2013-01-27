@@ -2099,3 +2099,64 @@ int	calculate_sleeptime(int nextcheck, int max_sleeptime)
 
 	return sleeptime;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_serveractive_element                                       *
+ *                                                                            *
+ * Purpose: parse a ServerActive element like "IP<:port>" or "[IPv6]<:port>"  *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default)
+{
+	char	*r1 = NULL, *r2 = NULL;
+	int	res = FAIL;
+
+	*port = port_default;
+
+	if ('[' == *str)
+	{
+		str++;
+
+		if (NULL == (r1 = strchr(str, ']')))
+			goto fail;
+
+		if (':' != r1[1] && '\0' != r1[1])
+			goto fail;
+
+		if (':' == r1[1] && SUCCEED != is_ushort(r1 + 2, port))
+			goto fail;
+
+		*r1 = '\0';
+
+		if (SUCCEED != is_ip6(str))
+			goto fail;
+
+		*host = zbx_strdup(*host, str);
+	}
+	else if (SUCCEED == is_ip6(str))
+	{
+		*host = zbx_strdup(*host, str);
+	}
+	else
+	{
+		if (NULL != (r2 = strchr(str, ':')))
+		{
+			if (SUCCEED != is_ushort(r2 + 1, port))
+				goto fail;
+
+			*r2 = '\0';
+		}
+
+		*host = zbx_strdup(NULL, str);
+	}
+
+	res = SUCCEED;
+fail:
+	if (NULL != r1)
+		*r1 = ']';
+	if (NULL != r2)
+		*r2 = ':';
+
+	return res;
+}

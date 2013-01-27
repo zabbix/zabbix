@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"08 December 2012"
-#define	ZABBIX_VERSION		"1.8.16"
+#define	ZABBIX_REVDATE		"16 January 2013"
+#define	ZABBIX_VERSION		"1.8.17rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -944,5 +944,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
+
+int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
 #endif

@@ -204,7 +204,7 @@ function addLinkTriggers(mapid,triggers,drawtype,color){
 
 		window.opener.ZBX_SYSMAPS[mapid].map.linkForm_addLinktrigger(linktrigger);
 	}
-	
+
 	window.close();
 
 return true;

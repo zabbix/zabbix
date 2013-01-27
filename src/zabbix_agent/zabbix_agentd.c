@@ -303,72 +303,33 @@ static int	add_activechk_host(const char *host, unsigned short port)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_active_hosts                                               *
+ * Function: get_serveractive_hosts                                           *
  *                                                                            *
  * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
-static void	parse_active_hosts(char *active_hosts)
+static void	get_serveractive_hosts(char *active_hosts)
 {
-	char		*l = active_hosts, *r, *r2, *r3, *pos;
-	unsigned short	port;
-	int		rc = SUCCEED;
+	char	*l = active_hosts, *r;
+	int	rc = SUCCEED;
 
 	do
 	{
+		char		*host = NULL;
+		unsigned short	port;
+
 		if (NULL != (r = strchr(l, ',')))
 			*r = '\0';
 
-		port = (unsigned short)CONFIG_SERVER_PORT;
-		pos = l;
-		r2 = r3 = NULL;
+		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)CONFIG_SERVER_PORT))
+			goto fail;
 
-		if ('[' == *l)
-		{
-			l++;
+		rc = add_activechk_host(host, port);
 
-			if (NULL == (r2 = strchr(l, ']')))
-				goto fail;
+		zbx_free(host);
 
-			if (':' != r2[1] && '\0' != r2[1])
-				goto fail;
-
-			if (':' == r2[1] && SUCCEED != is_ushort(r2 + 2, &port))
-				goto fail;
-
-			*r2 = '\0';
-
-			if (SUCCEED != is_ip6(l))
-				goto fail;
-
-			if (SUCCEED != (rc = add_activechk_host(l, port)))
-				goto fail;
-
-			*r2 = ']';
-		}
-		else if (SUCCEED == is_ip6(l))
-		{
-			if (SUCCEED != (rc = add_activechk_host(l, port)))
-				goto fail;
-		}
-		else
-		{
-			if (NULL != (r3 = strchr(l, ':')))
-			{
-				if (SUCCEED != is_ushort(r3 + 1, &port))
-					goto fail;
-
-				*r3 = '\0';
-			}
-
-			if (SUCCEED != (rc = add_activechk_host(l, port)))
-				goto fail;
-
-			if (NULL != r3)
-				*r3 = ':';
-		}
+		if (SUCCEED != rc)
+			goto fail;
 
 		if (NULL != r)
 		{
@@ -380,15 +341,10 @@ static void	parse_active_hosts(char *active_hosts)
 
 	return;
 fail:
-	if (NULL != r2)
-		*r2 = ']';
-	if (NULL != r3)
-		*r3 = ':';
-
 	if (SUCCEED != rc)
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", pos);
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", l);
 	else
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", pos);
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", l);
 
 	if (NULL != r)
 		*r = ',';
@@ -504,7 +460,7 @@ static void	zbx_load_config(int requirement)
 				*p = ',';
 		}
 		else
-			parse_active_hosts(active_hosts);
+			get_serveractive_hosts(active_hosts);
 	}
 
 	zbx_free(active_hosts);

@@ -140,13 +140,26 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 
 			if (1 == atoi(db_row[6]))
 			{
-				zbx_strlcpy(item.host.ipmi_ip_orig, db_row[7], sizeof(item.host.ipmi_ip));
+				zbx_strlcpy(item.host.ipmi_ip_orig, db_row[7], sizeof(item.host.ipmi_ip_orig));
 				item.host.ipmi_port = (unsigned short)atoi(db_row[8]);
 				item.host.ipmi_authtype = atoi(db_row[9]);
 				item.host.ipmi_privilege = atoi(db_row[10]);
 				zbx_strlcpy(item.host.ipmi_username, db_row[11], sizeof(item.host.ipmi_username));
 				zbx_strlcpy(item.host.ipmi_password, db_row[12], sizeof(item.host.ipmi_password));
 			}
+			else
+			{
+				*item.host.ipmi_ip_orig = '\0';
+				item.host.ipmi_port = 623;
+				item.host.ipmi_authtype = 0;
+				item.host.ipmi_privilege = 2;
+				*item.host.ipmi_username = '\0';
+				*item.host.ipmi_password = '\0';
+			}
+
+			item.host.ipmi_ip = zbx_strdup(item.host.ipmi_ip, item.host.ipmi_ip_orig);
+			substitute_simple_macros(NULL, NULL, NULL, &item, NULL, &item.host.ipmi_ip,
+						MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
 
 			if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
 			{
@@ -166,6 +179,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 				 *result = zbx_dsprintf(*result, "NODE %d: Cannot parse IPMI command",
 						CONFIG_NODEID);
 			}
+
+			zbx_free(item.host.ipmi_ip);
 		}
 		else
 		{
