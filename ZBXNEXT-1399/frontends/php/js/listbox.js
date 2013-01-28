@@ -73,8 +73,6 @@ jQuery(function($) {
 
 				inputObj.data('lastValue', value);
 
-				$('.no-results', containerObj).text(locale['Looking for'] + " '" + value + "'");
-
 				if (empty(isWaiting[selectObj.attr('id')])) {
 					isWaiting[selectObj.attr('id')] = true;
 				}

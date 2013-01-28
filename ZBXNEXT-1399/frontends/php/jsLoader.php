@@ -188,9 +188,6 @@ $tranStrings = array(
 		'Select some options' => _('Select some options'),
 		'Select option' => _('Select option'),
 		'No results match' => _('No results match')
-	),
-	'listbox.js' => array(
-		'Looking for' => _('Looking for')
 	)
 );
 
