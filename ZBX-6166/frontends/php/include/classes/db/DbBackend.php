@@ -104,6 +104,7 @@ abstract class DbBackend {
 			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
 		}
 		$sql .= ' SELECT * FROM dual';
+		DBexecute($sql);
 
 // DEL TESTS
 		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
@@ -116,7 +117,7 @@ abstract class DbBackend {
 			$rand = rand(0,1);
 			$sql .= "INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES ('".$i."', '".$md5."', '".$rand."', '".$rand."', '".$rand."')";
 		}
-		$sql = "END;";
+		$sql = "END";
 		DBexecute($sql);
 /* --- */
 
