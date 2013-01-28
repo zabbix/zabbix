@@ -53,7 +53,6 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'Parse error',
 		'syntax error',
 		'Try to read inaccessible property',
-		'.php:',
 		'Illegal string offset',
 		'must be an array'
 	);
@@ -179,6 +178,12 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function input_type($id, $str) {
 		$this->type($id, $str);
+	}
+
+	public function zbxDropdownHasOptions($id, array $strings) {
+		foreach ($strings as $string) {
+			$this->assertSelectHasOption($id, $string);
+		}
 	}
 
 	public function dropdown_select($id, $str) {
