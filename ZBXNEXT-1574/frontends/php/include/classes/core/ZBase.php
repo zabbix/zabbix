@@ -249,12 +249,8 @@ class ZBase {
 				return true;
 			}
 
-			$pathLength = strlen(__FILE__);
-
-			$pathLength -= 22;
-			$errfile = substr($errfile, $pathLength);
-
-			error($errstr.' ['.$errfile.':'.$errline.']');
+			// don't show the call to this handler function
+			error($errstr.' ['.CProfiler::getInstance()->formatCallStack(1).']');
 		}
 
 		set_error_handler('zbx_err_handler');
