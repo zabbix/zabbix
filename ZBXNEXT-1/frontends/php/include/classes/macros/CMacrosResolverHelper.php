@@ -208,10 +208,11 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveGraphName($name, $items) {
 		self::init();
-		return self::$macrosResolver->resolve(array(
+		$graph = reset(self::$macrosResolver->resolve(array(
 			'config' => 'graphName',
-			'data' => array('str' => $name, 'items' => $items)
-		));
+			'data' => array(array('name' => $name, 'items' => $items))
+		)));
+		return $graph['name'];
 	}
 
 	/**
@@ -235,19 +236,17 @@ class CMacrosResolverHelper {
 			' ORDER BY gi.sortorder'
 		));
 
-		$itemsByGraphId = array();
 		foreach ($items as $item) {
-			$itemsByGraphId[$item['graphid']][]['hostid'] = $item['hostid'];
+			if (!isset($data[$item['graphid']]['items'])) {
+				$data[$item['graphid']]['items'] = array();
+			}
+			$data[$item['graphid']]['items'][] = array('hostid' => $item['hostid']);
 		}
 
-		foreach ($itemsByGraphId as $graphId => $items) {
-			$data[$graphId]['name'] = self::$macrosResolver->resolve(array(
-				'config' => 'graphName',
-				'data' => array('str' => $data[$graphId]['name'], 'items' => $items)
-			));
-		}
-
-		return $data;
+		return self::$macrosResolver->resolve(array(
+			'config' => 'graphName',
+			'data' => $data
+		));
 	}
 
 	/**

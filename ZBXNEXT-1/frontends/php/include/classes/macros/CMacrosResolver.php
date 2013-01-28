@@ -77,6 +77,7 @@ class CMacrosResolver {
 		),
 		'graphName' => array(
 			'types' => array('graphFunctionalItem'),
+			'source' => 'name',
 			'method' => 'resolveGraph'
 		)
 	);
@@ -721,21 +722,23 @@ class CMacrosResolver {
 	/**
 	 * Resolve functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param array		$data						data container
-	 * @param type		$data['str']				string in which macros should be resolved
-	 * @param array		$data['items']				list of graph items
-	 * @param array		$data['items'][n]['hostid'] graph n-th item corresponding host Id
+	 * @param array		$data							list or hashmap of graphs
+	 * @param type		$data[]['name']					string in which macros should be resolved
+	 * @param array		$data[]['items']				list of graph items
+	 * @param array		$data[]['items'][n]['hostid']	graph n-th item corresponding host Id
 	 *
-	 * @return string	string with macros replaces with corresponding values
+	 * @return string	inputed data with resolved source field
 	 */
 	private function resolveGraph($data) {
-		$str = null;
-
+		$source = $this->getSource();
 		if ($this->isTypeAvailable('graphFunctionalItem')){
-			$str = $this->resolveGraphFunctionalItemMacros($data['str'], $data['items']);
+			foreach ($data as &$graph) {
+				$graph[$source] = $this->resolveGraphFunctionalItemMacros($graph[$source], $graph['items']);
+			}
+			unset($graph);
 		}
 
-		return $str;
+		return $data;
 	}
 
 	/**
