@@ -2226,7 +2226,6 @@ function get_status() {
 		'triggers_count_disabled' => 0,
 		'triggers_count_off' => 0,
 		'triggers_count_on' => 0,
-		'triggers_count_unknown' => 0,
 		'items_count' => 0,
 		'items_count_monitored' => 0,
 		'items_count_disabled' => 0,
@@ -2262,9 +2261,6 @@ function get_status() {
 					case TRIGGER_VALUE_TRUE:
 						$status['triggers_count_on'] = $dbTrigger['cnt'];
 						break;
-					case TRIGGER_VALUE_UNKNOWN:
-						$status['triggers_count_unknown'] = $dbTrigger['cnt'];
-						break;
 				}
 				break;
 			case TRIGGER_STATUS_DISABLED:
@@ -2272,8 +2268,7 @@ function get_status() {
 				break;
 		}
 	}
-	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on']
-			+ $status['triggers_count_unknown'];
+	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on'];
 	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items

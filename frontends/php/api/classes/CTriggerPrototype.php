@@ -480,8 +480,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$triggerDbFields = array(
 				'description' => null,
 				'expression' => null,
-				'error' => _('Trigger just added. No status update so far.'),
-				'value' => TRIGGER_VALUE_UNKNOWN
+				'error' => _('Trigger just added. No status update so far.')
 			);
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger.'));
