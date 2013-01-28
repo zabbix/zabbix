@@ -22,6 +22,8 @@
 class CMacrosResolver {
 
 	const PATTERN_HOST = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)}';
+	const PATTERN_HOST_INTERNAL = 'HOST\.HOST|HOSTNAME';
+	const PATTERN_MACRO_PARAM = '[1-9]?';
 	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
 	const PATTERN_IP = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
 	const PATTERN_IP_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
@@ -758,7 +760,7 @@ class CMacrosResolver {
 		// extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
 		// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
 		preg_match_all('/(?<macros>{'.
-			'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({(HOST\.HOST|HOSTNAME)[1-9]?}))):'.
+			'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
 			'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
 			'(?<functions>(last|max|min|avg))\('.
 			'(?<parameters>([0-9]+[smhdw]?))'.
@@ -816,8 +818,7 @@ class CMacrosResolver {
 	 */
 	private function resolveGraphPositionalMacros($str, $items) {
 		// extract all macros into $matches
-		// possible to add other macros "'/\{((HOST.HOST|SOME.OTHER.MACRO)([0-9]?))\}/'"
-		preg_match_all('/{((HOST\.HOST|HOSTNAME)([1-9]?))\}/', $str, $matches);
+		preg_match_all('/{(('.self::PATTERN_HOST_INTERNAL.')('.self::PATTERN_MACRO_PARAM.'))\}/', $str, $matches);
 
 		// match found groups if ever regexp should change
 		$matches['macroType'] = $matches[2];
