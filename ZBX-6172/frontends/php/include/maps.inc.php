@@ -1817,7 +1817,7 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 
 		$el_info = $map_info[$selementid];
 
-		$el_msgs = array('problem', 'unack', 'maintenance', 'unknown', 'ok', 'status');
+		$el_msgs = array('problem', 'unack', 'maintenance', 'ok', 'status');
 		foreach ($el_msgs as $caption) {
 			if (!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) {
 				continue;
