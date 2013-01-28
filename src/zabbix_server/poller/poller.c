@@ -58,8 +58,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DC_TRIGGER	*tr = NULL, *trigger;
-	int		tr_alloc = 0, tr_num = 0, i, events_num = 0;
+	DC_TRIGGER	trigger;
 	char		*sql = NULL, failed_type_buf[8];
 	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
@@ -108,7 +107,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 *     item and MYITEM types differ AND item host status is AVAILABLE    *
 	 *************************************************************************/
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
+			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.lastchange"
 			" from items i,functions f,triggers t,hosts h"
 			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
@@ -158,33 +157,21 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (tr_num == tr_alloc)
-		{
-			tr_alloc += 64;
-			tr = zbx_realloc(tr, tr_alloc * sizeof(DC_TRIGGER));
-		}
+		ZBX_STR2UINT64(trigger.triggerid, row[0]);
+		trigger.type = (unsigned char)atoi(row[1]);
+		trigger.value = atoi(row[2]);
+		trigger.value_flags = atoi(row[3]);
+		strscpy(trigger.error, row[4]);
+		trigger.lastchange = atoi(row[5]);
 
-		trigger = &tr[tr_num++];
-
-		ZBX_STR2UINT64(trigger->triggerid, row[0]);
-		trigger->type = (unsigned char)atoi(row[1]);
-		trigger->value = atoi(row[2]);
-		trigger->value_flags = atoi(row[3]);
-		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
-		strscpy(trigger->error, row[4]);
-		trigger->timespec = *ts;
-
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value, reason,
-				&trigger->timespec, &trigger->add_event, &trigger->value_changed))
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger.triggerid, trigger.type,
+				trigger.value, trigger.value_flags, trigger.error, trigger.lastchange,
+				TRIGGER_VALUE_UNKNOWN, reason, ts->sec, &trigger.add_event))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
-
-		if (1 == trigger->add_event)
-			events_num++;
 	}
 	DBfree_result(result);
 
@@ -194,26 +181,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
-
-	if (0 != events_num)
-	{
-		zbx_uint64_t	eventid;
-
-		eventid = DBget_maxid_num("events", events_num);
-
-		for (i = 0; i < tr_num; i++)
-		{
-			trigger = &tr[i];
-
-			if (1 != trigger->add_event)
-				continue;
-
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
-		}
-	}
-
-	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

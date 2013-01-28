@@ -119,8 +119,8 @@ function get_service_status_of_trigger($triggerid) {
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
  *
- * @param mixed $object object like CSpan, CDiv, etc.
- * @param int $triggerValue TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE or TRIGGER_VALUE_UNKNOWN
+ * @param mixed $object             object like CSpan, CDiv, etc.
+ * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
  * @param int $triggerLastChange
  * @param bool $isAcknowledged
  * @return void
@@ -164,7 +164,6 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 function trigger_value2str($value) {
 	$str_val[TRIGGER_VALUE_FALSE] = _('OK');
 	$str_val[TRIGGER_VALUE_TRUE] = _('PROBLEM');
-	$str_val[TRIGGER_VALUE_UNKNOWN] = _('UNKNOWN');
 
 	if (isset($str_val[$value])) {
 		return $str_val[$value];
@@ -1006,58 +1005,9 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 			),
 			'where' => array('triggerid' => $triggerids)
 		));
-
-		addUnknownEvent($triggerids);
 	}
 
 	return true;
-}
-
-/**
- * Create unknown type event for given triggers.
- *
- * @param int|array $triggerids triggers to whom add unknown type event
- *
- * @return array returns created event ids
- */
-function addUnknownEvent($triggerids) {
-	zbx_value2array($triggerids);
-
-	$triggers = API::Trigger()->get(array(
-		'triggerids' => $triggerids,
-		'output' => array('value'),
-		'preservekeys' => true
-	));
-
-	$eventids = array();
-	foreach ($triggerids as $triggerid) {
-		$event = array(
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'objectid' => $triggerid,
-			'clock' => time(),
-			'value' => TRIGGER_VALUE_UNKNOWN,
-			'acknowledged' => 0
-		);
-
-		// check if trigger exist in DB
-		if (isset($triggers[$event['objectid']])) {
-			if ($event['value'] != $triggers[$event['objectid']]['value']) {
-				$eventid = get_dbid('events', 'eventid');
-
-				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
-						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
-									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
-				if (!DBexecute($sql)) {
-					throw new Exception();
-				}
-
-				$eventids[$eventid] = $eventid;
-			}
-		}
-	}
-
-	return $eventids;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
@@ -1430,7 +1380,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 }
 
 function calculate_availability($triggerid, $period_start, $period_end) {
-	$start_value = -1;
+	$start_value = TRIGGER_VALUE_FALSE;
 	if ($period_start > 0 && $period_start <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
@@ -1470,10 +1420,8 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		else {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
-			$ret['unknown_time'] = 0;
 			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
 			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
-			$ret['unknown'] = (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 			return $ret;
 		}
 	}
@@ -1481,7 +1429,6 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$state = $start_value;
 	$true_time = 0;
 	$false_time = 0;
-	$unknown_time = 0;
 	$time = $min;
 	if ($period_start == 0 && $period_end == 0) {
 		$max = time();
@@ -1506,28 +1453,12 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$diff = $clock - $time;
 		$time = $clock;
 
-		if ($state == -1) {
-			$state = $value;
-			if ($state == 0) {
-				$false_time += $diff;
-			}
-			if ($state == 1) {
-				$true_time += $diff;
-			}
-			if ($state == 2) {
-				$unknown_time += $diff;
-			}
-		}
-		elseif ($state == 0) {
+		if ($state == 0) {
 			$false_time += $diff;
 			$state = $value;
 		}
 		elseif ($state == 1) {
 			$true_time += $diff;
-			$state = $value;
-		}
-		elseif ($state == 2) {
-			$unknown_time += $diff;
 			$state = $value;
 		}
 		$rows++;
@@ -1544,26 +1475,19 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	elseif ($state == TRIGGER_VALUE_TRUE) {
 		$true_time = $true_time + $period_end - $time;
 	}
-	elseif ($state == TRIGGER_VALUE_UNKNOWN) {
-		$unknown_time = $unknown_time + $period_end - $time;
-	}
-	$total_time = $true_time + $false_time + $unknown_time;
+	$total_time = $true_time + $false_time;
 
 	if ($total_time == 0) {
 		$ret['true_time'] = 0;
 		$ret['false_time'] = 0;
-		$ret['unknown_time'] = 0;
 		$ret['true'] = 0;
 		$ret['false'] = 0;
-		$ret['unknown'] = 100;
 	}
 	else {
 		$ret['true_time'] = $true_time;
 		$ret['false_time'] = $false_time;
-		$ret['unknown_time'] = $unknown_time;
 		$ret['true'] = (100 * $true_time) / $total_time;
 		$ret['false'] = (100 * $false_time) / $total_time;
-		$ret['unknown'] = (100 * $unknown_time) / $total_time;
 	}
 
 	return $ret;

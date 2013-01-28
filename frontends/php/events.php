@@ -81,8 +81,6 @@ $fields = array(
 // filter
 	'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
 	'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null),
-
-	'showUnknown'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
 //ajax
 	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
 	'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
@@ -114,14 +112,12 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 // FILTER
 if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['triggerid'] = 0;
-	$_REQUEST['showUnknown'] = 0;
 }
 
 $source = get_request('triggerid') > 0 ? EVENT_SOURCE_TRIGGERS
 		: get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
 $_REQUEST['triggerid'] = get_request('triggerid', CProfile::get('web.events.filter.triggerid', 0));
-$_REQUEST['showUnknown'] = get_request('showUnknown', CProfile::get('web.events.filter.showUnknown', 0));
 
 // Change triggerId filter if change hostId
 if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
@@ -222,7 +218,6 @@ if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
 
 if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 	CProfile::update('web.events.filter.triggerid', $_REQUEST['triggerid'], PROFILE_TYPE_ID);
-	CProfile::update('web.events.filter.showUnknown', $_REQUEST['showUnknown'], PROFILE_TYPE_INT);
 }
 // --------------
 
@@ -360,14 +355,6 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 	));
 	$filterForm->addRow($row);
 
-	$filterForm->addVar('showUnknown', $_REQUEST['showUnknown']);
-	$unkcbx = new CCheckBox('hide_unk',
-		$_REQUEST['showUnknown'],
-			'javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ',
-		'1');
-
-	$filterForm->addRow(_('Show unknown events'), $unkcbx);
-
 	$reset = new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
@@ -402,7 +389,6 @@ else {
 		$options['triggerids'] = $_REQUEST['triggerid'];
 	}
 	$options['object'] = EVENT_OBJECT_TRIGGER;
-	$options['filter'] = array('value_changed' => ($_REQUEST['showUnknown'] ? null : TRIGGER_VALUE_CHANGED_YES));
 	$options['nodeids'] = get_current_nodeid();
 }
 
@@ -584,7 +570,6 @@ else {
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'filter' => array(
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'object' => EVENT_OBJECT_TRIGGER,
 				),
 				'time_from' => $from,
@@ -594,10 +579,6 @@ else {
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => ($config['search_limit'] + 1)
 			);
-
-			if ($_REQUEST['showUnknown']) {
-				$options['filter']['value_changed'] = null;
-			}
 
 			// trigger options
 			$trigOpt = array(
@@ -702,7 +683,7 @@ else {
 						zbx_jsvalue($items, true).");");
 
 				// duration
-				if ($nextEvent = get_next_event($event, $events, $_REQUEST['showUnknown'])) {
+				if ($nextEvent = get_next_event($event, $events)) {
 					$event['duration'] = zbx_date2age($event['clock'], $nextEvent['clock']);
 				}
 				else {
