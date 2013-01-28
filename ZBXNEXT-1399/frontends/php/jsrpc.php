@@ -251,11 +251,6 @@ switch ($data['method']) {
 				);
 			}
 		}
-
-		if ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
-			$json = new CJSON();
-			$result = $json->encode($result);
-		}
 		break;
 
 	default:
@@ -264,17 +259,22 @@ switch ($data['method']) {
 
 if ($requestType == PAGE_TYPE_JSON) {
 	if (isset($data['id'])) {
-		$rpcResp = array(
+		echo $json->encode(array(
 			'jsonrpc' => '2.0',
 			'result' => $result,
 			'id' => $data['id']
-		);
-		echo $json->encode($rpcResp);
+		));
 	}
 }
-elseif ($requestType == PAGE_TYPE_TEXT
-			|| $requestType == PAGE_TYPE_JS
-			|| $requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
+elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
+	$json = new CJSON();
+sleep(3);
+	echo $json->encode(array(
+		'jsonrpc' => '2.0',
+		'result' => $result
+	));
+}
+elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
 	echo $result;
 }
 

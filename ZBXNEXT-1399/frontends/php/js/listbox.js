@@ -31,11 +31,11 @@ jQuery(function($) {
 		url.setArgument('objectName', options.objectName);
 		url = url.getUrl();
 
-		var jqxhr = null;
+		var jqxhrs = [];
 
-		this.each(function() {
-			var selectObj = $('#' + $(this).attr('id')),
-				containerObj = $('#' + $(this).attr('id') + '_chzn');
+		return this.each(function() {
+			var selectObj = $(this),
+				containerObj = $('#' + selectObj.attr('id') + '_chzn');
 
 			$('.search-field input', containerObj).bind('keyup', function() {
 				var inputObj = $(this),
@@ -50,29 +50,34 @@ jQuery(function($) {
 				$('.no-results', containerObj).text(locale['Looking for'] + " '" + value + "'");
 
 				window.setTimeout(function() {
-					if (jqxhr) {
-						jqxhr.abort();
+					if (!empty(jqxhrs[selectObj.attr('id')])) {
+						jqxhrs[selectObj.attr('id')].abort();
 					}
 
-					jqxhr = $.ajax({
+					jqxhrs[selectObj.attr('id')] = $.ajax({
 						url: url,
 						type: 'GET',
 						dataType: 'json',
 						data: {search: value}
 					})
-					.done(function(data) {
-						if (empty(data)) {
+					.success(function(data) {
+						if (empty(data['result'])) {
 							return;
 						}
 
 						var values = [];
 
 						$('option', selectObj).each(function() {
-							$(this).is(':selected') ? values.push($(this).val()) : $(this).remove();
+							if ($(this).is(':selected')) {
+								values.push($(this).val());
+							}
+							else {
+								$(this).remove();
+							}
 						});
 
-						$.each(data, function(i, item) {
-							if (values.indexOf(item.value) < 0) {
+						$.each(data['result'], function(i, item) {
+							if (typeof(values[item.value]) == 'undefined') {
 								$('<option />', {value: item.value, text: item.text}).appendTo(selectObj);
 							}
 						});
