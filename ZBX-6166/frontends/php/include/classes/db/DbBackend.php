@@ -89,11 +89,40 @@ abstract class DbBackend {
 			$newValues[] = $row;
 		}
 
-		$sql = $this->insertGeneration($table, $fields, $newValues);
+//		$sql = $this->insertGeneration($table, $fields, $newValues);
 
-		if (!DBexecute($sql)) {
-			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+//		if (!DBexecute($sql)) {
+//			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+//		}
+
+// ORACLE TESTS
+	// 1 DUAL METHOD - OK
+
+		$sql = 'INSERT ALL';
+		$tableAndFields = " INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
+		for($i = 20;$i < 220; $i++) {
+			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
 		}
+		$sql .= ' SELECT * FROM dual';
+
+// DEL TESTS
+		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
+/* --- */
+
+	// 2 BEGIN-END METHOD
+		$sql = "BEGIN";
+		for($i = 20;$i < 220; $i++) {
+			$md5 = md5(rand(1,1000000));
+			$rand = rand(0,1);
+			$sql .= "INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES ('".$i."', '".$md5."', '".$rand."', '".$rand."', '".$rand."')";
+		}
+		$sql = "END;";
+		DBexecute($sql);
+/* --- */
+
+// DEL TESTS
+		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
+/* --- */
 
 		return $resultIds;
 	}
@@ -128,9 +157,15 @@ abstract class DbBackend {
 	}
 
 	/**
-	 * !!!
+	 * Generate INSERT SQL query for MySQL and PostgreSQL.
+	 * Generation example:
+	 *	SQL QUERY!!!!!!!!!!!!!!!!!!!
 	 *
-	 * @return !!!
+	 * @param string $table
+	 * @param array $fields
+	 * @param array $values
+	 *
+	 * @return string
 	 */
 	public function insertGeneration($table, $fields, $values) {
 		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ';
