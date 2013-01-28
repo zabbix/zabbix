@@ -1184,8 +1184,6 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 						break;
 					}
 
-					cache_put_snmp_index(item, oid_normalized, index_value, idx);
-
 					zabbix_log(LOG_LEVEL_DEBUG, "Found index:%d", idx);
 
 					if (NULL == (pl = strchr(item->snmp_oid, '[')))
