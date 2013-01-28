@@ -41,14 +41,14 @@ class OracleDbBackend extends DbBackend {
 	}
 
 	/**
-	 * Generate INSERT SQL query. Generation example:
+	 * Generate INSERT SQL query.
 	 * Generation example:
-	 *	INSERT ALL
-	 *		INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode)
-	 *		VALUES ('20', '8d3d71fff0eb9e2108093d0526f55784', '1', '0', '1')
-	 *		INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode)
-	 *		VALUES ('21', '9c382b26b8dd11dc9dc2911dce5ab32b', '0', '0', '0')
-	 *	SELECT * FROM dual
+	 *	BEGIN
+	 *	INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode)
+	 *		VALUES ('20', 'admins', '1', '0', '1');
+	 *	INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode)
+	 *		VALUES ('21', 'users', '0', '0', '0');
+	 *  END;
 	 *
 	 * @param string $table
 	 * @param array $fields
@@ -57,14 +57,12 @@ class OracleDbBackend extends DbBackend {
 	 * @return string
 	 */
 	public function insertGeneration($table, $fields, $values) {
-		$sql = 'INSERT ALL';
-		$tableAndFields = ' INTO '.$table.' ('.implode(',', $fields).') VALUES';
-
+		$sql = 'BEGIN';
+		$fields = '('.implode(',', $fields).')';
 		foreach ($values as $row) {
-			$sql .= $tableAndFields.' ('.implode(',', array_values($row)).')';
+			$sql .= ' INSERT INTO '.$table.' '.$fields.' VALUES ('.implode(',', array_values($row)).');';
 		}
-
-		$sql .= ' SELECT * FROM dual';
+		$sql .= ' END;';
 
 		return $sql;
 	}

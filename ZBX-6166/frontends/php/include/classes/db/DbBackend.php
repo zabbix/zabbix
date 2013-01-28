@@ -24,6 +24,39 @@
  */
 abstract class DbBackend {
 
+	public static $instance;
+
+	/**
+	 * Get necessary DB class
+	 *
+	 * @return MysqlDbBackend|PostgresqlDbBackend|OracleDbBackend|Db2DbBackend|SqliteDbBackend
+	 */
+	public static function getInstance() {
+		global $DB;
+
+		if (!isset(self::$instance)) {
+			switch ($DB['TYPE']) {
+				case ZBX_DB_MYSQL:
+					self::$instance = new MysqlDbBackend();
+					break;
+				case ZBX_DB_POSTGRESQL:
+					self::$instance = new PostgresqlDbBackend();
+					break;
+				case ZBX_DB_ORACLE:
+					self::$instance = new OracleDbBackend();
+					break;
+				case ZBX_DB_DB2:
+					self::$instance = new Db2DbBackend();
+					break;
+				case ZBX_DB_SQLITE3:
+					self::$instance = new SqliteDbBackend();
+					break;
+			}
+		}
+
+		return self::$instance;
+	}
+
 	protected $error;
 
 	/**
@@ -89,78 +122,20 @@ abstract class DbBackend {
 			$newValues[] = $row;
 		}
 
-//		$sql = $this->insertGeneration($table, $fields, $newValues);
+		$sql = $this->insertGeneration($table, $fields, $newValues);
 
-//		if (!DBexecute($sql)) {
-//			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
-//		}
-
-// ORACLE TESTS
-	// 1 DUAL METHOD - OK
-
-		$sql = 'INSERT ALL';
-		$tableAndFields = " INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES";
-		for($i = 20;$i < 220; $i++) {
-			$sql .= $tableAndFields." ('".$i."', '".md5(rand(1,1000000))."', '".rand(0,1)."', '".rand(0,1)."', '".rand(0,1)."')";
+		if (!DBexecute($sql)) {
+			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 		}
-		$sql .= ' SELECT * FROM dual';
-		DBexecute($sql);
-
-// DEL TESTS
-		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
-/* --- */
-
-	// 2 BEGIN-END METHOD
-		$sql = "BEGIN";
-		for($i = 20;$i < 220; $i++) {
-			$md5 = md5(rand(1,1000000));
-			$rand = rand(0,1);
-			$sql .= "INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode) VALUES ('".$i."', '".$md5."', '".$rand."', '".$rand."', '".$rand."')";
-		}
-		$sql = "END";
-		DBexecute($sql);
-/* --- */
-
-// DEL TESTS
-		DBexecute('DELETE FROM usrgrp WHERE usrgrpid>19');
-/* --- */
 
 		return $resultIds;
 	}
 
 	/**
-	 * !!!
-	 *
-	 * @param !!!
-	 *
-	 * @return !!!
-	 */
-	public static function i() {
-	global $DB;
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-				$dbBackend = new MysqlDbBackend();
-				break;
-			case ZBX_DB_POSTGRESQL:
-				$dbBackend = new PostgresqlDbBackend();
-				break;
-			case ZBX_DB_ORACLE:
-				$dbBackend = new OracleDbBackend();
-				break;
-			case ZBX_DB_DB2:
-				$dbBackend = new Db2DbBackend();
-				break;
-			case ZBX_DB_SQLITE3:
-				$dbBackend = new SqliteDbBackend();
-				break;
-		}
-		return $dbBackend;
-	}
-
-	/**
-	 * Generate INSERT SQL query for MySQL and PostgreSQL.
+	 * Generate INSERT SQL query for MySQL, PostgreSQL and IBM DB2.
 	 * Generation example:
-	 *	SQL QUERY!!!!!!!!!!!!!!!!!!!
+	 *	INSERT INTO applications (name,hostid,templateid,applicationid)
+	 *	VALUES ('CPU','10113','13','868'),('Filesystems','10113','5','869'),('General','10113','21','870');
 	 *
 	 * @param string $table
 	 * @param array $fields
