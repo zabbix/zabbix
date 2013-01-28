@@ -8,6 +8,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6173] removed unknown trigger color from the trigger overview help pop up (Pavels)
 ...G...... [ZBX-6161] fixed reading empty files with vfs.file.contents key (wiper)
 ..F....... [ZBX-5458] fixed some date strings being not translatable (Toms)
 ..F....... [ZBX-6114] fixed errors in graphs (invalid arguments and division by zero) (Oleg)
