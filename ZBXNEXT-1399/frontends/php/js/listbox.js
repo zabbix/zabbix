@@ -88,7 +88,7 @@ jQuery(function($) {
 					}
 
 					jqxhrs[selectObj.attr('id')] = $.ajax({
-						url: url,
+						url: url + '&curtime=' + new CDate().getTime(),
 						type: 'GET',
 						dataType: 'json',
 						data: {search: value},
