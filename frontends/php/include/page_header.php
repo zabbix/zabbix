@@ -155,7 +155,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 .warning { background: #{$config['severity_color_2']} !important; }
 .information { background: #{$config['severity_color_1']} !important; }
 .not_classified { background: #{$config['severity_color_0']} !important; }
-.trigger_unknown { background: #DBDBDB !important; }
 CSS;
 			$pageHeader->addStyle($severityCss);
 
