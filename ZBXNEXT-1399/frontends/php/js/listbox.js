@@ -31,11 +31,37 @@ jQuery(function($) {
 		url.setArgument('objectName', options.objectName);
 		url = url.getUrl();
 
-		var jqxhrs = [];
+		var jqxhrs = [],
+			isWaiting = [];
 
 		return this.each(function() {
 			var selectObj = $(this),
 				containerObj = $('#' + selectObj.attr('id') + '_chzn');
+
+			var success = function(data) {
+				if (empty(data['result'])) {
+					return;
+				}
+
+				var values = [];
+
+				$('option', selectObj).each(function() {
+					if ($(this).is(':selected')) {
+						values.push($(this).val());
+					}
+					else {
+						$(this).remove();
+					}
+				});
+
+				$.each(data['result'], function(i, item) {
+					if (typeof(values[item.value]) == 'undefined') {
+						$('<option />', {value: item.value, text: item.text}).appendTo(selectObj);
+					}
+				});
+
+				chosenObj.trigger('liszt:updated');
+			};
 
 			$('.search-field input', containerObj).bind('keyup', function() {
 				var inputObj = $(this),
@@ -49,7 +75,16 @@ jQuery(function($) {
 
 				$('.no-results', containerObj).text(locale['Looking for'] + " '" + value + "'");
 
+				if (empty(isWaiting[selectObj.attr('id')])) {
+					isWaiting[selectObj.attr('id')] = true;
+				}
+				else if (isWaiting[selectObj.attr('id')]) {
+					return;
+				}
+
 				window.setTimeout(function() {
+					isWaiting[selectObj.attr('id')] = false;
+
 					if (!empty(jqxhrs[selectObj.attr('id')])) {
 						jqxhrs[selectObj.attr('id')].abort();
 					}
@@ -58,33 +93,22 @@ jQuery(function($) {
 						url: url,
 						type: 'GET',
 						dataType: 'json',
-						data: {search: value}
-					})
-					.success(function(data) {
-						if (empty(data['result'])) {
-							return;
-						}
-
-						var values = [];
-
-						$('option', selectObj).each(function() {
-							if ($(this).is(':selected')) {
-								values.push($(this).val());
-							}
-							else {
-								$(this).remove();
-							}
-						});
-
-						$.each(data['result'], function(i, item) {
-							if (typeof(values[item.value]) == 'undefined') {
-								$('<option />', {value: item.value, text: item.text}).appendTo(selectObj);
-							}
-						});
-
-						chosenObj.trigger('liszt:updated');
+						data: {search: value},
+						success: success
 					});
 				}, 500);
+			});
+
+			// preload data
+			$('.search-field input', containerObj).focus(function() {
+				$.ajax({
+					url: url,
+					type: 'GET',
+					dataType: 'json',
+					data: {limit: 10},
+					success: success
+				});
+				jQuery(this).off('focus');
 			});
 		});
 	};

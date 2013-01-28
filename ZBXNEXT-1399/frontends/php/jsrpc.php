@@ -222,6 +222,7 @@ switch ($data['method']) {
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
+	 * @param int    $data['limit']
 	 *
 	 * @return array(int => array('value' => int, 'text' => string))
 	 */
@@ -230,7 +231,8 @@ switch ($data['method']) {
 			$hostGroups = API::HostGroup()->get(array(
 				'output' => array('groupid', 'name'),
 				'startSearch' => true,
-				'search' => array('name' => $data['search'])
+				'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+				'limit' => isset($data['limit']) ? $data['limit'] : null
 			));
 			foreach ($hostGroups as &$hostGroup) {
 				$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
@@ -268,7 +270,7 @@ if ($requestType == PAGE_TYPE_JSON) {
 }
 elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
 	$json = new CJSON();
-sleep(3);
+
 	echo $json->encode(array(
 		'jsonrpc' => '2.0',
 		'result' => $result
