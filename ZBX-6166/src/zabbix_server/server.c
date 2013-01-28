@@ -591,9 +591,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DCload_config();
 
-	/* need to set trigger status to UNKNOWN since last run */
-	DBupdate_triggers_status_after_restart();
-
 	DBclose();
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))

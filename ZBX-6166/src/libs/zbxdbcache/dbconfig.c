@@ -44,6 +44,7 @@ typedef struct
 	const char	*description;
 	const char	*expression;
 	const char	*error;
+	int		lastchange;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	value;
@@ -1281,6 +1282,7 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		trigger->type = (unsigned char)atoi(row[5]);
 		trigger->value = (unsigned char)atoi(row[6]);
 		trigger->value_flags = (unsigned char)atoi(row[7]);
+		trigger->lastchange = atoi(row[8]);
 	}
 
 	/* remove deleted or disabled triggers from buffer */
@@ -2316,7 +2318,7 @@ void	DCsync_configuration()
 	sec = zbx_time();
 	trig_result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,"
-				"t.priority,t.type,t.value,t.value_flags"
+				"t.priority,t.type,t.value,t.value_flags,t.lastchange"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -3296,6 +3298,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->value = src_trigger->value;
 	dst_trigger->value_flags = src_trigger->value_flags;
 	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
+	dst_trigger->lastchange = src_trigger->lastchange;
 }
 
 /******************************************************************************
@@ -4247,7 +4250,7 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 		for (i = 0; NULL != (next_trigdep = trigdep->dependencies[i]); i++)
 		{
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
-					TRIGGER_VALUE_TRUE == next_trigger->value &&
+					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
 					TRIGGER_VALUE_FLAG_NORMAL == next_trigger->value_flags)
 			{
 				return FAIL;
@@ -4298,7 +4301,7 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char value_flags, const char *error)
+		unsigned char value_flags, const char *error, int *lastchange)
 {
 	ZBX_DC_TRIGGER	*dc_trigger;
 
@@ -4309,6 +4312,8 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
 		DCstrpool_replace(1, &dc_trigger->error, error);
 		dc_trigger->value = value;
 		dc_trigger->value_flags = value_flags;
+		if (NULL != lastchange)
+			dc_trigger->lastchange = *lastchange;
 	}
 
 	UNLOCK_CACHE;
