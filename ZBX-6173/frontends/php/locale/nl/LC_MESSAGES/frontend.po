@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-23 18:11+0200\n"
-"PO-Revision-Date: 2013-01-23 13:04+0200\n"
-"Last-Translator: DavidWouda <d.wouda@kpnplanet.nl>\n"
+"PO-Revision-Date: 2013-01-24 17:54+0200\n"
+"Last-Translator: Raymond <qix@the-wired.net>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -203,7 +203,7 @@ msgstr "Absoluut verschil tussen laatste en volgende waarde is GEEN N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Acceptabele SLA"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -291,7 +291,7 @@ msgstr "Actie"
 #: api/classes/CAction.php:774 api/classes/CAction.php:871
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Actie \"%1$s\" heeft foutieve waarde voor \"esc_period\" (minimaal %2$s seconden)."
 
 #: api/classes/CAction.php:777 api/classes/CAction.php:791
 #: api/classes/CAction.php:880 api/classes/CAction.php:899
@@ -342,7 +342,7 @@ msgstr "Actief"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Actief"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:571
 #: include/views/configuration.maintenance.edit.php:81 maintenance.php:147
@@ -418,7 +418,7 @@ msgstr "Element toevoegen"
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:267
 msgid "Add graph items first"
-msgstr ""
+msgstr "Voeg eerst grafiek items toe"
 
 #: include/actions.inc.php:338 include/actions.inc.php:553
 msgid "Add host"
@@ -629,7 +629,7 @@ msgstr "Toepassen"
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Aankomende"
 
 #: include/func.inc.php:221
 msgid "Apr"
@@ -682,7 +682,7 @@ msgstr "Op (hour:minute)"
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "Er moet minimaal een host of groep geselecteerd worden."
 
 #: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
 msgid "At least one maintenance period must be created."
@@ -1636,7 +1636,7 @@ msgstr "Kan kaart \"%1$s\" gebruikt in scherm \"%2$s\" niet vinden."
 
 #: include/js.inc.php:248
 msgid "Cannot find objects with name"
-msgstr "Kan geen objecten vinden met de naam"
+msgstr "Kan objecten niet vinden met naam"
 
 #: include/classes/import/CXmlImport18.php:541
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
@@ -2017,7 +2017,7 @@ msgstr "Kan gebruiker niet bijwerken. Beide wachtwoorden moeten hetzelfde zijn."
 
 #: usergrps.php:303
 msgid "Cannot update users status"
-msgstr "Kan gebruikers status niet bijwerken"
+msgstr "Kan gebruikerstatus niet bijwerken"
 
 #: adm.valuemapping.php:64
 msgid "Cannot update value map"
@@ -2060,11 +2060,11 @@ msgstr "Karakter"
 
 #: include/regexp.inc.php:178
 msgid "Character string included"
-msgstr "Iedere character string meegenomen"
+msgstr "Inclusief iedere tekenreeks"
 
 #: include/regexp.inc.php:184
 msgid "Character string not included"
-msgstr "Iedere character string niet meegenomen"
+msgstr "Exclusief tekenreeks"
 
 #: include/hosts.inc.php:239
 msgid "Chassis"
@@ -2138,7 +2138,7 @@ msgstr ""
 
 #: jsLoader.php:164
 msgid "Clear"
-msgstr ""
+msgstr "Wissen"
 
 #: include/views/configuration.item.edit.php:460
 msgid "Clear history and trends"
@@ -2147,11 +2147,11 @@ msgstr ""
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251
 msgid "Clear history for selected"
-msgstr ""
+msgstr "Geschiedenis wissen voor selectie"
 
 #: include/views/configuration.host.massupdate.php:119
 msgid "Clear when unlinking"
-msgstr ""
+msgstr "Wissen bij ontkoppelen"
 
 #: include/screens.inc.php:28
 msgid "Clock"
@@ -2176,14 +2176,14 @@ msgstr "Klok"
 #: include/views/configuration.template.edit.php:435
 #: include/views/configuration.triggers.edit.php:302
 msgid "Clone"
-msgstr ""
+msgstr "Kloon"
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
 #: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:148
 #: jsLoader.php:172 tr_testexpr.php:175
 msgid "Close"
-msgstr ""
+msgstr "Sluiten"
 
 #: include/views/configuration.triggers.edit.php:233
 msgid "Close expression constructor"
@@ -2199,11 +2199,11 @@ msgstr "Kleur"
 
 #: include/views/js/configuration.sysmaps.js.php:341
 msgid "Colour (OK)"
-msgstr ""
+msgstr "Kleur (OK)"
 
 #: include/profiles.inc.php:279
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Kleur is niet correct: hexadecimale kleurcode verwacht (6 tekens)."
 
 #: include/views/configuration.screen.constructor.edit.php:605
 #: screenedit.php:45
@@ -2217,26 +2217,26 @@ msgstr ""
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
-msgstr "Kolomen"
+msgstr "Kolommen"
 
 #: include/forms.inc.php:1844
 msgid "Combined result"
-msgstr ""
+msgstr "Gecombineerd resultaat"
 
 #: include/actions.inc.php:811 include/actions.inc.php:845
 #: include/actions.inc.php:900
 #: include/views/administration.auditacts.list.php:106
 #: include/views/administration.script.edit.php:68
 msgid "Command"
-msgstr ""
+msgstr "Opdracht"
 
 #: tr_events.php:134
 msgid "Command actions"
-msgstr ""
+msgstr "Opdracht acties"
 
 #: scripts.php:90
 msgid "Command cannot be empty."
-msgstr ""
+msgstr "Opdracht kan niet leeg zijn."
 
 #: include/views/administration.script.edit.php:63
 #: include/views/administration.script.list.php:40
@@ -2244,7 +2244,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:727 popup.php:1968
 #: popup.php:1975
 msgid "Commands"
-msgstr ""
+msgstr "Opdrachten"
 
 #: tr_comments.php:63
 msgid "Comment updated"
@@ -2257,11 +2257,11 @@ msgstr "Opmerkingen"
 
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Commercial"
-msgstr ""
+msgstr "Commerciële"
 
 #: report6.php:160
 msgid "Compare values for multiple periods"
-msgstr ""
+msgstr "Vergelijk waardes voor meerdere periodes"
 
 #: include/views/administration.usergroups.edit.php:113
 msgid "Composing permissions"
@@ -2292,7 +2292,7 @@ msgstr ""
 
 #: services.php:27
 msgid "Configuration of IT services"
-msgstr "Configuration van IT services"
+msgstr "Configuratie van IT Services"
 
 #: include/audit.inc.php:25
 msgid "Configuration of Zabbix"
@@ -2396,7 +2396,7 @@ msgstr ""
 
 #: report5.php:167
 msgid "Configuration of trigger"
-msgstr ""
+msgstr "Trigger configuratie"
 
 #: adm.triggerdisplayoptions.php:24
 msgid "Configuration of trigger displaying options"
@@ -2447,27 +2447,27 @@ msgstr ""
 
 #: include/views/administration.script.edit.php:109
 msgid "Confirmation text"
-msgstr ""
+msgstr "Bevestigingstekst"
 
 #: popup.php:617
 msgid "Conflict between selected templates."
-msgstr ""
+msgstr "Conflict tussen geselecteerde templates."
 
 #: include/views/administration.proxy.edit.php:54
 #: include/views/configuration.host.edit.php:217
 #: include/views/js/configuration.sysmaps.js.php:326
 msgid "Connect to"
-msgstr ""
+msgstr "Verbinden met"
 
 #: include/page_footer.php:98
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr ""
+msgstr "Verbonden als '%1$s'"
 
 #: include/page_footer.php:95
 #, php-format
 msgid "Connected as '%1$s' from '%2$s'"
-msgstr ""
+msgstr "Verbonden als '%1$s' vanaf '%2$s'"
 
 #: api/classes/CScript.php:473
 #, php-format
@@ -2501,7 +2501,7 @@ msgstr "Contact"
 
 #: include/hosts.inc.php:259
 msgid "Contract number"
-msgstr ""
+msgstr "Contract nummer"
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
@@ -2510,13 +2510,13 @@ msgstr ""
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
 msgid "Copy"
-msgstr ""
+msgstr "Kopiëren"
 
 #: include/views/configuration.graph.list.php:139
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
-msgstr ""
+msgstr "Kopiëer selectie naar ..."
 
 #: api/classes/CUser.php:985
 #, php-format
@@ -2525,21 +2525,21 @@ msgstr ""
 
 #: api/classes/CImage.php:493
 msgid "Could not save image!"
-msgstr ""
+msgstr "Kan afbeelding niet opslaan!"
 
 #: include/graphs.inc.php:84
 #: include/views/configuration.triggers.expression.php:95 popup_bitem.php:131
 #: popup_trexpr.php:45
 msgid "Count"
-msgstr "Telling"
+msgstr "Aantal"
 
 #: include/views/configuration.slideconf.list.php:42
 msgid "Count of slides"
-msgstr ""
+msgstr "Aantal slides"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
-msgstr ""
+msgstr "Actie aanmaken"
 
 #: include/views/configuration.application.list.php:31
 msgid "Create application"
@@ -2552,7 +2552,7 @@ msgstr ""
 
 #: include/views/configuration.graph.list.php:43
 msgid "Create graph"
-msgstr ""
+msgstr "Grafiek aanmaken"
 
 #: include/views/configuration.graph.list.php:46
 msgid "Create graph (select host first)"
@@ -2573,15 +2573,15 @@ msgstr ""
 
 #: adm.iconmapping.php:123
 msgid "Create icon map"
-msgstr ""
+msgstr "Icon map aanmaken"
 
 #: adm.images.php:145
 msgid "Create image"
-msgstr ""
+msgstr "Afbeelding aanmaken"
 
 #: include/views/configuration.item.list.php:30 items.php:662
 msgid "Create item"
-msgstr ""
+msgstr "Item aanmaken"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
@@ -2589,15 +2589,15 @@ msgstr ""
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
-msgstr ""
+msgstr "Onderhoudsperiode aanmaken"
 
 #: sysmaps.php:211
 msgid "Create map"
-msgstr "Maak kaart"
+msgstr "Kaart aanmaken"
 
 #: include/views/administration.mediatypes.list.php:26
 msgid "Create media type"
-msgstr ""
+msgstr "Media type aanmaken"
 
 #: include/views/administration.node.list.php:36
 msgid "Create node"
@@ -2605,27 +2605,27 @@ msgstr ""
 
 #: include/views/administration.proxy.list.php:32
 msgid "Create proxy"
-msgstr ""
+msgstr "Proxy aanmaken"
 
 #: include/views/configuration.httpconf.list.php:30
 msgid "Create scenario"
-msgstr ""
+msgstr "Scenario aanmaken"
 
 #: include/views/configuration.httpconf.list.php:33
 msgid "Create scenario (select host first)"
-msgstr ""
+msgstr "Scenario aanmaken (selecteer eerst host)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
-msgstr ""
+msgstr "Scherm aanmaken"
 
 #: include/views/administration.script.list.php:24
 msgid "Create script"
-msgstr ""
+msgstr "Script aanmaken"
 
 #: include/views/configuration.slideconf.list.php:27
 msgid "Create slide show"
-msgstr ""
+msgstr "Slideshow aanmaken"
 
 #: templates.php:436
 msgid "Create template"
@@ -2633,7 +2633,7 @@ msgstr ""
 
 #: include/views/configuration.triggers.list.php:44 jsLoader.php:103
 msgid "Create trigger"
-msgstr ""
+msgstr "Trigger aanmaken"
 
 #: include/views/configuration.triggers.list.php:39
 msgid "Create trigger prototype"
@@ -2641,7 +2641,7 @@ msgstr ""
 
 #: include/views/administration.users.list.php:30
 msgid "Create user"
-msgstr ""
+msgstr "Gebruiker aanmaken"
 
 #: include/views/administration.usergroups.list.php:30
 msgid "Create user group"
@@ -2766,11 +2766,11 @@ msgstr ""
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
 msgid "Current host"
-msgstr ""
+msgstr "Huidige host"
 
 #: include/page_header.php:364
 msgid "Current node"
-msgstr ""
+msgstr "Huidige node"
 
 #: popup_trexpr.php:478
 msgid "Current time is < N"
@@ -2790,11 +2790,11 @@ msgstr ""
 
 #: include/setup.inc.php:192
 msgid "Current value"
-msgstr ""
+msgstr "Huidige waarde"
 
 #: charts.php:26
 msgid "Custom graphs"
-msgstr "Speciale grafieken"
+msgstr "Aangepaste grafieken"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
@@ -2836,7 +2836,7 @@ msgstr ""
 
 #: include/locales.inc.php:49
 msgid "Czech (cs_CZ)"
-msgstr ""
+msgstr "Tsjechisch (cs_CZ)"
 
 #: include/classes/class.cchart.php:1227
 msgid "D"
@@ -2912,7 +2912,7 @@ msgstr ""
 #: include/graphs.inc.php:73 include/views/js/configuration.sysmaps.js.php:336
 #: include/views/js/configuration.sysmaps.js.php:412
 msgid "Dashed line"
-msgstr ""
+msgstr "Stippellijn"
 
 #: include/views/monitoring.overview.php:28
 msgid "Data"
@@ -3064,11 +3064,11 @@ msgstr ""
 #: include/forms.inc.php:1568 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
-msgstr ""
+msgstr "December"
 
 #: include/items.inc.php:133
 msgid "Decimal"
-msgstr ""
+msgstr "Decimaal"
 
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:127
@@ -3083,16 +3083,16 @@ msgstr "Standaard"
 
 #: include/views/administration.authentication.edit.php:41
 msgid "Default authentication"
-msgstr ""
+msgstr "Standaard authenticatie"
 
 #: include/views/configuration.slideconf.edit.php:39 slideconf.php:39
 msgid "Default delay (in seconds)"
-msgstr ""
+msgstr "Standaard vertraging (in seconden)"
 
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:534
 msgid "Default message"
-msgstr ""
+msgstr "Standaard bericht"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
