@@ -1048,7 +1048,10 @@ function make_webmon_overview($filter) {
 				is_show_all_nodes() ? $group['nodename'] : null,
 				$group['name'],
 				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
-				new CSpan(empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'], empty($data[$group['groupid']]['failed']) ? 'off' : 'on'),
+				new CSpan(
+					empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
+					empty($data[$group['groupid']]['failed']) ? 'off' : 'on'
+				),
 				new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown'], 'unknown')
 			));
 		}
