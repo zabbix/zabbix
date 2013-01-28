@@ -374,7 +374,6 @@ if ($config['event_ack_enable']) {
 		'triggerids' => $triggerIds,
 		'filter' => array(
 			'object' => EVENT_OBJECT_TRIGGER,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 			'acknowledged' => 0,
 			'value' => TRIGGER_VALUE_TRUE
 		),
@@ -402,8 +401,7 @@ if ($config['event_ack_enable']) {
 			'groupCount' => true,
 			'triggerids' => $triggerIdsWithoutUnackEvents,
 			'filter' => array(
-				'object' => EVENT_OBJECT_TRIGGER,
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES
+				'object' => EVENT_OBJECT_TRIGGER
 			),
 			'nopermissions' => true
 		));
@@ -421,9 +419,6 @@ if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'filter' => array(
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
-		),
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
