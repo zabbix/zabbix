@@ -200,28 +200,28 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param type  $label                  string in which macros should be resolved
-	 * @param array $items                  list of graph items
-	 * @param array $items[n]['hostid']     graph n-th item corresponding host Id
+	 * @param type	$name				string in which macros should be resolved
+	 * @param array $items				list of graph items
+	 * @param array $items[n]['hostid'] graph n-th item corresponding host Id
 	 *
-	 * @return string   label with macros replaced with corresponding values
+	 * @return string	string with macros replaced with corresponding values
 	 */
-	public static function resolveGraphLabel($label, $items) {
+	public static function resolveGraphName($name, $items) {
 		self::init();
 		return self::$macrosResolver->resolve(array(
 			'config' => 'graphName',
-			'data' => array('str' => $label, 'items' => $items)
+			'data' => array('str' => $name, 'items' => $items)
 		));
 	}
 
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param array $data list of graphs
-	 * @param int $data[]['graphid'] id of graph
-	 * @param string $data[]['name'] name of graph
+	 * @param array		$data				list of graphs
+	 * @param int		$data[]['graphid']	id of graph
+	 * @param string	$data[]['name']		name of graph
 	 *
-	 * @return array inputed data with resolved names
+	 * @return array	inputed data with resolved names
 	 */
 	public static function resolveGraphNameByIds($data) {
 		self::init();

@@ -76,6 +76,7 @@ class CMacrosResolver {
 			'method' => 'resolveTrigger'
 		),
 		'graphName' => array(
+			'types' => array('graphFunctionalItem'),
 			'method' => 'resolveGraph'
 		)
 	);
@@ -720,15 +721,19 @@ class CMacrosResolver {
 	/**
 	 * Resolve functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param type $str string in which macros should be resolved
-	 * @param array $items list of graph items
-	 * @param array $items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param array		$data						data container
+	 * @param type		$data['str']				string in which macros should be resolved
+	 * @param array		$data['items']				list of graph items
+	 * @param array		$data['items'][n]['hostid'] graph n-th item corresponding host Id
 	 *
-	 * @return string string with macros replaces with corresponding values
+	 * @return string	string with macros replaces with corresponding values
 	 */
-	public function resolveGraph($data) {
+	private function resolveGraph($data) {
+		$str = null;
 
-		$str = $this->resolveGraphFunctionalItemMacros($data['str'], $data['items']);
+		if ($this->isTypeAvailable('graphFunctionalItem')){
+			$str = $this->resolveGraphFunctionalItemMacros($data['str'], $data['items']);
+		}
 
 		return $str;
 	}
@@ -740,11 +745,11 @@ class CMacrosResolver {
 	 * Supports seconds as parameters, except "last" function.
 	 * Supports postfixes s,m,h,d and w for paramter.
 	 *
-	 * @param string $str string in which macros should be resolved
-	 * @param array $items list of graph items
-	 * @param array $items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param string	$str				string in which macros should be resolved
+	 * @param array		$items				list of graph items
+	 * @param array		$items[n]['hostid'] graph n-th item corresponding host Id
 	 *
-	 * @return string string with macros replaces with corresponding values
+	 * @return string	string with macros replaces with corresponding values
 	 */
 	private function resolveGraphFunctionalItemMacros($str, $items) {
 		// extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
@@ -800,11 +805,11 @@ class CMacrosResolver {
 	 * If macro can not be resolved it is replaced with UNRESOLVED_MACRO_STRING string i.e. "*UNKNOWN*"
 	 * Supports HOST.HOST<1..9> macros.
 	 *
-	 * @param string $str string in which macros should be resolved
-	 * @param array $items list of graph items
-	 * @param array $items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param string	$str				string in which macros should be resolved
+	 * @param array		$items				list of graph items
+	 * @param array		$items[n]['hostid'] graph n-th item corresponding host Id
 	 *
-	 * @return string string with macros replaces with corresponding values
+	 * @return string	string with macros replaces with corresponding values
 	 */
 	private function resolveGraphPositionalMacros($str, $items) {
 		// extract all macros into $matches
