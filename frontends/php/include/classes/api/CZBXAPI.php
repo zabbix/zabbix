@@ -756,6 +756,17 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Triggers a deprecated notice. Should be called when a deprecated parameter or method is used.
+	 *
+	 * The notice will not be displayed in the result returned by an API method.
+	 *
+	 * @param string $error     error text
+	 */
+	protected function deprecated($error) {
+		trigger_error($error, E_USER_NOTICE);
+	}
+
+	/**
 	 * Apply filter conditions to sql builded query.
 	 *
 	 * @param string $table
