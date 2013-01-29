@@ -122,10 +122,11 @@
 	}
 
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == 1) {
+		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>) {
 			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Key passphrase')); ?>);
 		}
-		if (jQuery('#authtype').val() != 1 || jQuery('#type').val() != 13) {
+		if (jQuery('#authtype').val() != <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>
+				|| jQuery('#type').val() != <?php echo CJs::encodeJson(ITEM_TYPE_SSH); ?>) {
 			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Password')); ?>);
 		}
 	}
