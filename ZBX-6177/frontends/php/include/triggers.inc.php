@@ -2289,8 +2289,7 @@ function get_item_function_info($expr) {
 					'hostids' => zbx_objectValues($hostFound, 'hostid'),
 					'filter' => array(
 						'key_' => array($exprPart['item']),
-					),
-					'webitems' => true
+					)
 				));
 
 				if (!$itemFound) {
