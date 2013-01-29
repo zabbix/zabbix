@@ -280,25 +280,34 @@ class CProfiler {
 			$callStack = debug_backtrace(false);
 
 			// never show the call to this method
-			$offset++;
+			array_shift($callStack);
 		}
-
-		if ($offset) {
-			$callStack = array_slice($callStack, $offset);
-		}
-
-		// reverse the order of the stack to show first calls in the beginning
-		$callStack = array_reverse($callStack);
 
 		$callStackString = '';
-		foreach ($callStack as $call) {
-			if (isset($call['class'])) {
-				$callStackString .= $call['class'].$call['type'];
+
+		// errors in functions
+		if (count($callStack) > 1) {
+			if ($offset) {
+				$callStack = array_slice($callStack, $offset);
 			}
-			$callStackString .= $call['function'].'() &rarr; ';
+
+			// reverse the order of the stack to show first calls in the beginning
+			$callStack = array_reverse($callStack);
+
+			foreach ($callStack as $call) {
+				if (isset($call['class'])) {
+					$callStackString .= $call['class'].$call['type'];
+				}
+				$callStackString .= $call['function'].'() &rarr; ';
+			}
+			$callStackString = rtrim($callStackString, '&rarr; ');
+			$callStackString .= ' in '.$call['file'].':'.$call['line'];
 		}
-		$callStackString = rtrim($callStackString, '&rarr; ');
-		$callStackString .= ' in '.$call['file'].':'.$call['line'];
+		// if the call stack contains only one element - this is a syntax error, just display the file name and the line
+		else {
+			$call = reset($callStack);
+			$callStackString .= ' in '.$call['file'].':'.$call['line'];
+		}
 
 		return $callStackString;
 	}
