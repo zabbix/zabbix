@@ -1151,6 +1151,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			return FAIL;
 #endif
 		strscpy(tmp,ip_list);
+		zbx_trim_str_list(tmp, ',');
 
 		for (start = tmp; '\0' != *start;)
 		{
