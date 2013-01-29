@@ -231,23 +231,22 @@ else {
 		'mediatypeids' => zbx_objectValues($data['mediatypes'], 'mediatypeid'),
 		'output' => array('actionid', 'name'),
 		'selectOperations' => array('opmessage'),
-		'preservekeys' => 1
+		'preservekeys' => true
 	));
 
 	foreach ($data['mediatypes'] as $number => $mediatype) {
 		// list actions where the media type is used
 		$data['mediatypes'][$number]['listOfActions'] = array();
-		foreach ($actions as $actionid => $action) {
+		foreach ($actions as $actionId => $action) {
 			foreach ($action['operations'] as $operation) {
 				if ($mediatype['mediatypeid'] == $operation['opmessage']['mediatypeid']) {
 					$data['mediatypes'][$number]['listOfActions'][] = array(
-						'actionid' => $actionid,
+						'actionid' => $actionId,
 						'name' => $action['name']
 					);
 				}
 			}
 		}
-		$data['mediatypes'][$number]['usedInActions'] = !isset($mediatype['listOfActions']);
 
 		// allow sort by mediatype name
 		$data['mediatypes'][$number]['typeid'] = $data['mediatypes'][$number]['type'];
