@@ -31,21 +31,30 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider allMediaTypes
 	 */
 	public function testPageAdministrationMediaTypes_CheckLayout($mediatype) {
-
 		$this->login('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
 		$this->ok(array('Media types', 'CONFIGURATION OF MEDIA TYPES', 'Displaying'));
-		$this->ok(array('Description', 'Type', 'Details'));
+		$this->ok(array('Name', 'Type', 'Status', 'Used in actions', 'Details'));
 		$this->ok($mediatype['description']);
-		if ($mediatype['type'] == MEDIA_TYPE_EMAIL) $this->ok('Email');
-		if ($mediatype['type'] == MEDIA_TYPE_JABBER) $this->ok('Jabber');
-		if ($mediatype['type'] == MEDIA_TYPE_SMS) $this->ok('SMS');
-		if ($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING) $this->ok('Ez Texting');
-		$this->assertElementPresent("//select[@id='go']/option[text()='Enable selected']");
-		$this->assertElementPresent("//select[@id='go']/option[text()='Disable selected']");
-		$this->assertElementPresent("//select[@id='go']/option[text()='Delete selected']");
-
+		switch ($mediatype['type']) {
+			case MEDIA_TYPE_EMAIL:
+				$this->ok('Email');
+				break;
+			case MEDIA_TYPE_EXEC:
+				$this->ok('Script');
+				break;
+			case MEDIA_TYPE_SMS:
+				$this->ok('SMS');
+				break;
+			case MEDIA_TYPE_JABBER:
+				$this->ok('Jabber');
+				break;
+			case MEDIA_TYPE_EZ_TEXTING:
+				$this->ok('Ez Texting');
+				break;
+		}
+		$this->zbxDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
 	/**
@@ -77,103 +86,86 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider allMediaTypes
 	 */
 	public function testPageAdministrationMediaTypes_Disable($mediatype) {
-
 		$this->login('media_types.php');
-
-		$mediatypeid = $mediatype['mediatypeid'];
 		$this->checkTitle('Configuration of media types');
 
-		$sql = 'SELECT mediatypeid FROM media_type WHERE mediatypeid = '.$mediatypeid;
-		$result = DBfetch(DBselect($sql));
-		$this->checkbox_select("mediatypeids_$mediatypeid");
+		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->dropdown_select('go', 'Disable selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->click('goButton');
+		$this->button_click('goButton');
+		$this->waitForConfirmation();
 		$this->wait();
-		$this->getConfirmation();
 		$this->ok('Media type disabled');
 
 		// checking that media type is disabled in the DB
-		$sql = 'SELECT * FROM media_type WHERE status=1 AND mediatypeid = '.$mediatypeid.' ORDER BY mediatypeid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Media type has not been disabled');
+		$sql = 'SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED.' AND mediatypeid='.$mediatype['mediatypeid'];
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	/**
 	 * @dataProvider allMediaTypes
 	 */
 	public function testPageAdministrationMediaTypes_Enable($mediatype) {
-
 		$this->login('media_types.php');
-
-		$name = $mediatype['description'];
 		$this->checkTitle('Configuration of media types');
 
-		$sql = 'SELECT mediatypeid FROM media_type WHERE description = '.zbx_dbstr($name);
-		$result = DBfetch(DBselect($sql));
-		$mediatypeid = $result['mediatypeid'];
-		$this->checkbox_select("mediatypeids_$mediatypeid");
+		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->dropdown_select('go', 'Enable selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->click('goButton');
+		$this->button_click('goButton');
+		$this->waitForConfirmation();
 		$this->wait();
-		$this->getConfirmation();
 		$this->ok('Media type enabled');
-		// checking that media type is enabled in the DB
-		$sql = 'SELECT * FROM media_type WHERE status=0 AND mediatypeid = '.$mediatypeid.' ORDER BY mediatypeid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Media type has not been enabled');
 
+		// checking that media type is enabled in the DB
+		$sql = 'SELECT * FROM media_type WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.' AND mediatypeid = '.$mediatype['mediatypeid'];
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	/**
 	 * @dataProvider allMediaTypes
 	 */
 	public function testPageAdministrationMediaTypes_DeleteSelected($mediatype) {
-
 		DBsave_tables('media_type');
 
-		$this->login('media_types.php');
-
-		$mediatypeid = $mediatype['mediatypeid'];
-		$this->checkTitle('Configuration of media types');
-
-		$sql = 'SELECT mediatypeid FROM media_type WHERE mediatypeid = '.$mediatypeid;
-		$result = DBfetch(DBselect($sql));
-
-		$row = DBfetch(DBselect('SELECT count(*) AS count FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
+		$row = DBfetch(DBselect(
+				'SELECT count(*) AS count'.
+				' FROM opmessage'.
+				' WHERE mediatypeid='.$mediatype['mediatypeid']
+		));
 		$used_in_operations = ($row['count'] > 0);
 
-		$this->checkbox_select("mediatypeids_$mediatypeid");
+		$this->login('media_types.php');
+		$this->checkTitle('Configuration of media types');
+
+		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->dropdown_select('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->click('goButton');
+		$this->button_click('goButton');
+		$this->waitForConfirmation();
 		$this->wait();
-		$this->getConfirmation();
+
+		$sql = 'SELECT NULL FROM media_type WHERE mediatypeid='.$mediatype['mediatypeid'];
 
 		if ($used_in_operations) {
 				$this->nok('Media type deleted');
-				$this->ok('Cannot delete media type');
-				$this->ok('Media types used by action');
+				$this->ok(array('ERROR: Cannot delete media type', 'Media types used by action'));
+				$this->assertEquals(1, DBcount($sql));
 		}
 		else {
 				$this->ok('Media type deleted');
-				$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.zbx_dbstr($mediatypeid);
-				$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
+				$this->assertEquals(0, DBcount($sql));
 		}
 
 		DBrestore_tables('media_type');
 	}
 
-	/**
-	 * @dataProvider allMediaTypes
-	 */
-/*	public function testPageAdministrationMediaTypes_MassDeleteAll($mediatype) {
+	public function testPageAdministrationMediaTypes_MassDeletedAll() {
+		$this->markTestIncomplete();
+/*		DBsave_tables('media_type');
 
-		DBsave_tables('media_type');
-		// DBsave_tables('media');
 		$this->login('media_types.php');
-
-		$mediatypeid = $mediatype['mediatypeid'];
-		$this->checkTitle('Media types');
+		$this->checkTitle('Configuration of media types');
 
 		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
 		$used_in_operations = ($row['cnt'] > 0);
@@ -196,49 +188,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
 		}
 
-		DBrestore_tables('media_type');
-	}
-*/
-
-	/**
-	 * @dataProvider allMediaTypes
-	 */
-	public function testPageAdministrationMediaTypes_MassDelete($mediatype) {
-		$id = $mediatype['mediatypeid'];
-
-		$row = DBfetch(DBselect('SELECT count(*) as cnt FROM opmessage WHERE mediatypeid = '.$id.''));
-		$used_in_operations = ($row['cnt'] > 0);
-
-		DBsave_tables('media_type');
-
-		$this->chooseOkOnNextConfirmation();
-
-		$this->login('media_types.php');
-		$this->checkTitle('Configuration of media types');
-		$this->checkbox_select("mediatypeids[$id]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-
-		$this->getConfirmation();
-		$this->wait();
-		$this->checkTitle('Configuration of media types');
-		if ($used_in_operations) {
-			$this->nok('Media type deleted');
-			$this->ok('Cannot delete media type');
-			$this->ok('Media types used by action');
-		}
-		else {
-			$this->ok('Media type deleted');
-			$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.$id.'';
-			$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
-		}
-
-		DBrestore_tables('media_type');
+		DBrestore_tables('media_type');*/
 	}
 
-	/**
-	 * @dataProvider allMediaTypes
-	 */
 	public function testPageAdministrationMediaTypes_Sorting() {
 		// TODO
 		$this->markTestIncomplete();
