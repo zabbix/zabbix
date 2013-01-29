@@ -82,7 +82,13 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 	{
 		if (0 != in_buf_size)
 		{
-			if (0 != ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
+			if (0 == ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot read command output: %s",
+						strerror_from_system(GetLastError()));
+				return FAIL;
+			}
+			else
 			{
 				tmp_buf[read_bytes] = '\0';
 				zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
@@ -97,12 +103,14 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 		Sleep(20);	/* milliseconds */
 	}
+
 	if (MAX_EXECUTE_OUTPUT_LEN <= *offset + in_buf_size)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "zbx_execute() output exceeded limit of %i KB",
+		zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 				MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		return FAIL;
 	}
+
 	return SUCCEED;
 }
 
@@ -431,7 +439,7 @@ close:
 		}
 		else if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "zbx_execute() output exceeded limit of %i KB",
+			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		}
 		else
