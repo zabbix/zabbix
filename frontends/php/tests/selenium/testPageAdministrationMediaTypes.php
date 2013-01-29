@@ -35,7 +35,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->checkTitle('Configuration of media types');
 
 		$this->ok(array('Media types', 'CONFIGURATION OF MEDIA TYPES', 'Displaying'));
-		$this->ok(array('Name', 'Type', 'Status', 'Used in actions', 'Details'));
+		$this->ok(array('Description', 'Type', 'Status', 'Used in actions', 'Details'));
 		$this->ok($mediatype['description']);
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
