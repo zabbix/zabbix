@@ -1,7 +1,0 @@
-The file data_test.sql contains test data used for continuous integration testing. It is not for real setups!
-
-1. How to output test data with compatible SQL syntax?
-
-From MySQL:
-
-mysqldump --quote-names=false --extended-insert=false -c -t -uroot <DB> <table>
