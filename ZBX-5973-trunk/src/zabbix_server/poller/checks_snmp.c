@@ -179,10 +179,7 @@ static void	cache_put_snmp_index(DC_ITEM *item, char *oid, char *value, const ch
 	s.value = value;
 
 	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
-	{
-		snmpidx[i].idx = zbx_strdup(snmpidx[i].idx, idx);
 		goto end;
-	}
 
 	if (snmpidx_count == snmpidx_alloc)
 	{
@@ -203,35 +200,47 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	cache_del_snmp_index(DC_ITEM *item, char *oid, char *value)
+static void	cache_del_snmp_index_by_position(int i)
 {
-	const char		*__function_name = "cache_del_snmp_index";
+	zbx_free(snmpidx[i].oid);
+	zbx_free(snmpidx[i].value);
+	zbx_free(snmpidx[i].idx);
+	memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i - 1));
+	snmpidx_count--;
+
+	if (snmpidx_count == snmpidx_alloc - 16)
+	{
+		snmpidx_alloc -= 16;
+		snmpidx = zbx_realloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
+	}
+}
+
+static void	cache_del_snmp_index_subtree(DC_ITEM *item, const char *oid)
+{
+	const char		*__function_name = "cache_del_snmp_index_subtree";
 	int			i;
 	zbx_snmp_index_t	s;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s'", __function_name, oid, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s'", __function_name, oid);
 
 	if (NULL == snmpidx)
 		goto end;
 
 	s.hostid = item->host.hostid;
 	s.port = item->interface.port;
-	s.oid = oid;
-	s.value = value;
+	s.oid = (char *)oid;
+	s.value = "";
 
-	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
-	{
-		zbx_free(snmpidx[i].oid);
-		zbx_free(snmpidx[i].value);
-		zbx_free(snmpidx[i].idx);
-		memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i - 1));
-		snmpidx_count--;
-	}
+	i = get_snmpidx_nearestindex(&s);
 
-	if (snmpidx_count == snmpidx_alloc - 16)
+	while (i < snmpidx_count)
 	{
-		snmpidx_alloc -= 16;
-		snmpidx = zbx_realloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
+		if (snmpidx[i].hostid != s.hostid || snmpidx[i].port != s.port || 0 != strcmp(snmpidx[i].oid, s.oid))
+			break;
+
+		cache_del_snmp_index_by_position(i);
+		/* No need to increment 'i'. Deleting an element from cache */
+		/* brings the next element into position 'i'. */
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -560,6 +569,9 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	memcpy(anOID, rootOID, rootOID_len * sizeof(oid));
 	anOID_len = rootOID_len;
 
+	if (1 == bulk)
+		cache_del_snmp_index_subtree(item, OID);
+
 	running = 1;
 	while (1 == running)
 	{
@@ -750,7 +762,7 @@ out:
 	return ret;
 }
 
-static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_ITEM *item, AGENT_RESULT *value)
+static int	snmp_set_value(struct variable_list *vars, DC_ITEM *item, AGENT_RESULT *value)
 {
 	const char	*__function_name = "snmp_set_value";
 	char		*strval_dyn;
@@ -869,9 +881,19 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	/* create OID from string */
-	snmp_parse_oid(OID, rootOID, &rootOID_len);
+	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "snmp_parse_oid(): cannot parse OID \"%s\".", OID);
+		ret = NOTSUPPORTED;
+		goto out;
+	}
 
-	snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len);
+	if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "snprint_objid(): buffer is not large enough: \"%s\".", OID);
+		ret = NOTSUPPORTED;
+		goto out;
+	}
 	OID_len = strlen(snmp_oid);
 
 	/* copy rootOID to anOID */
@@ -916,12 +938,20 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 							break;
 						}
 
-						snprint_objid(snmp_oid, sizeof(snmp_oid),
-								vars->name, vars->name_length);
+						if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid),
+								vars->name, vars->name_length))
+						{
+							zabbix_log(LOG_LEVEL_DEBUG, "snprint_objid(): buffer is not"
+									" large enough: OID: \"%s\" snmp_OID: \"%s\".",
+									OID, snmp_oid);
+							ret = NOTSUPPORTED;
+							running = 0;
+							break;
+						}
 
 						init_result(&snmp_value);
 
-						if (SUCCEED == snmp_set_value(snmp_oid, vars, item, &snmp_value) &&
+						if (SUCCEED == snmp_set_value(vars, item, &snmp_value) &&
 								GET_STR_RESULT(&snmp_value))
 						{
 							zbx_json_addobject(&j, NULL);
@@ -994,7 +1024,7 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 
 	if (ret == SUCCEED)
 		SET_TEXT_RESULT(value, strdup(j.buffer));
-
+out:
 	zbx_json_free(&j);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1016,7 +1046,12 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid
 
 	init_result(value);
 
-	snmp_parse_oid(snmp_oid, anOID, &anOID_len);
+	if (NULL == snmp_parse_oid(snmp_oid, anOID, &anOID_len))
+	{
+		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", snmp_oid));
+		ret = NOTSUPPORTED;
+		goto out;
+	}
 
 	pdu = snmp_pdu_create(SNMP_MSG_GET);
 	snmp_add_null_var(pdu, anOID, anOID_len);
@@ -1028,7 +1063,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid
 	{
 		for (vars = response->variables; vars; vars = vars->next_variable)
 		{
-			if (SUCCEED == (ret = snmp_set_value(snmp_oid, vars, item, value)))
+			if (SUCCEED == (ret = snmp_set_value(vars, item, value)))
 				break;
 		}
 	}
@@ -1070,7 +1105,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid
 
 	if (response)
 		snmp_free_pdu(response);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1240,15 +1275,13 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 					if (SUCCEED != ret && SUCCEED != (ret = snmp_get_index(ss, item, oid_normalized,
 							index_value, &idx, &idx_alloc, err, 1)))
 					{
-						cache_del_snmp_index(item, oid_normalized, index_value);
-
 						SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Cannot find index [%s]"
 								" of the OID [%s]: %s",
 								oid_index, item->snmp_oid, err));
 						break;
 					}
 
-					cache_put_snmp_index(item, oid_normalized, index_value, idx);
+					zabbix_log(LOG_LEVEL_DEBUG, "Found index:%s", idx);
 
 					if (NULL == (pl = strchr(item->snmp_oid, '[')))
 					{
