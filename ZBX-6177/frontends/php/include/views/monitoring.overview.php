@@ -44,8 +44,6 @@ for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 	$hintTable->addRow(array(getSeverityCell($i), _('Enabled')));
 }
 
-$hintTable->addRow(array(new CCol(SPACE, 'trigger_unknown'), _('Unknown')));
-
 if ($this->data['type'] == SHOW_TRIGGERS) {
 	// blinking preview in help popup (only if blinking is enabled)
 	$config = select_config();

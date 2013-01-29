@@ -1223,8 +1223,8 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	$config = select_config(); // for how long triggers should blink on status change (set by user in administration->general)
 
 	if (isset($triggerHosts[$hostName])) {
-		switch ($triggerHosts[$hostName]['value']) {
-			case TRIGGER_VALUE_TRUE:
+		// problem trigger
+		if ($triggerHosts[$hostName]['value'] == TRIGGER_VALUE_TRUE) {
 				$css_class = getSeverityStyle($triggerHosts[$hostName]['priority']);
 				$ack = null;
 
@@ -1244,12 +1244,10 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 						}
 					}
 				}
-				break;
-			case TRIGGER_VALUE_FALSE:
-				$css_class = 'normal';
-				break;
-			default:
-				$css_class = 'trigger_unknown';
+		}
+		// ok trigger
+		else {
+			$css_class = 'normal';
 		}
 		$style = 'cursor: pointer; ';
 
