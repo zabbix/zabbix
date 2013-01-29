@@ -24,39 +24,6 @@
  */
 abstract class DbBackend {
 
-	public static $instance;
-
-	/**
-	 * Get necessary DB class
-	 *
-	 * @return MysqlDbBackend|PostgresqlDbBackend|OracleDbBackend|Db2DbBackend|SqliteDbBackend
-	 */
-	public static function getInstance() {
-		global $DB;
-
-		if (!isset(self::$instance)) {
-			switch ($DB['TYPE']) {
-				case ZBX_DB_MYSQL:
-					self::$instance = new MysqlDbBackend();
-					break;
-				case ZBX_DB_POSTGRESQL:
-					self::$instance = new PostgresqlDbBackend();
-					break;
-				case ZBX_DB_ORACLE:
-					self::$instance = new OracleDbBackend();
-					break;
-				case ZBX_DB_DB2:
-					self::$instance = new Db2DbBackend();
-					break;
-				case ZBX_DB_SQLITE3:
-					self::$instance = new SqliteDbBackend();
-					break;
-			}
-		}
-
-		return self::$instance;
-	}
-
 	protected $error;
 
 	/**
@@ -84,51 +51,6 @@ abstract class DbBackend {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Insert batch data into DB
-	 *
-	 * @param string $table
-	 * @param array  $values pair of fieldname => fieldvalue
-	 * @param bool   $getids
-	 *
-	 * @return array    an array of ids with the keys preserved
-	 */
-	public function insertBatch($table, $values, $getids = true) {
-		if (empty($values)) {
-			return true;
-		}
-		$resultIds = array();
-
-		$tableSchema = DB::getSchema($table);
-		$values = DB::addMissingFields($tableSchema, $values);
-		$fields = array_keys($values[0]);
-
-		if ($getids) {
-			$id = DB::reserveIds($table, count($values));
-			$fields[] = $tableSchema['key'];
-		}
-
-		$newValues = array();
-		foreach ($values as $key => $row) {
-			if ($getids) {
-				$resultIds[$key] = $id;
-				$row[$tableSchema['key']] = $id;
-				$values[$key][$tableSchema['key']] = $id;
-				$id = bcadd($id, 1, 0);
-			}
-			DB::checkValueTypes($table, $row);
-			$newValues[] = $row;
-		}
-
-		$sql = $this->insertGeneration($table, $fields, $newValues);
-
-		if (!DBexecute($sql)) {
-			DB::exception(DB::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
-		}
-
-		return $resultIds;
 	}
 
 	/**

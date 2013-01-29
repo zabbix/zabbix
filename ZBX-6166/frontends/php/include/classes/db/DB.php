@@ -43,8 +43,40 @@ class DB {
 	private static $nodeId = null;
 	private static $maxNodeId = null;
 	private static $minNodeId = null;
+	private static $DbBackend;
 
-	public static function exception($code, $error) {
+	/**
+	 * Get necessary DB class
+	 *
+	 * @return MysqlDbBackend|PostgresqlDbBackend|OracleDbBackend|Db2DbBackend|SqliteDbBackend
+	 */
+	public static function getDbBackend() {
+		global $DB;
+
+		if (!isset(self::$DbBackend)) {
+			switch ($DB['TYPE']) {
+				case ZBX_DB_MYSQL:
+					self::$DbBackend = new MysqlDbBackend();
+					break;
+				case ZBX_DB_POSTGRESQL:
+					self::$DbBackend = new PostgresqlDbBackend();
+					break;
+				case ZBX_DB_ORACLE:
+					self::$DbBackend = new OracleDbBackend();
+					break;
+				case ZBX_DB_DB2:
+					self::$DbBackend = new Db2DbBackend();
+					break;
+				case ZBX_DB_SQLITE3:
+					self::$DbBackend = new SqliteDbBackend();
+					break;
+			}
+		}
+
+		return self::$DbBackend;
+	}
+
+	private static function exception($code, $error) {
 		throw new DBException($error, $code);
 	}
 
@@ -76,7 +108,7 @@ class DB {
 	 *
 	 * @return string
 	 */
-	public static function reserveIds($table, $count) {
+	protected static function reserveIds($table, $count) {
 		global $DB;
 
 		self::init();
@@ -230,7 +262,7 @@ class DB {
 		return isset($schema['fields'][$fieldName]);
 	}
 
-	public static function addMissingFields($tableSchema, $values) {
+	private static function addMissingFields($tableSchema, $values) {
 		global $DB;
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
@@ -648,5 +680,50 @@ class DB {
 				return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Insert batch data into DB
+	 *
+	 * @param string $table
+	 * @param array  $values pair of fieldname => fieldvalue
+	 * @param bool   $getids
+	 *
+	 * @return array    an array of ids with the keys preserved
+	 */
+	public static function insertBatch($table, $values, $getids = true) {
+		if (empty($values)) {
+			return true;
+		}
+		$resultIds = array();
+
+		$tableSchema = self::getSchema($table);
+		$values = self::addMissingFields($tableSchema, $values);
+		$fields = array_keys($values[0]);
+
+		if ($getids) {
+			$id = self::reserveIds($table, count($values));
+			$fields[] = $tableSchema['key'];
+		}
+
+		$newValues = array();
+		foreach ($values as $key => $row) {
+			if ($getids) {
+				$resultIds[$key] = $id;
+				$row[$tableSchema['key']] = $id;
+				$values[$key][$tableSchema['key']] = $id;
+				$id = bcadd($id, 1, 0);
+			}
+			self::checkValueTypes($table, $row);
+			$newValues[] = $row;
+		}
+
+		$sql = self::getDbBackend()->insertGeneration($table, $fields, $newValues);
+
+		if (!DBexecute($sql)) {
+			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+		}
+
+		return $resultIds;
 	}
 }
