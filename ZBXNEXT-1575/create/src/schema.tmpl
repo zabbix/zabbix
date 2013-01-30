@@ -481,7 +481,7 @@ FIELD		|comments	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|triggers	|triggerid
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_flags	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|status
 INDEX		|2		|value
@@ -1211,4 +1211,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010034	|2010035
+ROW		|2010036	|2010036
