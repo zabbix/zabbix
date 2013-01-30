@@ -1203,7 +1203,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (NULL == h)
 			continue;
 
-		item.status = atoi(row[1]);
+		item.status = (unsigned char)atoi(row[1]);
 		if (SUCCEED != DBis_null(row[2]))
 			item.lastclock = atoi(row[2]);
 		else

@@ -467,26 +467,13 @@ typedef enum
 const char	*zbx_alert_type_string(unsigned char type);
 
 /* item statuses */
-typedef enum
-{
-	ITEM_STATUS_ACTIVE = 0,
-	ITEM_STATUS_DISABLED,
-/*ITEM_STATUS_TRAPPED		2*/
-	ITEM_STATUS_NOTSUPPORTED = 3,
-/*ITEM_STATUS_DELETED		4*/
-/*ITEM_STATUS_NOTAVAILABLE	5*/
-} zbx_item_status_t;
+#define ITEM_STATUS_ACTIVE		0
+#define ITEM_STATUS_DISABLED		1
+#define ITEM_STATUS_NOTSUPPORTED	3
 
 /* item states */
-#define ITEM_STATE_NORMAL	0
-#define ITEM_STATE_NOTSUPPORTED	1
-
-/* trigger types */
-typedef enum
-{
-	TRIGGER_TYPE_NORMAL = 0,
-	TRIGGER_TYPE_MULTIPLE_TRUE
-} zbx_trigger_type_t;
+#define ITEM_STATE_NORMAL		0
+#define ITEM_STATE_NOTSUPPORTED		1
 
 /* group statuses */
 typedef enum
@@ -560,22 +547,26 @@ typedef enum
 #define HOST_INVENTORY_AUTOMATIC	1
 
 /* host availability */
-#define HOST_AVAILABLE_UNKNOWN	0
-#define HOST_AVAILABLE_TRUE	1
-#define HOST_AVAILABLE_FALSE	2
+#define HOST_AVAILABLE_UNKNOWN		0
+#define HOST_AVAILABLE_TRUE		1
+#define HOST_AVAILABLE_FALSE		2
 
 /* trigger statuses */
-#define TRIGGER_STATUS_ENABLED	0
-#define TRIGGER_STATUS_DISABLED	1
+#define TRIGGER_STATUS_ENABLED		0
+#define TRIGGER_STATUS_DISABLED		1
+
+/* trigger types */
+#define TRIGGER_TYPE_NORMAL		0
+#define TRIGGER_TYPE_MULTIPLE_TRUE	1
 
 /* trigger values */
-#define TRIGGER_VALUE_OK	0
-#define TRIGGER_VALUE_PROBLEM	1
-#define TRIGGER_VALUE_UNKNOWN	2	/* only in server code, never in DB */
+#define TRIGGER_VALUE_OK		0
+#define TRIGGER_VALUE_PROBLEM		1
+#define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
 
 /* trigger states */
-#define TRIGGER_STATE_NORMAL	0
-#define TRIGGER_STATE_UNKNOWN	1
+#define TRIGGER_STATE_NORMAL		0
+#define TRIGGER_STATE_UNKNOWN		1
 
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0

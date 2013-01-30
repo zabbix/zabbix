@@ -1226,7 +1226,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->units = row[12];
 	item->multiplier = atoi(row[13]);
 	item->formula = row[14];
-	item->status = atoi(row[15]);
+	item->status = (unsigned char)atoi(row[15]);
 	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
 
 	item->data_type = atoi(row[18]);
