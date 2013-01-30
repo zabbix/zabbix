@@ -1124,8 +1124,6 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	unsigned char	ipv4_mpd_mask[12] = {0,0,0,0,0,0,0,0,0,0,255,255};	/* IPv4-Mapped, the first 80 bits are zeros, 16 next - ones */
 #else
 	struct hostent	*hp;
-	char		*sip;
-	int		i[4], j[4];
 #endif
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
@@ -1144,12 +1142,6 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	}
 	else
 	{
-#if !defined(HAVE_IPV6)
-		zbx_strlcpy(sname, inet_ntoa(name.sin_addr), sizeof(sname));
-
-		if (4 != sscanf(sname, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]))
-			return FAIL;
-#endif
 		strscpy(tmp,ip_list);
 
 		for (start = tmp; '\0' != *start;)
@@ -1222,10 +1214,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #else
 			if (NULL != (hp = gethostbyname(start)))
 			{
-				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
-
-				if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
-						i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
+				if (name.sin_addr.s_addr == (((struct in_addr*)hp->h_addr)->s_addr))
 				{
 					return SUCCEED;
 				}
@@ -1249,7 +1238,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	else
 		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
 #else
-	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
+	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].",inet_ntoa(name.sin_addr), ip_list);
 #endif
 	return	FAIL;
 }
