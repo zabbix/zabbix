@@ -811,4 +811,32 @@ class CZBXAPI {
 
 		return false;
 	}
+
+	/**
+	 * Converts a deprecated parameter to a new one in the $params array. If both parameter are used,
+	 * the new parameter will override the deprecated one.
+	 *
+	 * If a deprecated parameter is used, a notice will be triggered in the frontend.
+	 *
+	 * @param array     $params
+	 * @param string    $deprecatedParam
+	 * @param string    $newParam
+	 *
+	 * @return array
+	 */
+	protected function convertDeprecatedParam(array $params, $deprecatedParam, $newParam) {
+		if (isset($params[$deprecatedParam])) {
+			self::deprecated('Parameter "'.$deprecatedParam.'" is deprecated.');
+
+			// if the new parameter is not used, use the deprecated one instead
+			if (!isset($params[$newParam])) {
+				$params[$newParam] = $params[$deprecatedParam];
+			}
+
+			// unset the deprecated parameter
+			unset($params[$deprecatedParam]);
+		}
+
+		return $params;
+	}
 }

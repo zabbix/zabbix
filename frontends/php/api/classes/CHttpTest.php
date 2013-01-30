@@ -296,8 +296,14 @@ class CHttpTest extends CZBXAPI {
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 		foreach ($httpTests as $hnum => $httpTest) {
 			unset($httpTests[$hnum]['templateid']);
-		}
 
+			// convert deprecated parameters
+			if (isset($httpTest['steps'])) {
+				foreach ($httpTest['steps'] as $i => $step) {
+					$httpTests[$hnum]['steps'][$i] = $this->convertDeprecatedParam($step, 'webstepid', 'httpstepid');
+				}
+			}
+		}
 
 		$dbHttpTests = array();
 		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
