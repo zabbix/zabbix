@@ -230,7 +230,7 @@ else {
 	$actions = API::Action()->get(array(
 		'mediatypeids' => zbx_objectValues($data['mediatypes'], 'mediatypeid'),
 		'output' => array('actionid', 'name'),
-		'selectOperations' => array('operationtype', 'opmessage'),
+		'selectOperations' => array('opmessage'),
 		'preservekeys' => true
 	));
 
@@ -239,9 +239,7 @@ else {
 		$data['mediatypes'][$number]['listOfActions'] = array();
 		foreach ($actions as $actionId => $action) {
 			foreach ($action['operations'] as $operation) {
-				if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-						&& $operation['opmessage']['mediatypeid'] == $mediatype['mediatypeid']) {
-
+				if ($mediatype['mediatypeid'] == $operation['opmessage']['mediatypeid']) {
 					$data['mediatypes'][$number]['listOfActions'][] = array(
 						'actionid' => $actionId,
 						'name' => $action['name']
