@@ -210,6 +210,19 @@ static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 }
 
+static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const char *field_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s ", table_name);
+
+#if defined(HAVE_MYSQL)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column %s ", field_name);
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename column %s to %s", field_name, field->name);
+#endif
+}
+
 static void	DBdrop_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *field_name)
 {
@@ -291,6 +304,24 @@ static int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 	sql = zbx_malloc(sql, sql_alloc);
 
 	DBadd_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBrename_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = DBreorg_table(table_name);
@@ -788,6 +819,13 @@ static int	DBpatch_02010035()
 
 	return FAIL;
 }
+
+static int	DBpatch_02010036()
+{
+	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("triggers", "value_flags", &field);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -861,11 +899,12 @@ int	DBcheck_version()
 		{DBpatch_02010033, 2010033, 0, 1},
 		{DBpatch_02010034, 2010034, 0, 1},
 		{DBpatch_02010035, 2010035, 0, 0},
+		{DBpatch_02010036, 2010036, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010034;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010036;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
