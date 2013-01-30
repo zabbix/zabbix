@@ -244,9 +244,9 @@ table.triggers_info tr td.header {
 	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
-table.hosts_info tr td.header {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
+/* host info module */
+table.hosts_info tr td.header { background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left; }
+table.hosts_info tr td.total { color: inherit; }
 
 /* server information module */
 table.server_info { background-color: #333333; border: 1px #555555 solid; }

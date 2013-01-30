@@ -288,9 +288,9 @@ table.triggers_info tr td.header {
 	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
-table.hosts_info tr td.header {
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
+/* host info module */
+table.hosts_info tr td.header { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
+table.hosts_info tr td.total { color: inherit; }
 
 /* server information module */
 table.server_info { border: 1px #77B7DA solid; }
