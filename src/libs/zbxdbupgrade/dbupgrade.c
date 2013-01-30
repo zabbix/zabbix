@@ -843,6 +843,18 @@ static int	DBpatch_02010039()
 
 	return DBadd_field("items", &field);
 }
+
+static int	DBpatch_02010040()
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update items"
+			" set state=%d,"
+				"status=%d"
+			" where status=%d", ITEM_STATE_NOTSUPPORTED, ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -920,11 +932,12 @@ int	DBcheck_version()
 		{DBpatch_02010037, 2010037, 0, 0},
 		{DBpatch_02010038, 2010038, 0, 0},
 		{DBpatch_02010039, 2010039, 0, 1},
+		{DBpatch_02010040, 2010040, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010039;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010040;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

@@ -477,6 +477,10 @@ typedef enum
 /*ITEM_STATUS_NOTAVAILABLE	5*/
 } zbx_item_status_t;
 
+/* item states */
+#define ITEM_STATE_NORMAL	0
+#define ITEM_STATE_NOTSUPPORTED	1
+
 /* trigger types */
 typedef enum
 {
@@ -569,7 +573,7 @@ typedef enum
 #define TRIGGER_VALUE_PROBLEM	1
 #define TRIGGER_VALUE_UNKNOWN	2	/* only in server code, never in DB */
 
-/* trigger value flags */
+/* trigger states */
 #define TRIGGER_STATE_NORMAL	0
 #define TRIGGER_STATE_UNKNOWN	1
 
