@@ -157,7 +157,7 @@ static int	cache_get_snmp_index(DC_ITEM *item, char *oid, char *value, char **id
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s idx:%s", __function_name, zbx_result_string(res),
-			res == SUCCEED ? *idx : "");
+			SUCCEED == res ? *idx : "");
 
 	return res;
 }
@@ -195,24 +195,17 @@ static void	cache_put_snmp_index(DC_ITEM *item, char *oid, char *value, const ch
 	snmpidx[i].value = zbx_strdup(NULL, value);
 	snmpidx[i].idx = zbx_strdup(NULL, idx);
 	snmpidx_count++;
-
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	cache_del_snmp_index_by_position(int i)
 {
+	snmpidx_count--;
 	zbx_free(snmpidx[i].oid);
 	zbx_free(snmpidx[i].value);
 	zbx_free(snmpidx[i].idx);
-	memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i - 1));
-	snmpidx_count--;
-
-	if (snmpidx_count == snmpidx_alloc - 16)
-	{
-		snmpidx_alloc -= 16;
-		snmpidx = zbx_realloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
-	}
+	memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i));
 }
 
 static void	cache_del_snmp_index_subtree(DC_ITEM *item, const char *oid)
@@ -1281,7 +1274,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 						break;
 					}
 
-					zabbix_log(LOG_LEVEL_DEBUG, "Found index:%s", idx);
+					zabbix_log(LOG_LEVEL_DEBUG, "found index:%s", idx);
 
 					if (NULL == (pl = strchr(item->snmp_oid, '[')))
 					{
