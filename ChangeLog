@@ -40,6 +40,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6169] fixed colors in "server info" and "host info" screen items for dark orange/blue themes (Eduard)
 ..F....... [ZBX-6172] removed unknown trigger status code from maps (Eduard)
 A......... [ZBX-6126] implemented empty parameter validation in user.delete (Pavels)
 ..F....... [ZBX-6160] changed the frontend to use temporary Oracle connections instead of persistent (Pavels)
