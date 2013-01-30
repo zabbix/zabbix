@@ -839,4 +839,19 @@ class CZBXAPI {
 
 		return $params;
 	}
+
+	/**
+	 * Check if a parameter contains a deprecated value. Currently supports only array parameters.
+	 *
+	 * @param array     $params
+	 * @param string    $paramName
+	 * @param string    $value
+	 *
+	 * @return void
+	 */
+	protected function checkDeprecatedParam(array $params, $paramName, $value) {
+		if (isset($params[$paramName]) && is_array($params[$paramName]) && in_array($value, $params[$paramName])) {
+			self::deprecated('Value "'.$value.'" for parameter "'.$paramName.'" is deprecated.');
+		}
+	}
 }
