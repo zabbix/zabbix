@@ -288,30 +288,19 @@ table.triggers_info tr td.header {
 	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
-table.hosts_info tr td.header {
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
+/* host info module */
+table.hosts_info tr td.header { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
+table.hosts_info tr td.total { color: inherit; }
 
-table.server_info{
-	border: 1px #77B7DA solid;
-}
-
-table.server_info tr td.header {
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
-
-table.server_info tr.footer td {
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
+/* server information module */
+table.server_info { border: 1px #77B7DA solid; }
+table.server_info tr td { background-color: #1D4161; }
+table.server_info tr td.header { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
+table.server_info tr.footer td { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
 
 table.history td.caption{
 	color: #77B7DA;
 }
-
-table.server_info {
-	background-color:#000E19;
-}
-
 
 /* MESSAGES */
 table.msgok{
