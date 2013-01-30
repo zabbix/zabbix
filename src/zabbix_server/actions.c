@@ -377,7 +377,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				atoi(condition->value),
 				event->eventid);
 
-
 		switch (condition->operator)
 		{
 			case CONDITION_OPERATOR_EQUAL:
