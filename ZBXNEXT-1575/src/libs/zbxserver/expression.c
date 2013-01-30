@@ -958,10 +958,12 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
 	result = DBselect(
 			"select count(*)"
 			" from events"
-			" where object=%d"
+			" where source=%d"
+				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and value in (%s)"
 				" and acknowledged=%d",
+			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			value,
