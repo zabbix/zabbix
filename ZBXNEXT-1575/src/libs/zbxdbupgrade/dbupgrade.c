@@ -826,6 +826,16 @@ static int	DBpatch_02010036()
 
 	return DBrename_field("triggers", "value_flags", &field);
 }
+
+static int	DBpatch_02010037()
+{
+	return DBdrop_index("events", "events_1");
+}
+
+static int	DBpatch_02010038()
+{
+	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -900,6 +910,8 @@ int	DBcheck_version()
 		{DBpatch_02010034, 2010034, 0, 1},
 		{DBpatch_02010035, 2010035, 0, 0},
 		{DBpatch_02010036, 2010036, 0, 1},
+		{DBpatch_02010037, 2010037, 0, 0},
+		{DBpatch_02010038, 2010038, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
