@@ -2301,7 +2301,8 @@ int	DBtable_exists(const char *table_name)
 	result = DBselect(
 			"select 1"
 			" from syscat.tables"
-			" where lower(tabname)='%s'",
+			" where tabschema=user"
+				" and lower(tabname)='%s'",
 			table_name_esc);
 #elif defined(HAVE_MYSQL)
 	result = DBselect("show tables like '%s'", table_name_esc);
