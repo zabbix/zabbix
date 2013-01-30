@@ -314,7 +314,6 @@ typedef struct
 	zbx_uint64_t		hostid;
 	zbx_item_type_t		type;
 	zbx_item_data_type_t	data_type;
-	zbx_item_status_t	status;
 	char			*key;
 	char			*host_name;
 	int			history;
@@ -336,6 +335,7 @@ typedef struct
 	char			*h_lasteventid;
 	char			*h_lastsource;
 	char			*h_lastseverity;
+	unsigned char		status;
 }
 DB_ITEM;
 
