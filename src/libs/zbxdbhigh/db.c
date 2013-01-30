@@ -493,30 +493,29 @@ DB_RESULT	DBselectN(const char *query, int n)
  *                                                                            *
  ******************************************************************************/
 int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, int value_flags, const char *error, int lastchange,
+		unsigned char type, int value, int state, const char *error, int lastchange,
 		int new_value, const char *new_error, int new_lastchange, unsigned char *add_event)
 {
 	const char	*__function_name = "DBget_trigger_update_sql";
 	const char	*new_error_local;
 	char		*new_error_esc;
-	int		new_value_flags, value_changed, value_flags_changed, multiple_problem, error_changed,
-			ret = FAIL;
+	int		new_state, value_changed, state_changed, multiple_problem, error_changed, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
-			__function_name, triggerid, value, value_flags, new_value);
+			__function_name, triggerid, value, state, new_value);
 
 	if (TRIGGER_VALUE_UNKNOWN == new_value)
 	{
-		new_value_flags = TRIGGER_VALUE_FLAG_UNKNOWN;
+		new_state = TRIGGER_STATE_UNKNOWN;
 		new_value = value;
 	}
 	else
-		new_value_flags = TRIGGER_VALUE_FLAG_NORMAL;
+		new_state = TRIGGER_STATE_NORMAL;
 
 	/**************************************************************************************************/
 	/*                                                                                                */
 	/* The following table shows in which cases trigger should be updated and/or events should be     */
-	/* generated. Trigger state changes from state "from" to state "to":                              */
+	/* generated. Trigger value(state) changes from state "from" to state "to":                       */
 	/*                                                                                                */
 	/*   _          |                                                                                 */
 	/*    \__ to    |                                                                                 */
@@ -548,13 +547,13 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	*add_event = 0;
 	new_error_local = (NULL == new_error ? "" : new_error);
 
-	value_changed = (value != new_value || (0 == lastchange && TRIGGER_VALUE_FLAG_UNKNOWN != new_value_flags));
-	value_flags_changed = (value_flags != new_value_flags);
+	value_changed = (value != new_value || (0 == lastchange && TRIGGER_STATE_UNKNOWN != new_state));
+	state_changed = (state != new_state);
 	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == type && TRIGGER_VALUE_PROBLEM == new_value &&
-			TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
+			TRIGGER_STATE_NORMAL == new_state);
 	error_changed = (0 != strcmp(error, new_error_local));
 
-	if (0 != value_changed || 0 != value_flags_changed || 0 != multiple_problem || 0 != error_changed)
+	if (0 != value_changed || 0 != state_changed || 0 != multiple_problem || 0 != error_changed)
 	{
 		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
 		{
@@ -568,7 +567,7 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 			if (0 != value_changed || 0 != multiple_problem)
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error_local,
+				DCconfig_set_trigger_value(triggerid, new_value, new_state, new_error_local,
 						&new_lastchange);
 
 				*add_event = 1;
@@ -576,15 +575,15 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 			}
 			else
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error_local,
+				DCconfig_set_trigger_value(triggerid, new_value, new_state, new_error_local,
 						NULL);
 			}
 
 			if (0 != value_changed)
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
 
-			if (0 != value_flags_changed)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value_flags=%d,", new_value_flags);
+			if (0 != state_changed)
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
 
 			if (0 != error_changed)
 			{

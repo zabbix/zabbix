@@ -2197,11 +2197,11 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,value_flags,templateid,flags,error)"
+						"comments,url,type,value,state,templateid,flags,error)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
 						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,'%s');\n",
 					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
-					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid,
+					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_UNKNOWN, triggerid,
 					(int)flags, error_esc);
 
 		zbx_free(error_esc);

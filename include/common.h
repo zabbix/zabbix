@@ -570,8 +570,8 @@ typedef enum
 #define TRIGGER_VALUE_UNKNOWN	2	/* only in server code, never in DB */
 
 /* trigger value flags */
-#define TRIGGER_VALUE_FLAG_NORMAL	0
-#define TRIGGER_VALUE_FLAG_UNKNOWN	1
+#define TRIGGER_STATE_NORMAL	0
+#define TRIGGER_STATE_UNKNOWN	1
 
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0

@@ -107,7 +107,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 *     item and MYITEM types differ AND item host status is AVAILABLE    *
 	 *************************************************************************/
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.lastchange"
+			"select distinct t.triggerid,t.type,t.value,t.state,t.error,t.lastchange"
 			" from items i,functions f,triggers t,hosts h"
 			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
@@ -160,12 +160,12 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		ZBX_STR2UINT64(trigger.triggerid, row[0]);
 		trigger.type = (unsigned char)atoi(row[1]);
 		trigger.value = atoi(row[2]);
-		trigger.value_flags = atoi(row[3]);
+		trigger.state = atoi(row[3]);
 		strscpy(trigger.error, row[4]);
 		trigger.lastchange = atoi(row[5]);
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger.triggerid, trigger.type,
-				trigger.value, trigger.value_flags, trigger.error, trigger.lastchange,
+				trigger.value, trigger.state, trigger.error, trigger.lastchange,
 				TRIGGER_VALUE_UNKNOWN, reason, ts->sec, &trigger.add_event))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
