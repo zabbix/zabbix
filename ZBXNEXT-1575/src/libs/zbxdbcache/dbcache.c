@@ -827,7 +827,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->lastchange,
+				trigger->type, trigger->value, trigger->state, trigger->error, trigger->lastchange,
 				trigger->new_value, trigger->new_error, trigger->timespec.sec, &trigger->add_event))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");

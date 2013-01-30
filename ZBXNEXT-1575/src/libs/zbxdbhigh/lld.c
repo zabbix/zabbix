@@ -685,7 +685,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	const char		*ins_triggers_sql =
 				"insert into triggers"
 				" (triggerid,description,expression,priority,status,"
-					"comments,url,type,value,value_flags,flags,error)"
+					"comments,url,type,value,state,flags,error)"
 				" values ";
 	const char		*ins_trigger_discovery_sql =
 				"insert into trigger_discovery"
@@ -795,8 +795,8 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')" ZBX_ROW_DL,
 					trigger->triggerid, description_esc, expression_esc, (int)priority, (int)status,
-					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK,
-					TRIGGER_VALUE_FLAG_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED, error_esc);
+					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_UNKNOWN,
+					ZBX_FLAG_DISCOVERY_CREATED, error_esc);
 			zbx_free(expression_esc);
 
 #ifndef HAVE_MULTIROW_INSERT
