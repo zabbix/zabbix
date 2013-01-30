@@ -753,15 +753,21 @@ class CService extends CZBXAPI {
 
 		foreach ($service['times'] as $time) {
 			if ($time['type'] == SERVICE_TIME_TYPE_UPTIME) {
+				$time['ts_from'] = prepareServiceTime($time['ts_from']);
+				$time['ts_to'] = prepareServiceTime($time['ts_to']);
+
 				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'ut');
 
 				// if exist any uptime - unmarked time is downtime
 				$unmarkedPeriodType = 'dt';
 			}
 			elseif ($time['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
+				$time['ts_from'] = prepareServiceTime($time['ts_from']);
+				$time['ts_to'] = prepareServiceTime($time['ts_to']);
+
 				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'dt');
 			}
-			elseif($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $periodStart && $time['ts_from'] <= $periodEnd) {
+			elseif ($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $periodStart && $time['ts_from'] <= $periodEnd) {
 				if ($time['ts_from'] < $periodStart) {
 					$time['ts_from'] = $periodStart;
 				}

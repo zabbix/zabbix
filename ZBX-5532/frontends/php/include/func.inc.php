@@ -133,8 +133,10 @@ function getDayOfWeekCaption($num) {
 	return _s('[Wrong value for day: "%s" ]', $num);
 }
 
-// Convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
+// convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
 function dowHrMinToStr($value, $display24Hours = false) {
+	$value = prepareServiceTime($value);
+
 	$dow = $value - $value % SEC_PER_DAY;
 	$hr = $value - $dow;
 	$hr -= $hr % SEC_PER_HOUR;
@@ -153,7 +155,14 @@ function dowHrMinToStr($value, $display24Hours = false) {
 	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
 }
 
-// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
+// convert old date format to new
+function prepareServiceTime($time) {
+	return ($time > SEC_PER_WEEK * 2)
+		? date('w', $time) * SEC_PER_DAY + (mktime(null, null, null, date('n', $time), date('j', $time), date('Y', $time)) - $time)
+		: $time;
+}
+
+// convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
 function dowHrMinToSec($dow, $hr, $min) {
 	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min) || !zbx_ctype_digit($dow) || !zbx_ctype_digit($hr) || !zbx_ctype_digit($min)) {
 		return false;
@@ -178,7 +187,7 @@ function dowHrMinToSec($dow, $hr, $min) {
 	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
-// Convert timestamp to string representation. Retun 'Never' if 0.
+// convert timestamp to string representation. Retun 'Never' if 0.
 function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
