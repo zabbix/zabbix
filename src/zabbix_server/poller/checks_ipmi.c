@@ -42,7 +42,10 @@ typedef struct
 	ipmi_sensor_t		*sensor;
 	char			*s_name;
 	zbx_ipmi_sensor_value_t	value;
-	int			type;
+	int			event_reading_type_code;	/* "Event/Reading Type Code", e.g. Threshold, */
+								/* Discrete, 'digital' Discrete */
+	int			type_code;	/* "Sensor Type Code", e.g. Temperature, Voltage, */
+						/* Current, Fan, Physical Security (Chassis Intrusion) */
 }
 zbx_ipmi_sensor_t;
 
@@ -104,7 +107,7 @@ static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port,
 	return h;
 }
 
-static zbx_ipmi_host_t  *allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
+static zbx_ipmi_host_t	*allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
 	const char	*__function_name = "allocate_ipmi_host";
@@ -200,7 +203,8 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	s->sensor = sensor;
 	s->s_name = s_name;
 	memset(&s->value, 0, sizeof(s->value));
-	s->type = ipmi_sensor_get_event_reading_type(sensor);
+	s->event_reading_type_code = ipmi_sensor_get_event_reading_type(sensor);
+	s->type_code = ipmi_sensor_get_sensor_type(sensor);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, s);
 
@@ -467,7 +471,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
 
 	/* Discrete values are 16-bit (ie: [0,2^16-1], so 2^16 = fail). We're using a 64-bit uint. */
-	s->value.discrete = 65536;
+	s->value.discrete = 0;
 
 	for (i = 0; i < 15; i++)
 	{
@@ -481,10 +485,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 				s->s_name, e_string, s_type_string, s_reading_type_string, i, is_state_set);
 
 		if (0 != is_state_set)
-		{
-			s->value.discrete = i;
-			break;
-		}
+			s->value.discrete += 1 << i;
 	}
 out:
 	h->done = 1;
@@ -505,7 +506,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 	h->ret = SUCCEED;
 	h->done = 0;
 
-	switch (s->type)
+	switch (s->event_reading_type_code)
 	{
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
 			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, got_thresh_reading, h)))
@@ -1090,7 +1091,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 
 	if (NULL != s)
 	{
-		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->type)
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->event_reading_type_code)
 			SET_DBL_RESULT(value, s->value.threshold);
 		else
 			SET_UI64_RESULT(value, s->value.discrete);
