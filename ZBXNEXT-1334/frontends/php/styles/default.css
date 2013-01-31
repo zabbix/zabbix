@@ -562,7 +562,7 @@ table.hosts_info tr td.uncn { background-color: #CCCCCC; }
 
 /* server information module */
 table.server_info { width: 100%; background-color: #EFEFEF; border: 1px gray dotted; }
-table.server_info tr td { border: 0; padding-left: 5px; padding-right: 5px; text-align: left; font-size: 1.1em; background-color: #EFEFEF; white-space: nowrap;word-spacing: 0; }
+table.server_info tr td { border: 0; padding-left: 5px; padding-right: 5px; text-align: left; font-size: 1.1em; background-color: #EFEFEF; white-space: nowrap; word-spacing: 0; }
 table.server_info tr td.header { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; color: #FFFFFF; }
 table.server_info tr.status td { white-space: nowrap; word-spacing: 0; }
 
