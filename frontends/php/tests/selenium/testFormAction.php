@@ -137,11 +137,12 @@ class testFormAction extends CWebTest {
 			$this->wait();
 		}
 		$this->type('esc_period', $action['esc_period']);
-		$this->button_click('operationTab');
 
-		$this->wait();
+		sleep(1);
+		$this->type('new_condition_value', '');
+		sleep(1);
+
 		$this->button_click('save');
-
 		$this->wait();
 		$this->ok('Action added');
 
@@ -259,10 +260,11 @@ class testFormAction extends CWebTest {
 		$this->type("esc_period", "123");
 		$this->ok("Run remote commands on current host");
 
-		$this->button_click("save");
-		$this->wait();
+		sleep(1);
+		$this->type('new_condition_value', '');
+		sleep(1);
 
-		$this->button_click("save");
+		$this->button_click('save');
 		$this->wait();
 		$this->ok("Action added");
 

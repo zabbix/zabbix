@@ -1351,7 +1351,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'theme' => array(
 				'null' => false,
@@ -4478,12 +4478,6 @@ return array(
 				'default' => '0',
 			),
 			'ns' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'value_changed' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

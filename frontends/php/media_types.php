@@ -227,24 +227,26 @@ else {
 	$data['mediatypes'] = API::Mediatype()->get($options);
 
 	// get media types used in actions
-	$options = array(
+	$actions = API::Action()->get(array(
 		'mediatypeids' => zbx_objectValues($data['mediatypes'], 'mediatypeid'),
 		'output' => array('actionid', 'name'),
-		'preservekeys' => 1
-	);
-	$actions = API::Action()->get($options);
+		'selectOperations' => array('opmessage'),
+		'preservekeys' => true
+	));
+
 	foreach ($data['mediatypes'] as $number => $mediatype) {
+		// list actions where the media type is used
 		$data['mediatypes'][$number]['listOfActions'] = array();
-		foreach ($actions as $actionid => $action) {
-			if (!empty($action['mediatypeids'])) {
-				foreach ($action['mediatypeids'] as $actionMediaTypeId) {
-					if ($mediatype['mediatypeid'] == $actionMediaTypeId) {
-						$data['mediatypes'][$number]['listOfActions'][] = array('actionid' => $actionid, 'name' => $action['name']);
-					}
+		foreach ($actions as $actionId => $action) {
+			foreach ($action['operations'] as $operation) {
+				if ($mediatype['mediatypeid'] == $operation['opmessage']['mediatypeid']) {
+					$data['mediatypes'][$number]['listOfActions'][] = array(
+						'actionid' => $actionId,
+						'name' => $action['name']
+					);
 				}
 			}
 		}
-		$data['mediatypes'][$number]['usedInActions'] = !isset($mediatype['listOfActions']);
 
 		// allow sort by mediatype name
 		$data['mediatypes'][$number]['typeid'] = $data['mediatypes'][$number]['type'];

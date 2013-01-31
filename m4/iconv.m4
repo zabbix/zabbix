@@ -31,9 +31,39 @@ found_iconv="yes")
 
 AC_DEFUN([LIBICONV_CHECK_CONFIG],
 [
+	AC_ARG_WITH([iconv],[
+If you want to specify iconv installation directories:
+AC_HELP_STRING([--with-iconv=@<:@DIR@:>@], [use iconv from given base install directory (DIR), default is to search through a number of common places for the iconv files.])],
+		[
+			ICONV_CFLAGS="-I/$withval/include"
+			ICONV_LDFLAGS="-L/$withval/lib"
+			_iconv_dir_set="yes"
+		]
+	)
+
+	AC_ARG_WITH([iconv-include],
+		AC_HELP_STRING([--with-iconv-include=@<:@DIR@:>@],
+			[use iconv include headers from given path.]
+		),
+		[
+			ICONV_CFLAGS="-I/$withval"
+			_iconv_dir_set="yes"
+		]
+	)
+
+	AC_ARG_WITH([iconv-lib],
+		AC_HELP_STRING([--with-iconv-lib=@<:@DIR@:>@],
+			[use iconv libraries from given path.]
+		),
+		[
+			ICONV_LDFLAGS="-L/$withval"
+			_iconv_dir_set="yes"
+		]
+	)
+
 	AC_MSG_CHECKING(for ICONV support)
 
-	if test -f /usr/include/iconv.h; then
+	if test -n "$_iconv_dir_set" -o -f /usr/include/iconv.h; then
 		found_iconv="yes"
 	elif test -f /usr/local/include/iconv.h; then
 		ICONV_CFLAGS="-I/usr/local/include"

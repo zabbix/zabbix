@@ -29,13 +29,17 @@
  */
 class CHistory extends CZBXAPI {
 
+	protected $tableName = 'history';
+	protected $tableAlias = 'h';
+	protected $sortColumns = array('itemid', 'clock');
+
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
 	}
 
 	/**
-	 * Get history data
+	 * Get history data.
 	 *
 	 * @param array $options
 	 * @param array $options['itemids']
@@ -43,14 +47,12 @@ class CHistory extends CZBXAPI {
 	 * @param string $options['pattern']
 	 * @param int $options['limit']
 	 * @param string $options['order']
+	 *
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-
-		// allowed columns for sorting
-		$sortColumns = array('itemid', 'clock');
 
 		$sqlParts = array(
 			'select'	=> array('history' => 'h.itemid'),
@@ -93,21 +95,24 @@ class CHistory extends CZBXAPI {
 		switch ($options['history']) {
 			case ITEM_VALUE_TYPE_LOG:
 				$sqlParts['from']['history'] = 'history_log h';
-				$sortColumns[] = 'id';
+				$tableName = 'history_log';
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
 				$sqlParts['from']['history'] = 'history_text h';
-				$sortColumns[] = 'id';
+				$tableName = 'history_text';
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				$sqlParts['from']['history'] = 'history_str h';
+				$tableName = 'history_str';
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				$sqlParts['from']['history'] = 'history_uint h';
+				$tableName = 'history_uint';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			default:
 				$sqlParts['from']['history'] = 'history h';
+				$tableName = 'history';
 		}
 
 		// editable + PERMISSION CHECK
@@ -210,7 +215,7 @@ class CHistory extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'h');
+		$sqlParts = $this->applyQuerySortOptions($tableName, $this->tableAlias(), $options, $sqlParts);
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
@@ -296,5 +301,22 @@ class CHistory extends CZBXAPI {
 	}
 
 	public function delete($itemids = array()) {
+	}
+
+	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$isIdFieldUsed = false;
+
+		if ($options['history'] == ITEM_VALUE_TYPE_LOG || $options['history'] == ITEM_VALUE_TYPE_TEXT) {
+			$this->sortColumns['id'] = 'id';
+			$isIdFieldUsed = true;
+		}
+
+		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($isIdFieldUsed) {
+			unset($this->sortColumns['id']);
+		}
+
+		return $sqlParts;
 	}
 }

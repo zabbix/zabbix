@@ -1330,6 +1330,17 @@ function zbx_toObject($value, $field) {
 	return $result;
 }
 
+/**
+ * Converts the given value to a numeric array:
+ * - a scalar value will be converted to an array and added as the only element;
+ * - an array with first element key containing only numeric characters will be converted to plain zero-based numeric array.
+ * This is used for reseting nonsequential numeric arrays;
+ * - an associative array will be returned in an array as the only element, except if first element key contains only numeric characters.
+ *
+ * @param mixed $value
+ *
+ * @return array
+ */
 function zbx_toArray($value) {
 	if ($value === null) {
 		return $value;
@@ -1864,34 +1875,76 @@ function num2letter($number) {
 	return $str;
 }
 
-function access_deny() {
-	require_once dirname(__FILE__).'/page_header.php';
-
-	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
+/**
+ * Renders an "access denied" message and stops the execution of the script.
+ *
+ * The $mode parameters controls the layout of the message:
+ * - ACCESS_DENY_OBJECT     - render the message when denying access to a specific object
+ * - ACCESS_DENY_PAGE       - render a complete access denied page
+ *
+ * @param int $mode
+ */
+function access_deny($mode = ACCESS_DENY_OBJECT) {
+	// deny access to an object
+	if ($mode == ACCESS_DENY_OBJECT) {
+		require_once dirname(__FILE__).'/page_header.php';
 		show_error_message(_('No permissions to referred object or it does not exist!'));
+		require_once dirname(__FILE__).'/page_footer.php';
 	}
+	// deny access to a page
 	else {
+
+		// url to redirect the user to after he loggs in
 		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);
 		$url = urlencode($url->toString());
 
-		$warning = new CWarning(_('You are not logged in.'), array(
-			_('You cannot view this URL as a'),
-			SPACE,
-			bold(ZBX_GUEST_USER),
-			'. ',
-			_('You must login to view this page.'),
-			BR(),
-			_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-		));
-		$warning->setButtons(array(
-			new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
-			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
-		));
-		$warning->show();
-	}
+		// if the user is logged in - render the access denied message
+		if (CWebUser::isLoggedIn()) {
+			$header = _('Access denied.');
+			$message = array(
+				_('Your are logged in as'),
+				' ',
+				bold(CWebUser::$data['alias']),
+				'. ',
+				_('You have no permissions to access this page.'),
+				BR(),
+				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+			);
 
-	require_once dirname(__FILE__).'/page_footer.php';
+			$buttons = array();
+			// display the login button only for guest users
+			if (CWebUser::isGuest()) {
+				$buttons[] = new CButton('login', _('Login'),
+					'javascript: document.location = "index.php?request='.$url.'";', 'formlist'
+				);
+			}
+			$buttons[] = new CButton('back', _('Go to dashboard'),
+				'javascript: document.location = "dashboard.php"', 'formlist'
+			);
+		}
+		// if the user is not logged in - offer to login
+		else {
+			$header = _('You are not logged in.');
+			$message = array(
+				_('You must login to view this page.'),
+				BR(),
+				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+			);
+			$buttons = array(
+				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist')
+			);
+		}
+
+		$warning = new CWarning($header, $message);
+		$warning->setButtons($buttons);
+
+		$warningView = new CView('general.warning', array(
+			'warning' => $warning
+		));
+		$warningView->render();
+		exit;
+	}
 }
 
 function detect_page_type($default = PAGE_TYPE_HTML) {
@@ -2173,7 +2226,6 @@ function get_status() {
 		'triggers_count_disabled' => 0,
 		'triggers_count_off' => 0,
 		'triggers_count_on' => 0,
-		'triggers_count_unknown' => 0,
 		'items_count' => 0,
 		'items_count_monitored' => 0,
 		'items_count_disabled' => 0,
@@ -2209,9 +2261,6 @@ function get_status() {
 					case TRIGGER_VALUE_TRUE:
 						$status['triggers_count_on'] = $dbTrigger['cnt'];
 						break;
-					case TRIGGER_VALUE_UNKNOWN:
-						$status['triggers_count_unknown'] = $dbTrigger['cnt'];
-						break;
 				}
 				break;
 			case TRIGGER_STATUS_DISABLED:
@@ -2219,8 +2268,7 @@ function get_status() {
 				break;
 		}
 	}
-	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on']
-			+ $status['triggers_count_unknown'];
+	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on'];
 	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items

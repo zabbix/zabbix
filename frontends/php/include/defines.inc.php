@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010027);
+define('ZABBIX_DB_VERSION',	 2010034);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2012');
@@ -615,6 +615,12 @@ define('GROUP_GUI_ACCESS_DISABLED', 2);
 define('GROUP_API_ACCESS_DISABLED', 0);
 define('GROUP_API_ACCESS_ENABLED',	1);
 
+/**
+ * @see access_deny()
+ */
+define('ACCESS_DENY_OBJECT', 0);
+define('ACCESS_DENY_PAGE', 1);
+
 define('GROUP_DEBUG_MODE_DISABLED', 0);
 define('GROUP_DEBUG_MODE_ENABLED',	1);
 
@@ -751,7 +757,6 @@ define('HOST_INVENTORY_DISABLED',	-1);
 define('HOST_INVENTORY_MANUAL',		0);
 define('HOST_INVENTORY_AUTOMATIC',	1);
 
-define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
@@ -883,11 +888,6 @@ define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
 
-/**
- * String that is used to substitude macro when it cannot be resolved.
- */
-define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
-
 // user default theme
 define('THEME_DEFAULT', 'default');
 
@@ -896,30 +896,8 @@ define('ZBX_DEFAULT_THEME', 'originalblue');
 
 define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 
-// date formats
-define('HISTORY_OF_ACTIONS_DATE_FORMAT', _('d M Y H:i:s'));
-define('EVENT_ACTION_MESSAGES_DATE_FORMAT', _('d M Y H:i:s'));
-define('EVENT_ACTION_CMDS_DATE_FORMAT', _('Y.M.d H:i:s'));
-define('HISTORY_LOG_LOCALTIME_DATE_FORMAT', _('Y.M.d H:i:s'));
-define('HISTORY_LOG_ITEM_PLAINTEXT', _('Y-m-d H:i:s'));
-define('HISTORY_PLAINTEXT_DATE_FORMAT', _('Y-m-d H:i:s'));
-define('HISTORY_ITEM_DATE_FORMAT', _('Y.M.d H:i:s'));
-define('EVENTS_DISCOVERY_TIME_FORMAT', _('d M Y H:i:s'));
-define('EVENTS_ACTION_TIME_FORMAT', _('d M Y H:i:s'));
-define('QUEUE_NODES_DATE_FORMAT', _('d M Y H:i:s'));
-define('CHARTBAR_HOURLY_DATE_FORMAT', _('Y.m.d H:i'));
-define('CHARTBAR_DAILY_DATE_FORMAT', _('Y.m.d'));
-// GETTEXT: Date format (year). Do not translate.
-define('REPORT4_ANNUALLY_DATE_FORMAT', _x('Y', 'date format'));
-define('REPORT4_MONTHLY_DATE_FORMAT', _('M Y'));
-define('REPORT4_DAILY_DATE_FORMAT', _('d M Y'));
-define('REPORT4_WEEKLY_DATE_FORMAT', _('d M Y H:i'));
-define('REPORTS_BAR_REPORT_DATE_FORMAT', _('d M Y H:i:s'));
-define('POPUP_PERIOD_CAPTION_DATE_FORMAT', _('d M Y H:i:s'));
-define('MAPS_DATE_FORMAT', _('Y.m.d H:i:s'));
-define('SERVER_INFO_DATE_FORMAT', _('D, d M Y H:i:s O'));
-define('XML_DATE_DATE_FORMAT', _('d.m.y'));
-define('XML_TIME_DATE_FORMAT', _('H.i'));
+// non translatable date formats
+define('TIMESTAMP_FORMAT', 'YmdHis');
 
 // actions
 define('LONG_DESCRIPTION',	0);

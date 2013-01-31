@@ -146,11 +146,6 @@ class ZBase {
 					init_nodes();
 					$this->initLocales();
 					DBclose();
-
-					// if config file exists, only super admin user can access setup
-					if (isset(CWebUser::$data['type']) && CWebUser::$data['type'] < USER_TYPE_SUPER_ADMIN) {
-						throw new Exception('No permissions to referred object or it does not exist!');
-					}
 				}
 				catch (ConfigFileException $e) {}
 				break;
@@ -254,12 +249,8 @@ class ZBase {
 				return true;
 			}
 
-			$pathLength = strlen(__FILE__);
-
-			$pathLength -= 22;
-			$errfile = substr($errfile, $pathLength);
-
-			error($errstr.' ['.$errfile.':'.$errline.']');
+			// don't show the call to this handler function
+			error($errstr.' ['.CProfiler::getInstance()->formatCallStack(1).']');
 		}
 
 		set_error_handler('zbx_err_handler');
@@ -352,6 +343,9 @@ class ZBase {
 		else {
 			error('Your PHP has no gettext support. Zabbix translations are not available.');
 		}
+
+		// should be after locale initialization
+		require_once $this->getRootDir().'/include/translateDefines.inc.php';
 
 		// numeric Locale to default
 		setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));

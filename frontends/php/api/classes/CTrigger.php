@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -28,9 +28,10 @@ class CTrigger extends CTriggerGeneral {
 
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
+	protected $sortColumns = array('triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname');
 
 	/**
-	 * Get Triggers data
+	 * Get Triggers data.
 	 *
 	 * @param array $options
 	 * @param array $options['itemids']
@@ -51,9 +52,6 @@ class CTrigger extends CTriggerGeneral {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
-
-		// allowed columns for sorting
-		$sortColumns = array('triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname');
 
 		$sqlParts = array(
 			'select'	=> array('triggers' => 't.triggerid'),
@@ -290,7 +288,6 @@ class CTrigger extends CTriggerGeneral {
 					' FROM events e'.
 					' WHERE t.triggerid=e.objectid'.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
 					')';
@@ -302,7 +299,6 @@ class CTrigger extends CTriggerGeneral {
 					' FROM events e'.
 					' WHERE e.objectid=t.triggerid'.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
 					')';
@@ -418,68 +414,6 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where'][] = 't.priority>='.$options['min_severity'];
 		}
 
-		// sorting
-		if (!zbx_empty($options['sortfield'])) {
-			if (!is_array($options['sortfield'])) {
-				$options['sortfield'] = array($options['sortfield']);
-			}
-
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				// validate sortfield
-				if (!str_in_array($sortfield, $sortColumns)) {
-					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
-				}
-
-				// add sort field to order
-				$sortorder = '';
-				if (is_array($options['sortorder'])) {
-					if (!empty($options['sortorder'][$i])) {
-						$sortorder = $options['sortorder'][$i] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
-					}
-				}
-				else {
-					$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
-				}
-
-				// we will be using lastchange for ordering in any case
-				if (!str_in_array('t.lastchange', $sqlParts['select']) && !str_in_array('t.*', $sqlParts['select'])) {
-					$sqlParts['select']['lastchange'] = 't.lastchange';
-				}
-
-				switch ($sortfield) {
-					case 'hostname':
-						// the only way to sort by host name is to get it like this:
-						// triggers -> functions -> items -> hosts
-						$sqlParts['select']['hostname'] = 'h.name';
-						$sqlParts['from']['functions'] = 'functions f';
-						$sqlParts['from']['items'] = 'items i';
-						$sqlParts['from']['hosts'] = 'hosts h';
-						$sqlParts['where'][] = 't.triggerid = f.triggerid';
-						$sqlParts['where'][] = 'f.itemid = i.itemid';
-						$sqlParts['where'][] = 'i.hostid = h.hostid';
-						$sqlParts['order'][] = 'h.name '.$sortorder;
-						break;
-					case 'lastchange':
-						$sqlParts['order'][] = $sortfield.' '.$sortorder;
-						break;
-					default:
-						// if lastchange is not used for ordering, it should be the second order criteria
-						$sqlParts['order'][] = 't.'.$sortfield.' '.$sortorder;
-						break;
-				}
-
-				// add sort field to select if distinct is used
-				if (count($sqlParts['from']) > 1) {
-					if (!str_in_array('t.'.$sortfield, $sqlParts['select']) && !str_in_array('t.*', $sqlParts['select'])) {
-						$sqlParts['select'][$sortfield] = 't.'.$sortfield;
-					}
-				}
-			}
-			if (!empty($sqlParts['order'])) {
-				$sqlParts['order'][] = 't.lastchange DESC';
-			}
-		}
-
 		// limit
 		$postLimit = false;
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
@@ -497,6 +431,7 @@ class CTrigger extends CTriggerGeneral {
 		$triggerids = array();
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
@@ -611,7 +546,6 @@ class CTrigger extends CTriggerGeneral {
 				' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 					' AND '.dbConditionInt('e.objectid', $triggerids).
 					' AND '.dbConditionInt('e.value', array(TRIGGER_VALUE_TRUE)).
-					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 				' GROUP BY e.objectid'
 			);
 			while ($event = DBfetch($eventsDb)) {
@@ -1319,8 +1253,6 @@ class CTrigger extends CTriggerGeneral {
 
 			// host trigger
 			if ($statusHost) {
-				addUnknownEvent($triggerId);
-
 				DB::update('triggers', array(
 					'values' => array(
 						'expression' => $triggerExpression[$triggerId],
@@ -1448,8 +1380,6 @@ class CTrigger extends CTriggerGeneral {
 
 				if (isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)) {
 					if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) {
-						addUnknownEvent($trigger['triggerid']);
-
 						$trigger['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
 					}
 				}
@@ -1501,13 +1431,6 @@ class CTrigger extends CTriggerGeneral {
 	public function syncTemplates(array $data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-		if (!API::Template()->isWritable($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
 
 		$triggers = $this->get(array(
 			'hostids' => $data['templateids'],
@@ -1997,5 +1920,33 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return $result;
+	}
+
+	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if (!zbx_empty($options['sortfield'])) {
+			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
+		}
+
+		return $sqlParts;
+	}
+
+	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
+		if ($sortfield == 'hostname') {
+			$sqlParts['select']['hostname'] = 'h.name';
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where'][] = 't.triggerid = f.triggerid';
+			$sqlParts['where'][] = 'f.itemid = i.itemid';
+			$sqlParts['where'][] = 'i.hostid = h.hostid';
+			$sqlParts['order'][] = 'h.name '.$sortorder;
+		}
+		else {
+			$sqlParts = parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }

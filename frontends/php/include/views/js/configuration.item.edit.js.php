@@ -122,7 +122,8 @@
 	}
 
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == 1) {
+		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>
+				&& jQuery('#type').val() == <?php echo CJs::encodeJson(ITEM_TYPE_SSH); ?>) {
 			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Key passphrase')); ?>);
 		}
 		else {
@@ -169,6 +170,7 @@
 				// update the interface select with each item type change
 				organizeInterfaces(itemTypeInterface(parseInt(jQuery(this).val())));
 				displayKeyButton();
+				setAuthTypeLabel();
 			})
 			.trigger('change');
 		jQuery('#type_visible, #interface_visible').click(function() {
@@ -185,7 +187,6 @@
 		jQuery('#authtype').bind('change', function() {
 			setAuthTypeLabel();
 		});
-		setAuthTypeLabel();
 
 		// mass update page
 		if (jQuery('#delay_flex_visible').length != 0) {

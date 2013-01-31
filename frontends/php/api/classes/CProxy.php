@@ -26,6 +26,7 @@ class CProxy extends CZBXAPI {
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
+	protected $sortColumns = array('hostid', 'host', 'status');
 
 	/**
 	 * Get Proxy data
@@ -44,9 +45,6 @@ class CProxy extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('hostid', 'host', 'status');
 
 		$sqlParts = array(
 			'select'	=> array('hostid' => 'h.hostid'),
@@ -118,15 +116,13 @@ class CProxy extends CZBXAPI {
 			$sqlParts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 'h');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($proxy = DBfetch($res)) {
@@ -359,15 +355,25 @@ class CProxy extends CZBXAPI {
 	/**
 	 * Delete Proxy.
 	 *
-	 * @param array $proxies
+	 * @param string|array $proxyIds
 	 *
 	 * @return array
 	 */
-	public function delete(array $proxies) {
-		$proxies = zbx_toArray($proxies);
-		$this->validateDelete($proxies);
+	public function delete($proxyIds) {
+		$proxyIds = zbx_toArray($proxyIds);
 
-		$proxyIds = zbx_objectValues($proxies, 'proxyid');
+		// deprecated input support
+		if ($proxyIds && is_array($proxyIds[0])) {
+			$this->deprecated('Passing objects is deprecated, use an array of IDs instead.');
+			foreach ($proxyIds as $proxy) {
+				if (!check_db_fields(array('proxyid' => null), $proxy)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No proxy ID given.'));
+				}
+			}
+			$proxyIds = zbx_objectValues($proxyIds, 'proxyid');
+		}
+
+		$this->validateDelete($proxyIds);
 
 		$dbProxies = DBselect(
 			'SELECT h.hostid,h.host'.
@@ -422,16 +428,16 @@ class CProxy extends CZBXAPI {
 	 *  - cannot delete proxy if it is used to monitor host
 	 *  - cannot delete proxy if it is used in discovery rule
 	 *
-	 * @param array $proxies
+	 * @param array $proxyIds
 	 */
-	protected function validateDelete(array $proxies) {
-		if (empty($proxies)) {
+	protected function validateDelete(array $proxyIds) {
+		if (empty($proxyIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions();
-		$this->checkUsedInDiscoveryRule($proxies);
-		$this->checkUsedForMonitoring($proxies);
+		$this->checkPermissions($proxyIds);
+		$this->checkUsedInDiscoveryRule($proxyIds);
+		$this->checkUsedForMonitoring($proxyIds);
 	}
 
 	/**
@@ -480,25 +486,28 @@ class CProxy extends CZBXAPI {
 	}
 
 	/**
-	 * Check permission for proxies.
-	 * Only super admin have write access for proxies.
+	 * Checks if the given proxies are editable.
+	 *
+	 * @param array $proxyIds   proxy IDs to check
+	 *
+	 * @throws APIException     if the user has no permissions to edit proxies or a proxy does not exist
 	 */
-	protected function checkPermissions() {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can delete proxies.'));
+	protected function checkPermissions(array $proxyIds) {
+		if (!$this->isWritable($proxyIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
 	/**
 	 * Check if proxy is used in discovery rule.
 	 *
-	 * @param array $proxies
+	 * @param array $proxyIds
 	 */
-	protected function checkUsedInDiscoveryRule(array $proxies) {
+	protected function checkUsedInDiscoveryRule(array $proxyIds) {
 		$dRule = DBfetch(DBselect(
 			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
 					' FROM drules dr'.
-					' WHERE '.dbConditionInt('dr.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
+					' WHERE '.dbConditionInt('dr.proxy_hostid', $proxyIds), 1));
 		if ($dRule) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$dRule['proxy_hostid']));
 
@@ -510,13 +519,13 @@ class CProxy extends CZBXAPI {
 	/**
 	 * Check if proxy is used to monitor hosts.
 	 *
-	 * @param array $proxies
+	 * @param array $proxyIds
 	 */
-	protected function checkUsedForMonitoring(array $proxies) {
+	protected function checkUsedForMonitoring(array $proxyIds) {
 		$host = DBfetch(DBselect(
 			'SELECT h.name,h.proxy_hostid'.
 					' FROM hosts h'.
-					' WHERE '.dbConditionInt('h.proxy_hostid', zbx_objectValues($proxies, 'proxyid')), 1));
+					' WHERE '.dbConditionInt('h.proxy_hostid', $proxyIds), 1));
 		if ($host) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
 			self::exception(ZBX_API_ERROR_PARAMETERS,

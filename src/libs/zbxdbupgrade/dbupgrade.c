@@ -188,11 +188,33 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 #endif
 }
 
+static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
+			table_name);
+
+#if defined(HAVE_MYSQL)
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#elif defined(HAVE_ORACLE)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default '%s'", field->name, field->default_value);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set default '%s'", field->name, field->default_value);
+#endif
+}
+
 static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s add ", table_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+}
+
+static void	DBdrop_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const char *field_name)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s drop column %s",
+			table_name, field_name);
 }
 
 static void	DBcreate_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -314,6 +336,24 @@ static int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
 	return ret;
 }
 
+static int	DBset_default(const char *table_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBset_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
 static int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
@@ -326,6 +366,24 @@ static int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBdrop_field(const char *table_name, const char *field_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -642,7 +700,88 @@ static int	DBpatch_02010027()
 
 static int	DBpatch_02010028()
 {
-	const char	*sql = "delete from profiles where idx='web.httpconf.showdisabled'";
+	const char	*sql =
+			"update profiles"
+			" set value_int=case when value_str='0' then 0 else 1 end,"
+				"value_str='',"
+				"type=2"	/* PROFILE_TYPE_INT */
+			" where idx='web.httpconf.showdisabled'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010029()
+{
+	const char	*sql =
+			"delete from profiles where idx in ('web.httpconf.applications','web.httpmon.applications')";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010030()
+{
+	const char	*sql = "delete from profiles where idx='web.items.filter_groupid'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010031()
+{
+	const char	*sql =
+			"update profiles"
+			" set value_id=value_int,"
+				"value_int=0"
+			" where idx like 'web.avail_report.%.groupid'"
+				" or idx like 'web.avail_report.%.hostid'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010032()
+{
+	const ZBX_FIELD	field = {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("users", &field);
+}
+
+static int	DBpatch_02010033()
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"delete from events"
+			" where source=%d"
+				" and object=%d"
+				" and (value=%d or value_changed=%d)",
+			EVENT_SOURCE_TRIGGERS,
+			EVENT_OBJECT_TRIGGER,
+			TRIGGER_VALUE_UNKNOWN,
+			0))	/*TRIGGER_VALUE_CHANGED_NO*/
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_02010034()
+{
+	return DBdrop_field("events", "value_changed");
+}
+
+static int	DBpatch_02010035()
+{
+	const char	*sql = "delete from profiles where idx='web.events.filter.showUnknown'";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
@@ -715,11 +854,18 @@ int	DBcheck_version()
 		{DBpatch_02010026, 2010026, 0, 1},
 		{DBpatch_02010027, 2010027, 0, 1},
 		{DBpatch_02010028, 2010028, 0, 0},
+		{DBpatch_02010029, 2010029, 0, 0},
+		{DBpatch_02010030, 2010030, 0, 0},
+		{DBpatch_02010031, 2010031, 0, 0},
+		{DBpatch_02010032, 2010032, 0, 1},
+		{DBpatch_02010033, 2010033, 0, 1},
+		{DBpatch_02010034, 2010034, 0, 1},
+		{DBpatch_02010035, 2010035, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010027;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010034;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

@@ -144,6 +144,7 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
+#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
@@ -564,17 +565,13 @@ typedef enum
 #define TRIGGER_STATUS_DISABLED	1
 
 /* trigger values */
-#define TRIGGER_VALUE_FALSE	0
-#define TRIGGER_VALUE_TRUE	1
-#define TRIGGER_VALUE_UNKNOWN	2 /* only in "events" table */
+#define TRIGGER_VALUE_OK	0
+#define TRIGGER_VALUE_PROBLEM	1
+#define TRIGGER_VALUE_UNKNOWN	2	/* only in server code, never in DB */
 
 /* trigger value flags */
 #define TRIGGER_VALUE_FLAG_NORMAL	0
 #define TRIGGER_VALUE_FLAG_UNKNOWN	1
-
-/* trigger value change flags */
-#define TRIGGER_VALUE_CHANGED_NO	0
-#define TRIGGER_VALUE_CHANGED_YES	1
 
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
@@ -1040,5 +1037,9 @@ unsigned char	get_interface_type_by_item_type(unsigned char type);
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
+
+void	zbx_trim_str_list(char *list, char delimiter);
+
+int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
 #endif

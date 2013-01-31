@@ -79,6 +79,7 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 		$filterForm->addVar('itemid', zbx_toHash($_REQUEST['itemid']));
 
 		$itemListbox = new CListBox('cmbitemlist[]');
+		$itemsData = array();
 		foreach ($this->data['items'] as $itemid => $item) {
 			if (!isset($this->data['iv_string'][$item['value_type']])) {
 				unset($this->data['items'][$itemid]);
@@ -86,7 +87,13 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 			}
 
 			$host = reset($item['hosts']);
-			$itemListbox->addItem($itemid, $host['name'].': '.itemName($item));
+			$itemsData[$itemid]['id'] = $itemid;
+			$itemsData[$itemid]['name'] = $host['name'].': '.itemName($item);
+		}
+
+		order_result($itemsData, 'name');
+		foreach ($itemsData as $item) {
+			$itemListbox->addItem($item['id'], $item['name']);
 		}
 
 		$addItemButton = new CButton('add_log', _('Add'), "return PopUp('popup.php?multiselect=1&real_hosts=1".
