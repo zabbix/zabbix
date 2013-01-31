@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-21 18:45+0200\n"
+"POT-Creation-Date: 2013-01-31 22:49+0200\n"
 "PO-Revision-Date: 2013-01-10 20:21+0200\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -55,7 +55,7 @@ msgid_plural "%1$s Items"
 msgstr[0] "%1$s elem"
 msgstr[1] "%1$s elem"
 
-#: include/page_header.php:481
+#: include/page_header.php:480
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
@@ -115,11 +115,11 @@ msgstr "- összes csoport -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[CSOPORTOS VISSZAIGAZOLÁS]----"
 
-#: include/triggers.inc.php:2225 include/triggers.inc.php:2226
-#: include/triggers.inc.php:2227 include/triggers.inc.php:2229
-#: include/triggers.inc.php:2231 include/triggers.inc.php:2234
-#: include/triggers.inc.php:2237 include/triggers.inc.php:2238
-#: include/triggers.inc.php:2249 include/triggers.inc.php:2256
+#: include/triggers.inc.php:2223 include/triggers.inc.php:2224
+#: include/triggers.inc.php:2225 include/triggers.inc.php:2227
+#: include/triggers.inc.php:2229 include/triggers.inc.php:2232
+#: include/triggers.inc.php:2235 include/triggers.inc.php:2236
+#: include/triggers.inc.php:2247 include/triggers.inc.php:2254
 msgid "0 or 1"
 msgstr "0 vagy 1"
 
@@ -159,7 +159,7 @@ msgstr "kézikönyv"
 msgid "ALARM ACKNOWLEDGES"
 msgstr "RIASZTÁSOK VISSZAIGAZOLÁSAI"
 
-#: include/triggers.inc.php:1664
+#: include/triggers.inc.php:1662
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:880
 #: include/views/configuration.triggers.edit.php:104 tr_logform.php:290
@@ -434,7 +434,7 @@ msgstr "Hiányzó hozzáadása"
 msgid "Add prototype"
 msgstr "Prototípus hozzáadása"
 
-#: jsLoader.php:182
+#: jsLoader.php:181
 msgid "Add service"
 msgstr "Szolgáltatás hozzáadása"
 
@@ -485,7 +485,7 @@ msgstr "Kor"
 msgid "Age less than"
 msgstr ""
 
-#: include/views/monitoring.overview.php:55
+#: include/views/monitoring.overview.php:53
 #, php-format
 msgid "Age less than %s"
 msgstr ""
@@ -515,7 +515,7 @@ msgstr "Ikonok igazítása"
 #: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1218
 #: include/blocks.inc.php:1227 include/blocks.inc.php:1272
 #: include/blocks.inc.php:1356 include/blocks.inc.php:1365
-#: include/nodes.inc.php:156 include/page_header.php:332
+#: include/nodes.inc.php:156 include/page_header.php:331
 #: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -528,7 +528,7 @@ msgstr "Ikonok igazítása"
 #: include/views/administration.users.list.php:36
 #: include/views/configuration.action.edit.php:519
 #: include/views/configuration.hostgroups.edit.php:39
-#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:88
+#: include/views/configuration.sysmap.edit.php:138 jsLoader.php:87
 #: popup_right.php:56 tr_status.php:215
 msgid "All"
 msgstr "Mind"
@@ -538,7 +538,7 @@ msgstr "Mind"
 msgid "All groups"
 msgstr "Minden csoport"
 
-#: jsLoader.php:155
+#: jsLoader.php:154
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr ""
 
@@ -634,7 +634,7 @@ msgid "Apr"
 msgstr "Ápr."
 
 #: include/forms.inc.php:1556 include/func.inc.php:107
-#: include/func.inc.php:238 jsLoader.php:118
+#: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
 msgstr "Április"
 
@@ -707,7 +707,7 @@ msgid "Aug"
 msgstr "Aug"
 
 #: include/forms.inc.php:1548 include/func.inc.php:111
-#: include/func.inc.php:242 jsLoader.php:122
+#: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
 msgstr "Augusztus"
 
@@ -810,7 +810,7 @@ msgctxt "Byte short"
 msgid "B"
 msgstr "B"
 
-#: include/page_header.php:225
+#: include/page_header.php:224
 msgid "BACK"
 msgstr "VISSZA"
 
@@ -2051,7 +2051,7 @@ msgid "Change password"
 msgstr "Jelszó módosítása"
 
 #: include/forms.inc.php:418 include/items.inc.php:120
-#: include/triggers.inc.php:2203 include/views/configuration.item.edit.php:217
+#: include/triggers.inc.php:2201 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:160
 msgid "Character"
 msgstr "Betű"
@@ -2134,7 +2134,7 @@ msgstr ""
 msgid "Classic"
 msgstr ""
 
-#: jsLoader.php:165
+#: jsLoader.php:164
 msgid "Clear"
 msgstr ""
 
@@ -2178,8 +2178,8 @@ msgstr "Klón"
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
-#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:149
-#: jsLoader.php:173 tr_testexpr.php:175
+#: include/views/js/configuration.sysmaps.js.php:376 jsLoader.php:148
+#: jsLoader.php:172 tr_testexpr.php:175
 msgid "Close"
 msgstr "Bezár"
 
@@ -2629,7 +2629,7 @@ msgstr ""
 msgid "Create template"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:44 jsLoader.php:104
+#: include/views/configuration.triggers.list.php:44 jsLoader.php:103
 msgid "Create trigger"
 msgstr ""
 
@@ -2765,7 +2765,7 @@ msgstr ""
 msgid "Current host"
 msgstr ""
 
-#: include/page_header.php:364
+#: include/page_header.php:363
 msgid "Current node"
 msgstr "Kiválasztott csomópont"
 
@@ -3040,7 +3040,7 @@ msgstr ""
 msgid "Days"
 msgstr "Napok"
 
-#: include/page_header.php:250
+#: include/page_header.php:249
 msgid "Debug"
 msgstr "Hibakeresés"
 
@@ -3059,7 +3059,7 @@ msgid "Dec"
 msgstr ""
 
 #: include/forms.inc.php:1568 include/func.inc.php:115
-#: include/func.inc.php:246 jsLoader.php:126
+#: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
 msgstr "December"
 
@@ -3073,7 +3073,7 @@ msgstr "Decimális"
 #: include/views/configuration.host.edit.php:219
 #: include/views/js/configuration.sysmaps.js.php:122
 #: include/views/monitoring.screen.php:117
-#: include/views/monitoring.slides.php:85 jsLoader.php:148 popup_bitem.php:114
+#: include/views/monitoring.slides.php:85 jsLoader.php:147 popup_bitem.php:114
 #: popup_period.php:113
 msgid "Default"
 msgstr "Alapértelmezett"
@@ -3124,7 +3124,7 @@ msgstr "Késleltetve"
 
 #: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/configuration.triggers.edit.php:154 jsLoader.php:105
+#: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:332 tr_logform.php:349
 msgid "Delete"
 msgstr "Törlés"
@@ -3154,7 +3154,7 @@ msgstr ""
 msgid "Delete discovery rule?"
 msgstr ""
 
-#: include/views/configuration.triggers.edit.php:156 jsLoader.php:107
+#: include/views/configuration.triggers.edit.php:156 jsLoader.php:106
 #: tr_logform.php:333
 msgid "Delete expression?"
 msgstr "Törli a kifejezést?"
@@ -3179,11 +3179,11 @@ msgstr ""
 msgid "Delete item?"
 msgstr ""
 
-#: jsLoader.php:106 tr_logform.php:349
+#: jsLoader.php:105 tr_logform.php:349
 msgid "Delete keyword?"
 msgstr "Törli a kulcsszót?"
 
-#: jsLoader.php:157
+#: jsLoader.php:156
 msgid "Delete links between selected elements?"
 msgstr ""
 
@@ -3263,7 +3263,7 @@ msgstr "Törli a kiválasztott alkalmazásokat?"
 msgid "Delete selected discovery rules?"
 msgstr "Törli a kijelölt felderítési szabályokat?"
 
-#: jsLoader.php:153
+#: jsLoader.php:152
 msgid "Delete selected elements?"
 msgstr ""
 
@@ -3372,7 +3372,7 @@ msgstr[1] ""
 msgid "Delete selected with linked elements"
 msgstr "Törli a kijelölteket a csatolt elemekkel együtt?"
 
-#: jsLoader.php:184
+#: jsLoader.php:183
 msgid "Delete service"
 msgstr ""
 
@@ -3384,7 +3384,7 @@ msgstr ""
 msgid "Delete template?"
 msgstr ""
 
-#: jsLoader.php:185
+#: jsLoader.php:184
 msgid "Delete the selected service?"
 msgstr ""
 
@@ -3473,11 +3473,11 @@ msgstr "Hozzáférés megtagadva"
 msgid "Dependencies"
 msgstr ""
 
-#: include/triggers.inc.php:1357 tr_status.php:558
+#: include/triggers.inc.php:1355 tr_status.php:558
 msgid "Dependent"
 msgstr "Függő"
 
-#: include/triggers.inc.php:1337
+#: include/triggers.inc.php:1335
 #: include/views/configuration.services.edit.php:101
 #: include/views/configuration.triggers.list.php:140 popup.php:1033
 #: tr_status.php:542
@@ -3651,7 +3651,7 @@ msgstr "Letiltja a kijelölt triggereket?"
 
 #: auditlogs.php:152 dashboard.php:227 dashconf.php:164
 #: include/discovery.inc.php:119 include/httptest.inc.php:46
-#: include/items.inc.php:150 include/triggers.inc.php:1610
+#: include/items.inc.php:150 include/triggers.inc.php:1608
 #: include/users.inc.php:60
 #: include/views/administration.mediatypes.list.php:93
 #: include/views/administration.usergroups.list.php:58
@@ -3672,7 +3672,7 @@ msgstr "Letiltja a kijelölt triggereket?"
 msgid "Disabled"
 msgstr "Letiltva"
 
-#: include/views/monitoring.overview.php:61
+#: include/views/monitoring.overview.php:59
 msgid "Disabled or no trigger"
 msgstr ""
 
@@ -3830,16 +3830,16 @@ msgstr "Ennél régebbi események törlése (napokban)"
 msgid "Do not keep events older than (in days) \"%1$s\"."
 msgstr ""
 
-#: jsLoader.php:102
+#: jsLoader.php:101
 msgid "Do you wish to replace the conditional expression?"
 msgstr ""
 
-#: jsLoader.php:135
+#: jsLoader.php:134
 msgid "Done"
 msgstr ""
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
-#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:151
+#: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:150
 msgid "Dot"
 msgstr "Pontozott vonal"
 
@@ -3969,7 +3969,7 @@ msgstr ""
 msgid "EVENTS"
 msgstr "ESEMÉNYEK"
 
-#: jsLoader.php:156
+#: jsLoader.php:155
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
@@ -3994,7 +3994,7 @@ msgstr "Karbantartási időszak szerkesztése"
 msgid "Edit map element"
 msgstr "Térkép elem szerkesztése"
 
-#: jsLoader.php:183
+#: jsLoader.php:182
 msgid "Edit service"
 msgstr ""
 
@@ -4214,7 +4214,7 @@ msgstr ""
 msgid "Error in item key: \"%s\"."
 msgstr ""
 
-#: include/db.inc.php:930
+#: include/db.inc.php:940
 #, php-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr ""
@@ -4257,7 +4257,7 @@ msgstr ""
 msgid "Event details"
 msgstr "Esemény részletei"
 
-#: include/triggers.inc.php:1609
+#: include/triggers.inc.php:1607
 msgid "Event generation"
 msgstr "Esemény generálás"
 
@@ -4273,8 +4273,8 @@ msgstr "Esemény forrása"
 msgid "Event source details"
 msgstr ""
 
-#: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1269
-#: jsLoader.php:112 search.php:134 search.php:206 search.php:261
+#: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1267
+#: jsLoader.php:111 search.php:134 search.php:206 search.php:261
 #: search.php:313 tr_status.php:211
 msgid "Events"
 msgstr "Események"
@@ -4357,7 +4357,7 @@ msgid "Export to CSV"
 msgstr ""
 
 #: include/forms.inc.php:1775 include/forms.inc.php:1906
-#: include/forms.inc.php:1979 include/triggers.inc.php:1608
+#: include/forms.inc.php:1979 include/triggers.inc.php:1606
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
@@ -4402,7 +4402,7 @@ msgstr "Külső ellenőrzés"
 msgid "Ez Texting"
 msgstr ""
 
-#: jsLoader.php:131
+#: jsLoader.php:130
 msgctxt "Friday short"
 msgid "F"
 msgstr ""
@@ -4459,7 +4459,7 @@ msgid "Feb"
 msgstr ""
 
 #: include/forms.inc.php:1546 include/func.inc.php:105
-#: include/func.inc.php:236 jsLoader.php:116
+#: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
 msgstr "Február"
 
@@ -4661,7 +4661,7 @@ msgstr ""
 msgid "German (de_DE)"
 msgstr "Német (de_DE)"
 
-#: include/page_header.php:236
+#: include/page_header.php:235
 msgid "Get support"
 msgstr "Támogatás"
 
@@ -4669,7 +4669,7 @@ msgstr "Támogatás"
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1740 tr_testexpr.php:36
+#: include/triggers.inc.php:1738 tr_testexpr.php:36
 msgid "Given expression is not a macro"
 msgstr ""
 
@@ -4709,7 +4709,7 @@ msgstr ""
 msgid "Go"
 msgstr "Mehet"
 
-#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:178
+#: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
 msgstr ""
 
@@ -4847,7 +4847,7 @@ msgstr ""
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
-#: include/menu.inc.php:62 include/triggers.inc.php:1313
+#: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:57
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
@@ -4972,7 +4972,7 @@ msgid "H.i"
 msgstr ""
 
 #: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
-#: include/page_header.php:486
+#: include/page_header.php:485
 msgid "H:i"
 msgstr ""
 
@@ -5032,7 +5032,7 @@ msgstr ""
 msgid "Height"
 msgstr "Magasság"
 
-#: include/page_header.php:234 include/views/general.login.php:38
+#: include/page_header.php:233 include/views/general.login.php:38
 msgid "Help"
 msgstr "Segítség"
 
@@ -5040,7 +5040,7 @@ msgstr "Segítség"
 msgid "Hexadecimal"
 msgstr "Hexadecimális"
 
-#: jsLoader.php:141 sysmap.php:158
+#: jsLoader.php:140 sysmap.php:158
 msgid "Hidden"
 msgstr ""
 
@@ -5071,14 +5071,14 @@ msgstr "Választottak elrejtése"
 msgid "High"
 msgstr "Magas"
 
-#: history.php:27 include/forms.inc.php:853 include/page_header.php:456
+#: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
-#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:109
+#: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
 #: latest.php:196 latest.php:323 latest.php:501
 msgid "History"
 msgstr "Előzmények"
 
-#: jsLoader.php:110
+#: jsLoader.php:109
 msgid "History and simple graphs"
 msgstr ""
 
@@ -5119,7 +5119,7 @@ msgstr "Vízszintes igazítás"
 #: include/classes/screens/CScreenHostTriggers.php:123
 #: include/forms.inc.php:504 include/html.inc.php:379 include/maps.inc.php:24
 #: include/reports.inc.php:112 include/setup.inc.php:310
-#: include/triggers.inc.php:1183 include/triggers.inc.php:1605
+#: include/triggers.inc.php:1183 include/triggers.inc.php:1603
 #: include/views/configuration.application.edit.php:44
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
@@ -5142,7 +5142,7 @@ msgstr "Vízszintes igazítás"
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
-#: items.php:624 items.php:647 jsLoader.php:143 latest.php:125 latest.php:191
+#: items.php:624 items.php:647 jsLoader.php:142 latest.php:125 latest.php:191
 #: popup.php:478 popup.php:515 popup.php:1092 popup.php:1286 popup.php:1484
 #: popup.php:1492 popup.php:1622 queue.php:249 report2.php:235 report5.php:60
 #: tr_status.php:173 tr_status.php:292
@@ -5212,7 +5212,7 @@ msgstr "Hoszt törölve"
 #: include/views/js/configuration.action.edit.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:28
-#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:146
+#: include/views/js/configuration.sysmaps.js.php:79 jsLoader.php:145
 #: search.php:258
 msgid "Host group"
 msgstr "Hoszt csoport"
@@ -5244,7 +5244,7 @@ msgstr "Hoszt csoportok"
 msgid "Host interface"
 msgstr ""
 
-#: hostinventories.php:26 jsLoader.php:181
+#: hostinventories.php:26 jsLoader.php:180
 msgid "Host inventories"
 msgstr ""
 
@@ -5278,7 +5278,7 @@ msgid "Host router"
 msgstr ""
 
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
-#: jsLoader.php:177
+#: jsLoader.php:176
 msgid "Host screens"
 msgstr ""
 
@@ -5370,7 +5370,7 @@ msgid "Hosts info"
 msgstr "Hoszt info"
 
 #: include/views/configuration.screen.constructor.edit.php:559
-#: include/views/monitoring.overview.php:81
+#: include/views/monitoring.overview.php:79
 msgid "Hosts location"
 msgstr "Hosztok elhelyezkedése"
 
@@ -5628,7 +5628,7 @@ msgstr ""
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr ""
 
-#: jsLoader.php:159
+#: jsLoader.php:158
 msgid "Iconmap is not enabled"
 msgstr ""
 
@@ -5645,7 +5645,7 @@ msgstr ""
 #: include/views/administration.general.image.edit.php:38
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:47
-#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:147
+#: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:146
 #: map.php:136
 msgid "Image"
 msgstr "Kép"
@@ -5988,7 +5988,7 @@ msgstr ""
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr ""
 
-#: include/triggers.inc.php:585 include/triggers.inc.php:1741
+#: include/triggers.inc.php:585 include/triggers.inc.php:1739
 #: tr_testexpr.php:37
 msgid "Incorrect function is used"
 msgstr "Hibás funkció"
@@ -6365,7 +6365,7 @@ msgstr "Információ"
 msgid "Insert"
 msgstr "Beszúrás"
 
-#: include/forms.inc.php:1353 jsLoader.php:103
+#: include/forms.inc.php:1353 jsLoader.php:102
 msgid "Insert macro"
 msgstr "Makró beszúrása"
 
@@ -6520,7 +6520,7 @@ msgstr "Eredmény"
 msgid "It is not possible to filter by user password."
 msgstr ""
 
-#: include/page_header.php:263
+#: include/page_header.php:262
 msgid "It is not possible to logout from HTTP authentication."
 msgstr ""
 
@@ -6742,7 +6742,7 @@ msgid "Jan"
 msgstr ""
 
 #: include/forms.inc.php:1541 include/func.inc.php:104
-#: include/func.inc.php:235 jsLoader.php:115
+#: include/func.inc.php:235 jsLoader.php:114
 msgid "January"
 msgstr "Január"
 
@@ -6755,7 +6755,7 @@ msgid "Jul"
 msgstr ""
 
 #: include/forms.inc.php:1543 include/func.inc.php:110
-#: include/func.inc.php:241 jsLoader.php:121
+#: include/func.inc.php:241 jsLoader.php:120
 msgid "July"
 msgstr "Július"
 
@@ -6764,7 +6764,7 @@ msgid "Jun"
 msgstr ""
 
 #: include/forms.inc.php:1566 include/func.inc.php:109
-#: include/func.inc.php:240 jsLoader.php:120
+#: include/func.inc.php:240 jsLoader.php:119
 msgid "June"
 msgstr "Június"
 
@@ -6817,7 +6817,7 @@ msgid "Key cannot be empty."
 msgstr ""
 
 #: include/views/configuration.action.edit.php:710
-#: include/views/js/configuration.item.edit.js.php:126
+#: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
 msgstr ""
 
@@ -6975,7 +6975,7 @@ msgstr "Utolsó érték"
 msgid "Last week graph"
 msgstr "Utolsó hét grafikonja"
 
-#: include/menu.inc.php:47 jsLoader.php:179 latest.php:26 report5.php:159
+#: include/menu.inc.php:47 jsLoader.php:178 latest.php:26 report5.php:159
 #: search.php:132 search.php:204 search.php:259 search.php:311
 msgid "Latest data"
 msgstr "Legfrissebb adat"
@@ -6995,7 +6995,7 @@ msgstr "Litván (lv_LV)"
 #: include/views/js/configuration.graph.edit.js.php:71
 #: include/views/js/configuration.sysmaps.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:229
-#: include/views/monitoring.overview.php:77 popup_bitem.php:137
+#: include/views/monitoring.overview.php:75 popup_bitem.php:137
 msgid "Left"
 msgstr "Balra"
 
@@ -7118,7 +7118,7 @@ msgid "Location longitude"
 msgstr ""
 
 #: include/forms.inc.php:419 include/items.inc.php:122
-#: include/triggers.inc.php:2204 include/views/configuration.item.edit.php:218
+#: include/triggers.inc.php:2202 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:161
 msgid "Log"
 msgstr "Napló"
@@ -7161,7 +7161,7 @@ msgid "Logged in as"
 msgstr "Belépett mint"
 
 #: auditlogs.php:143 include/config.inc.php:261 include/menu.inc.php:285
-#: include/page_header.php:271
+#: include/page_header.php:270
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:60
@@ -7186,7 +7186,7 @@ msgstr "Bejelentkezési név vagy jelszó hiba"
 msgid "Login name or password is incorrect."
 msgstr "Bejelentkezési név vagy jelszó hiba"
 
-#: auditlogs.php:146 include/page_header.php:262 include/page_header.php:266
+#: auditlogs.php:146 include/page_header.php:261 include/page_header.php:265
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
 msgstr "Kilépés"
@@ -7206,7 +7206,7 @@ msgctxt "Mega short"
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:127
+#: jsLoader.php:126
 msgctxt "Monday short"
 msgid "M"
 msgstr "H"
@@ -7367,7 +7367,7 @@ msgstr ""
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
-#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:144
+#: include/views/js/configuration.sysmaps.js.php:101 jsLoader.php:143
 #: map.php:25
 msgid "Map"
 msgstr "Térkép"
@@ -7434,7 +7434,7 @@ msgid "Mar"
 msgstr ""
 
 #: include/forms.inc.php:1551 include/func.inc.php:106
-#: include/func.inc.php:237 jsLoader.php:117
+#: include/func.inc.php:237 jsLoader.php:116
 msgid "March"
 msgstr "Március"
 
@@ -7533,7 +7533,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: include/forms.inc.php:1561 include/func.inc.php:108
-#: include/func.inc.php:239 jsLoader.php:119
+#: include/func.inc.php:239 jsLoader.php:118
 msgid "May"
 msgstr "Május"
 
@@ -7633,7 +7633,7 @@ msgstr ""
 msgid "Message timeout (seconds)"
 msgstr ""
 
-#: jsLoader.php:164
+#: jsLoader.php:163
 msgid "Messages"
 msgstr ""
 
@@ -7804,7 +7804,7 @@ msgstr ""
 msgid "Most busy triggers top 100"
 msgstr "Leggyakoribb trigger-ek (top 100)"
 
-#: jsLoader.php:167
+#: jsLoader.php:166
 msgid "Move"
 msgstr ""
 
@@ -7812,7 +7812,7 @@ msgstr ""
 msgid "Mozilla Firefox"
 msgstr ""
 
-#: include/triggers.inc.php:1609
+#: include/triggers.inc.php:1607
 msgid "Multiple PROBLEM events"
 msgstr ""
 
@@ -7820,7 +7820,7 @@ msgstr ""
 msgid "Multiple PROBLEM events generation"
 msgstr ""
 
-#: jsLoader.php:162
+#: jsLoader.php:161
 msgid "Mute"
 msgstr ""
 
@@ -7951,7 +7951,7 @@ msgstr "Új alkalmazás"
 msgid "New condition"
 msgstr "Új feltétel"
 
-#: jsLoader.php:154
+#: jsLoader.php:153
 msgid "New element"
 msgstr ""
 
@@ -8009,7 +8009,7 @@ msgstr "Következő ellenőrzés"
 
 #: events.php:756 include/config.inc.php:563 include/events.inc.php:303
 #: include/events.inc.php:321 include/forms.inc.php:1922
-#: include/triggers.inc.php:1610
+#: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
 msgid "No"
@@ -8142,7 +8142,7 @@ msgstr ""
 msgid "No discovery rules defined."
 msgstr ""
 
-#: jsLoader.php:174
+#: jsLoader.php:173
 msgid "No elements selected!"
 msgstr "Nincsenek kiválasztott elemek!"
 
@@ -8428,7 +8428,7 @@ msgstr ""
 #: api/classes/CApplication.php:694 api/classes/CDiscoveryRule.php:584
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
-#: api/classes/CEvent.php:578 api/classes/CGraphGeneral.php:161
+#: api/classes/CEvent.php:580 api/classes/CGraphGeneral.php:161
 #: api/classes/CGraph.php:790 api/classes/CGraphPrototype.php:837
 #: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
@@ -8548,7 +8548,7 @@ msgstr ""
 msgid "No times defined. Work 24x7."
 msgstr ""
 
-#: include/views/monitoring.overview.php:58
+#: include/views/monitoring.overview.php:56
 msgid "No trigger"
 msgstr "Nincs trigger"
 
@@ -8597,8 +8597,8 @@ msgstr ""
 #: include/blocks.inc.php:184 include/blocks.inc.php:362
 #: include/blocks.inc.php:846 include/blocks.inc.php:999
 #: include/blocks.inc.php:1090 include/blocks.inc.php:1390
-#: include/classes/screens/CScreenEvents.php:45 include/page_header.php:355
-#: include/triggers.inc.php:1584 include/views/administration.node.edit.php:83
+#: include/classes/screens/CScreenEvents.php:45 include/page_header.php:354
+#: include/triggers.inc.php:1582 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:493
 #: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
@@ -8642,7 +8642,7 @@ msgstr "Csomópontok"
 msgid "None"
 msgstr "Nincs"
 
-#: include/graphs.inc.php:24 include/triggers.inc.php:1609 popup.php:1417
+#: include/graphs.inc.php:24 include/triggers.inc.php:1607 popup.php:1417
 msgid "Normal"
 msgstr "Normál"
 
@@ -8729,11 +8729,11 @@ msgid "Nov"
 msgstr ""
 
 #: include/forms.inc.php:1563 include/func.inc.php:114
-#: include/func.inc.php:245 jsLoader.php:125
+#: include/func.inc.php:245 jsLoader.php:124
 msgid "November"
 msgstr "November"
 
-#: jsLoader.php:134
+#: jsLoader.php:133
 msgid "Now"
 msgstr ""
 
@@ -8794,14 +8794,14 @@ msgid "Number of users (online)"
 msgstr "Felhasználók száma (bejelentkezve)"
 
 #: include/forms.inc.php:417 include/items.inc.php:118
-#: include/triggers.inc.php:2202 include/views/configuration.item.edit.php:216
+#: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:159
 msgid "Numeric (float)"
 msgstr "Numerikus (lebegőpontos)"
 
-#: include/triggers.inc.php:2201 include/triggers.inc.php:2220
-#: include/triggers.inc.php:2230 include/triggers.inc.php:2235
-#: include/triggers.inc.php:2239
+#: include/triggers.inc.php:2199 include/triggers.inc.php:2218
+#: include/triggers.inc.php:2228 include/triggers.inc.php:2233
+#: include/triggers.inc.php:2237
 msgid "Numeric (integer 64bit)"
 msgstr "Numerikus (64 bites egész szám)"
 
@@ -8836,7 +8836,7 @@ msgstr ""
 msgid "OOB subnet mask"
 msgstr ""
 
-#: include/triggers.inc.php:1664
+#: include/triggers.inc.php:1662
 #: include/views/configuration.action.edit.php:115
 #: include/views/configuration.action.edit.php:881
 #: include/views/configuration.triggers.edit.php:111 tr_logform.php:291
@@ -8859,7 +8859,7 @@ msgstr "Oprendszer (rövid leírás)"
 msgid "OTHER CONFIGURATION PARAMETERS"
 msgstr ""
 
-#: include/views/monitoring.overview.php:68
+#: include/views/monitoring.overview.php:66
 msgid "OVERVIEW"
 msgstr "ÁTTEKINTÉS"
 
@@ -8872,11 +8872,11 @@ msgid "Octal"
 msgstr "Oktális"
 
 #: include/forms.inc.php:1558 include/func.inc.php:113
-#: include/func.inc.php:244 jsLoader.php:124
+#: include/func.inc.php:244 jsLoader.php:123
 msgid "October"
 msgstr "Október"
 
-#: jsLoader.php:140 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:139 sysmap.php:155 sysmap.php:161
 msgid "Off"
 msgstr "KIKAPCSOL"
 
@@ -8887,7 +8887,7 @@ msgstr "KIKAPCSOL"
 msgid "Ok"
 msgstr "Ok"
 
-#: jsLoader.php:139 sysmap.php:155 sysmap.php:161
+#: jsLoader.php:138 sysmap.php:155 sysmap.php:161
 msgid "On"
 msgstr "BEKAPCSOL"
 
@@ -9400,7 +9400,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.massupdate.php:240
 #: include/views/general.login.php:65
-#: include/views/js/configuration.item.edit.js.php:129
+#: include/views/js/configuration.item.edit.js.php:130
 msgid "Password"
 msgstr "Jelszó"
 
@@ -9468,7 +9468,7 @@ msgstr ""
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:62
 msgid "Persian (fa_IR)"
 msgstr ""
 
@@ -9509,11 +9509,11 @@ msgstr ""
 msgid "Please enter confirmation text."
 msgstr ""
 
-#: jsLoader.php:150
+#: jsLoader.php:149
 msgid "Please select two elements"
 msgstr ""
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Polish (pl_PL)"
 msgstr "Lengyel (pl_PL)"
 
@@ -9543,11 +9543,11 @@ msgstr ""
 msgid "Port range"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Portuguese (pt_BR)"
 msgstr "Portugál (pt_BR)"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -9619,7 +9619,7 @@ msgstr ""
 msgid "Primary POC screen name"
 msgstr ""
 
-#: include/page_header.php:241
+#: include/page_header.php:240
 msgid "Print"
 msgstr "Nyomtatás"
 
@@ -9667,7 +9667,7 @@ msgstr "Számítás, ha legalább egy alárendelt elem állapota hibás"
 msgid "Problems"
 msgstr "Hibák"
 
-#: include/page_header.php:247
+#: include/page_header.php:246
 msgid "Profile"
 msgstr "Profil"
 
@@ -10215,16 +10215,16 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Russian (ru_RU)"
 msgstr "Orosz (ru_RU)"
 
-#: jsLoader.php:132
+#: jsLoader.php:131
 msgctxt "Saturday short"
 msgid "S"
 msgstr ""
 
-#: jsLoader.php:133
+#: jsLoader.php:132
 msgctxt "Sunday short"
 msgid "S"
 msgstr ""
@@ -10643,7 +10643,7 @@ msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:262 include/views/administration.script.list.php:27
-#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:180 report5.php:160
+#: include/views/js/monitoring.maps.js.php:14 jsLoader.php:179 report5.php:160
 #: scripts_exec.php:25
 msgid "Scripts"
 msgstr "Scriptek"
@@ -10705,7 +10705,7 @@ msgid "Seconds"
 msgstr "Másodpercek"
 
 #: events.php:358 include/forms.inc.php:489 include/forms.inc.php:507
-#: include/forms.inc.php:529 include/page_header.php:359
+#: include/forms.inc.php:529 include/page_header.php:358
 #: include/reports.inc.php:694
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
@@ -10754,7 +10754,7 @@ msgstr "Másodpercek"
 msgid "Select"
 msgstr "Kiválaszt"
 
-#: include/page_header.php:325
+#: include/page_header.php:324
 msgid "Select Nodes"
 msgstr "Csomópont kiválasztása"
 
@@ -10829,7 +10829,7 @@ msgid "Separated"
 msgstr ""
 
 #: include/forms.inc.php:1553 include/func.inc.php:112
-#: include/func.inc.php:243 jsLoader.php:123
+#: include/func.inc.php:243 jsLoader.php:122
 msgid "September"
 msgstr "Szeptember"
 
@@ -10928,7 +10928,7 @@ msgstr ""
 
 #: events.php:563 events.php:576 include/classes/screens/CScreenEvents.php:49
 #: include/classes/screens/CScreenHistory.php:166
-#: include/triggers.inc.php:1607 include/views/configuration.item.list.php:109
+#: include/triggers.inc.php:1605 include/views/configuration.item.list.php:109
 #: include/views/configuration.triggers.edit.php:245
 #: include/views/configuration.triggers.list.php:93
 #: include/views/configuration.triggers.massupdate.php:65 popup.php:979
@@ -10985,7 +10985,7 @@ msgstr ""
 msgid "Show events not older than (in days) \"%1$s\"."
 msgstr ""
 
-#: include/triggers.inc.php:1289
+#: include/triggers.inc.php:1287
 msgid "Show graph of item"
 msgstr "Elemhez tartozó grafikon megjelenítése"
 
@@ -11038,7 +11038,7 @@ msgstr ""
 msgid "Show value"
 msgstr "Érték megjelenítése"
 
-#: include/triggers.inc.php:1296
+#: include/triggers.inc.php:1294
 msgid "Show values of item"
 msgstr "Elemhez tartozó értékek megjelenítése"
 
@@ -11050,7 +11050,7 @@ msgstr ""
 msgid "Show working time"
 msgstr "Munkaidő megjelenítése"
 
-#: jsLoader.php:142 sysmap.php:158
+#: jsLoader.php:141 sysmap.php:158
 msgid "Shown"
 msgstr ""
 
@@ -11071,7 +11071,7 @@ msgstr "Egyszerű ellenőrzés"
 msgid "Simple graph"
 msgstr "Egyszerű grafikon"
 
-#: include/blocks.inc.php:1227 jsLoader.php:108
+#: include/blocks.inc.php:1227 jsLoader.php:107
 msgid "Simple graphs"
 msgstr "Egyszerű grafikonok"
 
@@ -11157,11 +11157,11 @@ msgstr "Bemutatók"
 msgid "Slides"
 msgstr "Bemutatók"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Slovak (sk_SK)"
 msgstr ""
 
-#: jsLoader.php:166
+#: jsLoader.php:165
 msgid "Snooze"
 msgstr ""
 
@@ -11210,7 +11210,7 @@ msgstr "Sorba rendezés (0->999)"
 msgid "Sort triggers by"
 msgstr ""
 
-#: include/db.inc.php:993
+#: include/db.inc.php:1003
 #, php-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr ""
@@ -11224,7 +11224,7 @@ msgstr ""
 msgid "Source"
 msgstr "Forrás"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Spanish (es_ES)"
 msgstr "Spanyol (es_ES)"
 
@@ -11442,7 +11442,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Vezetéknév"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Swedish (sv_SE)"
 msgstr "Svéd (sv_SE)"
 
@@ -11467,12 +11467,12 @@ msgctxt "Tera short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:130
+#: jsLoader.php:129
 msgctxt "Thursday short"
 msgid "T"
 msgstr "Cs"
 
-#: jsLoader.php:128
+#: jsLoader.php:127
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "K"
@@ -11665,7 +11665,7 @@ msgid "Test string"
 msgstr "Teszt szöveg"
 
 #: include/forms.inc.php:420 include/items.inc.php:124
-#: include/triggers.inc.php:2205 include/views/configuration.item.edit.php:219
+#: include/triggers.inc.php:2203 include/views/configuration.item.edit.php:219
 #: include/views/configuration.item.massupdate.php:162
 msgid "Text"
 msgstr "Szöveg"
@@ -11772,7 +11772,7 @@ msgstr "-ig"
 #: include/views/administration.auditlogs.list.php:85
 #: include/views/configuration.services.edit.php:278
 #: include/views/configuration.services.edit.php:279
-#: include/views/configuration.services.edit.php:307 jsLoader.php:136
+#: include/views/configuration.services.edit.php:307 jsLoader.php:135
 msgid "Time"
 msgstr "Idő"
 
@@ -11848,7 +11848,7 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:132
 #: include/views/js/configuration.sysmaps.js.php:75
 #: include/views/js/configuration.sysmaps.js.php:231
-#: include/views/monitoring.overview.php:76
+#: include/views/monitoring.overview.php:74
 msgid "Top"
 msgstr "Felül"
 
@@ -11882,15 +11882,15 @@ msgstr "Trendek"
 
 #: events.php:309 events.php:355 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/class.cchart.php:466
-#: include/maps.inc.php:26 include/triggers.inc.php:1265
-#: include/triggers.inc.php:1606
+#: include/maps.inc.php:26 include/triggers.inc.php:1263
+#: include/triggers.inc.php:1604
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:65
 #: include/views/configuration.services.edit.php:78
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:261
 #: include/views/js/configuration.sysmaps.js.php:17
-#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:145
+#: include/views/js/configuration.sysmaps.js.php:93 jsLoader.php:144
 #: report5.php:61 services.php:474 tr_comments.php:69 tr_logform.php:151
 #: tr_logform.php:164
 msgid "Trigger"
@@ -12039,7 +12039,7 @@ msgstr "Trigger érték"
 #: include/views/configuration.triggers.list.php:65
 #: include/views/conf.import.php:33
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/monitoring.overview.php:27 jsLoader.php:111 popup.php:61
+#: include/views/monitoring.overview.php:27 jsLoader.php:110 popup.php:61
 #: search.php:133 search.php:138 search.php:168 search.php:187 search.php:205
 #: search.php:260 search.php:312 search.php:370 search.php:397 search.php:420
 #: templates.php:460 templates.php:525 tr_status.php:178
@@ -12096,11 +12096,11 @@ msgstr ""
 msgid "Tuesday"
 msgstr "Kedd"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Turkish (tr_TR)"
 msgstr ""
 
-#: jsLoader.php:152
+#: jsLoader.php:151
 msgid "Two elements should be selected"
 msgstr ""
 
@@ -12233,7 +12233,7 @@ msgstr "FELHASZNÁLÓI PROFIL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrán (uk_UA)"
 
@@ -12301,9 +12301,8 @@ msgstr "Egységek"
 #: include/triggers.inc.php:62 include/triggers.inc.php:173
 #: include/triggers.inc.php:191 include/users.inc.php:50
 #: include/users.inc.php:65
-#: include/views/js/configuration.discovery.edit.js.php:141
-#: include/views/monitoring.overview.php:47 popup.php:575 popup.php:593
-#: report2.php:239
+#: include/views/js/configuration.discovery.edit.js.php:141 popup.php:575
+#: popup.php:593 report2.php:239
 msgid "Unknown"
 msgstr "Ismeretlen"
 
@@ -12319,11 +12318,11 @@ msgstr "Ismeretlen szolgáltatási státusz számítási algoritmus"
 msgid "Unknown function."
 msgstr ""
 
-#: include/triggers.inc.php:1739 tr_testexpr.php:35
+#: include/triggers.inc.php:1737 tr_testexpr.php:35
 msgid "Unknown host item, no such item in selected host"
 msgstr ""
 
-#: include/triggers.inc.php:1738 tr_testexpr.php:34
+#: include/triggers.inc.php:1736 tr_testexpr.php:34
 msgid "Unknown host, no such host present in system"
 msgstr ""
 
@@ -12339,7 +12338,7 @@ msgstr "Ismeretlen forrás"
 msgid "Unknown value type"
 msgstr "Ismeretlen érték típus"
 
-#: include/triggers.inc.php:1737 tr_testexpr.php:33
+#: include/triggers.inc.php:1735 tr_testexpr.php:33
 msgid "Unknown variable type, testing not available"
 msgstr ""
 
@@ -12401,7 +12400,7 @@ msgstr ""
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: jsLoader.php:163
+#: jsLoader.php:162
 msgid "Unmute"
 msgstr ""
 
@@ -12786,7 +12785,7 @@ msgstr "Az érték-hozzárendelés numerikus értékhez rendel szövegeset."
 msgid "Value: no data"
 msgstr "Érték: nincs adat"
 
-#: include/items.inc.php:793 include/triggers.inc.php:1323
+#: include/items.inc.php:793 include/triggers.inc.php:1321
 #: include/views/monitoring.history.php:62
 msgid "Values"
 msgstr "Értékek"
@@ -12820,7 +12819,7 @@ msgstr ""
 msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
-#: jsLoader.php:129
+#: jsLoader.php:128
 msgctxt "Wednesday short"
 msgid "W"
 msgstr ""
@@ -12914,7 +12913,7 @@ msgid_plural "Warning. Minimum time period to display is %1$s hours."
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:170
+#: jsLoader.php:169
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr ""
 
@@ -13209,7 +13208,7 @@ msgstr "Évi"
 #: events.php:756 include/blocks.inc.php:712
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
 #: include/events.inc.php:306 include/events.inc.php:324
-#: include/forms.inc.php:1922 include/triggers.inc.php:1610
+#: include/forms.inc.php:1922 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:74
 msgid "Yes"
 msgstr "Igen"
@@ -13426,7 +13425,7 @@ msgstr "ZABBIX trapper"
 msgid "Zetta"
 msgstr "Zeta"
 
-#: jsLoader.php:89
+#: jsLoader.php:88
 msgid "Zoom"
 msgstr ""
 
@@ -13498,12 +13497,12 @@ msgstr "Piros"
 msgid "avg"
 msgstr "átl"
 
-#: include/func.inc.php:472 jsLoader.php:96
+#: include/func.inc.php:472 jsLoader.php:95
 msgctxt "day short"
 msgid "d"
 msgstr "n"
 
-#: include/maintenances.inc.php:57 include/page_header.php:485
+#: include/maintenances.inc.php:57 include/page_header.php:484
 #: include/translateDefines.inc.php:42
 #: include/views/configuration.item.list.php:101 report3.php:134
 msgid "d M Y"
@@ -13568,7 +13567,7 @@ msgstr "nn"
 msgid "default"
 msgstr "alapértelmezett"
 
-#: jsLoader.php:91
+#: jsLoader.php:90
 msgid "dynamic"
 msgstr "dinamikus"
 
@@ -13598,7 +13597,7 @@ msgstr ""
 msgid "executed"
 msgstr "végrehajtva"
 
-#: jsLoader.php:90
+#: jsLoader.php:89
 msgid "fixed"
 msgstr "fix"
 
@@ -13606,7 +13605,7 @@ msgstr "fix"
 msgid "found"
 msgstr "talált"
 
-#: include/func.inc.php:480 jsLoader.php:97
+#: include/func.inc.php:480 jsLoader.php:96
 msgctxt "hour short"
 msgid "h"
 msgstr "ó"
@@ -13662,12 +13661,12 @@ msgctxt "Milli short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:488 jsLoader.php:98
+#: include/func.inc.php:488 jsLoader.php:97
 msgctxt "minute short"
 msgid "m"
 msgstr "p"
 
-#: include/func.inc.php:464 jsLoader.php:94
+#: include/func.inc.php:464 jsLoader.php:93
 msgctxt "month short"
 msgid "m"
 msgstr "h"
@@ -13771,7 +13770,7 @@ msgstr "nincs kiválasztva"
 msgid "not sent"
 msgstr "nincs elküldve"
 
-#: jsLoader.php:92
+#: jsLoader.php:91
 msgid "now"
 msgstr "most"
 
@@ -13879,7 +13878,7 @@ msgstr "ismeretlen"
 msgid "value"
 msgstr "érték"
 
-#: jsLoader.php:95
+#: jsLoader.php:94
 msgctxt "week short"
 msgid "w"
 msgstr "h"
@@ -13896,7 +13895,7 @@ msgstr "hét"
 msgid "whole number"
 msgstr ""
 
-#: include/func.inc.php:456 jsLoader.php:93
+#: include/func.inc.php:456 jsLoader.php:92
 msgctxt "year short"
 msgid "y"
 msgstr "é"
