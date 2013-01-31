@@ -418,21 +418,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_trigger                                               *
+ * Function: DBlld_trigger_exists                                             *
  *                                                                            *
- * Purpose: copy specified trigger to host                                    *
+ * Purpose: check if trigger exists either in triggers list or in the         *
+ *          database                                                          *
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
- *             parent_triggerid - trigger identificator from database         *
- *             description_proto - trigger description                        *
- *             expression - trigger expression                                *
- *             status - trigger status                                        *
- *             type - trigger type                                            *
- *             priority - trigger priority                                    *
- *             comments_esc - trigger comments                                *
- *             url_esc - trigger url                                          *
+ *             triggerid - trigger identificator (0 = new trigger)            *
+ *             description - trigger description                              *
+ *             full_expression - trigger expression                           *
+ *             triggers - list of already checked triggers                    *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value: SUCCEED if trigger exists otherwise FAIL                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -445,7 +442,7 @@ static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, con
 	zbx_vector_ptr_t	functions;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			i, res = FAIL;
+	int			i, ret = FAIL;
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -487,11 +484,11 @@ static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, con
 		DBlld_clean_trigger_functions(&functions);
 
 		if (0 == strcmp(full_expression, h_full_expression))
-			res = SUCCEED;
+			ret = SUCCEED;
 
 		zbx_free(h_full_expression);
 
-		if (SUCCEED == res)
+		if (SUCCEED == ret)
 			break;
 	}
 	DBfree_result(result);
@@ -500,9 +497,27 @@ static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, con
 	zbx_free(description_esc);
 	zbx_free(sql);
 
-	return res;
+	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_make_trigger                                               *
+ *                                                                            *
+ * Purpose: create a trigger based on lld rule and add it to the list         *
+ *                                                                            *
+ * Parameters: hostid - trigger host identificator                            *
+ *             parent_triggerid - trigger identificator from database         *
+ *             triggers - [OUT] list of triggers                              *
+ *             description_proto - trigger description                        *
+ *             expression - trigger expression                                *
+ *             jp_row - json record corresponding to the trigger              *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers,
 		const char *description_proto, const char *expression, struct zbx_json_parse *jp_row, char **error)
 {
@@ -515,7 +530,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	zbx_lld_trigger_t	*trigger;
 	zbx_lld_function_t	*function;
 	zbx_uint64_t		h_triggerid;
-	int			i, res = SUCCEED;
+	int			i, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -613,7 +628,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s trigger [%s]: trigger already exists\n",
 				0 != trigger->triggerid ? "update" : "create", trigger->description);
-		res = FAIL;
+		ret = FAIL;
 		goto out;
 	}
 
@@ -627,18 +642,18 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 
 			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & function->flags))
 			{
-				if (FAIL == (res = DBlld_get_item(hostid, function->key, NULL, &function->itemid)))
+				if (FAIL == (ret = DBlld_get_item(hostid, function->key, NULL, &function->itemid)))
 					break;
 			}
 		}
 	}
 
-	if (FAIL == res)
+	if (FAIL == ret)
 		goto out;
 
 	zbx_vector_ptr_append(triggers, trigger);
 out:
-	if (FAIL == res)
+	if (FAIL == ret)
 	{
 		DBlld_clean_trigger_functions(&trigger->functions);
 		zbx_vector_ptr_destroy(&trigger->functions);
@@ -652,11 +667,29 @@ out:
 	zbx_free(description_esc);
 	zbx_vector_ptr_destroy(&functions);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_save_triggers                                              *
+ *                                                                            *
+ * Purpose: add or update triggers in database based on discovery rule        *
+ *                                                                            *
+ * Parameters: triggers - list of triggers                                    *
+ *             status - trigger status                                        *
+ *             type - trigger type                                            *
+ *             priority - trigger priority                                    *
+ *             comments_esc - trigger comments                                *
+ *             url_esc - trigger url                                          *
+ *             parent_triggerid - trigger identificator from database         *
+ *             description_proto_esc - trigger description                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status, unsigned char type,
 		unsigned char priority, const char *comments_esc, const char *url_esc, zbx_uint64_t parent_triggerid,
 		const char *description_proto_esc)
@@ -895,12 +928,14 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 	DB_ROW			row;
 	zbx_vector_ptr_t	triggers;
 	zbx_vector_uint64_t	triggerids;
+	zbx_uint64_t		triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&triggers);
 	zbx_vector_uint64_create(&triggerids);
 
+	/* list of generated trigger IDs (for later deletion of obsoleted triggers) */
 	result = DBselect(
 			"select distinct td.triggerid"
 			" from trigger_discovery td,triggers t,functions f,items i,item_discovery id"
@@ -913,10 +948,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	triggerid;
-
 		ZBX_STR2UINT64(triggerid, row[0]);
-
 		zbx_vector_uint64_append(&triggerids, triggerid);
 	}
 	DBfree_result(result);
@@ -931,6 +963,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 				" and id.parent_itemid=" ZBX_FS_UI64,
 			discovery_itemid);
 
+	/* run through trigger prototypes */
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	parent_triggerid;
@@ -1001,12 +1034,16 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_item                                                  *
+ * Function: DBlld_item_exists                                                *
  *                                                                            *
- * Parameters: parent_itemid - discovery rule identificator from database     *
+ * Purpose: check if item exists either in triggers list or in the database   *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             itemid - item identificator from database                      *
  *             key - new key descriptor with substituted macros               *
+ *             items - list of already checked items                          *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value: SUCCEED if item exists otherwise FAIL                        *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *

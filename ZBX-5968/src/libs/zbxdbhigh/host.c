@@ -1072,7 +1072,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 	DB_RESULT	result;
 	DB_ROW		row;
 
-/* disable actions */
+	/* disable actions */
 	result = DBselect("select distinct actionid from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
 			conditiontype, elementid);
 
@@ -1081,7 +1081,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 	DBfree_result(result);
 
-/* delete action conditions */
+	/* delete action conditions */
 	DBexecute("delete from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
 			conditiontype, elementid);
 }
@@ -1109,7 +1109,8 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	do /* add child triggers (auto-created) */
+	/* add child triggers (auto-created) */
+	do
 	{
 		num = triggerids->values_num;
 		sql_offset = 0;
