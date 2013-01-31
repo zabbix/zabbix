@@ -40,6 +40,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-5973] improved performance of SNMP dynamic index item cache building in poller processes (Andris, Sasha)
+..F....... [ZBX-6169] fixed colors in "server info" and "host info" screen items for dark orange/blue themes (Eduard)
 ..F....... [ZBX-6172] removed unknown trigger status code from maps (Eduard)
 A......... [ZBX-6126] implemented empty parameter validation in user.delete (Pavels)
 ..F....... [ZBX-6160] changed the frontend to use temporary Oracle connections instead of persistent (Pavels)
@@ -113,6 +115,9 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+...G...... [ZBX-5863] changed external command execution to store output in a dynamically allocated buffer up to 512KB (wiper)
+..F....... [ZBX-6177] fixed testing of a trigger expression with an item prototype (Sasha)
+..F....... [ZBX-6175] fixed password field naming in Items (Oleg)
 A.F....... [ZBX-6005] fixed event.get not returning network discovery or auto-registration events for admin users when passing only the "source" parameter (Pavels)
 ..F....... [ZBX-6173] removed unknown trigger color from the trigger overview help pop up (Pavels)
 ...G...... [ZBX-6161] fixed reading empty files with vfs.file.contents key (wiper)
