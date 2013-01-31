@@ -4,7 +4,7 @@ New features:
 A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
 A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
 A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete method to accept both objects and IDs (Pavels)
-...G...... [ZBXNEXT-1334] added whitespace trimming for server lists in agent conf file (wiper)
+...G...PS. [ZBXNEXT-1334] added whitespace trimming for server lists in agent conf file and allowed hosts for trapper items (wiper)
 A.F....... [ZBXNEXT-1491] fixed builded query ordering (Eduard)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
 ....I..... [ZBX-6038] added zfs to the default list of filesystems discovered by LLD based templates (Alexei)
