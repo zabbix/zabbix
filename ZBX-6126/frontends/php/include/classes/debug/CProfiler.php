@@ -286,6 +286,8 @@ class CProfiler {
 
 		$callStack = array_reverse($callStack);
 
+		$firstCall = reset($callStack);
+
 		$callWithFile = array();
 		foreach ($callStack as $call) {
 			// do not show the call to the error handler function
@@ -305,9 +307,19 @@ class CProfiler {
 				$callWithFile = $call;
 			}
 		}
-		$callStackString = rtrim($callStackString, '&rarr; ');
+
+		if ($callStackString) {
+			$path = pathinfo($firstCall['file']);
+			$firstCall['file'] = $path['basename'];
+			$callStackString = $firstCall['file'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
+		}
+
+		$path = pathinfo($callWithFile['file']);
+		$callWithFile['file'] = $path['basename'];
 		$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
 
 		return $callStackString;
 	}
+
 }
+
