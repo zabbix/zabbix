@@ -831,7 +831,7 @@ class CMacrosResolver {
 		foreach ($matches['position'] as $i => $position) {
 
 			// take care of macro without positional index
-			$posInItemList = ($position === '') ? 0 : $posInItemList = $position - 1;
+			$posInItemList = ($position === '') ? 0 : $position - 1;
 
 			// init array
 			if (!isset($macroList[$matches['macroType'][$i]])) {
