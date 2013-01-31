@@ -310,12 +310,9 @@ class CProfiler {
 
 		if ($callStackString) {
 			$path = pathinfo($firstCall['file']);
-			$firstCall['file'] = $path['basename'];
-			$callStackString = $firstCall['file'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
+			$callStackString = $path['basename'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
 		}
 
-		$path = pathinfo($callWithFile['file']);
-		$callWithFile['file'] = $path['basename'];
 		$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
 
 		return $callStackString;
