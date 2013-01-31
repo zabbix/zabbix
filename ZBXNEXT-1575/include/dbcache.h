@@ -106,7 +106,7 @@ typedef struct
 	int		delay;
 	int		nextcheck;
 	int		lastclock;
-	unsigned char	status;
+	unsigned char	state;
 	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
 	char		snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
@@ -176,7 +176,7 @@ typedef struct
 zbx_host_key_t;
 
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
-		zbx_timespec_t *ts, unsigned char status, const char *error, int timestamp, const char *source,
+		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime);
 void	dc_flush_history();
 int	DCsync_history(int sync_type);
@@ -243,7 +243,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 void	*DCconfig_get_config_data(void *data, int type);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastclocks, int *errcodes, size_t num);
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *errcodes, size_t num);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 

@@ -458,9 +458,11 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 				" and f.itemid=i.itemid"
 				" and t.status=%d"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and i.hostid=" ZBX_FS_UI64,
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL,
 			hostid);
 
 	while (NULL != (row = DBfetch(result)))

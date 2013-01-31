@@ -132,8 +132,9 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 				" and hg.groupid=g.groupid"
 				" and i.key_='%s'"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and h.status=%d",
-			esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED);
+			esc, ITEM_STATUS_ACTIVE, ITEM_STATE_NORMAL, HOST_STATUS_MONITORED);
 
 	zbx_free(esc);
 

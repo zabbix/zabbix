@@ -75,9 +75,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 	if (NOTSUPPORTED == ping_result)
 	{
-		item.status = ITEM_STATUS_NOTSUPPORTED;
+		item.state = ITEM_STATE_NOTSUPPORTED;
 		dc_add_history(item.itemid, item.value_type, item.flags, NULL, ts,
-				item.status, error, 0, NULL, 0, 0, 0, 0);
+				item.state, error, 0, NULL, 0, 0, 0, 0);
 	}
 	else
 	{
@@ -88,14 +88,14 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		else
 			SET_DBL_RESULT(&value, *value_dbl);
 
-		item.status = ITEM_STATUS_ACTIVE;
+		item.state = ITEM_STATE_NORMAL;
 		dc_add_history(item.itemid, item.value_type, item.flags, &value, ts,
-				item.status, NULL, 0, NULL, 0, 0, 0, 0);
+				item.state, NULL, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&value);
 	}
 
-	DCrequeue_items(&item.itemid, &item.status, &ts->sec, &errcode, 1);
+	DCrequeue_items(&item.itemid, &item.state, &ts->sec, &errcode, 1);
 clean:
 	DCconfig_clean_items(&item, &errcode, 1);
 
@@ -409,11 +409,11 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 			zbx_timespec(&ts);
 
-			items[i].status = ITEM_STATUS_NOTSUPPORTED;
+			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
-					items[i].status, error, 0, NULL, 0, 0, 0, 0);
+					items[i].state, error, 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_items(&items[i].itemid, &items[i].status, &ts.sec, &errcode, 1);
+			DCrequeue_items(&items[i].itemid, &items[i].state, &ts.sec, &errcode, 1);
 		}
 
 		zbx_free(items[i].key);

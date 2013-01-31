@@ -85,7 +85,7 @@ typedef struct
 	unsigned char		data_type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
-	unsigned char		status;
+	unsigned char		state;
 	unsigned char		location;
 	unsigned char		flags;
 }
@@ -427,7 +427,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 {
 	int	nextcheck;
 
-	if (ITEM_STATUS_NOTSUPPORTED == item->status)
+	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
 		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 				config->config->refresh_unsupported, NULL, now, NULL);
@@ -719,7 +719,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
 
 	time_t			now;
-	unsigned char		status, old_poller_type;
+	unsigned char		state, old_poller_type;
 	int			delay, found;
 	int			update_index, old_nextcheck;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
@@ -748,7 +748,7 @@ static void	DCsync_items(DB_RESULT result)
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
 		delay = atoi(row[15]);
-		status = (unsigned char)atoi(row[20]);
+		state = (unsigned char)atoi(row[20]);
 
 		/* array of selected items */
 		zbx_vector_uint64_append(&ids, itemid);
@@ -837,7 +837,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->poller_type = ZBX_NO_POLLER;
 			old_nextcheck = 0;
 
-			if (ITEM_STATUS_NOTSUPPORTED == status)
+			if (ITEM_STATE_NOTSUPPORTED == state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, config->config->refresh_unsupported, NULL, now, NULL);
@@ -852,19 +852,19 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			old_nextcheck = item->nextcheck;
 
-			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
+			if (ITEM_STATE_NORMAL == state && (state != item->state || delay != item->delay))
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, delay, row[16], now, NULL);
 			}
-			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
+			else if (ITEM_STATE_NOTSUPPORTED == state && state != item->state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, config->config->refresh_unsupported, NULL, now, NULL);
 			}
 		}
 
-		item->status = status;
+		item->state = state;
 		item->delay = delay;
 
 		old_poller_type = item->poller_type;
@@ -928,7 +928,7 @@ static void	DCsync_items(DB_RESULT result)
 			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
 
 			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
-					ITEM_STATUS_NOTSUPPORTED != item->status)
+					ITEM_STATE_NOTSUPPORTED != item->state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 						item->delay, flexitem->delay_flex, now, NULL);
@@ -941,7 +941,7 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(flexitem->delay_flex);
 			zbx_hashset_remove(&config->flexitems, &itemid);
 
-			if (ITEM_STATUS_NOTSUPPORTED != item->status)
+			if (ITEM_STATE_NOTSUPPORTED != item->state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 						item->delay, NULL, now, NULL);
@@ -2303,15 +2303,15 @@ void	DCsync_configuration()
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,"
 				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
-				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
+				"i.state,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
 				"i.flags,i.interfaceid,i.lastclock,i.snmpv3_authprotocol,i.snmpv3_privprotocol"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
-				" and h.status in (%d)"
-				" and i.status in (%d,%d)"
+				" and h.status=%d"
+				" and i.status=%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+			ITEM_STATUS_ACTIVE,
 			DBand_node_local("i.itemid"));
 	isec = zbx_time() - sec;
 
@@ -2323,13 +2323,13 @@ void	DCsync_configuration()
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
-				" and h.status in (%d)"
-				" and i.status in (%d,%d)"
-				" and t.status in (%d)"
-				" and t.flags not in (%d)"
+				" and h.status=%d"
+				" and i.status=%d"
+				" and t.status=%d"
+				" and t.flags<>%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+			ITEM_STATUS_ACTIVE,
 			TRIGGER_STATUS_ENABLED,
 			ZBX_FLAG_DISCOVERY_CHILD,
 			DBand_node_local("h.hostid"));
@@ -2351,13 +2351,13 @@ void	DCsync_configuration()
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
-				" and h.status in (%d)"
-				" and i.status in (%d,%d)"
-				" and t.status in (%d)"
-				" and t.flags not in (%d)"
+				" and h.status=%d"
+				" and i.status=%d"
+				" and t.status=%d"
+				" and t.flags<>%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+			ITEM_STATUS_ACTIVE,
 			TRIGGER_STATUS_ENABLED,
 			ZBX_FLAG_DISCOVERY_CHILD,
 			DBand_node_local("h.hostid"));
@@ -3113,7 +3113,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->key = NULL;
 	dst_item->delay = src_item->delay;
 	dst_item->nextcheck = src_item->nextcheck;
-	dst_item->status = src_item->status;
+	dst_item->state = src_item->state;
 	dst_item->lastclock = src_item->lastclock;
 	dst_item->flags = src_item->flags;
 
@@ -3743,7 +3743,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 		zbx_binary_heap_remove_min(queue);
 		dc_item->location = ZBX_LOC_NOWHERE;
 
-		if (0 == config->config->refresh_unsupported && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
+		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -3905,7 +3905,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &dc_interface_snmpitem->itemids.values[i])))
 			continue;
 
-		if (0 == config->config->refresh_unsupported && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
+		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
 			continue;
 
 		if (items_num == items_alloc)
@@ -4050,7 +4050,7 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastclocks, int *errcodes, size_t num)
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -4065,7 +4065,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastcl
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
 			continue;
 
-		dc_item->status = statuses[i];
+		dc_item->state = states[i];
 		dc_item->lastclock = lastclocks[i];
 
 		if (ZBX_NO_POLLER == dc_item->poller_type)
