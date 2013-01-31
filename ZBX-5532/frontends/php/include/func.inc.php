@@ -155,7 +155,13 @@ function dowHrMinToStr($value, $display24Hours = false) {
 	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
 }
 
-// convert old date format to new
+/**
+ * Convert 1.8 service time format (unixtime) to 2.0 format (seconds starting from Sunday).
+ *
+ * @param int $time
+ *
+ * @return int
+ */
 function prepareServiceTime($time) {
 	return ($time > SEC_PER_WEEK * 2)
 		? date('w', $time) * SEC_PER_DAY + (mktime(null, null, null, date('n', $time), date('j', $time), date('Y', $time)) - $time)
