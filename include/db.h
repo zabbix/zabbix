@@ -197,7 +197,7 @@ zbx_graph_item_type;
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
 				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
-				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
+				"i.lastclock,i.units,i.multiplier,i.formula,i.state,"		\
 				"i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
 #define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
@@ -335,7 +335,7 @@ typedef struct
 	char			*h_lasteventid;
 	char			*h_lastsource;
 	char			*h_lastseverity;
-	unsigned char		status;
+	unsigned char		state;
 }
 DB_ITEM;
 

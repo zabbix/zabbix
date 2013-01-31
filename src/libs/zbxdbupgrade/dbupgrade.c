@@ -850,7 +850,8 @@ static int	DBpatch_02010040()
 			"update items"
 			" set state=%d,"
 				"status=%d"
-			" where status=%d", ITEM_STATE_NOTSUPPORTED, ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED))
+			" where status=%d",
+			ITEM_STATE_NOTSUPPORTED, ITEM_STATUS_ACTIVE, 3 /*ITEM_STATUS_NOTSUPPORTED*/))
 		return SUCCEED;
 
 	return FAIL;

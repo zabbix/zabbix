@@ -92,7 +92,7 @@ typedef struct
 	unsigned char	value_null;
 	unsigned char	keep_history;
 	unsigned char	keep_trends;
-	unsigned char	status;
+	unsigned char	state;
 }
 ZBX_DC_HISTORY;
 
@@ -893,7 +893,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update items set lastclock=%d,lastns=%d",
 			h->clock, h->ns);
 
-	if (ITEM_STATUS_NOTSUPPORTED == h->status)
+	if (ITEM_STATE_NOTSUPPORTED == h->state)
 		goto notsupported;
 
 	switch (h->value_type)
@@ -912,7 +912,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 
 					if (SUCCEED != DBchk_double(h->value.dbl))
 					{
-						h->status = ITEM_STATUS_NOTSUPPORTED;
+						h->state = ITEM_STATE_NOTSUPPORTED;
 						h->value_null = 1;
 					}
 					break;
@@ -928,14 +928,14 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 
 						if (SUCCEED != DBchk_double(h->value.dbl))
 						{
-							h->status = ITEM_STATUS_NOTSUPPORTED;
+							h->state = ITEM_STATE_NOTSUPPORTED;
 							h->value_null = 1;
 						}
 					}
 					else
 						h->value_null = 1;
 
-					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					if (ITEM_STATE_NOTSUPPORTED != h->state)
 					{
 						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
@@ -950,14 +950,14 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 
 						if (SUCCEED != DBchk_double(h->value.dbl))
 						{
-							h->status = ITEM_STATUS_NOTSUPPORTED;
+							h->state = ITEM_STATE_NOTSUPPORTED;
 							h->value_null = 1;
 						}
 					}
 					else
 						h->value_null = 1;
 
-					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					if (ITEM_STATE_NOTSUPPORTED != h->state)
 					{
 						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
@@ -973,7 +973,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 						h->value.dbl);
 			}
 
-			if (ITEM_STATUS_NOTSUPPORTED == h->status)
+			if (ITEM_STATE_NOTSUPPORTED == h->state)
 			{
 				int	errcode = SUCCEED;
 
@@ -981,7 +981,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 						h->value.dbl, zbx_item_value_type_string(h->value_type));
 
-				DCrequeue_items(&h->itemid, &h->status, &h->clock, &errcode, 1);
+				DCrequeue_items(&h->itemid, &h->state, &h->clock, &errcode, 1);
 			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
@@ -1048,14 +1048,14 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			break;
 	}
 notsupported:
-	if (ITEM_STATUS_NOTSUPPORTED == h->status)
+	if (ITEM_STATE_NOTSUPPORTED == h->state)
 	{
-		if (ITEM_STATUS_NOTSUPPORTED != item->status)
+		if (ITEM_STATE_NOTSUPPORTED != item->state)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became not supported: %s",
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",status=%d", (int)h->status);
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",state=%d", (int)h->state);
 		}
 
 		if (0 == item->prevorgvalue_null)
@@ -1076,11 +1076,11 @@ notsupported:
 	}
 	else
 	{
-		if (ITEM_STATUS_NOTSUPPORTED == item->status)
+		if (ITEM_STATE_NOTSUPPORTED == item->state)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became supported", zbx_host_key_string(item->itemid));
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",status=%d,error=''", (int)h->status);
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",state=%d,error=''", (int)h->state);
 		}
 	}
 
@@ -1162,15 +1162,15 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,i.status,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
+			"select i.itemid,i.state,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
 				"i.history,i.trends,i.lastns,i.hostid,i.inventory_link,hi.inventory_mode,i.valuemapid,"
 				"i.units,i.error"
 			" from items i"
 				" left join host_inventory hi"
 					" on hi.hostid=i.hostid"
-			" where status in (%d,%d)"
+			" where status=%d"
 				" and",
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED);
+			ITEM_STATUS_ACTIVE);
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids.values, ids.values_num);
 
@@ -1203,7 +1203,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (NULL == h)
 			continue;
 
-		item.status = (unsigned char)atoi(row[1]);
+		item.state = (unsigned char)atoi(row[1]);
 		if (SUCCEED != DBis_null(row[2]))
 			item.lastclock = atoi(row[2]);
 		else
@@ -1824,7 +1824,7 @@ static void	dc_add_proxy_history_sql(ZBX_DC_HISTORY *history, int history_num, s
 			continue;
 		}
 
-		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -1881,7 +1881,7 @@ static void	dc_add_proxy_history_text_sql(ZBX_DC_HISTORY *history, int history_n
 		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
 			continue;
 
-		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
 		DBbind_parameter(1, &history[i].itemid, ZBX_TYPE_ID);
@@ -1908,7 +1908,7 @@ static void	dc_add_proxy_history_text_sql(ZBX_DC_HISTORY *history, int history_n
 		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
 			continue;
 
-		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -1951,7 +1951,7 @@ static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_nu
 		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
-		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
 		DBbind_parameter(1, &history[i].itemid, ZBX_TYPE_ID);
@@ -1985,7 +1985,7 @@ static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_nu
 		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
-		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -2018,7 +2018,7 @@ static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_nu
 static void	dc_add_proxy_history_notsupported_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
 {
 	int		i;
-	const char	*ins_proxy_history_sql = "insert into proxy_history (itemid,clock,ns,value,status) values ";
+	const char	*ins_proxy_history_sql = "insert into proxy_history (itemid,clock,ns,value,state) values ";
 	char		*value_esc;
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -2027,7 +2027,7 @@ static void	dc_add_proxy_history_notsupported_sql(ZBX_DC_HISTORY *history, int h
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_STATUS_NOTSUPPORTED != history[i].status)
+		if (ITEM_STATE_NOTSUPPORTED != history[i].state)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -2035,7 +2035,7 @@ static void	dc_add_proxy_history_notsupported_sql(ZBX_DC_HISTORY *history, int h
 #endif
 		value_esc = DBdyn_escape_string(history[i].value_orig.err);
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "(" ZBX_FS_UI64 ",%d,%d,'%s',%d)" ZBX_ROW_DL,
-				history[i].itemid, history[i].clock, history[i].ns, value_esc, (int)history[i].status);
+				history[i].itemid, history[i].clock, history[i].ns, value_esc, (int)history[i].state);
 		zbx_free(value_esc);
 	}
 
@@ -2067,7 +2067,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 		{
 			notsupported_num++;
 			continue;
@@ -2241,7 +2241,7 @@ int	DCsync_history(int sync_type)
 
 			memcpy(&history[history_num], &cache->history[f], sizeof(ZBX_DC_HISTORY));
 
-			if (ITEM_STATUS_NOTSUPPORTED == history[history_num].status)
+			if (ITEM_STATE_NOTSUPPORTED == history[history_num].state)
 			{
 				history[history_num].value_orig.err =
 						zbx_strdup(NULL, cache->history[f].value_orig.err);
@@ -2339,7 +2339,7 @@ int	DCsync_history(int sync_type)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+			if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			{
 				zbx_free(history[i].value_orig.err);
 			}
@@ -2488,7 +2488,7 @@ static void	DCvacuum_text()
 		if (ZBX_HISTORY_SIZE == f)
 			f = 0;
 
-		if (ITEM_STATUS_NOTSUPPORTED == cache->history[f].status)
+		if (ITEM_STATE_NOTSUPPORTED == cache->history[f].state)
 		{
 			DCmove_text(&cache->history[f].value_orig.err);
 			continue;
@@ -2632,7 +2632,7 @@ typedef struct
 	int		logeventid;	/* for log items only */
 	int		mtime;		/* for log items only */
 	unsigned char	value_type;
-	unsigned char	status;
+	unsigned char	state;
 	unsigned char	flags;
 }
 dc_item_value_t;
@@ -2664,7 +2664,7 @@ static void	DCadd_history_dbl(dc_item_value_t *value)
 	history->itemid = value->itemid;
 	history->clock = value->ts.sec;
 	history->ns = value->ts.ns;
-	history->status = ITEM_STATUS_ACTIVE;
+	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_FLOAT;
 	history->value_orig.dbl = value->value.value_dbl;
 	history->value.dbl = 0;
@@ -2685,7 +2685,7 @@ static void	DCadd_history_uint(dc_item_value_t *value)
 	history->itemid = value->itemid;
 	history->clock = value->ts.sec;
 	history->ns = value->ts.ns;
-	history->status = ITEM_STATUS_ACTIVE;
+	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_UINT64;
 	history->value_orig.ui64 = value->value.value_uint;
 	history->value.ui64 = 0;
@@ -2706,7 +2706,7 @@ static void	DCadd_history_str(dc_item_value_t *value)
 	history->itemid = value->itemid;
 	history->clock = value->ts.sec;
 	history->ns = value->ts.ns;
-	history->status = ITEM_STATUS_ACTIVE;
+	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_STR;
 	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
@@ -2726,7 +2726,7 @@ static void	DCadd_history_text(dc_item_value_t *value)
 	history->itemid = value->itemid;
 	history->clock = value->ts.sec;
 	history->ns = value->ts.ns;
-	history->status = ITEM_STATUS_ACTIVE;
+	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_TEXT;
 	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
@@ -2747,7 +2747,7 @@ static void	DCadd_history_lld(dc_item_value_t *value)
 	history->itemid = value->itemid;
 	history->clock = value->ts.sec;
 	history->ns = value->ts.ns;
-	history->status = ITEM_STATUS_ACTIVE;
+	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_TEXT;
 	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
@@ -2767,7 +2767,7 @@ static void	DCadd_history_log(dc_item_value_t *value)
 	history->itemid = value->itemid;
 	history->clock = value->ts.sec;
 	history->ns = value->ts.ns;
-	history->status = ITEM_STATUS_ACTIVE;
+	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_LOG;
 	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 0;
@@ -2798,7 +2798,7 @@ static void	DCadd_history_notsupported(dc_item_value_t *value)
 	history->itemid = value->itemid;
 	history->clock = value->ts.sec;
 	history->ns = value->ts.ns;
-	history->status = ITEM_STATUS_NOTSUPPORTED;
+	history->state = ITEM_STATE_NOTSUPPORTED;
 	DCadd_text(&history->value_orig.err, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	history->value_null = 1;
 
@@ -2837,7 +2837,7 @@ static void	dc_local_add_history_dbl(zbx_uint64_t itemid, zbx_timespec_t *ts, do
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_FLOAT;
-	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
 	item_value->value.value_dbl = value_orig;
 }
@@ -2851,7 +2851,7 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, zbx_timespec_t *ts, z
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_UINT64;
-	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
 	item_value->value.value_uint = value_orig;
 }
@@ -2865,7 +2865,7 @@ static void	dc_local_add_history_str(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_STR;
-	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
 	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
 
@@ -2884,7 +2884,7 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, zbx_timespec_t *ts, c
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_TEXT;
-	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
 	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
 
@@ -2904,7 +2904,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_LOG;
-	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
 	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
 	item_value->timestamp = timestamp;
@@ -2937,7 +2937,7 @@ static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, zbx_timespec_
 
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
-	item_value->status = ITEM_STATUS_NOTSUPPORTED;
+	item_value->state = ITEM_STATE_NOTSUPPORTED;
 	item_value->value.value_str.len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
@@ -2954,7 +2954,7 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
-	item_value->status = ITEM_STATUS_ACTIVE;
+	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = ZBX_FLAG_DISCOVERY;
 	item_value->value.value_str.len = strlen(value_orig) + 1;
 
@@ -2974,10 +2974,10 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, co
  *                                                                            *
  ******************************************************************************/
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
-		AGENT_RESULT *value, zbx_timespec_t *ts, unsigned char status, const char *error,
+		AGENT_RESULT *value, zbx_timespec_t *ts, unsigned char state, const char *error,
 		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
 {
-	if (ITEM_STATUS_NOTSUPPORTED == status)
+	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		dc_local_add_history_notsupported(itemid, ts, error);
 		return;
@@ -3043,7 +3043,7 @@ void	dc_flush_history()
 	{
 		item_value = &item_values[i];
 
-		if (ITEM_STATUS_NOTSUPPORTED == item_value->status)
+		if (ITEM_STATE_NOTSUPPORTED == item_value->state)
 		{
 			DCadd_history_notsupported(item_value);
 		}

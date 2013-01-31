@@ -2198,7 +2198,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	zbx_uint64_t		hostid = 0;
 	struct zbx_json_parse	jp, jp_data;
 	char			*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL, *error_esc;
-	unsigned char		status = 0;
+	unsigned char		state = 0;
 	unsigned short		lifetime;
 	char			*f_macro = NULL, *f_regexp = NULL;
 	ZBX_REGEXP		*regexps = NULL;
@@ -2213,7 +2213,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set lastclock=%d,lastns=%d", ts->sec, ts->ns);
 
 	result = DBselect(
-			"select hostid,key_,status,filter,error,lifetime"
+			"select hostid,key_,state,filter,error,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			discovery_itemid);
@@ -2224,7 +2224,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
-		status = (unsigned char)atoi(row[2]);
+		state = (unsigned char)atoi(row[2]);
 		filter = zbx_strdup(filter, row[3]);
 		db_error = zbx_strdup(db_error, row[4]);
 
@@ -2306,12 +2306,12 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	clean_regexps_ex(regexps, &regexps_num);
 	zbx_free(regexps);
 
-	if (ITEM_STATUS_NOTSUPPORTED == status)
+	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ITEM_STATUS_ACTIVE);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",state=%d", ITEM_STATE_NORMAL);
 	}
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))

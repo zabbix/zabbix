@@ -730,7 +730,12 @@ int	DBget_items_unsupported_count()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
+	result = DBselect(
+			"select count(*)"
+			" from items"
+			" where status=%d"
+				" and state=%d",
+			ITEM_STATUS_ACTIVE, ITEM_STATE_NOTSUPPORTED);
 
 	if (NULL != (row = DBfetch(result)))
 		count = atoi(row[0]);
@@ -762,6 +767,7 @@ int	DBget_queue_count(int from, int to)
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and i.value_type not in (%d)"
 				" and ("
 					"i.lastclock is not null"
@@ -778,6 +784,7 @@ int	DBget_queue_count(int from, int to)
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL,
 			ITEM_VALUE_TYPE_LOG,
 			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
@@ -832,10 +839,14 @@ double	DBget_requiredperformance()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* !!! Don't forget to sync the code with PHP !!! */
-	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
-			" where h.hostid=i.hostid and h.status=%d and i.status=%d and i.delay<>0",
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE);
+	result = DBselect(
+			"select sum(1.0/i.delay)"
+			" from hosts h,items i"
+			" where h.hostid=i.hostid"
+				" and h.status=%d"
+				" and i.status=%d"
+				" and i.delay<>0",
+			HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE);
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		qps_total = atof(row[0]);
 	DBfree_result(result);
@@ -1226,7 +1237,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->units = row[12];
 	item->multiplier = atoi(row[13]);
 	item->formula = row[14];
-	item->status = (unsigned char)atoi(row[15]);
+	item->state = (unsigned char)atoi(row[15]);
 	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
 
 	item->data_type = atoi(row[18]);

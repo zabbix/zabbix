@@ -2856,7 +2856,7 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
 	zbx_uint64_t	*itemids = NULL;
-	unsigned char	host_status;
+	unsigned char	host_status, item_status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
@@ -2867,7 +2867,7 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select %s,h.status"
+			"select %s,h.status,i.status"
 			" from %s"
 			" where i.hostid=h.hostid"
 				" and",
@@ -2885,6 +2885,7 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 		DBget_item_from_db(&item, row);
 
 		host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM]);
+		item_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM + 1]);
 
 		if (FAIL == (i = zbx_vector_ptr_bsearch(ifuncs, &item.itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2898,12 +2899,12 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 		{
 			func = (zbx_func_t *)ifunc->functions.values[i];
 
-			if (ITEM_STATUS_DISABLED == item.status)
+			if (ITEM_STATUS_DISABLED == item_status)
 			{
 				func->error = zbx_dsprintf(func->error, "Item disabled for function: {%s:%s.%s(%s)}",
 						item.host_name, item.key, func->function, func->parameter);
 			}
-			else if (ITEM_STATUS_NOTSUPPORTED == item.status)
+			else if (ITEM_STATE_NOTSUPPORTED == item.state)
 			{
 				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
 						item.host_name, item.key, func->function, func->parameter);

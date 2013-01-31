@@ -78,7 +78,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	size_t		num, i;
 	int		ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, timestamp;
 	zbx_uint64_t	*itemids = NULL;
-	unsigned char	*statuses = NULL;
+	unsigned char	*states = NULL;
 	AGENT_RESULT	*results = NULL;
 	ZBX_REGEXP	*regexps = NULL;
 	int		regexps_alloc = 0, regexps_num = 0;
@@ -86,7 +86,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
-	statuses = zbx_malloc(statuses, sizeof(unsigned char) * num);
+	states = zbx_malloc(states, sizeof(unsigned char) * num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * num);
 	results = zbx_malloc(results, sizeof(AGENT_RESULT) * num);
@@ -179,21 +179,21 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
 					calc_timestamp(trap, &timestamp, items[i].logtimefmt);
 
-				items[i].status = ITEM_STATUS_ACTIVE;
+				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-						ts, items[i].status, NULL, timestamp, NULL, 0, 0, 0, 0);
+						ts, items[i].state, NULL, timestamp, NULL, 0, 0, 0, 0);
 
 				itemids[i] = items[i].itemid;
-				statuses[i] = items[i].status;
+				states[i] = items[i].state;
 				lastclocks[i] = ts->sec;
 				break;
 			case NOTSUPPORTED:
-				items[i].status = ITEM_STATUS_NOTSUPPORTED;
+				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						ts, items[i].status, results[i].msg, 0, NULL, 0, 0, 0, 0);
+						ts, items[i].state, results[i].msg, 0, NULL, 0, 0, 0, 0);
 
 				itemids[i] = items[i].itemid;
-				statuses[i] = items[i].status;
+				states[i] = items[i].state;
 				lastclocks[i] = ts->sec;
 				break;
 		}
@@ -204,11 +204,11 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	zbx_free(results);
 
-	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, errcodes, num);
 
 	zbx_free(errcodes);
 	zbx_free(lastclocks);
-	zbx_free(statuses);
+	zbx_free(states);
 	zbx_free(itemids);
 
 	DCconfig_clean_items(items, NULL, num);
