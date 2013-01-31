@@ -2,15 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-31 22:49+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"POT-Creation-Date: 2013-01-31 22:51+0200\n"
+"PO-Revision-Date: 2013-01-27 08:54+0200\n"
+"Last-Translator: Niklas <niklas@gyori.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.1.6\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
@@ -32,8 +33,8 @@ msgstr ""
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d dag,"
+msgstr[1] "%1$d dagar,"
 
 #: httpmon.php:295 include/views/configuration.httpconf.list.php:116
 #, php-format

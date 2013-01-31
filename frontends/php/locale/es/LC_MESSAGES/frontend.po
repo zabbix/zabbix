@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-31 22:49+0200\n"
-"PO-Revision-Date: 2012-08-06 09:58+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2013-01-31 22:51+0200\n"
+"PO-Revision-Date: 2013-01-29 23:29+0200\n"
+"Last-Translator: saulortega <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -185,19 +185,19 @@ msgstr "INFORME DE DISPONIBILIDAD"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Diferencia absoluta entre el último y el penúltimo valor es < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Diferencia absoluta entre el último y el penúltimo valor = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Diferencia absoluta entre el último y el penúltimo valor es > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Diferencia absoluta entre el último y el penúltimo valor NO es N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
@@ -786,19 +786,19 @@ msgstr "Media por"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "El valor promedio durante el intervalo T es < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "El valor promedio durante el intervalo T es = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "El valor promedio durante el intervalo T es > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "El valor promedio durante el intervalo T NO es N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -878,7 +878,7 @@ msgstr "Aclarar"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Búlgaro (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -1139,7 +1139,7 @@ msgstr "No se puede añadir dependencia desde un equipo a una plantilla"
 #: include/triggers.inc.php:501
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "No se ha podido añadir dependencia para el disparador \"%1$s:%2$s\" porque no existe el disparador \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1302,11 +1302,11 @@ msgstr "No se puede crear otra conexión a base de datos"
 
 #: api/classes/CTrigger.php:1834
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "No se permite crear dependencias circulares."
 
 #: api/classes/CTrigger.php:1806
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "No se ha podido crear dependencia en el propio disparador."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -1374,7 +1374,7 @@ msgstr "No es posible eliminar el gráfico"
 
 #: api/classes/CItemPrototype.php:768
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "No ha sido posible eliminar el prototipo de gráfico"
 
 #: api/classes/CItem.php:981
 msgid "Cannot delete graph."
@@ -1386,7 +1386,7 @@ msgstr "No es posible eliminar los gráficos"
 
 #: api/classes/CGraphPrototype.php:785
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "No se permite eliminar gráficos que han sido creados automaticamente por descubrimiento a bajo nivel"
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
@@ -1422,7 +1422,7 @@ msgstr "No es posible eliminar los monitores"
 
 #: api/classes/CItemPrototype.php:785
 msgid "Cannot delete items created by low level discovery."
-msgstr ""
+msgstr "No se permite eliminar elementos creados por descubrimiento a bajo nivel"
 
 #: maintenance.php:237
 msgid "Cannot delete maintenance"
@@ -1502,7 +1502,7 @@ msgstr "No es posible eliminar el monitor de la plantilla"
 
 #: api/classes/CItemPrototype.php:729
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "No es posible eliminar elementos enlazados a plantillas"
 
 #: api/classes/CDiscoveryRule.php:587
 msgid "Cannot delete templated items."
@@ -1519,7 +1519,7 @@ msgstr "No es posible eliminar los iniciadores"
 
 #: api/classes/CItemPrototype.php:800
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "No es posible eliminar el prototipo de disparador"
 
 #: api/classes/CItem.php:997
 msgid "Cannot delete trigger."
@@ -1531,7 +1531,7 @@ msgstr "No es posible eliminar los iniciadores"
 
 #: api/classes/CTriggerPrototype.php:963
 msgid "Cannot delete triggers created by low level discovery."
-msgstr ""
+msgstr "No se permite eliminar disparadores creados por descubrimiento a bajo nivel."
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
@@ -1718,7 +1718,7 @@ msgstr "No se pudo realizar la actualización masiva de las plantillas visibles.
 #: api/classes/CHostGeneral.php:160
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr ""
+msgstr "No se puede pasar ID de plantillas duplicados para el enlace: %s."
 
 #: include/classes/db/DB.php:614
 #, php-format
@@ -1750,36 +1750,36 @@ msgstr "No se puede guardar una regla de descubrimiento sin comprobaciones."
 #: api/classes/CApplication.php:459
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "No se puede configurar \"templateid\" para la aplicación \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "No se puede configurar \"templateid\" para la gráfica \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "No se puede configurar \"templateid\" para el ítem \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "No se puede configurar \"templateid\" para la pantalla \"%1$s\"."
 
 #: api/classes/CTrigger.php:1099
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "No se puede configurar \"templateid\" para el disparador \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:759
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "No se puede configurar \"templateid\" para el prototipo del disparador \"%1$s\"."
 
 #: api/classes/CHostInterface.php:510
 msgid "Cannot switch host for interface."
-msgstr ""
+msgstr "No se puede cambiar de host para la interfaz."
 
 #: users.php:294
 msgid "Cannot unblock users"
@@ -1811,7 +1811,7 @@ msgstr "No se pudieron desenlazar y limpiar los ítems."
 
 #: api/classes/CHostGeneral.php:495 api/classes/CHostGeneral.php:512
 msgid "Cannot unlink and clear triggers"
-msgstr "No se pudieron desenlazar y limpiar los iniciadores."
+msgstr "No se pudo desenlazar y limpiar los disparadores."
 
 #: api/classes/CHost.php:1849
 msgid "Cannot unlink template"
@@ -1820,17 +1820,17 @@ msgstr "No se pudo desenlazar la plantilla."
 #: api/classes/CHostGeneral.php:449
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr "No se puede desenlazar el iniciador \"%s\", ya que la plantilla tiene ítems enlazadas al servidor."
+msgstr "No se pudo desenlazar el disparador \"%s\", ya que la plantilla tiene ítems enlazadas al servidor."
 
 #: api/classes/CApplication.php:456
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "No se pudo actualizar \"templateid\" para la aplicación \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "No se pudo actualizar \"templateid\" para la gráfica \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
