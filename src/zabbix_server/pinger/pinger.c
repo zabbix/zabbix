@@ -201,7 +201,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "unsupported pinger key");
+		zbx_snprintf(error, max_error_len, "Unsupported pinger key.");
 		return NOTSUPPORTED;
 	}
 
@@ -209,7 +209,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 
 	if (6 < num_params || (ICMPPINGSEC != *icmpping && 5 < num_params))
 	{
-		zbx_snprintf(error, max_error_len, "too many arguments");
+		zbx_snprintf(error, max_error_len, "Too many arguments.");
 		return NOTSUPPORTED;
 	}
 
@@ -219,7 +219,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	}
 	else if (FAIL == is_uint(buffer) || MIN_COUNT > (*count = atoi(buffer)) || *count > MAX_COUNT)
 	{
-		zbx_snprintf(error, max_error_len, "number of packets [%s] is not between %d and %d",
+		zbx_snprintf(error, max_error_len, "Number of packets \"%s\" is not between %d and %d.",
 				buffer, MIN_COUNT, MAX_COUNT);
 		return NOTSUPPORTED;
 	}
@@ -230,7 +230,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	}
 	else if (FAIL == is_uint(buffer) || MIN_INTERVAL > (*interval = atoi(buffer)))
 	{
-		zbx_snprintf(error, max_error_len, "interval [%s] should be at least %d", buffer, MIN_INTERVAL);
+		zbx_snprintf(error, max_error_len, "Interval \"%s\" should be at least %d.", buffer, MIN_INTERVAL);
 		return NOTSUPPORTED;
 	}
 
@@ -240,7 +240,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	}
 	else if (FAIL == is_uint(buffer) || MIN_SIZE > (*size = atoi(buffer)) || *size > MAX_SIZE)
 	{
-		zbx_snprintf(error, max_error_len, "packet size [%s] is not between %d and %d",
+		zbx_snprintf(error, max_error_len, "Packet size \"%s\" is not between %d and %d.",
 				buffer, MIN_SIZE, MAX_SIZE);
 		return NOTSUPPORTED;
 	}
@@ -249,7 +249,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 		*timeout = 0;
 	else if (FAIL == is_uint(buffer) || MIN_TIMEOUT > (*timeout = atoi(buffer)))
 	{
-		zbx_snprintf(error, max_error_len, "timeout [%s] should be at least %d", buffer, MIN_TIMEOUT);
+		zbx_snprintf(error, max_error_len, "Timeout \"%s\" should be at least %d.", buffer, MIN_TIMEOUT);
 		return NOTSUPPORTED;
 	}
 
@@ -271,7 +271,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 		}
 		else
 		{
-			zbx_snprintf(error, max_error_len, "mode [%s] is not supported", buffer);
+			zbx_snprintf(error, max_error_len, "Mode \"%s\" is not supported.", buffer);
 			return NOTSUPPORTED;
 		}
 	}
