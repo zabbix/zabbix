@@ -854,4 +854,28 @@ class CZBXAPI {
 			self::deprecated('Value "'.$value.'" for parameter "'.$paramName.'" is deprecated.');
 		}
 	}
+
+	/**
+	 * Adds a deprecated property to an array of resulting objects if it's requested in $output. The value for the
+	 * deprecated property will be taken from the new one.
+	 *
+	 * @param array         $objects
+	 * @param string        $deprecatedProperty
+	 * @param string        $newProperty
+	 * @param string|array  $output
+	 *
+	 * @return array
+	 */
+	protected function addDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
+		if ($this->outputIsRequested($deprecatedProperty, $output)) {
+			foreach ($objects as &$object) {
+				$object[$deprecatedProperty] = $object[$newProperty];
+			}
+			unset($object);
+		}
+
+		return $objects;
+	}
+
+
 }
