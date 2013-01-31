@@ -127,8 +127,8 @@ $firstAlert = reset($firstAlert);
 
 $data['timeline'] = array(
 	'period' => $effectivePeriod,
-	'starttime' => date('YmdHis', !empty($firstAlert) ? $firstAlert['clock'] : time() - SEC_PER_HOUR),
-	'usertime' => isset($data['stime']) ? date('YmdHis', zbxDateToTime($data['stime']) + $effectivePeriod) : null
+	'starttime' => date(TIMESTAMP_FORMAT, !empty($firstAlert) ? $firstAlert['clock'] : time() - SEC_PER_HOUR),
+	'usertime' => isset($data['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
 );
 
 // render view

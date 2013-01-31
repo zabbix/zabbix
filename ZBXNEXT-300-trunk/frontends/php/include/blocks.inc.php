@@ -255,8 +255,7 @@ function make_system_status($filter) {
 			'object' => EVENT_SOURCE_TRIGGERS,
 			'triggerids' => $trigger['triggerid'],
 			'filter'=> array(
-				'value' => TRIGGER_VALUE_TRUE,
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES
+				'value' => TRIGGER_VALUE_TRUE
 			),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
@@ -269,7 +268,6 @@ function make_system_status($filter) {
 		$events = API::Event()->get($options);
 		if (empty($events)) {
 			$trigger['event'] = array(
-				'value_changed' => 0,
 				'value' => $trigger['value'],
 				'acknowledged' => true,
 				'clock' => $trigger['lastchange']
@@ -538,6 +536,10 @@ function make_hoststat_summary($filter) {
 
 	foreach ($hosts as $host) {
 		foreach ($host['groups'] as $group) {
+			if (!isset($groups[$group['groupid']])) {
+				continue;
+			}
+
 			if (!isset($groups[$group['groupid']]['hosts'])) {
 				$groups[$group['groupid']]['hosts'] = array();
 			}
@@ -731,14 +733,13 @@ function make_status_of_zbx() {
 			new CSpan($status['items_count_not_supported'], 'unknown')
 		)
 	));
-	$title = new CSpan(_('Number of triggers (enabled/disabled)[problem/unknown/ok]'));
+	$title = new CSpan(_('Number of triggers (enabled/disabled)[problem/ok]'));
 	$title->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
 	$table->addRow(array($title, $status['triggers_count'],
 		array(
 			$status['triggers_count_enabled'], ' / ',
 			$status['triggers_count_disabled'].SPACE.SPACE.'[',
 			new CSpan($status['triggers_count_on'], 'on'), ' / ',
-			new CSpan($status['triggers_count_unknown'], 'unknown'), ' / ',
 			new CSpan($status['triggers_count_off'], 'off'), ']'
 		)
 	));
@@ -779,6 +780,7 @@ function make_latest_issues(array $filter = array()) {
 
 	$options = array(
 		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
 		'withLastEventUnacknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
@@ -788,23 +790,22 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array('triggerid', 'value_flags', 'error', 'url', 'expression', 'description', 'priority', 'type')
+		'output' => array('triggerid', 'value_flags', 'error', 'url', 'expression', 'description', 'priority', 'type'),
+		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
+		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
+		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
 	);
-	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
-	$options['sortorder'] = isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN;
-	$options['limit'] = isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT;
-
-	if (isset($filter['hostids'])) {
-		$options['hostids'] = $filter['hostids'];
-	}
 	$triggers = API::Trigger()->get($options);
 
-	// how many issues are there at all with given parameters
+	$sortfield = $options['sortfield'];
+	$sortorder = $options['sortorder'];
+
+	// get trigger issues count
 	$options['countOutput'] = true;
-	unset($options['limit']);
+	unset($options['limit'], $options['sortfield'], $options['sortorder']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
-	foreach($triggers as $tnum => $trigger) {
+	foreach ($triggers as $tnum => $trigger) {
 		// if trigger is lost(broken expression) we skip it
 		if (empty($trigger['hosts'])) {
 			unset($triggers[$tnum]);
@@ -832,7 +833,7 @@ function make_latest_issues(array $filter = array()) {
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
 
 	// indicator of sort field
-	$sortDiv = new CDiv(SPACE, $options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+	$sortDiv = new CDiv(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 	$sortDiv->addStyle('float: left');
 	$hostHeaderDiv = new CDiv(array(_('Host'), SPACE));
 	$hostHeaderDiv->addStyle('float: left');
@@ -845,9 +846,9 @@ function make_latest_issues(array $filter = array()) {
 	$table->setHeader(
 		array(
 			is_show_all_nodes() ? _('Node') : null,
-			$options['sortfield'] === 'hostname' ? array($hostHeaderDiv, $sortDiv) : _('Host'),
-			$options['sortfield'] === 'priority' ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
-			$options['sortfield'] === 'lastchange' ? array($lastChangeHeaderDiv, $sortDiv) : _('Last change'),
+			($sortfield === 'hostname') ? array($hostHeaderDiv, $sortDiv) : _('Host'),
+			($sortfield === 'priority') ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
+			($sortfield === 'lastchange') ? array($lastChangeHeaderDiv, $sortDiv) : _('Last change'),
 			_('Age'),
 			_('Info'),
 			$config['event_ack_enable'] ? _('Ack') : null,
@@ -909,8 +910,7 @@ function make_latest_issues(array $filter = array()) {
 			'acknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
-				'value' => TRIGGER_VALUE_TRUE,
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES
+				'value' => TRIGGER_VALUE_TRUE
 			),
 			'sortfield' => array('eventid'),
 			'sortorder' => ZBX_SORT_DOWN,
@@ -965,6 +965,15 @@ function make_latest_issues(array $filter = array()) {
 	return $widgetDiv;
 }
 
+/**
+ * Create and return a DIV with web monitoring overview.
+ *
+ * @param array $filter
+ * @param array $filter['groupids']
+ * @param bool  $filter['maintenance']
+ *
+ * @return CDiv
+ */
 function make_webmon_overview($filter) {
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
@@ -974,20 +983,20 @@ function make_webmon_overview($filter) {
 		'preservekeys' => true
 	));
 
-	foreach($groups as &$group) {
+	foreach ($groups as &$group) {
 		$group['nodename'] = get_node_name_by_elid($group['groupid']);
 	}
 	unset($group);
 
-	// we need natural sort
-	$sortFields = array(
+	CArrayHelper::sort($groups, array(
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
-	CArrayHelper::sort($groups, $sortFields);
+	));
+
+	$groupIds = array_keys($groups);
 
 	$availableHosts = API::Host()->get(array(
-		'groupids' => array_keys($groups),
+		'groupids' => $groupIds,
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid'),
@@ -995,7 +1004,7 @@ function make_webmon_overview($filter) {
 	));
 	$availableHostIds = array_keys($availableHosts);
 
-	$table  = new CTableInfo();
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -1004,46 +1013,42 @@ function make_webmon_overview($filter) {
 		_('Unknown')
 	));
 
+	$data = array();
+
+	$result = DBselect(
+		'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue,hg.groupid'.
+		' FROM items i,httptestitem hti,httptest ht,hosts_groups hg'.
+		' WHERE i.itemid=hti.itemid'.
+			' AND hti.httptestid=ht.httptestid'.
+			' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
+			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+			' AND ht.hostid=hg.hostid'.
+			' AND '.dbConditionInt('hg.hostid', $availableHostIds).
+			' AND '.dbConditionInt('hg.groupid', $groupIds)
+	);
+	while ($row = DBfetch($result)) {
+		if (!$row['lastclock']) {
+			$data[$row['groupid']]['unknown'] = empty($data[$row['groupid']]['unknown']) ? 1 : ++$data[$row['groupid']]['unknown'];
+		}
+		elseif ($row['lastvalue'] != 0) {
+			$data[$row['groupid']]['failed'] = empty($data[$row['groupid']]['failed']) ? 1 : ++$data[$row['groupid']]['failed'];
+		}
+		else {
+			$data[$row['groupid']]['ok'] = empty($data[$row['groupid']]['ok']) ? 1 : ++$data[$row['groupid']]['ok'];
+		}
+	}
 
 	foreach ($groups as $group) {
-		$showGroup = false;
-		$okCount = 0;
-		$failedCount = 0;
-		$unknownCount = 0;
-
-		$result = DBselect(
-			'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue'.
-			' FROM items i,httptestitem hti,httptest ht,applications a,hosts_groups hg'.
-			' WHERE i.itemid=hti.itemid'.
-				' AND hti.httptestid=ht.httptestid'.
-				' AND ht.applicationid=a.applicationid'.
-				' AND a.hostid=hg.hostid'.
-				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
-				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-				' AND '.dbConditionInt('hg.hostid', $availableHostIds).
-				' AND hg.groupid='.$group['groupid']
-		);
-		while ($row = DBfetch($result)) {
-			$showGroup = true;
-
-			if (!$row['lastclock']) {
-				$unknownCount++;
-			}
-			elseif ($row['lastvalue'] != 0) {
-				$failedCount++;
-			}
-			else {
-				$okCount++;
-			}
-		}
-
-		if ($showGroup) {
+		if (!empty($data[$group['groupid']])) {
 			$table->addRow(array(
 				is_show_all_nodes() ? $group['nodename'] : null,
 				$group['name'],
-				new CSpan($okCount, 'off'),
-				new CSpan($failedCount, $failedCount ? 'on' : 'off'),
-				new CSpan($unknownCount, 'unknown')
+				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
+				new CSpan(
+					empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
+					empty($data[$group['groupid']]['failed']) ? 'off' : 'on'
+				),
+				new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown'], 'unknown')
 			));
 		}
 	}

@@ -174,7 +174,6 @@ class CProfiler {
 		foreach ($this->sqlQueryLog as $query) {
 			$time = $query[0];
 			$sql = htmlspecialchars($query[1], ENT_QUOTES, 'UTF-8');
-			$callStack = array_reverse($query[2]);
 
 			if (strpos($sql, 'SELECT ') !== false) {
 				$sqlString = '<span style="color: green; font-size: 1.2em;">'.$sql.'</span>';
@@ -188,13 +187,7 @@ class CProfiler {
 			}
 			$debug_str .= $sqlString;
 
-			$callStackString = '<span style="font-style: italic;">';
-			foreach ($callStack as $call) {
-				if (isset($call['class'])) {
-					$callStackString .= $call['class'].$call['type'];
-				}
-				$callStackString .= $call['function'].'() -> ';
-			}
+			$callStackString = '<span style="font-style: italic;">'.$this->formatCallStack(null, $query[2]).'</span>'.'<br>'.'<br>';
 			$debug_str .= rtrim($callStackString, '-> ').'</span>'.'<br>'.'<br>';
 		}
 
@@ -269,5 +262,44 @@ class CProfiler {
 		else {
 			return memory_get_usage(true);
 		}
+	}
+
+	/**
+	 * Formats the function call stack and returns it as a string.
+	 *
+	 * The call stack can be obtained from Exception::getTrace() or from an API result debug stack trace. If no call
+	 * stack is given, it will be taken from debug_backtrace().
+	 *
+	 * @param int $offset       amount of last function calls to hide
+	 * @param array $callStack
+	 *
+	 * @return string
+	 */
+	public function formatCallStack($offset = 0, array $callStack = null) {
+		if (!$callStack) {
+			$callStack = debug_backtrace(false);
+
+			// never show the call to this method
+			$offset++;
+		}
+
+		if ($offset) {
+			$callStack = array_slice($callStack, $offset);
+		}
+
+		// reverse the order of the stack to show first calls in the beginning
+		$callStack = array_reverse($callStack);
+
+		$callStackString = '';
+		foreach ($callStack as $call) {
+			if (isset($call['class'])) {
+				$callStackString .= $call['class'].$call['type'];
+			}
+			$callStackString .= $call['function'].'() &rarr; ';
+		}
+		$callStackString = rtrim($callStackString, '&rarr; ');
+		$callStackString .= ' in '.$call['file'].':'.$call['line'];
+
+		return $callStackString;
 	}
 }

@@ -106,7 +106,7 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB'] = ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
+				$DB['DB'] = oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
 				if ($DB['DB']) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
@@ -198,7 +198,7 @@ function DBclose() {
 				$result = pg_close($DB['DB']);
 				break;
 			case ZBX_DB_ORACLE:
-				$result = ocilogoff($DB['DB']);
+				$result = oci_close($DB['DB']);
 				break;
 			case ZBX_DB_DB2:
 				$result = db2_close($DB['DB']);
@@ -328,7 +328,7 @@ function DBcommit() {
 			$result = DBexecute('commit');
 			break;
 		case ZBX_DB_ORACLE:
-			$result = ocicommit($DB['DB']);
+			$result = oci_commit($DB['DB']);
 			break;
 		case ZBX_DB_DB2:
 			$result = db2_commit($DB['DB']);
@@ -357,7 +357,7 @@ function DBrollback() {
 			$result = DBexecute('rollback');
 			break;
 		case ZBX_DB_ORACLE:
-			$result = ocirollback($DB['DB']);
+			$result = oci_rollback($DB['DB']);
 			break;
 		case ZBX_DB_DB2:
 			$result = db2_rollback($DB['DB']);
@@ -443,12 +443,12 @@ function DBselect($query, $limit = null, $offset = 0) {
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (!$result = OCIParse($DB['DB'], $query)) {
-				$e = @ocierror();
+			if (!$result = oci_parse($DB['DB'], $query)) {
+				$e = @oci_error();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
-			elseif (!@OCIExecute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = ocierror($result);
+			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = oci_error($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			break;
@@ -514,12 +514,12 @@ function DBexecute($query, $skip_error_messages = 0) {
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (!$result = OCIParse($DB['DB'], $query)) {
-				$e = @ocierror();
+			if (!$result = oci_parse($DB['DB'], $query)) {
+				$e = @oci_error();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
-			elseif (!@OCIExecute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = ocierror($result);
+			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = oci_error($result);
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
 			else {
@@ -580,10 +580,12 @@ function DBfetch($cursor, $convertNulls = true) {
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))) {
+			if ($row = oci_fetch_assoc($cursor)) {
 				$result = array();
 				foreach ($row as $key => $value) {
 					$field_type = zbx_strtolower(oci_field_type($cursor, $key));
+					// Oracle does not support NULL values for string fields, so if the string is empty, it will return NULL
+					// convert it to an empty string to be consistent with other databases
 					$value = (str_in_array($field_type, array('varchar', 'varchar2', 'blob', 'clob')) && is_null($value)) ? '' : $value;
 
 					if (is_object($value) && (zbx_stristr($field_type, 'lob') !== false)) {
@@ -939,43 +941,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	}
 
 	return false;
-}
-
-function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
-	if (!zbx_empty($options['sortfield'])) {
-		if (!is_array($options['sortfield'])) {
-			$options['sortfield'] = array($options['sortfield']);
-		}
-		else {
-			$options['sortfield'] = array_unique($options['sortfield']);
-		}
-
-		foreach ($options['sortfield'] as $i => $sortfield) {
-			// validate sortfield
-			if (!str_in_array($sortfield, $sort_columns)) {
-				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
-			}
-
-			// add sort field to order
-			$sortorder = '';
-			if (is_array($options['sortorder'])) {
-				if (!empty($options['sortorder'][$i])) {
-					$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
-				}
-			}
-			else {
-				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
-			}
-			$sql_parts['order'][] = $alias.'.'.$sortfield.$sortorder;
-
-			// add sort field to select if distinct is used
-			if (count($sql_parts['from']) > 1) {
-				if (!str_in_array($alias.'.'.$sortfield, $sql_parts['select']) && !str_in_array($alias.'.*', $sql_parts['select'])) {
-					$sql_parts['select'][$sortfield] = $alias.'.'.$sortfield;
-				}
-			}
-		}
-	}
 }
 
 function remove_nodes_from_id($id) {

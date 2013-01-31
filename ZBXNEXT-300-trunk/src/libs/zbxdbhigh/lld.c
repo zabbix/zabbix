@@ -795,7 +795,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')" ZBX_ROW_DL,
 					trigger->triggerid, description_esc, expression_esc, (int)priority, (int)status,
-					comments_esc, url_esc, (int)type, TRIGGER_VALUE_FALSE,
+					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK,
 					TRIGGER_VALUE_FLAG_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED, error_esc);
 			zbx_free(expression_esc);
 
@@ -2278,7 +2278,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 
 			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
 
-			result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 					" from regexps r,expressions e"
 					" where r.regexpid=e.regexpid"
 						" and r.name='%s'",
@@ -2287,8 +2287,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 			zbx_free(f_regexp_esc);
 
 			while (NULL != (row = DBfetch(result)))
+			{
 				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-						row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
+			}
 			DBfree_result(result);
 		}
 

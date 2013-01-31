@@ -30,6 +30,7 @@ class CScreen extends CZBXAPI {
 
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
+	protected $sortColumns = array('screenid', 'name');
 
 	/**
 	 * Get Screen data
@@ -47,9 +48,6 @@ class CScreen extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
-
-		// allowed columns for sorting
-		$sortColumns = array('screenid', 'name');
 
 		$sqlParts = array(
 			'select'	=> array('screens' => 's.screenid'),
@@ -112,9 +110,6 @@ class CScreen extends CZBXAPI {
 			zbx_db_search('screens s', $options, $sqlParts);
 		}
 
-		// sorting
-		zbx_db_sorting($sqlParts, $options, $sortColumns, 's');
-
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
@@ -122,6 +117,7 @@ class CScreen extends CZBXAPI {
 
 		$screenids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
