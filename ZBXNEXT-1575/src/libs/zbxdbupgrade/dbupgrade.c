@@ -855,6 +855,25 @@ static int	DBpatch_02010040()
 
 	return FAIL;
 }
+
+static int	DBpatch_02010041()
+{
+	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("proxy_history", "status", &field);
+}
+
+static int	DBpatch_02010042()
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update proxy_history"
+			" set state=%d"
+			" where state=%d",
+			ITEM_STATE_NOTSUPPORTED, 3 /*ITEM_STATUS_NOTSUPPORTED*/))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -933,11 +952,13 @@ int	DBcheck_version()
 		{DBpatch_02010038, 2010038, 0, 0},
 		{DBpatch_02010039, 2010039, 0, 1},
 		{DBpatch_02010040, 2010040, 0, 1},
+		{DBpatch_02010041, 2010041, 0, 1},
+		{DBpatch_02010042, 2010042, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010040;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010042;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
