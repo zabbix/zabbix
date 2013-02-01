@@ -8,6 +8,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+A......... [ZBX-5945] fixed map urls expanding (Eduard)
 ........S. [ZBX-5968] fixed updating of triggers and graphs when low-level discovered value changes (Sasha)
 ..F....... [ZBX-6180] fixed host edit page for IBM DB2 (Oleg)
 ...G...... [ZBX-5863] changed external command execution to store output in a dynamically allocated buffer up to 512KB (wiper)
