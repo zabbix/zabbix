@@ -876,6 +876,4 @@ class CZBXAPI {
 
 		return $objects;
 	}
-
-
 }
