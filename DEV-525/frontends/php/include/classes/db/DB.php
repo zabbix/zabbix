@@ -44,6 +44,42 @@ class DB {
 	private static $maxNodeId = null;
 	private static $minNodeId = null;
 
+	/**
+	 * @var DbBackend
+	 */
+	private static $dbBackend;
+
+	/**
+	 * Get necessary DB class
+	 *
+	 * @return DbBackend
+	 */
+	public static function getDbBackend() {
+		global $DB;
+
+		if (!self::$dbBackend) {
+			switch ($DB['TYPE']) {
+				case ZBX_DB_MYSQL:
+					self::$dbBackend = new MysqlDbBackend();
+					break;
+				case ZBX_DB_POSTGRESQL:
+					self::$dbBackend = new PostgresqlDbBackend();
+					break;
+				case ZBX_DB_ORACLE:
+					self::$dbBackend = new OracleDbBackend();
+					break;
+				case ZBX_DB_DB2:
+					self::$dbBackend = new Db2DbBackend();
+					break;
+				case ZBX_DB_SQLITE3:
+					self::$dbBackend = new SqliteDbBackend();
+					break;
+			}
+		}
+
+		return self::$dbBackend;
+	}
+
 	private static function exception($code, $error) {
 		throw new DBException($error, $code);
 	}
@@ -429,30 +465,28 @@ class DB {
 		}
 		$resultIds = array();
 
-		if ($getids) {
-			$id = self::reserveIds($table, count($values));
-		}
-
 		$tableSchema = self::getSchema($table);
-
 		$values = self::addMissingFields($tableSchema, $values);
-
 		$fields = array_keys($values[0]);
 
-		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).','.($getids ? $tableSchema['key'] : '').') VALUES ';
+		if ($getids) {
+			$id = self::reserveIds($table, count($values));
+			$fields[] = $tableSchema['key'];
+		}
 
+		$newValues = array();
 		foreach ($values as $key => $row) {
 			if ($getids) {
 				$resultIds[$key] = $id;
 				$row[$tableSchema['key']] = $id;
+				$values[$key][$tableSchema['key']] = $id;
 				$id = bcadd($id, 1, 0);
 			}
-
 			self::checkValueTypes($table, $row);
-
-			$sql .= '('.implode(',', array_values($row)).'),';
+			$newValues[] = $row;
 		}
-		$sql[strlen($sql) - 1] = ' ';
+
+		$sql = self::getDbBackend()->createInsertQuery($table, $fields, $newValues);
 
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
