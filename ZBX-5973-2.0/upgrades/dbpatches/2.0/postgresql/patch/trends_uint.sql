@@ -1,1 +1,0 @@
-ALTER TABLE ONLY trends_uint ALTER itemid DROP DEFAULT;
