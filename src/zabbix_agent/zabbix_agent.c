@@ -99,6 +99,8 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
 	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
+
+	zbx_trim_str_list(CONFIG_HOSTS_ALLOWED, ',');
 }
 
 /******************************************************************************
@@ -231,7 +233,7 @@ int	main(int argc, char **argv)
 		{
 			zbx_rtrim(command, "\r\n");
 
-			zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
+			zabbix_log(LOG_LEVEL_DEBUG, "requested [%s]", command);
 
 			init_result(&result);
 
@@ -242,7 +244,7 @@ int	main(int argc, char **argv)
 
 			if (NULL != value)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
+				zabbix_log(LOG_LEVEL_DEBUG, "sending back [%s]", *value);
 
 				ret = zbx_tcp_send(&s_out, *value);
 			}
@@ -251,7 +253,7 @@ int	main(int argc, char **argv)
 		}
 
 		if (FAIL == ret)
-			zabbix_log(LOG_LEVEL_DEBUG, "Processing error: %s", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "processing error: %s", zbx_tcp_strerror());
 	}
 
 	fflush(stdout);

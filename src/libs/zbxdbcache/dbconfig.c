@@ -652,6 +652,10 @@ static int	DCsync_config(DB_RESULT result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "UNIQUE=%s", DBget_unique_hostname_by_sample("сервер"));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "UNIQUE=%s", DBget_unique_hostname_by_sample("сервер"));
+
 	if (NULL == config->config)
 	{
 		found = 0;
@@ -953,7 +957,7 @@ static void	DCsync_items(DB_RESULT result)
 		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[17])
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
-
+			zbx_trim_str_list(row[17], ',');
 			DCstrpool_replace(found, &trapitem->trapper_hosts, row[17]);
 		}
 		else if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
