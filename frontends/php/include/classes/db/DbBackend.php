@@ -54,6 +54,30 @@ abstract class DbBackend {
 	}
 
 	/**
+	 * Create INSERT SQL query for MySQL, PostgreSQL and IBM DB2.
+	 * Creation example:
+	 *	INSERT INTO applications (name,hostid,templateid,applicationid)
+	 *	VALUES ('CPU','10113','13','868'),('Filesystems','10113','5','869'),('General','10113','21','870');
+	 *
+	 * @param string $table
+	 * @param array $fields
+	 * @param array $values
+	 *
+	 * @return string
+	 */
+	public function createInsertQuery($table, array $fields, array $values) {
+		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ';
+
+		foreach ($values as $row) {
+			$sql .= '('.implode(',', array_values($row)).'),';
+		}
+
+		$sql[strlen($sql) - 1] = ' ';
+
+		return $sql;
+	}
+
+	/**
 	 * Set error string.
 	 *
 	 * @param string $error

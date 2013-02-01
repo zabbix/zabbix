@@ -214,7 +214,7 @@ int main(int argc, char **argv)
 		ret = get_value(source_ip, host, port, key, &value);
 
 		if (SUCCEED == ret)
-			printf("%s\n",value);
+			printf("%s\n", value);
 
 		zbx_free(value);
 	}
