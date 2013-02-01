@@ -422,7 +422,7 @@ class CScreenBase {
 	 * @param string	$options['stimeNow']
 	 * @param string	$options['starttime']
 	 * @param string	$options['usertime']
-	 * @param boolean	$options['isNow']
+	 * @param int		$options['isNow']
 	 */
 	public static function debugTime(array $time = array()) {
 		return 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
