@@ -33,6 +33,51 @@ class testFormItem extends CWebTest {
 				array('type' => 'Zabbix agent')
 			),
 			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Hexadecimal'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Octal'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (float)'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Character'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Log'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Text'
+				)
+			),
+			array(
 				array('type' => 'Zabbix agent (active)'),
 			),
 			array(
@@ -46,6 +91,9 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array('type' => 'SNMPv2 agent')
+			),
+			array(
+				array('type' => 'SNMPv3 agent')
 			),
 			array(
 				array(
@@ -79,19 +127,36 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'SNMPv3 agent', 'snmpv3_securitylevel' => 'noAuthNoPriv', 'value_type' => 'Character')
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Character'
+				)
 			),
 			array(
-				array('type' => 'SNMPv3 agent', 'snmpv3_securitylevel' => 'noAuthNoPriv', 'value_type' => 'Log')
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Log')
 			),
 			array(
-				array('type' => 'SNMPv3 agent', 'snmpv3_securitylevel' => 'noAuthNoPriv', 'value_type' => 'Text')
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Text'
+				)
 			),
 			array(
-				array('type' => 'SNMPv3 agent', 'snmpv3_securitylevel' => 'authNoPriv')
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'authNoPriv'
+				)
 			),
 			array(
-				array('type' => 'SNMPv3 agent', 'snmpv3_securitylevel' => 'authPriv')
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'authPriv'
+				)
 			),
 			array(
 				array('type' => 'SNMP trap')
@@ -110,34 +175,48 @@ class testFormItem extends CWebTest {
 				array('type' => 'Zabbix trapper')
 			),
 			array(
-				array('type' => 'Zabbix aggregate'),
+				array('type' => 'Zabbix aggregate')
 			),
 			array(
-				array('type' => 'External check'),
+				array('type' => 'External check')
 			),
 			array(
-				array('type' => 'Database monitor'),
+				array('type' => 'Database monitor')
 			),
 			array(
-				array('type' => 'IPMI agent'),
+				array('type' => 'IPMI agent')
 			),
 			array(
-				array('type' => 'SSH agent'),
+				array('type' => 'SSH agent')
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Public key'),
+				array('type' => 'SSH agent', 'authtype' => 'Public key')
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Password'),
+				array('type' => 'SSH agent', 'authtype' => 'Password')
 			),
 			array(
-				array('type' => 'TELNET agent'),
+				array(
+					'type' => 'SSH agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean'
+				)
 			),
 			array(
-				array('type' => 'JMX agent'),
+				array(
+					'type' => 'SSH agent',
+					'authtype' => 'Password',
+					'value_type' => 'Character'
+				)
 			),
 			array(
-				array('type' => 'Calculated'),
+				array('type' => 'TELNET agent')
+			),
+			array(
+				array('type' => 'JMX agent')
+			),
+			array(
+				array('type' => 'Calculated')
 			)
 		);
 	}
