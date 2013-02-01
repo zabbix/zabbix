@@ -1,4 +1,4 @@
-cd <?php
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,8 +17,7 @@ cd <?php
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
@@ -27,11 +26,17 @@ define('ITEM_BAD', 1);
 
 class testFormItem extends CWebTest {
 
-	// Returns all possible item types
+	// returns all possible item types
 	public static function itemTypes() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
+			),
+			array(
+				array('type' => 'Zabbix agent (active)'),
+			),
+			array(
+				array('type' => 'Simple check')
 			),
 			array(
 				array('type' => 'SNMPv1 agent')
@@ -40,53 +45,37 @@ class testFormItem extends CWebTest {
 				array('type' => 'SNMPv1 agent', 'value_type' => 'Numeric (float)')
 			),
 			array(
-				array('type' => 'Zabbix trapper')
-			),
-			array(
-				array('type' => 'Simple check')
-			),
-			array(
 				array('type' => 'SNMPv2 agent')
 			),
 			array(
-				array('type' => 'Zabbix internal')
-			),
-			array(
 				array(
-					'type' => 'Zabbix internal',
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
 				)
 			),
 			array(
 				array(
-						'type' => 'SNMPv3 agent',
-						'snmpv3_securitylevel' => 'noAuthNoPriv',
-						'value_type' => 'Numeric (unsigned)',
-						'data_type' => 'Boolean'
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Hexadecimal'
 				)
 			),
 			array(
 				array(
-						'type' => 'SNMPv3 agent',
-						'snmpv3_securitylevel' => 'noAuthNoPriv',
-						'value_type' => 'Numeric (unsigned)',
-						'data_type' => 'Hexadecimal'
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Octal'
 				)
 			),
 			array(
 				array(
-						'type' => 'SNMPv3 agent',
-						'snmpv3_securitylevel' => 'noAuthNoPriv',
-						'value_type' => 'Numeric (unsigned)',
-						'data_type' => 'Octal'
-				)
-			),
-			array(
-				array(
-						'type' => 'SNMPv3 agent',
-						'snmpv3_securitylevel' => 'noAuthNoPriv',
-						'value_type' => 'Numeric (float)'
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Numeric (float)'
 				)
 			),
 			array(
@@ -105,7 +94,20 @@ class testFormItem extends CWebTest {
 				array('type' => 'SNMPv3 agent', 'snmpv3_securitylevel' => 'authPriv')
 			),
 			array(
-				array('type' => 'Zabbix agent (active)'),
+				array('type' => 'SNMP trap')
+			),
+			array(
+				array('type' => 'Zabbix internal')
+			),
+			array(
+				array(
+					'type' => 'Zabbix internal',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean'
+				)
+			),
+			array(
+				array('type' => 'Zabbix trapper')
 			),
 			array(
 				array('type' => 'Zabbix aggregate'),
@@ -132,13 +134,10 @@ class testFormItem extends CWebTest {
 				array('type' => 'TELNET agent'),
 			),
 			array(
-				array('type' => 'Calculated'),
-			),
-			array(
 				array('type' => 'JMX agent'),
 			),
 			array(
-				array('type' => 'SNMP trap')
+				array('type' => 'Calculated'),
 			)
 		);
 	}
@@ -170,7 +169,6 @@ class testFormItem extends CWebTest {
 		$this->assertAttribute("//input[@id='hostname']/@size", '50');
 		$this->assertVisible('btn_host');
 		$hostid = $this->getValue('hostid');
-
 
 		$this->ok('Name');
 		$this->assertVisible('name');
@@ -1525,4 +1523,3 @@ class testFormItem extends CWebTest {
 		DBrestore_tables('items');
 	}
 }
-?>
