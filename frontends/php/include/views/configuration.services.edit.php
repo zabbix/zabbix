@@ -122,11 +122,13 @@ foreach ($this->data['times'] as $serviceTime) {
 			$from = dowHrMinToStr($serviceTime['ts_from']);
 			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
+
 		case SERVICE_TIME_TYPE_DOWNTIME:
 			$type = new CSpan(_('Downtime'), 'disabled');
 			$from = dowHrMinToStr($serviceTime['ts_from']);
 			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
+
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = new CSpan(_('One-time downtime'), 'disabled');
 			$from = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_from']);
