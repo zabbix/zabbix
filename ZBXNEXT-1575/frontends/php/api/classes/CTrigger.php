@@ -731,7 +731,7 @@ class CTrigger extends CTriggerGeneral {
 				'expression' => null,
 				'error' => 'Trigger just added. No status update so far.',
 				'value' => TRIGGER_VALUE_FALSE,
-				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN
+				'state' => TRIGGER_STATE_UNKNOWN
 			);
 		}
 
@@ -1257,7 +1257,7 @@ class CTrigger extends CTriggerGeneral {
 					'values' => array(
 						'expression' => $triggerExpression[$triggerId],
 						'error' => 'Trigger just added. No status update so far.',
-						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN
+						'state' => TRIGGER_STATE_UNKNOWN
 					),
 					'where' => array('triggerid' => $triggerId)
 				));
@@ -1379,8 +1379,8 @@ class CTrigger extends CTriggerGeneral {
 				}
 
 				if (isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)) {
-					if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) {
-						$trigger['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
+					if ($trigger['state'] == TRIGGER_STATE_NORMAL) {
+						$trigger['state'] = TRIGGER_STATE_UNKNOWN;
 					}
 				}
 

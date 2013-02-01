@@ -156,7 +156,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description[] = new CLink($trigger['description'], 'trigger_prototypes.php?form=update&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].'&triggerid='.$triggerid);
 	}
 
-	if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) {
+	if ($trigger['flags'] == TRIGGER_STATE_NORMAL) {
 		$trigger['error'] = '';
 	}
 

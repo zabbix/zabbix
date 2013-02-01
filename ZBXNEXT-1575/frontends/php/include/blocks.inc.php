@@ -790,7 +790,7 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array('triggerid', 'value_flags', 'error', 'url', 'expression', 'description', 'priority', 'type'),
+		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type'),
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
@@ -898,7 +898,7 @@ function make_latest_issues(array $filter = array()) {
 
 		// unknown triggers
 		$unknown = SPACE;
-		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
@@ -1420,7 +1420,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 
 		// unknown triggers
 		$unknown = SPACE;
-		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
