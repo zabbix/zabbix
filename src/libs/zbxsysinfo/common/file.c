@@ -84,7 +84,7 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
-	int		ret = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL, file_exists = -1;
 
 	if (1 < num_param(param))
 		goto err;
@@ -92,13 +92,16 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		goto err;
 
-	SET_UI64_RESULT(result, 0);
-
 	if (0 == zbx_stat(filename, &buf))
-		if (S_ISREG(buf.st_mode))
-			SET_UI64_RESULT(result, 1);
+		file_exists = S_ISREG(buf.st_mode) ? 1 : 0;
+	else if (errno == ENOENT)
+		file_exists = 0;
 
-	ret = SYSINFO_RET_OK;
+	if (-1 != file_exists)
+	{
+		SET_UI64_RESULT(result, file_exists);
+		ret = SYSINFO_RET_OK;
+	}
 err:
 	return ret;
 }

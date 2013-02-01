@@ -245,10 +245,9 @@ class CUser extends CZBXAPI {
 	protected function checkInput(&$users, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
-		$delete = ($method == 'delete');
 
 		// permissions
-		if ($update || $delete) {
+		if ($update) {
 			$userDBfields = array('userid' => null);
 			$dbUsers = $this->get(array(
 				'output' => array('userid', 'alias', 'autologin', 'autologout'),
@@ -286,25 +285,6 @@ class CUser extends CZBXAPI {
 					}
 				}
 				$dbUser = $dbUsers[$user['userid']];
-			}
-			else {
-				if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to delete users.'));
-				}
-
-				if (!isset($dbUsers[$user['userid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to delete user or user does not exist.'));
-				}
-
-				if (bccomp(self::$userData['userid'], $user['userid']) == 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
-				}
-
-				if ($dbUsers[$user['userid']]['alias'] == ZBX_GUEST_USER) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER));
-				}
-
-				continue;
 			}
 
 			// check if user alais
@@ -550,30 +530,59 @@ class CUser extends CZBXAPI {
 	}
 
 	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $userIds
+	 *
+	 * @return void
+	 */
+	protected function validateDelete(array $userIds) {
+		if (empty($userIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$this->checkPermissions($userIds);
+		$this->checkDeleteCurrentUser($userIds);
+		$this->checkDeleteInternal($userIds);
+	}
+
+	/**
 	 * Delete Users
 	 *
-	 * @param array $users
-	 * @param array $users[0,...]['userids']
+	 * @param $userIds
+	 *
 	 * @return boolean
 	 */
-	public function delete($users) {
-		$users = zbx_toArray($users);
-		$userids = zbx_objectValues($users, 'userid');
+	public function delete($userIds) {
+		$userIds = zbx_toArray($userIds);
 
-		$this->checkInput($users, __FUNCTION__);
+		// deprecated input support
+		if ($userIds && is_array($userIds[0])) {
+			$this->deprecated('Passing objects is deprecated, use an array of IDs instead.');
+			foreach ($userIds as $user) {
+				if (!check_db_fields(array('userid' => null), $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No user ID given.'));
+				}
+			}
+			$userIds = zbx_objectValues($userIds, 'userid');
+		}
+
+		$this->validateDelete($userIds);
 
 		// delete action operation msg
 		$operationids = array();
 		$dbOperations = DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
-			' WHERE '.dbConditionInt('om.userid', $userids)
+			' WHERE '.dbConditionInt('om.userid', $userIds)
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('opmessage_usr', array('userid' => $userids));
+		DB::delete('opmessage_usr', array('userid' => $userIds));
 
 		// delete empty operations
 		$delOperationids = array();
@@ -588,12 +597,12 @@ class CUser extends CZBXAPI {
 		}
 
 		DB::delete('operations', array('operationid' => $delOperationids));
-		DB::delete('media', array('userid' => $userids));
-		DB::delete('profiles', array('userid' => $userids));
-		DB::delete('users_groups', array('userid' => $userids));
-		DB::delete('users', array('userid' => $userids));
+		DB::delete('media', array('userid' => $userIds));
+		DB::delete('profiles', array('userid' => $userIds));
+		DB::delete('users_groups', array('userid' => $userIds));
+		DB::delete('users', array('userid' => $userIds));
 
-		return array('userids' => $userids);
+		return array('userids' => $userIds);
 	}
 
 	/**
@@ -1130,5 +1139,51 @@ class CUser extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Checks if the given users are editable.
+	 *
+	 * @param array $userIds    user IDs to check
+	 *
+	 * @throws APIException     if the user has no permissions to edit users or a user does not exist
+	 */
+	protected function checkPermissions(array $userIds) {
+		if (!$this->isWritable($userIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Check if we're trying to delete the currently logged in user.
+	 *
+	 * @param array $userIds    user IDs to check
+	 *
+	 * @throws APIException  if we're deleting the current user
+	 */
+	protected function checkDeleteCurrentUser(array $userIds) {
+		if (in_array(self::$userData['userid'], $userIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
+		}
+	}
+
+	/**
+	 * Check if we're trying to delete the guest user.
+	 *
+	 * @param array $userIds    user IDs to check
+	 *
+	 * @throws APIException  if we're deleting the guest user
+	 */
+	protected function checkDeleteInternal(array $userIds) {
+		$guest = $this->get(array(
+			'output' => array('userid'),
+			'filter' => array(
+				'alias' => ZBX_GUEST_USER
+			)
+		));
+		$guest = reset($guest);
+		if (in_array($guest['userid'], $userIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER));
+		}
 	}
 }
