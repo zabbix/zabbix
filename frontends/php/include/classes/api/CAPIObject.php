@@ -44,7 +44,7 @@ class CAPIObject {
 			$trace = $result['data'];
 
 			if (isset($result['debug'])) {
-				$trace .= ' ['.CProfiler::getInstance()->formatCallStack(null, $result['debug']).']';
+				$trace .= ' ['.CProfiler::getInstance()->formatCallStack($result['debug']).']';
 			}
 
 			error($trace);
