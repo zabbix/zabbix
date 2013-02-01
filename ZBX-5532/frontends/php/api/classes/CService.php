@@ -1582,8 +1582,8 @@ class CService extends CZBXAPI {
 
 			foreach ($serviceTimes as $serviceTime) {
 				$refId = $serviceTime['serviceid'];
-				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
 
+				// convert periodical service time timestamps from old 1.8 format
 				if ($serviceTime['type'] == SERVICE_TIME_TYPE_UPTIME || $serviceTime['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
 					if (isset($serviceTime['ts_from'])) {
 						$serviceTime['ts_from'] = prepareServiceTime($serviceTime['ts_from']);
@@ -1593,6 +1593,7 @@ class CService extends CZBXAPI {
 					}
 				}
 
+				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
 				$result[$refId]['times'][] = $serviceTime;
 			}
 		}
