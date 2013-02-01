@@ -135,8 +135,6 @@ function getDayOfWeekCaption($num) {
 
 // convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
 function dowHrMinToStr($value, $display24Hours = false) {
-	$value = prepareServiceTime($value);
-
 	$dow = $value - $value % SEC_PER_DAY;
 	$hr = $value - $dow;
 	$hr -= $hr % SEC_PER_HOUR;
@@ -153,19 +151,6 @@ function dowHrMinToStr($value, $display24Hours = false) {
 	}
 
 	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
-}
-
-/**
- * Convert 1.8 service time format (unixtime) to 2.0 format (seconds starting from Sunday).
- *
- * @param int $time
- *
- * @return int
- */
-function prepareServiceTime($time) {
-	return ($time > SEC_PER_WEEK * 2)
-		? date('w', $time) * SEC_PER_DAY + (mktime(null, null, null, date('n', $time), date('j', $time), date('Y', $time)) - $time)
-		: $time;
 }
 
 // convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
