@@ -991,7 +991,7 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 			' AND f.triggerid=t.triggerid'.
 			' AND '.dbConditionInt('h.hostid', $hostids).
 			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
+			' AND t.state='.TRIGGER_STATE_NORMAL
 	);
 	while ($row = DBfetch($result)) {
 		$triggerids[] = $row['triggerid'];
@@ -1000,7 +1000,7 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 	if (!empty($triggerids)) {
 		DB::update('triggers', array(
 			'values' => array(
-				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+				'state' => TRIGGER_STATE_UNKNOWN,
 				'error' => _s('Host status became "%s"', _('Not monitored'))
 			),
 			'where' => array('triggerid' => $triggerids)

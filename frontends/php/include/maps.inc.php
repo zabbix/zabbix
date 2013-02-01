@@ -1076,7 +1076,7 @@ function getSelementsInfo($sysmap) {
 		$triggers = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
-			'filter' => array('value_flags' => null),
+			'filter' => array('state' => null),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
 		));
@@ -1094,7 +1094,7 @@ function getSelementsInfo($sysmap) {
 		$triggers = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
-			'filter' => array('value_flags' => null),
+			'filter' => array('state' => null),
 			'skipDependent' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
@@ -1115,7 +1115,7 @@ function getSelementsInfo($sysmap) {
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
 			'nopermissions' => true,
-			'filter' => array('value_flags' => null),
+			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
 			'skipDependent' => true
@@ -1141,7 +1141,7 @@ function getSelementsInfo($sysmap) {
 		'nodeids' => get_current_nodeid(true),
 		'nopermissions' => true,
 		'monitored' => true,
-		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'value_flags' => null)
+		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'state' => null)
 	));
 	$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
 

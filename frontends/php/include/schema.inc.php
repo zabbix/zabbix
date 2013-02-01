@@ -2316,7 +2316,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'value_flags' => array(
+			'state' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

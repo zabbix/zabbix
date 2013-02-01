@@ -274,7 +274,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=h.hostid'.
 					' AND '.dbConditionInt('t.triggerid', $triggerIdsToUpdate).
-					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
+					' AND t.state='.TRIGGER_STATE_NORMAL.
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
 			);
 			while ($row = DBfetch($db_triggers)) {
@@ -284,7 +284,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			if (!empty($valueTriggerIds)) {
 				DB::update('triggers', array(
 					'values' => array(
-						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+						'state' => TRIGGER_STATE_UNKNOWN,
 						'error' => _('Trigger status became "Disabled".')
 					),
 					'where' => array('triggerid' => $valueTriggerIds)
