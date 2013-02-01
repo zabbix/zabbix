@@ -58,10 +58,6 @@ check_fields($fields);
  * Ajax
  */
 if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.hostscreen.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.hostscreen.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
