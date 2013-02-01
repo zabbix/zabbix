@@ -418,21 +418,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_trigger                                               *
+ * Function: DBlld_trigger_exists                                             *
  *                                                                            *
- * Purpose: copy specified trigger to host                                    *
+ * Purpose: check if trigger exists either in triggers list or in the         *
+ *          database                                                          *
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
- *             parent_triggerid - trigger identificator from database         *
- *             description_proto - trigger description                        *
- *             expression - trigger expression                                *
- *             status - trigger status                                        *
- *             type - trigger type                                            *
- *             priority - trigger priority                                    *
- *             comments_esc - trigger comments                                *
- *             url_esc - trigger url                                          *
+ *             triggerid - trigger identificator (0 = new trigger)            *
+ *             description - trigger description                              *
+ *             full_expression - trigger expression                           *
+ *             triggers - list of already checked triggers                    *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value: SUCCEED if trigger exists otherwise FAIL                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -445,7 +442,7 @@ static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, con
 	zbx_vector_ptr_t	functions;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			i, res = FAIL;
+	int			i, ret = FAIL;
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -487,11 +484,11 @@ static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, con
 		DBlld_clean_trigger_functions(&functions);
 
 		if (0 == strcmp(full_expression, h_full_expression))
-			res = SUCCEED;
+			ret = SUCCEED;
 
 		zbx_free(h_full_expression);
 
-		if (SUCCEED == res)
+		if (SUCCEED == ret)
 			break;
 	}
 	DBfree_result(result);
@@ -500,9 +497,27 @@ static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, con
 	zbx_free(description_esc);
 	zbx_free(sql);
 
-	return res;
+	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_make_trigger                                               *
+ *                                                                            *
+ * Purpose: create a trigger based on lld rule and add it to the list         *
+ *                                                                            *
+ * Parameters: hostid - trigger host identificator                            *
+ *             parent_triggerid - trigger identificator from database         *
+ *             triggers - [OUT] list of triggers                              *
+ *             description_proto - trigger description                        *
+ *             expression - trigger expression                                *
+ *             jp_row - json record corresponding to the trigger              *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers,
 		const char *description_proto, const char *expression, struct zbx_json_parse *jp_row, char **error)
 {
@@ -515,7 +530,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	zbx_lld_trigger_t	*trigger;
 	zbx_lld_function_t	*function;
 	zbx_uint64_t		h_triggerid;
-	int			i, res = SUCCEED;
+	int			i, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -572,32 +587,35 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			char	*old_name = NULL;
-
 			ZBX_STR2UINT64(h_triggerid, row[0]);
 
-			old_name = zbx_strdup(old_name, row[2]);
-			substitute_discovery_macros(&old_name, jp_row);
+			DBlld_get_trigger_functions(h_triggerid, NULL, &functions);
+			full_expression = DBlld_expand_trigger_expression(row[1], &functions);
+			DBlld_clean_trigger_functions(&functions);
 
-			if (0 == strcmp(old_name, row[3]))
+			if (0 == strcmp(trigger->full_expression, full_expression))
 			{
-				DBlld_get_trigger_functions(h_triggerid, NULL, &functions);
-				full_expression = DBlld_expand_trigger_expression(row[1], &functions);
-				DBlld_clean_trigger_functions(&functions);
-
-				if (0 == strcmp(trigger->full_expression, full_expression))
-				{
-					trigger->update_expression = 0;
-					trigger->triggerid = h_triggerid;
-				}
-
-				zbx_free(full_expression);
-
-				if (0 == trigger->triggerid && SUCCEED == DBlld_compare_trigger_items(h_triggerid, jp_row))
-					trigger->triggerid = h_triggerid;
+				trigger->update_expression = 0;
+				trigger->triggerid = h_triggerid;
 			}
 
-			zbx_free(old_name);
+			zbx_free(full_expression);
+
+			if (0 == trigger->triggerid)
+			{
+				char	*old_name = NULL;
+
+				old_name = zbx_strdup(old_name, row[2]);
+				substitute_discovery_macros(&old_name, jp_row);
+
+				if (0 == strcmp(old_name, row[3]))
+				{
+					if (SUCCEED == DBlld_compare_trigger_items(h_triggerid, jp_row))
+						trigger->triggerid = h_triggerid;
+				}
+
+				zbx_free(old_name);
+			}
 
 			if (0 != trigger->triggerid)
 				break;
@@ -610,7 +628,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s trigger [%s]: trigger already exists\n",
 				0 != trigger->triggerid ? "update" : "create", trigger->description);
-		res = FAIL;
+		ret = FAIL;
 		goto out;
 	}
 
@@ -624,18 +642,18 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 
 			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & function->flags))
 			{
-				if (FAIL == (res = DBlld_get_item(hostid, function->key, NULL, &function->itemid)))
+				if (FAIL == (ret = DBlld_get_item(hostid, function->key, NULL, &function->itemid)))
 					break;
 			}
 		}
 	}
 
-	if (FAIL == res)
+	if (FAIL == ret)
 		goto out;
 
 	zbx_vector_ptr_append(triggers, trigger);
 out:
-	if (FAIL == res)
+	if (FAIL == ret)
 	{
 		DBlld_clean_trigger_functions(&trigger->functions);
 		zbx_vector_ptr_destroy(&trigger->functions);
@@ -649,11 +667,29 @@ out:
 	zbx_free(description_esc);
 	zbx_vector_ptr_destroy(&functions);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_save_triggers                                              *
+ *                                                                            *
+ * Purpose: add or update triggers in database based on discovery rule        *
+ *                                                                            *
+ * Parameters: triggers - list of triggers                                    *
+ *             status - trigger status                                        *
+ *             type - trigger type                                            *
+ *             priority - trigger priority                                    *
+ *             comments_esc - trigger comments                                *
+ *             url_esc - trigger url                                          *
+ *             parent_triggerid - trigger identificator from database         *
+ *             description_proto_esc - trigger description                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status, unsigned char type,
 		unsigned char priority, const char *comments_esc, const char *url_esc, zbx_uint64_t parent_triggerid,
 		const char *description_proto_esc)
@@ -891,10 +927,31 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	triggers;
+	zbx_vector_uint64_t	triggerids;
+	zbx_uint64_t		triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&triggers);
+	zbx_vector_uint64_create(&triggerids);
+
+	/* list of generated trigger IDs (for later deletion of obsoleted triggers) */
+	result = DBselect(
+			"select distinct td.triggerid"
+			" from trigger_discovery td,triggers t,functions f,items i,item_discovery id"
+			" where td.parent_triggerid=t.triggerid"
+				" and t.triggerid=f.triggerid"
+				" and f.itemid=i.itemid"
+				" and i.itemid=id.itemid"
+				" and id.parent_itemid=" ZBX_FS_UI64,
+			discovery_itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(triggerid, row[0]);
+		zbx_vector_uint64_append(&triggerids, triggerid);
+	}
+	DBfree_result(result);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,"
@@ -906,12 +963,14 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 				" and id.parent_itemid=" ZBX_FS_UI64,
 			discovery_itemid);
 
+	/* run through trigger prototypes */
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	parent_triggerid;
 		const char	*description_proto, *expression;
 		char		*description_proto_esc, *comments_esc, *url_esc;
 		unsigned char	status, type, priority;
+		int		i;
 
 		ZBX_STR2UINT64(parent_triggerid, row[0]);
 		description_proto = row[1];
@@ -924,13 +983,13 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		url_esc = DBdyn_escape_string(row[7]);
 
 		p = NULL;
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^
- */		while (NULL != (p = zbx_json_next(jp_data, p)))
+		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*                      ^                                             */
+		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^------------------^
- */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+			/*                      ^------------------^                          */
+			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
@@ -949,10 +1008,25 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		zbx_free(comments_esc);
 		zbx_free(description_proto_esc);
 
+		for (i = 0; i < triggerids.values_num;)
+		{
+			if (FAIL != zbx_vector_ptr_bsearch(&triggers, &triggerids.values[i],
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_remove_noorder(&triggerids, i);
+			}
+			else
+				i++;
+		}
+
 		DBlld_clean_triggers(&triggers);
 	}
 	DBfree_result(result);
 
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_triggers(&triggerids);
+
+	zbx_vector_uint64_destroy(&triggerids);
 	zbx_vector_ptr_destroy(&triggers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -960,12 +1034,16 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_make_item                                                  *
+ * Function: DBlld_item_exists                                                *
  *                                                                            *
- * Parameters: parent_itemid - discovery rule identificator from database     *
+ * Purpose: check if item exists either in triggers list or in the database   *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             itemid - item identificator from database                      *
  *             key - new key descriptor with substituted macros               *
+ *             items - list of already checked items                          *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value: SUCCEED if item exists otherwise FAIL                        *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1439,13 +1517,13 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		ZBX_DBROW2UINT64(interfaceid, row[33]);
 
 		p = NULL;
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^
- */		while (NULL != (p = zbx_json_next(jp_data, p)))
+		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*                      ^                                             */
+		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^------------------^
- */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+			/*                      ^------------------^                          */
+			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
@@ -1973,13 +2051,37 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	graphs;
+	zbx_vector_uint64_t	graphids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&graphs);
+	zbx_vector_uint64_create(&graphids);
 	sql = zbx_malloc(sql, sql_alloc);
+
+	result = DBselect(
+			"select distinct gd.graphid"
+			" from item_discovery id,items i,graphs_items gi,graphs g"
+			" left join items i1 on i1.itemid=g.ymin_itemid"
+			" left join items i2 on i2.itemid=g.ymax_itemid"
+			" join graph_discovery gd on gd.parent_graphid=g.graphid"
+			" where id.itemid=i.itemid"
+				" and i.itemid=gi.itemid"
+				" and gi.graphid=g.graphid"
+				" and id.parent_itemid=" ZBX_FS_UI64,
+			discovery_itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	graphid;
+
+		ZBX_STR2UINT64(graphid, row[0]);
+
+		zbx_vector_uint64_append(&graphids, graphid);
+	}
+	DBfree_result(result);
 
 	result = DBselect(
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
@@ -2006,6 +2108,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d,
 				ymin_type = GRAPH_YAXIS_TYPE_CALCULATED, ymax_type = GRAPH_YAXIS_TYPE_CALCULATED,
 				ymin_flags = 0, ymax_flags = 0;
+		int		i;
 
 		ZBX_STR2UINT64(parent_graphid, row[0]);
 		name_proto = row[1];
@@ -2050,13 +2153,13 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		DBget_graphitems(sql, &gitems_proto, &gitems_proto_alloc, &gitems_proto_num);
 
 		p = NULL;
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^
- */		while (NULL != (p = zbx_json_next(jp_data, p)))
+		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*                      ^                                             */
+		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                      ^------------------^
- */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+			/*                      ^------------------^                          */
+			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
@@ -2077,11 +2180,26 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		zbx_free(gitems_proto);
 		zbx_free(name_proto_esc);
 
+		for (i = 0; i < graphids.values_num;)
+		{
+			if (FAIL != zbx_vector_ptr_bsearch(&graphs, &graphids.values[i],
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_remove_noorder(&graphids, i);
+			}
+			else
+				i++;
+		}
+
 		DBlld_clean_graphs(&graphs);
 	}
 	DBfree_result(result);
 
+	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_graphs(&graphids);
+
 	zbx_free(sql);
+	zbx_vector_uint64_destroy(&graphids);
 	zbx_vector_ptr_destroy(&graphs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2094,14 +2212,14 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
 	DB_ROW			row;
 	zbx_uint64_t		itemdiscoveryid, itemid;
 	int			lastcheck, ts_delete, lifetime_sec;
-	zbx_vector_uint64_t	items;
+	zbx_vector_uint64_t	itemids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lifetime:%hu", __function_name, lifetime);
 
 	sql = zbx_malloc(sql, sql_alloc);
-	zbx_vector_uint64_create(&items);
+	zbx_vector_uint64_create(&itemids);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -2124,7 +2242,7 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
 
 		if (lastcheck < now - lifetime_sec)
 		{
-			zbx_vector_uint64_append(&items, itemid);
+			zbx_vector_uint64_append(&itemids, itemid);
 		}
 		else if (ts_delete != lastcheck + lifetime_sec)
 		{
@@ -2137,15 +2255,15 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
 	}
 	DBfree_result(result);
 
-	zbx_vector_uint64_sort(&items, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DBdelete_items(&items);
+	DBdelete_items(&itemids);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	zbx_vector_uint64_destroy(&items);
+	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2230,9 +2348,9 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 		goto error;
 	}
 
-/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
- *                     ^-------------------------------------------^
- */	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+	/*                     ^-------------------------------------------^  */
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		error = zbx_dsprintf(error, "Cannot find the \"%s\" array in the received JSON object",
 				ZBX_PROTO_TAG_DATA);

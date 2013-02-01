@@ -1072,7 +1072,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 	DB_RESULT	result;
 	DB_ROW		row;
 
-/* disable actions */
+	/* disable actions */
 	result = DBselect("select distinct actionid from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
 			conditiontype, elementid);
 
@@ -1081,7 +1081,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 	DBfree_result(result);
 
-/* delete action conditions */
+	/* delete action conditions */
 	DBexecute("delete from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
 			conditiontype, elementid);
 }
@@ -1092,15 +1092,10 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Purpose: delete trigger from database                                      *
  *                                                                            *
- * Parameters: triggerids     - [IN] trigger identificators from database     *
- *             triggerids_num - [IN] number of triggers                       *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ * Parameters: triggerids - [IN] trigger identificators from database         *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, int *triggerids_num)
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
@@ -1109,37 +1104,42 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 
-	if (0 == *triggerids_num)
+	if (0 == triggerids->values_num)
 		return;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	do /* add child triggers (auto-created) */
+	/* add child triggers (auto-created) */
+	do
 	{
-		num = *triggerids_num;
+		num = triggerids->values_num;
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select triggerid"
 				" from trigger_discovery"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", *triggerids, *triggerids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid",
+				triggerids->values, triggerids->values_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(triggerid, row[0]);
-			uint64_array_add(triggerids, triggerids_alloc, triggerids_num, triggerid, 64);
+			zbx_vector_uint64_append(triggerids, triggerid);
 		}
 		DBfree_result(result);
+
+		zbx_vector_uint64_sort(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
-	while (num != *triggerids_num);
+	while (num != triggerids->values_num);
 
-	DBdelete_services_by_triggerids(*triggerids, *triggerids_num);
-	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, *triggerids, *triggerids_num);
+	DBdelete_services_by_triggerids(triggerids->values, triggerids->values_num);
+	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids->values, triggerids->values_num);
 
-	for (i = 0; i < *triggerids_num; i++)
-		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, (*triggerids)[i]);
+	for (i = 0; i < triggerids->values_num; i++)
+		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1150,7 +1150,7 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 				" and object=%d"
 				" and",
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", *triggerids, *triggerids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", triggerids->values, triggerids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	/* delete from profiles */
@@ -1158,13 +1158,13 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 			"delete from profiles"
 			" where idx='web.events.filter.triggerid'"
 				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", *triggerids, *triggerids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", triggerids->values, triggerids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", *triggerids, *triggerids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1189,13 +1189,14 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
  ******************************************************************************/
 static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 {
-	const char	*__function_name = "DBdelete_triggers_by_itemids";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	*triggerids = NULL, triggerid;
-	int		triggerids_alloc = 0, triggerids_num = 0;
-	char		*sql = NULL;
-	size_t		sql_alloc = 512, sql_offset = 0;
+	const char		*__function_name = "DBdelete_triggers_by_itemids";
+
+	char			*sql = NULL;
+	size_t			sql_alloc = 512, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
@@ -1203,6 +1204,7 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&triggerids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct triggerid"
@@ -1215,13 +1217,14 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
-		uint64_array_add(&triggerids, &triggerids_alloc, &triggerids_num, triggerid, 64);
+		zbx_vector_uint64_append(&triggerids, triggerid);
 	}
 	DBfree_result(result);
 
-	DBdelete_triggers(&triggerids, &triggerids_alloc, &triggerids_num);
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_triggers(&triggerids);
 
-	zbx_free(triggerids);
+	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1298,16 +1301,11 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
  *                                                                            *
  * Parameters: graphids - [IN] array of graph id's from database              *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
-static void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
+void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 {
 	const char	*__function_name = "DBdelete_graphs";
+
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		num;
@@ -1463,14 +1461,11 @@ out:
  *                                                                            *
  * Parameters: itemids - [IN] array of item identificators from database      *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
 void	DBdelete_items(zbx_vector_uint64_t *itemids)
 {
 	const char	*__function_name = "DBdelete_items";
+
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		num;
@@ -1797,18 +1792,19 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
  ******************************************************************************/
 static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
-	const char	*__function_name = "DBdelete_template_triggers";
+	const char		*__function_name = "DBdelete_template_triggers";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	*triggerids = NULL, triggerid;
-	int		triggerids_alloc = 0, triggerids_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&triggerids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct f.triggerid"
@@ -1825,13 +1821,14 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
-		uint64_array_add(&triggerids, &triggerids_alloc, &triggerids_num, triggerid, 64);
+		zbx_vector_uint64_append(&triggerids, triggerid);
 	}
 	DBfree_result(result);
 
-	DBdelete_triggers(&triggerids, &triggerids_alloc, &triggerids_num);
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_triggers(&triggerids);
 
-	zbx_free(triggerids);
+	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
