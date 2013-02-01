@@ -788,6 +788,21 @@ static int	DBpatch_02010035()
 
 	return FAIL;
 }
+
+static int	DBpatch_02010036()
+{
+	const char	*sql =
+			"update profiles"
+			" set value_int=case when value_str='1' then 1 else 0 end,"
+				"value_str='',"
+				"type=2"	/* PROFILE_TYPE_INT */
+			" where idx like '%isnow'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -861,6 +876,7 @@ int	DBcheck_version()
 		{DBpatch_02010033, 2010033, 0, 1},
 		{DBpatch_02010034, 2010034, 0, 1},
 		{DBpatch_02010035, 2010035, 0, 0},
+		{DBpatch_02010036, 2010036, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
