@@ -234,7 +234,7 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
  *                                                                            *
  * Purpose: clean up timeout for socket operations                            *
  *                                                                            *
- * Parameters: s       - [IN] socket descriptor                               *
+ * Parameters: s - [OUT] socket descriptor                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -256,7 +256,9 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
  *                                                                            *
  * Purpose: connect to external host                                          *
  *                                                                            *
- * Return value: sockfd - open socket                                         *
+ * Parameters: s - [OUT] socket descriptor                                    *
+ *                                                                            *
+ * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1098,11 +1100,11 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: check_security                                                   *
+ * Function: zbx_tcp_check_security                                           *
  *                                                                            *
  * Purpose: check if connection initiator is in list of IP addresses          *
  *                                                                            *
- * Parameters: sockfd - socket descriptor                                     *
+ * Parameters: s - socket descriptor                                          *
  *             ip_list - comma-delimited list of IP addresses                 *
  *             allow_if_empty - allow connection if no IP given               *
  *                                                                            *
@@ -1124,13 +1126,10 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	unsigned char	ipv4_mpd_mask[12] = {0,0,0,0,0,0,0,0,0,0,255,255};	/* IPv4-Mapped, the first 80 bits are zeros, 16 next - ones */
 #else
 	struct hostent	*hp;
-	char		*sip;
-	int		i[4], j[4];
 #endif
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
-
-	char		tmp[MAX_STRING_LEN], sname[MAX_STRING_LEN], *start = NULL, *end = NULL;
+	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL;
 
 	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
 		return SUCCEED;
@@ -1144,13 +1143,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	}
 	else
 	{
-#if !defined(HAVE_IPV6)
-		zbx_strlcpy(sname, inet_ntoa(name.sin_addr), sizeof(sname));
-
-		if (4 != sscanf(sname, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]))
-			return FAIL;
-#endif
-		strscpy(tmp,ip_list);
+		strscpy(tmp, ip_list);
 
 		for (start = tmp; '\0' != *start;)
 		{
@@ -1220,16 +1213,8 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 				freeaddrinfo(ai);
 			}
 #else
-			if (NULL != (hp = gethostbyname(start)))
-			{
-				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
-
-				if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
-						i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
-				{
-					return SUCCEED;
-				}
-			}
+			if (NULL != (hp = gethostbyname(start)) && (name.sin_addr.s_addr == ((struct in_addr*)hp->h_addr)->s_addr))
+				return SUCCEED;
 #endif	/* HAVE_IPV6 */
 			if (NULL != end)
 			{
@@ -1244,12 +1229,12 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
-		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
+	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
+		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed servers are [%s].", tmp, ip_list);
 	else
-		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
+		zbx_set_tcp_strerror("Connection rejected. Allowed servers are [%s].", ip_list);
 #else
-	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
+	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed servers are [%s].", inet_ntoa(name.sin_addr), ip_list);
 #endif
 	return	FAIL;
 }
