@@ -38,7 +38,7 @@ class testPageEvents extends CWebTest {
 		$this->ok('Filter');
 		$this->ok('Displaying');
 		// table header
-		if (0 == DBcount('select * from events where value_changed=1 and source='.EVENT_SOURCE_TRIGGERS)) {
+		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS)) {
 			$this->ok('No events defined.');
 		}
 		else {

@@ -34,7 +34,7 @@ class testPageStatusOfZabbix extends CWebTest {
 		$this->ok('Zabbix server is running');
 		$this->ok('Number of hosts (monitored/not monitored/templates)');
 		$this->ok('Number of items (monitored/disabled/not supported)');
-		$this->ok('Number of triggers (enabled/disabled)[problem/unknown/ok]');
+		$this->ok('Number of triggers (enabled/disabled)[problem/ok]');
 		$this->ok('Number of users (online)');
 		$this->ok('Required server performance, new values per second');
 	}

@@ -40,6 +40,7 @@ function getLocales() {
 	$locales = array(
 		'en_GB' => _('English (en_GB)'),
 		'en_US' => _('English (en_US)'),
+		'bg_BG' => _('Bulgarian (bg_BG)'),
 		'zh_CN' => _('Chinese (zh_CN)'),
 		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
@@ -54,6 +55,7 @@ function getLocales() {
 		'ko_KR' => _('Korean (ko_KR)'),
 		'ja_JP' => _('Japanese (ja_JP)'),
 		'lv_LV' => _('Latvian (lv_LV)'),
+//		'lt_LT' => _('Lithuanian (lt_LT)'),
 		'fa_IR' => _('Persian (fa_IR)'),
 		'pl_PL' => _('Polish (pl_PL)'),
 		'pt_BR' => _('Portuguese (pt_BR)'),
@@ -136,6 +138,7 @@ function zbx_locale_variants_win($language) {
 	$winLanguageName = array(
 		'en_gb' => array('English_United Kingdom.1252', 'english-uk'),
 		'en_us' => array('English_United States.1252', 'english-usa'),
+		'bg_bg' => array('Bulgarian_Bulgaria.1251'),
 		'zh_cn' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
 		'zh_tw' => array('Chinese_Taiwan.950', 'chinese'),
 		'cs_cz' => array('Czech_Czech Republic.1250', 'czech'),
@@ -150,6 +153,7 @@ function zbx_locale_variants_win($language) {
 		'ko_kr' => array('Korean_Korea.949', 'korean'),
 		'ja_jp' => array('Japanese_Japan.932', 'japanese'),
 		'lv_lv' => array('Latvian_Latvia.1257', 'latvian'),
+//		'lt_lt' => array('Lithuanian_Lithuania.1257', 'lithuanian'),
 		'fa_ir' => array('Farsi_Iran.1256', 'farsi'),
 		'pl_pl' => array('Polish_Poland.1250', 'polish'),
 		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese-brazil'),

@@ -303,7 +303,6 @@ typedef struct
 	int		object;
 	int		clock;
 	int		value;
-	unsigned char	value_changed;
 	int		acknowledged;
 	int		ns;
 }
@@ -526,10 +525,9 @@ ZBX_GRAPH_ITEMS;
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-void	DBupdate_triggers_status_after_restart();
 int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
-		const zbx_timespec_t *ts, unsigned char *add_event, unsigned char *value_changed);
+		unsigned char type, int value, int value_flags, const char *error, int lastchange,
+		int new_value, const char *new_error, int new_lastchange, unsigned char *add_event);
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
 int	DBget_queue_count(int from, int to);
@@ -562,6 +560,8 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
+void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);

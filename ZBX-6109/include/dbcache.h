@@ -146,12 +146,12 @@ typedef struct
 	char		error[TRIGGER_ERROR_LEN_MAX];
 	char		*new_error;
 	zbx_timespec_t	timespec;
+	int		lastchange;
 	unsigned char	type;
 	unsigned char	value;
 	unsigned char	value_flags;
 	unsigned char	new_value;
 	unsigned char	add_event;
-	unsigned char	value_changed;
 }
 DC_TRIGGER;
 
@@ -250,7 +250,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char value_flags, const char *error);
+		unsigned char value_flags, const char *error, int *lastchange);
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
