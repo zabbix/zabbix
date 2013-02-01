@@ -27,16 +27,23 @@ $chartForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getH
 $chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->getGraphsCB(true)));
 
 $chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
-$chartsWidget->addPageHeader(_('Graphs'), array(
-	get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
-	SPACE,
-	get_icon('reset', array('id' => $this->data['graphid'])),
-	SPACE,
-	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
-));
+
+if ($this->data['graphid']) {
+	$chartsWidget->addPageHeader(_('Graphs'), array(
+		get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
+		SPACE,
+		get_icon('reset', array('id' => $this->data['graphid'])),
+		SPACE,
+		get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
+	));
+}
+else {
+	$chartsWidget->addPageHeader(_('Graphs'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+}
+
 $chartsWidget->addHeader(
-	!empty($this->data['pageFilter']->graphs[$this->data['pageFilter']->graphid])
-		? $this->data['pageFilter']->graphs[$this->data['pageFilter']->graphid]
+	isset($this->data['pageFilter']->graphs[$this->data['graphid']])
+		? $this->data['pageFilter']->graphs[$this->data['graphid']]
 		: null,
 	$chartForm
 );
