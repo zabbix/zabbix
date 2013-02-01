@@ -596,6 +596,16 @@ function DBfetch(&$cursor, $convertNulls = true) {
 			if (!$result = db2_fetch_assoc($cursor)) {
 				db2_free_result($cursor);
 			}
+			else {
+				// cast all of the values to string to be consistent with other DB drivers: all of them return
+				// only strings.
+				foreach ($result as &$value) {
+					if ($value !== null) {
+						$value = (string) $value;
+					}
+				}
+				unset($value);
+			}
 			break;
 		case ZBX_DB_SQLITE3:
 			if ($DB['TRANSACTIONS'] == 0) {
