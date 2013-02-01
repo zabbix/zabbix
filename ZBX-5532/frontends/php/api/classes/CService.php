@@ -1569,7 +1569,8 @@ class CService extends CZBXAPI {
 
 		// selectTimes
 		if ($options['selectTimes'] !== null) {
-			$timesOutput = $this->extendOutputOption('services_times', 'serviceid', $options['selectTimes']);
+			$timesOutput = $this->extendOutputOption('services_times', array('serviceid', 'type'), $options['selectTimes']);
+
 			$serviceTimes = API::getApi()->select('services_times', array(
 				'output' => $timesOutput,
 				'filter' => array('serviceid' => $serviceIds)
@@ -1578,15 +1579,18 @@ class CService extends CZBXAPI {
 				$service['times'] = array();
 			}
 			unset($service);
+
 			foreach ($serviceTimes as $serviceTime) {
 				$refId = $serviceTime['serviceid'];
 				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
 
-				if (isset($serviceTime['ts_from'])) {
-					$serviceTime['ts_from'] = prepareServiceTime($serviceTime['ts_from']);
-				}
-				if (isset($serviceTime['ts_to'])) {
-					$serviceTime['ts_to'] = prepareServiceTime($serviceTime['ts_to']);
+				if ($serviceTime['type'] == SERVICE_TIME_TYPE_UPTIME || $serviceTime['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
+					if (isset($serviceTime['ts_from'])) {
+						$serviceTime['ts_from'] = prepareServiceTime($serviceTime['ts_from']);
+					}
+					if (isset($serviceTime['ts_to'])) {
+						$serviceTime['ts_to'] = prepareServiceTime($serviceTime['ts_to']);
+					}
 				}
 
 				$result[$refId]['times'][] = $serviceTime;
