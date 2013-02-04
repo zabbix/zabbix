@@ -584,17 +584,11 @@ class CTrigger extends CTriggerGeneral {
 		// expandDescription
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
-
-			// unset the expression if it's not requested
-			$result = $this->unsetExtraFields($result, array('expression'), $options['output']);
 		}
 
 		// expandComment
 		if (!is_null($options['expandComment']) && $result && array_key_exists('comment', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
-
-			// unset the expression if it's not requested
-			$result = $this->unsetExtraFields($result, array('expression'), $options['output']);
 		}
 
 		// expand expression
@@ -614,6 +608,9 @@ class CTrigger extends CTriggerGeneral {
 
 		// deprecated fields
 		$result = $this->handleDeprecatedOutput($result, 'value_flag', 'state', $options['output']);
+
+		// unset extra fields
+		$result = $this->unsetExtraFields($result, array('state', 'expression'), $options['output']);
 
 		return $result;
 	}
