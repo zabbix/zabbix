@@ -874,7 +874,7 @@ class CZBXAPI {
 
 	/**
 	 * Adds a deprecated property to an array of resulting objects if it's requested in $output. The value for the
-	 * deprecated property will be taken from the new one.
+	 * deprecated property will be taken from the new one. If the new value is not requested, it will be unset.
 	 *
 	 * @param array         $objects
 	 * @param string        $deprecatedProperty
@@ -883,10 +883,15 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	protected function addDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
+	protected function handleDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
+		$newPropertyRequested = $this->outputIsRequested($newProperty, $output);
 		if ($this->outputIsRequested($deprecatedProperty, $output)) {
 			foreach ($objects as &$object) {
 				$object[$deprecatedProperty] = $object[$newProperty];
+
+				if (!$newPropertyRequested) {
+					unset($object[$newProperty]);
+				}
 			}
 			unset($object);
 		}

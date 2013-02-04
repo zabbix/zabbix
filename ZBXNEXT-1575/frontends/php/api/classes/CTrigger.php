@@ -118,6 +118,8 @@ class CTrigger extends CTriggerGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->checkDeprecatedParam($options, 'output', 'value_flag');
+
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -609,6 +611,9 @@ class CTrigger extends CTriggerGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
+		// deprecated fields
+		$result = $this->handleDeprecatedOutput($result, 'value_flag', 'state', $options['output']);
 
 		return $result;
 	}
@@ -1845,6 +1850,11 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($options['expandDescription'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
+			}
+
+			// select the state field to be able to return the deprecated value_flag property
+			if ($this->outputIsRequested('value_flag', $options['output'])) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('state'), $sqlParts);
 			}
 		}
 
