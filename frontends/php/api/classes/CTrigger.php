@@ -712,10 +712,9 @@ class CTrigger extends CTriggerGeneral {
 	public function checkInput(array &$triggers, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
-		$delete = ($method == 'delete');
 
 		// permissions
-		if ($update || $delete) {
+		if ($update) {
 			$triggerDbFields = array('triggerid' => null);
 			$dbTriggers = $this->get(array(
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -742,7 +741,7 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => &$trigger) {
 			$currentTrigger = $triggers[$tnum];
 
-			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
+			if ($update && !isset($dbTriggers[$trigger['triggerid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
@@ -761,21 +760,9 @@ class CTrigger extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
-			if ($update) {
-				$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			}
-			elseif ($delete) {
-				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger "%1$s:%2$s".', $dbTriggers[$trigger['triggerid']]['description'],
-							explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
-					);
-				}
-				continue;
-			}
-
 			$expressionChanged = true;
 			if ($update) {
+				$dbTrigger = $dbTriggers[$trigger['triggerid']];
 				if (isset($trigger['expression'])) {
 					$expressionFull = explode_exp($dbTrigger['expression']);
 					if (strcmp($trigger['expression'], $expressionFull) == 0) {
@@ -957,17 +944,8 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function delete($triggerids, $nopermissions = false) {
 		$triggerids = zbx_toArray($triggerids);
-		$triggers = zbx_toObject($triggerids, 'triggerid');
-		$delTriggerIds = $triggerids;
 
-		if (empty($triggerids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		// TODO: remove $nopermissions hack
-		if (!$nopermissions) {
-			$this->checkInput($triggers, __FUNCTION__);
-		}
+		$this->validateDelete($triggerids, $nopermissions);
 
 		// get child triggers
 		$parentTriggerids = $triggerids;
@@ -998,7 +976,28 @@ class CTrigger extends CTriggerGeneral {
 		// execute delete
 		$this->deleteByPks($triggerids);
 
-		return array('triggerids' => $delTriggerIds);
+		return array('triggerids' => $triggerids);
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array     $triggerIds
+	 * @param boolean   $nopermissions  if set to true permissions will not be checked
+	 *
+	 * @return void
+	 */
+	protected function validateDelete(array $triggerIds, $nopermissions) {
+		if (!$triggerIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		if (!$nopermissions) {
+			$this->checkPermissions($triggerIds);
+		}
+		$this->checkNotInherited($triggerIds);
 	}
 
 
@@ -1948,5 +1947,40 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return $sqlParts;
+	}
+
+	/**
+	 * Checks if all of the given triggers are available for writing.
+	 *
+	 * @throws APIException     if a trigger is not writable or does not exist
+	 *
+	 * @param array $triggerIds
+	 */
+	protected function checkPermissions(array $triggerIds) {
+		if (!$this->isWritable($triggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Checks that none of the given triggers are inherited from a template.
+	 *
+	 * @throws APIException     if one of the triggers is inherited
+	 *
+	 * @param array $triggerIds
+	 */
+	protected function checkNotInherited(array $triggerIds) {
+		$trigger = DBfetch(DBselect(
+			'SELECT t.triggerid,t.description,t.expression'.
+				' FROM triggers t'.
+				' WHERE '.dbConditionInt('t.triggerid', $triggerIds).
+				'AND t.templateid IS NOT NULL',
+			1
+		));
+		if ($trigger) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot delete templated trigger "%1$s:%2$s".', $trigger['description'],	explode_exp($trigger['expression']))
+			);
+		}
 	}
 }
