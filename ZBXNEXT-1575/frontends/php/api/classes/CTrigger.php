@@ -745,16 +745,13 @@ class CTrigger extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $trigger)) {
-				if ($update) {
-					$error = _s('Cannot update "templateid" for trigger "%1$s".', $trigger['description']);
-				}
-				else {
-					$error = _s('Cannot set "templateid" for trigger "%1$s".', $trigger['description']);
-				}
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			if ($update) {
+				$error = _s('Cannot update "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
 			}
+			else {
+				$error = _s('Cannot set "%1$s" for trigger "%2$s".', '%1$s', $trigger['description']);
+			}
+			$this->checkNoParameters($trigger, array('templateid', 'state', 'value', 'value_flag'), $error);
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));

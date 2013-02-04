@@ -744,6 +744,23 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Checks if an objects contains any of the given parameters.
+	 *
+	 * @throws APIException     if any of the parameters are present in the object
+	 *
+	 * @param array $object
+	 * @param array $params
+	 * @param $error
+	 */
+	protected function checkNoParameters(array $object, array $params, $error) {
+		foreach ($params as $param) {
+			if (array_key_exists($param, $object)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $param));
+			}
+		}
+	}
+
+	/**
 	 * Throws an API exception.
 	 *
 	 * @static
