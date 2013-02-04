@@ -26,6 +26,42 @@ define('TRIGGER_BAD', 1);
 
 class testFormTrigger extends CWebTest {
 
+	// returns all possible trigger data
+	public static function triggerData() {
+		return array(
+			array(
+				array('constructor' => 'open')
+			),
+			array(
+				array('constructor' => 'open_close')
+			),
+			array(
+				array('constructor' => 'open', 'severity' => 'Warning')
+			),
+			array(
+				array('constructor' => 'open_close', 'severity' => 'Disaster')
+			),
+			array(
+				array('severity' => 'Not classified')
+			),
+			array(
+				array('severity' => 'Information')
+			),
+			array(
+				array('severity' => 'Warning')
+			),
+			array(
+				array('severity' => 'Average')
+			),
+			array(
+				array('severity' => 'High')
+			),
+			array(
+				array('severity' => 'Disaster')
+			)
+		);
+	}
+
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
@@ -34,9 +70,9 @@ class testFormTrigger extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider itemTypes
+	 * @dataProvider triggerData
 	 */
-	public function testFormTrigger_CheckLayout() {
+	public function testFormTrigger_CheckLayout($data) {
 
 		$this->login('triggers.php');
 		$this->checkTitle('Configuration of triggers');
@@ -46,91 +82,128 @@ class testFormTrigger extends CWebTest {
 		$this->wait();
 		$this->checkTitle('Configuration of triggers');
 
-		$this->ok('Name');
-		$this->ok('Expression');
-		$this->ok('Expression constructor');
-		$this->ok('Multiple PROBLEM events generation');
-		$this->ok('Description');
-		$this->ok('URL');
-		$this->ok('Severity');
-		$this->ok('Enabled');
-		$this->ok('Not classified');
-		$this->ok('Information');
-		$this->ok('Warning');
-		$this->ok('Average');
-		$this->ok('High');
-		$this->ok('Disaster');
-		$this->ok('Dependencies');
-		$this->ok('No dependencies defined.');
-		$this->ok('Name');
-		$this->ok('Action');
+		if (isset($data['constructor'])) {
+			switch ($data['constructor']) {
+				case 'open':
+					$this->button_click("//span[text()='Expression constructor']");
+					sleep(1);
+					break;
+				case 'open_close':
+					$this->button_click("//span[text()='Expression constructor']");
+					sleep(1);
+					$this->button_click("//span[text()='Close expression constructor']");
+					sleep(1);
+					break;
+				default:
+					break;
+			}
+		}
 
-		$this->assertElementPresent('description');
+		$this->ok('Trigger');
+		$this->ok('Name');
+		$this->assertVisible('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
+		$this->assertAttribute("//input[@id='description']/@size", '50');
 
-		$this->assertElementPresent('expression');
-		$this->assertAttribute("//*[@id='expression']/@rows", '7');
+		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
+			$this->ok(array('Expression', 'Expression constructor'));
+			$this->assertVisible('expression');
+			$this->assertAttribute("//textarea[@id='expression']/@rows", '7');
+			$this->assertVisible('insert');
+			$this->assertAttribute("//input[@id='insert']/@value", 'Add');
 
-		$this->assertElementPresent("//*/span[text()='Expression constructor']");
+			$this->assertElementNotPresent('add_expression');
+			$this->assertElementNotPresent('insert_macro');
+			$this->assertElementNotPresent('exp_list');
+		} else {
+			$this->ok('Expression');
+			$this->assertVisible('expr_temp');
+			$this->assertAttribute("//textarea[@id='expr_temp']/@rows", '7');
+			$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
+			$this->nok('Expression constructor');
+			$this->assertNotVisible('expression');
 
-		// expression constructor
-		$this->button_click("//*/span[text()='Expression constructor']");
-		sleep(1);
+			$this->assertVisible('add_expression');
+			$this->assertAttribute("//input[@id='add_expression']/@value", 'Add');
 
-		$this->ok('Target');
-		$this->ok('Expression');
-		$this->ok('Error');
-		$this->ok('Action');
-		$this->ok('Close expression constructor');
+			$this->assertVisible('insert');
+			$this->assertAttribute("//input[@id='insert']/@value", 'Edit');
 
-		$this->assertElementPresent('insert');
-		$this->assertElementPresent('insert_macro');
-		$this->assertElementPresent('expr_temp');
-		$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
-		$this->assertElementPresent("//*/span[text()='Close expression constructor']");
+			$this->assertVisible('insert_macro');
+			$this->assertAttribute("//input[@id='insert_macro']/@value", 'Insert macro');
 
-		$this->button_click("//*/span[text()='Close expression constructor']");
-		sleep(1);
-		$this->nok('Insert macro');
-		$this->nok('Close expression constructor');
+			$this->ok(array('Target', 'Expression', 'Error', 'Action', 'Close expression constructor'));
+			$this->assertVisible('exp_list');
+			$this->ok('Close expression constructor');
+		}
 
-		$this->assertElementPresent('type');
-		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');
-		$this->assertFalse($this->isChecked('type'));
 
-		$this->assertElementPresent('comments');
-		$this->assertAttribute("//*[@id='comments']/@rows", '7');
+		$this->ok('Multiple PROBLEM events generation');
+		$this->assertVisible('type');
+		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');// TODO not checked
 
-		$this->assertElementPresent('url');
+		$this->ok('Description');
+		$this->assertVisible('comments');
+		$this->assertAttribute("//textarea[@id='comments']/@rows", '7');
+
+		$this->ok('URL');
+		$this->assertVisible('url');
 		$this->assertAttribute("//input[@id='url']/@maxlength", '255');
+		$this->assertAttribute("//input[@id='url']/@size", '50');
 
-		$this->assertElementPresent('severity_0');
+		$this->assertVisible('severity_0');
 		$this->assertAttribute("//*[@id='severity_0']/@checked", 'checked');
 		$this->assertElementPresent("//*[@id='severity_label_0']/span[text()='Not classified']");
-
-		$this->assertElementPresent('severity_1');
+		$this->assertVisible('severity_1');
 		$this->assertElementPresent("//*[@id='severity_label_1']/span[text()='Information']");
-
-		$this->assertElementPresent('severity_2');
+		$this->assertVisible('severity_2');
 		$this->assertElementPresent("//*[@id='severity_label_2']/span[text()='Warning']");
-
-		$this->assertElementPresent('severity_3');
+		$this->assertVisible('severity_3');
 		$this->assertElementPresent("//*[@id='severity_label_3']/span[text()='Average']");
-
-		$this->assertElementPresent('severity_4');
+		$this->assertVisible('severity_4');
 		$this->assertElementPresent("//*[@id='severity_label_4']/span[text()='High']");
-
-		$this->assertElementPresent('severity_5');
+		$this->assertVisible('severity_5');
 		$this->assertElementPresent("//*[@id='severity_label_5']/span[text()='Disaster']");
 
-		$this->assertElementPresent('status');
-		$this->assertTrue($this->isChecked('status'));
+		if (isset($data['severity'])) {
+			switch ($data['severity']) {
+				case 'Not classified':
+					$this->button_click('severity_0');
+					break;
+				case 'Information':
+					$this->button_click('severity_1');
+					break;
+				case 'Warning':
+					$this->button_click('severity_2');
+					break;
+				case 'Average':
+					$this->button_click('severity_3');
+					break;
+				case 'High':
+					$this->button_click('severity_4');
+					break;
+				case 'Disaster':
+					$this->button_click('severity_5');
+					break;
+				default:
+					break;
+			}
+		}
 
-		$this->assertElementPresent('save');
-		$this->assertElementPresent('cancel');
+		$this->ok('Enabled');
+		$this->assertVisible('status');
+		$this->assertAttribute("//input[@id='status']/@type", 'checkbox');
+
+		$this->assertVisible('save');
+		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+
+		$this->assertVisible('cancel');
+		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
+
 		$this->button_click('link=Dependencies');
+		$this->ok(array('Dependencies', 'Name', 'Action', 'No dependencies defined'));
 		$this->assertElementPresent('bnt1');
-		$this->button_click('link=Trigger');
+		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
 
 	/**
