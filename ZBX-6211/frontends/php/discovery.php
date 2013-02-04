@@ -40,6 +40,17 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('ip', ZBX_SORT_UP);
 
+// check discovery for existing if defined druleid and it > 0 (0 - all)
+if (isset($_REQUEST['druleid']) && $_REQUEST['druleid'] > 0) {
+	$dbDRule = API::DRule()->get(array(
+			'druleids' => $_REQUEST['druleid'],
+			'countOutput' => true
+	));
+	if (!$dbDRule) {
+		access_deny();
+	}
+}
+
 /*
  * Ajax
  */
