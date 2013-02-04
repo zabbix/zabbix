@@ -414,7 +414,7 @@ static int	DBdrop_field(const char *table_name, const char *field_name)
 	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = SUCCEED;
+		ret = DBreorg_table(table_name);
 
 	zbx_free(sql);
 
