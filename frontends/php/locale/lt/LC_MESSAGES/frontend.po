@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-02-01 15:19+0200\n"
-"PO-Revision-Date: 2013-02-01 13:33+0200\n"
+"PO-Revision-Date: 2013-02-01 16:06+0200\n"
 "Last-Translator: Saulute <salomejazelskyte@gmail.com>\n"
 "Language-Team: none\n"
 "Language: lt\n"
@@ -28,7 +28,7 @@ msgstr "\"Rodyti OK trigerius\" reikšmė turi būti \"0\" arba teigiamas sveika
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Trigeriai mirksi keičiantis statusui\" reikšmė turi būti \"0\" arba teigiamas sveikasis skaičius."
 
-# it would be good if first form would be written like "pirmą dieną (first day), or "vieną dieną" (one day). Just for number 1.
+# 
 # „%1 -ą“ (1, 21, 31, 41, 51 and etc..)
 # „%1 -as“ (2-9, 22-29,49,42, and etc.)
 # „%1 -ų“ (10-20, 30, 40, 50 and etc..)
@@ -45,22 +45,22 @@ msgstr[2] "%1$d dienų,"
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d scenarijų"
+msgstr[1] "%1$d scenarijus"
+msgstr[2] "%1$d scenarijų"
 
 #: chart4.php:90 chart5.php:83
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (metai %2$s)"
 
 #: latest.php:379 latest.php:556
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s Elementą"
+msgstr[1] "%1$s Elementus"
+msgstr[2] "%1$s Elementų"
 
 #: include/page_header.php:480
 #, php-format
@@ -92,34 +92,34 @@ msgstr ""
 
 #: include/views/configuration.hostgroups.list.php:31
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Tik Super Administratorius gali sukurti grupę)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:143
 msgid "(Only superadmins can create group)"
-msgstr ""
+msgstr "(Tik super administratoriai gali sukurti grupę)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
-msgstr ""
+msgstr "(dienomis)"
 
 #: include/forms.inc.php:436
 msgid "(in sec)"
-msgstr ""
+msgstr "(sekundėmis)"
 
 #: include/views/configuration.action.edit.php:434
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(mažiausiai 60 sekundžių, 0 - naudoti numatytą veiksmą)"
 
 #: include/views/configuration.host.edit.php:284
 #: include/views/configuration.host.massupdate.php:60
 msgid "(no proxy)"
-msgstr ""
+msgstr "(nerastas įgaliotasis serveris)"
 
 #: include/views/configuration.screen.constructor.edit.php:475 popup.php:1875
 #: popup.php:1876
 msgid "- all groups -"
-msgstr ""
+msgstr "- visos grupės -"
 
 #: acknow.php:97
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -131,35 +131,35 @@ msgstr ""
 #: include/triggers.inc.php:2235 include/triggers.inc.php:2236
 #: include/triggers.inc.php:2247 include/triggers.inc.php:2254
 msgid "0 or 1"
-msgstr ""
+msgstr "0 arba 1"
 
 #: queue.php:162 queue.php:225
 msgid "1 minute"
-msgstr ""
+msgstr "1 minutė"
 
 #: queue.php:160 queue.php:223
 msgid "10 seconds"
-msgstr ""
+msgstr "10 sekundžių"
 
 #: queue.php:161 queue.php:224
 msgid "30 seconds"
-msgstr ""
+msgstr "30 sekundžių"
 
 #: include/views/configuration.graph.edit.php:277
 msgid "3D view"
-msgstr ""
+msgstr "3D vaizdas"
 
 #: queue.php:163 queue.php:226
 msgid "5 minutes"
-msgstr ""
+msgstr "5 minutės"
 
 #: queue.php:159 queue.php:222
 msgid "5 seconds"
-msgstr ""
+msgstr "5 sekundės"
 
 #: include/items.inc.php:794 include/views/monitoring.history.php:63
 msgid "500 latest values"
-msgstr ""
+msgstr "500 paskutinių reikšmių"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
