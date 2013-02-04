@@ -759,7 +759,7 @@ class CService extends CZBXAPI {
 			elseif ($time['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
 				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'dt');
 			}
-			elseif($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $periodStart && $time['ts_from'] <= $periodEnd) {
+			elseif ($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $periodStart && $time['ts_from'] <= $periodEnd) {
 				if ($time['ts_from'] < $periodStart) {
 					$time['ts_from'] = $periodStart;
 				}
@@ -1567,7 +1567,8 @@ class CService extends CZBXAPI {
 
 		// selectTimes
 		if ($options['selectTimes'] !== null) {
-			$timesOutput = $this->extendOutputOption('services_times', 'serviceid', $options['selectTimes']);
+			$timesOutput = $this->extendOutputOption('services_times', array('serviceid', 'type'), $options['selectTimes']);
+
 			$serviceTimes = API::getApi()->select('services_times', array(
 				'output' => $timesOutput,
 				'filter' => array('serviceid' => $serviceIds)
@@ -1576,8 +1577,20 @@ class CService extends CZBXAPI {
 				$service['times'] = array();
 			}
 			unset($service);
+
 			foreach ($serviceTimes as $serviceTime) {
 				$refId = $serviceTime['serviceid'];
+
+				// convert periodical service time timestamps from old 1.8 format
+				if ($serviceTime['type'] == SERVICE_TIME_TYPE_UPTIME || $serviceTime['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
+					if (isset($serviceTime['ts_from'])) {
+						$serviceTime['ts_from'] = prepareServiceTime($serviceTime['ts_from']);
+					}
+					if (isset($serviceTime['ts_to'])) {
+						$serviceTime['ts_to'] = prepareServiceTime($serviceTime['ts_to']);
+					}
+				}
+
 				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
 				$result[$refId]['times'][] = $serviceTime;
 			}

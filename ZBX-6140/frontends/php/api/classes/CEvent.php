@@ -115,7 +115,9 @@ class CEvent extends CZBXAPI {
 				$options['object'] = EVENT_OBJECT_TRIGGER;
 			}
 
-			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGERS) {
+			if (($options['object'] !== null && $options['object'] == EVENT_OBJECT_TRIGGER) ||
+					($options['source'] !== null && $options['source'] == EVENT_SOURCE_TRIGGERS)) {
+
 				if (!is_null($options['triggerids'])) {
 					$triggers = API::Trigger()->get(array(
 						'triggerids' => $options['triggerids'],

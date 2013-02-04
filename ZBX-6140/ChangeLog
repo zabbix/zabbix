@@ -1,30 +1,50 @@
 Changes for 2.0.5rc1
 
 New features:
+.......PS. [ZBXNEXT-1600] increased maximum values of *CacheSize parameters up to 2GB (Sasha)
+....I..... [ZBX-5957] added configure options to specify iconv include/lib directories (wiper)
 A.F....... [ZBX-1357] added Bulgarian translation (Richlv)
 ...G...... [ZBX-6040] added support of Windows 8 and Windows Server 2012 for system.uname check (Sasha)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Japanese, Latvian, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Finnish, French, German, Greek, Hungarian, Japanese, Latvian, Polish, Portuguese (Portugal), Russian, Spanish, Swedish, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
 ...G...... [ZBX-6140] fixed job creation for script execution on windows 2000 (wiper)
+..F....... [ZBX-5933] fixed triggers with negative values in graphs (Oleg)
+A.F....... [ZBX-5532] added support of 1.8 IT services time format (Eduard)
+A......... [ZBX-5945] fixed map URL expanding (Eduard)
+........S. [ZBX-5968] fixed updating of triggers and graphs when low-level discovered value changes (Sasha)
+..F....... [ZBX-6180] fixed host edit page for IBM DB2 (Oleg)
+...G...... [ZBX-5863] changed external command execution to store output in a dynamically allocated buffer up to 512KB (wiper)
+..F....... [ZBX-6177] fixed testing of a trigger expression with an item prototype (Sasha)
+..F....... [ZBX-6175] fixed password field naming in item properties (Oleg)
+A.F....... [ZBX-6005] fixed event.get not returning network discovery or auto-registration events for admin users when passing only the "source" parameter (Pavels)
+..F....... [ZBX-6173] removed unknown trigger color from the trigger overview help pop up (Pavels)
+...G...... [ZBX-6161] fixed reading empty files with vfs.file.contents key (wiper)
+..F....... [ZBX-5458] fixed some date strings being not translatable (Toms)
+..F....... [ZBX-6114] fixed errors in graphs (invalid arguments and division by zero) (Oleg)
+...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
+A......... [ZBX-6142] fixed "Current host" removing in Configuration -> Actions -> Operations (Oleg)
+..F....... [ZBX-6131] fixed undefined indexes in maintenance periods (Oleg)
+..F....... [ZBX-6133] fixed undefined indexes when importing hosts with "Update existing" disabled (Pavels)
+..F....... [ZBX-6122] fixed error when trying to create an IT service and submitting an incorrectly filled form (Pavels)
+.......PS. [ZBX-6101] fixed processing of SNMP traps in maintenance "with data collection"; thanks to Volker Fröhlich for patch (Sasha)
 .......PS. [ZBX-6012] added support of user macros and global regular expressions in SNMP trap item key parameter (Sasha)
-.......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
+.......PS. [ZBX-5973] improved performance of SNMP dynamic index item cache building in poller processes (Andris)
 A......... [ZBX-3534] fixed templated linking using read-only template (Eduard)
-..F....... [ZBX-5458] fixed some date strings are not being translated (Toms)
-..F....... [ZBX-6110] fixed selected map remembering in monitoring->map (Eduard)
+..F....... [ZBX-6110] fixed selected map remembering in Monitoring -> Maps (Eduard)
 ..F....... [ZBX-6117] fixed item value macros resolving using non-converted to null values (Eduard)
 ..F....... [ZBX-6113] fixed hidden input field appearing when assigning hosts to groups in IE (Pavels)
 ..F....... [ZBX-6063] fixed graph selection pop up working incorrectly when adding a graph to a templated screen (Pavels)
-A.F....... [ZBX-6014] improved performance in most it services pages and pages that retrieve trigger information (dotneft, Oleg)
+A.F....... [ZBX-6014] improved performance in most IT services pages and pages that retrieve trigger information (dotneft, Oleg)
 ..F....... [ZBX-6070] fixed event CSV export ignoring the selected page and filters (Pavels)
 ..F....... [ZBX-6006] optimized web interface API calls, which requested redundant data (Toms)
 A......... [ZBX-5806] fixed template.massadd and template.massremove returning an empty hostids array (Pavels)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
 A......... [ZBX-6054] fixed host write permissions being required to view screens (dotneft, Pavels)
-..F....... [ZBX-6027] fixed global notification messages don't work in fullscreen frontend mode (Toms)
+..F....... [ZBX-6027] fixed global notification messages not working in fullscreen frontend mode (Toms)
 ..F....... [ZBX-6037] fixed duplicate frontend messages and changed frontend messages to show last event for 15 triggers instead of last 15 events (Oleg)
-A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance periods validation (Oleg)
+A.F....... [ZBX-5900] fixed date validation in services and maintenances, fixed JS calendar and fixed maintenance period validation (Oleg)
 ..F....... [ZBX-5835] fixed possible "Undefined index" in Configuration -> Actions screen (Sasha)
 A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
 ..F....... [ZBX-5986] fixed page filter to not use remembered group if selected host is not in that group (Toms)
@@ -32,7 +52,7 @@ A......... [ZBX-6097] fixed the ability to override LDAP configuration when call
 A......... [ZBX-5977] removed possibility to add an LLD rule to an application via the API in application and discovery rule (Oleg)
 ....I..... [ZBX-5938] removed orphaned trigger from default data set (Alexei)
 .D........ [ZBXNEXT-894] fixed generate_events comment to say that events are generated after maintenance if trigger changed its state during the maintenance at all (Richlv)
-.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(), DBlld_process_discovery_rule(). Thanks to Takanori Suzuki for patch (Andris, Sasha)
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(), DBlld_process_discovery_rule(); thanks to Takanori Suzuki for patch (Andris, Sasha)
 ...G...... [ZBX-5940] fixed displaying default key parameters when agent is used with option -p (Andris)
 .......PS. [ZBX-5981] fixed incorrect use of function assert() if build option -DNDEBUG was used, it caused random crashes (Alexei)
 .......PS. [ZBX-3379] added SourceIP support for SNMP items (dimir)
@@ -1215,6 +1235,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 
 Changes for 1.8.16
@@ -1226,7 +1247,7 @@ Changes for 1.8.16rc2
 .......PS. [ZBX-6034] fixed IPMI remote commands and scripts, possible poller and escalator crash (dimir, Sasha)
 ...G...... [ZBX-5201] added handling of PerfCounter error PDH_CALC_NEGATIVE_DENOMINATOR (dimir)
 A......... [ZBX-6097] fixed the ability to override LDAP configuration when calling user.login (Pavels)
-.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(). Thanks to Takanori Suzuki for patch. (Andris)
+.......PS. [ZBX-5988] fixed memory leak in functions evaluate_LOGEVENTID(), evaluate_STR(); thanks to Takanori Suzuki for patch (Andris)
 
 Changes for 1.8.16rc1
 

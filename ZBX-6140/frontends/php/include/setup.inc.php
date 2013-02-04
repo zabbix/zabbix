@@ -462,7 +462,7 @@ class CsetupWizard extends CForm {
 					BR(), BR()
 				)
 				: array(
-					'Congratulations on successful instalation of Zabbix frontend.', BR(), BR()
+					'Congratulations on successful installation of Zabbix frontend.', BR(), BR()
 				),
 			'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Finish"').' button'
 		);

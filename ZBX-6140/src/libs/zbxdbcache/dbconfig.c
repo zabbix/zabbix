@@ -2976,6 +2976,8 @@ void	DCload_config()
 
 	UNLOCK_CACHE;
 
+	DBfree_result(result);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -3872,10 +3874,14 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)) ||
-			NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_interface->hostid)) ||
-			HOST_MAINTENANCE_STATUS_OFF != dc_host->maintenance_status ||
-			MAINTENANCE_TYPE_NORMAL != dc_host->maintenance_type)
+	if (NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
+		goto unlock;
+
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_interface->hostid)))
+		goto unlock;
+
+	if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+			MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 	{
 		goto unlock;
 	}

@@ -789,7 +789,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	background: url('../images/general/transparent.png') repeat scroll center top transparent;
 }
 
-.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal {
+.disaster, .high, .average, .warning, .information, .not_classified, .normal {
 	color: #222;
 }
 

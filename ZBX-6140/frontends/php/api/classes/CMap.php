@@ -367,7 +367,7 @@ class CMap extends CMapElement {
 								)
 							)
 						) {
-							$selements[$snum]['urls'][$mapUrl['sysmapurlid']] = $this->expandUrlMacro($mapUrl, $selement);
+							$selements[$snum]['urls'][] = $this->expandUrlMacro($mapUrl, $selement);
 						}
 					}
 				}
@@ -380,10 +380,10 @@ class CMap extends CMapElement {
 			);
 			while ($selementUrl = DBfetch($dbSelementUrls)) {
 				if (is_null($options['expandUrls'])) {
-					$selements[$selementUrl['selementid']]['urls'][$selementUrl['sysmapelementurlid']] = $selementUrl;
+					$selements[$selementUrl['selementid']]['urls'][] = $selementUrl;
 				}
 				else {
-					$selements[$selementUrl['selementid']]['urls'][$selementUrl['sysmapelementurlid']] = $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
+					$selements[$selementUrl['selementid']]['urls'][] = $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
 				}
 			}
 
