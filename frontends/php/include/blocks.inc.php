@@ -266,14 +266,7 @@ function make_system_status($filter) {
 			'limit' => 1
 		);
 		$events = API::Event()->get($options);
-		if (empty($events)) {
-			$trigger['event'] = array(
-				'value' => $trigger['value'],
-				'acknowledged' => true,
-				'clock' => $trigger['lastchange']
-			);
-		}
-		else {
+		if ($events) {
 			$trigger['event'] = reset($events);
 		}
 
@@ -287,7 +280,7 @@ function make_system_status($filter) {
 			}
 
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))
-					&& !$trigger['event']['acknowledged']) {
+					&& isset($trigger['event']) && !$trigger['event']['acknowledged']) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 
 				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
@@ -1403,19 +1396,21 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 	));
 
 	foreach ($triggers as $tnum => $trigger) {
-		$triggers[$tnum]['clock'] = $trigger['event']['clock'];
+		$triggers[$tnum]['clock'] = isset($trigger['event']) ? $trigger['event']['clock'] : $trigger['lastchange'];
 	}
 	CArrayHelper::sort($triggers, array(array('field' => 'clock', 'order' => ZBX_SORT_DOWN)));
 
 	foreach ($triggers as $trigger) {
-		$event = $trigger['event'];
-		$ack = getEventAckState($event, true, true, $ackParams);
-
-		if (isset($event['eventid'])) {
+		// an event exists
+		if (isset($trigger['event'])) {
+			$event = $trigger['event'];
+			$ack = getEventAckState($event, true, true, $ackParams);
 			$actions = get_event_actions_status($event['eventid']);
 		}
+		// no events exist
 		else {
-			$actions = _('no data');
+			$ack = _('No events');
+			$actions = _('No data');
 		}
 
 		// unknown triggers
