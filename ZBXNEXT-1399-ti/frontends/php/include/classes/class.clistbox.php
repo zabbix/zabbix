@@ -31,23 +31,4 @@ class CListBox extends CComboBox {
 	public function setSize($value) {
 		$this->attr('size', $value);
 	}
-
-	/**
-	 * Apply chosen jQuery plugin to listbox.
-	 *
-	 * @param int    $options['width']
-	 * @param string $options['objectName']
-	 */
-	public function makeDynamic(array $options = array()) {
-		$name = zbx_formatDomId($this->getName());
-		$this->setAttribute('class', 'chzn-select-'.$name);
-
-		// width
-		if (empty($options['width'])) {
-			$options['width'] = ZBX_TEXTAREA_STANDARD_WIDTH;
-		}
-		$this->setAttribute('style', 'width:'.$options['width'].'px;');
-
-		zbx_add_post_js('jQuery(".chzn-select-'.$name.'").listbox({objectName: "'.$options['objectName'].'"})');
-	}
 }

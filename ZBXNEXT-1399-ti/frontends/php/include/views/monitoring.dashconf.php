@@ -53,33 +53,18 @@ if (!$this->data['isFilterEnable']) {
 $dashconfFormList->addRow(_('Host groups'), $hostGroupsComboBox);
 
 if ($this->data['grpswitch']) {
-	// show groups
-	$groupListBox = new CListBox('groupids[]');
-	$groupListBox->makeDynamic(array('objectName' => 'hostGroup'));
-
-	if (!$this->data['isFilterEnable']) {
-		$groupListBox->setAttribute('disabled', 'disabled');
-	}
-
-	foreach ($this->data['groups'] as $group) {
-		$groupListBox->addItem($group['groupid'], $group['nodename'].$group['name'], true);
-	}
-
-	$dashconfFormList->addRow(_('Show selected groups'), $groupListBox);
-
-	// hide groups
-	$hideGroupListBox = new CListBox('hidegroupids[]');
-	$hideGroupListBox->makeDynamic(array('objectName' => 'hostGroup'));
-
-	if (!$this->data['isFilterEnable']) {
-		$hideGroupListBox->setAttribute('disabled', 'disabled');
-	}
-
-	foreach ($this->data['hideGroups'] as $hideGroup) {
-		$hideGroupListBox->addItem($hideGroup['groupid'], $hideGroup['nodename'].$hideGroup['name'], true);
-	}
-
-	$dashconfFormList->addRow(_('Hide selected groups'), $hideGroupListBox);
+	$dashconfFormList->addRow(_('Show selected groups'), new CTokenInput(array(
+		'name' => 'groupids[]',
+		'objectName' => 'hostGroup',
+		'data' => $this->data['groups'],
+		'disabled' => !$this->data['isFilterEnable']
+	)));
+	$dashconfFormList->addRow(_('Hide selected groups'), new CTokenInput(array(
+		'name' => 'hidegroupids[]',
+		'objectName' => 'hostGroup',
+		'data' => $this->data['hideGroups'],
+		'disabled' => !$this->data['isFilterEnable']
+	)));
 }
 
 // append host in maintenance checkbox to form list

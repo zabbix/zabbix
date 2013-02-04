@@ -217,16 +217,16 @@ switch ($data['method']) {
 		break;
 
 	/**
-	 * Create chosen data.
+	 * Create token input data.
 	 * Supported objects: "hostGroup"
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
 	 * @param int    $data['limit']
 	 *
-	 * @return array(int => array('value' => int, 'text' => string))
+	 * @return array(int => array('id' => int, 'name' => string))
 	 */
-	case 'chosen.get':
+	case 'tokeninput.get':
 		if ($data['objectName'] == 'hostGroup') {
 			$hostGroups = API::HostGroup()->get(array(
 				'output' => array('groupid', 'name'),
@@ -246,10 +246,8 @@ switch ($data['method']) {
 
 			foreach ($hostGroups as $hostGroup) {
 				$result[] = array(
-					'value' => $hostGroup['groupid'],
-					'text' => !empty($hostGroup['nodename'])
-						? $hostGroup['nodename'].$hostGroup['name']
-						: $hostGroup['name']
+					'id' => $hostGroup['groupid'],
+					'name' => ($hostGroup['nodename'] !== '') ? $hostGroup['nodename'].$hostGroup['name'] : $hostGroup['name']
 				);
 			}
 		}

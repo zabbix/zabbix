@@ -87,8 +87,8 @@ class CPageHeader {
 	 * @param array $scripts
 	 */
 	public function addCssByScripts($scripts) {
-		if (in_array('chosen.jquery.js', $scripts)) {
-			$this->cssFiles[] = 'js/vendors/chosen/chosen.css';
+		if (in_array('jquery.tokeninput.js', $scripts)) {
+			$this->cssFiles[] = 'js/vendors/tokeninput/token-input.css';
 		}
 	}
 

@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('chosen.jquery.js', 'listbox.js');
+$page['scripts'] = array('jquery.tokeninput.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -146,7 +146,7 @@ if ($data['grpswitch']) {
 	$data['groups'] = API::HostGroup()->get(array(
 		'nodeids' => get_current_nodeid(true),
 		'groupids' => $data['groupIds'],
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('groupid', 'name')
 	));
 
 	foreach ($data['groups'] as &$group) {
@@ -159,11 +159,16 @@ if ($data['grpswitch']) {
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));
 
+	foreach ($data['groups'] as &$group) {
+		$group['name'] = $group['nodename'].$group['name'];
+	}
+	unset($group);
+
 	// hide groups
 	$data['hideGroups'] = API::HostGroup()->get(array(
 		'nodeids' => get_current_nodeid(true),
 		'groupids' => $data['hideGroupIds'],
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('groupid', 'name')
 	));
 	foreach ($data['hideGroups'] as &$hideGroup) {
 		$hideGroup['nodename'] = get_node_name_by_elid($hideGroup['groupid'], true, ': ');
@@ -174,6 +179,11 @@ if ($data['grpswitch']) {
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));
+
+	foreach ($data['hideGroups'] as &$group) {
+		$group['name'] = $group['nodename'].$group['name'];
+	}
+	unset($group);
 }
 
 // render view
