@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 11:42+0200\n"
-"PO-Revision-Date: 2012-09-21 16:01+0200\n"
-"Last-Translator: Marcel <maco@blava.net>\n"
+"POT-Creation-Date: 2013-02-05 11:43+0200\n"
+"PO-Revision-Date: 2013-02-05 09:49+0200\n"
+"Last-Translator: marki555 <marki@marki-online.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: maintenance.php:153 maintenance.php:165 services.php:193 services.php:207
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" musí byť v intervale od 1970.01.01 do 2038.01.18."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
