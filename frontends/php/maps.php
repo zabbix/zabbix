@@ -51,10 +51,7 @@ check_fields($fields);
  * Ajax
  */
 if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.maps.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-	elseif ($_REQUEST['favobj'] == 'sysmapid') {
+	if ($_REQUEST['favobj'] == 'sysmapid') {
 		$result = false;
 
 		if ($_REQUEST['favaction'] == 'add') {

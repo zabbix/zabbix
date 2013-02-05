@@ -31,11 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'druleid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
-	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY,	'isset({favobj})')
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('ip', ZBX_SORT_UP);
@@ -49,19 +45,6 @@ if ($druleid = get_request('druleid')) {
 	if (!$dbDRule) {
 		access_deny();
 	}
-}
-
-/*
- * Ajax
- */
-if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.discovery.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-}
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
 }
 
 /*
