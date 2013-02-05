@@ -909,3 +909,29 @@ fieldset legend { margin: 0.2em 0.5em; }
 
 /* flickerfreescreen */
 .flickerfreescreen .shadow { background-color: #000000; }
+
+/* multiselect */
+.multiselect { min-height: 25px;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#EEE', endColorstr='#fff', GradientType=0);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #EEE), color-stop(15%, white));
+	background-image: -webkit-linear-gradient(top, #EEE 1%, white 15%);
+	background-image: -moz-linear-gradient(top, #EEE 1%, white 15%);
+	background-image: -o-linear-gradient(top, #EEE 1%, white 15%);
+	background-image: linear-gradient(#EEE 1%, white 15%);
+	border: 1px solid #AAAAAA;
+}
+.multiselect input { min-height: 25px; background: none; border: none; }
+.multiselect li {
+	margin: 1px 4px; list-style: none outside none; display: inline-block;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f4f4f4', endColorstr='#eeeeee', GradientType=0);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(20%, #F4F4F4), color-stop(50%, #F0F0F0), color-stop(52%, #E8E8E8), color-stop(100%, #EEE));
+	background-image: -webkit-linear-gradient(top, #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
+	background-image: -moz-linear-gradient(top, #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
+	background-image: -o-linear-gradient(top, #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
+	background-image: linear-gradient(#F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	border: 1px solid #AAA;
+}
+.multiselect li span { padding: 1px 2px; }

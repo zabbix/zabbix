@@ -53,13 +53,13 @@ if (!$this->data['isFilterEnable']) {
 $dashconfFormList->addRow(_('Host groups'), $hostGroupsComboBox);
 
 if ($this->data['grpswitch']) {
-	$dashconfFormList->addRow(_('Show selected groups'), new CTokenInput(array(
+	$dashconfFormList->addRow(_('Show selected groups'), new CMultiSelect(array(
 		'name' => 'groupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['groups'],
 		'disabled' => !$this->data['isFilterEnable']
 	)));
-	$dashconfFormList->addRow(_('Hide selected groups'), new CTokenInput(array(
+	$dashconfFormList->addRow(_('Hide selected groups'), new CMultiSelect(array(
 		'name' => 'hidegroupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['hideGroups'],

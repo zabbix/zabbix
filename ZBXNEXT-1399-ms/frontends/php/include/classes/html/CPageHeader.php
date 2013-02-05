@@ -82,17 +82,6 @@ class CPageHeader {
 	}
 
 	/**
-	 * Add css files by scripts.
-	 *
-	 * @param array $scripts
-	 */
-	public function addCssByScripts($scripts) {
-		if (in_array('jquery.tokeninput.js', $scripts)) {
-			$this->cssFiles[] = 'js/vendors/tokeninput/token-input.css';
-		}
-	}
-
-	/**
 	 * Add css style to render in page head.
 	 *
 	 * @param string $style

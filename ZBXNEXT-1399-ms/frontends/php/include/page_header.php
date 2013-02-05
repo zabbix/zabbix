@@ -133,10 +133,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($pageTitle);
 	$pageHeader->addCssInit();
 
-	if (!empty($page['scripts'])) {
-		$pageHeader->addCssByScripts($page['scripts']);
-	}
-
 	$css = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
 		if (!empty($DB['DB'])) {

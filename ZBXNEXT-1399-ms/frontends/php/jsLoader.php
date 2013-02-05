@@ -55,12 +55,12 @@ $availableJScripts = array(
 	'dom.js' => '',
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
+	'multiselect.js' => '',
 	// vendors
 	'prototype.js' => '',
 	'jquery.js' => 'jquery/',
 	'jquery-ui.js' => 'jquery/',
 	'activity-indicator.js' => 'vendors/',
-	'jquery.tokeninput.js' => 'vendors/tokeninput/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -182,11 +182,6 @@ $tranStrings = array(
 		'Edit service' => _('Edit service'),
 		'Delete service' => _('Delete service'),
 		'Delete the selected service?' => _('Delete the selected service?')
-	),
-	'jquery.tokeninput.js' => array(
-		'Select some options' => _('Select some options'),
-		'Select option' => _('Select option'),
-		'No results match' => _('No results match')
 	)
 );
 

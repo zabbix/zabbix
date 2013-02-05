@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('jquery.tokeninput.js');
+$page['scripts'] = array('multiselect.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -160,7 +160,9 @@ if ($data['grpswitch']) {
 	));
 
 	foreach ($data['groups'] as &$group) {
-		$group['name'] = $group['nodename'].$group['name'];
+		$group['id'] = $group['groupid'];
+		$group['prefix'] = $group['nodename'];
+		unset($group['groupid'], $group['nodename']);
 	}
 	unset($group);
 
@@ -181,7 +183,9 @@ if ($data['grpswitch']) {
 	));
 
 	foreach ($data['hideGroups'] as &$group) {
-		$group['name'] = $group['nodename'].$group['name'];
+		$group['id'] = $group['groupid'];
+		$group['prefix'] = $group['nodename'];
+		unset($group['groupid'], $group['nodename']);
 	}
 	unset($group);
 }

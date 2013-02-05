@@ -19,44 +19,33 @@
 **/
 
 
-class CTokenInput extends CTag {
+class CMultiSelect extends CTag {
 
 	/**
 	 * @param string $options['name']
 	 * @param string $options['objectName']
 	 * @param array  $options['data']
 	 * @param bool   $options['disabled']
+	 * @param int    $options['width']
 	 */
 	public function __construct(array $options = array()) {
-		parent::__construct('input', 'no');
-		$this->attr('type', 'text');
-		$this->attr('name', $options['name']);
+		parent::__construct('div', 'yes');
 		$this->attr('id', zbx_formatDomId($options['name']));
-		$this->attr('disabled', $options['disabled'] ? $options['disabled'] : null);
+		$this->addClass('multiselect');
+		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_TEXTAREA_STANDARD_WIDTH).'px;');
 
-		// url
-		$url = new CUrl('jsrpc.php');
-		$url->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
-		$url->setArgument('method', 'tokeninput.get');
-		$url->setArgument('objectName', $options['objectName']);
-
-		$data = '';
+		$data = '[]';
 		if (!empty($options['data'])) {
-			foreach ($options['data'] as $id => $name) {
-				$data .= '{id: "'.$id.'", name: "'.$name['name'].'"},';
-			}
-			$data = substr($data, 0, strlen($data) - 1);
+			$json = new CJSON();
+
+			$data = $json->encode($options['data']);
 		}
 
-		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").tokenInput("'.$url->getUrl().'", {
-				preventDuplicates: true,
-				queryParam: "search",
-				jsonContainer: "result",
-				hintText: "I can has tv shows?",
-				noResultsText: "'._('no results found').'",
-				searchingText: "'._('Searching..').'",
-				prePopulate: ['.$data.']
-			})'
-		);
+		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect({
+			name: "'.$options['name'].'",
+			objectName: "'.$options['objectName'].'",
+			data: '.$data.'
+			//disabled: '.$options['disabled'].'
+		});');
 	}
 }

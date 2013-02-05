@@ -217,7 +217,7 @@ switch ($data['method']) {
 		break;
 
 	/**
-	 * Create token input data.
+	 * Create multi select data.
 	 * Supported objects: "hostGroup"
 	 *
 	 * @param string $data['objectName']
@@ -226,7 +226,7 @@ switch ($data['method']) {
 	 *
 	 * @return array(int => array('id' => int, 'name' => string))
 	 */
-	case 'tokeninput.get':
+	case 'multiselect.get':
 		if ($data['objectName'] == 'hostGroup') {
 			$hostGroups = API::HostGroup()->get(array(
 				'output' => array('groupid', 'name'),
@@ -247,7 +247,8 @@ switch ($data['method']) {
 			foreach ($hostGroups as $hostGroup) {
 				$result[] = array(
 					'id' => $hostGroup['groupid'],
-					'name' => ($hostGroup['nodename'] !== '') ? $hostGroup['nodename'].$hostGroup['name'] : $hostGroup['name']
+					'prefix' => $hostGroup['nodename'],
+					'name' => $hostGroup['name']
 				);
 			}
 		}
