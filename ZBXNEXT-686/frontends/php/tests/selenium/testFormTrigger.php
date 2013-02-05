@@ -94,8 +94,6 @@ class testFormTrigger extends CWebTest {
 					$this->button_click("//span[text()='Close expression constructor']");
 					sleep(1);
 					break;
-				default:
-					break;
 			}
 		}
 
@@ -205,6 +203,356 @@ class testFormTrigger extends CWebTest {
 		$this->assertElementPresent('bnt1');
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
+
+	// Returns all possible item data
+	public static function dataCreate() {
+		return array(
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.',
+						'Warning. Incorrect value for field "expression": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "expression": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'expression' => '6 & 0 | 0',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '6 & 0 | 0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Trigger expression must contain at least one host:key reference.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host}',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect trigger expression. Check expression part starting from "{Test host}".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_sysUptime',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_generalCheck',
+					'expression' => '{Test host:system.uptime.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'severity' => 'High',
+					'status' => false,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Zabbix host:system.uptime.last(0)}<0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect trigger expression. Host "Zabbix host" does not exist or you have no access to this host.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:someItem.uptime.last(0)}<0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect item key "someItem.uptime" provided for trigger expression on "Test host".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:system.uptime.somefunc(0)}<0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Cannot implode expression "{Test host:system.uptime.somefunc(0)}<0". Incorrect trigger function "somefunc" provided in expression. Unknown function.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:system.uptime.last(0)} | {#MACRO}',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect trigger expression. Check expression part starting from " {#MACRO}".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:system.uptime.last(0)} | {#MACRO}',
+					'constructor' => array(array(
+						'text' => array('A | B', 'A', 'B'),
+						'elements' => array('expr_0_32', 'expr_36_43')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Zabbix host:system.uptime.last(0)}<0 | 8 & 9',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'OR', 'AND', 'A', 'B', 'C'),
+						'elements' => array('expr_0_36', 'expr_40_40', 'expr_44_44'),
+						'elementError' => true
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Test host:system.uptime.last(0)}',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'A', 'B', 'C'),
+						'elements' => array('expr_0_36', 'expr_40_40', 'expr_44_80'),
+						'elementError' => true
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:system.uptime.lasta(0)}<0 | 8 & 9 + {Test host:system.uptime.last(0)}',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'A', 'B', 'C'),
+						'elements' => array('expr_0_35', 'expr_39_39', 'expr_43_79'),
+						'elementError' => true
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host@:system.uptime.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Test host@:system.uptime.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:system .uptime.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Test host:system .uptime.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:system .uptime.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Test host:system .uptime.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Test host:system.uptime.lastA(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Test host:system.uptime.lastA(0)}".'),
+						)
+					)
+				)
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider dataCreate
+	 */
+	public function testFormTrigger_Create($data) {
+
+		$this->login('triggers.php');
+		$this->checkTitle('Configuration of triggers');
+		$this->ok('CONFIGURATION OF TRIGGERS');
+		$this->dropdown_select_wait('groupid', 'all');
+
+		$this->button_click('form');
+		$this->wait();
+		$this->checkTitle('Configuration of triggers');
+		$this->ok('CONFIGURATION OF TRIGGERS');
+
+
+		if (isset($data['description'])) {
+			$this->input_type('description', $data['description']);
+		}
+
+		if (isset($data['expression'])) {
+			$this->input_type('expression', $data['expression']);
+		}
+
+		if (isset($data['type'])) {
+			$this->checkbox_select('type');
+		}
+
+		if (isset($data['comments'])) {
+			$this->input_type('comments', $data['comments']);;
+		}
+
+		if (isset($data['url'])) {
+			$this->input_type('url', $data['url']);;
+		}
+
+		if (isset($data['severity'])) {
+			switch ($data['severity']) {
+				case 'Not classified':
+					$this->button_click('severity_0');
+					break;
+				case 'Information':
+					$this->button_click('severity_1');
+					break;
+				case 'Warning':
+					$this->button_click('severity_2');
+					break;
+				case 'Average':
+					$this->button_click('severity_3');
+					break;
+				case 'High':
+					$this->button_click('severity_4');
+					break;
+				case 'Disaster':
+					$this->button_click('severity_5');
+					break;
+			}
+		}
+
+		if (isset($data['status'])) {
+			$this->checkbox_unselect('status');
+		}
+
+		if (isset($data['constructor'])) {
+			$this->button_click("//span[text()='Expression constructor']");
+			sleep(1);
+
+			foreach($data['constructor'] as $constructor) {
+				if (isset($constructor['errors'])) {
+					foreach($constructor['errors'] as $err) {
+						$this->ok($err);
+					}
+				}
+				else {
+					$this->assertAttribute("//input[@id='and_expression']/@value", 'AND');
+					$this->assertElementPresent('and_expression');
+
+					$this->assertAttribute("//input[@id='or_expression']/@value", 'OR');
+					$this->assertElementPresent('or_expression');
+
+					$this->assertAttribute("//input[@id='replace_expression']/@value", 'Replace');
+					$this->assertElementPresent('replace_expression');
+					if (isset($constructor['text'])) {
+						foreach($constructor['text'] as $txt) {
+							$this->ok($txt);
+						}
+					}
+					if (isset($constructor['elements'])) {
+						foreach($constructor['elements'] as $elem) {
+							$this->assertElementPresent($elem);
+						}
+					}
+					if (isset($constructor['elementError'])) {
+						$this->assertElementPresent('//img[@alt="expression_errors"]');
+					}
+					else {
+						$this->assertElementPresent('//img[@alt="expression_no_errors"]');
+					}
+				}
+			}
+		}
+
+		if (!isset($data['constructor'])) {
+			$this->button_click('save');
+			$this->wait();
+			switch ($data['expected']) {
+				case TRIGGER_GOOD:
+				$this->ok('Trigger added');
+				$this->checkTitle('Configuration of triggers');
+				$this->ok('CONFIGURATION OF TRIGGERS');
+				break;
+				case TRIGGER_BAD:
+				$this->checkTitle('Configuration of triggers');
+				$this->ok('CONFIGURATION OF TRIGGERS');
+				foreach ($data['errors'] as $msg) {
+					$this->ok($msg);
+				}
+				$this->ok('Name');
+				$this->ok('Expression');
+				$this->ok('Description');
+				break;
+			}
+		}
+	}
+
 
 	/**
 	 * Restore the original tables.
