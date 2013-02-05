@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-01 15:19+0200\n"
+"POT-Creation-Date: 2013-02-05 11:42+0200\n"
 "PO-Revision-Date: 2013-01-31 23:09+0200\n"
 "Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -926,13 +926,13 @@ msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "KONFIGURATION DER DISCOVERY-REGELN"
 
 #: include/views/configuration.graph.edit.php:25
-#: include/views/configuration.graph.list.php:32
+#: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "KONFIGURATION DER DIAGRAMM-VORLAGEN"
 
 # Vielleicht überhaupt "Graphen konfigurieren"?
 #: include/views/configuration.graph.edit.php:29
-#: include/views/configuration.graph.list.php:51
+#: include/views/configuration.graph.list.php:50
 msgid "CONFIGURATION OF GRAPHS"
 msgstr "KONFIGURATION VON DIAGRAMMEN"
 
@@ -2537,7 +2537,7 @@ msgid "Copy"
 msgstr "Kopieren"
 
 # Passive Form besser lesbar im Dropdown-Feld
-#: include/views/configuration.graph.list.php:139
+#: include/views/configuration.graph.list.php:138
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2576,15 +2576,15 @@ msgstr "Erstelle Kategorie"
 msgid "Create discovery rule"
 msgstr "Erstelle Discovery-Regel"
 
-#: include/views/configuration.graph.list.php:43
+#: include/views/configuration.graph.list.php:42
 msgid "Create graph"
 msgstr "Erstelle Diagramm"
 
-#: include/views/configuration.graph.list.php:46
+#: include/views/configuration.graph.list.php:45
 msgid "Create graph (select host first)"
 msgstr "Erstelle Diagramm (zuerst Host wählen)"
 
-#: include/views/configuration.graph.list.php:30
+#: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
 msgstr "Erstelle Diagrammprototyp"
 
@@ -3264,7 +3264,7 @@ msgstr "Skript löschen?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:142
+#: include/views/configuration.graph.list.php:141
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3300,7 +3300,7 @@ msgstr "Ausgewählte Discovery-Regeln löschen?"
 msgid "Delete selected elements?"
 msgstr "Ausgewählte Elemente löschen?"
 
-#: include/views/configuration.graph.list.php:143
+#: include/views/configuration.graph.list.php:142
 msgid "Delete selected graphs?"
 msgstr "Ausgewählte Diagramme löschen?"
 
@@ -4736,7 +4736,7 @@ msgstr "Globale Skripts"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:146
+#: include/views/configuration.graph.list.php:145
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4858,7 +4858,7 @@ msgstr "Diagrammprototyp muss mindestens ein Prototypenelement haben."
 msgid "Graph prototypes"
 msgstr "Diagramm-Prototypen"
 
-#: include/views/configuration.graph.list.php:33
+#: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
 msgstr "Diagrammprototypen von"
 
@@ -4868,7 +4868,7 @@ msgid "Graph sum"
 msgstr "Diagrammsumme"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:81 popup.php:1346 popup.php:1352
+#: include/views/configuration.graph.list.php:80 popup.php:1346 popup.php:1352
 msgid "Graph type"
 msgstr "Diagrammtyp"
 
@@ -4889,7 +4889,7 @@ msgstr "Namensgleiches Diagramm anderen Typs existiert bereits."
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
-#: include/views/configuration.graph.list.php:57
+#: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
@@ -4925,7 +4925,7 @@ msgstr "Raster"
 #: include/reports.inc.php:559
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
-#: include/views/configuration.graph.list.php:54
+#: include/views/configuration.graph.list.php:53
 #: include/views/configuration.httpconf.list.php:41
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
@@ -5068,7 +5068,7 @@ msgid "Hardware (Full details)"
 msgstr "Hardware (Alle Details)"
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.list.php:80
+#: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -5169,7 +5169,7 @@ msgstr "Horizontale Ausrichtung"
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
 #: include/views/configuration.application.list.php:53
-#: include/views/configuration.graph.list.php:55
+#: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:497
 #: include/views/configuration.httpconf.list.php:42
@@ -5379,7 +5379,7 @@ msgstr "Host mit gleichem sichtbaren Namen \"%s\" existiert bereits."
 #: include/reports.inc.php:591 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
-#: include/views/configuration.graph.list.php:77
+#: include/views/configuration.graph.list.php:76
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.hostgroups.list.php:111
 #: include/views/configuration.item.copy.php:42
@@ -7920,7 +7920,7 @@ msgstr "NTLM-Authentifizierung"
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:53
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:78
+#: include/views/configuration.graph.list.php:77
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.massupdate.php:90
@@ -8236,11 +8236,11 @@ msgstr "Keine Diagramm ID für Übersichtsseitenelement eingegeben."
 msgid "No graph item with graphid \"%s\"."
 msgstr "Kein Diagramm mit graphid \"%s\" vorhanden."
 
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes defined."
 msgstr "Keine Diagrammprototypen definiert."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:74
+#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1341
@@ -13046,7 +13046,7 @@ msgid "When active"
 msgstr "Aktiv um"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
-#: include/views/configuration.graph.list.php:79
+#: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43

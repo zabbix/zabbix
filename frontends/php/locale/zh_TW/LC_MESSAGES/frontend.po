@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-31 22:49+0200\n"
+"POT-Creation-Date: 2013-02-05 11:42+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -384,7 +384,7 @@ msgstr "作用中直到"
 #: include/views/configuration.item.edit.php:312
 #: include/views/configuration.item.massupdate.php:318
 #: include/views/configuration.services.edit.php:104
-#: include/views/configuration.services.edit.php:293
+#: include/views/configuration.services.edit.php:295
 #: include/views/configuration.slideconf.edit.php:85
 #: include/views/configuration.sysmap.edit.php:187
 #: include/views/configuration.template.edit.php:407
@@ -914,12 +914,12 @@ msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "探索規則的組態"
 
 #: include/views/configuration.graph.edit.php:25
-#: include/views/configuration.graph.list.php:32
+#: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "圖形原型的組態"
 
 #: include/views/configuration.graph.edit.php:29
-#: include/views/configuration.graph.list.php:51
+#: include/views/configuration.graph.list.php:50
 msgid "CONFIGURATION OF GRAPHS"
 msgstr "圖形的組態"
 
@@ -2514,7 +2514,7 @@ msgstr "座標"
 msgid "Copy"
 msgstr "複製"
 
-#: include/views/configuration.graph.list.php:139
+#: include/views/configuration.graph.list.php:138
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2552,15 +2552,15 @@ msgstr "創建應用集"
 msgid "Create discovery rule"
 msgstr "創建探索規則"
 
-#: include/views/configuration.graph.list.php:43
+#: include/views/configuration.graph.list.php:42
 msgid "Create graph"
 msgstr "創建圖形"
 
-#: include/views/configuration.graph.list.php:46
+#: include/views/configuration.graph.list.php:45
 msgid "Create graph (select host first)"
 msgstr "創建圖形(先選擇主機)"
 
-#: include/views/configuration.graph.list.php:30
+#: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
 msgstr "創建圖形原型"
 
@@ -3235,7 +3235,7 @@ msgstr "删除脚本?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:142
+#: include/views/configuration.graph.list.php:141
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3271,7 +3271,7 @@ msgstr "删除所選的探索規則?"
 msgid "Delete selected elements?"
 msgstr "刪除所選的組件?"
 
-#: include/views/configuration.graph.list.php:143
+#: include/views/configuration.graph.list.php:142
 msgid "Delete selected graphs?"
 msgstr "刪除所選的圖形?"
 
@@ -3470,7 +3470,7 @@ msgstr "差量 (每秒速率)"
 msgid "Deny"
 msgstr "禁止"
 
-#: include/views/configuration.services.edit.php:306
+#: include/views/configuration.services.edit.php:308
 #: include/views/configuration.triggers.edit.php:284
 #: include/views/configuration.triggers.edit.php:293
 msgid "Dependencies"
@@ -3809,7 +3809,7 @@ msgstr "多個項目的分佈的值"
 msgid "Distribution of values for multiple periods"
 msgstr "多個期間的分佈的值"
 
-#: include/services.inc.php:61
+#: include/services.inc.php:60
 msgid "Do not calculate"
 msgstr "不要計算"
 
@@ -3866,8 +3866,8 @@ msgstr "方案\"%s\"的下載速度."
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "方案\"%2$s\"之步驟\"%1$s\"的下載速度."
 
-#: include/views/configuration.services.edit.php:126
-#: include/views/configuration.services.edit.php:285
+#: include/views/configuration.services.edit.php:127
+#: include/views/configuration.services.edit.php:287
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:168 report3.php:85
 msgid "Downtime"
@@ -4588,8 +4588,8 @@ msgstr "週五"
 
 #: include/reports.inc.php:130 include/reports.inc.php:241
 #: include/reports.inc.php:610 include/views/configuration.action.edit.php:418
-#: include/views/configuration.services.edit.php:211
-#: include/views/configuration.services.edit.php:278
+#: include/views/configuration.services.edit.php:213
+#: include/views/configuration.services.edit.php:280
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
 #: report3.php:145 report4.php:180 services.php:187 services.php:193
 msgid "From"
@@ -4698,7 +4698,7 @@ msgstr "全域腳本"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:146
+#: include/views/configuration.graph.list.php:145
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4820,7 +4820,7 @@ msgstr "圖形原型必需至少有一個原型."
 msgid "Graph prototypes"
 msgstr "圖形原型"
 
-#: include/views/configuration.graph.list.php:33
+#: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
 msgstr "圖形原型的"
 
@@ -4830,7 +4830,7 @@ msgid "Graph sum"
 msgstr "圖形總合"
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:81 popup.php:1346 popup.php:1352
+#: include/views/configuration.graph.list.php:80 popup.php:1346 popup.php:1352
 msgid "Graph type"
 msgstr "圖形類別"
 
@@ -4851,7 +4851,7 @@ msgstr "同名但不同類型的圖形已存在."
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
-#: include/views/configuration.graph.list.php:57
+#: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
@@ -4887,7 +4887,7 @@ msgstr "網格"
 #: include/reports.inc.php:559
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
-#: include/views/configuration.graph.list.php:54
+#: include/views/configuration.graph.list.php:53
 #: include/views/configuration.httpconf.list.php:41
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
@@ -5027,7 +5027,7 @@ msgid "Hardware (Full details)"
 msgstr "硬體(全細節)"
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.list.php:80
+#: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -5127,7 +5127,7 @@ msgstr "横向對齊"
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
 #: include/views/configuration.application.list.php:53
-#: include/views/configuration.graph.list.php:55
+#: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:497
 #: include/views/configuration.httpconf.list.php:42
@@ -5335,7 +5335,7 @@ msgstr "可視名稱同樣為 \"%s\" 的主機已存在."
 #: include/reports.inc.php:591 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
-#: include/views/configuration.graph.list.php:77
+#: include/views/configuration.graph.list.php:76
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.hostgroups.list.php:111
 #: include/views/configuration.item.copy.php:42
@@ -6198,15 +6198,15 @@ msgstr "提供了不正確的篩選ID\"%s\"給篩選項目."
 msgid "Incorrect screen provided for slide show."
 msgstr "用於簡報片展示的不正確篩選."
 
-#: include/services.inc.php:491 include/services.inc.php:500
+#: include/services.inc.php:490 include/services.inc.php:499
 msgid "Incorrect service end time."
 msgstr "不正確的服務終止時間."
 
-#: include/services.inc.php:488 include/services.inc.php:497
+#: include/services.inc.php:487 include/services.inc.php:496
 msgid "Incorrect service start time."
 msgstr "不正確的服務開始時間."
 
-#: include/services.inc.php:482
+#: include/services.inc.php:481
 msgid "Incorrect service time type."
 msgstr "不正確的服務時間類型."
 
@@ -7869,7 +7869,7 @@ msgstr "NTLM認證"
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:53
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:78
+#: include/views/configuration.graph.list.php:77
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.massupdate.php:90
@@ -7989,7 +7989,7 @@ msgstr "新的示警媒介"
 msgid "New regular expression"
 msgstr "新的正規表示式"
 
-#: include/views/configuration.services.edit.php:288
+#: include/views/configuration.services.edit.php:290
 msgid "New service time"
 msgstr "新的服務時間"
 
@@ -8184,11 +8184,11 @@ msgstr "沒有提供圖形ID給篩選組件."
 msgid "No graph item with graphid \"%s\"."
 msgstr "沒有圖形ID\"%s\"的圖形項目."
 
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes defined."
 msgstr "沒有已定義的圖形原型."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:74
+#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1341
@@ -8632,7 +8632,7 @@ msgid "Nodes"
 msgstr "節點"
 
 #: adm.other.php:81 include/hosts.inc.php:38 include/httptest.inc.php:27
-#: include/services.inc.php:317
+#: include/services.inc.php:316
 #: include/views/administration.general.gui.edit.php:27
 #: include/views/administration.general.other.edit.php:31
 #: include/views/configuration.item.edit.php:398
@@ -8698,7 +8698,7 @@ msgid "Not supported"
 msgstr "不支持的"
 
 #: include/views/configuration.services.edit.php:115
-#: include/views/configuration.services.edit.php:210
+#: include/views/configuration.services.edit.php:212
 #: include/views/configuration.services.parent.list.php:48
 msgid "Note"
 msgstr "備註"
@@ -8902,8 +8902,8 @@ msgstr "一次"
 msgid "One time only"
 msgstr "一次性"
 
-#: include/views/configuration.services.edit.php:131
-#: include/views/configuration.services.edit.php:286
+#: include/views/configuration.services.edit.php:133
+#: include/views/configuration.services.edit.php:288
 msgid "One-time downtime"
 msgstr " 單次停機"
 
@@ -8988,7 +8988,7 @@ msgstr "每次僅有一個用戶群組可以被改變."
 msgid "Only super admins can delete proxies."
 msgstr "只有超級管理員可以刪除系統代理程式."
 
-#: include/services.inc.php:299
+#: include/services.inc.php:298
 #, php-format
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "只可顯示最近的20%%的指示燈號."
@@ -9653,11 +9653,11 @@ msgstr "問題在"
 msgid "Problem time"
 msgstr "問題時間"
 
-#: include/services.inc.php:60
+#: include/services.inc.php:59
 msgid "Problem, if all children have problems"
 msgstr "問題, 如果所有的下層都有問題"
 
-#: include/services.inc.php:59
+#: include/services.inc.php:58
 msgid "Problem, if at least one child has a problem"
 msgstr "問題, 如果至少一個下層有一個問題"
 
@@ -9911,7 +9911,7 @@ msgstr "遠端命令"
 #: include/views/configuration.item.edit.php:284
 #: include/views/configuration.item.massupdate.php:284
 #: include/views/configuration.services.edit.php:94
-#: include/views/configuration.services.edit.php:146
+#: include/views/configuration.services.edit.php:148
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/configuration.sysmap.edit.php:161
 #: include/views/configuration.sysmap.edit.php:179
@@ -10441,7 +10441,7 @@ msgstr "週六"
 #: include/views/configuration.maintenance.edit.php:219
 #: include/views/configuration.screen.constructor.edit.php:626
 #: include/views/configuration.screen.edit.php:50
-#: include/views/configuration.services.edit.php:318
+#: include/views/configuration.services.edit.php:320
 #: include/views/configuration.slideconf.edit.php:106
 #: include/views/configuration.slideconf.edit.php:112
 #: include/views/configuration.sysmap.edit.php:205
@@ -10853,7 +10853,7 @@ msgstr "伺服器時間"
 
 #: events.php:522 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
-#: include/views/configuration.services.edit.php:305
+#: include/views/configuration.services.edit.php:307
 #: include/views/configuration.services.parent.list.php:36 services.php:472
 #: srv_status.php:156
 msgid "Service"
@@ -10895,11 +10895,11 @@ msgstr "服務已删除"
 msgid "Service port"
 msgstr "服務端口"
 
-#: include/services.inc.php:505
+#: include/services.inc.php:504
 msgid "Service start time must be less than end time."
 msgstr "服務的開始時間不能晚於截止時間."
 
-#: include/views/configuration.services.edit.php:153
+#: include/views/configuration.services.edit.php:155
 msgid "Service times"
 msgstr "服務次數"
 
@@ -11746,8 +11746,8 @@ msgstr "週四"
 
 #: include/reports.inc.php:154 include/reports.inc.php:265
 #: include/reports.inc.php:634
-#: include/views/configuration.services.edit.php:251
-#: include/views/configuration.services.edit.php:279 popup_period.php:155
+#: include/views/configuration.services.edit.php:253
+#: include/views/configuration.services.edit.php:281 popup_period.php:155
 #: report3.php:145 report4.php:180 services.php:201 services.php:207
 msgid "Till"
 msgstr "直到"
@@ -11764,9 +11764,9 @@ msgstr "直到"
 #: include/events.inc.php:211
 #: include/views/administration.auditacts.list.php:70
 #: include/views/administration.auditlogs.list.php:85
-#: include/views/configuration.services.edit.php:278
-#: include/views/configuration.services.edit.php:279
-#: include/views/configuration.services.edit.php:307 jsLoader.php:135
+#: include/views/configuration.services.edit.php:280
+#: include/views/configuration.services.edit.php:281
+#: include/views/configuration.services.edit.php:309 jsLoader.php:135
 msgid "Time"
 msgstr "時間"
 
@@ -12304,7 +12304,7 @@ msgstr "未知的"
 msgid "Unknown action"
 msgstr "未知的操作"
 
-#: include/services.inc.php:370
+#: include/services.inc.php:369
 msgid "Unknown calculation algorithm of service status"
 msgstr "未知的服務狀態計算演算法"
 
@@ -12497,7 +12497,7 @@ msgid "Upper level maps"
 msgstr "上層拓墣圖"
 
 #: include/views/configuration.services.edit.php:121
-#: include/views/configuration.services.edit.php:284
+#: include/views/configuration.services.edit.php:286
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:165
 msgid "Uptime"
@@ -12959,7 +12959,7 @@ msgid "When active"
 msgstr "當作用中時"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
-#: include/views/configuration.graph.list.php:79
+#: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
@@ -13504,8 +13504,8 @@ msgid "d M Y"
 msgstr "d M Y"
 
 #: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
-#: include/views/configuration.services.edit.php:132
-#: include/views/configuration.services.edit.php:133 report3.php:161
+#: include/views/configuration.services.edit.php:134
+#: include/views/configuration.services.edit.php:135 report3.php:161
 msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
@@ -13552,8 +13552,8 @@ msgstr "日"
 
 #: include/views/configuration.maintenance.edit.php:71
 #: include/views/configuration.maintenance.edit.php:111
-#: include/views/configuration.services.edit.php:200
-#: include/views/configuration.services.edit.php:241
+#: include/views/configuration.services.edit.php:202
+#: include/views/configuration.services.edit.php:243
 msgid "dd"
 msgstr "dd"
 
@@ -13607,10 +13607,10 @@ msgstr "h"
 
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.maintenance.edit.php:117
-#: include/views/configuration.services.edit.php:206
-#: include/views/configuration.services.edit.php:247
-#: include/views/configuration.services.edit.php:267
-#: include/views/configuration.services.edit.php:273
+#: include/views/configuration.services.edit.php:208
+#: include/views/configuration.services.edit.php:249
+#: include/views/configuration.services.edit.php:269
+#: include/views/configuration.services.edit.php:275
 msgid "hh"
 msgstr "hh"
 
@@ -13700,12 +13700,12 @@ msgstr "最少60秒"
 #: include/views/configuration.maintenance.edit.php:79
 #: include/views/configuration.maintenance.edit.php:113
 #: include/views/configuration.maintenance.edit.php:119
-#: include/views/configuration.services.edit.php:202
-#: include/views/configuration.services.edit.php:208
-#: include/views/configuration.services.edit.php:243
-#: include/views/configuration.services.edit.php:249
-#: include/views/configuration.services.edit.php:270
-#: include/views/configuration.services.edit.php:276
+#: include/views/configuration.services.edit.php:204
+#: include/views/configuration.services.edit.php:210
+#: include/views/configuration.services.edit.php:245
+#: include/views/configuration.services.edit.php:251
+#: include/views/configuration.services.edit.php:272
+#: include/views/configuration.services.edit.php:278
 msgid "mm"
 msgstr "mm"
 
@@ -13804,8 +13804,8 @@ msgstr "刷新於 "
 msgid "remember selected"
 msgstr "記住所選的"
 
-#: include/services.inc.php:104 include/services.inc.php:107
-#: include/services.inc.php:200
+#: include/services.inc.php:103 include/services.inc.php:106
+#: include/services.inc.php:199
 #: include/views/configuration.services.parent.list.php:41
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:43
@@ -13836,7 +13836,7 @@ msgstr "秒"
 msgid "sent"
 msgstr "已發送"
 
-#: include/views/configuration.services.edit.php:198
+#: include/views/configuration.services.edit.php:200
 msgid "short description"
 msgstr "簡述"
 
@@ -13911,8 +13911,8 @@ msgstr "是"
 
 #: include/views/configuration.maintenance.edit.php:75
 #: include/views/configuration.maintenance.edit.php:115
-#: include/views/configuration.services.edit.php:204
-#: include/views/configuration.services.edit.php:245
+#: include/views/configuration.services.edit.php:206
+#: include/views/configuration.services.edit.php:247
 msgid "yyyy"
 msgstr "yyy"
 
