@@ -21,6 +21,10 @@
 
 #ifdef HAVE_OPENIPMI
 
+#if !IPMI_SENSOR_ID_SZ
+#define	IPMI_SENSOR_ID_SZ	16	/* max bytes for sensor ID, see SDR record format in IPMI v2 specification */
+#endif
+
 #include "log.h"
 
 #include <OpenIPMI/ipmiif.h>
@@ -40,10 +44,10 @@ zbx_ipmi_sensor_value_t;
 typedef struct
 {
 	ipmi_sensor_t		*sensor;
-	char			*id;
+	char			id[IPMI_SENSOR_ID_SZ + 1];
 	enum ipmi_str_type_e	id_type;	/* For sensors IPMI specifications mention Unicode, BCD plus, */
 						/* 6-bit ASCII packed, 8-bit ASCII+Latin1. */
-	int			id_sz;		/* "id" length in bytes */
+	int			id_sz;		/* "id" value length in bytes */
 	zbx_ipmi_sensor_value_t	value;
 	int			reading_type;	/* "Event/Reading Type Code", e.g. Threshold, */
 						/* Discrete, 'digital' Discrete. */
@@ -185,13 +189,13 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 {
 	const char		*__function_name = "allocate_ipmi_sensor";
 	zbx_ipmi_sensor_t	*s;
-	char			*id = NULL;
+	char			id[IPMI_SENSOR_ID_SZ + 1];
 	enum ipmi_str_type_e	id_type;
 	int			id_sz, sz;
 
 	id_sz = ipmi_sensor_get_id_length(sensor);
-	id = zbx_malloc(id, id_sz + 1);		/* TODO: only ASCII/Unicode strings require 1 byte more. Other types do not */
-	ipmi_sensor_get_id(sensor, id, id_sz);
+	memset(id, 0, sizeof(id));
+	ipmi_sensor_get_id(sensor, id, sizeof(id));
 	id_type = ipmi_sensor_get_id_type(sensor);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name, id, h->ip, h->port);
@@ -206,7 +210,7 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 
 	s = &h->sensors[h->sensor_count - 1];
 	s->sensor = sensor;
-	s->id = id;
+	memcpy(s->id, id, sizeof(id));
 	s->id_type = id_type;
 	s->id_sz = id_sz;
 	memset(&s->value, 0, sizeof(s->value));
@@ -236,8 +240,6 @@ static void	delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "sensor '%s@[%s]:%d' deleted",
 				h->sensors[i].id, h->ip, h->port);
-
-		zbx_free(h->sensors[i].id);
 
 		h->sensor_count--;
 		if (h->sensor_count != i)
@@ -939,9 +941,6 @@ int	free_ipmi_handler()
 		hosts = hosts->next;
 
 		h->con->close_connection(h->con);
-
-		for (i = 0; i < h->sensor_count; i++)
-			zbx_free(h->sensors[i].id);
 
 		for (i = 0; i < h->control_count; i++)
 		{
