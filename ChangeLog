@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-6084] fixed adding/removing items from favourites (Eduard)
 ..F....... [ZBX-6166] fixed SQL error in Oracle, when adding link template (Oleg)
 .......PS. [ZBX-5973] improved performance of SNMP dynamic index item cache building in poller processes (Andris, Sasha)
 ..F....... [ZBX-6169] fixed colors in "server info" and "host info" screen items for dark orange/blue themes (Eduard)
