@@ -9,6 +9,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+....I..... [ZBX-6069] fixed axis in the default "Zabbix Server performance" graph template (Sasha)
 ..F....... [ZBX-6195] fixed navigation bar displaying when host remembering in switched off and user watch graph prototypes (Eduard)
 ...G...... [ZBX-6140] fixed job creation for script execution on windows 2000 (wiper)
 ..F....... [ZBX-5933] fixed triggers with negative values in graphs (Oleg)
