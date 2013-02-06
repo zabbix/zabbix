@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-31 22:49+0200\n"
+"POT-Creation-Date: 2013-02-05 11:42+0200\n"
 "PO-Revision-Date: 2013-01-23 18:56+0200\n"
 "Last-Translator: jeppe <jeppe@arabuusimiehet.com>\n"
 "Language-Team: none\n"
@@ -386,7 +386,7 @@ msgstr "Aktiivinen asti"
 #: include/views/configuration.item.edit.php:312
 #: include/views/configuration.item.massupdate.php:318
 #: include/views/configuration.services.edit.php:104
-#: include/views/configuration.services.edit.php:293
+#: include/views/configuration.services.edit.php:295
 #: include/views/configuration.slideconf.edit.php:85
 #: include/views/configuration.sysmap.edit.php:187
 #: include/views/configuration.template.edit.php:407
@@ -916,12 +916,12 @@ msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr ""
 
 #: include/views/configuration.graph.edit.php:25
-#: include/views/configuration.graph.list.php:32
+#: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr ""
 
 #: include/views/configuration.graph.edit.php:29
-#: include/views/configuration.graph.list.php:51
+#: include/views/configuration.graph.list.php:50
 msgid "CONFIGURATION OF GRAPHS"
 msgstr ""
 
@@ -2508,7 +2508,7 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:139
+#: include/views/configuration.graph.list.php:138
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2546,15 +2546,15 @@ msgstr ""
 msgid "Create discovery rule"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:43
+#: include/views/configuration.graph.list.php:42
 msgid "Create graph"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:46
+#: include/views/configuration.graph.list.php:45
 msgid "Create graph (select host first)"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:30
+#: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
 msgstr ""
 
@@ -3229,7 +3229,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:142
+#: include/views/configuration.graph.list.php:141
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3265,7 +3265,7 @@ msgstr ""
 msgid "Delete selected elements?"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:143
+#: include/views/configuration.graph.list.php:142
 msgid "Delete selected graphs?"
 msgstr ""
 
@@ -3465,7 +3465,7 @@ msgstr ""
 msgid "Deny"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:306
+#: include/views/configuration.services.edit.php:308
 #: include/views/configuration.triggers.edit.php:284
 #: include/views/configuration.triggers.edit.php:293
 msgid "Dependencies"
@@ -3804,7 +3804,7 @@ msgstr ""
 msgid "Distribution of values for multiple periods"
 msgstr ""
 
-#: include/services.inc.php:61
+#: include/services.inc.php:60
 msgid "Do not calculate"
 msgstr ""
 
@@ -3861,8 +3861,8 @@ msgstr ""
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
 
-#: include/views/configuration.services.edit.php:126
-#: include/views/configuration.services.edit.php:285
+#: include/views/configuration.services.edit.php:127
+#: include/views/configuration.services.edit.php:287
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:168 report3.php:85
 msgid "Downtime"
@@ -4583,8 +4583,8 @@ msgstr ""
 
 #: include/reports.inc.php:130 include/reports.inc.php:241
 #: include/reports.inc.php:610 include/views/configuration.action.edit.php:418
-#: include/views/configuration.services.edit.php:211
-#: include/views/configuration.services.edit.php:278
+#: include/views/configuration.services.edit.php:213
+#: include/views/configuration.services.edit.php:280
 #: include/views/js/configuration.sysmaps.js.php:308 popup_period.php:130
 #: report3.php:145 report4.php:180 services.php:187 services.php:193
 msgid "From"
@@ -4693,7 +4693,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:146
+#: include/views/configuration.graph.list.php:145
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4815,7 +4815,7 @@ msgstr ""
 msgid "Graph prototypes"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:33
+#: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
 msgstr ""
 
@@ -4825,7 +4825,7 @@ msgid "Graph sum"
 msgstr ""
 
 #: include/views/configuration.graph.edit.php:59
-#: include/views/configuration.graph.list.php:81 popup.php:1346 popup.php:1352
+#: include/views/configuration.graph.list.php:80 popup.php:1346 popup.php:1352
 msgid "Graph type"
 msgstr ""
 
@@ -4846,7 +4846,7 @@ msgstr ""
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
 #: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
-#: include/views/configuration.graph.list.php:57
+#: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:400
 #: include/views/configuration.template.edit.php:282
@@ -4882,7 +4882,7 @@ msgstr ""
 #: include/reports.inc.php:559
 #: include/views/configuration.application.list.php:37
 #: include/views/configuration.copy.elements.php:59
-#: include/views/configuration.graph.list.php:54
+#: include/views/configuration.graph.list.php:53
 #: include/views/configuration.httpconf.list.php:41
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
@@ -5022,7 +5022,7 @@ msgid "Hardware (Full details)"
 msgstr ""
 
 #: graphs.php:44 include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.list.php:80
+#: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -5122,7 +5122,7 @@ msgstr ""
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.application.list.php:38
 #: include/views/configuration.application.list.php:53
-#: include/views/configuration.graph.list.php:55
+#: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:497
 #: include/views/configuration.httpconf.list.php:42
@@ -5330,7 +5330,7 @@ msgstr ""
 #: include/reports.inc.php:591 include/views/administration.proxy.edit.php:82
 #: include/views/administration.proxy.list.php:51
 #: include/views/configuration.copy.elements.php:46
-#: include/views/configuration.graph.list.php:77
+#: include/views/configuration.graph.list.php:76
 #: include/views/configuration.hostgroups.edit.php:59
 #: include/views/configuration.hostgroups.list.php:111
 #: include/views/configuration.item.copy.php:42
@@ -6193,15 +6193,15 @@ msgstr ""
 msgid "Incorrect screen provided for slide show."
 msgstr ""
 
-#: include/services.inc.php:491 include/services.inc.php:500
+#: include/services.inc.php:490 include/services.inc.php:499
 msgid "Incorrect service end time."
 msgstr ""
 
-#: include/services.inc.php:488 include/services.inc.php:497
+#: include/services.inc.php:487 include/services.inc.php:496
 msgid "Incorrect service start time."
 msgstr ""
 
-#: include/services.inc.php:482
+#: include/services.inc.php:481
 msgid "Incorrect service time type."
 msgstr ""
 
@@ -7868,7 +7868,7 @@ msgstr ""
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:53
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:78
+#: include/views/configuration.graph.list.php:77
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.massupdate.php:90
@@ -7988,7 +7988,7 @@ msgstr ""
 msgid "New regular expression"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:288
+#: include/views/configuration.services.edit.php:290
 msgid "New service time"
 msgstr ""
 
@@ -8183,11 +8183,11 @@ msgstr ""
 msgid "No graph item with graphid \"%s\"."
 msgstr ""
 
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes defined."
 msgstr ""
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:74
+#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1341
@@ -8631,7 +8631,7 @@ msgid "Nodes"
 msgstr ""
 
 #: adm.other.php:81 include/hosts.inc.php:38 include/httptest.inc.php:27
-#: include/services.inc.php:317
+#: include/services.inc.php:316
 #: include/views/administration.general.gui.edit.php:27
 #: include/views/administration.general.other.edit.php:31
 #: include/views/configuration.item.edit.php:398
@@ -8697,7 +8697,7 @@ msgid "Not supported"
 msgstr ""
 
 #: include/views/configuration.services.edit.php:115
-#: include/views/configuration.services.edit.php:210
+#: include/views/configuration.services.edit.php:212
 #: include/views/configuration.services.parent.list.php:48
 msgid "Note"
 msgstr ""
@@ -8901,8 +8901,8 @@ msgstr ""
 msgid "One time only"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:131
-#: include/views/configuration.services.edit.php:286
+#: include/views/configuration.services.edit.php:133
+#: include/views/configuration.services.edit.php:288
 msgid "One-time downtime"
 msgstr ""
 
@@ -8987,7 +8987,7 @@ msgstr ""
 msgid "Only super admins can delete proxies."
 msgstr ""
 
-#: include/services.inc.php:299
+#: include/services.inc.php:298
 #, php-format
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr ""
@@ -9652,11 +9652,11 @@ msgstr ""
 msgid "Problem time"
 msgstr ""
 
-#: include/services.inc.php:60
+#: include/services.inc.php:59
 msgid "Problem, if all children have problems"
 msgstr ""
 
-#: include/services.inc.php:59
+#: include/services.inc.php:58
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
@@ -9911,7 +9911,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:284
 #: include/views/configuration.item.massupdate.php:284
 #: include/views/configuration.services.edit.php:94
-#: include/views/configuration.services.edit.php:146
+#: include/views/configuration.services.edit.php:148
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/configuration.sysmap.edit.php:161
 #: include/views/configuration.sysmap.edit.php:179
@@ -10441,7 +10441,7 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:219
 #: include/views/configuration.screen.constructor.edit.php:626
 #: include/views/configuration.screen.edit.php:50
-#: include/views/configuration.services.edit.php:318
+#: include/views/configuration.services.edit.php:320
 #: include/views/configuration.slideconf.edit.php:106
 #: include/views/configuration.slideconf.edit.php:112
 #: include/views/configuration.sysmap.edit.php:205
@@ -10853,7 +10853,7 @@ msgstr ""
 
 #: events.php:522 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
-#: include/views/configuration.services.edit.php:305
+#: include/views/configuration.services.edit.php:307
 #: include/views/configuration.services.parent.list.php:36 services.php:472
 #: srv_status.php:156
 msgid "Service"
@@ -10895,11 +10895,11 @@ msgstr ""
 msgid "Service port"
 msgstr ""
 
-#: include/services.inc.php:505
+#: include/services.inc.php:504
 msgid "Service start time must be less than end time."
 msgstr ""
 
-#: include/views/configuration.services.edit.php:153
+#: include/views/configuration.services.edit.php:155
 msgid "Service times"
 msgstr ""
 
@@ -11749,8 +11749,8 @@ msgstr ""
 
 #: include/reports.inc.php:154 include/reports.inc.php:265
 #: include/reports.inc.php:634
-#: include/views/configuration.services.edit.php:251
-#: include/views/configuration.services.edit.php:279 popup_period.php:155
+#: include/views/configuration.services.edit.php:253
+#: include/views/configuration.services.edit.php:281 popup_period.php:155
 #: report3.php:145 report4.php:180 services.php:201 services.php:207
 msgid "Till"
 msgstr ""
@@ -11767,9 +11767,9 @@ msgstr ""
 #: include/events.inc.php:211
 #: include/views/administration.auditacts.list.php:70
 #: include/views/administration.auditlogs.list.php:85
-#: include/views/configuration.services.edit.php:278
-#: include/views/configuration.services.edit.php:279
-#: include/views/configuration.services.edit.php:307 jsLoader.php:135
+#: include/views/configuration.services.edit.php:280
+#: include/views/configuration.services.edit.php:281
+#: include/views/configuration.services.edit.php:309 jsLoader.php:135
 msgid "Time"
 msgstr ""
 
@@ -12307,7 +12307,7 @@ msgstr ""
 msgid "Unknown action"
 msgstr ""
 
-#: include/services.inc.php:370
+#: include/services.inc.php:369
 msgid "Unknown calculation algorithm of service status"
 msgstr ""
 
@@ -12500,7 +12500,7 @@ msgid "Upper level maps"
 msgstr ""
 
 #: include/views/configuration.services.edit.php:121
-#: include/views/configuration.services.edit.php:284
+#: include/views/configuration.services.edit.php:286
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:165
 msgid "Uptime"
@@ -12964,7 +12964,7 @@ msgid "When active"
 msgstr ""
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:54
-#: include/views/configuration.graph.list.php:79
+#: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:50 screenedit.php:43
@@ -13506,8 +13506,8 @@ msgid "d M Y"
 msgstr ""
 
 #: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
-#: include/views/configuration.services.edit.php:132
-#: include/views/configuration.services.edit.php:133 report3.php:161
+#: include/views/configuration.services.edit.php:134
+#: include/views/configuration.services.edit.php:135 report3.php:161
 msgid "d M Y H:i"
 msgstr ""
 
@@ -13554,8 +13554,8 @@ msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:71
 #: include/views/configuration.maintenance.edit.php:111
-#: include/views/configuration.services.edit.php:200
-#: include/views/configuration.services.edit.php:241
+#: include/views/configuration.services.edit.php:202
+#: include/views/configuration.services.edit.php:243
 msgid "dd"
 msgstr ""
 
@@ -13609,10 +13609,10 @@ msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.maintenance.edit.php:117
-#: include/views/configuration.services.edit.php:206
-#: include/views/configuration.services.edit.php:247
-#: include/views/configuration.services.edit.php:267
-#: include/views/configuration.services.edit.php:273
+#: include/views/configuration.services.edit.php:208
+#: include/views/configuration.services.edit.php:249
+#: include/views/configuration.services.edit.php:269
+#: include/views/configuration.services.edit.php:275
 msgid "hh"
 msgstr ""
 
@@ -13702,12 +13702,12 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:79
 #: include/views/configuration.maintenance.edit.php:113
 #: include/views/configuration.maintenance.edit.php:119
-#: include/views/configuration.services.edit.php:202
-#: include/views/configuration.services.edit.php:208
-#: include/views/configuration.services.edit.php:243
-#: include/views/configuration.services.edit.php:249
-#: include/views/configuration.services.edit.php:270
-#: include/views/configuration.services.edit.php:276
+#: include/views/configuration.services.edit.php:204
+#: include/views/configuration.services.edit.php:210
+#: include/views/configuration.services.edit.php:245
+#: include/views/configuration.services.edit.php:251
+#: include/views/configuration.services.edit.php:272
+#: include/views/configuration.services.edit.php:278
 msgid "mm"
 msgstr ""
 
@@ -13806,8 +13806,8 @@ msgstr "verestä joka"
 msgid "remember selected"
 msgstr "muista valitut"
 
-#: include/services.inc.php:104 include/services.inc.php:107
-#: include/services.inc.php:200
+#: include/services.inc.php:103 include/services.inc.php:106
+#: include/services.inc.php:199
 #: include/views/configuration.services.parent.list.php:41
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:43
@@ -13838,7 +13838,7 @@ msgstr "sekuntia"
 msgid "sent"
 msgstr "lähetetty"
 
-#: include/views/configuration.services.edit.php:198
+#: include/views/configuration.services.edit.php:200
 msgid "short description"
 msgstr "lyhyt kuvaus"
 
@@ -13913,8 +13913,8 @@ msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:75
 #: include/views/configuration.maintenance.edit.php:115
-#: include/views/configuration.services.edit.php:204
-#: include/views/configuration.services.edit.php:245
+#: include/views/configuration.services.edit.php:206
+#: include/views/configuration.services.edit.php:247
 msgid "yyyy"
 msgstr "vvvv"
 
