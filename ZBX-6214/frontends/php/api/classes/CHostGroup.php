@@ -1025,6 +1025,13 @@ class CHostGroup extends CZBXAPI {
 			}
 		}
 
+		if (!empty($newHostIds)) {
+			$unlinkable = getUnlinkableHosts($groupIds, $newHostIds);
+			if (count($newHostIds) != count($unlinkable)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the objects is left without host group.');
+			}
+		}
+
 		// get host groups
 		$dbHostGroups = DBfetchArray(DBselect(
 			'SELECT *'.
