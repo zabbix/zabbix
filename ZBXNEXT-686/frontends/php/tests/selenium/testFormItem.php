@@ -32,7 +32,7 @@ class testFormItem extends CWebTest {
 			array(
 				array('type' => 'Zabbix agent')
 			),
-/*			array(
+			array(
 				array(
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
@@ -217,7 +217,7 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array('type' => 'Calculated')
-			)*/
+			)
 		);
 	}
 
@@ -305,6 +305,9 @@ class testFormItem extends CWebTest {
 		if ($value_type == 'Numeric (unsigned)') {
 			$data_type = $this->getSelectedLabel('data_type');
 		}
+		else {
+			$data_type = null;
+		}
 
 		if (isset($data['authtype'])) {
 			$this->dropdown_select('authtype', $data['authtype']);
@@ -312,6 +315,9 @@ class testFormItem extends CWebTest {
 
 		if ($type == 'SSH agent') {
 			$authtype = $this->getSelectedLabel('authtype');
+		}
+		else {
+			$authtype = null;
 		}
 
 		if ($type == 'Database monitor') {
@@ -345,36 +351,36 @@ class testFormItem extends CWebTest {
 		}
 
 		$interfaceType = itemTypeInterface($this->getValue('type'));
-		switch ($interfaceType) {
-			case INTERFACE_TYPE_SNMP :
-			case INTERFACE_TYPE_IPMI :
-			case INTERFACE_TYPE_AGENT :
-			case INTERFACE_TYPE_ANY :
-			case INTERFACE_TYPE_JMX :
-				$this->ok('Host interface');
-				$dbInterfaces = DBdata(
-					'SELECT type,ip,port'.
-					' FROM interface'.
-					' WHERE hostid='.$hostid.
-						($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
-				);
-				$dbInterfaces = reset($dbInterfaces);
-				if ($dbInterfaces != null) {
-					foreach ($dbInterfaces as $host_interface) {
-						$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
-						$host_interface['ip'].' : '.
-						$host_interface['port'].'"]');
+			switch ($interfaceType) {
+				case INTERFACE_TYPE_SNMP :
+				case INTERFACE_TYPE_IPMI :
+				case INTERFACE_TYPE_AGENT :
+				case INTERFACE_TYPE_ANY :
+				case INTERFACE_TYPE_JMX :
+					$this->ok('Host interface');
+					$dbInterfaces = DBdata(
+						'SELECT type,ip,port'.
+						' FROM interface'.
+						' WHERE hostid='.$hostid.
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+					);
+					$dbInterfaces = reset($dbInterfaces);
+					if ($dbInterfaces != null) {
+						foreach ($dbInterfaces as $host_interface) {
+							$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
+							$host_interface['ip'].' : '.
+							$host_interface['port'].'"]');
+						}
 					}
-				}
-				else {
-					$this->ok('No interface found');
+					else {
+						$this->ok('No interface found');
+						$this->assertNotVisible('interfaceid');
+					}
+					break;
+				default:
+					$this->nok(array('Host interface', 'No interface found'));
 					$this->assertNotVisible('interfaceid');
-				}
-				break;
-			default:
-				$this->nok(array('Host interface', 'No interface found'));
-				$this->assertNotVisible('interfaceid');
-				break;
+					break;
 		}
 
 		if ($type == 'IPMI agent') {
@@ -405,7 +411,7 @@ class testFormItem extends CWebTest {
 			$this->assertAttribute("//input[@id='username']/@maxlength", '64');
 			$this->assertAttribute("//input[@id='username']/@size", '25');
 
-			if (isset($authtype) && $authtype == 'Public key') {
+			if ($authtype == 'Public key') {
 				$this->ok('Key passphrase');
 			}
 			else {
@@ -423,7 +429,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('password');
 		}
 
-		if	(isset($authtype) && $authtype == 'Public key') {
+		if	($authtype == 'Public key') {
 			$this->ok('Public key file');
 			$this->assertVisible('publickey');
 			$this->assertAttribute("//input[@id='publickey']/@maxlength", '64');
@@ -497,7 +503,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('snmpv3_securitylevel');
 		}
 
-		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel != 'noAuthNoPriv') {
+		if ($type == 'SNMPv3 agent' && $snmpv3_securitylevel != 'noAuthNoPriv') {
 			$this->ok('Authentication protocol');
 			$this->assertVisible('row_snmpv3_authprotocol');
 			$this->assertVisible("//span[text()='MD5']");
@@ -518,7 +524,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('snmpv3_authpassphrase');
 		}
 
-		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel == 'authPriv') {
+		if ($type == 'SNMPv3 agent' && $snmpv3_securitylevel == 'authPriv') {
 			$this->ok('Privacy protocol');
 			$this->assertVisible('row_snmpv3_privprotocol');
 			$this->assertVisible("//span[text()='DES']");
@@ -1503,10 +1509,10 @@ class testFormItem extends CWebTest {
 		$this->ok('CONFIGURATION OF HOSTS');
 
 		$host=$data['host'];
-		$row = DBfetch(DBselect('select hostid from hosts where name='.zbx_dbstr($host)));
+		$row = DBfetch(DBselect("select hostid from hosts where name='$host'"));
 		$hostid = $row['hostid'];
 
-		$this->href_click('items.php?filter_set=1&hostid='.$hostid.'&sid=');
+		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
 
 		$this->checkTitle('Configuration of items');
@@ -1556,7 +1562,6 @@ class testFormItem extends CWebTest {
 				}
 			}
 		}
-
 		if (isset($data['history'])) {
 			$this->input_type('history', $data['history']);
 		}
@@ -1571,19 +1576,21 @@ class testFormItem extends CWebTest {
 			$expected = $data['expected'];
 			switch ($expected) {
 				case ITEM_GOOD:
-					$this->ok('Item added');
-					$this->checkTitle('Configuration of items');
-					$this->ok('CONFIGURATION OF ITEMS');
-					break;
+			$this->ok('Item added');
+			$this->checkTitle('Configuration of items');
+			$this->ok('CONFIGURATION OF ITEMS');
+			break;
 
 				case ITEM_BAD:
-					$this->checkTitle('Configuration of items');
-					$this->ok('CONFIGURATION OF ITEMS');
-					foreach ($data['errors'] as $msg) {
-						$this->ok($msg);
-					}
-					$this->ok(array('Host', 'Name', 'Key'));
-					break;
+			$this->checkTitle('Configuration of items');
+			$this->ok('CONFIGURATION OF ITEMS');
+			foreach ($data['errors'] as $msg) {
+				$this->ok($msg);
+			}
+			$this->ok('Host');
+			$this->ok('Name');
+			$this->ok('Key');
+			break;
 			}
 		}
 	}
