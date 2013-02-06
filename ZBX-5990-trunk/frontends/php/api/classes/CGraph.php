@@ -104,14 +104,14 @@ class CGraph extends CGraphGeneral {
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM graphs_items gi,items i,hosts_groups hgg'.
-					' JOIN rights r'.
+					' LEFT JOIN rights r'.
 						' ON r.id=hgg.groupid'.
 							' AND '.dbConditionInt('r.groupid', $userGroups).
 				' WHERE g.graphid=gi.graphid'.
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY gi.graphid'.
-				' HAVING MIN(r.permission)>'.PERM_DENY.
+				' HAVING MIN(CASE WHEN (r.permission IS NULL) THEN 0 ELSE r.permission END)>0'.
 					' AND MAX(r.permission)>='.$permission.
 				')';
 		}
