@@ -22,7 +22,8 @@
 #ifdef HAVE_OPENIPMI
 
 #if !IPMI_SENSOR_ID_SZ
-#define	IPMI_SENSOR_ID_SZ	16	/* max bytes for sensor ID, see SDR record format in IPMI v2 specification */
+#define	IPMI_SENSOR_ID_SZ	17	/* max 16 bytes for sensor ID and terminating '\0' */
+					/* see SDR record format in IPMI v2 spec */
 #endif
 
 #include "log.h"
@@ -44,9 +45,9 @@ zbx_ipmi_sensor_value_t;
 typedef struct
 {
 	ipmi_sensor_t		*sensor;
-	char			id[IPMI_SENSOR_ID_SZ + 1];
+	char			id[IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e	id_type;	/* For sensors IPMI specifications mention Unicode, BCD plus, */
-						/* 6-bit ASCII packed, 8-bit ASCII+Latin1. */
+						/* 6-bit ASCII packed, 8-bit ASCII+Latin1.  */
 	int			id_sz;		/* "id" value length in bytes */
 	zbx_ipmi_sensor_value_t	value;
 	int			reading_type;	/* "Event/Reading Type Code", e.g. Threshold, */
@@ -86,6 +87,49 @@ zbx_ipmi_host_t;
 
 static zbx_ipmi_host_t	*hosts = NULL;
 static os_handler_t	*os_hnd;
+
+static char *sensor_id_to_str(char *str, size_t str_sz, const char *id, int id_type, int id_sz)
+{
+	/* minimum size of 'str' buffer, str_sz, is 35 bytes to avoid truncation */
+	int	i;
+	char	*p = str;
+
+	if (0 == id_sz)		/* id is meaningful only if length > 0 (see SDR record format in IPMI v2 spec) */
+	{
+		*str = '\0';
+		return str;
+	}
+
+	if (IPMI_SENSOR_ID_SZ < id_sz)
+	{
+		zbx_strlcpy(str, "ILLEGAL-SENSOR-ID-SIZE", str_sz);
+		THIS_SHOULD_NEVER_HAPPEN;
+		return str;
+	}
+
+	switch (id_type)
+	{
+		case IPMI_ASCII_STR:
+		case IPMI_UNICODE_STR:
+			memcpy(str, id, str_sz > (size_t)id_sz ? (size_t)id_sz : str_sz - 1);
+			*(str + (str_sz > (size_t)id_sz ? (size_t)id_sz : str_sz - 1)) = '\0';
+			break;
+		case IPMI_BINARY_STR:
+			/* "BCD Plus" or "6-bit ASCII packed" encoding. OpenIPMI does not tell us which one. */
+			/* Don't guess, just print it as a hex string. */
+
+			*p++ = '0';	/* prefix to distinguish from ASCII/Unicode strings */
+			*p++ = 'x';
+			for (i = 0; i < id_sz; i++, p += 2)
+				zbx_snprintf(p, str_sz - 2 - i - i, "%2.2hhx", *(id + i));
+			*p = '\0';
+			break;
+		default:
+			zbx_strlcpy(str, "ILLEGAL-SENSOR-ID-TYPE", str_sz);
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	return str;
+}
 
 static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port,
 		int authtype, int privilege, const char *username,
@@ -188,8 +232,9 @@ static zbx_ipmi_sensor_t	*get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const char *
 static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	const char		*__function_name = "allocate_ipmi_sensor";
+	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	zbx_ipmi_sensor_t	*s;
-	char			id[IPMI_SENSOR_ID_SZ + 1];
+	char			id[IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e	id_type;
 	int			id_sz, sz;
 
@@ -198,7 +243,8 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	ipmi_sensor_get_id(sensor, id, sizeof(id));
 	id_type = ipmi_sensor_get_id_type(sensor);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name, id, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name,
+			sensor_id_to_str(id_str, sizeof(id_str), id, id_type, id_sz), h->ip, h->port);
 
 	h->sensor_count++;
 	sz = h->sensor_count * sizeof(zbx_ipmi_sensor_t);
@@ -225,6 +271,7 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 static void	delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	const char	*__function_name = "delete_ipmi_sensor";
+	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int		i;
 	size_t		sz;
 
@@ -239,7 +286,8 @@ static void	delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 		sz = sizeof(zbx_ipmi_sensor_t);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "sensor '%s@[%s]:%d' deleted",
-				h->sensors[i].id, h->ip, h->port);
+				sensor_id_to_str(id_str, sizeof(id_str), h->sensors[i].id, h->sensors[i].id_type,
+				h->sensors[i].id_sz), h->ip, h->port);
 
 		h->sensor_count--;
 		if (h->sensor_count != i)
@@ -370,6 +418,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 		unsigned int raw_value, double val, ipmi_states_t *states, void *cb_data)
 {
 	const char		*__function_name = "got_thresh_reading";
+	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	const char		*e_string, *s_type_string, *s_reading_type_string;
 	ipmi_entity_t		*ent;
 	const char		*percent = "", *base, *mod_use = "", *modifier = "", *rate;
@@ -433,8 +482,9 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 			rate = ipmi_sensor_get_rate_unit_string(sensor);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Value [%s | %s | %s | %s | " ZBX_FS_DBL "%s %s%s%s%s]",
-					s->id, e_string, s_type_string, s_reading_type_string,
-					val, percent, base, mod_use, modifier, rate);
+					sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+					e_string, s_type_string, s_reading_type_string, val, percent, base,
+					mod_use, modifier, rate);
 			break;
 	}
 	h->done = 1;
@@ -446,6 +496,7 @@ out:
 static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
 {
 	const char		*__function_name = "got_discrete_states";
+	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 
 	int			id, i, val, ret, is_state_set;
 	const char		*e_string, *s_type_string, *s_reading_type_string;
@@ -479,7 +530,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 	s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
 	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
 
-	/* Discrete values are 16-bit (ie: [0,2^16-1], so 2^16 = fail). We're using a 64-bit uint. */
+	/* Discrete values are 16-bit. We're using a 64-bit uint. */
 	s->value.discrete = 0;
 
 	for (i = 0; i < 15; i++)
@@ -491,7 +542,8 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 		is_state_set = ipmi_is_state_set(states, i);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
-				s->id, e_string, s_type_string, s_reading_type_string, i, is_state_set);
+				sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+				e_string, s_type_string, s_reading_type_string, i, is_state_set);
 
 		if (0 != is_state_set)
 			s->value.discrete += 1 << i;
@@ -505,12 +557,14 @@ out:
 static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 {
 	const char	*__function_name = "read_ipmi_sensor";
+	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 
 	int		ret;
 	const char	*s_reading_type_string;
 	struct timeval	tv;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name, s->id, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name,
+			sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
 
 	h->ret = SUCCEED;
 	h->done = 0;
@@ -522,7 +576,8 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			{
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_get_reading() return error: 0x%x",
-						s->id, ret);
+						sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+						ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -543,7 +598,8 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			{
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_get_states() return error: 0x%x",
-						s->id, ret);
+						sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+						ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -553,7 +609,8 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 
 			h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 					" IPMI reading type \"%s\" is not supported",
-					s->id, s_reading_type_string);
+					sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+					s_reading_type_string);
 			h->ret = NOTSUPPORTED;
 			goto out;
 	}
