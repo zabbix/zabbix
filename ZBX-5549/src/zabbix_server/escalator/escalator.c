@@ -119,7 +119,7 @@ static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 
 	if (USER_TYPE_SUPER_ADMIN == user_type)
 	{
-		perm = PERM_MAX;
+		perm = PERM_READ_WRITE;
 		goto out;
 	}
 
