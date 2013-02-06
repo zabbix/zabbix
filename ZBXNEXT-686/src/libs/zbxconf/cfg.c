@@ -173,31 +173,31 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 				zabbix_log(LOG_LEVEL_DEBUG, "accepted configuration parameter: '%s' = '%s'",parameter, value);
 
-				if (TYPE_INT == cfg[i].type)
+				switch (cfg[i].type)
 				{
-					if (FAIL == str2uint64(value, "KMGT", &var))
-						goto incorrect_config;
+					case TYPE_INT:
+						if (FAIL == str2uint64(value, "KMGT", &var))
+							goto incorrect_config;
 
-					if ((cfg[i].min && var < cfg[i].min) || (cfg[i].max && var > cfg[i].max))
-						goto incorrect_config;
+						/* usability: 2G converts to 0x7fffffff (2GB - 1 byte) */
+						if ((zbx_uint64_t)2 * ZBX_GIBIBYTE == var)
+							var--;
 
-					*((int *)cfg[i].variable) = (int)var;
-				}
-				else if (TYPE_STRING == cfg[i].type)
-				{
-					/* free previous value memory */
-					char *p = *((char **)cfg[i].variable);
-					if (NULL != p)
-						zbx_free(p);
+						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
+							goto incorrect_config;
 
-					*((char **)cfg[i].variable) = strdup(value);
+						*((int *)cfg[i].variable) = (int)var;
+						break;
+					case TYPE_STRING:
+						*((char **)cfg[i].variable) =
+								zbx_strdup(*((char **)cfg[i].variable), value);
+						break;
+					case TYPE_MULTISTRING:
+						zbx_strarr_add(cfg[i].variable, value);
+						break;
+					default:
+						assert(0);
 				}
-				else if (TYPE_MULTISTRING == cfg[i].type)
-				{
-					zbx_strarr_add(cfg[i].variable, value);
-				}
-				else
-					assert(0);
 			}
 
 			if (0 == param_valid && ZBX_CFG_STRICT == strict)
@@ -214,42 +214,38 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (PARM_MAND != cfg[i].mandatory)
 			continue;
 
-		if (TYPE_INT == cfg[i].type)
+		switch (cfg[i].type)
 		{
-			if (0 == *((int *)cfg[i].variable))
-				goto missing_mandatory;
+			case TYPE_INT:
+				if (0 == *((int *)cfg[i].variable))
+					goto missing_mandatory;
+				break;
+			case TYPE_STRING:
+				if (NULL == (*(char **)cfg[i].variable))
+					goto missing_mandatory;
+				break;
+			default:
+				assert(0);
 		}
-		else if (TYPE_STRING == cfg[i].type)
-		{
-			if (NULL == (*(char **)cfg[i].variable))
-				goto missing_mandatory;
-		}
-		else
-			assert(0);
 	}
 
 	return result;
-
 cannot_open:
 	if (optional)
 		return result;
 	zbx_error("cannot open config file [%s]: %s", cfg_file, zbx_strerror(errno));
 	exit(1);
-
 missing_mandatory:
 	zbx_error("missing mandatory parameter [%s] in config file [%s]", cfg[i].parameter, cfg_file);
 	exit(1);
-
 incorrect_config:
 	fclose(file);
 	zbx_error("wrong value of [%s] in config file [%s], line %d", cfg[i].parameter, cfg_file, lineno);
 	exit(1);
-
 unknown_parameter:
 	fclose(file);
 	zbx_error("unknown parameter [%s] in config file [%s], line %d", parameter, cfg_file, lineno);
 	exit(1);
-
 garbage:
 	fclose(file);
 	zbx_error("invalid entry [%s] (not following \"parameter=value\" notation) in config file [%s], line %d",
