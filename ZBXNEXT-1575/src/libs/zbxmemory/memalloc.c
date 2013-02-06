@@ -808,9 +808,11 @@ void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 	UNLOCK_INFO;
 }
 
-size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, const char *param)
+size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param)
 {
 	const char	*__function_name = "zbx_mem_required_size";
+
+	size_t		size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_SIZE_T " chunks_num:%d descr:'%s' param:'%s'",
 			__function_name, (zbx_fs_size_t)size, chunks_num, descr, param);

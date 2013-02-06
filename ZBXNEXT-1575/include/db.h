@@ -298,7 +298,6 @@ typedef struct
 	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	objectid;
-	zbx_uint64_t	ack_eventid;
 	int		source;
 	int		object;
 	int		clock;
