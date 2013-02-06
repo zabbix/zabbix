@@ -21,7 +21,7 @@
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageHistory extends CWebTest {
-	// Returns all enabled items that belong to enabled hosts
+	// returns all enabled items that belong to enabled hosts
 	public static function allEnabledItems() {
 		return DBdata(
 				'SELECT i.itemid'.
@@ -36,18 +36,17 @@ class testPageHistory extends CWebTest {
 	/**
 	* @dataProvider allEnabledItems
 	*/
-
 	public function testPageItems_CheckLayout($item) {
-
 		// should switch to graph for numeric items, should check filter for history & text items
 		// also different header for log items (different for eventlog items ?)
 		$itemid = $item['itemid'];
 		$this->login("history.php?action=showvalues&itemid=$itemid");
-		$this->checkTitle('History');
-		// Header
+		$this->checkTitle('History \[refreshed every 30 sec\]');
+
+		// header
 		$this->ok(array('Timestamp', 'Value'));
 		$this->dropdown_select_wait('action', '500 latest values');
-		$this->checkTitle('History');
+		$this->checkTitle('History \[refreshed every 30 sec\]');
 		$this->button_click('plaintext');
 		$this->wait();
 
@@ -55,9 +54,8 @@ class testPageHistory extends CWebTest {
 		$this->goBack();
 		$this->wait();
 		$this->dropdown_select_wait('action', 'Values');
-		$this->checkTitle('History');
+		$this->checkTitle('History \[refreshed every 30 sec\]');
 		$this->button_click('plaintext');
 		$this->wait();
-
 	}
 }
