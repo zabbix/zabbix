@@ -27,44 +27,47 @@ jQuery(function($) {
 		url.setArgument('objectName', options.objectName);
 		url = url.getUrl();
 
-		var jqxhrs = [],
-			isWaiting = [];
-
 		return this.each(function() {
 			var obj = $(this),
 				objId = obj.attr('id'),
-				width = (parseInt(obj.css('width')) - 2) + 'px';
+				isWaiting = false,
+				jqxhr = null,
+				values = {
+					name: options.name,
+					width: parseInt(obj.css('width')),
+					selected: [],
+					available: []
+				};
 
-			// input
+			// search input
 			var input = $('<input>', {
 				type: 'text',
 				value: '',
-				css: {width: width},
-				'data-lastValue': ''
+				css: {width: values.width}
 			})
 			.keyup(function(e) {
-				var value = input.val();
+				var search = input.val();
 
-				if (!empty(value) && input.data('lastValue') != value) {
-					input.data('lastValue', value);
+				if (!empty(search) && input.data('lastSearch') != search) {
+					input.data('lastSearch', search);
 
-					if (!isWaiting[objId]) {
-						isWaiting[objId] = true;
+					if (!isWaiting) {
+						isWaiting = true;
 
 						window.setTimeout(function() {
-							isWaiting[objId] = false;
+							isWaiting = false;
 
-							if (!empty(jqxhrs[objId])) {
-								jqxhrs[objId].abort();
+							if (!empty(jqxhr)) {
+								jqxhr.abort();
 							}
 
-							jqxhrs[objId] = $.ajax({
+							jqxhr = $.ajax({
 								url: url + '&curtime=' + new CDate().getTime(),
 								type: 'GET',
 								dataType: 'json',
-								data: {search: value},
+								data: {search: search},
 								success: function(data) {
-									loadData(obj, options, data);
+									loadAvailable(obj, values, data);
 								}
 							});
 						}, 500);
@@ -76,72 +79,163 @@ jQuery(function($) {
 					cancelEvent(e);
 				}
 			});
-			obj.append(input);
+			obj.append($('<div>', {style: 'position: relative;'}).append(input));
 
-			// list
+			// selected
 			obj.append($('<div>', {
-				'class': 'list',
-				css: {width: width}
+				'class': 'selected',
+				css: {width: values.width}
 			}).append($('<ul>')));
+
+			// available
+			var available = $('<div>', {
+				'class': 'available',
+				css: {
+					width: values.width - 2,
+					display: 'none'
+				}
+			})
+			.append($('<ul>'))
+			.focusout(function () {
+				hideAvailable(obj);
+			});
+			obj.append($('<div>', {style: 'position: relative;'}).append(available));
 
 			// preload data
 			if (!empty(options.data)) {
-				loadData(obj, options, {result: options.data});
+				loadSelected(obj, values, options.data);
+				loadAvailable(obj, values, {result: options.data});
 			}
-
-			// load ajax data
-			/*var loadData = function(data) {
-				if (empty(data['result'])) {
-					return;
-				}
-
-				var values = [];
-
-				$('option', selectObj).each(function() {
-					if ($(this).is(':selected')) {
-						values.push($(this).val());
-					}
-					else {
-						$(this).remove();
-					}
-				});
-
-				$.each(data['result'], function(i, item) {
-					if (typeof(values[item.value]) == 'undefined') {
-						$('<option />', {value: item.value, text: item.text}).appendTo(selectObj);
-					}
-				});
-			};*/
-
-			/* preload data
-			$('.search-field input', containerObj).focus(function() {
-				$.ajax({
-					url: url,
-					type: 'GET',
-					dataType: 'json',
-					data: {limit: 10},
-					success: success
-				});
-				jQuery(this).off('focus');
-			});*/
 		});
 
-		function loadData(obj, options, data) {
-			$.each(data.result, function(i, item) {
+		function loadSelected(obj, values, data) {
+			$.each(data, function(i, item) {
+				addSelected(obj, values, item);
+			});
+		};
+
+		function addSelected(obj, values, item) {
+			if (typeof(values.selected[item.id]) == 'undefined') {
+				values.selected[item.id] = item.id;
+
+				// add hidden input
 				obj.append($('<input>', {
 					type: 'hidden',
-					name: options.name,
+					name: values.name,
 					value: item.id
 				}));
 
-				$('ul', obj).each(function() {
-					$(this).append($('<li>', {
-						'data-id': item.id,
-						'data-name': item.name
-					})
-					.append($('<span>', {text: item.prefix + item.name})));
+				// add list item
+				var li = $('<li>', {
+					'data-id': item.id,
+					'data-name': item.name
 				});
+
+				var text = $('<span>', {
+					'class': 'text',
+					text: empty(item.prefix) ? item.name : item.prefix + item.name
+				});
+
+				var arrow = $('<span>', {
+					'class': 'arrow',
+					'data-id': item.id
+				})
+				.click(function() {
+					removeSelected(obj, values, $(this).data('id'));
+				});
+
+				$('.selected ul', obj).append(li.append(text, arrow));
+
+				// resize
+				resizeSelected(obj, values);
+			}
+		};
+
+		function removeSelected(obj, values, id) {
+			$('.selected li[data-id="' + id + '"]', obj).remove();
+			$('input[value="' + id + '"]', obj).remove();
+			values.selected[id] = 'undefined';
+
+			// resize
+			resizeSelected(obj, values);
+		};
+
+		function resizeSelected(obj, values) {
+			var position = $('.selected li:last-child .arrow', obj).position(),
+				top = position.top,
+				left = position.left + 20,
+				height = $('.selected li:last-child', obj).height();
+
+			if (left > values.width) {
+				top += (height / 2);
+				left = 0;
+
+				$('.selected ul', obj).css({
+					'padding-bottom': height / 2
+				});
+			}
+			else {
+				$('.selected ul', obj).css({
+					'padding-bottom': 0
+				});
+			}
+
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left,
+				width: values.width - left
 			});
+		};
+
+		function loadAvailable(obj, values, data) {
+			if (!empty(data.result)) {
+				$.each(data.result, function(i, item) {
+					addAvailable(obj, values, item);
+				});
+
+				showAvailable(obj);
+			}
+			else {
+			}
+		};
+
+		function addAvailable(obj, values, item) {
+			if (typeof(values.available[item.id]) == 'undefined') {
+				values.available[item.id] = item.id;
+
+				// add list item
+				var li = $('<li>', {
+					'data-id': item.id,
+					'data-name': item.name,
+					text: empty(item.prefix) ? item.name : item.prefix + item.name
+				})
+				.click(function() {
+					removeAvailable(obj, values, $(this).data('id'));
+				});
+
+				$('.available ul', obj).append(li);
+			}
+		};
+
+		function showAvailable(obj) {
+			$('.selected ul', obj).css({
+				'-webkit-box-shadow': '0 0 5px rgba(0, 0, 0, 0.3)',
+				'-moz-box-shadow': '0 0 5px rgba(0, 0, 0, 0.3)',
+				'box-shadow': '0 0 5px rgba(0, 0, 0, 0.3)',
+				border: '1px solid #5897FB'
+			});
+			$('.available', obj).fadeIn(100);
+		};
+
+		function hideAvailable(obj) {
+			$('.selected ul', obj).css({
+				'-webkit-box-shadow': 'none',
+				'-moz-box-shadow': 'none',
+				'box-shadow': 'none',
+				border: '1px solid #AAAAAA'
+			});
+
+			$('.available', obj).fadeOut(50);
 		};
 	};
 });
