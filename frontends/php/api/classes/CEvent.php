@@ -31,6 +31,40 @@ class CEvent extends CZBXAPI {
 	protected $sortColumns = array('eventid', 'object', 'objectid');
 
 	/**
+	 * Array of supported objects where keys are object IDs and values are translated object names.
+	 *
+	 * @var array
+	 */
+	protected $objects = array();
+
+	/**
+	 * Array of supported sources where keys are source IDs and values are translated source names.
+	 *
+	 * @var array
+	 */
+	protected $sources = array();
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->sources = array(
+			EVENT_SOURCE_TRIGGERS => _('trigger'),
+			EVENT_SOURCE_DISCOVERY => _('discovery'),
+			EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
+			EVENT_SOURCE_INTERNAL => _('internal'),
+		);
+
+		$this->objects = array(
+			EVENT_OBJECT_TRIGGER => _('trigger'),
+			EVENT_OBJECT_DHOST => _('discovered host'),
+			EVENT_OBJECT_DSERVICE => _('discovered service'),
+			EVENT_OBJECT_AUTOREGHOST => _('auto-registered host'),
+			EVENT_OBJECT_ITEM => _('item'),
+			EVENT_OBJECT_LLDRULE => _('low-level discovery rule'),
+		);
+	}
+
+	/**
 	 * Get events data.
 	 *
 	 * @param _array $options
@@ -70,8 +104,8 @@ class CEvent extends CZBXAPI {
 			'triggerids'				=> null,
 			'eventids'					=> null,
 			'editable'					=> null,
-			'object'					=> null,
-			'source'					=> null,
+			'object'					=> EVENT_OBJECT_TRIGGER,
+			'source'					=> EVENT_SOURCE_TRIGGERS,
 			'acknowledged'				=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -103,9 +137,11 @@ class CEvent extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->validateGet($options);
+
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['source'] == EVENT_SOURCE_TRIGGERS) {
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				if (!is_null($options['triggerids'])) {
 					$triggers = API::Trigger()->get(array(
 						'triggerids' => $options['triggerids'],
@@ -323,6 +359,21 @@ class CEvent extends CZBXAPI {
 		return $result;
 	}
 
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @throws APIException     if the input is invalid
+	 *
+	 * @param array     $options
+	 *
+	 * @return void
+	 */
+	protected function validateGet(array $options) {
+		$this->checkSource($options);
+		$this->checkObject($options);
+		$this->checkSourceObject($options);
+	}
+
 	public function acknowledge($data) {
 		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
 		$eventids = zbx_toHash($eventids);
@@ -511,5 +562,82 @@ class CEvent extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates the "source" parameter.
+	 *
+	 * @throws APIException     if the source is incorrect
+	 *
+	 * @param array $object
+	 *
+	 * @return void
+	 */
+	protected function checkSource(array $object) {
+		if (!isset($this->sources[$object['source']])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
+		}
+	}
+
+	/**
+	 * Validates the "object" parameter.
+	 *
+	 * @throws APIException     if the object is incorrect
+	 *
+	 * @param array $object
+	 *
+	 * @return void
+	 */
+	protected function checkObject(array $object) {
+		if (!isset($this->objects[$object['object']])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
+		}
+	}
+
+	/**
+	 * Validates the given object is supported by the source.
+	 *
+	 * @throws APIException     if the object is not supported by the source
+	 *
+	 * @param array $object
+	 *
+	 * @return void
+	 */
+	protected function checkSourceObject(array $object) {
+		$pairs = array(
+			EVENT_SOURCE_TRIGGERS => array(
+				EVENT_OBJECT_TRIGGER => 1
+			),
+			EVENT_SOURCE_DISCOVERY => array(
+				EVENT_OBJECT_DHOST => 1,
+				EVENT_OBJECT_DSERVICE => 1
+			),
+			EVENT_SOURCE_AUTO_REGISTRATION => array(
+				EVENT_OBJECT_AUTOREGHOST => 1
+			),
+			EVENT_SOURCE_INTERNAL => array(
+				EVENT_OBJECT_TRIGGER => 1,
+				EVENT_OBJECT_ITEM => 1,
+				EVENT_OBJECT_LLDRULE => 1
+			)
+		);
+
+		$objects = $pairs[$object['source']];
+		if (!isset($objects[$object['object']])) {
+			$supportedObjects = '';
+			foreach ($objects as $object => $i) {
+				$supportedObjects .= $object.' - '.$this->objects[$object].', ';
+			}
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect object "%1$s" (%2$s) for source "%3$s" (%4$s), only the following objects are supported: %5$s.',
+					$object['object'],
+					$this->objects[$object['object']],
+					$object['source'],
+					$this->sources[$object['source']],
+					rtrim($supportedObjects, ', ')
+				)
+			);
+		}
 	}
 }
