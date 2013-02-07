@@ -34,6 +34,7 @@ class CMultiSelect extends CTag {
 		$this->addClass('multiselect');
 		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_TEXTAREA_STANDARD_WIDTH).'px;');
 
+		// data
 		$data = '[]';
 		if (!empty($options['data'])) {
 			$json = new CJSON();
@@ -41,10 +42,19 @@ class CMultiSelect extends CTag {
 			$data = $json->encode($options['data']);
 		}
 
+		// url
+		$url = new Curl('jsrpc.php');
+		$url->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
+		$url->setArgument('method', 'multiselect.get');
+		$url->setArgument('objectName', $options['objectName']);
+
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect({
+			url: "'.$url->getUrl().'",
 			name: "'.$options['name'].'",
-			objectName: "'.$options['objectName'].'",
-			data: '.$data.'
+			data: '.$data.',
+			labels: {
+				emptyResult: "'._('No matches found').'"
+			},
 			//disabled: '.$options['disabled'].'
 		});');
 	}

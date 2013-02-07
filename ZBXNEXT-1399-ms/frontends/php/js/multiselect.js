@@ -20,12 +20,42 @@
 
 jQuery(function($) {
 
+	/**
+	 * Create multi select input element.
+	 *
+	 * @param string $options['url']
+	 * @param string $options['name']
+	 * @param bool   $options['disabled']
+	 * @param object $options['labels']
+	 * @param object $options['data']
+	 * @param string $options['data'][id]
+	 * @param string $options['data'][name]
+	 * @param string $options['data'][prefix]
+	 *
+	 * @return object
+	 */
 	$.fn.multiSelect = function(options) {
-		var url = new Curl('jsrpc.php');
-		url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
-		url.setArgument('method', 'multiselect.get');
-		url.setArgument('objectName', options.objectName);
-		url = url.getUrl();
+		var defaults = {
+			url: '',
+			name: '',
+			data: {},
+			disabled: false,
+			labels: {
+				emptyResult: 'No matches found'
+			}
+		};
+		options = $.extend({}, defaults, options);
+
+		var KEY = {
+			ARROW_DOWN: 40,
+			ARROW_LEFT: 37,
+			ARROW_RIGHT: 39,
+			BACKSPACE: 8,
+			DELETE: 46,
+			ENTER: 13,
+			ESCAPE: 27,
+			TAB: 9
+		};
 
 		return this.each(function() {
 			var obj = $(this),
@@ -33,10 +63,9 @@ jQuery(function($) {
 				isWaiting = false,
 				jqxhr = null,
 				values = {
-					name: options.name,
 					width: parseInt(obj.css('width')),
-					selected: [],
-					available: []
+					selected: {},
+					available: {}
 				};
 
 			// search input
@@ -46,38 +75,90 @@ jQuery(function($) {
 				css: {width: values.width}
 			})
 			.keyup(function(e) {
-				var search = input.val();
+				if (!isWaiting) {
+					isWaiting = true;
 
-				if (!empty(search) && input.data('lastSearch') != search) {
-					input.data('lastSearch', search);
+					window.setTimeout(function() {
+						isWaiting = false;
 
-					if (!isWaiting) {
-						isWaiting = true;
+						var search = input.val();
 
-						window.setTimeout(function() {
-							isWaiting = false;
+						if (!empty(search)) {
+							if (input.data('lastSearch') != search) {
+								input.data('lastSearch', search);
 
-							if (!empty(jqxhr)) {
-								jqxhr.abort();
-							}
-
-							jqxhr = $.ajax({
-								url: url + '&curtime=' + new CDate().getTime(),
-								type: 'GET',
-								dataType: 'json',
-								data: {search: search},
-								success: function(data) {
-									loadAvailable(obj, values, data);
+								if (!empty(jqxhr)) {
+									jqxhr.abort();
 								}
-							});
-						}, 500);
-					}
+
+								jqxhr = $.ajax({
+									url: options.url + '&curtime=' + new CDate().getTime(),
+									type: 'GET',
+									dataType: 'json',
+									data: {search: search},
+									success: function(data) {
+										loadAvailable(data.result, search, obj, values, options);
+									}
+								});
+							}
+						}
+						else {
+							input.data('lastSearch', '');
+							cleanAvailable(obj, values);
+							hideAvailable(obj);
+						}
+					}, 500);
 				}
 			})
-			.keypress(function(e) {
-				if (e.which == 13) {
-					cancelEvent(e);
+			.bind('keypress, keydown', function (e) {
+				switch (e.which) {
+					case KEY.ENTER:
+						cancelEvent(e);
+						break;
+
+					case KEY.BACKSPACE:
+					case KEY.ARROW_LEFT:
+					case KEY.DELETE:
+						if (empty(input.val())) {
+							if ($('.selected li', obj).length) {
+								var lastItem = $('.selected li:last-child', obj);
+
+								if (lastItem.hasClass('pressed')) {
+									if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
+										removeSelected(lastItem.data('id'), obj, values);
+									}
+								}
+								else {
+									$('.selected li:last-child', obj).addClass('pressed');
+								}
+
+								cancelEvent(e);
+							}
+						}
+						break;
+
+					case KEY.ARROW_RIGHT:
+						// remove selected item pressed state
+						if (empty(input.val())) {
+							$('.selected li:last-child', obj).removeClass('pressed');
+						}
+
+						// place cursor on first available item
+						$('.available li:first-child', obj).addClass('hover');
+						break;
+
+					case KEY.ARROW_DOWN:
+						showAvailable(obj, values);
+						break;
+
+					case KEY.TAB:
+					case KEY.ESCAPE:
+						hideAvailable(obj);
+						break;
 				}
+			})
+			.bind('click', function () {
+				showAvailable(obj, values);
 			});
 			obj.append($('<div>', {style: 'position: relative;'}).append(input));
 
@@ -99,29 +180,56 @@ jQuery(function($) {
 			.focusout(function () {
 				hideAvailable(obj);
 			});
-			obj.append($('<div>', {style: 'position: relative;'}).append(available));
+
+			// multi select
+			obj.append($('<div>', {style: 'position: relative;'}).append(available))
+			.focusout(function () {
+				setTimeout(function() {
+					if ($('.available', obj).is(':visible')) {
+						hideAvailable(obj);
+					}
+				}, 200);
+			});
 
 			// preload data
 			if (!empty(options.data)) {
-				loadSelected(obj, values, options.data);
-				loadAvailable(obj, values, {result: options.data});
+				loadSelected(options.data, obj, values, options);
 			}
 		});
 
-		function loadSelected(obj, values, data) {
+		function loadSelected(data, obj, values, options) {
 			$.each(data, function(i, item) {
-				addSelected(obj, values, item);
+				addSelected(item, obj, values, options);
 			});
 		};
 
-		function addSelected(obj, values, item) {
+		function loadAvailable(data, search, obj, values, options) {
+			cleanAvailable(obj, values);
+
+			if (!empty(data)) {
+				$.each(data, function(i, item) {
+					addAvailable(item, search, obj, values, options);
+				});
+			}
+
+			if (objectLength(values.available) == 0) {
+				$('.available', obj).append($('<div>', {
+					'class': 'label-empty-result',
+					text: options.labels.emptyResult
+				}));
+			}
+
+			showAvailable(obj, values);
+		};
+
+		function addSelected(item, obj, values, options) {
 			if (typeof(values.selected[item.id]) == 'undefined') {
-				values.selected[item.id] = item.id;
+				values.selected[item.id] = item;
 
 				// add hidden input
 				obj.append($('<input>', {
 					type: 'hidden',
-					name: values.name,
+					name: options.name,
 					value: item.id
 				}));
 
@@ -141,7 +249,7 @@ jQuery(function($) {
 					'data-id': item.id
 				})
 				.click(function() {
-					removeSelected(obj, values, $(this).data('id'));
+					removeSelected($(this).data('id'), obj, values);
 				});
 
 				$('.selected ul', obj).append(li.append(text, arrow));
@@ -151,27 +259,108 @@ jQuery(function($) {
 			}
 		};
 
-		function removeSelected(obj, values, id) {
+		function removeSelected(id, obj, values) {
 			$('.selected li[data-id="' + id + '"]', obj).remove();
 			$('input[value="' + id + '"]', obj).remove();
-			values.selected[id] = 'undefined';
 
-			// resize
+			delete values.selected[id];
+
 			resizeSelected(obj, values);
 		};
 
-		function resizeSelected(obj, values) {
-			var position = $('.selected li:last-child .arrow', obj).position(),
-				top = position.top,
-				left = position.left + 20,
-				height = $('.selected li:last-child', obj).height();
+		function addAvailable(item, search, obj, values, options) {
+			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.id]) == 'undefined') {
+				values.available[item.id] = item;
 
-			if (left > values.width) {
-				top += (height / 2);
-				left = 0;
+				var prefix = $('<span>', {
+					'class': 'prefix',
+					text: item.prefix
+				});
+
+				var matchedText = $('<span>', {
+					'class': 'matched',
+					text: item.name.substr(0, search.length)
+				});
+
+				var unMatchedText = $('<span>', {
+					text: item.name.substr(search.length, item.name.length)
+				});
+
+				var li = $('<li>', {
+					'data-id': item.id
+				})
+				.append(prefix, matchedText, unMatchedText)
+				.click(function() {
+					var id = $(this).data('id');
+
+					addSelected(values.available[id], obj, values, options);
+					removeAvailable(id, obj, values);
+				});
+
+				$('.available ul', obj).append(li);
+			}
+		};
+
+		function removeAvailable(id, obj, values) {
+			$('.available li[data-id="' + id + '"]', obj).remove();
+
+			delete values.available[id];
+
+			if ($('.available li', obj).length == 0) {
+				hideAvailable(obj);
+			}
+		};
+
+		function showAvailable(obj, values) {
+			if ($('.label-empty-result', obj).length > 0 || objectLength(values.available) > 0) {
+				$('.selected ul', obj).addClass('active');
+				$('.available', obj).fadeIn(0);
+
+				// remove selected item pressed state
+				$('.selected li:last-child', obj).removeClass('pressed');
+			}
+		};
+
+		function hideAvailable(obj) {
+			$('.selected ul', obj).removeClass('active');
+			$('.available', obj).fadeOut(0);
+		};
+
+		function cleanAvailable(obj, values) {
+			$('.label-empty-result', obj).remove();
+			$('.available li', obj).remove();
+			values.available = {};
+		};
+
+		function resizeSelected(obj, values) {
+			// settings
+			var searchInputMinWidth = 50,
+				searchInputLeftPaddings = 4,
+				searchInputTopPaddings = IE8 ? 7 : 0;
+
+			// calculate
+			var top, left, height;
+
+			if ($('.selected li', obj).length) {
+				var position = $('.selected li:last-child .arrow', obj).position();
+				top = position.top - 1 + searchInputTopPaddings;
+				left = position.left + 20;
+				height = $('.selected li:last-child', obj).height();
+			}
+			else {
+				top = 2 + searchInputTopPaddings;
+				left = searchInputLeftPaddings;
+				height = 0;
+			}
+
+			if (left + searchInputMinWidth > values.width) {
+				var topPaddings = (height > 20) ? height / 2 : height;
+
+				top += topPaddings;
+				left = searchInputLeftPaddings;
 
 				$('.selected ul', obj).css({
-					'padding-bottom': height / 2
+					'padding-bottom': topPaddings
 				});
 			}
 			else {
@@ -187,55 +376,16 @@ jQuery(function($) {
 			});
 		};
 
-		function loadAvailable(obj, values, data) {
-			if (!empty(data.result)) {
-				$.each(data.result, function(i, item) {
-					addAvailable(obj, values, item);
-				});
+		function objectLength(obj) {
+			var count = 0;
 
-				showAvailable(obj);
+			for (var key in obj) {
+				if (obj.hasOwnProperty(key)) {
+					count++;
+				}
 			}
-			else {
-			}
-		};
 
-		function addAvailable(obj, values, item) {
-			if (typeof(values.available[item.id]) == 'undefined') {
-				values.available[item.id] = item.id;
-
-				// add list item
-				var li = $('<li>', {
-					'data-id': item.id,
-					'data-name': item.name,
-					text: empty(item.prefix) ? item.name : item.prefix + item.name
-				})
-				.click(function() {
-					removeAvailable(obj, values, $(this).data('id'));
-				});
-
-				$('.available ul', obj).append(li);
-			}
-		};
-
-		function showAvailable(obj) {
-			$('.selected ul', obj).css({
-				'-webkit-box-shadow': '0 0 5px rgba(0, 0, 0, 0.3)',
-				'-moz-box-shadow': '0 0 5px rgba(0, 0, 0, 0.3)',
-				'box-shadow': '0 0 5px rgba(0, 0, 0, 0.3)',
-				border: '1px solid #5897FB'
-			});
-			$('.available', obj).fadeIn(100);
-		};
-
-		function hideAvailable(obj) {
-			$('.selected ul', obj).css({
-				'-webkit-box-shadow': 'none',
-				'-moz-box-shadow': 'none',
-				'box-shadow': 'none',
-				border: '1px solid #AAAAAA'
-			});
-
-			$('.available', obj).fadeOut(50);
+			return count;
 		};
 	};
 });
