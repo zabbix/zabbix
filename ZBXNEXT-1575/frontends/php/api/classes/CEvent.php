@@ -569,12 +569,12 @@ class CEvent extends CZBXAPI {
 	 *
 	 * @throws APIException     if the source is incorrect
 	 *
-	 * @param array $object
+	 * @param array $data
 	 *
 	 * @return void
 	 */
-	protected function checkSource(array $object) {
-		if (!isset($this->sources[$object['source']])) {
+	protected function checkSource(array $data) {
+		if (!isset($this->sources[$data['source']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
 		}
 	}
@@ -584,12 +584,12 @@ class CEvent extends CZBXAPI {
 	 *
 	 * @throws APIException     if the object is incorrect
 	 *
-	 * @param array $object
+	 * @param array $data
 	 *
 	 * @return void
 	 */
-	protected function checkObject(array $object) {
-		if (!isset($this->objects[$object['object']])) {
+	protected function checkObject(array $data) {
+		if (!isset($this->objects[$data['object']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
 		}
 	}
@@ -599,11 +599,11 @@ class CEvent extends CZBXAPI {
 	 *
 	 * @throws APIException     if the object is not supported by the source
 	 *
-	 * @param array $object
+	 * @param array $data
 	 *
 	 * @return void
 	 */
-	protected function checkSourceObject(array $object) {
+	protected function checkSourceObject(array $data) {
 		$pairs = array(
 			EVENT_SOURCE_TRIGGERS => array(
 				EVENT_OBJECT_TRIGGER => 1
@@ -622,8 +622,8 @@ class CEvent extends CZBXAPI {
 			)
 		);
 
-		$objects = $pairs[$object['source']];
-		if (!isset($objects[$object['object']])) {
+		$objects = $pairs[$data['source']];
+		if (!isset($objects[$data['object']])) {
 			$supportedObjects = '';
 			foreach ($objects as $object => $i) {
 				$supportedObjects .= $object.' - '.$this->objects[$object].', ';
@@ -631,10 +631,10 @@ class CEvent extends CZBXAPI {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect object "%1$s" (%2$s) for source "%3$s" (%4$s), only the following objects are supported: %5$s.',
-					$object['object'],
-					$this->objects[$object['object']],
-					$object['source'],
-					$this->sources[$object['source']],
+					$data['object'],
+					$this->objects[$data['object']],
+					$data['source'],
+					$this->sources[$data['source']],
 					rtrim($supportedObjects, ', ')
 				)
 			);
