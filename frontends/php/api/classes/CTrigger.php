@@ -132,10 +132,10 @@ class CTrigger extends CTriggerGeneral {
 							' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE  f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
-					' GROUP BY r.permission'.
+					' GROUP BY f.triggerid'.
 					' HAVING MIN(CASE WHEN (r.permission IS NULL) THEN '.PERM_DENY.' ELSE r.permission END)>'.PERM_DENY.
 						' AND MAX(r.permission)>='.$permission.
-				' ) as x'.
+				' ) AS x'.
 			')';
 		}
 
