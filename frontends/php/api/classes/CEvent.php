@@ -127,6 +127,7 @@ class CEvent extends CZBXAPI {
 			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'selectTriggers'			=> null,
+			'selectRelatedObject'       => null,
 			'select_alerts'				=> null,
 			'select_acknowledges'		=> null,
 			'countOutput'				=> null,
@@ -138,6 +139,8 @@ class CEvent extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->checkDeprecatedParam($options, 'selectTriggers');
+		$this->checkDeprecatedParam($options, 'selectItems');
 		$options = $this->convertDeprecatedParam($options, 'triggerids', 'objectids');
 		$this->validateGet($options);
 
@@ -519,6 +522,43 @@ class CEvent extends CZBXAPI {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $items, 'items');
+		}
+
+		// adding the related object
+		if ($options['selectRelatedObject'] !== null && $options['selectRelatedObject'] != API_OUTPUT_COUNT
+				&& $options['object'] != EVENT_OBJECT_AUTOREGHOST) {
+
+			$relationMap = new CRelationMap();
+			foreach ($result as $event) {
+				$relationMap->addRelation($event['eventid'], $event['objectid']);
+			}
+
+			switch ($options['object']) {
+				case EVENT_OBJECT_TRIGGER:
+					$api = API::Trigger();
+					break;
+				case EVENT_OBJECT_DHOST:
+					$api = API::DHost();
+					break;
+				case EVENT_OBJECT_DSERVICE:
+					$api = API::DService();
+					break;
+				case EVENT_OBJECT_ITEM:
+					$api = API::Item();
+					break;
+				case EVENT_OBJECT_LLDRULE:
+					$api = API::DiscoveryRule();
+					break;
+			}
+
+			$objects = $api->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectRelatedObject'],
+				$api->pkOption() => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapOne($result, $objects, 'relatedObject');
 		}
 
 		// adding alerts
