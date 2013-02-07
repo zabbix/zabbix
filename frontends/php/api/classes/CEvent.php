@@ -321,23 +321,6 @@ class CEvent extends CZBXAPI {
 					unset($event['hostid']);
 				}
 
-				// triggerids
-				if (isset($event['triggerid']) && is_null($options['selectTriggers'])) {
-					if (!isset($result[$event['eventid']]['triggers'])) {
-						$result[$event['eventid']]['triggers'] = array();
-					}
-					$result[$event['eventid']]['triggers'][] = array('triggerid' => $event['triggerid']);
-					unset($event['triggerid']);
-				}
-
-				// itemids
-				if (isset($event['itemid']) && is_null($options['selectItems'])) {
-					if (!isset($result[$event['eventid']]['items'])) {
-						$result[$event['eventid']]['items'] = array();
-					}
-					$result[$event['eventid']]['items'][] = array('itemid' => $event['itemid']);
-					unset($event['itemid']);
-				}
 				$result[$event['eventid']] += $event;
 			}
 		}
