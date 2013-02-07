@@ -143,30 +143,65 @@ class CEvent extends CZBXAPI {
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				if (!is_null($options['objectids'])) {
+				// specific triggers
+				if ($options['objectids'] !== null) {
 					$triggers = API::Trigger()->get(array(
 						'triggerids' => $options['objectids'],
 						'editable' => $options['editable']
 					));
 					$options['objectids'] = zbx_objectValues($triggers, 'triggerid');
 				}
+				// all triggers
 				else {
 					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-					$userGroups = getUserGroupsByUserId($userid);
-
 					$sqlParts['where'][] = 'EXISTS ('.
 							'SELECT NULL'.
 							' FROM functions f,items i,hosts_groups hgg'.
 								' JOIN rights r'.
 									' ON r.id=hgg.groupid'.
-										' AND '.dbConditionInt('r.groupid', $userGroups).
+										' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
 							' WHERE e.objectid=f.triggerid'.
 								' AND f.itemid=i.itemid'.
 								' AND i.hostid=hgg.hostid'.
-								' AND e.object='.EVENT_OBJECT_TRIGGER.
 							' GROUP BY f.triggerid'.
+							' HAVING MIN(r.permission)>'.PERM_DENY.
+								' AND MAX(r.permission)>='.$permission.
+							')';
+				}
+			}
+			// items and LLD rules
+			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
+				// specific items or LLD rules
+				if ($options['objectids'] !== null) {
+					if ($options['object'] == EVENT_OBJECT_ITEM) {
+						$items = API::Item()->get(array(
+							'itemids' => $options['objectids'],
+							'editable' => $options['editable']
+						));
+						$options['objectids'] = zbx_objectValues($items, 'itemid');
+					}
+					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
+						$items = API::DiscoveryRule()->get(array(
+							'itemids' => $options['objectids'],
+							'editable' => $options['editable']
+						));
+						$options['objectids'] = zbx_objectValues($items, 'itemid');
+					}
+				}
+				// all items and LLD rules
+				else {
+					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+					$sqlParts['where'][] = 'EXISTS ('.
+							'SELECT NULL'.
+							' FROM items i,hosts_groups hgg'.
+								' JOIN rights r'.
+									' ON r.id=hgg.groupid'.
+										' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+							' WHERE e.objectid=i.itemid'.
+								' AND i.hostid=hgg.hostid'.
+							' GROUP BY hgg.hostid'.
 							' HAVING MIN(r.permission)>'.PERM_DENY.
 								' AND MAX(r.permission)>='.$permission.
 							')';
