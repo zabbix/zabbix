@@ -1831,7 +1831,7 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] !== null) {
+		if ($options['countOutput'] === null) {
 			// expandData
 			if (!is_null($options['expandData'])) {
 				$sqlParts['select']['hostname'] = 'h.name AS hostname';
