@@ -371,7 +371,7 @@ if ($config['event_ack_enable']) {
 	$eventCounts = API::Event()->get(array(
 		'countOutput' => true,
 		'groupCount' => true,
-		'triggerids' => $triggerIds,
+		'objectids' => $triggerIds,
 		'filter' => array(
 			'object' => EVENT_OBJECT_TRIGGER,
 			'acknowledged' => 0,
@@ -399,7 +399,7 @@ if ($config['event_ack_enable']) {
 		$allEventCounts = API::Event()->get(array(
 			'countOutput' => true,
 			'groupCount' => true,
-			'triggerids' => $triggerIdsWithoutUnackEvents,
+			'objectids' => $triggerIdsWithoutUnackEvents,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER
 			),
@@ -418,7 +418,7 @@ if ($config['event_ack_enable']) {
 if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+		'objectids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,

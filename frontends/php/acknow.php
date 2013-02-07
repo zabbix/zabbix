@@ -104,7 +104,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		$options = array(
 			'output' => array('eventid'),
 			'acknowledged' => 0,
-			'triggerids' => $_REQUEST['triggers']
+			'objectids' => $_REQUEST['triggers']
 		);
 		$_REQUEST['events'] = API::Event()->get($options);
 	}

@@ -102,6 +102,7 @@ class CEvent extends CZBXAPI {
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'triggerids'				=> null,
+			'objectids'				    => null,
 			'eventids'					=> null,
 			'editable'					=> null,
 			'object'					=> EVENT_OBJECT_TRIGGER,
@@ -137,17 +138,18 @@ class CEvent extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$options = $this->convertDeprecatedParam($options, 'triggerids', 'objectids');
 		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				if (!is_null($options['triggerids'])) {
+				if (!is_null($options['objectids'])) {
 					$triggers = API::Trigger()->get(array(
-						'triggerids' => $options['triggerids'],
+						'triggerids' => $options['objectids'],
 						'editable' => $options['editable']
 					));
-					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+					$options['objectids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				else {
 					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -186,10 +188,12 @@ class CEvent extends CZBXAPI {
 			}
 		}
 
-		// triggerids
-		if (!is_null($options['triggerids']) && $options['object'] == EVENT_OBJECT_TRIGGER) {
-			zbx_value2array($options['triggerids']);
-			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['triggerids']);
+		// objectids
+		if ($options['objectids'] !== null
+				&& in_array($options['object'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
+
+			zbx_value2array($options['objectids']);
+			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['objectid'] = 'e.objectid';

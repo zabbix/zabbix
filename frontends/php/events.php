@@ -386,7 +386,7 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 }
 else {
 	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
-		$options['triggerids'] = $_REQUEST['triggerid'];
+		$options['objectids'] = $_REQUEST['triggerid'];
 	}
 	$options['object'] = EVENT_OBJECT_TRIGGER;
 	$options['nodeids'] = get_current_nodeid();
@@ -599,7 +599,7 @@ else {
 			$trigOpt['monitored'] = true;
 
 			$triggers = API::Trigger()->get($trigOpt);
-			$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+			$options['objectids'] = zbx_objectValues($triggers, 'triggerid');
 
 			// query event with short data
 			$events = API::Event()->get($options);
