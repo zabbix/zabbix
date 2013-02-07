@@ -82,12 +82,12 @@ $_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 if (!$bulk) {
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
-		'selectTriggers' => API_OUTPUT_EXTEND,
+		'selectRelatedObject' => API_OUTPUT_EXTEND,
 		'eventids' => $_REQUEST['eventid']
 	);
 	$events = API::Event()->get($options);
 	$event = reset($events);
-	$event_trigger = reset($event['triggers']);
+	$event_trigger = $event['relatedObject'];
 	$event_acknowledged = $event['acknowledged'];
 	$_REQUEST['events'] = $_REQUEST['eventid'];
 }
