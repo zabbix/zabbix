@@ -519,7 +519,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 	if (err)
 	{
 		h->err = zbx_dsprintf(h->err, "error 0x%x while reading a discrete sensor %s@[%s]:%d",
-				s->id, h->ip, h->port);
+				sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -530,10 +530,11 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 	s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
 	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
 
-	/* Discrete values are 16-bit. We're using a 64-bit uint. */
-	s->value.discrete = 0;
+	/* Discrete values are 16-bit. We're storing them into a 64-bit uint. */
+#define MAX_DISCRETE_STATES	15
 
-	for (i = 0; i < 15; i++)
+	s->value.discrete = 0;
+	for (i = 0; i < MAX_DISCRETE_STATES; i++)
 	{
 		ret = ipmi_sensor_discrete_event_readable(sensor, i, &val);
 		if (0 != ret || 0 == val)
@@ -548,6 +549,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 		if (0 != is_state_set)
 			s->value.discrete += 1 << i;
 	}
+#undef MAX_DISCRETE_STATES
 out:
 	h->done = 1;
 
@@ -1027,7 +1029,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	const char		*__function_name = "init_ipmi_host";
 	zbx_ipmi_host_t		*h;
 	int			ret;
-	ipmi_open_option_t	options[2];
+	ipmi_open_option_t	options[4];
 	struct timeval		tv;
 	char			*addrs[1], *ports[1];
 
@@ -1075,10 +1077,14 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 
 	options[0].option = IPMI_OPEN_OPTION_ALL;
 	options[0].ival = 0;
-	options[1].option = IPMI_OPEN_OPTION_SDRS;
+	options[1].option = IPMI_OPEN_OPTION_SDRS;		/* scan SDRs */
 	options[1].ival = 1;
+	options[2].option = IPMI_OPEN_OPTION_IPMB_SCAN;		/* scan IPMB bus to find out as much as possible */
+	options[2].ival = 1;
+	options[3].option = IPMI_OPEN_OPTION_LOCAL_ONLY;	/* scan non-local MCs */
+	options[3].ival = 0;
 
-	if (0 != (ret = ipmi_open_domain("", &h->con, 1, setup_done, h, domain_up, h, options, 2, NULL)))
+	if (0 != (ret = ipmi_open_domain("", &h->con, 1, setup_done, h, domain_up, h, options, 4, NULL)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d. ipmi_open_domain() failed: %s",
 				h->ip, h->port, zbx_strerror(ret));
