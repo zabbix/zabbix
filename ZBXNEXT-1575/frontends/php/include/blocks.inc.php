@@ -253,7 +253,7 @@ function make_system_status($filter) {
 		$options = array(
 			'nodeids' => get_current_nodeid(),
 			'object' => EVENT_SOURCE_TRIGGERS,
-			'triggerids' => $trigger['triggerid'],
+			'objectids' => $trigger['triggerid'],
 			'filter'=> array(
 				'value' => TRIGGER_VALUE_TRUE
 			),
@@ -906,7 +906,7 @@ function make_latest_issues(array $filter = array()) {
 		$events = API::Event()->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
-			'triggerids' => $trigger['triggerid'],
+			'objectids' => $trigger['triggerid'],
 			'acknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,

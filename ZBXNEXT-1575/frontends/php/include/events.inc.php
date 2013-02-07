@@ -71,7 +71,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 
 	return API::Event()->get(array(
 		'countOutput' => 1,
-		'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
+		'objectids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => array(
 			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'acknowledged' => $ack ? 1 : 0
@@ -139,7 +139,7 @@ function make_small_eventlist($startEvent) {
 	$clock = $startEvent['clock'];
 
 	$options = array(
-		'triggerids' => $startEvent['objectid'],
+		'objectids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
@@ -213,7 +213,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
-		'triggerids' => $triggerid,
+		'objectids' => $triggerid,
 		'eventid_till' => $eventid,
 		'filter' => array(
 			'object' => EVENT_OBJECT_TRIGGER
@@ -371,7 +371,7 @@ function getLastEvents($options) {
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 	// events
-	$eventOptions['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+	$eventOptions['objectids'] = zbx_objectValues($triggers, 'triggerid');
 	$events = API::Event()->get($eventOptions);
 
 	$sortClock = array();
