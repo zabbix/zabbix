@@ -2366,7 +2366,8 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	result = DBselect(
 			"select 1"
 			" from syscat.columns"
-			" where lower(tabname)='%s'"
+			" where tabschema=user"
+				" and lower(tabname)='%s'"
 				" and lower(colname)='%s'",
 			table_name_esc, field_name_esc);
 

@@ -187,7 +187,7 @@ class CProfiler {
 			}
 			$debug_str .= $sqlString;
 
-			$callStackString = '<span style="font-style: italic;">'.$this->formatCallStack(null, $query[2]).'</span>'.'<br>'.'<br>';
+			$callStackString = '<span style="font-style: italic;">'.$this->formatCallStack($query[2]).'</span>'.'<br>'.'<br>';
 			$debug_str .= rtrim($callStackString, '-> ').'</span>'.'<br>'.'<br>';
 		}
 
@@ -270,36 +270,53 @@ class CProfiler {
 	 * The call stack can be obtained from Exception::getTrace() or from an API result debug stack trace. If no call
 	 * stack is given, it will be taken from debug_backtrace().
 	 *
-	 * @param int $offset       amount of last function calls to hide
 	 * @param array $callStack
 	 *
 	 * @return string
 	 */
-	public function formatCallStack($offset = 0, array $callStack = null) {
+	public function formatCallStack(array $callStack = null) {
 		if (!$callStack) {
 			$callStack = debug_backtrace(false);
 
 			// never show the call to this method
-			$offset++;
+			array_shift($callStack);
 		}
-
-		if ($offset) {
-			$callStack = array_slice($callStack, $offset);
-		}
-
-		// reverse the order of the stack to show first calls in the beginning
-		$callStack = array_reverse($callStack);
 
 		$callStackString = '';
+
+		$callStack = array_reverse($callStack);
+
+		$firstCall = reset($callStack);
+
+		$callWithFile = array();
 		foreach ($callStack as $call) {
-			if (isset($call['class'])) {
-				$callStackString .= $call['class'].$call['type'];
+			// do not show the call to the error handler function
+			if ($call['function'] != 'zbx_err_handler') {
+				if (isset($call['class'])) {
+					$callStackString .= $call['class'].$call['type'];
+				}
+				$callStackString .= $call['function'].'() &rarr; ';
 			}
-			$callStackString .= $call['function'].'() &rarr; ';
+
+			// if the error is caused by an incorrect function call - the location of that call is contained in
+			// the call of that function
+			// if it's caused by something else (like an undefined index) - the location of the call is contained in the
+			// call to the error handler function
+			// to display the location we use the last call where this information is present
+			if (isset($call['file'])) {
+				$callWithFile = $call;
+			}
 		}
-		$callStackString = rtrim($callStackString, '&rarr; ');
-		$callStackString .= ' in '.$call['file'].':'.$call['line'];
+
+		if ($callStackString) {
+			$path = pathinfo($firstCall['file']);
+			$callStackString = $path['basename'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
+		}
+
+		$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
 
 		return $callStackString;
 	}
+
 }
+
