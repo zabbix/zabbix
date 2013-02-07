@@ -33,6 +33,9 @@ static	SERVICE_STATUS_HANDLE	serviceHandle;
 
 int	application_status = ZBX_APP_RUNNING;
 
+/* free resources allocated by MAIN_ZABBIX_ENTRY() */
+void zbx_free_service_resources();
+
 static void	parent_signal_handler(int sig)
 {
 	switch (sig)
@@ -67,15 +70,12 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 
 			/* notify other threads and allow them to terminate */
 			ZBX_DO_EXIT();
-			zbx_sleep(1);
+			zbx_free_service_resources();
 
 			serviceStatus.dwCurrentState	= SERVICE_STOPPED;
 			serviceStatus.dwWaitHint	= 0;
 			serviceStatus.dwCheckPoint	= 0;
 			serviceStatus.dwWin32ExitCode	= 0;
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
-					ZABBIX_VERSION, ZABBIX_REVISION);
 
 			break;
 		default:
@@ -399,4 +399,9 @@ void	set_parent_signal_handler()
 {
 	signal(SIGINT, parent_signal_handler);
 	signal(SIGTERM, parent_signal_handler);
+}
+
+void	CALLBACK ZBXEndThread(ULONG_PTR dwParam)
+{
+	_endthreadex(SUCCEED);
 }
