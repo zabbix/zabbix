@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1574] changed the text in the "ack" column for triggers with no events in the trigger pop up of the "System status" widget to "No events" (Pavels)
 A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
 A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
 A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete method to accept both objects and IDs (Pavels)
@@ -39,6 +40,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6006] fixed urls not displayed in maps configuration (Toms)
 A.F....... [ZBX-6084] fixed adding/removing items from favourites (Eduard)
 ..F....... [ZBX-6166] fixed SQL error in Oracle, when adding link template (Oleg)
 .......PS. [ZBX-5973] improved performance of SNMP dynamic index item cache building in poller processes (Andris, Sasha)
@@ -117,6 +119,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+A......... [ZBX-6124] fixed hostgroup.massupdate validation on removing group from host with only one group (Eduard)
 ....I..... [ZBX-6197] updated DB2 image importer script to work with larger (>16KB) images (wiper)
 ..F....... [ZBX-6211] fixed errors in Monitoring->Discovery and added check for Discovery existing (Oleg)
 ....I..... [ZBX-6069] fixed axis in the default "Zabbix Server performance" graph template (Sasha)
