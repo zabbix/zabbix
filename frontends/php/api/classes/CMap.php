@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @package API
+ */
 /**
  * Class containing methods for operations with Maps
  */
@@ -760,38 +764,39 @@ class CMap extends CMapElement {
 		return array('sysmapids' => $sysmapids);
 	}
 
-
 	/**
-	 * Delete Map
+	 * Delete Map.
 	 *
 	 * @param array $sysmaps
 	 * @param array $sysmaps['sysmapid']
-	 * @return boolean
+	 *
+	 * @return array
 	 */
-	public function delete($sysmapids) {
+	public function delete($sysmapIds) {
+		$maps = zbx_toObject($sysmapIds, 'sysmapid');
 
-		$maps = zbx_toObject($sysmapids, 'sysmapid');
 		$this->checkInput($maps, __FUNCTION__);
 
-		// delete maps from selements of other maps
 		DB::delete('sysmaps_elements', array(
-			'elementid' => $sysmapids,
+			'elementid' => $sysmapIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
 		));
-
 		DB::delete('screens_items', array(
-			'resourceid' => $sysmapids,
+			'resourceid' => $sysmapIds,
 			'resourcetype' => SCREEN_RESOURCE_MAP
 		));
-
 		DB::delete('profiles', array(
 			'idx' => 'web.maps.sysmapid',
-			'value_id' => $sysmapids
+			'value_id' => $sysmapIds
 		));
-		//----
-		DB::delete('sysmaps', array('sysmapid' => $sysmapids));
+		DB::delete('profiles', array(
+			'idx' => 'web.favorite.sysmapids',
+			'source' => 'sysmapid',
+			'value_id' => $sysmapIds
+		));
+		DB::delete('sysmaps', array('sysmapid' => $sysmapIds));
 
-		return array('sysmapids' => $sysmapids);
+		return array('sysmapids' => $sysmapIds);
 	}
 
 	private function expandUrlMacro($url, $selement) {

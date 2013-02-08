@@ -11,4 +11,3 @@
 	define('PHPUNIT_LOGIN_NAME', 'Admin');
 	define('PHPUNIT_LOGIN_PWD', 'zabbix');
 	define('PHPUNIT_FRONTEND_HOST', 'hudson');
-?>
