@@ -248,13 +248,25 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['groupids']);
 
 			$sqlParts = $this->addQuerySelect('hg.groupid', $sqlParts);
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			}
+			// lld rules and items
+			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+			}
 		}
 
 		// hostids
@@ -262,11 +274,21 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['hostids']);
 
 			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
-			$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			}
+			// lld rules and items
+			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+			}
 		}
 
 		// should last, after all ****IDS checks
@@ -455,17 +477,30 @@ class CEvent extends CZBXAPI {
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			// trigger events
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$query = DBselect(
+					'SELECT e.eventid,i.hostid'.
+						' FROM events e,functions f,items i'.
+						' WHERE '.dbConditionInt('e.eventid', $eventIds).
+						' AND e.objectid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND e.object='.EVENT_OBJECT_TRIGGER
+				);
+			}
+			// item and LLD rule events
+			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
+				$query = DBselect(
+					'SELECT e.eventid,i.hostid'.
+						' FROM events e,items i'.
+						' WHERE '.dbConditionInt('e.eventid', $eventIds).
+						' AND e.objectid=i.itemid'.
+						' AND e.object='.$options['object']
+				);
+			}
+
 			$relationMap = new CRelationMap();
-			// discovered items
-			$dbRules = DBselect(
-				'SELECT e.eventid,i.hostid'.
-					' FROM events e,functions f,items i'.
-					' WHERE '.dbConditionInt('e.eventid', $eventIds).
-					' AND e.objectid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER
-			);
-			while ($relation = DBfetch($dbRules)) {
+			while ($relation = DBfetch($query)) {
 				$relationMap->addRelation($relation['eventid'], $relation['hostid']);
 			}
 
