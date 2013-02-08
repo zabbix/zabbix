@@ -68,7 +68,7 @@ jQuery(function($) {
 					width: parseInt(obj.css('width')),
 					selected: {},
 					available: {},
-					availableIds: {} // for sorting
+					availableIds: {} // used for returning values from selected back to available
 				};
 
 			// search input
@@ -84,9 +84,11 @@ jQuery(function($) {
 					window.setTimeout(function() {
 						isWaiting = false;
 
-						values.search = input.val();
+						var search = input.val();
 
-						if (!empty(values.search)) {
+						if (!empty(search)) {
+							values.search = search;
+
 							if (input.data('lastSearch') != values.search) {
 								input.data('lastSearch', values.search);
 
@@ -105,11 +107,6 @@ jQuery(function($) {
 								});
 							}
 						}
-						else {
-							input.data('lastSearch', '');
-							cleanAvailable(obj, values);
-							hideAvailable(obj);
-						}
 					}, 500);
 				}
 			})
@@ -122,10 +119,7 @@ jQuery(function($) {
 						var availableActive = $('.available li.hover', obj).get(0);
 
 						if (availableActive) {
-							var id = $(availableActive).data('id');
-
-							addSelected(values.available[id], obj, values, options);
-							removeAvailable(id, obj, values);
+							select($(availableActive).data('id'), obj, values, options);
 						}
 						break;
 
@@ -148,26 +142,50 @@ jQuery(function($) {
 								cancelEvent(e);
 							}
 						}
+
+						hideAvailable(obj);
 						break;
 
 					case KEY.ARROW_RIGHT:
 						// remove selected item pressed state
-						if (empty(input.val())) {
-							$('.selected li:last-child', obj).removeClass('pressed');
+						var lastSelected = $('.selected li:last-child', obj);
+
+						if (lastSelected.hasClass('pressed')) {
+							$(lastSelected).removeClass('pressed');
+						}
+						else {
+							// restore last searched value
+							if (empty(input.val())) {
+								input.val(values.search);
+
+								showAvailable(obj, values);
+							}
 						}
 						break;
 
 					case KEY.ARROW_UP:
-						showAvailable(obj, values);
-
 						// move hover
-						if ($('.available li.hover', obj).length > 0) {
-							$('.available li.hover', obj).removeClass('hover').prev().addClass('hover');
+						if ($('.available li', obj).length > 0) {
+							showAvailable(obj, values);
 
-							scrollAvailable(obj);
+							if ($('.available li.hover', obj).length > 0) {
+								var prev = $('.available li.hover', obj).removeClass('hover').prev();
+
+								if (prev.length > 0) {
+									prev.addClass('hover');
+								}
+								else {
+									$('.available li:last-child', obj).addClass('hover');
+								}
+
+								scrollAvailable(obj);
+							}
+							else {
+								$('.available li:last-child', obj).addClass('hover');
+							}
 						}
 						else {
-							$('.available li:last-child', obj).addClass('hover');
+							hideAvailable(obj);
 						}
 						break;
 
@@ -176,14 +194,20 @@ jQuery(function($) {
 
 						// move hover
 						if ($('.available li.hover', obj).length > 0) {
-							$('.available li.hover', obj).removeClass('hover').next().addClass('hover');
+							var next = $('.available li.hover', obj).removeClass('hover').next();
+
+							if (next.length > 0) {
+								next.addClass('hover');
+							}
+							else {
+								$('.available li:first-child', obj).addClass('hover');
+							}
 
 							scrollAvailable(obj);
 						}
 						else {
 							$('.available li:first-child', obj).addClass('hover');
 						}
-
 						break;
 
 					case KEY.TAB:
@@ -270,8 +294,7 @@ jQuery(function($) {
 
 				// add list item
 				var li = $('<li>', {
-					'data-id': item.id,
-					'data-name': item.name
+					'data-id': item.id
 				});
 
 				var text = $('<span>', {
@@ -297,15 +320,17 @@ jQuery(function($) {
 		function removeSelected(id, obj, values, options) {
 			var item = values.selected[id];
 
+			// remove
 			$('.selected li[data-id="' + id + '"]', obj).remove();
 			$('input[value="' + id + '"]', obj).remove();
 
 			delete values.selected[id];
 
+			// resize
 			resizeSelected(obj, values);
 
-			// try return value to available
-			if (typeof(values.availableIds[id] != 'undefined')) {
+			// return selected to available
+			if (item.name.substr(0, values.search.length).toLowerCase() === values.search.toLowerCase()) {
 				addAvailable(item, obj, values, options);
 			}
 		};
@@ -332,10 +357,7 @@ jQuery(function($) {
 					'data-id': item.id
 				})
 				.click(function() {
-					var id = $(this).data('id');
-
-					addSelected(values.available[id], obj, values, options);
-					removeAvailable(id, obj, values);
+					select($(this).data('id'), obj, values, options);
 				})
 				.hover(
 					function() {
@@ -348,12 +370,14 @@ jQuery(function($) {
 				)
 				.append(prefix, matchedText, unMatchedText);
 
-				// insert item
+				// insert li
 				if (typeof(values.availableIds[item.id]) == 'undefined') {
 					values.availableIds[item.id] = 'isPresented';
 
 					$('.available ul', obj).append(li);
 				}
+
+				// insert li on previous position to keep sorting
 				else {
 					var insertAfterId = null;
 
@@ -373,9 +397,18 @@ jQuery(function($) {
 					else {
 						$('.available li[data-id="' + insertAfterId + '"]', obj).after(li);
 					}
+
+					values.availableIds[item.id] = 'isPresented';
 				}
 			}
 		};
+
+		function select(id, obj, values, options) {
+			addSelected(values.available[id], obj, values, options);
+			removeAvailable(id, obj, values);
+			hideAvailable(obj);
+			$('input[type="text"]', obj).val('');
+		}
 
 		function removeAvailable(id, obj, values) {
 			$('.available li[data-id="' + id + '"]', obj).remove();

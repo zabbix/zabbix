@@ -913,11 +913,11 @@ fieldset legend { margin: 0.2em 0.5em; }
 /* multiselect */
 .multiselect input[type="text"] {
 	padding: 2px 0 0 4px; top: 0; left: 0; min-height: 25px; position: absolute; z-index: 10;
-	background: none/*rgba(0, 0, 0, 0.2)*/; border: none; outline: none;
+	background: none; border: none; outline: none;
 }
 .multiselect .selected { top: 0; left: 0; position: relative; }
 .multiselect .selected ul {
-	padding: 2px 0 0 2px; min-height: 25px; border: 1px solid #AAAAAA;
+	padding: 2px 0 0 2px; min-height: 25px; background: white; border: 1px solid #AAAAAA;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #EEE), color-stop(15%, white));
 	background-image: -webkit-linear-gradient(top, #EEE 1%, white 15%);
 	background-image: -moz-linear-gradient(top, #EEE 1%, white 15%);
@@ -931,7 +931,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 	border: 1px solid #5897FB;
 }
 .multiselect .selected ul li {
-	margin: 0 2px 2px 0; padding: 0 2px; list-style: none outside none; display: inline-block; border: 1px solid #AAA;
+	margin: 0 2px 2px 0; padding: 0 2px; list-style: none outside none; display: inline-block; border: 1px solid #AAAAAA;
 	background: #E8E8E8;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(20%, #F4F4F4), color-stop(50%, #F0F0F0), color-stop(52%, #E8E8E8), color-stop(100%, #EEE));
 	background-image: -webkit-linear-gradient(top, #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
@@ -949,7 +949,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .selected ul li span.arrow:hover { background-position: -12px -14px; }
 .multiselect .available {
 	top: 0; left: 0; min-height: 25px; position: absolute; z-index: 12;
-	background: #FFFFFF; border: 1px solid #AAAAAA; border-top: 0;
+	background: #FFFFFF; border: 1px solid #AAAAAA; border-top: none;
 	-webkit-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
 	-moz-box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
 	box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
