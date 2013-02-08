@@ -209,6 +209,7 @@ define('CONDITION_TYPE_DCHECK',				19);
 define('CONDITION_TYPE_PROXY',				20);
 define('CONDITION_TYPE_DOBJECT',			21);
 define('CONDITION_TYPE_HOST_NAME',			22);
+define('CONDITION_TYPE_EVENT_TYPE',			23);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -218,6 +219,14 @@ define('CONDITION_OPERATOR_IN',			4);
 define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
+
+// event type action condition values
+define('EVENT_TYPE_ITEM_NOTSUPPORTED',      0);
+define('EVENT_TYPE_ITEM_NORMAL',            1);
+define('EVENT_TYPE_LLDRULE_NOTSUPPORTED',   2);
+define('EVENT_TYPE_LLDRULE_NORMAL',         3);
+define('EVENT_TYPE_TRIGGER_UNKNOWN',        4);
+define('EVENT_TYPE_TRIGGER_NORMAL',         5);
 
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
