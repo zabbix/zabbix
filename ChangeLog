@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1574] changed the text in the "ack" column for triggers with no events in the trigger pop up of the "System status" widget to "No events" (Pavels)
 A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
 A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
 A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete method to accept both objects and IDs (Pavels)
