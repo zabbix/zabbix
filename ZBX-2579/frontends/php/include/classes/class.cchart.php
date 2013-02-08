@@ -718,6 +718,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
+		// check if items use B or Bps units
 		for ($item = 0; $item < $this->num; $item++) {
 			if (($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps')
 					&& $this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
@@ -729,6 +730,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
+		// Base8 intervals
 		if($leftBase8 || $rightBase8) {
 			$intervalsBase8 = $intervals;
 			foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
@@ -738,6 +740,8 @@ class CChart extends CGraphDraw {
 				}
 			}
 		}
+
+		// Base10 intervals
 		if(!$leftBase8 || !$rightBase8) {
 			$intervalsBase10 = $intervals;
 			foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
@@ -792,6 +796,7 @@ class CChart extends CGraphDraw {
 
 		$dist = bcmul(5, bcpow(10, 18));
 
+		// interval select (base8 or base10)
 		if ($leftBase8 && $side == GRAPH_YAXIS_SIDE_LEFT) {
 			$intervals = $intervalsBase8;
 		}
@@ -1383,6 +1388,7 @@ class CChart extends CGraphDraw {
 		$unitsLong = null;
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				// check if items use B or Bps units
 				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
 					$byteStep = true;
 				}
@@ -2284,11 +2290,6 @@ class CChart extends CGraphDraw {
 				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 			}
 		}
-
-		$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] *= 0.99;
-		$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] *= 1.01;
-		$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] *= 0.99;
-		$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] *= 1.01;
 
 		$this->calcMinMaxInterval();
 		$this->updateShifts();

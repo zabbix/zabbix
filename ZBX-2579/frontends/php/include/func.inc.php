@@ -501,7 +501,7 @@ function convertUnitsS($value) {
 	return rtrim($value);
 }
 
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep) {
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -549,6 +549,8 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		default:
 			$step = 1000;
 	}
+
+	// if one or more items is B or Bps, then Y-scale use base 8 and calculate in bytes
 	if ($byteStep) {
 		$step = 1024;
 	}
