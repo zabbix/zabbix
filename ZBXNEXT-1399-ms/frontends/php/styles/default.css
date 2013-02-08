@@ -911,13 +911,14 @@ fieldset legend { margin: 0.2em 0.5em; }
 .flickerfreescreen .shadow { background-color: #000000; }
 
 /* multiselect */
+.multiselect { margin: 1px 2px 1px 1px; }
 .multiselect input[type="text"] {
-	padding: 2px 0 0 4px; top: 0; left: 0; min-height: 25px; position: absolute; z-index: 10;
+	padding: 2px 0 0 4px; top: 0; left: 0; min-height: 22px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
 }
 .multiselect .selected { top: 0; left: 0; position: relative; }
 .multiselect .selected ul {
-	padding: 2px 0 0 2px; min-height: 25px; background: white; border: 1px solid #AAAAAA;
+	padding: 2px 0 0 2px; min-height: 22px; background: white; border: 1px solid #AAAAAA;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #EEE), color-stop(15%, white));
 	background-image: -webkit-linear-gradient(top, #EEE 1%, white 15%);
 	background-image: -moz-linear-gradient(top, #EEE 1%, white 15%);

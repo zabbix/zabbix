@@ -77,7 +77,7 @@ jQuery(function($) {
 				value: '',
 				css: {width: values.width}
 			})
-			.keyup(function(e) {
+			.on('keyup change', function(e) {
 				if (!isWaiting) {
 					isWaiting = true;
 
@@ -110,17 +110,17 @@ jQuery(function($) {
 					}, 500);
 				}
 			})
-			.bind('keypress, keydown', function (e) {
+			.on('keypress keydown', function(e) {
 				switch (e.which) {
 					case KEY.ENTER:
-						// break form submit
-						cancelEvent(e);
+						var availableActive = $('.available li.hover', obj);
 
-						var availableActive = $('.available li.hover', obj).get(0);
-
-						if (availableActive) {
-							select($(availableActive).data('id'), obj, values, options);
+						if (availableActive.length > 0) {
+							select(availableActive.data('id'), obj, values, options);
 						}
+
+						// stop form submit
+						cancelEvent(e);
 						break;
 
 					case KEY.BACKSPACE:
@@ -147,41 +147,39 @@ jQuery(function($) {
 						break;
 
 					case KEY.ARROW_RIGHT:
-						// remove selected item pressed state
 						var lastSelected = $('.selected li:last-child', obj);
 
 						if (lastSelected.hasClass('pressed')) {
-							$(lastSelected).removeClass('pressed');
+							// remove last selected pressed state
+							lastSelected.removeClass('pressed');
 						}
 						else {
-							// restore last searched value
-							if (empty(input.val())) {
-								input.val(values.search);
-
-								showAvailable(obj, values);
-							}
+							showAvailable(obj, values);
 						}
 						break;
 
 					case KEY.ARROW_UP:
-						// move hover
 						if ($('.available li', obj).length > 0) {
-							showAvailable(obj, values);
+							if ($('.available', obj).is(':hidden')) {
+								showAvailable(obj, values);
+							}
+							else {
+								// move hover
+								if ($('.available li.hover', obj).length > 0) {
+									var prev = $('.available li.hover', obj).removeClass('hover').prev();
 
-							if ($('.available li.hover', obj).length > 0) {
-								var prev = $('.available li.hover', obj).removeClass('hover').prev();
+									if (prev.length > 0) {
+										prev.addClass('hover');
+									}
+									else {
+										$('.available li:last-child', obj).addClass('hover');
+									}
 
-								if (prev.length > 0) {
-									prev.addClass('hover');
+									scrollAvailable(obj);
 								}
 								else {
 									$('.available li:last-child', obj).addClass('hover');
 								}
-
-								scrollAvailable(obj);
-							}
-							else {
-								$('.available li:last-child', obj).addClass('hover');
 							}
 						}
 						else {
@@ -190,23 +188,26 @@ jQuery(function($) {
 						break;
 
 					case KEY.ARROW_DOWN:
-						showAvailable(obj, values);
+						if ($('.available', obj).is(':hidden')) {
+							showAvailable(obj, values);
+						}
+						else {
+							// move hover
+							if ($('.available li.hover', obj).length > 0) {
+								var next = $('.available li.hover', obj).removeClass('hover').next();
 
-						// move hover
-						if ($('.available li.hover', obj).length > 0) {
-							var next = $('.available li.hover', obj).removeClass('hover').next();
+								if (next.length > 0) {
+									next.addClass('hover');
+								}
+								else {
+									$('.available li:first-child', obj).addClass('hover');
+								}
 
-							if (next.length > 0) {
-								next.addClass('hover');
+								scrollAvailable(obj);
 							}
 							else {
 								$('.available li:first-child', obj).addClass('hover');
 							}
-
-							scrollAvailable(obj);
-						}
-						else {
-							$('.available li:first-child', obj).addClass('hover');
 						}
 						break;
 
@@ -215,9 +216,19 @@ jQuery(function($) {
 						hideAvailable(obj);
 						break;
 				}
+
+				if (IE8) {
+					cancelEvent(e);
+				}
 			})
-			.click(function () {
+			.click(function() {
 				showAvailable(obj, values);
+			})
+			.focusin(function() {
+				$('.selected ul', obj).addClass('active');
+			})
+			.focusout(function() {
+				$('.selected ul', obj).removeClass('active');
 			});
 			obj.append($('<div>', {style: 'position: relative;'}).append(input));
 
@@ -236,13 +247,13 @@ jQuery(function($) {
 				}
 			})
 			.append($('<ul>'))
-			.focusout(function () {
+			.focusout(function() {
 				hideAvailable(obj);
 			});
 
 			// multi select
 			obj.append($('<div>', {style: 'position: relative;'}).append(available))
-			.focusout(function () {
+			.focusout(function() {
 				setTimeout(function() {
 					if ($('.available', obj).is(':visible')) {
 						hideAvailable(obj);
@@ -271,6 +282,7 @@ jQuery(function($) {
 				});
 			}
 
+			// write empty result label
 			if (objectLength(values.available) == 0) {
 				$('.available', obj).append($('<div>', {
 					'class': 'label-empty-result',
@@ -323,6 +335,7 @@ jQuery(function($) {
 			// remove
 			$('.selected li[data-id="' + id + '"]', obj).remove();
 			$('input[value="' + id + '"]', obj).remove();
+			$('input[type="text"]', obj).val('');
 
 			delete values.selected[id];
 
@@ -330,9 +343,12 @@ jQuery(function($) {
 			resizeSelected(obj, values);
 
 			// return selected to available
-			if (item.name.substr(0, values.search.length).toLowerCase() === values.search.toLowerCase()) {
+			if ($('.label-empty-result', obj).length == 0
+					&& item.name.substr(0, values.search.length).toLowerCase() === values.search.toLowerCase()) {
 				addAvailable(item, obj, values, options);
 			}
+
+			$('input[type="text"]', obj).focus();
 		};
 
 		function addAvailable(item, obj, values, options) {
@@ -428,11 +444,13 @@ jQuery(function($) {
 
 				// remove selected item pressed state
 				$('.selected li:last-child', obj).removeClass('pressed');
+
+				// preselect first available
+				$('.available li:first-child', obj).addClass('hover');
 			}
 		};
 
 		function hideAvailable(obj) {
-			$('.selected ul', obj).removeClass('active');
 			$('.available', obj).fadeOut(0);
 		};
 
@@ -454,12 +472,12 @@ jQuery(function($) {
 
 			if ($('.selected li', obj).length > 0) {
 				var position = $('.selected li:last-child .arrow', obj).position();
-				top = position.top - 1 + searchInputTopPaddings;
+				top = position.top + searchInputTopPaddings;
 				left = position.left + 20;
 				height = $('.selected li:last-child', obj).height();
 			}
 			else {
-				top = 2 + searchInputTopPaddings;
+				top = 3 + searchInputTopPaddings;
 				left = searchInputLeftPaddings;
 				height = 0;
 			}
