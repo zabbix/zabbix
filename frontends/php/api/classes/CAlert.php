@@ -109,6 +109,7 @@ class CAlert extends CZBXAPI {
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
+						' AND e.source='.EVENT_SOURCE_TRIGGERS.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' GROUP BY e.eventid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
@@ -126,7 +127,7 @@ class CAlert extends CZBXAPI {
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+			$sqlParts['where']['e'] = 'e.source='.EVENT_SOURCE_TRIGGERS.' AND e.object='.EVENT_OBJECT_TRIGGER;
 			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
@@ -140,7 +141,7 @@ class CAlert extends CZBXAPI {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
-			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+			$sqlParts['where']['e'] = 'e.source='.EVENT_SOURCE_TRIGGERS.' AND e.object='.EVENT_OBJECT_TRIGGER;
 			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
@@ -158,7 +159,7 @@ class CAlert extends CZBXAPI {
 
 			$sqlParts['select']['actionid'] = 'a.actionid';
 			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+			$sqlParts['where']['e'] = 'e.source='.EVENT_SOURCE_TRIGGERS.' AND e.object='.EVENT_OBJECT_TRIGGER;
 			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['triggerids']);
 		}
 
@@ -310,6 +311,7 @@ class CAlert extends CZBXAPI {
 					' AND a.eventid=e.eventid'.
 					' AND e.objectid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
+					' AND e.source='.EVENT_SOURCE_TRIGGERS.
 					' AND e.object='.EVENT_OBJECT_TRIGGER
 			);
 			while ($relation = DBfetch($res)) {

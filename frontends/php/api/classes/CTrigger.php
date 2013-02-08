@@ -289,6 +289,7 @@ class CTrigger extends CTriggerGeneral {
 					'SELECT NULL'.
 					' FROM events e'.
 					' WHERE t.triggerid=e.objectid'.
+						' AND e.source='.EVENT_SOURCE_TRIGGERS.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
@@ -300,6 +301,7 @@ class CTrigger extends CTriggerGeneral {
 					'SELECT NULL'.
 					' FROM events e'.
 					' WHERE e.objectid=t.triggerid'.
+						' AND e.source='.EVENT_SOURCE_TRIGGERS.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
@@ -546,6 +548,7 @@ class CTrigger extends CTriggerGeneral {
 				'SELECT MAX(e.eventid) AS eventid,e.objectid'.
 				' FROM events e'.
 				' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.source='.EVENT_SOURCE_TRIGGERS.
 					' AND '.dbConditionInt('e.objectid', $triggerids).
 					' AND '.dbConditionInt('e.value', array(TRIGGER_VALUE_TRUE)).
 				' GROUP BY e.objectid'
