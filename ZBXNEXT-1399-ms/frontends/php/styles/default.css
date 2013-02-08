@@ -963,7 +963,5 @@ fieldset legend { margin: 0.2em 0.5em; }
 	overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .multiselect .available ul li { padding: 3px 2px; list-style: none outside none; cursor: pointer; }
-.multiselect .available ul li.hover,
-.multiselect .available ul li:hover { background: #7A9FC1; color: #FFFFFF; }
-.multiselect .available ul li.hover .prefix,
-.multiselect .available ul li:hover .prefix { color: #F1F1F1; }
+.multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
+.multiselect .available ul li.hover .prefix { color: #F1F1F1; }
