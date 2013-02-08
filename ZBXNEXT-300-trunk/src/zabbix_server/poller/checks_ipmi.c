@@ -596,6 +596,22 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 		case IPMI_EVENT_READING_TYPE_DISCRETE_REDUNDANCY:
 		case IPMI_EVENT_READING_TYPE_DISCRETE_ACPI_POWER:
 		case IPMI_EVENT_READING_TYPE_SENSOR_SPECIFIC:
+		case 0x70:	/* reading types 70h-7Fh are for OEM discrete sensors */
+		case 0x71:
+		case 0x72:
+		case 0x73:
+		case 0x74:
+		case 0x75:
+		case 0x76:
+		case 0x77:
+		case 0x78:
+		case 0x79:
+		case 0x7a:
+		case 0x7b:
+		case 0x7c:
+		case 0x7d:
+		case 0x7e:
+		case 0x7f:
 			if (0 != (ret = ipmi_sensor_get_states(s->sensor, got_discrete_states, h)))
 			{
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
