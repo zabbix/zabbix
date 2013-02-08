@@ -1395,10 +1395,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 		_('Actions')
 	));
 
-	foreach ($triggers as $tnum => $trigger) {
-		$triggers[$tnum]['clock'] = isset($trigger['event']) ? $trigger['event']['clock'] : $trigger['lastchange'];
-	}
-	CArrayHelper::sort($triggers, array(array('field' => 'clock', 'order' => ZBX_SORT_DOWN)));
+	CArrayHelper::sort($triggers, array(array('field' => 'lastchange', 'order' => ZBX_SORT_DOWN)));
 
 	foreach ($triggers as $trigger) {
 		// an event exists
@@ -1425,7 +1422,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 			get_node_name_by_elid($trigger['triggerid']),
 			$trigger['hostname'],
 			getSeverityCell($trigger['priority'], $trigger['description']),
-			zbx_date2age($trigger['clock']),
+			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$config['event_ack_enable'] ? $ack : null,
 			$actions
