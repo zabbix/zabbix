@@ -58,9 +58,10 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DC_TRIGGER	trigger;
 	char		*sql = NULL, failed_type_buf[8];
 	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	unsigned char	new_event, event_source, event_value;
+	zbx_uint64_t	triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
@@ -108,7 +109,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 *     item and MYITEM types differ AND item host status is AVAILABLE    *
 	 *************************************************************************/
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.state,t.error,t.lastchange"
+			"select distinct t.triggerid,t.description,t.expression,t.priority,t.type,t.value,t.state,"
+				"t.error,t.lastchange"
 			" from items i,functions f,triggers t,hosts h"
 			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
@@ -151,7 +153,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			hostid,
 			HOST_STATUS_MONITORED,
 			failed_type_buf,
-			ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_JMX,
+			ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI,
+			ITEM_TYPE_JMX,
 			ITEM_TYPE_ZABBIX, HOST_AVAILABLE_TRUE,
 			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, HOST_AVAILABLE_TRUE,
 			ITEM_TYPE_IPMI, HOST_AVAILABLE_TRUE,
@@ -162,19 +165,13 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(trigger.triggerid, row[0]);
-		trigger.type = (unsigned char)atoi(row[1]);
-		trigger.value = atoi(row[2]);
-		trigger.state = atoi(row[3]);
-		strscpy(trigger.error, row[4]);
-		trigger.lastchange = atoi(row[5]);
+		ZBX_STR2UINT64(triggerid, row[0]);
 
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger.triggerid, trigger.type,
-				trigger.value, trigger.state, trigger.error, trigger.lastchange,
-				TRIGGER_VALUE_UNKNOWN, reason, ts->sec, &trigger.add_event))
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, row[1], row[2],
+				(unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]), atoi(row[5]), atoi(row[6]),
+				row[7], atoi(row[8]), TRIGGER_VALUE_UNKNOWN, reason, ts))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 	}
@@ -184,6 +181,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	if (sql_offset > 16)	/* begin..end; is a must in case of ORACLE */
 		DBexecute("%s", sql);
+
+	process_events();
 
 	zbx_free(sql);
 

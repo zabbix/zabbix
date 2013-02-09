@@ -161,9 +161,12 @@ fail:
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
 	const char	*r;
-	int		f, source = 0, object = 0, value = 0, acknowledged = 0;
+	int		f, source = 0, object = 0, value = 0;
 	zbx_uint64_t	eventid = 0, objectid = 0;
 	zbx_timespec_t	ts;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
 
@@ -192,11 +195,29 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 			ts.ns = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "value"))
 			value = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
-			acknowledged = atoi(buffer);
 	}
 
-	return process_event(eventid, source, object, objectid, &ts, value, acknowledged);
+	if (EVENT_OBJECT_TRIGGER == object)
+	{
+		result = DBselect(
+				"select description,expression,priority,type"
+				" from triggers"
+				" where triggerid=" ZBX_FS_UI64,
+				objectid);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			add_event(eventid, source, object, objectid, &ts, value, row[0], row[1],
+					(unsigned char)atoi(row[2]), (unsigned char)atoi(row[3]));
+		}
+		else
+			ret = FAIL;
+		DBfree_result(result);
+	}
+	else
+		add_event(eventid, source, object, objectid, &ts, value, NULL, NULL, 0, 0);
+
+	return ret;
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
 			CONFIG_NODEID, sender_nodeid, nodeid, record);

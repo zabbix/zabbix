@@ -481,20 +481,16 @@ DB_RESULT	DBselectN(const char *query, int n)
  *                                                                            *
  * Purpose: generates sql statement for updating trigger value                *
  *                                                                            *
- * Parameters: add_event      - [OUT] 0 - do not add event                    *
- *                                    1 - generate new event                  *
- *                                                                            *
  * Return value: SUCCEED - sql statement generated successfully               *
  *               FAIL    - trigger update isn't required                      *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: do not update value if there are dependencies with value PROBLEM *
  *                                                                            *
  ******************************************************************************/
 int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, int state, const char *error, int lastchange,
-		int new_value, const char *new_error, int new_lastchange, unsigned char *add_event)
+		const char *description, const char *expression, unsigned char priority, unsigned char type, int value,
+		int state, const char *error, int lastchange, int new_value, const char *new_error,
+		zbx_timespec_t *new_lastchange)
 {
 	const char	*__function_name = "DBget_trigger_update_sql";
 	const char	*new_error_local;
@@ -544,7 +540,6 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	/*                                                                                                */
 	/**************************************************************************************************/
 
-	*add_event = 0;
 	new_error_local = (NULL == new_error ? "" : new_error);
 
 	value_changed = (value != new_value || (0 == lastchange && TRIGGER_STATE_UNKNOWN != new_state));
@@ -568,10 +563,12 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 			if (0 != value_changed || 0 != multiple_problem)
 			{
 				DCconfig_set_trigger_value(triggerid, new_value, new_state, new_error_local,
-						&new_lastchange);
+						&new_lastchange->sec);
 
-				*add_event = 1;
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
+				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, new_lastchange,
+						new_value, description, expression, priority, type);
+
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange->sec);
 			}
 			else
 			{
@@ -583,7 +580,12 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
 
 			if (0 != state_changed)
+			{
+				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, triggerid, new_lastchange,
+						new_state, description, expression, priority, type);
+
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
+			}
 
 			if (0 != error_changed)
 			{
@@ -1777,11 +1779,12 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		}
 		DBfree_result(result);
 
-		process_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-				autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, 0);
-
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);
+
+		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
+				TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
+		process_events();
 	}
 
 	zbx_free(host_esc);

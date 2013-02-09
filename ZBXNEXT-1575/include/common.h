@@ -220,6 +220,10 @@ typedef enum
 #define EVENT_OBJECT_ITEM		4
 #define EVENT_OBJECT_LLDRULE		5
 
+/* acknowledged flags */
+#define EVENT_NOT_ACKNOWLEDGED		0
+#define EVENT_ACKNOWLEDGED		1
+
 typedef enum
 {
 	DOBJECT_STATUS_UP = 0,

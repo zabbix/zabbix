@@ -3289,16 +3289,26 @@ static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src
 static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger)
 {
 	dst_trigger->triggerid = src_trigger->triggerid;
-	dst_trigger->expression = zbx_strdup(NULL, src_trigger->expression);
-	strscpy(dst_trigger->error, src_trigger->error);
+	dst_trigger->description = zbx_strdup(NULL, src_trigger->description);
+	dst_trigger->expression_orig = zbx_strdup(NULL, src_trigger->expression);
+	dst_trigger->expression = NULL;
+	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
 	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
 	dst_trigger->timespec.ns = 0;
+	dst_trigger->priority = src_trigger->priority;
 	dst_trigger->type = src_trigger->type;
 	dst_trigger->value = src_trigger->value;
 	dst_trigger->state = src_trigger->state;
 	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 	dst_trigger->lastchange = src_trigger->lastchange;
+}
+
+static void	DCclean_trigger(DC_TRIGGER *trigger)
+{
+	zbx_free(trigger->error);
+	zbx_free(trigger->expression_orig);
+	zbx_free(trigger->description);
 }
 
 /******************************************************************************
@@ -3490,40 +3500,6 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_trigger_for_event                                   *
- *                                                                            *
- * Purpose: get trigger by triggerid to be used in event processing           *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: fields "url" and "comment" are not filled for event processing   *
- *                                                                            *
- ******************************************************************************/
-int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
-{
-	int			ret = SUCCEED;
-	const ZBX_DC_TRIGGER	*dc_trigger;
-
-	LOCK_CACHE;
-
-	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
-	{
-		trigger->triggerid = dc_trigger->triggerid;
-		trigger->description = zbx_strdup(trigger->description, dc_trigger->description);
-		trigger->expression = zbx_strdup(trigger->expression, dc_trigger->expression);
-		trigger->priority = dc_trigger->priority;
-		trigger->type = dc_trigger->type;
-	}
-	else
-		ret = FAIL;
-
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCconfig_get_time_based_triggers                                 *
  *                                                                            *
  * Purpose: get triggers that have time-based functions (sorted by triggerid) *
@@ -3600,6 +3576,15 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+}
+
+void	DCfree_triggers(zbx_vector_ptr_t *triggers)
+{
+	int	i;
+
+	for (i = 0; i < triggers->values_num; i++)
+		DCclean_trigger((DC_TRIGGER *)triggers->values[i]);
+	triggers->values_num = 0;
 }
 
 /******************************************************************************
