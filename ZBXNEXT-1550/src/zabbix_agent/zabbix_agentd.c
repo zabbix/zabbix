@@ -33,6 +33,7 @@
 #endif
 #include "active.h"
 #include "listener.h"
+#include "modules.h"
 
 #include "symbols.h"
 
@@ -417,6 +418,10 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 #ifdef _WINDOWS
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
@@ -426,6 +431,7 @@ static void	zbx_load_config(int requirement)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
+	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 #ifdef _WINDOWS
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
@@ -465,6 +471,7 @@ static void	zbx_load_config(int requirement)
 static void	zbx_free_config()
 {
 	zbx_strarr_free(CONFIG_ALIASES);
+	zbx_strarr_free(CONFIG_LOAD_MODULE);
 	zbx_strarr_free(CONFIG_USER_PARAMETERS);
 #ifdef _WINDOWS
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
@@ -531,6 +538,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_perf_collector(1);
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
+	load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE);
 	load_user_parameters(CONFIG_USER_PARAMETERS);
 	load_aliases(CONFIG_ALIASES);
 
@@ -646,6 +654,7 @@ void	zbx_on_exit()
 
 	zabbix_close_log();
 
+	unload_modules();
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
@@ -722,6 +731,7 @@ int	main(int argc, char **argv)
 			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
+			load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE);
 			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
@@ -732,6 +742,7 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 #endif
+			unload_modules();
 			free_metrics();
 			alias_list_free();
 			exit(SUCCEED);
