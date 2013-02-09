@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-09 02:37+0200\n"
-"PO-Revision-Date: 2012-12-27 08:05+0200\n"
+"POT-Creation-Date: 2013-02-09 02:39+0200\n"
+"PO-Revision-Date: 2013-02-01 14:41+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -903,7 +903,7 @@ msgstr "Светлее"
 
 #: include/locales.inc.php:43
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Болгарский (bg_BG)"
 
 #: tr_status.php:787
 msgid "Bulk acknowledge"
@@ -2266,7 +2266,7 @@ msgstr "Объединение столбцов"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s слишком большое."
 
 #: include/views/configuration.screen.edit.php:42 screenconf.php:51
 msgid "Columns"
@@ -2311,7 +2311,7 @@ msgstr "Комментарии"
 #: include/views/monitoring.triggerComment.php:43
 #, php-format
 msgid "Comments for \"%s\"."
-msgstr ""
+msgstr "Комментарии по \"%s\"."
 
 #: include/views/administration.mediatypes.edit.php:46
 msgid "Commercial"
@@ -6035,7 +6035,7 @@ msgstr "Использованы некорректные символы в им
 #: api/classes/CScreenItem.php:590
 #, php-format
 msgid "Incorrect column span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Указано некорректное объединение колонок у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
 #: api/classes/CDRule.php:270
 msgid "Incorrect delay."
@@ -6133,7 +6133,7 @@ msgstr "В выражении триггера \"%2$s\" указан некор�
 #: include/classes/validators/CTriggerFunctionValidator.php:64
 #, php-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
-msgstr ""
+msgstr "Указан некорректный тип элемента данных \"%1$s\" для функции триггера \"%2$s\"."
 
 #: api/classes/CDRule.php:315
 msgid "Incorrect key."
@@ -6274,7 +6274,7 @@ msgstr "Указан некорректный тип ресурса для эл�
 #: api/classes/CScreenItem.php:585
 #, php-format
 msgid "Incorrect row span provided for screen element located at X - %1$s and Y - %2$s."
-msgstr ""
+msgstr "Указано некорректное объединение строк у элемента комплексного экрана размещенного в X - %1$s и Y - %2$s."
 
 #: api/classes/CScreenItem.php:558
 #, php-format
@@ -6539,7 +6539,7 @@ msgstr "Ошибочный запрос."
 #: maintenance.php:146 maintenance.php:160 services.php:178 services.php:192
 #, php-format
 msgid "Invalid date \"%s\"."
-msgstr ""
+msgstr "Ошибочная дата \"%s\"."
 
 #: api/classes/CUserMacro.php:817
 #, php-format
@@ -6553,7 +6553,7 @@ msgstr "Ошибочный формат ключа элемента данных
 
 #: maintenance.php:308
 msgid "Invalid maintenance period"
-msgstr ""
+msgstr "Ошибочный период обслуживания"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:205 api/classes/CService.php:381
@@ -6745,7 +6745,7 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: api/classes/managers/CHttpTestManager.php:820
 #, php-format
 msgid "Item with key \"%1$s\" already exists."
-msgstr ""
+msgstr "Элемент данных с ключем \"%1$s\" уже существует."
 
 #: hosts.php:684 hosts.php:763 include/html.inc.php:430
 #: include/html.inc.php:434 include/items.inc.php:747
@@ -7603,19 +7603,19 @@ msgstr[2] "Максимальная длина имени узла сети %2$d
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
-msgstr ""
+msgstr "Максимальное значение за период T < N"
 
 #: popup_trexpr.php:252
 msgid "Maximum value for period T is = N"
-msgstr ""
+msgstr "Максимальное значение за период T = N"
 
 #: popup_trexpr.php:247
 msgid "Maximum value for period T is > N"
-msgstr ""
+msgstr "Максимальное значение за период T > N"
 
 #: popup_trexpr.php:257
 msgid "Maximum value for period T is NOT N"
-msgstr ""
+msgstr "Максимальное значение за период T NOT N"
 
 #: api/classes/CHost.php:754
 #, php-format
@@ -7792,19 +7792,19 @@ msgstr "Минимально требуемый размер PHP post - %s (ко
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
-msgstr ""
+msgstr "Минимальное значение за период T < N"
 
 #: popup_trexpr.php:272
 msgid "Minimum value for period T is = N"
-msgstr ""
+msgstr "Минимальное значение за период T = N"
 
 #: popup_trexpr.php:267
 msgid "Minimum value for period T is > N"
-msgstr ""
+msgstr "Минимальное значение за период T > N"
 
 #: popup_trexpr.php:277
 msgid "Minimum value for period T is NOT N"
-msgstr ""
+msgstr "Минимальное значение за период T NOT N"
 
 #: include/forms.inc.php:1663
 msgid "Minutes"
@@ -8147,7 +8147,7 @@ msgstr "Нет группы элементов данных с ID \"%1$s\"."
 
 #: include/views/configuration.httpconf.edit.php:89
 msgid "No applications defined"
-msgstr ""
+msgstr "Группы элементов данных не заданы"
 
 #: include/views/configuration.application.list.php:50 popup.php:1284
 msgid "No applications defined."
