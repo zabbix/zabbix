@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "modules.h"
 #include "sysinfo.h"
 #include "log.h"
 #include "cfg.h"
@@ -111,6 +112,54 @@ int	add_user_parameter(const char *key, char *command)
 	return SUCCEED;
 }
 
+int	add_user_module(const char *key, int (*function)())
+{
+	int		i;
+	char		usr_cmd[MAX_STRING_LEN], usr_param[MAX_STRING_LEN];
+	unsigned	flag = CF_MODFUNCTION;
+
+	if (ZBX_COMMAND_ERROR == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to add module function \"%s\": parsing error", key);
+		return FAIL;
+	}
+	else if (ZBX_COMMAND_WITH_PARAMS == i)
+	{
+		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add module function \"%s\": invalid key", key);
+			return FAIL;
+		}
+		flag |= CF_USEUPARAM;
+	}
+
+	for (i = 0;; i++)
+	{
+		/* add new parameters */
+		if (NULL == commands[i].key)
+		{
+			commands[i].key = zbx_strdup(NULL, usr_cmd);
+			commands[i].flags = flag;
+			commands[i].function = function;
+			commands[i].main_param = 0;
+			commands[i].test_param = 0;
+
+			commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
+			commands[i + 1].key = NULL;
+			break;
+		}
+
+		/* treat duplicate UserParameters as error */
+		if (0 == strcmp(commands[i].key, usr_cmd))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "failed to add module function \"%s\": duplicate key", key);
+			exit(FAIL);
+		}
+	}
+
+	return SUCCEED;
+}
+
 void	init_metrics()
 {
 	int	i;
@@ -176,28 +225,119 @@ void	free_result(AGENT_RESULT *result)
 	UNSET_MSG_RESULT(result);
 }
 
-/*
- * return value: ZBX_COMMAND_ERROR - error
- *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters
- *               ZBX_COMMAND_WITH_PARAMS - command with parameters
- */
-int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
+/******************************************************************************
+ *                                                                            *
+ * Function: init_request                                                     *
+ *                                                                            *
+ * Purpose: initialize the request structure                                  *
+ *                                                                            *
+ * Parameters: request - pointer to the structure                             *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	init_request(AGENT_REQUEST *request)
+{
+	request->key = NULL;
+
+	request->nparam = 0;
+	request->timeout = 0;
+	request->params = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: free_request                                                     *
+ *                                                                            *
+ * Purpose: free memory used by the request                                   *
+ *                                                                            *
+ * Parameters: request - pointer to the request structure                     *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	free_request(AGENT_REQUEST *request)
+{
+	int i;
+
+	zbx_free(request->key);
+	for (i = 0; i < request->nparam; i++)
+	{
+		zbx_free(request->params[i]);
+	}
+	zbx_free(request->params);
+	request->nparam = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_item_key                                                   *
+ *                                                                            *
+ * Purpose: parse item command (key) and fill AGET_REQUEST structure          *
+ *                                                                            *
+ * Parameters: cmd - complete item key                                        *
+ *             key - item key without parameters                              *
+ *                                                                            *
+ * Return value: request - structure filled with data from item key           *
+ *                                                                            *
+ * Comment: this function should be rewritten to get rid of key,buf,get_param *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_item_key(char *cmd, char *key, AGENT_REQUEST *request)
+{
+	int i;
+/* TODO Rewrite without use of buf, key and get_param */
+	char		buf[MAX_STRING_LEN];
+
+	request->nparam = num_param(cmd);
+	request->key = zbx_strdup(NULL, key);
+
+/* TODO Perhaps params[0] should return key? It will simplify agents */
+
+	request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
+
+	for (i = 0; i < request->nparam; i++)
+	{
+		if(0 == get_param(cmd, i+1, buf, sizeof(buf)))
+		{
+			request->params[i] = zbx_strdup(NULL, buf);
+		}
+		else
+		{
+			request->params[i] = zbx_strdup(NULL, '\0');
+		}
+	}
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_command                                                    *
+ *                                                                            *
+ * Purpose: parses item key and splits it into command and parameters         *
+ *                                                                            *
+ * Return value: ZBX_COMMAND_ERROR - error                                    *
+ *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters      *
+ *               ZBX_COMMAND_WITH_PARAMS - command with parameters            *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_command(const char *key, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
 {
 	const char	*pl, *pr;
 	size_t		sz;
 
-	for (pl = command; SUCCEED == is_key_char(*pl); pl++)
+	for (pl = key; SUCCEED == is_key_char(*pl); pl++)
 		;
 
-	if (pl == command)
-		return 0;
+	if (pl == key)
+		return ZBX_COMMAND_ERROR;
 
 	if (NULL != cmd)
 	{
-		if (cmd_max_len <= (sz = (size_t)(pl - command)))
-			return 0;
+		if (cmd_max_len <= (sz = (size_t)(pl - key)))
+			return ZBX_COMMAND_ERROR;
 
-		memcpy(cmd, command, sz);
+		memcpy(cmd, key, sz);
 		cmd[sz] = '\0';
 	}
 
@@ -205,28 +345,28 @@ int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *para
 	{
 		if (NULL != param)
 			*param = '\0';
-		return 1;
+		return ZBX_COMMAND_WITHOUT_PARAMS;
 	}
 
 	if ('[' != *pl)		/* unsupported character */
-		return 0;
+		return ZBX_COMMAND_ERROR;
 
 	for (pr = ++pl; '\0' != *pr; pr++)
 		;
 
 	if (']' != *--pr)
-		return 0;
+		return ZBX_COMMAND_ERROR;
 
 	if (NULL != param)
 	{
 		if (param_max_len <= (sz = (size_t)(pr - pl)))
-			return 0;
+			return ZBX_COMMAND_ERROR;
 
 		memcpy(param, pl, sz);
 		param[sz] = '\0';
 	}
 
-	return 2;
+	return ZBX_COMMAND_WITH_PARAMS;
 }
 
 void	test_parameter(const char *key, unsigned flags)
@@ -355,6 +495,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	char		param[MAX_STRING_LEN], error[MAX_STRING_LEN];
 
 	ZBX_METRIC	*command = NULL;
+	AGENT_REQUEST	request;
 
 	assert(result);
 	init_result(result);
@@ -372,11 +513,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	if (NULL != command->key)
 	{
+
 		if (0 != (command->flags & CF_USEUPARAM))
 		{
 			if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
 				strscpy(usr_param, command->test_param);
 		}
+		/* Command does not accept parameters but was called with parameters */
 		else if (ZBX_COMMAND_WITH_PARAMS == rc)
 			goto notsupported;
 
@@ -401,11 +544,34 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		else
 			strscpy(param, usr_param);
 
-		if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
+		/* The coomand is found in one of agent loadable modules */
+		if (0 != (command->flags & CF_MODFUNCTION))
 		{
-			/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
-			/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-			goto notsupported;
+			init_request(&request);
+			if (0 != parse_item_key(param, usr_cmd, &request))
+			{
+				free_request(&request);
+				goto notsupported;
+			}
+/* TODO Not sure if it is the best place to set timeout */
+			request.timeout = CONFIG_TIMEOUT;
+			if (SYSINFO_RET_OK != command->function(&request, result))
+			{
+				free_request(&request);
+				/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+				/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
+				goto notsupported;
+			}
+			free_request(&request);
+		}
+		else
+		{
+			if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
+			{
+				/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+				/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
+				goto notsupported;
+			}
 		}
 	}
 	else

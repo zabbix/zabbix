@@ -130,6 +130,7 @@ AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(kstat_open, kstat)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(clock_gettime, rt)
+AC_SEARCH_LIBS(dlopen, dl)
 
 dnl AIX
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])

@@ -218,6 +218,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for command */
 #define CF_USEUPARAM	1	/* use user param */
+#define CF_MODFUNCTION	2	/* function called from external module */
 
 /* flags for process */
 #define PROCESS_TEST		1
@@ -230,6 +231,7 @@ void	free_metrics();
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
 int	add_user_parameter(const char *key, char *command);
+int	add_user_module(const char *key, int (*function)());
 void	test_parameters();
 void	test_parameter(const char *key, unsigned flags);
 

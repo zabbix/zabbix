@@ -32,7 +32,8 @@ zabbix_agent_SOURCES = \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
 	vmstats.c vmstats.h \
-	zbxconf.c zbxconf.h
+	zbxconf.c zbxconf.h \
+	modules.c
 
 zabbix_agent_LDADD = $(agents_ldadd)
 
@@ -47,7 +48,8 @@ zabbix_agentd_SOURCES = \
 	logfiles.c logfiles.h \
 	zabbix_agentd.c \
 	zbxconf.c zbxconf.h \
-	listener.c listener.h
+	listener.c listener.h \
+	modules.c
 
 zabbix_agentd_LDADD = $(agents_ldadd)
 

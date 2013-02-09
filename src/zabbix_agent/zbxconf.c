@@ -51,10 +51,13 @@ int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 100;
 
-char	**CONFIG_ALIASES                = NULL;
-char	**CONFIG_USER_PARAMETERS        = NULL;
+char	*CONFIG_LOAD_MODULE_PATH	= NULL;
+
+char	**CONFIG_ALIASES		= NULL;
+char	**CONFIG_LOAD_MODULE		= NULL;
+char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
-char	**CONFIG_PERF_COUNTERS          = NULL;
+char	**CONFIG_PERF_COUNTERS		= NULL;
 #endif
 
 /******************************************************************************
