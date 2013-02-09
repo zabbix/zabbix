@@ -142,16 +142,18 @@ DC_FUNCTION;
 typedef struct
 {
 	zbx_uint64_t	triggerid;
+	char		*description;
+	char		*expression_orig;
 	char		*expression;
-	char		error[TRIGGER_ERROR_LEN_MAX];
+	char		*error;
 	char		*new_error;
 	zbx_timespec_t	timespec;
 	int		lastchange;
+	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	value;
 	unsigned char	state;
 	unsigned char	new_value;
-	unsigned char	add_event;
 }
 DC_TRIGGER;
 
@@ -227,8 +229,8 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
-int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid);
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num);
+void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);

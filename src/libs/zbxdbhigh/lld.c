@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "events.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxserver.h"
@@ -2428,6 +2429,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	{
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
+
+		add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, discovery_itemid, ts, ITEM_STATE_NORMAL,
+				NULL, NULL, 0, 0);
+		process_events();
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",state=%d", ITEM_STATE_NORMAL);
 	}

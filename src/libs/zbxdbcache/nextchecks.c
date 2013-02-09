@@ -32,44 +32,19 @@ typedef struct
 ZBX_DC_NEXTCHECK;
 
 static ZBX_DC_NEXTCHECK	*nextchecks = NULL;
-static int		nextcheck_allocated = 64;
-static int		nextcheck_num;
+static int		nextcheck_alloc = 0;
+static int		nextcheck_num = 0;
 
 /******************************************************************************
  *                                                                            *
- * Function: DCinit_nextchecks                                                *
- *                                                                            *
- * Purpose: initialize nextchecks array                                       *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-void	DCinit_nextchecks()
-{
-	const char	*__function_name = "DCinit_nextchecks";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (NULL == nextchecks)
-		nextchecks = zbx_malloc(nextchecks, nextcheck_allocated * sizeof(ZBX_DC_NEXTCHECK));
-
-	nextcheck_num = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCrelease_nextchecks                                             *
+ * Function: DCclean_nextchecks                                               *
  *                                                                            *
  * Purpose: free memory allocated for `error_msg'es                           *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
  ******************************************************************************/
-static void	DCrelease_nextchecks()
+static void	DCclean_nextchecks()
 {
-	const char	*__function_name = "DCrelease_nextchecks";
+	const char	*__function_name = "DCclean_nextchecks";
 
 	int		i;
 
@@ -77,6 +52,8 @@ static void	DCrelease_nextchecks()
 
 	for (i = 0; i < nextcheck_num; i++)
 		zbx_free(nextchecks[i].error_msg);
+
+	nextcheck_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -95,14 +72,11 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 	const char	*__function_name = "DCadd_nextcheck";
 
 	int		i;
-	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == error_msg)
 		return;
-
-	sz = sizeof(ZBX_DC_NEXTCHECK);
 
 	i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
 
@@ -111,21 +85,22 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 		if (nextchecks[i].now < now)
 		{
 			/* delete item */
-			memmove(&nextchecks[i], &nextchecks[i + 1], sz * (nextcheck_num - (i + 1)));
+			memmove(&nextchecks[i], &nextchecks[i + 1],
+					sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - (i + 1)));
 			nextcheck_num--;
 		}
 		else
 			return;
 	}
 
-	if (nextcheck_allocated == nextcheck_num)
+	if (nextcheck_alloc == nextcheck_num)
 	{
-		nextcheck_allocated += 64;
-		nextchecks = zbx_realloc(nextchecks, nextcheck_allocated * sz);
+		nextcheck_alloc += 64;
+		nextchecks = zbx_realloc(nextchecks, sizeof(ZBX_DC_NEXTCHECK) * nextcheck_alloc);
 	}
 
 	/* insert new item */
-	memmove(&nextchecks[i + 1], &nextchecks[i], sz * (nextcheck_num - i));
+	memmove(&nextchecks[i + 1], &nextchecks[i], sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - i));
 
 	nextchecks[i].itemid = itemid;
 	nextchecks[i].now = now;
@@ -180,19 +155,18 @@ void	DCflush_nextchecks()
 
 	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, errors, nextcheck_num);
 
-	zbx_free(itemids);
-	zbx_free(timespecs);
 	zbx_free(errors);
+	zbx_free(timespecs);
+	zbx_free(itemids);
 
 	if (0 != trigger_order.values_num)
 	{
 		char		*sql = NULL;
 		size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 		DC_TRIGGER	*trigger;
+		unsigned char	new_event, event_source, event_value;
 
 		sql = zbx_malloc(sql, sql_alloc);
-
-		DBbegin();
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -201,25 +175,24 @@ void	DCflush_nextchecks()
 			trigger = (DC_TRIGGER *)trigger_order.values[i];
 
 			if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
+					trigger->description, trigger->expression_orig, trigger->priority,
 					trigger->type, trigger->value, trigger->state, trigger->error,
 					trigger->lastchange, TRIGGER_VALUE_UNKNOWN, trigger->new_error,
-					trigger->timespec.sec, &trigger->add_event))
+					&trigger->timespec))
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
-			zbx_free(trigger->expression);
 			zbx_free(trigger->new_error);
 		}
+
+		DCfree_triggers(&trigger_order);
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
-
-		DBcommit();
 
 		zbx_free(sql);
 	}
@@ -227,7 +200,7 @@ void	DCflush_nextchecks()
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
 
-	DCrelease_nextchecks();
+	DCclean_nextchecks();
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

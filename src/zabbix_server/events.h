@@ -20,7 +20,9 @@
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
-int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, int acknowledged);
+void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, const char *trigger_description,
+		const char *trigger_expression, unsigned char trigger_priority, unsigned char trigger_type);
+void	process_events();
 
 #endif
