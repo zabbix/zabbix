@@ -25,7 +25,7 @@
 #include "log.h"
 #include "sysinfo.h"
 
-void **modules = NULL;
+static void **modules = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -42,24 +42,28 @@ void **modules = NULL;
 void	register_module(void *module)
 {
 	const char	*__function_name = "register_module";
-/*	int	i = 0;*/
+	int	i = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-/*	while (NULL != modules[i])
+	if (NULL == modules)
 	{
-	zabbix_log(LOG_LEVEL_WARNING, "In2 %s()", __function_name);
+		modules = zbx_malloc(NULL, sizeof(void *));
+		modules[0] = NULL;
+	}
+
+	while (NULL != modules[i])
+	{
 		if(module == modules[i])
 		{
 			return;
 		}
 		i++;
 	}
-	zabbix_log(LOG_LEVEL_WARNING, "In2 %s()", __function_name);
 
-	modules = zbx_realloc(modules, (i+1)*sizeof(void *));
+	modules = zbx_realloc(modules, (i+2)*sizeof(void *));
 	modules[i] = module;
-	modules[i+1] = NULL;*/
+	modules[i+1] = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -141,7 +145,6 @@ void	load_modules(const char *path, char **modules)
 		keys = func_list();
 		for (key = keys; NULL != *key; key++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Added new key \"%s\"", *key);
 			add_user_module(*key, func_process);
 		}
 
@@ -166,12 +169,18 @@ void	load_modules(const char *path, char **modules)
 void	unload_modules()
 {
 	const char	*__function_name = "unload_modules";
-/*	int	(*func_uninit)();
-	void	**module;*/
+	int	(*func_uninit)();
+	void	**module;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-/*	for (module = modules; NULL != *module; module++)
+	/* there is no registered modules */
+	if (NULL == modules)
+	{
+		return;
+	}
+
+	for (module = modules; NULL != *module; module++)
 	{
 		*(void **) (&func_uninit) = dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
 		if (NULL == func_uninit)
@@ -190,7 +199,9 @@ void	unload_modules()
 		}
 
 		dlclose(*module);
-	}*/
+	}
+
+	zbx_free(modules);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
