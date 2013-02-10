@@ -534,6 +534,7 @@ misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 src/modules/agent/dummy/Makefile -text
+src/modules/agent/dummy/README -text
 src/modules/agent/dummy/dummy.c -text
 src/zabbix_agent/modules.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
