@@ -153,7 +153,7 @@ int	add_user_module(const char *key, int (*function)())
 		if (0 == strcmp(commands[i].key, usr_cmd))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "failed to add module function \"%s\": duplicate key", key);
-			exit(FAIL);
+			return FAIL;
 		}
 	}
 
