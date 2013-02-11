@@ -55,7 +55,7 @@ class CMultiSelect extends CTag {
 			labels: {
 				emptyResult: "'._('No matches found').'"
 			},
-			//disabled: '.$options['disabled'].'
+			disabled: '.($options['disabled'] ? 'true' : 'false').'
 		});');
 	}
 }

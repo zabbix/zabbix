@@ -60,177 +60,191 @@ jQuery(function($) {
 
 		return this.each(function() {
 			var obj = $(this),
-				objId = obj.attr('id'),
-				isWaiting = false,
 				jqxhr = null,
 				values = {
 					search: '',
 					width: parseInt(obj.css('width')),
+					isWaiting: false,
+					isAjaxLoaded: true,
+					isDisabled: options.disabled,
 					selected: {},
 					available: {},
 					availableIds: {} // used for returning values from selected back to available
 				};
 
 			// search input
-			var input = $('<input>', {
-				type: 'text',
-				value: '',
-				css: {width: values.width}
-			})
-			.on('keyup change', function(e) {
-				if (!isWaiting) {
-					isWaiting = true;
+			if (!values.isDisabled) {
+				var input = $('<input>', {
+					type: 'text',
+					value: '',
+					css: {width: values.width}
+				})
+				.on('keyup change', function(e) {
+					var search = input.val();
 
-					window.setTimeout(function() {
-						isWaiting = false;
+					if (!empty(search)) {
+						if (input.data('lastSearch') != search) {
+							if (!values.isWaiting) {
+								values.isWaiting = true;
 
-						var search = input.val();
+								window.setTimeout(function() {
+									values.isWaiting = false;
+									values.search = input.val();
 
-						if (!empty(search)) {
-							values.search = search;
+									input.data('lastSearch', values.search);
 
-							if (input.data('lastSearch') != values.search) {
-								input.data('lastSearch', values.search);
-
-								if (!empty(jqxhr)) {
-									jqxhr.abort();
-								}
-
-								jqxhr = $.ajax({
-									url: options.url + '&curtime=' + new CDate().getTime(),
-									type: 'GET',
-									dataType: 'json',
-									data: {search: values.search},
-									success: function(data) {
-										loadAvailable(data.result, obj, values, options);
+									if (!empty(jqxhr)) {
+										jqxhr.abort();
 									}
-								});
+
+									values.isAjaxLoaded = false;
+
+									jqxhr = $.ajax({
+										url: options.url + '&curtime=' + new CDate().getTime(),
+										type: 'GET',
+										dataType: 'json',
+										data: {search: values.search},
+										success: function(data) {
+											values.isAjaxLoaded = true;
+
+											loadAvailable(data.result, obj, values, options);
+										}
+									});
+								}, 500);
 							}
-						}
-					}, 500);
-				}
-			})
-			.on('keypress keydown', function(e) {
-				switch (e.which) {
-					case KEY.ENTER:
-						var availableActive = $('.available li.hover', obj);
-
-						if (availableActive.length > 0) {
-							select(availableActive.data('id'), obj, values, options);
-						}
-
-						// stop form submit
-						cancelEvent(e);
-						break;
-
-					case KEY.BACKSPACE:
-					case KEY.ARROW_LEFT:
-					case KEY.DELETE:
-						if (empty(input.val())) {
-							if ($('.selected li', obj).length > 0) {
-								var lastItem = $('.selected li:last-child', obj);
-
-								if (lastItem.hasClass('pressed')) {
-									if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
-										removeSelected(lastItem.data('id'), obj, values, options);
-									}
-								}
-								else {
-									$('.selected li:last-child', obj).addClass('pressed');
-								}
-
-								cancelEvent(e);
-							}
-						}
-
-						hideAvailable(obj);
-						break;
-
-					case KEY.ARROW_RIGHT:
-						var lastSelected = $('.selected li:last-child', obj);
-
-						if (lastSelected.hasClass('pressed')) {
-							// remove last selected pressed state
-							lastSelected.removeClass('pressed');
 						}
 						else {
 							showAvailable(obj, values);
 						}
-						break;
+					}
+				})
+				.on('keypress keydown', function(e) {
+					switch (e.which) {
+						case KEY.ENTER:
+							var availableActive = $('.available li.hover', obj);
 
-					case KEY.ARROW_UP:
-						if ($('.available li', obj).length > 0) {
+							if (availableActive.length > 0) {
+								select(availableActive.data('id'), obj, values, options);
+							}
+
+							// stop form submit
+							cancelEvent(e);
+							return false;
+							break;
+
+						case KEY.BACKSPACE:
+						case KEY.ARROW_LEFT:
+						case KEY.DELETE:
+							if (empty(input.val())) {
+								if ($('.selected li', obj).length > 0) {
+									if ($('.selected li.pressed', obj).length > 0) {
+										if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
+											removeSelected($('.selected li.pressed', obj).data('id'), obj, values, options);
+										}
+										else {
+											var prev = $('.selected li.pressed', obj).removeClass('pressed').prev();
+
+											if (prev.length > 0) {
+												prev.addClass('pressed');
+											}
+											else {
+												$('.selected li:first-child', obj).addClass('pressed');
+											}
+										}
+									}
+									else {
+										$('.selected li:last-child', obj).addClass('pressed');
+									}
+
+									hideAvailable(obj);
+								}
+							}
+							break;
+
+						case KEY.ARROW_RIGHT:
+							if ($('.selected li.pressed', obj).length > 0) {
+								var next = $('.selected li.pressed', obj).removeClass('pressed').next();
+
+								if (next.length > 0) {
+									next.addClass('pressed');
+								}
+							}
+							else {
+								showAvailable(obj, values);
+							}
+							break;
+
+						case KEY.ARROW_UP:
+							if ($('.available li', obj).length > 0) {
+								if ($('.available', obj).is(':hidden')) {
+									showAvailable(obj, values);
+								}
+								else {
+									// move hover
+									if ($('.available li.hover', obj).length > 0) {
+										var prev = $('.available li.hover', obj).removeClass('hover').prev();
+
+										if (prev.length > 0) {
+											prev.addClass('hover');
+										}
+										else {
+											$('.available li:last-child', obj).addClass('hover');
+										}
+
+										scrollAvailable(obj);
+									}
+									else {
+										$('.available li:last-child', obj).addClass('hover');
+									}
+								}
+							}
+							else {
+								hideAvailable(obj);
+							}
+							break;
+
+						case KEY.ARROW_DOWN:
 							if ($('.available', obj).is(':hidden')) {
 								showAvailable(obj, values);
 							}
 							else {
 								// move hover
 								if ($('.available li.hover', obj).length > 0) {
-									var prev = $('.available li.hover', obj).removeClass('hover').prev();
+									var next = $('.available li.hover', obj).removeClass('hover').next();
 
-									if (prev.length > 0) {
-										prev.addClass('hover');
+									if (next.length > 0) {
+										next.addClass('hover');
 									}
 									else {
-										$('.available li:last-child', obj).addClass('hover');
+										$('.available li:first-child', obj).addClass('hover');
 									}
 
 									scrollAvailable(obj);
 								}
 								else {
-									$('.available li:last-child', obj).addClass('hover');
-								}
-							}
-						}
-						else {
-							hideAvailable(obj);
-						}
-						break;
-
-					case KEY.ARROW_DOWN:
-						if ($('.available', obj).is(':hidden')) {
-							showAvailable(obj, values);
-						}
-						else {
-							// move hover
-							if ($('.available li.hover', obj).length > 0) {
-								var next = $('.available li.hover', obj).removeClass('hover').next();
-
-								if (next.length > 0) {
-									next.addClass('hover');
-								}
-								else {
 									$('.available li:first-child', obj).addClass('hover');
 								}
-
-								scrollAvailable(obj);
 							}
-							else {
-								$('.available li:first-child', obj).addClass('hover');
-							}
-						}
-						break;
+							break;
 
-					case KEY.TAB:
-					case KEY.ESCAPE:
-						hideAvailable(obj);
-						break;
-				}
-
-				if (IE8) {
-					cancelEvent(e);
-				}
-			})
-			.click(function() {
-				showAvailable(obj, values);
-			})
-			.focusin(function() {
-				$('.selected ul', obj).addClass('active');
-			})
-			.focusout(function() {
-				$('.selected ul', obj).removeClass('active');
-			});
-			obj.append($('<div>', {style: 'position: relative;'}).append(input));
+						case KEY.TAB:
+						case KEY.ESCAPE:
+							hideAvailable(obj);
+							break;
+					}
+				})
+				.click(function() {
+					showAvailable(obj, values);
+				})
+				.focusin(function() {
+					$('.selected ul', obj).addClass('active');
+				})
+				.focusout(function() {
+					$('.selected ul', obj).removeClass('active');
+					input.val('');
+				});
+				obj.append($('<div>', {style: 'position: relative;'}).append(input));
+			}
 
 			// selected
 			obj.append($('<div>', {
@@ -239,27 +253,29 @@ jQuery(function($) {
 			}).append($('<ul>')));
 
 			// available
-			var available = $('<div>', {
-				'class': 'available',
-				css: {
-					width: values.width - 2,
-					display: 'none'
-				}
-			})
-			.append($('<ul>'))
-			.focusout(function() {
-				hideAvailable(obj);
-			});
-
-			// multi select
-			obj.append($('<div>', {style: 'position: relative;'}).append(available))
-			.focusout(function() {
-				setTimeout(function() {
-					if ($('.available', obj).is(':visible')) {
-						hideAvailable(obj);
+			if (!values.isDisabled) {
+				var available = $('<div>', {
+					'class': 'available',
+					css: {
+						width: values.width - 2,
+						display: 'none'
 					}
-				}, 200);
-			});
+				})
+				.append($('<ul>'))
+				.focusout(function() {
+					hideAvailable(obj);
+				});
+
+				// multi select
+				obj.append($('<div>', {style: 'position: relative;'}).append(available))
+				.focusout(function() {
+					setTimeout(function() {
+						if ($('.available', obj).is(':visible')) {
+							hideAvailable(obj);
+						}
+					}, 200);
+				});
+			}
 
 			// preload data
 			if (!empty(options.data)) {
@@ -314,18 +330,23 @@ jQuery(function($) {
 					text: empty(item.prefix) ? item.name : item.prefix + item.name
 				});
 
-				var arrow = $('<span>', {
-					'class': 'arrow',
-					'data-id': item.id
-				})
-				.click(function() {
-					removeSelected($(this).data('id'), obj, values, options);
-				});
+				if (!values.isDisabled) {
+					var arrow = $('<span>', {
+						'class': 'arrow',
+						'data-id': item.id
+					})
+					.click(function() {
+						removeSelected($(this).data('id'), obj, values, options);
+					});
 
-				$('.selected ul', obj).append(li.append(text, arrow));
+					$('.selected ul', obj).append(li.append(text, arrow));
 
-				// resize
-				resizeSelected(obj, values);
+					// resize
+					resizeSelected(obj, values);
+				}
+				else {
+					$('.selected ul', obj).append(li.append(text));
+				}
 			}
 		};
 
@@ -420,10 +441,12 @@ jQuery(function($) {
 		};
 
 		function select(id, obj, values, options) {
-			addSelected(values.available[id], obj, values, options);
-			removeAvailable(id, obj, values);
-			hideAvailable(obj);
-			$('input[type="text"]', obj).val('');
+			if (values.isAjaxLoaded && !values.isWaiting) {
+				addSelected(values.available[id], obj, values, options);
+				removeAvailable(id, obj, values);
+				hideAvailable(obj);
+				$('input[type="text"]', obj).val('');
+			}
 		}
 
 		function removeAvailable(id, obj, values) {
@@ -438,15 +461,18 @@ jQuery(function($) {
 		};
 
 		function showAvailable(obj, values) {
-			if ($('.label-empty-result', obj).length > 0 || objectLength(values.available) > 0) {
-				$('.selected ul', obj).addClass('active');
-				$('.available', obj).fadeIn(0);
+			if ($('.available', obj).is(':hidden')) {
+				if ($('.label-empty-result', obj).length > 0 || objectLength(values.available) > 0) {
+					$('.selected ul', obj).addClass('active');
+					$('.available', obj).fadeIn(0);
 
-				// remove selected item pressed state
-				$('.selected li:last-child', obj).removeClass('pressed');
+					// remove selected item pressed state
+					$('.selected li.pressed', obj).removeClass('pressed');
 
-				// preselect first available
-				$('.available li:first-child', obj).addClass('hover');
+					// preselect first available
+					$('.available li.hover', obj).removeClass('hover');
+					$('.available li:first-child', obj).addClass('hover');
+				}
 			}
 		};
 
