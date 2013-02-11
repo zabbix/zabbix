@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <dlfcn.h>
-
 #include "common.h"
 #include "modules.h"
 
@@ -39,7 +37,7 @@ static void **modules = NULL;
  * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
-void	register_module(void *module)
+static void	register_module(void *module)
 {
 	const char	*__function_name = "register_module";
 	int	i = 0;
@@ -48,22 +46,20 @@ void	register_module(void *module)
 
 	if (NULL == modules)
 	{
-		modules = zbx_malloc(NULL, sizeof(void *));
+		modules = zbx_malloc(modules, sizeof(void *));
 		modules[0] = NULL;
 	}
 
 	while (NULL != modules[i])
 	{
-		if(module == modules[i])
-		{
+		if (module == modules[i])
 			return;
-		}
 		i++;
 	}
 
-	modules = zbx_realloc(modules, (i+2)*sizeof(void *));
+	modules = zbx_realloc(modules, (i + 2) * sizeof(void *));
 	modules[i] = module;
-	modules[i+1] = NULL;
+	modules[i + 1] = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -78,10 +74,11 @@ void	register_module(void *module)
  * Parameters: path - directory where modules are located                     *
  *             modules - list of module names                                 *
  *                                                                            *
- * Return value:                                                              *
+ * Return value: 0 - success                                                  *
+ *               -1 - loading of modules failed                               *
  *                                                                            *
  ******************************************************************************/
-void	load_modules(const char *path, char **modules)
+int	load_modules(const char *path, char **modules)
 {
 	const char	*__function_name = "load_modules";
 	char	**module;
@@ -91,6 +88,7 @@ void	load_modules(const char *path, char **modules)
 	int	(*func_init)();
 	int	(*func_process)();
 	char	**(*func_list)();
+	int	ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -98,46 +96,50 @@ void	load_modules(const char *path, char **modules)
 	{
 		zbx_snprintf(filename, sizeof(filename), "%s/%s", path, *module);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Loading module \"%s\"", filename);
+		zabbix_log(LOG_LEVEL_WARNING, "Loading module \"%s\"", filename);
 
 		lib = dlopen(filename, RTLD_NOW);
 
 		if (NULL == lib)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Loading module failed: %s", dlerror());
-			continue;
+			ret = FAIL;
+			goto ret;
 		}
 
-		*(void **) (&func_init) = dlsym(lib, ZBX_MODULE_FUNC_INIT);
+		*(void **)(&func_init) = dlsym(lib, ZBX_MODULE_FUNC_INIT);
 		if (NULL == func_init)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot find init function: %s", dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find initialization function: %s",
+				filename, dlerror());
 			dlclose(lib);
-			continue;
+			ret = FAIL;
+			goto ret;
 		}
 
-		if(ZBX_MODULE_OK != func_init())
+		if (ZBX_MODULE_OK != func_init())
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Initialization failed.",
 				filename);
 			dlclose(lib);
-			continue;
+			ret = FAIL;
+			goto ret;
 		}
 
-		*(void **) (&func_process) = dlsym(lib, ZBX_MODULE_FUNC_PROCESS);
+		*(void **)(&func_process) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_PROCESS);
 		if(NULL == func_process)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find process function: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find item process function: %s",
 				filename, dlerror());
 			dlclose(lib);
 			continue;
 		}
 
-		*(void **) (&func_list) = dlsym(lib, ZBX_MODULE_FUNC_LIST);
+		*(void **)(&func_list) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST);
 		if(NULL == func_list)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Finding list function \"%s\" failed: %s",
-				filename, ZBX_MODULE_FUNC_LIST, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Finding item list function \"%s\" failed: %s",
+				filename, ZBX_MODULE_FUNC_ITEM_LIST, dlerror());
 			dlclose(lib);
 			continue;
 		}
@@ -151,7 +153,10 @@ void	load_modules(const char *path, char **modules)
 		register_module(lib);
 	}
 
+ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -185,7 +190,7 @@ void	unload_modules()
 		*(void **) (&func_uninit) = dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
 		if (NULL == func_uninit)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot find uninit function: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot find uninit function: %s",
 				dlerror());
 			dlclose(*module);
 			continue;
