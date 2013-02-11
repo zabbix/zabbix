@@ -27,13 +27,13 @@
  */
 static LPSTR	get_if_description(MIB_IFROW *pIfRow)
 {
-	static LPTSTR (*mb_to_unicode)(LPCSTR) = NULL;
-	LPTSTR	wdescr;
-	LPSTR	utf8_descr;
+	static LPTSTR	(*mb_to_unicode)(LPCSTR) = NULL;
+	LPTSTR		wdescr;
+	LPSTR		utf8_descr;
 
 	if (NULL == mb_to_unicode)
 	{
-		OSVERSIONINFO version_info = {sizeof(OSVERSIONINFO)};
+		OSVERSIONINFO	version_info = {sizeof(OSVERSIONINFO)};
 
 		/* starting with Windows Vista (Windows Server 2008) the interface description */
 		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
