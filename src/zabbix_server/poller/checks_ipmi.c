@@ -516,9 +516,9 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 		goto out;
 	}
 
-	if (err)
+	if (0 != err)
 	{
-		h->err = zbx_dsprintf(h->err, "error 0x%x while reading a discrete sensor %s@[%s]:%d",
+		h->err = zbx_dsprintf(h->err, "error 0x%x while reading a discrete sensor %s@[%s]:%d", err,
 				sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
 		h->ret = NOTSUPPORTED;
 		goto out;
