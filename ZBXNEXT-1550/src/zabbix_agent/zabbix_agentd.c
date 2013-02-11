@@ -540,7 +540,7 @@ int	MAIN_ZABBIX_ENTRY()
 #endif
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exsiting...");
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(FAIL);
 	}
 	load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -737,7 +737,7 @@ int	main(int argc, char **argv)
 #endif
 			if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exsiting...");
+				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(FAIL);
 			}
 			load_user_parameters(CONFIG_USER_PARAMETERS);
