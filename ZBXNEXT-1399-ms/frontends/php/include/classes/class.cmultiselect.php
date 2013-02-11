@@ -27,6 +27,7 @@ class CMultiSelect extends CTag {
 	 * @param array  $options['data']
 	 * @param bool   $options['disabled']
 	 * @param int    $options['width']
+	 * @param int    $options['limit']
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
@@ -41,7 +42,7 @@ class CMultiSelect extends CTag {
 
 			$data = $json->encode($options['data']);
 		}
-
+$options['limit'] = 5;
 		// url
 		$url = new Curl('jsrpc.php');
 		$url->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
@@ -52,6 +53,7 @@ class CMultiSelect extends CTag {
 			url: "'.$url->getUrl().'",
 			name: "'.$options['name'].'",
 			data: '.$data.',
+			limit: '.(isset($options['limit']) ? $options['limit'] : 'null').',
 			labels: {
 				emptyResult: "'._('No matches found').'"
 			},

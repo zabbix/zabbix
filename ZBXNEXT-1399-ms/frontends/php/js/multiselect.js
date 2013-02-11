@@ -25,6 +25,7 @@ jQuery(function($) {
 	 *
 	 * @param string $options['url']
 	 * @param string $options['name']
+	 * @param int    $options['limit']
 	 * @param bool   $options['disabled']
 	 * @param object $options['labels']
 	 * @param object $options['data']
@@ -38,6 +39,7 @@ jQuery(function($) {
 		var defaults = {
 			url: '',
 			name: '',
+			limit: null,
 			data: {},
 			disabled: false,
 			labels: {
@@ -66,14 +68,12 @@ jQuery(function($) {
 					width: parseInt(obj.css('width')),
 					isWaiting: false,
 					isAjaxLoaded: true,
-					isDisabled: options.disabled,
 					selected: {},
-					available: {},
-					availableIds: {} // used for returning values from selected back to available
+					available: {}
 				};
 
 			// search input
-			if (!values.isDisabled) {
+			if (!options.disabled) {
 				var input = $('<input>', {
 					type: 'text',
 					value: '',
@@ -83,38 +83,49 @@ jQuery(function($) {
 					var search = input.val();
 
 					if (!empty(search)) {
-						if (input.data('lastSearch') != search) {
+						if (input.attr('data-lastSearch') != search) {
 							if (!values.isWaiting) {
 								values.isWaiting = true;
 
 								window.setTimeout(function() {
 									values.isWaiting = false;
-									values.search = input.val();
 
-									input.data('lastSearch', values.search);
+									var search = input.val();
 
-									if (!empty(jqxhr)) {
-										jqxhr.abort();
-									}
+									// re-check search after delay
+									if (!empty(search) && input.attr('data-lastSearch') != search) {
+										values.search = search;
 
-									values.isAjaxLoaded = false;
+										input.attr('data-lastSearch', values.search);
 
-									jqxhr = $.ajax({
-										url: options.url + '&curtime=' + new CDate().getTime(),
-										type: 'GET',
-										dataType: 'json',
-										data: {search: values.search},
-										success: function(data) {
-											values.isAjaxLoaded = true;
-
-											loadAvailable(data.result, obj, values, options);
+										if (!empty(jqxhr)) {
+											jqxhr.abort();
 										}
-									});
+
+										values.isAjaxLoaded = false;
+
+										jqxhr = $.ajax({
+											url: options.url + '&curtime=' + new CDate().getTime(),
+											type: 'GET',
+											dataType: 'json',
+											data: {
+												search: values.search,
+												limit: (options.limit > 0) ? options.limit + 1 : null
+											},
+											success: function(data) {
+												values.isAjaxLoaded = true;
+
+												loadAvailable(data.result, obj, values, options);
+											}
+										});
+									}
 								}, 500);
 							}
 						}
 						else {
-							showAvailable(obj, values);
+							if ($('.available', obj).is(':hidden')) {
+								showAvailable(obj, values);
+							}
 						}
 					}
 				})
@@ -175,40 +186,27 @@ jQuery(function($) {
 							break;
 
 						case KEY.ARROW_UP:
-							if ($('.available li', obj).length > 0) {
-								if ($('.available', obj).is(':hidden')) {
-									showAvailable(obj, values);
-								}
-								else {
-									// move hover
-									if ($('.available li.hover', obj).length > 0) {
-										var prev = $('.available li.hover', obj).removeClass('hover').prev();
+							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
+								if ($('.available li.hover', obj).length > 0) {
+									var prev = $('.available li.hover', obj).removeClass('hover').prev();
 
-										if (prev.length > 0) {
-											prev.addClass('hover');
-										}
-										else {
-											$('.available li:last-child', obj).addClass('hover');
-										}
-
-										scrollAvailable(obj);
+									if (prev.length > 0) {
+										prev.addClass('hover');
 									}
 									else {
 										$('.available li:last-child', obj).addClass('hover');
 									}
+
+									scrollAvailable(obj);
 								}
-							}
-							else {
-								hideAvailable(obj);
+								else {
+									$('.available li:last-child', obj).addClass('hover');
+								}
 							}
 							break;
 
 						case KEY.ARROW_DOWN:
-							if ($('.available', obj).is(':hidden')) {
-								showAvailable(obj, values);
-							}
-							else {
-								// move hover
+							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
 								if ($('.available li.hover', obj).length > 0) {
 									var next = $('.available li.hover', obj).removeClass('hover').next();
 
@@ -233,9 +231,6 @@ jQuery(function($) {
 							break;
 					}
 				})
-				.click(function() {
-					showAvailable(obj, values);
-				})
 				.focusin(function() {
 					$('.selected ul', obj).addClass('active');
 				})
@@ -253,7 +248,7 @@ jQuery(function($) {
 			}).append($('<ul>')));
 
 			// available
-			if (!values.isDisabled) {
+			if (!options.disabled) {
 				var available = $('<div>', {
 					'class': 'available',
 					css: {
@@ -293,9 +288,16 @@ jQuery(function($) {
 			cleanAvailable(obj, values);
 
 			if (!empty(data)) {
-				$.each(data, function(i, item) {
-					addAvailable(item, obj, values, options);
-				});
+				var n = 0;
+
+				for (var id in data) {
+					if (options.limit > 0 && n > options.limit) {
+						n++;
+						continue;
+					}
+
+					addAvailable(data[id], obj, values, options);
+				}
 			}
 
 			// write empty result label
@@ -330,7 +332,7 @@ jQuery(function($) {
 					text: empty(item.prefix) ? item.name : item.prefix + item.name
 				});
 
-				if (!values.isDisabled) {
+				if (!options.disabled) {
 					var arrow = $('<span>', {
 						'class': 'arrow',
 						'data-id': item.id
@@ -407,36 +409,7 @@ jQuery(function($) {
 				)
 				.append(prefix, matchedText, unMatchedText);
 
-				// insert li
-				if (typeof(values.availableIds[item.id]) == 'undefined') {
-					values.availableIds[item.id] = 'isPresented';
-
-					$('.available ul', obj).append(li);
-				}
-
-				// insert li on previous position to keep sorting
-				else {
-					var insertAfterId = null;
-
-					for (var id in values.availableIds) {
-						if (values.availableIds[id] == 'isPresented') {
-							insertAfterId = id;
-						}
-
-						if (item.id == id) {
-							break;
-						}
-					}
-
-					if (empty(insertAfterId)) {
-						$('.available ul', obj).prepend(li);
-					}
-					else {
-						$('.available li[data-id="' + insertAfterId + '"]', obj).after(li);
-					}
-
-					values.availableIds[item.id] = 'isPresented';
-				}
+				$('.available ul', obj).append(li);
 			}
 		};
 
@@ -452,7 +425,6 @@ jQuery(function($) {
 		function removeAvailable(id, obj, values) {
 			$('.available li[data-id="' + id + '"]', obj).remove();
 
-			values.availableIds[id] = 'isRemoved';
 			delete values.available[id];
 
 			if ($('.available li', obj).length == 0) {
@@ -461,18 +433,16 @@ jQuery(function($) {
 		};
 
 		function showAvailable(obj, values) {
-			if ($('.available', obj).is(':hidden')) {
-				if ($('.label-empty-result', obj).length > 0 || objectLength(values.available) > 0) {
-					$('.selected ul', obj).addClass('active');
-					$('.available', obj).fadeIn(0);
+			if ($('.label-empty-result', obj).length > 0 || objectLength(values.available) > 0) {
+				$('.selected ul', obj).addClass('active');
+				$('.available', obj).fadeIn(0);
 
-					// remove selected item pressed state
-					$('.selected li.pressed', obj).removeClass('pressed');
+				// remove selected item pressed state
+				$('.selected li.pressed', obj).removeClass('pressed');
 
-					// preselect first available
-					$('.available li.hover', obj).removeClass('hover');
-					$('.available li:first-child', obj).addClass('hover');
-				}
+				// pre-select first available
+				$('.available li.hover', obj).removeClass('hover');
+				$('.available li:first-child', obj).addClass('hover');
 			}
 		};
 
@@ -484,7 +454,6 @@ jQuery(function($) {
 			$('.label-empty-result', obj).remove();
 			$('.available li', obj).remove();
 			values.available = {};
-			values.availableIds = {};
 		};
 
 		function resizeSelected(obj, values) {
