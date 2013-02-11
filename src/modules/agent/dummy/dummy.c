@@ -38,7 +38,7 @@ int zbx_module_version()
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_module_list                                                  *
+ * Function: zbx_module_item_list                                             *
  *                                                                            *
  * Purpose: returns list of item keys supported by the module                 *
  *                                                                            *
@@ -49,9 +49,10 @@ int zbx_module_version()
  * Comment: item keys that accept optional parameters must have [*] included  *
  *                                                                            *
  ******************************************************************************/
-char **zbx_module_list()
+char **zbx_module_item_list()
 {
 	/* keys having [*] accept optional parameters */
+	/* key, func, useparam, testparam */
 	static char *keys[]={"dummy.ping", "dummy.echo[*]", "dummy.random[*]"};
 	return keys;
 }
@@ -82,6 +83,7 @@ static int dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if(request->nparam != 2)
 	{
+/* TODO set msg */
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -96,7 +98,7 @@ static int dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_module_process                                               *
+ * Function: zbx_module_item_process                                          *
  *                                                                            *
  * Purpose: a main entry point for processing of items                        *
  *                                                                            *
@@ -118,7 +120,7 @@ static int dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
  *          by checking value of request->nparam.                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_module_process(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_module_item_process(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int ret = SYSINFO_RET_FAIL;
 
@@ -153,7 +155,7 @@ int	zbx_module_process(AGENT_REQUEST *request, AGENT_RESULT *result)
  * Return value: ZBX_MODULE_OK - success                                      *
  *               ZBX_MODULE_FAIL - module initialization failed               *
  *                                                                            *
- * Comment: agent will not load the module in case of ZBX_MODULE_FAIL         *
+ * Comment: the module won't be loaded in case of ZBX_MODULE_FAIL             *
  *                                                                            *
  ******************************************************************************/
 int zbx_module_init()

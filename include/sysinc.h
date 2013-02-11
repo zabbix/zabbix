@@ -432,4 +432,8 @@
 #	include <mntent.h>
 #endif
 
+#ifdef HAVE_DLFCN_H
+#	include <dlfcn.h>
+#endif
+
 #endif
