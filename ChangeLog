@@ -1,5 +1,5 @@
 Changes for 1.8.17rc1
-
+..F....... [ZBX-6217] fixed not possible to use html special characters in web scenario password (Toms)
 ...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 

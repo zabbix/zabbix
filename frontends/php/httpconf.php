@@ -190,8 +190,8 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['save'])){
 		if($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE){
-			$http_user = htmlspecialchars($_REQUEST['http_user']);
-			$http_password = htmlspecialchars($_REQUEST['http_password']);
+			$http_user = $_REQUEST['http_user'];
+			$http_password = $_REQUEST['http_password'];
 		}
 		else{
 			$http_user = '';
