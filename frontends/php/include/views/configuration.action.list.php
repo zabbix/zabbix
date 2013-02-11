@@ -33,6 +33,7 @@ $sourceComboBox = new CComboBox('eventsource', $this->data['eventsource'], 'subm
 $sourceComboBox->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
 $sourceComboBox->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
 $sourceComboBox->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
+$sourceComboBox->addItem(EVENT_SOURCE_INTERNAL, _('Internal'));
 $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Event source'), SPACE, $sourceComboBox));
 

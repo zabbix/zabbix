@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'actionid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,	IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION)), null),
+	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,	IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)), null),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
 	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null, _('Default operation step duration')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
@@ -358,8 +358,6 @@ if (isset($_REQUEST['form'])) {
 		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
 		$data['action']['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
-		$data['action']['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
-		$data['action']['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
 
@@ -371,6 +369,8 @@ if (isset($_REQUEST['form'])) {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
 				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+				$data['action']['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+				$data['action']['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 			}
 			elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
 				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
@@ -379,6 +379,12 @@ if (isset($_REQUEST['form'])) {
 			elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
 				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
 				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
+			}
+			else {
+				$data['action']['def_shortdata'] = get_request('def_shortdata');
+				$data['action']['def_longdata'] = get_request('def_longdata');
+				$data['action']['r_shortdata'] = get_request('r_shortdata');
+				$data['action']['r_longdata'] = get_request('r_longdata');
 			}
 		}
 	}
