@@ -825,30 +825,13 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
-/*	switch (ipmi_sensor_get_event_reading_type(sensor))
-	{
-		case IPMI_EVENT_READING_TYPE_THRESHOLD:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_USAGE:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_STATE:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_PREDICTIVE_FAILURE:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_LIMIT_EXCEEDED:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_PERFORMANCE_MET:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_SEVERITY:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_PRESENCE:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_ENABLE:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_AVAILABILITY:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_REDUNDANCY:
-		case IPMI_EVENT_READING_TYPE_DISCRETE_ACPI_POWER:
-		case IPMI_EVENT_READING_TYPE_SENSOR_SPECIFIC:*/
-	if (op == IPMI_ADDED && 0 != ipmi_sensor_get_is_readable(sensor))	/* for now ignore Event-only and */
-	{									/* other non-readable sensors */
+	if (op == IPMI_ADDED && 0 != ipmi_sensor_get_is_readable(sensor))	/* ignore non-readable sensors */
+	{									/* (e.g. Event-only) */
 		if (NULL == get_ipmi_sensor(h, sensor))
 			allocate_ipmi_sensor(h, sensor);
 	}
 	else if (op == IPMI_DELETED)
 		delete_ipmi_sensor(h, sensor);
-/*			break;
-	}*/
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
