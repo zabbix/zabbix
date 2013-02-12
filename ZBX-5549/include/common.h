@@ -651,7 +651,7 @@ typedef enum
 typedef enum
 {
 	PERM_DENY = 0,
-	PERM_READ_ONLY = 2,
+	PERM_READ = 2,
 	PERM_READ_WRITE
 } zbx_user_permission_t;
 
