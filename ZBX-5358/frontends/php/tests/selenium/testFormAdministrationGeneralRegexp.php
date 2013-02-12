@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralRegexp extends CWebTest {
@@ -293,4 +292,3 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 	}
 }
-?>
