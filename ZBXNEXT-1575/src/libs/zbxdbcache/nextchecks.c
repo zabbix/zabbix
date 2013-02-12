@@ -26,7 +26,7 @@
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	time_t		now;
+	zbx_timespec_t	ts;
 	char		*error_msg;
 }
 ZBX_DC_NEXTCHECK;
@@ -44,18 +44,11 @@ static int		nextcheck_num = 0;
  ******************************************************************************/
 static void	DCclean_nextchecks()
 {
-	const char	*__function_name = "DCclean_nextchecks";
-
-	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	int	i;
 
 	for (i = 0; i < nextcheck_num; i++)
 		zbx_free(nextchecks[i].error_msg);
-
 	nextcheck_num = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -64,10 +57,8 @@ static void	DCclean_nextchecks()
  *                                                                            *
  * Purpose: add item nextcheck to the array                                   *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
-void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
+void	DCadd_nextcheck(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *error_msg)
 {
 	const char	*__function_name = "DCadd_nextcheck";
 
@@ -80,18 +71,8 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 
 	i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
 
-	if (i < nextcheck_num && nextchecks[i].itemid == itemid)	/* item exists? */
-	{
-		if (nextchecks[i].now < now)
-		{
-			/* delete item */
-			memmove(&nextchecks[i], &nextchecks[i + 1],
-					sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - (i + 1)));
-			nextcheck_num--;
-		}
-		else
-			return;
-	}
+	if (i < nextcheck_num && nextchecks[i].itemid == itemid)	/* an item found */
+		return;
 
 	if (nextcheck_alloc == nextcheck_num)
 	{
@@ -99,11 +80,11 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 		nextchecks = zbx_realloc(nextchecks, sizeof(ZBX_DC_NEXTCHECK) * nextcheck_alloc);
 	}
 
-	/* insert new item */
+	/* insert a new item */
 	memmove(&nextchecks[i + 1], &nextchecks[i], sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - i));
 
 	nextchecks[i].itemid = itemid;
-	nextchecks[i].now = now;
+	nextchecks[i].ts = *ts;
 	nextchecks[i].error_msg = zbx_strdup(NULL, error_msg);
 
 	nextcheck_num++;
@@ -116,8 +97,6 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
  * Function: DCflush_nextchecks                                               *
  *                                                                            *
  * Purpose: update triggers to UNKNOWN and generate events                    *
- *                                                                            *
- * Author: Alexander Vladishev, Dmitry Borovikov                              *
  *                                                                            *
  ******************************************************************************/
 void	DCflush_nextchecks()
@@ -143,7 +122,7 @@ void	DCflush_nextchecks()
 	for (i = 0; i < nextcheck_num; i++)
 	{
 		itemids[i] = nextchecks[i].itemid;
-		timespecs[i].sec = nextchecks[i].now;
+		timespecs[i] = nextchecks[i].ts;
 		errors[i] = nextchecks[i].error_msg;
 	}
 

@@ -185,8 +185,7 @@ int	DCsync_history(int sync_type);
 void	init_database_cache();
 void	free_database_cache();
 
-void	DCinit_nextchecks();
-void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg);
+void	DCadd_nextcheck(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *error_msg);
 void	DCflush_nextchecks();
 
 #define ZBX_STATS_HISTORY_COUNTER	0
