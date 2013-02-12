@@ -79,6 +79,8 @@ class CHttpTest extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->checkDeprecatedParam($options, 'selectSteps', 'webstepid');
+
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -296,8 +298,14 @@ class CHttpTest extends CZBXAPI {
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 		foreach ($httpTests as $hnum => $httpTest) {
 			unset($httpTests[$hnum]['templateid']);
-		}
 
+			// convert deprecated parameters
+			if (isset($httpTest['steps'])) {
+				foreach ($httpTest['steps'] as $i => $step) {
+					$httpTests[$hnum]['steps'][$i] = $this->convertDeprecatedParam($step, 'webstepid', 'httpstepid');
+				}
+			}
+		}
 
 		$dbHttpTests = array();
 		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
@@ -729,12 +737,7 @@ class CHttpTest extends CZBXAPI {
 				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
 
 				// add the deprecated webstepid parameter if it's requested
-				if ($this->outputIsRequested('webstepid', $options['selectSteps'])) {
-					foreach ($httpSteps as &$httpStep) {
-						$httpStep['webstepid'] = $httpStep['httpstepid'];
-					}
-					unset($httpStep);
-				}
+				$httpSteps = $this->addDeprecatedOutput($httpSteps, 'webstepid', 'httpstepid', $options['selectSteps']);
 
 				$httpSteps = $this->unsetExtraFields($httpSteps, array('httptestid', 'httpstepid'), $options['selectSteps']);
 

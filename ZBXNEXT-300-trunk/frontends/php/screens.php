@@ -60,10 +60,6 @@ check_fields($fields);
  * Filter
  */
 if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.screens.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.screens.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
