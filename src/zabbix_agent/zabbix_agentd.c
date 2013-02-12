@@ -587,7 +587,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 	{
 		/* wait for the service worker thread to terminate us */
-		zbx_sleep(2);
+		zbx_sleep(3);
+
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
@@ -603,16 +604,20 @@ int	MAIN_ZABBIX_ENTRY()
 	/* all exiting child processes should be caught by signal handlers */
 	THIS_SHOULD_NEVER_HAPPEN;
 #endif
-
 	zbx_on_exit();
 
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_service_resources                                       *
+ *                                                                            *
+ * Purpose: free service resources allocated by main thread                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_free_service_resources()
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
-
 	if (NULL != threads)
 	{
 		int		i;
@@ -623,23 +628,26 @@ void	zbx_on_exit()
 		sigemptyset(&set);
 		sigaddset(&set, SIGCHLD);
 		sigprocmask(SIG_BLOCK, &set, NULL);
+#else
+		/* wait for threads to finish first. although listener threads will never end */
+		WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
 #endif
+		for (i = 0; i < threads_num; i++)
+		{
+			if (threads[i])
+				zbx_thread_kill(threads[i]);
+		}
 
 		for (i = 0; i < threads_num; i++)
 		{
 			if (threads[i])
-			{
-				zbx_thread_kill(threads[i]);
-				threads[i] = ZBX_THREAD_HANDLE_NULL;
-			}
+				zbx_thread_wait(threads[i]);
+
+			threads[i] = ZBX_THREAD_HANDLE_NULL;
 		}
 
 		zbx_free(threads);
 	}
-
-#ifndef _WINDOWS
-	zbx_sleep(2);	/* wait for all processes to exit */
-#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
@@ -652,6 +660,13 @@ void	zbx_on_exit()
 #ifdef _WINDOWS
 	free_perf_collector();
 #endif
+}
+
+void	zbx_on_exit()
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
+
+	zbx_free_service_resources();
 
 	exit(SUCCEED);
 }
