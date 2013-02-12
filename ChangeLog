@@ -21,6 +21,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+...G...... [ZBX-5358] fixed encoding of network interface names with non ASCII characters on Vista/Server 2008 + (wiper)
 ...G...... [ZBX-6216] fixed crash when zabbix_sender was used in realtime mode on windows (wiper)
 A......... [ZBX-6124] fixed hostgroup.massupdate validation on removing group from host with only one group (Eduard)
 ....I..... [ZBX-6197] updated DB2 image importer script to work with larger (>16KB) images (wiper)
