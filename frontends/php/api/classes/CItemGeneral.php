@@ -201,9 +201,6 @@ abstract class CItemGeneral extends CZBXAPI {
 				if (!isset($item['hostid'])) {
 					$item['hostid'] = $fullItem['hostid'];
 				}
-				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
-					$item['error'] = '';
-				}
 
 				// if a templated item is being assigned to an interface with a different type, ignore it
 				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
