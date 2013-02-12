@@ -34,7 +34,7 @@ static	SERVICE_STATUS_HANDLE	serviceHandle;
 int	application_status = ZBX_APP_RUNNING;
 
 /* free resources allocated by MAIN_ZABBIX_ENTRY() */
-void zbx_free_service_resources();
+void	zbx_free_service_resources();
 
 static void	parent_signal_handler(int sig)
 {
@@ -48,7 +48,7 @@ static void	parent_signal_handler(int sig)
 	}
 }
 
-static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
+static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 {
 	serviceStatus.dwServiceType		= SERVICE_WIN32_OWN_PROCESS;
 	serviceStatus.dwCurrentState		= SERVICE_RUNNING;
@@ -58,7 +58,7 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	serviceStatus.dwCheckPoint		= 0;
 	serviceStatus.dwWaitHint		= 0;
 
-	switch(ctrlCode)
+	switch (ctrlCode)
 	{
 		case SERVICE_CONTROL_STOP:
 		case SERVICE_CONTROL_SHUTDOWN:
@@ -85,7 +85,7 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	SetServiceStatus(serviceHandle, &serviceStatus);
 }
 
-static VOID WINAPI ServiceEntry(DWORD argc, LPTSTR *argv)
+static VOID WINAPI	ServiceEntry(DWORD argc, LPTSTR *argv)
 {
 	LPTSTR	wservice_name;
 
@@ -401,7 +401,7 @@ void	set_parent_signal_handler()
 	signal(SIGTERM, parent_signal_handler);
 }
 
-void	CALLBACK ZBXEndThread(ULONG_PTR dwParam)
+void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 {
 	_endthreadex(SUCCEED);
 }
