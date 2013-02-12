@@ -156,22 +156,21 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description[] = new CLink($trigger['description'], 'trigger_prototypes.php?form=update&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].'&triggerid='.$triggerid);
 	}
 
-	if ($trigger['flags'] == TRIGGER_STATE_NORMAL) {
-		$trigger['error'] = '';
-	}
-
 	$templated = false;
 	foreach ($trigger['hosts'] as $hostid => $host) {
 		$templated |= (HOST_STATUS_TEMPLATE == $host['status']);
 	}
 
 	if (empty($this->data['parent_discoveryid'])) {
-		if (!zbx_empty($trigger['error']) && !$templated) {
-			$error = new CDiv(SPACE, 'status_icon iconerror');
-			$error->setHint($trigger['error'], '', 'on');
-		}
-		else {
-			$error = new CDiv(SPACE, 'status_icon iconok');
+		$error = '';
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+			if (!zbx_empty($trigger['error']) && !$templated) {
+				$error = new CDiv(SPACE, 'status_icon iconerror');
+				$error->setHint($trigger['error'], '', 'on');
+			}
+			else {
+				$error = new CDiv(SPACE, 'status_icon iconok');
+			}
 		}
 	}
 	else {
