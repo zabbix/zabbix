@@ -19,9 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
-require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../include/defines.inc.php';
-require_once dirname(__FILE__).'/../../include/classes/parsers/CTriggerExpression.php';
 
 define('TRIGGER_GOOD', 0);
 define('TRIGGER_BAD', 1);
