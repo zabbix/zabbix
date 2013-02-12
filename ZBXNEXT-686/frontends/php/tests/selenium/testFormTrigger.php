@@ -19,6 +19,9 @@
 **/
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/parsers/CTriggerExpression.php';
 
 define('TRIGGER_GOOD', 0);
 define('TRIGGER_BAD', 1);
@@ -134,10 +137,9 @@ class testFormTrigger extends CWebTest {
 			$this->ok('Close expression constructor');
 		}
 
-
 		$this->ok('Multiple PROBLEM events generation');
 		$this->assertVisible('type');
-		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');// TODO not checked
+		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');
 
 		$this->ok('Description');
 		$this->assertVisible('comments');
@@ -263,6 +265,79 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_sysUptime',
 					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '1234567890',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'a?aa+',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '}aa]a{',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '-aaa=%',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa,;:',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa><.',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa*&_',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa#@!',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '([)$^',
+					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'formCheck' => true,
 				)
 			),
 			array(
@@ -423,7 +498,7 @@ class testFormTrigger extends CWebTest {
 						)
 					)
 				)
-			),
+			)
 		);
 	}
 
@@ -445,10 +520,12 @@ class testFormTrigger extends CWebTest {
 
 		if (isset($data['description'])) {
 			$this->input_type('description', $data['description']);
+			$description = $data['description'];
 		}
 
 		if (isset($data['expression'])) {
 			$this->input_type('expression', $data['expression']);
+			$expression = $data['expression'];
 		}
 
 		if (isset($data['type'])) {
@@ -549,9 +626,15 @@ class testFormTrigger extends CWebTest {
 				$this->ok('Description');
 				break;
 			}
+
+			if (isset($data['formCheck'])) {
+				$this->button_click("link=$description");
+				$this->wait();
+				$this->assertAttribute("//input[@id='description']/@value", 'exact:'.$description);
+				$this->assertTrue(true, "//text()='$expression'");
+			}
 		}
 	}
-
 
 	/**
 	 * Restore the original tables.
