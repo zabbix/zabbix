@@ -651,10 +651,8 @@ typedef enum
 typedef enum
 {
 	PERM_DENY = 0,
-	PERM_READ_LIST,
-	PERM_READ_ONLY,
-	PERM_READ_WRITE,
-	PERM_MAX = 3
+	PERM_READ = 2,
+	PERM_READ_WRITE
 } zbx_user_permission_t;
 
 const char	*zbx_permission_string(int perm);

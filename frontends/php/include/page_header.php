@@ -287,7 +287,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	if (ZBX_DISTRIBUTED && !defined('ZBX_HIDE_NODE_SELECTION')) {
 		insert_js_function('check_all');
 
-		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_DATA_ARRAY);
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
 		if (empty($available_nodes[0])) {
 			unset($available_nodes[0]);

@@ -2459,10 +2459,8 @@ const char	*zbx_permission_string(int perm)
 	{
 		case PERM_DENY:
 			return "dn";
-		case PERM_READ_LIST:
-			return "rl";
-		case PERM_READ_ONLY:
-			return "ro";
+		case PERM_READ:
+			return "r";
 		case PERM_READ_WRITE:
 			return "rw";
 		default:
