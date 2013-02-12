@@ -171,11 +171,11 @@ function item_status2str($type = null) {
  * @return string
  */
 function itemIndicator($status, $state = null) {
-	if (!$state || $state == ITEM_STATE_NORMAL) {
-		return ($status == ITEM_STATUS_ACTIVE) ? _('Enabled') : _('Disabled');
+	if ($status == ITEM_STATUS_ACTIVE) {
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? _('Not supported') : _('Enabled');
 	}
-	elseif ($state == ITEM_STATE_NOTSUPPORTED) {
-		return _('Not supported');
+	elseif ($status == ITEM_STATUS_DISABLED) {
+		return _('Disabled');
 	}
 
 	return _('Unknown');
@@ -191,8 +191,11 @@ function itemIndicator($status, $state = null) {
  * @return string
  */
 function itemIndicatorStyle($status, $state = null) {
-	if (!$state || $state == ITEM_STATE_NORMAL) {
-		return ($status == ITEM_STATUS_ACTIVE) ? 'off' : 'on';
+	if ($status == ITEM_STATUS_ACTIVE) {
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'off';
+	}
+	elseif ($status == ITEM_STATUS_DISABLED) {
+		return 'on';
 	}
 
 	return 'unknown';
