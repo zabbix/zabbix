@@ -21,37 +21,11 @@
 #include "sighandler.h"
 
 #include "log.h"
-#include "threads.h"
 #include "fatal.h"
+#include "sigcommon.h"
 
-static int	parent_pid = -1;
-static int	exiting = 0;
-
-#define CHECKED_FIELD(siginfo, field)			(NULL == siginfo ? -1 : siginfo->field)
-#define CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
-#define PARENT_PROCESS					(parent_pid == (int)getpid())
-
-/******************************************************************************
- *                                                                            *
- * Function: check_signal                                                     *
- *                                                                            *
- * Purpose: check parameters passsed to a signal handler function             *
- *                                                                            *
- ******************************************************************************/
-static void	check_signal(int sig, siginfo_t *siginfo, void *context)
-{
-	if (NULL == siginfo)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "received [signal:%d(%s)] with NULL siginfo",
-				sig, get_signal_name(sig));
-	}
-
-	if (NULL == context)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "received [signal:%d(%s)] with NULL context",
-				sig, get_signal_name(sig));
-	}
-}
+int	sig_parent_pid = -1;
+int	sig_exiting = 0;
 
 /******************************************************************************
  *                                                                            *
@@ -62,12 +36,12 @@ static void	check_signal(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	check_signal(sig, siginfo, context);
+	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	zabbix_log(LOG_LEVEL_CRIT, "Got signal [signal:%d(%s),reason:%d,refaddr:%p]. Crashing ...",
 			sig, get_signal_name(sig),
-			CHECKED_FIELD(siginfo, si_code),
-			CHECKED_FIELD_TYPE(siginfo, si_addr, void *));
+			SIG_CHECKED_FIELD(siginfo, si_code),
+			SIG_CHECKED_FIELD_TYPE(siginfo, si_addr, void *));
 	print_fatal_info(sig, siginfo, context);
 	exit(FAIL);
 }
@@ -81,7 +55,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	check_signal(sig, siginfo, context);
+	SIG_CHECK_PARAMS(sig, siginfo, context);
 }
 
 /******************************************************************************
@@ -93,109 +67,39 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	check_signal(sig, siginfo, context);
+	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	if (!PARENT_PROCESS)
+	if (!SIG_PARENT_PROCESS)
 	{
-		zabbix_log(parent_pid == CHECKED_FIELD(siginfo, si_pid) ?
+		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
 				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-				"reason:%d]. Exiting ...",
+				"reason:%d]. sig_exiting ...",
 				sig, get_signal_name(sig),
-				CHECKED_FIELD(siginfo, si_pid),
-				CHECKED_FIELD(siginfo, si_uid),
-				CHECKED_FIELD(siginfo, si_code));
+				SIG_CHECKED_FIELD(siginfo, si_pid),
+				SIG_CHECKED_FIELD(siginfo, si_uid),
+				SIG_CHECKED_FIELD(siginfo, si_code));
 		exit(FAIL);
 	}
 	else
 	{
-		if (0 == exiting)
+		if (0 == sig_exiting)
 		{
-			exiting = 1;
-			zabbix_log(parent_pid == CHECKED_FIELD(siginfo, si_pid) ?
+			sig_exiting = 1;
+			zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
 					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-					"reason:%d]. Exiting ...",
+					"reason:%d]. sig_exiting ...",
 					sig, get_signal_name(sig),
-					CHECKED_FIELD(siginfo, si_pid),
-					CHECKED_FIELD(siginfo, si_uid),
-					CHECKED_FIELD(siginfo, si_code));
+					SIG_CHECKED_FIELD(siginfo, si_pid),
+					SIG_CHECKED_FIELD(siginfo, si_uid),
+					SIG_CHECKED_FIELD(siginfo, si_code));
 			zbx_on_exit();
 		}
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: user1_signal_handler                                             *
- *                                                                            *
- * Purpose: handle user signal SIGUSR1                                        *
- *                                                                            *
- ******************************************************************************/
-static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
-{
-	check_signal(sig, siginfo, context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d].",
-			sig, get_signal_name(sig),
-			CHECKED_FIELD(siginfo, si_pid),
-			CHECKED_FIELD(siginfo, si_uid),
-			CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
-#ifdef HAVE_SIGQUEUE
-	if (!PARENT_PROCESS)
-	{
-		extern void	zbx_sigusr_handler(zbx_task_t task);
-
-		zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
-	}
-	else if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT))
-	{
-		extern unsigned char	daemon_type;
-
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
-					" cannot be performed for a passive proxy");
-		}
-		else
-		{
-			union sigval	s;
-			extern pid_t	*threads;
-
-			s.ZBX_SIVAL_INT = ZBX_TASK_CONFIG_CACHE_RELOAD;
-
-			/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
-			if (-1 != sigqueue(threads[0], SIGUSR1, s))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
-						" the configuration syncer");
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-						zbx_strerror(errno));
-			}
-		}
-	}
-#endif
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: pipe_signal_handler                                              *
- *                                                                            *
- * Purpose: handle pipe signal SIGPIPE                                        *
- *                                                                            *
- ******************************************************************************/
-static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
-{
-	check_signal(sig, siginfo, context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d]. Ignoring ...",
-			sig, get_signal_name(sig),
-			CHECKED_FIELD(siginfo, si_pid));
-}
 
 /******************************************************************************
  *                                                                            *
@@ -206,16 +110,16 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	check_signal(sig, siginfo, context);
+	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	if (!PARENT_PROCESS)
+	if (!SIG_PARENT_PROCESS)
 		exit(FAIL);
 
-	if (0 == exiting)
+	if (0 == sig_exiting)
 	{
-		exiting = 1;
-		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
-				CHECKED_FIELD(siginfo, si_pid), CHECKED_FIELD(siginfo, si_status));
+		sig_exiting = 1;
+		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). sig_exiting ...",
+				SIG_CHECKED_FIELD(siginfo, si_pid), SIG_CHECKED_FIELD(siginfo, si_status));
 		zbx_on_exit();
 	}
 }
@@ -231,7 +135,7 @@ void	zbx_set_common_signal_handlers()
 {
 	struct sigaction	phan;
 
-	parent_pid = (int)getpid();
+	sig_parent_pid = (int)getpid();
 
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
@@ -253,29 +157,6 @@ void	zbx_set_common_signal_handlers()
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_daemon_signal_handlers                                   *
- *                                                                            *
- * Purpose: set the signal handlers used by daemons                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_set_daemon_signal_handlers()
-{
-	struct sigaction	phan;
-
-	parent_pid = (int)getpid();
-
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-
-	phan.sa_sigaction = user1_signal_handler;
-	sigaction(SIGUSR1, &phan, NULL);
-
-	phan.sa_sigaction = pipe_signal_handler;
-	sigaction(SIGPIPE, &phan, NULL);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_set_child_signal_handler                                     *
  *                                                                            *
  * Purpose: set the handlers for child process signals                        *
@@ -286,7 +167,7 @@ void 	zbx_set_child_signal_handler()
 {
 	struct sigaction	phan;
 
-	parent_pid = (int)getpid();
+	sig_parent_pid = (int)getpid();
 
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
