@@ -1052,7 +1052,7 @@ notsupported:
 			zbx_free(value_esc);
 		}
 
-		DCadd_nextcheck(item->itemid, h->ts.sec, h->value_orig.err);
+		DCadd_nextcheck(item->itemid, &h->ts, h->value_orig.err);
 	}
 	else
 	{
