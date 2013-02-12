@@ -959,6 +959,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .available .prefix { color: #838383; }
 .multiselect .available .matched { font-weight: bold; }
 .multiselect .available .label-empty-result { padding: 4px 0 0 4px; }
+.multiselect .available .label-more-matches-found { padding: 4px 0 3px 4px; font-weight: bold; }
 .multiselect .available ul {
 	padding: 0; max-height: 300px;
 	overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;

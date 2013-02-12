@@ -42,7 +42,7 @@ class CMultiSelect extends CTag {
 
 			$data = $json->encode($options['data']);
 		}
-$options['limit'] = 5;
+
 		// url
 		$url = new Curl('jsrpc.php');
 		$url->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
@@ -53,9 +53,10 @@ $options['limit'] = 5;
 			url: "'.$url->getUrl().'",
 			name: "'.$options['name'].'",
 			data: '.$data.',
-			limit: '.(isset($options['limit']) ? $options['limit'] : 'null').',
+			limit: '.(isset($options['limit']) ? $options['limit'] : '5').',
 			labels: {
-				emptyResult: "'._('No matches found').'"
+				emptyResult: "'._('No matches found').'",
+				moreMatchesFound: "'._('More matches found..').'"
 			},
 			disabled: '.($options['disabled'] ? 'true' : 'false').'
 		});');
