@@ -38,6 +38,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+...G...... [ZBX-3646] improved agent termination and resource cleanup on windows (wiper)
 .......P.. [ZBX-6219] fixed proxy sending host availability data for templates (wiper)
 ..F....... [ZBX-6196] added missing HTTPS and TELNET options to Service type condition in Action configuration (Toms)
 ..F....... [ZBXNEXT-1574] changed the text in the "ack" column for triggers with no events in the trigger pop up of the "System status" widget to "No events" (Pavels)
