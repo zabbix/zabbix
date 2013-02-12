@@ -587,7 +587,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 	{
 		/* wait for the service worker thread to terminate us */
-		zbx_sleep(5);
+		zbx_sleep(3);
+
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
