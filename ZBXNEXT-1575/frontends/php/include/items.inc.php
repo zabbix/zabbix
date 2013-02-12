@@ -147,8 +147,7 @@ function item_data_type2str($type = null) {
 function item_status2str($type = null) {
 	$types = array(
 		ITEM_STATUS_ACTIVE => _('Enabled'),
-		ITEM_STATUS_DISABLED => _('Disabled'),
-		ITEM_STATUS_NOTSUPPORTED => _('Not supported')
+		ITEM_STATUS_DISABLED => _('Disabled')
 	);
 	if (is_null($type)) {
 		return $types;
@@ -253,7 +252,6 @@ function update_item_status($itemids, $status) {
 		$old_status = $item['status'];
 		if ($status != $old_status) {
 			$result &= DBexecute('UPDATE items SET status='.$status.
-				($status != ITEM_STATUS_NOTSUPPORTED ? ",error=''" : '').
 				' WHERE itemid='.$item['itemid']);
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
@@ -278,11 +276,6 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
 	));
-	foreach ($srcItems as &$srcItem) {
-		if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
-			$srcItem['status'] = ITEM_STATUS_ACTIVE;
-		}
-	}
 
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
@@ -345,13 +338,6 @@ function copyItems($srcHostId, $dstHostId) {
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
 	));
-
-	foreach ($srcItems as &$srcItem) {
-		if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
-			$srcItem['status'] = ITEM_STATUS_ACTIVE;
-		}
-	}
-
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
 		'selectInterfaces' => array('interfaceid', 'type', 'main'),
