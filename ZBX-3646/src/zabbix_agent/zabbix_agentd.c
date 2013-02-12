@@ -631,10 +631,11 @@ void	zbx_free_service_resources()
 		/* wait for threads to finish first. although listener threads will never end */
 		WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
 #endif
-
 		for (i = 0; i < threads_num; i++)
+		{
 			if (threads[i])
 				zbx_thread_kill(threads[i]);
+		}
 
 		for (i = 0; i < threads_num; i++)
 		{
