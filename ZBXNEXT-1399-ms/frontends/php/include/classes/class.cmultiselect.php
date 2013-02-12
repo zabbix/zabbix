@@ -53,7 +53,7 @@ class CMultiSelect extends CTag {
 			url: "'.$url->getUrl().'",
 			name: "'.$options['name'].'",
 			data: '.$data.',
-			limit: '.(isset($options['limit']) ? $options['limit'] : '5').',
+			limit: '.(isset($options['limit']) ? $options['limit'] : '20').',
 			labels: {
 				emptyResult: "'._('No matches found').'",
 				moreMatchesFound: "'._('More matches found..').'"
