@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "modules.h"
 #include "sysinfo.h"
+#include "module.h"
 
 /******************************************************************************
  *                                                                            *
@@ -54,6 +54,7 @@ char **zbx_module_item_list()
 	/* keys having [*] accept optional parameters */
 	/* key, func, useparam, testparam */
 	static char *keys[]={"dummy.ping", "dummy.echo[*]", "dummy.random[*]"};
+
 	return keys;
 }
 
@@ -61,38 +62,48 @@ static int dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_UI64_RESULT(result, 1);
 
-	return	SYSINFO_RET_OK;
+	return	ZBX_MODULE_OK;
 }
 
 static int dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 /* TODO nparam return 1 event in case if there are no parameters, it should be fixed */
-	if(request->nparam != 1)
+	if (request->nparam != 1)
 	{
-		return SYSINFO_RET_FAIL;
+		/* set optional error message */
+		SET_MSG_RESULT(result, strdup("Incorrect number of parameters, expected one parameter."));
+		return ZBX_MODULE_FAIL;
 	}
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, get_rparam(request,0)));
+	SET_STR_RESULT(result, strdup(get_rparam(request,0)));
 
-	return	SYSINFO_RET_OK;
+	return	ZBX_MODULE_OK;
 }
 
 static int dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	from, to;
 
-	if(request->nparam != 2)
+	if (request->nparam != 2)
 	{
-/* TODO set msg */
-		return SYSINFO_RET_FAIL;
+		/* set optional error message */
+		SET_MSG_RESULT(result, strdup("Incorrect number of parameters, expected two parameters."));
+		return ZBX_MODULE_FAIL;
 	}
 
+	/* there is no strict validation of parameters for simplicity sake */
 	from = atoi(get_rparam(request, 0));
 	to = atoi(get_rparam(request, 1));
 
+	if (from > to)
+	{
+		SET_MSG_RESULT(result, strdup("Incorrect range given."));
+		return ZBX_MODULE_FAIL;
+	}
+
 	SET_UI64_RESULT(result, from + rand() % (to - from+1));
 
-	return	SYSINFO_RET_OK;
+	return	ZBX_MODULE_OK;
 }
 
 
@@ -122,25 +133,25 @@ static int dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
  ******************************************************************************/
 int	zbx_module_item_process(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int ret = SYSINFO_RET_FAIL;
+	int ret = ZBX_MODULE_FAIL;
 
 	/* it always returns 1 */
-	if(0 == strcmp(request->key,"dummy.ping"))
+	if (0 == strcmp(request->key, "dummy.ping"))
 	{
 		ret = dummy_ping(request, result);
 	}
 	/* dummy.echo[param1] accepts one parameter and returns it as a result. For example: dummy.echo[abc] -> abc */
-	else if(0 == strcmp(request->key,"dummy.echo"))
+	else if (0 == strcmp(request->key, "dummy.echo"))
 	{
 		ret = dummy_echo(request, result);
 	}
 	/* dummy.random[from,to] returns integer random number between 'from' and 'to' */
-	else if(0 == strcmp(request->key,"dummy.random"))
+	else if (0 == strcmp(request->key, "dummy.random"))
 	{
 		ret = dummy_random(request, result);
 	}
 
-	return ret;
+	return ZBX_MODULE_OK;
 }
 
 /******************************************************************************

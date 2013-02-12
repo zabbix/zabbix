@@ -21,60 +21,7 @@
 #define ZABBIX_SYSINFO_H
 
 #include "common.h"
-
-/* agent return value */
-typedef struct
-{
-	int	 	type;
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
-	char		*text;
-	char		*msg;
-}
-AGENT_RESULT;
-
-/* agent result types */
-#define AR_UINT64	0x01
-#define AR_DOUBLE	0x02
-#define AR_STRING	0x04
-#define AR_TEXT		0x08
-#define AR_MESSAGE	0x10
-
-/* SET RESULT */
-
-#define SET_UI64_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_UINT64,		\
-	(res)->ui64 = (zbx_uint64_t)(val)	\
-)
-
-#define SET_DBL_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_DOUBLE,		\
-	(res)->dbl = (double)(val)		\
-)
-
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_STR_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_STRING,		\
-	(res)->str = (char *)(val)		\
-)
-
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_TEXT_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_TEXT,			\
-	(res)->text = (char *)(val)		\
-)
-
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_MSG_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_MESSAGE,		\
-	(res)->msg = (char *)(val)		\
-)
+#include "module.h"
 
 /* CHECK RESULT */
 

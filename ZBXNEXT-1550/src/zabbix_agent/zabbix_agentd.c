@@ -24,6 +24,7 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
+#include "zbxmodules.h"
 #include "comms.h"
 #include "alias.h"
 
@@ -33,7 +34,6 @@
 #endif
 #include "active.h"
 #include "listener.h"
-#include "modules.h"
 
 #include "symbols.h"
 

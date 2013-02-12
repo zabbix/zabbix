@@ -188,6 +188,13 @@ int	main(int argc, char **argv)
 	/* metrics should be initialized before loading user parameters */
 	init_metrics();
 
+	/* loadable modules */
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(FAIL);
+	}
+
 	/* user parameters */
 	load_user_parameters(CONFIG_USER_PARAMETERS);
 
@@ -207,6 +214,7 @@ int	main(int argc, char **argv)
 				test_parameter(TEST_METRIC, PROCESS_TEST);
 			else
 				test_parameters();
+			unload_modules();
 			zabbix_close_log();
 			free_metrics();
 			alias_list_free();
@@ -259,6 +267,8 @@ int	main(int argc, char **argv)
 	fflush(stdout);
 
 	alarm(0);
+
+	unload_modules();
 
 	zabbix_close_log();
 
