@@ -84,14 +84,17 @@ foreach ($this->data['items'] as $item) {
 		($item['status'] ? 'activate' : 'disable'), itemIndicatorStyle($item['status'], $item['state']))
 	);
 
-	if (zbx_empty($item['error'])) {
-		$error = new CDiv(SPACE, 'status_icon iconok');
+	$statusIcons = array();
+	if ($item['status'] == ITEM_STATUS_ACTIVE) {
+		if (zbx_empty($item['error'])) {
+			$error = new CDiv(SPACE, 'status_icon iconok');
+		}
+		else {
+			$error = new CDiv(SPACE, 'status_icon iconerror');
+			$error->setHint($item['error'], '', 'on');
+		}
+		$statusIcons[] = $error;
 	}
-	else {
-		$error = new CDiv(SPACE, 'status_icon iconerror');
-		$error->setHint($item['error'], '', 'on');
-	}
-	$statusIcons = array($error);
 
 	// discovered item lifetime indicator
 	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {

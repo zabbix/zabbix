@@ -74,12 +74,15 @@ foreach ($data['discoveries'] as $discovery) {
 		itemIndicatorStyle($discovery['status'])
 	);
 
-	if (zbx_empty($discovery['error'])) {
-		$error = new CDiv(SPACE, 'status_icon iconok');
-	}
-	else {
-		$error = new CDiv(SPACE, 'status_icon iconerror');
-		$error->setHint($discovery['error'], '', 'on');
+	$error = '';
+	if ($discovery['status'] == ITEM_STATUS_ACTIVE) {
+		if (zbx_empty($discovery['error'])) {
+			$error = new CDiv(SPACE, 'status_icon iconok');
+		}
+		else {
+			$error = new CDiv(SPACE, 'status_icon iconerror');
+			$error->setHint($discovery['error'], '', 'on');
+		}
 	}
 
 	$discoveryTable->addRow(array(
