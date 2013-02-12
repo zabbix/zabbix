@@ -119,7 +119,7 @@ static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 
 	if (USER_TYPE_SUPER_ADMIN == user_type)
 	{
-		perm = PERM_MAX;
+		perm = PERM_READ_WRITE;
 		goto out;
 	}
 
@@ -201,7 +201,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	if (SUCCEED != check_perm2system(userid))
 		return;
 
-	if (EVENT_SOURCE_TRIGGERS == source && PERM_READ_ONLY > get_trigger_permission(userid, triggerid))
+	if (EVENT_SOURCE_TRIGGERS == source && PERM_READ > get_trigger_permission(userid, triggerid))
 		return;
 
 	p = *user_msg;
