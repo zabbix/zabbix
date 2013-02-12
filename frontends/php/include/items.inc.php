@@ -161,20 +161,45 @@ function item_status2str($type = null) {
 	}
 }
 
-function item_status2style($status) {
-	switch ($status) {
-		case ITEM_STATUS_ACTIVE:
-			return 'off';
-		case ITEM_STATUS_DISABLED:
-			return 'on';
-		case ITEM_STATUS_NOTSUPPORTED:
-		default:
-			return 'unknown';
+/**
+ * Returns the text indicating the items status and state. If the $state parameter is not given, only the status of
+ * the item will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function itemIndicator($status, $state = null) {
+	if (!$state || $state == ITEM_STATE_NORMAL) {
+		return ($status == ITEM_STATUS_ACTIVE) ? _('Enabled') : _('Disabled');
 	}
+	elseif ($state == ITEM_STATE_NOTSUPPORTED) {
+		return _('Not supported');
+	}
+
+	return _('Unknown');
 }
 
 /**
- * Returns the name of the given interface type.
+ * Returns the CSS class for the items status and state indicator. If the $state parameter is not given, only the status of
+ * the item will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function itemIndicatorStyle($status, $state = null) {
+	if (!$state || $state == ITEM_STATE_NORMAL) {
+		return ($status == ITEM_STATUS_ACTIVE) ? 'off' : 'on';
+	}
+
+	return 'unknown';
+}
+
+/**
+ * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type
  *

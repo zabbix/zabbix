@@ -1160,7 +1160,7 @@ elseif ($srctbl == 'items') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
+			new CSpan(itemIndicator($item['status'], $item['state']), itemIndicatorStyle($item['status'], $item['state']))
 		));
 
 		// made to save memory usage
@@ -1260,7 +1260,7 @@ elseif ($srctbl == 'prototypes') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
+			new CSpan(itemIndicator($item['status']), itemIndicatorStyle($item['status']))
 		));
 	}
 
@@ -1660,7 +1660,7 @@ elseif ($srctbl == 'plain_text') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
+			new CSpan(itemIndicator($item['status'], $item['state']), itemIndicatorStyle($item['status'], $item['state']))
 		));
 	}
 	$table->show();
