@@ -33,19 +33,23 @@ static	SERVICE_STATUS_HANDLE	serviceHandle;
 
 int	application_status = ZBX_APP_RUNNING;
 
+/* free resources allocated by MAIN_ZABBIX_ENTRY() */
+void	zbx_free_service_resources();
+
 static void	parent_signal_handler(int sig)
 {
 	switch (sig)
 	{
 		case SIGINT:
 		case SIGTERM:
+			ZBX_DO_EXIT();
 			zabbix_log(LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
 			zbx_on_exit();
 			break;
 	}
 }
 
-static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
+static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 {
 	serviceStatus.dwServiceType		= SERVICE_WIN32_OWN_PROCESS;
 	serviceStatus.dwCurrentState		= SERVICE_RUNNING;
@@ -55,7 +59,7 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	serviceStatus.dwCheckPoint		= 0;
 	serviceStatus.dwWaitHint		= 0;
 
-	switch(ctrlCode)
+	switch (ctrlCode)
 	{
 		case SERVICE_CONTROL_STOP:
 		case SERVICE_CONTROL_SHUTDOWN:
@@ -67,15 +71,12 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 
 			/* notify other threads and allow them to terminate */
 			ZBX_DO_EXIT();
-			zbx_sleep(1);
+			zbx_free_service_resources();
 
 			serviceStatus.dwCurrentState	= SERVICE_STOPPED;
 			serviceStatus.dwWaitHint	= 0;
 			serviceStatus.dwCheckPoint	= 0;
 			serviceStatus.dwWin32ExitCode	= 0;
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
-					ZABBIX_VERSION, ZABBIX_REVISION);
 
 			break;
 		default:
@@ -85,7 +86,7 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	SetServiceStatus(serviceHandle, &serviceStatus);
 }
 
-static VOID WINAPI ServiceEntry(DWORD argc, LPTSTR *argv)
+static VOID WINAPI	ServiceEntry(DWORD argc, LPTSTR *argv)
 {
 	LPTSTR	wservice_name;
 
@@ -399,4 +400,9 @@ void	set_parent_signal_handler()
 {
 	signal(SIGINT, parent_signal_handler);
 	signal(SIGTERM, parent_signal_handler);
+}
+
+void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
+{
+	_endthreadex(SUCCEED);
 }
