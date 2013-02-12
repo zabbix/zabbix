@@ -80,8 +80,8 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	// status
-	$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
-		($item['status'] ? 'activate' : 'disable'), item_status2style($item['status']))
+	$status = new CCol(new CLink(itemIndicator($item['status'], $item['state']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
+		($item['status'] ? 'activate' : 'disable'), itemIndicatorStyle($item['status'], $item['state']))
 	);
 
 	if (zbx_empty($item['error'])) {
