@@ -17,28 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MODULES_H
-#define ZABBIX_MODULES_H
-
-/* agent request structure */
-typedef struct
-{
-	char	*key;
-	int	nparam;
-	int	timeout;
-	char	**params;
-}
-AGENT_REQUEST;
-
-#define ZBX_MODULE_OK		0
-#define ZBX_MODULE_FAIL		-1
+#ifndef ZABBIX_ZBXMODULES_H
+#define ZABBIX_ZBXMODULES_H
 
 #define ZBX_MODULE_FUNC_INIT		"zbx_module_init"
 #define ZBX_MODULE_FUNC_ITEM_LIST	"zbx_module_item_list"
 #define ZBX_MODULE_FUNC_ITEM_PROCESS	"zbx_module_item_process"
-#define ZBX_MODULE_FUNC_UNINIT	"zbx_module_uninit"
-
-#define get_rparam(request,num) ((request->nparam > num) ? request->params[num] : NULL)
+#define ZBX_MODULE_FUNC_UNINIT		"zbx_module_uninit"
 
 int	load_modules(const char *path, char **modules);
 void	unload_modules();

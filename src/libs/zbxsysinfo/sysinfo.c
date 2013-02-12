@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "modules.h"
+#include "module.h"
 #include "sysinfo.h"
 #include "log.h"
 #include "cfg.h"
@@ -555,7 +555,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			}
 /* TODO Not sure if it is the best place to set timeout */
 			request.timeout = CONFIG_TIMEOUT;
-			if (SYSINFO_RET_OK != command->function(&request, result))
+			if (ZBX_MODULE_OK != command->function(&request, result))
 			{
 				free_request(&request);
 				/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */

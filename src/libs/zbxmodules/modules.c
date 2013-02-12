@@ -18,7 +18,8 @@
 **/
 
 #include "common.h"
-#include "modules.h"
+#include "module.h"
+#include "zbxmodules.h"
 
 #include "log.h"
 #include "sysinfo.h"
