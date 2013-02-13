@@ -887,28 +887,6 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 	return ret;
 }
 
-void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
-{
-	zbx_uint64_t	escalationid;
-
-	escalationid = DBget_maxid("escalations");
-
-	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
-			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
-			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
-}
-
-void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
-{
-	zbx_uint64_t	escalationid;
-
-	escalationid = DBget_maxid("escalations");
-
-	DBexecute("insert into escalations (escalationid,actionid,triggerid,r_eventid,status)"
-			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
-			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DBget_escape_string_len                                          *

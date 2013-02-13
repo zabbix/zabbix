@@ -135,13 +135,6 @@ static void	save_events()
  ******************************************************************************/
 static void	process_event(DB_EVENT *event)
 {
-	process_actions(event);
-
-	if (EVENT_SOURCE_TRIGGERS == event->source)
-	{
-		DBupdate_services(event->objectid, TRIGGER_VALUE_PROBLEM == event->value ? event->trigger.priority : 0,
-				event->clock);
-	}
 }
 
 /******************************************************************************
@@ -179,8 +172,16 @@ void	process_events()
 	{
 		save_events();
 
+		process_actions(events, events_num);
+
 		for (i = 0; i < events_num; i++)
-			process_event(&events[i]);
+		{
+			if (EVENT_SOURCE_TRIGGERS == events[i].source)
+			{
+				DBupdate_services(events[i].objectid, TRIGGER_VALUE_PROBLEM == events[i].value ?
+						events[i].trigger.priority : 0, events[i].clock);
+			}
+		}
 
 		clean_events();
 	}
