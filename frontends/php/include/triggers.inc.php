@@ -979,37 +979,6 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	return $expression;
 }
 
-function updateTriggerValueToUnknownByHostId($hostids) {
-	zbx_value2array($hostids);
-	$triggerids = array();
-
-	$result = DBselect(
-		'SELECT DISTINCT t.triggerid'.
-		' FROM hosts h,items i,functions f,triggers t'.
-		' WHERE h.hostid=i.hostid'.
-			' AND i.itemid=f.itemid'.
-			' AND f.triggerid=t.triggerid'.
-			' AND '.dbConditionInt('h.hostid', $hostids).
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND t.state='.TRIGGER_STATE_NORMAL
-	);
-	while ($row = DBfetch($result)) {
-		$triggerids[] = $row['triggerid'];
-	}
-
-	if (!empty($triggerids)) {
-		DB::update('triggers', array(
-			'values' => array(
-				'state' => TRIGGER_STATE_UNKNOWN,
-				'error' => _s('Host status became "%s"', _('Not monitored'))
-			),
-			'where' => array('triggerid' => $triggerids)
-		));
-	}
-
-	return true;
-}
-
 function check_right_on_trigger_by_expression($permission, $expression) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {

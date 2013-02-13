@@ -554,9 +554,6 @@ function updateHostStatus($hostids, $status) {
 				' AND h.status='.$oldStatus
 	);
 	while ($host = DBfetch($db_hosts)) {
-		if ($status == HOST_STATUS_NOT_MONITORED) {
-			updateTriggerValueToUnknownByHostId($host['hostid']);
-		}
 		$hostIds[] = $host['hostid'];
 
 		$host_new = $host;
