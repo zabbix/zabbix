@@ -97,6 +97,21 @@ $param3_sec_val = array(
 		'T' => T_ZBX_INT // type
 	)
 );
+$paramIntSecCount = array(
+	array(
+		'C' => 'Mask', // caption
+		'T' => T_ZBX_STR
+	),
+	array(
+		'C' => _('Last of').' (T)', // caption
+		'T' => T_ZBX_INT, // type
+		'M' => $metrics // metrics
+	),
+	array(
+		'C' => _('Time shift').' ', // caption
+		'T' => T_ZBX_INT // type
+	)
+);
 $allowed_types_any = array(
 	ITEM_VALUE_TYPE_FLOAT => 1,
 	ITEM_VALUE_TYPE_STR => 1,
@@ -115,6 +130,9 @@ $allowed_types_str = array(
 );
 $allowed_types_log = array(
 	ITEM_VALUE_TYPE_LOG => 1
+);
+$allowed_types_int = array(
+	ITEM_VALUE_TYPE_UINT64 => 1
 );
 
 $functions = array(
@@ -499,6 +517,26 @@ $functions = array(
 		'description' =>  _('No data received during period of time T, then N NOT 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
+	),
+	'and[<]' => array(
+		'description' =>  _('Bitwise AND of last (most recent) T value is < N'),
+		'params' => $paramIntSecCount,
+		'allowed_types' => $allowed_types_int
+	),
+	'and[>]' => array(
+		'description' =>  _('Bitwise AND of last (most recent) T value is > N'),
+		'params' => $paramIntSecCount,
+		'allowed_types' => $allowed_types_int
+	),
+	'and[=]' => array(
+		'description' =>  _('Bitwise AND of last (most recent) T value is = N'),
+		'params' => $paramIntSecCount,
+		'allowed_types' => $allowed_types_int
+	),
+	'and[#]' => array(
+		'description' =>  _('Bitwise AND of last (most recent) T value is NOT N'),
+		'params' => $paramIntSecCount,
+		'allowed_types' => $allowed_types_int
 	)
 );
 
