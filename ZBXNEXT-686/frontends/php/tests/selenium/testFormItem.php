@@ -852,7 +852,10 @@ class testFormItem extends CWebTest {
 					'host' => 'ЗАББИКС Сервер',
 					'type' => ITEM_TYPE_ZABBIX,
 					'name' => 'Checksum of $1',
-					'key' => 'vfs.file.cksum[/sbin/shutdown]'
+					'key' => 'vfs.file.cksum[/sbin/shutdown]',
+					'dbName' => 'Checksum of /sbin/shutdown',
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			),
 			// Duplicate item
@@ -1179,7 +1182,9 @@ class testFormItem extends CWebTest {
 					'flexPeriod' => array(
 						array('flexTime' => '1-5,00:00-24:00'),
 						array('flexTime' => '6-7,00:00-24:00')
-					)
+					),
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			),
 			// Delay combined with flex periods
@@ -1380,14 +1385,16 @@ class testFormItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'host' => 'ЗАББИКС Сервер',
 					'type' => ITEM_TYPE_ZABBIX,
-					'name' => 'Item flex',
+					'name' => 'Item flex Check',
 					'key' => 'item-flex-delay8',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true),
 						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true),
 						array('flexTime' => '1-5,00:00-24:00'),
 						array('flexTime' => '6-7,00:00-24:00')
-					)
+					),
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			),
 			// History
@@ -1450,7 +1457,9 @@ class testFormItem extends CWebTest {
 					'type' => ITEM_TYPE_ZABBIX,
 					'name' => 'Item trends',
 					'key' => 'item-trends-empty',
-					'trends' => ''
+					'trends' => '',
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			),
 			// Trends
@@ -1489,9 +1498,22 @@ class testFormItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'host' => 'ЗАББИКС Сервер',
 					'type' => ITEM_TYPE_ZABBIX,
-					'name' => 'Item trends',
+					'name' => 'Item trends Check',
 					'key' => 'item-trends-test',
-					'trends' => 'trends'
+					'trends' => 'trends',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'host' => 'ЗАББИКС Сервер',
+					'type' => ITEM_TYPE_ZABBIX,
+					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
+					'key' => 'item-symbols-test',
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			)
 		);
@@ -1525,10 +1547,12 @@ class testFormItem extends CWebTest {
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);
 		}
+		$name = $this->getValue('name');
 
 		if (isset($data['key'])) {
 			$this->input_type('key', $data['key']);
 		}
+		$key = $this->getValue('key');
 
 		if (isset($data['formula'])) {
 			$this->checkbox_select('multiplier');
@@ -1570,6 +1594,11 @@ class testFormItem extends CWebTest {
 			$this->input_type('trends', $data['trends']);
 		}
 
+		$type = $this->getSelectedLabel('type');
+		$interfaceid = $this->getSelectedLabel('interfaceid');
+		$value_type = $this->getSelectedLabel('value_type');
+		$data_type = $this->getSelectedLabel('data_type');
+
 		if ($itemFlexFlag == true) {
 			$this->button_click('save');
 			$this->wait();
@@ -1591,6 +1620,65 @@ class testFormItem extends CWebTest {
 			$this->ok('Name');
 			$this->ok('Key');
 			break;
+			}
+
+		if (isset($data['dbCheck'])) {
+			$result = DBselect("SELECT name, key_, value_type, data_type FROM items where key_ = '".$key."'");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['name'], $name);
+				$this->assertEquals($row['key_'], $key);
+
+				switch($row['value_type'])	{
+					case ITEM_VALUE_TYPE_FLOAT:
+						$value_typeDB = 'Numeric (float)';
+						break;
+					case ITEM_VALUE_TYPE_STR:
+						$value_typeDB = 'Character';
+						break;
+					case ITEM_VALUE_TYPE_LOG:
+						$value_typeDB = 'Log';
+						break;
+					case ITEM_VALUE_TYPE_UINT64:
+						$value_typeDB = 'Numeric (unsigned)';
+						break;
+					case ITEM_VALUE_TYPE_TEXT:
+						$value_typeDB = 'Text';
+						break;
+				}
+				$this->assertEquals($value_typeDB, $value_type);
+
+				switch($row['data_type'])	{
+					case ITEM_DATA_TYPE_DECIMAL:
+						$data_typeDB = 'Decimal';
+						break;
+					case ITEM_DATA_TYPE_OCTAL:
+						$data_typeDB = 'Octal';
+						break;
+					case ITEM_DATA_TYPE_HEXADECIMAL:
+						$data_typeDB = 'Hexadecimal' ;
+						break;
+					case ITEM_DATA_TYPE_BOOLEAN:
+						$data_typeDB = 'Boolean' ;
+						break;
+				}
+				$this->assertEquals($data_typeDB, $data_type);
+			}
+		}
+		if (isset($data['formCheck'])) {
+			if (isset ($data['dbName'])) {
+				$dbName = $data['dbName'];
+			}
+			else {
+				$dbName = $name;
+			}
+			$this->button_click("link=$dbName");
+			$this->wait();
+			$this->assertAttribute("//input[@id='name']/@value", 'exact:'.$name);
+			$this->assertAttribute("//input[@id='key']/@value", 'exact:'.$key);
+			$this->assertElementPresent("//select[@id='type']/option[text()='$type']");
+			$this->assertElementPresent("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+			$this->assertElementPresent("//select[@id='value_type']/option[text()='$value_type']");
+			$this->assertElementPresent("//select[@id='data_type']/option[text()='$data_type']");
 			}
 		}
 	}
