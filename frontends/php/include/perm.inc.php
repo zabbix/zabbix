@@ -218,7 +218,7 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 
 		// calculate permissions
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {
-			$group_data['permission'] = PERM_MAX;
+			$group_data['permission'] = PERM_READ_WRITE;
 		}
 		elseif (isset($processed[$group_data['groupid']])) {
 			if ($group_data['permission_deny'] == PERM_DENY) {
@@ -341,10 +341,6 @@ function get_accessible_nodes_by_user(&$user_data, $perm, $perm_res = null, $nod
 	$rights[i]['id']	= resource id
 */
 function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res = null, $nodeid = null) {
-	if ($perm == PERM_READ_LIST) {
-		$perm = PERM_READ;
-	}
-
 	$result = array();
 	$res_perm = array();
 
@@ -386,7 +382,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 
 		// select min rights from groups
 		if (USER_TYPE_SUPER_ADMIN == $user_type) {
-			$host_data['permission'] = PERM_MAX;
+			$host_data['permission'] = PERM_READ_WRITE;
 		}
 		else {
 			if (isset($perm_by_host[$hostid])) {
@@ -447,7 +443,7 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res 
 	);
 	while ($group_data = DBfetch($db_groups)) {
 		if (USER_TYPE_SUPER_ADMIN == $user_type) {
-			$group_data['permission'] = PERM_MAX;
+			$group_data['permission'] = PERM_READ_WRITE;
 		}
 		else {
 			if (isset($group_perm[$group_data['groupid']])) {

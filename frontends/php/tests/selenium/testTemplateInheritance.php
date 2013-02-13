@@ -51,8 +51,7 @@ class testTemplateInheritance extends CWebTest {
 	}
 
 	public function testFormItem_linkHost(){
-		$this->open('hosts.php');
-		$this->wait();
+		$this->login('hosts.php');
 		$this->button_click('link='.$this->hostName);
 		$this->wait();
 
@@ -71,6 +70,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->wait();
 		$this->ok('Host updated');
 	}
+
 	// Returns all possible item data
 	public static function dataCreate() {
 	// result, template, itemName, keyName, errorMsg
@@ -158,38 +158,36 @@ class testTemplateInheritance extends CWebTest {
 
 		switch ($result) {
 			case ITEM_GOOD:
-		// check that the inherited item matches the original
-		$this->open('hosts.php');
-		$this->wait();
-		$this->button_click('link='.$this->hostName);
-		$this->wait();
-		$this->button_click('link=Items');
-		$this->wait();
-		$this->ok("$template: $itemName");
-		$this->button_click("link=$itemName");
-		$this->wait();
-		$this->assertElementValue('name', $itemName);
-		$this->assertElementValue('key', $keyName);
-		$this->assertElementValue('typename', 'Simple check');
-		$this->assertElementValue('value_type_name', 'Numeric (unsigned)');
-		$this->assertElementValue('data_type_name', 'Octal');
-		$this->assertElementValue('units', 'units');
-		$this->assertElementValue('formula', 3);
-		$this->assertElementValue('delay', '33');
-		$this->assertElementValue('history', '54');
-		$this->assertElementValue('trends', '55');
-		$this->assertElementText('description', 'description');
-		$this->assertElementValue('delta_name', 'Delta (simple change)');
+				// check that the inherited item matches the original
+				$this->open('hosts.php');
+				$this->wait();
+				$this->button_click('link='.$this->hostName);
+				$this->wait();
+				$this->button_click('link=Items');
+				$this->wait();
+				$this->ok("$template: $itemName");
+				$this->button_click("link=$itemName");
+				$this->wait();
+				$this->assertElementValue('name', $itemName);
+				$this->assertElementValue('key', $keyName);
+				$this->assertElementValue('typename', 'Simple check');
+				$this->assertElementValue('value_type_name', 'Numeric (unsigned)');
+				$this->assertElementValue('data_type_name', 'Octal');
+				$this->assertElementValue('units', 'units');
+				$this->assertElementValue('formula', 3);
+				$this->assertElementValue('delay', '33');
+				$this->assertElementValue('history', '54');
+				$this->assertElementValue('trends', '55');
+				$this->assertElementText('description', 'description');
+				$this->assertElementValue('delta_name', 'Delta (simple change)');
 				break;
-
 			case ITEM_BAD:
 				break;
 		}
 	}
 
 	public function testFormItem_unlinkHost(){
-		$this->open('hosts.php');
-		$this->wait();
+		$this->login('hosts.php');
 		$this->button_click('link='.$this->hostName);
 		$this->wait();
 

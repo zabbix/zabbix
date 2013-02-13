@@ -647,8 +647,8 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		'iconid' => $selement['iconid_off']
 	);
 
-	if($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
-		|| in_array($showUnack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH)))) {
+	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
+			|| in_array($showUnack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH)))) {
 
 		$info['iconid'] = $selement['iconid_on'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
@@ -660,22 +660,14 @@ function getTriggersInfo($selement, $i, $showUnack) {
 	elseif ($i['trigger_disabled']) {
 		$info['iconid'] = $selement['iconid_disabled'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
-		$info['info'] = array(
-			'status' => array(
-				'msg' => _('DISABLED'),
-				'color' => $colors['Dark Red']
-			)
+		$info['info']['status'] = array(
+			'msg' => _('DISABLED'),
+			'color' => $colors['Dark Red']
 		);
 	}
 	else {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-		$info['info'] = array(
-			'unknown' => array(
-				'msg' => _('OK'),
-				'color' => $colors['Dark Green']
-			)
-		);
 	}
 
 	return $info;
@@ -727,18 +719,11 @@ function getHostsInfo($selement, $i, $show_unack) {
 			);
 		}
 
-		// set element to problem state if it has problem events, ignore unknown events
+		// set element to problem state if it has problem events
 		if ($info['info']) {
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 			$has_problem = true;
-		}
-
-		if ($i['unknown']) {
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'].' '._('Unknown'),
-				'color' => $colors['Gray']
-			);
 		}
 	}
 
@@ -761,10 +746,6 @@ function getHostsInfo($selement, $i, $show_unack) {
 	elseif (!$has_problem) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-		$info['info']['unknown'] = array(
-			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
-		);
 	}
 
 	return $info;
@@ -817,18 +798,11 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 			);
 		}
 
-		// set element to problem state if it has problem events, ignore unknown events
+		// set element to problem state if it has problem events
 		if ($info['info']) {
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 			$has_problem = true;
-		}
-
-		if ($i['unknown']) {
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'].' '._('Unknown'),
-				'color' => $colors['Gray']
-			);
 		}
 	}
 
@@ -858,10 +832,6 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 	if (!$has_status && !$has_problem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
-		$info['info']['unknown'] = array(
-			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
-		);
 	}
 
 	return $info;
@@ -920,13 +890,6 @@ function getMapsInfo($selement, $i, $show_unack) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 			$has_problem = true;
 		}
-
-		if ($i['unknown']) {
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'].' '._('Unknown'),
-				'color' => $colors['Gray']
-			);
-		}
 	}
 
 	if ($i['maintenance']) {
@@ -955,10 +918,6 @@ function getMapsInfo($selement, $i, $show_unack) {
 	if (!$has_status && !$has_problem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
-		$info['info']['unknown'] = array(
-			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
-		);
 	}
 
 	return $info;
@@ -1193,7 +1152,6 @@ function getSelementsInfo($sysmap) {
 			'maintenance' => 0,
 			'problem' => 0,
 			'problem_unack' => 0,
-			'unknown' => 0,
 			'priority' => 0,
 			'trigger_disabled' => 0,
 			'latelyChanged' => false,
@@ -1859,7 +1817,7 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 
 		$el_info = $map_info[$selementid];
 
-		$el_msgs = array('problem', 'unack', 'maintenance', 'unknown', 'ok', 'status');
+		$el_msgs = array('problem', 'unack', 'maintenance', 'ok', 'status');
 		foreach ($el_msgs as $caption) {
 			if (!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) {
 				continue;

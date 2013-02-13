@@ -811,4 +811,69 @@ class CZBXAPI {
 
 		return false;
 	}
+
+	/**
+	 * Converts a deprecated parameter to a new one in the $params array. If both parameter are used,
+	 * the new parameter will override the deprecated one.
+	 *
+	 * If a deprecated parameter is used, a notice will be triggered in the frontend.
+	 *
+	 * @param array     $params
+	 * @param string    $deprecatedParam
+	 * @param string    $newParam
+	 *
+	 * @return array
+	 */
+	protected function convertDeprecatedParam(array $params, $deprecatedParam, $newParam) {
+		if (isset($params[$deprecatedParam])) {
+			self::deprecated('Parameter "'.$deprecatedParam.'" is deprecated.');
+
+			// if the new parameter is not used, use the deprecated one instead
+			if (!isset($params[$newParam])) {
+				$params[$newParam] = $params[$deprecatedParam];
+			}
+
+			// unset the deprecated parameter
+			unset($params[$deprecatedParam]);
+		}
+
+		return $params;
+	}
+
+	/**
+	 * Check if a parameter contains a deprecated value. Currently supports only array parameters.
+	 *
+	 * @param array     $params
+	 * @param string    $paramName
+	 * @param string    $value
+	 *
+	 * @return void
+	 */
+	protected function checkDeprecatedParam(array $params, $paramName, $value) {
+		if (isset($params[$paramName]) && is_array($params[$paramName]) && in_array($value, $params[$paramName])) {
+			self::deprecated('Value "'.$value.'" for parameter "'.$paramName.'" is deprecated.');
+		}
+	}
+
+	/**
+	 * Adds a deprecated property to an array of resulting objects if it's requested in $output. The value for the
+	 * deprecated property will be taken from the new one.
+	 *
+	 * @param array         $objects
+	 * @param string        $deprecatedProperty
+	 * @param string        $newProperty
+	 * @param string|array  $output
+	 *
+	 * @return array
+	 */
+	protected function addDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
+		if ($this->outputIsRequested($deprecatedProperty, $output)) {
+			foreach ($objects as &$object) {
+				$object[$deprecatedProperty] = $object[$newProperty];
+			}
+			unset($object);
+		}
+
+		return $objects;
+	}
 }

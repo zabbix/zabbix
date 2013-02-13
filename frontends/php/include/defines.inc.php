@@ -624,10 +624,8 @@ define('ACCESS_DENY_PAGE', 1);
 define('GROUP_DEBUG_MODE_DISABLED', 0);
 define('GROUP_DEBUG_MODE_ENABLED',	1);
 
-define('PERM_MAX',			3);
 define('PERM_READ_WRITE',	3);
 define('PERM_READ',			2);
-define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
@@ -757,7 +755,6 @@ define('HOST_INVENTORY_DISABLED',	-1);
 define('HOST_INVENTORY_MANUAL',		0);
 define('HOST_INVENTORY_AUTOMATIC',	1);
 
-define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
